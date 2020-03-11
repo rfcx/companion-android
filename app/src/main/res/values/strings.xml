@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">rfcx-audiomoth-android</string>
+
+    <!--  MainActivity  -->
+    <string name="scan_qr_code">Scan QR code</string>
+    <string name="or_enter_code">or enter code</string>
+
+</resources>
