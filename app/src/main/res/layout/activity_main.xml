@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
     tools:context=".MainActivity">
 
     <androidx.constraintlayout.widget.Guideline
@@ -25,31 +26,49 @@
         android:layout_width="@dimen/ic_audiomoth_size"
         android:layout_height="@dimen/ic_audiomoth_size"
         android:src="@drawable/ic_audiomoth"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/horizontalGutter1"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/horizontalGutter1"/>
+        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/scanQRButton"
         style="@style/RangerButton.GreenButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/scan_qr_code"
         android:paddingStart="@dimen/margin_padding_xlarge"
         android:paddingEnd="@dimen/margin_padding_xlarge"
+        android:text="@string/scan_qr_code"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/horizontalGutter2" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/enterCodeTextView"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/coordinatesLinearLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/scanQRButton"
-        android:layout_marginTop="@dimen/text_xlarge"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:orientation="horizontal"
+        android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
-        android:text="@string/or_enter_code"
-        tools:text="or enter code"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/scanQRButton">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/orTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/or"
+            tools:text="or" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/enterCodeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_padding_small"
+            android:textColor="@color/colorPrimary"
+            android:text="@string/enter_code"
+            tools:text="enter code" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
