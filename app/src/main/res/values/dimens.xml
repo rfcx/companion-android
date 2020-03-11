@@ -16,4 +16,6 @@
     <dimen name="text_xsmall">12sp</dimen>
     <dimen name="text_xxsmall">10sp</dimen>
 
+    <dimen name="ic_audiomoth_size">170dp</dimen>
+
 </resources>

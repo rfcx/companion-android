@@ -6,6 +6,29 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/horizontalGutter1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/horizontalGutter2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.6" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/appIconImageView"
+        android:layout_width="@dimen/ic_audiomoth_size"
+        android:layout_height="@dimen/ic_audiomoth_size"
+        android:src="@drawable/ic_audiomoth"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/horizontalGutter1"/>
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/scanQRButton"
         style="@style/RangerButton.GreenButton"
@@ -14,10 +37,9 @@
         android:text="@string/scan_qr_code"
         android:paddingStart="@dimen/margin_padding_xlarge"
         android:paddingEnd="@dimen/margin_padding_xlarge"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/horizontalGutter2" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/enterCodeTextView"
