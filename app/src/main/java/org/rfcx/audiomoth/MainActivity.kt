@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.zxing.integration.android.IntentIntegrator
 import kotlinx.android.synthetic.main.activity_main.*
+import org.rfcx.audiomoth.view.CreateStreamActivity
 
 open class MainActivity : AppCompatActivity() {
 
@@ -33,7 +34,7 @@ open class MainActivity : AppCompatActivity() {
             if (result.contents == null) {
                 Toast.makeText(this, "The data is empty", Toast.LENGTH_SHORT).show()
             } else {
-                valueTextView.text = result.contents
+                CreateStreamActivity.startActivity(this, result.contents)
             }
 
         } else {

@@ -15,7 +15,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name=".view.ScanQRCodeActivity"
+            android:name=".view.CreateStreamActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".MainActivity"
