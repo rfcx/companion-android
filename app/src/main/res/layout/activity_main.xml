@@ -43,12 +43,12 @@
         app:layout_constraintTop_toTopOf="@id/horizontalGutter2" />
 
     <LinearLayout
-        android:id="@+id/coordinatesLinearLayout"
+        android:id="@+id/enterCodeLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_padding_normal"
-        android:orientation="horizontal"
         android:gravity="center"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/scanQRButton">
@@ -65,10 +65,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_padding_small"
-            android:textColor="@color/colorPrimary"
             android:text="@string/enter_code"
+            android:textColor="@color/colorPrimary"
             tools:text="enter code" />
 
     </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/valueTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_padding_xlarge"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/enterCodeLinearLayout"
+        tools:text="123" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
