@@ -16,7 +16,7 @@ class CreateStreamActivity : AppCompatActivity() {
         if (intent.hasExtra(DEVICE_ID)) {
             val deviceId = intent.getStringExtra(DEVICE_ID)
             if (deviceId != null){
-                deviceIdTextView.text = deviceId.split("=")[1]
+                deviceIdTextView.text = deviceId
             }
         }
     }
