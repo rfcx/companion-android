@@ -4,14 +4,14 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_scan_qrcode.*
+import kotlinx.android.synthetic.main.activity_create_stream.*
 import org.rfcx.audiomoth.R
 
 class CreateStreamActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_scan_qrcode)
+        setContentView(R.layout.activity_create_stream)
 
         if (intent.hasExtra(DEVICE_ID)) {
             val deviceId = intent.getStringExtra(DEVICE_ID)
