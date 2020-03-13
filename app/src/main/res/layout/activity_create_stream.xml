@@ -25,39 +25,48 @@
         android:layout_margin="@dimen/margin_padding_normal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
-        tools:text="123456789" />
+        tools:text="Device id: 123456789" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/streamNameTextInput"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/streamNameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_padding_normal"
+        android:text="@string/stream_name"
+        android:textColor="@color/text_primary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/deviceIdTextView" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/streamNameEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_padding_normal"
-        android:hint="@string/stream_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/deviceIdTextView">
+        app:layout_constraintTop_toBottomOf="@id/streamNameTextView" />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/siteTextInput"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/siteTextView"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_padding_normal"
-        android:hint="@string/site"
+        android:text="@string/site"
+        android:textColor="@color/text_primary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/streamNameEditText" />
+
+    <androidx.appcompat.widget.AppCompatSpinner
+        android:id="@+id/siteSpinner"
+        style="@style/Base.Widget.AppCompat.Spinner.Underlined"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="@dimen/margin_padding_normal"
+        android:prompt="@string/prompt_site"
+        android:spinnerMode="dialog"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/streamNameTextInput">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </com.google.android.material.textfield.TextInputLayout>
+        app:layout_constraintTop_toBottomOf="@id/siteTextView" />
 
     <androidx.appcompat.widget.AppCompatButton
         style="@style/RangerButton.GreenButton"
@@ -68,6 +77,6 @@
         android:text="@string/create_stream"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/siteTextInput" />
+        app:layout_constraintTop_toBottomOf="@id/siteSpinner" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

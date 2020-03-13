@@ -15,5 +15,6 @@
     <string name="create_stream">Create Stream</string>
     <string name="stream_name">Stream name</string>
     <string name="site">Site</string>
+    <string name="prompt_site">Select Site</string>
 
 </resources>
