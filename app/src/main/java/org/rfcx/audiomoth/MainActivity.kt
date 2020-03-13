@@ -1,12 +1,14 @@
 package org.rfcx.audiomoth
 
 import android.annotation.SuppressLint
+import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Paint.UNDERLINE_TEXT_FLAG
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.google.zxing.integration.android.IntentIntegrator
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.alertlayout.view.*
@@ -14,7 +16,7 @@ import org.rfcx.audiomoth.view.CreateStreamActivity
 
 open class MainActivity : AppCompatActivity() {
 
-    @SuppressLint("SetTextI18n", "DefaultLocale")
+    @SuppressLint("SetTextI18n", "DefaultLocale", "ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -50,6 +52,8 @@ open class MainActivity : AppCompatActivity() {
             val alertDialog = builder.create()
             alertDialog.show()
 
+            val buttonNeutral = alertDialog.getButton(DialogInterface.BUTTON_NEUTRAL)
+            buttonNeutral.setTextColor(ContextCompat.getColor(this, R.color.text_secondary))
         }
     }
 

@@ -4,9 +4,16 @@
     <!--  MainActivity  -->
     <string name="scan_qr_code">Scan QR code</string>
     <string name="or">or</string>
-    <string name="enter_code">enter code</string>
+    <string name="enter_code">enter device id</string>
     <string name="code_empty">The code is empty</string>
+    <string name="device_id">Device id</string>
+    <string name="device_id_number">Device id: %s</string>
     <string name="ok">OK</string>
     <string name="cancel">CANCEL</string>
+
+    <!--  CreateStreamActivity  -->
+    <string name="create_stream">Create Stream</string>
+    <string name="stream_name">Stream name</string>
+    <string name="site">Site</string>
 
 </resources>
