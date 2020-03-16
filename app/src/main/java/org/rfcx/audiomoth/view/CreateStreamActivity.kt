@@ -10,34 +10,19 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_create_stream.*
 import org.rfcx.audiomoth.R
-import java.util.ArrayList
+import org.rfcx.audiomoth.util.Firestore
+import java.util.*
 
 class CreateStreamActivity : AppCompatActivity() {
 
-    private val db = Firebase.firestore
-
-    private var arrayAdapter: ArrayAdapter<String>? = null
-    val sites: ArrayList<String>? = null
+    private lateinit var arrayAdapter: ArrayAdapter<String>
+    var sites = ArrayList<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_stream)
-
-        db.collection("sites")
-            .get()
-            .addOnSuccessListener { result ->
-                for (document in result) {
-//                    Log.d(TAG, "${document.id} => ${document.data}")
-                    sites?.add(document.data["name"].toString())
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.w(TAG, "Error getting documents.", exception)
-            }
 
         if (intent.hasExtra(DEVICE_ID)) {
             val deviceId = intent.getStringExtra(DEVICE_ID)
@@ -46,22 +31,48 @@ class CreateStreamActivity : AppCompatActivity() {
             }
         }
 
-        arrayAdapter =
-            sites?.let { ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, it) }
-        siteSpinner.adapter = arrayAdapter
+        setAdapter()
+        getSites()
+        setSiteSpinner()
 
-        //spinner as dialog
+        streamNameEditText.showKeyboard()
+    }
+
+    private fun setAdapter() {
+        arrayAdapter = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, sites)
+        siteSpinner.adapter = arrayAdapter
+    }
+
+    private fun setSiteSpinner() {
         siteSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                Toast.makeText(this@CreateStreamActivity, sites?.get(position), Toast.LENGTH_SHORT)
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                Toast.makeText(this@CreateStreamActivity, sites[position], Toast.LENGTH_SHORT)
                     .show()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
+    }
 
-        streamNameEditText.showKeyboard()
+    private fun getSites() {
+        Firestore().db.collection("sites")
+            .get()
+            .addOnSuccessListener { result ->
+                sites = ArrayList()
+                result.map { sites.add(it.data["name"].toString()) }
+
+                arrayAdapter.addAll(sites)
+                arrayAdapter.notifyDataSetChanged()
+            }
+            .addOnFailureListener { exception ->
+                Log.w(TAG, "Error getting documents.", exception)
+            }
     }
 
     private fun View.showKeyboard() = this.let {
