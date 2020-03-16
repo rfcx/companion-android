@@ -1,6 +1,5 @@
 package org.rfcx.audiomoth
 
-import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Paint.UNDERLINE_TEXT_FLAG
@@ -16,7 +15,6 @@ import org.rfcx.audiomoth.view.CreateStreamActivity
 
 open class MainActivity : AppCompatActivity() {
 
-    @SuppressLint("SetTextI18n", "DefaultLocale", "ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
