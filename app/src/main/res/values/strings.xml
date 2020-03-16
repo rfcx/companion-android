@@ -5,5 +5,8 @@
     <string name="scan_qr_code">Scan QR code</string>
     <string name="or">or</string>
     <string name="enter_code">enter code</string>
+    <string name="code_empty">The code is empty</string>
+    <string name="ok">OK</string>
+    <string name="cancel">CANCEL</string>
 
 </resources>
