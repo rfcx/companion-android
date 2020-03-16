@@ -8,6 +8,7 @@
     <string name="code_empty">The code is empty</string>
     <string name="device_id">Device id</string>
     <string name="device_id_number">Device id: %s</string>
+    <string name="device_id_empty">Please enter device id.</string>
     <string name="ok">OK</string>
     <string name="cancel">CANCEL</string>
 

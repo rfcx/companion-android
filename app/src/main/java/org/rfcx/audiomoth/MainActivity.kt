@@ -38,9 +38,14 @@ open class MainActivity : AppCompatActivity() {
             builder.setView(view)
 
             builder.setPositiveButton(getString(R.string.ok)) { dialog, _ ->
-                dialog.dismiss()
                 val deviceId = view.deviceIdEditText.text.toString().trim()
-                CreateStreamActivity.startActivity(this, deviceId)
+                if (deviceId.isEmpty()) {
+                    Toast.makeText(this, getText(R.string.device_id_empty), Toast.LENGTH_SHORT)
+                        .show()
+                } else {
+                    CreateStreamActivity.startActivity(this, deviceId)
+                }
+                dialog.dismiss()
             }
 
             builder.setNeutralButton(getString(R.string.cancel)) { dialog, _ ->
