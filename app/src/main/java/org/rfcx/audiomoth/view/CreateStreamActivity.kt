@@ -34,9 +34,9 @@ class CreateStreamActivity : AppCompatActivity() {
         setContentView(R.layout.activity_create_stream)
 
         setAdapter()
-        getSites()
         setSiteSpinner()
         addTextChanged()
+        checkDeviceId()
 
         createStreamButton.setOnClickListener {
             createStreamProgressBar.visibility = View.VISIBLE
@@ -44,7 +44,35 @@ class CreateStreamActivity : AppCompatActivity() {
             streamNameEditText.hideKeyboard()
             saveStreamData()
         }
-}
+    }
+
+    private fun checkDeviceId() {
+        if (intent.hasExtra(DEVICE_ID)) {
+            val deviceId = intent.getStringExtra(DEVICE_ID)
+            if (deviceId != null) {
+                val docRef = Firestore().db.collection(DEVICES).document(deviceId)
+                docRef.get()
+                    .addOnSuccessListener { document ->
+                        if (document != null) {
+                            val data = document.data
+                            if (data != null) {
+                                getSiteFromDeviceId(
+                                    data["siteName"].toString(),
+                                    data["siteId"].toString()
+                                )
+                            } else {
+                                getSites()
+                            }
+                        } else {
+                            Log.d(TAG, "No such document")
+                        }
+                    }
+                    .addOnFailureListener { exception ->
+                        Log.d(TAG, "get failed with ", exception)
+                    }
+            }
+        }
+    }
 
     private fun setAdapter() {
         arrayAdapter = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, sites)
@@ -69,7 +97,7 @@ class CreateStreamActivity : AppCompatActivity() {
     }
 
     private fun getSites() {
-        Firestore().db.collection("sites")
+        Firestore().db.collection(SITES)
             .get()
             .addOnSuccessListener { result ->
                 sites = ArrayList()
@@ -83,6 +111,17 @@ class CreateStreamActivity : AppCompatActivity() {
             .addOnFailureListener { exception ->
                 Log.w(TAG, "Error getting documents.", exception)
             }
+    }
+
+    private fun getSiteFromDeviceId(site: String, siteId: String) {
+        sites = ArrayList()
+        sitesId = ArrayList()
+
+        sites.add(site)
+        sitesId.add(siteId)
+
+        arrayAdapter.addAll(sites)
+        arrayAdapter.notifyDataSetChanged()
     }
 
     private fun View.hideKeyboard() = this.let {
@@ -125,7 +164,7 @@ class CreateStreamActivity : AppCompatActivity() {
                     items["siteName"] = site
                     items["siteId"] = siteId
 
-                    Firestore().db.collection("device").document(deviceId).set(items)
+                    Firestore().db.collection(DEVICES).document(deviceId).set(items)
                         .addOnSuccessListener {
                             ConfigureActivity.startActivity(this)
                             finish()
@@ -150,6 +189,8 @@ class CreateStreamActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "CreateStreamActivity"
         private const val DEVICE_ID = "DEVICE_ID"
+        private const val DEVICES = "devices"
+        private const val SITES = "sites"
 
         fun startActivity(context: Context, id: String?) {
             val intent = Intent(context, CreateStreamActivity::class.java)
