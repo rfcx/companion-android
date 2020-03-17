@@ -3,6 +3,8 @@ package org.rfcx.audiomoth.view
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -26,14 +28,12 @@ class CreateStreamActivity : AppCompatActivity() {
 
         if (intent.hasExtra(DEVICE_ID)) {
             val deviceId = intent.getStringExtra(DEVICE_ID)
-            if (deviceId != null) {
-                deviceIdTextView.text = getString(R.string.device_id_number, deviceId)
-            }
         }
 
         setAdapter()
         getSites()
         setSiteSpinner()
+        addTextChanged()
 
         streamNameEditText.showKeyboard()
     }
@@ -78,6 +78,25 @@ class CreateStreamActivity : AppCompatActivity() {
     private fun View.showKeyboard() = this.let {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+    }
+
+    private fun addTextChanged() {
+        streamNameEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {
+                if (p0 != null) {
+                    if (p0.isEmpty()) {
+                        createStreamButton.isEnabled = false
+                    }
+                }
+            }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                createStreamButton.isEnabled = true
+            }
+        })
     }
 
     companion object {

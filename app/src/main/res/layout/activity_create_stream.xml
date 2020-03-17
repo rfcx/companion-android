@@ -19,15 +19,6 @@
         app:titleTextColor="@color/text_black" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/deviceIdTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_padding_normal"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
-        tools:text="Device id: 123456789" />
-
-    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/streamNameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -35,7 +26,7 @@
         android:text="@string/stream_name"
         android:textColor="@color/text_primary"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/deviceIdTextView" />
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
     <androidx.appcompat.widget.AppCompatEditText
         android:id="@+id/streamNameEditText"
@@ -69,6 +60,7 @@
         app:layout_constraintTop_toBottomOf="@id/siteTextView" />
 
     <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/createStreamButton"
         style="@style/RangerButton.GreenButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
