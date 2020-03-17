@@ -57,6 +57,7 @@ class CreateStreamActivity : AppCompatActivity() {
                         if (document != null) {
                             val data = document.data
                             if (data != null) {
+                                siteSpinner.isEnabled = false
                                 hasPreviouslyCreated = true
                                 getSiteFromDeviceId(
                                     data["siteName"].toString(),
