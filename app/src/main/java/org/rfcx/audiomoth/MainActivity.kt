@@ -68,7 +68,7 @@ open class MainActivity : AppCompatActivity() {
             if (result.contents == null) {
                 Toast.makeText(this, getText(R.string.code_empty), Toast.LENGTH_SHORT).show()
             } else {
-                CreateStreamActivity.startActivity(this, result.contents)
+                CreateStreamActivity.startActivity(this, result.contents.split("=")[1])
                 finish()
             }
 
