@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_create_stream.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.util.Firestore
+import org.rfcx.audiomoth.view.configure.ConfigureActivity
 import java.sql.Timestamp
 import java.util.*
 
@@ -37,12 +38,13 @@ class CreateStreamActivity : AppCompatActivity() {
         setSiteSpinner()
         addTextChanged()
 
-        streamNameEditText.showKeyboard()
-
         createStreamButton.setOnClickListener {
+            createStreamProgressBar.visibility = View.VISIBLE
+            createStreamButton.isEnabled = false
+            streamNameEditText.hideKeyboard()
             saveStreamData()
         }
-    }
+}
 
     private fun setAdapter() {
         arrayAdapter = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, sites)
@@ -83,9 +85,9 @@ class CreateStreamActivity : AppCompatActivity() {
             }
     }
 
-    private fun View.showKeyboard() = this.let {
-        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+    private fun View.hideKeyboard() = this.let {
+        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(windowToken, 0)
     }
 
     private fun addTextChanged() {
@@ -109,7 +111,7 @@ class CreateStreamActivity : AppCompatActivity() {
         })
     }
 
-    fun saveStreamData() {
+    private fun saveStreamData() {
         if (intent.hasExtra(DEVICE_ID)) {
             val deviceId = intent.getStringExtra(DEVICE_ID)
 
@@ -124,19 +126,22 @@ class CreateStreamActivity : AppCompatActivity() {
                     items["siteId"] = siteId
 
                     Firestore().db.collection("device").document(deviceId).set(items)
-                        .addOnSuccessListener { void: Void? ->
-                            Toast.makeText(
-                                this,
-                                "Successfully uploaded to the database :)",
-                                Toast.LENGTH_LONG
-                            ).show()
+                        .addOnSuccessListener {
+                            ConfigureActivity.startActivity(this)
+                            finish()
                         }.addOnFailureListener { exception: java.lang.Exception ->
+                            createStreamProgressBar.visibility = View.INVISIBLE
+                            createStreamButton.isEnabled = true
                             Toast.makeText(this, exception.toString(), Toast.LENGTH_LONG).show()
                         }
                 } catch (e: Exception) {
+                    createStreamProgressBar.visibility = View.INVISIBLE
+                    createStreamButton.isEnabled = true
                     Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show()
                 }
             } else {
+                createStreamProgressBar.visibility = View.INVISIBLE
+                createStreamButton.isEnabled = true
                 Toast.makeText(this, "Please fill up the fields :(", Toast.LENGTH_LONG).show()
             }
         }

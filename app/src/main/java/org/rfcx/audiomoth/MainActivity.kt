@@ -44,6 +44,7 @@ open class MainActivity : AppCompatActivity() {
                         .show()
                 } else {
                     CreateStreamActivity.startActivity(this, deviceId)
+                    finish()
                 }
                 dialog.dismiss()
             }
@@ -68,6 +69,7 @@ open class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, getText(R.string.code_empty), Toast.LENGTH_SHORT).show()
             } else {
                 CreateStreamActivity.startActivity(this, result.contents)
+                finish()
             }
 
         } else {

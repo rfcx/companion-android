@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="org.rfcx.audiomoth">
 
+    <uses-sdk tools:overrideLibrary="com.google.zxing.client.android" />
+
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
@@ -14,6 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".view.configure.ConfigureActivity"></activity>
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
@@ -31,5 +34,5 @@
             </intent-filter>
         </activity>
     </application>
-    <uses-sdk tools:overrideLibrary="com.google.zxing.client.android" />
+
 </manifest>
