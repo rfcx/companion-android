@@ -15,20 +15,22 @@ import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_create_stream.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.util.Firestore
+import java.sql.Timestamp
 import java.util.*
 
 class CreateStreamActivity : AppCompatActivity() {
 
     private lateinit var arrayAdapter: ArrayAdapter<String>
     var sites = ArrayList<String>()
+    var sitesId = ArrayList<String>()
+
+    var site = ""
+    var siteId = ""
+    var nameStream = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_stream)
-
-        if (intent.hasExtra(DEVICE_ID)) {
-            val deviceId = intent.getStringExtra(DEVICE_ID)
-        }
 
         setAdapter()
         getSites()
@@ -36,6 +38,10 @@ class CreateStreamActivity : AppCompatActivity() {
         addTextChanged()
 
         streamNameEditText.showKeyboard()
+
+        createStreamButton.setOnClickListener {
+            saveStreamData()
+        }
     }
 
     private fun setAdapter() {
@@ -51,8 +57,8 @@ class CreateStreamActivity : AppCompatActivity() {
                 position: Int,
                 id: Long
             ) {
-                Toast.makeText(this@CreateStreamActivity, sites[position], Toast.LENGTH_SHORT)
-                    .show()
+                site = sites[position]
+                siteId = sitesId[position]
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -65,7 +71,9 @@ class CreateStreamActivity : AppCompatActivity() {
             .get()
             .addOnSuccessListener { result ->
                 sites = ArrayList()
+                sitesId = ArrayList()
                 result.map { sites.add(it.data["name"].toString()) }
+                result.map { sitesId.add(it.id) }
 
                 arrayAdapter.addAll(sites)
                 arrayAdapter.notifyDataSetChanged()
@@ -84,6 +92,8 @@ class CreateStreamActivity : AppCompatActivity() {
         streamNameEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
                 if (p0 != null) {
+                    nameStream = p0.toString()
+
                     if (p0.isEmpty()) {
                         createStreamButton.isEnabled = false
                     }
@@ -97,6 +107,39 @@ class CreateStreamActivity : AppCompatActivity() {
                 createStreamButton.isEnabled = true
             }
         })
+    }
+
+    fun saveStreamData() {
+        if (intent.hasExtra(DEVICE_ID)) {
+            val deviceId = intent.getStringExtra(DEVICE_ID)
+
+            if (deviceId != null && site.isNotEmpty() && siteId.isNotEmpty() && nameStream.isNotEmpty()) {
+
+                try {
+                    val items = HashMap<String, Any>()
+                    items["createdAt"] = Timestamp(System.currentTimeMillis()).toString()
+                    items["isLogin"] = false
+                    items["streamName"] = nameStream
+                    items["siteName"] = site
+                    items["siteId"] = siteId
+
+                    Firestore().db.collection("device").document(deviceId).set(items)
+                        .addOnSuccessListener { void: Void? ->
+                            Toast.makeText(
+                                this,
+                                "Successfully uploaded to the database :)",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }.addOnFailureListener { exception: java.lang.Exception ->
+                            Toast.makeText(this, exception.toString(), Toast.LENGTH_LONG).show()
+                        }
+                } catch (e: Exception) {
+                    Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show()
+                }
+            } else {
+                Toast.makeText(this, "Please fill up the fields :(", Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     companion object {
