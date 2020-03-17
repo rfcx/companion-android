@@ -28,6 +28,7 @@ class CreateStreamActivity : AppCompatActivity() {
     var site = ""
     var siteId = ""
     var nameStream = ""
+    var hasPreviouslyCreated = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +43,7 @@ class CreateStreamActivity : AppCompatActivity() {
             createStreamProgressBar.visibility = View.VISIBLE
             createStreamButton.isEnabled = false
             streamNameEditText.hideKeyboard()
-            saveStreamData()
+            onCreateStreamClick()
         }
     }
 
@@ -56,11 +57,13 @@ class CreateStreamActivity : AppCompatActivity() {
                         if (document != null) {
                             val data = document.data
                             if (data != null) {
+                                hasPreviouslyCreated = true
                                 getSiteFromDeviceId(
                                     data["siteName"].toString(),
                                     data["siteId"].toString()
                                 )
                             } else {
+                                hasPreviouslyCreated = false
                                 getSites()
                             }
                         } else {
@@ -150,40 +153,58 @@ class CreateStreamActivity : AppCompatActivity() {
         })
     }
 
-    private fun saveStreamData() {
+    private fun onCreateStreamClick() {
         if (intent.hasExtra(DEVICE_ID)) {
             val deviceId = intent.getStringExtra(DEVICE_ID)
 
             if (deviceId != null && site.isNotEmpty() && siteId.isNotEmpty() && nameStream.isNotEmpty()) {
 
-                try {
-                    val items = HashMap<String, Any>()
-                    items["createdAt"] = Timestamp(System.currentTimeMillis()).toString()
-                    items["isLogin"] = false
-                    items["streamName"] = nameStream
-                    items["siteName"] = site
-                    items["siteId"] = siteId
+                if (!hasPreviouslyCreated) {
+                    try {
+                        val items = HashMap<String, Any>()
+                        items["isLogin"] = false
+                        items["siteName"] = site
+                        items["siteId"] = siteId
 
-                    Firestore().db.collection(DEVICES).document(deviceId).set(items)
-                        .addOnSuccessListener {
-                            ConfigureActivity.startActivity(this)
-                            finish()
-                        }.addOnFailureListener { exception: java.lang.Exception ->
-                            createStreamProgressBar.visibility = View.INVISIBLE
-                            createStreamButton.isEnabled = true
-                            Toast.makeText(this, exception.toString(), Toast.LENGTH_LONG).show()
-                        }
-                } catch (e: Exception) {
-                    createStreamProgressBar.visibility = View.INVISIBLE
-                    createStreamButton.isEnabled = true
-                    Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show()
+                        Firestore().db.collection(DEVICES).document(deviceId).set(items)
+                            .addOnSuccessListener {
+                                saveStream(deviceId)
+                            }.addOnFailureListener { exception: java.lang.Exception ->
+                                createStreamProgressBar.visibility = View.INVISIBLE
+                                createStreamButton.isEnabled = true
+                                Toast.makeText(this, exception.toString(), Toast.LENGTH_LONG).show()
+                            }
+                    } catch (e: Exception) {
+                        createStreamProgressBar.visibility = View.INVISIBLE
+                        createStreamButton.isEnabled = true
+                        Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show()
+                    }
+                } else {
+                    saveStream(deviceId)
                 }
+
+
             } else {
                 createStreamProgressBar.visibility = View.INVISIBLE
                 createStreamButton.isEnabled = true
                 Toast.makeText(this, "Please fill up the fields :(", Toast.LENGTH_LONG).show()
             }
         }
+    }
+
+    private fun saveStream(deviceId: String) {
+        val docRef = Firestore().db.collection(DEVICES).document(deviceId)
+        val docData = hashMapOf(
+            "createdAt" to Timestamp(System.currentTimeMillis()).toString(),
+            "sampleRateKiloHertz" to 8, "gain" to 3
+        )
+
+        docRef.collection("streams").document(nameStream)
+            .set(docData)
+            .addOnCompleteListener {
+                ConfigureActivity.startActivity(this)
+                finish()
+            }
     }
 
     companion object {
