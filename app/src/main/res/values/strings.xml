@@ -18,7 +18,11 @@
     <string name="site">Site</string>
     <string name="prompt_site">Select Site</string>
 
-    <!--    ConfigureActivity-->
+    <!--    ConfigureFragment-->
     <string name="configure">Configure</string>
+    <string name="sample_rate">Sample rate (kHz)</string>
+    <string name="gain">Gain</string>
+    <string name="sleep_duration">Sleep duration</string>
+    <string name="recording_duration">Recording duration</string>
 
 </resources>

@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.configure.ConfigureFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?android:actionBarSize"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+            app:title="@string/configure"
+            app:titleTextColor="@color/text_black" />
+
+        <LinearLayout
+            android:id="@+id/sampleRateLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/margin_padding_normal"
+            app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+            <TextView
+                android:id="@+id/sampleRateTextView"
+                style="@style/AudioMothText.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/margin_padding_normal"
+                android:paddingEnd="@dimen/margin_padding_normal"
+                android:text="@string/sample_rate" />
+
+            <TextView
+                android:id="@+id/sampleRateValueTextView"
+                style="@style/AudioMothText.Body.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/margin_padding_normal"
+                android:paddingEnd="@dimen/margin_padding_normal"
+                android:paddingBottom="@dimen/margin_padding_normal"
+                android:text="8kHz (default)"
+                tools:text="8kHz (default)" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/margin_padding_small"
+                android:background="@color/gray_30" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/gainLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/margin_padding_normal"
+            app:layout_constraintTop_toBottomOf="@id/sampleRateLayout">
+
+            <TextView
+                android:id="@+id/gainTextView"
+                style="@style/AudioMothText.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/margin_padding_normal"
+                android:paddingEnd="@dimen/margin_padding_normal"
+                android:text="@string/gain" />
+
+            <TextView
+                android:id="@+id/gainValueTextView"
+                style="@style/AudioMothText.Body.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/margin_padding_normal"
+                android:paddingEnd="@dimen/margin_padding_normal"
+                android:paddingBottom="@dimen/margin_padding_normal"
+                android:text="5 (default)"
+                tools:text="5 (default)" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/margin_padding_small"
+                android:background="@color/gray_30" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/sleepDurationLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/margin_padding_normal"
+            app:layout_constraintTop_toBottomOf="@id/gainLayout">
+
+            <TextView
+                android:id="@+id/sleepDurationTextView"
+                style="@style/AudioMothText.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/margin_padding_normal"
+                android:paddingEnd="@dimen/margin_padding_normal"
+                android:text="@string/sleep_duration" />
+
+            <TextView
+                android:id="@+id/sleepDurationValueTextView"
+                style="@style/AudioMothText.Body.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/margin_padding_normal"
+                android:paddingEnd="@dimen/margin_padding_normal"
+                android:paddingBottom="@dimen/margin_padding_normal"
+                android:text="0 second"
+                tools:text="0 second" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/recordingDurationLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@id/sleepDurationLayout">
+
+            <TextView
+                android:id="@+id/recordingDurationTextView"
+                style="@style/AudioMothText.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/margin_padding_normal"
+                android:paddingEnd="@dimen/margin_padding_normal"
+                android:text="@string/recording_duration" />
+
+            <TextView
+                android:id="@+id/recordingDurationValueTextView"
+                style="@style/AudioMothText.Body.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/margin_padding_normal"
+                android:paddingEnd="@dimen/margin_padding_normal"
+                android:paddingBottom="@dimen/margin_padding_normal"
+                android:text="0 second"
+                tools:text="0 second" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/margin_padding_small"
+                android:background="@color/gray_30" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>
