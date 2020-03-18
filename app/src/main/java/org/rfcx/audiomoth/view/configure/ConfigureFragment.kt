@@ -8,9 +8,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import org.rfcx.audiomoth.R
 
-/**
- * A simple [Fragment] subclass.
- */
 class ConfigureFragment : Fragment() {
 
     override fun onCreateView(
