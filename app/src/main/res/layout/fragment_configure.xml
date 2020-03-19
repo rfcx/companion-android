@@ -50,7 +50,7 @@
                 android:paddingStart="@dimen/margin_padding_normal"
                 android:paddingEnd="@dimen/margin_padding_normal"
                 android:paddingBottom="@dimen/margin_padding_normal"
-                android:text="8kHz (default)"
+                android:text="8 kHz (default)"
                 tools:text="8kHz (default)" />
 
             <View
