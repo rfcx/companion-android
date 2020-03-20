@@ -12,8 +12,8 @@ import org.rfcx.audiomoth.R
 
 class ConfigureFragment : Fragment() {
 
-    private val sampleRateList = arrayOf(8, 16, 32, 48, 96, 192, 256, 384)
-    private val listItems = arrayOf("8 (default)", "16", "32", "48", "96", "192", "256", "384")
+    private val sampleRateList = arrayOf("8", "16", "32", "48", "96", "192", "256", "384")
+    private val gainList = arrayOf("1 Low", "2", "3 Medium", "4", "5 High")
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -27,30 +27,34 @@ class ConfigureFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         sampleRateLayout.setOnClickListener {
-            val mBuilder = context?.let { it1 -> AlertDialog.Builder(it1) }
-
-            val str: String = sampleRateValueTextView.text.trim().toString()
-            var index = 0
-
-            for (i in listItems.indices) {
-                if(listItems[i] == str.split(" ")[0]) {
-                    index = i
-                }
+            val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
+            if (builder != null) {
+                builder.setTitle(R.string.choose_sample_rate)
+                    ?.setItems(sampleRateList) { dialog, i ->
+                        try {
+                            sampleRateValueTextView.text =
+                                "${sampleRateList[i]} ${getString(R.string.kilohertz)}"
+                        } catch (e: IllegalArgumentException) {
+                            dialog.dismiss()
+                        }
+                    }
+                val dialog = builder.create()
+                dialog?.show()
             }
+        }
 
-            if (mBuilder != null) {
-                mBuilder.setTitle("Choose sample rate (kHz)")
-
-                mBuilder.setSingleChoiceItems(listItems, index) { dialogInterface, i ->
-                    sampleRateValueTextView.text = "${sampleRateList[i]} kHz"
-                    dialogInterface.dismiss()
+        gainLayout.setOnClickListener {
+            val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
+            if (builder != null) {
+                builder.setTitle(R.string.choose_gain)?.setItems(gainList) { dialog, i ->
+                    try {
+                        gainValueTextView.text = gainList[i]
+                    } catch (e: IllegalArgumentException) {
+                        dialog.dismiss()
+                    }
                 }
-                mBuilder.setNeutralButton("Cancel") { dialog, which ->
-                    dialog.cancel()
-                }
-
-                val mDialog = mBuilder.create()
-                mDialog.show()
+                val dialog = builder.create()
+                dialog?.show()
             }
         }
     }

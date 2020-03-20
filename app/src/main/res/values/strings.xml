@@ -7,7 +7,6 @@
     <string name="enter_code">enter device id</string>
     <string name="code_empty">The code is empty</string>
     <string name="device_id">Device id</string>
-    <string name="device_id_number">Device id: %s</string>
     <string name="device_id_empty">Please enter device id.</string>
     <string name="ok">OK</string>
     <string name="cancel">CANCEL</string>
@@ -24,5 +23,8 @@
     <string name="gain">Gain</string>
     <string name="sleep_duration">Sleep duration</string>
     <string name="recording_duration">Recording duration</string>
+    <string name="choose_sample_rate">Choose sample rate (kHz)</string>
+    <string name="choose_gain">Choose gain</string>
+    <string name="kilohertz">kHz</string>
 
 </resources>
