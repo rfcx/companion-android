@@ -89,8 +89,8 @@
                 android:paddingStart="@dimen/margin_padding_normal"
                 android:paddingEnd="@dimen/margin_padding_normal"
                 android:paddingBottom="@dimen/margin_padding_normal"
-                android:text="5 (default)"
-                tools:text="5 (default)" />
+                android:text="3 - Medium (default)"
+                tools:text="3 (default)" />
 
             <View
                 android:layout_width="match_parent"
@@ -170,6 +170,19 @@
                 android:background="@color/gray_30" />
 
         </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/nextButton"
+            style="@style/RangerButton.GreenButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_padding_normal"
+            android:layout_marginEnd="@dimen/margin_padding_normal"
+            android:layout_marginBottom="@dimen/margin_padding_normal"
+            android:text="@string/next"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

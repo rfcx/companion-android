@@ -29,5 +29,6 @@
     <string name="second">%s second</string>
     <string name="enter_sleep_duration">Enter sleep duration (second)</string>
     <string name="enter_recording_duration">Enter recording duration (second)</string>
+    <string name="next">Next</string>
 
 </resources>

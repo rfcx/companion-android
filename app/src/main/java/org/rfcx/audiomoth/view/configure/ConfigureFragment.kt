@@ -18,7 +18,7 @@ class ConfigureFragment : Fragment() {
 
     // Todo: save array in string.xml
     private val sampleRateList = arrayOf("8", "16", "32", "48", "96", "192", "256", "384")
-    private val gainList = arrayOf("1 Low", "2", "3 Medium", "4", "5 High")
+    private val gainList = arrayOf("1 - Low...?", "2 - Low", "3 - Medium", "4 - High", "5 - High...?")
 
     override fun onCreateView(
         inflater: LayoutInflater,
