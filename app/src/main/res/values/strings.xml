@@ -18,4 +18,7 @@
     <string name="site">Site</string>
     <string name="prompt_site">Select Site</string>
 
+    <!--    ConfigureActivity-->
+    <string name="configure">Configure</string>
+
 </resources>
