@@ -34,5 +34,6 @@
     <string name="add_recording_period">Add recording period</string>
     <string name="start_period">Start recording:</string>
     <string name="end_period">End recording:</string>
+    <string name="always_recording">Always recording</string>
 
 </resources>

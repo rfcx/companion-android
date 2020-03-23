@@ -56,7 +56,7 @@
                     android:layout_height="wrap_content"
                     android:paddingStart="@dimen/margin_padding_normal"
                     android:paddingEnd="@dimen/margin_padding_normal"
-                    android:paddingBottom="@dimen/margin_padding_normal"
+                    android:paddingBottom="@dimen/margin_padding_small"
                     android:text="8 kHz (default)"
                     tools:text="8kHz (default)" />
 
@@ -95,7 +95,7 @@
                     android:layout_height="wrap_content"
                     android:paddingStart="@dimen/margin_padding_normal"
                     android:paddingEnd="@dimen/margin_padding_normal"
-                    android:paddingBottom="@dimen/margin_padding_normal"
+                    android:paddingBottom="@dimen/margin_padding_small"
                     android:text="3 - Medium (default)"
                     tools:text="3 (default)" />
 
@@ -134,7 +134,7 @@
                     android:layout_height="wrap_content"
                     android:paddingStart="@dimen/margin_padding_normal"
                     android:paddingEnd="@dimen/margin_padding_normal"
-                    android:paddingBottom="@dimen/margin_padding_normal"
+                    android:paddingBottom="@dimen/margin_padding_small"
                     android:text="0 second"
                     tools:text="0 second" />
 
@@ -166,7 +166,7 @@
                     android:layout_height="wrap_content"
                     android:paddingStart="@dimen/margin_padding_normal"
                     android:paddingEnd="@dimen/margin_padding_normal"
-                    android:paddingBottom="@dimen/margin_padding_normal"
+                    android:paddingBottom="@dimen/margin_padding_small"
                     android:text="0 second"
                     tools:text="0 second" />
 
@@ -186,40 +186,56 @@
                 android:padding="@dimen/margin_padding_normal"
                 app:layout_constraintTop_toBottomOf="@id/recordingDurationLayout">
 
-                <TextView
-                    android:id="@+id/customRecordingPeriodTextView"
-                    style="@style/AudioMothText.Subhead"
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
                     android:layout_weight="1"
-                    android:text="@string/custom_recording_period" />
+                    android:orientation="vertical">
 
-                <FrameLayout
-                    android:id="@+id/customRecordingPeriodSwitchLayout"
+                    <TextView
+                        android:id="@+id/customRecordingPeriodTextView"
+                        style="@style/AudioMothText.Subhead"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="@string/custom_recording_period" />
+
+                    <TextView
+                        android:id="@+id/alwaysRecordingTextView"
+                        style="@style/AudioMothText.Body.Secondary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/always_recording"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/customRecordingPeriodLayout" />
+                </LinearLayout>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/customRecordingPeriodSwitch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:clickable="true"
-                    android:focusable="true">
-
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/customRecordingPeriodSwitch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:checked="false"
-                        android:clickable="false"
-                        android:focusable="false"
-                        tools:checked="false" />
-                </FrameLayout>
+                    android:focusable="true"
+                    tools:checked="false" />
             </LinearLayout>
+
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/addRecordingPeriodGroupView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:constraint_referenced_ids="startPeriodLayout,endPeriodLayout,addRecordingPeriodTextView" />
 
             <LinearLayout
                 android:id="@+id/startPeriodLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
                 android:orientation="horizontal"
-                android:padding="@dimen/margin_padding_normal"
+                android:paddingStart="@dimen/margin_padding_normal"
+                android:paddingEnd="@dimen/margin_padding_normal"
+                android:paddingBottom="@dimen/margin_padding_normal"
                 app:layout_constraintTop_toBottomOf="@id/customRecordingPeriodLayout">
 
                 <TextView
@@ -245,9 +261,10 @@
                 android:id="@+id/endPeriodLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
                 android:orientation="horizontal"
-                android:padding="@dimen/margin_padding_normal"
+                android:paddingStart="@dimen/margin_padding_normal"
+                android:paddingEnd="@dimen/margin_padding_normal"
+                android:paddingBottom="@dimen/margin_padding_normal"
                 app:layout_constraintTop_toBottomOf="@id/startPeriodLayout">
 
                 <TextView
@@ -278,6 +295,9 @@
                 android:drawableStart="@drawable/ic_more"
                 android:drawablePadding="8dp"
                 android:gravity="center"
+                android:paddingStart="@dimen/margin_padding_normal"
+                android:paddingEnd="@dimen/margin_padding_normal"
+                android:paddingBottom="@dimen/margin_padding_normal"
                 android:textColor="@color/colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -287,7 +307,6 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginTop="@dimen/margin_padding_normal"
                 android:background="@color/gray_30"
                 app:layout_constraintTop_toBottomOf="@id/addRecordingPeriodTextView" />
 
@@ -297,8 +316,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_normal"
-                android:layout_marginEnd="@dimen/margin_padding_normal"
                 android:layout_marginTop="@dimen/margin_padding_xlarge"
+                android:layout_marginEnd="@dimen/margin_padding_normal"
                 android:text="@string/next"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

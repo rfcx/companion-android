@@ -54,6 +54,16 @@ class ConfigureFragment : Fragment() {
         endPeriodLayout.setOnClickListener {
             setStartPeriod(endPeriodTextView)
         }
+
+        customRecordingPeriodSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                addRecordingPeriodGroupView.visibility = View.VISIBLE
+                alwaysRecordingTextView.visibility = View.GONE
+            } else {
+                addRecordingPeriodGroupView.visibility = View.GONE
+                alwaysRecordingTextView.visibility = View.VISIBLE
+            }
+        }
     }
 
     private fun setSampleRateLayout() {
