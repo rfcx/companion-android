@@ -27,5 +27,9 @@
     <style name="AudioMothText.Body.Secondary" parent="TextAppearance.AppCompat.Body1">
         <item name="android:textColor">@color/text_secondary</item>
     </style>
+    
+    <style name="AudioMothText.Body.Headline" parent="Base.TextAppearance.AppCompat.Headline">
+        <item name="android:textColor">@color/text_secondary</item>
+    </style>
 
 </resources>

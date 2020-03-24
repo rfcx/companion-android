@@ -8,7 +8,7 @@ import kotlinx.android.synthetic.main.activity_configure.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
 
-class ConfigureActivity : AppCompatActivity() {
+class ConfigureActivity : AppCompatActivity(), ConfigureListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,6 +25,18 @@ class ConfigureActivity : AppCompatActivity() {
         }
     }
 
+    override fun openSync() {
+        supportFragmentManager.beginTransaction()
+            .replace(configureContainer.id, SyncFragment(),
+                "SyncFragment").commit()
+    }
+
+    override fun openVerifySync() {
+        supportFragmentManager.beginTransaction()
+            .replace(configureContainer.id, VerifySyncFragment(),
+                "VerifySyncFragment").commit()
+    }
+
     companion object {
         const val STREAM_NAME = "STREAM_NAME"
 
@@ -35,4 +47,9 @@ class ConfigureActivity : AppCompatActivity() {
             context.startActivity(intent)
         }
     }
+}
+
+interface ConfigureListener {
+    fun openSync()
+    fun openVerifySync()
 }

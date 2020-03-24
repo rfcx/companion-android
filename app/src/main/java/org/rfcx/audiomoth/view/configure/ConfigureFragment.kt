@@ -3,6 +3,7 @@ package org.rfcx.audiomoth.view.configure
 
 import android.annotation.SuppressLint
 import android.app.TimePickerDialog
+import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -23,6 +24,7 @@ import java.util.*
 
 class ConfigureFragment : Fragment() {
 
+    lateinit var listener: ConfigureListener
     private val sampleRateList = arrayOf("8", "16", "32", "48", "96", "192", "256", "384")
     private val gainList = arrayOf("1 - Lowest", "2 - Low", "3 - Medium", "4 - High", "5 - Highest")
     val calendar = Calendar.getInstance()
@@ -31,6 +33,11 @@ class ConfigureFragment : Fragment() {
     var sampleRate = 0
     var sleepDuration = 0
     var recordingDuration = 0
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        listener = (context as ConfigureListener)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -82,6 +89,7 @@ class ConfigureFragment : Fragment() {
                     val streamName = it.getString(ConfigureActivity.STREAM_NAME)
                     if (deviceId != null && streamName != null) {
                         updateStream(deviceId, streamName)
+                        listener.openSync()
                     }
                 }
             }

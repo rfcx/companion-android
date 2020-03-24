@@ -36,4 +36,8 @@
     <string name="end_period">End recording:</string>
     <string name="always_recording">Always recording</string>
 
+    <!--    SyncFragment-->
+    <string name="sync">Sync</string>
+    <string name="syncing">Syncing</string>
+
 </resources>
