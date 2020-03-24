@@ -17,24 +17,30 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
         if (intent.hasExtra(DEVICE_ID) && intent.hasExtra(STREAM_NAME)) {
             val deviceId = intent.getStringExtra(DEVICE_ID)
             val streamName = intent.getStringExtra(STREAM_NAME)
-            if(deviceId != null && streamName != null) {
+            if (deviceId != null && streamName != null) {
                 supportFragmentManager.beginTransaction()
-                    .add(configureContainer.id, ConfigureFragment.newInstance(deviceId, streamName),
-                        "ConfigureFragment").commit()
+                    .add(
+                        configureContainer.id, ConfigureFragment.newInstance(deviceId, streamName),
+                        "ConfigureFragment"
+                    ).commit()
             }
         }
     }
 
     override fun openSync() {
         supportFragmentManager.beginTransaction()
-            .replace(configureContainer.id, SyncFragment(),
-                "SyncFragment").commit()
+            .replace(
+                configureContainer.id, SyncFragment(),
+                "SyncFragment"
+            ).commit()
     }
 
     override fun openVerifySync() {
         supportFragmentManager.beginTransaction()
-            .replace(configureContainer.id, VerifySyncFragment(),
-                "VerifySyncFragment").commit()
+            .replace(
+                configureContainer.id, VerifySyncFragment(),
+                "VerifySyncFragment"
+            ).commit()
     }
 
     companion object {
@@ -42,8 +48,8 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
 
         fun startActivity(context: Context, deviceId: String, streamName: String) {
             val intent = Intent(context, ConfigureActivity::class.java)
-                intent.putExtra(DEVICE_ID, deviceId)
-                intent.putExtra(STREAM_NAME, streamName)
+            intent.putExtra(DEVICE_ID, deviceId)
+            intent.putExtra(STREAM_NAME, streamName)
             context.startActivity(intent)
         }
     }
