@@ -197,21 +197,24 @@ class CreateStreamActivity : AppCompatActivity() {
         val docRef = Firestore().db.collection(DEVICES).document(deviceId)
         val docData = hashMapOf(
             "createdAt" to Timestamp(System.currentTimeMillis()).toString(),
-            "sampleRateKiloHertz" to 8, "gain" to 3
+            "sampleRateKiloHertz" to 8,
+            "gain" to 3,
+            "sleepDurationSecond" to 0,
+            "recordingDurationSecond" to 0
         )
 
         docRef.collection("streams").document(nameStream)
             .set(docData)
             .addOnCompleteListener {
-                ConfigureActivity.startActivity(this)
+                ConfigureActivity.startActivity(this, deviceId, nameStream)
                 finish()
             }
     }
 
     companion object {
         private const val TAG = "CreateStreamActivity"
-        private const val DEVICE_ID = "DEVICE_ID"
-        private const val DEVICES = "devices"
+        const val DEVICE_ID = "DEVICE_ID"
+        const val DEVICES = "devices"
         private const val SITES = "sites"
 
         fun startActivity(context: Context, id: String?) {

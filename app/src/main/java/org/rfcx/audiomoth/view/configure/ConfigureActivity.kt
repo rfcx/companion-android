@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import kotlinx.android.synthetic.main.activity_configure.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
 
 class ConfigureActivity : AppCompatActivity() {
 
@@ -13,14 +14,24 @@ class ConfigureActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_configure)
 
-        supportFragmentManager.beginTransaction()
-            .add(configureContainer.id, ConfigureFragment(),
-                "ConfigureFragment").commit()
+        if (intent.hasExtra(DEVICE_ID) && intent.hasExtra(STREAM_NAME)) {
+            val deviceId = intent.getStringExtra(DEVICE_ID)
+            val streamName = intent.getStringExtra(STREAM_NAME)
+            if(deviceId != null && streamName != null) {
+                supportFragmentManager.beginTransaction()
+                    .add(configureContainer.id, ConfigureFragment.newInstance(deviceId, streamName),
+                        "ConfigureFragment").commit()
+            }
+        }
     }
 
     companion object {
-        fun startActivity(context: Context) {
+        const val STREAM_NAME = "STREAM_NAME"
+
+        fun startActivity(context: Context, deviceId: String, streamName: String) {
             val intent = Intent(context, ConfigureActivity::class.java)
+                intent.putExtra(DEVICE_ID, deviceId)
+                intent.putExtra(STREAM_NAME, streamName)
             context.startActivity(intent)
         }
     }
