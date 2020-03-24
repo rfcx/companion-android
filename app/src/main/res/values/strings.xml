@@ -7,8 +7,7 @@
     <string name="enter_code">enter device id</string>
     <string name="code_empty">The code is empty</string>
     <string name="device_id">Device id</string>
-    <string name="device_id_number">Device id: %s</string>
-    <string name="device_id_empty">Please enter device id.</string>
+    <string name="device_id_empty">Please enter device id</string>
     <string name="ok">OK</string>
     <string name="cancel">CANCEL</string>
 
@@ -18,7 +17,18 @@
     <string name="site">Site</string>
     <string name="prompt_site">Select Site</string>
 
-    <!--    ConfigureActivity-->
+    <!--    ConfigureFragment-->
     <string name="configure">Configure</string>
+    <string name="sample_rate">Sample rate</string>
+    <string name="gain">Gain</string>
+    <string name="sleep_duration">Sleep duration</string>
+    <string name="recording_duration">Recording duration</string>
+    <string name="choose_sample_rate">Choose sample rate (kHz)</string>
+    <string name="choose_gain">Choose gain</string>
+    <string name="kilohertz">%s kHz</string>
+    <string name="second">%s second</string>
+    <string name="enter_sleep_duration">Enter sleep duration (second)</string>
+    <string name="enter_recording_duration">Enter recording duration (second)</string>
+    <string name="next">Next</string>
 
 </resources>
