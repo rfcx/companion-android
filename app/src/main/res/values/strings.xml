@@ -36,4 +36,17 @@
     <string name="end_period">End recording:</string>
     <string name="always_recording">Always recording</string>
 
+    <!--    SyncFragment-->
+    <string name="sync">Sync</string>
+    <string name="syncing">Syncing</string>
+
+    <!--    VerifySyncFragment-->
+    <string name="what_light_you_see">What light do you see now?</string>
+    <string name="green">Green</string>
+    <string name="red">Red</string>
+    <string name="none">None</string>
+
+    <!--    DashboardStreamActivity-->
+    <string name="dashboard">Dashboard Stream Page</string>
+
 </resources>

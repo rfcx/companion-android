@@ -19,12 +19,28 @@
         <item name="android:textColor">@android:color/white</item>
     </style>
 
+    <style name="RangerButton.RedButton" parent="RangerButton">
+        <item name="android:background">@drawable/bg_color_red_button</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="RangerButton.GreyButton" parent="RangerButton">
+        <item name="android:background">@drawable/bg_color_grey_button</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
     <!-- TextView -->
     <style name="AudioMothText.Subhead" parent="Base.TextAppearance.AppCompat.Subhead">
         <item name="android:textColor">@color/text_black</item>
     </style>
 
     <style name="AudioMothText.Body.Secondary" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textColor">@color/text_secondary</item>
+    </style>
+
+    <style name="AudioMothText.Body.Headline" parent="Base.TextAppearance.AppCompat.Headline">
         <item name="android:textColor">@color/text_secondary</item>
     </style>
 
