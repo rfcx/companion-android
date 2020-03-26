@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.alert_duration_layout.view.*
 import kotlinx.android.synthetic.main.fragment_configure.*
 import org.rfcx.audiomoth.R
@@ -21,18 +22,21 @@ import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
-class ConfigureFragment : Fragment() {
+class ConfigureFragment : Fragment(), OnItemClickListener {
 
+    private val recordingPeriodAdapter by lazy { RecordingPeriodAdapter(this) }
     lateinit var listener: ConfigureListener
     private val sampleRateList = arrayOf("8", "16", "32", "48", "96", "192", "256", "384")
     private val gainList = arrayOf("1 - Lowest", "2 - Low", "3 - Medium", "4 - High", "5 - Highest")
     val calendar = Calendar.getInstance()
 
-    var gain = 0
-    var sampleRate = 0
-    var sleepDuration = 0
-    var recordingDuration = 0
+    private var gain = 0
+    private var sampleRate = 0
+    private var sleepDuration = 0
+    private var recordingDuration = 0
+    private var recordingPeriod = ArrayList<String>()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -47,17 +51,31 @@ class ConfigureFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_configure, container, false)
     }
 
-    @SuppressLint("SimpleDateFormat")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        addRecordingPeriodTextView.text = getString(R.string.add_recording_period).toUpperCase()
-
-        setSampleRateLayout()
         setGainLayout()
+        setNextOnClick()
+        setSampleRateLayout()
         setSleepDurationLayout()
+        setCustomRecordingPeriod()
         setRecordingDurationLayout()
+        setCustomRecordingPeriodRecyclerView()
 
+    }
+
+    private fun setCustomRecordingPeriodRecyclerView() {
+        customRecordingPeriodRecyclerView.apply {
+            val alertsLayoutManager = LinearLayoutManager(context)
+            layoutManager = alertsLayoutManager
+            adapter = recordingPeriodAdapter
+        }
+        recordingPeriodAdapter.items = recordingPeriod
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private fun setCustomRecordingPeriod() {
+        addRecordingPeriodTextView.text = getString(R.string.add_recording_period).toUpperCase()
         startPeriodTextView.text = SimpleDateFormat("HH:mm").format(calendar.time)
         endPeriodTextView.text = SimpleDateFormat("HH:mm").format(calendar.time)
 
@@ -79,6 +97,12 @@ class ConfigureFragment : Fragment() {
             }
         }
 
+        addRecordingPeriodTextView.setOnClickListener {
+            recordingPeriod.add("")
+        }
+    }
+
+    private fun setNextOnClick() {
         nextButton.setOnClickListener {
             if (arguments?.containsKey(DEVICE_ID) == true && arguments?.containsKey(
                     ConfigureActivity.STREAM_NAME
@@ -148,6 +172,8 @@ class ConfigureFragment : Fragment() {
     }
 
     private fun setSleepDurationLayout() {
+        sleepDurationValueTextView.text = getString(R.string.second, "0")
+
         sleepDurationLayout.setOnClickListener {
             setAlertDialog(
                 getString(R.string.enter_sleep_duration),
@@ -158,6 +184,8 @@ class ConfigureFragment : Fragment() {
     }
 
     private fun setRecordingDurationLayout() {
+        recordingDurationValueTextView.text = getString(R.string.second, "0")
+
         recordingDurationLayout.setOnClickListener {
             setAlertDialog(
                 getString(R.string.enter_recording_duration),
@@ -222,6 +250,11 @@ class ConfigureFragment : Fragment() {
         ).show()
     }
 
+    override fun onItemClick(position: Int) {
+        recordingPeriod.removeAt(position)
+        recordingPeriodAdapter.items = recordingPeriod
+    }
+
     companion object {
         fun newInstance(deviceId: String, streamName: String): ConfigureFragment {
             return ConfigureFragment().apply {
@@ -232,4 +265,8 @@ class ConfigureFragment : Fragment() {
             }
         }
     }
+}
+
+interface OnItemClickListener {
+    fun onItemClick(position: Int)
 }
