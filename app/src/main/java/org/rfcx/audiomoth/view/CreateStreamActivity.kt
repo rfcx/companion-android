@@ -200,7 +200,9 @@ class CreateStreamActivity : AppCompatActivity() {
             "sampleRateKiloHertz" to 8,
             "gain" to 3,
             "sleepDurationSecond" to 0,
-            "recordingDurationSecond" to 0
+            "recordingDurationSecond" to 0,
+            "customRecordingPeriod" to false,
+            "recordingPeriodList" to listOf("")
         )
 
         docRef.collection("streams").document(nameStream)

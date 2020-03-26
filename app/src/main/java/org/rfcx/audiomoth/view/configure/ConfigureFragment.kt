@@ -41,6 +41,7 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
     @SuppressLint("SimpleDateFormat")
     private var endPeriod = Calendar.getInstance()
     private var recordingPeriod = ArrayList<String>()
+    private var customRecordingPeriod = false
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -92,6 +93,7 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
         }
 
         customRecordingPeriodSwitch.setOnCheckedChangeListener { _, isChecked ->
+            customRecordingPeriod = isChecked
             if (isChecked) {
                 addRecordingPeriodGroupView.visibility = View.VISIBLE
                 alwaysRecordingTextView.visibility = View.GONE
@@ -137,7 +139,9 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
                     "sampleRateKiloHertz" to sampleRate,
                     "gain" to gain,
                     "sleepDurationSecond" to sleepDuration,
-                    "recordingDurationSecond" to recordingDuration
+                    "recordingDurationSecond" to recordingDuration,
+                    "customRecordingPeriod" to customRecordingPeriod,
+                    "recordingPeriodList" to recordingPeriod
                 )
             )
     }
