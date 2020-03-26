@@ -30,12 +30,16 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
     lateinit var listener: ConfigureListener
     private val sampleRateList = arrayOf("8", "16", "32", "48", "96", "192", "256", "384")
     private val gainList = arrayOf("1 - Lowest", "2 - Low", "3 - Medium", "4 - High", "5 - Highest")
-    val calendar = Calendar.getInstance()
 
     private var gain = 0
     private var sampleRate = 0
     private var sleepDuration = 0
     private var recordingDuration = 0
+
+    @SuppressLint("SimpleDateFormat")
+    private var startPeriod = Calendar.getInstance()
+    @SuppressLint("SimpleDateFormat")
+    private var endPeriod = Calendar.getInstance()
     private var recordingPeriod = ArrayList<String>()
 
     override fun onAttach(context: Context) {
@@ -76,15 +80,15 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
     @SuppressLint("SimpleDateFormat")
     private fun setCustomRecordingPeriod() {
         addRecordingPeriodTextView.text = getString(R.string.add_recording_period).toUpperCase()
-        startPeriodTextView.text = SimpleDateFormat("HH:mm").format(calendar.time)
-        endPeriodTextView.text = SimpleDateFormat("HH:mm").format(calendar.time)
+        startPeriodTextView.text = SimpleDateFormat("HH:mm").format(startPeriod.time)
+        endPeriodTextView.text = SimpleDateFormat("HH:mm").format(endPeriod.time)
 
         startPeriodLayout.setOnClickListener {
-            setStartPeriod(startPeriodTextView)
+            setTimePickerDialog(startPeriodTextView, startPeriod, true)
         }
 
         endPeriodLayout.setOnClickListener {
-            setStartPeriod(endPeriodTextView)
+            setTimePickerDialog(endPeriodTextView, endPeriod, false)
         }
 
         customRecordingPeriodSwitch.setOnCheckedChangeListener { _, isChecked ->
@@ -98,7 +102,12 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
         }
 
         addRecordingPeriodTextView.setOnClickListener {
-            recordingPeriod.add("")
+            recordingPeriod.add(
+                "${SimpleDateFormat("HH:mm").format(startPeriod.time)} - ${SimpleDateFormat(
+                    "HH:mm"
+                ).format(endPeriod.time)}"
+            )
+            recordingPeriodAdapter.items = recordingPeriod
         }
     }
 
@@ -224,30 +233,45 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
             alertDialog.show()
 
             val buttonNeutral = alertDialog.getButton(DialogInterface.BUTTON_NEUTRAL)
-            context?.let { it1 -> ContextCompat.getColor(it1, R.color.text_secondary) }
-                ?.let { it2 ->
-                    buttonNeutral.setTextColor(
-                        it2
-                    )
-                }
+            context?.let { ContextCompat.getColor(it, R.color.text_secondary) }?.let {
+                buttonNeutral.setTextColor(
+                    it
+                )
+            }
         }
     }
 
     @SuppressLint("SimpleDateFormat")
-    private fun setStartPeriod(textView: TextView) {
-        val cal = Calendar.getInstance()
+    private fun setTimePickerDialog(
+        textView: TextView,
+        calendarBefore: Calendar,
+        isStartPeriod: Boolean
+    ) {
         val timeSetListener = TimePickerDialog.OnTimeSetListener { _, hour, minute ->
-            cal.set(Calendar.HOUR_OF_DAY, hour)
-            cal.set(Calendar.MINUTE, minute)
-            textView.text = SimpleDateFormat("HH:mm").format(cal.time)
+            calendarBefore.set(Calendar.HOUR_OF_DAY, hour)
+            calendarBefore.set(Calendar.MINUTE, minute)
+            textView.text = SimpleDateFormat("HH:mm").format(calendarBefore.time)
+            if (isStartPeriod) {
+                startPeriod = calendarBefore
+            } else {
+                endPeriod = calendarBefore
+            }
         }
-        TimePickerDialog(
+        val timePickerDialog = TimePickerDialog(
             context,
             timeSetListener,
-            cal.get(Calendar.HOUR_OF_DAY),
-            cal.get(Calendar.MINUTE),
+            calendarBefore.get(Calendar.HOUR_OF_DAY),
+            calendarBefore.get(Calendar.MINUTE),
             true
-        ).show()
+        )
+        timePickerDialog.show()
+
+        val buttonNeutral = timePickerDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
+        context?.let { ContextCompat.getColor(it, R.color.text_secondary) }?.let {
+            buttonNeutral.setTextColor(
+                it
+            )
+        }
     }
 
     override fun onItemClick(position: Int) {
