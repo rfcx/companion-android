@@ -6,13 +6,22 @@
     android:layout_height="match_parent"
     tools:context=".view.dashboard.DashboardStreamActivity">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        style="@style/AudioMothText.Body.Headline"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?android:actionBarSize"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:title="@string/dashboard"
+        app:titleTextColor="@color/text_black" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/streamsRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/dashboard"
-        android:gravity="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

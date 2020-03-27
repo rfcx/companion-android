@@ -2,8 +2,8 @@ package org.rfcx.audiomoth.view.configure
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_configure.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
@@ -36,11 +36,14 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
     }
 
     override fun openVerifySync() {
-        supportFragmentManager.beginTransaction()
-            .replace(
-                configureContainer.id, VerifySyncFragment(),
-                "VerifySyncFragment"
-            ).commit()
+        if (intent.hasExtra(DEVICE_ID)) {
+            val deviceId = intent.getStringExtra(DEVICE_ID)
+            supportFragmentManager.beginTransaction()
+                .replace(
+                    configureContainer.id, VerifySyncFragment.newInstance(deviceId),
+                    "VerifySyncFragment"
+                ).commit()
+        }
     }
 
     companion object {

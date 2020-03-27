@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_verify_sync.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.view.CreateStreamActivity
 import org.rfcx.audiomoth.view.dashboard.DashboardStreamActivity
 
 class VerifySyncFragment : Fragment() {
@@ -30,11 +31,27 @@ class VerifySyncFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         greenButton.setOnClickListener {
-            context?.let { it1 -> DashboardStreamActivity.startActivity(it1) }
+            if (arguments?.containsKey(CreateStreamActivity.DEVICE_ID) == true) {
+                arguments?.let {
+                    val deviceId = it.getString(CreateStreamActivity.DEVICE_ID)
+                    if (deviceId != null) {
+                        context?.let { it1 -> DashboardStreamActivity.startActivity(it1, deviceId) }
+                    }
+                }
+            }
         }
 
         redButton.setOnClickListener {
             listener.openSync()
+        }
+    }
+    companion object {
+        fun newInstance(deviceId: String): VerifySyncFragment {
+            return VerifySyncFragment().apply {
+                arguments = Bundle().apply {
+                    putString(CreateStreamActivity.DEVICE_ID, deviceId)
+                }
+            }
         }
     }
 }
