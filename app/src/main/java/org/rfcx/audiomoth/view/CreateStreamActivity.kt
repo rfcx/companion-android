@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_create_stream.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.Stream
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.view.configure.ConfigureActivity
 import java.sql.Timestamp
@@ -194,6 +195,7 @@ class CreateStreamActivity : AppCompatActivity() {
     }
 
     private fun saveStream(deviceId: String) {
+        val stream = Stream(3, 8, false, 0, 0, arrayListOf())
         val docRef = Firestore().db.collection(DEVICES).document(deviceId)
         val docData = hashMapOf(
             "createdAt" to Timestamp(System.currentTimeMillis()).toString(),
@@ -208,7 +210,7 @@ class CreateStreamActivity : AppCompatActivity() {
         docRef.collection("streams").document(nameStream)
             .set(docData)
             .addOnCompleteListener {
-                ConfigureActivity.startActivity(this, deviceId, nameStream)
+                ConfigureActivity.startActivity(this, deviceId, nameStream, stream)
                 finish()
             }
     }

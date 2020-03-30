@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_configure.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.Stream
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
 
 class ConfigureActivity : AppCompatActivity(), ConfigureListener {
@@ -14,13 +15,15 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_configure)
 
-        if (intent.hasExtra(DEVICE_ID) && intent.hasExtra(STREAM_NAME)) {
+        if (intent.hasExtra(DEVICE_ID) && intent.hasExtra(STREAM_NAME) && intent.hasExtra(STREAM)) {
             val deviceId = intent.getStringExtra(DEVICE_ID)
             val streamName = intent.getStringExtra(STREAM_NAME)
-            if (deviceId != null && streamName != null) {
+            val stream = intent.getSerializableExtra(STREAM) as? Stream
+            if (deviceId != null && streamName != null && stream !== null) {
                 supportFragmentManager.beginTransaction()
                     .add(
-                        configureContainer.id, ConfigureFragment.newInstance(deviceId, streamName),
+                        configureContainer.id,
+                        ConfigureFragment.newInstance(deviceId, streamName, stream),
                         "ConfigureFragment"
                     ).commit()
             }
@@ -38,21 +41,25 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
     override fun openVerifySync() {
         if (intent.hasExtra(DEVICE_ID)) {
             val deviceId = intent.getStringExtra(DEVICE_ID)
-            supportFragmentManager.beginTransaction()
-                .replace(
-                    configureContainer.id, VerifySyncFragment.newInstance(deviceId),
-                    "VerifySyncFragment"
-                ).commit()
+            if (deviceId != null) {
+                supportFragmentManager.beginTransaction()
+                    .replace(
+                        configureContainer.id, VerifySyncFragment.newInstance(deviceId),
+                        "VerifySyncFragment"
+                    ).commit()
+            }
         }
     }
 
     companion object {
         const val STREAM_NAME = "STREAM_NAME"
+        const val STREAM = "STREAM"
 
-        fun startActivity(context: Context, deviceId: String, streamName: String) {
+        fun startActivity(context: Context, deviceId: String, streamName: String, stream: Stream) {
             val intent = Intent(context, ConfigureActivity::class.java)
             intent.putExtra(DEVICE_ID, deviceId)
             intent.putExtra(STREAM_NAME, streamName)
+            intent.putExtra(STREAM, stream)
             context.startActivity(intent)
         }
     }

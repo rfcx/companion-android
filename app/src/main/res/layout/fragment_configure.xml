@@ -58,7 +58,6 @@
                     android:paddingStart="@dimen/margin_padding_normal"
                     android:paddingEnd="@dimen/margin_padding_normal"
                     android:paddingBottom="@dimen/margin_padding_small"
-                    android:text="8 kHz (default)"
                     tools:text="8kHz (default)" />
 
                 <View
@@ -97,7 +96,6 @@
                     android:paddingStart="@dimen/margin_padding_normal"
                     android:paddingEnd="@dimen/margin_padding_normal"
                     android:paddingBottom="@dimen/margin_padding_small"
-                    android:text="3 - Medium (default)"
                     tools:text="3 (default)" />
 
                 <View

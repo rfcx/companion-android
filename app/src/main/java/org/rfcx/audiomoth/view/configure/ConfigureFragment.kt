@@ -17,31 +17,31 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.alert_duration_layout.view.*
 import kotlinx.android.synthetic.main.fragment_configure.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.Stream
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
-class ConfigureFragment : Fragment(), OnItemClickListener {
+class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
 
     private val recordingPeriodAdapter by lazy { RecordingPeriodAdapter(this) }
     lateinit var listener: ConfigureListener
     private val sampleRateList = arrayOf("8", "16", "32", "48", "96", "192", "256", "384")
     private val gainList = arrayOf("1 - Lowest", "2 - Low", "3 - Medium", "4 - High", "5 - Highest")
 
-    private var gain = 0
-    private var sampleRate = 0
-    private var sleepDuration = 0
-    private var recordingDuration = 0
+    private var gain = stream.gain
+    private var sampleRate = stream.sampleRate
+    private var sleepDuration = stream.sleepDuration
+    private var recordingDuration = stream.recordingDuration
 
     @SuppressLint("SimpleDateFormat")
     private var startPeriod = Calendar.getInstance()
     @SuppressLint("SimpleDateFormat")
     private var endPeriod = Calendar.getInstance()
-    private var recordingPeriod = ArrayList<String>()
-    private var customRecordingPeriod = false
+    private var recordingPeriod = stream.recordingPeriodList
+    private var customRecordingPeriod = stream.customRecordingPeriod
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -83,6 +83,8 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
         addRecordingPeriodTextView.text = getString(R.string.add_recording_period).toUpperCase()
         startPeriodTextView.text = SimpleDateFormat("HH:mm").format(startPeriod.time)
         endPeriodTextView.text = SimpleDateFormat("HH:mm").format(endPeriod.time)
+        customRecordingPeriodSwitch.isChecked = customRecordingPeriod
+        isChecked(customRecordingPeriod)
 
         startPeriodLayout.setOnClickListener {
             setTimePickerDialog(startPeriodTextView, startPeriod, true)
@@ -91,16 +93,9 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
         endPeriodLayout.setOnClickListener {
             setTimePickerDialog(endPeriodTextView, endPeriod, false)
         }
-
         customRecordingPeriodSwitch.setOnCheckedChangeListener { _, isChecked ->
             customRecordingPeriod = isChecked
-            if (isChecked) {
-                addRecordingPeriodGroupView.visibility = View.VISIBLE
-                alwaysRecordingTextView.visibility = View.GONE
-            } else {
-                addRecordingPeriodGroupView.visibility = View.GONE
-                alwaysRecordingTextView.visibility = View.VISIBLE
-            }
+            isChecked(isChecked)
         }
 
         addRecordingPeriodTextView.setOnClickListener {
@@ -110,6 +105,16 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
                 ).format(endPeriod.time)}"
             )
             recordingPeriodAdapter.items = recordingPeriod
+        }
+    }
+
+    private fun isChecked(isChecked: Boolean) {
+        if (isChecked) {
+            addRecordingPeriodGroupView.visibility = View.VISIBLE
+            alwaysRecordingTextView.visibility = View.GONE
+        } else {
+            addRecordingPeriodGroupView.visibility = View.GONE
+            alwaysRecordingTextView.visibility = View.VISIBLE
         }
     }
 
@@ -147,6 +152,7 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
     }
 
     private fun setSampleRateLayout() {
+        sampleRateValueTextView.text = getString(R.string.kilohertz, sampleRate.toString())
         sampleRateLayout.setOnClickListener {
             val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
             if (builder != null) {
@@ -167,6 +173,8 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
     }
 
     private fun setGainLayout() {
+        gainValueTextView.text = gainList[gain - 1]
+
         gainLayout.setOnClickListener {
             val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
             if (builder != null) {
@@ -185,7 +193,7 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
     }
 
     private fun setSleepDurationLayout() {
-        sleepDurationValueTextView.text = getString(R.string.second, "0")
+        sleepDurationValueTextView.text = getString(R.string.second, sleepDuration.toString())
 
         sleepDurationLayout.setOnClickListener {
             setAlertDialog(
@@ -197,7 +205,8 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
     }
 
     private fun setRecordingDurationLayout() {
-        recordingDurationValueTextView.text = getString(R.string.second, "0")
+        recordingDurationValueTextView.text =
+            getString(R.string.second, recordingDuration.toString())
 
         recordingDurationLayout.setOnClickListener {
             setAlertDialog(
@@ -284,8 +293,8 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
     }
 
     companion object {
-        fun newInstance(deviceId: String, streamName: String): ConfigureFragment {
-            return ConfigureFragment().apply {
+        fun newInstance(deviceId: String, streamName: String, streams: Stream): ConfigureFragment {
+            return ConfigureFragment(streams).apply {
                 arguments = Bundle().apply {
                     putString(DEVICE_ID, deviceId)
                     putString(ConfigureActivity.STREAM_NAME, streamName)
