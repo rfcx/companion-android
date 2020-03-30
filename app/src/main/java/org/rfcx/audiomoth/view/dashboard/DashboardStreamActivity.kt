@@ -8,12 +8,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.Stream
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.view.CreateStreamActivity
+import org.rfcx.audiomoth.view.configure.ConfigureActivity
 
 class DashboardStreamActivity : AppCompatActivity() {
     private val dashboardStreamAdapter by lazy { DashboardStreamAdapter() }
     private var streams = ArrayList<String>()
+    var currentDeviceId = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,6 +25,7 @@ class DashboardStreamActivity : AppCompatActivity() {
         if (intent.hasExtra(CreateStreamActivity.DEVICE_ID)) {
             val deviceId = intent.getStringExtra(CreateStreamActivity.DEVICE_ID)
             if (deviceId != null) {
+                currentDeviceId = deviceId
                 val docRef =
                     Firestore().db.collection(CreateStreamActivity.DEVICES).document(deviceId)
                 docRef.collection("streams").get()
@@ -49,8 +53,37 @@ class DashboardStreamActivity : AppCompatActivity() {
         }
 
         dashboardStreamAdapter.onDashboardClick = object : OnDashboardClickListener {
-            override fun onDashboardClick(position: Int) {
-                Log.d("onDashboardClick", "$position")
+            override fun onDashboardClick(streamName: String) {
+                val docRef =
+                    Firestore().db.collection(CreateStreamActivity.DEVICES)
+                        .document(currentDeviceId)
+                docRef.collection("streams").document(streamName).get()
+                    .addOnSuccessListener { document ->
+                        if (document != null) {
+                            val data = document.data
+                            if (data != null) {
+                                val stream = Stream(
+                                    data["gain"].toString().toInt(),
+                                    data["sampleRateKiloHertz"].toString().toInt(),
+                                    data["customRecordingPeriod"] as Boolean,
+                                    data["recordingDurationSecond"].toString().toInt(),
+                                    data["sleepDurationSecond"].toString().toInt(),
+                                    data["recordingPeriodList"] as ArrayList<String>
+                                )
+                                ConfigureActivity.startActivity(
+                                    this@DashboardStreamActivity,
+                                    currentDeviceId,
+                                    streamName,
+                                    stream
+                                )
+                            }
+                        } else {
+                            Log.d(TAG, "No such document")
+                        }
+                    }
+                    .addOnFailureListener { exception ->
+                        Log.d(TAG, "get failed with ", exception)
+                    }
             }
         }
     }
@@ -67,5 +100,5 @@ class DashboardStreamActivity : AppCompatActivity() {
 }
 
 interface OnDashboardClickListener {
-    fun onDashboardClick(position: Int)
+    fun onDashboardClick(streamName: String)
 }

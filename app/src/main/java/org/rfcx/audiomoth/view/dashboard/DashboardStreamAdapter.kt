@@ -27,7 +27,7 @@ class DashboardStreamAdapter :
         val item = items[position]
         holder.bind(item)
         holder.itemView.setOnClickListener {
-            onDashboardClick?.onDashboardClick(position)
+            onDashboardClick?.onDashboardClick(item)
         }
     }
 
