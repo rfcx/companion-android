@@ -47,6 +47,6 @@
     <string name="none">None</string>
 
     <!--    DashboardStreamActivity-->
-    <string name="dashboard">Dashboard Stream Page</string>
+    <string name="dashboard">Dashboard</string>
 
 </resources>

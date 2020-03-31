@@ -49,14 +49,14 @@ open class MainActivity : AppCompatActivity() {
                 dialog.dismiss()
             }
 
-            builder.setNeutralButton(getString(R.string.cancel)) { dialog, _ ->
+            builder.setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
                 dialog.dismiss()
             }
 
             val alertDialog = builder.create()
             alertDialog.show()
 
-            val buttonNeutral = alertDialog.getButton(DialogInterface.BUTTON_NEUTRAL)
+            val buttonNeutral = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
             buttonNeutral.setTextColor(ContextCompat.getColor(this, R.color.text_secondary))
         }
     }
