@@ -27,7 +27,7 @@ import java.util.*
 class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
 
     private val recordingPeriodAdapter by lazy { RecordingPeriodAdapter(this) }
-    lateinit var listener: ConfigureListener
+    private lateinit var listener: ConfigureListener
     private val sampleRateList = arrayOf("8", "16", "32", "48", "96", "192", "256", "384")
     private val gainList = arrayOf("1 - Lowest", "2 - Low", "3 - Medium", "4 - High", "5 - Highest")
 
@@ -93,6 +93,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         endPeriodLayout.setOnClickListener {
             setTimePickerDialog(endPeriodTextView, endPeriod, false)
         }
+
         customRecordingPeriodSwitch.setOnCheckedChangeListener { _, isChecked ->
             customRecordingPeriod = isChecked
             isChecked(isChecked)
@@ -238,14 +239,14 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
                 dialog.dismiss()
             }
 
-            builder.setNeutralButton(getString(R.string.cancel)) { dialog, _ ->
+            builder.setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
                 dialog.dismiss()
             }
 
             val alertDialog = builder.create()
             alertDialog.show()
 
-            val buttonNeutral = alertDialog.getButton(DialogInterface.BUTTON_NEUTRAL)
+            val buttonNeutral = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
             context?.let { ContextCompat.getColor(it, R.color.text_secondary) }?.let {
                 buttonNeutral.setTextColor(
                     it
