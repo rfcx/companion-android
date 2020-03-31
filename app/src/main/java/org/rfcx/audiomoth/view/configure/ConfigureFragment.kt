@@ -19,9 +19,10 @@ import kotlinx.android.synthetic.main.fragment_configure.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Stream
 import org.rfcx.audiomoth.util.Firestore
+import org.rfcx.audiomoth.util.getCalendar
+import org.rfcx.audiomoth.util.toTimeString
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
-import java.text.SimpleDateFormat
 import java.util.*
 
 class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
@@ -36,10 +37,8 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
     private var sleepDuration = stream.sleepDuration
     private var recordingDuration = stream.recordingDuration
 
-    @SuppressLint("SimpleDateFormat")
-    private var startPeriod = Calendar.getInstance()
-    @SuppressLint("SimpleDateFormat")
-    private var endPeriod = Calendar.getInstance()
+    private var startPeriod = getCalendar()
+    private var endPeriod = getCalendar()
     private var recordingPeriod = stream.recordingPeriodList
     private var customRecordingPeriod = stream.customRecordingPeriod
 
@@ -78,11 +77,10 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         recordingPeriodAdapter.items = recordingPeriod
     }
 
-    @SuppressLint("SimpleDateFormat")
     private fun setCustomRecordingPeriod() {
         addRecordingPeriodTextView.text = getString(R.string.add_recording_period).toUpperCase()
-        startPeriodTextView.text = SimpleDateFormat("HH:mm").format(startPeriod.time)
-        endPeriodTextView.text = SimpleDateFormat("HH:mm").format(endPeriod.time)
+        startPeriodTextView.text = startPeriod.toTimeString()
+        endPeriodTextView.text = endPeriod.toTimeString()
         customRecordingPeriodSwitch.isChecked = customRecordingPeriod
         isChecked(customRecordingPeriod)
 
@@ -101,9 +99,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
 
         addRecordingPeriodTextView.setOnClickListener {
             recordingPeriod.add(
-                "${SimpleDateFormat("HH:mm").format(startPeriod.time)} - ${SimpleDateFormat(
-                    "HH:mm"
-                ).format(endPeriod.time)}"
+                "${startPeriod.toTimeString()} - ${endPeriod.toTimeString()}"
             )
             recordingPeriodAdapter.items = recordingPeriod
         }
@@ -255,7 +251,6 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         }
     }
 
-    @SuppressLint("SimpleDateFormat")
     private fun setTimePickerDialog(
         textView: TextView,
         calendarBefore: Calendar,
@@ -264,7 +259,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         val timeSetListener = TimePickerDialog.OnTimeSetListener { _, hour, minute ->
             calendarBefore.set(Calendar.HOUR_OF_DAY, hour)
             calendarBefore.set(Calendar.MINUTE, minute)
-            textView.text = SimpleDateFormat("HH:mm").format(calendarBefore.time)
+            textView.text = calendarBefore.toTimeString()
             if (isStartPeriod) {
                 startPeriod = calendarBefore
             } else {
