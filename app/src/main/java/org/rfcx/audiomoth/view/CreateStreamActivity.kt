@@ -17,6 +17,7 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Stream
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.view.configure.ConfigureActivity
+import org.rfcx.audiomoth.view.configure.ConfigureFragment
 import java.sql.Timestamp
 import java.util.*
 
@@ -195,7 +196,7 @@ class CreateStreamActivity : AppCompatActivity() {
     }
 
     private fun saveStream(deviceId: String) {
-        val stream = Stream(3, 8, false, 0, 0, arrayListOf())
+        val stream = Stream(3, 8, false, 0, 0, arrayListOf(), ConfigureFragment.RECOMMENDED)
         val docRef = Firestore().db.collection(DEVICES).document(deviceId)
         val docData = hashMapOf(
             "createdAt" to Timestamp(System.currentTimeMillis()).toString(),
@@ -204,7 +205,8 @@ class CreateStreamActivity : AppCompatActivity() {
             "sleepDurationSecond" to 0,
             "recordingDurationSecond" to 0,
             "customRecordingPeriod" to false,
-            "recordingPeriodList" to listOf("")
+            "recordingPeriodList" to listOf(""),
+            "durationSelected" to ConfigureFragment.RECOMMENDED
         )
 
         docRef.collection("streams").document(nameStream)

@@ -44,7 +44,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
     private var endPeriod = getCalendar()
     private var recordingPeriod = stream.recordingPeriodList
     private var customRecordingPeriod = stream.customRecordingPeriod
-    private var durationSelected = ""
+    private var durationSelected = stream.durationSelected
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -70,7 +70,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         setCustomRecordingPeriod()
         setRecordingDurationLayout()
         setCustomRecordingPeriodRecyclerView()
-        itemSelected(RECOMMENDED)
+        itemSelected(durationSelected)
     }
 
     private fun setSiteSpinner() {
@@ -83,6 +83,9 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
                 )
             }
         durationSpinner.adapter = arrayAdapter
+        if (arrayAdapter != null) {
+            durationSpinner.setSelection(arrayAdapter.getPosition(durationSelected))
+        }
 
         durationSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
@@ -234,7 +237,8 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
                     "sleepDurationSecond" to sleepDuration,
                     "recordingDurationSecond" to recordingDuration,
                     "customRecordingPeriod" to customRecordingPeriod,
-                    "recordingPeriodList" to recordingPeriod
+                    "recordingPeriodList" to recordingPeriod,
+                    "durationSelected" to durationSelected
                 )
             )
     }

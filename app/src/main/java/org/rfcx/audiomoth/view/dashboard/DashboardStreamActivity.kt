@@ -68,7 +68,8 @@ class DashboardStreamActivity : AppCompatActivity() {
                                     data["customRecordingPeriod"] as Boolean,
                                     data["recordingDurationSecond"].toString().toInt(),
                                     data["sleepDurationSecond"].toString().toInt(),
-                                    data["recordingPeriodList"] as ArrayList<String>
+                                    data["recordingPeriodList"] as ArrayList<String>,
+                                    data["durationSelected"].toString()
                                 )
                                 ConfigureActivity.startActivity(
                                     this@DashboardStreamActivity,

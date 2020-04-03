@@ -9,5 +9,6 @@ open class Stream(
     val customRecordingPeriod: Boolean,
     val recordingDuration: Int,
     val sleepDuration: Int,
-    val recordingPeriodList: ArrayList<String>
+    val recordingPeriodList: ArrayList<String>,
+    val durationSelected: String
 ): Serializable
