@@ -8,8 +8,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -21,7 +19,6 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Stream
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.util.getCalendar
-import org.rfcx.audiomoth.util.getIntColor
 import org.rfcx.audiomoth.util.toTimeString
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
@@ -33,7 +30,6 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
     private lateinit var listener: ConfigureListener
     private val sampleRateList = arrayOf("8", "16", "32", "48", "96", "192", "256", "384")
     private val gainList = arrayOf("1 - Lowest", "2 - Low", "3 - Medium", "4 - High", "5 - Highest")
-    private val duration = arrayOf(RECOMMENDED, CONTINUOUS, CUSTOM)
 
     private var gain = stream.gain
     private var sampleRate = stream.sampleRate
@@ -64,102 +60,83 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
 
         setGainLayout()
         setNextOnClick()
-        setSiteSpinner()
         setSampleRateLayout()
         setSleepDurationLayout()
         setCustomRecordingPeriod()
         setRecordingDurationLayout()
         setCustomRecordingPeriodRecyclerView()
         itemSelected(durationSelected)
-    }
 
-    private fun setSiteSpinner() {
-        val arrayAdapter =
-            context?.let {
-                ArrayAdapter(
-                    it,
-                    R.layout.support_simple_spinner_dropdown_item,
-                    duration
-                )
-            }
-        durationSpinner.adapter = arrayAdapter
-        if (arrayAdapter != null) {
-            durationSpinner.setSelection(arrayAdapter.getPosition(durationSelected))
+        recommendedButton.setOnClickListener {
+            itemSelected(RECOMMENDED)
         }
 
-        durationSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                durationSelected = duration[position]
-                itemSelected(durationSelected)
-            }
+        continuousButton.setOnClickListener {
+            itemSelected(CONTINUOUS)
+        }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-            }
+        customButton.setOnClickListener {
+            itemSelected(CUSTOM)
         }
     }
 
-    fun itemSelected(item: String) {
+    private fun itemSelected(item: String) {
         when (item) {
-            RECOMMENDED -> context.let {
-                if (it != null) {
-                    setDuration(
-                        false,
-                        it.getIntColor(R.color.dark_gray),
-                        it.getIntColor(R.color.dark_gray),
-                        getString(R.string.second, "10"),
-                        getString(R.string.second, "30")
-                    )
-                }
-                sleepDuration = 10
-                recordingDuration = 30
+            RECOMMENDED -> {
+                setDuration(
+                    durationSelectVisibility = true,
+                    durationLayout = false,
+                    durationSelectText = getString(R.string.duration_select, 10, 30),
+                    duration = RECOMMENDED
+                )
+                durationSelected = RECOMMENDED
             }
-            CONTINUOUS -> context.let {
-                if (it != null) {
-                    setDuration(
-                        false,
-                        it.getIntColor(R.color.dark_gray),
-                        it.getIntColor(R.color.dark_gray),
-                        getString(R.string.second, "0"),
-                        getString(R.string.continuous)
-                    )
-                }
-                sleepDuration = 0
-                recordingDuration = 0
+            CONTINUOUS -> {
+                setDuration(
+                    durationSelectVisibility = true,
+                    durationLayout = false,
+                    durationSelectText = getString(R.string.always_recording),
+                    duration = CONTINUOUS
+                )
+                durationSelected = CONTINUOUS
             }
-            CUSTOM -> context.let {
-                if (it != null) {
-                    setDuration(
-                        true,
-                        it.getIntColor(R.color.text_black),
-                        it.getIntColor(R.color.text_secondary),
-                        getString(R.string.second, sleepDuration.toString()),
-                        getString(R.string.second, recordingDuration.toString())
-                    )
-                }
+            CUSTOM -> {
+                setDuration(
+                    durationSelectVisibility = false,
+                    durationLayout = true,
+                    durationSelectText = getString(R.string.always_recording),
+                    duration = CUSTOM
+                )
+                recordingDurationValueTextView.text =
+                    getString(R.string.second, recordingDuration.toString())
+                sleepDurationValueTextView.text =
+                    getString(R.string.second, sleepDuration.toString())
+                durationSelected = CUSTOM
             }
         }
     }
 
     private fun setDuration(
-        enabled: Boolean,
-        durationColor: Int,
-        durationValueColor: Int,
-        sleep: String,
-        recording: String
+        durationSelectVisibility: Boolean,
+        durationLayout: Boolean,
+        durationSelectText: String,
+        duration: String
     ) {
-        sleepDurationLayout.isEnabled = enabled
-        recordingDurationLayout.isEnabled = enabled
-        sleepDurationTextView.setTextColor(durationColor)
-        sleepDurationValueTextView.text = sleep
-        sleepDurationValueTextView.setTextColor(durationValueColor)
-        recordingDurationTextView.setTextColor(durationColor)
-        recordingDurationValueTextView.text = recording
-        recordingDurationValueTextView.setTextColor(durationValueColor)
+        durationSelectTextView.visibility = if (durationSelectVisibility) {
+            View.VISIBLE
+        } else View.GONE
+        durationSelectTextView.text = durationSelectText
+
+        sleepDurationLayout.visibility = if (durationLayout) {
+            View.VISIBLE
+        } else View.GONE
+        recordingDurationLayout.visibility = if (durationLayout) {
+            View.VISIBLE
+        } else View.GONE
+
+        continuousButton.isChecked = duration == CONTINUOUS
+        recommendedButton.isChecked = duration == RECOMMENDED
+        customButton.isChecked = duration == CUSTOM
     }
 
     private fun setCustomRecordingPeriodRecyclerView() {
@@ -380,8 +357,8 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
 
     companion object {
         const val RECOMMENDED = "Recommended"
-        const val CONTINUOUS = "Continuous duration"
-        const val CUSTOM = "Custom duration"
+        const val CONTINUOUS = "Continuous"
+        const val CUSTOM = "Custom"
 
         fun newInstance(deviceId: String, streamName: String, streams: Stream): ConfigureFragment {
             return ConfigureFragment(streams).apply {

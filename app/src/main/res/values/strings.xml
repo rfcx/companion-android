@@ -28,7 +28,7 @@
     <string name="choose_gain">Choose gain</string>
     <string name="kilohertz">%s kHz</string>
     <string name="second">%s second</string>
-    <string name="continuous">continuous</string>
+    <string name="continuous">Continuous</string>
     <string name="enter_sleep_duration">Enter sleep duration (second)</string>
     <string name="enter_recording_duration">Enter recording duration (second)</string>
     <string name="next">Next</string>
@@ -37,6 +37,9 @@
     <string name="start_period">Start recording:</string>
     <string name="end_period">End recording:</string>
     <string name="always_recording">Always recording</string>
+    <string name="recommended">Recommended</string>
+    <string name="custom">Custom</string>
+    <string name="duration_select">"Sleep duration %1d second and recording duration %2d second"</string>
 
     <!--    SyncFragment-->
     <string name="sync">Sync</string>
