@@ -8,6 +8,7 @@ import kotlinx.android.synthetic.main.activity_configure.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Stream
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
+import org.rfcx.audiomoth.view.configure.ConfigureFragment.Companion.CREATE_STREAM
 
 class ConfigureActivity : AppCompatActivity(), ConfigureListener {
 
@@ -19,11 +20,12 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
             val deviceId = intent.getStringExtra(DEVICE_ID)
             val streamName = intent.getStringExtra(STREAM_NAME)
             val stream = intent.getSerializableExtra(STREAM) as? Stream
-            if (deviceId != null && streamName != null && stream !== null) {
+            val from = intent.getStringExtra(FROM)
+            if (deviceId != null && streamName != null && stream !== null && from != null) {
                 supportFragmentManager.beginTransaction()
                     .add(
                         configureContainer.id,
-                        ConfigureFragment.newInstance(deviceId, streamName, stream),
+                        ConfigureFragment.newInstance(deviceId, streamName, stream, from),
                         "ConfigureFragment"
                     ).commit()
             }
@@ -54,12 +56,14 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
     companion object {
         const val STREAM_NAME = "STREAM_NAME"
         const val STREAM = "STREAM"
+        const val FROM = "FROM"
 
-        fun startActivity(context: Context, deviceId: String, streamName: String, stream: Stream) {
+        fun startActivity(context: Context, deviceId: String, streamName: String, stream: Stream, from: String) {
             val intent = Intent(context, ConfigureActivity::class.java)
             intent.putExtra(DEVICE_ID, deviceId)
             intent.putExtra(STREAM_NAME, streamName)
             intent.putExtra(STREAM, stream)
+            intent.putExtra(FROM, from)
             context.startActivity(intent)
         }
     }

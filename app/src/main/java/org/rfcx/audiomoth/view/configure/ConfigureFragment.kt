@@ -13,7 +13,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.alert_duration_layout.view.*
 import kotlinx.android.synthetic.main.fragment_configure.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Stream
@@ -22,6 +21,7 @@ import org.rfcx.audiomoth.util.getCalendar
 import org.rfcx.audiomoth.util.toTimeString
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
+import org.rfcx.audiomoth.view.configure.ConfigureActivity.Companion.FROM
 import java.util.*
 
 class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
@@ -61,82 +61,80 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         setGainLayout()
         setNextOnClick()
         setSampleRateLayout()
-        setSleepDurationLayout()
         setCustomRecordingPeriod()
-        setRecordingDurationLayout()
         setCustomRecordingPeriodRecyclerView()
-        itemSelected(durationSelected)
+        durationSelectedItem(durationSelected)
 
-        recommendedButton.setOnClickListener {
-            itemSelected(RECOMMENDED)
+        if (arguments?.containsKey(FROM) == true) {
+            arguments?.let {
+                val from = it.getString(FROM)
+                if (from != null) {
+                    if (from == DASHBOARD_STREAM) {
+                        sleepDurationEditText.setText(sleepDuration.toString())
+                        recordingDurationEditText.setText(recordingDuration.toString())
+                    }
+                }
+            }
         }
 
-        continuousButton.setOnClickListener {
-            itemSelected(CONTINUOUS)
-        }
-
-        customButton.setOnClickListener {
-            itemSelected(CUSTOM)
+        radioGroup.setOnCheckedChangeListener { _, checkedId ->
+            when (checkedId) {
+                R.id.recommendedRadioButton -> {
+                    durationSelected = RECOMMENDED
+                    durationSelectedItem(RECOMMENDED)
+                }
+                R.id.continuousRadioButton -> {
+                    durationSelected = CONTINUOUS
+                    durationSelectedItem(CONTINUOUS)
+                }
+                R.id.customRadioButton -> {
+                    durationSelected = CUSTOM
+                    durationSelectedItem(CUSTOM)
+                }
+            }
         }
     }
 
-    private fun itemSelected(item: String) {
-        when (item) {
+    private fun durationSelectedItem(selected: String) {
+        when (selected) {
             RECOMMENDED -> {
+                recommendedRadioButton.isChecked = true
                 setDuration(
-                    durationSelectVisibility = true,
-                    durationLayout = false,
-                    durationSelectText = getString(R.string.duration_select, 10, 30),
-                    duration = RECOMMENDED
+                    recommendedText = true,
+                    continuousText = false,
+                    durationTextInput = false
                 )
-                durationSelected = RECOMMENDED
             }
+
             CONTINUOUS -> {
+                continuousRadioButton.isChecked = true
                 setDuration(
-                    durationSelectVisibility = true,
-                    durationLayout = false,
-                    durationSelectText = getString(R.string.always_recording),
-                    duration = CONTINUOUS
+                    recommendedText = false,
+                    continuousText = true,
+                    durationTextInput = false
                 )
-                durationSelected = CONTINUOUS
             }
+
             CUSTOM -> {
+                customRadioButton.isChecked = true
                 setDuration(
-                    durationSelectVisibility = false,
-                    durationLayout = true,
-                    durationSelectText = getString(R.string.always_recording),
-                    duration = CUSTOM
+                    recommendedText = false,
+                    continuousText = false,
+                    durationTextInput = true
                 )
-                recordingDurationValueTextView.text =
-                    getString(R.string.second, recordingDuration.toString())
-                sleepDurationValueTextView.text =
-                    getString(R.string.second, sleepDuration.toString())
-                durationSelected = CUSTOM
             }
         }
     }
 
     private fun setDuration(
-        durationSelectVisibility: Boolean,
-        durationLayout: Boolean,
-        durationSelectText: String,
-        duration: String
+        recommendedText: Boolean,
+        continuousText: Boolean,
+        durationTextInput: Boolean
     ) {
-        durationSelectTextView.visibility = if (durationSelectVisibility) {
-            View.VISIBLE
-        } else View.GONE
-        durationSelectTextView.text = durationSelectText
-
-        sleepDurationLayout.visibility = if (durationLayout) {
-            View.VISIBLE
-        } else View.GONE
-        recordingDurationLayout.visibility = if (durationLayout) {
-            View.VISIBLE
-        } else View.GONE
-
-        continuousButton.isChecked = duration == CONTINUOUS
-        recommendedButton.isChecked = duration == RECOMMENDED
-        customButton.isChecked = duration == CUSTOM
+        recommendedTextView.visibility = if (recommendedText) View.VISIBLE else View.GONE
+        continuousTextView.visibility = if (continuousText) View.VISIBLE else View.GONE
+        recordingDurationTextInput.visibility = if (durationTextInput) View.VISIBLE else View.GONE
+        sleepDurationTextInput.visibility = if (durationTextInput) View.VISIBLE else View.GONE
     }
 
     private fun setCustomRecordingPeriodRecyclerView() {
@@ -188,6 +186,10 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
 
     private fun setNextOnClick() {
         nextButton.setOnClickListener {
+            if (durationSelected == CUSTOM) {
+                recordingDuration = recordingDurationEditText.text.toString().toInt()
+                sleepDuration = sleepDurationEditText.text.toString().toInt()
+            }
             if (arguments?.containsKey(DEVICE_ID) == true && arguments?.containsKey(
                     ConfigureActivity.STREAM_NAME
                 ) == true
@@ -261,63 +263,6 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         }
     }
 
-    private fun setSleepDurationLayout() {
-        sleepDurationLayout.setOnClickListener {
-            setAlertDialog(
-                getString(R.string.enter_sleep_duration),
-                getString(R.string.sleep_duration),
-                sleepDurationValueTextView
-            )
-        }
-    }
-
-    private fun setRecordingDurationLayout() {
-        recordingDurationLayout.setOnClickListener {
-            setAlertDialog(
-                getString(R.string.enter_recording_duration),
-                getString(R.string.recording_duration),
-                recordingDurationValueTextView
-            )
-        }
-    }
-
-    private fun setAlertDialog(title: String, hint: String, textView: TextView) {
-        val view = layoutInflater.inflate(R.layout.alert_duration_layout, null)
-        view.durationTextInput.hint = hint
-        val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
-        if (builder != null) {
-            builder.setTitle(title)
-            builder.setView(view)
-
-            builder.setPositiveButton(getString(R.string.ok)) { dialog, _ ->
-                val duration = view.durationEditText.text.toString().trim()
-                if (duration.isNotEmpty()) {
-                    textView.text = getString(R.string.second, duration)
-                    if (hint == getString(R.string.sleep_duration)) {
-                        sleepDuration = duration.toInt()
-                    } else {
-                        recordingDuration = duration.toInt()
-                    }
-                }
-                dialog.dismiss()
-            }
-
-            builder.setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
-                dialog.dismiss()
-            }
-
-            val alertDialog = builder.create()
-            alertDialog.show()
-
-            val buttonNeutral = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
-            context?.let { ContextCompat.getColor(it, R.color.text_secondary) }?.let {
-                buttonNeutral.setTextColor(
-                    it
-                )
-            }
-        }
-    }
-
     private fun setTimePickerDialog(
         textView: TextView,
         calendarBefore: Calendar,
@@ -359,11 +304,19 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         const val RECOMMENDED = "Recommended"
         const val CONTINUOUS = "Continuous"
         const val CUSTOM = "Custom"
+        const val CREATE_STREAM = "CREATE_STREAM"
+        const val DASHBOARD_STREAM = "DASHBOARD_STREAM"
 
-        fun newInstance(deviceId: String, streamName: String, streams: Stream): ConfigureFragment {
+        fun newInstance(
+            deviceId: String,
+            streamName: String,
+            streams: Stream,
+            from: String
+        ): ConfigureFragment {
             return ConfigureFragment(streams).apply {
                 arguments = Bundle().apply {
                     putString(DEVICE_ID, deviceId)
+                    putString(FROM, from)
                     putString(ConfigureActivity.STREAM_NAME, streamName)
                 }
             }

@@ -18,6 +18,7 @@ import org.rfcx.audiomoth.entity.Stream
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.view.configure.ConfigureActivity
 import org.rfcx.audiomoth.view.configure.ConfigureFragment
+import org.rfcx.audiomoth.view.configure.ConfigureFragment.Companion.CREATE_STREAM
 import java.sql.Timestamp
 import java.util.*
 
@@ -212,7 +213,7 @@ class CreateStreamActivity : AppCompatActivity() {
         docRef.collection("streams").document(nameStream)
             .set(docData)
             .addOnCompleteListener {
-                ConfigureActivity.startActivity(this, deviceId, nameStream, stream)
+                ConfigureActivity.startActivity(this, deviceId, nameStream, stream, CREATE_STREAM)
                 finish()
             }
     }
