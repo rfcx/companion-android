@@ -8,7 +8,6 @@ import kotlinx.android.synthetic.main.activity_configure.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Stream
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
-import org.rfcx.audiomoth.view.configure.ConfigureFragment.Companion.CREATE_STREAM
 
 class ConfigureActivity : AppCompatActivity(), ConfigureListener {
 
@@ -21,7 +20,7 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
             val streamName = intent.getStringExtra(STREAM_NAME)
             val stream = intent.getSerializableExtra(STREAM) as? Stream
             val from = intent.getStringExtra(FROM)
-            if (deviceId != null && streamName != null && stream !== null && from != null) {
+            if (deviceId != null && streamName != null && stream != null && from != null) {
                 supportFragmentManager.beginTransaction()
                     .add(
                         configureContainer.id,
@@ -58,7 +57,13 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
         const val STREAM = "STREAM"
         const val FROM = "FROM"
 
-        fun startActivity(context: Context, deviceId: String, streamName: String, stream: Stream, from: String) {
+        fun startActivity(
+            context: Context,
+            deviceId: String,
+            streamName: String,
+            stream: Stream,
+            from: String
+        ) {
             val intent = Intent(context, ConfigureActivity::class.java)
             intent.putExtra(DEVICE_ID, deviceId)
             intent.putExtra(STREAM_NAME, streamName)
