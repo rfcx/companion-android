@@ -43,7 +43,7 @@
 
                 <TextView
                     android:id="@+id/sampleRateTextView"
-                    style="@style/AudioMothText.Subhead"
+                    style="@style/AudioMothText.Subhead.Bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="@dimen/margin_padding_normal"
@@ -81,7 +81,7 @@
 
                 <TextView
                     android:id="@+id/gainTextView"
-                    style="@style/AudioMothText.Subhead"
+                    style="@style/AudioMothText.Subhead.Bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="@dimen/margin_padding_normal"
@@ -106,84 +106,109 @@
 
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/sleepDurationLayout"
+            <TextView
+                android:id="@+id/durationTextView"
+                style="@style/AudioMothText.Subhead.Bold"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
-                android:orientation="vertical"
-                android:paddingTop="@dimen/margin_padding_normal"
-                app:layout_constraintTop_toBottomOf="@id/gainLayout">
+                android:padding="@dimen/margin_padding_normal"
+                android:text="@string/recording_duration_title"
+                app:layout_constraintTop_toBottomOf="@id/gainLayout" />
 
-                <TextView
-                    android:id="@+id/sleepDurationTextView"
-                    style="@style/AudioMothText.Subhead"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/margin_padding_normal"
-                    android:paddingEnd="@dimen/margin_padding_normal"
-                    android:text="@string/sleep_duration" />
-
-                <TextView
-                    android:id="@+id/sleepDurationValueTextView"
-                    style="@style/AudioMothText.Body.Secondary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/margin_padding_normal"
-                    android:paddingEnd="@dimen/margin_padding_normal"
-                    android:paddingBottom="@dimen/margin_padding_small"
-                    tools:text="0 second" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/recordingDurationLayout"
+            <RadioGroup
+                android:id="@+id/radioGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
-                android:orientation="vertical"
-                app:layout_constraintTop_toBottomOf="@id/sleepDurationLayout">
+                android:paddingStart="@dimen/margin_padding_normal"
+                android:paddingEnd="@dimen/margin_padding_normal"
+                app:layout_constraintTop_toBottomOf="@id/durationTextView">
 
-                <TextView
-                    android:id="@+id/recordingDurationTextView"
-                    style="@style/AudioMothText.Subhead"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/margin_padding_normal"
-                    android:paddingEnd="@dimen/margin_padding_normal"
-                    android:text="@string/recording_duration" />
-
-                <TextView
-                    android:id="@+id/recordingDurationValueTextView"
-                    style="@style/AudioMothText.Body.Secondary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/margin_padding_normal"
-                    android:paddingEnd="@dimen/margin_padding_normal"
-                    android:paddingBottom="@dimen/margin_padding_small"
-                    tools:text="0 second" />
-
-                <View
+                <androidx.appcompat.widget.AppCompatRadioButton
+                    android:id="@+id/recommendedRadioButton"
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="@dimen/margin_padding_small"
-                    android:background="@color/gray_30" />
+                    android:layout_height="wrap_content"
+                    android:text="@string/recommended" />
 
-            </LinearLayout>
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/recommendedTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_padding_xlarge"
+                    android:text="@string/recommended_text"
+                    android:textSize="@dimen/text_small" />
+
+                <androidx.appcompat.widget.AppCompatRadioButton
+                    android:id="@+id/continuousRadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/continuous" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/continuousTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_padding_xlarge"
+                    android:text="@string/always_recording"
+                    android:textSize="@dimen/text_small" />
+
+                <androidx.appcompat.widget.AppCompatRadioButton
+                    android:id="@+id/customRadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/custom" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/recordingDurationTextInput"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_padding_xlarge"
+                    android:focusableInTouchMode="true"
+                    android:focusable="true"
+                    android:hint="@string/recording_duration">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/recordingDurationEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/sleepDurationTextInput"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_padding_xlarge"
+                    android:layout_marginTop="@dimen/margin_padding_small"
+                    android:focusableInTouchMode="true"
+                    android:focusable="true"
+                    android:hint="@string/sleep_duration">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/sleepDurationEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </RadioGroup>
+
+            <View
+                android:id="@+id/view1"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:background="@color/gray_30"
+                app:layout_constraintTop_toBottomOf="@id/radioGroup" />
 
             <LinearLayout
                 android:id="@+id/customRecordingPeriodLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingTop="@dimen/margin_padding_normal"
-                android:paddingStart="@dimen/margin_padding_normal"
-                android:paddingEnd="@dimen/margin_padding_normal"
-                app:layout_constraintTop_toBottomOf="@id/recordingDurationLayout">
+                android:padding="@dimen/margin_padding_normal"
+                app:layout_constraintTop_toBottomOf="@id/view1">
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -193,7 +218,7 @@
 
                     <TextView
                         android:id="@+id/customRecordingPeriodTextView"
-                        style="@style/AudioMothText.Subhead"
+                        style="@style/AudioMothText.Subhead.Bold"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
@@ -224,7 +249,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/margin_padding_normal"
-                android:background = "@drawable/bg_color_grey_button"
+                android:background="@drawable/bg_color_grey_button"
                 app:layout_constraintTop_toBottomOf="@id/customRecordingPeriodLayout" />
 
             <androidx.constraintlayout.widget.Group
@@ -239,8 +264,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingTop="@dimen/margin_padding_normal"
                 android:paddingStart="@dimen/margin_padding_normal"
+                android:paddingTop="@dimen/margin_padding_normal"
                 android:paddingEnd="@dimen/margin_padding_normal"
                 android:paddingBottom="@dimen/margin_padding_normal"
                 app:layout_constraintTop_toBottomOf="@id/customRecordingPeriodRecyclerView">
@@ -299,12 +324,12 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_more"
                 android:drawablePadding="8dp"
                 android:gravity="center"
                 android:padding="@dimen/margin_padding_normal"
                 android:textColor="@color/colorPrimary"
-                android:background="?attr/selectableItemBackground"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/endPeriodLayout"
@@ -315,7 +340,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="@color/gray_30"
-                android:layout_marginTop="@dimen/margin_padding_normal"
                 app:layout_constraintTop_toBottomOf="@id/addRecordingPeriodTextView" />
 
             <androidx.appcompat.widget.AppCompatButton
@@ -328,9 +352,9 @@
                 android:layout_marginEnd="@dimen/margin_padding_normal"
                 android:layout_marginBottom="@dimen/margin_padding_xlarge"
                 android:text="@string/next"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/recordingPeriodView" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

@@ -12,6 +12,7 @@ import org.rfcx.audiomoth.entity.Stream
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.view.CreateStreamActivity
 import org.rfcx.audiomoth.view.configure.ConfigureActivity
+import org.rfcx.audiomoth.view.configure.ConfigureFragment.Companion.DASHBOARD_STREAM
 
 class DashboardStreamActivity : AppCompatActivity() {
     private val dashboardStreamAdapter by lazy { DashboardStreamAdapter() }
@@ -68,13 +69,15 @@ class DashboardStreamActivity : AppCompatActivity() {
                                     data["customRecordingPeriod"] as Boolean,
                                     data["recordingDurationSecond"].toString().toInt(),
                                     data["sleepDurationSecond"].toString().toInt(),
-                                    data["recordingPeriodList"] as ArrayList<String>
+                                    data["recordingPeriodList"] as ArrayList<String>,
+                                    data["durationSelected"].toString()
                                 )
                                 ConfigureActivity.startActivity(
                                     this@DashboardStreamActivity,
                                     currentDeviceId,
                                     streamName,
-                                    stream
+                                    stream,
+                                    DASHBOARD_STREAM
                                 )
                             }
                         } else {

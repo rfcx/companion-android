@@ -21,20 +21,22 @@
     <string name="configure">Configure</string>
     <string name="sample_rate">Sample rate</string>
     <string name="gain">Gain</string>
-    <string name="sleep_duration">Sleep duration</string>
-    <string name="recording_duration">Recording duration</string>
+    <string name="sleep_duration">Sleep duration (second)</string>
+    <string name="recording_duration">Recording duration (second)</string>
+    <string name="recording_duration_title">Recording duration</string>
     <string name="choose_sample_rate">Choose sample rate (kHz)</string>
     <string name="choose_gain">Choose gain</string>
     <string name="kilohertz">%s kHz</string>
-    <string name="second">%s second</string>
-    <string name="enter_sleep_duration">Enter sleep duration (second)</string>
-    <string name="enter_recording_duration">Enter recording duration (second)</string>
+    <string name="continuous">Continuous</string>
     <string name="next">Next</string>
     <string name="custom_recording_period">Custom recording period</string>
     <string name="add_recording_period">Add recording period</string>
     <string name="start_period">Start recording:</string>
     <string name="end_period">End recording:</string>
     <string name="always_recording">Always recording</string>
+    <string name="recommended">Recommended</string>
+    <string name="custom">Custom</string>
+    <string name="recommended_text">"Record for 5 minutes, sleep for 10 minutes"</string>
 
     <!--    SyncFragment-->
     <string name="sync">Sync</string>
