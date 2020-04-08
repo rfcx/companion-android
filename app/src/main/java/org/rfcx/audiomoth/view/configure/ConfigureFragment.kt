@@ -28,7 +28,7 @@ import java.util.*
 class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
 
     private val recordingPeriodAdapter by lazy { RecordingPeriodAdapter(this) }
-    private val timeAdapter by lazy { TimeAdapter(this) }
+    private val timeAdapter by lazy { TimeAdapter(this, context) }
     private lateinit var listener: ConfigureListener
     private val sampleRateList = arrayOf("8", "16", "32", "48", "96", "192", "256", "384")
     private val gainList = arrayOf("1 - Lowest", "2 - Low", "3 - Medium", "4 - High", "5 - Highest")
@@ -71,6 +71,8 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         "23:00"
     )
 
+    private val timeState = mutableMapOf<String, Boolean>()
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         listener = (context as ConfigureListener)
@@ -94,6 +96,10 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         setCustomRecordingPeriod()
         setCustomRecordingPeriodRecyclerView()
         durationSelectedItem(durationSelected)
+
+        for (time in timeList) {
+            timeState[time] = false
+        }
 
         if (arguments?.containsKey(FROM) == true) {
             arguments?.let {
@@ -183,7 +189,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
             layoutManager = timeLayoutManager
             adapter = timeAdapter
         }
-        timeAdapter.items = timeList
+        timeAdapter.items = timeState
     }
 
     private fun setCustomRecordingPeriod() {
@@ -240,6 +246,13 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
                     if (deviceId != null && streamName != null) {
                         updateStream(deviceId, streamName)
                         listener.openSync()
+                        val timeRecordingPeriod = arrayListOf<String>()
+                        timeState.forEach { timeStatus ->
+                            if(timeStatus.value){
+                                timeRecordingPeriod.add(timeStatus.key)
+                            }
+                        }
+                        Log.d("timeRecordingPeriod", "$timeRecordingPeriod")
                     }
                 }
             }
@@ -341,7 +354,11 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
     }
 
     override fun onTimeItemClick(time: String) {
-        Log.d("onTimeItemClick", time)
+        val status = timeState[time]
+        if(status != null) {
+            timeState[time] = !status
+        }
+        timeAdapter.items = timeState
     }
 
     companion object {

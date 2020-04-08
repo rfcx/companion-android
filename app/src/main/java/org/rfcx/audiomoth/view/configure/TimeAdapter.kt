@@ -1,16 +1,18 @@
 package org.rfcx.audiomoth.view.configure
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.time_item.view.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.util.getIntColor
 
-class TimeAdapter(private val listener: OnItemClickListener) :
+class TimeAdapter(private val listener: OnItemClickListener, private val context: Context?) :
     RecyclerView.Adapter<TimeAdapter.TimeAdapterViewHolder>() {
 
-    var items: ArrayList<String> = arrayListOf()
+    var items: MutableMap<String, Boolean> = mutableMapOf()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -23,8 +25,15 @@ class TimeAdapter(private val listener: OnItemClickListener) :
     }
 
     override fun onBindViewHolder(holder: TimeAdapterViewHolder, position: Int) {
-        val item = items[position]
-        holder.bind(item)
+        val timeList = arrayListOf<String>()
+        val timeStatus = arrayListOf<Boolean>()
+        items.forEach {
+            timeList.add(it.key)
+            timeStatus.add(it.value)
+        }
+        val item = timeList[position]
+        val status = timeStatus[position]
+        holder.bind(item, status)
         holder.itemView.timeItem.setOnClickListener {
             listener.onTimeItemClick(item)
         }
@@ -35,8 +44,16 @@ class TimeAdapter(private val listener: OnItemClickListener) :
     inner class TimeAdapterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val time = itemView.timeItem
 
-        fun bind(item: String) {
+        fun bind(item: String, status: Boolean) {
             time.text = item
+
+            if (context != null) {
+                if (status) {
+                    time.setBackgroundColor(context.getIntColor(R.color.colorPrimary))
+                } else {
+                    time.setBackgroundColor(context.getIntColor(R.color.transparent))
+                }
+            }
         }
     }
 }
