@@ -5,6 +5,7 @@ import android.app.TimePickerDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,6 +28,7 @@ import java.util.*
 class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
 
     private val recordingPeriodAdapter by lazy { RecordingPeriodAdapter(this) }
+    private val timeAdapter by lazy { TimeAdapter(this) }
     private lateinit var listener: ConfigureListener
     private val sampleRateList = arrayOf("8", "16", "32", "48", "96", "192", "256", "384")
     private val gainList = arrayOf("1 - Lowest", "2 - Low", "3 - Medium", "4 - High", "5 - Highest")
@@ -41,6 +43,33 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
     private var recordingPeriod = stream.recordingPeriodList
     private var customRecordingPeriod = stream.customRecordingPeriod
     private var durationSelected = stream.durationSelected
+
+    private var timeList = arrayListOf(
+        "00:00",
+        "01:00",
+        "02:00",
+        "03:00",
+        "04:00",
+        "05:00",
+        "06:00",
+        "07:00",
+        "08:00",
+        "09:00",
+        "10:00",
+        "11:00",
+        "12:00",
+        "13:00",
+        "14:00",
+        "15:00",
+        "16:00",
+        "17:00",
+        "18:00",
+        "19:00",
+        "20:00",
+        "21:00",
+        "22:00",
+        "23:00"
+    )
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -61,6 +90,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         setGainLayout()
         setNextOnClick()
         setSampleRateLayout()
+        setTimeRecyclerView()
         setCustomRecordingPeriod()
         setCustomRecordingPeriodRecyclerView()
         durationSelectedItem(durationSelected)
@@ -139,11 +169,21 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
 
     private fun setCustomRecordingPeriodRecyclerView() {
         customRecordingPeriodRecyclerView.apply {
-            val alertsLayoutManager = LinearLayoutManager(context)
-            layoutManager = alertsLayoutManager
+            val recordingPeriodLayoutManager = LinearLayoutManager(context)
+            layoutManager = recordingPeriodLayoutManager
             adapter = recordingPeriodAdapter
         }
         recordingPeriodAdapter.items = recordingPeriod
+    }
+
+    private fun setTimeRecyclerView() {
+        timeRecyclerView.apply {
+            val timeLayoutManager =
+                LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            layoutManager = timeLayoutManager
+            adapter = timeAdapter
+        }
+        timeAdapter.items = timeList
     }
 
     private fun setCustomRecordingPeriod() {
@@ -300,6 +340,10 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         recordingPeriodAdapter.items = recordingPeriod
     }
 
+    override fun onTimeItemClick(time: String) {
+        Log.d("onTimeItemClick", time)
+    }
+
     companion object {
         const val RECOMMENDED = "Recommended"
         const val CONTINUOUS = "Continuous"
@@ -326,4 +370,5 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
 
 interface OnItemClickListener {
     fun onItemClick(position: Int)
+    fun onTimeItemClick(time: String)
 }
