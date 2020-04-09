@@ -3,6 +3,7 @@ package org.rfcx.audiomoth.view.configure
 
 import android.app.*
 import android.content.Context
+import android.content.Context.ALARM_SERVICE
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
@@ -12,6 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -20,12 +22,12 @@ import kotlinx.android.synthetic.main.fragment_configure.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Stream
 import org.rfcx.audiomoth.util.Firestore
+import org.rfcx.audiomoth.util.NotificationBroadcastReceiver
 import org.rfcx.audiomoth.util.getCalendar
 import org.rfcx.audiomoth.util.toTimeString
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
 import org.rfcx.audiomoth.view.configure.ConfigureActivity.Companion.FROM
-import org.rfcx.audiomoth.view.dashboard.DashboardStreamActivity
 import java.util.*
 
 class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
@@ -46,9 +48,8 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
     private var customRecordingPeriod = stream.customRecordingPeriod
     private var durationSelected = stream.durationSelected
 
-    lateinit var builder: Notification.Builder
     private val channelId = "org.rfcx.audiomoth.view.configure"
-    private val description = "receives a notification"
+    private val name = "Notification"
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -70,6 +71,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         setNextOnClick()
         setSampleRateLayout()
         setCustomRecordingPeriod()
+        createNotificationChannel()
         setCustomRecordingPeriodRecyclerView()
         durationSelectedItem(durationSelected)
 
@@ -208,7 +210,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
                     if (deviceId != null && streamName != null) {
                         updateStream(deviceId, streamName)
                         listener.openSync()
-                        notification(deviceId.toInt())
+                        notification()
                     }
                 }
             }
@@ -231,34 +233,31 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
             )
     }
 
-    private fun notification(deviceId: Int) {
+    private fun createNotificationChannel() {
         val notificationManager =
             context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        // todo: pass deviceId to DashboardStreamActivity
-        val intent = Intent(context, DashboardStreamActivity::class.java)
-        val pendingIntent =
-            PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notificationChannel =
-                NotificationChannel(channelId, description, NotificationManager.IMPORTANCE_HIGH)
+                NotificationChannel(channelId, name, NotificationManager.IMPORTANCE_HIGH)
             notificationChannel.enableLights(true)
             notificationChannel.lightColor = Color.GREEN
             notificationChannel.enableVibration(false)
             notificationManager.createNotificationChannel(notificationChannel)
-
-            builder = Notification.Builder(context, channelId)
-                .setContentTitle(getString(R.string.will_run_out_on, " April 11, 2020"))
-                .setSmallIcon(R.drawable.ic_audiomoth)
-                .setContentIntent(pendingIntent)
-
-        } else {
-            builder = Notification.Builder(context)
-                .setContentTitle(getString(R.string.will_run_out_on, " April 11, 2020"))
-                .setSmallIcon(R.drawable.ic_audiomoth)
-                .setContentIntent(pendingIntent)
         }
-        notificationManager.notify(deviceId, builder.build())
+    }
+
+    private fun notification() {
+        // todo: pass deviceId to DashboardStreamActivity
+        val intent = Intent(context, NotificationBroadcastReceiver::class.java)
+        val pendingIntent =
+            PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        val alarmManager = context?.getSystemService(ALARM_SERVICE) as AlarmManager
+
+        alarmManager.set(AlarmManager.RTC, System.currentTimeMillis() + 1000 * 10, pendingIntent)
+        Toast.makeText(context, "Alarm is set", Toast.LENGTH_SHORT).show()
+
     }
 
     private fun setSampleRateLayout() {
