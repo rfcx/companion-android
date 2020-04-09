@@ -25,6 +25,7 @@ import org.rfcx.audiomoth.util.toTimeString
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
 import org.rfcx.audiomoth.view.configure.ConfigureActivity.Companion.FROM
+import org.rfcx.audiomoth.view.dashboard.DashboardStreamActivity
 import java.util.*
 
 class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
@@ -233,8 +234,8 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
     private fun notification(deviceId: Int) {
         val notificationManager =
             context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        val intent = Intent(context, LauncherActivity::class.java)
+        // todo: pass deviceId to DashboardStreamActivity
+        val intent = Intent(context, DashboardStreamActivity::class.java)
         val pendingIntent =
             PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 
