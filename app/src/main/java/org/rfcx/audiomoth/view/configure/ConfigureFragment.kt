@@ -1,9 +1,12 @@
 package org.rfcx.audiomoth.view.configure
 
 
-import android.app.TimePickerDialog
+import android.app.*
 import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -41,6 +44,10 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
     private var recordingPeriod = stream.recordingPeriodList
     private var customRecordingPeriod = stream.customRecordingPeriod
     private var durationSelected = stream.durationSelected
+
+    lateinit var builder: Notification.Builder
+    private val channelId = "org.rfcx.audiomoth.view.configure"
+    private val description = "receives a notification"
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -200,6 +207,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
                     if (deviceId != null && streamName != null) {
                         updateStream(deviceId, streamName)
                         listener.openSync()
+                        notification(deviceId.toInt())
                     }
                 }
             }
@@ -220,6 +228,36 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
                     "durationSelected" to durationSelected
                 )
             )
+    }
+
+    private fun notification(deviceId: Int) {
+        val notificationManager =
+            context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val intent = Intent(context, LauncherActivity::class.java)
+        val pendingIntent =
+            PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationChannel =
+                NotificationChannel(channelId, description, NotificationManager.IMPORTANCE_HIGH)
+            notificationChannel.enableLights(true)
+            notificationChannel.lightColor = Color.GREEN
+            notificationChannel.enableVibration(false)
+            notificationManager.createNotificationChannel(notificationChannel)
+
+            builder = Notification.Builder(context, channelId)
+                .setContentTitle(getString(R.string.will_run_out_on, " April 11, 2020"))
+                .setSmallIcon(R.drawable.ic_audiomoth)
+                .setContentIntent(pendingIntent)
+
+        } else {
+            builder = Notification.Builder(context)
+                .setContentTitle(getString(R.string.will_run_out_on, " April 11, 2020"))
+                .setSmallIcon(R.drawable.ic_audiomoth)
+                .setContentIntent(pendingIntent)
+        }
+        notificationManager.notify(deviceId, builder.build())
     }
 
     private fun setSampleRateLayout() {
