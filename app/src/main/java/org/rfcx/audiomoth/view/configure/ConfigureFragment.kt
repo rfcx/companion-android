@@ -13,7 +13,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -210,7 +209,8 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
                     if (deviceId != null && streamName != null) {
                         updateStream(deviceId, streamName)
                         listener.openSync()
-                        notification()
+                        // Todo: Remove comment
+//                        notification()
                     }
                 }
             }
@@ -255,9 +255,22 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
 
         val alarmManager = context?.getSystemService(ALARM_SERVICE) as AlarmManager
 
-        alarmManager.set(AlarmManager.RTC, System.currentTimeMillis() + 1000 * 10, pendingIntent)
-        Toast.makeText(context, "Alarm is set", Toast.LENGTH_SHORT).show()
+        val calendar =
+            Calendar.getInstance()  // Todo: Change to the date of the battery will run out.
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MINUTE, 30)
+        calendar.set(Calendar.HOUR, 9)  // receives a notification at 9:30
+        calendar.get(Calendar.MONTH)
+        calendar.get(Calendar.DAY_OF_MONTH)
+        calendar.get(Calendar.YEAR)
+        // Todo: Remove comment to receives a notification 3 days before battery is due to run out
+        // calendar.add(Calendar.DATE, -3)
 
+        alarmManager.setExact(
+            AlarmManager.RTC_WAKEUP,
+            calendar.timeInMillis,
+            pendingIntent
+        )
     }
 
     private fun setSampleRateLayout() {
