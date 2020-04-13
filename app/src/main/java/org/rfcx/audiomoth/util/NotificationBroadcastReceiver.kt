@@ -10,6 +10,7 @@ import org.rfcx.audiomoth.R
 class NotificationBroadcastReceiver : BroadcastReceiver() {
     private val channelId = "org.rfcx.audiomoth.view.configure"
 
+    // todo: Change the text displayed for notifications
     override fun onReceive(context: Context, intent: Intent) {
         val builder = NotificationCompat.Builder(context, channelId)
             .setContentTitle(context.getString(R.string.will_run_out_on, " April 11, 2020"))
