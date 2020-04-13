@@ -12,7 +12,7 @@ import org.rfcx.audiomoth.util.getIntColor
 class TimeAdapter(private val listener: OnItemClickListener, private val context: Context?) :
     RecyclerView.Adapter<TimeAdapter.TimeAdapterViewHolder>() {
 
-    var items: MutableMap<String, Boolean> = mutableMapOf()
+    var items: ArrayList<TimeItem> = arrayListOf()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -25,33 +25,26 @@ class TimeAdapter(private val listener: OnItemClickListener, private val context
     }
 
     override fun onBindViewHolder(holder: TimeAdapterViewHolder, position: Int) {
-        val timeList = arrayListOf<String>()
-        val timeStatus = arrayListOf<Boolean>()
-        items.forEach {
-            timeList.add(it.key)
-            timeStatus.add(it.value)
-        }
-        val item = timeList[position]
-        val status = timeStatus[position]
-        holder.bind(item, status)
-        holder.itemView.timeItem.setOnClickListener {
-            listener.onTimeItemClick(item)
+        holder.bind(items[position])
+
+        holder.itemView.timeItemTextView.setOnClickListener {
+            listener.onTimeItemClick(items[position], position)
         }
     }
 
     override fun getItemCount(): Int = items.size
 
     inner class TimeAdapterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val time = itemView.timeItem
+        private val timeTextView = itemView.timeItemTextView
 
-        fun bind(item: String, status: Boolean) {
-            time.text = item
+        fun bind(item: TimeItem) {
+            timeTextView.text = item.time
 
             if (context != null) {
-                if (status) {
-                    time.setBackgroundColor(context.getIntColor(R.color.colorPrimary))
+                if (item.state) {
+                    timeTextView.setBackgroundColor(context.getIntColor(R.color.colorPrimary))
                 } else {
-                    time.setBackgroundColor(context.getIntColor(R.color.transparent))
+                    timeTextView.setBackgroundColor(context.getIntColor(R.color.transparent))
                 }
             }
         }

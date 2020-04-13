@@ -60,7 +60,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         "23:00"
     )
 
-    private val timeState = mutableMapOf<String, Boolean>()
+    private val timeState = ArrayList<TimeItem>()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -86,7 +86,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         durationSelectedItem(durationSelected)
 
         for (time in timeList) {
-            timeState[time] = recordingPeriod.contains(time)
+            timeState.add(TimeItem(time, recordingPeriod.contains(time)))
         }
 
         if (arguments?.containsKey(FROM) == true) {
@@ -207,8 +207,8 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
                         val timeRecordingPeriod = arrayListOf<String>()
                         if (customRecordingPeriod) {
                             timeState.forEach { timeStatus ->
-                                if (timeStatus.value) {
-                                    timeRecordingPeriod.add(timeStatus.key)
+                                if (timeStatus.state) {
+                                    timeRecordingPeriod.add(timeStatus.time)
                                 }
                             }
                             recordingPeriod = timeRecordingPeriod
@@ -284,11 +284,8 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         recordingPeriodAdapter.items = recordingPeriod
     }
 
-    override fun onTimeItemClick(time: String) {
-        val status = timeState[time]
-        if (status != null) {
-            timeState[time] = !status
-        }
+    override fun onTimeItemClick(item: TimeItem, position: Int) {
+        timeState[position] = TimeItem(item.time, !item.state)
         timeAdapter.items = timeState
     }
 
@@ -318,5 +315,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
 
 interface OnItemClickListener {
     fun onItemClick(position: Int)
-    fun onTimeItemClick(time: String)
+    fun onTimeItemClick(item: TimeItem, position: Int)
 }
+
+data class TimeItem(val time: String, val state: Boolean)
