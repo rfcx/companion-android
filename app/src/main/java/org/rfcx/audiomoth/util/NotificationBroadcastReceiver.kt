@@ -8,7 +8,7 @@ import androidx.core.app.NotificationManagerCompat
 import org.rfcx.audiomoth.R
 
 class NotificationBroadcastReceiver : BroadcastReceiver() {
-    private val channelId = "org.rfcx.audiomoth.view.configure"
+    private val channelId = "AudioMoth Notification"
 
     // todo: Change the text displayed for notifications
     override fun onReceive(context: Context, intent: Intent) {

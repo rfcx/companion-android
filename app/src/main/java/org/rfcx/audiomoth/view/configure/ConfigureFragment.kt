@@ -47,8 +47,8 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
     private var customRecordingPeriod = stream.customRecordingPeriod
     private var durationSelected = stream.durationSelected
 
-    private val channelId = "org.rfcx.audiomoth.view.configure"
-    private val name = "Notification"
+    private val channelId = "AudioMoth Notification"
+    private val channelName = "Notification"
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -239,7 +239,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notificationChannel =
-                NotificationChannel(channelId, name, NotificationManager.IMPORTANCE_HIGH)
+                NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH)
             notificationChannel.enableLights(true)
             notificationChannel.lightColor = Color.GREEN
             notificationChannel.enableVibration(false)
