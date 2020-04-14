@@ -8,6 +8,8 @@ import android.media.AudioTrack
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
+import com.google.gson.reflect.TypeToken
+import org.rfcx.audiomoth.R
 import java.util.*
 import kotlin.math.*
 
@@ -17,7 +19,7 @@ class ConnectDevice {
     private val minBufferSize = AudioTrack.getMinBufferSize(
         sampleRate,
         AudioFormat.CHANNEL_OUT_MONO,
-        AudioFormat.ENCODING_PCM_FLOAT
+        AudioFormat.ENCODING_PCM_16BIT
     )
 
     private var player = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -30,9 +32,9 @@ class ConnectDevice {
             )
             .setAudioFormat(
                 AudioFormat.Builder()
-                    .setEncoding(AudioFormat.ENCODING_PCM_FLOAT)
+                    .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
                     .setSampleRate(sampleRate)
-                    .setChannelMask(AudioFormat.CHANNEL_OUT_STEREO)
+                    .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
                     .build()
             )
             .setBufferSizeInBytes(minBufferSize)
@@ -40,8 +42,8 @@ class ConnectDevice {
     } else {
         AudioTrack(
             AudioManager.STREAM_MUSIC, sampleRate,
-            AudioFormat.CHANNEL_OUT_STEREO,
-            AudioFormat.ENCODING_PCM_FLOAT,
+            AudioFormat.CHANNEL_OUT_MONO,
+            AudioFormat.ENCODING_PCM_16BIT,
             minBufferSize,
             AudioTrack.MODE_STATIC
         )
@@ -232,7 +234,7 @@ class ConnectDevice {
             duration.toFloat(),
             0.090f
         )
-        waveState2 = wave2.second
+//        waveState2 = wave2.second
         waveform2.addAll(wave2.first)
 
         // Sound wave creation - sum the waveforms
@@ -243,23 +245,31 @@ class ConnectDevice {
         return sumWaveform
     }
 
-    fun playSound(context: Context) {
-        val waveform = createWaveform()
+    fun playSound(context: Context, isExample: Boolean = false) {
+        val waveform = if (isExample) {
+            ReadFileUtil<List<Float>>().parseRawJson(
+                context, R.raw.example_audio,
+                object : TypeToken<List<Float>>() {}.type, null
+            )
+        } else {
+            createWaveform()
+        }
+
+        // Start play
+        player.play()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Log.i(TAG, "Wave Form: $waveform")
-            player.write(
-                waveform.toFloatArray(),
-                0,
-                waveform.size,
-                AudioTrack.WRITE_NON_BLOCKING
-            )
+
+            val buffer = ShortArray(waveform!!.size)
+            waveform.forEachIndexed { index, fl ->
+                buffer[index] = (fl * Short.MAX_VALUE).toShort()
+            }
+
+            player.write(buffer, 0, waveform.size)
         } else {
             Toast.makeText(context, "No working for Android APIs lower 21.", Toast.LENGTH_SHORT)
                 .show()
         }
-
-        // Play Here
-        player.play()
     }
 
     private fun Int.toBytes(byteCount: Int): ArrayList<Int> {
