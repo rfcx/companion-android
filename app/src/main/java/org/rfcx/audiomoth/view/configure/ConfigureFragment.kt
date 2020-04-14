@@ -229,7 +229,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
                         updateStream(deviceId, streamName)
                         listener.openSync()
                         // Todo: start notification here
-                        notification()
+//                        notification()
                     }
                 }
             }
@@ -277,8 +277,8 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         val calendar =
             Calendar.getInstance()  // Todo: Change to the date of the battery will run out.
         calendar.set(Calendar.SECOND, 0)
-        calendar.set(Calendar.MINUTE, 35)
-        calendar.set(Calendar.HOUR, 11)  // receives a notification at 9:30
+        calendar.set(Calendar.MINUTE, 30)
+        calendar.set(Calendar.HOUR, 9)  // receives a notification at 9:30
         calendar.get(Calendar.MONTH)
         calendar.get(Calendar.DAY_OF_MONTH)
         calendar.get(Calendar.YEAR)
