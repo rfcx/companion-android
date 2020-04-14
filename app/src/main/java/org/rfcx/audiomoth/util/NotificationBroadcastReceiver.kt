@@ -6,13 +6,12 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.view.configure.ConfigureFragment.Companion.CHANNEL_ID
 
 class NotificationBroadcastReceiver : BroadcastReceiver() {
-    private val channelId = "AudioMoth Notification"
-
     // todo: Change the text displayed for notifications
     override fun onReceive(context: Context, intent: Intent) {
-        val builder = NotificationCompat.Builder(context, channelId)
+        val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setContentTitle(context.getString(R.string.will_run_out_on, " April 11, 2020"))
             .setSmallIcon(R.drawable.ic_audiomoth)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)

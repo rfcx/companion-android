@@ -47,9 +47,6 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
     private var customRecordingPeriod = stream.customRecordingPeriod
     private var durationSelected = stream.durationSelected
 
-    private val channelId = "AudioMoth Notification"
-    private val channelName = "Notification"
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
         listener = (context as ConfigureListener)
@@ -239,7 +236,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notificationChannel =
-                NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH)
+                NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH)
             notificationChannel.enableLights(true)
             notificationChannel.lightColor = Color.GREEN
             notificationChannel.enableVibration(false)
@@ -357,6 +354,8 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         const val CUSTOM = "Custom"
         const val CREATE_STREAM = "CREATE_STREAM"
         const val DASHBOARD_STREAM = "DASHBOARD_STREAM"
+        const val CHANNEL_ID = "AudioMoth Notification"
+        const val CHANNEL_NAME = "Notification"
 
         fun newInstance(
             deviceId: String,
