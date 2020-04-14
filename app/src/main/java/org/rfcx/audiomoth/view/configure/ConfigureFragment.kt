@@ -1,10 +1,12 @@
 package org.rfcx.audiomoth.view.configure
 
 
-import android.app.*
+import android.app.AlarmManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Context.ALARM_SERVICE
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
 import android.os.Build
@@ -12,9 +14,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_configure.*
@@ -22,16 +22,16 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Stream
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.util.NotificationBroadcastReceiver
-import org.rfcx.audiomoth.util.getCalendar
-import org.rfcx.audiomoth.util.toTimeString
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
 import org.rfcx.audiomoth.view.configure.ConfigureActivity.Companion.FROM
 import java.util.*
+import kotlin.collections.ArrayList
 
 class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
 
     private val recordingPeriodAdapter by lazy { RecordingPeriodAdapter(this) }
+    private val timeAdapter by lazy { TimeAdapter(this, context) }
     private lateinit var listener: ConfigureListener
     private val sampleRateList = arrayOf("8", "16", "32", "48", "96", "192", "256", "384")
     private val gainList = arrayOf("1 - Lowest", "2 - Low", "3 - Medium", "4 - High", "5 - Highest")
@@ -40,12 +40,38 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
     private var sampleRate = stream.sampleRate
     private var sleepDuration = stream.sleepDuration
     private var recordingDuration = stream.recordingDuration
-
-    private var startPeriod = getCalendar()
-    private var endPeriod = getCalendar()
     private var recordingPeriod = stream.recordingPeriodList
     private var customRecordingPeriod = stream.customRecordingPeriod
     private var durationSelected = stream.durationSelected
+
+    private var timeList = arrayListOf(
+        "00:00",
+        "01:00",
+        "02:00",
+        "03:00",
+        "04:00",
+        "05:00",
+        "06:00",
+        "07:00",
+        "08:00",
+        "09:00",
+        "10:00",
+        "11:00",
+        "12:00",
+        "13:00",
+        "14:00",
+        "15:00",
+        "16:00",
+        "17:00",
+        "18:00",
+        "19:00",
+        "20:00",
+        "21:00",
+        "22:00",
+        "23:00"
+    )
+
+    private val timeState = ArrayList<TimeItem>()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -66,10 +92,14 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         setGainLayout()
         setNextOnClick()
         setSampleRateLayout()
+        setTimeRecyclerView()
         setCustomRecordingPeriod()
         createNotificationChannel()
-        setCustomRecordingPeriodRecyclerView()
         durationSelectedItem(durationSelected)
+
+        for (time in timeList) {
+            timeState.add(TimeItem(time, recordingPeriod.contains(time)))
+        }
 
         if (arguments?.containsKey(FROM) == true) {
             arguments?.let {
@@ -143,49 +173,31 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         sleepDurationTextInput.visibility = if (durationTextInput) View.VISIBLE else View.GONE
     }
 
-    private fun setCustomRecordingPeriodRecyclerView() {
-        customRecordingPeriodRecyclerView.apply {
-            val alertsLayoutManager = LinearLayoutManager(context)
-            layoutManager = alertsLayoutManager
-            adapter = recordingPeriodAdapter
+    private fun setTimeRecyclerView() {
+        timeRecyclerView.apply {
+            val timeLayoutManager =
+                LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            layoutManager = timeLayoutManager
+            adapter = timeAdapter
         }
-        recordingPeriodAdapter.items = recordingPeriod
+        timeAdapter.items = timeState
     }
 
     private fun setCustomRecordingPeriod() {
-        addRecordingPeriodTextView.text = getString(R.string.add_recording_period).toUpperCase()
-        startPeriodTextView.text = startPeriod.toTimeString()
-        endPeriodTextView.text = endPeriod.toTimeString()
-        customRecordingPeriodSwitch.isChecked = customRecordingPeriod
         isChecked(customRecordingPeriod)
-
-        startPeriodLayout.setOnClickListener {
-            setTimePickerDialog(startPeriodTextView, startPeriod, true)
-        }
-
-        endPeriodLayout.setOnClickListener {
-            setTimePickerDialog(endPeriodTextView, endPeriod, false)
-        }
-
+        customRecordingPeriodSwitch.isChecked = customRecordingPeriod
         customRecordingPeriodSwitch.setOnCheckedChangeListener { _, isChecked ->
             customRecordingPeriod = isChecked
             isChecked(isChecked)
-        }
-
-        addRecordingPeriodTextView.setOnClickListener {
-            recordingPeriod.add(
-                "${startPeriod.toTimeString()} - ${endPeriod.toTimeString()}"
-            )
-            recordingPeriodAdapter.items = recordingPeriod
         }
     }
 
     private fun isChecked(isChecked: Boolean) {
         if (isChecked) {
-            addRecordingPeriodGroupView.visibility = View.VISIBLE
+            timeRecyclerView.visibility = View.VISIBLE
             alwaysRecordingTextView.visibility = View.GONE
         } else {
-            addRecordingPeriodGroupView.visibility = View.GONE
+            timeRecyclerView.visibility = View.GONE
             alwaysRecordingTextView.visibility = View.VISIBLE
         }
     }
@@ -204,10 +216,20 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
                     val deviceId = it.getString(DEVICE_ID)
                     val streamName = it.getString(ConfigureActivity.STREAM_NAME)
                     if (deviceId != null && streamName != null) {
+                        val timeRecordingPeriod = arrayListOf<String>()
+                        if (customRecordingPeriod) {
+                            timeState.forEach { timeStatus ->
+                                if (timeStatus.state) {
+                                    timeRecordingPeriod.add(timeStatus.time)
+                                }
+                            }
+                            recordingPeriod = timeRecordingPeriod
+                        }
+
                         updateStream(deviceId, streamName)
                         listener.openSync()
                         // Todo: start notification here
-//                        notification()
+                        notification()
                     }
                 }
             }
@@ -255,8 +277,8 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         val calendar =
             Calendar.getInstance()  // Todo: Change to the date of the battery will run out.
         calendar.set(Calendar.SECOND, 0)
-        calendar.set(Calendar.MINUTE, 30)
-        calendar.set(Calendar.HOUR, 9)  // receives a notification at 9:30
+        calendar.set(Calendar.MINUTE, 35)
+        calendar.set(Calendar.HOUR, 11)  // receives a notification at 9:30
         calendar.get(Calendar.MONTH)
         calendar.get(Calendar.DAY_OF_MONTH)
         calendar.get(Calendar.YEAR)
@@ -311,41 +333,14 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         }
     }
 
-    private fun setTimePickerDialog(
-        textView: TextView,
-        calendarBefore: Calendar,
-        isStartPeriod: Boolean
-    ) {
-        val timeSetListener = TimePickerDialog.OnTimeSetListener { _, hour, minute ->
-            calendarBefore.set(Calendar.HOUR_OF_DAY, hour)
-            calendarBefore.set(Calendar.MINUTE, minute)
-            textView.text = calendarBefore.toTimeString()
-            if (isStartPeriod) {
-                startPeriod = calendarBefore
-            } else {
-                endPeriod = calendarBefore
-            }
-        }
-        val timePickerDialog = TimePickerDialog(
-            context,
-            timeSetListener,
-            calendarBefore.get(Calendar.HOUR_OF_DAY),
-            calendarBefore.get(Calendar.MINUTE),
-            true
-        )
-        timePickerDialog.show()
-
-        val buttonNeutral = timePickerDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
-        context?.let { ContextCompat.getColor(it, R.color.text_secondary) }?.let {
-            buttonNeutral.setTextColor(
-                it
-            )
-        }
-    }
-
     override fun onItemClick(position: Int) {
         recordingPeriod.removeAt(position)
         recordingPeriodAdapter.items = recordingPeriod
+    }
+
+    override fun onTimeItemClick(item: TimeItem, position: Int) {
+        timeState[position] = TimeItem(item.time, !item.state)
+        timeAdapter.items = timeState
     }
 
     companion object {
@@ -376,4 +371,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
 
 interface OnItemClickListener {
     fun onItemClick(position: Int)
+    fun onTimeItemClick(item: TimeItem, position: Int)
 }
+
+data class TimeItem(val time: String, val state: Boolean)
