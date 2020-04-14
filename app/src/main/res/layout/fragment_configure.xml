@@ -163,8 +163,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_padding_xlarge"
-                    android:focusableInTouchMode="true"
                     android:focusable="true"
+                    android:focusableInTouchMode="true"
                     android:hint="@string/recording_duration">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -182,8 +182,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_padding_xlarge"
                     android:layout_marginTop="@dimen/margin_padding_small"
-                    android:focusableInTouchMode="true"
                     android:focusable="true"
+                    android:focusableInTouchMode="true"
                     android:hint="@string/sleep_duration">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -245,102 +245,21 @@
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/customRecordingPeriodRecyclerView"
-                android:layout_width="match_parent"
+                android:id="@+id/timeRecyclerView"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/margin_padding_normal"
-                android:background="@drawable/bg_color_grey_button"
-                app:layout_constraintTop_toBottomOf="@id/customRecordingPeriodLayout" />
-
-            <androidx.constraintlayout.widget.Group
-                android:id="@+id/addRecordingPeriodGroupView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:constraint_referenced_ids="startPeriodLayout,endPeriodLayout,addRecordingPeriodTextView,customRecordingPeriodRecyclerView" />
-
-            <LinearLayout
-                android:id="@+id/startPeriodLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingStart="@dimen/margin_padding_normal"
-                android:paddingTop="@dimen/margin_padding_normal"
-                android:paddingEnd="@dimen/margin_padding_normal"
                 android:paddingBottom="@dimen/margin_padding_normal"
-                app:layout_constraintTop_toBottomOf="@id/customRecordingPeriodRecyclerView">
-
-                <TextView
-                    android:id="@+id/startCustomPeriodTextView"
-                    style="@style/AudioMothText.Subhead"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="1"
-                    android:text="@string/start_period" />
-
-                <TextView
-                    android:id="@+id/startPeriodTextView"
-                    style="@style/AudioMothText.Subhead"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    tools:text="10:00" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/endPeriodLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingStart="@dimen/margin_padding_normal"
-                android:paddingEnd="@dimen/margin_padding_normal"
-                android:paddingBottom="@dimen/margin_padding_normal"
-                app:layout_constraintTop_toBottomOf="@id/startPeriodLayout">
-
-                <TextView
-                    android:id="@+id/endCustomPeriodTextView"
-                    style="@style/AudioMothText.Subhead"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="1"
-                    android:text="@string/end_period" />
-
-                <TextView
-                    android:id="@+id/endPeriodTextView"
-                    style="@style/AudioMothText.Subhead"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    tools:text="11:00" />
-
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/addRecordingPeriodTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:background="?attr/selectableItemBackground"
-                android:drawableStart="@drawable/ic_more"
-                android:drawablePadding="8dp"
-                android:gravity="center"
-                android:padding="@dimen/margin_padding_normal"
-                android:textColor="@color/colorPrimary"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/recordingPeriodView"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/endPeriodLayout"
-                tools:text="@string/add_recording_period" />
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/customRecordingPeriodLayout" />
 
             <View
                 android:id="@+id/recordingPeriodView"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="@color/gray_30"
-                app:layout_constraintTop_toBottomOf="@id/addRecordingPeriodTextView" />
+                app:layout_constraintTop_toBottomOf="@id/timeRecyclerView" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/nextButton"
