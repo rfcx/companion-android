@@ -206,7 +206,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
                     if (deviceId != null && streamName != null) {
                         updateStream(deviceId, streamName)
                         listener.openSync()
-                        // Todo: Remove comment
+                        // Todo: start notification here
 //                        notification()
                     }
                 }
