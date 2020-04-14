@@ -1,7 +1,15 @@
 package org.rfcx.audiomoth.view.configure
 
 
+import android.app.AlarmManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Context.ALARM_SERVICE
+import android.content.Intent
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,9 +21,12 @@ import kotlinx.android.synthetic.main.fragment_configure.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Stream
 import org.rfcx.audiomoth.util.Firestore
+import org.rfcx.audiomoth.util.NotificationBroadcastReceiver
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
 import org.rfcx.audiomoth.view.configure.ConfigureActivity.Companion.FROM
+import java.util.*
+import kotlin.collections.ArrayList
 
 class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
 
@@ -83,6 +94,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         setSampleRateLayout()
         setTimeRecyclerView()
         setCustomRecordingPeriod()
+        createNotificationChannel()
         durationSelectedItem(durationSelected)
 
         for (time in timeList) {
@@ -216,6 +228,8 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
 
                         updateStream(deviceId, streamName)
                         listener.openSync()
+                        // Todo: start notification here
+//                        notification()
                     }
                 }
             }
@@ -236,6 +250,46 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
                     "durationSelected" to durationSelected
                 )
             )
+    }
+
+    private fun createNotificationChannel() {
+        val notificationManager =
+            context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationChannel =
+                NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH)
+            notificationChannel.enableLights(true)
+            notificationChannel.lightColor = Color.GREEN
+            notificationChannel.enableVibration(false)
+            notificationManager.createNotificationChannel(notificationChannel)
+        }
+    }
+
+    private fun notification() {
+        // todo: pass deviceId to DashboardStreamActivity
+        val intent = Intent(context, NotificationBroadcastReceiver::class.java)
+        val pendingIntent =
+            PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        val alarmManager = context?.getSystemService(ALARM_SERVICE) as AlarmManager
+
+        val calendar =
+            Calendar.getInstance()  // Todo: Change to the date of the battery will run out.
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MINUTE, 30)
+        calendar.set(Calendar.HOUR, 9)  // receives a notification at 9:30
+        calendar.get(Calendar.MONTH)
+        calendar.get(Calendar.DAY_OF_MONTH)
+        calendar.get(Calendar.YEAR)
+        // Todo: Remove comment to receives a notification 3 days before battery is due to run out
+        // calendar.add(Calendar.DATE, -3)
+
+        alarmManager.setExact(
+            AlarmManager.RTC_WAKEUP,
+            calendar.timeInMillis,
+            pendingIntent
+        )
     }
 
     private fun setSampleRateLayout() {
@@ -295,6 +349,8 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         const val CUSTOM = "Custom"
         const val CREATE_STREAM = "CREATE_STREAM"
         const val DASHBOARD_STREAM = "DASHBOARD_STREAM"
+        const val CHANNEL_ID = "AudioMoth Notification"
+        const val CHANNEL_NAME = "Notification"
 
         fun newInstance(
             deviceId: String,
