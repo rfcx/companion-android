@@ -13,7 +13,7 @@ class ConnectDeviceActivity : AppCompatActivity() {
         setContentView(R.layout.activity_connect_device)
 
         configureButton.setOnClickListener {
-            ConnectDevice().playSound(this, true)
+            ConnectDevice().playSound(this)
         }
     }
 }
