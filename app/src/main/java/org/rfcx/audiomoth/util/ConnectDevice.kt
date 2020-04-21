@@ -8,8 +8,6 @@ import android.media.AudioTrack
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
-import com.google.gson.reflect.TypeToken
-import org.rfcx.audiomoth.R
 import java.util.*
 import kotlin.math.*
 
@@ -104,7 +102,7 @@ class ConnectDevice {
         val bitSequence = arrayListOf<Int>()
         bytes.forEach {
             val low = (it and 0x0F)
-            val high = (it and 0x0F) shr 4
+            val high = it and 0xFF shr 4
 
             for (x in 0 until 7) {
                 bitSequence.add(hamming[low][x])
@@ -115,40 +113,46 @@ class ConnectDevice {
     }
 
     private fun createWaveform(
-        state: WaveformState, frequency: Float, phase: Int, rampUp: Float,
-        sustain: Float, rampDown: Float
+        state: WaveformState, frequency: Double, phase: Int, rampUp: Double,
+        sustain: Double, rampDown: Double
     ): Pair<ArrayList<Float>, WaveformState> {
         val waveform = arrayListOf<Float>()
         val samplesInRampUp = rampUp * sampleRate
         val samplesInSustain = sustain * sampleRate
         val samplesInRampDown = rampDown * sampleRate
+        val theta = 2f * Math.PI.toFloat() * frequency / sampleRate
+        val waveSize = round(samplesInRampUp + samplesInSustain + samplesInRampDown).toInt()
 
-        for (k in 0 until ((samplesInRampUp + samplesInSustain + samplesInRampDown).toInt())) {
-            if (k < samplesInRampUp) {
+        for (k in 0 until waveSize) {
+
+            if (k < ceil(samplesInRampUp)) {
                 state.amplitudePhase =
                     min(
-                        Math.PI / 2.0f,
-                        state.amplitudePhase + Math.PI / 2.0f / samplesInRampUp
-                    ).toFloat()
+                        Math.PI.toFloat() / 2.0f,
+                        state.amplitudePhase + Math.PI.toFloat() / 2.0f / samplesInRampUp.toFloat()
+                    )
             }
 
-            if (k >= samplesInRampUp + samplesInSustain) {
+            if (k >= ceil(samplesInRampUp + samplesInSustain)) {
                 state.amplitudePhase =
-                    max(0.0f, (state.amplitudePhase - Math.PI / 2.0f / samplesInRampDown).toFloat())
+                    max(
+                        0.0f,
+                        state.amplitudePhase - Math.PI.toFloat() / 2.0f / samplesInRampDown.toFloat()
+                    )
             }
 
-            val volume = sin(state.amplitudePhase).pow(2.0f)
+            val volume = sin(state.amplitudePhase).pow(10f)
             waveform.add((volume * phase * state.x))
-            val theta = 2 * Math.PI * frequency / sampleRate
 
-            state.x = (state.x * cos(theta) - state.y * sin(theta)).toFloat()
-            state.y = (state.x * sin(theta) + state.y * cos(theta)).toFloat()
+            val x = (state.x * cos(theta).toFloat()) - (state.y * sin(theta).toFloat())
+            val y = (state.x * sin(theta).toFloat()) + (state.y * cos(theta).toFloat())
+            state.x = x
+            state.y = y
         }
-
         return Pair(waveform, state)
     }
 
-    private fun createWaveform(): ArrayList<Float> {
+    private fun getWaveform(): ArrayList<Float> {
         val sumWaveform = arrayListOf<Float>()
         val waveform1 = arrayListOf<Float>()
         val waveform2 = arrayListOf<Float>()
@@ -176,17 +180,17 @@ class ConnectDevice {
         Log.i(TAG, "Number of Bits: ${bitSequence.size}")
 
         // Sound wave creation
-        val frequency = 18000f
+        val frequency = 18000.0
         var waveState1 = WaveformState()
 
         // Sound wave creation - high tone(wave1)
         var wave1: Pair<ArrayList<Float>, WaveformState>
         for (h in 0 until 5) {
-            wave1 = createWaveform(waveState1, frequency, 1, 0.0005f, 0.0065f, 0.0005f)
+            wave1 = createWaveform(waveState1, frequency, 1, 0.0005, 0.0065, 0.0005)
             waveState1 = wave1.second
             waveform1.addAll(wave1.first)
 
-            wave1 = createWaveform(waveState1, frequency, -1, 0.0005f, 0.0065f, 0.0005f)
+            wave1 = createWaveform(waveState1, frequency, -1, 0.0005, 0.0065, 0.0005)
             waveState1 = wave1.second
             waveform1.addAll(wave1.first)
         }
@@ -194,47 +198,46 @@ class ConnectDevice {
         var phase = 1
         bitSequence.forEach {
             if (it == 1) {
-                wave1 = createWaveform(waveState1, frequency, phase, 0.0005f, 0.009f, 0.0005f)
+                wave1 = createWaveform(waveState1, frequency, phase, 0.0005, 0.009, 0.0005)
                 waveState1 = wave1.second
                 waveform1.addAll(wave1.first)
             } else {
-                wave1 = createWaveform(waveState1, frequency, phase, 0.0005f, 0.004f, 0.0005f)
+                wave1 = createWaveform(waveState1, frequency, phase, 0.0005, 0.004, 0.0005)
                 waveState1 = wave1.second
                 waveform1.addAll(wave1.first)
             }
             phase *= -1
         }
-        wave1 = createWaveform(waveState1, frequency, phase, 0.0005f, 0.004f, 0.0005f)
+        wave1 = createWaveform(waveState1, frequency, phase, 0.0005, 0.004, 0.0005)
         waveState1 = wave1.second
         waveform1.addAll(wave1.first)
 
         // Sound wave creation - wave2
-        val multiplier = 1.25f
+        val multiplier = 1.25
         var wave2: Pair<ArrayList<Float>, WaveformState>
         var waveState2 = WaveformState()
 
-        wave2 = createWaveform(waveState2, multiplier * 261.63f, 1, 0.030f, 0.120f, 0.030f)
+        wave2 = createWaveform(waveState2, multiplier * 261.63, 1, 0.030, 0.120, 0.030)
         waveState2 = wave2.second
         waveform2.addAll(wave2.first)
 
-        wave2 = createWaveform(waveState2, multiplier * 293.66f, 1, 0.030f, 0.120f, 0.030f)
+        wave2 = createWaveform(waveState2, multiplier * 293.66, 1, 0.030, 0.120, 0.030)
         waveState2 = wave2.second
         waveform2.addAll(wave2.first)
 
-        wave2 = createWaveform(waveState2, multiplier * 329.63f, 1, 0.030f, 0.120f, 0.030f)
+        wave2 = createWaveform(waveState2, multiplier * 329.63, 1, 0.030, 0.120, 0.030)
         waveState2 = wave2.second
         waveform2.addAll(wave2.first)
 
         val duration = ((waveform1.size - waveform2.size) - 0.120 * sampleRate) / sampleRate
         wave2 = createWaveform(
             waveState2,
-            multiplier * 261.63f,
+            multiplier * 261.63,
             1,
-            0.030f,
-            duration.toFloat(),
-            0.090f
+            0.030,
+            duration,
+            0.090
         )
-//        waveState2 = wave2.second
         waveform2.addAll(wave2.first)
 
         // Sound wave creation - sum the waveforms
@@ -245,22 +248,15 @@ class ConnectDevice {
         return sumWaveform
     }
 
-    fun playSound(context: Context, isExample: Boolean = false) {
-        val waveform = if (isExample) {
-            ReadFileUtil<List<Float>>().parseRawJson(
-                context, R.raw.example_audio,
-                object : TypeToken<List<Float>>() {}.type, null
-            )
-        } else {
-            createWaveform()
-        }
+    fun playSound(context: Context) {
+        val waveform = getWaveform()
 
         // Start play
         player.play()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Log.i(TAG, "Wave Form: $waveform")
 
-            val buffer = ShortArray(waveform!!.size)
+            val buffer = ShortArray(waveform.size)
             waveform.forEachIndexed { index, fl ->
                 buffer[index] = (fl * Short.MAX_VALUE).toShort()
             }
