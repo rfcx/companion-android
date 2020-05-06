@@ -52,6 +52,14 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
         }
     }
 
+    override fun openPerformBattery() {
+        supportFragmentManager.beginTransaction()
+            .replace(
+                configureContainer.id, PerformBatteryFragment(),
+                PerformBatteryFragment.TAG
+            ).commit()
+    }
+
     companion object {
         const val STREAM_NAME = "STREAM_NAME"
         const val STREAM = "STREAM"
@@ -77,4 +85,5 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
 interface ConfigureListener {
     fun openSync()
     fun openVerifySync()
+    fun openPerformBattery()
 }

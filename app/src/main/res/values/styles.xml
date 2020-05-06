@@ -11,7 +11,9 @@
     </style>
 
     <!-- Button -->
-    <style name="RangerButton" parent="Widget.AppCompat.Button"/>
+    <style name="RangerButton" parent="Widget.AppCompat.Button">
+        <item name="android:minWidth">120dp</item>
+    </style>
 
     <style name="RangerButton.GreenButton" parent="RangerButton">
         <item name="android:background">@drawable/bg_color_primary_button</item>

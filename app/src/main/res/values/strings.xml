@@ -52,4 +52,12 @@
     <!--    DashboardStreamActivity-->
     <string name="dashboard">Dashboard</string>
 
+    <!--  Perform Battery  -->
+    <string name="label_perform_battery">Perform battery check?</string>
+    <string name="yes">Yes</string>
+    <string name="btn_skip_check_battery"><u>No, I\'m sure it\'s fully charged</u></string>
+    <string name="format_confirm_perform_battery">Given your battery level, this device will record until %s</string>
+    <string name="msg_ask_count_flashes">Count the flashes!</string>
+    <string name="label_battery_level">How many from count the flashes?</string>
+
 </resources>
