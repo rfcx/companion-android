@@ -60,4 +60,10 @@
     <string name="msg_ask_count_flashes">Count the flashes!</string>
     <string name="label_battery_level">How many from count the flashes?</string>
 
+    <!--  DeployFragment  -->
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="finish">finish</string>
+    <string name="name_location">Name Location</string>
+
 </resources>
