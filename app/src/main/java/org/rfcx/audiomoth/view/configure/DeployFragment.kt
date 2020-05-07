@@ -1,12 +1,19 @@
 package org.rfcx.audiomoth.view.configure
 
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.app.ActivityCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import com.mapbox.mapboxsdk.Mapbox
@@ -27,6 +34,8 @@ class DeployFragment : Fragment(), OnMapReadyCallback {
     private lateinit var mapboxMap: MapboxMap
     private lateinit var mapView: MapView
     private lateinit var symbolManager: SymbolManager
+    private var locationManager: LocationManager? = null
+    private var lastLocation: Location? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,9 +54,7 @@ class DeployFragment : Fragment(), OnMapReadyCallback {
         mapView = view.findViewById(R.id.mapBoxView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
-
-        setupView()
-        onLatLngChanged()
+        getLastLocation()
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
@@ -57,7 +64,12 @@ class DeployFragment : Fragment(), OnMapReadyCallback {
             symbolManager.iconAllowOverlap = true
             symbolManager.iconIgnorePlacement = true
 
-            setPinOnMap(LatLng(-2.4896794, -46.43152714))
+            lastLocation?.let { lastLocation ->
+                setPinOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
+                setupView(lastLocation.latitude.toString(), lastLocation.longitude.toString())
+            }
+
+            onLatLngChanged()
         }
     }
 
@@ -70,10 +82,12 @@ class DeployFragment : Fragment(), OnMapReadyCallback {
             mapboxMap.style?.addImage(PIN_MAP, mBitmap)
         }
 
-        symbolManager.create(SymbolOptions()
-            .withLatLng(latLng)
-            .withIconImage(PIN_MAP)
-            .withIconSize(1.0f))
+        symbolManager.create(
+            SymbolOptions()
+                .withLatLng(latLng)
+                .withIconImage(PIN_MAP)
+                .withIconSize(1.0f)
+        )
 
         mapboxMap.moveCamera(
             CameraUpdateFactory.newLatLngZoom(
@@ -125,9 +139,74 @@ class DeployFragment : Fragment(), OnMapReadyCallback {
         })
     }
 
-    private fun setupView() {
-        latitudeEditText.setText("-2.4896794")
-        longitudeEditText.setText("-46.43152714")
+    private val locationListener = object : android.location.LocationListener {
+        override fun onLocationChanged(p0: Location?) {}
+        override fun onStatusChanged(p0: String?, p1: Int, p2: Bundle?) {}
+        override fun onProviderEnabled(p0: String?) {}
+        override fun onProviderDisabled(p0: String?) {}
+    }
+
+    private fun getLastLocation() {
+        if (checkPermissions()) {
+            locationManager?.removeUpdates(locationListener)
+            locationManager =
+                activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager?
+
+            try {
+                locationManager?.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER,
+                    5 * 1000L,
+                    0f,
+                    locationListener
+                )
+                lastLocation = locationManager?.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+
+            } catch (ex: SecurityException) {
+                ex.printStackTrace()
+            } catch (ex: IllegalArgumentException) {
+                ex.printStackTrace()
+            }
+        } else {
+            requestPermissions()
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == REQUEST_PERMISSIONS_REQUEST_CODE) {
+            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                getLastLocation()
+            }
+        }
+    }
+
+    private fun checkPermissions(): Boolean {
+        val permissionState = context?.let {
+            ActivityCompat.checkSelfPermission(
+                it,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        }
+        return permissionState == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            activity?.requestPermissions(
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                REQUEST_PERMISSIONS_REQUEST_CODE
+            )
+        } else {
+            throw Exception("Request permissions not required before API 23 (should never happen)")
+        }
+    }
+
+    private fun setupView(latitudeText: String, longitudeText: String) {
+        latitudeEditText.setText(latitudeText)
+        longitudeEditText.setText(longitudeText)
     }
 
     override fun onStart() {
@@ -161,6 +240,7 @@ class DeployFragment : Fragment(), OnMapReadyCallback {
     }
 
     companion object {
+        const val REQUEST_PERMISSIONS_REQUEST_CODE = 34
         const val PIN_MAP = "pin-map"
         const val MAPBOX_ACCESS_TOKEN =
             "pk.eyJ1IjoicmF0cmVlLW9jaG4iLCJhIjoiY2s5Mjk5MDQ3MDYzcDNmbzVnZHd1aXNqaSJ9.UCrMjgGw8zROm_sRlebSGQ"
