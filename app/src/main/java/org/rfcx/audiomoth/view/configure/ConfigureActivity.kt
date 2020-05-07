@@ -60,6 +60,14 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
             ).commit()
     }
 
+    override fun openDeploy() {
+        supportFragmentManager.beginTransaction()
+            .replace(
+                configureContainer.id, DeployFragment(),
+                DeployFragment.TAG
+            ).commit()
+    }
+
     companion object {
         const val STREAM_NAME = "STREAM_NAME"
         const val STREAM = "STREAM"
@@ -84,6 +92,7 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
 
 interface ConfigureListener {
     fun openSync()
+    fun openDeploy()
     fun openVerifySync()
     fun openPerformBattery()
 }

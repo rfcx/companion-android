@@ -240,6 +240,7 @@ class DeployFragment : Fragment(), OnMapReadyCallback {
     }
 
     companion object {
+        const val TAG = "DeployFragment"
         const val REQUEST_PERMISSIONS_REQUEST_CODE = 34
         const val PIN_MAP = "pin-map"
         const val MAPBOX_ACCESS_TOKEN =

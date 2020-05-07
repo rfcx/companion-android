@@ -1,5 +1,6 @@
 package org.rfcx.audiomoth.view.configure
 
+import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,6 +18,12 @@ import java.util.*
 class PerformBatteryFragment : Fragment(), BatteryLevelListener {
 
     private val batteryLevelFragment by lazy { BatteryLevelBottomSheetFragment(this) }
+    lateinit var listener: ConfigureListener
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        listener = (context as ConfigureListener)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -62,7 +69,7 @@ class PerformBatteryFragment : Fragment(), BatteryLevelListener {
                 R.string.format_confirm_perform_battery,
                 mockPredict.toDateTimeString()
             ), DialogInterface.OnClickListener { dialog, _ ->
-                // TODO: Open Deploy Page
+                listener.openDeploy()
                 dialog.dismiss()
             }
         )
