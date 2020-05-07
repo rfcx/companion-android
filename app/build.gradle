@@ -47,6 +47,7 @@ dependencies {
 
     //mapbox
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:9.1.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-annotation-v9:0.8.0'
 
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.12'
