@@ -69,7 +69,7 @@ class PerformBatteryFragment : Fragment(), BatteryLevelListener {
                 R.string.format_confirm_perform_battery,
                 mockPredict.toDateTimeString()
             ), DialogInterface.OnClickListener { dialog, _ ->
-                listener.openDeploy()
+                listener.openDeploy(batteryLv, mockPredict.time)
                 dialog.dismiss()
             }
         )

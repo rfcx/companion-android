@@ -40,13 +40,23 @@ class CreateStreamActivity : AppCompatActivity() {
         setAdapter()
         setSiteSpinner()
         addTextChanged()
-        checkDeviceId()
+
+        //TODO: Check device id and get site after check
+        getSites()
+//        checkDeviceId()
 
         createStreamButton.setOnClickListener {
             createStreamProgressBar.visibility = View.VISIBLE
             createStreamButton.isEnabled = false
             streamNameEditText.hideKeyboard()
-            onCreateStreamClick()
+
+            //TODO: Delete it after change structure of data
+            val stream = Stream(3,8,false,0,0, arrayListOf(), "Recommended")
+            ConfigureActivity.startActivity(this, "123", nameStream, stream, CREATE_STREAM)
+            finish()
+
+            //TODO: Change structure of data
+//            onCreateStreamClick()
         }
     }
 

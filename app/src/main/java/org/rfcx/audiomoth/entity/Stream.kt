@@ -1,6 +1,7 @@
 package org.rfcx.audiomoth.entity
 
 import java.io.Serializable
+import java.sql.Timestamp
 
 
 open class Stream(
@@ -11,4 +12,19 @@ open class Stream(
     val sleepDuration: Int,
     val recordingPeriodList: ArrayList<String>,
     val durationSelected: String
-): Serializable
+) : Serializable
+
+open class Device(
+    val deviceId: String,
+    val deployedAt: Timestamp,
+    val location: LatLong,
+    val locationName: String,
+    val batteryLevel: Int,
+    val batteryPredictedUntil: Timestamp,
+    val configuration: Stream
+) : Serializable
+
+open class LatLong(
+    val lat: Double,
+    val lng: Double
+) : Serializable
