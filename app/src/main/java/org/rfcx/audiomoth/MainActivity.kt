@@ -3,13 +3,16 @@ package org.rfcx.audiomoth
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.zxing.integration.android.IntentIntegrator
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.Style
+import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.view.CreateStreamActivity
+import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
 import org.rfcx.audiomoth.view.configure.DeployFragment
 
 open class MainActivity : AppCompatActivity() {
@@ -24,9 +27,25 @@ open class MainActivity : AppCompatActivity() {
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync { mapboxMap ->
             mapboxMap.setStyle(Style.OUTDOORS) {
+                getDevices()
                 // Map is set up and the style has loaded. Now you can add data or make other map adjustments
             }
         }
+    }
+
+    private fun getDevices() {
+        val docRef = Firestore().db.collection(DEVICES)
+        docRef.get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot != null) {
+                    val data = documentSnapshot.documents
+                    data.map {
+                        if (it.data != null) {
+                            Log.d(TAG, "${it.data?.get("location")}")
+                        }
+                    }
+                }
+            }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -77,6 +96,7 @@ open class MainActivity : AppCompatActivity() {
     }
 
     companion object {
+        const val TAG = "MainActivity"
         fun startActivity(context: Context) {
             val intent = Intent(context, MainActivity::class.java)
             context.startActivity(intent)
