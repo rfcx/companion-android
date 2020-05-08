@@ -60,12 +60,17 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
             ).commit()
     }
 
-    override fun openDeploy() {
-        supportFragmentManager.beginTransaction()
-            .replace(
-                configureContainer.id, DeployFragment(),
-                DeployFragment.TAG
-            ).commit()
+    override fun openDeploy(batteryLv: Int, datePredict: Long) {
+        if (intent.hasExtra(DEVICE_ID)) {
+            val deviceId = intent.getStringExtra(DEVICE_ID)
+            if (deviceId != null) {
+                supportFragmentManager.beginTransaction()
+                    .replace(
+                        configureContainer.id, DeployFragment.newInstance(deviceId, batteryLv, datePredict),
+                        DeployFragment.TAG
+                    ).commit()
+            }
+        }
     }
 
     companion object {
@@ -92,7 +97,7 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
 
 interface ConfigureListener {
     fun openSync()
-    fun openDeploy()
     fun openVerifySync()
     fun openPerformBattery()
+    fun openDeploy(batteryLv: Int, datePredict: Long)
 }

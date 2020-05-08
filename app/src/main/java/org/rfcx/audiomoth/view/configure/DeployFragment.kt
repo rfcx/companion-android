@@ -34,6 +34,7 @@ import org.rfcx.audiomoth.entity.LatLong
 import org.rfcx.audiomoth.entity.Stream
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
+import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
 import java.sql.Timestamp
 
 class DeployFragment : Fragment(), OnMapReadyCallback {
@@ -69,6 +70,22 @@ class DeployFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun saveDevice() {
+        var deviceId = ""
+        var batteryLevel = 0
+        var datePredictTimeMillis: Long = 0
+        if (arguments?.containsKey(DEVICE_ID) == true && arguments?.containsKey(
+                DATE_PREDICT_TIME_MILLIS
+            ) == true && arguments?.containsKey(
+                BATTERY_LEVEL
+            ) == true
+        ) {
+            arguments?.let {
+                deviceId = it.getString(DEVICE_ID).toString()
+                batteryLevel = it.getInt(BATTERY_LEVEL)
+                datePredictTimeMillis = it.getLong(DATE_PREDICT_TIME_MILLIS)
+            }
+        }
+
         // TODO: Update later it is mockup!
         val latLong = LatLong(
             latitudeEditText.text.toString().toDouble(),
@@ -76,12 +93,12 @@ class DeployFragment : Fragment(), OnMapReadyCallback {
         )
         val stream = Stream(3, 8, false, 5, 10, arrayListOf(), ConfigureFragment.RECOMMENDED)
         val device = Device(
-            "123",
+            deviceId,
             Timestamp(System.currentTimeMillis()),
             latLong,
             locationNameEditText.text.toString(),
-            3,
-            Timestamp(System.currentTimeMillis()),
+            batteryLevel,
+            Timestamp(datePredictTimeMillis),
             stream
         )
         Firestore().db.collection(DEVICES).document().set(device)
@@ -278,5 +295,22 @@ class DeployFragment : Fragment(), OnMapReadyCallback {
         const val PIN_MAP = "pin-map"
         const val MAPBOX_ACCESS_TOKEN =
             "pk.eyJ1IjoicmF0cmVlLW9jaG4iLCJhIjoiY2s5Mjk5MDQ3MDYzcDNmbzVnZHd1aXNqaSJ9.UCrMjgGw8zROm_sRlebSGQ"
+
+        private const val DATE_PREDICT_TIME_MILLIS = "datePredictTimeMillis"
+        private const val BATTERY_LEVEL = "batteryLevel"
+
+        fun newInstance(
+            deviceId: String,
+            batteryLv: Int,
+            datePredictTimeMillis: Long
+        ): DeployFragment {
+            return DeployFragment().apply {
+                arguments = Bundle().apply {
+                    putString(DEVICE_ID, deviceId)
+                    putLong(DATE_PREDICT_TIME_MILLIS, datePredictTimeMillis)
+                    putInt(BATTERY_LEVEL, batteryLv)
+                }
+            }
+        }
     }
 }
