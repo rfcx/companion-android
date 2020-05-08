@@ -165,6 +165,13 @@ open class MainActivity : AppCompatActivity(), InputDeviceIdListener {
 
     override fun onSelectedScanQrCode() {
         inputDeviceIdBottomSheet.dismiss()
+
+        val integrator = IntentIntegrator(this)
+        integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
+        integrator.setOrientationLocked(false)
+        integrator.setPrompt(getString(R.string.scan_qr_code))
+        integrator.setBeepEnabled(false)
+        integrator.initiateScan()
     }
 
     override fun onSelectedEnterDeviceId() {
