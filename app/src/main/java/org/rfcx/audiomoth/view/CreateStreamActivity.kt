@@ -43,7 +43,7 @@ class CreateStreamActivity : AppCompatActivity() {
 
         //TODO: Check device id and get site after check
         getSites()
-//        checkDeviceId()
+        checkDeviceId()
 
         createStreamButton.setOnClickListener {
             createStreamProgressBar.visibility = View.VISIBLE
@@ -51,7 +51,7 @@ class CreateStreamActivity : AppCompatActivity() {
             streamNameEditText.hideKeyboard()
 
             //TODO: Delete it after change structure of data
-            val stream = Stream(3,8,false,0,0, arrayListOf(), "Recommended")
+            val stream = Stream(3, 8, false, 0, 0, arrayListOf(), "Recommended")
             ConfigureActivity.startActivity(this, "123", nameStream, stream, CREATE_STREAM)
             finish()
 
@@ -60,33 +60,44 @@ class CreateStreamActivity : AppCompatActivity() {
         }
     }
 
+    private fun checkEdgeOrGuardian(deviceId: String) {
+        val firstChar = deviceId[0]
+        if (firstChar == 'G') {
+            Toast.makeText(this, "This is Guardian", Toast.LENGTH_SHORT).show()
+        } else if (firstChar == 'E') {
+            Toast.makeText(this, "This is Edge", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun checkDeviceId() {
         if (intent.hasExtra(DEVICE_ID)) {
             val deviceId = intent.getStringExtra(DEVICE_ID)
             if (deviceId != null) {
-                val docRef = Firestore().db.collection(DEVICES).document(deviceId)
-                docRef.get()
-                    .addOnSuccessListener { document ->
-                        if (document != null) {
-                            val data = document.data
-                            if (data != null) {
-                                siteSpinner.isEnabled = false
-                                hasPreviouslyCreated = true
-                                getSiteFromDeviceId(
-                                    data["siteName"].toString(),
-                                    data["siteId"].toString()
-                                )
-                            } else {
-                                hasPreviouslyCreated = false
-                                getSites()
-                            }
-                        } else {
-                            Log.d(TAG, "No such document")
-                        }
-                    }
-                    .addOnFailureListener { exception ->
-                        Log.d(TAG, "get failed with ", exception)
-                    }
+                checkEdgeOrGuardian(deviceId)
+
+//                val docRef = Firestore().db.collection(DEVICES).document(deviceId)
+//                docRef.get()
+//                    .addOnSuccessListener { document ->
+//                        if (document != null) {
+//                            val data = document.data
+//                            if (data != null) {
+//                                siteSpinner.isEnabled = false
+//                                hasPreviouslyCreated = true
+//                                getSiteFromDeviceId(
+//                                    data["siteName"].toString(),
+//                                    data["siteId"].toString()
+//                                )
+//                            } else {
+//                                hasPreviouslyCreated = false
+//                                getSites()
+//                            }
+//                        } else {
+//                            Log.d(TAG, "No such document")
+//                        }
+//                    }
+//                    .addOnFailureListener { exception ->
+//                        Log.d(TAG, "get failed with ", exception)
+//                    }
             }
         }
     }
