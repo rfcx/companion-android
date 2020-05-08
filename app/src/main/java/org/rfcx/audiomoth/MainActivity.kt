@@ -1,63 +1,31 @@
 package org.rfcx.audiomoth
 
-import android.content.DialogInterface
 import android.content.Intent
-import android.graphics.Paint.UNDERLINE_TEXT_FLAG
 import android.os.Bundle
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import com.google.zxing.integration.android.IntentIntegrator
+import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.maps.MapView
+import com.mapbox.mapboxsdk.maps.Style
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.alertlayout.view.*
 import org.rfcx.audiomoth.view.CreateStreamActivity
+import org.rfcx.audiomoth.view.configure.DeployFragment
 
 open class MainActivity : AppCompatActivity() {
+    private lateinit var mapView: MapView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Mapbox.getInstance(this, DeployFragment.MAPBOX_ACCESS_TOKEN)
         setContentView(R.layout.activity_main)
 
-        enterCodeTextView.paintFlags = enterCodeTextView.paintFlags or UNDERLINE_TEXT_FLAG
-
-        scanQRButton.setOnClickListener {
-            val integrator = IntentIntegrator(this)
-            integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
-            integrator.setOrientationLocked(false)
-            integrator.setPrompt(getString(R.string.scan_qr_code))
-            integrator.setBeepEnabled(false)
-            integrator.initiateScan()
-        }
-
-        enterCodeTextView.setOnClickListener {
-            val view = layoutInflater.inflate(R.layout.alertlayout, null)
-            val builder = AlertDialog.Builder(this)
-            builder.setTitle(getString(R.string.enter_code).capitalize())
-            builder.setIcon(R.drawable.ic_audiomoth)
-            builder.setView(view)
-
-            builder.setPositiveButton(getString(R.string.ok)) { dialog, _ ->
-                val deviceId = view.deviceIdEditText.text.toString().trim()
-                if (deviceId.isEmpty()) {
-                    Toast.makeText(this, getText(R.string.device_id_empty), Toast.LENGTH_SHORT)
-                        .show()
-                } else {
-                    CreateStreamActivity.startActivity(this, deviceId)
-                    finish()
-                }
-                dialog.dismiss()
+        mapView = findViewById(R.id.mapBoxView)
+        mapView.onCreate(savedInstanceState)
+        mapView.getMapAsync { mapboxMap ->
+            mapboxMap.setStyle(Style.OUTDOORS) {
+                // Map is set up and the style has loaded. Now you can add data or make other map adjustments
             }
-
-            builder.setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
-                dialog.dismiss()
-            }
-
-            val alertDialog = builder.create()
-            alertDialog.show()
-
-            val buttonNeutral = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
-            buttonNeutral.setTextColor(ContextCompat.getColor(this, R.color.text_secondary))
         }
     }
 
@@ -76,5 +44,35 @@ open class MainActivity : AppCompatActivity() {
             // the camera will not close if the result is still null
             super.onActivityResult(requestCode, resultCode, data)
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        mapView.onStart()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mapView.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mapView.onPause()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mapView.onStop()
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        mapView.onLowMemory()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mapView.onDestroy()
     }
 }
