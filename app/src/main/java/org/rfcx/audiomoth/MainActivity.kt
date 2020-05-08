@@ -59,8 +59,9 @@ open class MainActivity : AppCompatActivity() {
                             val location = it.data?.get("location") as Map<*, *>
                             val latitude = location["lat"] as Double
                             val longitude = location["lng"] as Double
-
-                            displayPinOfDevices(LatLng(latitude, longitude))
+                            val timestamp =
+                                it.data?.get("batteryPredictedUntil") as com.google.firebase.Timestamp
+                            displayPinOfDevices(LatLng(latitude, longitude), checkBatteryPredictedUntil(timestamp.seconds * 1000))
 
                         }
                     }
@@ -91,11 +92,25 @@ open class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun displayPinOfDevices(latLng: LatLng) {
+    private fun checkBatteryPredictedUntil(timestamp: Long): String {
+        val currentMillis = System.currentTimeMillis()
+        val threeDays = 3 * 24 * 60 * 60 * 1000
+        val oneDay = 24 * 60 * 60 * 1000
+
+        return if (timestamp > (currentMillis + threeDays)) {
+            PIN_MAP_GREEN
+        } else if (timestamp > (currentMillis + oneDay) && timestamp < (currentMillis + threeDays)) {
+            PIN_MAP_ORANGE
+        } else {
+            PIN_MAP_RED
+        }
+    }
+
+    private fun displayPinOfDevices(latLng: LatLng, imageName: String) {
         symbolManager.create(
             SymbolOptions()
                 .withLatLng(latLng)
-                .withIconImage(PIN_MAP_RED)
+                .withIconImage(imageName)
                 .withIconSize(1.0f)
         )
 
