@@ -22,6 +22,8 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/deviceIdEditText"
+            android:digits="ABCDEFGHIJKLMNOPQRSTUVWX1Z1234567890abcdefghijklmnopqrstuvwxyz "
+            android:maxLength="8"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>
