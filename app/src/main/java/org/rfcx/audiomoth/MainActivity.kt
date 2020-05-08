@@ -36,6 +36,7 @@ open class MainActivity : AppCompatActivity() {
         mapView.getMapAsync { mapboxMap ->
             this.mapboxMap = mapboxMap
             mapboxMap.setStyle(Style.OUTDOORS) {
+                setUpImage(it)
                 symbolManager = SymbolManager(mapView, mapboxMap, it)
                 symbolManager.iconAllowOverlap = true
                 symbolManager.iconIgnorePlacement = true
@@ -67,17 +68,34 @@ open class MainActivity : AppCompatActivity() {
             }
     }
 
-    private fun displayPinOfDevices(latLng: LatLng) {
-        val drawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map, null)
-        val mBitmap = BitmapUtils.getBitmapFromDrawable(drawable)
-        if (mBitmap != null) {
-            mapboxMap.style?.addImage(DeployFragment.PIN_MAP, mBitmap)
+    private fun setUpImage(style: Style) {
+        val drawablePinMapGreen =
+            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map, null)
+        val mBitmapPinMapGreen = BitmapUtils.getBitmapFromDrawable(drawablePinMapGreen)
+        if (mBitmapPinMapGreen != null) {
+            style.addImage(PIN_MAP_GREEN, mBitmapPinMapGreen)
         }
 
+        val drawablePinMapOrange =
+            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map_orange, null)
+        val mBitmapPinMapOrange = BitmapUtils.getBitmapFromDrawable(drawablePinMapOrange)
+        if (mBitmapPinMapOrange != null) {
+            style.addImage(PIN_MAP_ORANGE, mBitmapPinMapOrange)
+        }
+
+        val drawablePinMapRed =
+            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map_red, null)
+        val mBitmapPinMapRed = BitmapUtils.getBitmapFromDrawable(drawablePinMapRed)
+        if (mBitmapPinMapRed != null) {
+            style.addImage(PIN_MAP_RED, mBitmapPinMapRed)
+        }
+    }
+
+    private fun displayPinOfDevices(latLng: LatLng) {
         symbolManager.create(
             SymbolOptions()
                 .withLatLng(latLng)
-                .withIconImage(DeployFragment.PIN_MAP)
+                .withIconImage(PIN_MAP_RED)
                 .withIconSize(1.0f)
         )
 
@@ -138,6 +156,9 @@ open class MainActivity : AppCompatActivity() {
 
     companion object {
         const val TAG = "MainActivity"
+        const val PIN_MAP_GREEN = "PIN_MAP_GREEN"
+        const val PIN_MAP_ORANGE = "PIN_MAP_ORANGE"
+        const val PIN_MAP_RED = "PIN_MAP_RED"
         fun startActivity(context: Context) {
             val intent = Intent(context, MainActivity::class.java)
             context.startActivity(intent)
