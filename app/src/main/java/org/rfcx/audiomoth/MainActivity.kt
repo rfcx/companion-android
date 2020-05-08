@@ -3,20 +3,28 @@ package org.rfcx.audiomoth
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import com.google.zxing.integration.android.IntentIntegrator
 import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
+import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
+import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
+import com.mapbox.mapboxsdk.utils.BitmapUtils
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.view.CreateStreamActivity
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
 import org.rfcx.audiomoth.view.configure.DeployFragment
 
 open class MainActivity : AppCompatActivity() {
+    private lateinit var mapboxMap: MapboxMap
     private lateinit var mapView: MapView
+    private lateinit var symbolManager: SymbolManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,9 +34,13 @@ open class MainActivity : AppCompatActivity() {
         mapView = findViewById(R.id.mapBoxView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync { mapboxMap ->
+            this.mapboxMap = mapboxMap
             mapboxMap.setStyle(Style.OUTDOORS) {
+                symbolManager = SymbolManager(mapView, mapboxMap, it)
+                symbolManager.iconAllowOverlap = true
+                symbolManager.iconIgnorePlacement = true
+
                 getDevices()
-                // Map is set up and the style has loaded. Now you can add data or make other map adjustments
             }
         }
     }
@@ -39,13 +51,42 @@ open class MainActivity : AppCompatActivity() {
             .addOnSuccessListener { documentSnapshot ->
                 if (documentSnapshot != null) {
                     val data = documentSnapshot.documents
+                    symbolManager.deleteAll()
+
                     data.map {
                         if (it.data != null) {
-                            Log.d(TAG, "${it.data?.get("location")}")
+                            val location = it.data?.get("location") as Map<*, *>
+                            val latitude = location["lat"] as Double
+                            val longitude = location["lng"] as Double
+
+                            displayPinOfDevices(LatLng(latitude, longitude))
+
                         }
                     }
                 }
             }
+    }
+
+    private fun displayPinOfDevices(latLng: LatLng) {
+        val drawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map, null)
+        val mBitmap = BitmapUtils.getBitmapFromDrawable(drawable)
+        if (mBitmap != null) {
+            mapboxMap.style?.addImage(DeployFragment.PIN_MAP, mBitmap)
+        }
+
+        symbolManager.create(
+            SymbolOptions()
+                .withLatLng(latLng)
+                .withIconImage(DeployFragment.PIN_MAP)
+                .withIconSize(1.0f)
+        )
+
+        mapboxMap.moveCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                latLng,
+                15.0
+            )
+        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
