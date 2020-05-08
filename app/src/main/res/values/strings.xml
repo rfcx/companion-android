@@ -10,6 +10,8 @@
     <string name="device_id_empty">Please enter device id</string>
     <string name="ok">OK</string>
     <string name="cancel">CANCEL</string>
+    <string name="find_qr_code">Find the QR code on your RFCx Edge</string>
+    <string name="alternatively">Alternatively,</string>
 
     <!--  CreateStreamActivity  -->
     <string name="create_stream">Create Stream</string>

@@ -17,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/newReportFabButton"
+        android:id="@+id/inputDeviceIdButton"
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:layout_margin="@dimen/margin_padding_normal"

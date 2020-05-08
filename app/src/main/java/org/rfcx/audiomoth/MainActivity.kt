@@ -2,10 +2,15 @@ package org.rfcx.audiomoth
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Paint.UNDERLINE_TEXT_FLAG
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.zxing.integration.android.IntentIntegrator
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
@@ -16,20 +21,32 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.utils.BitmapUtils
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.fragment_input_deviec_id_bottom_sheet.*
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.view.CreateStreamActivity
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
 import org.rfcx.audiomoth.view.configure.DeployFragment
 
-open class MainActivity : AppCompatActivity() {
+open class MainActivity : AppCompatActivity(), InputDeviceIdListener {
+
     private lateinit var mapboxMap: MapboxMap
     private lateinit var mapView: MapView
     private lateinit var symbolManager: SymbolManager
+    private val inputDeviecIdBottomSheet by lazy { InputDeviceIdBottomSheet(this) }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Mapbox.getInstance(this, DeployFragment.MAPBOX_ACCESS_TOKEN)
         setContentView(R.layout.activity_main)
+
+        inputDeviceIdButton.setOnClickListener {
+            inputDeviecIdBottomSheet.show(
+                supportFragmentManager,
+                InputDeviceIdBottomSheet.TAG
+            )
+        }
 
         mapView = findViewById(R.id.mapBoxView)
         mapView.onCreate(savedInstanceState)
@@ -61,7 +78,10 @@ open class MainActivity : AppCompatActivity() {
                             val longitude = location["lng"] as Double
                             val timestamp =
                                 it.data?.get("batteryPredictedUntil") as com.google.firebase.Timestamp
-                            displayPinOfDevices(LatLng(latitude, longitude), checkBatteryPredictedUntil(timestamp.seconds * 1000))
+                            displayPinOfDevices(
+                                LatLng(latitude, longitude),
+                                checkBatteryPredictedUntil(timestamp.seconds * 1000)
+                            )
 
                         }
                     }
@@ -139,6 +159,14 @@ open class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onSelectedScanQrCode() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun onSelectedEnterDeviceId() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun onStart() {
         super.onStart()
         mapView.onStart()
@@ -178,5 +206,30 @@ open class MainActivity : AppCompatActivity() {
             val intent = Intent(context, MainActivity::class.java)
             context.startActivity(intent)
         }
+    }
+}
+
+interface InputDeviceIdListener {
+    fun onSelectedScanQrCode()
+    fun onSelectedEnterDeviceId()
+}
+
+class InputDeviceIdBottomSheet(private val listener: InputDeviceIdListener) :
+    BottomSheetDialogFragment() {
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_input_deviec_id_bottom_sheet, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        enterCodeTextView.paintFlags = enterCodeTextView.paintFlags or UNDERLINE_TEXT_FLAG
+    }
+
+    companion object {
+        const val TAG = "InputDeviceIdBottomSheet"
     }
 }
