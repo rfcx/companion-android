@@ -1,6 +1,7 @@
 package org.rfcx.audiomoth
 
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Paint.UNDERLINE_TEXT_FLAG
 import android.os.Bundle
@@ -8,7 +9,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.zxing.integration.android.IntentIntegrator
@@ -22,6 +25,7 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.utils.BitmapUtils
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.alertlayout.view.*
 import kotlinx.android.synthetic.main.fragment_input_deviec_id_bottom_sheet.*
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.view.CreateStreamActivity
@@ -33,7 +37,7 @@ open class MainActivity : AppCompatActivity(), InputDeviceIdListener {
     private lateinit var mapboxMap: MapboxMap
     private lateinit var mapView: MapView
     private lateinit var symbolManager: SymbolManager
-    private val inputDeviecIdBottomSheet by lazy { InputDeviceIdBottomSheet(this) }
+    private val inputDeviceIdBottomSheet by lazy { InputDeviceIdBottomSheet(this) }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,7 +46,7 @@ open class MainActivity : AppCompatActivity(), InputDeviceIdListener {
         setContentView(R.layout.activity_main)
 
         inputDeviceIdButton.setOnClickListener {
-            inputDeviecIdBottomSheet.show(
+            inputDeviceIdBottomSheet.show(
                 supportFragmentManager,
                 InputDeviceIdBottomSheet.TAG
             )
@@ -160,11 +164,39 @@ open class MainActivity : AppCompatActivity(), InputDeviceIdListener {
     }
 
     override fun onSelectedScanQrCode() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        inputDeviceIdBottomSheet.dismiss()
     }
 
     override fun onSelectedEnterDeviceId() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        inputDeviceIdBottomSheet.dismiss()
+
+        val view = layoutInflater.inflate(R.layout.alertlayout, null)
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle(getString(R.string.enter_code).capitalize())
+        builder.setIcon(R.drawable.ic_audiomoth)
+        builder.setView(view)
+
+        builder.setPositiveButton(getString(R.string.ok)) { dialog, _ ->
+            val deviceId = view.deviceIdEditText.text.toString().trim()
+            if (deviceId.isEmpty()) {
+                Toast.makeText(this, getText(R.string.device_id_empty), Toast.LENGTH_SHORT)
+                    .show()
+            } else {
+                CreateStreamActivity.startActivity(this, deviceId)
+                finish()
+            }
+            dialog.dismiss()
+        }
+
+        builder.setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
+            dialog.dismiss()
+        }
+
+        val alertDialog = builder.create()
+        alertDialog.show()
+
+        val buttonNeutral = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
+        buttonNeutral.setTextColor(ContextCompat.getColor(this, R.color.text_secondary))
     }
 
     override fun onStart() {
@@ -227,6 +259,12 @@ class InputDeviceIdBottomSheet(private val listener: InputDeviceIdListener) :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         enterCodeTextView.paintFlags = enterCodeTextView.paintFlags or UNDERLINE_TEXT_FLAG
+        setView()
+    }
+
+    private fun setView() {
+        enterCodeTextView.setOnClickListener { listener.onSelectedEnterDeviceId() }
+        scanQrCodeButton.setOnClickListener { listener.onSelectedScanQrCode() }
     }
 
     companion object {
