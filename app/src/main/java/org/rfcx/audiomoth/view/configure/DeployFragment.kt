@@ -27,7 +27,14 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.utils.BitmapUtils
 import kotlinx.android.synthetic.main.fragment_deploy.*
+import org.rfcx.audiomoth.MainActivity
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.Device
+import org.rfcx.audiomoth.entity.LatLong
+import org.rfcx.audiomoth.entity.Stream
+import org.rfcx.audiomoth.util.Firestore
+import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
+import java.sql.Timestamp
 
 class DeployFragment : Fragment(), OnMapReadyCallback {
 
@@ -55,6 +62,32 @@ class DeployFragment : Fragment(), OnMapReadyCallback {
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
         getLastLocation()
+
+        finishButton.setOnClickListener {
+            saveDevice()
+        }
+    }
+
+    private fun saveDevice() {
+        // TODO: Update later it is mockup!
+        val latLong = LatLong(
+            latitudeEditText.text.toString().toDouble(),
+            longitudeEditText.text.toString().toDouble()
+        )
+        val stream = Stream(3, 8, false, 5, 10, arrayListOf(), ConfigureFragment.RECOMMENDED)
+        val device = Device(
+            "123",
+            Timestamp(System.currentTimeMillis()),
+            latLong,
+            locationNameEditText.text.toString(),
+            3,
+            Timestamp(System.currentTimeMillis()),
+            stream
+        )
+        Firestore().db.collection(DEVICES).document().set(device)
+            .addOnCompleteListener {
+                context?.let { it1 -> MainActivity.startActivity(it1) }
+            }
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {

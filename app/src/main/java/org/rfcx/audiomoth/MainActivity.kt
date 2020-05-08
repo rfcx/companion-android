@@ -1,5 +1,6 @@
 package org.rfcx.audiomoth
 
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Paint.UNDERLINE_TEXT_FLAG
@@ -75,6 +76,13 @@ open class MainActivity : AppCompatActivity() {
         } else {
             // the camera will not close if the result is still null
             super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
+
+    companion object {
+        fun startActivity(context: Context) {
+            val intent = Intent(context, MainActivity::class.java)
+            context.startActivity(intent)
         }
     }
 }
