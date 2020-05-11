@@ -52,6 +52,27 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
         }
     }
 
+    override fun openPerformBattery() {
+        supportFragmentManager.beginTransaction()
+            .replace(
+                configureContainer.id, PerformBatteryFragment(),
+                PerformBatteryFragment.TAG
+            ).commit()
+    }
+
+    override fun openDeploy(batteryLv: Int, datePredict: Long) {
+        if (intent.hasExtra(DEVICE_ID)) {
+            val deviceId = intent.getStringExtra(DEVICE_ID)
+            if (deviceId != null) {
+                supportFragmentManager.beginTransaction()
+                    .replace(
+                        configureContainer.id, DeployFragment.newInstance(deviceId, batteryLv, datePredict),
+                        DeployFragment.TAG
+                    ).commit()
+            }
+        }
+    }
+
     companion object {
         const val STREAM_NAME = "STREAM_NAME"
         const val STREAM = "STREAM"
@@ -77,4 +98,6 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
 interface ConfigureListener {
     fun openSync()
     fun openVerifySync()
+    fun openPerformBattery()
+    fun openDeploy(batteryLv: Int, datePredict: Long)
 }

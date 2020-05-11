@@ -9,7 +9,12 @@
     <string name="device_id">Device id</string>
     <string name="device_id_empty">Please enter device id</string>
     <string name="ok">OK</string>
+    <string name="got_it">Got it</string>
     <string name="cancel">CANCEL</string>
+    <string name="find_qr_code">Find the QR code on your RFCx Edge</string>
+    <string name="alternatively">Alternatively,</string>
+    <string name="please_switch_mode">You\'ve just deployed your RFCx Edge device. Please switch to RECORD mode and place the device</string>
+    <string name="input_format_text">ABCDEFGHIJKLMNOPQRSTUVWX1Z1234567890abcdefghijklmnopqrstuvwxyz</string>
 
     <!--  CreateStreamActivity  -->
     <string name="create_stream">Create Stream</string>
@@ -51,5 +56,19 @@
 
     <!--    DashboardStreamActivity-->
     <string name="dashboard">Dashboard</string>
+
+    <!--  Perform Battery  -->
+    <string name="label_perform_battery">Perform battery check?</string>
+    <string name="yes">Yes</string>
+    <string name="btn_skip_check_battery"><u>No, I\'m sure it\'s fully charged</u></string>
+    <string name="format_confirm_perform_battery">Given your battery level, this device will record until %s</string>
+    <string name="msg_ask_count_flashes">Count the flashes!</string>
+    <string name="label_battery_level">How many from count the flashes?</string>
+
+    <!--  DeployFragment  -->
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="finish">finish</string>
+    <string name="name_location">Name Location</string>
 
 </resources>

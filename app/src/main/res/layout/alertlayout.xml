@@ -22,8 +22,11 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/deviceIdEditText"
+            android:digits="@string/input_format_text"
+            android:maxLength="8"
+            android:maxLines="1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content" /> 
     </com.google.android.material.textfield.TextInputLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

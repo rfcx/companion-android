@@ -31,14 +31,7 @@ class VerifySyncFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         greenButton.setOnClickListener {
-            if (arguments?.containsKey(CreateStreamActivity.DEVICE_ID) == true) {
-                arguments?.let {
-                    val deviceId = it.getString(CreateStreamActivity.DEVICE_ID)
-                    if (deviceId != null) {
-                        context?.let { it1 -> DashboardStreamActivity.startActivity(it1, deviceId) }
-                    }
-                }
-            }
+            listener.openPerformBattery()
         }
 
         redButton.setOnClickListener {
