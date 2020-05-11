@@ -4,16 +4,6 @@ import java.io.Serializable
 import java.sql.Timestamp
 
 
-open class Stream(
-    val gain: Int,
-    val sampleRate: Int,
-    val customRecordingPeriod: Boolean,
-    val recordingDuration: Int,
-    val sleepDuration: Int,
-    val recordingPeriodList: ArrayList<String>,
-    val durationSelected: String
-) : Serializable
-
 open class Device(
     val deviceId: String,
     val deployedAt: Timestamp,
@@ -22,6 +12,16 @@ open class Device(
     val batteryLevel: Int,
     val batteryPredictedUntil: Timestamp,
     val configuration: Stream
+) : Serializable
+
+open class Stream(
+    val gain: Int,
+    val sampleRate: Int,
+    val customRecordingPeriod: Boolean,
+    val recordingDuration: Int,
+    val sleepDuration: Int,
+    val recordingPeriodList: ArrayList<String>,
+    val durationSelected: String
 ) : Serializable
 
 open class LatLong(
