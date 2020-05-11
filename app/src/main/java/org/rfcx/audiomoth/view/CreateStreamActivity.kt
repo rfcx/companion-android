@@ -55,12 +55,11 @@ class CreateStreamActivity : AppCompatActivity() {
             ConfigureActivity.startActivity(this, "123", nameStream, stream, CREATE_STREAM)
             finish()
 
-            //TODO: Change structure of data
-//            onCreateStreamClick()
         }
     }
 
     private fun checkEdgeOrGuardian(deviceId: String) {
+        // TODO: Change to do something after know is Edge or Guardian
         val firstChar = deviceId[0]
         if (firstChar == 'G') {
             Toast.makeText(this, "This is Guardian", Toast.LENGTH_SHORT).show()
@@ -74,30 +73,7 @@ class CreateStreamActivity : AppCompatActivity() {
             val deviceId = intent.getStringExtra(DEVICE_ID)
             if (deviceId != null) {
                 checkEdgeOrGuardian(deviceId)
-
-//                val docRef = Firestore().db.collection(DEVICES).document(deviceId)
-//                docRef.get()
-//                    .addOnSuccessListener { document ->
-//                        if (document != null) {
-//                            val data = document.data
-//                            if (data != null) {
-//                                siteSpinner.isEnabled = false
-//                                hasPreviouslyCreated = true
-//                                getSiteFromDeviceId(
-//                                    data["siteName"].toString(),
-//                                    data["siteId"].toString()
-//                                )
-//                            } else {
-//                                hasPreviouslyCreated = false
-//                                getSites()
-//                            }
-//                        } else {
-//                            Log.d(TAG, "No such document")
-//                        }
-//                    }
-//                    .addOnFailureListener { exception ->
-//                        Log.d(TAG, "get failed with ", exception)
-//                    }
+                // TODO: Check device id is exist in Firestore
             }
         }
     }

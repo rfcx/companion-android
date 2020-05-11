@@ -226,10 +226,9 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
                             recordingPeriod = timeRecordingPeriod
                         }
 
-//                        updateStream(deviceId, streamName)
                         listener.openSync()
+
                         // Todo: start notification here
-//                        notification()
                     }
                 }
             }
