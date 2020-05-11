@@ -19,14 +19,15 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_configure.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.Device
+import org.rfcx.audiomoth.entity.LatLong
 import org.rfcx.audiomoth.entity.Stream
-import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.util.NotificationBroadcastReceiver
-import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
 import org.rfcx.audiomoth.view.configure.ConfigureActivity.Companion.FROM
 import org.rfcx.audiomoth.view.configure.ConfigureActivity.Companion.SITE_ID
 import org.rfcx.audiomoth.view.configure.ConfigureActivity.Companion.SITE_NAME
+import java.sql.Timestamp
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -39,6 +40,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
     private val gainList = arrayOf("1 - Lowest", "2 - Low", "3 - Medium", "4 - High", "5 - Highest")
 
     private var gain = stream.gain
+    private var streamName = stream.streamName
     private var sampleRate = stream.sampleRate
     private var sleepDuration = stream.sleepDuration
     private var recordingDuration = stream.recordingDuration
@@ -240,7 +242,30 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
                             recordingPeriod = timeRecordingPeriod
                         }
 
-                        listener.openSync()
+                        val latLongDefault = LatLong(0.0, 0.0)
+                        val stream = Stream(
+                            streamName,
+                            gain,
+                            sampleRate,
+                            customRecordingPeriod,
+                            recordingDuration,
+                            sleepDuration,
+                            recordingPeriod,
+                            durationSelected
+                        )
+                        val device = Device(
+                            deviceId,
+                            siteId,
+                            siteName,
+                            Timestamp(System.currentTimeMillis()),
+                            latLongDefault,
+                            "locationName",
+                            0,
+                            Timestamp(System.currentTimeMillis()),
+                            stream
+                        )
+
+                        listener.openSync(device)
 
                         // Todo: start notification here
                     }

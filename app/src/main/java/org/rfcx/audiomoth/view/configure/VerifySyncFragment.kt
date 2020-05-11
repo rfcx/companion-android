@@ -35,7 +35,7 @@ class VerifySyncFragment : Fragment() {
         }
 
         redButton.setOnClickListener {
-            listener.openSync()
+//            listener.openSync()
         }
     }
     companion object {
