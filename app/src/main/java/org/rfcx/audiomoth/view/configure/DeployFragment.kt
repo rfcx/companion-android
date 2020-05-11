@@ -31,19 +31,19 @@ import org.rfcx.audiomoth.MainActivity
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Device
 import org.rfcx.audiomoth.entity.LatLong
-import org.rfcx.audiomoth.entity.Stream
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
 import java.sql.Timestamp
 
-class DeployFragment : Fragment(), OnMapReadyCallback {
+class DeployFragment(device: Device) : Fragment(), OnMapReadyCallback {
 
     private lateinit var mapboxMap: MapboxMap
     private lateinit var mapView: MapView
     private lateinit var symbolManager: SymbolManager
     private var locationManager: LocationManager? = null
     private var lastLocation: Location? = null
+    private var deviceInfo: Device = device
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -86,23 +86,20 @@ class DeployFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-        // TODO: Update later it is mockup!
         val latLong = LatLong(
             latitudeEditText.text.toString().toDouble(),
             longitudeEditText.text.toString().toDouble()
         )
-        val stream =
-            Stream("stream01", 3, 8, false, 5, 10, arrayListOf(), ConfigureFragment.RECOMMENDED)
         val device = Device(
             deviceId,
-            "",
-            "",
+            deviceInfo.siteId,
+            deviceInfo.siteName,
             Timestamp(System.currentTimeMillis()),
             latLong,
             locationNameEditText.text.toString(),
             batteryLevel,
             Timestamp(datePredictTimeMillis),
-            stream
+            deviceInfo.configuration
         )
         Firestore().db.collection(DEVICES).document().set(device)
             .addOnCompleteListener {
@@ -305,9 +302,10 @@ class DeployFragment : Fragment(), OnMapReadyCallback {
         fun newInstance(
             deviceId: String,
             batteryLv: Int,
-            datePredictTimeMillis: Long
+            datePredictTimeMillis: Long,
+            device: Device
         ): DeployFragment {
-            return DeployFragment().apply {
+            return DeployFragment(device).apply {
                 arguments = Bundle().apply {
                     putString(DEVICE_ID, deviceId)
                     putLong(DATE_PREDICT_TIME_MILLIS, datePredictTimeMillis)

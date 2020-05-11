@@ -12,6 +12,8 @@ import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
 
 class ConfigureActivity : AppCompatActivity(), ConfigureListener {
 
+    var device: Device? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_configure)
@@ -55,6 +57,7 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
     }
 
     override fun openSync(device: Device) {
+        this.device = device
         supportFragmentManager.beginTransaction()
             .replace(
                 configureContainer.id, SyncFragment(),
@@ -86,11 +89,11 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
     override fun openDeploy(batteryLv: Int, datePredict: Long) {
         if (intent.hasExtra(DEVICE_ID)) {
             val deviceId = intent.getStringExtra(DEVICE_ID)
-            if (deviceId != null) {
+            if (deviceId != null && device != null) {
                 supportFragmentManager.beginTransaction()
                     .replace(
                         configureContainer.id,
-                        DeployFragment.newInstance(deviceId, batteryLv, datePredict),
+                        DeployFragment.newInstance(deviceId, batteryLv, datePredict, device!!),
                         DeployFragment.TAG
                     ).commit()
             }
