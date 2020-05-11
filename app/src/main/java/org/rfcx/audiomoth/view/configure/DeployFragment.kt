@@ -103,7 +103,7 @@ class DeployFragment : Fragment(), OnMapReadyCallback {
         )
         Firestore().db.collection(DEVICES).document().set(device)
             .addOnCompleteListener {
-                context?.let { it1 -> MainActivity.startActivity(it1) }
+                context?.let { it1 -> MainActivity.startActivity(it1, true) }
             }
     }
 

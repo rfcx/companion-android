@@ -4,16 +4,25 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Paint.UNDERLINE_TEXT_FLAG
+import android.graphics.Typeface
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.snackbar.Snackbar
 import com.google.zxing.integration.android.IntentIntegrator
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
@@ -25,9 +34,11 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.utils.BitmapUtils
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.alert_tell_switch_mode.view.*
 import kotlinx.android.synthetic.main.alertlayout.view.*
 import kotlinx.android.synthetic.main.fragment_input_deviec_id_bottom_sheet.*
 import org.rfcx.audiomoth.util.Firestore
+import org.rfcx.audiomoth.util.getIntColor
 import org.rfcx.audiomoth.view.CreateStreamActivity
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
 import org.rfcx.audiomoth.view.configure.DeployFragment
@@ -65,6 +76,42 @@ open class MainActivity : AppCompatActivity(), InputDeviceIdListener {
                 getDevices()
             }
         }
+
+        if (intent.hasExtra(SHOW_SNACKBAR)) {
+            val show = intent.getBooleanExtra(SHOW_SNACKBAR, false)
+            if (show) {
+                val view = layoutInflater.inflate(R.layout.alert_tell_switch_mode, null)
+                makeTextBold(getString(R.string.please_switch_mode), view.switchModeTextView)
+                val builder = AlertDialog.Builder(this)
+                builder.setCancelable(false)
+                builder.setView(view)
+
+                builder.setPositiveButton(getString(R.string.got_it)) { dialog, _ ->
+                    dialog.dismiss()
+                }
+
+                val alertDialog = builder.create()
+                alertDialog.show()
+
+            }
+        }
+    }
+
+    private fun makeTextBold(sentence: String, textView: AppCompatTextView) {
+        val builder = SpannableStringBuilder()
+        val startIndex = 61
+        val endIndex = 68
+        val spannableString = SpannableString(sentence)
+        val boldSpan = StyleSpan(Typeface.BOLD)
+        spannableString.setSpan(boldSpan, startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        spannableString.setSpan(
+            ForegroundColorSpan(this.getIntColor(R.color.text_error)),
+            startIndex,
+            endIndex,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        builder.append(spannableString)
+        textView.setText(builder, TextView.BufferType.SPANNABLE)
     }
 
     private fun getDevices() {
@@ -236,13 +283,21 @@ open class MainActivity : AppCompatActivity(), InputDeviceIdListener {
         mapView.onDestroy()
     }
 
+    private fun Snackbar.allowInfiniteLines(): Snackbar {
+        return apply {
+            (view.findViewById<View?>(R.id.snackbar_text) as? TextView?)?.isSingleLine = false
+        }
+    }
+
     companion object {
         const val TAG = "MainActivity"
         const val PIN_MAP_GREEN = "PIN_MAP_GREEN"
         const val PIN_MAP_ORANGE = "PIN_MAP_ORANGE"
         const val PIN_MAP_RED = "PIN_MAP_RED"
-        fun startActivity(context: Context) {
+        const val SHOW_SNACKBAR = "SHOW_SNACKBAR"
+        fun startActivity(context: Context, showSnackbar: Boolean = false) {
             val intent = Intent(context, MainActivity::class.java)
+            intent.putExtra(SHOW_SNACKBAR, showSnackbar)
             context.startActivity(intent)
         }
     }

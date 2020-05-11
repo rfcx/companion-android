@@ -9,9 +9,11 @@
     <string name="device_id">Device id</string>
     <string name="device_id_empty">Please enter device id</string>
     <string name="ok">OK</string>
+    <string name="got_it">Got it</string>
     <string name="cancel">CANCEL</string>
     <string name="find_qr_code">Find the QR code on your RFCx Edge</string>
     <string name="alternatively">Alternatively,</string>
+    <string name="please_switch_mode">You\'ve just deployed your RFCx Edge device. Please switch to RECORD mode and place the device</string>
 
     <!--  CreateStreamActivity  -->
     <string name="create_stream">Create Stream</string>
