@@ -91,9 +91,12 @@ class DeployFragment : Fragment(), OnMapReadyCallback {
             latitudeEditText.text.toString().toDouble(),
             longitudeEditText.text.toString().toDouble()
         )
-        val stream = Stream(3, 8, false, 5, 10, arrayListOf(), ConfigureFragment.RECOMMENDED)
+        val stream =
+            Stream("stream01", 3, 8, false, 5, 10, arrayListOf(), ConfigureFragment.RECOMMENDED)
         val device = Device(
             deviceId,
+            "",
+            "",
             Timestamp(System.currentTimeMillis()),
             latLong,
             locationNameEditText.text.toString(),

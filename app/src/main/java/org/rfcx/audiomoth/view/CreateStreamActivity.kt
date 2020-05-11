@@ -51,7 +51,7 @@ class CreateStreamActivity : AppCompatActivity() {
             streamNameEditText.hideKeyboard()
 
             //TODO: Delete it after change structure of data
-            val stream = Stream(3, 8, false, 0, 0, arrayListOf(), "Recommended")
+            val stream = Stream("stream01",3, 8, false, 0, 0, arrayListOf(), "Recommended")
             ConfigureActivity.startActivity(this, "123", nameStream, stream, CREATE_STREAM)
             finish()
 
@@ -194,7 +194,7 @@ class CreateStreamActivity : AppCompatActivity() {
     }
 
     private fun saveStream(deviceId: String) {
-        val stream = Stream(3, 8, false, 0, 0, arrayListOf(), ConfigureFragment.RECOMMENDED)
+        val stream = Stream("stream01",3, 8, false, 0, 0, arrayListOf(), ConfigureFragment.RECOMMENDED)
         val docRef = Firestore().db.collection(DEVICES).document(deviceId)
         val docData = hashMapOf(
             "createdAt" to Timestamp(System.currentTimeMillis()).toString(),

@@ -64,6 +64,7 @@ class DashboardStreamActivity : AppCompatActivity() {
                             val data = document.data
                             if (data != null) {
                                 val stream = Stream(
+                                    data["streamName"].toString(),
                                     data["gain"].toString().toInt(),
                                     data["sampleRateKiloHertz"].toString().toInt(),
                                     data["customRecordingPeriod"] as Boolean,

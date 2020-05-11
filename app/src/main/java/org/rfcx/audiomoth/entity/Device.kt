@@ -6,6 +6,8 @@ import java.sql.Timestamp
 
 open class Device(
     val deviceId: String,
+    val siteId: String,
+    val siteName: String,
     val deployedAt: Timestamp,
     val location: LatLong,
     val locationName: String,
@@ -15,6 +17,7 @@ open class Device(
 ) : Serializable
 
 open class Stream(
+    val streamName: String,
     val gain: Int,
     val sampleRate: Int,
     val customRecordingPeriod: Boolean,
