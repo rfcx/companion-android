@@ -25,6 +25,8 @@ import org.rfcx.audiomoth.util.NotificationBroadcastReceiver
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
 import org.rfcx.audiomoth.view.configure.ConfigureActivity.Companion.FROM
+import org.rfcx.audiomoth.view.configure.ConfigureActivity.Companion.SITE_ID
+import org.rfcx.audiomoth.view.configure.ConfigureActivity.Companion.SITE_NAME
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -43,6 +45,8 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
     private var recordingPeriod = stream.recordingPeriodList
     private var customRecordingPeriod = stream.customRecordingPeriod
     private var durationSelected = stream.durationSelected
+    var siteName = ""
+    var siteId = ""
 
     private var timeList = arrayListOf(
         "00:00",
@@ -89,6 +93,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setSite()
         setGainLayout()
         setNextOnClick()
         setSampleRateLayout()
@@ -126,6 +131,19 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
                 R.id.customRadioButton -> {
                     durationSelected = CUSTOM
                     durationSelectedItem(CUSTOM)
+                }
+            }
+        }
+    }
+
+    private fun setSite() {
+        if (arguments?.containsKey(SITE_ID) == true && arguments?.containsKey(SITE_NAME) == true) {
+            arguments?.let {
+                val siteId = it.getString(SITE_ID)
+                val siteName = it.getString(SITE_NAME)
+                if (siteId != null && siteName != null) {
+                    this.siteId = siteId
+                    this.siteName = siteName
                 }
             }
         }
@@ -208,14 +226,10 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
                 recordingDuration = recordingDurationEditText.text.toString().toInt()
                 sleepDuration = sleepDurationEditText.text.toString().toInt()
             }
-            if (arguments?.containsKey(DEVICE_ID) == true && arguments?.containsKey(
-                    ConfigureActivity.STREAM_NAME
-                ) == true
-            ) {
+            if (arguments?.containsKey(DEVICE_ID) == true) {
                 arguments?.let {
                     val deviceId = it.getString(DEVICE_ID)
-                    val streamName = it.getString(ConfigureActivity.STREAM_NAME)
-                    if (deviceId != null && streamName != null) {
+                    if (deviceId != null) {
                         val timeRecordingPeriod = arrayListOf<String>()
                         if (customRecordingPeriod) {
                             timeState.forEach { timeStatus ->
@@ -353,15 +367,17 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
 
         fun newInstance(
             deviceId: String,
-            streamName: String,
+            siteId: String,
+            siteName: String,
             streams: Stream,
             from: String
         ): ConfigureFragment {
             return ConfigureFragment(streams).apply {
                 arguments = Bundle().apply {
                     putString(DEVICE_ID, deviceId)
+                    putString(SITE_ID, siteId)
+                    putString(SITE_NAME, siteName)
                     putString(FROM, from)
-                    putString(ConfigureActivity.STREAM_NAME, streamName)
                 }
             }
         }

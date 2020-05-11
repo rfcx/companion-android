@@ -73,13 +73,7 @@ class DashboardStreamActivity : AppCompatActivity() {
                                     data["recordingPeriodList"] as ArrayList<String>,
                                     data["durationSelected"].toString()
                                 )
-                                ConfigureActivity.startActivity(
-                                    this@DashboardStreamActivity,
-                                    currentDeviceId,
-                                    streamName,
-                                    stream,
-                                    DASHBOARD_STREAM
-                                )
+                                // TODO: Open ConfigureActivity
                             }
                         } else {
                             Log.d(TAG, "No such document")

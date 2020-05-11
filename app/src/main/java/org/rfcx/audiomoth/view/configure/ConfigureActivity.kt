@@ -15,16 +15,38 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_configure)
 
-        if (intent.hasExtra(DEVICE_ID) && intent.hasExtra(STREAM_NAME) && intent.hasExtra(STREAM)) {
+        if (intent.hasExtra(DEVICE_ID) && intent.hasExtra(STREAM_NAME) && intent.hasExtra(SITE_ID) && intent.hasExtra(
+                SITE_NAME
+            ) && intent.hasExtra(FROM)
+        ) {
             val deviceId = intent.getStringExtra(DEVICE_ID)
             val streamName = intent.getStringExtra(STREAM_NAME)
-            val stream = intent.getSerializableExtra(STREAM) as? Stream
+            val siteId = intent.getStringExtra(SITE_ID)
+            val siteName = intent.getStringExtra(SITE_NAME)
             val from = intent.getStringExtra(FROM)
-            if (deviceId != null && streamName != null && stream != null && from != null) {
+
+            if (deviceId != null && streamName != null && from != null && siteId != null && siteName != null) {
+                val streamDefault = Stream(
+                    streamName,
+                    3,
+                    8,
+                    false,
+                    0,
+                    0,
+                    arrayListOf(),
+                    ConfigureFragment.RECOMMENDED
+                )
+
                 supportFragmentManager.beginTransaction()
                     .add(
                         configureContainer.id,
-                        ConfigureFragment.newInstance(deviceId, streamName, stream, from),
+                        ConfigureFragment.newInstance(
+                            deviceId,
+                            siteId,
+                            siteName,
+                            streamDefault,
+                            from
+                        ),
                         "ConfigureFragment"
                     ).commit()
             }
@@ -66,7 +88,8 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
             if (deviceId != null) {
                 supportFragmentManager.beginTransaction()
                     .replace(
-                        configureContainer.id, DeployFragment.newInstance(deviceId, batteryLv, datePredict),
+                        configureContainer.id,
+                        DeployFragment.newInstance(deviceId, batteryLv, datePredict),
                         DeployFragment.TAG
                     ).commit()
             }
@@ -76,19 +99,23 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
     companion object {
         const val STREAM_NAME = "STREAM_NAME"
         const val STREAM = "STREAM"
+        const val SITE_ID = "SITE_ID"
+        const val SITE_NAME = "SITE_NAME"
         const val FROM = "FROM"
 
         fun startActivity(
             context: Context,
             deviceId: String,
             streamName: String,
-            stream: Stream,
+            siteId: String,
+            siteName: String,
             from: String
         ) {
             val intent = Intent(context, ConfigureActivity::class.java)
             intent.putExtra(DEVICE_ID, deviceId)
             intent.putExtra(STREAM_NAME, streamName)
-            intent.putExtra(STREAM, stream)
+            intent.putExtra(SITE_ID, siteId)
+            intent.putExtra(SITE_NAME, siteName)
             intent.putExtra(FROM, from)
             context.startActivity(intent)
         }
