@@ -249,22 +249,6 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         }
     }
 
-    private fun updateStream(deviceId: String, streamName: String) {
-        val docRef = Firestore().db.collection(DEVICES).document(deviceId)
-        docRef.collection("streams").document(streamName)
-            .update(
-                mapOf(
-                    "sampleRateKiloHertz" to sampleRate,
-                    "gain" to gain,
-                    "sleepDurationSecond" to sleepDuration,
-                    "recordingDurationSecond" to recordingDuration,
-                    "customRecordingPeriod" to customRecordingPeriod,
-                    "recordingPeriodList" to recordingPeriod,
-                    "durationSelected" to durationSelected
-                )
-            )
-    }
-
     private fun createNotificationChannel() {
         val notificationManager =
             context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
