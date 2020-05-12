@@ -38,7 +38,7 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
                             val data = documentSnapshot.documents
                             if (data.isNotEmpty()) {
                                 val configuration =
-                                    data.last().data?.get("configuration") as Map<*, *>
+                                    data[0].data?.get("configuration") as Map<*, *>
                                 val gain = configuration["gain"].toString().toInt()
                                 val sampleRate = configuration["sampleRate"].toString().toInt()
                                 val recordingDuration =
