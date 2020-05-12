@@ -8,6 +8,8 @@ import kotlinx.android.synthetic.main.activity_configure.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Device
 import org.rfcx.audiomoth.entity.Stream
+import org.rfcx.audiomoth.util.Firestore
+import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
 
 class ConfigureActivity : AppCompatActivity(), ConfigureListener {
@@ -29,29 +31,74 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
             val from = intent.getStringExtra(FROM)
 
             if (deviceId != null && streamName != null && from != null && siteId != null && siteName != null) {
-                val streamDefault = Stream(
-                    streamName,
-                    3,
-                    8,
-                    false,
-                    0,
-                    0,
-                    arrayListOf(),
-                    ConfigureFragment.RECOMMENDED
-                )
+                val docRef = Firestore().db.collection(DEVICES)
+                docRef.get()
+                    .addOnSuccessListener { documentSnapshot ->
+                        if (documentSnapshot != null) {
+                            val data = documentSnapshot.documents
+                            if (data.isNotEmpty()) {
+                                val configuration =
+                                    data.last().data?.get("configuration") as Map<*, *>
+                                val gain = configuration["gain"].toString().toInt()
+                                val sampleRate = configuration["sampleRate"].toString().toInt()
+                                val recordingDuration =
+                                    configuration["recordingDuration"].toString().toInt()
+                                val sleepDuration =
+                                    configuration["sleepDuration"].toString().toInt()
+                                val customRecordingPeriod =
+                                    configuration["customRecordingPeriod"] as Boolean
+                                val durationSelected = configuration["durationSelected"] as String
+                                val recordingPeriodList =
+                                    configuration["recordingPeriodList"] as ArrayList<String>
 
-                supportFragmentManager.beginTransaction()
-                    .add(
-                        configureContainer.id,
-                        ConfigureFragment.newInstance(
-                            deviceId,
-                            siteId,
-                            siteName,
-                            streamDefault,
-                            from
-                        ),
-                        "ConfigureFragment"
-                    ).commit()
+                                supportFragmentManager.beginTransaction()
+                                    .add(
+                                        configureContainer.id,
+                                        ConfigureFragment.newInstance(
+                                            deviceId,
+                                            siteId,
+                                            siteName,
+                                            Stream(
+                                                streamName,
+                                                gain,
+                                                sampleRate,
+                                                customRecordingPeriod,
+                                                recordingDuration,
+                                                sleepDuration,
+                                                recordingPeriodList,
+                                                durationSelected
+                                            ),
+                                            from
+                                        ),
+                                        "ConfigureFragment"
+                                    ).commit()
+                            } else {
+                                val streamDefault = Stream(
+                                    streamName,
+                                    3,
+                                    8,
+                                    false,
+                                    0,
+                                    0,
+                                    arrayListOf(),
+                                    ConfigureFragment.RECOMMENDED
+                                )
+
+                                supportFragmentManager.beginTransaction()
+                                    .add(
+                                        configureContainer.id,
+                                        ConfigureFragment.newInstance(
+                                            deviceId,
+                                            siteId,
+                                            siteName,
+                                            streamDefault,
+                                            from
+                                        ),
+                                        "ConfigureFragment"
+                                    ).commit()
+                            }
+                        }
+                    }
             }
         }
     }

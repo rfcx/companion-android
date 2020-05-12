@@ -120,7 +120,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
             arguments?.let {
                 val from = it.getString(FROM)
                 if (from != null) {
-                    if (from == DASHBOARD_STREAM) {
+                    if (from == CREATE_STREAM) {
                         sleepDurationEditText.setText(sleepDuration.toString())
                         recordingDurationEditText.setText(recordingDuration.toString())
                     }
