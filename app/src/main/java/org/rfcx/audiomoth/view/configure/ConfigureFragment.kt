@@ -334,6 +334,8 @@ class ConfigureFragment(stream: Stream, lastDeviceId: String) : Fragment(), OnIt
                                 }
                             }
                             recordingPeriod = timeRecordingPeriod
+                        } else {
+                            recordingPeriod = arrayListOf()
                         }
 
                         when (durationSelected) {
