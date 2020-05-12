@@ -33,10 +33,7 @@ class VerifySyncFragment : Fragment() {
         greenButton.setOnClickListener {
             listener.openPerformBattery()
         }
-
-        redButton.setOnClickListener {
-//            listener.openSync()
-        }
+        
     }
     companion object {
         fun newInstance(deviceId: String): VerifySyncFragment {
