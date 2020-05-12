@@ -116,9 +116,11 @@ class DeployFragment(device: Device) : Fragment(), OnMapReadyCallback {
 
             lastLocation?.let { lastLocation ->
                 setPinOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
-                setupView(lastLocation.latitude.toString(), lastLocation.longitude.toString())
+                setupView(
+                    String.format("%.6f", lastLocation.latitude),
+                    String.format("%.6f", lastLocation.longitude)
+                )
             }
-
             onLatLngChanged()
         }
     }
