@@ -275,7 +275,7 @@
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/nextButton"
-                style="@style/RangerButton.GreenButton"
+                style="@style/AudioMothButton.GreenButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_normal"

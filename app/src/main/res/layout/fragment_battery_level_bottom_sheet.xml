@@ -20,7 +20,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/batteryLv1Button"
-        style="@style/RangerButton.GreenButton"
+        style="@style/AudioMothButton.GreenButton"
         android:layout_width="@dimen/button_battery_lv"
         android:layout_height="@dimen/button_battery_lv"
         android:layout_marginTop="@dimen/margin_padding_normal"
@@ -30,7 +30,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/batteryLv2Button"
-        style="@style/RangerButton.GreenButton"
+        style="@style/AudioMothButton.GreenButton"
         android:layout_width="@dimen/button_battery_lv"
         android:layout_height="@dimen/button_battery_lv"
         android:layout_margin="@dimen/margin_padding_large"
@@ -41,7 +41,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/batteryLv3Button"
-        style="@style/RangerButton.GreenButton"
+        style="@style/AudioMothButton.GreenButton"
         android:layout_width="@dimen/button_battery_lv"
         android:layout_height="@dimen/button_battery_lv"
         android:layout_margin="@dimen/margin_padding_large"

@@ -19,7 +19,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/checkBatteryButton"
-        style="@style/RangerButton.GreenButton"
+        style="@style/AudioMothButton.GreenButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_padding_large"

@@ -11,23 +11,23 @@
     </style>
 
     <!-- Button -->
-    <style name="RangerButton" parent="Widget.AppCompat.Button">
+    <style name="AudioMothButton" parent="Widget.AppCompat.Button">
         <item name="android:minWidth">120dp</item>
     </style>
 
-    <style name="RangerButton.GreenButton" parent="RangerButton">
+    <style name="AudioMothButton.GreenButton" parent="AudioMothButton">
         <item name="android:background">@drawable/bg_color_primary_button</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
 
-    <style name="RangerButton.RedButton" parent="RangerButton">
+    <style name="AudioMothButton.RedButton" parent="AudioMothButton">
         <item name="android:background">@drawable/bg_color_red_button</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
 
-    <style name="RangerButton.GreyButton" parent="RangerButton">
+    <style name="AudioMothButton.GreyButton" parent="AudioMothButton">
         <item name="android:background">@drawable/bg_color_grey_button</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@android:color/black</item>

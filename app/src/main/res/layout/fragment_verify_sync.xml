@@ -39,7 +39,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/greenButton"
-        style="@style/RangerButton.GreenButton"
+        style="@style/AudioMothButton.GreenButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_normal"
@@ -52,7 +52,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/redButton"
-        style="@style/RangerButton.RedButton"
+        style="@style/AudioMothButton.RedButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_normal"
@@ -65,7 +65,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/greyButton"
-        style="@style/RangerButton.GreyButton"
+        style="@style/AudioMothButton.GreyButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_normal"
