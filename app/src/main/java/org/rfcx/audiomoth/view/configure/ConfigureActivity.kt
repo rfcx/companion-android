@@ -62,70 +62,73 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
                     .addOnSuccessListener { documentSnapshot ->
                         if (documentSnapshot != null) {
                             val data = documentSnapshot.documents
-                            data.map {
-                                if (it.data != null) {
-                                    val configuration =
-                                        data[0].data?.get("configuration") as Map<*, *>
-                                    val gain = configuration["gain"].toString().toInt()
-                                    val sampleRate = configuration["sampleRate"].toString().toInt()
-                                    val recordingDuration =
-                                        configuration["recordingDuration"].toString().toInt()
-                                    val sleepDuration =
-                                        configuration["sleepDuration"].toString().toInt()
-                                    val customRecordingPeriod =
-                                        configuration["customRecordingPeriod"] as Boolean
-                                    val durationSelected =
-                                        configuration["durationSelected"] as String
-                                    val recordingPeriodList =
-                                        configuration["recordingPeriodList"] as ArrayList<String>
+                            if (data.isEmpty()) {
+                                val streamDefault = Stream(
+                                    streamName,
+                                    3,
+                                    8,
+                                    false,
+                                    0,
+                                    0,
+                                    arrayListOf(),
+                                    ConfigureFragment.RECOMMENDED
+                                )
 
-                                    supportFragmentManager.beginTransaction()
-                                        .add(
-                                            configureContainer.id,
-                                            ConfigureFragment.newInstance(
-                                                deviceId,
-                                                siteId,
-                                                siteName,
-                                                Stream(
-                                                    streamName,
-                                                    gain,
-                                                    sampleRate,
-                                                    customRecordingPeriod,
-                                                    recordingDuration,
-                                                    sleepDuration,
-                                                    recordingPeriodList,
-                                                    durationSelected
+                                supportFragmentManager.beginTransaction()
+                                    .add(
+                                        configureContainer.id,
+                                        ConfigureFragment.newInstance(
+                                            deviceId,
+                                            siteId,
+                                            siteName,
+                                            streamDefault,
+                                            from,
+                                            ""
+                                        ),
+                                        "ConfigureFragment"
+                                    ).commit()
+                            } else {
+                                data.map {
+                                    if (it.data != null) {
+                                        val configuration =
+                                            data[0].data?.get("configuration") as Map<*, *>
+                                        val gain = configuration["gain"].toString().toInt()
+                                        val sampleRate =
+                                            configuration["sampleRate"].toString().toInt()
+                                        val recordingDuration =
+                                            configuration["recordingDuration"].toString().toInt()
+                                        val sleepDuration =
+                                            configuration["sleepDuration"].toString().toInt()
+                                        val customRecordingPeriod =
+                                            configuration["customRecordingPeriod"] as Boolean
+                                        val durationSelected =
+                                            configuration["durationSelected"] as String
+                                        val recordingPeriodList =
+                                            configuration["recordingPeriodList"] as ArrayList<String>
+
+                                        supportFragmentManager.beginTransaction()
+                                            .add(
+                                                configureContainer.id,
+                                                ConfigureFragment.newInstance(
+                                                    deviceId,
+                                                    siteId,
+                                                    siteName,
+                                                    Stream(
+                                                        streamName,
+                                                        gain,
+                                                        sampleRate,
+                                                        customRecordingPeriod,
+                                                        recordingDuration,
+                                                        sleepDuration,
+                                                        recordingPeriodList,
+                                                        durationSelected
+                                                    ),
+                                                    from,
+                                                    data[0].data?.get("deviceId") as String
                                                 ),
-                                                from,
-                                                data[0].data?.get("deviceId") as String
-                                            ),
-                                            "ConfigureFragment"
-                                        ).commit()
-                                } else {
-                                    val streamDefault = Stream(
-                                        streamName,
-                                        3,
-                                        8,
-                                        false,
-                                        0,
-                                        0,
-                                        arrayListOf(),
-                                        ConfigureFragment.RECOMMENDED
-                                    )
-
-                                    supportFragmentManager.beginTransaction()
-                                        .add(
-                                            configureContainer.id,
-                                            ConfigureFragment.newInstance(
-                                                deviceId,
-                                                siteId,
-                                                siteName,
-                                                streamDefault,
-                                                from,
-                                                ""
-                                            ),
-                                            "ConfigureFragment"
-                                        ).commit()
+                                                "ConfigureFragment"
+                                            ).commit()
+                                    }
                                 }
                             }
                         }
