@@ -14,6 +14,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,7 +23,9 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Device
 import org.rfcx.audiomoth.entity.LatLong
 import org.rfcx.audiomoth.entity.Stream
+import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.util.NotificationBroadcastReceiver
+import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
 import org.rfcx.audiomoth.view.configure.ConfigureActivity.Companion.FROM
 import org.rfcx.audiomoth.view.configure.ConfigureActivity.Companion.SITE_ID
@@ -47,8 +50,11 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
     private var recordingPeriod = stream.recordingPeriodList
     private var customRecordingPeriod = stream.customRecordingPeriod
     private var durationSelected = stream.durationSelected
-    var siteName = ""
-    var siteId = ""
+    private var siteName = ""
+    private var siteId = ""
+    private lateinit var arrayAdapter: ArrayAdapter<String>
+    private var profiles = arrayListOf<String>()
+    private var profile = ""
 
     private var timeList = arrayListOf(
         "00:00",
@@ -96,6 +102,8 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         super.onViewCreated(view, savedInstanceState)
 
         setSite()
+        setAdapter()
+        getProfiles()
         setGainLayout()
         setNextOnClick()
         setSampleRateLayout()
@@ -136,6 +144,37 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
                 }
             }
         }
+    }
+
+    private fun getProfiles() {
+        val docRef = Firestore().db.collection(DEVICES)
+        docRef.get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot != null) {
+                    val data = documentSnapshot.documents
+                    profiles = arrayListOf("New profile")
+
+                    data.map {
+                        if (it.data != null) {
+                            val configuration = it.data?.get("configuration") as Map<*, *>
+                            val streamName = configuration["streamName"] as String
+                            profiles.add(streamName)
+
+                        }
+                    }
+                    profile = profiles[0]
+
+                    arrayAdapter.addAll(profiles)
+                    arrayAdapter.notifyDataSetChanged()
+                }
+            }
+    }
+
+    private fun setAdapter() {
+        context?.let {
+            arrayAdapter = ArrayAdapter(it, R.layout.support_simple_spinner_dropdown_item, profiles)
+        }
+        profileSpinner.adapter = arrayAdapter
     }
 
     private fun setSite() {
