@@ -64,6 +64,7 @@ class DashboardStreamActivity : AppCompatActivity() {
                             val data = document.data
                             if (data != null) {
                                 val stream = Stream(
+                                    data["streamName"].toString(),
                                     data["gain"].toString().toInt(),
                                     data["sampleRateKiloHertz"].toString().toInt(),
                                     data["customRecordingPeriod"] as Boolean,
@@ -72,13 +73,7 @@ class DashboardStreamActivity : AppCompatActivity() {
                                     data["recordingPeriodList"] as ArrayList<String>,
                                     data["durationSelected"].toString()
                                 )
-                                ConfigureActivity.startActivity(
-                                    this@DashboardStreamActivity,
-                                    currentDeviceId,
-                                    streamName,
-                                    stream,
-                                    DASHBOARD_STREAM
-                                )
+                                // TODO: Open ConfigureActivity
                             }
                         } else {
                             Log.d(TAG, "No such document")

@@ -14,21 +14,28 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_configure.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.Device
+import org.rfcx.audiomoth.entity.LatLong
 import org.rfcx.audiomoth.entity.Stream
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.util.NotificationBroadcastReceiver
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
 import org.rfcx.audiomoth.view.configure.ConfigureActivity.Companion.FROM
+import org.rfcx.audiomoth.view.configure.ConfigureActivity.Companion.SITE_ID
+import org.rfcx.audiomoth.view.configure.ConfigureActivity.Companion.SITE_NAME
+import java.sql.Timestamp
 import java.util.*
 import kotlin.collections.ArrayList
 
-class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
+class ConfigureFragment(stream: Stream, lastDeviceId: String) : Fragment(), OnItemClickListener {
 
     private val recordingPeriodAdapter by lazy { RecordingPeriodAdapter(this) }
     private val timeAdapter by lazy { TimeAdapter(this, context) }
@@ -37,12 +44,20 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
     private val gainList = arrayOf("1 - Lowest", "2 - Low", "3 - Medium", "4 - High", "5 - Highest")
 
     private var gain = stream.gain
+    private var streamName = stream.streamName
     private var sampleRate = stream.sampleRate
     private var sleepDuration = stream.sleepDuration
     private var recordingDuration = stream.recordingDuration
     private var recordingPeriod = stream.recordingPeriodList
     private var customRecordingPeriod = stream.customRecordingPeriod
     private var durationSelected = stream.durationSelected
+    private var siteName = ""
+    private var siteId = ""
+    private lateinit var arrayAdapter: ArrayAdapter<String>
+    private var profiles = arrayListOf<String>()
+    private var devices = arrayListOf<String>()
+    private var profile = ""
+    private var lastDevice = lastDeviceId
 
     private var timeList = arrayListOf(
         "00:00",
@@ -71,7 +86,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         "23:00"
     )
 
-    private val timeState = ArrayList<TimeItem>()
+    private var timeState = ArrayList<TimeItem>()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -89,7 +104,11 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setSite()
+        setAdapter()
+        getProfiles()
         setGainLayout()
+        setProfileSpinner()
         setNextOnClick()
         setSampleRateLayout()
         setTimeRecyclerView()
@@ -105,7 +124,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
             arguments?.let {
                 val from = it.getString(FROM)
                 if (from != null) {
-                    if (from == DASHBOARD_STREAM) {
+                    if (from == CREATE_STREAM) {
                         sleepDurationEditText.setText(sleepDuration.toString())
                         recordingDurationEditText.setText(recordingDuration.toString())
                     }
@@ -126,6 +145,105 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
                 R.id.customRadioButton -> {
                     durationSelected = CUSTOM
                     durationSelectedItem(CUSTOM)
+                }
+            }
+        }
+    }
+
+    private fun setProfileSpinner() {
+        profileSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                profile = profiles[position]
+                getProfileByDeviceId(devices[position])
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
+    }
+
+    private fun getProfileByDeviceId(device: String) {
+        Firestore().db.collection(DEVICES).whereEqualTo("deviceId", device).get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot != null) {
+                    val data = documentSnapshot.documents
+                    data.map {
+                        if (it.data != null) {
+                            val configuration = it.data?.get("configuration") as Map<*, *>
+                            gain = configuration["gain"].toString().toInt()
+                            sampleRate = configuration["sampleRate"].toString().toInt()
+                            sleepDuration = configuration["sleepDuration"].toString().toInt()
+                            recordingDuration =
+                                configuration["recordingDuration"].toString().toInt()
+                            recordingPeriod =
+                                configuration["recordingPeriodList"] as ArrayList<String>
+                            customRecordingPeriod =
+                                configuration["customRecordingPeriod"] as Boolean
+                            durationSelected = configuration["durationSelected"] as String
+
+                            timeState = arrayListOf()
+                            for (time in timeList) {
+                                timeState.add(TimeItem(time, recordingPeriod.contains(time)))
+                            }
+
+                            setGainLayout()
+                            setSampleRateLayout()
+                            setTimeRecyclerView()
+                            setCustomRecordingPeriod()
+                            durationSelectedItem(durationSelected)
+                        }
+                    }
+                }
+            }
+    }
+
+    private fun getProfiles() {
+        val docRef = Firestore().db.collection(DEVICES)
+        docRef.get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot != null) {
+                    val data = documentSnapshot.documents
+                    devices = arrayListOf(lastDevice)
+                    profiles = arrayListOf("New profile")
+
+                    data.map {
+                        if (it.data != null) {
+                            val deviceId = it.data?.get("deviceId") as String
+                            val configuration = it.data?.get("configuration") as Map<*, *>
+                            val streamName = configuration["streamName"] as String
+                            profiles.add(streamName)
+                            devices.add(deviceId)
+                        }
+                    }
+
+                    profile = profiles[0]
+
+                    arrayAdapter.addAll(profiles)
+                    arrayAdapter.notifyDataSetChanged()
+                }
+            }
+    }
+
+    private fun setAdapter() {
+        context?.let {
+            arrayAdapter = ArrayAdapter(it, R.layout.support_simple_spinner_dropdown_item, profiles)
+        }
+        profileSpinner.adapter = arrayAdapter
+    }
+
+    private fun setSite() {
+        if (arguments?.containsKey(SITE_ID) == true && arguments?.containsKey(SITE_NAME) == true) {
+            arguments?.let {
+                val siteId = it.getString(SITE_ID)
+                val siteName = it.getString(SITE_NAME)
+                if (siteId != null && siteName != null) {
+                    this.siteId = siteId
+                    this.siteName = siteName
                 }
             }
         }
@@ -204,18 +322,10 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
 
     private fun setNextOnClick() {
         nextButton.setOnClickListener {
-            if (durationSelected == CUSTOM) {
-                recordingDuration = recordingDurationEditText.text.toString().toInt()
-                sleepDuration = sleepDurationEditText.text.toString().toInt()
-            }
-            if (arguments?.containsKey(DEVICE_ID) == true && arguments?.containsKey(
-                    ConfigureActivity.STREAM_NAME
-                ) == true
-            ) {
+            if (arguments?.containsKey(DEVICE_ID) == true) {
                 arguments?.let {
                     val deviceId = it.getString(DEVICE_ID)
-                    val streamName = it.getString(ConfigureActivity.STREAM_NAME)
-                    if (deviceId != null && streamName != null) {
+                    if (deviceId != null) {
                         val timeRecordingPeriod = arrayListOf<String>()
                         if (customRecordingPeriod) {
                             timeState.forEach { timeStatus ->
@@ -224,31 +334,58 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
                                 }
                             }
                             recordingPeriod = timeRecordingPeriod
+                        } else {
+                            recordingPeriod = arrayListOf()
                         }
 
-                        listener.openSync()
+                        when (durationSelected) {
+                            RECOMMENDED -> {
+                                recordingDuration = 5
+                                sleepDuration = 10
+                            }
+
+                            CONTINUOUS -> {
+                                recordingDuration = 0
+                                sleepDuration = 0
+                            }
+
+                            CUSTOM -> {
+                                recordingDuration =
+                                    recordingDurationEditText.text.toString().toInt()
+                                sleepDuration = sleepDurationEditText.text.toString().toInt()
+                            }
+                        }
+
+                        val latLongDefault = LatLong(0.0, 0.0)
+                        val stream = Stream(
+                            streamName,
+                            gain,
+                            sampleRate,
+                            customRecordingPeriod,
+                            recordingDuration,
+                            sleepDuration,
+                            recordingPeriod,
+                            durationSelected
+                        )
+                        val device = Device(
+                            deviceId,
+                            siteId,
+                            siteName,
+                            Timestamp(System.currentTimeMillis()),
+                            latLongDefault,
+                            "locationName",
+                            0,
+                            Timestamp(System.currentTimeMillis()),
+                            stream
+                        )
+
+                        listener.openSync(device)
 
                         // Todo: start notification here
                     }
                 }
             }
         }
-    }
-
-    private fun updateStream(deviceId: String, streamName: String) {
-        val docRef = Firestore().db.collection(DEVICES).document(deviceId)
-        docRef.collection("streams").document(streamName)
-            .update(
-                mapOf(
-                    "sampleRateKiloHertz" to sampleRate,
-                    "gain" to gain,
-                    "sleepDurationSecond" to sleepDuration,
-                    "recordingDurationSecond" to recordingDuration,
-                    "customRecordingPeriod" to customRecordingPeriod,
-                    "recordingPeriodList" to recordingPeriod,
-                    "durationSelected" to durationSelected
-                )
-            )
     }
 
     private fun createNotificationChannel() {
@@ -353,15 +490,19 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
 
         fun newInstance(
             deviceId: String,
-            streamName: String,
+            siteId: String,
+            siteName: String,
             streams: Stream,
-            from: String
+            from: String,
+            lastDeviceId: String
+
         ): ConfigureFragment {
-            return ConfigureFragment(streams).apply {
+            return ConfigureFragment(streams, lastDeviceId).apply {
                 arguments = Bundle().apply {
                     putString(DEVICE_ID, deviceId)
+                    putString(SITE_ID, siteId)
+                    putString(SITE_NAME, siteName)
                     putString(FROM, from)
-                    putString(ConfigureActivity.STREAM_NAME, streamName)
                 }
             }
         }

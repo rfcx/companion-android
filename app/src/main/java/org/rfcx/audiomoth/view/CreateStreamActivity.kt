@@ -14,12 +14,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_create_stream.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.Stream
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.view.configure.ConfigureActivity
-import org.rfcx.audiomoth.view.configure.ConfigureFragment
 import org.rfcx.audiomoth.view.configure.ConfigureFragment.Companion.CREATE_STREAM
-import java.sql.Timestamp
 import java.util.*
 
 class CreateStreamActivity : AppCompatActivity() {
@@ -31,7 +28,6 @@ class CreateStreamActivity : AppCompatActivity() {
     var site = ""
     var siteId = ""
     var nameStream = ""
-    var hasPreviouslyCreated = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,11 +46,20 @@ class CreateStreamActivity : AppCompatActivity() {
             createStreamButton.isEnabled = false
             streamNameEditText.hideKeyboard()
 
-            //TODO: Delete it after change structure of data
-            val stream = Stream(3, 8, false, 0, 0, arrayListOf(), "Recommended")
-            ConfigureActivity.startActivity(this, "123", nameStream, stream, CREATE_STREAM)
-            finish()
-
+            if (intent.hasExtra(DEVICE_ID)) {
+                val deviceId = intent.getStringExtra(DEVICE_ID)
+                if (deviceId != null) {
+                    ConfigureActivity.startActivity(
+                        this,
+                        deviceId,
+                        nameStream,
+                        siteId,
+                        site,
+                        CREATE_STREAM
+                    )
+                    finish()
+                }
+            }
         }
     }
 
@@ -73,7 +78,7 @@ class CreateStreamActivity : AppCompatActivity() {
             val deviceId = intent.getStringExtra(DEVICE_ID)
             if (deviceId != null) {
                 checkEdgeOrGuardian(deviceId)
-                // TODO: Check device id is exist in Firestore
+                // TODO: Check device id is exist in Firestore (if have will get site)
             }
         }
     }
@@ -108,6 +113,9 @@ class CreateStreamActivity : AppCompatActivity() {
                 sitesId = ArrayList()
                 result.map { sites.add(it.data["name"].toString()) }
                 result.map { sitesId.add(it.id) }
+
+                site = sites[0]
+                siteId = sitesId[0]
 
                 arrayAdapter.addAll(sites)
                 arrayAdapter.notifyDataSetChanged()
@@ -152,67 +160,6 @@ class CreateStreamActivity : AppCompatActivity() {
                 createStreamButton.isEnabled = true
             }
         })
-    }
-
-    private fun onCreateStreamClick() {
-        if (intent.hasExtra(DEVICE_ID)) {
-            val deviceId = intent.getStringExtra(DEVICE_ID)
-
-            if (deviceId != null && site.isNotEmpty() && siteId.isNotEmpty() && nameStream.isNotEmpty()) {
-
-                if (!hasPreviouslyCreated) {
-                    try {
-                        val items = HashMap<String, Any>()
-                        items["isLogin"] = false
-                        items["siteName"] = site
-                        items["siteId"] = siteId
-
-                        Firestore().db.collection(DEVICES).document(deviceId).set(items)
-                            .addOnSuccessListener {
-                                saveStream(deviceId)
-                            }.addOnFailureListener { exception: java.lang.Exception ->
-                                createStreamProgressBar.visibility = View.INVISIBLE
-                                createStreamButton.isEnabled = true
-                                Toast.makeText(this, exception.toString(), Toast.LENGTH_LONG).show()
-                            }
-                    } catch (e: Exception) {
-                        createStreamProgressBar.visibility = View.INVISIBLE
-                        createStreamButton.isEnabled = true
-                        Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show()
-                    }
-                } else {
-                    saveStream(deviceId)
-                }
-
-
-            } else {
-                createStreamProgressBar.visibility = View.INVISIBLE
-                createStreamButton.isEnabled = true
-                Toast.makeText(this, "Please fill up the fields :(", Toast.LENGTH_LONG).show()
-            }
-        }
-    }
-
-    private fun saveStream(deviceId: String) {
-        val stream = Stream(3, 8, false, 0, 0, arrayListOf(), ConfigureFragment.RECOMMENDED)
-        val docRef = Firestore().db.collection(DEVICES).document(deviceId)
-        val docData = hashMapOf(
-            "createdAt" to Timestamp(System.currentTimeMillis()).toString(),
-            "sampleRateKiloHertz" to 8,
-            "gain" to 3,
-            "sleepDurationSecond" to 0,
-            "recordingDurationSecond" to 0,
-            "customRecordingPeriod" to false,
-            "recordingPeriodList" to listOf(""),
-            "durationSelected" to ConfigureFragment.RECOMMENDED
-        )
-
-        docRef.collection("streams").document(nameStream)
-            .set(docData)
-            .addOnCompleteListener {
-                ConfigureActivity.startActivity(this, deviceId, nameStream, stream, CREATE_STREAM)
-                finish()
-            }
     }
 
     companion object {

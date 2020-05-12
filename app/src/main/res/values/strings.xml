@@ -15,12 +15,16 @@
     <string name="alternatively">Alternatively,</string>
     <string name="please_switch_mode">You\'ve just deployed your RFCx Edge device. Please switch to RECORD mode and place the device</string>
     <string name="input_format_text">ABCDEFGHIJKLMNOPQRSTUVWX1Z1234567890abcdefghijklmnopqrstuvwxyz</string>
+    <string name="green_pin">Green = 3+ days</string>
+    <string name="orange_pin">Orange = 1–2 days</string>
+    <string name="red_pin">Red = <![CDATA[<]]>1 day</string>
 
     <!--  CreateStreamActivity  -->
     <string name="create_stream">Create Stream</string>
     <string name="stream_name">Stream name</string>
     <string name="site">Site</string>
     <string name="prompt_site">Select Site</string>
+    <string name="prompt_profile">Select Profile</string>
 
     <!--    ConfigureFragment-->
     <string name="configure">Configure</string>
@@ -33,7 +37,7 @@
     <string name="choose_gain">Choose gain</string>
     <string name="kilohertz">%s kHz</string>
     <string name="continuous">Continuous</string>
-    <string name="next">Next</string>
+    <string name="sync_to_device">Sync to Device</string>
     <string name="custom_recording_period">Custom recording period</string>
     <string name="add_recording_period">Add recording period</string>
     <string name="start_period">Start recording:</string>
