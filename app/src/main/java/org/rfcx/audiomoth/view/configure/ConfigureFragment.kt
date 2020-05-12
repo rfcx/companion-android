@@ -35,7 +35,7 @@ import java.sql.Timestamp
 import java.util.*
 import kotlin.collections.ArrayList
 
-class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
+class ConfigureFragment(stream: Stream, lastDeviceId: String) : Fragment(), OnItemClickListener {
 
     private val recordingPeriodAdapter by lazy { RecordingPeriodAdapter(this) }
     private val timeAdapter by lazy { TimeAdapter(this, context) }
@@ -57,6 +57,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
     private var profiles = arrayListOf<String>()
     private var devices = arrayListOf<String>()
     private var profile = ""
+    private var lastDevice = lastDeviceId
 
     private var timeList = arrayListOf(
         "00:00",
@@ -207,12 +208,8 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
             .addOnSuccessListener { documentSnapshot ->
                 if (documentSnapshot != null) {
                     val data = documentSnapshot.documents
-                    if (data.isNotEmpty()) {
-                        val lastDeviceId = data[0].data?.get("deviceId") as String
-                        devices = arrayListOf(lastDeviceId)
-                    }
+                    devices = arrayListOf(lastDevice)
                     profiles = arrayListOf("New profile")
-
 
                     data.map {
                         if (it.data != null) {
@@ -494,9 +491,11 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
             siteId: String,
             siteName: String,
             streams: Stream,
-            from: String
+            from: String,
+            lastDeviceId: String
+
         ): ConfigureFragment {
-            return ConfigureFragment(streams).apply {
+            return ConfigureFragment(streams, lastDeviceId).apply {
                 arguments = Bundle().apply {
                     putString(DEVICE_ID, deviceId)
                     putString(SITE_ID, siteId)
