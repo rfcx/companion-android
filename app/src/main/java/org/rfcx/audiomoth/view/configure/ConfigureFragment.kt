@@ -14,6 +14,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
@@ -54,6 +55,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
     private var siteId = ""
     private lateinit var arrayAdapter: ArrayAdapter<String>
     private var profiles = arrayListOf<String>()
+    private var devices = arrayListOf<String>()
     private var profile = ""
 
     private var timeList = arrayListOf(
@@ -83,7 +85,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         "23:00"
     )
 
-    private val timeState = ArrayList<TimeItem>()
+    private var timeState = ArrayList<TimeItem>()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -105,6 +107,7 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         setAdapter()
         getProfiles()
         setGainLayout()
+        setProfileSpinner()
         setNextOnClick()
         setSampleRateLayout()
         setTimeRecyclerView()
@@ -146,22 +149,81 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
         }
     }
 
+    private fun setProfileSpinner() {
+        profileSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                profile = profiles[position]
+                getProfileByDeviceId(devices[position])
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
+    }
+
+    private fun getProfileByDeviceId(device: String) {
+        Firestore().db.collection(DEVICES).whereEqualTo("deviceId", device).get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot != null) {
+                    val data = documentSnapshot.documents
+                    data.map {
+                        if (it.data != null) {
+                            val configuration = it.data?.get("configuration") as Map<*, *>
+                            gain = configuration["gain"].toString().toInt()
+                            sampleRate = configuration["sampleRate"].toString().toInt()
+                            sleepDuration = configuration["sleepDuration"].toString().toInt()
+                            recordingDuration =
+                                configuration["recordingDuration"].toString().toInt()
+                            recordingPeriod =
+                                configuration["recordingPeriodList"] as ArrayList<String>
+                            customRecordingPeriod =
+                                configuration["customRecordingPeriod"] as Boolean
+                            durationSelected = configuration["durationSelected"] as String
+
+                            timeState = arrayListOf()
+                            for (time in timeList) {
+                                timeState.add(TimeItem(time, recordingPeriod.contains(time)))
+                            }
+
+                            setGainLayout()
+                            setSampleRateLayout()
+                            setTimeRecyclerView()
+                            setCustomRecordingPeriod()
+                            durationSelectedItem(durationSelected)
+                        }
+                    }
+                }
+            }
+    }
+
     private fun getProfiles() {
         val docRef = Firestore().db.collection(DEVICES)
         docRef.get()
             .addOnSuccessListener { documentSnapshot ->
                 if (documentSnapshot != null) {
                     val data = documentSnapshot.documents
+                    if (data.isNotEmpty()) {
+                        val lastDeviceId = data[0].data?.get("deviceId") as String
+                        devices = arrayListOf(lastDeviceId)
+                    }
                     profiles = arrayListOf("New profile")
+
 
                     data.map {
                         if (it.data != null) {
+                            val deviceId = it.data?.get("deviceId") as String
                             val configuration = it.data?.get("configuration") as Map<*, *>
                             val streamName = configuration["streamName"] as String
                             profiles.add(streamName)
-
+                            devices.add(deviceId)
                         }
                     }
+
                     profile = profiles[0]
 
                     arrayAdapter.addAll(profiles)
@@ -263,10 +325,6 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
 
     private fun setNextOnClick() {
         nextButton.setOnClickListener {
-            if (durationSelected == CUSTOM) {
-                recordingDuration = recordingDurationEditText.text.toString().toInt()
-                sleepDuration = sleepDurationEditText.text.toString().toInt()
-            }
             if (arguments?.containsKey(DEVICE_ID) == true) {
                 arguments?.let {
                     val deviceId = it.getString(DEVICE_ID)
@@ -279,6 +337,24 @@ class ConfigureFragment(stream: Stream) : Fragment(), OnItemClickListener {
                                 }
                             }
                             recordingPeriod = timeRecordingPeriod
+                        }
+
+                        when (durationSelected) {
+                            RECOMMENDED -> {
+                                recordingDuration = 5
+                                sleepDuration = 10
+                            }
+
+                            CONTINUOUS -> {
+                                recordingDuration = 0
+                                sleepDuration = 0
+                            }
+
+                            CUSTOM -> {
+                                recordingDuration =
+                                    recordingDurationEditText.text.toString().toInt()
+                                sleepDuration = sleepDurationEditText.text.toString().toInt()
+                            }
                         }
 
                         val latLongDefault = LatLong(0.0, 0.0)
