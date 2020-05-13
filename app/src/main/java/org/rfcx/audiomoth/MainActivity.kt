@@ -115,6 +115,7 @@ open class MainActivity : AppCompatActivity(), InputDeviceIdListener {
     }
 
     private fun getDevices() {
+        var lastProfile: Long = 0
         val docRef = Firestore().db.collection(DEVICES)
         docRef.get()
             .addOnSuccessListener { documentSnapshot ->
@@ -129,11 +130,16 @@ open class MainActivity : AppCompatActivity(), InputDeviceIdListener {
                             val longitude = location["lng"] as Double
                             val timestamp =
                                 it.data?.get("batteryPredictedUntil") as com.google.firebase.Timestamp
+                            val timestampDeployed =
+                                it.data?.get("deployedAt") as com.google.firebase.Timestamp
+                            if (lastProfile < timestampDeployed.seconds) {
+                                lastProfile = timestampDeployed.seconds
+                                moveCamera(LatLng(latitude, longitude))
+                            }
                             displayPinOfDevices(
                                 LatLng(latitude, longitude),
                                 checkBatteryPredictedUntil(timestamp.seconds * 1000)
                             )
-
                         }
                     }
                 }
@@ -184,7 +190,9 @@ open class MainActivity : AppCompatActivity(), InputDeviceIdListener {
                 .withIconImage(imageName)
                 .withIconSize(1.0f)
         )
+    }
 
+    private fun moveCamera(latLng: LatLng) {
         mapboxMap.moveCamera(
             CameraUpdateFactory.newLatLngZoom(
                 latLng,
