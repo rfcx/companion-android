@@ -14,7 +14,8 @@
     <string name="find_qr_code">Find the QR code on your RFCx Edge</string>
     <string name="alternatively">Alternatively,</string>
     <string name="please_switch_mode">You\'ve just deployed your RFCx Edge device. Please switch to RECORD mode and place the device</string>
-    <string name="input_format_text">ABCDEFGHIJKLMNOPQRSTUVWX1Z1234567890abcdefghijklmnopqrstuvwxyz</string>
+    <string name="input_format_text">ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890abcdefghijklmnopqrstuvwxyz</string>
+    <string name="input_format_number">1234567890.-</string>
     <string name="green_pin">Green = 3+ days</string>
     <string name="orange_pin">Orange = 1–2 days</string>
     <string name="red_pin">Red = <![CDATA[<]]>1 day</string>

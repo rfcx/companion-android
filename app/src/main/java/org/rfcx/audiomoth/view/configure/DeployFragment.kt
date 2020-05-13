@@ -65,7 +65,22 @@ class DeployFragment(device: Device) : Fragment(), OnMapReadyCallback {
         getLastLocation()
 
         finishButton.setOnClickListener {
+            progressBar(true)
             saveDevice()
+        }
+    }
+
+    private fun progressBar(show: Boolean) {
+        progressBar.visibility = if (show) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
+
+        finishButton.visibility = if (!show) {
+            View.VISIBLE
+        } else {
+            View.INVISIBLE
         }
     }
 
@@ -104,6 +119,8 @@ class DeployFragment(device: Device) : Fragment(), OnMapReadyCallback {
         Firestore().db.collection(DEVICES).document().set(device)
             .addOnCompleteListener {
                 context?.let { it1 -> MainActivity.startActivity(it1, true) }
+            }.addOnFailureListener {
+                progressBar(false)
             }
     }
 
@@ -150,10 +167,23 @@ class DeployFragment(device: Device) : Fragment(), OnMapReadyCallback {
     }
 
     private fun onLatLngChanged() {
+        locationNameEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {
+                if (p0 != null) {
+                    finishButton.isEnabled = p0.isNotEmpty()
+                }
+            }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+        })
+
         latitudeEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
                 if (p0 != null) {
-                    if (p0.toString() != "-" && p0.isNotEmpty()) {
+                    finishButton.isEnabled = p0.isNotEmpty()
+                    if (p0.toString() != "-" && p0.isNotEmpty() && p0.toString() != ".") {
                         if (p0.toString().toDouble() >= -90.0 && p0.toString().toDouble() <= 90) {
                             setPinOnMap(
                                 LatLng(
@@ -174,7 +204,8 @@ class DeployFragment(device: Device) : Fragment(), OnMapReadyCallback {
         longitudeEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
                 if (p0 != null) {
-                    if (p0.toString() != "-" && p0.isNotEmpty()) {
+                    finishButton.isEnabled = p0.isNotEmpty()
+                    if (p0.toString() != "-" && p0.isNotEmpty() && p0.toString() != ".") {
                         setPinOnMap(
                             LatLng(
                                 latitudeEditText.text.toString().toDouble(),
