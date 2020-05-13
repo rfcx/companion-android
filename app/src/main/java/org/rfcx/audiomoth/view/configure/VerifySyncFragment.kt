@@ -8,8 +8,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_verify_sync.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.view.CreateStreamActivity
-import org.rfcx.audiomoth.view.dashboard.DashboardStreamActivity
 
 class VerifySyncFragment : Fragment() {
 
@@ -34,14 +32,5 @@ class VerifySyncFragment : Fragment() {
             listener.openPerformBattery()
         }
         
-    }
-    companion object {
-        fun newInstance(deviceId: String): VerifySyncFragment {
-            return VerifySyncFragment().apply {
-                arguments = Bundle().apply {
-                    putString(CreateStreamActivity.DEVICE_ID, deviceId)
-                }
-            }
-        }
     }
 }

@@ -6,31 +6,41 @@
     android:layout_height="match_parent"
     tools:context=".view.configure.DeployFragment">
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guidelineHorizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.30" />
-
-    <com.mapbox.mapboxsdk.maps.MapView
-        android:id="@+id/mapBoxView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/guidelineHorizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/locationNameTextView"
+        android:id="@+id/deployDeviceTextView"
+        style="@style/AudioMothText.Subhead.Bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_padding_normal"
-        android:text="@string/name_location"
-        android:textColor="@color/text_primary"
+        android:text="@string/deploying_the_device"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/guidelineHorizontal" />
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_padding_normal"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/deployDeviceTextView">
+
+        <androidx.appcompat.widget.AppCompatRadioButton
+            android:id="@+id/recommendedRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/new_location"
+            android:textSize="@dimen/text_small" />
+
+        <androidx.appcompat.widget.AppCompatRadioButton
+            android:id="@+id/continuousRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/existing"
+            android:textSize="@dimen/text_small" />
+
+    </RadioGroup>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/locationNameTextInput"
@@ -38,9 +48,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_padding_normal"
+        android:hint="@string/name_location"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/locationNameTextView">
+        app:layout_constraintTop_toBottomOf="@id/radioGroup">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/locationNameEditText"
@@ -48,25 +59,30 @@
             android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/latitudeTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <com.mapbox.mapboxsdk.maps.MapView
+        android:id="@+id/mapBoxView"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
         android:layout_margin="@dimen/margin_padding_normal"
-        android:text="@string/latitude"
-        android:textColor="@color/text_primary"
+        android:layout_marginTop="44dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/locationNameTextInput" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/latitudeTextInput"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_padding_normal"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="@dimen/margin_padding_normal"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:layout_marginEnd="@dimen/margin_padding_small"
+        android:layout_marginBottom="@dimen/margin_padding_normal"
+        android:hint="@string/latitude"
+        app:layout_constraintEnd_toStartOf="@id/longitudeTextInput"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/latitudeTextView">
+        app:layout_constraintTop_toBottomOf="@id/mapBoxView">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/latitudeEditText"
@@ -75,25 +91,20 @@
             android:digits="@string/input_format_number" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/longitudeTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_padding_normal"
-        android:text="@string/longitude"
-        android:textColor="@color/text_primary"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/latitudeTextInput" />
-
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/longitudeTextInput"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_padding_normal"
+        android:layout_marginStart="@dimen/margin_padding_small"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:layout_marginEnd="@dimen/margin_padding_normal"
+        android:layout_marginBottom="@dimen/margin_padding_normal"
+        android:layout_weight="1"
+        android:hint="@string/longitude"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/longitudeTextView">
+        app:layout_constraintStart_toEndOf="@id/latitudeTextInput"
+        app:layout_constraintTop_toBottomOf="@id/mapBoxView">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/longitudeEditText"
@@ -108,8 +119,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_padding_normal"
-        android:text="@string/finish"
         android:enabled="false"
+        android:text="@string/finish"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/longitudeTextInput" />
@@ -121,9 +132,9 @@
         android:layout_gravity="center"
         android:background="@color/transparent"
         android:visibility="gone"
-        app:layout_constraintStart_toStartOf="@id/finishButton"
+        app:layout_constraintBottom_toBottomOf="@id/finishButton"
         app:layout_constraintEnd_toEndOf="@id/finishButton"
-        app:layout_constraintTop_toTopOf="@id/finishButton"
-        app:layout_constraintBottom_toBottomOf="@id/finishButton"/>
+        app:layout_constraintStart_toStartOf="@id/finishButton"
+        app:layout_constraintTop_toTopOf="@id/finishButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
