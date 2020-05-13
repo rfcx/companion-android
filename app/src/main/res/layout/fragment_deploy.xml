@@ -114,4 +114,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/longitudeTextInput" />
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        android:background="@color/transparent"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="@id/finishButton"
+        app:layout_constraintEnd_toEndOf="@id/finishButton"
+        app:layout_constraintTop_toTopOf="@id/finishButton"
+        app:layout_constraintBottom_toBottomOf="@id/finishButton"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

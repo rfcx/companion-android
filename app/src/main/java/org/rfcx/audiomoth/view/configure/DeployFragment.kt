@@ -65,7 +65,22 @@ class DeployFragment(device: Device) : Fragment(), OnMapReadyCallback {
         getLastLocation()
 
         finishButton.setOnClickListener {
+            progressBar(true)
             saveDevice()
+        }
+    }
+
+    private fun progressBar(show: Boolean) {
+        progressBar.visibility = if (show) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
+
+        finishButton.visibility = if (!show) {
+            View.VISIBLE
+        } else {
+            View.INVISIBLE
         }
     }
 
@@ -104,6 +119,8 @@ class DeployFragment(device: Device) : Fragment(), OnMapReadyCallback {
         Firestore().db.collection(DEVICES).document().set(device)
             .addOnCompleteListener {
                 context?.let { it1 -> MainActivity.startActivity(it1, true) }
+            }.addOnFailureListener {
+                progressBar(false)
             }
     }
 
