@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Paint.UNDERLINE_TEXT_FLAG
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,7 +24,6 @@ import com.mapbox.mapboxsdk.utils.BitmapUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_input_deviec_id_bottom_sheet.*
 import org.rfcx.audiomoth.util.Firestore
-import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
 import org.rfcx.audiomoth.view.configure.ConfigureActivity
 import org.rfcx.audiomoth.view.configure.LocationFragment.Companion.MAPBOX_ACCESS_TOKEN
 
@@ -58,45 +56,37 @@ open class MainActivity : AppCompatActivity() {
                 getDevices()
             }
         }
-
-        Firestore().db.collection("users").get()
-            .addOnSuccessListener { documents ->
-                for (document in documents) {
-                    Log.d(TAG, "${document.id} => ${document.data}")
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.w(TAG, "Error getting documents: ", exception)
-            }
     }
 
     private fun getDevices() {
-        var lastProfile: Long = 0
-        val docRef = Firestore().db.collection(DEVICES)
-        docRef.get()
-            .addOnSuccessListener { documentSnapshot ->
-                if (documentSnapshot != null) {
-                    val data = documentSnapshot.documents
-                    symbolManager.deleteAll()
+        Firestore().db.collection("users").get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    val name = document.data["name"] as String
+                    // TODO: Check user name and move to location newly added device
+                    if (name == "Ratree Onchana") {
+                        Firestore().db.collection("users").document(document.id)
+                            .collection("deployments").get()
+                            .addOnSuccessListener { subDocuments ->
+                                symbolManager.deleteAll()
+                                for (sub in subDocuments) {
+                                    val isLatest = sub.data["isLatest"] as Boolean
+                                    if (isLatest) {
+                                        val location = sub.data["location"] as Map<*, *>
+                                        val latitude = location["latitude"] as Double
+                                        val longitude = location["longitude"] as Double
+                                        val batteryPredicted =
+                                            sub.data["batteryPredictedAt"] as com.google.firebase.Timestamp
 
-                    data.map {
-                        if (it.data != null) {
-                            val location = it.data?.get("location") as Map<*, *>
-                            val latitude = location["lat"] as Double
-                            val longitude = location["lng"] as Double
-                            val timestamp =
-                                it.data?.get("batteryPredictedUntil") as com.google.firebase.Timestamp
-                            val timestampDeployed =
-                                it.data?.get("deployedAt") as com.google.firebase.Timestamp
-                            if (lastProfile < timestampDeployed.seconds) {
-                                lastProfile = timestampDeployed.seconds
-                                moveCamera(LatLng(latitude, longitude))
+                                        displayPinOfDevices(
+                                            LatLng(latitude, longitude),
+                                            checkBatteryPredictedUntil(batteryPredicted.seconds * 1000)
+                                        )
+
+                                        moveCamera(LatLng(latitude, longitude))
+                                    }
+                                }
                             }
-                            displayPinOfDevices(
-                                LatLng(latitude, longitude),
-                                checkBatteryPredictedUntil(timestamp.seconds * 1000)
-                            )
-                        }
                     }
                 }
             }
