@@ -61,6 +61,7 @@ open class MainActivity : AppCompatActivity() {
     private fun getDevices() {
         Firestore().db.collection("users").get()
             .addOnSuccessListener { documents ->
+                symbolManager.deleteAll()
                 for (document in documents) {
                     val name = document.data["name"] as String
                     // TODO: Check user name and move to location newly added device
@@ -68,7 +69,6 @@ open class MainActivity : AppCompatActivity() {
                         Firestore().db.collection("users").document(document.id)
                             .collection("deployments").get()
                             .addOnSuccessListener { subDocuments ->
-                                symbolManager.deleteAll()
                                 for (sub in subDocuments) {
                                     val isLatest = sub.data["isLatest"] as Boolean
                                     if (isLatest) {
