@@ -26,7 +26,7 @@ import kotlinx.android.synthetic.main.fragment_input_deviec_id_bottom_sheet.*
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
 import org.rfcx.audiomoth.view.configure.ConfigureActivity
-import org.rfcx.audiomoth.view.configure.DeployFragment
+import org.rfcx.audiomoth.view.configure.LocationFragment.Companion.MAPBOX_ACCESS_TOKEN
 
 open class MainActivity : AppCompatActivity() {
 
@@ -36,7 +36,7 @@ open class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Mapbox.getInstance(this, DeployFragment.MAPBOX_ACCESS_TOKEN)
+        Mapbox.getInstance(this, MAPBOX_ACCESS_TOKEN)
         setContentView(R.layout.activity_main)
 
         inputDeviceIdButton.setOnClickListener {

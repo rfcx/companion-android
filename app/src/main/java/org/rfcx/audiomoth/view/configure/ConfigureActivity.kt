@@ -17,7 +17,7 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
         setContentView(R.layout.activity_configure)
 
         supportFragmentManager.beginTransaction()
-            .add(configureContainer.id, DeployFragment(), DeployFragment.TAG).commit()
+            .add(configureContainer.id, LocationFragment(), LocationFragment.TAG).commit()
     }
 
     override fun openSync(device: Device) {
@@ -39,7 +39,7 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
 
     override fun openDeploy(batteryLv: Int, datePredict: Long) {
         supportFragmentManager.beginTransaction()
-            .replace(configureContainer.id, DeployFragment(), DeployFragment.TAG).commit()
+            .replace(configureContainer.id, LocationFragment(), LocationFragment.TAG).commit()
     }
 
     companion object {

@@ -28,13 +28,13 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.utils.BitmapUtils
-import kotlinx.android.synthetic.main.fragment_deploy.*
+import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
 import java.util.*
 
-class DeployFragment : Fragment(), OnMapReadyCallback {
+class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var mapboxMap: MapboxMap
     private lateinit var mapView: MapView
@@ -49,7 +49,7 @@ class DeployFragment : Fragment(), OnMapReadyCallback {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_deploy, container, false)
+        return inflater.inflate(R.layout.fragment_location, container, false)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -329,7 +329,7 @@ class DeployFragment : Fragment(), OnMapReadyCallback {
     }
 
     companion object {
-        const val TAG = "DeployFragment"
+        const val TAG = "LocationFragment"
         const val REQUEST_PERMISSIONS_REQUEST_CODE = 34
         const val PIN_MAP = "pin-map"
         const val MAPBOX_ACCESS_TOKEN =
