@@ -59,15 +59,16 @@ open class MainActivity : AppCompatActivity() {
     }
 
     private fun getDevices() {
-        Firestore().db.collection("users").get()
+        val docRef = Firestore().db.collection(USERS)
+        docRef.get()
             .addOnSuccessListener { documents ->
                 symbolManager.deleteAll()
                 for (document in documents) {
                     val name = document.data["name"] as String
                     // TODO: Check user name and move to location newly added device
                     if (name == "Ratree Onchana") {
-                        Firestore().db.collection("users").document(document.id)
-                            .collection("deployments").get()
+                        docRef.document(document.id)
+                            .collection(DEPLOYMENTS).get()
                             .addOnSuccessListener { subDocuments ->
                                 for (sub in subDocuments) {
                                     val isLatest = sub.data["isLatest"] as Boolean
@@ -177,53 +178,15 @@ open class MainActivity : AppCompatActivity() {
         mapView.onDestroy()
     }
 
-    private fun Snackbar.allowInfiniteLines(): Snackbar {
-        return apply {
-            (view.findViewById<View?>(R.id.snackbar_text) as? TextView?)?.isSingleLine = false
-        }
-    }
-
     companion object {
         const val TAG = "MainActivity"
         const val PIN_MAP_GREEN = "PIN_MAP_GREEN"
         const val PIN_MAP_ORANGE = "PIN_MAP_ORANGE"
         const val PIN_MAP_RED = "PIN_MAP_RED"
         const val SHOW_SNACKBAR = "SHOW_SNACKBAR"
-        fun startActivity(context: Context, showSnackbar: Boolean = false) {
-            val intent = Intent(context, MainActivity::class.java)
-            intent.putExtra(SHOW_SNACKBAR, showSnackbar)
-            context.startActivity(intent)
-        }
-    }
-}
 
-interface InputDeviceIdListener {
-    fun onSelectedScanQrCode()
-    fun onSelectedEnterDeviceId()
-}
-
-class InputDeviceIdBottomSheet(private val listener: InputDeviceIdListener) :
-    BottomSheetDialogFragment() {
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_input_deviec_id_bottom_sheet, container, false)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        enterCodeTextView.paintFlags = enterCodeTextView.paintFlags or UNDERLINE_TEXT_FLAG
-        setView()
-    }
-
-    private fun setView() {
-        enterCodeTextView.setOnClickListener { listener.onSelectedEnterDeviceId() }
-        scanQrCodeButton.setOnClickListener { listener.onSelectedScanQrCode() }
-    }
-
-    companion object {
-        const val TAG = "InputDeviceIdBottomSheet"
+        const val USERS = "users"
+        const val DEPLOYMENTS = "deployments"
+        const val LOCATIONS = "locations"
     }
 }

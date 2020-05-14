@@ -29,9 +29,10 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.utils.BitmapUtils
 import kotlinx.android.synthetic.main.fragment_location.*
+import org.rfcx.audiomoth.MainActivity.Companion.LOCATIONS
+import org.rfcx.audiomoth.MainActivity.Companion.USERS
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.util.Firestore
-import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
 import java.util.*
 
 class LocationFragment : Fragment(), OnMapReadyCallback {
@@ -119,21 +120,27 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun getLocation() {
-        Firestore().db.collection(DEVICES).get()
-            .addOnSuccessListener { documentSnapshot ->
-                if (documentSnapshot != null) {
-                    val data = documentSnapshot.documents
-                    locations = arrayListOf()
-
-                    data.map {
-                        if (it.data != null) {
-                            val location = it.data?.get("locationName") as String
-                            locations.add(location)
-                        }
+        val docRef = Firestore().db.collection(USERS)
+        docRef.get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    val name = document.data["name"] as String
+                    // TODO: Check user name and move to location newly added device
+                    if (name == "Ratree Onchana") {
+                        locations = arrayListOf()
+                        docRef.document(document.id)
+                            .collection(LOCATIONS).get()
+                            .addOnSuccessListener { subDocuments ->
+                                val locationList = ArrayList<String>()
+                                for (sub in subDocuments) {
+                                    val location = sub.data["name"] as String
+                                    locationList.add(location)
+                                    locations.add(location)
+                                }
+                                arrayAdapter.addAll(locationList)
+                                arrayAdapter.notifyDataSetChanged()
+                            }
                     }
-
-                    arrayAdapter.addAll(locations)
-                    arrayAdapter.notifyDataSetChanged()
                 }
             }
     }
@@ -270,7 +277,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     0f,
                     locationListener
                 )
-                lastLocation = locationManager?.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                lastLocation =
+                    locationManager?.getLastKnownLocation(LocationManager.GPS_PROVIDER)
 
             } catch (ex: SecurityException) {
                 ex.printStackTrace()
