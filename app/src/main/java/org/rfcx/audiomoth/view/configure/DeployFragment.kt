@@ -13,6 +13,8 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.core.app.ActivityCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
@@ -28,6 +30,9 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.utils.BitmapUtils
 import kotlinx.android.synthetic.main.fragment_deploy.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.util.Firestore
+import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
+import java.util.*
 
 class DeployFragment : Fragment(), OnMapReadyCallback {
 
@@ -36,6 +41,9 @@ class DeployFragment : Fragment(), OnMapReadyCallback {
     private lateinit var symbolManager: SymbolManager
     private var locationManager: LocationManager? = null
     private var lastLocation: Location? = null
+    private var locations = ArrayList<String>()
+    private var location = ""
+    private lateinit var arrayAdapter: ArrayAdapter<String>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -54,11 +62,58 @@ class DeployFragment : Fragment(), OnMapReadyCallback {
         mapView = view.findViewById(R.id.mapBoxView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
+
         getLastLocation()
+        getLocation()
+        setAdapter()
+        setLocationSpinner()
 
         finishButton.setOnClickListener {
             progressBar(true)
         }
+    }
+
+    private fun setAdapter() {
+        context?.let {
+            arrayAdapter =
+                ArrayAdapter(it, R.layout.support_simple_spinner_dropdown_item, locations)
+        }
+        locationNameSpinner.adapter = arrayAdapter
+    }
+
+    private fun setLocationSpinner() {
+        locationNameSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                location = locations[position]
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+    }
+
+    private fun getLocation() {
+        Firestore().db.collection(DEVICES).get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot != null) {
+                    val data = documentSnapshot.documents
+                    locations = arrayListOf()
+
+                    data.map {
+                        if (it.data != null) {
+                            val location = it.data?.get("locationName") as String
+                            locations.add(location)
+                        }
+                    }
+
+                    arrayAdapter.addAll(locations)
+                    arrayAdapter.notifyDataSetChanged()
+                }
+            }
     }
 
     private fun progressBar(show: Boolean) {
