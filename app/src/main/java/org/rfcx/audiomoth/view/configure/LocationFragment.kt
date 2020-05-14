@@ -43,6 +43,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var locationManager: LocationManager? = null
     private var lastLocation: Location? = null
     private var locations = ArrayList<String>()
+    private var locationsLatLng = ArrayList<LatLng>()
+    private var locationLatLng: LatLng? = null
     private var location = ""
     private lateinit var arrayAdapter: ArrayAdapter<String>
 
@@ -84,11 +86,19 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         radioGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.newLocationRadioButton -> {
+                    lastLocation?.let { lastLocation ->
+                        setPinOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
+                        setupView(
+                            String.format("%.6f", lastLocation.latitude),
+                            String.format("%.6f", lastLocation.longitude)
+                        )
+                    }
                     locationNameTextInput.visibility = View.VISIBLE
                     locationNameSpinner.visibility = View.GONE
                 }
 
                 R.id.existingRadioButton -> {
+                    locationLatLng?.let { setPinOnMap(it) }
                     locationNameTextInput.visibility = View.GONE
                     locationNameSpinner.visibility = View.VISIBLE
                 }
@@ -113,6 +123,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 id: Long
             ) {
                 location = locations[position]
+                locationLatLng = locationsLatLng[position]
+                setPinOnMap(locationsLatLng[position])
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -128,14 +140,18 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     // TODO: Check user name and move to location newly added device
                     if (name == "Ratree Onchana") {
                         locations = arrayListOf()
+                        locationsLatLng = arrayListOf()
                         docRef.document(document.id)
                             .collection(LOCATIONS).get()
                             .addOnSuccessListener { subDocuments ->
                                 val locationList = ArrayList<String>()
                                 for (sub in subDocuments) {
                                     val location = sub.data["name"] as String
+                                    val latitude = sub.data["latitude"] as Double
+                                    val longitude = sub.data["longitude"] as Double
                                     locationList.add(location)
                                     locations.add(location)
+                                    locationsLatLng.add(LatLng(latitude, longitude))
                                 }
                                 arrayAdapter.addAll(locationList)
                                 arrayAdapter.notifyDataSetChanged()
