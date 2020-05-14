@@ -63,6 +63,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
 
+        //TODO: Check new location or existing
+        newLocationRadioButton.isChecked = true
+        locationNameTextInput.visibility = View.VISIBLE
+        locationNameSpinner.visibility = View.GONE
+
+        radioCheckedChange()
         getLastLocation()
         getLocation()
         setAdapter()
@@ -70,6 +76,22 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
         finishButton.setOnClickListener {
             progressBar(true)
+        }
+    }
+
+    private fun radioCheckedChange() {
+        radioGroup.setOnCheckedChangeListener { _, checkedId ->
+            when (checkedId) {
+                R.id.newLocationRadioButton -> {
+                    locationNameTextInput.visibility = View.VISIBLE
+                    locationNameSpinner.visibility = View.GONE
+                }
+
+                R.id.existingRadioButton -> {
+                    locationNameTextInput.visibility = View.GONE
+                    locationNameSpinner.visibility = View.VISIBLE
+                }
+            }
         }
     }
 
