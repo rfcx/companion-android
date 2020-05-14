@@ -90,15 +90,21 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                         setPinOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
                         setupView(
                             String.format("%.6f", lastLocation.latitude),
-                            String.format("%.6f", lastLocation.longitude)
+                            String.format("%.6f", lastLocation.longitude), true
                         )
                     }
+
+                    finishButton.isEnabled = locationNameEditText.text.toString().isNotEmpty()
+
                     locationNameTextInput.visibility = View.VISIBLE
                     locationNameSpinner.visibility = View.GONE
                 }
 
                 R.id.existingRadioButton -> {
-                    locationLatLng?.let { setPinOnMap(it) }
+                    locationLatLng?.let {
+                        setPinOnMap(it)
+                        setupView(it.latitude.toString(), it.longitude.toString(), false)
+                    }
                     locationNameTextInput.visibility = View.GONE
                     locationNameSpinner.visibility = View.VISIBLE
                 }
@@ -125,6 +131,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 location = locations[position]
                 locationLatLng = locationsLatLng[position]
                 setPinOnMap(locationsLatLng[position])
+
+                setupView(
+                    locationsLatLng[position].latitude.toString(),
+                    locationsLatLng[position].longitude.toString(),
+                    false
+                )
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -153,6 +165,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                                     locations.add(location)
                                     locationsLatLng.add(LatLng(latitude, longitude))
                                 }
+                                locationLatLng = locationsLatLng[0]
                                 arrayAdapter.addAll(locationList)
                                 arrayAdapter.notifyDataSetChanged()
                             }
@@ -186,7 +199,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 setPinOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
                 setupView(
                     String.format("%.6f", lastLocation.latitude),
-                    String.format("%.6f", lastLocation.longitude)
+                    String.format("%.6f", lastLocation.longitude), true
                 )
             }
             onLatLngChanged()
@@ -339,9 +352,11 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun setupView(latitudeText: String, longitudeText: String) {
+    private fun setupView(latitudeText: String, longitudeText: String, enabled: Boolean) {
         latitudeEditText.setText(latitudeText)
+        latitudeEditText.isEnabled = enabled
         longitudeEditText.setText(longitudeText)
+        longitudeEditText.isEnabled = enabled
     }
 
     override fun onStart() {
