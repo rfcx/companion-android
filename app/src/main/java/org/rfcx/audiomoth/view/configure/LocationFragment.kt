@@ -169,6 +169,29 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                                 }
                                 arrayAdapter.addAll(locationList)
                                 arrayAdapter.notifyDataSetChanged()
+
+                                if (locationsLatLng.size == subDocuments.size()) {
+                                    var minDistance = 51.0
+                                    var latLng: LatLng = locationsLatLng[0]
+
+                                    locationsLatLng.map {
+                                        val location = Location(LocationManager.GPS_PROVIDER)
+                                        location.latitude = it.latitude
+                                        location.longitude = it.longitude
+
+                                        val distance = location.distanceTo(lastLocation)
+                                        if (distance <= 50.0f) {
+                                            if (minDistance > distance) {
+                                                minDistance = distance.toDouble()
+
+                                                latLng = it
+                                            }
+                                        }
+                                    }
+
+                                    val position = locationsLatLng.indexOf(latLng)
+                                    locationNameSpinner.setSelection(position)
+                                }
                             }
                     }
                 }
