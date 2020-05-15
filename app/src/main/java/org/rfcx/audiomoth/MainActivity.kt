@@ -6,6 +6,8 @@ import androidx.core.content.res.ResourcesCompat
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.location.modes.CameraMode
+import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
@@ -42,10 +44,18 @@ open class MainActivity : AppCompatActivity() {
                 symbolManager = SymbolManager(mapView, mapboxMap, it)
                 symbolManager.iconAllowOverlap = true
                 symbolManager.iconIgnorePlacement = true
-
+                enableLocationComponent(it)
                 getDevices()
             }
         }
+    }
+
+    private fun enableLocationComponent(loadedMapStyle: Style) {
+        val locationComponent = mapboxMap.locationComponent
+        locationComponent.activateLocationComponent(this, loadedMapStyle)
+        locationComponent.isLocationComponentEnabled = true
+        locationComponent.cameraMode = CameraMode.TRACKING
+        locationComponent.renderMode = RenderMode.COMPASS
     }
 
     private fun getDevices() {
