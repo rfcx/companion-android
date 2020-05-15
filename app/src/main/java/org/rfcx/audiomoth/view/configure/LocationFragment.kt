@@ -45,7 +45,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var locations = ArrayList<String>()
     private var locationsLatLng = ArrayList<LatLng>()
     private var locationLatLng: LatLng? = null
+    private var minDistance = 51.0
     private var location = ""
+    private var locationMinDistance = ""
     private lateinit var arrayAdapter: ArrayAdapter<String>
 
     override fun onCreateView(
@@ -118,6 +120,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 ArrayAdapter(it, R.layout.support_simple_spinner_dropdown_item, locations)
         }
         locationNameSpinner.adapter = arrayAdapter
+
+        val spinnerPosition = arrayAdapter.getPosition(locationMinDistance)
+        locationNameSpinner.setSelection(spinnerPosition)
     }
 
     private fun setLocationSpinner() {
@@ -158,11 +163,25 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                             .addOnSuccessListener { subDocuments ->
                                 val locationList = ArrayList<String>()
                                 for (sub in subDocuments) {
-                                    val location = sub.data["name"] as String
+                                    val locationName = sub.data["name"] as String
                                     val latitude = sub.data["latitude"] as Double
                                     val longitude = sub.data["longitude"] as Double
-                                    locationList.add(location)
-                                    locations.add(location)
+
+                                    val location = Location(LocationManager.GPS_PROVIDER)
+                                    location.latitude = latitude
+                                    location.longitude = longitude
+
+                                    val distance = location.distanceTo(lastLocation)
+                                    if (distance <= 50.0f) {
+                                        if (minDistance > distance) {
+
+                                            minDistance = distance.toDouble()
+                                            locationMinDistance = locationName
+                                        }
+                                    }
+
+                                    locationList.add(locationName)
+                                    locations.add(locationName)
                                     locationsLatLng.add(LatLng(latitude, longitude))
                                 }
                                 locationLatLng = locationsLatLng[0]
