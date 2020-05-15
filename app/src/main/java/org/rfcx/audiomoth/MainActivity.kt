@@ -1,17 +1,8 @@
 package org.rfcx.audiomoth
 
-import android.content.Context
-import android.content.Intent
-import android.graphics.Paint.UNDERLINE_TEXT_FLAG
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.snackbar.Snackbar
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -22,7 +13,6 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.utils.BitmapUtils
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_input_deviec_id_bottom_sheet.*
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.view.configure.ConfigureActivity
 import org.rfcx.audiomoth.view.configure.LocationFragment.Companion.MAPBOX_ACCESS_TOKEN
@@ -60,35 +50,31 @@ open class MainActivity : AppCompatActivity() {
 
     private fun getDevices() {
         val docRef = Firestore().db.collection(USERS)
-        docRef.get()
+        docRef.whereEqualTo("name", "Ratree Onchana").get()
             .addOnSuccessListener { documents ->
                 symbolManager.deleteAll()
                 for (document in documents) {
-                    val name = document.data["name"] as String
-                    // TODO: Check user name and move to location newly added device
-                    if (name == "Ratree Onchana") {
-                        docRef.document(document.id)
-                            .collection(DEPLOYMENTS).get()
-                            .addOnSuccessListener { subDocuments ->
-                                for (sub in subDocuments) {
-                                    val isLatest = sub.data["isLatest"] as Boolean
-                                    if (isLatest) {
-                                        val location = sub.data["location"] as Map<*, *>
-                                        val latitude = location["latitude"] as Double
-                                        val longitude = location["longitude"] as Double
-                                        val batteryPredicted =
-                                            sub.data["batteryPredictedAt"] as com.google.firebase.Timestamp
+                    docRef.document(document.id)
+                        .collection(DEPLOYMENTS).get()
+                        .addOnSuccessListener { subDocuments ->
+                            for (sub in subDocuments) {
+                                val isLatest = sub.data["isLatest"] as Boolean
+                                if (isLatest) {
+                                    val location = sub.data["location"] as Map<*, *>
+                                    val latitude = location["latitude"] as Double
+                                    val longitude = location["longitude"] as Double
+                                    val batteryPredicted =
+                                        sub.data["batteryPredictedAt"] as com.google.firebase.Timestamp
 
-                                        displayPinOfDevices(
-                                            LatLng(latitude, longitude),
-                                            checkBatteryPredictedUntil(batteryPredicted.seconds * 1000)
-                                        )
+                                    displayPinOfDevices(
+                                        LatLng(latitude, longitude),
+                                        checkBatteryPredictedUntil(batteryPredicted.seconds * 1000)
+                                    )
 
-                                        moveCamera(LatLng(latitude, longitude))
-                                    }
+                                    moveCamera(LatLng(latitude, longitude))
                                 }
                             }
-                    }
+                        }
                 }
             }
     }

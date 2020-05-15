@@ -45,9 +45,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var locations = ArrayList<String>()
     private var locationsLatLng = ArrayList<LatLng>()
     private var locationLatLng: LatLng? = null
-    private var minDistance = 51.0
     private var location = ""
-    private var locationMinDistance = ""
     private lateinit var arrayAdapter: ArrayAdapter<String>
 
     override fun onCreateView(
@@ -67,11 +65,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         mapView = view.findViewById(R.id.mapBoxView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
-
-        //TODO: Check new location or existing
-        newLocationRadioButton.isChecked = true
-        locationNameTextInput.visibility = View.VISIBLE
-        locationNameSpinner.visibility = View.GONE
 
         radioCheckedChange()
         getLastLocation()
@@ -120,9 +113,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 ArrayAdapter(it, R.layout.support_simple_spinner_dropdown_item, locations)
         }
         locationNameSpinner.adapter = arrayAdapter
-
-        val spinnerPosition = arrayAdapter.getPosition(locationMinDistance)
-        locationNameSpinner.setSelection(spinnerPosition)
     }
 
     private fun setLocationSpinner() {
@@ -150,12 +140,14 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private fun getLocation() {
         val docRef = Firestore().db.collection(USERS)
-        docRef.get()
+        docRef.whereEqualTo("name", "Ratree Onchana").get()
             .addOnSuccessListener { documents ->
-                for (document in documents) {
-                    val name = document.data["name"] as String
-                    // TODO: Check user name and move to location newly added device
-                    if (name == "Ratree Onchana") {
+                if (documents.isEmpty) {
+                    newLocationRadioButton.isChecked = true
+                    existingRadioButton.isEnabled = false
+                } else {
+                    existingRadioButton.isChecked = true
+                    for (document in documents) {
                         locations = arrayListOf()
                         locationsLatLng = arrayListOf()
                         docRef.document(document.id)
@@ -171,20 +163,10 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                                     location.latitude = latitude
                                     location.longitude = longitude
 
-                                    val distance = location.distanceTo(lastLocation)
-                                    if (distance <= 50.0f) {
-                                        if (minDistance > distance) {
-
-                                            minDistance = distance.toDouble()
-                                            locationMinDistance = locationName
-                                        }
-                                    }
-
                                     locationList.add(locationName)
                                     locations.add(locationName)
                                     locationsLatLng.add(LatLng(latitude, longitude))
                                 }
-                                locationLatLng = locationsLatLng[0]
                                 arrayAdapter.addAll(locationList)
                                 arrayAdapter.notifyDataSetChanged()
                             }
