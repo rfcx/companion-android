@@ -53,6 +53,9 @@
     <!--    SyncFragment-->
     <string name="sync">Sync</string>
     <string name="syncing">Syncing</string>
+    <string name="switch_to_config">1. Switch your device to CONFIG</string>
+    <string name="max_volume">2. Max volume of your phone</string>
+    <string name="hold_device">3. Hold the device less than 50 cm apart</string>
 
     <!--    VerifySyncFragment-->
     <string name="what_light_you_see">What light do you see now?</string>
