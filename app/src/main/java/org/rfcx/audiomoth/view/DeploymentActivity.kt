@@ -11,6 +11,8 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.view.configure.ConfigureFragment
 import org.rfcx.audiomoth.view.configure.LocationFragment
 import org.rfcx.audiomoth.view.configure.SelectProfileFragment
+import org.rfcx.audiomoth.view.configure.SyncFragment
+import org.rfcx.audiomoth.view.configure.SyncFragment.Companion.BEFORE_SYNC
 
 class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, UserListener, DeploymentListener {
 
@@ -76,6 +78,9 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, UserListener
             1 -> {
                 startFragment(SelectProfileFragment.newInstance())
             }
+            2 -> {
+                startFragment(SyncFragment.newInstance(BEFORE_SYNC))
+            }
             else -> {
                 startFragment(ExampleFragment.newInstance(currentStep))
             }
@@ -102,6 +107,10 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, UserListener
 
     override fun openConfigure() {
         startFragment(ConfigureFragment.newInstance())
+    }
+
+    override fun openSync(status: String) {
+        startFragment(SyncFragment.newInstance(status))
     }
 
     companion object {
@@ -132,4 +141,5 @@ interface UserListener {
 
 interface DeploymentListener {
     fun openConfigure()
+    fun openSync(status: String)
 }
