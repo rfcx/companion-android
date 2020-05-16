@@ -10,15 +10,26 @@ import kotlinx.android.synthetic.main.activity_deployment.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.view.configure.LocationFragment
 
-class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
+class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, UserListener {
 
     private var currentStep = 0
     private val steps by lazy { resources.getStringArray(R.array.steps) }
+    private var userId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_deployment)
         setupView()
+        setUserId()
+    }
+
+    private fun setUserId() {
+        if (intent.hasExtra(USER_ID)) {
+            val userId = intent.getStringExtra(USER_ID)
+            if (userId != null) {
+                this.userId = userId
+            }
+        }
     }
 
     private fun setupView() {
@@ -80,9 +91,19 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
             .commit()
     }
 
+    override fun getUserId(): String? {
+        return userId
+    }
+
+
     companion object {
-        fun startActivity(context: Context) {
-            context.startActivity(Intent(context, DeploymentActivity::class.java))
+        private const val USER_ID = "USER_ID"
+
+        fun startActivity(context: Context, userId: String?) {
+            val intent = Intent(context, DeploymentActivity::class.java)
+            if (userId != null)
+                intent.putExtra(USER_ID, userId)
+            context.startActivity(intent)
         }
     }
 }
@@ -95,4 +116,8 @@ interface DeploymentProtocol {
     fun backStep()
 
     fun getNameNextStep(): String // example get data from parent
+}
+
+interface UserListener {
+    fun getUserId(): String?
 }

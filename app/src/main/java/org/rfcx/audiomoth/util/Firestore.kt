@@ -4,6 +4,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.Device
+import org.rfcx.audiomoth.entity.Location
 import org.rfcx.audiomoth.entity.User.Companion.FIELD_NAME
 
 
@@ -73,6 +74,26 @@ class Firestore {
                 if (documents.isNotEmpty()) {
                     val deployments = documents.map { it.toObject(Deployment::class.java) }
                     callback.onSuccessListener(deployments)
+                } else {
+                    callback.onSuccessListener(null)
+                }
+            }
+            .addOnFailureListener {
+                callback.addOnFailureListener(it)
+            }
+    }
+
+    fun getLocations(
+        documentId: String,
+        callback: FirestoreResponseCallback<List<Location?>?>
+    ) {
+        db.collection(COLLECTION_USERS).document(documentId).collection(COLLECTION_LOCATIONS)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                val documents = querySnapshot.documents
+                if (documents.isNotEmpty()) {
+                    val locations = documents.map { it.toObject(Location::class.java) }
+                    callback.onSuccessListener(locations)
                 } else {
                     callback.onSuccessListener(null)
                 }

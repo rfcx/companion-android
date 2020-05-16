@@ -29,11 +29,10 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.utils.BitmapUtils
 import kotlinx.android.synthetic.main.fragment_location.*
-import org.rfcx.audiomoth.MainActivity.Companion.LOCATIONS
-import org.rfcx.audiomoth.MainActivity.Companion.USERS
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.util.Firestore
-import java.util.*
+import org.rfcx.audiomoth.util.FirestoreResponseCallback
+import org.rfcx.audiomoth.view.UserListener
 
 class LocationFragment : Fragment(), OnMapReadyCallback {
 
@@ -65,16 +64,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         mapView = view.findViewById(R.id.mapBoxView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
-
-        radioCheckedChange()
-        getLastLocation()
-        getLocation()
-        setAdapter()
-        setLocationSpinner()
-
-        finishButton.setOnClickListener {
-            progressBar(true)
-        }
+        finishButton.visibility = View.GONE
     }
 
     private fun radioCheckedChange() {
@@ -82,11 +72,11 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             when (checkedId) {
                 R.id.newLocationRadioButton -> {
                     lastLocation?.let { lastLocation ->
-                        setPinOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
                         setupView(
                             String.format("%.6f", lastLocation.latitude),
                             String.format("%.6f", lastLocation.longitude), true
                         )
+                        setPinOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
                     }
 
                     finishButton.isEnabled = locationNameEditText.text.toString().isNotEmpty()
@@ -138,64 +128,54 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun getLocation() {
-        val docRef = Firestore().db.collection(USERS)
-        docRef.whereEqualTo("name", "Ratree Onchana").get()
-            .addOnSuccessListener { documents ->
-                if (documents.isEmpty) {
-                    newLocationRadioButton.isChecked = true
-                    existingRadioButton.isEnabled = false
-                } else {
-                    existingRadioButton.isChecked = true
-                    for (document in documents) {
-                        locations = arrayListOf()
-                        locationsLatLng = arrayListOf()
-                        docRef.document(document.id)
-                            .collection(LOCATIONS).get()
-                            .addOnSuccessListener { subDocuments ->
-                                val locationList = ArrayList<String>()
-                                for (sub in subDocuments) {
-                                    val locationName = sub.data["name"] as String
-                                    val latitude = sub.data["latitude"] as Double
-                                    val longitude = sub.data["longitude"] as Double
+    private fun getLocation(documentId: String?) {
+        if (documentId.isNullOrEmpty()) {
+            newLocationRadioButton.isChecked = true
+            existingRadioButton.isEnabled = false
+        } else {
+            existingRadioButton.isChecked = true
 
-                                    val location = Location(LocationManager.GPS_PROVIDER)
-                                    location.latitude = latitude
-                                    location.longitude = longitude
+            Firestore().getLocations(documentId,
+                object : FirestoreResponseCallback<List<org.rfcx.audiomoth.entity.Location?>?> {
+                    override fun onSuccessListener(response: List<org.rfcx.audiomoth.entity.Location?>?) {
+                        val locations = ArrayList<String>()
+                        response?.map { it ->
+                            it?.let { location ->
+                                locations.add(location.name)
+                                locationsLatLng.add(LatLng(location.latitude, location.longitude))
 
-                                    locationList.add(locationName)
-                                    locations.add(locationName)
-                                    locationsLatLng.add(LatLng(latitude, longitude))
-                                }
-                                arrayAdapter.addAll(locationList)
-                                arrayAdapter.notifyDataSetChanged()
-
-                                if (locationsLatLng.size == subDocuments.size()) {
-                                    var minDistance = 51.0
-                                    var latLng: LatLng = locationsLatLng[0]
-
-                                    locationsLatLng.map {
-                                        val location = Location(LocationManager.GPS_PROVIDER)
-                                        location.latitude = it.latitude
-                                        location.longitude = it.longitude
-
-                                        val distance = location.distanceTo(lastLocation)
-                                        if (distance <= 50.0f) {
-                                            if (minDistance > distance) {
-                                                minDistance = distance.toDouble()
-
-                                                latLng = it
-                                            }
-                                        }
-                                    }
-
-                                    val position = locationsLatLng.indexOf(latLng)
-                                    locationNameSpinner.setSelection(position)
-                                }
+                                setRecommendLocation()
                             }
+                        }
+                        arrayAdapter.addAll(locations)
+                        arrayAdapter.notifyDataSetChanged()
                     }
+
+                    override fun addOnFailureListener(exception: Exception) {}
+                })
+        }
+    }
+
+    private fun setRecommendLocation() {
+        var minDistance = 51.0
+        var latLng: LatLng = locationsLatLng[0]
+
+        locationsLatLng.map {
+            val loc = Location(LocationManager.GPS_PROVIDER)
+            loc.latitude = it.latitude
+            loc.longitude = it.longitude
+
+            val distance = loc.distanceTo(lastLocation)
+            if (distance <= 50.0f) {
+                if (minDistance > distance) {
+                    minDistance = distance.toDouble()
+
+                    latLng = it
                 }
             }
+            val position = locationsLatLng.indexOf(latLng)
+            locationNameSpinner.setSelection(position)
+        }
     }
 
     private fun progressBar(show: Boolean) {
@@ -227,6 +207,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 )
             }
             onLatLngChanged()
+            radioCheckedChange()
+
+            getLastLocation()
+            getLocation((activity as UserListener).getUserId())
+            setAdapter()
+            setLocationSpinner()
         }
     }
 
@@ -271,7 +257,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             override fun afterTextChanged(p0: Editable?) {
                 if (p0 != null) {
                     finishButton.isEnabled = p0.isNotEmpty()
-                    if (p0.toString() != "-" && p0.isNotEmpty() && p0.toString() != ".") {
+                    if (p0.toString() != "-" && p0.isNotEmpty() && p0.toString() != "." && longitudeEditText.text.toString().isNotEmpty()) {
                         if (p0.toString().toDouble() >= -90.0 && p0.toString().toDouble() <= 90) {
                             setPinOnMap(
                                 LatLng(
@@ -293,7 +279,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             override fun afterTextChanged(p0: Editable?) {
                 if (p0 != null) {
                     finishButton.isEnabled = p0.isNotEmpty()
-                    if (p0.toString() != "-" && p0.isNotEmpty() && p0.toString() != ".") {
+                    if (p0.toString() != "-" && p0.isNotEmpty() && p0.toString() != "." && latitudeEditText.text.toString().isNotEmpty()) {
                         setPinOnMap(
                             LatLng(
                                 latitudeEditText.text.toString().toDouble(),

@@ -26,6 +26,7 @@ open class MainActivity : AppCompatActivity() {
     private lateinit var mapboxMap: MapboxMap
     private lateinit var mapView: MapView
     private lateinit var symbolManager: SymbolManager
+    private var userId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +34,7 @@ open class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         inputDeviceIdButton.setOnClickListener {
-            DeploymentActivity.startActivity(this)
+            DeploymentActivity.startActivity(this, userId)
         }
 
         mapView = findViewById(R.id.mapBoxView)
@@ -65,6 +66,7 @@ open class MainActivity : AppCompatActivity() {
                 override fun onSuccessListener(response: String?) {
                     if (response != null) {
                         getLocation(response)
+                        userId = response
                     }
                 }
 
