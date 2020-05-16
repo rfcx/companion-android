@@ -14,7 +14,11 @@ open class Device(
     val batteryLevel: Int,
     val batteryPredictedUntil: Timestamp,
     val configuration: Stream
-) : Serializable
+) : Serializable {
+    companion object {
+        const val FIELD_DEVICE_ID = "deviceId"
+    }
+}
 
 open class Stream(
     val streamName: String,

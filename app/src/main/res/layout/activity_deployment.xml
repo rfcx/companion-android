@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".view.DeploymentActivity">
+
+    <com.shuhart.stepview.StepView
+        android:id="@+id/stepView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/margin_padding_large"
+        android:paddingTop="@dimen/margin_padding_normal"
+        android:paddingEnd="@dimen/margin_padding_large"
+        android:paddingBottom="@dimen/margin_padding_normal"
+        app:layout_constraintTop_toTopOf="parent"
+        app:sv_animationType="All"
+        app:sv_doneCircleColor="@color/colorAccent"
+        app:sv_doneStepLineColor="@color/colorAccent"
+        app:sv_doneStepMarkColor="@color/white"
+        app:sv_doneTextColor="@color/grey"
+        app:sv_nextStepCircleEnabled="true"
+        app:sv_nextStepLineColor="@color/grey"
+        app:sv_nextTextColor="@color/grey"
+        app:sv_selectedCircleColor="@color/colorAccent"
+        app:sv_selectedStepNumberColor="@color/white"
+        app:sv_selectedTextColor="@color/colorAccent"
+        app:sv_stepLineWidth="1dp"
+        app:sv_steps="@array/steps" />
+
+    <FrameLayout
+        android:id="@+id/contentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/stepView" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/completeStepButton"
+        style="@style/AudioMothButton.Primary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_padding_normal"
+        android:text="@string/next"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

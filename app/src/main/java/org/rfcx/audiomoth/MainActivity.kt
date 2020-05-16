@@ -16,7 +16,7 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.utils.BitmapUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import org.rfcx.audiomoth.util.Firestore
-import org.rfcx.audiomoth.view.configure.ConfigureActivity
+import org.rfcx.audiomoth.view.DeploymentActivity
 import org.rfcx.audiomoth.view.configure.LocationFragment.Companion.MAPBOX_ACCESS_TOKEN
 
 open class MainActivity : AppCompatActivity() {
@@ -31,8 +31,7 @@ open class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         inputDeviceIdButton.setOnClickListener {
-            ConfigureActivity.startActivity(this)
-            finish()
+            DeploymentActivity.startActivity(this)
         }
 
         mapView = findViewById(R.id.mapBoxView)
@@ -179,8 +178,6 @@ open class MainActivity : AppCompatActivity() {
         const val PIN_MAP_GREEN = "PIN_MAP_GREEN"
         const val PIN_MAP_ORANGE = "PIN_MAP_ORANGE"
         const val PIN_MAP_RED = "PIN_MAP_RED"
-        const val SHOW_SNACKBAR = "SHOW_SNACKBAR"
-
         const val USERS = "users"
         const val DEPLOYMENTS = "deployments"
         const val LOCATIONS = "locations"

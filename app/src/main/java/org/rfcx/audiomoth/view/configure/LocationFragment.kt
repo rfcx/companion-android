@@ -419,5 +419,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         const val PIN_MAP = "pin-map"
         const val MAPBOX_ACCESS_TOKEN =
             "pk.eyJ1IjoicmF0cmVlLW9jaG4iLCJhIjoiY2s5Mjk5MDQ3MDYzcDNmbzVnZHd1aXNqaSJ9.UCrMjgGw8zROm_sRlebSGQ"
+
+        fun newInstance(): LocationFragment {
+            return LocationFragment()
+        }
     }
 }

@@ -78,5 +78,6 @@
     <string name="deploying_the_device">Where are you deploying the device?</string>
     <string name="new_location">New location</string>
     <string name="existing">Existing</string>
+    <string name="next">Next</string>
 
 </resources>

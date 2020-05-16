@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="steps">
+        <item>Locate</item>
+        <item>Config</item>
+        <item>Sync</item>
+        <item>Verify</item>
+        <item>Deploy</item>
+    </string-array>
+</resources>
