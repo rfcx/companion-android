@@ -7,116 +7,101 @@
     android:background="@color/white"
     tools:context=".view.configure.ConfigureFragment">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?android:actionBarSize"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:title="@string/configure"
-        app:titleTextColor="@color/text_black" />
-
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <androidx.appcompat.widget.AppCompatSpinner
-                android:id="@+id/profileSpinner"
-                style="@style/Base.Widget.AppCompat.Spinner.Underlined"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_margin="@dimen/margin_padding_normal"
-                android:prompt="@string/prompt_profile"
-                android:spinnerMode="dialog"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <LinearLayout
-                android:id="@+id/sampleRateLayout"
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/sampleRateAndGainLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
-                android:orientation="vertical"
-                android:paddingTop="@dimen/margin_padding_normal"
-                app:layout_constraintTop_toBottomOf="@id/profileSpinner">
+                android:orientation="horizontal"
+                app:layout_constraintTop_toTopOf="parent">
 
-                <TextView
-                    android:id="@+id/sampleRateTextView"
-                    style="@style/AudioMothText.Subhead.Bold"
+                <LinearLayout
+                    android:id="@+id/sampleRateLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/margin_padding_normal"
-                    android:paddingEnd="@dimen/margin_padding_normal"
-                    android:text="@string/sample_rate" />
+                    android:layout_weight="1"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:orientation="vertical"
+                    android:paddingTop="@dimen/margin_padding_normal">
 
-                <TextView
-                    android:id="@+id/sampleRateValueTextView"
-                    style="@style/AudioMothText.Body.Secondary"
+                    <TextView
+                        android:id="@+id/sampleRateTextView"
+                        style="@style/AudioMothText.Subhead.Bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="@dimen/margin_padding_normal"
+                        android:paddingEnd="@dimen/margin_padding_normal"
+                        android:text="@string/sample_rate" />
+
+                    <TextView
+                        android:id="@+id/sampleRateValueTextView"
+                        style="@style/AudioMothText.Body.Secondary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="@dimen/margin_padding_normal"
+                        android:paddingEnd="@dimen/margin_padding_normal"
+                        android:paddingBottom="@dimen/margin_padding_small"
+                        tools:text="8kHz (default)" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="@dimen/margin_padding_small"
+                        android:background="@color/gray_30" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/gainLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/margin_padding_normal"
-                    android:paddingEnd="@dimen/margin_padding_normal"
-                    android:paddingBottom="@dimen/margin_padding_small"
-                    tools:text="8kHz (default)" />
+                    android:layout_weight="1"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:orientation="vertical"
+                    android:paddingTop="@dimen/margin_padding_normal"
+                    app:layout_constraintTop_toBottomOf="@id/sampleRateLayout">
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="@dimen/margin_padding_small"
-                    android:background="@color/gray_30" />
+                    <TextView
+                        android:id="@+id/gainTextView"
+                        style="@style/AudioMothText.Subhead.Bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="@dimen/margin_padding_normal"
+                        android:paddingEnd="@dimen/margin_padding_normal"
+                        android:text="@string/gain" />
 
-            </LinearLayout>
+                    <TextView
+                        android:id="@+id/gainValueTextView"
+                        style="@style/AudioMothText.Body.Secondary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="@dimen/margin_padding_normal"
+                        android:paddingEnd="@dimen/margin_padding_normal"
+                        android:paddingBottom="@dimen/margin_padding_small"
+                        tools:text="3 (default)" />
 
-            <LinearLayout
-                android:id="@+id/gainLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
-                android:orientation="vertical"
-                android:paddingTop="@dimen/margin_padding_normal"
-                app:layout_constraintTop_toBottomOf="@id/sampleRateLayout">
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="@dimen/margin_padding_small"
+                        android:background="@color/gray_30" />
 
-                <TextView
-                    android:id="@+id/gainTextView"
-                    style="@style/AudioMothText.Subhead.Bold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/margin_padding_normal"
-                    android:paddingEnd="@dimen/margin_padding_normal"
-                    android:text="@string/gain" />
-
-                <TextView
-                    android:id="@+id/gainValueTextView"
-                    style="@style/AudioMothText.Body.Secondary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/margin_padding_normal"
-                    android:paddingEnd="@dimen/margin_padding_normal"
-                    android:paddingBottom="@dimen/margin_padding_small"
-                    tools:text="3 (default)" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="@dimen/margin_padding_small"
-                    android:background="@color/gray_30" />
-
-            </LinearLayout>
+                </LinearLayout>
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
             <TextView
                 android:id="@+id/durationTextView"
@@ -125,7 +110,7 @@
                 android:layout_height="wrap_content"
                 android:padding="@dimen/margin_padding_normal"
                 android:text="@string/recording_duration_title"
-                app:layout_constraintTop_toBottomOf="@id/gainLayout" />
+                app:layout_constraintTop_toBottomOf="@id/sampleRateAndGainLayout" />
 
             <RadioGroup
                 android:id="@+id/radioGroup"
@@ -169,41 +154,49 @@
                     android:layout_height="wrap_content"
                     android:text="@string/custom" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/recordingDurationTextInput"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/margin_padding_xlarge"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    android:hint="@string/recording_duration">
+                    android:orientation="horizontal">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/recordingDurationEditText"
-                        android:layout_width="match_parent"
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/recordingDurationTextInput"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:inputType="number" />
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:layout_marginEnd="@dimen/margin_padding_small"
+                        android:layout_weight="1"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:hint="@string/recording_duration">
 
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/recordingDurationEditText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="number" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/sleepDurationTextInput"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/margin_padding_xlarge"
-                    android:layout_marginTop="@dimen/margin_padding_small"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    android:hint="@string/sleep_duration">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/sleepDurationEditText"
-                        android:layout_width="match_parent"
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/sleepDurationTextInput"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:inputType="number" />
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:layout_marginStart="@dimen/margin_padding_small"
+                        android:layout_weight="1"
+
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:hint="@string/sleep_duration">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/sleepDurationEditText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="number" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
             </RadioGroup>
 
             <View
@@ -261,9 +254,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:paddingBottom="@dimen/margin_padding_normal"
+                android:visibility="gone"
                 app:layout_constraintBottom_toTopOf="@id/recordingPeriodView"
                 app:layout_constraintStart_toStartOf="parent"
-                android:visibility="gone"
                 app:layout_constraintTop_toBottomOf="@id/customRecordingPeriodLayout" />
 
             <View
@@ -273,20 +266,34 @@
                 android:background="@color/gray_30"
                 app:layout_constraintTop_toBottomOf="@id/timeRecyclerView" />
 
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/profileTextInput"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/margin_padding_normal"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:hint="@string/profile_name"
+                app:layout_constraintTop_toBottomOf="@+id/recordingPeriodView">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/profileEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </com.google.android.material.textfield.TextInputLayout>
+
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/nextButton"
                 style="@style/AudioMothButton.GreenButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_normal"
-                android:layout_marginTop="@dimen/margin_padding_xlarge"
-                android:layout_marginEnd="@dimen/margin_padding_normal"
-                android:layout_marginBottom="@dimen/margin_padding_xlarge"
-                android:text="@string/sync_to_device"
+                android:layout_margin="@dimen/margin_padding_normal"
+                android:text="@string/next"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/recordingPeriodView" />
+                app:layout_constraintTop_toBottomOf="@id/profileTextInput" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

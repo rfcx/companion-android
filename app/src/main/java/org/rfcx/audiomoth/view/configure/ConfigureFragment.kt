@@ -14,7 +14,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
@@ -54,7 +53,6 @@ class ConfigureFragment(stream: Stream, lastDeviceId: String) : Fragment(), OnIt
     private var durationSelected = stream.durationSelected
     private var siteName = ""
     private var siteId = ""
-    private lateinit var arrayAdapter: ArrayAdapter<String>
     private var profiles = arrayListOf<String>()
     private var devices = arrayListOf<String>()
     private var profile = ""
@@ -106,10 +104,8 @@ class ConfigureFragment(stream: Stream, lastDeviceId: String) : Fragment(), OnIt
         super.onViewCreated(view, savedInstanceState)
 
         setSite()
-        setAdapter()
         getProfiles()
         setGainLayout()
-        setProfileSpinner()
         setNextOnClick()
         setSampleRateLayout()
         setTimeRecyclerView()
@@ -153,58 +149,6 @@ class ConfigureFragment(stream: Stream, lastDeviceId: String) : Fragment(), OnIt
         }
     }
 
-    private fun setProfileSpinner() {
-        profileSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                profile = profiles[position]
-                getProfileByDeviceId(devices[position])
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-            }
-        }
-    }
-
-    private fun getProfileByDeviceId(device: String) {
-        Firestore().db.collection(DEVICES).whereEqualTo("deviceId", device).get()
-            .addOnSuccessListener { documentSnapshot ->
-                if (documentSnapshot != null) {
-                    val data = documentSnapshot.documents
-                    data.map {
-                        if (it.data != null) {
-                            val configuration = it.data?.get("configuration") as Map<*, *>
-                            gain = configuration["gain"].toString().toInt()
-                            sampleRate = configuration["sampleRate"].toString().toInt()
-                            sleepDuration = configuration["sleepDuration"].toString().toInt()
-                            recordingDuration =
-                                configuration["recordingDuration"].toString().toInt()
-                            recordingPeriod =
-                                configuration["recordingPeriodList"] as ArrayList<String>
-                            customRecordingPeriod =
-                                configuration["customRecordingPeriod"] as Boolean
-                            durationSelected = configuration["durationSelected"] as String
-
-                            timeState = arrayListOf()
-                            for (time in timeList) {
-                                timeState.add(TimeItem(time, recordingPeriod.contains(time)))
-                            }
-
-                            setGainLayout()
-                            setSampleRateLayout()
-                            setTimeRecyclerView()
-                            setCustomRecordingPeriod()
-                            durationSelectedItem(durationSelected)
-                        }
-                    }
-                }
-            }
-    }
-
     private fun getProfiles() {
         val docRef = Firestore().db.collection(DEVICES)
         docRef.get()
@@ -226,17 +170,8 @@ class ConfigureFragment(stream: Stream, lastDeviceId: String) : Fragment(), OnIt
 
                     profile = profiles[0]
 
-                    arrayAdapter.addAll(profiles)
-                    arrayAdapter.notifyDataSetChanged()
                 }
             }
-    }
-
-    private fun setAdapter() {
-        context?.let {
-            arrayAdapter = ArrayAdapter(it, R.layout.support_simple_spinner_dropdown_item, profiles)
-        }
-        profileSpinner.adapter = arrayAdapter
     }
 
     private fun setSite() {
