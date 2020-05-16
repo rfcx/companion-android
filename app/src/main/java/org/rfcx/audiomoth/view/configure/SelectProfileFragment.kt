@@ -6,14 +6,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.android.synthetic.main.fragment_select_profile.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.view.DeploymentActivity
+import org.rfcx.audiomoth.entity.Profile
+import org.rfcx.audiomoth.util.Firestore
+import org.rfcx.audiomoth.util.FirestoreResponseCallback
 import org.rfcx.audiomoth.view.DeploymentActivity.Companion.CONFIGURE_FRAGMENT
-import org.rfcx.audiomoth.view.DeploymentActivity.Companion.LOCATION_FRAGMENT
-import org.rfcx.audiomoth.view.DeploymentActivity.Companion.SELECT_PROFILE_FRAGMENT
 import org.rfcx.audiomoth.view.DeploymentProtocol
+import org.rfcx.audiomoth.view.UserListener
 
 class SelectProfileFragment : Fragment() {
+    private val profilesAdapter by lazy { ProfilesAdapter() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -25,6 +29,38 @@ class SelectProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         (activity as DeploymentProtocol).setLastPageInStep(false, CONFIGURE_FRAGMENT)
+
+        createNewButton.setOnClickListener {
+            (activity as DeploymentProtocol).nextStep()
+        }
+
+        profileRecyclerView.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = profilesAdapter
+        }
+
+        getProfile((activity as UserListener).getUserId())
+    }
+
+    private fun getProfile(documentId: String?) {
+
+        if (documentId != null) {
+            Firestore().getProfiles(documentId,
+                object : FirestoreResponseCallback<List<Profile?>?> {
+                    override fun onSuccessListener(response: List<Profile?>?) {
+                        val items = arrayListOf<Profile>()
+                        response?.map {
+                            if (it != null) {
+                                items.add(it)
+                            }
+                        }
+                        profilesAdapter.items = items
+                    }
+
+                    override fun addOnFailureListener(exception: Exception) {}
+                })
+        }
+
     }
 
     companion object {

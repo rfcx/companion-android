@@ -80,4 +80,9 @@
     <string name="existing">Existing</string>
     <string name="next">Next</string>
 
+
+    <!--  SelectProfileFragment  -->
+    <string name="use_an_existing">Use an existing profile</string>
+    <string name="or_create_new">or create new</string>
+
 </resources>
