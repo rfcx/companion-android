@@ -15,7 +15,9 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.utils.BitmapUtils
 import kotlinx.android.synthetic.main.activity_main.*
+import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.util.Firestore
+import org.rfcx.audiomoth.util.FirestoreResponseCallback
 import org.rfcx.audiomoth.view.DeploymentActivity
 import org.rfcx.audiomoth.view.configure.LocationFragment.Companion.MAPBOX_ACCESS_TOKEN
 
@@ -44,7 +46,7 @@ open class MainActivity : AppCompatActivity() {
                 symbolManager.iconAllowOverlap = true
                 symbolManager.iconIgnorePlacement = true
                 enableLocationComponent(it)
-                getDevices()
+                getDocumentId()
             }
         }
     }
@@ -57,35 +59,37 @@ open class MainActivity : AppCompatActivity() {
         locationComponent.renderMode = RenderMode.COMPASS
     }
 
-    private fun getDevices() {
-        val docRef = Firestore().db.collection(USERS)
-        docRef.whereEqualTo("name", "Ratree Onchana").get()
-            .addOnSuccessListener { documents ->
-                symbolManager.deleteAll()
-                for (document in documents) {
-                    docRef.document(document.id)
-                        .collection(DEPLOYMENTS).get()
-                        .addOnSuccessListener { subDocuments ->
-                            for (sub in subDocuments) {
-                                val isLatest = sub.data["isLatest"] as Boolean
-                                if (isLatest) {
-                                    val location = sub.data["location"] as Map<*, *>
-                                    val latitude = location["latitude"] as Double
-                                    val longitude = location["longitude"] as Double
-                                    val batteryPredicted =
-                                        sub.data["batteryPredictedAt"] as com.google.firebase.Timestamp
-
-                                    displayPinOfDevices(
-                                        LatLng(latitude, longitude),
-                                        checkBatteryPredictedUntil(batteryPredicted.seconds * 1000)
-                                    )
-
-                                    moveCamera(LatLng(latitude, longitude))
-                                }
-                            }
-                        }
+    private fun getDocumentId() {
+        Firestore().getDocumentIdOfUser("Ratree Onchana",
+            object : FirestoreResponseCallback<String?> {
+                override fun onSuccessListener(response: String?) {
+                    if (response != null) {
+                        getLocation(response)
+                    }
                 }
-            }
+
+                override fun addOnFailureListener(exception: Exception) {}
+            })
+    }
+
+    fun getLocation(documentId: String) {
+        Firestore().getDeployments(documentId,
+            object : FirestoreResponseCallback<List<Deployment?>?> {
+                override fun onSuccessListener(response: List<Deployment?>?) {
+                    response?.map {
+                        if (it != null) {
+                            displayPinOfDevices(
+                                LatLng(it.location.latitude, it.location.longitude),
+                                checkBatteryPredictedUntil(it.batteryDepletedAt.time)
+                            )
+
+                            moveCamera(LatLng(it.location.latitude, it.location.longitude))
+                        }
+                    }
+                }
+
+                override fun addOnFailureListener(exception: Exception) {}
+            })
     }
 
     private fun setUpImage(style: Style) {
@@ -179,7 +183,6 @@ open class MainActivity : AppCompatActivity() {
         const val PIN_MAP_ORANGE = "PIN_MAP_ORANGE"
         const val PIN_MAP_RED = "PIN_MAP_RED"
         const val USERS = "users"
-        const val DEPLOYMENTS = "deployments"
         const val LOCATIONS = "locations"
     }
 }
