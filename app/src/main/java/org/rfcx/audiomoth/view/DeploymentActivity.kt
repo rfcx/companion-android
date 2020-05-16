@@ -37,6 +37,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, UserListener
 
     private fun setupView() {
         handleFragment(page) // start page
+        completeStepButton.visibility = View.GONE
         completeStepButton.setOnClickListener {
             nextStep()
         }

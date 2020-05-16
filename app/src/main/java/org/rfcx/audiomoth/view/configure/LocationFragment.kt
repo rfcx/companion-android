@@ -66,10 +66,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         mapView = view.findViewById(R.id.mapBoxView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
-        finishButton.visibility = View.GONE
 
         (activity as DeploymentProtocol).setLastPageInStep(true, SELECT_PROFILE_FRAGMENT)
 
+        finishButton.setOnClickListener {
+            (activity as DeploymentProtocol).nextStep()
+        }
     }
 
     private fun radioCheckedChange() {
