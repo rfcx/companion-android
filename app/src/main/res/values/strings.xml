@@ -75,5 +75,6 @@
     <string name="longitude">Longitude</string>
     <string name="finish">finish</string>
     <string name="name_location">Name Location</string>
+    <string name="next">Next</string>
 
 </resources>

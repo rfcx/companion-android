@@ -15,6 +15,12 @@
         <item name="android:minWidth">120dp</item>
     </style>
 
+    <style name="AudioMothButton.Primary" parent="AudioMothButton">
+        <item name="android:background">@drawable/bg_color_primary_button</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
     <style name="AudioMothButton.GreenButton" parent="AudioMothButton">
         <item name="android:background">@drawable/bg_color_primary_button</item>
         <item name="android:textStyle">bold</item>
