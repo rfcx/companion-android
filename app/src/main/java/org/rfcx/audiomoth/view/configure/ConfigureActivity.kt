@@ -174,7 +174,7 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
                 supportFragmentManager.beginTransaction()
                     .replace(
                         configureContainer.id,
-                        DeployFragment.newInstance(deviceId, batteryLv, datePredict, device!!),
+                        DeployFragment.newInstance(),
                         DeployFragment.TAG
                     ).commit()
             }

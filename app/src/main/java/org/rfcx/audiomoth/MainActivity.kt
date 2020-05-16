@@ -41,6 +41,7 @@ import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.util.getIntColor
 import org.rfcx.audiomoth.view.CreateStreamActivity
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
+import org.rfcx.audiomoth.view.DeploymentActivity
 import org.rfcx.audiomoth.view.configure.DeployFragment
 
 open class MainActivity : AppCompatActivity(), InputDeviceIdListener {
@@ -57,10 +58,7 @@ open class MainActivity : AppCompatActivity(), InputDeviceIdListener {
         setContentView(R.layout.activity_main)
 
         inputDeviceIdButton.setOnClickListener {
-            inputDeviceIdBottomSheet.show(
-                supportFragmentManager,
-                InputDeviceIdBottomSheet.TAG
-            )
+            DeploymentActivity.startActivity(this)
         }
 
         mapView = findViewById(R.id.mapBoxView)
