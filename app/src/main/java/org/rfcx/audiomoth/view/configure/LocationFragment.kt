@@ -32,7 +32,6 @@ import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.util.FirestoreResponseCallback
-import org.rfcx.audiomoth.view.DeploymentActivity.Companion.SELECT_PROFILE_FRAGMENT
 import org.rfcx.audiomoth.view.DeploymentProtocol
 import org.rfcx.audiomoth.view.UserListener
 
@@ -48,6 +47,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var locationLatLng: LatLng? = null
     private var location = ""
     private lateinit var arrayAdapter: ArrayAdapter<String>
+    private var deploymentProtocol: DeploymentProtocol? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        deploymentProtocol = context as DeploymentProtocol
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -67,10 +72,10 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
 
-        (activity as DeploymentProtocol).setLastPageInStep(true, SELECT_PROFILE_FRAGMENT)
+        deploymentProtocol?.hideCompleteButton()
 
         finishButton.setOnClickListener {
-            (activity as DeploymentProtocol).nextStep()
+            deploymentProtocol?.nextStep()
         }
     }
 

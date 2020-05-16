@@ -1,6 +1,7 @@
 package org.rfcx.audiomoth.view.configure
 
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,12 +13,16 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.util.FirestoreResponseCallback
-import org.rfcx.audiomoth.view.DeploymentActivity.Companion.CONFIGURE_FRAGMENT
+import org.rfcx.audiomoth.view.DeploymentActivity
+import org.rfcx.audiomoth.view.DeploymentListener
 import org.rfcx.audiomoth.view.DeploymentProtocol
 import org.rfcx.audiomoth.view.UserListener
 
 class SelectProfileFragment : Fragment() {
     private val profilesAdapter by lazy { ProfilesAdapter() }
+    private var deploymentProtocol: DeploymentProtocol? = null
+    private var deploymentListener: DeploymentListener? = null
+    private var userListener: UserListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,12 +31,20 @@ class SelectProfileFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_select_profile, container, false)
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        deploymentProtocol = context as DeploymentProtocol
+        deploymentListener = context as DeploymentListener
+        userListener = context as UserListener
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        (activity as DeploymentProtocol).setLastPageInStep(false, CONFIGURE_FRAGMENT)
+
+        deploymentProtocol?.hideCompleteButton()
 
         createNewButton.setOnClickListener {
-            (activity as DeploymentProtocol).nextStep()
+            deploymentListener?.openConfigure()
         }
 
         profileRecyclerView.apply {
@@ -39,7 +52,7 @@ class SelectProfileFragment : Fragment() {
             adapter = profilesAdapter
         }
 
-        getProfile((activity as UserListener).getUserId())
+        getProfile(userListener?.getUserId())
     }
 
     private fun getProfile(documentId: String?) {

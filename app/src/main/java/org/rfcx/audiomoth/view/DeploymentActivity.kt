@@ -12,12 +12,11 @@ import org.rfcx.audiomoth.view.configure.ConfigureFragment
 import org.rfcx.audiomoth.view.configure.LocationFragment
 import org.rfcx.audiomoth.view.configure.SelectProfileFragment
 
-class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, UserListener {
+class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, UserListener, DeploymentListener {
+
     private var currentStep = 0
     private val steps by lazy { resources.getStringArray(R.array.steps) }
     private var userId: String? = null
-    private var lastPageInStep: Boolean = true
-    private var page: String = LOCATION_FRAGMENT
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,8 +35,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, UserListener
     }
 
     private fun setupView() {
-        handleFragment(page) // start page
-        completeStepButton.visibility = View.GONE
+        handleFragment(currentStep) // start page
         completeStepButton.setOnClickListener {
             nextStep()
         }
@@ -56,9 +54,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, UserListener
     }
 
     override fun nextStep() {
-        if (lastPageInStep) {
-            currentStep += 1
-        }
+        currentStep += 1
 
         if (stepView.stepCount == currentStep) {
             stepView.done(true)
@@ -68,27 +64,19 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, UserListener
         }
 
         /* do something when everything done */
-        handleFragment(page)
+        handleFragment(currentStep)
     }
 
-    override fun setLastPageInStep(lastPage: Boolean, nextPage: String) {
-        page = nextPage
-        lastPageInStep = lastPage
-    }
-
-    private fun handleFragment(page: String) {
+    private fun handleFragment(currentStep: Int) {
         // setup fragment for current step
-        when (page) {
-            LOCATION_FRAGMENT -> {
+        when (currentStep) {
+            0 -> {
                 startFragment(LocationFragment.newInstance())
             }
-            SELECT_PROFILE_FRAGMENT -> {
+            1 -> {
                 startFragment(SelectProfileFragment.newInstance())
             }
-            CONFIGURE_FRAGMENT -> {
-                startFragment(ConfigureFragment.newInstance())
-            }
-            EXAMPLE_FRAGMENT -> {
+            else -> {
                 startFragment(ExampleFragment.newInstance(currentStep))
             }
         }
@@ -112,13 +100,12 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, UserListener
         return userId
     }
 
+    override fun openConfigure() {
+        startFragment(ConfigureFragment.newInstance())
+    }
 
     companion object {
         private const val USER_ID = "USER_ID"
-        const val LOCATION_FRAGMENT = "LOCATION_FRAGMENT"
-        const val SELECT_PROFILE_FRAGMENT = "SELECT_PROFILE_FRAGMENT"
-        const val CONFIGURE_FRAGMENT = "CONFIGURE_FRAGMENT"
-        const val EXAMPLE_FRAGMENT = "EXAMPLE_FRAGMENT"
 
         fun startActivity(context: Context, userId: String?) {
             val intent = Intent(context, DeploymentActivity::class.java)
@@ -131,7 +118,6 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, UserListener
 
 interface DeploymentProtocol {
     fun setCompleteTextButton(text: String)
-    fun setLastPageInStep(lastPage: Boolean, nextPage: String)
     fun hideCompleteButton()
     fun showCompleteButton()
     fun nextStep()
@@ -142,4 +128,8 @@ interface DeploymentProtocol {
 
 interface UserListener {
     fun getUserId(): String?
+}
+
+interface DeploymentListener {
+    fun openConfigure()
 }

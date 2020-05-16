@@ -28,7 +28,6 @@ import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.util.NotificationBroadcastReceiver
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
-import org.rfcx.audiomoth.view.DeploymentActivity.Companion.EXAMPLE_FRAGMENT
 import org.rfcx.audiomoth.view.DeploymentProtocol
 import org.rfcx.audiomoth.view.configure.ConfigureActivity.Companion.FROM
 import org.rfcx.audiomoth.view.configure.ConfigureActivity.Companion.SITE_ID
@@ -39,6 +38,7 @@ import kotlin.collections.ArrayList
 
 class ConfigureFragment(stream: Stream, lastDeviceId: String) : Fragment(), OnItemClickListener {
 
+    private var deploymentProtocol: DeploymentProtocol? = null
     private val recordingPeriodAdapter by lazy { RecordingPeriodAdapter(this) }
     private val timeAdapter by lazy { TimeAdapter(this, context) }
     private val sampleRateList = arrayOf("8", "16", "32", "48", "96", "192", "256", "384")
@@ -89,6 +89,11 @@ class ConfigureFragment(stream: Stream, lastDeviceId: String) : Fragment(), OnIt
 
     private var timeState = ArrayList<TimeItem>()
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        deploymentProtocol = context as DeploymentProtocol
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -99,7 +104,6 @@ class ConfigureFragment(stream: Stream, lastDeviceId: String) : Fragment(), OnIt
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        (activity as DeploymentProtocol).setLastPageInStep(true, EXAMPLE_FRAGMENT)
 
         setSite()
         setAdapter()
@@ -112,6 +116,8 @@ class ConfigureFragment(stream: Stream, lastDeviceId: String) : Fragment(), OnIt
         setCustomRecordingPeriod()
         createNotificationChannel()
         durationSelectedItem(durationSelected)
+
+        deploymentProtocol?.hideCompleteButton()
 
         for (time in timeList) {
             timeState.add(TimeItem(time, recordingPeriod.contains(time)))
@@ -319,6 +325,8 @@ class ConfigureFragment(stream: Stream, lastDeviceId: String) : Fragment(), OnIt
 
     private fun setNextOnClick() {
         nextButton.setOnClickListener {
+            deploymentProtocol?.nextStep()
+
             if (arguments?.containsKey(DEVICE_ID) == true) {
                 arguments?.let {
                     val deviceId = it.getString(DEVICE_ID)
