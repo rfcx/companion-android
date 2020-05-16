@@ -32,6 +32,8 @@ import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.util.FirestoreResponseCallback
+import org.rfcx.audiomoth.view.DeploymentActivity.Companion.SELECT_PROFILE_FRAGMENT
+import org.rfcx.audiomoth.view.DeploymentProtocol
 import org.rfcx.audiomoth.view.UserListener
 
 class LocationFragment : Fragment(), OnMapReadyCallback {
@@ -65,6 +67,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
         finishButton.visibility = View.GONE
+
+        (activity as DeploymentProtocol).setLastPageInStep(true, SELECT_PROFILE_FRAGMENT)
+
     }
 
     private fun radioCheckedChange() {

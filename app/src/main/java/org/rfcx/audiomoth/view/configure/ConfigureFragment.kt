@@ -28,6 +28,8 @@ import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.util.NotificationBroadcastReceiver
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
+import org.rfcx.audiomoth.view.DeploymentActivity.Companion.EXAMPLE_FRAGMENT
+import org.rfcx.audiomoth.view.DeploymentProtocol
 import org.rfcx.audiomoth.view.configure.ConfigureActivity.Companion.FROM
 import org.rfcx.audiomoth.view.configure.ConfigureActivity.Companion.SITE_ID
 import org.rfcx.audiomoth.view.configure.ConfigureActivity.Companion.SITE_NAME
@@ -39,7 +41,6 @@ class ConfigureFragment(stream: Stream, lastDeviceId: String) : Fragment(), OnIt
 
     private val recordingPeriodAdapter by lazy { RecordingPeriodAdapter(this) }
     private val timeAdapter by lazy { TimeAdapter(this, context) }
-    private lateinit var listener: ConfigureListener
     private val sampleRateList = arrayOf("8", "16", "32", "48", "96", "192", "256", "384")
     private val gainList = arrayOf("1 - Lowest", "2 - Low", "3 - Medium", "4 - High", "5 - Highest")
 
@@ -88,11 +89,6 @@ class ConfigureFragment(stream: Stream, lastDeviceId: String) : Fragment(), OnIt
 
     private var timeState = ArrayList<TimeItem>()
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        listener = (context as ConfigureListener)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -103,6 +99,7 @@ class ConfigureFragment(stream: Stream, lastDeviceId: String) : Fragment(), OnIt
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        (activity as DeploymentProtocol).setLastPageInStep(true, EXAMPLE_FRAGMENT)
 
         setSite()
         setAdapter()
@@ -379,8 +376,6 @@ class ConfigureFragment(stream: Stream, lastDeviceId: String) : Fragment(), OnIt
                             stream
                         )
 
-                        listener.openSync(device)
-
                         // Todo: start notification here
                     }
                 }
@@ -488,23 +483,8 @@ class ConfigureFragment(stream: Stream, lastDeviceId: String) : Fragment(), OnIt
         const val CHANNEL_ID = "AudioMoth Notification"
         const val CHANNEL_NAME = "Notification"
 
-        fun newInstance(
-            deviceId: String,
-            siteId: String,
-            siteName: String,
-            streams: Stream,
-            from: String,
-            lastDeviceId: String
-
-        ): ConfigureFragment {
-            return ConfigureFragment(streams, lastDeviceId).apply {
-                arguments = Bundle().apply {
-                    putString(DEVICE_ID, deviceId)
-                    putString(SITE_ID, siteId)
-                    putString(SITE_NAME, siteName)
-                    putString(FROM, from)
-                }
-            }
+        fun newInstance(): ConfigureFragment {
+            return ConfigureFragment(Stream("", 4, 8, false, 0, 0, arrayListOf(), CONTINUOUS), "")
         }
     }
 }
