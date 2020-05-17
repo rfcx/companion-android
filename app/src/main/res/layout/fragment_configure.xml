@@ -30,7 +30,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
                     android:orientation="vertical"
@@ -41,7 +40,7 @@
                         style="@style/AudioMothText.Subhead.Bold"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingStart="@dimen/margin_padding_normal"
+                        android:paddingStart="@dimen/margin_padding_large"
                         android:paddingEnd="@dimen/margin_padding_normal"
                         android:text="@string/sample_rate" />
 
@@ -50,7 +49,7 @@
                         style="@style/AudioMothText.Body.Secondary"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingStart="@dimen/margin_padding_normal"
+                        android:paddingStart="@dimen/margin_padding_large"
                         android:paddingEnd="@dimen/margin_padding_normal"
                         android:paddingBottom="@dimen/margin_padding_small"
                         tools:text="8kHz (default)" />
@@ -58,6 +57,7 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
+                        android:layout_marginStart="@dimen/margin_padding_large"
                         android:layout_marginTop="@dimen/margin_padding_small"
                         android:background="@color/gray_30" />
 
@@ -68,7 +68,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
                     android:orientation="vertical"
@@ -80,7 +79,6 @@
                         style="@style/AudioMothText.Subhead.Bold"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingStart="@dimen/margin_padding_normal"
                         android:paddingEnd="@dimen/margin_padding_normal"
                         android:text="@string/gain" />
 
@@ -89,7 +87,6 @@
                         style="@style/AudioMothText.Body.Secondary"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingStart="@dimen/margin_padding_normal"
                         android:paddingEnd="@dimen/margin_padding_normal"
                         android:paddingBottom="@dimen/margin_padding_small"
                         tools:text="3 (default)" />
@@ -98,6 +95,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginTop="@dimen/margin_padding_small"
+                        android:layout_marginEnd="@dimen/margin_padding_large"
                         android:background="@color/gray_30" />
 
                 </LinearLayout>
@@ -108,7 +106,9 @@
                 style="@style/AudioMothText.Subhead.Bold"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/margin_padding_normal"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:layout_marginEnd="@dimen/margin_padding_large"
                 android:text="@string/recording_duration_title"
                 app:layout_constraintTop_toBottomOf="@id/sampleRateAndGainLayout" />
 
@@ -116,8 +116,9 @@
                 android:id="@+id/radioGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="@dimen/margin_padding_normal"
-                android:paddingEnd="@dimen/margin_padding_normal"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:layout_marginEnd="@dimen/margin_padding_large"
                 app:layout_constraintTop_toBottomOf="@id/durationTextView">
 
                 <androidx.appcompat.widget.AppCompatRadioButton
@@ -203,7 +204,9 @@
                 android:id="@+id/view1"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
+                android:layout_marginStart="@dimen/margin_padding_large"
                 android:layout_marginTop="@dimen/margin_padding_normal"
+                android:layout_marginEnd="@dimen/margin_padding_large"
                 android:background="@color/gray_30"
                 app:layout_constraintTop_toBottomOf="@id/radioGroup" />
 
@@ -211,8 +214,10 @@
                 android:id="@+id/customRecordingPeriodLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:layout_marginEnd="@dimen/margin_padding_large"
                 android:orientation="horizontal"
-                android:padding="@dimen/margin_padding_normal"
                 app:layout_constraintTop_toBottomOf="@id/view1">
 
                 <LinearLayout
@@ -253,9 +258,12 @@
                 android:id="@+id/timeRecyclerView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:paddingBottom="@dimen/margin_padding_normal"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_small"
+                android:layout_marginEnd="@dimen/margin_padding_large"
                 android:visibility="gone"
                 app:layout_constraintBottom_toTopOf="@id/recordingPeriodView"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/customRecordingPeriodLayout" />
 
@@ -263,6 +271,9 @@
                 android:id="@+id/recordingPeriodView"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:layout_marginEnd="@dimen/margin_padding_large"
                 android:background="@color/gray_30"
                 app:layout_constraintTop_toBottomOf="@id/timeRecyclerView" />
 
@@ -271,7 +282,9 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/margin_padding_normal"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:layout_marginEnd="@dimen/margin_padding_large"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:hint="@string/profile_name"
@@ -288,7 +301,9 @@
                 style="@style/AudioMothButton.GreenButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/margin_padding_normal"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:layout_marginEnd="@dimen/margin_padding_large"
                 android:text="@string/next"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

@@ -34,9 +34,9 @@
         style="@style/AudioMothText.Subhead.Bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_normal"
+        android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginTop="@dimen/margin_padding_normal"
-        android:layout_marginEnd="@dimen/margin_padding_normal"
+        android:layout_marginEnd="@dimen/margin_padding_large"
         android:text="@string/switch_to_config"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/guidelineHorizontal" />
@@ -46,9 +46,9 @@
         style="@style/AudioMothText.Subhead.Bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_normal"
+        android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginTop="@dimen/margin_padding_normal"
-        android:layout_marginEnd="@dimen/margin_padding_normal"
+        android:layout_marginEnd="@dimen/margin_padding_large"
         android:text="@string/max_volume"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/switchToConfigTextView" />
@@ -58,9 +58,9 @@
         style="@style/AudioMothText.Subhead.Bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_normal"
+        android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginTop="@dimen/margin_padding_normal"
-        android:layout_marginEnd="@dimen/margin_padding_normal"
+        android:layout_marginEnd="@dimen/margin_padding_large"
         android:text="@string/hold_device"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/maxVolumeTextView" />
@@ -70,9 +70,9 @@
         style="@style/AudioMothButton.GreenButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_normal"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginEnd="@dimen/margin_padding_large"
         android:layout_marginBottom="@dimen/margin_padding_normal"
-        android:layout_marginEnd="@dimen/margin_padding_normal"
         android:text="@string/sync"
         app:layout_constraintBottom_toBottomOf="parent" />
 
