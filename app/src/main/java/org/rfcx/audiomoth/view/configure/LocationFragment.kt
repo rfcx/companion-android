@@ -163,7 +163,10 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                         arrayAdapter.notifyDataSetChanged()
                     }
 
-                    override fun addOnFailureListener(exception: Exception) {}
+                    override fun addOnFailureListener(exception: Exception) {
+                        newLocationRadioButton.isChecked = true
+                        existingRadioButton.isEnabled = false
+                    }
                 })
         }
     }

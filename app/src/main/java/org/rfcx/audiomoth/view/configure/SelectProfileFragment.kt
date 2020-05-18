@@ -39,11 +39,10 @@ class SelectProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         deploymentProtocol?.hideCompleteButton()
 
         createNewButton.setOnClickListener {
-            val profile = Profile(3,"",8, 5,10, arrayListOf(), ConfigureFragment.RECOMMENDED)
+            val profile = Profile(3, "", 8, 5, 10, arrayListOf(), ConfigureFragment.RECOMMENDED)
             deploymentListener?.openConfigure(profile)
         }
 
@@ -59,10 +58,14 @@ class SelectProfileFragment : Fragment() {
                 deploymentListener?.openConfigure(profile)
             }
         }
+
+        tryAgainTextView.setOnClickListener {
+            getProfile(userListener?.getUserId())
+        }
     }
 
     private fun getProfile(documentId: String?) {
-
+        checkState(SHOW_LOADING)
         if (documentId != null) {
             Firestore().getProfiles(documentId,
                 object : FirestoreResponseCallback<List<Profile?>?> {
@@ -74,15 +77,41 @@ class SelectProfileFragment : Fragment() {
                             }
                         }
                         profilesAdapter.items = items
+                        checkState(SHOW_LIST_PROFILE)
                     }
 
-                    override fun addOnFailureListener(exception: Exception) {}
+                    override fun addOnFailureListener(exception: Exception) {
+                        checkState(SHOW_TRY_AGAIN)
+                    }
                 })
         }
+    }
 
+    private fun checkState(state: String) {
+        when (state) {
+            SHOW_LOADING -> {
+                tryAgainTextView.visibility = View.GONE
+                profileRecyclerView.visibility = View.GONE
+                profileProgressBar.visibility = View.VISIBLE
+            }
+            SHOW_TRY_AGAIN -> {
+                tryAgainTextView.visibility = View.VISIBLE
+                profileRecyclerView.visibility = View.GONE
+                profileProgressBar.visibility = View.GONE
+            }
+            SHOW_LIST_PROFILE -> {
+                tryAgainTextView.visibility = View.GONE
+                profileRecyclerView.visibility = View.VISIBLE
+                profileProgressBar.visibility = View.GONE
+            }
+        }
     }
 
     companion object {
+        const val SHOW_LOADING = "SHOW_LOADING"
+        const val SHOW_TRY_AGAIN = "SHOW_TRY_AGAIN"
+        const val SHOW_LIST_PROFILE = "SHOW_LIST_PROFILE"
+
         fun newInstance(): SelectProfileFragment {
             return SelectProfileFragment()
         }
