@@ -6,11 +6,8 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_configure.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.Device
 
 class ConfigureActivity : AppCompatActivity(), ConfigureListener {
-
-    var device: Device? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,8 +17,7 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
             .add(configureContainer.id, LocationFragment(), LocationFragment.TAG).commit()
     }
 
-    override fun openSync(device: Device) {
-        this.device = device
+    override fun openSync() {
         supportFragmentManager.beginTransaction()
             .replace(configureContainer.id, SyncFragment(), "SyncFragment").commit()
     }
@@ -55,7 +51,7 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
 }
 
 interface ConfigureListener {
-    fun openSync(device: Device)
+    fun openSync()
     fun openVerifySync()
     fun openPerformBattery()
     fun openDeploy(batteryLv: Int, datePredict: Long)

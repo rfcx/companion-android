@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.Stream
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.view.CreateStreamActivity
 
@@ -61,16 +60,6 @@ class DashboardStreamActivity : AppCompatActivity() {
                         if (document != null) {
                             val data = document.data
                             if (data != null) {
-                                val stream = Stream(
-                                    data["streamName"].toString(),
-                                    data["gain"].toString().toInt(),
-                                    data["sampleRateKiloHertz"].toString().toInt(),
-                                    data["customRecordingPeriod"] as Boolean,
-                                    data["recordingDurationSecond"].toString().toInt(),
-                                    data["sleepDurationSecond"].toString().toInt(),
-                                    data["recordingPeriodList"] as ArrayList<String>,
-                                    data["durationSelected"].toString()
-                                )
                                 // TODO: Open ConfigureActivity
                             }
                         } else {

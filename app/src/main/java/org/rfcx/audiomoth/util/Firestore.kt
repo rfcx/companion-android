@@ -3,9 +3,9 @@ package org.rfcx.audiomoth.util
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import org.rfcx.audiomoth.entity.Deployment
-import org.rfcx.audiomoth.entity.Device
 import org.rfcx.audiomoth.entity.Location
 import org.rfcx.audiomoth.entity.Profile
+import org.rfcx.audiomoth.entity.User
 import org.rfcx.audiomoth.entity.User.Companion.FIELD_NAME
 
 
@@ -22,28 +22,11 @@ interface FirestoreResponseCallback<T> {
 class Firestore {
     val db = Firebase.firestore
 
-    fun saveDevice(device: Device, callback: FirestoreCallback) {
-        db.collection(COLLECTION_DEVICES).document().set(device)
+    fun saveDevice(user: User, callback: FirestoreCallback) {
+        db.collection(COLLECTION_DEVICES).document().set(user)
             .addOnCompleteListener {
                 callback.onCompleteListener()
             }.addOnFailureListener {
-                callback.addOnFailureListener(it)
-            }
-    }
-
-    fun getDeviceById(deviceId: String, callback: FirestoreResponseCallback<Device?>) {
-        db.collection(COLLECTION_DEVICES).whereEqualTo(Device.FIELD_DEVICE_ID, deviceId).limit(1)
-            .get()
-            .addOnSuccessListener { querySnapshot ->
-                val documents = querySnapshot.documents
-                if (documents.isNotEmpty()) {
-                    val devices = documents.map { it.toObject(Device::class.java) }
-                    callback.onSuccessListener(devices[0])
-                } else {
-                    callback.onSuccessListener(null)
-                }
-            }
-            .addOnFailureListener {
                 callback.addOnFailureListener(it)
             }
     }
