@@ -16,6 +16,8 @@ class ProfilesAdapter : RecyclerView.Adapter<ProfilesAdapter.ProfilesAdapterView
             notifyDataSetChanged()
         }
 
+    var mOnItemClickListener: OnItemProfileClickListener? = null
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProfilesAdapterViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_profile, parent, false)
         return ProfilesAdapterViewHolder(view)
@@ -25,6 +27,9 @@ class ProfilesAdapter : RecyclerView.Adapter<ProfilesAdapter.ProfilesAdapterView
 
     override fun onBindViewHolder(holder: ProfilesAdapterViewHolder, position: Int) {
         holder.bind(items[position])
+        holder.itemView.setOnClickListener {
+            mOnItemClickListener?.onItemClick(items[position].name)
+        }
     }
 
     inner class ProfilesAdapterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

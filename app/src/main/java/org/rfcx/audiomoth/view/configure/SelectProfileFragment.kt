@@ -13,7 +13,6 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.util.FirestoreResponseCallback
-import org.rfcx.audiomoth.view.DeploymentActivity
 import org.rfcx.audiomoth.view.DeploymentListener
 import org.rfcx.audiomoth.view.DeploymentProtocol
 import org.rfcx.audiomoth.view.UserListener
@@ -53,6 +52,12 @@ class SelectProfileFragment : Fragment() {
         }
 
         getProfile(userListener?.getUserId())
+
+        profilesAdapter.mOnItemClickListener = object : OnItemProfileClickListener {
+            override fun onItemClick(profileName: String) {
+                deploymentListener?.openConfigure()
+            }
+        }
     }
 
     private fun getProfile(documentId: String?) {
@@ -81,4 +86,8 @@ class SelectProfileFragment : Fragment() {
             return SelectProfileFragment()
         }
     }
+}
+
+interface OnItemProfileClickListener {
+    fun onItemClick(profileName: String)
 }
