@@ -8,17 +8,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_deployment.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.view.configure.ConfigureFragment
 import org.rfcx.audiomoth.view.configure.LocationFragment
 import org.rfcx.audiomoth.view.configure.SelectProfileFragment
 import org.rfcx.audiomoth.view.configure.SyncFragment
 import org.rfcx.audiomoth.view.configure.SyncFragment.Companion.BEFORE_SYNC
 
-class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, UserListener, DeploymentListener {
-
+class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, UserListener,
+    DeploymentListener {
     private var currentStep = 0
     private val steps by lazy { resources.getStringArray(R.array.steps) }
     private var userId: String? = null
+    private var profile: Profile? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -105,7 +107,12 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, UserListener
         return userId
     }
 
-    override fun openConfigure() {
+    override fun getProfile(): Profile? {
+        return profile
+    }
+
+    override fun openConfigure(profile: Profile) {
+        this.profile = profile
         startFragment(ConfigureFragment.newInstance())
     }
 
@@ -137,9 +144,10 @@ interface DeploymentProtocol {
 
 interface UserListener {
     fun getUserId(): String?
+    fun getProfile(): Profile?
 }
 
 interface DeploymentListener {
-    fun openConfigure()
+    fun openConfigure(profile: Profile)
     fun openSync(status: String)
 }

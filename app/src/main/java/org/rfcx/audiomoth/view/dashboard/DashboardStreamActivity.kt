@@ -11,8 +11,6 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Stream
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.view.CreateStreamActivity
-import org.rfcx.audiomoth.view.configure.ConfigureActivity
-import org.rfcx.audiomoth.view.configure.ConfigureFragment.Companion.DASHBOARD_STREAM
 
 class DashboardStreamActivity : AppCompatActivity() {
     private val dashboardStreamAdapter by lazy { DashboardStreamAdapter() }

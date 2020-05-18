@@ -28,7 +28,7 @@ class ProfilesAdapter : RecyclerView.Adapter<ProfilesAdapter.ProfilesAdapterView
     override fun onBindViewHolder(holder: ProfilesAdapterViewHolder, position: Int) {
         holder.bind(items[position])
         holder.itemView.setOnClickListener {
-            mOnItemClickListener?.onItemClick(items[position].name)
+            mOnItemClickListener?.onItemClick(items[position])
         }
     }
 

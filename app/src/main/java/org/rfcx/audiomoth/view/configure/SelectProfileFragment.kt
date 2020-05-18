@@ -43,7 +43,8 @@ class SelectProfileFragment : Fragment() {
         deploymentProtocol?.hideCompleteButton()
 
         createNewButton.setOnClickListener {
-            deploymentListener?.openConfigure()
+            val profile = Profile(3,"",8, 5,10, arrayListOf(), ConfigureFragment.RECOMMENDED)
+            deploymentListener?.openConfigure(profile)
         }
 
         profileRecyclerView.apply {
@@ -54,8 +55,8 @@ class SelectProfileFragment : Fragment() {
         getProfile(userListener?.getUserId())
 
         profilesAdapter.mOnItemClickListener = object : OnItemProfileClickListener {
-            override fun onItemClick(profileName: String) {
-                deploymentListener?.openConfigure()
+            override fun onItemClick(profile: Profile) {
+                deploymentListener?.openConfigure(profile)
             }
         }
     }
@@ -89,5 +90,5 @@ class SelectProfileFragment : Fragment() {
 }
 
 interface OnItemProfileClickListener {
-    fun onItemClick(profileName: String)
+    fun onItemClick(profile: Profile)
 }
