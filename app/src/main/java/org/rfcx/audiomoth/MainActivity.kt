@@ -1,6 +1,8 @@
 package org.rfcx.audiomoth
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import com.mapbox.mapboxsdk.Mapbox
@@ -32,8 +34,8 @@ open class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         Mapbox.getInstance(this, MAPBOX_ACCESS_TOKEN)
         setContentView(R.layout.activity_main)
-
-        inputDeviceIdButton.setOnClickListener {
+        setCreateLocationButton(false)
+        createLocationButton.setOnClickListener {
             DeploymentActivity.startActivity(this, userId)
         }
 
@@ -52,6 +54,12 @@ open class MainActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("RestrictedApi")
+    private fun setCreateLocationButton(show: Boolean) {
+        createLocationButton.visibility = if(show) View.VISIBLE else View.GONE
+        progressBar.visibility = if(!show) View.VISIBLE else View.GONE
+    }
+
     private fun enableLocationComponent(loadedMapStyle: Style) {
         val locationComponent = mapboxMap.locationComponent
         locationComponent.activateLocationComponent(this, loadedMapStyle)
@@ -67,10 +75,13 @@ open class MainActivity : AppCompatActivity() {
                     if (response != null) {
                         getLocation(response)
                         userId = response
+                        setCreateLocationButton(true)
                     }
                 }
 
-                override fun addOnFailureListener(exception: Exception) {}
+                override fun addOnFailureListener(exception: Exception) {
+                    setCreateLocationButton(true)
+                }
             })
     }
 
