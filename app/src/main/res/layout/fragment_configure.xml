@@ -18,88 +18,90 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:id="@+id/sampleRateAndGainLayout"
-                android:layout_width="match_parent"
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guidelineVertical"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.50" />
+
+            <LinearLayout
+                android:id="@+id/sampleRateLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical"
+                android:paddingTop="@dimen/margin_padding_normal"
+                app:layout_constraintEnd_toEndOf="@id/guidelineVertical"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <LinearLayout
-                    android:id="@+id/sampleRateLayout"
+                <TextView
+                    android:id="@+id/sampleRateTextView"
+                    style="@style/AudioMothText.Subhead.Bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:orientation="vertical"
-                    android:paddingTop="@dimen/margin_padding_normal">
+                    android:paddingStart="@dimen/margin_padding_large"
+                    android:paddingEnd="@dimen/margin_padding_normal"
+                    android:text="@string/sample_rate" />
 
-                    <TextView
-                        android:id="@+id/sampleRateTextView"
-                        style="@style/AudioMothText.Subhead.Bold"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingStart="@dimen/margin_padding_large"
-                        android:paddingEnd="@dimen/margin_padding_normal"
-                        android:text="@string/sample_rate" />
-
-                    <TextView
-                        android:id="@+id/sampleRateValueTextView"
-                        style="@style/AudioMothText.Body.Secondary"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingStart="@dimen/margin_padding_large"
-                        android:paddingEnd="@dimen/margin_padding_normal"
-                        android:paddingBottom="@dimen/margin_padding_small"
-                        tools:text="8kHz (default)" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginStart="@dimen/margin_padding_large"
-                        android:layout_marginTop="@dimen/margin_padding_small"
-                        android:background="@color/gray_30" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/gainLayout"
+                <TextView
+                    android:id="@+id/sampleRateValueTextView"
+                    style="@style/AudioMothText.Body.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:orientation="vertical"
-                    android:paddingTop="@dimen/margin_padding_normal"
-                    app:layout_constraintTop_toBottomOf="@id/sampleRateLayout">
+                    android:paddingStart="@dimen/margin_padding_large"
+                    android:paddingEnd="@dimen/margin_padding_normal"
+                    android:paddingBottom="@dimen/margin_padding_small"
+                    tools:text="8kHz (default)" />
 
-                    <TextView
-                        android:id="@+id/gainTextView"
-                        style="@style/AudioMothText.Subhead.Bold"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingEnd="@dimen/margin_padding_normal"
-                        android:text="@string/gain" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="@dimen/margin_padding_large"
+                    android:layout_marginTop="@dimen/margin_padding_small"
+                    android:background="@color/gray_30" />
+            </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/gainValueTextView"
-                        style="@style/AudioMothText.Body.Secondary"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingEnd="@dimen/margin_padding_normal"
-                        android:paddingBottom="@dimen/margin_padding_small"
-                        tools:text="3 (default)" />
+            <LinearLayout
+                android:id="@+id/gainLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical"
+                android:paddingTop="@dimen/margin_padding_normal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/guidelineVertical"
+                app:layout_constraintTop_toTopOf="parent">
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginTop="@dimen/margin_padding_small"
-                        android:layout_marginEnd="@dimen/margin_padding_large"
-                        android:background="@color/gray_30" />
+                <TextView
+                    android:id="@+id/gainTextView"
+                    style="@style/AudioMothText.Subhead.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingEnd="@dimen/margin_padding_normal"
+                    android:text="@string/gain" />
 
-                </LinearLayout>
-            </androidx.appcompat.widget.LinearLayoutCompat>
+                <TextView
+                    android:id="@+id/gainValueTextView"
+                    style="@style/AudioMothText.Body.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingEnd="@dimen/margin_padding_normal"
+                    android:paddingBottom="@dimen/margin_padding_small"
+                    tools:text="3 (default)" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/margin_padding_small"
+                    android:layout_marginEnd="@dimen/margin_padding_large"
+                    android:background="@color/gray_30" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/durationTextView"
@@ -110,7 +112,7 @@
                 android:layout_marginTop="@dimen/margin_padding_normal"
                 android:layout_marginEnd="@dimen/margin_padding_large"
                 android:text="@string/recording_duration_title"
-                app:layout_constraintTop_toBottomOf="@id/sampleRateAndGainLayout" />
+                app:layout_constraintTop_toBottomOf="@id/sampleRateLayout" />
 
             <RadioGroup
                 android:id="@+id/radioGroup"
@@ -307,6 +309,7 @@
                 android:layout_marginStart="@dimen/margin_padding_large"
                 android:layout_marginTop="@dimen/margin_padding_normal"
                 android:layout_marginEnd="@dimen/margin_padding_large"
+                android:layout_marginBottom="@dimen/margin_padding_normal"
                 android:text="@string/next"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

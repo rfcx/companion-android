@@ -193,20 +193,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun progressBar(show: Boolean) {
-        progressBar.visibility = if (show) {
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
-
-        finishButton.visibility = if (!show) {
-            View.VISIBLE
-        } else {
-            View.INVISIBLE
-        }
-    }
-
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
         mapboxMap.setStyle(Style.OUTDOORS) {
