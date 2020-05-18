@@ -17,9 +17,9 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/inputDeviceIdButton"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
+        android:id="@+id/createLocationButton"
+        android:layout_width="@dimen/button_battery_lv"
+        android:layout_height="@dimen/button_battery_lv"
         android:layout_margin="@dimen/margin_padding_normal"
         android:src="@drawable/ic_signs"
         app:backgroundTint="@color/colorPrimary"
@@ -42,22 +42,30 @@
             style="@style/AudioMothText.Subhead.Bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/colorPrimary"
-            android:text="@string/green_pin" />
+            android:text="@string/green_pin"
+            android:textColor="@color/colorPrimary" />
 
         <androidx.appcompat.widget.AppCompatTextView
             style="@style/AudioMothText.Subhead.Bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/orange"
-            android:text="@string/orange_pin" />
+            android:text="@string/orange_pin"
+            android:textColor="@color/orange" />
 
         <androidx.appcompat.widget.AppCompatTextView
             style="@style/AudioMothText.Subhead.Bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/text_error"
-            android:text="@string/red_pin" />
+            android:text="@string/red_pin"
+            android:textColor="@color/text_error" />
     </androidx.appcompat.widget.LinearLayoutCompat>
-    
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="@dimen/progress_bar"
+        android:layout_height="@dimen/progress_bar"
+        android:layout_margin="@dimen/margin_padding_large"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

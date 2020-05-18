@@ -13,6 +13,8 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.core.app.ActivityCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
@@ -26,22 +28,43 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.utils.BitmapUtils
-import kotlinx.android.synthetic.main.fragment_deploy.*
+import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.Profile
+import org.rfcx.audiomoth.util.Firestore
+import org.rfcx.audiomoth.util.FirestoreResponseCallback
+import org.rfcx.audiomoth.view.DeploymentListener
+import org.rfcx.audiomoth.view.DeploymentProtocol
+import org.rfcx.audiomoth.view.UserListener
 
-class DeployFragment : Fragment(), OnMapReadyCallback {
+class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var mapboxMap: MapboxMap
     private lateinit var mapView: MapView
     private lateinit var symbolManager: SymbolManager
     private var locationManager: LocationManager? = null
     private var lastLocation: Location? = null
+    private var locations = ArrayList<String>()
+    private var locationsLatLng = ArrayList<LatLng>()
+    private var locationLatLng: LatLng? = null
+    private var location = ""
+    private lateinit var arrayAdapter: ArrayAdapter<String>
+    private var deploymentProtocol: DeploymentProtocol? = null
+    private var userListener: UserListener? = null
+    private var deploymentListener: DeploymentListener? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        deploymentProtocol = context as DeploymentProtocol
+        userListener = context as UserListener
+        deploymentListener = context as DeploymentListener
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_deploy, container, false)
+        return inflater.inflate(R.layout.fragment_location, container, false)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,24 +77,140 @@ class DeployFragment : Fragment(), OnMapReadyCallback {
         mapView = view.findViewById(R.id.mapBoxView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
-        getLastLocation()
+
+        deploymentProtocol?.hideCompleteButton()
 
         finishButton.setOnClickListener {
-            progressBar(true)
+            val userId = userListener?.getUserId()
+            val profile =
+                Profile(3, "", 8, 5, 10, arrayListOf(), ConfigureFragment.RECOMMENDED)
+            if (userId != null) {
+                userId.let { it1 ->
+                    Firestore().haveProfiles(it1) { isHave ->
+                        if (isHave) {
+                            deploymentProtocol?.nextStep()
+                        } else {
+                            deploymentListener?.openConfigure(profile)
+                        }
+                    }
+                }
+            } else {
+                deploymentListener?.openConfigure(profile)
+            }
         }
     }
 
-    private fun progressBar(show: Boolean) {
-        progressBar.visibility = if (show) {
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
+    private fun radioCheckedChange() {
+        radioGroup.setOnCheckedChangeListener { _, checkedId ->
+            when (checkedId) {
+                R.id.newLocationRadioButton -> {
+                    lastLocation?.let { lastLocation ->
+                        setupView(
+                            String.format("%.6f", lastLocation.latitude),
+                            String.format("%.6f", lastLocation.longitude), true
+                        )
+                        setPinOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
+                    }
 
-        finishButton.visibility = if (!show) {
-            View.VISIBLE
+                    finishButton.isEnabled = locationNameEditText.text.toString().isNotEmpty()
+
+                    locationNameTextInput.visibility = View.VISIBLE
+                    locationNameSpinner.visibility = View.GONE
+                }
+
+                R.id.existingRadioButton -> {
+                    locationLatLng?.let {
+                        setPinOnMap(it)
+                        setupView(it.latitude.toString(), it.longitude.toString(), false)
+                    }
+                    locationNameTextInput.visibility = View.GONE
+                    locationNameSpinner.visibility = View.VISIBLE
+                }
+            }
+        }
+    }
+
+    private fun setAdapter() {
+        context?.let {
+            arrayAdapter =
+                ArrayAdapter(it, R.layout.support_simple_spinner_dropdown_item, locations)
+        }
+        locationNameSpinner.adapter = arrayAdapter
+    }
+
+    private fun setLocationSpinner() {
+        locationNameSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                location = locations[position]
+                locationLatLng = locationsLatLng[position]
+                setPinOnMap(locationsLatLng[position])
+
+                setupView(
+                    locationsLatLng[position].latitude.toString(),
+                    locationsLatLng[position].longitude.toString(),
+                    false
+                )
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+    }
+
+    private fun getLocation(documentId: String?) {
+        if (documentId.isNullOrEmpty()) {
+            newLocationRadioButton.isChecked = true
+            existingRadioButton.isEnabled = false
         } else {
-            View.INVISIBLE
+            existingRadioButton.isChecked = true
+
+            Firestore().getLocations(documentId,
+                object : FirestoreResponseCallback<List<org.rfcx.audiomoth.entity.Location?>?> {
+                    override fun onSuccessListener(response: List<org.rfcx.audiomoth.entity.Location?>?) {
+                        val locations = ArrayList<String>()
+                        response?.map { it ->
+                            it?.let { location ->
+                                locations.add(location.name)
+                                locationsLatLng.add(LatLng(location.latitude, location.longitude))
+
+                                setRecommendLocation()
+                            }
+                        }
+                        arrayAdapter.addAll(locations)
+                        arrayAdapter.notifyDataSetChanged()
+                    }
+
+                    override fun addOnFailureListener(exception: Exception) {
+                        newLocationRadioButton.isChecked = true
+                        existingRadioButton.isEnabled = false
+                    }
+                })
+        }
+    }
+
+    private fun setRecommendLocation() {
+        var minDistance = 51.0
+        var latLng: LatLng = locationsLatLng[0]
+
+        locationsLatLng.map {
+            val loc = Location(LocationManager.GPS_PROVIDER)
+            loc.latitude = it.latitude
+            loc.longitude = it.longitude
+
+            val distance = loc.distanceTo(lastLocation)
+            if (distance <= 50.0f) {
+                if (minDistance > distance) {
+                    minDistance = distance.toDouble()
+
+                    latLng = it
+                }
+            }
+            val position = locationsLatLng.indexOf(latLng)
+            locationNameSpinner.setSelection(position)
         }
     }
 
@@ -86,10 +225,16 @@ class DeployFragment : Fragment(), OnMapReadyCallback {
                 setPinOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
                 setupView(
                     String.format("%.6f", lastLocation.latitude),
-                    String.format("%.6f", lastLocation.longitude)
+                    String.format("%.6f", lastLocation.longitude), true
                 )
             }
             onLatLngChanged()
+            radioCheckedChange()
+
+            getLastLocation()
+            getLocation(userListener?.getUserId())
+            setAdapter()
+            setLocationSpinner()
         }
     }
 
@@ -134,7 +279,7 @@ class DeployFragment : Fragment(), OnMapReadyCallback {
             override fun afterTextChanged(p0: Editable?) {
                 if (p0 != null) {
                     finishButton.isEnabled = p0.isNotEmpty()
-                    if (p0.toString() != "-" && p0.isNotEmpty() && p0.toString() != ".") {
+                    if (p0.toString() != "-" && p0.isNotEmpty() && p0.toString() != "." && longitudeEditText.text.toString().isNotEmpty()) {
                         if (p0.toString().toDouble() >= -90.0 && p0.toString().toDouble() <= 90) {
                             setPinOnMap(
                                 LatLng(
@@ -156,7 +301,7 @@ class DeployFragment : Fragment(), OnMapReadyCallback {
             override fun afterTextChanged(p0: Editable?) {
                 if (p0 != null) {
                     finishButton.isEnabled = p0.isNotEmpty()
-                    if (p0.toString() != "-" && p0.isNotEmpty() && p0.toString() != ".") {
+                    if (p0.toString() != "-" && p0.isNotEmpty() && p0.toString() != "." && latitudeEditText.text.toString().isNotEmpty()) {
                         setPinOnMap(
                             LatLng(
                                 latitudeEditText.text.toString().toDouble(),
@@ -193,7 +338,8 @@ class DeployFragment : Fragment(), OnMapReadyCallback {
                     0f,
                     locationListener
                 )
-                lastLocation = locationManager?.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                lastLocation =
+                    locationManager?.getLastKnownLocation(LocationManager.GPS_PROVIDER)
 
             } catch (ex: SecurityException) {
                 ex.printStackTrace()
@@ -238,9 +384,11 @@ class DeployFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun setupView(latitudeText: String, longitudeText: String) {
+    private fun setupView(latitudeText: String, longitudeText: String, enabled: Boolean) {
         latitudeEditText.setText(latitudeText)
+        latitudeEditText.isEnabled = enabled
         longitudeEditText.setText(longitudeText)
+        longitudeEditText.isEnabled = enabled
     }
 
     override fun onStart() {
@@ -274,17 +422,14 @@ class DeployFragment : Fragment(), OnMapReadyCallback {
     }
 
     companion object {
-        const val TAG = "DeployFragment"
+        const val TAG = "LocationFragment"
         const val REQUEST_PERMISSIONS_REQUEST_CODE = 34
         const val PIN_MAP = "pin-map"
         const val MAPBOX_ACCESS_TOKEN =
             "pk.eyJ1IjoicmF0cmVlLW9jaG4iLCJhIjoiY2s5Mjk5MDQ3MDYzcDNmbzVnZHd1aXNqaSJ9.UCrMjgGw8zROm_sRlebSGQ"
 
-        private const val DATE_PREDICT_TIME_MILLIS = "datePredictTimeMillis"
-        private const val BATTERY_LEVEL = "batteryLevel"
-
-        fun newInstance(): DeployFragment {
-            return DeployFragment()
+        fun newInstance(): LocationFragment {
+            return LocationFragment()
         }
     }
 }

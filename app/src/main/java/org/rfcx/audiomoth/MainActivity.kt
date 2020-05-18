@@ -1,32 +1,15 @@
 package org.rfcx.audiomoth
 
-import android.content.Context
-import android.content.DialogInterface
-import android.content.Intent
-import android.graphics.Paint.UNDERLINE_TEXT_FLAG
-import android.graphics.Typeface
+import android.annotation.SuppressLint
 import android.os.Bundle
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.SpannableStringBuilder
-import android.text.style.ForegroundColorSpan
-import android.text.style.StyleSpan
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.snackbar.Snackbar
-import com.google.zxing.integration.android.IntentIntegrator
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.location.modes.CameraMode
+import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
@@ -34,31 +17,26 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.utils.BitmapUtils
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.alert_tell_switch_mode.view.*
-import kotlinx.android.synthetic.main.alertlayout.view.*
-import kotlinx.android.synthetic.main.fragment_input_deviec_id_bottom_sheet.*
+import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.util.Firestore
-import org.rfcx.audiomoth.util.getIntColor
-import org.rfcx.audiomoth.view.CreateStreamActivity
-import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
+import org.rfcx.audiomoth.util.FirestoreResponseCallback
 import org.rfcx.audiomoth.view.DeploymentActivity
-import org.rfcx.audiomoth.view.configure.DeployFragment
+import org.rfcx.audiomoth.view.configure.LocationFragment.Companion.MAPBOX_ACCESS_TOKEN
 
-open class MainActivity : AppCompatActivity(), InputDeviceIdListener {
+open class MainActivity : AppCompatActivity() {
 
     private lateinit var mapboxMap: MapboxMap
     private lateinit var mapView: MapView
     private lateinit var symbolManager: SymbolManager
-    private val inputDeviceIdBottomSheet by lazy { InputDeviceIdBottomSheet(this) }
-
+    private var userId = "SPYW1VXiT68geKPdOel6"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Mapbox.getInstance(this, DeployFragment.MAPBOX_ACCESS_TOKEN)
+        Mapbox.getInstance(this, MAPBOX_ACCESS_TOKEN)
         setContentView(R.layout.activity_main)
-
-        inputDeviceIdButton.setOnClickListener {
-            DeploymentActivity.startActivity(this)
+        setCreateLocationButton(false)
+        createLocationButton.setOnClickListener {
+            DeploymentActivity.startActivity(this, userId)
         }
 
         mapView = findViewById(R.id.mapBoxView)
@@ -70,78 +48,47 @@ open class MainActivity : AppCompatActivity(), InputDeviceIdListener {
                 symbolManager = SymbolManager(mapView, mapboxMap, it)
                 symbolManager.iconAllowOverlap = true
                 symbolManager.iconIgnorePlacement = true
-
-                getDevices()
-            }
-        }
-
-        if (intent.hasExtra(SHOW_SNACKBAR)) {
-            val show = intent.getBooleanExtra(SHOW_SNACKBAR, false)
-            if (show) {
-                val view = layoutInflater.inflate(R.layout.alert_tell_switch_mode, null)
-                makeTextBold(getString(R.string.please_switch_mode), view.switchModeTextView)
-                val builder = AlertDialog.Builder(this)
-                builder.setCancelable(false)
-                builder.setView(view)
-
-                builder.setPositiveButton(getString(R.string.got_it)) { dialog, _ ->
-                    dialog.dismiss()
-                }
-
-                val alertDialog = builder.create()
-                alertDialog.show()
-
+                enableLocationComponent(it)
+                getLocation(userId)
             }
         }
     }
 
-    private fun makeTextBold(sentence: String, textView: AppCompatTextView) {
-        val builder = SpannableStringBuilder()
-        val startIndex = 61
-        val endIndex = 68
-        val spannableString = SpannableString(sentence)
-        val boldSpan = StyleSpan(Typeface.BOLD)
-        spannableString.setSpan(boldSpan, startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        spannableString.setSpan(
-            ForegroundColorSpan(this.getIntColor(R.color.text_error)),
-            startIndex,
-            endIndex,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-        builder.append(spannableString)
-        textView.setText(builder, TextView.BufferType.SPANNABLE)
+    @SuppressLint("RestrictedApi")
+    private fun setCreateLocationButton(show: Boolean) {
+        createLocationButton.visibility = if (show) View.VISIBLE else View.GONE
+        progressBar.visibility = if (!show) View.VISIBLE else View.GONE
     }
 
-    private fun getDevices() {
-        var lastProfile: Long = 0
-        val docRef = Firestore().db.collection(DEVICES)
-        docRef.get()
-            .addOnSuccessListener { documentSnapshot ->
-                if (documentSnapshot != null) {
-                    val data = documentSnapshot.documents
-                    symbolManager.deleteAll()
+    private fun enableLocationComponent(loadedMapStyle: Style) {
+        val locationComponent = mapboxMap.locationComponent
+        locationComponent.activateLocationComponent(this, loadedMapStyle)
+        locationComponent.isLocationComponentEnabled = true
+        locationComponent.cameraMode = CameraMode.TRACKING
+        locationComponent.renderMode = RenderMode.COMPASS
+    }
 
-                    data.map {
-                        if (it.data != null) {
-                            val location = it.data?.get("location") as Map<*, *>
-                            val latitude = location["lat"] as Double
-                            val longitude = location["lng"] as Double
-                            val timestamp =
-                                it.data?.get("batteryPredictedUntil") as com.google.firebase.Timestamp
-                            val timestampDeployed =
-                                it.data?.get("deployedAt") as com.google.firebase.Timestamp
-                            if (lastProfile < timestampDeployed.seconds) {
-                                lastProfile = timestampDeployed.seconds
-                                moveCamera(LatLng(latitude, longitude))
-                            }
+    private fun getLocation(documentId: String) {
+        Firestore().getDeployments(documentId,
+            object : FirestoreResponseCallback<List<Deployment?>?> {
+                override fun onSuccessListener(response: List<Deployment?>?) {
+                    response?.map {
+                        if (it != null) {
                             displayPinOfDevices(
-                                LatLng(latitude, longitude),
-                                checkBatteryPredictedUntil(timestamp.seconds * 1000)
+                                LatLng(it.location.latitude, it.location.longitude),
+                                checkBatteryPredictedUntil(it.batteryDepletedAt.time)
                             )
+
+                            moveCamera(LatLng(it.location.latitude, it.location.longitude))
+                            setCreateLocationButton(true)
                         }
                     }
                 }
-            }
+
+                override fun addOnFailureListener(exception: Exception) {
+                    setCreateLocationButton(true)
+                }
+            })
     }
 
     private fun setUpImage(style: Style) {
@@ -199,66 +146,6 @@ open class MainActivity : AppCompatActivity(), InputDeviceIdListener {
         )
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
-
-        if (result != null) {
-            if (result.contents == null) {
-                Toast.makeText(this, getText(R.string.code_empty), Toast.LENGTH_SHORT).show()
-            } else {
-                CreateStreamActivity.startActivity(this, result.contents.split("=")[1])
-                finish()
-            }
-
-        } else {
-            // the camera will not close if the result is still null
-            super.onActivityResult(requestCode, resultCode, data)
-        }
-    }
-
-    override fun onSelectedScanQrCode() {
-        inputDeviceIdBottomSheet.dismiss()
-
-        val integrator = IntentIntegrator(this)
-        integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
-        integrator.setOrientationLocked(false)
-        integrator.setPrompt(getString(R.string.scan_qr_code))
-        integrator.setBeepEnabled(false)
-        integrator.initiateScan()
-    }
-
-    override fun onSelectedEnterDeviceId() {
-        inputDeviceIdBottomSheet.dismiss()
-
-        val view = layoutInflater.inflate(R.layout.alertlayout, null)
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle(getString(R.string.enter_code).capitalize())
-        builder.setIcon(R.drawable.ic_audiomoth)
-        builder.setView(view)
-
-        builder.setPositiveButton(getString(R.string.ok)) { dialog, _ ->
-            val deviceId = view.deviceIdEditText.text.toString().trim()
-            if (deviceId.isEmpty()) {
-                Toast.makeText(this, getText(R.string.device_id_empty), Toast.LENGTH_SHORT)
-                    .show()
-            } else {
-                CreateStreamActivity.startActivity(this, deviceId)
-                finish()
-            }
-            dialog.dismiss()
-        }
-
-        builder.setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
-            dialog.dismiss()
-        }
-
-        val alertDialog = builder.create()
-        alertDialog.show()
-
-        val buttonNeutral = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
-        buttonNeutral.setTextColor(ContextCompat.getColor(this, R.color.text_secondary))
-    }
-
     override fun onStart() {
         super.onStart()
         mapView.onStart()
@@ -289,53 +176,12 @@ open class MainActivity : AppCompatActivity(), InputDeviceIdListener {
         mapView.onDestroy()
     }
 
-    private fun Snackbar.allowInfiniteLines(): Snackbar {
-        return apply {
-            (view.findViewById<View?>(R.id.snackbar_text) as? TextView?)?.isSingleLine = false
-        }
-    }
-
     companion object {
         const val TAG = "MainActivity"
         const val PIN_MAP_GREEN = "PIN_MAP_GREEN"
         const val PIN_MAP_ORANGE = "PIN_MAP_ORANGE"
         const val PIN_MAP_RED = "PIN_MAP_RED"
-        const val SHOW_SNACKBAR = "SHOW_SNACKBAR"
-        fun startActivity(context: Context, showSnackbar: Boolean = false) {
-            val intent = Intent(context, MainActivity::class.java)
-            intent.putExtra(SHOW_SNACKBAR, showSnackbar)
-            context.startActivity(intent)
-        }
-    }
-}
-
-interface InputDeviceIdListener {
-    fun onSelectedScanQrCode()
-    fun onSelectedEnterDeviceId()
-}
-
-class InputDeviceIdBottomSheet(private val listener: InputDeviceIdListener) :
-    BottomSheetDialogFragment() {
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_input_deviec_id_bottom_sheet, container, false)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        enterCodeTextView.paintFlags = enterCodeTextView.paintFlags or UNDERLINE_TEXT_FLAG
-        setView()
-    }
-
-    private fun setView() {
-        enterCodeTextView.setOnClickListener { listener.onSelectedEnterDeviceId() }
-        scanQrCodeButton.setOnClickListener { listener.onSelectedScanQrCode() }
-    }
-
-    companion object {
-        const val TAG = "InputDeviceIdBottomSheet"
+        const val USERS = "users"
+        const val LOCATIONS = "locations"
     }
 }

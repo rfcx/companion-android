@@ -24,6 +24,12 @@ class ExampleFragment : Fragment() {
         arguments?.let {
             stepNumber = it.getInt(ARG_STEP_NUMBER)
         }
+
+        if (stepNumber != null) {
+            if (stepNumber!! < 5) {
+                deploymentProtocol?.showCompleteButton()
+            }
+        }
     }
 
     override fun onCreateView(

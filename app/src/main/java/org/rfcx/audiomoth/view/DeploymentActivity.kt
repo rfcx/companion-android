@@ -8,17 +8,34 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_deployment.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.view.configure.DeployFragment
+import org.rfcx.audiomoth.entity.Profile
+import org.rfcx.audiomoth.view.configure.ConfigureFragment
+import org.rfcx.audiomoth.view.configure.LocationFragment
+import org.rfcx.audiomoth.view.configure.SelectProfileFragment
+import org.rfcx.audiomoth.view.configure.SyncFragment
+import org.rfcx.audiomoth.view.configure.SyncFragment.Companion.BEFORE_SYNC
 
-class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
-
+class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, UserListener,
+    DeploymentListener {
     private var currentStep = 0
     private val steps by lazy { resources.getStringArray(R.array.steps) }
+    private var userId: String? = null
+    private var profile: Profile? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_deployment)
         setupView()
+        setUserId()
+    }
+
+    private fun setUserId() {
+        if (intent.hasExtra(USER_ID)) {
+            val userId = intent.getStringExtra(USER_ID)
+            if (userId != null) {
+                this.userId = userId
+            }
+        }
     }
 
     private fun setupView() {
@@ -58,7 +75,13 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         // setup fragment for current step
         when (currentStep) {
             0 -> {
-                startFragment(DeployFragment.newInstance())
+                startFragment(LocationFragment.newInstance())
+            }
+            1 -> {
+                startFragment(SelectProfileFragment.newInstance())
+            }
+            2 -> {
+                startFragment(SyncFragment.newInstance(BEFORE_SYNC))
             }
             else -> {
                 startFragment(ExampleFragment.newInstance(currentStep))
@@ -80,9 +103,33 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
             .commit()
     }
 
+    override fun getUserId(): String? {
+        return userId
+    }
+
+    override fun getProfile(): Profile? {
+        return profile
+    }
+
+    override fun openConfigure(profile: Profile) {
+        this.profile = profile
+        currentStep = 1
+        stepView.go(currentStep, true)
+        startFragment(ConfigureFragment.newInstance())
+    }
+
+    override fun openSync(status: String) {
+        startFragment(SyncFragment.newInstance(status))
+    }
+
     companion object {
-        fun startActivity(context: Context) {
-            context.startActivity(Intent(context, DeploymentActivity::class.java))
+        private const val USER_ID = "USER_ID"
+
+        fun startActivity(context: Context, userId: String?) {
+            val intent = Intent(context, DeploymentActivity::class.java)
+            if (userId != null)
+                intent.putExtra(USER_ID, userId)
+            context.startActivity(intent)
         }
     }
 }
@@ -95,4 +142,14 @@ interface DeploymentProtocol {
     fun backStep()
 
     fun getNameNextStep(): String // example get data from parent
+}
+
+interface UserListener {
+    fun getUserId(): String?
+    fun getProfile(): Profile?
+}
+
+interface DeploymentListener {
+    fun openConfigure(profile: Profile)
+    fun openSync(status: String)
 }

@@ -15,8 +15,6 @@ import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_create_stream.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.util.Firestore
-import org.rfcx.audiomoth.view.configure.ConfigureActivity
-import org.rfcx.audiomoth.view.configure.ConfigureFragment.Companion.CREATE_STREAM
 import java.util.*
 
 class CreateStreamActivity : AppCompatActivity() {
@@ -45,21 +43,6 @@ class CreateStreamActivity : AppCompatActivity() {
             createStreamProgressBar.visibility = View.VISIBLE
             createStreamButton.isEnabled = false
             streamNameEditText.hideKeyboard()
-
-            if (intent.hasExtra(DEVICE_ID)) {
-                val deviceId = intent.getStringExtra(DEVICE_ID)
-                if (deviceId != null) {
-                    ConfigureActivity.startActivity(
-                        this,
-                        deviceId,
-                        nameStream,
-                        siteId,
-                        site,
-                        CREATE_STREAM
-                    )
-                    finish()
-                }
-            }
         }
     }
 
