@@ -30,8 +30,10 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.utils.BitmapUtils
 import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.util.FirestoreResponseCallback
+import org.rfcx.audiomoth.view.DeploymentListener
 import org.rfcx.audiomoth.view.DeploymentProtocol
 import org.rfcx.audiomoth.view.UserListener
 
@@ -48,10 +50,14 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var location = ""
     private lateinit var arrayAdapter: ArrayAdapter<String>
     private var deploymentProtocol: DeploymentProtocol? = null
+    private var userListener: UserListener? = null
+    private var deploymentListener: DeploymentListener? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         deploymentProtocol = context as DeploymentProtocol
+        userListener = context as UserListener
+        deploymentListener = context as DeploymentListener
     }
 
     override fun onCreateView(
@@ -75,7 +81,22 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         deploymentProtocol?.hideCompleteButton()
 
         finishButton.setOnClickListener {
-            deploymentProtocol?.nextStep()
+            val userId = userListener?.getUserId()
+            val profile =
+                Profile(3, "", 8, 5, 10, arrayListOf(), ConfigureFragment.RECOMMENDED)
+            if (userId != null) {
+                userId.let { it1 ->
+                    Firestore().haveProfiles(it1) { isHave ->
+                        if (isHave) {
+                            deploymentProtocol?.nextStep()
+                        } else {
+                            deploymentListener?.openConfigure(profile)
+                        }
+                    }
+                }
+            } else {
+                deploymentListener?.openConfigure(profile)
+            }
         }
     }
 
@@ -211,7 +232,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             radioCheckedChange()
 
             getLastLocation()
-            getLocation((activity as UserListener).getUserId())
+            getLocation(userListener?.getUserId())
             setAdapter()
             setLocationSpinner()
         }

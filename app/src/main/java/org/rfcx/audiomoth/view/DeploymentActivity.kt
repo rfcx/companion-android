@@ -113,6 +113,8 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, UserListener
 
     override fun openConfigure(profile: Profile) {
         this.profile = profile
+        currentStep = 1
+        stepView.go(currentStep, true)
         startFragment(ConfigureFragment.newInstance())
     }
 

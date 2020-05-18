@@ -6,7 +6,6 @@ import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.Location
 import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.entity.User
-import org.rfcx.audiomoth.entity.User.Companion.FIELD_NAME
 
 
 interface FirestoreCallback {
@@ -88,6 +87,22 @@ class Firestore {
             }
             .addOnFailureListener {
                 callback.addOnFailureListener(it)
+            }
+    }
+
+    fun haveProfiles(documentId: String, callback: (Boolean) -> Unit) {
+        db.collection(COLLECTION_USERS).document(documentId).collection(COLLECTION_PROFILES)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                val documents = querySnapshot.documents
+                if (documents.isNotEmpty()) {
+                    callback(true)
+                } else {
+                    callback(false)
+                }
+            }
+            .addOnFailureListener {
+                callback(false)
             }
     }
 
