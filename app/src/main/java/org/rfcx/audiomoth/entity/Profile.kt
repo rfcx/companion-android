@@ -1,9 +1,9 @@
 package org.rfcx.audiomoth.entity
 
-import java.io.Serializable
-import java.util.ArrayList
+import org.rfcx.audiomoth.view.configure.ConfigureFragment
+import java.util.*
 
-open class Profile(
+data class Profile(
     val gain: Int = 0,
     val name: String = "",
     val sampleRate: Int = 0,
@@ -11,4 +11,17 @@ open class Profile(
     val sleepDuration: Int = 0,
     val recordingPeriodList: ArrayList<String> = arrayListOf(),
     val durationSelected: String = ""
-) : Serializable
+) {
+    companion object {
+        fun default() = Profile(
+            gain = 3,
+            name = "",
+            sampleRate = 8,
+            recordingDuration = 5,
+            sleepDuration = 10,
+            recordingPeriodList = arrayListOf(),
+            durationSelected = ConfigureFragment.RECOMMENDED
+        )
+
+    }
+}

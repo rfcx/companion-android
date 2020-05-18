@@ -1,17 +1,11 @@
 package org.rfcx.audiomoth.util
 
+import android.util.Log
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import org.rfcx.audiomoth.entity.Deployment
-import org.rfcx.audiomoth.entity.Location
+import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.Profile
-import org.rfcx.audiomoth.entity.User
-
-
-interface FirestoreCallback {
-    fun onCompleteListener()
-    fun addOnFailureListener(exception: Exception)
-}
 
 interface FirestoreResponseCallback<T> {
     fun onSuccessListener(response: T)
@@ -20,79 +14,62 @@ interface FirestoreResponseCallback<T> {
 
 class Firestore {
     val db = Firebase.firestore
+    /* TODO: update get user */
+    private val userDocument = db.collection(COLLECTION_USERS).document(USER_ID)
 
-    fun saveDevice(user: User, callback: FirestoreCallback) {
-        db.collection(COLLECTION_DEVICES).document().set(user)
-            .addOnCompleteListener {
-                callback.onCompleteListener()
-            }.addOnFailureListener {
-                callback.addOnFailureListener(it)
-            }
-    }
-
-    fun getDeployments(
-        documentId: String,
-        callback: FirestoreResponseCallback<List<Deployment?>?>
-    ) {
-        db.collection(COLLECTION_USERS).document(documentId).collection(COLLECTION_DEPLOYMENTS)
-            .get()
+    fun getDeployments(callback: FirestoreResponseCallback<List<Deployment?>>) {
+        userDocument.collection(COLLECTION_DEPLOYMENTS).get()
             .addOnSuccessListener { querySnapshot ->
                 val documents = querySnapshot.documents
-                if (documents.isNotEmpty()) {
-                    val deployments = documents.map { it.toObject(Deployment::class.java) }
-                    callback.onSuccessListener(deployments)
+                val response = if (documents.isNotEmpty()) {
+                    documents.map { it.toObject(Deployment::class.java) }
                 } else {
-                    callback.onSuccessListener(null)
+                    arrayListOf()
                 }
+                callback.onSuccessListener(response)
             }
             .addOnFailureListener {
                 callback.addOnFailureListener(it)
             }
     }
 
-    fun getLocations(
-        documentId: String,
-        callback: FirestoreResponseCallback<List<Location?>?>
-    ) {
-        db.collection(COLLECTION_USERS).document(documentId).collection(COLLECTION_LOCATIONS)
-            .get()
+    fun getLocations(callback: FirestoreResponseCallback<List<Locate?>>) {
+        userDocument.collection(COLLECTION_LOCATIONS).get()
             .addOnSuccessListener { querySnapshot ->
                 val documents = querySnapshot.documents
-                if (documents.isNotEmpty()) {
-                    val locations = documents.map { it.toObject(Location::class.java) }
-                    callback.onSuccessListener(locations)
+                Log.d("Firestore", "getLocations $documents")
+                Log.d("Firestore", "getLocations ${documents.size}")
+
+                val response = if (documents.isNotEmpty()) {
+                    documents.map { it.toObject(Locate::class.java) }
                 } else {
-                    callback.onSuccessListener(null)
+                    arrayListOf()
                 }
+                callback.onSuccessListener(response)
             }
             .addOnFailureListener {
                 callback.addOnFailureListener(it)
             }
     }
 
-    fun getProfiles(
-        documentId: String,
-        callback: FirestoreResponseCallback<List<Profile?>?>
-    ) {
-        db.collection(COLLECTION_USERS).document(documentId).collection(COLLECTION_PROFILES)
-            .get()
+    fun getProfiles(callback: FirestoreResponseCallback<List<Profile?>?>) {
+        userDocument.collection(COLLECTION_PROFILES).get()
             .addOnSuccessListener { querySnapshot ->
                 val documents = querySnapshot.documents
-                if (documents.isNotEmpty()) {
-                    val profiles = documents.map { it.toObject(Profile::class.java) }
-                    callback.onSuccessListener(profiles)
+                val response = if (documents.isNotEmpty()) {
+                    documents.map { it.toObject(Profile::class.java) }
                 } else {
-                    callback.onSuccessListener(null)
+                    arrayListOf()
                 }
+                callback.onSuccessListener(response)
             }
             .addOnFailureListener {
                 callback.addOnFailureListener(it)
             }
     }
 
-    fun haveProfiles(documentId: String, callback: (Boolean) -> Unit) {
-        db.collection(COLLECTION_USERS).document(documentId).collection(COLLECTION_PROFILES)
-            .get()
+    fun haveProfiles(callback: (Boolean) -> Unit) {
+        userDocument.collection(COLLECTION_PROFILES).get()
             .addOnSuccessListener { querySnapshot ->
                 val documents = querySnapshot.documents
                 if (documents.isNotEmpty()) {
@@ -113,5 +90,8 @@ class Firestore {
         const val COLLECTION_DEPLOYMENTS = "deployments"
         const val COLLECTION_LOCATIONS = "locations"
         const val COLLECTION_PROFILES = "profiles"
+
+        // MOCKUP
+        const val USER_ID = "SPYW1VXiT68geKPdOel6"
     }
 }

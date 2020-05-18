@@ -33,9 +33,7 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.util.FirestoreResponseCallback
-import org.rfcx.audiomoth.view.DeploymentListener
 import org.rfcx.audiomoth.view.DeploymentProtocol
-import org.rfcx.audiomoth.view.UserListener
 
 class LocationFragment : Fragment(), OnMapReadyCallback {
 
@@ -50,14 +48,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var location = ""
     private lateinit var arrayAdapter: ArrayAdapter<String>
     private var deploymentProtocol: DeploymentProtocol? = null
-    private var userListener: UserListener? = null
-    private var deploymentListener: DeploymentListener? = null
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
         deploymentProtocol = context as DeploymentProtocol
-        userListener = context as UserListener
-        deploymentListener = context as DeploymentListener
     }
 
     override fun onCreateView(
@@ -81,21 +74,17 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         deploymentProtocol?.hideCompleteButton()
 
         finishButton.setOnClickListener {
-            val userId = userListener?.getUserId()
-            val profile =
-                Profile(3, "", 8, 5, 10, arrayListOf(), ConfigureFragment.RECOMMENDED)
-            if (userId != null) {
-                userId.let { it1 ->
-                    Firestore().haveProfiles(it1) { isHave ->
-                        if (isHave) {
-                            deploymentProtocol?.nextStep()
-                        } else {
-                            deploymentListener?.openConfigure(profile)
-                        }
-                    }
-                }
+            checkProfiles()
+        }
+    }
+
+    private fun checkProfiles() {
+        Firestore().haveProfiles { isHave ->
+            if (isHave) {
+                deploymentProtocol?.nextStep()
             } else {
-                deploymentListener?.openConfigure(profile)
+                // open configure page by create Profile Default?
+                deploymentProtocol?.openConfigure(Profile.default())
             }
         }
     }
@@ -167,32 +156,37 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             existingRadioButton.isEnabled = false
         } else {
             existingRadioButton.isChecked = true
-
-            Firestore().getLocations(documentId,
-                object : FirestoreResponseCallback<List<org.rfcx.audiomoth.entity.Location?>?> {
-                    override fun onSuccessListener(response: List<org.rfcx.audiomoth.entity.Location?>?) {
-                        val locations = ArrayList<String>()
-                        response?.map { it ->
-                            it?.let { location ->
-                                locations.add(location.name)
-                                locationsLatLng.add(LatLng(location.latitude, location.longitude))
-
-                                setRecommendLocation()
-                            }
-                        }
-                        arrayAdapter.addAll(locations)
-                        arrayAdapter.notifyDataSetChanged()
-                    }
-
-                    override fun addOnFailureListener(exception: Exception) {
-                        newLocationRadioButton.isChecked = true
-                        existingRadioButton.isEnabled = false
-                    }
-                })
+            retrieveLocations()
         }
     }
 
+    private fun retrieveLocations() {
+        Firestore().getLocations(
+            object : FirestoreResponseCallback<List<org.rfcx.audiomoth.entity.Locate?>> {
+                override fun onSuccessListener(response: List<org.rfcx.audiomoth.entity.Locate?>) {
+                    val locations = ArrayList<String>()
+                    response.forEach {
+                        it?.let { location ->
+                            locations.add(location.name)
+                            locationsLatLng.add(LatLng(location.latitude, location.longitude))
+
+                            setRecommendLocation()
+                        }
+                    }
+                    arrayAdapter.addAll(locations)
+                    arrayAdapter.notifyDataSetChanged()
+                }
+
+                override fun addOnFailureListener(exception: Exception) {
+                    newLocationRadioButton.isChecked = true
+                    existingRadioButton.isEnabled = false
+                }
+            })
+    }
+
     private fun setRecommendLocation() {
+        lastLocation ?: return
+
         var minDistance = 51.0
         var latLng: LatLng = locationsLatLng[0]
 
@@ -232,7 +226,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             radioCheckedChange()
 
             getLastLocation()
-            getLocation(userListener?.getUserId())
+            getLocation(Firestore.USER_ID) // TODO: get real user profile
             setAdapter()
             setLocationSpinner()
         }

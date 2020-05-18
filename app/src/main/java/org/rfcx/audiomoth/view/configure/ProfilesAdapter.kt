@@ -8,15 +8,14 @@ import kotlinx.android.synthetic.main.item_profile.view.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Profile
 
-class ProfilesAdapter : RecyclerView.Adapter<ProfilesAdapter.ProfilesAdapterViewHolder>() {
+class ProfilesAdapter(private val itemClickListener: (Profile) -> Unit) :
+    RecyclerView.Adapter<ProfilesAdapter.ProfilesAdapterViewHolder>() {
 
     var items: List<Profile> = arrayListOf()
         set(value) {
             field = value
             notifyDataSetChanged()
         }
-
-    var mOnItemClickListener: OnItemProfileClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProfilesAdapterViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_profile, parent, false)
@@ -26,9 +25,10 @@ class ProfilesAdapter : RecyclerView.Adapter<ProfilesAdapter.ProfilesAdapterView
     override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: ProfilesAdapterViewHolder, position: Int) {
-        holder.bind(items[position])
+        val profile = items[position]
+        holder.bind(profile)
         holder.itemView.setOnClickListener {
-            mOnItemClickListener?.onItemClick(items[position])
+            this.itemClickListener(profile)
         }
     }
 

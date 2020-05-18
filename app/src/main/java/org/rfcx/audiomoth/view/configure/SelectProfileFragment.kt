@@ -13,15 +13,11 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.util.FirestoreResponseCallback
-import org.rfcx.audiomoth.view.DeploymentListener
 import org.rfcx.audiomoth.view.DeploymentProtocol
-import org.rfcx.audiomoth.view.UserListener
 
-class SelectProfileFragment : Fragment() {
-    private val profilesAdapter by lazy { ProfilesAdapter() }
+class SelectProfileFragment : Fragment(), (Profile) -> Unit {
+    private val profilesAdapter by lazy { ProfilesAdapter(this) }
     private var deploymentProtocol: DeploymentProtocol? = null
-    private var deploymentListener: DeploymentListener? = null
-    private var userListener: UserListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,17 +29,24 @@ class SelectProfileFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         deploymentProtocol = context as DeploymentProtocol
-        deploymentListener = context as DeploymentListener
-        userListener = context as UserListener
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupView()
+        retrieveProfiles()
+    }
+
+    // @{ProfilesAdapter.itemClickListener}
+    override fun invoke(profile: Profile) {
+        deploymentProtocol?.openConfigure(profile)
+    }
+
+    private fun setupView() {
         deploymentProtocol?.hideCompleteButton()
 
         createNewButton.setOnClickListener {
-            val profile = Profile(3, "", 8, 5, 10, arrayListOf(), ConfigureFragment.RECOMMENDED)
-            deploymentListener?.openConfigure(profile)
+            deploymentProtocol?.openConfigure(Profile.default())
         }
 
         profileRecyclerView.apply {
@@ -51,40 +54,29 @@ class SelectProfileFragment : Fragment() {
             adapter = profilesAdapter
         }
 
-        getProfile(userListener?.getUserId())
-
-        profilesAdapter.mOnItemClickListener = object : OnItemProfileClickListener {
-            override fun onItemClick(profile: Profile) {
-                deploymentListener?.openConfigure(profile)
-            }
-        }
-
         tryAgainTextView.setOnClickListener {
-            getProfile(userListener?.getUserId())
+            retrieveProfiles()
         }
     }
 
-    private fun getProfile(documentId: String?) {
+    private fun retrieveProfiles() {
         checkState(SHOW_LOADING)
-        if (documentId != null) {
-            Firestore().getProfiles(documentId,
-                object : FirestoreResponseCallback<List<Profile?>?> {
-                    override fun onSuccessListener(response: List<Profile?>?) {
-                        val items = arrayListOf<Profile>()
-                        response?.map {
-                            if (it != null) {
-                                items.add(it)
-                            }
-                        }
-                        profilesAdapter.items = items
-                        checkState(SHOW_LIST_PROFILE)
+        Firestore().getProfiles(object : FirestoreResponseCallback<List<Profile?>?> {
+            override fun onSuccessListener(response: List<Profile?>?) {
+                val items = arrayListOf<Profile>()
+                response?.forEach {
+                    if (it != null) {
+                        items.add(it)
                     }
+                }
+                profilesAdapter.items = items
+                checkState(SHOW_LIST_PROFILE)
+            }
 
-                    override fun addOnFailureListener(exception: Exception) {
-                        checkState(SHOW_TRY_AGAIN)
-                    }
-                })
-        }
+            override fun addOnFailureListener(exception: Exception) {
+                checkState(SHOW_TRY_AGAIN)
+            }
+        })
     }
 
     private fun checkState(state: String) {
@@ -116,8 +108,4 @@ class SelectProfileFragment : Fragment() {
             return SelectProfileFragment()
         }
     }
-}
-
-interface OnItemProfileClickListener {
-    fun onItemClick(profile: Profile)
 }

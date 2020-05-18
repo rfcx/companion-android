@@ -28,7 +28,6 @@ open class MainActivity : AppCompatActivity() {
     private lateinit var mapboxMap: MapboxMap
     private lateinit var mapView: MapView
     private lateinit var symbolManager: SymbolManager
-    private var userId = "SPYW1VXiT68geKPdOel6"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +35,7 @@ open class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setCreateLocationButton(false)
         createLocationButton.setOnClickListener {
-            DeploymentActivity.startActivity(this, userId)
+            DeploymentActivity.startActivity(this)
         }
 
         mapView = findViewById(R.id.mapBoxView)
@@ -49,7 +48,7 @@ open class MainActivity : AppCompatActivity() {
                 symbolManager.iconAllowOverlap = true
                 symbolManager.iconIgnorePlacement = true
                 enableLocationComponent(it)
-                getLocation(userId)
+                getLocation()
             }
         }
     }
@@ -68,27 +67,26 @@ open class MainActivity : AppCompatActivity() {
         locationComponent.renderMode = RenderMode.COMPASS
     }
 
-    private fun getLocation(documentId: String) {
-        Firestore().getDeployments(documentId,
-            object : FirestoreResponseCallback<List<Deployment?>?> {
-                override fun onSuccessListener(response: List<Deployment?>?) {
-                    response?.map {
-                        if (it != null) {
-                            displayPinOfDevices(
-                                LatLng(it.location.latitude, it.location.longitude),
-                                checkBatteryPredictedUntil(it.batteryDepletedAt.time)
-                            )
+    private fun getLocation() {
+        Firestore().getDeployments(object : FirestoreResponseCallback<List<Deployment?>> {
+            override fun onSuccessListener(response: List<Deployment?>) {
+                response.forEach {
+                    if (it != null) {
+                        displayPinOfDevices(
+                            LatLng(it.location.latitude, it.location.longitude),
+                            checkBatteryPredictedUntil(it.batteryDepletedAt.time)
+                        )
 
-                            moveCamera(LatLng(it.location.latitude, it.location.longitude))
-                            setCreateLocationButton(true)
-                        }
+                        moveCamera(LatLng(it.location.latitude, it.location.longitude))
+                        setCreateLocationButton(true)
                     }
                 }
+            }
 
-                override fun addOnFailureListener(exception: Exception) {
-                    setCreateLocationButton(true)
-                }
-            })
+            override fun addOnFailureListener(exception: Exception) {
+                setCreateLocationButton(true)
+            }
+        })
     }
 
     private fun setUpImage(style: Style) {

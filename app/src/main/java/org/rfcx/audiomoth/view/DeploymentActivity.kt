@@ -15,27 +15,15 @@ import org.rfcx.audiomoth.view.configure.SelectProfileFragment
 import org.rfcx.audiomoth.view.configure.SyncFragment
 import org.rfcx.audiomoth.view.configure.SyncFragment.Companion.BEFORE_SYNC
 
-class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, UserListener,
-    DeploymentListener {
+class DeploymentActivity : AppCompatActivity(), DeploymentProtocol{
     private var currentStep = 0
     private val steps by lazy { resources.getStringArray(R.array.steps) }
-    private var userId: String? = null
     private var profile: Profile? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_deployment)
         setupView()
-        setUserId()
-    }
-
-    private fun setUserId() {
-        if (intent.hasExtra(USER_ID)) {
-            val userId = intent.getStringExtra(USER_ID)
-            if (userId != null) {
-                this.userId = userId
-            }
-        }
     }
 
     private fun setupView() {
@@ -83,9 +71,6 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, UserListener
             2 -> {
                 startFragment(SyncFragment.newInstance(BEFORE_SYNC))
             }
-            else -> {
-                startFragment(ExampleFragment.newInstance(currentStep))
-            }
         }
     }
 
@@ -95,16 +80,6 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, UserListener
 
     override fun getNameNextStep(): String {
         return if ((currentStep + 1) < stepView.stepCount) steps[currentStep + 1] else "Finish!"
-    }
-
-    private fun startFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(contentContainer.id, fragment)
-            .commit()
-    }
-
-    override fun getUserId(): String? {
-        return userId
     }
 
     override fun getProfile(): Profile? {
@@ -122,13 +97,15 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, UserListener
         startFragment(SyncFragment.newInstance(status))
     }
 
-    companion object {
-        private const val USER_ID = "USER_ID"
+    private fun startFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+            .replace(contentContainer.id, fragment)
+            .commit()
+    }
 
-        fun startActivity(context: Context, userId: String?) {
+    companion object {
+        fun startActivity(context: Context) {
             val intent = Intent(context, DeploymentActivity::class.java)
-            if (userId != null)
-                intent.putExtra(USER_ID, userId)
             context.startActivity(intent)
         }
     }
@@ -141,15 +118,9 @@ interface DeploymentProtocol {
     fun nextStep()
     fun backStep()
 
-    fun getNameNextStep(): String // example get data from parent
-}
-
-interface UserListener {
-    fun getUserId(): String?
-    fun getProfile(): Profile?
-}
-
-interface DeploymentListener {
     fun openConfigure(profile: Profile)
     fun openSync(status: String)
+
+    fun getProfile(): Profile?
+    fun getNameNextStep(): String // example get data from parent
 }

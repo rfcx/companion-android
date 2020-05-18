@@ -23,14 +23,12 @@ import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.util.NotificationBroadcastReceiver
 import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
 import org.rfcx.audiomoth.view.DeploymentProtocol
-import org.rfcx.audiomoth.view.UserListener
 import java.util.*
 import kotlin.collections.ArrayList
 
 class ConfigureFragment : Fragment(), OnItemClickListener {
 
     private var deploymentProtocol: DeploymentProtocol? = null
-    private var userListener: UserListener? = null
     private val recordingPeriodAdapter by lazy { RecordingPeriodAdapter(this) }
     private val timeAdapter by lazy { TimeAdapter(this, context) }
 
@@ -76,7 +74,6 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         deploymentProtocol = context as DeploymentProtocol
-        userListener = context as UserListener
     }
 
     override fun onCreateView(
@@ -90,7 +87,7 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        profile = userListener?.getProfile()
+        profile = deploymentProtocol?.getProfile()
         deploymentProtocol?.hideCompleteButton()
 
         for (time in timeList) {

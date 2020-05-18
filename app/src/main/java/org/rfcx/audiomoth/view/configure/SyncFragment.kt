@@ -1,6 +1,5 @@
 package org.rfcx.audiomoth.view.configure
 
-
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
@@ -12,18 +11,14 @@ import kotlinx.android.synthetic.main.fragment_after_sync.*
 import kotlinx.android.synthetic.main.fragment_before_sync.*
 import kotlinx.android.synthetic.main.fragment_sync.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.view.DeploymentListener
 import org.rfcx.audiomoth.view.DeploymentProtocol
 
 class SyncFragment : Fragment() {
-
-    lateinit var deploymentListener: DeploymentListener
-    lateinit var deploymentProtocol: DeploymentProtocol
+    private var deploymentProtocol: DeploymentProtocol? = null
     private var status: String? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        deploymentListener = (context as DeploymentListener)
         deploymentProtocol = (context as DeploymentProtocol)
     }
 
@@ -52,7 +47,7 @@ class SyncFragment : Fragment() {
 
     fun beforeSync() {
         nextButton.setOnClickListener {
-            deploymentListener.openSync(SYNCING)
+            deploymentProtocol?.openSync(SYNCING)
         }
     }
 
@@ -68,7 +63,7 @@ class SyncFragment : Fragment() {
                     percentSyncTextView.text = "$i %"
                     handler.postDelayed(this, 500)
                 } else {
-                    deploymentListener.openSync(AFTER_SYNC)
+                    deploymentProtocol?.openSync(AFTER_SYNC)
                 }
             }
         }, 0)
@@ -76,7 +71,7 @@ class SyncFragment : Fragment() {
 
     fun afterSync() {
         nextAfterSyncButton.setOnClickListener {
-            deploymentProtocol.nextStep()
+            deploymentProtocol?.nextStep()
         }
     }
 
