@@ -4,10 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="@dimen/margin_padding_large"
-    android:layout_marginTop="@dimen/margin_padding_normal"
-    android:layout_marginEnd="@dimen/margin_padding_large"
-    android:background="?attr/selectableItemBackground">
+    android:background="?attr/selectableItemBackground"
+    android:paddingTop="@dimen/margin_padding_normal"
+    android:paddingBottom="@dimen/margin_padding_normal">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/nameProfileTextView"
@@ -23,6 +22,8 @@
         style="@style/AudioMothText.Body.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/nameProfileTextView"
         tools:text="12 kHz, medium, 60 sec/120 sec" />

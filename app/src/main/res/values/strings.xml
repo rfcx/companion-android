@@ -88,5 +88,12 @@
     <!--  SelectProfileFragment  -->
     <string name="use_an_existing">Use an existing profile</string>
     <string name="or_create_new">or create new</string>
+    <string-array name="gainLabel">
+        <item>Lowest</item>
+        <item>Low</item>
+        <item>Medium</item>
+        <item>High</item>
+        <item>Highest</item>
+    </string-array>
 
 </resources>
