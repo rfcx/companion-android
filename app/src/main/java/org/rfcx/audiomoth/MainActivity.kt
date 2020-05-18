@@ -10,7 +10,6 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
-import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
@@ -18,27 +17,25 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.utils.BitmapUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import org.rfcx.audiomoth.entity.Deployment
+import org.rfcx.audiomoth.util.Battery
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.util.FirestoreResponseCallback
 import org.rfcx.audiomoth.view.DeploymentActivity
-import org.rfcx.audiomoth.view.configure.LocationFragment.Companion.MAPBOX_ACCESS_TOKEN
 
 open class MainActivity : AppCompatActivity() {
-
-    private lateinit var mapboxMap: MapboxMap
-    private lateinit var mapView: MapView
+    private var mapboxMap: MapboxMap? = null
     private lateinit var symbolManager: SymbolManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Mapbox.getInstance(this, MAPBOX_ACCESS_TOKEN)
+        Mapbox.getInstance(this, getString(R.string.mapbox_token))
         setContentView(R.layout.activity_main)
-        setCreateLocationButton(false)
-        createLocationButton.setOnClickListener {
-            DeploymentActivity.startActivity(this)
-        }
 
-        mapView = findViewById(R.id.mapBoxView)
+        setView(savedInstanceState)
+    }
+
+    private fun setView(savedInstanceState: Bundle?) {
+        setCreateLocationButton(false)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync { mapboxMap ->
             this.mapboxMap = mapboxMap
@@ -51,6 +48,10 @@ open class MainActivity : AppCompatActivity() {
                 getLocation()
             }
         }
+
+        createLocationButton.setOnClickListener {
+            DeploymentActivity.startActivity(this)
+        }
     }
 
     @SuppressLint("RestrictedApi")
@@ -60,11 +61,11 @@ open class MainActivity : AppCompatActivity() {
     }
 
     private fun enableLocationComponent(loadedMapStyle: Style) {
-        val locationComponent = mapboxMap.locationComponent
-        locationComponent.activateLocationComponent(this, loadedMapStyle)
-        locationComponent.isLocationComponentEnabled = true
-        locationComponent.cameraMode = CameraMode.TRACKING
-        locationComponent.renderMode = RenderMode.COMPASS
+        val locationComponent = mapboxMap?.locationComponent
+        locationComponent?.activateLocationComponent(this, loadedMapStyle)
+        locationComponent?.isLocationComponentEnabled = true
+        locationComponent?.cameraMode = CameraMode.TRACKING
+        locationComponent?.renderMode = RenderMode.COMPASS
     }
 
     private fun getLocation() {
@@ -74,7 +75,7 @@ open class MainActivity : AppCompatActivity() {
                     if (it != null) {
                         displayPinOfDevices(
                             LatLng(it.location.latitude, it.location.longitude),
-                            checkBatteryPredictedUntil(it.batteryDepletedAt.time)
+                            Battery.getBatteryPinImage(it.batteryDepletedAt.time)
                         )
 
                         moveCamera(LatLng(it.location.latitude, it.location.longitude))
@@ -94,35 +95,21 @@ open class MainActivity : AppCompatActivity() {
             ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map, null)
         val mBitmapPinMapGreen = BitmapUtils.getBitmapFromDrawable(drawablePinMapGreen)
         if (mBitmapPinMapGreen != null) {
-            style.addImage(PIN_MAP_GREEN, mBitmapPinMapGreen)
+            style.addImage(Battery.BATTERY_PIN_GREEN, mBitmapPinMapGreen)
         }
 
         val drawablePinMapOrange =
             ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map_orange, null)
         val mBitmapPinMapOrange = BitmapUtils.getBitmapFromDrawable(drawablePinMapOrange)
         if (mBitmapPinMapOrange != null) {
-            style.addImage(PIN_MAP_ORANGE, mBitmapPinMapOrange)
+            style.addImage(Battery.BATTERY_PIN_ORANGE, mBitmapPinMapOrange)
         }
 
         val drawablePinMapRed =
             ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map_red, null)
         val mBitmapPinMapRed = BitmapUtils.getBitmapFromDrawable(drawablePinMapRed)
         if (mBitmapPinMapRed != null) {
-            style.addImage(PIN_MAP_RED, mBitmapPinMapRed)
-        }
-    }
-
-    private fun checkBatteryPredictedUntil(timestamp: Long): String {
-        val currentMillis = System.currentTimeMillis()
-        val threeDays = 3 * 24 * 60 * 60 * 1000
-        val oneDay = 24 * 60 * 60 * 1000
-
-        return if (timestamp > (currentMillis + threeDays)) {
-            PIN_MAP_GREEN
-        } else if (timestamp > (currentMillis + oneDay) && timestamp < (currentMillis + threeDays)) {
-            PIN_MAP_ORANGE
-        } else {
-            PIN_MAP_RED
+            style.addImage(Battery.BATTERY_PIN_RED, mBitmapPinMapRed)
         }
     }
 
@@ -136,7 +123,7 @@ open class MainActivity : AppCompatActivity() {
     }
 
     private fun moveCamera(latLng: LatLng) {
-        mapboxMap.moveCamera(
+        mapboxMap?.moveCamera(
             CameraUpdateFactory.newLatLngZoom(
                 latLng,
                 15.0
@@ -172,14 +159,5 @@ open class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         mapView.onDestroy()
-    }
-
-    companion object {
-        const val TAG = "MainActivity"
-        const val PIN_MAP_GREEN = "PIN_MAP_GREEN"
-        const val PIN_MAP_ORANGE = "PIN_MAP_ORANGE"
-        const val PIN_MAP_RED = "PIN_MAP_RED"
-        const val USERS = "users"
-        const val LOCATIONS = "locations"
     }
 }

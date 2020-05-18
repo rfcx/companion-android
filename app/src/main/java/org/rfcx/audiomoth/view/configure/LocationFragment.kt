@@ -62,7 +62,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        context?.let { Mapbox.getInstance(it, MAPBOX_ACCESS_TOKEN) }
+        context?.let { Mapbox.getInstance(it, getString(R.string.mapbox_token)) }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -419,8 +419,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         const val TAG = "LocationFragment"
         const val REQUEST_PERMISSIONS_REQUEST_CODE = 34
         const val PIN_MAP = "pin-map"
-        const val MAPBOX_ACCESS_TOKEN =
-            "pk.eyJ1IjoicmF0cmVlLW9jaG4iLCJhIjoiY2s5Mjk5MDQ3MDYzcDNmbzVnZHd1aXNqaSJ9.UCrMjgGw8zROm_sRlebSGQ"
 
         fun newInstance(): LocationFragment {
             return LocationFragment()
