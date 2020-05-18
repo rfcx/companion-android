@@ -28,7 +28,7 @@ open class MainActivity : AppCompatActivity() {
     private lateinit var mapboxMap: MapboxMap
     private lateinit var mapView: MapView
     private lateinit var symbolManager: SymbolManager
-    private var userId: String? = null
+    private var userId = "SPYW1VXiT68geKPdOel6"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,15 +49,15 @@ open class MainActivity : AppCompatActivity() {
                 symbolManager.iconAllowOverlap = true
                 symbolManager.iconIgnorePlacement = true
                 enableLocationComponent(it)
-                getDocumentId()
+                getLocation(userId)
             }
         }
     }
 
     @SuppressLint("RestrictedApi")
     private fun setCreateLocationButton(show: Boolean) {
-        createLocationButton.visibility = if(show) View.VISIBLE else View.GONE
-        progressBar.visibility = if(!show) View.VISIBLE else View.GONE
+        createLocationButton.visibility = if (show) View.VISIBLE else View.GONE
+        progressBar.visibility = if (!show) View.VISIBLE else View.GONE
     }
 
     private fun enableLocationComponent(loadedMapStyle: Style) {
@@ -68,24 +68,7 @@ open class MainActivity : AppCompatActivity() {
         locationComponent.renderMode = RenderMode.COMPASS
     }
 
-    private fun getDocumentId() {
-        Firestore().getDocumentIdOfUser("Ratree Onchana",
-            object : FirestoreResponseCallback<String?> {
-                override fun onSuccessListener(response: String?) {
-                    if (response != null) {
-                        getLocation(response)
-                        userId = response
-                        setCreateLocationButton(true)
-                    }
-                }
-
-                override fun addOnFailureListener(exception: Exception) {
-                    setCreateLocationButton(true)
-                }
-            })
-    }
-
-    fun getLocation(documentId: String) {
+    private fun getLocation(documentId: String) {
         Firestore().getDeployments(documentId,
             object : FirestoreResponseCallback<List<Deployment?>?> {
                 override fun onSuccessListener(response: List<Deployment?>?) {
@@ -97,11 +80,14 @@ open class MainActivity : AppCompatActivity() {
                             )
 
                             moveCamera(LatLng(it.location.latitude, it.location.longitude))
+                            setCreateLocationButton(true)
                         }
                     }
                 }
 
-                override fun addOnFailureListener(exception: Exception) {}
+                override fun addOnFailureListener(exception: Exception) {
+                    setCreateLocationButton(true)
+                }
             })
     }
 

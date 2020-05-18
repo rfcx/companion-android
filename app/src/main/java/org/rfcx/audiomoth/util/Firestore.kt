@@ -31,22 +31,6 @@ class Firestore {
             }
     }
 
-    fun getDocumentIdOfUser(userName: String, callback: FirestoreResponseCallback<String?>) {
-        db.collection(COLLECTION_USERS).whereEqualTo(FIELD_NAME, userName).limit(1).get()
-            .addOnSuccessListener { querySnapshot ->
-                val documents = querySnapshot.documents
-                if (documents.isNotEmpty()) {
-                    val users = documents.map { it.id }
-                    callback.onSuccessListener(users[0])
-                } else {
-                    callback.onSuccessListener(null)
-                }
-            }
-            .addOnFailureListener {
-                callback.addOnFailureListener(it)
-            }
-    }
-
     fun getDeployments(
         documentId: String,
         callback: FirestoreResponseCallback<List<Deployment?>?>
