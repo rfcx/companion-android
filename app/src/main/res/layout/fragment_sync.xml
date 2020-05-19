@@ -7,30 +7,38 @@
     tools:context=".view.configure.SyncFragment">
 
     <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineHorizontalTop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.05" />
+
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guidelineHorizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.45" />
+        app:layout_constraintGuide_percent="0.60" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        style="@style/AudioMothText.Body.Headline"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/margin_padding_xlarge"
-        android:gravity="center"
-        android:text="@string/syncing"
-        android:textColor="@color/text_black"
-        app:layout_constraintBottom_toBottomOf="@id/guidelineHorizontal" />
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/configImageView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="@dimen/margin_padding_xlarge"
+        android:src="@drawable/rfcx_edge"
+        app:layout_constraintBottom_toBottomOf="@id/guidelineHorizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/guidelineHorizontalTop" />
 
     <ProgressBar
         android:id="@+id/progressBarHorizontal"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/margin_padding_xlarge"
+        android:padding="@dimen/margin_padding_large"
         android:progress="0"
-        android:scaleY="4"
+        android:scaleY="3"
         app:layout_constraintTop_toTopOf="@id/guidelineHorizontal" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -40,6 +48,17 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         app:layout_constraintTop_toBottomOf="@id/progressBarHorizontal"
-        tools:text="0%"/>
+        tools:text="0%" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/cancelButton"
+        style="@style/AudioMothButton.GreenButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginEnd="@dimen/margin_padding_large"
+        android:layout_marginBottom="@dimen/margin_padding_normal"
+        android:text="@string/cancel"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

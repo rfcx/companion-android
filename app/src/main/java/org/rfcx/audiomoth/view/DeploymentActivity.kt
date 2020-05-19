@@ -9,10 +9,8 @@ import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_deployment.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Profile
-import org.rfcx.audiomoth.view.configure.ConfigureFragment
-import org.rfcx.audiomoth.view.configure.LocationFragment
-import org.rfcx.audiomoth.view.configure.SelectProfileFragment
-import org.rfcx.audiomoth.view.configure.SyncFragment
+import org.rfcx.audiomoth.view.configure.*
+import org.rfcx.audiomoth.view.configure.PerformBatteryFragment.Companion.TEST_BATTERY
 import org.rfcx.audiomoth.view.configure.SyncFragment.Companion.BEFORE_SYNC
 
 class DeploymentActivity : AppCompatActivity(), DeploymentProtocol{
@@ -71,6 +69,12 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol{
             2 -> {
                 startFragment(SyncFragment.newInstance(BEFORE_SYNC))
             }
+            3 -> {
+                startFragment(PerformBatteryFragment.newInstance(TEST_BATTERY, null))
+            }
+            else -> {
+                startFragment(ExampleFragment.newInstance(currentStep))
+            }
         }
     }
 
@@ -97,6 +101,10 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol{
         startFragment(SyncFragment.newInstance(status))
     }
 
+    override fun openPerformBattery(status: String, image: Int?) {
+        startFragment(PerformBatteryFragment.newInstance(status, image))
+    }
+
     private fun startFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
             .replace(contentContainer.id, fragment)
@@ -120,6 +128,7 @@ interface DeploymentProtocol {
 
     fun openConfigure(profile: Profile)
     fun openSync(status: String)
+    fun openPerformBattery(status: String, image: Int?)
 
     fun getProfile(): Profile?
     fun getNameNextStep(): String // example get data from parent

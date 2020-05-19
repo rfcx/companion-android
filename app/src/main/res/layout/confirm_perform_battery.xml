@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guidelineHorizontalTop"
@@ -30,49 +33,47 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/batteryBlankImageView"
+        android:id="@+id/batteryLevelImageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="@dimen/margin_padding_xlarge"
-        android:src="@drawable/battery_level_blank"
         app:layout_constraintBottom_toBottomOf="@id/guidelineHorizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/guidelineHorizontalTop" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/testButton"
-        style="@style/AudioMothButton.GreenButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_large"
-        android:layout_marginEnd="@dimen/margin_padding_large"
-        android:layout_marginBottom="@dimen/margin_padding_normal"
-        android:text="@string/test"
-        app:layout_constraintBottom_toTopOf="@id/fullBatteryTextView" />
+        app:layout_constraintTop_toTopOf="@id/guidelineHorizontalTop"
+        tools:src="@drawable/battery_level_4" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/fullBatteryTextView"
-        style="@style/AudioMothText.Body.Secondary"
+        android:id="@+id/daysTextView"
+        style="@style/AudioMothText.Subhead.Bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_large"
-        android:layout_marginEnd="@dimen/margin_padding_large"
-        android:layout_marginBottom="@dimen/margin_padding_normal"
-        android:text="@string/it_full"
-        app:layout_constraintBottom_toTopOf="@id/skipButton"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:text="@string/days"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/guidelineHorizontal" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/chargedTextView"
+        style="@style/AudioMothText.Subhead.Bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:text="@string/charged"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/daysTextView" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/skipButton"
+        android:id="@+id/nextButton"
         style="@style/AudioMothButton.GreenButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginEnd="@dimen/margin_padding_large"
         android:layout_marginBottom="@dimen/margin_padding_normal"
-        android:text="@string/skip"
+        android:text="@string/next"
         app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
