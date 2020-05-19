@@ -4,6 +4,7 @@
     package="org.rfcx.audiomoth">
 
     <uses-sdk tools:overrideLibrary="com.google.zxing.client.android" />
+
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
 
@@ -34,9 +35,13 @@
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".view.DeploymentActivity"
+            android:screenOrientation="portrait" />
+
         <activity android:name=".view.configure.ConnectDeviceActivity" />
 
         <receiver

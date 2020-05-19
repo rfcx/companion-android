@@ -31,8 +31,9 @@
     <string name="configure">Configure</string>
     <string name="sample_rate">Sample rate</string>
     <string name="gain">Gain</string>
-    <string name="sleep_duration">Sleep duration (second)</string>
-    <string name="recording_duration">Recording duration (second)</string>
+    <string name="sleep_duration">Sleep (second)</string>
+    <string name="recording_duration">Recording (second)</string>
+    <string name="profile_name">Profile name (optional)</string>
     <string name="recording_duration_title">Recording duration</string>
     <string name="choose_sample_rate">Choose sample rate (kHz)</string>
     <string name="choose_gain">Choose gain</string>
@@ -52,6 +53,12 @@
     <!--    SyncFragment-->
     <string name="sync">Sync</string>
     <string name="syncing">Syncing</string>
+    <string name="switch_to_config">1. Switch your device to CONFIG</string>
+    <string name="max_volume">2. Max volume of your phone</string>
+    <string name="hold_device">3. Hold the device less than 50 cm apart</string>
+    <string name="no_retry">No, Retry</string>
+    <string name="did_green_flash">Did the green LED flash on completion?</string>
+    <string name="yes">Yes</string>
 
     <!--    VerifySyncFragment-->
     <string name="what_light_you_see">What light do you see now?</string>
@@ -63,17 +70,38 @@
     <string name="dashboard">Dashboard</string>
 
     <!--  Perform Battery  -->
-    <string name="label_perform_battery">Perform battery check?</string>
-    <string name="yes">Yes</string>
-    <string name="btn_skip_check_battery"><u>No, I\'m sure it\'s fully charged</u></string>
-    <string name="format_confirm_perform_battery">Given your battery level, this device will record until %s</string>
-    <string name="msg_ask_count_flashes">Count the flashes!</string>
-    <string name="label_battery_level">How many from count the flashes?</string>
+    <string name="test">test</string>
+    <string name="skip">skip</string>
+    <string name="it_full">or, if it is full then:</string>
+    <string name="how_many_time">How many time did the green LED flash?</string>
+    <string name="try_again">try again</string>
+    <string name="how_long_battery">How long will the battery last?</string>
+    <string name="days">%s days</string>
+    <string name="day">%s day</string>
+    <string name="charged">%s charged</string>
 
-    <!--  DeployFragment  -->
+    <!--  LocationFragment  -->
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
     <string name="finish">finish</string>
     <string name="name_location">Name Location</string>
+    <string name="deploying_the_device">Where are you deploying the device?</string>
+    <string name="new_location">New location</string>
+    <string name="existing">Existing</string>
+    <string name="next">Next</string>
+
+
+    <!--  SelectProfileFragment  -->
+    <string name="use_an_existing">Use an existing profile</string>
+    <string name="or_create_new">or create new</string>
+    <string name="can_not_get_profiles">Can\'t get profiles, try again</string>
+    <string-array name="gainLabel">
+        <item>Lowest</item>
+        <item>Low</item>
+        <item>Medium</item>
+        <item>High</item>
+        <item>Highest</item>
+    </string-array>
+    <string name="deploy">Deploy</string>
 
 </resources>

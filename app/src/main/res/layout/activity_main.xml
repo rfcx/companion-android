@@ -8,7 +8,7 @@
     tools:context=".MainActivity">
 
     <com.mapbox.mapboxsdk.maps.MapView
-        android:id="@+id/mapBoxView"
+        android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -17,9 +17,9 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/inputDeviceIdButton"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
+        android:id="@+id/createLocationButton"
+        android:layout_width="@dimen/button_battery_lv"
+        android:layout_height="@dimen/button_battery_lv"
         android:layout_margin="@dimen/margin_padding_normal"
         android:src="@drawable/ic_signs"
         app:backgroundTint="@color/colorPrimary"
@@ -28,36 +28,12 @@
         app:maxImageSize="16dp"
         app:tint="#ffffff" />
 
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingStart="@dimen/margin_padding_normal"
-        android:paddingEnd="@dimen/margin_padding_normal"
-        android:paddingBottom="@dimen/margin_padding_xlarge"
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="@dimen/progress_bar"
+        android:layout_height="@dimen/progress_bar"
+        android:layout_margin="@dimen/margin_padding_large"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintEnd_toEndOf="parent" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            style="@style/AudioMothText.Subhead.Bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/colorPrimary"
-            android:text="@string/green_pin" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            style="@style/AudioMothText.Subhead.Bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/orange"
-            android:text="@string/orange_pin" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            style="@style/AudioMothText.Subhead.Bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text_error"
-            android:text="@string/red_pin" />
-    </androidx.appcompat.widget.LinearLayoutCompat>
-    
 </androidx.constraintlayout.widget.ConstraintLayout>

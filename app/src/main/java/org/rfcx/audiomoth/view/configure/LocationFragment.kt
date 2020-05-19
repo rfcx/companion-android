@@ -13,6 +13,8 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.core.app.ActivityCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
@@ -26,35 +28,41 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.utils.BitmapUtils
-import kotlinx.android.synthetic.main.fragment_deploy.*
-import org.rfcx.audiomoth.MainActivity
+import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.Device
-import org.rfcx.audiomoth.entity.LatLong
+import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.util.Firestore
-import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICES
-import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
-import java.sql.Timestamp
+import org.rfcx.audiomoth.util.FirestoreResponseCallback
+import org.rfcx.audiomoth.view.DeploymentProtocol
 
-class DeployFragment(device: Device) : Fragment(), OnMapReadyCallback {
+class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var mapboxMap: MapboxMap
     private lateinit var mapView: MapView
     private lateinit var symbolManager: SymbolManager
     private var locationManager: LocationManager? = null
     private var lastLocation: Location? = null
-    private var deviceInfo: Device = device
+    private var locations = ArrayList<String>()
+    private var locationsLatLng = ArrayList<LatLng>()
+    private var locationLatLng: LatLng? = null
+    private var location = ""
+    private lateinit var arrayAdapter: ArrayAdapter<String>
+    private var deploymentProtocol: DeploymentProtocol? = null
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        deploymentProtocol = context as DeploymentProtocol
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_deploy, container, false)
+        return inflater.inflate(R.layout.fragment_location, container, false)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        context?.let { Mapbox.getInstance(it, MAPBOX_ACCESS_TOKEN) }
+        context?.let { Mapbox.getInstance(it, getString(R.string.mapbox_token)) }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -62,66 +70,142 @@ class DeployFragment(device: Device) : Fragment(), OnMapReadyCallback {
         mapView = view.findViewById(R.id.mapBoxView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
-        getLastLocation()
+
+        deploymentProtocol?.hideCompleteButton()
 
         finishButton.setOnClickListener {
-            progressBar(true)
-            saveDevice()
+            checkProfiles()
         }
     }
 
-    private fun progressBar(show: Boolean) {
-        progressBar.visibility = if (show) {
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
-
-        finishButton.visibility = if (!show) {
-            View.VISIBLE
-        } else {
-            View.INVISIBLE
+    private fun checkProfiles() {
+        Firestore().haveProfiles { isHave ->
+            if (isHave) {
+                deploymentProtocol?.nextStep()
+            } else {
+                // open configure page by create Profile Default?
+                deploymentProtocol?.openConfigure(Profile.default())
+            }
         }
     }
 
-    private fun saveDevice() {
-        var deviceId = ""
-        var batteryLevel = 0
-        var datePredictTimeMillis: Long = 0
-        if (arguments?.containsKey(DEVICE_ID) == true && arguments?.containsKey(
-                DATE_PREDICT_TIME_MILLIS
-            ) == true && arguments?.containsKey(
-                BATTERY_LEVEL
-            ) == true
-        ) {
-            arguments?.let {
-                deviceId = it.getString(DEVICE_ID).toString()
-                batteryLevel = it.getInt(BATTERY_LEVEL)
-                datePredictTimeMillis = it.getLong(DATE_PREDICT_TIME_MILLIS)
+    private fun radioCheckedChange() {
+        radioGroup.setOnCheckedChangeListener { _, checkedId ->
+            when (checkedId) {
+                R.id.newLocationRadioButton -> {
+                    lastLocation?.let { lastLocation ->
+                        setupView(
+                            String.format("%.6f", lastLocation.latitude),
+                            String.format("%.6f", lastLocation.longitude), true
+                        )
+                        setPinOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
+                    }
+
+                    finishButton.isEnabled = locationNameEditText.text.toString().isNotEmpty()
+
+                    locationNameTextInput.visibility = View.VISIBLE
+                    locationNameSpinner.visibility = View.GONE
+                }
+
+                R.id.existingRadioButton -> {
+                    locationLatLng?.let {
+                        setPinOnMap(it)
+                        setupView(it.latitude.toString(), it.longitude.toString(), false)
+                    }
+                    locationNameTextInput.visibility = View.GONE
+                    locationNameSpinner.visibility = View.VISIBLE
+                }
             }
         }
+    }
 
-        val latLong = LatLong(
-            latitudeEditText.text.toString().toDouble(),
-            longitudeEditText.text.toString().toDouble()
-        )
-        val device = Device(
-            deviceId,
-            deviceInfo.siteId,
-            deviceInfo.siteName,
-            Timestamp(System.currentTimeMillis()),
-            latLong,
-            locationNameEditText.text.toString(),
-            batteryLevel,
-            Timestamp(datePredictTimeMillis),
-            deviceInfo.configuration
-        )
-        Firestore().db.collection(DEVICES).document().set(device)
-            .addOnCompleteListener {
-                context?.let { it1 -> MainActivity.startActivity(it1, true) }
-            }.addOnFailureListener {
-                progressBar(false)
+    private fun setAdapter() {
+        context?.let {
+            arrayAdapter =
+                ArrayAdapter(it, R.layout.support_simple_spinner_dropdown_item, locations)
+        }
+        locationNameSpinner.adapter = arrayAdapter
+    }
+
+    private fun setLocationSpinner() {
+        locationNameSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                location = locations[position]
+                locationLatLng = locationsLatLng[position]
+                setPinOnMap(locationsLatLng[position])
+
+                setupView(
+                    locationsLatLng[position].latitude.toString(),
+                    locationsLatLng[position].longitude.toString(),
+                    false
+                )
             }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+    }
+
+    private fun getLocation(documentId: String?) {
+        if (documentId.isNullOrEmpty()) {
+            newLocationRadioButton.isChecked = true
+            existingRadioButton.isEnabled = false
+        } else {
+            existingRadioButton.isChecked = true
+            retrieveLocations()
+        }
+    }
+
+    private fun retrieveLocations() {
+        Firestore().getLocations(
+            object : FirestoreResponseCallback<List<org.rfcx.audiomoth.entity.Locate?>> {
+                override fun onSuccessListener(response: List<org.rfcx.audiomoth.entity.Locate?>) {
+                    val locations = ArrayList<String>()
+                    response.forEach {
+                        it?.let { location ->
+                            locations.add(location.name)
+                            locationsLatLng.add(LatLng(location.latitude, location.longitude))
+
+                            setRecommendLocation()
+                        }
+                    }
+                    arrayAdapter.addAll(locations)
+                    arrayAdapter.notifyDataSetChanged()
+                }
+
+                override fun addOnFailureListener(exception: Exception) {
+                    newLocationRadioButton.isChecked = true
+                    existingRadioButton.isEnabled = false
+                }
+            })
+    }
+
+    private fun setRecommendLocation() {
+        lastLocation ?: return
+
+        var minDistance = 51.0
+        var latLng: LatLng = locationsLatLng[0]
+
+        locationsLatLng.map {
+            val loc = Location(LocationManager.GPS_PROVIDER)
+            loc.latitude = it.latitude
+            loc.longitude = it.longitude
+
+            val distance = loc.distanceTo(lastLocation)
+            if (distance <= 50.0f) {
+                if (minDistance > distance) {
+                    minDistance = distance.toDouble()
+
+                    latLng = it
+                }
+            }
+            val position = locationsLatLng.indexOf(latLng)
+            locationNameSpinner.setSelection(position)
+        }
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
@@ -135,10 +219,16 @@ class DeployFragment(device: Device) : Fragment(), OnMapReadyCallback {
                 setPinOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
                 setupView(
                     String.format("%.6f", lastLocation.latitude),
-                    String.format("%.6f", lastLocation.longitude)
+                    String.format("%.6f", lastLocation.longitude), true
                 )
             }
             onLatLngChanged()
+            radioCheckedChange()
+
+            getLastLocation()
+            getLocation(Firestore.USER_ID) // TODO: get real user profile
+            setAdapter()
+            setLocationSpinner()
         }
     }
 
@@ -183,7 +273,7 @@ class DeployFragment(device: Device) : Fragment(), OnMapReadyCallback {
             override fun afterTextChanged(p0: Editable?) {
                 if (p0 != null) {
                     finishButton.isEnabled = p0.isNotEmpty()
-                    if (p0.toString() != "-" && p0.isNotEmpty() && p0.toString() != ".") {
+                    if (p0.toString() != "-" && p0.isNotEmpty() && p0.toString() != "." && longitudeEditText.text.toString().isNotEmpty()) {
                         if (p0.toString().toDouble() >= -90.0 && p0.toString().toDouble() <= 90) {
                             setPinOnMap(
                                 LatLng(
@@ -205,7 +295,7 @@ class DeployFragment(device: Device) : Fragment(), OnMapReadyCallback {
             override fun afterTextChanged(p0: Editable?) {
                 if (p0 != null) {
                     finishButton.isEnabled = p0.isNotEmpty()
-                    if (p0.toString() != "-" && p0.isNotEmpty() && p0.toString() != ".") {
+                    if (p0.toString() != "-" && p0.isNotEmpty() && p0.toString() != "." && latitudeEditText.text.toString().isNotEmpty()) {
                         setPinOnMap(
                             LatLng(
                                 latitudeEditText.text.toString().toDouble(),
@@ -242,7 +332,8 @@ class DeployFragment(device: Device) : Fragment(), OnMapReadyCallback {
                     0f,
                     locationListener
                 )
-                lastLocation = locationManager?.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                lastLocation =
+                    locationManager?.getLastKnownLocation(LocationManager.GPS_PROVIDER)
 
             } catch (ex: SecurityException) {
                 ex.printStackTrace()
@@ -287,9 +378,11 @@ class DeployFragment(device: Device) : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun setupView(latitudeText: String, longitudeText: String) {
+    private fun setupView(latitudeText: String, longitudeText: String, enabled: Boolean) {
         latitudeEditText.setText(latitudeText)
+        latitudeEditText.isEnabled = enabled
         longitudeEditText.setText(longitudeText)
+        longitudeEditText.isEnabled = enabled
     }
 
     override fun onStart() {
@@ -323,28 +416,12 @@ class DeployFragment(device: Device) : Fragment(), OnMapReadyCallback {
     }
 
     companion object {
-        const val TAG = "DeployFragment"
+        const val TAG = "LocationFragment"
         const val REQUEST_PERMISSIONS_REQUEST_CODE = 34
         const val PIN_MAP = "pin-map"
-        const val MAPBOX_ACCESS_TOKEN =
-            "pk.eyJ1IjoicmF0cmVlLW9jaG4iLCJhIjoiY2s5Mjk5MDQ3MDYzcDNmbzVnZHd1aXNqaSJ9.UCrMjgGw8zROm_sRlebSGQ"
 
-        private const val DATE_PREDICT_TIME_MILLIS = "datePredictTimeMillis"
-        private const val BATTERY_LEVEL = "batteryLevel"
-
-        fun newInstance(
-            deviceId: String,
-            batteryLv: Int,
-            datePredictTimeMillis: Long,
-            device: Device
-        ): DeployFragment {
-            return DeployFragment(device).apply {
-                arguments = Bundle().apply {
-                    putString(DEVICE_ID, deviceId)
-                    putLong(DATE_PREDICT_TIME_MILLIS, datePredictTimeMillis)
-                    putInt(BATTERY_LEVEL, batteryLv)
-                }
-            }
+        fun newInstance(): LocationFragment {
+            return LocationFragment()
         }
     }
 }
