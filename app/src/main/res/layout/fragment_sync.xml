@@ -18,14 +18,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.40" />
+        app:layout_constraintGuide_percent="0.60" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/configImageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="@dimen/margin_padding_xlarge"
-        android:src="@drawable/ic_audiomoth"
+        android:src="@drawable/rfcx_edge"
         app:layout_constraintBottom_toBottomOf="@id/guidelineHorizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
