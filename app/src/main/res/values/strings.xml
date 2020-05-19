@@ -102,5 +102,6 @@
         <item>High</item>
         <item>Highest</item>
     </string-array>
+    <string name="deploy">Deploy</string>
 
 </resources>

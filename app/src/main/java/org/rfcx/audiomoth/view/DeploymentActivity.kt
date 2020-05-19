@@ -74,6 +74,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol{
             }
             else -> {
                 startFragment(ExampleFragment.newInstance(currentStep))
+                showDeployButton()
             }
         }
     }
@@ -109,6 +110,15 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol{
         supportFragmentManager.beginTransaction()
             .replace(contentContainer.id, fragment)
             .commit()
+    }
+
+    private fun showDeployButton() {
+        setCompleteTextButton(getString(R.string.deploy))
+        showCompleteButton()
+        completeStepButton.setOnClickListener {
+            nextStep()
+            finish()
+        }
     }
 
     companion object {
