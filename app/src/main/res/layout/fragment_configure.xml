@@ -11,12 +11,14 @@
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/nextButton"
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_padding_large"
+            android:layout_marginEnd="@dimen/margin_padding_large">
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guidelineVertical"
@@ -43,8 +45,6 @@
                     style="@style/AudioMothText.Subhead.Bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/margin_padding_large"
-                    android:paddingEnd="@dimen/margin_padding_normal"
                     android:text="@string/sample_rate" />
 
                 <TextView
@@ -52,16 +52,12 @@
                     style="@style/AudioMothText.Body.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/margin_padding_large"
-                    android:paddingEnd="@dimen/margin_padding_normal"
                     android:paddingBottom="@dimen/margin_padding_small"
                     tools:text="8kHz (default)" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginStart="@dimen/margin_padding_large"
-                    android:layout_marginTop="@dimen/margin_padding_small"
                     android:background="@color/gray_30" />
             </LinearLayout>
 
@@ -83,7 +79,6 @@
                     style="@style/AudioMothText.Subhead.Bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingEnd="@dimen/margin_padding_normal"
                     android:text="@string/gain" />
 
                 <TextView
@@ -91,15 +86,12 @@
                     style="@style/AudioMothText.Body.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingEnd="@dimen/margin_padding_normal"
-                    android:paddingBottom="@dimen/margin_padding_small"
                     tools:text="3 (default)" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginTop="@dimen/margin_padding_small"
-                    android:layout_marginEnd="@dimen/margin_padding_large"
                     android:background="@color/gray_30" />
             </LinearLayout>
 
@@ -108,9 +100,7 @@
                 style="@style/AudioMothText.Subhead.Bold"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_large"
                 android:layout_marginTop="@dimen/margin_padding_normal"
-                android:layout_marginEnd="@dimen/margin_padding_large"
                 android:text="@string/recording_duration_title"
                 app:layout_constraintTop_toBottomOf="@id/sampleRateLayout" />
 
@@ -118,9 +108,7 @@
                 android:id="@+id/radioGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_large"
                 android:layout_marginTop="@dimen/margin_padding_normal"
-                android:layout_marginEnd="@dimen/margin_padding_large"
                 app:layout_constraintTop_toBottomOf="@id/durationTextView">
 
                 <androidx.appcompat.widget.AppCompatRadioButton
@@ -208,9 +196,7 @@
                 android:id="@+id/view1"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginStart="@dimen/margin_padding_large"
                 android:layout_marginTop="@dimen/margin_padding_normal"
-                android:layout_marginEnd="@dimen/margin_padding_large"
                 android:background="@color/gray_30"
                 app:layout_constraintTop_toBottomOf="@id/radioGroup" />
 
@@ -218,9 +204,7 @@
                 android:id="@+id/customRecordingPeriodLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_large"
                 android:layout_marginTop="@dimen/margin_padding_normal"
-                android:layout_marginEnd="@dimen/margin_padding_large"
                 android:orientation="horizontal"
                 app:layout_constraintTop_toBottomOf="@id/view1">
 
@@ -262,9 +246,7 @@
                 android:id="@+id/timeRecyclerView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_large"
                 android:layout_marginTop="@dimen/margin_padding_small"
-                android:layout_marginEnd="@dimen/margin_padding_large"
                 android:visibility="gone"
                 app:layout_constraintBottom_toTopOf="@id/recordingPeriodView"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -275,9 +257,7 @@
                 android:id="@+id/recordingPeriodView"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginStart="@dimen/margin_padding_large"
                 android:layout_marginTop="@dimen/margin_padding_normal"
-                android:layout_marginEnd="@dimen/margin_padding_large"
                 android:background="@color/gray_30"
                 app:layout_constraintTop_toBottomOf="@id/timeRecyclerView" />
 
@@ -286,9 +266,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_large"
                 android:layout_marginTop="@dimen/margin_padding_normal"
-                android:layout_marginEnd="@dimen/margin_padding_large"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:hint="@string/profile_name"
@@ -300,22 +278,23 @@
                     android:layout_height="wrap_content"
                     android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/nextButton"
-                style="@style/AudioMothButton.GreenButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_large"
-                android:layout_marginTop="@dimen/margin_padding_normal"
-                android:layout_marginEnd="@dimen/margin_padding_large"
-                android:layout_marginBottom="@dimen/margin_padding_normal"
-                android:text="@string/next"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/profileTextInput" />
-
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/nextButton"
+        style="@style/AudioMothButton.GreenButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:layout_marginEnd="@dimen/margin_padding_large"
+        android:layout_marginBottom="@dimen/margin_padding_normal"
+        android:text="@string/next"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/scrollView" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
