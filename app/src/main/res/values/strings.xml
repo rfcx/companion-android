@@ -58,6 +58,7 @@
     <string name="hold_device">3. Hold the device less than 50 cm apart</string>
     <string name="no_retry">No, Retry</string>
     <string name="did_green_flash">Did the green LED flash on completion?</string>
+    <string name="yes">Yes</string>
 
     <!--    VerifySyncFragment-->
     <string name="what_light_you_see">What light do you see now?</string>
@@ -69,12 +70,14 @@
     <string name="dashboard">Dashboard</string>
 
     <!--  Perform Battery  -->
-    <string name="label_perform_battery">Perform battery check?</string>
-    <string name="yes">Yes</string>
-    <string name="btn_skip_check_battery"><u>No, I\'m sure it\'s fully charged</u></string>
-    <string name="format_confirm_perform_battery">Given your battery level, this device will record until %s</string>
-    <string name="msg_ask_count_flashes">Count the flashes!</string>
-    <string name="label_battery_level">How many from count the flashes?</string>
+    <string name="test">test</string>
+    <string name="skip">skip</string>
+    <string name="it_full">or, if it is full then:</string>
+    <string name="how_many_time">How many time did the green LED flash?</string>
+    <string name="try_again">try again</string>
+    <string name="how_long_battery">How long will the battery last?</string>
+    <string name="days">%s days</string>
+    <string name="charged">%s % charged</string>
 
     <!--  LocationFragment  -->
     <string name="latitude">Latitude</string>
