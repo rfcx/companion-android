@@ -71,6 +71,9 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol{
             2 -> {
                 startFragment(SyncFragment.newInstance(BEFORE_SYNC))
             }
+            else -> {
+                startFragment(ExampleFragment.newInstance(currentStep))
+            }
         }
     }
 

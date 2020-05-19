@@ -45,31 +45,39 @@ class SyncFragment : Fragment() {
         }
     }
 
-    fun beforeSync() {
+    private fun beforeSync() {
         nextButton.setOnClickListener {
             deploymentProtocol?.openSync(SYNCING)
         }
     }
 
-    fun syncing() {
+    private fun syncing() {
         var i = 0
         val handler = Handler()
 
-        handler.postDelayed(object : Runnable {
+        val timerRunnable = object : Runnable {
             override fun run() {
                 if (i != 100) {
                     i += 20
-                    progressBarHorizontal.progress = i
-                    percentSyncTextView.text = "$i %"
+                    if (progressBarHorizontal != null && percentSyncTextView != null) {
+                        progressBarHorizontal.progress = i
+                        percentSyncTextView.text = "$i %"
+                    }
                     handler.postDelayed(this, 500)
                 } else {
                     deploymentProtocol?.openSync(AFTER_SYNC)
                 }
             }
-        }, 0)
+        }
+        handler.postDelayed(timerRunnable, 0)
+
+        cancelButton.setOnClickListener {
+            handler.removeCallbacks(timerRunnable)
+            deploymentProtocol?.openSync(BEFORE_SYNC)
+        }
     }
 
-    fun afterSync() {
+    private fun afterSync() {
         nextAfterSyncButton.setOnClickListener {
             deploymentProtocol?.nextStep()
         }
