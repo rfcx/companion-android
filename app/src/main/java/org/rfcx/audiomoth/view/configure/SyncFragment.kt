@@ -78,8 +78,12 @@ class SyncFragment : Fragment() {
     }
 
     private fun afterSync() {
-        nextAfterSyncButton.setOnClickListener {
+        yesButton.setOnClickListener {
             deploymentProtocol?.nextStep()
+        }
+
+        noButton.setOnClickListener {
+            deploymentProtocol?.openSync(BEFORE_SYNC)
         }
     }
 
