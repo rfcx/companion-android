@@ -102,6 +102,10 @@
         <item>High</item>
         <item>Highest</item>
     </string-array>
-    <string name="deploy">Deploy</string>
+
+    <!--  DeployFragment  -->
+    <string name="almost_there">Almost there!</string>
+    <string name="switch_to_deploy">Switch your device to DEPLOY</string>
+    <string name="take_photos">Take some photos of the deploy location (optional)</string>
 
 </resources>
