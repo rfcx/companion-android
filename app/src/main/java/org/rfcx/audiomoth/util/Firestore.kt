@@ -17,20 +17,26 @@ class Firestore {
     /* TODO: update get user */
     private val userDocument = db.collection(COLLECTION_USERS).document(USER_ID)
 
-    fun getDeployments(callback: FirestoreResponseCallback<List<Deployment?>>) {
+    fun getDeployments(callback: FirestoreResponseCallback<List<Deployment>>) {
         userDocument.collection(COLLECTION_DEPLOYMENTS).get()
             .addOnSuccessListener { querySnapshot ->
                 val documents = querySnapshot.documents
                 val response = if (documents.isNotEmpty()) {
-                    documents.map { it.toObject(Deployment::class.java) }
+                    val deploymentList = arrayListOf<Deployment>()
+                    documents.forEach {
+                        val obj = it.toObject(Deployment::class.java)
+                        obj?.let { it1 -> deploymentList.add(it1) }
+                    }
+                    deploymentList
                 } else {
-                    arrayListOf()
+                    listOf<Deployment>()
                 }
                 callback.onSuccessListener(response)
             }
             .addOnFailureListener {
                 callback.addOnFailureListener(it)
             }
+
     }
 
     fun getLocations(callback: FirestoreResponseCallback<List<Locate?>>) {
