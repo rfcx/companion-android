@@ -77,7 +77,8 @@
     <string name="try_again">try again</string>
     <string name="how_long_battery">How long will the battery last?</string>
     <string name="days">%s days</string>
-    <string name="charged">%s % charged</string>
+    <string name="day">%s day</string>
+    <string name="charged">%s charged</string>
 
     <!--  LocationFragment  -->
     <string name="latitude">Latitude</string>

@@ -70,7 +70,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol{
                 startFragment(SyncFragment.newInstance(BEFORE_SYNC))
             }
             3 -> {
-                startFragment(PerformBatteryFragment.newInstance(TEST_BATTERY))
+                startFragment(PerformBatteryFragment.newInstance(TEST_BATTERY, null))
             }
             else -> {
                 startFragment(ExampleFragment.newInstance(currentStep))
@@ -101,8 +101,8 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol{
         startFragment(SyncFragment.newInstance(status))
     }
 
-    override fun openPerformBattery(status: String) {
-        startFragment(PerformBatteryFragment.newInstance(status))
+    override fun openPerformBattery(status: String, image: Int?) {
+        startFragment(PerformBatteryFragment.newInstance(status, image))
     }
 
     private fun startFragment(fragment: Fragment) {
@@ -128,7 +128,7 @@ interface DeploymentProtocol {
 
     fun openConfigure(profile: Profile)
     fun openSync(status: String)
-    fun openPerformBattery(status: String)
+    fun openPerformBattery(status: String, image: Int?)
 
     fun getProfile(): Profile?
     fun getNameNextStep(): String // example get data from parent
