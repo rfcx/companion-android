@@ -107,4 +107,8 @@
     <string name="these_photos_already_exists">These photos already exist</string>
     <string name="this_photo_already_exists">This photo already exists</string>
     <string name="can_not_create_image">Can\'t create image file</string>
+
+    <string name="location_permission_msg">Deploy App would like to use your location</string>
+    <string name="notification_location_not_availability">Please enable your device\'s location settings</string>
+
 </resources>
