@@ -16,7 +16,7 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.util.*
 import java.io.File
 
-abstract class BaseImageActivity : Fragment() {
+abstract class BaseImageFragment : Fragment() {
 
     protected abstract fun didAddImages(imagePaths: List<String>)
     protected abstract fun didRemoveImage(imagePath: String)

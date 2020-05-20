@@ -11,7 +11,7 @@ import kotlinx.android.synthetic.main.fragment_deploy.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.view.DeploymentProtocol
 
-class DeployFragment : BaseImageActivity() {
+class DeployFragment : BaseImageFragment() {
 
     private var deploymentProtocol: DeploymentProtocol? = null
 
