@@ -19,5 +19,6 @@
     <dimen name="ic_audiomoth_size">170dp</dimen>
     <dimen name="button_battery_lv">56dp</dimen>
     <dimen name="progress_bar">40dp</dimen>
+    <dimen name="button_height">44dp</dimen>
 
 </resources>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.LoginActivity">
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/loginGroupView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        app:constraint_referenced_ids="loginEmailEditText,loginPasswordEditText,signInButton" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/bellLogoImageView"
+        android:layout_width="@dimen/ic_audiomoth_size"
+        android:layout_height="@dimen/ic_audiomoth_size"
+        android:layout_marginTop="@dimen/margin_padding_small"
+        android:layout_marginBottom="@dimen/margin_padding_small"
+        android:src="@drawable/ic_audiomoth"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/protectingRainforestsTextView"
+        style="@style/AudioMothText.Body.Headline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_normal"
+        android:layout_marginTop="@dimen/margin_padding_small"
+        android:layout_marginEnd="@dimen/margin_padding_normal"
+        android:text="@string/app_name"
+        android:textStyle="bold"
+        android:textColor="@color/text_black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bellLogoImageView"
+        tools:text="RFCx Deploy" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/loginEmailEditText"
+        style="@style/AudioMothEditText.Background"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_normal"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:layout_marginEnd="@dimen/margin_padding_normal"
+        android:hint="@string/email"
+        android:imeOptions="actionNext"
+        android:inputType="textEmailAddress"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/protectingRainforestsTextView" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/loginPasswordEditText"
+        style="@style/AudioMothEditText.Background"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_normal"
+        android:layout_marginEnd="@dimen/margin_padding_normal"
+        android:hint="@string/password"
+        android:imeOptions="actionDone"
+        android:inputType="textPassword"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/loginEmailEditText" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/signInButton"
+        style="@style/AudioMothButton.GreenButton"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/button_height"
+        android:layout_margin="@dimen/margin_padding_normal"
+        android:layout_marginStart="@dimen/margin_padding_normal"
+        android:layout_marginEnd="@dimen/margin_padding_normal"
+        android:text="@string/login_sign_in_button_label"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/loginPasswordEditText" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/poweredByTextView"
+        style="@style/AudioMothText.Body.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_padding_xlarge"
+        android:layout_marginBottom="@dimen/margin_padding_small"
+        android:text="@string/powered_by"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/rfcxLogoImageView" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/rfcxLogoImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="27dp"
+        android:layout_marginBottom="@dimen/margin_padding_large"
+        android:src="@drawable/rfcx_logo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/loginProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@color/transparent"
+        app:layout_constraintTop_toBottomOf="@id/protectingRainforestsTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/poweredByTextView"
+        android:visibility="invisible" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
