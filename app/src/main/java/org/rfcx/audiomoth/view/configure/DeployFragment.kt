@@ -6,12 +6,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_deploy.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.view.DeploymentProtocol
 
-class DeployFragment : Fragment() {
+class DeployFragment : BaseImageActivity() {
+
     private var deploymentProtocol: DeploymentProtocol? = null
 
     override fun onAttach(context: Context) {
@@ -28,10 +29,24 @@ class DeployFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupImageRecycler()
         finishButton.setOnClickListener {
             deploymentProtocol?.completeStep()
         }
     }
+
+    private fun setupImageRecycler() {
+        attachImageRecycler.apply {
+            adapter = imageAdapter
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            setHasFixedSize(true)
+        }
+        imageAdapter.setImages(arrayListOf())
+    }
+
+    override fun didAddImages(imagePaths: List<String>) {}
+
+    override fun didRemoveImage(imagePath: String) {}
 
     companion object {
         fun newInstance(): DeployFragment {

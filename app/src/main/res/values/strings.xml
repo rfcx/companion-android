@@ -98,4 +98,13 @@
     <string name="switch_to_deploy">Switch your device to DEPLOY</string>
     <string name="take_photos">Take some photos of the deploy location (optional)</string>
 
+    <string name="camera_permission_msg">Deploy App would like to use your camera</string>
+    <string name="read_storage_permission_msg">Deploy App would like to read your storage</string>
+    <string name="go_to_setting">Settings</string>
+    <string name="menu_camera">Camera</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="some_photo_already_exists">Some photo already exists</string>
+    <string name="these_photos_already_exists">These photos already exist</string>
+    <string name="this_photo_already_exists">This photo already exists</string>
+    <string name="can_not_create_image">Can\'t create image file</string>
 </resources>
