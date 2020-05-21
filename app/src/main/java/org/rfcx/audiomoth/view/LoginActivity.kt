@@ -16,7 +16,12 @@ import org.rfcx.audiomoth.MainActivity
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Err
 import org.rfcx.audiomoth.entity.Ok
+import org.rfcx.audiomoth.entity.UserTouchResponse
+import org.rfcx.audiomoth.repo.ApiManager
 import org.rfcx.audiomoth.util.CredentialVerifier
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class LoginActivity : AppCompatActivity() {
 
@@ -58,15 +63,39 @@ class LoginActivity : AppCompatActivity() {
                         is Err -> {
                             Toast.makeText(this@LoginActivity, result.error, Toast.LENGTH_SHORT)
                                 .show()
+                            loading(false)
                         }
                         is Ok -> {
-                            MainActivity.startActivity(this@LoginActivity, result.value.guid)
+                            userTouch(result.value.idToken, result.value.guid)
                         }
                     }
                 }
 
                 override fun onFailure(exception: AuthenticationException) {
                     exception.printStackTrace()
+                    loading(false)
+                }
+            })
+    }
+
+    private fun userTouch(idToken: String, guid: String) {
+        val authUser = "Bearer $idToken"
+        ApiManager.getInstance().apiRest.userTouch(authUser)
+            .enqueue(object : Callback<UserTouchResponse> {
+                override fun onFailure(call: Call<UserTouchResponse>, t: Throwable) {
+                    Toast.makeText(this@LoginActivity, t.message, Toast.LENGTH_SHORT).show()
+                    loading(false)
+                }
+
+                override fun onResponse(
+                    call: Call<UserTouchResponse>,
+                    response: Response<UserTouchResponse>
+                ) {
+                    response.body()?.let {
+                        if (it.success) {
+                            MainActivity.startActivity(this@LoginActivity, guid)
+                        }
+                    }
                 }
             })
     }
