@@ -18,6 +18,7 @@ import org.rfcx.audiomoth.entity.Err
 import org.rfcx.audiomoth.entity.Ok
 import org.rfcx.audiomoth.entity.UserTouchResponse
 import org.rfcx.audiomoth.repo.ApiManager
+import org.rfcx.audiomoth.util.CredentialKeeper
 import org.rfcx.audiomoth.util.CredentialVerifier
 import retrofit2.Call
 import retrofit2.Callback
@@ -40,6 +41,11 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
+        if (CredentialKeeper(this).hasValidCredentials()) {
+            MainActivity.startActivity(this@LoginActivity)
+            finish()
+        }
 
         signInButton.setOnClickListener {
             val email = loginEmailEditText.text.toString()
@@ -66,7 +72,8 @@ class LoginActivity : AppCompatActivity() {
                             loading(false)
                         }
                         is Ok -> {
-                            userTouch(result.value.idToken, result.value.guid)
+                            userTouch(result.value.idToken)
+                            CredentialKeeper(this@LoginActivity).save(result.value)
                         }
                     }
                 }
@@ -78,7 +85,7 @@ class LoginActivity : AppCompatActivity() {
             })
     }
 
-    private fun userTouch(idToken: String, guid: String) {
+    private fun userTouch(idToken: String) {
         val authUser = "Bearer $idToken"
         ApiManager.getInstance().apiRest.userTouch(authUser)
             .enqueue(object : Callback<UserTouchResponse> {
@@ -93,7 +100,8 @@ class LoginActivity : AppCompatActivity() {
                 ) {
                     response.body()?.let {
                         if (it.success) {
-                            MainActivity.startActivity(this@LoginActivity, guid)
+                            MainActivity.startActivity(this@LoginActivity)
+                            finish()
                         }
                     }
                 }

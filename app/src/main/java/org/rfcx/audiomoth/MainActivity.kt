@@ -305,8 +305,6 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     companion object {
-        private const val GUID = "GUID"
-
         private const val SOURCE_DEPLOYMENT = "source.deployment"
         private const val MARKER_DEPLOYMENT_ID = "marker.deployment"
         private const val WINDOW_DEPLOYMENT_ID = "info.deployment"
@@ -317,9 +315,8 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         private const val PROPERTY_MARKER_CAPTION = "caption"
         private const val PROPERTY_MARKER_IMAGE = "marker-image"
 
-        fun startActivity(context: Context, guid: String) {
+        fun startActivity(context: Context) {
             val intent = Intent(context, MainActivity::class.java)
-            intent.putExtra(GUID, guid)
             context.startActivity(intent)
         }
     }
