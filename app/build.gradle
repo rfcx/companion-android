@@ -60,6 +60,12 @@ dependencies {
     implementation('com.auth0.android:auth0:1.14.1') {
         exclude group: 'com.android.support', module: 'customtabs'
     }
+    implementation 'com.auth0.android:jwtdecode:1.2.0'
+    implementation 'io.jsonwebtoken:jjwt-api:0.10.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.10.5'
+    runtimeOnly('io.jsonwebtoken:jjwt-orgjson:0.10.5') {
+        exclude group: 'org.json', module: 'json' //provided by Android natively
+    }
 
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.12'

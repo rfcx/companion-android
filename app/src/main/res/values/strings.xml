@@ -110,4 +110,6 @@
     </string-array>
     <string name="deploy">Deploy</string>
 
+    <string name="an_error_occurred">Service unavailable</string>
+
 </resources>

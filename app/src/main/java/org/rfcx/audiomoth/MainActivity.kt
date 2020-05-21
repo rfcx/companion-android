@@ -1,5 +1,7 @@
 package org.rfcx.audiomoth
 
+import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.PointF
 import android.os.Bundle
@@ -303,6 +305,8 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     companion object {
+        private const val GUID = "GUID"
+
         private const val SOURCE_DEPLOYMENT = "source.deployment"
         private const val MARKER_DEPLOYMENT_ID = "marker.deployment"
         private const val WINDOW_DEPLOYMENT_ID = "info.deployment"
@@ -312,5 +316,11 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         private const val PROPERTY_MARKER_TITLE = "title"
         private const val PROPERTY_MARKER_CAPTION = "caption"
         private const val PROPERTY_MARKER_IMAGE = "marker-image"
+
+        fun startActivity(context: Context, guid: String) {
+            val intent = Intent(context, MainActivity::class.java)
+            intent.putExtra(GUID, guid)
+            context.startActivity(intent)
+        }
     }
 }

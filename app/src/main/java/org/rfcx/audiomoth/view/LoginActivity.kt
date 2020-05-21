@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.auth0.android.Auth0
 import com.auth0.android.authentication.AuthenticationAPIClient
@@ -11,7 +12,11 @@ import com.auth0.android.authentication.AuthenticationException
 import com.auth0.android.callback.BaseCallback
 import com.auth0.android.result.Credentials
 import kotlinx.android.synthetic.main.activity_login.*
+import org.rfcx.audiomoth.MainActivity
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.Err
+import org.rfcx.audiomoth.entity.Ok
+import org.rfcx.audiomoth.util.CredentialVerifier
 
 class LoginActivity : AppCompatActivity() {
 
@@ -49,7 +54,15 @@ class LoginActivity : AppCompatActivity() {
             .setAudience(this.getString(R.string.auth0_audience))
             .start(object : BaseCallback<Credentials, AuthenticationException> {
                 override fun onSuccess(credentials: Credentials) {
-
+                    when (val result = CredentialVerifier(this@LoginActivity).verify(credentials)) {
+                        is Err -> {
+                            Toast.makeText(this@LoginActivity, result.error, Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                        is Ok -> {
+                            MainActivity.startActivity(this@LoginActivity, result.value.guid)
+                        }
+                    }
                 }
 
                 override fun onFailure(exception: AuthenticationException) {
