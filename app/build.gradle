@@ -11,6 +11,7 @@ android {
     buildToolsVersion "29.0.3"
     defaultConfig {
         applicationId "org.rfcx.audiomoth"
+        manifestPlaceholders = [auth0Domain: "@string/auth0_domain", auth0Scheme: "@string/auth0_scheme"]
         minSdkVersion 19
         targetSdkVersion 29
         versionCode 1
@@ -54,6 +55,11 @@ dependencies {
     implementation 'com.shuhart.stepview:stepview:1.5.1'
 
     implementation 'com.google.android.gms:play-services-location:17.0.0'
+
+    /* auth0 */
+    implementation('com.auth0.android:auth0:1.14.1') {
+        exclude group: 'com.android.support', module: 'customtabs'
+    }
 
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.12'
