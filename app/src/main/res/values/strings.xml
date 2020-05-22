@@ -78,7 +78,7 @@
 
     <!--  Perform Battery  -->
     <string name="test">test</string>
-    <string name="skip">skip</string>
+    <string name="skip">Skip</string>
     <string name="it_full">or, if it is full then:</string>
     <string name="how_many_time">How many time did the green LED flash?</string>
     <string name="try_again">try again</string>

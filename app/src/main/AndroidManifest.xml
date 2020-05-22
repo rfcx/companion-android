@@ -27,6 +27,9 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".view.configure.TutorialActivity"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".view.dashboard.DashboardStreamActivity"
             android:screenOrientation="portrait" />
         <activity

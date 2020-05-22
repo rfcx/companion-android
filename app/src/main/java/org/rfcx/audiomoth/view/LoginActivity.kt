@@ -20,6 +20,7 @@ import org.rfcx.audiomoth.entity.UserTouchResponse
 import org.rfcx.audiomoth.repo.ApiManager
 import org.rfcx.audiomoth.util.CredentialKeeper
 import org.rfcx.audiomoth.util.CredentialVerifier
+import org.rfcx.audiomoth.view.configure.TutorialActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -100,7 +101,7 @@ class LoginActivity : AppCompatActivity() {
                 ) {
                     response.body()?.let {
                         if (it.success) {
-                            MainActivity.startActivity(this@LoginActivity)
+                            TutorialActivity.startActivity(this@LoginActivity)
                             finish()
                         }
                     }
