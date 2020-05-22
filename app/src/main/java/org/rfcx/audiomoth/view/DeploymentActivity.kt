@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_deployment.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.entity.User
 import org.rfcx.audiomoth.util.Firestore
@@ -22,6 +23,13 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     private var currentStep = 0
     private val steps by lazy { resources.getStringArray(R.array.steps) }
     private var profile: Profile? = null
+    private var locate: Locate? = null
+    private var profileId: String? = null
+    private var locateId: String? = null
+
+    private val preferences = Preferences.getInstance(this)
+    private val guid = preferences.getString(Preferences.USER_GUID)
+    private val name = preferences.getString(Preferences.NICKNAME)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,6 +104,10 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         return profile
     }
 
+    override fun setLocate(locate: Locate) {
+        this.locate = locate
+    }
+
     override fun openConfigure(profile: Profile) {
         this.profile = profile
         currentStep = 1
@@ -112,16 +124,28 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     }
 
     override fun saveUser() {
-        val preferences = Preferences.getInstance(this)
-        val guid = preferences.getString(Preferences.USER_GUID)
-        val name = preferences.getString(Preferences.NICKNAME)
         if (guid != null && name != null) {
             val user = User(name)
             Firestore().saveUser(guid, user) { message, success ->
                 if (success) {
-                    nextStep()
+                    saveLocation()
                 } else {
                     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    override fun saveLocation() {
+        if (guid != null && name != null && locate != null) {
+            locate?.let {
+                Firestore().saveLocation(guid, it) { str, success ->
+                    if (success) {
+                        locateId = str
+                        nextStep()
+                    } else {
+                        Toast.makeText(this, str, Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }
@@ -163,6 +187,8 @@ interface DeploymentProtocol {
 
     fun getProfile(): Profile?
     fun getNameNextStep(): String // example get data from parent
+    fun setLocate(locate: Locate)
 
     fun saveUser()
+    fun saveLocation()
 }

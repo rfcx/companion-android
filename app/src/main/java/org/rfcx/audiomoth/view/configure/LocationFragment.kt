@@ -30,6 +30,7 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.utils.BitmapUtils
 import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.util.FirestoreResponseCallback
@@ -79,6 +80,14 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun checkProfiles() {
+        if (newLocationRadioButton.isChecked) {
+            val name = locationNameEditText.text.toString()
+            val lat = latitudeEditText.text.toString().toDouble()
+            val lng = longitudeEditText.text.toString().toDouble()
+            val locate = Locate("", name, lat, lng)
+            deploymentProtocol?.setLocate(locate)
+        }
+
         Firestore().haveProfiles { isHave ->
             if (isHave) {
                 deploymentProtocol?.nextStep()
