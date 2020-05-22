@@ -4,16 +4,21 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_deployment.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Profile
+import org.rfcx.audiomoth.entity.User
+import org.rfcx.audiomoth.util.Firestore
+import org.rfcx.audiomoth.util.Preferences
 import org.rfcx.audiomoth.view.configure.*
 import org.rfcx.audiomoth.view.configure.PerformBatteryFragment.Companion.TEST_BATTERY
 import org.rfcx.audiomoth.view.configure.SyncFragment.Companion.BEFORE_SYNC
 
-class DeploymentActivity : AppCompatActivity(), DeploymentProtocol{
+class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
+
     private var currentStep = 0
     private val steps by lazy { resources.getStringArray(R.array.steps) }
     private var profile: Profile? = null
@@ -106,6 +111,22 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol{
         startFragment(PerformBatteryFragment.newInstance(status, image))
     }
 
+    override fun saveUser() {
+        val preferences = Preferences.getInstance(this)
+        val guid = preferences.getString(Preferences.USER_GUID)
+        val name = preferences.getString(Preferences.NICKNAME)
+        if (guid != null && name != null) {
+            val user = User(name)
+            Firestore().saveUser(guid, user) { message, success ->
+                if (success) {
+                    nextStep()
+                } else {
+                    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
     private fun startFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
             .replace(contentContainer.id, fragment)
@@ -142,4 +163,6 @@ interface DeploymentProtocol {
 
     fun getProfile(): Profile?
     fun getNameNextStep(): String // example get data from parent
+
+    fun saveUser()
 }

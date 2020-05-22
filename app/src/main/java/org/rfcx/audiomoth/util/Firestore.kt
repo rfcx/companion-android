@@ -1,11 +1,11 @@
 package org.rfcx.audiomoth.util
 
-import android.util.Log
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.Profile
+import org.rfcx.audiomoth.entity.User
 
 interface FirestoreResponseCallback<T> {
     fun onSuccessListener(response: T)
@@ -16,6 +16,17 @@ class Firestore {
     val db = Firebase.firestore
     /* TODO: update get user */
     private val userDocument = db.collection(COLLECTION_USERS).document(USER_ID)
+
+    fun saveUser(guid: String, user: User, callback: (String?, Boolean) -> Unit) {
+        db.collection(COLLECTION_USERS).document(guid)
+            .set(user)
+            .addOnSuccessListener {
+                callback(null, true)
+            }
+            .addOnFailureListener { e ->
+                callback(e.message, false)
+            }
+    }
 
     fun getDeployments(callback: FirestoreResponseCallback<List<Deployment>>) {
         userDocument.collection(COLLECTION_DEPLOYMENTS).get()
@@ -43,8 +54,6 @@ class Firestore {
         userDocument.collection(COLLECTION_LOCATIONS).get()
             .addOnSuccessListener { querySnapshot ->
                 val documents = querySnapshot.documents
-                Log.d("Firestore", "getLocations $documents")
-                Log.d("Firestore", "getLocations ${documents.size}")
 
                 val response = if (documents.isNotEmpty()) {
                     documents.map { it.toObject(Locate::class.java) }
@@ -90,6 +99,8 @@ class Firestore {
     }
 
     companion object {
+        const val TAG = "Firestore"
+
         // Firestore Collection
         const val COLLECTION_DEVICES = "devices" // TODO: delete
         const val COLLECTION_USERS = "users"

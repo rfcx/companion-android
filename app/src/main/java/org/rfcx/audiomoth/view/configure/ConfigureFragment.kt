@@ -213,7 +213,7 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
 
     private fun setNextOnClick() {
         nextButton.setOnClickListener {
-            deploymentProtocol?.nextStep()
+            deploymentProtocol?.saveUser()
 
             if (arguments?.containsKey(DEVICE_ID) == true) {
                 arguments?.let {
