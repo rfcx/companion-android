@@ -258,10 +258,9 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
                     recordingPeriod,
                     durationSelected
                 )
-                deploymentProtocol?.saveProfile(profile)
+                deploymentProtocol?.setProfile(profile)
             }
-
-//            deploymentProtocol?.saveUser()
+            deploymentProtocol?.saveUser()
         }
     }
 

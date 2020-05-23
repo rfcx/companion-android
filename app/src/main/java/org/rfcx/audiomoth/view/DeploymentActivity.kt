@@ -9,9 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_deployment.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.Locate
-import org.rfcx.audiomoth.entity.Profile
-import org.rfcx.audiomoth.entity.User
+import org.rfcx.audiomoth.entity.*
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.util.Preferences
 import org.rfcx.audiomoth.view.configure.*
@@ -26,6 +24,8 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     private var locate: Locate? = null
     private var profileId: String? = null
     private var locateId: String? = null
+    private var configuration: Configuration? = null
+    private var locationInDeployment: LocationInDeployment? = null
 
     private val preferences = Preferences.getInstance(this)
     private val guid = preferences.getString(Preferences.USER_GUID)
@@ -104,8 +104,24 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         return profile
     }
 
+    override fun getProfileId(): String? {
+        return profileId
+    }
+
+    override fun geConfiguration(): Configuration? {
+        return configuration
+    }
+
+    override fun getLocationInDeployment(): LocationInDeployment? {
+        return locationInDeployment
+    }
+
     override fun setLocate(locate: Locate) {
         this.locate = locate
+    }
+
+    override fun setProfile(profile: Profile) {
+        this.profile = profile
     }
 
     override fun openConfigure(profile: Profile) {
@@ -137,11 +153,39 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     }
 
     override fun saveLocation() {
-        if (guid != null && name != null && locate != null) {
+        if (guid != null && locate != null) {
             locate?.let {
                 Firestore().saveLocation(guid, it) { str, success ->
                     if (success) {
                         locateId = str
+                        saveProfile()
+                        setLocationInDeployment(it)
+                    } else {
+                        Toast.makeText(this, str, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+        } else {
+            nextStep()
+        }
+    }
+
+    private fun setLocationInDeployment(locate: Locate) {
+        if (locateId != null) {
+            locationInDeployment = locateId?.let {
+                LocationInDeployment(it, locate.name, locate.latitude, locate.longitude)
+            }
+        }
+    }
+
+    override fun saveProfile() {
+        if (guid != null && profile != null) {
+            profile?.let {
+                setConfiguration(it)
+                Firestore().saveProfile(guid, it) { str, success ->
+                    if (success) {
+                        profileId = str
                         nextStep()
                     } else {
                         Toast.makeText(this, str, Toast.LENGTH_SHORT).show()
@@ -153,11 +197,21 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         }
     }
 
-    override fun saveProfile(profile: Profile) {
-        if (guid != null && name != null) {
-            Firestore().saveProfile(guid, profile) { str, success ->
+    private fun setConfiguration(profile: Profile) {
+        configuration = Configuration(
+            profile.gain,
+            profile.sampleRate,
+            profile.recordingDuration,
+            profile.sleepDuration,
+            profile.recordingPeriodList,
+            profile.durationSelected
+        )
+    }
+
+    override fun saveDeployment(deployment: Deployment) {
+        if (guid != null) {
+            Firestore().saveDeployment(guid, deployment) { str, success ->
                 if (success) {
-                    profileId = str
                     nextStep()
                 } else {
                     Toast.makeText(this, str, Toast.LENGTH_SHORT).show()
@@ -203,10 +257,15 @@ interface DeploymentProtocol {
     fun openPerformBattery(status: String, image: Int?)
 
     fun getProfile(): Profile?
+    fun getProfileId(): String?
+    fun geConfiguration(): Configuration?
+    fun getLocationInDeployment(): LocationInDeployment?
     fun getNameNextStep(): String // example get data from parent
     fun setLocate(locate: Locate)
+    fun setProfile(profile: Profile)
 
     fun saveUser()
     fun saveLocation()
-    fun saveProfile(profile: Profile)
+    fun saveProfile()
+    fun saveDeployment(deployment: Deployment)
 }

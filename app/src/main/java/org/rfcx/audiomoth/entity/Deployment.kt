@@ -7,7 +7,7 @@ data class Deployment(
     val deployedAt: Date = Date(),
     val batteryLevel: Int = 0,
     val isLatest: Boolean = false,
-    val configuration: Configuration = Configuration(0, 0),
-    val location: LocationInDeployment = LocationInDeployment("", "", 0.0, 0.0),
+    val configuration: Configuration = Configuration.default(),
+    val location: LocationInDeployment = LocationInDeployment.default(),
     val profileId: String = ""
 )
