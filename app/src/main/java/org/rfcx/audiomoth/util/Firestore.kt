@@ -39,6 +39,17 @@ class Firestore {
             }
     }
 
+    fun saveProfile(guid: String, profile: Profile, callback: (String?, Boolean) -> Unit) {
+        db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_PROFILES)
+            .add(profile)
+            .addOnSuccessListener { documentReference ->
+                callback(documentReference.id, true)
+            }
+            .addOnFailureListener { e ->
+                callback(e.message, false)
+            }
+    }
+
     fun getDeployments(callback: FirestoreResponseCallback<List<Deployment>>) {
         userDocument.collection(COLLECTION_DEPLOYMENTS).get()
             .addOnSuccessListener { querySnapshot ->

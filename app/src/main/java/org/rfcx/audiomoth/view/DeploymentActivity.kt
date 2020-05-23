@@ -148,6 +148,23 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
                     }
                 }
             }
+        } else {
+            nextStep()
+        }
+    }
+
+    override fun saveProfile(profile: Profile) {
+        if (guid != null && name != null) {
+            Firestore().saveProfile(guid, profile) { str, success ->
+                if (success) {
+                    profileId = str
+                    nextStep()
+                } else {
+                    Toast.makeText(this, str, Toast.LENGTH_SHORT).show()
+                }
+            }
+        } else {
+            nextStep()
         }
     }
 
@@ -191,4 +208,5 @@ interface DeploymentProtocol {
 
     fun saveUser()
     fun saveLocation()
+    fun saveProfile(profile: Profile)
 }

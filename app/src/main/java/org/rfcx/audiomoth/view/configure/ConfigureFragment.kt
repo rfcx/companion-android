@@ -18,10 +18,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_configure.*
+import kotlinx.android.synthetic.main.item_profile.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.util.NotificationBroadcastReceiver
-import org.rfcx.audiomoth.view.CreateStreamActivity.Companion.DEVICE_ID
 import org.rfcx.audiomoth.view.DeploymentProtocol
 import java.util.*
 import kotlin.collections.ArrayList
@@ -211,47 +211,57 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
         }
     }
 
-    private fun setNextOnClick() {
-        nextButton.setOnClickListener {
-            deploymentProtocol?.saveUser()
-
-            if (arguments?.containsKey(DEVICE_ID) == true) {
-                arguments?.let {
-                    val deviceId = it.getString(DEVICE_ID)
-                    if (deviceId != null) {
-                        val timeRecordingPeriod = arrayListOf<String>()
-                        if (customRecordingPeriod) {
-                            timeState.forEach { timeStatus ->
-                                if (timeStatus.state) {
-                                    timeRecordingPeriod.add(timeStatus.time)
-                                }
-                            }
-                            recordingPeriod = timeRecordingPeriod
-                        } else {
-                            recordingPeriod = arrayListOf()
-                        }
-
-                        when (durationSelected) {
-                            RECOMMENDED -> {
-                                recordingDuration = 5
-                                sleepDuration = 10
-                            }
-
-                            CONTINUOUS -> {
-                                recordingDuration = 0
-                                sleepDuration = 0
-                            }
-
-                            CUSTOM -> {
-                                recordingDuration =
-                                    recordingDurationEditText.text.toString().toInt()
-                                sleepDuration = sleepDurationEditText.text.toString().toInt()
-                            }
-                        }
-                        // Todo: start notification here
-                    }
+    private fun setupData() {
+        val timeRecordingPeriod = arrayListOf<String>()
+        recordingPeriod = if (customRecordingPeriod) {
+            timeState.forEach { timeStatus ->
+                if (timeStatus.state) {
+                    timeRecordingPeriod.add(timeStatus.time)
                 }
             }
+            timeRecordingPeriod
+        } else {
+            arrayListOf()
+        }
+
+        when (durationSelected) {
+            RECOMMENDED -> {
+                recordingDuration = 5
+                sleepDuration = 10
+            }
+
+            CONTINUOUS -> {
+                recordingDuration = 0
+                sleepDuration = 0
+            }
+
+            CUSTOM -> {
+                recordingDuration =
+                    recordingDurationEditText.text.toString().toInt()
+                sleepDuration = sleepDurationEditText.text.toString().toInt()
+            }
+        }
+    }
+
+    private fun setNextOnClick() {
+        nextButton.setOnClickListener {
+            val profileName = profileEditText.text.toString()
+            if (profileName.isNotEmpty()) {
+                setupData()
+
+                val profile = Profile(
+                    gain,
+                    profileEditText.text.toString(),
+                    sampleRate,
+                    recordingDuration,
+                    sleepDuration,
+                    recordingPeriod,
+                    durationSelected
+                )
+                deploymentProtocol?.saveProfile(profile)
+            }
+
+//            deploymentProtocol?.saveUser()
         }
     }
 
