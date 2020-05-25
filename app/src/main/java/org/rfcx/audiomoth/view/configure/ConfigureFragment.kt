@@ -28,7 +28,6 @@ import kotlin.collections.ArrayList
 class ConfigureFragment : Fragment(), OnItemClickListener {
 
     private var deploymentProtocol: DeploymentProtocol? = null
-    private val recordingPeriodAdapter by lazy { RecordingPeriodAdapter(this) }
     private val timeAdapter by lazy { TimeAdapter(this, context) }
 
     private val sampleRateList = arrayOf("8", "16", "32", "48", "96", "192", "256", "384")
@@ -382,11 +381,6 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
         }
     }
 
-    override fun onItemClick(position: Int) {
-        recordingPeriod.removeAt(position)
-        recordingPeriodAdapter.items = recordingPeriod
-    }
-
     override fun onTimeItemClick(item: TimeItem, position: Int) {
         timeState[position] = TimeItem(item.time, !item.state)
         timeAdapter.items = timeState
@@ -406,7 +400,6 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
 }
 
 interface OnItemClickListener {
-    fun onItemClick(position: Int)
     fun onTimeItemClick(item: TimeItem, position: Int)
 }
 

@@ -19,7 +19,6 @@ import org.rfcx.audiomoth.view.configure.PerformBatteryFragment.Companion.TEST_B
 import org.rfcx.audiomoth.view.configure.SyncFragment.Companion.BEFORE_SYNC
 
 class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
-
     private var currentStep = 0
     private val steps by lazy { resources.getStringArray(R.array.steps) }
     private var profile: Profile? = null
@@ -88,9 +87,8 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
             3 -> {
                 startFragment(PerformBatteryFragment.newInstance(TEST_BATTERY, null))
             }
-            else -> {
-                startFragment(ExampleFragment.newInstance(currentStep))
-                showDeployButton()
+            4 -> {
+                startFragment(DeployFragment.newInstance())
             }
         }
     }
@@ -261,13 +259,9 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
             .commit()
     }
 
-    private fun showDeployButton() {
-        setCompleteTextButton(getString(R.string.deploy))
-        showCompleteButton()
-        completeStepButton.setOnClickListener {
-            nextStep()
-            finish()
-        }
+    override fun completeStep() {
+        nextStep()
+        finish()
     }
 
     private fun View.hideKeyboard() = this.let {
@@ -290,6 +284,7 @@ interface DeploymentProtocol {
     fun showCompleteButton()
     fun nextStep()
     fun backStep()
+    fun completeStep()
 
     fun openConfigure(profile: Profile)
     fun openSync(status: String)

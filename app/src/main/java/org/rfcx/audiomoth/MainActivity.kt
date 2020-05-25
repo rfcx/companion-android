@@ -41,9 +41,23 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private var deployments = listOf<Deployment>()
     private var deploymentSource: GeoJsonSource? = null
     private var deploymentFeatures: FeatureCollection? = null
+    private val locationPermissions by lazy { LocationPermissions(this) }
 
-    override
-    fun onCreate(savedInstanceState: Bundle?) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        locationPermissions.handleActivityResult(requestCode, resultCode)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        locationPermissions.handleRequestResult(requestCode, grantResults)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Mapbox.getInstance(this, getString(R.string.mapbox_token))
         setContentView(R.layout.activity_main)
@@ -51,11 +65,19 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         setView(savedInstanceState)
     }
 
+    private fun checkThenAccquireLocation(style: Style) {
+        locationPermissions.check { isAllowed: Boolean ->
+            if (isAllowed) {
+                enableLocationComponent(style)
+            }
+        }
+    }
+
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
         mapboxMap.setStyle(Style.OUTDOORS) {
+            checkThenAccquireLocation(it)
             setupSources(it)
-            enableLocationComponent(it)
             setupImages(it)
             setupMarkerLayers(it)
             setupWindowInfo(it)
@@ -138,7 +160,10 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 Pair(PROPERTY_MARKER_LOCATION_ID, it.location.id),
                 Pair(PROPERTY_MARKER_IMAGE, Battery.getBatteryPinImage(it.batteryDepletedAt.time)),
                 Pair(PROPERTY_MARKER_TITLE, it.location.name),
-                Pair(PROPERTY_MARKER_CAPTION, Battery.getPredictionBattery(it.batteryDepletedAt.time))
+                Pair(
+                    PROPERTY_MARKER_CAPTION,
+                    Battery.getPredictionBattery(it.batteryDepletedAt.time)
+                )
             )
             Feature.fromGeometry(
                 fromLngLat(it.location.longitude, it.location.latitude),
