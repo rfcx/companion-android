@@ -1,5 +1,12 @@
 <resources>
-    <string name="app_name">rfcx-audiomoth-android</string>
+
+    <!-- LoginActivity -->
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login_sign_in_button_label">Sign in</string>
+    <string name="powered_by">Powered by</string>
+    <string name="pls_fill_email">Please fill email</string>
+    <string name="pls_fill_password">Please fill password</string>
 
     <!--  MainActivity  -->
     <string name="ok">OK</string>
@@ -61,7 +68,7 @@
 
     <!--  Perform Battery  -->
     <string name="test">test</string>
-    <string name="skip">skip</string>
+    <string name="skip">Skip</string>
     <string name="it_full">or, if it is full then:</string>
     <string name="how_many_time">How many time did the green LED flash?</string>
     <string name="try_again">try again</string>
@@ -79,7 +86,6 @@
     <string name="new_location">New location</string>
     <string name="existing">Existing</string>
     <string name="next">Next</string>
-
 
     <!--  SelectProfileFragment  -->
     <string name="use_an_existing">Use an existing profile</string>
@@ -110,5 +116,7 @@
 
     <string name="location_permission_msg">Deploy App would like to use your location</string>
     <string name="notification_location_not_availability">Please enable your device\'s location settings</string>
+
+    <string name="an_error_occurred">Service unavailable</string>
 
 </resources>

@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
@@ -54,6 +54,14 @@
 
     <style name="AudioMothText.Body.Headline" parent="Base.TextAppearance.AppCompat.Headline">
         <item name="android:textColor">@color/text_secondary</item>
+    </style>
+
+    <!-- EditText -->
+    <style name="AudioMothEditText" parent="Widget.AppCompat.EditText" />
+
+    <style name="AudioMothEditText.Background" parent="AudioMothEditText">
+        <item name="android:padding">@dimen/margin_padding_normal</item>
+        <item name="android:backgroundTint" tools:targetApi="lollipop">@color/gray_30</item>
     </style>
 
 </resources>

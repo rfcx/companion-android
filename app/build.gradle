@@ -13,6 +13,7 @@ android {
     buildToolsVersion "29.0.3"
     defaultConfig {
         applicationId "org.rfcx.audiomoth"
+        manifestPlaceholders = [auth0Domain: "@string/auth0_domain", auth0Scheme: "@string/auth0_scheme"]
         minSdkVersion 19
         targetSdkVersion 29
         versionCode 1
@@ -59,6 +60,22 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.9.0'
     kapt 'com.github.bumptech.glide:compiler:4.9.0'
     implementation 'com.zhihu.android:matisse:0.5.3-beta3'
+
+    /* retrofit */
+    implementation 'com.squareup.retrofit2:retrofit:2.7.1'
+    implementation 'com.squareup.retrofit2:converter-gson:2.7.1'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.7'
+
+    /* auth0 */
+    implementation('com.auth0.android:auth0:1.14.1') {
+        exclude group: 'com.android.support', module: 'customtabs'
+    }
+    implementation 'com.auth0.android:jwtdecode:1.2.0'
+    implementation 'io.jsonwebtoken:jjwt-api:0.10.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.10.5'
+    runtimeOnly('io.jsonwebtoken:jjwt-orgjson:0.10.5') {
+        exclude group: 'org.json', module: 'json' //provided by Android natively
+    }
 
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.12'

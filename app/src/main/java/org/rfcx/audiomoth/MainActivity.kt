@@ -1,5 +1,6 @@
 package org.rfcx.audiomoth
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.PointF
@@ -42,18 +43,6 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private var deploymentSource: GeoJsonSource? = null
     private var deploymentFeatures: FeatureCollection? = null
     private val locationPermissions by lazy { LocationPermissions(this) }
-
-    private val locationListener = object : android.location.LocationListener {
-        override fun onLocationChanged(p0: Location?) {
-            p0?.let {
-                moveCamera(LatLng(it.latitude, it.longitude))
-            }
-        }
-
-        override fun onStatusChanged(p0: String?, p1: Int, p2: Bundle?) {}
-        override fun onProviderEnabled(p0: String?) {}
-        override fun onProviderDisabled(p0: String?) {}
-    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -348,5 +337,10 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         private const val PROPERTY_MARKER_TITLE = "title"
         private const val PROPERTY_MARKER_CAPTION = "caption"
         private const val PROPERTY_MARKER_IMAGE = "marker-image"
+
+        fun startActivity(context: Context) {
+            val intent = Intent(context, MainActivity::class.java)
+            context.startActivity(intent)
+        }
     }
 }
