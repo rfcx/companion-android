@@ -150,36 +150,38 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         startFragment(PerformBatteryFragment.newInstance(status, image))
     }
 
-    override fun saveUser() {
+    override fun saveUser(callback: (Boolean) -> Unit) {
         view1.hideKeyboard()
         if (guid != null && name != null) {
             val user = User(name)
             Firestore(this).saveUser(guid, user) { message, success ->
-                if (success) {
-                    saveLocation()
-                } else {
+                callback(success)
+                if (!success) {
                     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
 
-    override fun saveLocation() {
+    override fun saveLocation(callback: (Boolean) -> Unit) {
         if (guid != null && locate != null) {
             locate?.let {
                 Firestore(this).saveLocation(guid, it) { str, success ->
+                    callback(success)
                     if (success) {
                         locateId = str
-                        saveProfile()
                         setLocationInDeployment(it)
                     } else {
                         Toast.makeText(this, str, Toast.LENGTH_SHORT).show()
                     }
                 }
             }
-
         } else {
-            saveProfile()
+            saveProfile {
+                if (it) {
+                    nextStep()
+                }
+            }
         }
     }
 
@@ -201,27 +203,27 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         }
     }
 
-    override fun saveProfile() {
+    override fun saveProfile(callback: (Boolean) -> Unit) {
         if (guid != null && profile != null) {
             profile?.let {
                 setConfiguration(it)
                 if (it.name.isNotEmpty()) {
                     Firestore(this).saveProfile(guid, it) { str, success ->
+                        callback(success)
                         if (success) {
                             if (str != null) {
                                 profileId = str
                             }
-                            nextStep()
                         } else {
                             Toast.makeText(this, str, Toast.LENGTH_SHORT).show()
                         }
                     }
                 } else {
-                    nextStep()
+                    callback(true)
                 }
             }
         } else {
-            nextStep()
+            callback(true)
         }
     }
 
@@ -305,8 +307,8 @@ interface DeploymentProtocol {
     fun setLocationInDeployment(locate: Locate)
     fun updateLocation()
 
-    fun saveUser()
-    fun saveLocation()
-    fun saveProfile()
+    fun saveUser(callback: (Boolean) -> Unit)
+    fun saveLocation(callback: (Boolean) -> Unit)
+    fun saveProfile(callback: (Boolean) -> Unit)
     fun saveDeployment(deployment: Deployment)
 }

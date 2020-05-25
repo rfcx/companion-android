@@ -108,6 +108,7 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
             recordingDurationEditText.setText(it.recordingDuration.toString())
         }
 
+        setNextButton(true)
         setGainLayout()
         setSampleRateLayout()
         setTimeRecyclerView()
@@ -242,8 +243,14 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
         }
     }
 
+    private fun setNextButton(show: Boolean) {
+        nextButton.visibility = if (show) View.VISIBLE else View.GONE
+        configProgressBar.visibility = if (!show) View.VISIBLE else View.GONE
+    }
+
     private fun setNextOnClick() {
         nextButton.setOnClickListener {
+            setNextButton(false)
             setupData()
 
             val profile = Profile(
@@ -256,7 +263,25 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
                 durationSelected
             )
             deploymentProtocol?.setProfile(profile)
-            deploymentProtocol?.saveUser()
+            deploymentProtocol?.saveUser { saveUserSuccess ->
+                if (saveUserSuccess) {
+                    deploymentProtocol?.saveLocation { saveLocationSuccess ->
+                        if (saveLocationSuccess) {
+                            deploymentProtocol?.saveProfile { saveProfileSuccess ->
+                                if (saveProfileSuccess) {
+                                    deploymentProtocol?.nextStep()
+                                } else {
+                                    setNextButton(true)
+                                }
+                            }
+                        } else {
+                            setNextButton(true)
+                        }
+                    }
+                } else {
+                    setNextButton(true)
+                }
+            }
         }
     }
 
