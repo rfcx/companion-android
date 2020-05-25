@@ -26,6 +26,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     private var locate: Locate? = null
     private var profileId: String = ""
     private var locateId: String? = null
+    private var deploymentId: String? = null
     private var configuration: Configuration? = null
     private var locationInDeployment: LocationInDeployment? = null
 
@@ -110,6 +111,10 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         return profileId
     }
 
+    override fun getDeploymentId(): String? {
+        return deploymentId
+    }
+
     override fun geConfiguration(): Configuration? {
         return configuration
     }
@@ -149,7 +154,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         view1.hideKeyboard()
         if (guid != null && name != null) {
             val user = User(name)
-            Firestore().saveUser(guid, user) { message, success ->
+            Firestore(this).saveUser(guid, user) { message, success ->
                 if (success) {
                     saveLocation()
                 } else {
@@ -162,7 +167,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     override fun saveLocation() {
         if (guid != null && locate != null) {
             locate?.let {
-                Firestore().saveLocation(guid, it) { str, success ->
+                Firestore(this).saveLocation(guid, it) { str, success ->
                     if (success) {
                         locateId = str
                         saveProfile()
@@ -175,6 +180,16 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
 
         } else {
             saveProfile()
+        }
+    }
+
+    override fun updateLocation() {
+        if (guid != null && locateId != null && deploymentId != null) {
+            locateId?.let { locateId ->
+                deploymentId?.let { deploymentId ->
+                    Firestore(this).updateLocation(guid, locateId, deploymentId)
+                }
+            }
         }
     }
 
@@ -191,7 +206,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
             profile?.let {
                 setConfiguration(it)
                 if (it.name.isNotEmpty()) {
-                    Firestore().saveProfile(guid, it) { str, success ->
+                    Firestore(this).saveProfile(guid, it) { str, success ->
                         if (success) {
                             if (str != null) {
                                 profileId = str
@@ -223,8 +238,10 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
 
     override fun saveDeployment(deployment: Deployment) {
         if (guid != null) {
-            Firestore().saveDeployment(guid, deployment) { str, success ->
+            Firestore(this).saveDeployment(guid, deployment) { str, success ->
                 if (success) {
+                    deploymentId = str
+                    updateLocation()
                     nextStep()
                 } else {
                     Toast.makeText(this, str, Toast.LENGTH_SHORT).show()
@@ -278,6 +295,7 @@ interface DeploymentProtocol {
 
     fun getProfile(): Profile?
     fun getProfileId(): String?
+    fun getDeploymentId(): String?
     fun geConfiguration(): Configuration?
     fun getLocationInDeployment(): LocationInDeployment?
     fun getNameNextStep(): String // example get data from parent
@@ -285,6 +303,7 @@ interface DeploymentProtocol {
     fun setProfile(profile: Profile)
     fun setLocateId(locateId: String)
     fun setLocationInDeployment(locate: Locate)
+    fun updateLocation()
 
     fun saveUser()
     fun saveLocation()

@@ -25,7 +25,7 @@ class DashboardStreamActivity : AppCompatActivity() {
             if (deviceId != null) {
                 currentDeviceId = deviceId
                 val docRef =
-                    Firestore().db.collection(CreateStreamActivity.DEVICES).document(deviceId)
+                    Firestore(this).db.collection(CreateStreamActivity.DEVICES).document(deviceId)
                 docRef.collection("streams").get()
                     .addOnSuccessListener { document ->
                         if (document != null) {
@@ -53,7 +53,7 @@ class DashboardStreamActivity : AppCompatActivity() {
         dashboardStreamAdapter.onDashboardClick = object : OnDashboardClickListener {
             override fun onDashboardClick(streamName: String) {
                 val docRef =
-                    Firestore().db.collection(CreateStreamActivity.DEVICES)
+                    Firestore(this@DashboardStreamActivity).db.collection(CreateStreamActivity.DEVICES)
                         .document(currentDeviceId)
                 docRef.collection("streams").document(streamName).get()
                     .addOnSuccessListener { document ->

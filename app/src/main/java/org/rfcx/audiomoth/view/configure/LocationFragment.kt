@@ -35,6 +35,7 @@ import org.rfcx.audiomoth.entity.LocateItem
 import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.util.FirestoreResponseCallback
+import org.rfcx.audiomoth.util.Preferences
 import org.rfcx.audiomoth.view.DeploymentProtocol
 
 class LocationFragment : Fragment(), OnMapReadyCallback {
@@ -97,12 +98,14 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-        Firestore().haveProfiles { isHave ->
-            if (isHave) {
-                deploymentProtocol?.nextStep()
-            } else {
-                // open configure page by create Profile Default?
-                deploymentProtocol?.openConfigure(Profile.default())
+        context?.let {
+            Firestore(it).haveProfiles { isHave ->
+                if (isHave) {
+                    deploymentProtocol?.nextStep()
+                } else {
+                    // open configure page by create Profile Default?
+                    deploymentProtocol?.openConfigure(Profile.default())
+                }
             }
         }
     }
@@ -180,31 +183,33 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun retrieveLocations() {
-        Firestore().getLocations(
-            object : FirestoreResponseCallback<List<LocateItem?>> {
-                override fun onSuccessListener(response: List<LocateItem?>) {
-                    val locations = ArrayList<String>()
-                    response.forEach {
-                        it?.let { location ->
-                            location.locate?.name?.let { it1 -> locations.add(it1) }
-                            val latitude = location.locate?.latitude
-                            val longitude = location.locate?.longitude
-                            if (latitude != null && longitude != null) {
-                                locationsLatLng.add(LatLng(latitude, longitude))
+        context?.let {
+            Firestore(it).getLocations(
+                object : FirestoreResponseCallback<List<LocateItem?>> {
+                    override fun onSuccessListener(response: List<LocateItem?>) {
+                        val locations = ArrayList<String>()
+                        response.forEach {
+                            it?.let { location ->
+                                location.locate?.name?.let { it1 -> locations.add(it1) }
+                                val latitude = location.locate?.latitude
+                                val longitude = location.locate?.longitude
+                                if (latitude != null && longitude != null) {
+                                    locationsLatLng.add(LatLng(latitude, longitude))
+                                }
+                                locateItemList.add(location)
+                                setRecommendLocation()
                             }
-                            locateItemList.add(location)
-                            setRecommendLocation()
                         }
+                        arrayAdapter.addAll(locations)
+                        arrayAdapter.notifyDataSetChanged()
                     }
-                    arrayAdapter.addAll(locations)
-                    arrayAdapter.notifyDataSetChanged()
-                }
 
-                override fun addOnFailureListener(exception: Exception) {
-                    newLocationRadioButton.isChecked = true
-                    existingRadioButton.isEnabled = false
-                }
-            })
+                    override fun addOnFailureListener(exception: Exception) {
+                        newLocationRadioButton.isChecked = true
+                        existingRadioButton.isEnabled = false
+                    }
+                })
+        }
     }
 
     private fun setRecommendLocation() {
@@ -233,6 +238,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
+        val preferences = context?.let { Preferences.getInstance(it) }
+        val guid = preferences?.getString(Preferences.USER_GUID, "")
+
         this.mapboxMap = mapboxMap
         mapboxMap.setStyle(Style.OUTDOORS) {
             symbolManager = SymbolManager(mapView, mapboxMap, it)
@@ -250,7 +258,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             radioCheckedChange()
 
             getLastLocation()
-            getLocation(Firestore.USER_ID) // TODO: get real user profile
+            getLocation(guid)
             setAdapter()
             setLocationSpinner()
         }

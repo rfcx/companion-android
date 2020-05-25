@@ -1,18 +1,22 @@
 package org.rfcx.audiomoth.util
 
+import android.content.Context
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import org.rfcx.audiomoth.entity.*
+import org.rfcx.audiomoth.entity.Deployment.Companion.LAST_DEPLOYMENT
 
 interface FirestoreResponseCallback<T> {
     fun onSuccessListener(response: T)
     fun addOnFailureListener(exception: Exception)
 }
 
-class Firestore {
+class Firestore (context: Context) {
     val db = Firebase.firestore
     /* TODO: update get user */
-    private val userDocument = db.collection(COLLECTION_USERS).document(USER_ID)
+    private val preferences = Preferences.getInstance(context)
+    private val guid = preferences.getString(Preferences.USER_GUID, "")
+    private val userDocument = db.collection(COLLECTION_USERS).document(guid)
 
     fun saveUser(guid: String, user: User, callback: (String?, Boolean) -> Unit) {
         db.collection(COLLECTION_USERS).document(guid)
@@ -99,6 +103,12 @@ class Firestore {
             .addOnFailureListener {
                 callback.addOnFailureListener(it)
             }
+    }
+
+    fun updateLocation(guid: String, locateId: String, deploymentId: String) {
+        db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_LOCATIONS)
+            .document(locateId)
+            .update(LAST_DEPLOYMENT, deploymentId)
     }
 
     fun getProfiles(callback: FirestoreResponseCallback<List<Profile?>?>) {

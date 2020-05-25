@@ -89,7 +89,7 @@ class CreateStreamActivity : AppCompatActivity() {
     }
 
     private fun getSites() {
-        Firestore().db.collection(SITES)
+        Firestore(this).db.collection(SITES)
             .get()
             .addOnSuccessListener { result ->
                 sites = ArrayList()

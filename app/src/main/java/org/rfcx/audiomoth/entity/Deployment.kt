@@ -10,4 +10,8 @@ data class Deployment(
     val configuration: Configuration = Configuration.default(),
     val location: LocationInDeployment = LocationInDeployment.default(),
     val profileId: String = ""
-)
+) {
+    companion object {
+        const val LAST_DEPLOYMENT = "lastDeployment"
+    }
+}

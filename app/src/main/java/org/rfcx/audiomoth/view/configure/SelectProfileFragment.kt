@@ -71,22 +71,24 @@ class SelectProfileFragment : Fragment(), (Profile) -> Unit {
 
     private fun retrieveProfiles() {
         checkState(SHOW_LOADING)
-        Firestore().getProfiles(object : FirestoreResponseCallback<List<Profile?>?> {
-            override fun onSuccessListener(response: List<Profile?>?) {
-                val items = arrayListOf<Profile>()
-                response?.forEach {
-                    if (it != null) {
-                        items.add(it)
+        context?.let {
+            Firestore(it).getProfiles(object : FirestoreResponseCallback<List<Profile?>?> {
+                override fun onSuccessListener(response: List<Profile?>?) {
+                    val items = arrayListOf<Profile>()
+                    response?.forEach {
+                        if (it != null) {
+                            items.add(it)
+                        }
                     }
+                    profilesAdapter.items = items
+                    checkState(SHOW_LIST_PROFILE)
                 }
-                profilesAdapter.items = items
-                checkState(SHOW_LIST_PROFILE)
-            }
 
-            override fun addOnFailureListener(exception: Exception) {
-                checkState(SHOW_TRY_AGAIN)
-            }
-        })
+                override fun addOnFailureListener(exception: Exception) {
+                    checkState(SHOW_TRY_AGAIN)
+                }
+            })
+        }
     }
 
     private fun checkState(state: String) {

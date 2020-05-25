@@ -119,7 +119,7 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun getDeployments() {
-        Firestore().getDeployments(object : FirestoreResponseCallback<List<Deployment>> {
+        Firestore(this).getDeployments(object : FirestoreResponseCallback<List<Deployment>> {
             override fun onSuccessListener(response: List<Deployment>) {
                 handleMarkerDeployment(response)
             }
