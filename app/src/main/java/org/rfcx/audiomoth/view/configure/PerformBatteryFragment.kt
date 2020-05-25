@@ -17,6 +17,7 @@ import java.sql.Timestamp
 class PerformBatteryFragment : Fragment() {
     private var status: String? = null
     private var deploymentProtocol: DeploymentProtocol? = null
+    private val day = 24 * 60 * 60 * 1000
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -55,7 +56,24 @@ class PerformBatteryFragment : Fragment() {
         }
 
         skipButton.setOnClickListener {
-            deploymentProtocol?.nextStep()
+            val batteryDepletedAt = Timestamp(System.currentTimeMillis() + (day * 6))
+            val deployedAt = Timestamp(System.currentTimeMillis())
+            val configuration = deploymentProtocol?.geConfiguration()
+            val location = deploymentProtocol?.getLocationInDeployment()
+            val profileId = deploymentProtocol?.getProfileId()
+            if (configuration != null && location != null && profileId != null) {
+                val deployment =
+                    Deployment(
+                        batteryDepletedAt,
+                        deployedAt,
+                        100,
+                        true,
+                        configuration,
+                        location,
+                        profileId
+                    )
+                deploymentProtocol?.saveDeployment(deployment)
+            }
         }
     }
 
@@ -140,7 +158,6 @@ class PerformBatteryFragment : Fragment() {
         batteryLevelImageView.setImageResource(image)
 
         nextButton.setOnClickListener {
-            val day = 24 * 60 * 60 * 1000
             val batteryDepletedAt = Timestamp(System.currentTimeMillis() + (day * numberOfDays))
             val deployedAt = Timestamp(System.currentTimeMillis())
             val configuration = deploymentProtocol?.geConfiguration()
