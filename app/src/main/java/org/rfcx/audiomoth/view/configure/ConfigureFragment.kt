@@ -18,7 +18,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_configure.*
-import kotlinx.android.synthetic.main.item_profile.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.util.NotificationBroadcastReceiver
@@ -245,21 +244,18 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
 
     private fun setNextOnClick() {
         nextButton.setOnClickListener {
-            val profileName = profileEditText.text.toString()
-            if (profileName.isNotEmpty()) {
-                setupData()
+            setupData()
 
-                val profile = Profile(
-                    gain,
-                    profileEditText.text.toString(),
-                    sampleRate,
-                    recordingDuration,
-                    sleepDuration,
-                    recordingPeriod,
-                    durationSelected
-                )
-                deploymentProtocol?.setProfile(profile)
-            }
+            val profile = Profile(
+                gain,
+                profileEditText.text.toString(),
+                sampleRate,
+                recordingDuration,
+                sleepDuration,
+                recordingPeriod,
+                durationSelected
+            )
+            deploymentProtocol?.setProfile(profile)
             deploymentProtocol?.saveUser()
         }
     }
