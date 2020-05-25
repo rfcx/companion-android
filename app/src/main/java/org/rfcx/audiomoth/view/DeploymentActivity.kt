@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_deployment.*
 import kotlinx.android.synthetic.main.fragment_configure.*
+import org.rfcx.audiomoth.MainActivity
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.*
 import org.rfcx.audiomoth.util.Firestore
@@ -259,8 +260,9 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
             .commit()
     }
 
-    override fun completeStep() {
+    override fun completeStep(images: ArrayList<String>?) {
         nextStep()
+        MainActivity.startActivity(this, images)
         finish()
     }
 
@@ -284,7 +286,7 @@ interface DeploymentProtocol {
     fun showCompleteButton()
     fun nextStep()
     fun backStep()
-    fun completeStep()
+    fun completeStep(images: ArrayList<String>?)
 
     fun openConfigure(profile: Profile)
     fun openSync(status: String)

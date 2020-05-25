@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_deploy.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.util.Storage
 import org.rfcx.audiomoth.view.DeploymentProtocol
 
 class DeployFragment : BaseImageFragment() {
@@ -32,8 +31,9 @@ class DeployFragment : BaseImageFragment() {
         super.onViewCreated(view, savedInstanceState)
         setupImageRecycler()
         finishButton.setOnClickListener {
-            context?.let { it1 -> Storage(it1).uploadImage(imageAdapter.getNewAttachImage()) }
-            deploymentProtocol?.completeStep()
+            val images = ArrayList<String>()
+            imageAdapter.getNewAttachImage().map { images.add(it) }
+            deploymentProtocol?.completeStep(images)
         }
     }
 

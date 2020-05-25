@@ -63,6 +63,11 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_main)
 
         setView(savedInstanceState)
+
+        val images = intent.extras?.getStringArrayList(IMAGES)
+        if(!images.isNullOrEmpty()){
+            Storage(this).uploadImage(images)
+        }
     }
 
     private fun checkThenAccquireLocation(style: Style) {
@@ -330,6 +335,8 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     companion object {
+        private const val IMAGES = "IMAGES"
+
         private const val SOURCE_DEPLOYMENT = "source.deployment"
         private const val MARKER_DEPLOYMENT_ID = "marker.deployment"
         private const val WINDOW_DEPLOYMENT_ID = "info.deployment"
@@ -340,8 +347,9 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         private const val PROPERTY_MARKER_CAPTION = "caption"
         private const val PROPERTY_MARKER_IMAGE = "marker-image"
 
-        fun startActivity(context: Context) {
+        fun startActivity(context: Context, images: ArrayList<String>?) {
             val intent = Intent(context, MainActivity::class.java)
+            intent.putStringArrayListExtra(IMAGES, images)
             context.startActivity(intent)
         }
     }

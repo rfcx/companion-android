@@ -15,7 +15,7 @@ class TutorialActivity : AppCompatActivity() {
         setContentView(R.layout.activity_tutorial)
 
         skipTextView.setOnClickListener {
-            MainActivity.startActivity(this)
+            MainActivity.startActivity(this, null)
             finish()
         }
     }
