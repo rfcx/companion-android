@@ -5,6 +5,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import org.rfcx.audiomoth.entity.*
 import org.rfcx.audiomoth.entity.Deployment.Companion.LAST_DEPLOYMENT
+import org.rfcx.audiomoth.entity.Deployment.Companion.PHOTOS
 
 interface FirestoreResponseCallback<T> {
     fun onSuccessListener(response: T)
@@ -109,6 +110,12 @@ class Firestore (context: Context) {
         db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_LOCATIONS)
             .document(locateId)
             .update(LAST_DEPLOYMENT, deploymentId)
+    }
+
+    fun updateDeployment(guid: String, deploymentId: String, photos: ArrayList<String>) {
+        db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_DEPLOYMENTS)
+            .document(deploymentId)
+            .update(PHOTOS, photos)
     }
 
     fun getProfiles(callback: FirestoreResponseCallback<List<Profile?>?>) {

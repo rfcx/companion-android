@@ -2,14 +2,13 @@ package org.rfcx.audiomoth.util
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.Task
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import java.io.File
 
-class Storage(context: Context) {
+class Storage(val context: Context) {
     private val storage = FirebaseStorage.getInstance()
     private val storageRef = storage.reference
     private val preferences = Preferences.getInstance(context)
@@ -17,6 +16,8 @@ class Storage(context: Context) {
 
     fun uploadImage(uris: List<String>, deploymentId: String, callback: (Int, Int) -> Unit) {
         var count = uris.size
+        val pathImages = arrayListOf<String>()
+
         uris.forEach {
             callback(uris.size, count)
 
@@ -40,8 +41,10 @@ class Storage(context: Context) {
                     count -= 1
                     val downloadUri = task.result
                     callback(uris.size, count)
-                    Log.d("downloadUri", "$downloadUri")
-                    Log.d("downloadUri", "$deploymentId")
+                    pathImages.add(downloadUri.toString())
+                    if (count == 0) {
+                        Firestore(context).updateDeployment(guid, deploymentId, pathImages)
+                    }
                 }
             }
         }

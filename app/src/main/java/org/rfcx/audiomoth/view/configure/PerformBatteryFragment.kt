@@ -70,7 +70,8 @@ class PerformBatteryFragment : Fragment() {
                         true,
                         configuration,
                         location,
-                        profileId
+                        profileId,
+                        arrayListOf()
                     )
                 deploymentProtocol?.saveDeployment(deployment)
             }
@@ -172,7 +173,8 @@ class PerformBatteryFragment : Fragment() {
                         true,
                         configuration,
                         location,
-                        profileId
+                        profileId,
+                        arrayListOf()
                     )
                 deploymentProtocol?.saveDeployment(deployment)
             }
