@@ -2,10 +2,7 @@ package org.rfcx.audiomoth.util
 
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import org.rfcx.audiomoth.entity.Deployment
-import org.rfcx.audiomoth.entity.Locate
-import org.rfcx.audiomoth.entity.Profile
-import org.rfcx.audiomoth.entity.User
+import org.rfcx.audiomoth.entity.*
 
 interface FirestoreResponseCallback<T> {
     fun onSuccessListener(response: T)
@@ -83,13 +80,17 @@ class Firestore {
 
     }
 
-    fun getLocations(callback: FirestoreResponseCallback<List<Locate?>>) {
+    fun getLocations(callback: FirestoreResponseCallback<List<LocateItem?>>) {
         userDocument.collection(COLLECTION_LOCATIONS).get()
             .addOnSuccessListener { querySnapshot ->
                 val documents = querySnapshot.documents
+                val response = ArrayList<LocateItem>()
 
-                val response = if (documents.isNotEmpty()) {
-                    documents.map { it.toObject(Locate::class.java) }
+                if (documents.isNotEmpty()) {
+                    documents.map {
+                        val locate = it.toObject(Locate::class.java)
+                        response.add(LocateItem(locate, it.id))
+                    }
                 } else {
                     arrayListOf()
                 }

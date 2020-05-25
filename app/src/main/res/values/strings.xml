@@ -111,5 +111,6 @@
     <string name="deploy">Deploy</string>
 
     <string name="an_error_occurred">Service unavailable</string>
+    <string name="error_has_occurred">An error has occurred Please try again later</string>
 
 </resources>

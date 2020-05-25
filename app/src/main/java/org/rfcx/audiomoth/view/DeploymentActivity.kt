@@ -120,6 +120,10 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         this.locate = locate
     }
 
+    override fun setLocateId(locateId: String) {
+        this.locateId = locateId
+    }
+
     override fun setProfile(profile: Profile) {
         this.profile = profile
     }
@@ -167,11 +171,11 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
             }
 
         } else {
-            nextStep()
+            saveProfile()
         }
     }
 
-    private fun setLocationInDeployment(locate: Locate) {
+    override fun setLocationInDeployment(locate: Locate) {
         if (locateId != null) {
             locationInDeployment = locateId?.let {
                 LocationInDeployment(it, locate.name, locate.latitude, locate.longitude)
@@ -219,6 +223,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
             }
         } else {
             nextStep()
+            Toast.makeText(this, getString(R.string.error_has_occurred), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -263,6 +268,8 @@ interface DeploymentProtocol {
     fun getNameNextStep(): String // example get data from parent
     fun setLocate(locate: Locate)
     fun setProfile(profile: Profile)
+    fun setLocateId(locateId: String)
+    fun setLocationInDeployment(locate: Locate)
 
     fun saveUser()
     fun saveLocation()

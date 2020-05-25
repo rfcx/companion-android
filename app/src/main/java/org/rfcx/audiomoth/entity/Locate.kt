@@ -6,3 +6,5 @@ data class Locate(
     val latitude: Double = 0.0,
     val longitude: Double = 0.0
 )
+
+data class LocateItem(var locate: Locate?, var docId: String)

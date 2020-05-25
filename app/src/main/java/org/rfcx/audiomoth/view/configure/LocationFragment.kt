@@ -31,6 +31,7 @@ import com.mapbox.mapboxsdk.utils.BitmapUtils
 import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Locate
+import org.rfcx.audiomoth.entity.LocateItem
 import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.util.FirestoreResponseCallback
@@ -46,6 +47,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var locations = ArrayList<String>()
     private var locationsLatLng = ArrayList<LatLng>()
     private var locationLatLng: LatLng? = null
+    private var locateItemList = ArrayList<LocateItem>()
+    private var locateItem: LocateItem? = null
     private var location = ""
     private lateinit var arrayAdapter: ArrayAdapter<String>
     private var deploymentProtocol: DeploymentProtocol? = null
@@ -86,6 +89,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             val lng = longitudeEditText.text.toString().toDouble()
             val locate = Locate("", name, lat, lng)
             deploymentProtocol?.setLocate(locate)
+
+        } else if (existingRadioButton.isChecked) {
+            locateItem?.let {
+                deploymentProtocol?.setLocateId(it.docId)
+                it.locate?.let { it1 -> deploymentProtocol?.setLocationInDeployment(it1) }
+            }
         }
 
         Firestore().haveProfiles { isHave ->
@@ -147,6 +156,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 location = locations[position]
                 locationLatLng = locationsLatLng[position]
                 setPinOnMap(locationsLatLng[position])
+                locateItem = locateItemList[position]
 
                 setupView(
                     locationsLatLng[position].latitude.toString(),
@@ -171,14 +181,18 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private fun retrieveLocations() {
         Firestore().getLocations(
-            object : FirestoreResponseCallback<List<org.rfcx.audiomoth.entity.Locate?>> {
-                override fun onSuccessListener(response: List<org.rfcx.audiomoth.entity.Locate?>) {
+            object : FirestoreResponseCallback<List<LocateItem?>> {
+                override fun onSuccessListener(response: List<LocateItem?>) {
                     val locations = ArrayList<String>()
                     response.forEach {
                         it?.let { location ->
-                            locations.add(location.name)
-                            locationsLatLng.add(LatLng(location.latitude, location.longitude))
-
+                            location.locate?.name?.let { it1 -> locations.add(it1) }
+                            val latitude = location.locate?.latitude
+                            val longitude = location.locate?.longitude
+                            if (latitude != null && longitude != null) {
+                                locationsLatLng.add(LatLng(latitude, longitude))
+                            }
+                            locateItemList.add(location)
                             setRecommendLocation()
                         }
                     }
@@ -214,6 +228,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             }
             val position = locationsLatLng.indexOf(latLng)
             locationNameSpinner.setSelection(position)
+            locateItem = locateItemList[position]
         }
     }
 
