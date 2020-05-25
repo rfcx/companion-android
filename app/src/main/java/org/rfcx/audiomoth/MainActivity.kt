@@ -1,7 +1,9 @@
 package org.rfcx.audiomoth
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.PointF
+import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -39,9 +41,35 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private var deployments = listOf<Deployment>()
     private var deploymentSource: GeoJsonSource? = null
     private var deploymentFeatures: FeatureCollection? = null
+    private val locationPermissions by lazy { LocationPermissions(this) }
 
-    override
-    fun onCreate(savedInstanceState: Bundle?) {
+    private val locationListener = object : android.location.LocationListener {
+        override fun onLocationChanged(p0: Location?) {
+            p0?.let {
+                moveCamera(LatLng(it.latitude, it.longitude))
+            }
+        }
+
+        override fun onStatusChanged(p0: String?, p1: Int, p2: Bundle?) {}
+        override fun onProviderEnabled(p0: String?) {}
+        override fun onProviderDisabled(p0: String?) {}
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        locationPermissions.handleActivityResult(requestCode, resultCode)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        locationPermissions.handleRequestResult(requestCode, grantResults)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Mapbox.getInstance(this, getString(R.string.mapbox_token))
         setContentView(R.layout.activity_main)
@@ -49,11 +77,19 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         setView(savedInstanceState)
     }
 
+    private fun checkThenAccquireLocation(style: Style) {
+        locationPermissions.check { isAllowed: Boolean ->
+            if (isAllowed) {
+                enableLocationComponent(style)
+            }
+        }
+    }
+
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
         mapboxMap.setStyle(Style.OUTDOORS) {
+            checkThenAccquireLocation(it)
             setupSources(it)
-            enableLocationComponent(it)
             setupImages(it)
             setupMarkerLayers(it)
             setupWindowInfo(it)
