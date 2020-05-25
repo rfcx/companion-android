@@ -15,6 +15,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
@@ -79,7 +80,15 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         deploymentProtocol?.hideCompleteButton()
 
         finishButton.setOnClickListener {
-            checkProfiles()
+            if (existingRadioButton.isChecked) {
+                checkProfiles()
+            } else if (newLocationRadioButton.isChecked) {
+                if (locationNameEditText.text.toString().isNotEmpty() && latitudeEditText.text.toString().isNotEmpty() && longitudeEditText.text.toString().isNotEmpty()) {
+                    checkProfiles()
+                } else {
+                    Toast.makeText(context, getString(R.string.please_fill_information), Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
@@ -121,9 +130,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                         )
                         setPinOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
                     }
-
-                    finishButton.isEnabled = locationNameEditText.text.toString().isNotEmpty()
-
                     locationNameTextInput.visibility = View.VISIBLE
                     locationNameSpinner.visibility = View.GONE
                 }
@@ -289,22 +295,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun onLatLngChanged() {
-        locationNameEditText.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(p0: Editable?) {
-                if (p0 != null) {
-                    finishButton.isEnabled = p0.isNotEmpty()
-                }
-            }
-
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-        })
-
         latitudeEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
                 if (p0 != null) {
-                    finishButton.isEnabled = p0.isNotEmpty()
                     if (p0.toString() != "-" && p0.isNotEmpty() && p0.toString() != "." && longitudeEditText.text.toString().isNotEmpty()) {
                         if (p0.toString().toDouble() >= -90.0 && p0.toString().toDouble() <= 90) {
                             setPinOnMap(
@@ -313,6 +306,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                                     longitudeEditText.text.toString().toDouble()
                                 )
                             )
+                        } else {
+                            Toast.makeText(context, getString(R.string.latitude_must_between), Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
@@ -326,14 +321,17 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         longitudeEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
                 if (p0 != null) {
-                    finishButton.isEnabled = p0.isNotEmpty()
                     if (p0.toString() != "-" && p0.isNotEmpty() && p0.toString() != "." && latitudeEditText.text.toString().isNotEmpty()) {
-                        setPinOnMap(
-                            LatLng(
-                                latitudeEditText.text.toString().toDouble(),
-                                p0.toString().toDouble()
+                        if (latitudeEditText.text.toString().toDouble() >= -90.0 && latitudeEditText.text.toString().toDouble() <= 90) {
+                            setPinOnMap(
+                                LatLng(
+                                    latitudeEditText.text.toString().toDouble(),
+                                    p0.toString().toDouble()
+                                )
                             )
-                        )
+                        } else {
+                            Toast.makeText(context, getString(R.string.latitude_must_between), Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
             }
