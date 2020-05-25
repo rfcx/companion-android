@@ -44,7 +44,7 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login)
 
         if (CredentialKeeper(this).hasValidCredentials()) {
-            MainActivity.startActivity(this@LoginActivity, null)
+            MainActivity.startActivity(this@LoginActivity)
             finish()
         }
 

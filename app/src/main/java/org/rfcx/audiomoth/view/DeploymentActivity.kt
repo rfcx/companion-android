@@ -262,7 +262,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
 
     override fun completeStep(images: ArrayList<String>?) {
         nextStep()
-        MainActivity.startActivity(this, images)
+        deploymentId?.let { MainActivity.startActivity(this, images, it) }
         finish()
     }
 

@@ -2,6 +2,7 @@ package org.rfcx.audiomoth.util
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.Task
 import com.google.firebase.storage.FirebaseStorage
@@ -14,8 +15,11 @@ class Storage(context: Context) {
     private val preferences = Preferences.getInstance(context)
     private val guid = preferences.getString(Preferences.USER_GUID, "images")
 
-    fun uploadImage(uris: List<String>) {
+    fun uploadImage(uris: List<String>, deploymentId: String, callback: (Int, Int) -> Unit) {
+        var count = uris.size
         uris.forEach {
+            callback(uris.size, count)
+
             val file = Uri.fromFile(File(it))
 
             val ref =
@@ -33,7 +37,11 @@ class Storage(context: Context) {
                 return@Continuation ref.downloadUrl
             })?.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
+                    count -= 1
                     val downloadUri = task.result
+                    callback(uris.size, count)
+                    Log.d("downloadUri", "$downloadUri")
+                    Log.d("downloadUri", "$deploymentId")
                 }
             }
         }
