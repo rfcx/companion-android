@@ -22,7 +22,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     private val steps by lazy { resources.getStringArray(R.array.steps) }
     private var profile: Profile? = null
     private var locate: Locate? = null
-    private var profileId: String? = null
+    private var profileId: String = ""
     private var locateId: String? = null
     private var configuration: Configuration? = null
     private var locationInDeployment: LocationInDeployment? = null
@@ -187,13 +187,19 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         if (guid != null && profile != null) {
             profile?.let {
                 setConfiguration(it)
-                Firestore().saveProfile(guid, it) { str, success ->
-                    if (success) {
-                        profileId = str
-                        nextStep()
-                    } else {
-                        Toast.makeText(this, str, Toast.LENGTH_SHORT).show()
+                if (it.name.isNotEmpty()) {
+                    Firestore().saveProfile(guid, it) { str, success ->
+                        if (success) {
+                            if (str != null) {
+                                profileId = str
+                            }
+                            nextStep()
+                        } else {
+                            Toast.makeText(this, str, Toast.LENGTH_SHORT).show()
+                        }
                     }
+                } else {
+                    nextStep()
                 }
             }
         } else {
