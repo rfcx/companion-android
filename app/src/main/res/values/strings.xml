@@ -48,6 +48,7 @@
     <string name="custom">Custom</string>
     <string name="recommended_text">Record for 5 minutes, sleep for 10 minutes</string>
     <string name="will_run_out_on">The battery will run out on %s</string>
+    <string name="edge_device_battery">RFCx Edge device battery</string>
 
     <!--    SyncFragment-->
     <string name="sync">Sync</string>
