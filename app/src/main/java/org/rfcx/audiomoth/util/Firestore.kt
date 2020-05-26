@@ -134,6 +134,21 @@ class Firestore (context: Context) {
             }
     }
 
+    fun haveLocations(callback: (Boolean) -> Unit) {
+        userDocument.collection(COLLECTION_LOCATIONS).get()
+            .addOnSuccessListener { querySnapshot ->
+                val documents = querySnapshot.documents
+                if (documents.isNotEmpty()) {
+                    callback(true)
+                } else {
+                    callback(false)
+                }
+            }
+            .addOnFailureListener {
+                callback(false)
+            }
+    }
+
     fun haveProfiles(callback: (Boolean) -> Unit) {
         userDocument.collection(COLLECTION_PROFILES).get()
             .addOnSuccessListener { querySnapshot ->

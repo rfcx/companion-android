@@ -180,6 +180,7 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun getDeployments() {
         Firestore(this).getDeployments(object : FirestoreResponseCallback<List<Deployment>> {
             override fun onSuccessListener(response: List<Deployment>) {
+                setCreateLocationButton(true)
                 handleMarkerDeployment(response)
             }
 
@@ -240,7 +241,6 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         val lastDeployment = deployments.lastOrNull()
         if (lastDeployment != null) {
             moveCamera(LatLng(lastDeployment.location.latitude, lastDeployment.location.longitude))
-            setCreateLocationButton(true)
         }
     }
 
