@@ -15,6 +15,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
@@ -30,9 +31,12 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.utils.BitmapUtils
 import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.Locate
+import org.rfcx.audiomoth.entity.LocateItem
 import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.util.FirestoreResponseCallback
+import org.rfcx.audiomoth.util.Preferences
 import org.rfcx.audiomoth.view.DeploymentProtocol
 
 class LocationFragment : Fragment(), OnMapReadyCallback {
@@ -45,6 +49,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var locations = ArrayList<String>()
     private var locationsLatLng = ArrayList<LatLng>()
     private var locationLatLng: LatLng? = null
+    private var locateItemList = ArrayList<LocateItem>()
+    private var locateItem: LocateItem? = null
     private var location = ""
     private lateinit var arrayAdapter: ArrayAdapter<String>
     private var deploymentProtocol: DeploymentProtocol? = null
@@ -74,17 +80,41 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         deploymentProtocol?.hideCompleteButton()
 
         finishButton.setOnClickListener {
-            checkProfiles()
+            if (existingRadioButton.isChecked) {
+                checkProfiles()
+            } else if (newLocationRadioButton.isChecked) {
+                if (locationNameEditText.text.toString().isNotEmpty() && latitudeEditText.text.toString().isNotEmpty() && longitudeEditText.text.toString().isNotEmpty()) {
+                    checkProfiles()
+                } else {
+                    Toast.makeText(context, getString(R.string.please_fill_information), Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
     private fun checkProfiles() {
-        Firestore().haveProfiles { isHave ->
-            if (isHave) {
-                deploymentProtocol?.nextStep()
-            } else {
-                // open configure page by create Profile Default?
-                deploymentProtocol?.openConfigure(Profile.default())
+        if (newLocationRadioButton.isChecked) {
+            val name = locationNameEditText.text.toString()
+            val lat = latitudeEditText.text.toString().toDouble()
+            val lng = longitudeEditText.text.toString().toDouble()
+            val locate = Locate("", name, lat, lng)
+            deploymentProtocol?.setLocate(locate)
+
+        } else if (existingRadioButton.isChecked) {
+            locateItem?.let {
+                deploymentProtocol?.setLocateId(it.docId)
+                it.locate?.let { it1 -> deploymentProtocol?.setLocationInDeployment(it1) }
+            }
+        }
+
+        context?.let {
+            Firestore(it).haveProfiles { isHave ->
+                if (isHave) {
+                    deploymentProtocol?.nextStep()
+                } else {
+                    // open configure page by create Profile Default?
+                    deploymentProtocol?.openConfigure(Profile.default())
+                }
             }
         }
     }
@@ -100,9 +130,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                         )
                         setPinOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
                     }
-
-                    finishButton.isEnabled = locationNameEditText.text.toString().isNotEmpty()
-
                     locationNameTextInput.visibility = View.VISIBLE
                     locationNameSpinner.visibility = View.GONE
                 }
@@ -138,6 +165,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 location = locations[position]
                 locationLatLng = locationsLatLng[position]
                 setPinOnMap(locationsLatLng[position])
+                locateItem = locateItemList[position]
 
                 setupView(
                     locationsLatLng[position].latitude.toString(),
@@ -161,27 +189,33 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun retrieveLocations() {
-        Firestore().getLocations(
-            object : FirestoreResponseCallback<List<org.rfcx.audiomoth.entity.Locate?>> {
-                override fun onSuccessListener(response: List<org.rfcx.audiomoth.entity.Locate?>) {
-                    val locations = ArrayList<String>()
-                    response.forEach {
-                        it?.let { location ->
-                            locations.add(location.name)
-                            locationsLatLng.add(LatLng(location.latitude, location.longitude))
-
-                            setRecommendLocation()
+        context?.let {
+            Firestore(it).getLocations(
+                object : FirestoreResponseCallback<List<LocateItem?>> {
+                    override fun onSuccessListener(response: List<LocateItem?>) {
+                        val locations = ArrayList<String>()
+                        response.forEach {
+                            it?.let { location ->
+                                location.locate?.name?.let { it1 -> locations.add(it1) }
+                                val latitude = location.locate?.latitude
+                                val longitude = location.locate?.longitude
+                                if (latitude != null && longitude != null) {
+                                    locationsLatLng.add(LatLng(latitude, longitude))
+                                }
+                                locateItemList.add(location)
+                                setRecommendLocation()
+                            }
                         }
+                        arrayAdapter.addAll(locations)
+                        arrayAdapter.notifyDataSetChanged()
                     }
-                    arrayAdapter.addAll(locations)
-                    arrayAdapter.notifyDataSetChanged()
-                }
 
-                override fun addOnFailureListener(exception: Exception) {
-                    newLocationRadioButton.isChecked = true
-                    existingRadioButton.isEnabled = false
-                }
-            })
+                    override fun addOnFailureListener(exception: Exception) {
+                        newLocationRadioButton.isChecked = true
+                        existingRadioButton.isEnabled = false
+                    }
+                })
+        }
     }
 
     private fun setRecommendLocation() {
@@ -205,10 +239,14 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             }
             val position = locationsLatLng.indexOf(latLng)
             locationNameSpinner.setSelection(position)
+            locateItem = locateItemList[position]
         }
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
+        val preferences = context?.let { Preferences.getInstance(it) }
+        val guid = preferences?.getString(Preferences.USER_GUID, "")
+
         this.mapboxMap = mapboxMap
         mapboxMap.setStyle(Style.OUTDOORS) {
             symbolManager = SymbolManager(mapView, mapboxMap, it)
@@ -226,7 +264,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             radioCheckedChange()
 
             getLastLocation()
-            getLocation(Firestore.USER_ID) // TODO: get real user profile
+            getLocation(guid)
             setAdapter()
             setLocationSpinner()
         }
@@ -257,22 +295,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun onLatLngChanged() {
-        locationNameEditText.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(p0: Editable?) {
-                if (p0 != null) {
-                    finishButton.isEnabled = p0.isNotEmpty()
-                }
-            }
-
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-        })
-
         latitudeEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
                 if (p0 != null) {
-                    finishButton.isEnabled = p0.isNotEmpty()
                     if (p0.toString() != "-" && p0.isNotEmpty() && p0.toString() != "." && longitudeEditText.text.toString().isNotEmpty()) {
                         if (p0.toString().toDouble() >= -90.0 && p0.toString().toDouble() <= 90) {
                             setPinOnMap(
@@ -281,6 +306,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                                     longitudeEditText.text.toString().toDouble()
                                 )
                             )
+                        } else {
+                            Toast.makeText(context, getString(R.string.latitude_must_between), Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
@@ -294,14 +321,17 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         longitudeEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
                 if (p0 != null) {
-                    finishButton.isEnabled = p0.isNotEmpty()
                     if (p0.toString() != "-" && p0.isNotEmpty() && p0.toString() != "." && latitudeEditText.text.toString().isNotEmpty()) {
-                        setPinOnMap(
-                            LatLng(
-                                latitudeEditText.text.toString().toDouble(),
-                                p0.toString().toDouble()
+                        if (latitudeEditText.text.toString().toDouble() >= -90.0 && latitudeEditText.text.toString().toDouble() <= 90) {
+                            setPinOnMap(
+                                LatLng(
+                                    latitudeEditText.text.toString().toDouble(),
+                                    p0.toString().toDouble()
+                                )
                             )
-                        )
+                        } else {
+                            Toast.makeText(context, getString(R.string.latitude_must_between), Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
             }

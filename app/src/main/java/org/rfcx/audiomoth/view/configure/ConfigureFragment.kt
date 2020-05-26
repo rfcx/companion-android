@@ -107,6 +107,7 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
             recordingDurationEditText.setText(it.recordingDuration.toString())
         }
 
+        setNextButton(true)
         setGainLayout()
         setSampleRateLayout()
         setTimeRecyclerView()
@@ -209,9 +210,77 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
         }
     }
 
+    private fun setupData() {
+        val timeRecordingPeriod = arrayListOf<String>()
+        recordingPeriod = if (customRecordingPeriod) {
+            timeState.forEach { timeStatus ->
+                if (timeStatus.state) {
+                    timeRecordingPeriod.add(timeStatus.time)
+                }
+            }
+            timeRecordingPeriod
+        } else {
+            arrayListOf()
+        }
+
+        when (durationSelected) {
+            RECOMMENDED -> {
+                recordingDuration = 5
+                sleepDuration = 10
+            }
+
+            CONTINUOUS -> {
+                recordingDuration = 0
+                sleepDuration = 0
+            }
+
+            CUSTOM -> {
+                recordingDuration =
+                    recordingDurationEditText.text.toString().toInt()
+                sleepDuration = sleepDurationEditText.text.toString().toInt()
+            }
+        }
+    }
+
+    private fun setNextButton(show: Boolean) {
+        nextButton.visibility = if (show) View.VISIBLE else View.GONE
+        configProgressBar.visibility = if (!show) View.VISIBLE else View.GONE
+    }
+
     private fun setNextOnClick() {
         nextButton.setOnClickListener {
-            deploymentProtocol?.nextStep()
+            setNextButton(false)
+            setupData()
+
+            val profile = Profile(
+                gain,
+                profileEditText.text.toString(),
+                sampleRate,
+                recordingDuration,
+                sleepDuration,
+                recordingPeriod,
+                durationSelected
+            )
+            deploymentProtocol?.setProfile(profile)
+            deploymentProtocol?.saveUser { saveUserSuccess ->
+                if (saveUserSuccess) {
+                    deploymentProtocol?.saveLocation { saveLocationSuccess ->
+                        if (saveLocationSuccess) {
+                            deploymentProtocol?.saveProfile { saveProfileSuccess ->
+                                if (saveProfileSuccess) {
+                                    deploymentProtocol?.nextStep()
+                                } else {
+                                    setNextButton(true)
+                                }
+                            }
+                        } else {
+                            setNextButton(true)
+                        }
+                    }
+                } else {
+                    setNextButton(true)
+                }
+            }
         }
     }
 

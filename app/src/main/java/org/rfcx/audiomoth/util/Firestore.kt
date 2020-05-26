@@ -1,21 +1,66 @@
 package org.rfcx.audiomoth.util
 
-import android.util.Log
+import android.content.Context
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import org.rfcx.audiomoth.entity.Deployment
-import org.rfcx.audiomoth.entity.Locate
-import org.rfcx.audiomoth.entity.Profile
+import org.rfcx.audiomoth.entity.*
+import org.rfcx.audiomoth.entity.Deployment.Companion.LAST_DEPLOYMENT
 
 interface FirestoreResponseCallback<T> {
     fun onSuccessListener(response: T)
     fun addOnFailureListener(exception: Exception)
 }
 
-class Firestore {
+class Firestore (context: Context) {
     val db = Firebase.firestore
     /* TODO: update get user */
-    private val userDocument = db.collection(COLLECTION_USERS).document(USER_ID)
+    private val preferences = Preferences.getInstance(context)
+    private val guid = preferences.getString(Preferences.USER_GUID, "")
+    private val userDocument = db.collection(COLLECTION_USERS).document(guid)
+
+    fun saveUser(guid: String, user: User, callback: (String?, Boolean) -> Unit) {
+        db.collection(COLLECTION_USERS).document(guid)
+            .set(user)
+            .addOnSuccessListener {
+                callback(null, true)
+            }
+            .addOnFailureListener { e ->
+                callback(e.message, false)
+            }
+    }
+
+    fun saveLocation(guid: String, locate: Locate, callback: (String?, Boolean) -> Unit) {
+        db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_LOCATIONS)
+            .add(locate)
+            .addOnSuccessListener { documentReference ->
+                callback(documentReference.id, true)
+            }
+            .addOnFailureListener { e ->
+                callback(e.message, false)
+            }
+    }
+
+    fun saveProfile(guid: String, profile: Profile, callback: (String?, Boolean) -> Unit) {
+        db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_PROFILES)
+            .add(profile)
+            .addOnSuccessListener { documentReference ->
+                callback(documentReference.id, true)
+            }
+            .addOnFailureListener { e ->
+                callback(e.message, false)
+            }
+    }
+
+    fun saveDeployment(guid: String, deployment: Deployment, callback: (String?, Boolean) -> Unit) {
+        db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_DEPLOYMENTS)
+            .add(deployment)
+            .addOnSuccessListener { documentReference ->
+                callback(documentReference.id, true)
+            }
+            .addOnFailureListener { e ->
+                callback(e.message, false)
+            }
+    }
 
     fun getDeployments(callback: FirestoreResponseCallback<List<Deployment>>) {
         userDocument.collection(COLLECTION_DEPLOYMENTS).get()
@@ -39,15 +84,17 @@ class Firestore {
 
     }
 
-    fun getLocations(callback: FirestoreResponseCallback<List<Locate?>>) {
+    fun getLocations(callback: FirestoreResponseCallback<List<LocateItem?>>) {
         userDocument.collection(COLLECTION_LOCATIONS).get()
             .addOnSuccessListener { querySnapshot ->
                 val documents = querySnapshot.documents
-                Log.d("Firestore", "getLocations $documents")
-                Log.d("Firestore", "getLocations ${documents.size}")
+                val response = ArrayList<LocateItem>()
 
-                val response = if (documents.isNotEmpty()) {
-                    documents.map { it.toObject(Locate::class.java) }
+                if (documents.isNotEmpty()) {
+                    documents.map {
+                        val locate = it.toObject(Locate::class.java)
+                        response.add(LocateItem(locate, it.id))
+                    }
                 } else {
                     arrayListOf()
                 }
@@ -56,6 +103,12 @@ class Firestore {
             .addOnFailureListener {
                 callback.addOnFailureListener(it)
             }
+    }
+
+    fun updateLocation(guid: String, locateId: String, deploymentId: String) {
+        db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_LOCATIONS)
+            .document(locateId)
+            .update(LAST_DEPLOYMENT, deploymentId)
     }
 
     fun getProfiles(callback: FirestoreResponseCallback<List<Profile?>?>) {
@@ -90,8 +143,9 @@ class Firestore {
     }
 
     companion object {
+        const val TAG = "Firestore"
+
         // Firestore Collection
-        const val COLLECTION_DEVICES = "devices" // TODO: delete
         const val COLLECTION_USERS = "users"
         const val COLLECTION_DEPLOYMENTS = "deployments"
         const val COLLECTION_LOCATIONS = "locations"

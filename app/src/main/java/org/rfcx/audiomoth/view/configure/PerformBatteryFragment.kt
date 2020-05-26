@@ -10,11 +10,14 @@ import kotlinx.android.synthetic.main.confirm_perform_battery.*
 import kotlinx.android.synthetic.main.fragment_battery_level.*
 import kotlinx.android.synthetic.main.fragment_perform_battery.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.view.DeploymentProtocol
+import java.sql.Timestamp
 
 class PerformBatteryFragment : Fragment() {
     private var status: String? = null
     private var deploymentProtocol: DeploymentProtocol? = null
+    private val day = 24 * 60 * 60 * 1000
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -53,7 +56,24 @@ class PerformBatteryFragment : Fragment() {
         }
 
         skipButton.setOnClickListener {
-            deploymentProtocol?.nextStep()
+            val batteryDepletedAt = Timestamp(System.currentTimeMillis() + (day * 6))
+            val deployedAt = Timestamp(System.currentTimeMillis())
+            val configuration = deploymentProtocol?.geConfiguration()
+            val location = deploymentProtocol?.getLocationInDeployment()
+            val profileId = deploymentProtocol?.getProfileId()
+            if (configuration != null && location != null && profileId != null) {
+                val deployment =
+                    Deployment(
+                        batteryDepletedAt,
+                        deployedAt,
+                        100,
+                        true,
+                        configuration,
+                        location,
+                        profileId
+                    )
+                deploymentProtocol?.saveDeployment(deployment)
+            }
         }
     }
 
@@ -93,6 +113,8 @@ class PerformBatteryFragment : Fragment() {
     private fun knowBatteryLevel() {
         var image = 0
         var days = ""
+        var numberOfDays = 0
+        var batteryLevel = 0
         var percent = ""
         arguments?.let {
             image = it.getInt(IMAGE)
@@ -100,22 +122,32 @@ class PerformBatteryFragment : Fragment() {
 
         when (image) {
             R.drawable.battery_level_1 -> {
+                numberOfDays = 0
+                batteryLevel = 20
                 days = getString(R.string.day, "<1")
                 percent = getString(R.string.charged, "20%")
             }
             R.drawable.battery_level_2 -> {
+                numberOfDays = 1
+                batteryLevel = 40
                 days = getString(R.string.day, "1")
                 percent = getString(R.string.charged, "40%")
             }
             R.drawable.battery_level_3 -> {
+                numberOfDays = 2
+                batteryLevel = 60
                 days = getString(R.string.days, "2")
                 percent = getString(R.string.charged, "60%")
             }
             R.drawable.battery_level_4 -> {
+                numberOfDays = 4
+                batteryLevel = 80
                 days = getString(R.string.days, "4")
                 percent = getString(R.string.charged, "80%")
             }
             R.drawable.battery_level_5 -> {
+                numberOfDays = 6
+                batteryLevel = 100
                 days = getString(R.string.days, "6")
                 percent = getString(R.string.charged, "100%")
             }
@@ -126,7 +158,24 @@ class PerformBatteryFragment : Fragment() {
         batteryLevelImageView.setImageResource(image)
 
         nextButton.setOnClickListener {
-            deploymentProtocol?.nextStep()
+            val batteryDepletedAt = Timestamp(System.currentTimeMillis() + (day * numberOfDays))
+            val deployedAt = Timestamp(System.currentTimeMillis())
+            val configuration = deploymentProtocol?.geConfiguration()
+            val location = deploymentProtocol?.getLocationInDeployment()
+            val profileId = deploymentProtocol?.getProfileId()
+            if (configuration != null && location != null && profileId != null) {
+                val deployment =
+                    Deployment(
+                        batteryDepletedAt,
+                        deployedAt,
+                        batteryLevel,
+                        true,
+                        configuration,
+                        location,
+                        profileId
+                    )
+                deploymentProtocol?.saveDeployment(deployment)
+            }
         }
     }
 

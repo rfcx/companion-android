@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.PointF
-import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -142,7 +141,7 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun getDeployments() {
-        Firestore().getDeployments(object : FirestoreResponseCallback<List<Deployment>> {
+        Firestore(this).getDeployments(object : FirestoreResponseCallback<List<Deployment>> {
             override fun onSuccessListener(response: List<Deployment>) {
                 handleMarkerDeployment(response)
             }
@@ -161,7 +160,10 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 Pair(PROPERTY_MARKER_LOCATION_ID, it.location.id),
                 Pair(PROPERTY_MARKER_IMAGE, Battery.getBatteryPinImage(it.batteryDepletedAt.time)),
                 Pair(PROPERTY_MARKER_TITLE, it.location.name),
-                Pair(PROPERTY_MARKER_CAPTION, Battery.getPredictionBattery(it.batteryDepletedAt.time))
+                Pair(
+                    PROPERTY_MARKER_CAPTION,
+                    Battery.getPredictionBattery(it.batteryDepletedAt.time)
+                )
             )
             Feature.fromGeometry(
                 fromLngLat(it.location.longitude, it.location.latitude),

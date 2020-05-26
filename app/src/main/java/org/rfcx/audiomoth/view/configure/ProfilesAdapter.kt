@@ -39,11 +39,15 @@ class ProfilesAdapter(private val itemClickListener: (Profile) -> Unit) :
         fun bind(profile: Profile) {
             val gainLabel = itemView.resources.getStringArray(R.array.gainLabel)[profile.gain - 1]
             var time = ""
-            profile.recordingPeriodList.map {
-                time += when (it) {
-                    profile.recordingPeriodList[0] -> "($it, "
-                    profile.recordingPeriodList.last() -> "$it)"
-                    else -> "$it, "
+            if (profile.recordingPeriodList.size == 1) {
+                time = "(${profile.recordingPeriodList[0]})"
+            } else {
+                profile.recordingPeriodList.map {
+                    time += when (it) {
+                        profile.recordingPeriodList[0] -> "($it, "
+                        profile.recordingPeriodList.last() -> "$it)"
+                        else -> "$it, "
+                    }
                 }
             }
 
@@ -55,7 +59,7 @@ class ProfilesAdapter(private val itemClickListener: (Profile) -> Unit) :
 
             var detail = "${profile.sampleRate} kHz, ${gainLabel}, $duration"
 
-            if (profile.recordingPeriodList.isNotEmpty()){
+            if (profile.recordingPeriodList.isNotEmpty()) {
                 detail = "${profile.sampleRate} kHz, ${gainLabel}, $duration, $time"
             }
 
