@@ -1,6 +1,9 @@
 package org.rfcx.audiomoth.view.configure
 
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,8 +14,11 @@ import kotlinx.android.synthetic.main.fragment_battery_level.*
 import kotlinx.android.synthetic.main.fragment_perform_battery.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Deployment
+import org.rfcx.audiomoth.util.NotificationBroadcastReceiver
+import org.rfcx.audiomoth.util.toDateTimeString
 import org.rfcx.audiomoth.view.DeploymentProtocol
 import java.sql.Timestamp
+import java.util.*
 
 class PerformBatteryFragment : Fragment() {
     private var status: String? = null
@@ -73,6 +79,7 @@ class PerformBatteryFragment : Fragment() {
                         profileId,
                         arrayListOf()
                     )
+                notification(batteryDepletedAt)
                 deploymentProtocol?.saveDeployment(deployment)
             }
         }
@@ -176,9 +183,30 @@ class PerformBatteryFragment : Fragment() {
                         profileId,
                         arrayListOf()
                     )
+                notification(batteryDepletedAt)
                 deploymentProtocol?.saveDeployment(deployment)
             }
         }
+    }
+
+    private fun notification(batteryDepletedAt: Timestamp) {
+        val intent = Intent(context, NotificationBroadcastReceiver::class.java)
+        val date = Date(batteryDepletedAt.time)
+        val dateAlarm = Date(batteryDepletedAt.time - day)
+        intent.putExtra(BATTERY_DEPLETED_AT, date.toDateTimeString())
+
+        val pendingIntent =
+            PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        val cal = Calendar.getInstance()
+        cal.time = dateAlarm
+
+        val alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarmManager.setExact(
+            AlarmManager.RTC_WAKEUP,
+            cal.timeInMillis,
+            pendingIntent
+        )
     }
 
     companion object {
@@ -188,6 +216,7 @@ class PerformBatteryFragment : Fragment() {
         const val TEST_BATTERY = "TEST_BATTERY"
         const val TIME_LED_FLASH = "TIME_LED_FLASH"
         const val BATTERY_LEVEL = "BATTERY_LEVEL"
+        const val BATTERY_DEPLETED_AT = "BATTERY_DEPLETED_AT"
 
         @JvmStatic
         fun newInstance(page: String, image: Int?) = PerformBatteryFragment().apply {
