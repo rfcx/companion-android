@@ -79,7 +79,7 @@ class PerformBatteryFragment : Fragment() {
                         profileId,
                         arrayListOf()
                     )
-                notification(batteryDepletedAt)
+                notification(batteryDepletedAt, location.name)
                 deploymentProtocol?.saveDeployment(deployment)
             }
         }
@@ -183,17 +183,18 @@ class PerformBatteryFragment : Fragment() {
                         profileId,
                         arrayListOf()
                     )
-                notification(batteryDepletedAt)
+                notification(batteryDepletedAt, location.name)
                 deploymentProtocol?.saveDeployment(deployment)
             }
         }
     }
 
-    private fun notification(batteryDepletedAt: Timestamp) {
+    private fun notification(batteryDepletedAt: Timestamp, locationName: String) {
         val intent = Intent(context, NotificationBroadcastReceiver::class.java)
         val date = Date(batteryDepletedAt.time)
         val dateAlarm = Date(batteryDepletedAt.time - day)
         intent.putExtra(BATTERY_DEPLETED_AT, date.toDateTimeString())
+        intent.putExtra(LOCATION_NAME, locationName)
 
         val pendingIntent =
             PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
@@ -217,6 +218,7 @@ class PerformBatteryFragment : Fragment() {
         const val TIME_LED_FLASH = "TIME_LED_FLASH"
         const val BATTERY_LEVEL = "BATTERY_LEVEL"
         const val BATTERY_DEPLETED_AT = "BATTERY_DEPLETED_AT"
+        const val LOCATION_NAME = "LOCATION_NAME"
 
         @JvmStatic
         fun newInstance(page: String, image: Int?) = PerformBatteryFragment().apply {
