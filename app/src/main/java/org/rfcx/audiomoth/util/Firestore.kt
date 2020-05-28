@@ -1,9 +1,11 @@
 package org.rfcx.audiomoth.util
 
 import android.content.Context
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import org.rfcx.audiomoth.entity.*
+import org.rfcx.audiomoth.entity.Deployment.Companion.DEPLOYED_AT
 import org.rfcx.audiomoth.entity.Deployment.Companion.IS_LATEST
 import org.rfcx.audiomoth.entity.Deployment.Companion.LAST_DEPLOYMENT
 import org.rfcx.audiomoth.entity.Deployment.Companion.PHOTOS
@@ -64,14 +66,19 @@ class Firestore(context: Context) {
     }
 
     fun getDeployments(callback: FirestoreResponseCallback<List<Deployment>>) {
-        userDocument.collection(COLLECTION_DEPLOYMENTS).whereEqualTo(IS_LATEST, true).get()
+        userDocument.collection(COLLECTION_DEPLOYMENTS)
+            .orderBy(DEPLOYED_AT, Query.Direction.ASCENDING).get()
             .addOnSuccessListener { querySnapshot ->
                 val documents = querySnapshot.documents
                 val response = if (documents.isNotEmpty()) {
                     val deploymentList = arrayListOf<Deployment>()
                     documents.forEach {
                         val obj = it.toObject(Deployment::class.java)
-                        obj?.let { it1 -> deploymentList.add(it1) }
+                        obj?.let { it1 ->
+                            if (it1.latest) {
+                                deploymentList.add(it1)
+                            }
+                        }
                     }
                     deploymentList
                 } else {
@@ -122,6 +129,7 @@ class Firestore(context: Context) {
         userDocument.collection(COLLECTION_DEPLOYMENTS).get()
             .addOnSuccessListener { querySnapshot ->
                 val documents = querySnapshot.documents
+                if (documents.size == 0) callback(true)
                 documents.map {
                     val deployment = it.toObject(Deployment::class.java)
                     if (deployment?.location?.id == locateId) {
@@ -192,8 +200,5 @@ class Firestore(context: Context) {
         const val COLLECTION_DEPLOYMENTS = "deployments"
         const val COLLECTION_LOCATIONS = "locations"
         const val COLLECTION_PROFILES = "profiles"
-
-        // MOCKUP
-        const val USER_ID = "SPYW1VXiT68geKPdOel6"
     }
 }

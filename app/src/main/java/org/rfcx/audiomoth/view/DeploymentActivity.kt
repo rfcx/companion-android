@@ -31,7 +31,6 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     private var locationInDeployment: LocationInDeployment? = null
 
     private val preferences = Preferences.getInstance(this)
-    private val guid = preferences.getString(Preferences.USER_GUID)
     private val name = preferences.getString(Preferences.NICKNAME)
 
     override fun onCreate(savedInstanceState: Bundle?) {

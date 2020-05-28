@@ -17,5 +17,6 @@ data class Deployment(
         const val LAST_DEPLOYMENT = "lastDeployment"
         const val PHOTOS = "photos"
         const val IS_LATEST = "latest"
+        const val DEPLOYED_AT = "deployedAt"
     }
 }
