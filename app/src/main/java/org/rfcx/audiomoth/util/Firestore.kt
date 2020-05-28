@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import org.rfcx.audiomoth.entity.*
+import org.rfcx.audiomoth.entity.Deployment.Companion.IS_LATEST
 import org.rfcx.audiomoth.entity.Deployment.Companion.LAST_DEPLOYMENT
 import org.rfcx.audiomoth.entity.Deployment.Companion.PHOTOS
 
@@ -12,16 +13,15 @@ interface FirestoreResponseCallback<T> {
     fun addOnFailureListener(exception: Exception)
 }
 
-class Firestore (context: Context) {
+class Firestore(context: Context) {
     val db = Firebase.firestore
     /* TODO: update get user */
     private val preferences = Preferences.getInstance(context)
     private val guid = preferences.getString(Preferences.USER_GUID, "")
     private val userDocument = db.collection(COLLECTION_USERS).document(guid)
 
-    fun saveUser(guid: String, user: User, callback: (String?, Boolean) -> Unit) {
-        db.collection(COLLECTION_USERS).document(guid)
-            .set(user)
+    fun saveUser(user: User, callback: (String?, Boolean) -> Unit) {
+        userDocument.set(user)
             .addOnSuccessListener {
                 callback(null, true)
             }
@@ -30,8 +30,8 @@ class Firestore (context: Context) {
             }
     }
 
-    fun saveLocation(guid: String, locate: Locate, callback: (String?, Boolean) -> Unit) {
-        db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_LOCATIONS)
+    fun saveLocation(locate: Locate, callback: (String?, Boolean) -> Unit) {
+        userDocument.collection(COLLECTION_LOCATIONS)
             .add(locate)
             .addOnSuccessListener { documentReference ->
                 callback(documentReference.id, true)
@@ -41,8 +41,8 @@ class Firestore (context: Context) {
             }
     }
 
-    fun saveProfile(guid: String, profile: Profile, callback: (String?, Boolean) -> Unit) {
-        db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_PROFILES)
+    fun saveProfile(profile: Profile, callback: (String?, Boolean) -> Unit) {
+        userDocument.collection(COLLECTION_PROFILES)
             .add(profile)
             .addOnSuccessListener { documentReference ->
                 callback(documentReference.id, true)
@@ -52,8 +52,8 @@ class Firestore (context: Context) {
             }
     }
 
-    fun saveDeployment(guid: String, deployment: Deployment, callback: (String?, Boolean) -> Unit) {
-        db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_DEPLOYMENTS)
+    fun saveDeployment(deployment: Deployment, callback: (String?, Boolean) -> Unit) {
+        userDocument.collection(COLLECTION_DEPLOYMENTS)
             .add(deployment)
             .addOnSuccessListener { documentReference ->
                 callback(documentReference.id, true)
@@ -64,7 +64,7 @@ class Firestore (context: Context) {
     }
 
     fun getDeployments(callback: FirestoreResponseCallback<List<Deployment>>) {
-        userDocument.collection(COLLECTION_DEPLOYMENTS).get()
+        userDocument.collection(COLLECTION_DEPLOYMENTS).whereEqualTo(IS_LATEST, true).get()
             .addOnSuccessListener { querySnapshot ->
                 val documents = querySnapshot.documents
                 val response = if (documents.isNotEmpty()) {
@@ -106,16 +106,36 @@ class Firestore (context: Context) {
             }
     }
 
-    fun updateLocation(guid: String, locateId: String, deploymentId: String) {
-        db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_LOCATIONS)
+    fun updateLocation(locateId: String, deploymentId: String) {
+        userDocument.collection(COLLECTION_LOCATIONS)
             .document(locateId)
             .update(LAST_DEPLOYMENT, deploymentId)
     }
 
-    fun updateDeployment(guid: String, deploymentId: String, photos: ArrayList<String>) {
-        db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_DEPLOYMENTS)
+    fun updateDeployment(deploymentId: String, photos: ArrayList<String>) {
+        userDocument.collection(COLLECTION_DEPLOYMENTS)
             .document(deploymentId)
             .update(PHOTOS, photos)
+    }
+
+    fun updateIsLatest(locateId: String, callback: (Boolean) -> Unit) {
+        userDocument.collection(COLLECTION_DEPLOYMENTS).get()
+            .addOnSuccessListener { querySnapshot ->
+                val documents = querySnapshot.documents
+                documents.map {
+                    val deployment = it.toObject(Deployment::class.java)
+                    if (deployment?.location?.id == locateId) {
+                        userDocument.collection(COLLECTION_DEPLOYMENTS)
+                            .document(it.id)
+                            .update(IS_LATEST, false)
+                    }
+                    if (it.id == documents.last().id) {
+                        callback(true)
+                    }
+                }
+            }.addOnFailureListener {
+                callback(false)
+            }
     }
 
     fun getProfiles(callback: FirestoreResponseCallback<List<Profile?>?>) {

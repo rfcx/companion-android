@@ -43,7 +43,7 @@ class Storage(val context: Context) {
                     callback(uris.size, count)
                     pathImages.add(downloadUri.toString())
                     if (count == 0) {
-                        Firestore(context).updateDeployment(guid, deploymentId, pathImages)
+                        Firestore(context).updateDeployment(deploymentId, pathImages)
                     }
                 }
             }

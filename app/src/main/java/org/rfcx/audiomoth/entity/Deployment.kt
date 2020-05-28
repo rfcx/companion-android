@@ -7,7 +7,7 @@ data class Deployment(
     val batteryDepletedAt: Date = Date(),
     val deployedAt: Date = Date(),
     val batteryLevel: Int = 0,
-    val isLatest: Boolean = false,
+    val latest: Boolean = false,
     val configuration: Configuration = Configuration.default(),
     val location: LocationInDeployment = LocationInDeployment.default(),
     val profileId: String = "",
@@ -16,5 +16,6 @@ data class Deployment(
     companion object {
         const val LAST_DEPLOYMENT = "lastDeployment"
         const val PHOTOS = "photos"
+        const val IS_LATEST = "latest"
     }
 }
