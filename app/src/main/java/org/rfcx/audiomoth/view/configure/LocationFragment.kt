@@ -86,7 +86,11 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 if (locationNameEditText.text.toString().isNotEmpty() && latitudeEditText.text.toString().isNotEmpty() && longitudeEditText.text.toString().isNotEmpty()) {
                     checkProfiles()
                 } else {
-                    Toast.makeText(context, getString(R.string.please_fill_information), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context,
+                        getString(R.string.please_fill_information),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
@@ -178,13 +182,17 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun getLocation(documentId: String?) {
-        if (documentId.isNullOrEmpty()) {
-            newLocationRadioButton.isChecked = true
-            existingRadioButton.isEnabled = false
-        } else {
-            existingRadioButton.isChecked = true
-            retrieveLocations()
+    private fun getLocation() {
+        context?.let {
+            Firestore(it).haveLocations { isHave ->
+                if (isHave) {
+                    existingRadioButton.isChecked = true
+                    retrieveLocations()
+                } else {
+                    newLocationRadioButton.isChecked = true
+                    existingRadioButton.isEnabled = false
+                }
+            }
         }
     }
 
@@ -264,7 +272,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             radioCheckedChange()
 
             getLastLocation()
-            getLocation(guid)
+            getLocation()
             setAdapter()
             setLocationSpinner()
         }
@@ -307,7 +315,11 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                                 )
                             )
                         } else {
-                            Toast.makeText(context, getString(R.string.latitude_must_between), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                getString(R.string.latitude_must_between),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 }
@@ -330,7 +342,11 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                                 )
                             )
                         } else {
-                            Toast.makeText(context, getString(R.string.latitude_must_between), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                getString(R.string.latitude_must_between),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 }

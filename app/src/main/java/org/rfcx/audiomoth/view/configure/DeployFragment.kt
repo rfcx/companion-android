@@ -31,7 +31,9 @@ class DeployFragment : BaseImageFragment() {
         super.onViewCreated(view, savedInstanceState)
         setupImageRecycler()
         finishButton.setOnClickListener {
-            deploymentProtocol?.completeStep()
+            val images = ArrayList<String>()
+            imageAdapter.getNewAttachImage().map { images.add(it) }
+            deploymentProtocol?.completeStep(images)
         }
     }
 

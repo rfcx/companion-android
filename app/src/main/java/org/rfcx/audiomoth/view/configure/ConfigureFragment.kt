@@ -298,32 +298,6 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
         }
     }
 
-    private fun notification() {
-        // todo: pass deviceId to DashboardStreamActivity
-        val intent = Intent(context, NotificationBroadcastReceiver::class.java)
-        val pendingIntent =
-            PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-
-        val alarmManager = context?.getSystemService(ALARM_SERVICE) as AlarmManager
-
-        val calendar =
-            Calendar.getInstance()  // Todo: Change to the date of the battery will run out.
-        calendar.set(Calendar.SECOND, 0)
-        calendar.set(Calendar.MINUTE, 30)
-        calendar.set(Calendar.HOUR, 9)  // receives a notification at 9:30
-        calendar.get(Calendar.MONTH)
-        calendar.get(Calendar.DAY_OF_MONTH)
-        calendar.get(Calendar.YEAR)
-        // Todo: Remove comment to receives a notification 3 days before battery is due to run out
-        // calendar.add(Calendar.DATE, -3)
-
-        alarmManager.setExact(
-            AlarmManager.RTC_WAKEUP,
-            calendar.timeInMillis,
-            pendingIntent
-        )
-    }
-
     private fun setSampleRateLayout() {
         if (profile != null) {
             profile?.let {
