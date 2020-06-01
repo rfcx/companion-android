@@ -70,6 +70,11 @@ class LoginActivity : AppCompatActivity() {
             loading()
             loginWithFacebook()
         }
+
+        smsLoginButton.setOnClickListener {
+            loading()
+            loginMagicLink()
+        }
     }
 
     private fun login(email: String, password: String) {
@@ -110,6 +115,37 @@ class LoginActivity : AppCompatActivity() {
                 override fun onFailure(exception: AuthenticationException) {
                     exception.printStackTrace()
                     loading(false)
+                }
+
+                override fun onSuccess(credentials: Credentials) {
+                    when (val result = CredentialVerifier(this@LoginActivity).verify(credentials)) {
+                        is Err -> {
+                            Toast.makeText(this@LoginActivity, result.error, Toast.LENGTH_SHORT)
+                                .show()
+                            loading(false)
+                        }
+                        is Ok -> {
+                            userTouch(result.value.idToken)
+                            CredentialKeeper(this@LoginActivity).save(result.value)
+                        }
+                    }
+                }
+            })
+    }
+
+    private fun loginMagicLink() {
+        webAuthentication
+            .withConnection("")
+            .withScope(this.getString(R.string.auth0_scopes))
+            .withScheme(this.getString(R.string.auth0_scheme))
+            .withAudience(this.getString(R.string.auth0_audience))
+            .start(this, object : AuthCallback {
+                override fun onFailure(dialog: Dialog) {}
+
+                override fun onFailure(exception: AuthenticationException) {
+                    Toast.makeText(this@LoginActivity, exception.description, Toast.LENGTH_SHORT)
+                        .show()
+                    loading (false)
                 }
 
                 override fun onSuccess(credentials: Credentials) {
