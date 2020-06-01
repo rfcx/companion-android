@@ -16,6 +16,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/photoSyncTextView"
+        style="@style/AudioMothText.Body.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_padding_xlarge"
+        android:layout_marginStart="@dimen/margin_padding_small"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="3 photos (2 not yet synced)" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/createLocationButton"
         android:layout_width="@dimen/button_battery_lv"

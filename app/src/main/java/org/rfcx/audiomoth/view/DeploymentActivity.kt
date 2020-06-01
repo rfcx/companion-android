@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_deployment.*
 import kotlinx.android.synthetic.main.fragment_configure.*
+import org.rfcx.audiomoth.MainActivity
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.*
 import org.rfcx.audiomoth.util.Firestore
@@ -30,7 +31,6 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     private var locationInDeployment: LocationInDeployment? = null
 
     private val preferences = Preferences.getInstance(this)
-    private val guid = preferences.getString(Preferences.USER_GUID)
     private val name = preferences.getString(Preferences.NICKNAME)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -150,9 +150,9 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
 
     override fun saveUser(callback: (Boolean) -> Unit) {
         view1.hideKeyboard()
-        if (guid != null && name != null) {
+        if (name != null) {
             val user = User(name)
-            Firestore(this).saveUser(guid, user) { message, success ->
+            Firestore(this).saveUser(user) { message, success ->
                 callback(success)
                 if (!success) {
                     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
@@ -162,9 +162,9 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     }
 
     override fun saveLocation(callback: (Boolean) -> Unit) {
-        if (guid != null && locate != null) {
+        if (locate != null) {
             locate?.let {
-                Firestore(this).saveLocation(guid, it) { str, success ->
+                Firestore(this).saveLocation(it) { str, success ->
                     callback(success)
                     if (success) {
                         locateId = str
@@ -184,10 +184,10 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     }
 
     override fun updateLocation() {
-        if (guid != null && locateId != null && deploymentId != null) {
+        if (locateId != null && deploymentId != null) {
             locateId?.let { locateId ->
                 deploymentId?.let { deploymentId ->
-                    Firestore(this).updateLocation(guid, locateId, deploymentId)
+                    Firestore(this).updateLocation(locateId, deploymentId)
                 }
             }
         }
@@ -202,11 +202,11 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     }
 
     override fun saveProfile(callback: (Boolean) -> Unit) {
-        if (guid != null && profile != null) {
+        if (profile != null) {
             profile?.let {
                 setConfiguration(it)
                 if (it.name.isNotEmpty()) {
-                    Firestore(this).saveProfile(guid, it) { str, success ->
+                    Firestore(this).saveProfile(it) { str, success ->
                         callback(success)
                         if (success) {
                             if (str != null) {
@@ -237,19 +237,30 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     }
 
     override fun saveDeployment(deployment: Deployment) {
-        if (guid != null) {
-            Firestore(this).saveDeployment(guid, deployment) { str, success ->
-                if (success) {
-                    deploymentId = str
-                    updateLocation()
-                    nextStep()
-                } else {
-                    Toast.makeText(this, str, Toast.LENGTH_SHORT).show()
+        if (locateId != null) {
+            locateId?.let {
+                Firestore(this).updateIsLatest(it) { canUpdate ->
+                    if (canUpdate) {
+                        Firestore(this).saveDeployment(deployment) { str, success ->
+                            if (success) {
+                                deploymentId = str
+                                updateLocation()
+                                nextStep()
+                            } else {
+                                Toast.makeText(this, str, Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    } else {
+                        Toast.makeText(
+                            this,
+                            getString(R.string.error_has_occurred),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        MainActivity.startActivity(this)
+                        finish()
+                    }
                 }
             }
-        } else {
-            nextStep()
-            Toast.makeText(this, getString(R.string.error_has_occurred), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -259,8 +270,9 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
             .commit()
     }
 
-    override fun completeStep() {
+    override fun completeStep(images: ArrayList<String>?) {
         nextStep()
+        deploymentId?.let { MainActivity.startActivity(this, images, it) }
         finish()
     }
 
@@ -284,7 +296,7 @@ interface DeploymentProtocol {
     fun showCompleteButton()
     fun nextStep()
     fun backStep()
-    fun completeStep()
+    fun completeStep(images: ArrayList<String>?)
 
     fun openConfigure(profile: Profile)
     fun openSync(status: String)

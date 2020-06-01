@@ -63,6 +63,43 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_main)
 
         setView(savedInstanceState)
+        setSyncImage()
+    }
+
+    private fun setSyncImage() {
+        val images = intent.extras?.getStringArrayList(IMAGES)
+        val deploymentId = intent.extras?.getString(DEPLOYMENT_ID)
+        if (!images.isNullOrEmpty()) {
+            if (deploymentId != null) {
+                Storage(this).uploadImage(images, deploymentId) { count, unSyncNum ->
+                    if (count == 1) {
+                        if (unSyncNum == 0) {
+                            photoSyncTextView.visibility = View.GONE
+                        } else {
+                            photoSyncTextView.visibility = View.VISIBLE
+                            photoSyncTextView.text = getString(
+                                R.string.format_image_unsync,
+                                count.toString(),
+                                unSyncNum.toString()
+                            )
+                        }
+                    } else {
+                        if (unSyncNum == 0) {
+                            photoSyncTextView.visibility = View.GONE
+                        } else {
+                            photoSyncTextView.visibility = View.VISIBLE
+                            photoSyncTextView.text = getString(
+                                R.string.format_images_unsync,
+                                count.toString(),
+                                unSyncNum.toString()
+                            )
+                        }
+                    }
+                }
+            }
+        } else {
+            photoSyncTextView.visibility = View.GONE
+        }
     }
 
     private fun checkThenAccquireLocation(style: Style) {
@@ -143,6 +180,7 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun getDeployments() {
         Firestore(this).getDeployments(object : FirestoreResponseCallback<List<Deployment>> {
             override fun onSuccessListener(response: List<Deployment>) {
+                setCreateLocationButton(true)
                 handleMarkerDeployment(response)
             }
 
@@ -203,7 +241,6 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         val lastDeployment = deployments.lastOrNull()
         if (lastDeployment != null) {
             moveCamera(LatLng(lastDeployment.location.latitude, lastDeployment.location.longitude))
-            setCreateLocationButton(true)
         }
     }
 
@@ -330,6 +367,9 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     companion object {
+        private const val IMAGES = "IMAGES"
+        private const val DEPLOYMENT_ID = "DEPLOYMENT_ID"
+
         private const val SOURCE_DEPLOYMENT = "source.deployment"
         private const val MARKER_DEPLOYMENT_ID = "marker.deployment"
         private const val WINDOW_DEPLOYMENT_ID = "info.deployment"
@@ -340,8 +380,14 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         private const val PROPERTY_MARKER_CAPTION = "caption"
         private const val PROPERTY_MARKER_IMAGE = "marker-image"
 
-        fun startActivity(context: Context) {
+        fun startActivity(
+            context: Context,
+            images: ArrayList<String>? = null,
+            deploymentId: String? = null
+        ) {
             val intent = Intent(context, MainActivity::class.java)
+            intent.putStringArrayListExtra(IMAGES, images)
+            intent.putExtra(DEPLOYMENT_ID, deploymentId)
             context.startActivity(intent)
         }
     }

@@ -60,7 +60,7 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
         submitList(ArrayList(imagesSource))
     }
 
-    private fun getNewAttachImage(): List<String> {
+    fun getNewAttachImage(): List<String> {
         return imagesSource.filter {
             (it is LocalImageItem && it.canDelete)
         }.map {
