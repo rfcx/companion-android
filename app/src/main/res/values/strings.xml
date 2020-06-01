@@ -19,6 +19,8 @@
     <string name="green_pin">Green = 3+ days</string>
     <string name="orange_pin">Orange = 1–2 days</string>
     <string name="red_pin">Red = <![CDATA[<]]>1 day</string>
+    <string name="format_image_unsync">%s photo (%s not yet synced)</string>
+    <string name="format_images_unsync">%s photos (%s not yet synced)</string>
 
     <!--  CreateStreamActivity  -->
     <string name="create_stream">Create Stream</string>
@@ -48,7 +50,8 @@
     <string name="recommended">Recommended</string>
     <string name="custom">Custom</string>
     <string name="recommended_text">Record for 5 minutes, sleep for 10 minutes</string>
-    <string name="will_run_out_on">The battery will run out on %s</string>
+    <string name="will_run_out_on">The battery at %s location will run out on %s</string>
+    <string name="edge_device_battery">RFCx Edge device battery</string>
 
     <!--    SyncFragment-->
     <string name="sync">Sync</string>
