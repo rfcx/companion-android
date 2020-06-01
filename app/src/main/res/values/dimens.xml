@@ -16,7 +16,7 @@
     <dimen name="text_xsmall">12sp</dimen>
     <dimen name="text_xxsmall">10sp</dimen>
 
-    <dimen name="ic_audiomoth_size">170dp</dimen>
+    <dimen name="ic_audiomoth_size">110dp</dimen>
     <dimen name="button_battery_lv">56dp</dimen>
     <dimen name="progress_bar">40dp</dimen>
     <dimen name="button_height">44dp</dimen>

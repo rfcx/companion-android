@@ -7,6 +7,8 @@
     <string name="powered_by">Powered by</string>
     <string name="pls_fill_email">Please fill email</string>
     <string name="pls_fill_password">Please fill password</string>
+    <string name="connect_with_facebook">Continue with facebook</string>
+    <string name="or">OR</string>
 
     <!--  MainActivity  -->
     <string name="ok">OK</string>

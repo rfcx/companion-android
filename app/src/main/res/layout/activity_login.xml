@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="visible"
-        app:constraint_referenced_ids="loginEmailEditText,loginPasswordEditText,signInButton" />
+        app:constraint_referenced_ids="loginEmailEditText,loginPasswordEditText,leftLineView,orTextView,rightLineView,facebookLoginButton,signInButton" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/bellLogoImageView"
@@ -81,6 +81,53 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/loginPasswordEditText" />
+
+    <View
+        android:id="@+id/leftLineView"
+        android:layout_width="0dp"
+        android:layout_height="0.5dp"
+        android:layout_margin="@dimen/margin_padding_large"
+        android:layout_marginEnd="@dimen/margin_padding_large"
+        android:background="@color/text_secondary"
+        app:layout_constraintEnd_toEndOf="@+id/orTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/signInButton" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/orTextView"
+        style="@style/AudioMothText.Label.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_padding_normal"
+        android:text="@string/or"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/signInButton"
+        tools:text="OR" />
+
+    <View
+        android:id="@+id/rightLineView"
+        android:layout_width="0dp"
+        android:layout_height="0.5dp"
+        android:layout_margin="@dimen/margin_padding_large"
+        android:layout_marginEnd="@dimen/margin_padding_large"
+        android:background="@color/text_secondary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/orTextView"
+        app:layout_constraintTop_toBottomOf="@+id/signInButton" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/facebookLoginButton"
+        style="@style/RangerButton.FacebookButton"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/button_height"
+        android:layout_margin="@dimen/margin_padding_normal"
+        android:layout_marginStart="@dimen/margin_padding_normal"
+        android:layout_marginEnd="@dimen/margin_padding_normal"
+        android:text="@string/connect_with_facebook"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/orTextView" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/poweredByTextView"

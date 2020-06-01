@@ -39,6 +39,12 @@
         <item name="android:textColor">@android:color/black</item>
     </style>
 
+    <style name="RangerButton.FacebookButton" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/bg_facebook_login_button</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
     <!-- TextView -->
     <style name="AudioMothText.Subhead" parent="Base.TextAppearance.AppCompat.Subhead">
         <item name="android:textColor">@color/text_black</item>
@@ -52,8 +58,14 @@
         <item name="android:textColor">@color/text_secondary</item>
     </style>
 
-    <style name="AudioMothText.Body.Headline" parent="Base.TextAppearance.AppCompat.Headline">
+    <style name="AudioMothText.Body.Headline" parent="Base.TextAppearance.AppCompat.Title">
         <item name="android:textColor">@color/text_secondary</item>
+    </style>
+
+    <style name="AudioMothText.Label.Secondary" parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">@dimen/text_small</item>
+        <item name="android:fontFamily">sans-serif</item>
     </style>
 
     <!-- EditText -->
