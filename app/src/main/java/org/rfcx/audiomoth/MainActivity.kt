@@ -35,6 +35,7 @@ import kotlinx.android.synthetic.main.layout_map_window_info.view.*
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.DeploymentActivity
+import org.rfcx.audiomoth.view.LoginActivity
 
 open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private var mapboxMap: MapboxMap? = null
@@ -63,6 +64,12 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_main)
 
         setView(savedInstanceState)
+
+        logoutImageView.setOnClickListener {
+            Preferences.getInstance(this).clear()
+            LoginActivity.startActivity(this)
+            finish()
+        }
         setSyncImage()
     }
 
