@@ -87,73 +87,58 @@ class PerformBatteryFragment : Fragment() {
 
     private fun timeFlash() {
         batteryLv1Button.setOnClickListener {
-            deploymentProtocol?.openPerformBattery(
-                BATTERY_LEVEL,
-                R.drawable.battery_level_5
-            )
+            deploymentProtocol?.openPerformBattery(BATTERY_LEVEL, 1)
         }
         batteryLv2Button.setOnClickListener {
-            deploymentProtocol?.openPerformBattery(
-                BATTERY_LEVEL,
-                R.drawable.battery_level_4
-            )
+            deploymentProtocol?.openPerformBattery(BATTERY_LEVEL, 2)
         }
         batteryLv3Button.setOnClickListener {
-            deploymentProtocol?.openPerformBattery(
-                BATTERY_LEVEL,
-                R.drawable.battery_level_3
-            )
+            deploymentProtocol?.openPerformBattery(BATTERY_LEVEL, 3)
         }
         batteryLv4Button.setOnClickListener {
-            deploymentProtocol?.openPerformBattery(
-                BATTERY_LEVEL,
-                R.drawable.battery_level_2
-            )
+            deploymentProtocol?.openPerformBattery(BATTERY_LEVEL, 4)
         }
         batteryLv5Button.setOnClickListener {
-            deploymentProtocol?.openPerformBattery(
-                BATTERY_LEVEL,
-                R.drawable.battery_level_1
-            )
+            deploymentProtocol?.openPerformBattery(BATTERY_LEVEL, 5)
         }
     }
 
     private fun knowBatteryLevel() {
-        var image = 0
+        var level = 0
         var days = ""
         var numberOfDays = 0
         var batteryLevel = 0
         var percent = ""
         arguments?.let {
-            image = it.getInt(IMAGE)
+            level = it.getInt(LEVEL)
         }
 
-        when (image) {
-            R.drawable.battery_level_1 -> {
+        when (level) {
+            5 -> {
                 numberOfDays = 0
                 batteryLevel = 20
                 days = getString(R.string.day, "<1")
                 percent = getString(R.string.charged, "20%")
             }
-            R.drawable.battery_level_2 -> {
+            4 -> {
                 numberOfDays = 1
                 batteryLevel = 40
                 days = getString(R.string.day, "1")
                 percent = getString(R.string.charged, "40%")
             }
-            R.drawable.battery_level_3 -> {
+            3 -> {
                 numberOfDays = 2
                 batteryLevel = 60
                 days = getString(R.string.days, "2")
                 percent = getString(R.string.charged, "60%")
             }
-            R.drawable.battery_level_4 -> {
+            2 -> {
                 numberOfDays = 4
                 batteryLevel = 80
                 days = getString(R.string.days, "4")
                 percent = getString(R.string.charged, "80%")
             }
-            R.drawable.battery_level_5 -> {
+            1-> {
                 numberOfDays = 6
                 batteryLevel = 100
                 days = getString(R.string.days, "6")
@@ -161,9 +146,9 @@ class PerformBatteryFragment : Fragment() {
             }
         }
 
+        setBatteryView(level)
         daysTextView.text = days
         chargedTextView.text = percent
-        batteryLevelImageView.setImageResource(image)
 
         nextButton.setOnClickListener {
             val batteryDepletedAt = Timestamp(System.currentTimeMillis() + (day * numberOfDays))
@@ -185,6 +170,46 @@ class PerformBatteryFragment : Fragment() {
                     )
                 notification(batteryDepletedAt, location.name)
                 deploymentProtocol?.saveDeployment(deployment)
+            }
+        }
+    }
+
+    private fun setBatteryView(level: Int) {
+        when (level) {
+            5 -> {
+                batteryLevel1View.visibility = View.VISIBLE
+                batteryLevel2View.visibility = View.INVISIBLE
+                batteryLevel3View.visibility = View.INVISIBLE
+                batteryLevel4View.visibility = View.INVISIBLE
+                batteryLevel5View.visibility = View.INVISIBLE
+            }
+            4 -> {
+                batteryLevel1View.visibility = View.VISIBLE
+                batteryLevel2View.visibility = View.VISIBLE
+                batteryLevel3View.visibility = View.INVISIBLE
+                batteryLevel4View.visibility = View.INVISIBLE
+                batteryLevel5View.visibility = View.INVISIBLE
+            }
+            3 -> {
+                batteryLevel1View.visibility = View.VISIBLE
+                batteryLevel2View.visibility = View.VISIBLE
+                batteryLevel3View.visibility = View.VISIBLE
+                batteryLevel4View.visibility = View.INVISIBLE
+                batteryLevel5View.visibility = View.INVISIBLE
+            }
+            2 -> {
+                batteryLevel1View.visibility = View.VISIBLE
+                batteryLevel2View.visibility = View.VISIBLE
+                batteryLevel3View.visibility = View.VISIBLE
+                batteryLevel4View.visibility = View.VISIBLE
+                batteryLevel5View.visibility = View.INVISIBLE
+            }
+            1 -> {
+                batteryLevel1View.visibility = View.VISIBLE
+                batteryLevel2View.visibility = View.VISIBLE
+                batteryLevel3View.visibility = View.VISIBLE
+                batteryLevel4View.visibility = View.VISIBLE
+                batteryLevel5View.visibility = View.VISIBLE
             }
         }
     }
@@ -213,7 +238,7 @@ class PerformBatteryFragment : Fragment() {
     companion object {
         const val TAG = "PerformBatteryFragment"
         const val STATUS = "STATUS"
-        const val IMAGE = "IMAGE"
+        const val LEVEL = "LEVEL"
         const val TEST_BATTERY = "TEST_BATTERY"
         const val TIME_LED_FLASH = "TIME_LED_FLASH"
         const val BATTERY_LEVEL = "BATTERY_LEVEL"
@@ -221,11 +246,11 @@ class PerformBatteryFragment : Fragment() {
         const val LOCATION_NAME = "LOCATION_NAME"
 
         @JvmStatic
-        fun newInstance(page: String, image: Int?) = PerformBatteryFragment().apply {
+        fun newInstance(page: String, level: Int?) = PerformBatteryFragment().apply {
             arguments = Bundle().apply {
                 putString(STATUS, page)
-                if (image != null) {
-                    putInt(IMAGE, image)
+                if (level != null) {
+                    putInt(LEVEL, level)
                 }
             }
         }

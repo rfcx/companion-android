@@ -39,10 +39,22 @@
         <item name="android:textColor">@android:color/black</item>
     </style>
 
-    <style name="RangerButton.FacebookButton" parent="Widget.AppCompat.Button">
+    <style name="AudioMothButton.FacebookButton" parent="Widget.AppCompat.Button">
         <item name="android:background">@drawable/bg_facebook_login_button</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="AudioMothButton.BlackButton" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/bg_color_black_button</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="AudioMothButton.GreenButton.Radius5" parent="AudioMothButton">
+        <item name="android:background">@drawable/bg_color_green_radius_5</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@android:color/black</item>
     </style>
 
     <!-- TextView -->

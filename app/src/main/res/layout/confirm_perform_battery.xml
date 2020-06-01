@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -32,16 +31,90 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/batteryLevelImageView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_margin="@dimen/margin_padding_xlarge"
+    <View
+        android:layout_width="40dp"
+        android:layout_height="12dp"
+        android:background="@color/text_black"
+        app:layout_constraintBottom_toTopOf="@id/batteryLevel5View"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <View
+        android:id="@+id/batteryView"
+        style="@style/AudioMothButton.BlackButton"
+        android:layout_width="100dp"
+        android:layout_height="130dp"
         app:layout_constraintBottom_toBottomOf="@id/guidelineHorizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/guidelineHorizontalTop"
-        tools:src="@drawable/battery_level_4" />
+        app:layout_constraintTop_toTopOf="@id/guidelineHorizontalTop" />
+
+    <View
+        android:id="@+id/batteryLevel1View"
+        style="@style/AudioMothButton.GreenButton.Radius5"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/margin_padding_xsmall"
+        android:layout_marginEnd="@dimen/margin_padding_xsmall"
+        android:layout_marginBottom="@dimen/margin_padding_xsmall"
+        app:layout_constraintBottom_toBottomOf="@id/batteryView"
+        app:layout_constraintEnd_toEndOf="@id/batteryView"
+        app:layout_constraintStart_toStartOf="@id/batteryView"
+        app:layout_constraintTop_toBottomOf="@id/batteryLevel2View" />
+
+    <View
+        android:id="@+id/batteryLevel2View"
+        style="@style/AudioMothButton.GreenButton.Radius5"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/margin_padding_xsmall"
+        android:layout_marginEnd="@dimen/margin_padding_xsmall"
+        android:layout_marginBottom="@dimen/margin_padding_xsmall"
+        app:layout_constraintBottom_toTopOf="@id/batteryLevel1View"
+        app:layout_constraintEnd_toEndOf="@id/batteryView"
+        app:layout_constraintStart_toStartOf="@id/batteryView"
+        app:layout_constraintTop_toBottomOf="@id/batteryLevel3View" />
+
+    <View
+        android:id="@+id/batteryLevel3View"
+        style="@style/AudioMothButton.GreenButton.Radius5"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/margin_padding_xsmall"
+        android:layout_marginEnd="@dimen/margin_padding_xsmall"
+        android:layout_marginBottom="@dimen/margin_padding_xsmall"
+        app:layout_constraintBottom_toTopOf="@id/batteryLevel2View"
+        app:layout_constraintEnd_toEndOf="@id/batteryView"
+        app:layout_constraintStart_toStartOf="@id/batteryView"
+        app:layout_constraintTop_toBottomOf="@id/batteryLevel4View" />
+
+    <View
+        android:id="@+id/batteryLevel4View"
+        style="@style/AudioMothButton.GreenButton.Radius5"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/margin_padding_xsmall"
+        android:layout_marginEnd="@dimen/margin_padding_xsmall"
+        android:layout_marginBottom="@dimen/margin_padding_xsmall"
+        app:layout_constraintBottom_toTopOf="@id/batteryLevel3View"
+        app:layout_constraintEnd_toEndOf="@id/batteryView"
+        app:layout_constraintStart_toStartOf="@id/batteryView"
+        app:layout_constraintTop_toBottomOf="@id/batteryLevel5View" />
+
+    <View
+        android:id="@+id/batteryLevel5View"
+        style="@style/AudioMothButton.GreenButton.Radius5"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/margin_padding_xsmall"
+        android:layout_marginTop="@dimen/margin_padding_xsmall"
+        android:layout_marginEnd="@dimen/margin_padding_xsmall"
+        android:layout_marginBottom="@dimen/margin_padding_xsmall"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@id/batteryLevel4View"
+        app:layout_constraintEnd_toEndOf="@id/batteryView"
+        app:layout_constraintStart_toStartOf="@id/batteryView"
+        app:layout_constraintTop_toTopOf="@id/batteryView" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/daysTextView"
