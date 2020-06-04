@@ -9,13 +9,15 @@ import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
 import org.rfcx.audiomoth.util.LocationPermissions
+import org.rfcx.audiomoth.util.Preferences
 import org.rfcx.audiomoth.util.Storage
 import org.rfcx.audiomoth.view.DeploymentActivity
+import org.rfcx.audiomoth.view.LoginActivity
 import org.rfcx.audiomoth.view.configure.MapFragment
 import org.rfcx.audiomoth.view.configure.ProfileFragment
 import org.rfcx.audiomoth.widget.BottomNavigationMenuItem
 
-open class MainActivity : AppCompatActivity() {
+open class MainActivity : AppCompatActivity(), MainActivityListener {
 
     private var currentFragment: Fragment? = null
     private val locationPermissions by lazy { LocationPermissions(this) }
@@ -157,6 +159,11 @@ open class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onLogout() {
+        Preferences.getInstance(this).clear()
+        LoginActivity.startActivity(this)
+        finish()    }
+
     companion object {
         private const val IMAGES = "IMAGES"
         private const val DEPLOYMENT_ID = "DEPLOYMENT_ID"
@@ -172,4 +179,8 @@ open class MainActivity : AppCompatActivity() {
             context.startActivity(intent)
         }
     }
+}
+
+interface MainActivityListener {
+    fun onLogout()
 }

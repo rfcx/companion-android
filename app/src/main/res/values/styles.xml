@@ -56,6 +56,29 @@
         <item name="android:textColor">@color/text_secondary</item>
     </style>
 
+    <style name="AudioMothText.Label.Secondary" parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">@dimen/text_small</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="AudioMothText.Headline" parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="AudioMothText.Title" parent="TextAppearance.AppCompat.Body2">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">@dimen/text_small</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="AudioMothText.SubTitle" parent="Base.TextAppearance.AppCompat.Title">
+        <item name="android:textColor">@color/text_black</item>
+        <item name="android:textSize">@dimen/text_small</item>
+    </style>
+
     <!-- EditText -->
     <style name="AudioMothEditText" parent="Widget.AppCompat.EditText" />
 

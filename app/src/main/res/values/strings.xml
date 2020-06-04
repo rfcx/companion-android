@@ -106,6 +106,13 @@
         <item>Highest</item>
     </string-array>
 
+    <!--  ProfileFragment  -->
+    <string name="profile_aditional_label">Additional</string>
+    <string name="profile_app_version_label">App version</string>
+    <string name="account">Account</string>
+    <string name="profile_sign_out_label">Sign out</string>
+    <string name="version_app">%s (%s)</string>
+
     <!--  DeployFragment  -->
     <string name="almost_there">Almost there!</string>
     <string name="switch_to_deploy">Switch your device to DEPLOY</string>
