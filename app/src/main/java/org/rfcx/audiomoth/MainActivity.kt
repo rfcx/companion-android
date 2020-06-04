@@ -66,7 +66,6 @@ open class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        Mapbox.getInstance(this, getString(R.string.mapbox_token))
         setContentView(R.layout.activity_main)
 
         setView(savedInstanceState)
@@ -426,36 +425,6 @@ open class MainActivity : AppCompatActivity() {
             refreshSource()
         }
     }
-
-//    override fun onStart() {
-//        super.onStart()
-//        mapView.onStart()
-//    }
-//
-//    override fun onResume() {
-//        super.onResume()
-//        mapView.onResume()
-//    }
-//
-//    override fun onPause() {
-//        super.onPause()
-//        mapView.onPause()
-//    }
-//
-//    override fun onStop() {
-//        super.onStop()
-//        mapView.onStop()
-//    }
-//
-//    override fun onLowMemory() {
-//        super.onLowMemory()
-//        mapView.onLowMemory()
-//    }
-//
-//    override fun onDestroy() {
-//        super.onDestroy()
-//        mapView.onDestroy()
-//    }
 
     companion object {
         private const val IMAGES = "IMAGES"
