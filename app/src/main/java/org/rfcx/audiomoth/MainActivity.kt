@@ -8,19 +8,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point.fromLngLat
 import com.mapbox.mapboxsdk.annotations.BubbleLayout
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
-import com.mapbox.mapboxsdk.location.LocationComponentOptions
-import com.mapbox.mapboxsdk.location.modes.CameraMode
-import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.style.expressions.Expression
@@ -35,7 +29,6 @@ import kotlinx.android.synthetic.main.layout_map_window_info.view.*
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.DeploymentActivity
-import org.rfcx.audiomoth.view.LoginActivity
 import org.rfcx.audiomoth.view.configure.MapFragment
 import org.rfcx.audiomoth.view.configure.ProfileFragment
 import org.rfcx.audiomoth.widget.BottomNavigationMenuItem
@@ -68,18 +61,20 @@ open class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        setView(savedInstanceState)
+        createLocationButton.setOnClickListener {
+            DeploymentActivity.startActivity(this)
+        }
 
         setupBottomMenu()
         if (savedInstanceState == null) {
             setupFragments()
         }
 
-        logoutImageView.setOnClickListener {
-            Preferences.getInstance(this).clear()
-            LoginActivity.startActivity(this)
-            finish()
-        }
+//        logoutImageView.setOnClickListener {
+//            Preferences.getInstance(this).clear()
+//            LoginActivity.startActivity(this)
+//            finish()
+//        }
         setSyncImage()
         progressBar.visibility = View.GONE
         logoutImageView.visibility = View.GONE
@@ -193,14 +188,6 @@ open class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun checkThenAccquireLocation(style: Style) {
-        locationPermissions.check { isAllowed: Boolean ->
-            if (isAllowed) {
-                enableLocationComponent(style)
-            }
-        }
-    }
-
 //    override fun onMapReady(mapboxMap: MapboxMap) {
 //        this.mapboxMap = mapboxMap
 //        mapboxMap.setStyle(Style.OUTDOORS) {
@@ -217,15 +204,6 @@ open class MainActivity : AppCompatActivity() {
 //        }
 //    }
 
-    private fun setView(savedInstanceState: Bundle?) {
-        setCreateLocationButton(false)
-//        mapView.onCreate(savedInstanceState)
-//        mapView.getMapAsync(this)
-        createLocationButton.setOnClickListener {
-            DeploymentActivity.startActivity(this)
-        }
-    }
-
     private fun setupSources(style: Style) {
         deploymentSource =
             GeoJsonSource(SOURCE_DEPLOYMENT, FeatureCollection.fromFeatures(listOf()))
@@ -239,32 +217,8 @@ open class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun setCreateLocationButton(show: Boolean) {
+    private fun setCreateLocationButton(show: Boolean) { // delete
 //        progressBar.visibility = if (!show) View.VISIBLE else View.GONE
-    }
-
-    private fun enableLocationComponent(style: Style) {
-        val customLocationComponentOptions = LocationComponentOptions.builder(this)
-            .trackingGesturesManagement(true)
-            .accuracyColor(ContextCompat.getColor(this, R.color.colorPrimary))
-            .build()
-
-        val locationComponentActivationOptions =
-            LocationComponentActivationOptions.builder(this, style)
-                .locationComponentOptions(customLocationComponentOptions)
-                .build()
-
-        mapboxMap?.let { it ->
-            it.locationComponent.apply {
-                if (locationComponentActivationOptions != null) {
-                    activateLocationComponent(locationComponentActivationOptions)
-                }
-
-                isLocationComponentEnabled = true
-                cameraMode = CameraMode.TRACKING
-                renderMode = RenderMode.COMPASS
-            }
-        }
     }
 
     private fun getDeployments() {
@@ -335,7 +289,7 @@ open class MainActivity : AppCompatActivity() {
     }
 
     private fun setWindowInfoImageGenResults(windowInfoImages: HashMap<String, Bitmap>) {
-        mapboxMap?.style?.addImages(windowInfoImages)
+//        mapboxMap?.style?.addImages(windowInfoImages)
     }
 
     private fun setupImages(style: Style) {
@@ -386,7 +340,7 @@ open class MainActivity : AppCompatActivity() {
     }
 
     private fun moveCamera(latLng: LatLng) {
-        mapboxMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0))
+//        mapboxMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0))
     }
 
     private fun handleClickIcon(screenPoint: PointF): Boolean {
