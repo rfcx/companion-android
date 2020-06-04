@@ -38,22 +38,14 @@
         app:maxImageSize="16dp"
         app:tint="#ffffff" />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/logoutImageView"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:layout_margin="@dimen/margin_padding_normal"
-        android:src="@drawable/ic_logout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/photoSyncTextView"
         style="@style/AudioMothText.Body.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_small"
-        android:layout_marginBottom="@dimen/margin_padding_xlarge"
+        android:layout_marginTop="@dimen/margin_padding_small"
+        android:layout_gravity="top|start"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:text="3 photos (2 not yet synced)" />

@@ -46,14 +46,7 @@ open class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             setupFragments()
         }
-
-//        logoutImageView.setOnClickListener {
-//            Preferences.getInstance(this).clear()
-//            LoginActivity.startActivity(this)
-//            finish()
-//        }
         setSyncImage()
-        logoutImageView.visibility = View.GONE
     }
 
     private fun setupBottomMenu() {
