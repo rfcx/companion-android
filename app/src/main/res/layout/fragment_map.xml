@@ -11,4 +11,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="@dimen/progress_bar"
+        android:layout_height="@dimen/progress_bar"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/margin_padding_large" />
+
 </FrameLayout>

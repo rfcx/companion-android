@@ -6,12 +6,8 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.mapbox.geojson.FeatureCollection
-import com.mapbox.mapboxsdk.maps.MapboxMap
-import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
-import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.util.LocationPermissions
 import org.rfcx.audiomoth.util.Storage
 import org.rfcx.audiomoth.view.DeploymentActivity
@@ -57,7 +53,6 @@ open class MainActivity : AppCompatActivity() {
 //            finish()
 //        }
         setSyncImage()
-        progressBar.visibility = View.GONE
         logoutImageView.visibility = View.GONE
     }
 

@@ -31,6 +31,7 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.BitmapUtils
+import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_map_window_info.view.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Deployment
@@ -63,6 +64,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
 
+        progressBar.visibility = View.VISIBLE
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
@@ -175,12 +177,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         context?.let {
             Firestore(it).getDeployments(object : FirestoreResponseCallback<List<Deployment>> {
                 override fun onSuccessListener(response: List<Deployment>) {
-                    //setCreateLocationButton(true)
+                    progressBar.visibility = View.INVISIBLE
                     handleMarkerDeployment(response)
                 }
 
                 override fun addOnFailureListener(exception: Exception) {
-                    //setCreateLocationButton(true)
+                    progressBar.visibility = View.INVISIBLE
                 }
             })
         }

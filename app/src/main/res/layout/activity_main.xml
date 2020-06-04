@@ -38,15 +38,6 @@
         app:maxImageSize="16dp"
         app:tint="#ffffff" />
 
-<!--    <com.mapbox.mapboxsdk.maps.MapView-->
-<!--        android:id="@+id/mapView"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="0dp"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent" />-->
-
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/logoutImageView"
         android:layout_width="25dp"
@@ -66,12 +57,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:text="3 photos (2 not yet synced)" />
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="@dimen/progress_bar"
-        android:layout_height="@dimen/progress_bar"
-        android:layout_gravity=""
-        android:layout_margin="@dimen/margin_padding_large" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
