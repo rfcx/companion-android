@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,14 +7,45 @@
     android:background="@android:color/white"
     tools:context=".MainActivity">
 
-    <com.mapbox.mapboxsdk.maps.MapView
-        android:id="@+id/mapView"
+    <FrameLayout
+        android:id="@+id/contentContainer"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:id="@+id/bottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:clickable="false"
+        app:contentInsetStart="0dp"
+        app:contentInsetStartWithNavigation="0dp"
+        app:fabAlignmentMode="center"
+        app:titleMarginStart="0dp">
+
+        <include layout="@layout/layout_bottom_navigation_menu" />
+
+    </com.google.android.material.bottomappbar.BottomAppBar>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/createLocationButton"
+        android:layout_width="@dimen/button_battery_lv"
+        android:layout_height="@dimen/button_battery_lv"
+        android:src="@drawable/ic_signs"
+        app:backgroundTint="@color/colorPrimary"
+        app:layout_anchor="@id/bottomBar"
+        app:maxImageSize="16dp"
+        app:tint="#ffffff" />
+
+<!--    <com.mapbox.mapboxsdk.maps.MapView-->
+<!--        android:id="@+id/mapView"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="0dp"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/logoutImageView"
@@ -30,30 +61,17 @@
         style="@style/AudioMothText.Body.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/margin_padding_xlarge"
         android:layout_marginStart="@dimen/margin_padding_small"
+        android:layout_marginBottom="@dimen/margin_padding_xlarge"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:text="3 photos (2 not yet synced)" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/createLocationButton"
-        android:layout_width="@dimen/button_battery_lv"
-        android:layout_height="@dimen/button_battery_lv"
-        android:layout_margin="@dimen/margin_padding_normal"
-        android:src="@drawable/ic_signs"
-        app:backgroundTint="@color/colorPrimary"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:maxImageSize="16dp"
-        app:tint="#ffffff" />
 
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="@dimen/progress_bar"
         android:layout_height="@dimen/progress_bar"
-        android:layout_margin="@dimen/margin_padding_large"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:layout_gravity=""
+        android:layout_margin="@dimen/margin_padding_large" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

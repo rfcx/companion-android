@@ -10,10 +10,10 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.fragment.app.Fragment
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point.fromLngLat
-import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.BubbleLayout
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -22,7 +22,6 @@ import com.mapbox.mapboxsdk.location.LocationComponentOptions
 import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapboxMap
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.style.expressions.Expression
 import com.mapbox.mapboxsdk.style.layers.Property
@@ -31,13 +30,20 @@ import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.BitmapUtils
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
 import kotlinx.android.synthetic.main.layout_map_window_info.view.*
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.DeploymentActivity
 import org.rfcx.audiomoth.view.LoginActivity
+import org.rfcx.audiomoth.view.configure.MapFragment
+import org.rfcx.audiomoth.view.configure.ProfileFragment
+import org.rfcx.audiomoth.widget.BottomNavigationMenuItem
 
-open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
+open class MainActivity : AppCompatActivity() {
+
+    private var currentFragment: Fragment? = null
+
     private var mapboxMap: MapboxMap? = null
     private var deployments = listOf<Deployment>()
     private var deploymentSource: GeoJsonSource? = null
@@ -60,10 +66,15 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Mapbox.getInstance(this, getString(R.string.mapbox_token))
+//        Mapbox.getInstance(this, getString(R.string.mapbox_token))
         setContentView(R.layout.activity_main)
 
         setView(savedInstanceState)
+
+        setupBottomMenu()
+        if (savedInstanceState == null) {
+            setupFragments()
+        }
 
         logoutImageView.setOnClickListener {
             Preferences.getInstance(this).clear()
@@ -71,6 +82,80 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             finish()
         }
         setSyncImage()
+        progressBar.visibility = View.GONE
+        logoutImageView.visibility = View.GONE
+    }
+
+    private fun setupBottomMenu() {
+        menuMap.setOnClickListener {
+            onBottomMenuClick(it)
+        }
+
+        menuProfile.setOnClickListener {
+            onBottomMenuClick(it)
+        }
+
+        menuMap.performClick()
+    }
+
+    private fun onBottomMenuClick(menu: View) {
+        if ((menu as BottomNavigationMenuItem).menuSelected) return
+        when (menu.id) {
+            menuMap.id -> {
+                menuMap.menuSelected = true
+                menuProfile.menuSelected = false
+
+                showMap()
+            }
+
+            menuProfile.id -> {
+                menuMap.menuSelected = false
+                menuProfile.menuSelected = true
+
+                showProfile()
+            }
+        }
+    }
+
+    private fun showProfile() {
+        showAboveAppbar(true)
+        this.currentFragment = getProfile()
+        supportFragmentManager.beginTransaction()
+            .show(getProfile())
+            .hide(getMap())
+            .commit()
+    }
+
+    private fun showMap() {
+        showAboveAppbar(false)
+        this.currentFragment = getMap()
+        supportFragmentManager.beginTransaction()
+            .show(getMap())
+            .hide(getProfile())
+            .commit()
+    }
+
+    private fun showAboveAppbar(show: Boolean) {
+        val contentContainerPaddingBottom =
+            if (show) resources.getDimensionPixelSize(R.dimen.button_battery_lv) else 0
+        contentContainer.setPadding(0, 0, 0, contentContainerPaddingBottom)
+    }
+
+    private fun getMap(): MapFragment =
+        supportFragmentManager.findFragmentByTag(MapFragment.tag) as MapFragment?
+            ?: MapFragment.newInstance()
+
+    private fun getProfile(): ProfileFragment =
+        supportFragmentManager.findFragmentByTag(ProfileFragment.tag) as ProfileFragment?
+            ?: ProfileFragment.newInstance()
+
+    private fun setupFragments() {
+        supportFragmentManager.beginTransaction()
+            .add(contentContainer.id, getProfile(), ProfileFragment.tag)
+            .add(contentContainer.id, getMap(), MapFragment.tag)
+            .commit()
+
+        menuMap.performClick()
     }
 
     private fun setSyncImage() {
@@ -117,26 +202,26 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    override fun onMapReady(mapboxMap: MapboxMap) {
-        this.mapboxMap = mapboxMap
-        mapboxMap.setStyle(Style.OUTDOORS) {
-            checkThenAccquireLocation(it)
-            setupSources(it)
-            setupImages(it)
-            setupMarkerLayers(it)
-            setupWindowInfo(it)
-
-            getDeployments()
-            mapboxMap.addOnMapClickListener { latLng ->
-                handleClickIcon(mapboxMap.projection.toScreenLocation(latLng))
-            }
-        }
-    }
+//    override fun onMapReady(mapboxMap: MapboxMap) {
+//        this.mapboxMap = mapboxMap
+//        mapboxMap.setStyle(Style.OUTDOORS) {
+//            checkThenAccquireLocation(it)
+//            setupSources(it)
+//            setupImages(it)
+//            setupMarkerLayers(it)
+//            setupWindowInfo(it)
+//
+//            getDeployments()
+//            mapboxMap.addOnMapClickListener { latLng ->
+//                handleClickIcon(mapboxMap.projection.toScreenLocation(latLng))
+//            }
+//        }
+//    }
 
     private fun setView(savedInstanceState: Bundle?) {
         setCreateLocationButton(false)
-        mapView.onCreate(savedInstanceState)
-        mapView.getMapAsync(this)
+//        mapView.onCreate(savedInstanceState)
+//        mapView.getMapAsync(this)
         createLocationButton.setOnClickListener {
             DeploymentActivity.startActivity(this)
         }
@@ -156,8 +241,7 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
     private fun setCreateLocationButton(show: Boolean) {
-        if (show) createLocationButton.show() else createLocationButton.hide()
-        progressBar.visibility = if (!show) View.VISIBLE else View.GONE
+//        progressBar.visibility = if (!show) View.VISIBLE else View.GONE
     }
 
     private fun enableLocationComponent(style: Style) {
@@ -343,35 +427,35 @@ open class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        mapView.onStart()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        mapView.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        mapView.onPause()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        mapView.onStop()
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-        mapView.onLowMemory()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mapView.onDestroy()
-    }
+//    override fun onStart() {
+//        super.onStart()
+//        mapView.onStart()
+//    }
+//
+//    override fun onResume() {
+//        super.onResume()
+//        mapView.onResume()
+//    }
+//
+//    override fun onPause() {
+//        super.onPause()
+//        mapView.onPause()
+//    }
+//
+//    override fun onStop() {
+//        super.onStop()
+//        mapView.onStop()
+//    }
+//
+//    override fun onLowMemory() {
+//        super.onLowMemory()
+//        mapView.onLowMemory()
+//    }
+//
+//    override fun onDestroy() {
+//        super.onDestroy()
+//        mapView.onDestroy()
+//    }
 
     companion object {
         private const val IMAGES = "IMAGES"
