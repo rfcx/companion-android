@@ -63,9 +63,9 @@
     <View
         android:id="@+id/view1"
         android:layout_width="match_parent"
-        android:layout_height="10dp"
+        android:layout_height="35dp"
         android:layout_marginTop="@dimen/margin_padding_normal"
-        android:background="@color/grey_light"
+        android:background="@color/colorPrimary"
         app:layout_constraintTop_toBottomOf="@id/userProfileLayout" />
 
     <TextView
@@ -74,24 +74,24 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_normal"
-        android:layout_marginTop="@dimen/margin_padding_normal"
         android:text="@string/profile_aditional_label"
         android:textAllCaps="true"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="@id/view1"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/view1" />
+        app:layout_constraintTop_toTopOf="@id/view1" />
 
     <TextView
         android:id="@+id/appVersionTextView"
         style="@style/AudioMothText.Body.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_padding_small"
         android:layout_marginStart="@dimen/margin_padding_normal"
-        android:paddingTop="@dimen/margin_padding_normal"
+        android:layout_marginTop="@dimen/margin_padding_normal"
         android:text="@string/profile_app_version_label"
         android:textColor="@color/text_secondary"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/additionalTextView" />
+        app:layout_constraintTop_toBottomOf="@id/view1" />
 
     <TextView
         android:id="@+id/versionTextView"
@@ -104,13 +104,24 @@
         app:layout_constraintTop_toBottomOf="@id/appVersionTextView"
         tools:text="2.0.0(135)" />
 
+    <TextView
+        android:id="@+id/feedbackTextView"
+        style="@style/AudioMothText.SubTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_padding_small"
+        android:background="?attr/selectableItemBackground"
+        android:padding="@dimen/margin_padding_normal"
+        android:text="@string/profile_feedback_label"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/versionTextView" />
+
     <View
         android:id="@+id/view2"
         android:layout_width="match_parent"
-        android:layout_height="10dp"
-        android:layout_marginTop="@dimen/margin_padding_normal"
-        android:background="@color/grey_light"
-        app:layout_constraintTop_toBottomOf="@id/versionTextView" />
+        android:layout_height="35dp"
+        android:background="@color/colorPrimary"
+        app:layout_constraintTop_toBottomOf="@id/feedbackTextView" />
 
     <TextView
         android:id="@+id/accountTextView"
@@ -120,8 +131,10 @@
         android:layout_margin="@dimen/margin_padding_normal"
         android:text="@string/account"
         android:textAllCaps="true"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="@id/view2"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/view2" />
+        app:layout_constraintTop_toTopOf="@id/view2" />
 
     <TextView
         android:id="@+id/logoutTextView"
@@ -130,9 +143,8 @@
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"
         android:padding="@dimen/margin_padding_normal"
-        android:layout_marginTop="@dimen/margin_padding_small"
         android:text="@string/profile_sign_out_label"
-        app:layout_constraintTop_toBottomOf="@id/accountTextView"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/view2" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
