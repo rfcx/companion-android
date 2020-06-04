@@ -112,6 +112,7 @@
     <string name="account">Account</string>
     <string name="profile_sign_out_label">Sign out</string>
     <string name="version_app">%s (%s)</string>
+    <string name="profile_feedback_label">Feedback</string>
 
     <!--  DeployFragment  -->
     <string name="almost_there">Almost there!</string>
