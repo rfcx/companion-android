@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.zhihu.matisse.Matisse
 import com.zhihu.matisse.MimeType
 import kotlinx.android.synthetic.main.activity_feedback.*
@@ -163,6 +164,7 @@ class FeedbackActivity : AppCompatActivity() {
     private fun sendFeedback() {
         val sendFeedbackView = findViewById<View>(R.id.sendFeedbackView)
         val contextView = findViewById<View>(R.id.content)
+        val feedbackInput = feedbackEditText.text.toString()
 
         feedbackGroupView.visibility = View.GONE
         feedbackProgressBar.visibility = View.VISIBLE
@@ -170,20 +172,22 @@ class FeedbackActivity : AppCompatActivity() {
         setEnableSendFeedbackView(false)
         sendFeedbackView.hideKeyboard()
 
-//        val feedbackInput = feedbackEditText.text.toString()
-//        feedbackViewModel.saveDataInFirestore(pathListArray, feedbackInput, contextView)
-//
-//        feedbackViewModel.statusToSaveData.observe(this, Observer {
-//            if (it == "Success") {
-        val intent = Intent()
-        setResult(ProfileFragment.RESULT_CODE, intent)
-        finish()
-//            } else if (it == "Fail") {
-//                setEnableSendFeedbackView()
-//                feedbackGroupView.visibility = View.VISIBLE
-//                feedbackProgressBar.visibility = View.INVISIBLE
-//            }
-//        })
+        Firestore(this).saveFeedback(feedbackInput, pathListArray) { success ->
+            if (success) {
+                val intent = Intent()
+                setResult(ProfileFragment.RESULT_CODE, intent)
+                finish()
+            } else {
+                feedbackGroupView.visibility = View.VISIBLE
+                feedbackProgressBar.visibility = View.GONE
+
+                Snackbar.make(
+                    contextView,
+                    R.string.feedback_submission_failed,
+                    Snackbar.LENGTH_LONG
+                ).setAction(R.string.snackbar_retry) { sendFeedback() }.show()
+            }
+        }
     }
 
     private fun View.hideKeyboard() = this.let {

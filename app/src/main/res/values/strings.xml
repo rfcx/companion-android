@@ -120,6 +120,8 @@
     <string name="maximum_number_of_attachments">You have reached max selectable. Try remove some items before adding more attachments.</string>
     <string name="feedback_submitted">Feedback submitted. Thank you for your time :)</string>
     <string name="profile_send_feedback">Send feedback</string>
+    <string name="feedback_submission_failed">Feedback submission failed! Please try again.</string>
+    <string name="snackbar_retry">RETRY</string>
 
     <!--  DeployFragment  -->
     <string name="almost_there">Almost there!</string>
