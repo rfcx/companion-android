@@ -114,6 +114,13 @@
     <string name="version_app">%s (%s)</string>
     <string name="profile_feedback_label">Feedback</string>
 
+    <!--  FeedbackActivity  -->
+    <string name="app_feedback_share_ideas">Leave app feedback or share your ideas</string>
+    <string name="from">From: %s</string>
+    <string name="maximum_number_of_attachments">You have reached max selectable. Try remove some items before adding more attachments.</string>
+    <string name="feedback_submitted">Feedback submitted. Thank you for your time :)</string>
+    <string name="profile_send_feedback">Send feedback</string>
+
     <!--  DeployFragment  -->
     <string name="almost_there">Almost there!</string>
     <string name="switch_to_deploy">Switch your device to DEPLOY</string>

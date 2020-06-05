@@ -14,7 +14,7 @@ object ImageUtils {
 
     // region Take a photo
     fun createReportImageFile(): File {
-        val directoryName = "RFCx-Ranger"
+        val directoryName = "RFCx-Companion"
         val imageFileName = "IMG_${Date().time}"
         val directory = File(
             Environment.getExternalStoragePublicDirectory(

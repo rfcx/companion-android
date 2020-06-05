@@ -20,6 +20,9 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
+            android:name=".view.configure.FeedbackActivity"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".view.LoginActivity"
             android:screenOrientation="portrait">
             <intent-filter>

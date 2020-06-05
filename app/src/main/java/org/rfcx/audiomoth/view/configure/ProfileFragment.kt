@@ -2,12 +2,14 @@ package org.rfcx.audiomoth.view.configure
 
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_profile.*
 import org.rfcx.audiomoth.BuildConfig
 import org.rfcx.audiomoth.MainActivityListener
@@ -21,6 +23,10 @@ class ProfileFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         listener = (context as MainActivityListener)
+    }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        handleShowSnackbarResult(requestCode, resultCode, data)
     }
 
     override fun onCreateView(
@@ -41,7 +47,8 @@ class ProfileFragment : Fragment() {
         )
 
         feedbackTextView.setOnClickListener {
-            Toast.makeText(context, "Feedback!", Toast.LENGTH_SHORT).show()
+            val intent = Intent(activity, FeedbackActivity::class.java)
+            startActivityForResult(intent, REQUEST_CODE)
         }
 
         logoutTextView.setOnClickListener {
@@ -49,8 +56,21 @@ class ProfileFragment : Fragment() {
         }
     }
 
+    private fun handleShowSnackbarResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
+        if (requestCode != REQUEST_CODE || resultCode != RESULT_CODE || intentData == null) return
+
+        view?.let {
+            Snackbar.make(it, R.string.feedback_submitted, Snackbar.LENGTH_LONG)
+                .setAnimationMode(Snackbar.ANIMATION_MODE_SLIDE)
+                .setAnchorView(R.id.createLocationButton).show()
+        }
+    }
+
     companion object {
         const val tag = "ProfileFragment"
+        const val RESULT_CODE = 12
+        const val REQUEST_CODE = 11
+
         fun newInstance(): ProfileFragment {
             return ProfileFragment()
         }
