@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.Menu
@@ -15,6 +16,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
@@ -29,6 +31,7 @@ import java.io.File
 class FeedbackActivity : AppCompatActivity() {
     private var imageFile: File? = null
     private val galleryPermissions by lazy { GalleryPermissions(this) }
+    private val cameraPermissions by lazy { CameraPermissions(this) }
     private val feedbackImageAdapter by lazy { FeedbackImageAdapter() }
     private var pathListArray: List<String>? = null
     private var menuAll: Menu? = null
@@ -84,6 +87,7 @@ class FeedbackActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         handleGalleryResult(requestCode, resultCode, data)
+        handleTakePhotoResult(requestCode, resultCode)
     }
 
     @SuppressLint("ResourceAsColor")
@@ -98,7 +102,8 @@ class FeedbackActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             android.R.id.home -> finish()
-            R.id.attachView -> openGallery()
+            R.id.camera -> takePhoto()
+            R.id.gallery -> openGallery()
             R.id.sendFeedbackView -> sendFeedback()
         }
         return super.onOptionsItemSelected(item)
@@ -129,6 +134,31 @@ class FeedbackActivity : AppCompatActivity() {
         }
     }
 
+    private fun takePhoto() {
+        if (!cameraPermissions.allowed()) {
+            imageFile = null
+            cameraPermissions.check { }
+        } else {
+            startTakePhoto()
+        }
+    }
+
+    private fun startTakePhoto() {
+        if (feedbackImageAdapter.getImageCount() < FeedbackImageAdapter.MAX_IMAGE_SIZE) {
+            val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            imageFile = ImageUtils.createReportImageFile()
+            if (imageFile != null) {
+                val photoURI = imageFile?.let {
+                    FileProvider.getUriForFile(this, ImageUtils.FILE_CONTENT_PROVIDER, it)
+                }
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                startActivityForResult(takePictureIntent, ImageUtils.REQUEST_TAKE_PHOTO)
+            }
+        } else {
+            Toast.makeText(this, R.string.maximum_number_of_attachments, Toast.LENGTH_LONG).show()
+        }
+    }
+
     private fun startOpenGallery() {
         if (feedbackImageAdapter.getImageCount() < FeedbackImageAdapter.MAX_IMAGE_SIZE) {
             val remainingImage =
@@ -144,6 +174,23 @@ class FeedbackActivity : AppCompatActivity() {
                 .forResult(ImageUtils.REQUEST_GALLERY)
         } else {
             Toast.makeText(this, R.string.maximum_number_of_attachments, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun handleTakePhotoResult(requestCode: Int, resultCode: Int) {
+        if (requestCode != ImageUtils.REQUEST_TAKE_PHOTO) return
+
+        if (resultCode == Activity.RESULT_OK) {
+            imageFile?.let {
+                val pathList = listOf(it.absolutePath)
+                feedbackImageAdapter.addImages(pathList)
+            }
+        } else {
+            // remove file image
+            imageFile?.let {
+                ImageFileUtils.removeFile(it)
+                this.imageFile = null
+            }
         }
     }
 
