@@ -82,16 +82,27 @@
         app:layout_constraintTop_toTopOf="@id/view1" />
 
     <TextView
+        android:id="@+id/feedbackTextView"
+        style="@style/AudioMothText.SubTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:padding="@dimen/margin_padding_normal"
+        android:text="@string/profile_feedback_label"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/view1" />
+
+    <TextView
         android:id="@+id/appVersionTextView"
         style="@style/AudioMothText.Body.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_normal"
-        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:layout_marginTop="@dimen/margin_padding_small"
         android:text="@string/profile_app_version_label"
         android:textColor="@color/text_secondary"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/view1" />
+        app:layout_constraintTop_toBottomOf="@id/feedbackTextView" />
 
     <TextView
         android:id="@+id/versionTextView"
@@ -104,24 +115,13 @@
         app:layout_constraintTop_toBottomOf="@id/appVersionTextView"
         tools:text="2.0.0(135)" />
 
-    <TextView
-        android:id="@+id/feedbackTextView"
-        style="@style/AudioMothText.SubTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_padding_small"
-        android:background="?attr/selectableItemBackground"
-        android:padding="@dimen/margin_padding_normal"
-        android:text="@string/profile_feedback_label"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/versionTextView" />
-
     <View
         android:id="@+id/view2"
         android:layout_width="match_parent"
         android:layout_height="35dp"
+        android:layout_marginTop="@dimen/margin_padding_small"
         android:background="@color/colorPrimary"
-        app:layout_constraintTop_toBottomOf="@id/feedbackTextView" />
+        app:layout_constraintTop_toBottomOf="@id/versionTextView" />
 
     <TextView
         android:id="@+id/accountTextView"
