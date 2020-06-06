@@ -1,5 +1,6 @@
 package org.rfcx.audiomoth.view
 
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -11,6 +12,8 @@ import com.auth0.android.Auth0
 import com.auth0.android.authentication.AuthenticationAPIClient
 import com.auth0.android.authentication.AuthenticationException
 import com.auth0.android.callback.BaseCallback
+import com.auth0.android.provider.AuthCallback
+import com.auth0.android.provider.WebAuthProvider
 import com.auth0.android.result.Credentials
 import kotlinx.android.synthetic.main.activity_login.*
 import org.rfcx.audiomoth.MainActivity
@@ -40,6 +43,10 @@ class LoginActivity : AppCompatActivity() {
         AuthenticationAPIClient(auth0)
     }
 
+    private val webAuthentication by lazy {
+        WebAuthProvider.init(auth0)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -58,6 +65,16 @@ class LoginActivity : AppCompatActivity() {
                 loading()
                 login(email, password)
             }
+        }
+
+        facebookLoginButton.setOnClickListener {
+            loading()
+            loginWithFacebook()
+        }
+
+        smsLoginButton.setOnClickListener {
+            loading()
+            loginMagicLink()
         }
     }
 
@@ -87,7 +104,70 @@ class LoginActivity : AppCompatActivity() {
             })
     }
 
+    private fun loginWithFacebook() {
+        webAuthentication
+            .withConnection("facebook")
+            .withScope(this.getString(R.string.auth0_scopes))
+            .withScheme(this.getString(R.string.auth0_scheme))
+            .withAudience(this.getString(R.string.auth0_audience))
+            .start(this, object : AuthCallback {
+                override fun onFailure(dialog: Dialog) {}
+
+                override fun onFailure(exception: AuthenticationException) {
+                    exception.printStackTrace()
+                    loading(false)
+                }
+
+                override fun onSuccess(credentials: Credentials) {
+                    when (val result = CredentialVerifier(this@LoginActivity).verify(credentials)) {
+                        is Err -> {
+                            Toast.makeText(this@LoginActivity, result.error, Toast.LENGTH_SHORT)
+                                .show()
+                            loading(false)
+                        }
+                        is Ok -> {
+                            userTouch(result.value.idToken)
+                            CredentialKeeper(this@LoginActivity).save(result.value)
+                        }
+                    }
+                }
+            })
+    }
+
+    private fun loginMagicLink() {
+        webAuthentication
+            .withConnection("")
+            .withScope(this.getString(R.string.auth0_scopes))
+            .withScheme(this.getString(R.string.auth0_scheme))
+            .withAudience(this.getString(R.string.auth0_audience))
+            .start(this, object : AuthCallback {
+                override fun onFailure(dialog: Dialog) {}
+
+                override fun onFailure(exception: AuthenticationException) {
+                    Toast.makeText(this@LoginActivity, exception.description, Toast.LENGTH_SHORT)
+                        .show()
+                    loading (false)
+                }
+
+                override fun onSuccess(credentials: Credentials) {
+                    when (val result = CredentialVerifier(this@LoginActivity).verify(credentials)) {
+                        is Err -> {
+                            Toast.makeText(this@LoginActivity, result.error, Toast.LENGTH_SHORT)
+                                .show()
+                            loading(false)
+                        }
+                        is Ok -> {
+                            userTouch(result.value.idToken)
+                            CredentialKeeper(this@LoginActivity).save(result.value)
+                        }
+                    }
+                }
+            })
+    }
+
     private fun userTouch(idToken: String) {
+        runOnUiThread { loading() }
+
         val authUser = "Bearer $idToken"
         ApiManager.getInstance().apiRest.userTouch(authUser)
             .enqueue(object : Callback<UserTouchResponse> {
@@ -104,6 +184,8 @@ class LoginActivity : AppCompatActivity() {
                         if (it.success) {
                             TutorialActivity.startActivity(this@LoginActivity)
                             finish()
+                        } else {
+                            loading(false)
                         }
                     }
                 }
@@ -124,6 +206,11 @@ class LoginActivity : AppCompatActivity() {
             return false
         }
         return true
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loading(false)
     }
 
     private fun View.hideKeyboard() = this.let {

@@ -3,17 +3,9 @@
 
     <item android:state_enabled="true">
         <shape android:shape="rectangle">
-            <solid android:color="@color/grey_light" />
+            <solid android:color="@color/text_black" />
             <corners android:radius="10dp" />
         </shape>
 
     </item>
-
-    <item>
-        <shape android:shape="rectangle">
-            <solid android:color="@color/divider" />
-            <corners android:radius="10dp" />
-        </shape>
-    </item>
-
 </selector>

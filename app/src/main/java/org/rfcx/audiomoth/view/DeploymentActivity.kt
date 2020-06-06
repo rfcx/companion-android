@@ -144,8 +144,8 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         startFragment(SyncFragment.newInstance(status))
     }
 
-    override fun openPerformBattery(status: String, image: Int?) {
-        startFragment(PerformBatteryFragment.newInstance(status, image))
+    override fun openPerformBattery(status: String, level: Int?) {
+        startFragment(PerformBatteryFragment.newInstance(status, level))
     }
 
     override fun saveUser(callback: (Boolean) -> Unit) {
@@ -300,7 +300,7 @@ interface DeploymentProtocol {
 
     fun openConfigure(profile: Profile)
     fun openSync(status: String)
-    fun openPerformBattery(status: String, image: Int?)
+    fun openPerformBattery(status: String, level: Int?)
 
     fun getProfile(): Profile?
     fun getProfileId(): String?
