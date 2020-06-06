@@ -11,7 +11,7 @@ import kotlinx.android.synthetic.main.fragment_after_sync.*
 import kotlinx.android.synthetic.main.fragment_before_sync.*
 import kotlinx.android.synthetic.main.fragment_sync.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.view.DeploymentProtocol
+import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 
 class SyncFragment : Fragment() {
     private var deploymentProtocol: DeploymentProtocol? = null

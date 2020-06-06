@@ -1,4 +1,4 @@
-package org.rfcx.audiomoth.view.locate
+package org.rfcx.audiomoth.view.deployment.locate
 
 
 import android.Manifest
@@ -14,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.res.ResourcesCompat
@@ -33,11 +34,9 @@ import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.LocateItem
-import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.localdb.DeploymentLocationDb
-import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.util.RealmHelper
-import org.rfcx.audiomoth.view.DeploymentProtocol
+import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 
 class LocationFragment : Fragment(), OnMapReadyCallback {
     private val deploymentLocationDb by lazy {
@@ -50,8 +49,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var locationManager: LocationManager? = null
     private var lastLocation: Location? = null
     private var deployLocations = ArrayList<LocateItem>()
+    private var deployLocationNames = ArrayList<String>()
     private var locateItem: LocateItem? = null
-    private lateinit var deployLocationAdapter: DeployLocationAdapter
+    private var deployLocationAdapter: ArrayAdapter<String>? = null
     private var deploymentProtocol: DeploymentProtocol? = null
 
     override fun onAttach(context: Context) {
@@ -117,6 +117,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         val lng = longitudeEditText.text.toString().toDouble()
         val deploymentLocation = DeploymentLocation(name = name, latitude = lat, longitude = lng)
         deploymentProtocol?.setDeployLocation(deploymentLocation)
+        deploymentProtocol?.nextStep()
     }
 
     private fun setupLocationOptions() {
@@ -146,11 +147,18 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun setAdapter() {
-        context?.let {
-            deployLocationAdapter = DeployLocationAdapter(it, deployLocations.toTypedArray())
-        }
+    private fun setLocationAdapter() {
+        context ?: return
+
+        deployLocations.mapTo(deployLocationNames, { it.name })
+        deployLocationAdapter =
+            ArrayAdapter(context!!, R.layout.item_deploy_location, deployLocationNames)
         locationNameSpinner.adapter = deployLocationAdapter
+        setLocationSpinner()
+        setRecommendLocation()
+
+        newLocationRadioButton.isChecked = deployLocations.isEmpty()
+        existingRadioButton.isEnabled = deployLocations.isNotEmpty()
     }
 
     private fun setLocationSpinner() {
@@ -161,7 +169,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 position: Int,
                 id: Long
             ) {
-                locateItem = deployLocationAdapter.getItem(position)
+                locateItem = deployLocations[position]
                 setPinOnMap(locateItem!!.getLatLng())
                 setupView(
                     locateItem?.latitude.toString(),
@@ -174,31 +182,11 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun retrieveDeployLocation() {
-        context?.let {
-            Firestore(it).haveLocations { isHave ->
-                if (isHave) {
-                    existingRadioButton.isChecked = true
-                    retrieveLocations()
-                } else {
-                    newLocationRadioButton.isChecked = true
-                    existingRadioButton.isEnabled = false
-                }
-            }
-        }
-    }
-
-    private fun retrieveLocations() {
-        deployLocationAdapter.clear()
+    private fun retrieveDeployLocations() {
         deploymentLocationDb.getLocations().mapTo(deployLocations, {
             LocateItem(it.id, it.name, it.latitude, it.longitude)
         })
-        deployLocationAdapter.addAll(deployLocations)
-        deployLocationAdapter.notifyDataSetChanged()
-        setRecommendLocation()
-
-        newLocationRadioButton.isChecked = deployLocations.isEmpty()
-        existingRadioButton.isEnabled = deployLocations.isNotEmpty()
+        setLocationAdapter()
     }
 
     private fun setRecommendLocation() {
@@ -239,9 +227,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             setupLocationOptions()
 
             getLastLocation()
-            retrieveDeployLocation()
-            setAdapter()
-            setLocationSpinner()
+            retrieveDeployLocations()
         }
     }
 

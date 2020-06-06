@@ -17,7 +17,7 @@ import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.DeploymentState
 import org.rfcx.audiomoth.util.NotificationBroadcastReceiver
 import org.rfcx.audiomoth.util.toDateTimeString
-import org.rfcx.audiomoth.view.DeploymentProtocol
+import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 import java.sql.Timestamp
 import java.util.*
 

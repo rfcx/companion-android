@@ -13,7 +13,7 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.util.FirestoreResponseCallback
-import org.rfcx.audiomoth.view.DeploymentProtocol
+import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 
 class SelectProfileFragment : Fragment(), (Profile) -> Unit {
     private val profilesAdapter by lazy { ProfilesAdapter(this) }

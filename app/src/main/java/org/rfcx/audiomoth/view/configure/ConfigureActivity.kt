@@ -6,7 +6,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_configure.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.view.locate.LocationFragment
+import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
 
 class ConfigureActivity : AppCompatActivity(), ConfigureListener {
 

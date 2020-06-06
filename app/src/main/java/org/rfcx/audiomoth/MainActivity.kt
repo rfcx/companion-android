@@ -11,7 +11,7 @@ import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
 import org.rfcx.audiomoth.util.LocationPermissions
 import org.rfcx.audiomoth.util.Preferences
 import org.rfcx.audiomoth.util.Storage
-import org.rfcx.audiomoth.view.DeploymentActivity
+import org.rfcx.audiomoth.view.deployment.DeploymentActivity
 import org.rfcx.audiomoth.view.LoginActivity
 import org.rfcx.audiomoth.view.configure.MapFragment
 import org.rfcx.audiomoth.view.configure.ProfileFragment

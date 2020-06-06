@@ -18,6 +18,9 @@ open class DeploymentLocation(
     var syncState: Int = 0,
     var createdAt: Date = Date()
 ) : RealmModel {
+
+    fun isNew(): Boolean = id == 0
+
     companion object {
         const val FIELD_ID = "id"
 

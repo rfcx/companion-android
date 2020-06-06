@@ -13,4 +13,17 @@ class DeploymentLocationDb(private val realm: Realm) {
         return realm.where(DeploymentLocation::class.java).equalTo(DeploymentLocation.FIELD_ID, id)
             .findFirst()
     }
+
+    fun saveDeploymentLocation(deploymentLocation: DeploymentLocation): Int {
+        var id = deploymentLocation.id
+        realm.executeTransaction {
+            if (deploymentLocation.id == 0) {
+                id = (realm.where(DeploymentLocation::class.java).max(DeploymentLocation.FIELD_ID)
+                    ?.toInt() ?: 0) + 1
+                deploymentLocation.id = id
+            }
+            it.insertOrUpdate(deploymentLocation)
+        }
+        return id
+    }
 }

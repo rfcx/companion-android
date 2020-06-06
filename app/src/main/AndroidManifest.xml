@@ -53,7 +53,7 @@
             android:name=".MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".view.DeploymentActivity"
+            android:name=".view.deployment.DeploymentActivity"
             android:screenOrientation="portrait" />
         <activity android:name=".view.configure.ConnectDeviceActivity" />
 

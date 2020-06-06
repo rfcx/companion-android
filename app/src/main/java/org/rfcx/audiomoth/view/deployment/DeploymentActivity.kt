@@ -1,31 +1,39 @@
-package org.rfcx.audiomoth.view
+package org.rfcx.audiomoth.view.deployment
 
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_deployment.*
-import kotlinx.android.synthetic.main.fragment_configure.*
-import org.rfcx.audiomoth.MainActivity
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.*
-import org.rfcx.audiomoth.util.Firestore
+import org.rfcx.audiomoth.entity.Configuration
+import org.rfcx.audiomoth.entity.Deployment
+import org.rfcx.audiomoth.entity.DeploymentLocation
+import org.rfcx.audiomoth.entity.Profile
+import org.rfcx.audiomoth.localdb.DeploymentDb
+import org.rfcx.audiomoth.localdb.DeploymentLocationDb
 import org.rfcx.audiomoth.util.Preferences
+import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.view.configure.*
 import org.rfcx.audiomoth.view.configure.PerformBatteryFragment.Companion.TEST_BATTERY
 import org.rfcx.audiomoth.view.configure.SyncFragment.Companion.BEFORE_SYNC
-import org.rfcx.audiomoth.view.locate.LocationFragment
+import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
 
-class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
+class DeploymentActivity : AppCompatActivity(),
+    DeploymentProtocol {
+    // manager database
+    private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
+    private val deploymentDb by lazy { DeploymentDb(realm) }
+    private val deployLocationDb by lazy { DeploymentLocationDb(realm) }
+
     private var currentStep = 0
-    private val steps by lazy { resources.getStringArray(R.array.steps) }
     private var profile: Profile? = null
     private var profileId: String = ""
-    private var locateId: String? = null
     private var _deployment: Deployment? = null
     private var _deployLocation: DeploymentLocation? = null
     private var configuration: Configuration? = null
@@ -60,6 +68,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
 
     override fun nextStep() {
         currentStep += 1
+        Log.d("DeplaymentActivity", "nextStep next $currentStep")
 
         if (stepView.stepCount == currentStep) {
             stepView.done(true)
@@ -68,7 +77,6 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
             stepView.go(currentStep, true)
         }
 
-        /* do something when everything done */
         handleFragment(currentStep)
     }
 
@@ -111,11 +119,14 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         return configuration
     }
 
-    override fun getDeploymentLocation(): DeploymentLocation?= this._deployLocation
+    override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
     override fun setDeployLocation(location: DeploymentLocation) {
         // TODO: save deploy and deploy location in local db
-        startSetupConfigure(Profile.default())
+        if (location.isNew()) {
+            val newid = deployLocationDb.saveDeploymentLocation(location)
+            Log.d("DeplaymentActivity", "location id $newid")
+        }
     }
 
     override fun setProfile(profile: Profile) {
