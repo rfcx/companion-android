@@ -21,6 +21,8 @@
     <string name="red_pin">Red = <![CDATA[<]]>1 day</string>
     <string name="format_image_unsync">%s photo (%s not yet synced)</string>
     <string name="format_images_unsync">%s photos (%s not yet synced)</string>
+    <string name="menu_map">MAP</string>
+    <string name="menu_profile">PROFILE</string>
 
     <!--  CreateStreamActivity  -->
     <string name="create_stream">Create Stream</string>
@@ -106,6 +108,23 @@
         <item>High</item>
         <item>Highest</item>
     </string-array>
+
+    <!--  ProfileFragment  -->
+    <string name="profile_aditional_label">Additional</string>
+    <string name="profile_app_version_label">App version</string>
+    <string name="account">Account</string>
+    <string name="profile_sign_out_label">Sign out</string>
+    <string name="version_app">%s (%s)</string>
+    <string name="profile_feedback_label">Feedback</string>
+
+    <!--  FeedbackActivity  -->
+    <string name="app_feedback_share_ideas">Leave app feedback or share your ideas</string>
+    <string name="from">From: %s</string>
+    <string name="maximum_number_of_attachments">You have reached max selectable. Try remove some items before adding more attachments.</string>
+    <string name="feedback_submitted">Feedback submitted. Thank you for your time :)</string>
+    <string name="profile_send_feedback">Send feedback</string>
+    <string name="feedback_submission_failed">Feedback submission failed! Please try again.</string>
+    <string name="snackbar_retry">RETRY</string>
 
     <!--  DeployFragment  -->
     <string name="almost_there">Almost there!</string>

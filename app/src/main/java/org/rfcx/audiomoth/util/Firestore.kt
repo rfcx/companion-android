@@ -1,6 +1,7 @@
 package org.rfcx.audiomoth.util
 
 import android.content.Context
+import android.view.View
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -9,18 +10,20 @@ import org.rfcx.audiomoth.entity.Deployment.Companion.DEPLOYED_AT
 import org.rfcx.audiomoth.entity.Deployment.Companion.IS_LATEST
 import org.rfcx.audiomoth.entity.Deployment.Companion.LAST_DEPLOYMENT
 import org.rfcx.audiomoth.entity.Deployment.Companion.PHOTOS
+import java.sql.Timestamp
 
 interface FirestoreResponseCallback<T> {
     fun onSuccessListener(response: T)
     fun addOnFailureListener(exception: Exception)
 }
 
-class Firestore(context: Context) {
+class Firestore(val context: Context) {
     val db = Firebase.firestore
     /* TODO: update get user */
     private val preferences = Preferences.getInstance(context)
     private val guid = preferences.getString(Preferences.USER_GUID, "")
     private val userDocument = db.collection(COLLECTION_USERS).document(guid)
+    private val feedbackDocument = db.collection(COLLECTION_FEEDBACK)
 
     fun saveUser(user: User, callback: (String?, Boolean) -> Unit) {
         userDocument.set(user)
@@ -192,11 +195,37 @@ class Firestore(context: Context) {
             }
     }
 
+    fun saveFeedback(
+        text: String, uris: List<String>?, callback: (Boolean) -> Unit
+    ) {
+        val docData = hashMapOf(
+            "userId" to guid,
+            "from" to context.getEmailUser(),
+            "inputFeedback" to text,
+            "pathImages" to arrayListOf<String>(),
+            "timeStamp" to Timestamp(System.currentTimeMillis()).toString()
+        )
+
+        feedbackDocument.add(docData)
+            .addOnSuccessListener {
+                callback(true)
+                if (uris != null) {
+                    Storage(context).uploadImagesOfFeedback(uris) { success, pathImages ->
+                        if (success) {
+                            val docData = hashMapOf("pathImages" to pathImages)
+                            it.update(docData as Map<String, Any>)
+                        }
+                    }
+                }
+            }.addOnFailureListener { callback(false) }
+    }
+
     companion object {
         const val TAG = "Firestore"
 
         // Firestore Collection
         const val COLLECTION_USERS = "users"
+        const val COLLECTION_FEEDBACK = "feedback"
         const val COLLECTION_DEPLOYMENTS = "deployments"
         const val COLLECTION_LOCATIONS = "locations"
         const val COLLECTION_PROFILES = "profiles"

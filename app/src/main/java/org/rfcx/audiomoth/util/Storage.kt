@@ -49,4 +49,38 @@ class Storage(val context: Context) {
             }
         }
     }
+
+    fun uploadImagesOfFeedback(
+        uris: List<String>,
+        callback: (Boolean, ArrayList<String>?) -> Unit
+    ) {
+        var counter = 0
+        val pathImages = ArrayList<String>()
+
+        uris.forEach { pathName ->
+            val file = Uri.fromFile(File(pathName))
+            val ref = file.lastPathSegment?.let { storageRef.child(file.lastPathSegment!!) }
+            val uploadTask = ref?.putFile(file)
+
+            uploadTask?.continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
+                if (!task.isSuccessful) {
+                    task.exception?.let { throw it }
+                }
+                return@Continuation ref.downloadUrl
+            })?.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    counter += 1
+
+                    val downloadUri = task.result
+                    pathImages.add(downloadUri.toString())
+
+                    if (counter == uris.size) {
+                        callback(true, pathImages)
+                    }
+                } else {
+                    callback(false, null)
+                }
+            }
+        }
+    }
 }

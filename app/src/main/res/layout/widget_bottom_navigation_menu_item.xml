@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iconImageView"
+        android:layout_width="@dimen/bottom_navigation_widget_icon_size"
+        android:layout_height="@dimen/bottom_navigation_widget_icon_size"
+        android:layout_gravity="center"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toTopOf="@+id/menuTitleTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:src="@drawable/ic_signs" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/menuTitleTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:gravity="center"
+        android:textSize="@dimen/bottom_navigation_widget_title_size"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/iconImageView"
+        tools:text="@string/app_name" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/badgeImageView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/bg_circle_green"
+        app:layout_constraintBottom_toBottomOf="@+id/countTextView"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="@+id/countTextView"
+        app:layout_constraintStart_toStartOf="@+id/countTextView"
+        app:layout_constraintTop_toTopOf="@+id/countTextView" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/countTextView"
+        style="@style/AudioMothText.Body.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:maxLines="1"
+        android:layout_marginBottom="@dimen/margin_padding_normal"
+        android:layout_marginStart="20dp"
+        android:padding="@dimen/margin_padding_xsmall"
+        android:textSize="@dimen/bottom_navigation_widget_title_size"
+        android:textColor="@color/text_white"
+        app:layout_constraintBottom_toBottomOf="@+id/iconImageView"
+        app:layout_constraintEnd_toEndOf="@+id/iconImageView"
+        app:layout_constraintStart_toStartOf="@+id/iconImageView"
+        app:layout_constraintTop_toTopOf="@+id/iconImageView"
+        tools:text="99" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/badgeGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="badgeImageView,countTextView"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

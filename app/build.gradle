@@ -56,6 +56,7 @@ dependencies {
 
     // StepView
     implementation 'com.shuhart.stepview:stepview:1.5.1'
+    implementation 'com.google.android.material:material:1.2.0-alpha01'
 
     implementation 'com.google.android.gms:play-services-location:17.0.0'
     implementation 'com.github.bumptech.glide:glide:4.9.0'

@@ -81,7 +81,6 @@ object ImageFileUtils {
 
     fun removeFile(file: File) {
         if (file.exists()) {
-            Log.i("RFCx Report", "remove file -> ${file.absolutePath}")
             file.deleteOnExit()
         }
     }

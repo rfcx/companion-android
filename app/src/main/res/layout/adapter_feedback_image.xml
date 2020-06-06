@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="172dp"
+    android:layout_margin="16dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/imageFeedbackImageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <View
+            android:id="@+id/lineView"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@color/grey_light"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/nameImageTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="middle"
+            android:textColor="@color/text_black"
+            android:textSize="@dimen/text_xsmall"
+            app:layout_constraintBottom_toBottomOf="@id/lineView"
+            app:layout_constraintEnd_toStartOf="@id/deleteImageFeedbackButton"
+            app:layout_constraintHorizontal_bias="0.15"
+            app:layout_constraintStart_toStartOf="@+id/lineView"
+            app:layout_constraintTop_toTopOf="@id/lineView"
+            app:layout_constraintVertical_bias="0.5"
+            tools:text="Screenshot_20190830_090710.png" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/deleteImageFeedbackButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin_padding_normal"
+            android:backgroundTint="@color/grey_light"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_close_grey_600_24dp"
+            app:layout_constraintBottom_toBottomOf="@id/lineView"
+            app:layout_constraintEnd_toEndOf="@id/lineView"
+            app:layout_constraintTop_toTopOf="@id/lineView" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
