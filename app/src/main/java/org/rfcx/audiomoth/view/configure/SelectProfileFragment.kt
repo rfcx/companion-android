@@ -39,24 +39,14 @@ class SelectProfileFragment : Fragment(), (Profile) -> Unit {
 
     // @{ProfilesAdapter.itemClickListener}
     override fun invoke(profile: Profile) {
-        deploymentProtocol?.openConfigure(
-            Profile(
-                profile.gain,
-                "",
-                profile.sampleRate,
-                profile.recordingDuration,
-                profile.sleepDuration,
-                profile.recordingPeriodList,
-                profile.durationSelected
-            )
-        )
+        deploymentProtocol?.startSetupConfigure(profile)
     }
 
     private fun setupView() {
         deploymentProtocol?.hideCompleteButton()
 
         createNewButton.setOnClickListener {
-            deploymentProtocol?.openConfigure(Profile.default())
+            deploymentProtocol?.startSetupConfigure(Profile.default()) // new profile
         }
 
         profileRecyclerView.apply {

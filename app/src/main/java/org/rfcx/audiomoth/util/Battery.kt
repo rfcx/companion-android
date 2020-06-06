@@ -1,7 +1,5 @@
 package org.rfcx.audiomoth.util
 
-import android.content.Context
-
 object Battery {
     const val BATTERY_PIN_GREEN = "BATTERY_PIN_GREEN"
     const val BATTERY_PIN_ORANGE = "BATTERY_PIN_ORANGE"

@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_configure.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.view.locate.LocationFragment
 
 class ConfigureActivity : AppCompatActivity(), ConfigureListener {
 
@@ -14,7 +15,8 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
         setContentView(R.layout.activity_configure)
 
         supportFragmentManager.beginTransaction()
-            .add(configureContainer.id, LocationFragment(), LocationFragment.TAG).commit()
+            .add(configureContainer.id,
+                LocationFragment(), LocationFragment.TAG).commit()
     }
 
     override fun openSync() {
@@ -35,7 +37,8 @@ class ConfigureActivity : AppCompatActivity(), ConfigureListener {
 
     override fun openDeploy(batteryLv: Int, datePredict: Long) {
         supportFragmentManager.beginTransaction()
-            .replace(configureContainer.id, LocationFragment(), LocationFragment.TAG).commit()
+            .replace(configureContainer.id,
+                LocationFragment(), LocationFragment.TAG).commit()
     }
 
     companion object {

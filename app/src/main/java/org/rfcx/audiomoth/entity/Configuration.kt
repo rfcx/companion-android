@@ -1,24 +1,17 @@
 package org.rfcx.audiomoth.entity
 
-import org.rfcx.audiomoth.view.configure.ConfigureFragment.Companion.RECOMMENDED
+import io.realm.RealmList
+import io.realm.RealmModel
+import io.realm.annotations.RealmClass
+import org.rfcx.audiomoth.view.configure.ConfigureFragment
 import java.util.*
 
-data class Configuration(
-    val gain: Int = 0,
-    val sampleRate: Int = 0,
-    val recordingDuration: Int = 0,
-    val sleepDuration: Int = 0,
-    val recordingPeriodList: ArrayList<String> = arrayListOf(),
-    val durationSelected: String = ""
-) {
-    companion object {
-        fun default() = Configuration(
-            gain = 3,
-            sampleRate = 8,
-            recordingDuration = 5,
-            sleepDuration = 10,
-            recordingPeriodList = arrayListOf(),
-            durationSelected = RECOMMENDED
-        )
-    }
-}
+@RealmClass
+open class Configuration(
+    var gain: Int = 3,
+    var sampleRate: Int = 8,
+    var recordingDuration: Int = 5,
+    var sleepDuration: Int = 10,
+    var recordingPeriodList: RealmList<String> = RealmList(),
+    var durationSelected: String = "RECOMMENDED"
+) : RealmModel

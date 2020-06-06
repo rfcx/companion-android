@@ -35,16 +35,16 @@ class Firestore(val context: Context) {
             }
     }
 
-    fun saveLocation(locate: Locate, callback: (String?, Boolean) -> Unit) {
-        userDocument.collection(COLLECTION_LOCATIONS)
-            .add(locate)
-            .addOnSuccessListener { documentReference ->
-                callback(documentReference.id, true)
-            }
-            .addOnFailureListener { e ->
-                callback(e.message, false)
-            }
-    }
+//    fun saveLocation(locate: Locate, callback: (String?, Boolean) -> Unit) {
+//        userDocument.collection(COLLECTION_LOCATIONS)
+//            .add(locate)
+//            .addOnSuccessListener { documentReference ->
+//                callback(documentReference.id, true)
+//            }
+//            .addOnFailureListener { e ->
+//                callback(e.message, false)
+//            }
+//    }
 
     fun saveProfile(profile: Profile, callback: (String?, Boolean) -> Unit) {
         userDocument.collection(COLLECTION_PROFILES)
@@ -68,53 +68,53 @@ class Firestore(val context: Context) {
             }
     }
 
-    fun getDeployments(callback: FirestoreResponseCallback<List<Deployment>>) {
-        userDocument.collection(COLLECTION_DEPLOYMENTS)
-            .orderBy(DEPLOYED_AT, Query.Direction.ASCENDING).get()
-            .addOnSuccessListener { querySnapshot ->
-                val documents = querySnapshot.documents
-                val response = if (documents.isNotEmpty()) {
-                    val deploymentList = arrayListOf<Deployment>()
-                    documents.forEach {
-                        val obj = it.toObject(Deployment::class.java)
-                        obj?.let { it1 ->
-                            if (it1.latest) {
-                                deploymentList.add(it1)
-                            }
-                        }
-                    }
-                    deploymentList
-                } else {
-                    listOf<Deployment>()
-                }
-                callback.onSuccessListener(response)
-            }
-            .addOnFailureListener {
-                callback.addOnFailureListener(it)
-            }
-
-    }
-
-    fun getLocations(callback: FirestoreResponseCallback<List<LocateItem?>>) {
-        userDocument.collection(COLLECTION_LOCATIONS).get()
-            .addOnSuccessListener { querySnapshot ->
-                val documents = querySnapshot.documents
-                val response = ArrayList<LocateItem>()
-
-                if (documents.isNotEmpty()) {
-                    documents.map {
-                        val locate = it.toObject(Locate::class.java)
-                        response.add(LocateItem(locate, it.id))
-                    }
-                } else {
-                    arrayListOf()
-                }
-                callback.onSuccessListener(response)
-            }
-            .addOnFailureListener {
-                callback.addOnFailureListener(it)
-            }
-    }
+//    fun getDeployments(callback: FirestoreResponseCallback<List<Deployment>>) {
+//        userDocument.collection(COLLECTION_DEPLOYMENTS)
+//            .orderBy(DEPLOYED_AT, Query.Direction.ASCENDING).get()
+//            .addOnSuccessListener { querySnapshot ->
+//                val documents = querySnapshot.documents
+//                val response = if (documents.isNotEmpty()) {
+//                    val deploymentList = arrayListOf<Deployment>()
+//                    documents.forEach {
+//                        val obj = it.toObject(Deployment::class.java)
+//                        obj?.let { it1 ->
+//                            if (it1.latest) {
+//                                deploymentList.add(it1)
+//                            }
+//                        }
+//                    }
+//                    deploymentList
+//                } else {
+//                    listOf<Deployment>()
+//                }
+//                callback.onSuccessListener(response)
+//            }
+//            .addOnFailureListener {
+//                callback.addOnFailureListener(it)
+//            }
+//
+//    }
+//
+//    fun getLocations(callback: FirestoreResponseCallback<List<LocateItem?>>) {
+//        userDocument.collection(COLLECTION_LOCATIONS).get()
+//            .addOnSuccessListener { querySnapshot ->
+//                val documents = querySnapshot.documents
+//                val response = ArrayList<LocateItem>()
+//
+//                if (documents.isNotEmpty()) {
+//                    documents.map {
+//                        val locate = it.toObject(Locate::class.java)
+//                        response.add(LocateItem(locate, it.id))
+//                    }
+//                } else {
+//                    arrayListOf()
+//                }
+//                callback.onSuccessListener(response)
+//            }
+//            .addOnFailureListener {
+//                callback.addOnFailureListener(it)
+//            }
+//    }
 
     fun updateLocation(locateId: String, deploymentId: String) {
         userDocument.collection(COLLECTION_LOCATIONS)
@@ -128,26 +128,26 @@ class Firestore(val context: Context) {
             .update(PHOTOS, photos)
     }
 
-    fun updateIsLatest(locateId: String, callback: (Boolean) -> Unit) {
-        userDocument.collection(COLLECTION_DEPLOYMENTS).get()
-            .addOnSuccessListener { querySnapshot ->
-                val documents = querySnapshot.documents
-                if (documents.size == 0) callback(true)
-                documents.map {
-                    val deployment = it.toObject(Deployment::class.java)
-                    if (deployment?.location?.id == locateId) {
-                        userDocument.collection(COLLECTION_DEPLOYMENTS)
-                            .document(it.id)
-                            .update(IS_LATEST, false)
-                    }
-                    if (it.id == documents.last().id) {
-                        callback(true)
-                    }
-                }
-            }.addOnFailureListener {
-                callback(false)
-            }
-    }
+//    fun updateIsLatest(locateId: String, callback: (Boolean) -> Unit) {
+//        userDocument.collection(COLLECTION_DEPLOYMENTS).get()
+//            .addOnSuccessListener { querySnapshot ->
+//                val documents = querySnapshot.documents
+//                if (documents.size == 0) callback(true)
+//                documents.map {
+//                    val deployment = it.toObject(Deployment::class.java)
+//                    if (deployment?.locationLocation?.id == locateId) {
+//                        userDocument.collection(COLLECTION_DEPLOYMENTS)
+//                            .document(it.id)
+//                            .update(IS_LATEST, false)
+//                    }
+//                    if (it.id == documents.last().id) {
+//                        callback(true)
+//                    }
+//                }
+//            }.addOnFailureListener {
+//                callback(false)
+//            }
+//    }
 
     fun getProfiles(callback: FirestoreResponseCallback<List<Profile?>?>) {
         userDocument.collection(COLLECTION_PROFILES).get()

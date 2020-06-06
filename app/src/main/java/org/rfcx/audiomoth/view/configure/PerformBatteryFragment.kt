@@ -14,6 +14,7 @@ import kotlinx.android.synthetic.main.fragment_battery_level.*
 import kotlinx.android.synthetic.main.fragment_perform_battery.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Deployment
+import org.rfcx.audiomoth.entity.DeploymentState
 import org.rfcx.audiomoth.util.NotificationBroadcastReceiver
 import org.rfcx.audiomoth.util.toDateTimeString
 import org.rfcx.audiomoth.view.DeploymentProtocol
@@ -65,22 +66,20 @@ class PerformBatteryFragment : Fragment() {
             val batteryDepletedAt = Timestamp(System.currentTimeMillis() + (day * 6))
             val deployedAt = Timestamp(System.currentTimeMillis())
             val configuration = deploymentProtocol?.geConfiguration()
-            val location = deploymentProtocol?.getLocationInDeployment()
+            val location = deploymentProtocol?.getDeploymentLocation()
             val profileId = deploymentProtocol?.getProfileId()
             if (configuration != null && location != null && profileId != null) {
                 val deployment =
                     Deployment(
-                        batteryDepletedAt,
-                        deployedAt,
-                        100,
-                        true,
-                        configuration,
-                        location,
-                        profileId,
-                        arrayListOf()
+                        batteryDepletedAt = batteryDepletedAt,
+                        deployedAt = deployedAt,
+                        batteryLevel = 100,
+                        configuration = configuration,
+                        locationId = location.id,
+                        state = DeploymentState.sync.key
                     )
                 notification(batteryDepletedAt, location.name)
-                deploymentProtocol?.saveDeployment(deployment)
+//                deploymentProtocol?.saveDeployment(deployment)
             }
         }
     }
@@ -138,7 +137,7 @@ class PerformBatteryFragment : Fragment() {
                 days = getString(R.string.days, "4")
                 percent = getString(R.string.charged, "80%")
             }
-            1-> {
+            1 -> {
                 numberOfDays = 6
                 batteryLevel = 100
                 days = getString(R.string.days, "6")
@@ -154,22 +153,20 @@ class PerformBatteryFragment : Fragment() {
             val batteryDepletedAt = Timestamp(System.currentTimeMillis() + (day * numberOfDays))
             val deployedAt = Timestamp(System.currentTimeMillis())
             val configuration = deploymentProtocol?.geConfiguration()
-            val location = deploymentProtocol?.getLocationInDeployment()
+            val location = deploymentProtocol?.getDeploymentLocation()
             val profileId = deploymentProtocol?.getProfileId()
             if (configuration != null && location != null && profileId != null) {
                 val deployment =
-                    Deployment(
-                        batteryDepletedAt,
-                        deployedAt,
-                        batteryLevel,
-                        true,
-                        configuration,
-                        location,
-                        profileId,
-                        arrayListOf()
-                    )
+                Deployment(
+                    batteryDepletedAt = batteryDepletedAt,
+                    deployedAt = deployedAt,
+                    batteryLevel = batteryLevel,
+                    configuration = configuration,
+                    locationId = location.id,
+                    state = DeploymentState.sync.key
+                )
                 notification(batteryDepletedAt, location.name)
-                deploymentProtocol?.saveDeployment(deployment)
+//                deploymentProtocol?.saveDeployment(deployment)
             }
         }
     }

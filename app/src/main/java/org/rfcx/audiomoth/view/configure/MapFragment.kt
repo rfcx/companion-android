@@ -174,71 +174,71 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun getDeployments() {
-        context?.let {
-            Firestore(it).getDeployments(object : FirestoreResponseCallback<List<Deployment>> {
-                override fun onSuccessListener(response: List<Deployment>) {
-                    progressBar.visibility = View.INVISIBLE
-                    handleMarkerDeployment(response)
-                }
-
-                override fun addOnFailureListener(exception: Exception) {
-                    progressBar.visibility = View.INVISIBLE
-                }
-            })
-        }
+//        context?.let {
+//            Firestore(it).getDeployments(object : FirestoreResponseCallback<List<Deployment>> {
+//                override fun onSuccessListener(response: List<Deployment>) {
+//                    progressBar.visibility = View.INVISIBLE
+//                    handleMarkerDeployment(response)
+//                }
+//
+//                override fun addOnFailureListener(exception: Exception) {
+//                    progressBar.visibility = View.INVISIBLE
+//                }
+//            })
+//        }
     }
 
     private fun handleMarkerDeployment(deployments: List<Deployment>) {
-        this.deployments = deployments
-        // Create point
-        val pointFeatures = deployments.map {
-            val properties = mapOf(
-                Pair(PROPERTY_MARKER_LOCATION_ID, it.location.id),
-                Pair(PROPERTY_MARKER_IMAGE, Battery.getBatteryPinImage(it.batteryDepletedAt.time)),
-                Pair(PROPERTY_MARKER_TITLE, it.location.name),
-                Pair(
-                    PROPERTY_MARKER_CAPTION,
-                    Battery.getPredictionBattery(it.batteryDepletedAt.time)
-                )
-            )
-            Feature.fromGeometry(
-                Point.fromLngLat(it.location.longitude, it.location.latitude),
-                properties.toJsonObject()
-            )
-        }
-
-        // Create window info
-        val windowInfoImages = hashMapOf<String, Bitmap>()
-        val inflater = LayoutInflater.from(context)
-        pointFeatures.forEach {
-            val bubbleLayout =
-                inflater.inflate(R.layout.layout_map_window_info, null) as BubbleLayout
-
-            val id = it.getStringProperty(PROPERTY_MARKER_LOCATION_ID)
-
-            val title = it.getStringProperty(PROPERTY_MARKER_TITLE)
-            bubbleLayout.infoWindowTitle.text = title
-
-            val caption = it.getStringProperty(PROPERTY_MARKER_CAPTION)
-            bubbleLayout.infoWindowDescription.text = caption
-
-            val measureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-            bubbleLayout.measure(measureSpec, measureSpec)
-            val measuredWidth = bubbleLayout.measuredWidth
-            bubbleLayout.arrowPosition = (measuredWidth / 2 - 5).toFloat()
-
-            val bitmap = SymbolGenerator.generate(bubbleLayout)
-            windowInfoImages[id] = bitmap
-        }
-
-        setWindowInfoImageGenResults(windowInfoImages)
-        deploymentFeatures = FeatureCollection.fromFeatures(pointFeatures)
-        refreshSource()
-
-        val lastDeployment = deployments.lastOrNull()
-        if (lastDeployment != null) {
-            moveCamera(LatLng(lastDeployment.location.latitude, lastDeployment.location.longitude))
-        }
+//        this.deployments = deployments
+//        // Create point
+//        val pointFeatures = deployments.map {
+//            val properties = mapOf(
+//                Pair(PROPERTY_MARKER_LOCATION_ID, it.location.id),
+//                Pair(PROPERTY_MARKER_IMAGE, Battery.getBatteryPinImage(it.batteryDepletedAt.time)),
+//                Pair(PROPERTY_MARKER_TITLE, it.location.name),
+//                Pair(
+//                    PROPERTY_MARKER_CAPTION,
+//                    Battery.getPredictionBattery(it.batteryDepletedAt.time)
+//                )
+//            )
+//            Feature.fromGeometry(
+//                Point.fromLngLat(it.location.longitude, it.location.latitude),
+//                properties.toJsonObject()
+//            )
+//        }
+//
+//        // Create window info
+//        val windowInfoImages = hashMapOf<String, Bitmap>()
+//        val inflater = LayoutInflater.from(context)
+//        pointFeatures.forEach {
+//            val bubbleLayout =
+//                inflater.inflate(R.layout.layout_map_window_info, null) as BubbleLayout
+//
+//            val id = it.getStringProperty(PROPERTY_MARKER_LOCATION_ID)
+//
+//            val title = it.getStringProperty(PROPERTY_MARKER_TITLE)
+//            bubbleLayout.infoWindowTitle.text = title
+//
+//            val caption = it.getStringProperty(PROPERTY_MARKER_CAPTION)
+//            bubbleLayout.infoWindowDescription.text = caption
+//
+//            val measureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+//            bubbleLayout.measure(measureSpec, measureSpec)
+//            val measuredWidth = bubbleLayout.measuredWidth
+//            bubbleLayout.arrowPosition = (measuredWidth / 2 - 5).toFloat()
+//
+//            val bitmap = SymbolGenerator.generate(bubbleLayout)
+//            windowInfoImages[id] = bitmap
+//        }
+//
+//        setWindowInfoImageGenResults(windowInfoImages)
+//        deploymentFeatures = FeatureCollection.fromFeatures(pointFeatures)
+//        refreshSource()
+//
+//        val lastDeployment = deployments.lastOrNull()
+//        if (lastDeployment != null) {
+//            moveCamera(LatLng(lastDeployment.location.latitude, lastDeployment.location.longitude))
+//        }
     }
 
     private fun refreshSource() {
