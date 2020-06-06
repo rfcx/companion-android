@@ -87,7 +87,7 @@ abstract class BaseImageFragment : Fragment() {
 
     private fun startTakePhoto() {
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        imageFile = ImageUtils.createReportImageFile()
+        imageFile = ImageUtils.createImageFile()
         if (imageFile != null) {
             val photoURI =
                 context?.let {

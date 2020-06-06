@@ -23,10 +23,10 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
     private var context: Context? = null
     private var imagesSource = arrayListOf<BaseListItem>()
 
-    fun setImages(reportImages: List<Image>) {
+    fun setImages(images: List<Image>) {
         imagesSource = arrayListOf()
         var index = 0
-        reportImages.forEach {
+        images.forEach {
             if (it.remotePath != null) {
                 imagesSource.add(RemoteImageItem(index, it.remotePath!!, false))
             } else {
@@ -34,7 +34,7 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
                     LocalImageItem(
                         index,
                         it.localPath,
-                        false // it.syncState == ReportImageDb.UNSENT
+                        false
                     )
                 )
             }
@@ -159,15 +159,15 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
         private val onImageAdapterClickListener: OnImageAdapterClickListener?
     ) : RecyclerView.ViewHolder(itemView) {
         fun bind(imagePath: String, canDelete: Boolean) {
-            Glide.with(itemView.imageReport)
+            Glide.with(itemView.image)
                 .load(imagePath)
                 .placeholder(R.drawable.bg_grey_light)
                 .error(R.drawable.bg_grey_light)
-                .into(itemView.imageReport)
+                .into(itemView.image)
             itemView.deleteImageButton.setOnClickListener {
                 onImageAdapterClickListener?.onDeleteImageClick(adapterPosition, imagePath)
             }
-            itemView.imageReport.visibility = if (canDelete) View.VISIBLE else View.INVISIBLE
+            itemView.image.visibility = if (canDelete) View.VISIBLE else View.INVISIBLE
         }
     }
 

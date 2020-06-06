@@ -146,7 +146,7 @@ class FeedbackActivity : AppCompatActivity() {
     private fun startTakePhoto() {
         if (feedbackImageAdapter.getImageCount() < FeedbackImageAdapter.MAX_IMAGE_SIZE) {
             val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            imageFile = ImageUtils.createReportImageFile()
+            imageFile = ImageUtils.createImageFile()
             if (imageFile != null) {
                 val photoURI = imageFile?.let {
                     FileProvider.getUriForFile(this, ImageUtils.FILE_CONTENT_PROVIDER, it)
