@@ -21,7 +21,14 @@ open class Locate(
 ) : RealmModel {
 
     fun getLatLng(): LatLng = LatLng(latitude, longitude)
-    fun isNew(): Boolean = id == 0
+
+    fun asDeploymentLocation(): DeploymentLocation {
+        return DeploymentLocation(
+            name = name,
+            latitude = latitude,
+            longitude = longitude
+        )
+    }
 
     companion object {
         const val FIELD_ID = "id"

@@ -77,27 +77,6 @@ class DeploymentActivity : AppCompatActivity(),
         handleFragment(currentStep)
     }
 
-    private fun handleFragment(currentStep: Int) {
-        // setup fragment for current step
-        when (currentStep) {
-            0 -> {
-                startFragment(LocationFragment.newInstance())
-            }
-            1 -> {
-                startFragment(SelectProfileFragment.newInstance())
-            }
-            2 -> {
-                startFragment(SyncFragment.newInstance(BEFORE_SYNC))
-            }
-            3 -> {
-                startFragment(PerformBatteryFragment.newInstance(TEST_BATTERY, null))
-            }
-            4 -> {
-                startFragment(DeployFragment.newInstance())
-            }
-        }
-    }
-
     override fun backStep() {
         stepView.go(stepView.currentStep - 1, true)
     }
@@ -112,6 +91,10 @@ class DeploymentActivity : AppCompatActivity(),
 
     override fun getDeployment(): Deployment? = this._deployment
 
+    override fun setDeployment(deployment: Deployment) {
+        this._deployment = deployment
+    }
+
     override fun geConfiguration(): Configuration? {
         return configuration
     }
@@ -119,11 +102,11 @@ class DeploymentActivity : AppCompatActivity(),
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
     override fun setDeployLocation(locate: Locate) {
-        // TODO: save deploy and deploy location in local db
-        if (locate.isNew()) {
-            val newid = locateDb.insertLocate(locate)
-            Log.d("DeplaymentActivity", "location id $newid")
-        }
+        val deployment = _deployment ?: Deployment()
+        deployment.state = DeploymentState.Locate.key // state
+
+        val deploymentId = deploymentDb.insertOrUpdateDeployment(deployment, locate)
+        locateDb.updateLocate(deploymentId, locate)
     }
 
     override fun setProfile(profile: Profile) {
@@ -145,103 +128,26 @@ class DeploymentActivity : AppCompatActivity(),
         startFragment(PerformBatteryFragment.newInstance(status, level))
     }
 
-//    override fun saveUser(callback: (Boolean) -> Unit) {
-//        view1.hideKeyboard()
-//        if (name != null) {
-//            val user = User(name)
-//            Firestore(this).saveUser(user) { message, success ->
-//                callback(success)
-//                if (!success) {
-//                    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-//                }
-//            }
-//        }
-//    }
-
-//    override fun saveLocation(callback: (Boolean) -> Unit) {
-//        if (locate != null) {
-//            locate?.let {
-//                Firestore(this).saveLocation(it) { str, success ->
-//                    callback(success)
-//                    if (success) {
-//                        locateId = str
-//                        setLocationInDeployment(it)
-//                    } else {
-//                        Toast.makeText(this, str, Toast.LENGTH_SHORT).show()
-//                    }
-//                }
-//            }
-//        } else {
-//            saveProfile {
-//                if (it) {
-//                    nextStep()
-//                }
-//            }
-//        }
-//    }
-
-//    override fun saveProfile(callback: (Boolean) -> Unit) {
-//        if (profile != null) {
-//            profile?.let {
-//                setConfiguration(it)
-//                if (it.name.isNotEmpty()) {
-//                    Firestore(this).saveProfile(it) { str, success ->
-//                        callback(success)
-//                        if (success) {
-//                            if (str != null) {
-//                                profileId = str
-//                            }
-//                        } else {
-//                            Toast.makeText(this, str, Toast.LENGTH_SHORT).show()
-//                        }
-//                    }
-//                } else {
-//                    callback(true)
-//                }
-//            }
-//        } else {
-//            callback(true)
-//        }
-//    }
-
-    private fun setConfiguration(profile: Profile) {
-        configuration = Configuration(
-            profile.gain,
-            profile.sampleRate,
-            profile.recordingDuration,
-            profile.sleepDuration,
-            profile.recordingPeriodList,
-            profile.durationSelected
-        )
+    private fun handleFragment(currentStep: Int) {
+        // setup fragment for current step
+        when (currentStep) {
+            0 -> {
+                startFragment(LocationFragment.newInstance())
+            }
+            1 -> {
+                startFragment(SelectProfileFragment.newInstance())
+            }
+            2 -> {
+                startFragment(SyncFragment.newInstance(BEFORE_SYNC))
+            }
+            3 -> {
+                startFragment(PerformBatteryFragment.newInstance(TEST_BATTERY, null))
+            }
+            4 -> {
+                startFragment(DeployFragment.newInstance())
+            }
+        }
     }
-//
-//    override fun saveDeployment(deployment: Deployment) {
-//        if (locateId != null) {
-//            locateId?.let {
-//                Firestore(this).updateIsLatest(it) { canUpdate ->
-//                    if (canUpdate) {
-//                        Firestore(this).saveDeployment(deployment) { str, success ->
-//                            if (success) {
-//                                deploymentId = str
-//                                updateLocation()
-//                                nextStep()
-//                            } else {
-//                                Toast.makeText(this, str, Toast.LENGTH_SHORT).show()
-//                            }
-//                        }
-//                    } else {
-//                        Toast.makeText(
-//                            this,
-//                            getString(R.string.error_has_occurred),
-//                            Toast.LENGTH_SHORT
-//                        ).show()
-//                        MainActivity.startActivity(this)
-//                        finish()
-//                    }
-//                }
-//            }
-//        }
-//    }
 
     private fun startFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
@@ -280,6 +186,8 @@ interface DeploymentProtocol {
     fun startSetupConfigure(profile: Profile)
     fun openSync(status: String)
     fun openPerformBattery(status: String, level: Int?)
+
+    fun setDeployment(deployment: Deployment)
 
     fun getProfile(): Profile?
     fun getProfileId(): String?

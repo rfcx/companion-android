@@ -1,5 +1,10 @@
 package org.rfcx.audiomoth.entity
 
 enum class DeploymentState(val key: Int) {
-    locate(1), config(2), sync(3), verify(4), deploy(5)
+    Locate(1), Config(2), Sync(3), Verify(4), Deploy(5);
+
+    companion object {
+        private val map = DeploymentState.values().associateBy(DeploymentState::key)
+        fun fromInt(ageEstimate: Int) = map[ageEstimate] ?: Locate
+    }
 }

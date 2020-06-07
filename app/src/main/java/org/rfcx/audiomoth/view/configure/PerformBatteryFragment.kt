@@ -76,7 +76,7 @@ class PerformBatteryFragment : Fragment() {
                         batteryLevel = 100,
                         configuration = configuration,
                         location = location,
-                        state = DeploymentState.sync.key
+                        state = DeploymentState.Sync.key
                     )
                 notification(batteryDepletedAt, location.name)
 //                deploymentProtocol?.saveDeployment(deployment)
@@ -163,7 +163,7 @@ class PerformBatteryFragment : Fragment() {
                     batteryLevel = batteryLevel,
                     configuration = configuration,
                     location = location,
-                    state = DeploymentState.sync.key
+                    state = DeploymentState.Sync.key
                 )
                 notification(batteryDepletedAt, location.name)
 //                deploymentProtocol?.saveDeployment(deployment)
