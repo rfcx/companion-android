@@ -32,15 +32,14 @@ import com.mapbox.mapboxsdk.utils.BitmapUtils
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.DeploymentLocation
-import org.rfcx.audiomoth.entity.LocateItem
-import org.rfcx.audiomoth.localdb.DeploymentLocationDb
+import org.rfcx.audiomoth.entity.Locate
+import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 
 class LocationFragment : Fragment(), OnMapReadyCallback {
-    private val deploymentLocationDb by lazy {
-        DeploymentLocationDb(Realm.getInstance(RealmHelper.migrationConfig()))
+    private val locateDb by lazy {
+        LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
     }
 
     private lateinit var mapboxMap: MapboxMap
@@ -48,10 +47,11 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private lateinit var symbolManager: SymbolManager
     private var locationManager: LocationManager? = null
     private var lastLocation: Location? = null
-    private var deployLocations = ArrayList<LocateItem>()
-    private var deployLocationNames = ArrayList<String>()
-    private var locateItem: LocateItem? = null
-    private var deployLocationAdapter: ArrayAdapter<String>? = null
+    private var locateItems = ArrayList<Locate>()
+    private var locateNames = ArrayList<String>()
+    private var locateItem: Locate? = null
+    private var locateAdapter: ArrayAdapter<String>? = null
+
     private var deploymentProtocol: DeploymentProtocol? = null
 
     override fun onAttach(context: Context) {
@@ -105,8 +105,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private fun handleExistLocate() {
         locateItem?.let {
-            val deploymentLocation = deploymentLocationDb.getDeploymentLocationById(it.id)
-            deploymentProtocol?.setDeployLocation(deploymentLocation!!)
+            deploymentProtocol?.setDeployLocation(it)
             deploymentProtocol?.nextStep()
         }
     }
@@ -115,8 +114,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         val name = locationNameEditText.text.toString()
         val lat = latitudeEditText.text.toString().toDouble()
         val lng = longitudeEditText.text.toString().toDouble()
-        val deploymentLocation = DeploymentLocation(name = name, latitude = lat, longitude = lng)
-        deploymentProtocol?.setDeployLocation(deploymentLocation)
+        val locate = Locate(name = name, latitude = lat, longitude = lng)
+        deploymentProtocol?.setDeployLocation(locate)
         deploymentProtocol?.nextStep()
     }
 
@@ -150,15 +149,15 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private fun setLocationAdapter() {
         context ?: return
 
-        deployLocations.mapTo(deployLocationNames, { it.name })
-        deployLocationAdapter =
-            ArrayAdapter(context!!, R.layout.item_deploy_location, deployLocationNames)
-        locationNameSpinner.adapter = deployLocationAdapter
+        locateItems.mapTo(locateNames, { it.name })
+        locateAdapter =
+            ArrayAdapter(context!!, R.layout.support_simple_spinner_dropdown_item, locateNames)
+        locationNameSpinner.adapter = locateAdapter
         setLocationSpinner()
         setRecommendLocation()
 
-        newLocationRadioButton.isChecked = deployLocations.isEmpty()
-        existingRadioButton.isEnabled = deployLocations.isNotEmpty()
+        newLocationRadioButton.isChecked = locateItems.isEmpty()
+        existingRadioButton.isEnabled = locateItems.isNotEmpty()
     }
 
     private fun setLocationSpinner() {
@@ -169,7 +168,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 position: Int,
                 id: Long
             ) {
-                locateItem = deployLocations[position]
+                locateItem = locateItems[position]
                 setPinOnMap(locateItem!!.getLatLng())
                 setupView(
                     locateItem?.latitude.toString(),
@@ -183,19 +182,19 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun retrieveDeployLocations() {
-        deploymentLocationDb.getLocations().mapTo(deployLocations, {
-            LocateItem(it.id, it.name, it.latitude, it.longitude)
-        })
+        locateItems.clear()
+        val locations = locateDb.getLocations()
+        locateItems.addAll(locations)
         setLocationAdapter()
     }
 
     private fun setRecommendLocation() {
         lastLocation ?: return
 
-        if (deployLocations.isNotEmpty()) {
-            val itemsWithDistance = arrayListOf<Pair<LocateItem, Float>>()
+        if (locateItems.isNotEmpty()) {
+            val itemsWithDistance = arrayListOf<Pair<Locate, Float>>()
             // Find locate distances
-            deployLocations.mapTo(itemsWithDistance, {
+            locateItems.mapTo(itemsWithDistance, {
                 val loc = Location(LocationManager.GPS_PROVIDER)
                 loc.latitude = it.latitude
                 loc.longitude = it.longitude
@@ -203,9 +202,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 Pair(it, distance)
             })
             val nearItem = itemsWithDistance.minBy { it.second }
-            val position = deployLocations.indexOf(nearItem?.first)
+            val position = locateItems.indexOf(nearItem?.first)
             locationNameSpinner.setSelection(position)
-            locateItem = deployLocations[position]
+            locateItem = locateItems[position]
         }
     }
 

@@ -14,10 +14,9 @@ open class Deployment(
     var deployedAt: Date = Date(),
     var batteryLevel: Int = 0,
     var state: Int = 0, // 1 = Locate, 2 = Config, 3 = Sync, 4 = Verify, 5 = Deploy, 6 = Ready To Upload
-    var locationId: Int? = null,
     var configuration: Configuration? = null,
+    var location: DeploymentLocation? = null,
     var createdAt: Date = Date(),
-
     @Expose(serialize = false)
     var syncState: Int = 0
 ) : RealmModel {

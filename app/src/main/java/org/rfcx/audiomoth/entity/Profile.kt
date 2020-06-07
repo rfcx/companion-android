@@ -1,12 +1,12 @@
 package org.rfcx.audiomoth.entity
 
+import com.google.gson.annotations.Expose
 import io.realm.RealmList
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
 import org.rfcx.audiomoth.view.configure.ConfigureFragment
 import java.util.*
-import kotlin.collections.ArrayList
 
 @RealmClass
 open class Profile(
@@ -19,7 +19,9 @@ open class Profile(
     var sleepDuration: Int = 0,
     var recordingPeriodList: RealmList<String> = RealmList(),
     var durationSelected: String = "",
-    var createdAt: Date = Date()
+    var createdAt: Date = Date(),
+    @Expose(serialize = false)
+    var syncState: Int = 0
 ) : RealmModel {
     fun asConfiguration(): Configuration {
         return Configuration(

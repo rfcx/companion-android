@@ -75,7 +75,7 @@ class PerformBatteryFragment : Fragment() {
                         deployedAt = deployedAt,
                         batteryLevel = 100,
                         configuration = configuration,
-                        locationId = location.id,
+                        location = location,
                         state = DeploymentState.sync.key
                     )
                 notification(batteryDepletedAt, location.name)
@@ -162,7 +162,7 @@ class PerformBatteryFragment : Fragment() {
                     deployedAt = deployedAt,
                     batteryLevel = batteryLevel,
                     configuration = configuration,
-                    locationId = location.id,
+                    location = location,
                     state = DeploymentState.sync.key
                 )
                 notification(batteryDepletedAt, location.name)
