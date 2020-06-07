@@ -3,8 +3,10 @@ package org.rfcx.audiomoth.localdb
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
+import org.rfcx.audiomoth.entity.Configuration
 import org.rfcx.audiomoth.entity.Deployment
-import org.rfcx.audiomoth.entity.Locate
+import org.rfcx.audiomoth.entity.DeploymentLocation
+import org.rfcx.audiomoth.entity.DeploymentState
 
 class DeploymentDb(private val realm: Realm) {
 
@@ -14,7 +16,7 @@ class DeploymentDb(private val realm: Realm) {
             .findAllAsync()
     }
 
-    fun insertOrUpdateDeployment(deployment: Deployment, locate: Locate): Int {
+    fun insertOrUpdateDeployment(deployment: Deployment, location: DeploymentLocation): Int {
         var id = deployment.id
         realm.executeTransaction {
             if (deployment.id == 0) {
@@ -22,10 +24,17 @@ class DeploymentDb(private val realm: Realm) {
                     ?.toInt() ?: 0) + 1
                 deployment.id = id
             }
-            deployment.location = locate.asDeploymentLocation() // add deploy location
+            deployment.location = location // add deploy location
             it.insertOrUpdate(deployment)
         }
         return id
+    }
+
+    fun updateDeployment(deployment: Deployment) {
+        realm.executeTransaction {
+            it.insertOrUpdate(deployment)
+        }
+
     }
 
     fun getDeploymentById(id: Int): Deployment? {

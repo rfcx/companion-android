@@ -3,8 +3,6 @@ package org.rfcx.audiomoth.entity
 import io.realm.RealmList
 import io.realm.RealmModel
 import io.realm.annotations.RealmClass
-import org.rfcx.audiomoth.view.configure.ConfigureFragment
-import java.util.*
 
 @RealmClass
 open class Configuration(

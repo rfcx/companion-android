@@ -1,4 +1,4 @@
-package org.rfcx.audiomoth.view.configure
+package org.rfcx.audiomoth.view.deployment.configure
 
 import android.view.LayoutInflater
 import android.view.View

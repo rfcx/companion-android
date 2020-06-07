@@ -67,8 +67,7 @@ class PerformBatteryFragment : Fragment() {
             val deployedAt = Timestamp(System.currentTimeMillis())
             val configuration = deploymentProtocol?.geConfiguration()
             val location = deploymentProtocol?.getDeploymentLocation()
-            val profileId = deploymentProtocol?.getProfileId()
-            if (configuration != null && location != null && profileId != null) {
+            if (configuration != null && location != null) {
                 val deployment =
                     Deployment(
                         batteryDepletedAt = batteryDepletedAt,
@@ -154,8 +153,7 @@ class PerformBatteryFragment : Fragment() {
             val deployedAt = Timestamp(System.currentTimeMillis())
             val configuration = deploymentProtocol?.geConfiguration()
             val location = deploymentProtocol?.getDeploymentLocation()
-            val profileId = deploymentProtocol?.getProfileId()
-            if (configuration != null && location != null && profileId != null) {
+            if (configuration != null && location != null) {
                 val deployment =
                 Deployment(
                     batteryDepletedAt = batteryDepletedAt,

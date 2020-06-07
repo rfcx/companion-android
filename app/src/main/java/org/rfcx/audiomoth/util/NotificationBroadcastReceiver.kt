@@ -7,7 +7,7 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.view.configure.ConfigureFragment.Companion.CHANNEL_ID
+import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment.Companion.CHANNEL_ID
 import org.rfcx.audiomoth.view.configure.PerformBatteryFragment.Companion.BATTERY_DEPLETED_AT
 import org.rfcx.audiomoth.view.configure.PerformBatteryFragment.Companion.LOCATION_NAME
 

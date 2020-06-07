@@ -255,7 +255,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     if (it.state >= DeploymentState.Verify.key)
                         Battery.getPredictionBattery(it.batteryDepletedAt.time)
                     else
-                        getString(R.string.format_in_progress_step, DeploymentState.fromInt(it.state))
+                        getString(
+                            R.string.format_in_progress_step,
+                            DeploymentState.fromInt(it.state)
+                        )
                 )
             )
             Feature.fromGeometry(

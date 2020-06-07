@@ -22,7 +22,7 @@ class LocateDb(private val realm: Realm) {
             .findFirst()
     }
 
-    fun updateLocate(deploymentId: Int, locate: Locate) {
+    fun insertOrUpdateLocate(deploymentId: Int, locate: Locate) {
         realm.executeTransaction {
             if (locate.id == 0) {
                 val id = (realm.where(Locate::class.java).max(Locate.FIELD_ID)

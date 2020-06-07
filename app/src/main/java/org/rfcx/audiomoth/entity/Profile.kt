@@ -5,7 +5,7 @@ import io.realm.RealmList
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
-import org.rfcx.audiomoth.view.configure.ConfigureFragment
+import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
 import java.util.*
 
 @RealmClass
@@ -23,6 +23,26 @@ open class Profile(
     @Expose(serialize = false)
     var syncState: Int = 0
 ) : RealmModel {
+    constructor(
+        gain: Int,
+        name: String,
+        sampleRate: Int,
+        recordingDuration: Int,
+        sleepDuration: Int,
+        recordingPeriodList: ArrayList<String>,
+        durationSelected: String
+    ) : this() {
+        this.gain = gain
+        this.name = name
+        this.sampleRate = sampleRate
+        this.recordingDuration = recordingDuration
+        this.sleepDuration = sleepDuration
+        this.recordingPeriodList = recordingPeriodList.mapTo(RealmList(), { it })
+        this.durationSelected = durationSelected
+    }
+
+    fun isNew() = (this.id == 0)
+
     fun asConfiguration(): Configuration {
         return Configuration(
             gain = gain,
@@ -35,6 +55,8 @@ open class Profile(
     }
 
     companion object {
+        const val FIELD_ID = "id"
+
         fun default() = Profile(
             gain = 3,
             name = "",
