@@ -17,4 +17,9 @@ open class DeploymentImage(
     var createdAt: Date = Date(),
     @Expose(serialize = false)
     var syncState: Int = 0
-) : RealmModel
+) : RealmModel {
+    companion object {
+        const val FIELD_ID = "id"
+        const val FIELD_SYNC_STATE = "syncState"
+    }
+}

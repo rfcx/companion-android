@@ -3,12 +3,23 @@ package org.rfcx.audiomoth.localdb
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
-import org.rfcx.audiomoth.entity.Configuration
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.DeploymentState
+import org.rfcx.audiomoth.entity.SyncState
 
+/**
+ * For Manage the saving and sending of deployment from the local database
+ */
 class DeploymentDb(private val realm: Realm) {
+
+    fun unsentCount(): Long {
+        return realm.where(Deployment::class.java)
+            .equalTo(Deployment.FIELD_STATE, DeploymentState.ReadyToUpload.key)
+            .and()
+            .notEqualTo(Deployment.FIELD_SYNC_STATE, SyncState.Uploaded.key)
+            .count()
+    }
 
     fun getAllResultsAsync(sort: Sort = Sort.DESCENDING): RealmResults<Deployment> {
         return realm.where(Deployment::class.java)

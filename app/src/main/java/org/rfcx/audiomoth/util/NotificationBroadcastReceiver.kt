@@ -8,8 +8,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment.Companion.CHANNEL_ID
-import org.rfcx.audiomoth.view.configure.PerformBatteryFragment.Companion.BATTERY_DEPLETED_AT
-import org.rfcx.audiomoth.view.configure.PerformBatteryFragment.Companion.LOCATION_NAME
+import org.rfcx.audiomoth.view.deployment.verify.PerformBatteryFragment.Companion.BATTERY_DEPLETED_AT
+import org.rfcx.audiomoth.view.deployment.verify.PerformBatteryFragment.Companion.LOCATION_NAME
 
 class NotificationBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {

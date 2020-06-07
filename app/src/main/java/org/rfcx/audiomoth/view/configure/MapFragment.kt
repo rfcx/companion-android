@@ -385,7 +385,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         super.onDestroy()
         mapView.onDestroy()
         deployLiveData.removeObserver(deploymentObserve)
-
+        locateLiveData.removeObserver(locateObserve)
     }
 
     companion object {

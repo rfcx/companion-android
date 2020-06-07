@@ -1,4 +1,4 @@
-package org.rfcx.audiomoth.view.configure
+package org.rfcx.audiomoth.view.deployment.sync
 
 import android.content.Context
 import android.os.Bundle
@@ -47,7 +47,7 @@ class SyncFragment : Fragment() {
 
     private fun beforeSync() {
         nextButton.setOnClickListener {
-            deploymentProtocol?.openSync(SYNCING)
+            deploymentProtocol?.startSyncing(SYNCING)
         }
     }
 
@@ -65,7 +65,7 @@ class SyncFragment : Fragment() {
                     }
                     handler.postDelayed(this, 500)
                 } else {
-                    deploymentProtocol?.openSync(AFTER_SYNC)
+                    deploymentProtocol?.startSyncing(AFTER_SYNC)
                 }
             }
         }
@@ -73,7 +73,7 @@ class SyncFragment : Fragment() {
 
         cancelButton.setOnClickListener {
             handler.removeCallbacks(timerRunnable)
-            deploymentProtocol?.openSync(BEFORE_SYNC)
+            deploymentProtocol?.startSyncing(BEFORE_SYNC)
         }
     }
 
@@ -83,7 +83,7 @@ class SyncFragment : Fragment() {
         }
 
         noButton.setOnClickListener {
-            deploymentProtocol?.openSync(BEFORE_SYNC)
+            deploymentProtocol?.startSyncing(BEFORE_SYNC)
         }
     }
 
@@ -94,7 +94,8 @@ class SyncFragment : Fragment() {
         const val BEFORE_SYNC = "BEFORE_SYNC"
 
         @JvmStatic
-        fun newInstance(page: String) = SyncFragment().apply {
+        fun newInstance(page: String) = SyncFragment()
+            .apply {
             arguments = Bundle().apply {
                 putString(STATUS, page)
             }

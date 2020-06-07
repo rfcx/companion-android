@@ -1,4 +1,4 @@
-package org.rfcx.audiomoth.view.configure
+package org.rfcx.audiomoth.view.deployment
 
 
 import android.content.Context
@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_deploy.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
+import org.rfcx.audiomoth.view.configure.BaseImageFragment
 
 class DeployFragment : BaseImageFragment() {
 
@@ -31,9 +31,8 @@ class DeployFragment : BaseImageFragment() {
         super.onViewCreated(view, savedInstanceState)
         setupImageRecycler()
         finishButton.setOnClickListener {
-            val images = ArrayList<String>()
-            imageAdapter.getNewAttachImage().map { images.add(it) }
-            deploymentProtocol?.completeStep(images)
+            val images = imageAdapter.getNewAttachImage()
+            deploymentProtocol?.setReadyToDeploy(images)
         }
     }
 

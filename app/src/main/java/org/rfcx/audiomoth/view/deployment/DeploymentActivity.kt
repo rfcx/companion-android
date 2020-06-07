@@ -11,17 +11,19 @@ import kotlinx.android.synthetic.main.activity_deployment.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.*
 import org.rfcx.audiomoth.localdb.DeploymentDb
+import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.ProfileDb
 import org.rfcx.audiomoth.util.RealmHelper
-import org.rfcx.audiomoth.view.configure.DeployFragment
-import org.rfcx.audiomoth.view.configure.PerformBatteryFragment
-import org.rfcx.audiomoth.view.configure.PerformBatteryFragment.Companion.TEST_BATTERY
-import org.rfcx.audiomoth.view.configure.SyncFragment
-import org.rfcx.audiomoth.view.configure.SyncFragment.Companion.BEFORE_SYNC
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
 import org.rfcx.audiomoth.view.deployment.configure.SelectProfileFragment
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
+import org.rfcx.audiomoth.view.deployment.sync.SyncFragment
+import org.rfcx.audiomoth.view.deployment.sync.SyncFragment.Companion.BEFORE_SYNC
+import org.rfcx.audiomoth.view.deployment.verify.PerformBatteryFragment
+import org.rfcx.audiomoth.view.deployment.verify.PerformBatteryFragment.Companion.TEST_BATTERY
+import java.sql.Timestamp
+import java.util.*
 
 class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     // manager database
@@ -29,6 +31,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     private val deploymentDb by lazy { DeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
     private val profileDb by lazy { ProfileDb(realm) }
+    private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
 
     private var currentStep = 0
     private var _profiles: List<Profile> = listOf()
@@ -93,7 +96,11 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         // update deployment
         _deployment?.let { deploymentDb.updateDeployment(it) }
         // update profile
-        profileDb.insertOrUpdateProfile(profile)
+        if (profile.name.isNotEmpty()) {
+            profileDb.insertOrUpdateProfile(profile)
+        }
+
+        nextStep()
     }
 
     override fun geConfiguration(): Configuration? = _configuration
@@ -107,7 +114,8 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         this._deployLocation = locate.asDeploymentLocation()
         val deploymentId = deploymentDb.insertOrUpdateDeployment(deployment, _deployLocation!!)
         locateDb.insertOrUpdateLocate(deploymentId, locate) // update locate - last deployment
-        this._deployment = deployment
+
+        setDeployment(deployment)
     }
 
     override fun getProfiles(): List<Profile> = this._profiles
@@ -118,6 +126,31 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         this._profile = profile
     }
 
+    override fun setPerformBattery(batteryDepletedAt: Timestamp, batteryLevel: Int) {
+        this._deployment?.let {
+            it.batteryDepletedAt = batteryDepletedAt
+            it.batteryLevel = batteryLevel
+
+            // update about battery
+            this.deploymentDb.updateDeployment(it)
+        }
+    }
+
+    override fun setReadyToDeploy(images: List<String>) {
+        stepView.done(true)
+
+        _deployment?.let {
+            it.deployedAt = Date()
+            it.state = DeploymentState.ReadyToUpload.key
+            setDeployment(it)
+
+            deploymentImageDb.insertImage(it, images)
+            deploymentDb.updateDeployment(it)
+        }
+
+        finish()
+    }
+
     override fun startSetupConfigure(profile: Profile) {
         setProfile(profile)
         currentStep = 1
@@ -125,11 +158,11 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         startFragment(ConfigureFragment.newInstance())
     }
 
-    override fun openSync(status: String) {
+    override fun startSyncing(status: String) {
         startFragment(SyncFragment.newInstance(status))
     }
 
-    override fun openPerformBattery(status: String, level: Int?) {
+    override fun startCheckBattery(status: String, level: Int?) {
         startFragment(PerformBatteryFragment.newInstance(status, level))
     }
 
@@ -179,12 +212,6 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         this._deployment?.let { deploymentDb.updateDeployment(it) }
     }
 
-    override fun completeStep(images: ArrayList<String>?) {
-        nextStep()
-//        deployment?.let { MainActivity.startActivity(this, images, deployment.it) }
-        finish()
-    }
-
     companion object {
         fun startActivity(context: Context) {
             val intent = Intent(context, DeploymentActivity::class.java)
@@ -199,13 +226,10 @@ interface DeploymentProtocol {
     fun showCompleteButton()
     fun nextStep()
     fun backStep()
-    fun completeStep(images: ArrayList<String>?)
 
     fun startSetupConfigure(profile: Profile)
-    fun openSync(status: String)
-    fun openPerformBattery(status: String, level: Int?)
-
-    fun setDeployment(deployment: Deployment)
+    fun startSyncing(status: String)
+    fun startCheckBattery(status: String, level: Int?)
 
     fun getProfiles(): List<Profile>
     fun getProfile(): Profile?
@@ -213,7 +237,10 @@ interface DeploymentProtocol {
     fun geConfiguration(): Configuration?
     fun getDeploymentLocation(): DeploymentLocation?
 
+    fun setDeployment(deployment: Deployment)
     fun setDeployLocation(locate: Locate)
     fun setProfile(profile: Profile)
     fun setDeploymentConfigure(profile: Profile)
+    fun setPerformBattery(batteryDepletedAt: Timestamp, batteryLevel: Int)
+    fun setReadyToDeploy(images: List<String>)
 }

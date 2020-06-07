@@ -259,35 +259,6 @@ class ConfigureFragment : Fragment(),
             setNextButton(false)
             setupData()
             updateProfile()
-//            val profile = Profile(
-//                gain,
-//                profileEditText.text.toString(),
-//                sampleRate,
-//                recordingDuration,
-//                sleepDuration,
-//                recordingPeriod,
-//                durationSelected
-//            )
-//            deploymentProtocol?.setProfile(profile)
-//            deploymentProtocol?.saveUser { saveUserSuccess ->
-//                if (saveUserSuccess) {
-//                    deploymentProtocol?.saveLocation { saveLocationSuccess ->
-//                        if (saveLocationSuccess) {
-//                            deploymentProtocol?.saveProfile { saveProfileSuccess ->
-//                                if (saveProfileSuccess) {
-//                                    deploymentProtocol?.nextStep()
-//                                } else {
-//                                    setNextButton(true)
-//                                }
-//                            }
-//                        } else {
-//                            setNextButton(true)
-//                        }
-//                    }
-//                } else {
-//                    setNextButton(true)
-//                }
-//            }
         }
     }
 
@@ -314,7 +285,6 @@ class ConfigureFragment : Fragment(),
         }
 
         deploymentProtocol?.setDeploymentConfigure(newProfile)
-        deploymentProtocol?.nextStep()
     }
 
     private fun createNotificationChannel() {
