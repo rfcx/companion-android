@@ -12,7 +12,7 @@ class DeploymentImageDb(private val realm: Realm) {
     fun unsentCount(): Long {
         return realm.where(DeploymentImage::class.java).notEqualTo(
             DeploymentImage.FIELD_SYNC_STATE,
-            SyncState.Uploaded.key
+            SyncState.Sent.key
         ).count()
     }
 

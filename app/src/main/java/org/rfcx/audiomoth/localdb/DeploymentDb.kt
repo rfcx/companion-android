@@ -17,7 +17,7 @@ class DeploymentDb(private val realm: Realm) {
         return realm.where(Deployment::class.java)
             .equalTo(Deployment.FIELD_STATE, DeploymentState.ReadyToUpload.key)
             .and()
-            .notEqualTo(Deployment.FIELD_SYNC_STATE, SyncState.Uploaded.key)
+            .notEqualTo(Deployment.FIELD_SYNC_STATE, SyncState.Sent.key)
             .count()
     }
 
@@ -41,11 +41,31 @@ class DeploymentDb(private val realm: Realm) {
         return id
     }
 
+    fun markUnsent(id: Int) {
+        mark(id = id, syncState = SyncState.Unsent.key)
+    }
+
+    fun markUploaded(id: Int) {
+        mark(id, SyncState.Sent.key)
+    }
+
+    fun markUploading(id: Int) {
+        mark(id, SyncState.Uploading.key)
+    }
+
+    private fun mark(id: Int, syncState: Int) {
+        realm.executeTransaction {
+            val deployment = it.where(Deployment::class.java).equalTo(Deployment.FIELD_ID, id).findFirst()
+            if (deployment != null) {
+                deployment.syncState = syncState
+            }
+        }
+    }
+
     fun updateDeployment(deployment: Deployment) {
         realm.executeTransaction {
             it.insertOrUpdate(deployment)
         }
-
     }
 
     fun getDeploymentById(id: Int): Deployment? {

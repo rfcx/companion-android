@@ -244,7 +244,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 Pair(PROPERTY_MARKER_LOCATION_ID, location.name),
                 Pair(
                     PROPERTY_MARKER_IMAGE,
-                    if (it.state >= DeploymentState.Verify.key)
+                    if (it.state == DeploymentState.ReadyToUpload.key)
                         Battery.getBatteryPinImage(it.batteryDepletedAt.time)
                     else
                         Battery.BATTERY_PIN_GREY
@@ -252,7 +252,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 Pair(PROPERTY_MARKER_TITLE, location.name),
                 Pair(
                     PROPERTY_MARKER_CAPTION,
-                    if (it.state >= DeploymentState.Verify.key)
+                    if (it.state >= DeploymentState.ReadyToUpload.key)
                         Battery.getPredictionBattery(it.batteryDepletedAt.time)
                     else
                         getString(

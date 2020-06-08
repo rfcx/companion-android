@@ -12,10 +12,7 @@ import androidx.lifecycle.Transformations
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
-import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.DeploymentImage
-import org.rfcx.audiomoth.entity.DeploymentState
-import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.util.LocationPermissions
 import org.rfcx.audiomoth.util.Preferences
@@ -30,18 +27,12 @@ import org.rfcx.audiomoth.widget.BottomNavigationMenuItem
 open class MainActivity : AppCompatActivity(), MainActivityListener {
     // database manager
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val deploymentDb by lazy { DeploymentDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
 
     private var currentFragment: Fragment? = null
     private val locationPermissions by lazy { LocationPermissions(this) }
 
-    private lateinit var deployLiveData: LiveData<List<Deployment>>
     private lateinit var deployImageLiveData: LiveData<List<DeploymentImage>>
-    private var deployCount = 0
-    private var deployUnsentCount = 0
-    private var deployImageCount = 0
-    private var deployImageUnsentCount = 0
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -69,16 +60,10 @@ open class MainActivity : AppCompatActivity(), MainActivityListener {
         if (savedInstanceState == null) {
             setupFragments()
         }
-//        setSyncImage()
         fetchData()
     }
 
     private fun fetchData() {
-        deployLiveData = Transformations.map(deploymentDb.getAllResultsAsync().asLiveData()) {
-            it
-        }
-        deployLiveData.observeForever(deploymentObserve)
-
         deployImageLiveData =
             Transformations.map(deploymentImageDb.getAllResultsAsync().asLiveData()) {
                 it
@@ -86,39 +71,24 @@ open class MainActivity : AppCompatActivity(), MainActivityListener {
         deployImageLiveData.observeForever(deploymentImageObserver)
     }
 
-    private val deploymentObserve = Observer<List<Deployment>> {
-        this.deployCount = it.filter { it1 -> it1.state == DeploymentState.ReadyToUpload.key }.size
-        this.deployUnsentCount = deploymentDb.unsentCount().toInt()
-        updateSyncingView()
-    }
-
     private val deploymentImageObserver = Observer<List<DeploymentImage>> {
-        this.deployImageCount = it.size
-        this.deployImageUnsentCount = deploymentImageDb.unsentCount().toInt()
-        updateSyncingView()
+        val imageCount = it.size
+        val imageUnsentCount = deploymentImageDb.unsentCount().toInt()
+        updateSyncingView(imageCount, imageUnsentCount)
     }
 
-    private fun updateSyncingView() {
+    private fun updateSyncingView(imageCount: Int, imageUnsentCount: Int) {
         // TODO: implement logic display syncing view
-        deploySyncTextView.visibility = if (deployCount >= deployUnsentCount) {
+        imageSyncTextView.visibility = if (imageCount >= imageUnsentCount) {
             View.VISIBLE
         } else {
             View.GONE
         }
 
-        imageSyncTextView.visibility = if (deployImageCount >= deployImageUnsentCount) {
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
-
-        deploySyncTextView.text = getString(
-            R.string.format_deploy_unsync, deployCount.toString(), deployUnsentCount.toString()
-        )
         imageSyncTextView.text = getString(
-            if (deployImageCount > 1) R.string.format_images_unsync else R.string.format_image_unsync,
-            deployImageCount.toString(),
-            deployImageUnsentCount.toString()
+            if (imageCount > 1) R.string.format_images_unsync else R.string.format_image_unsync,
+            imageCount.toString(),
+            imageUnsentCount.toString()
         )
     }
 
@@ -194,45 +164,8 @@ open class MainActivity : AppCompatActivity(), MainActivityListener {
         menuMap.performClick()
     }
 
-//    private fun setSyncImage() {
-//        val images = intent.extras?.getStringArrayList(IMAGES)
-//        val deploymentId = intent.extras?.getString(DEPLOYMENT_ID)
-//        if (!images.isNullOrEmpty()) {
-//            if (deploymentId != null) {
-//                Storage(this).uploadImage(images, deploymentId) { count, unSyncNum ->
-//                    if (count == 1) {
-//                        if (unSyncNum == 0) {
-//                            photoSyncTextView.visibility = View.GONE
-//                        } else {
-//                            photoSyncTextView.visibility = View.VISIBLE
-//                            photoSyncTextView.text = getString(
-//                                R.string.format_image_unsync,
-//                                count.toString(),
-//                                unSyncNum.toString()
-//                            )
-//                        }
-//                    } else {
-//                        if (unSyncNum == 0) {
-//                            photoSyncTextView.visibility = View.GONE
-//                        } else {
-//                            photoSyncTextView.visibility = View.VISIBLE
-//                            photoSyncTextView.text = getString(
-//                                R.string.format_images_unsync,
-//                                count.toString(),
-//                                unSyncNum.toString()
-//                            )
-//                        }
-//                    }
-//                }
-//            }
-//        } else {
-//            photoSyncTextView.visibility = View.GONE
-//        }
-//    }
-
     override fun onDestroy() {
         super.onDestroy()
-        deployLiveData.removeObserver(deploymentObserve)
         deployImageLiveData.removeObserver(deploymentImageObserver)
     }
 

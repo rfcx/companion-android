@@ -1,9 +1,11 @@
 package org.rfcx.audiomoth.view.deployment
 
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import io.realm.Realm
@@ -14,7 +16,10 @@ import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.ProfileDb
+import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.util.RealmHelper
+import org.rfcx.audiomoth.util.showCommonDialog
+import org.rfcx.audiomoth.view.LoadingDialogFragment
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
 import org.rfcx.audiomoth.view.deployment.configure.SelectProfileFragment
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
@@ -138,7 +143,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
 
     override fun setReadyToDeploy(images: List<String>) {
         stepView.done(true)
-
+        showLoading()
         _deployment?.let {
             it.deployedAt = Date()
             it.state = DeploymentState.ReadyToUpload.key
@@ -146,9 +151,8 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
 
             deploymentImageDb.insertImage(it, images)
             deploymentDb.updateDeployment(it)
+            saveDevelopment(it)
         }
-
-        finish()
     }
 
     override fun startSetupConfigure(profile: Profile) {
@@ -212,7 +216,48 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         this._deployment?.let { deploymentDb.updateDeployment(it) }
     }
 
+    private fun saveDevelopment(deployment: Deployment) {
+        Firestore(this).saveDeployment(deploymentDb, deployment) { string, isSuccess ->
+            if (isSuccess) {
+                Toast.makeText(
+                    this,
+                    getString(R.string.deployment_uploaded),
+                    Toast.LENGTH_SHORT
+                ).show()
+                hideLoading()
+                finish()
+            } else {
+                hideLoading()
+                showCommonDialog(
+                    title = "",
+                    message = string ?: getString(R.string.error_upload_deployment),
+                    onClick = DialogInterface.OnClickListener { dialog, _ ->
+                        dialog.dismiss()
+                        finish()
+                    }
+                )
+            }
+        }
+    }
+
+    private fun showLoading() {
+        val loadingDialog: LoadingDialogFragment =
+            supportFragmentManager.findFragmentByTag(loadingDialogTag) as LoadingDialogFragment?
+                ?: run {
+                    LoadingDialogFragment()
+                }
+        loadingDialog.show(supportFragmentManager, loadingDialogTag)
+    }
+
+    private fun hideLoading() {
+        val loadingDialog: LoadingDialogFragment? =
+            supportFragmentManager.findFragmentByTag(loadingDialogTag) as LoadingDialogFragment?
+        loadingDialog?.dismissDialog()
+    }
+
     companion object {
+        const val loadingDialogTag = "LoadingDialog"
+
         fun startActivity(context: Context) {
             val intent = Intent(context, DeploymentActivity::class.java)
             context.startActivity(intent)
