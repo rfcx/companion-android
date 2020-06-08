@@ -6,21 +6,33 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.Transformations
+import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
+import org.rfcx.audiomoth.entity.DeploymentImage
+import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.util.LocationPermissions
 import org.rfcx.audiomoth.util.Preferences
-import org.rfcx.audiomoth.util.Storage
-import org.rfcx.audiomoth.view.DeploymentActivity
+import org.rfcx.audiomoth.util.RealmHelper
+import org.rfcx.audiomoth.util.asLiveData
 import org.rfcx.audiomoth.view.LoginActivity
 import org.rfcx.audiomoth.view.configure.MapFragment
 import org.rfcx.audiomoth.view.configure.ProfileFragment
+import org.rfcx.audiomoth.view.deployment.DeploymentActivity
 import org.rfcx.audiomoth.widget.BottomNavigationMenuItem
 
 open class MainActivity : AppCompatActivity(), MainActivityListener {
+    // database manager
+    private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
+    private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
 
     private var currentFragment: Fragment? = null
     private val locationPermissions by lazy { LocationPermissions(this) }
+
+    private lateinit var deployImageLiveData: LiveData<List<DeploymentImage>>
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -48,7 +60,36 @@ open class MainActivity : AppCompatActivity(), MainActivityListener {
         if (savedInstanceState == null) {
             setupFragments()
         }
-        setSyncImage()
+        fetchData()
+    }
+
+    private fun fetchData() {
+        deployImageLiveData =
+            Transformations.map(deploymentImageDb.getAllResultsAsync().asLiveData()) {
+                it
+            }
+        deployImageLiveData.observeForever(deploymentImageObserver)
+    }
+
+    private val deploymentImageObserver = Observer<List<DeploymentImage>> {
+        val imageCount = it.size
+        val imageUnsentCount = deploymentImageDb.unsentCount().toInt()
+        updateSyncingView(imageCount, imageUnsentCount)
+    }
+
+    private fun updateSyncingView(imageCount: Int, imageUnsentCount: Int) {
+        // TODO: implement logic display syncing view
+        imageSyncTextView.visibility = if (imageCount >= imageUnsentCount) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
+
+        imageSyncTextView.text = getString(
+            if (imageCount > 1) R.string.format_images_unsync else R.string.format_image_unsync,
+            imageCount.toString(),
+            imageUnsentCount.toString()
+        )
     }
 
     private fun setupBottomMenu() {
@@ -123,46 +164,16 @@ open class MainActivity : AppCompatActivity(), MainActivityListener {
         menuMap.performClick()
     }
 
-    private fun setSyncImage() {
-        val images = intent.extras?.getStringArrayList(IMAGES)
-        val deploymentId = intent.extras?.getString(DEPLOYMENT_ID)
-        if (!images.isNullOrEmpty()) {
-            if (deploymentId != null) {
-                Storage(this).uploadImage(images, deploymentId) { count, unSyncNum ->
-                    if (count == 1) {
-                        if (unSyncNum == 0) {
-                            photoSyncTextView.visibility = View.GONE
-                        } else {
-                            photoSyncTextView.visibility = View.VISIBLE
-                            photoSyncTextView.text = getString(
-                                R.string.format_image_unsync,
-                                count.toString(),
-                                unSyncNum.toString()
-                            )
-                        }
-                    } else {
-                        if (unSyncNum == 0) {
-                            photoSyncTextView.visibility = View.GONE
-                        } else {
-                            photoSyncTextView.visibility = View.VISIBLE
-                            photoSyncTextView.text = getString(
-                                R.string.format_images_unsync,
-                                count.toString(),
-                                unSyncNum.toString()
-                            )
-                        }
-                    }
-                }
-            }
-        } else {
-            photoSyncTextView.visibility = View.GONE
-        }
+    override fun onDestroy() {
+        super.onDestroy()
+        deployImageLiveData.removeObserver(deploymentImageObserver)
     }
 
     override fun onLogout() {
         Preferences.getInstance(this).clear()
         LoginActivity.startActivity(this)
-        finish()    }
+        finish()
+    }
 
     companion object {
         private const val IMAGES = "IMAGES"

@@ -10,7 +10,7 @@ fun Activity.showCommonDialog(message: String) {
     showCommonDialog(null, message)
 }
 
-fun Activity.showCommonDialog(title: String?, message: String,
+fun Activity.showCommonDialog(title: String? = null, message: String,
                               onClick: DialogInterface.OnClickListener? = null) {
     if (isDestroyed || isFinishing) return
 

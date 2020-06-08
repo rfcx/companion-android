@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.time_item.view.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.util.getIntColor
+import org.rfcx.audiomoth.view.deployment.configure.OnItemClickListener
+import org.rfcx.audiomoth.view.deployment.configure.TimeItem
 
 class TimeAdapter(private val listener: OnItemClickListener, private val context: Context?) :
     RecyclerView.Adapter<TimeAdapter.TimeAdapterViewHolder>() {

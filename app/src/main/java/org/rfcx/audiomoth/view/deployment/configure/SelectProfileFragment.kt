@@ -1,4 +1,4 @@
-package org.rfcx.audiomoth.view.configure
+package org.rfcx.audiomoth.view.deployment.configure
 
 
 import android.content.Context
@@ -11,13 +11,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_select_profile.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Profile
-import org.rfcx.audiomoth.util.Firestore
-import org.rfcx.audiomoth.util.FirestoreResponseCallback
-import org.rfcx.audiomoth.view.DeploymentProtocol
+import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 
 class SelectProfileFragment : Fragment(), (Profile) -> Unit {
     private val profilesAdapter by lazy { ProfilesAdapter(this) }
     private var deploymentProtocol: DeploymentProtocol? = null
+    private var profiles = listOf<Profile>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,24 +38,14 @@ class SelectProfileFragment : Fragment(), (Profile) -> Unit {
 
     // @{ProfilesAdapter.itemClickListener}
     override fun invoke(profile: Profile) {
-        deploymentProtocol?.openConfigure(
-            Profile(
-                profile.gain,
-                "",
-                profile.sampleRate,
-                profile.recordingDuration,
-                profile.sleepDuration,
-                profile.recordingPeriodList,
-                profile.durationSelected
-            )
-        )
+        deploymentProtocol?.startSetupConfigure(profile)
     }
 
     private fun setupView() {
         deploymentProtocol?.hideCompleteButton()
 
         createNewButton.setOnClickListener {
-            deploymentProtocol?.openConfigure(Profile.default())
+            deploymentProtocol?.startSetupConfigure(Profile.default()) // new profile
         }
 
         profileRecyclerView.apply {
@@ -71,23 +60,12 @@ class SelectProfileFragment : Fragment(), (Profile) -> Unit {
 
     private fun retrieveProfiles() {
         checkState(SHOW_LOADING)
-        context?.let {
-            Firestore(it).getProfiles(object : FirestoreResponseCallback<List<Profile?>?> {
-                override fun onSuccessListener(response: List<Profile?>?) {
-                    val items = arrayListOf<Profile>()
-                    response?.forEach {
-                        if (it != null) {
-                            items.add(it)
-                        }
-                    }
-                    profilesAdapter.items = items
-                    checkState(SHOW_LIST_PROFILE)
-                }
-
-                override fun addOnFailureListener(exception: Exception) {
-                    checkState(SHOW_TRY_AGAIN)
-                }
-            })
+        this.profiles = deploymentProtocol?.getProfiles() ?: arrayListOf()
+        if (profiles.isNotEmpty()) {
+            profilesAdapter.items = profiles
+            checkState(SHOW_LIST_PROFILE)
+        } else {
+            checkState(SHOW_TRY_AGAIN)
         }
     }
 

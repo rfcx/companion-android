@@ -1,4 +1,4 @@
-package org.rfcx.audiomoth.view.configure
+package org.rfcx.audiomoth.view.deployment.configure
 
 
 import android.app.NotificationChannel
@@ -16,12 +16,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_configure.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Profile
-import org.rfcx.audiomoth.view.DeploymentProtocol
+import org.rfcx.audiomoth.view.configure.TimeAdapter
+import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 
-class ConfigureFragment : Fragment(), OnItemClickListener {
+class ConfigureFragment : Fragment(),
+    OnItemClickListener {
 
     private var deploymentProtocol: DeploymentProtocol? = null
-    private val timeAdapter by lazy { TimeAdapter(this, context) }
+    private val timeAdapter by lazy {
+        TimeAdapter(
+            this,
+            context
+        )
+    }
 
     private val sampleRateList = arrayOf("8", "16", "32", "48", "96", "192", "256", "384")
     private val gainList = arrayOf("1 - Lowest", "2 - Low", "3 - Medium", "4 - High", "5 - Highest")
@@ -58,7 +65,8 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
     private var recordingDuration = 0
     private var recordingPeriod = ArrayList<String>()
     private var customRecordingPeriod = recordingPeriod.isNotEmpty()
-    private var durationSelected = RECOMMENDED
+    private var durationSelected =
+        RECOMMENDED
     private var profile: Profile? = null
     private var timeState = ArrayList<TimeItem>()
 
@@ -83,14 +91,17 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
 
         for (time in timeList) {
             profile?.let {
-                timeState.add(TimeItem(time, it.recordingPeriodList.contains(time)))
+                timeState.add(
+                    TimeItem(
+                        time,
+                        it.recordingPeriodList.contains(time)
+                    )
+                )
             }
         }
 
         if (profile != null) {
-            profile?.let {
-                durationSelectedItem(it.durationSelected)
-            }
+            durationSelectedItem(profile!!.durationSelected)
         } else {
             durationSelectedItem(durationSelected)
         }
@@ -114,15 +125,18 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
         radioGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.recommendedRadioButton -> {
-                    durationSelected = RECOMMENDED
+                    durationSelected =
+                        RECOMMENDED
                     durationSelectedItem(RECOMMENDED)
                 }
                 R.id.continuousRadioButton -> {
-                    durationSelected = CONTINUOUS
+                    durationSelected =
+                        CONTINUOUS
                     durationSelectedItem(CONTINUOUS)
                 }
                 R.id.customRadioButton -> {
-                    durationSelected = CUSTOM
+                    durationSelected =
+                        CUSTOM
                     durationSelectedItem(CUSTOM)
                 }
             }
@@ -244,37 +258,33 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
         nextButton.setOnClickListener {
             setNextButton(false)
             setupData()
-
-            val profile = Profile(
-                gain,
-                profileEditText.text.toString(),
-                sampleRate,
-                recordingDuration,
-                sleepDuration,
-                recordingPeriod,
-                durationSelected
-            )
-            deploymentProtocol?.setProfile(profile)
-            deploymentProtocol?.saveUser { saveUserSuccess ->
-                if (saveUserSuccess) {
-                    deploymentProtocol?.saveLocation { saveLocationSuccess ->
-                        if (saveLocationSuccess) {
-                            deploymentProtocol?.saveProfile { saveProfileSuccess ->
-                                if (saveProfileSuccess) {
-                                    deploymentProtocol?.nextStep()
-                                } else {
-                                    setNextButton(true)
-                                }
-                            }
-                        } else {
-                            setNextButton(true)
-                        }
-                    }
-                } else {
-                    setNextButton(true)
-                }
-            }
+            updateProfile()
         }
+    }
+
+    private fun updateProfile() {
+        val profileName = profileEditText.text
+        val profileTemp = Profile(
+            gain = gain,
+            name = profileName?.trim()?.toString() ?: "",
+            sampleRate = sampleRate,
+            recordingDuration = recordingDuration,
+            sleepDuration = sleepDuration,
+            recordingPeriodList = recordingPeriod,
+            durationSelected = durationSelected
+        )
+
+        // is new Profile?
+        val newProfile = profile?.let {
+            if (it.name == profileTemp.name) {
+                profileTemp.id = it.id
+            }
+            profileTemp
+        } ?: kotlin.run {
+            profileTemp
+        }
+
+        deploymentProtocol?.setDeploymentConfigure(newProfile)
     }
 
     private fun createNotificationChannel() {

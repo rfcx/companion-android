@@ -21,6 +21,7 @@
     <string name="red_pin">Red = <![CDATA[<]]>1 day</string>
     <string name="format_image_unsync">%s photo (%s not yet synced)</string>
     <string name="format_images_unsync">%s photos (%s not yet synced)</string>
+    <string name="format_deploy_unsync">%s deploy (%s not yet synced)</string>
     <string name="menu_map">MAP</string>
     <string name="menu_profile">PROFILE</string>
 
@@ -146,5 +147,8 @@
 
     <string name="an_error_occurred">Service unavailable</string>
     <string name="error_has_occurred">An error has occurred Please try again later</string>
+    <string name="format_in_progress_step">Not deploy yet [%s]</string>
+    <string name="error_upload_deployment">Something went wrong.</string>
+    <string name="deployment_uploaded">Deployment uploaded!</string>
 
 </resources>

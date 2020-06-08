@@ -16,14 +16,14 @@ import org.rfcx.audiomoth.adapter.AddImageItem
 import org.rfcx.audiomoth.adapter.BaseListItem
 import org.rfcx.audiomoth.adapter.LocalImageItem
 import org.rfcx.audiomoth.adapter.RemoteImageItem
-import org.rfcx.audiomoth.entity.Image
+import org.rfcx.audiomoth.entity.DeploymentImage
 
 class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAdapterDiffUtil()) {
     var onImageAdapterClickListener: OnImageAdapterClickListener? = null
     private var context: Context? = null
     private var imagesSource = arrayListOf<BaseListItem>()
 
-    fun setImages(images: List<Image>) {
+    fun setImages(images: List<DeploymentImage>) {
         imagesSource = arrayListOf()
         var index = 0
         images.forEach {

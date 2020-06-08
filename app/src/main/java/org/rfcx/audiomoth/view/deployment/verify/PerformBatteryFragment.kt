@@ -1,4 +1,4 @@
-package org.rfcx.audiomoth.view.configure
+package org.rfcx.audiomoth.view.deployment.verify
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -13,21 +13,24 @@ import kotlinx.android.synthetic.main.confirm_perform_battery.*
 import kotlinx.android.synthetic.main.fragment_battery_level.*
 import kotlinx.android.synthetic.main.fragment_perform_battery.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.Deployment
+import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.util.NotificationBroadcastReceiver
 import org.rfcx.audiomoth.util.toDateTimeString
-import org.rfcx.audiomoth.view.DeploymentProtocol
+import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 import java.sql.Timestamp
 import java.util.*
 
 class PerformBatteryFragment : Fragment() {
     private var status: String? = null
     private var deploymentProtocol: DeploymentProtocol? = null
+    private var location: DeploymentLocation? = null
+
     private val day = 24 * 60 * 60 * 1000
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        deploymentProtocol = (context as DeploymentProtocol)
+        this.deploymentProtocol = (context as DeploymentProtocol)
+        this.location = deploymentProtocol?.getDeploymentLocation()
     }
 
     override fun onCreateView(
@@ -58,48 +61,34 @@ class PerformBatteryFragment : Fragment() {
 
     private fun checkBattery() {
         testButton.setOnClickListener {
-            deploymentProtocol?.openPerformBattery(TIME_LED_FLASH, null)
+            deploymentProtocol?.startCheckBattery(TIME_LED_FLASH, null)
         }
 
         skipButton.setOnClickListener {
             val batteryDepletedAt = Timestamp(System.currentTimeMillis() + (day * 6))
-            val deployedAt = Timestamp(System.currentTimeMillis())
-            val configuration = deploymentProtocol?.geConfiguration()
-            val location = deploymentProtocol?.getLocationInDeployment()
-            val profileId = deploymentProtocol?.getProfileId()
-            if (configuration != null && location != null && profileId != null) {
-                val deployment =
-                    Deployment(
-                        batteryDepletedAt,
-                        deployedAt,
-                        100,
-                        true,
-                        configuration,
-                        location,
-                        profileId,
-                        arrayListOf()
-                    )
-                notification(batteryDepletedAt, location.name)
-                deploymentProtocol?.saveDeployment(deployment)
+            if (location != null) {
+                notification(batteryDepletedAt, location!!.name)
+                deploymentProtocol?.setPerformBattery(batteryDepletedAt, 100)
+                deploymentProtocol?.nextStep()
             }
         }
     }
 
     private fun timeFlash() {
         batteryLv1Button.setOnClickListener {
-            deploymentProtocol?.openPerformBattery(BATTERY_LEVEL, 1)
+            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 1)
         }
         batteryLv2Button.setOnClickListener {
-            deploymentProtocol?.openPerformBattery(BATTERY_LEVEL, 2)
+            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 2)
         }
         batteryLv3Button.setOnClickListener {
-            deploymentProtocol?.openPerformBattery(BATTERY_LEVEL, 3)
+            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 3)
         }
         batteryLv4Button.setOnClickListener {
-            deploymentProtocol?.openPerformBattery(BATTERY_LEVEL, 4)
+            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 4)
         }
         batteryLv5Button.setOnClickListener {
-            deploymentProtocol?.openPerformBattery(BATTERY_LEVEL, 5)
+            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 5)
         }
     }
 
@@ -138,7 +127,7 @@ class PerformBatteryFragment : Fragment() {
                 days = getString(R.string.days, "4")
                 percent = getString(R.string.charged, "80%")
             }
-            1-> {
+            1 -> {
                 numberOfDays = 6
                 batteryLevel = 100
                 days = getString(R.string.days, "6")
@@ -152,24 +141,11 @@ class PerformBatteryFragment : Fragment() {
 
         nextButton.setOnClickListener {
             val batteryDepletedAt = Timestamp(System.currentTimeMillis() + (day * numberOfDays))
-            val deployedAt = Timestamp(System.currentTimeMillis())
-            val configuration = deploymentProtocol?.geConfiguration()
-            val location = deploymentProtocol?.getLocationInDeployment()
-            val profileId = deploymentProtocol?.getProfileId()
-            if (configuration != null && location != null && profileId != null) {
-                val deployment =
-                    Deployment(
-                        batteryDepletedAt,
-                        deployedAt,
-                        batteryLevel,
-                        true,
-                        configuration,
-                        location,
-                        profileId,
-                        arrayListOf()
-                    )
-                notification(batteryDepletedAt, location.name)
-                deploymentProtocol?.saveDeployment(deployment)
+            if (location != null) {
+
+                notification(batteryDepletedAt, location!!.name)
+                deploymentProtocol?.setPerformBattery(batteryDepletedAt, batteryLevel)
+                deploymentProtocol?.nextStep()
             }
         }
     }
@@ -246,7 +222,8 @@ class PerformBatteryFragment : Fragment() {
         const val LOCATION_NAME = "LOCATION_NAME"
 
         @JvmStatic
-        fun newInstance(page: String, level: Int?) = PerformBatteryFragment().apply {
+        fun newInstance(page: String, level: Int?) = PerformBatteryFragment()
+            .apply {
             arguments = Bundle().apply {
                 putString(STATUS, page)
                 if (level != null) {
