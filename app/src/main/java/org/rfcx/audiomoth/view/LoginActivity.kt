@@ -18,12 +18,11 @@ import com.auth0.android.result.Credentials
 import kotlinx.android.synthetic.main.activity_login.*
 import org.rfcx.audiomoth.MainActivity
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.Err
-import org.rfcx.audiomoth.entity.Ok
-import org.rfcx.audiomoth.entity.UserTouchResponse
+import org.rfcx.audiomoth.entity.*
 import org.rfcx.audiomoth.repo.ApiManager
 import org.rfcx.audiomoth.util.CredentialKeeper
 import org.rfcx.audiomoth.util.CredentialVerifier
+import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.view.configure.TutorialActivity
 import retrofit2.Call
 import retrofit2.Callback
@@ -88,20 +87,42 @@ class LoginActivity : AppCompatActivity() {
                         is Err -> {
                             Toast.makeText(this@LoginActivity, result.error, Toast.LENGTH_SHORT)
                                 .show()
-                            loading(false)
+                            runOnUiThread { loading(false) }
                         }
                         is Ok -> {
-                            userTouch(result.value.idToken)
-                            CredentialKeeper(this@LoginActivity).save(result.value)
+                            saveUserToFirestore(result.value)
                         }
                     }
                 }
 
                 override fun onFailure(exception: AuthenticationException) {
                     exception.printStackTrace()
-                    loading(false)
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@LoginActivity,
+                            getString(R.string.error_has_occurred),
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
+                        loading(false)
+                    }
                 }
             })
+    }
+
+    private fun saveUserToFirestore(result: UserAuthResponse) {
+        val name = result.nickname ?: "Companion"
+        val user = User(name)
+
+        Firestore(this@LoginActivity).saveUser(user, result.guid) { string, isSuccess ->
+            if (isSuccess) {
+                userTouch(result.idToken)
+                CredentialKeeper(this@LoginActivity).save(result)
+            } else {
+                Toast.makeText(this@LoginActivity, string, Toast.LENGTH_SHORT).show()
+                loading(false)
+            }
+        }
     }
 
     private fun loginWithFacebook() {
@@ -126,8 +147,7 @@ class LoginActivity : AppCompatActivity() {
                             loading(false)
                         }
                         is Ok -> {
-                            userTouch(result.value.idToken)
-                            CredentialKeeper(this@LoginActivity).save(result.value)
+                            saveUserToFirestore(result.value)
                         }
                     }
                 }
@@ -157,8 +177,7 @@ class LoginActivity : AppCompatActivity() {
                             loading(false)
                         }
                         is Ok -> {
-                            userTouch(result.value.idToken)
-                            CredentialKeeper(this@LoginActivity).save(result.value)
+                            saveUserToFirestore(result.value)
                         }
                     }
                 }

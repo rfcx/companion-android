@@ -23,8 +23,8 @@ class Firestore(val context: Context) {
     private val userDocument = db.collection(COLLECTION_USERS).document(guid)
     private val feedbackDocument = db.collection(COLLECTION_FEEDBACK)
 
-    fun saveUser(user: User, callback: (String?, Boolean) -> Unit) {
-        userDocument.set(user)
+    fun saveUser(user: User, guid: String, callback: (String?, Boolean) -> Unit) {
+        db.collection(COLLECTION_USERS).document(guid).set(user)
             .addOnSuccessListener {
                 callback(null, true)
             }
