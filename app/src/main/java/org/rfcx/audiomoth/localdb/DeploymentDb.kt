@@ -69,6 +69,11 @@ class DeploymentDb(private val realm: Realm) {
     }
 
     fun getDeploymentById(id: Int): Deployment? {
-        return realm.where(Deployment::class.java).equalTo(Deployment.FIELD_ID, id).findFirst()
+        val deployment =
+            realm.where(Deployment::class.java).equalTo(Deployment.FIELD_ID, id).findFirst()
+        if (deployment != null) {
+            return realm.copyFromRealm(deployment)
+        }
+        return null
     }
 }

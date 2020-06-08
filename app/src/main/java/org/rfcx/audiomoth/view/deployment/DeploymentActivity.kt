@@ -48,7 +48,31 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_deployment)
-        setupView()
+        val deploymentId = intent.extras?.getInt(DEPLOYMENT_ID)
+        if (deploymentId != null) {
+
+            val deployment = deploymentDb.getDeploymentById(deploymentId)
+            if (deployment != null) {
+                setDeployment(deployment)
+
+                when (deployment.state) { // 1 = Locate, 2 = Config, 3 = Sync, 4 = Verify, 5 = Deploy, 6 = Ready To Upload
+                    2 -> {
+                        this._deployLocation = deployment.location
+                        this._configuration = deployment.configuration
+                    }
+                    3 -> {
+                        this._deployLocation = deployment.location
+                        this._configuration = deployment.configuration
+                    }
+                }
+
+                currentStep = deployment.state - 1
+                stepView.go(currentStep, true)
+                handleFragment(currentStep)
+            }
+        } else {
+            setupView()
+        }
     }
 
     private fun setupView() {
@@ -257,9 +281,16 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
 
     companion object {
         const val loadingDialogTag = "LoadingDialog"
+        const val DEPLOYMENT_ID = "DEPLOYMENT_ID"
 
         fun startActivity(context: Context) {
             val intent = Intent(context, DeploymentActivity::class.java)
+            context.startActivity(intent)
+        }
+
+        fun startActivity(context: Context, deploymentId: Int) {
+            val intent = Intent(context, DeploymentActivity::class.java)
+            intent.putExtra(DEPLOYMENT_ID, deploymentId)
             context.startActivity(intent)
         }
     }
