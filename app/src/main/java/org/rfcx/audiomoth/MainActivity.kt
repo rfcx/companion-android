@@ -79,11 +79,7 @@ open class MainActivity : AppCompatActivity(), MainActivityListener {
 
     private fun updateSyncingView(imageCount: Int, imageUnsentCount: Int) {
         // TODO: implement logic display syncing view
-        imageSyncTextView.visibility = if (imageCount >= imageUnsentCount) {
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
+        imageSyncTextView.visibility = View.GONE
 
         imageSyncTextView.text = getString(
             if (imageCount > 1) R.string.format_images_unsync else R.string.format_image_unsync,

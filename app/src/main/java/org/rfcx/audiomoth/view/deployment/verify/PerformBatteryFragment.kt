@@ -52,6 +52,7 @@ class PerformBatteryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        deploymentProtocol?.hideCompleteButton()
         when (status) {
             TEST_BATTERY -> checkBattery()
             TIME_LED_FLASH -> timeFlash()

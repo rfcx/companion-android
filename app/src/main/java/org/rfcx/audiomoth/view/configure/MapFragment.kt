@@ -196,11 +196,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val y = screenPoint.y.toInt()
 
         if (hitRectText.contains(x, y)) {
-            context?.let {
-                DeploymentActivity.startActivity(
-                    it,
-                    feature.getProperty(PROPERTY_MARKER_DEPLOYMENT_ID).asInt
-                )
+            val deployment = deploymentDb.getDeploymentById(feature.getProperty(PROPERTY_MARKER_DEPLOYMENT_ID).asInt)
+            if(deployment != null) {
+                if (deployment.state != 6) {
+                    context?.let {
+                        DeploymentActivity.startActivity(
+                            it,
+                            feature.getProperty(PROPERTY_MARKER_DEPLOYMENT_ID).asInt
+                        )
+                    }
+                }
             }
             return true
         }
