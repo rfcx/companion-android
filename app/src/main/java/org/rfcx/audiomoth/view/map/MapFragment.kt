@@ -1,4 +1,4 @@
-package org.rfcx.audiomoth.view.configure
+package org.rfcx.audiomoth.view.map
 
 
 import android.graphics.Bitmap

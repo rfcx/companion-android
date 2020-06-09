@@ -158,7 +158,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
         newLocationRadioButton.isChecked = locateItems.isEmpty()
         existingRadioButton.isEnabled = locateItems.isNotEmpty()
-
         existingRadioButton.isChecked = locateItems.isNotEmpty()
     }
 

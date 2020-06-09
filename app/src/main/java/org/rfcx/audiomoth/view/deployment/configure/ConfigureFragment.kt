@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_configure.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Profile
-import org.rfcx.audiomoth.view.configure.TimeAdapter
 import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 
 class ConfigureFragment : Fragment(),

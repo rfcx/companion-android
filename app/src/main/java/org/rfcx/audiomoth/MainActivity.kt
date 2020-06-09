@@ -19,8 +19,8 @@ import org.rfcx.audiomoth.util.Preferences
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.util.asLiveData
 import org.rfcx.audiomoth.view.LoginActivity
-import org.rfcx.audiomoth.view.configure.MapFragment
-import org.rfcx.audiomoth.view.configure.ProfileFragment
+import org.rfcx.audiomoth.view.map.MapFragment
+import org.rfcx.audiomoth.view.profile.ProfileFragment
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity
 import org.rfcx.audiomoth.widget.BottomNavigationMenuItem
 

@@ -1,4 +1,4 @@
-package org.rfcx.audiomoth.view.configure
+package org.rfcx.audiomoth.view
 
 import android.content.Context
 import android.content.Intent

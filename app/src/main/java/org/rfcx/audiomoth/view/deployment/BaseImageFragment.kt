@@ -1,4 +1,4 @@
-package org.rfcx.audiomoth.view.configure
+package org.rfcx.audiomoth.view.deployment
 
 import android.app.Activity
 import android.content.Intent
@@ -44,7 +44,8 @@ abstract class BaseImageFragment : Fragment() {
 
     private fun setupImages() {
         imageAdapter.onImageAdapterClickListener =
-            object : OnImageAdapterClickListener {
+            object :
+                OnImageAdapterClickListener {
                 override fun onAddImageClick() {
                     attachImageDialog.show()
                 }

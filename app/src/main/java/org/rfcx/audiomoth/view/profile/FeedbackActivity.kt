@@ -1,4 +1,4 @@
-package org.rfcx.audiomoth.view.configure
+package org.rfcx.audiomoth.view.profile
 
 import android.annotation.SuppressLint
 import android.app.Activity

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".view.configure.MapFragment">
+    tools:context=".view.map.MapFragment">
 
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/mapView"
