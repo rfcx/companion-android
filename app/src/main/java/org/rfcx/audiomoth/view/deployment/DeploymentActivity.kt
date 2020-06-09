@@ -50,22 +50,17 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         setContentView(R.layout.activity_deployment)
         val deploymentId = intent.extras?.getInt(DEPLOYMENT_ID)
         if (deploymentId != null) {
-
             val deployment = deploymentDb.getDeploymentById(deploymentId)
             if (deployment != null) {
                 setDeployment(deployment)
 
-                when (deployment.state) { // 1 = Locate, 2 = Config, 3 = Sync, 4 = Verify, 5 = Deploy, 6 = Ready To Upload
-                    2 -> {
-                        this._deployLocation = deployment.location
-                        this._configuration = deployment.configuration
-                    }
-                    3 -> {
-                        this._deployLocation = deployment.location
-                        this._configuration = deployment.configuration
-                    }
+                if (deployment.location != null) {
+                    _deployLocation = deployment.location
                 }
 
+                if (deployment.configuration != null) {
+                    _configuration = deployment.configuration
+                }
                 currentStep = deployment.state - 1
                 stepView.go(currentStep, true)
                 handleFragment(currentStep)
@@ -221,11 +216,27 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     }
 
     private fun handleSelectingConfig() {
-        this._profiles = profileDb.getProfiles()
-        if (_profiles.isNotEmpty()) {
-            startFragment(SelectProfileFragment.newInstance())
+        if (_configuration != null) {
+            val config = _configuration
+            if (config != null) {
+                val profile = Profile(
+                    gain = config.gain,
+                    name = "",
+                    sampleRate = config.sampleRate,
+                    recordingDuration = config.recordingDuration,
+                    sleepDuration = config.sleepDuration,
+                    recordingPeriodList = config.recordingPeriodList,
+                    durationSelected = config.durationSelected
+                )
+                startSetupConfigure(profile)
+            }
         } else {
-            startSetupConfigure(Profile.default())
+            this._profiles = profileDb.getProfiles()
+            if (_profiles.isNotEmpty()) {
+                startFragment(SelectProfileFragment.newInstance())
+            } else {
+                startSetupConfigure(Profile.default())
+            }
         }
     }
 

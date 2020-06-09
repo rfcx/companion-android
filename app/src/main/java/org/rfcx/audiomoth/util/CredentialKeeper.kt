@@ -43,6 +43,6 @@ class CredentialKeeper(val context: Context) {
     fun hasValidCredentials(): Boolean {
         val preferences = Preferences.getInstance(context)
         val idToken = preferences.getString(Preferences.ID_TOKEN)
-        return idToken.isNullOrEmpty()
+        return idToken != null
     }
 }

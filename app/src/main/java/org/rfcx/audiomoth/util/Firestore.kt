@@ -20,7 +20,6 @@ class Firestore(val context: Context) {
     /* TODO: update get user */
     private val preferences = Preferences.getInstance(context)
     private val guid = preferences.getString(Preferences.USER_GUID, "")
-    private val userDocument = db.collection(COLLECTION_USERS).document(guid)
     private val feedbackDocument = db.collection(COLLECTION_FEEDBACK)
 
     fun saveUser(user: User, guid: String, callback: (String?, Boolean) -> Unit) {
@@ -37,7 +36,7 @@ class Firestore(val context: Context) {
         // set uploaded
         deploymentDb.markUploading(deployment.id)
 
-        userDocument.collection(COLLECTION_DEPLOYMENTS)
+        db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_DEPLOYMENTS)
             .add(deployment)
             .addOnSuccessListener { documentReference ->
                 deploymentDb.markUploaded(deployment.id)
@@ -50,7 +49,7 @@ class Firestore(val context: Context) {
     }
 
     fun updateDeployment(deploymentId: String, photos: ArrayList<String>) {
-        userDocument.collection(COLLECTION_DEPLOYMENTS)
+        db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_DEPLOYMENTS)
             .document(deploymentId)
             .update(PHOTOS, photos)
     }

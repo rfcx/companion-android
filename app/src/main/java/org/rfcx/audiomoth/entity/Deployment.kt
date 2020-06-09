@@ -26,10 +26,6 @@ open class Deployment(
         const val FIELD_ID = "id"
         const val FIELD_STATE = "state"
         const val FIELD_SYNC_STATE = "syncState"
-
-        const val LAST_DEPLOYMENT = "lastDeployment"
         const val PHOTOS = "photos"
-        const val IS_LATEST = "latest"
-        const val DEPLOYED_AT = "deployedAt"
     }
 }
