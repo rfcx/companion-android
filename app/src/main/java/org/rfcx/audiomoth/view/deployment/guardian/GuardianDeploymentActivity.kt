@@ -15,6 +15,7 @@ import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
 import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianConfigureFragment
 import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianSelectProfileFragment
 import org.rfcx.audiomoth.view.deployment.guardian.connect.ConnectGuardianFragment
+import org.rfcx.audiomoth.view.deployment.guardian.deploy.GuardianDeployFragment
 import org.rfcx.audiomoth.view.deployment.guardian.sync.GuardianSyncFragment
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
 import org.rfcx.audiomoth.view.deployment.sync.SyncFragment
@@ -198,7 +199,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             }
             4 -> {
                 updateDeploymentState(DeploymentState.Guardian.Deploy)
-                startFragment(DeployFragment.newInstance())
+                startFragment(GuardianDeployFragment.newInstance())
             }
         }
     }
