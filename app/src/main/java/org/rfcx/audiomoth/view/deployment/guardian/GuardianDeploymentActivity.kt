@@ -24,6 +24,7 @@ import org.rfcx.audiomoth.view.LoadingDialogFragment
 import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
 import org.rfcx.audiomoth.view.deployment.configure.SelectProfileFragment
+import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianSelectProfileFragment
 import org.rfcx.audiomoth.view.deployment.guardian.connect.ConnectGuardianFragment
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
 import org.rfcx.audiomoth.view.deployment.sync.SyncFragment
@@ -33,7 +34,7 @@ import org.rfcx.audiomoth.view.deployment.verify.PerformBatteryFragment.Companio
 import java.sql.Timestamp
 import java.util.*
 
-class GuardianDeploymentActivity : AppCompatActivity(), DeploymentProtocol {
+class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeployProtocol {
     // manager database
     // TODO: need to implement db for guardian
 //    private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
@@ -110,77 +111,76 @@ class GuardianDeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         stepView.go(stepView.currentStep - 1, true)
     }
 
-    override fun getDeployment(): Deployment? = this._deployment
+//    override fun getDeployment(): Deployment? = this._deployment
+//
+//    override fun setDeployment(deployment: Deployment) {
+//        this._deployment = deployment
+//    }
+//
+//    override fun setDeploymentConfigure(profile: Profile) {
+//        setProfile(profile)
+//        this._configuration = profile.asConfiguration()
+//        this._deployment?.configuration = _configuration
+//
+//        // update deployment
+////        _deployment?.let { deploymentDb.updateDeployment(it) }
+//        // update profile
+////        if (profile.name.isNotEmpty()) {
+////            profileDb.insertOrUpdateProfile(profile)
+////        }
+//
+//        nextStep()
+//    }
 
-    override fun setDeployment(deployment: Deployment) {
-        this._deployment = deployment
-    }
+//    override fun geConfiguration(): Configuration? = _configuration
+//
+//    override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
+//
+//    override fun setDeployLocation(locate: Locate) {
+//        val deployment = _deployment ?: Deployment()
+//        deployment.state = DeploymentState.Guardian.Locate.key // state
+//
+//        this._deployLocation = locate.asDeploymentLocation()
+////        val deploymentId = deploymentDb.insertOrUpdateDeployment(deployment, _deployLocation!!)
+////        locateDb.insertOrUpdateLocate(deploymentId, locate) // update locate - last deployment
+//
+//        setDeployment(deployment)
+//    }
 
-    override fun setDeploymentConfigure(profile: Profile) {
-        setProfile(profile)
-        this._configuration = profile.asConfiguration()
-        this._deployment?.configuration = _configuration
-
-        // update deployment
-//        _deployment?.let { deploymentDb.updateDeployment(it) }
-        // update profile
-//        if (profile.name.isNotEmpty()) {
-//            profileDb.insertOrUpdateProfile(profile)
+//    override fun getProfiles(): List<Profile> = this._profiles
+//
+//    override fun getProfile(): Profile? = this._profile
+//
+//    override fun setProfile(profile: Profile) {
+//        this._profile = profile
+//    }
+//
+//    override fun setPerformBattery(batteryDepletedAt: Timestamp, batteryLevel: Int) {
+//        this._deployment?.let {
+//            it.batteryDepletedAt = batteryDepletedAt
+//            it.batteryLevel = batteryLevel
+//
+//            // update about battery
+////            this.deploymentDb.updateDeployment(it)
 //        }
+//    }
 
-        nextStep()
-    }
+//    override fun setReadyToDeploy(images: List<String>) {
+//        stepView.done(true)
+//        showLoading()
+//        _deployment?.let {
+//            it.deployedAt = Date()
+//            it.state = DeploymentState.Guardian.ReadyToUpload.key
+//            setDeployment(it)
+//
+////            deploymentImageDb.insertImage(it, images)
+////            deploymentDb.updateDeployment(it)
+//            saveDevelopment(it)
+//        }
+//    }
 
-    override fun geConfiguration(): Configuration? = _configuration
-
-    override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
-
-    override fun setDeployLocation(locate: Locate) {
-        val deployment = _deployment ?: Deployment()
-        deployment.state = DeploymentState.Guardian.Locate.key // state
-
-        this._deployLocation = locate.asDeploymentLocation()
-//        val deploymentId = deploymentDb.insertOrUpdateDeployment(deployment, _deployLocation!!)
-//        locateDb.insertOrUpdateLocate(deploymentId, locate) // update locate - last deployment
-
-        setDeployment(deployment)
-    }
-
-    override fun getProfiles(): List<Profile> = this._profiles
-
-    override fun getProfile(): Profile? = this._profile
-
-    override fun setProfile(profile: Profile) {
-        this._profile = profile
-    }
-
-    override fun setPerformBattery(batteryDepletedAt: Timestamp, batteryLevel: Int) {
-        this._deployment?.let {
-            it.batteryDepletedAt = batteryDepletedAt
-            it.batteryLevel = batteryLevel
-
-            // update about battery
-//            this.deploymentDb.updateDeployment(it)
-        }
-    }
-
-    override fun setReadyToDeploy(images: List<String>) {
-        stepView.done(true)
-        showLoading()
-        _deployment?.let {
-            it.deployedAt = Date()
-            it.state = DeploymentState.Guardian.ReadyToUpload.key
-            setDeployment(it)
-
-//            deploymentImageDb.insertImage(it, images)
-//            deploymentDb.updateDeployment(it)
-            saveDevelopment(it)
-        }
-    }
-
-    override fun startSetupConfigure(profile: Profile) {
-        setProfile(profile)
-        currentStep = 1
+    override fun startSetupConfigure() {
+        currentStep = 2
         stepView.go(currentStep, true)
         startFragment(ConfigureFragment.newInstance())
     }
@@ -206,7 +206,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), DeploymentProtocol {
             }
             2 -> {
                 updateDeploymentState(DeploymentState.Guardian.Config)
-                startFragment(SyncFragment.newInstance(BEFORE_SYNC))
+                startFragment(GuardianSelectProfileFragment.newInstance())
             }
             3 -> {
                 updateDeploymentState(DeploymentState.Guardian.Sync)
@@ -219,30 +219,30 @@ class GuardianDeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         }
     }
 
-    private fun handleSelectingConfig() {
-        if (_configuration != null) {
-            val config = _configuration
-            if (config != null) {
-                val profile = Profile(
-                    gain = config.gain,
-                    name = "",
-                    sampleRate = config.sampleRate,
-                    recordingDuration = config.recordingDuration,
-                    sleepDuration = config.sleepDuration,
-                    recordingPeriodList = config.recordingPeriodList,
-                    durationSelected = config.durationSelected
-                )
-                startSetupConfigure(profile)
-            }
-        } else {
-//            this._profiles = profileDb.getProfiles()
-            if (_profiles.isNotEmpty()) {
-                startFragment(SelectProfileFragment.newInstance())
-            } else {
-                startSetupConfigure(Profile.default())
-            }
-        }
-    }
+//    private fun handleSelectingConfig() {
+//        if (_configuration != null) {
+//            val config = _configuration
+//            if (config != null) {
+//                val profile = Profile(
+//                    gain = config.gain,
+//                    name = "",
+//                    sampleRate = config.sampleRate,
+//                    recordingDuration = config.recordingDuration,
+//                    sleepDuration = config.sleepDuration,
+//                    recordingPeriodList = config.recordingPeriodList,
+//                    durationSelected = config.durationSelected
+//                )
+//                startSetupConfigure(profile)
+//            }
+//        } else {
+////            this._profiles = profileDb.getProfiles()
+//            if (_profiles.isNotEmpty()) {
+//                startFragment(SelectProfileFragment.newInstance())
+//            } else {
+//                startSetupConfigure(Profile.default())
+//            }
+//        }
+//    }
 
     private fun startFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
