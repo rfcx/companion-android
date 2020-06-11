@@ -8,14 +8,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_connect_guardian.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
+import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 
 class ConnectGuardianFragment : Fragment() {
-    private var deploymentProtocol: DeploymentProtocol? = null
+    private var deploymentProtocol: GuardianDeploymentProtocol? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        deploymentProtocol = (context as DeploymentProtocol)
+        deploymentProtocol = (context as GuardianDeploymentProtocol)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

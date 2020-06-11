@@ -2,39 +2,24 @@ package org.rfcx.audiomoth.view.deployment.guardian
 
 import org.rfcx.audiomoth.view.deployment.DeployFragment
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_deployment.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.*
-import org.rfcx.audiomoth.localdb.DeploymentDb
-import org.rfcx.audiomoth.localdb.DeploymentImageDb
-import org.rfcx.audiomoth.localdb.LocateDb
-import org.rfcx.audiomoth.localdb.ProfileDb
-import org.rfcx.audiomoth.util.Firestore
-import org.rfcx.audiomoth.util.RealmHelper
-import org.rfcx.audiomoth.util.showCommonDialog
 import org.rfcx.audiomoth.view.LoadingDialogFragment
-import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
-import org.rfcx.audiomoth.view.deployment.configure.SelectProfileFragment
 import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianSelectProfileFragment
 import org.rfcx.audiomoth.view.deployment.guardian.connect.ConnectGuardianFragment
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
 import org.rfcx.audiomoth.view.deployment.sync.SyncFragment
 import org.rfcx.audiomoth.view.deployment.sync.SyncFragment.Companion.BEFORE_SYNC
-import org.rfcx.audiomoth.view.deployment.verify.PerformBatteryFragment
-import org.rfcx.audiomoth.view.deployment.verify.PerformBatteryFragment.Companion.TEST_BATTERY
-import java.sql.Timestamp
 import java.util.*
 
-class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeployProtocol {
+class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtocol {
     // manager database
     // TODO: need to implement db for guardian
 //    private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
@@ -134,18 +119,18 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeployProtocol {
 
 //    override fun geConfiguration(): Configuration? = _configuration
 //
-//    override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
-//
-//    override fun setDeployLocation(locate: Locate) {
-//        val deployment = _deployment ?: Deployment()
-//        deployment.state = DeploymentState.Guardian.Locate.key // state
-//
-//        this._deployLocation = locate.asDeploymentLocation()
-////        val deploymentId = deploymentDb.insertOrUpdateDeployment(deployment, _deployLocation!!)
-////        locateDb.insertOrUpdateLocate(deploymentId, locate) // update locate - last deployment
-//
+    override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
+
+    override fun setDeployLocation(locate: Locate) {
+        val deployment = _deployment ?: Deployment()
+        deployment.state = DeploymentState.Guardian.Locate.key // state
+
+        this._deployLocation = locate.asDeploymentLocation()
+//        val deploymentId = deploymentDb.insertOrUpdateDeployment(deployment, _deployLocation!!)
+//        locateDb.insertOrUpdateLocate(deploymentId, locate) // update locate - last deployment
+
 //        setDeployment(deployment)
-//    }
+    }
 
 //    override fun getProfiles(): List<Profile> = this._profiles
 //
@@ -165,19 +150,19 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeployProtocol {
 //        }
 //    }
 
-//    override fun setReadyToDeploy(images: List<String>) {
-//        stepView.done(true)
-//        showLoading()
-//        _deployment?.let {
-//            it.deployedAt = Date()
-//            it.state = DeploymentState.Guardian.ReadyToUpload.key
+    override fun setReadyToDeploy(images: List<String>) {
+        stepView.done(true)
+        showLoading()
+        _deployment?.let {
+            it.deployedAt = Date()
+            it.state = DeploymentState.Guardian.ReadyToUpload.key
 //            setDeployment(it)
-//
-////            deploymentImageDb.insertImage(it, images)
-////            deploymentDb.updateDeployment(it)
-//            saveDevelopment(it)
-//        }
-//    }
+
+//            deploymentImageDb.insertImage(it, images)
+//            deploymentDb.updateDeployment(it)
+            saveDevelopment(it)
+        }
+    }
 
     override fun startSetupConfigure() {
         currentStep = 2
@@ -187,10 +172,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeployProtocol {
 
     override fun startSyncing(status: String) {
         startFragment(SyncFragment.newInstance(status))
-    }
-
-    override fun startCheckBattery(status: String, level: Int?) {
-        startFragment(PerformBatteryFragment.newInstance(status, level))
     }
 
     private fun handleFragment(currentStep: Int) {

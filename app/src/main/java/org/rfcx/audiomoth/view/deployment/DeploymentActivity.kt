@@ -307,13 +307,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     }
 }
 
-interface DeploymentProtocol {
-    fun setCompleteTextButton(text: String)
-    fun hideCompleteButton()
-    fun showCompleteButton()
-    fun nextStep()
-    fun backStep()
-
+interface DeploymentProtocol : BaseDeploymentProtocal {
     fun startSetupConfigure(profile: Profile)
     fun startSyncing(status: String)
     fun startCheckBattery(status: String, level: Int?)
@@ -322,12 +316,9 @@ interface DeploymentProtocol {
     fun getProfile(): Profile?
     fun getDeployment(): Deployment?
     fun geConfiguration(): Configuration?
-    fun getDeploymentLocation(): DeploymentLocation?
 
     fun setDeployment(deployment: Deployment)
-    fun setDeployLocation(locate: Locate)
     fun setProfile(profile: Profile)
     fun setDeploymentConfigure(profile: Profile)
     fun setPerformBattery(batteryDepletedAt: Timestamp, batteryLevel: Int)
-    fun setReadyToDeploy(images: List<String>)
 }

@@ -35,6 +35,7 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.util.RealmHelper
+import org.rfcx.audiomoth.view.deployment.BaseDeploymentProtocal
 import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 
 class LocationFragment : Fragment(), OnMapReadyCallback {
@@ -52,11 +53,11 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var locateItem: Locate? = null
     private var locateAdapter: ArrayAdapter<String>? = null
 
-    private var deploymentProtocol: DeploymentProtocol? = null
+    private var deploymentProtocol: BaseDeploymentProtocal? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        deploymentProtocol = context as DeploymentProtocol
+        deploymentProtocol = context as BaseDeploymentProtocal
     }
 
     override fun onCreateView(
