@@ -60,6 +60,7 @@ class GuardianSelectProfileFragment : Fragment(), (Profile) -> Unit {
     }
 
     private fun retrieveProfiles() {
+        //TODO: getting guardian profile from guardian db
 //        checkState(SHOW_LOADING)
 //        this.profiles = deploymentProtocol?.getProfiles() ?: arrayListOf()
 //        if (profiles.isNotEmpty()) {

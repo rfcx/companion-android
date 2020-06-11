@@ -106,7 +106,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 //    }
 //
     override fun setDeploymentConfigure() {
-        //TODO: make it with guardian db
+        //TODO: retrieve configure data from configure fragment and make it with guardian db
 //        setProfile(profile)
 //        this._configuration = profile.asConfiguration()
 //        this._deployment?.configuration = _configuration
@@ -157,15 +157,15 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     override fun setReadyToDeploy(images: List<String>) {
         stepView.done(true)
         showLoading()
-        _deployment?.let {
-            it.deployedAt = Date()
-            it.state = DeploymentState.Guardian.ReadyToUpload.key
+//        _deployment?.let {
+//            it.deployedAt = Date()
+//            it.state = DeploymentState.Guardian.ReadyToUpload.key
 //            setDeployment(it)
 
 //            deploymentImageDb.insertImage(it, images)
 //            deploymentDb.updateDeployment(it)
-            saveDevelopment(it)
-        }
+//        }
+//        saveDevelopment(it)
     }
 
     override fun startSetupConfigure() {
@@ -175,7 +175,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     }
 
     override fun startSyncing(status: String) {
-        startFragment(SyncFragment.newInstance(status))
+        startFragment(GuardianSyncFragment.newInstance(status))
     }
 
     private fun handleFragment(currentStep: Int) {
