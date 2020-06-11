@@ -155,4 +155,7 @@
     <string name="nearby_guardians">Nearby Guardian(s)</string>
     <string name="connect">Connect</string>
 
+    <!-- GuardianSelectProfileFragment -->
+    <string name="profile_default">Default</string>
+
 </resources>
