@@ -14,10 +14,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
 import org.rfcx.audiomoth.entity.DeploymentImage
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
-import org.rfcx.audiomoth.util.LocationPermissions
-import org.rfcx.audiomoth.util.Preferences
-import org.rfcx.audiomoth.util.RealmHelper
-import org.rfcx.audiomoth.util.asLiveData
+import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.LoginActivity
 import org.rfcx.audiomoth.view.map.MapFragment
 import org.rfcx.audiomoth.view.profile.ProfileFragment
@@ -178,8 +175,7 @@ open class MainActivity : AppCompatActivity(), MainActivityListener {
     }
 
     override fun onLogout() {
-        Preferences.getInstance(this).clear()
-        LoginActivity.startActivity(this)
+        this.logout()
         finish()
     }
 
