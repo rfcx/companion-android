@@ -1,6 +1,7 @@
 package org.rfcx.audiomoth.view.map
 
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.PointF
 import android.graphics.Rect
@@ -69,6 +70,20 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
 
     private val locationPermissions by lazy { activity?.let { LocationPermissions(it) } }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        locationPermissions?.handleActivityResult(requestCode, resultCode)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        locationPermissions?.handleRequestResult(requestCode, grantResults)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

@@ -37,6 +37,12 @@ open class MainActivity : AppCompatActivity(), MainActivityListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         locationPermissions.handleActivityResult(requestCode, resultCode)
+
+        currentFragment?.let {
+            if (it is MapFragment) {
+                it.onActivityResult(requestCode, resultCode, data)
+            }
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -46,6 +52,12 @@ open class MainActivity : AppCompatActivity(), MainActivityListener {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         locationPermissions.handleRequestResult(requestCode, grantResults)
+
+        currentFragment?.let {
+            if (it is MapFragment) {
+                it.onRequestPermissionsResult(requestCode, permissions, grantResults)
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
