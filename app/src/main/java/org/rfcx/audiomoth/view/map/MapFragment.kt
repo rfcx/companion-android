@@ -4,7 +4,6 @@ package org.rfcx.audiomoth.view.map
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.PointF
-import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -68,7 +67,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private lateinit var deployLiveData: LiveData<List<Deployment>>
     private lateinit var locateLiveData: LiveData<List<Locate>>
 
-
     private val locationPermissions by lazy { activity?.let { LocationPermissions(it) } }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -121,8 +119,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 val features = mapboxMap.queryRenderedFeatures(screenPoint, WINDOW_DEPLOYMENT_ID)
                 if (features.isNotEmpty()) {
                     val feature = features[0]
-                    val symbolScreenPoint =
-                        mapboxMap.projection.toScreenLocation(convertToLatLng(feature))
                     handleClickCallout(feature)
                 } else {
                     handleClickIcon(mapboxMap.projection.toScreenLocation(latLng))
