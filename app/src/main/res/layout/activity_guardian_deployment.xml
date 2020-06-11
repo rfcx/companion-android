@@ -28,7 +28,7 @@
         app:sv_selectedStepNumberColor="@color/white"
         app:sv_selectedTextColor="@color/colorAccent"
         app:sv_stepLineWidth="1dp"
-        app:sv_steps="@array/audiomoth_steps" />
+        app:sv_steps="@array/guardian_steps" />
 
     <FrameLayout
         android:id="@+id/contentContainer"

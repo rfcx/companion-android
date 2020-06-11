@@ -1,5 +1,6 @@
-package org.rfcx.audiomoth.view.deployment
+package org.rfcx.audiomoth.view.deployment.guardian
 
+import org.rfcx.audiomoth.view.deployment.DeployFragment
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -20,6 +21,7 @@ import org.rfcx.audiomoth.util.Firestore
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.util.showCommonDialog
 import org.rfcx.audiomoth.view.LoadingDialogFragment
+import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
 import org.rfcx.audiomoth.view.deployment.configure.SelectProfileFragment
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
@@ -30,13 +32,14 @@ import org.rfcx.audiomoth.view.deployment.verify.PerformBatteryFragment.Companio
 import java.sql.Timestamp
 import java.util.*
 
-class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
+class GuardianDeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     // manager database
-    private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val deploymentDb by lazy { DeploymentDb(realm) }
-    private val locateDb by lazy { LocateDb(realm) }
-    private val profileDb by lazy { ProfileDb(realm) }
-    private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
+    // TODO: need to implement db for guardian
+//    private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
+//    private val deploymentDb by lazy { DeploymentDb(realm) }
+//    private val locateDb by lazy { LocateDb(realm) }
+//    private val profileDb by lazy { ProfileDb(realm) }
+//    private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
 
     private var currentStep = 0
     private var _profiles: List<Profile> = listOf()
@@ -47,24 +50,24 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_deployment)
+        setContentView(R.layout.activity_guardian_deployment)
         val deploymentId = intent.extras?.getInt(DEPLOYMENT_ID)
         if (deploymentId != null) {
-            val deployment = deploymentDb.getDeploymentById(deploymentId)
-            if (deployment != null) {
-                setDeployment(deployment)
-
-                if (deployment.location != null) {
-                    _deployLocation = deployment.location
-                }
-
-                if (deployment.configuration != null) {
-                    _configuration = deployment.configuration
-                }
-                currentStep = deployment.state - 1
-                stepView.go(currentStep, true)
-                handleFragment(currentStep)
-            }
+//            val deployment = deploymentDb.getDeploymentById(deploymentId)
+//            if (deployment != null) {
+//                setDeployment(deployment)
+//
+//                if (deployment.location != null) {
+//                    _deployLocation = deployment.location
+//                }
+//
+//                if (deployment.configuration != null) {
+//                    _configuration = deployment.configuration
+//                }
+//                currentStep = deployment.state - 1
+//                stepView.go(currentStep, true)
+//                handleFragment(currentStep)
+//            }
         } else {
             setupView()
         }
@@ -118,11 +121,11 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         this._deployment?.configuration = _configuration
 
         // update deployment
-        _deployment?.let { deploymentDb.updateDeployment(it) }
+//        _deployment?.let { deploymentDb.updateDeployment(it) }
         // update profile
-        if (profile.name.isNotEmpty()) {
-            profileDb.insertOrUpdateProfile(profile)
-        }
+//        if (profile.name.isNotEmpty()) {
+//            profileDb.insertOrUpdateProfile(profile)
+//        }
 
         nextStep()
     }
@@ -133,11 +136,11 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
 
     override fun setDeployLocation(locate: Locate) {
         val deployment = _deployment ?: Deployment()
-        deployment.state = DeploymentState.AudioMoth.Locate.key // state
+        deployment.state = DeploymentState.Guardian.Locate.key // state
 
         this._deployLocation = locate.asDeploymentLocation()
-        val deploymentId = deploymentDb.insertOrUpdateDeployment(deployment, _deployLocation!!)
-        locateDb.insertOrUpdateLocate(deploymentId, locate) // update locate - last deployment
+//        val deploymentId = deploymentDb.insertOrUpdateDeployment(deployment, _deployLocation!!)
+//        locateDb.insertOrUpdateLocate(deploymentId, locate) // update locate - last deployment
 
         setDeployment(deployment)
     }
@@ -156,7 +159,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
             it.batteryLevel = batteryLevel
 
             // update about battery
-            this.deploymentDb.updateDeployment(it)
+//            this.deploymentDb.updateDeployment(it)
         }
     }
 
@@ -165,11 +168,11 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         showLoading()
         _deployment?.let {
             it.deployedAt = Date()
-            it.state = DeploymentState.AudioMoth.ReadyToUpload.key
+            it.state = DeploymentState.Guardian.ReadyToUpload.key
             setDeployment(it)
 
-            deploymentImageDb.insertImage(it, images)
-            deploymentDb.updateDeployment(it)
+//            deploymentImageDb.insertImage(it, images)
+//            deploymentDb.updateDeployment(it)
             saveDevelopment(it)
         }
     }
@@ -193,23 +196,23 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         // setup fragment for current step
         when (currentStep) {
             0 -> {
-                updateDeploymentState(DeploymentState.AudioMoth.Locate)
+                updateDeploymentState(DeploymentState.Guardian.Connect)
                 startFragment(LocationFragment.newInstance())
             }
             1 -> {
-                updateDeploymentState(DeploymentState.AudioMoth.Config)
+                updateDeploymentState(DeploymentState.Guardian.Locate)
                 handleSelectingConfig()
             }
             2 -> {
-                updateDeploymentState(DeploymentState.AudioMoth.Sync)
+                updateDeploymentState(DeploymentState.Guardian.Config)
                 startFragment(SyncFragment.newInstance(BEFORE_SYNC))
             }
             3 -> {
-                updateDeploymentState(DeploymentState.AudioMoth.Verify)
-                startFragment(PerformBatteryFragment.newInstance(TEST_BATTERY, null))
+                updateDeploymentState(DeploymentState.Guardian.Sync)
+                startFragment(SyncFragment.newInstance(BEFORE_SYNC))
             }
             4 -> {
-                updateDeploymentState(DeploymentState.AudioMoth.Deploy)
+                updateDeploymentState(DeploymentState.Guardian.Deploy)
                 startFragment(DeployFragment.newInstance())
             }
         }
@@ -231,7 +234,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
                 startSetupConfigure(profile)
             }
         } else {
-            this._profiles = profileDb.getProfiles()
+//            this._profiles = profileDb.getProfiles()
             if (_profiles.isNotEmpty()) {
                 startFragment(SelectProfileFragment.newInstance())
             } else {
@@ -246,33 +249,33 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
             .commit()
     }
 
-    private fun updateDeploymentState(state: DeploymentState.AudioMoth) {
+    private fun updateDeploymentState(state: DeploymentState.Guardian) {
         this._deployment?.state = state.key
-        this._deployment?.let { deploymentDb.updateDeployment(it) }
+//        this._deployment?.let { deploymentDb.updateDeployment(it) }
     }
 
     private fun saveDevelopment(deployment: Deployment) {
-        Firestore(this).saveDeployment(deploymentDb, deployment) { string, isSuccess ->
-            if (isSuccess) {
-                Toast.makeText(
-                    this,
-                    getString(R.string.deployment_uploaded),
-                    Toast.LENGTH_SHORT
-                ).show()
-                hideLoading()
-                finish()
-            } else {
-                hideLoading()
-                showCommonDialog(
-                    title = "",
-                    message = string ?: getString(R.string.error_upload_deployment),
-                    onClick = DialogInterface.OnClickListener { dialog, _ ->
-                        dialog.dismiss()
-                        finish()
-                    }
-                )
-            }
-        }
+//        Firestore(this).saveDeployment(deploymentDb, deployment) { string, isSuccess ->
+//            if (isSuccess) {
+//                Toast.makeText(
+//                    this,
+//                    getString(R.string.deployment_uploaded),
+//                    Toast.LENGTH_SHORT
+//                ).show()
+//                hideLoading()
+//                finish()
+//            } else {
+//                hideLoading()
+//                showCommonDialog(
+//                    title = "",
+//                    message = string ?: getString(R.string.error_upload_deployment),
+//                    onClick = DialogInterface.OnClickListener { dialog, _ ->
+//                        dialog.dismiss()
+//                        finish()
+//                    }
+//                )
+//            }
+//        }
     }
 
     private fun showLoading() {
@@ -295,39 +298,14 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         const val DEPLOYMENT_ID = "DEPLOYMENT_ID"
 
         fun startActivity(context: Context) {
-            val intent = Intent(context, DeploymentActivity::class.java)
+            val intent = Intent(context, GuardianDeploymentActivity::class.java)
             context.startActivity(intent)
         }
 
         fun startActivity(context: Context, deploymentId: Int) {
-            val intent = Intent(context, DeploymentActivity::class.java)
+            val intent = Intent(context, GuardianDeploymentActivity::class.java)
             intent.putExtra(DEPLOYMENT_ID, deploymentId)
             context.startActivity(intent)
         }
     }
-}
-
-interface DeploymentProtocol {
-    fun setCompleteTextButton(text: String)
-    fun hideCompleteButton()
-    fun showCompleteButton()
-    fun nextStep()
-    fun backStep()
-
-    fun startSetupConfigure(profile: Profile)
-    fun startSyncing(status: String)
-    fun startCheckBattery(status: String, level: Int?)
-
-    fun getProfiles(): List<Profile>
-    fun getProfile(): Profile?
-    fun getDeployment(): Deployment?
-    fun geConfiguration(): Configuration?
-    fun getDeploymentLocation(): DeploymentLocation?
-
-    fun setDeployment(deployment: Deployment)
-    fun setDeployLocation(locate: Locate)
-    fun setProfile(profile: Profile)
-    fun setDeploymentConfigure(profile: Profile)
-    fun setPerformBattery(batteryDepletedAt: Timestamp, batteryLevel: Int)
-    fun setReadyToDeploy(images: List<String>)
 }

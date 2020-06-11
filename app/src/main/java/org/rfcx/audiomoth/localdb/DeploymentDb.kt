@@ -6,6 +6,7 @@ import io.realm.Sort
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.DeploymentState
+import org.rfcx.audiomoth.entity.DeploymentState.AudioMoth
 import org.rfcx.audiomoth.entity.SyncState
 
 /**
@@ -15,7 +16,7 @@ class DeploymentDb(private val realm: Realm) {
 
     fun unsentCount(): Long {
         return realm.where(Deployment::class.java)
-            .equalTo(Deployment.FIELD_STATE, DeploymentState.ReadyToUpload.key)
+            .equalTo(Deployment.FIELD_STATE, DeploymentState.AudioMoth.ReadyToUpload.key)
             .and()
             .notEqualTo(Deployment.FIELD_SYNC_STATE, SyncState.Sent.key)
             .count()
