@@ -12,8 +12,10 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.*
 import org.rfcx.audiomoth.view.LoadingDialogFragment
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
+import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianConfigureFragment
 import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianSelectProfileFragment
 import org.rfcx.audiomoth.view.deployment.guardian.connect.ConnectGuardianFragment
+import org.rfcx.audiomoth.view.deployment.guardian.sync.GuardianSyncFragment
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
 import org.rfcx.audiomoth.view.deployment.sync.SyncFragment
 import org.rfcx.audiomoth.view.deployment.sync.SyncFragment.Companion.BEFORE_SYNC
@@ -102,20 +104,21 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 //        this._deployment = deployment
 //    }
 //
-//    override fun setDeploymentConfigure(profile: Profile) {
+    override fun setDeploymentConfigure() {
+        //TODO: make it with guardian db
 //        setProfile(profile)
 //        this._configuration = profile.asConfiguration()
 //        this._deployment?.configuration = _configuration
-//
-//        // update deployment
-////        _deployment?.let { deploymentDb.updateDeployment(it) }
-//        // update profile
-////        if (profile.name.isNotEmpty()) {
-////            profileDb.insertOrUpdateProfile(profile)
-////        }
-//
-//        nextStep()
-//    }
+
+        // update deployment
+//        _deployment?.let { deploymentDb.updateDeployment(it) }
+        // update profile
+//        if (profile.name.isNotEmpty()) {
+//            profileDb.insertOrUpdateProfile(profile)
+//        }
+
+        nextStep()
+    }
 
 //    override fun geConfiguration(): Configuration? = _configuration
 //
@@ -167,7 +170,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     override fun startSetupConfigure() {
         currentStep = 2
         stepView.go(currentStep, true)
-        startFragment(ConfigureFragment.newInstance())
+        startFragment(GuardianConfigureFragment.newInstance())
     }
 
     override fun startSyncing(status: String) {
@@ -191,7 +194,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             }
             3 -> {
                 updateDeploymentState(DeploymentState.Guardian.Sync)
-                startFragment(SyncFragment.newInstance(BEFORE_SYNC))
+                startFragment(GuardianSyncFragment.newInstance(BEFORE_SYNC))
             }
             4 -> {
                 updateDeploymentState(DeploymentState.Guardian.Deploy)

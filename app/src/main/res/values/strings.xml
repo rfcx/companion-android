@@ -158,4 +158,10 @@
     <!-- GuardianSelectProfileFragment -->
     <string name="profile_default">Default</string>
 
+    <!-- GuardianConfigureFragment -->
+    <string name="bitrate">Bitrate</string>
+    <string name="duration">Duration (per audio)</string>
+    <string name="choose_bitrate">Choose bitrate (kbs)</string>
+    <string name="choose_file_format">Choose file format</string>
+
 </resources>
