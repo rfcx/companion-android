@@ -151,4 +151,8 @@
     <string name="error_upload_deployment">Something went wrong.</string>
     <string name="deployment_uploaded">Deployment uploaded!</string>
 
+    <!-- ConnectGuardianFragment -->
+    <string name="nearby_guardians">Nearby Guardian(s)</string>
+    <string name="connect">Connect</string>
+
 </resources>
