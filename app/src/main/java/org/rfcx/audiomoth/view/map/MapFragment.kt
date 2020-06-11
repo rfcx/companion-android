@@ -1,8 +1,10 @@
-package org.rfcx.audiomoth.view.configure
+package org.rfcx.audiomoth.view.map
 
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.PointF
+import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -44,6 +46,7 @@ import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.util.*
+import org.rfcx.audiomoth.view.deployment.DeploymentActivity
 
 class MapFragment : Fragment(), OnMapReadyCallback {
     // map
@@ -51,6 +54,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var mapboxMap: MapboxMap? = null
     private var deploymentSource: GeoJsonSource? = null
     private var deploymentFeatures: FeatureCollection? = null
+    private val mapInfoViews = hashMapOf<String, View>()
 
     // database manager
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
@@ -66,6 +70,20 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
 
     private val locationPermissions by lazy { activity?.let { LocationPermissions(it) } }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        locationPermissions?.handleActivityResult(requestCode, resultCode)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        locationPermissions?.handleRequestResult(requestCode, grantResults)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -99,7 +117,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
             fetchData()
             mapboxMap.addOnMapClickListener { latLng ->
-                handleClickIcon(mapboxMap.projection.toScreenLocation(latLng))
+                val screenPoint = mapboxMap.projection.toScreenLocation(latLng)
+                val features = mapboxMap.queryRenderedFeatures(screenPoint, WINDOW_DEPLOYMENT_ID)
+                if (features.isNotEmpty()) {
+                    val feature = features[0]
+                    val symbolScreenPoint =
+                        mapboxMap.projection.toScreenLocation(convertToLatLng(feature))
+                    handleClickCallout(feature, screenPoint, symbolScreenPoint)
+                } else {
+                    handleClickIcon(mapboxMap.projection.toScreenLocation(latLng))
+                }
             }
         }
     }
@@ -162,6 +189,42 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             )
         }
         style.addLayer(markerLayer)
+    }
+
+    private fun handleClickCallout(
+        feature: Feature,
+        screenPoint: PointF,
+        symbolScreenPoint: PointF
+    ): Boolean {
+        val view = mapInfoViews[feature.getStringProperty(PROPERTY_MARKER_LOCATION_ID)]
+        val textContainer =
+            view?.findViewById<View>(R.id.infoWindowTitle)
+
+        val hitRectText = Rect()
+        textContainer?.getHitRect(hitRectText)
+
+        // move hitbox to location of symbol
+        hitRectText.offset(symbolScreenPoint.x.toInt(), symbolScreenPoint.y.toInt())
+        hitRectText.offset(0, -(view?.measuredHeight ?: 0))
+
+        val x = screenPoint.x.toInt()
+        val y = screenPoint.y.toInt()
+
+        if (hitRectText.contains(x, y)) {
+            val deployment = deploymentDb.getDeploymentById(feature.getProperty(PROPERTY_MARKER_DEPLOYMENT_ID).asInt)
+            if(deployment != null) {
+                if (deployment.state != 6) {
+                    context?.let {
+                        DeploymentActivity.startActivity(
+                            it,
+                            feature.getProperty(PROPERTY_MARKER_DEPLOYMENT_ID).asInt
+                        )
+                    }
+                }
+            }
+            return true
+        }
+        return false
     }
 
     private fun handleClickIcon(screenPoint: PointF): Boolean {
@@ -250,6 +313,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         Battery.BATTERY_PIN_GREY
                 ),
                 Pair(PROPERTY_MARKER_TITLE, location.name),
+                Pair(PROPERTY_MARKER_DEPLOYMENT_ID, it.id.toString()),
                 Pair(
                     PROPERTY_MARKER_CAPTION,
                     if (it.state >= DeploymentState.ReadyToUpload.key)
@@ -288,6 +352,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             bubbleLayout.arrowPosition = (measuredWidth / 2 - 5).toFloat()
 
             val bitmap = SymbolGenerator.generate(bubbleLayout)
+            mapInfoViews[id] = bubbleLayout
             windowInfoImages[id] = bitmap
         }
 
@@ -356,6 +421,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    private fun convertToLatLng(feature: Feature): LatLng {
+        val symbolPoint = feature.geometry() as Point
+        return LatLng(symbolPoint.latitude(), symbolPoint.longitude())
+    }
+
     override fun onStart() {
         super.onStart()
         mapView.onStart()
@@ -398,6 +468,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         private const val PROPERTY_SELECTED = "selected"
         private const val PROPERTY_MARKER_LOCATION_ID = "location"
         private const val PROPERTY_MARKER_TITLE = "title"
+        private const val PROPERTY_MARKER_DEPLOYMENT_ID = "deployment"
         private const val PROPERTY_MARKER_CAPTION = "caption"
         private const val PROPERTY_MARKER_IMAGE = "marker-image"
 

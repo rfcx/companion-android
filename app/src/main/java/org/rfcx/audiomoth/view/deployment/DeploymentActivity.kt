@@ -48,7 +48,26 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_deployment)
-        setupView()
+        val deploymentId = intent.extras?.getInt(DEPLOYMENT_ID)
+        if (deploymentId != null) {
+            val deployment = deploymentDb.getDeploymentById(deploymentId)
+            if (deployment != null) {
+                setDeployment(deployment)
+
+                if (deployment.location != null) {
+                    _deployLocation = deployment.location
+                }
+
+                if (deployment.configuration != null) {
+                    _configuration = deployment.configuration
+                }
+                currentStep = deployment.state - 1
+                stepView.go(currentStep, true)
+                handleFragment(currentStep)
+            }
+        } else {
+            setupView()
+        }
     }
 
     private fun setupView() {
@@ -197,11 +216,27 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     }
 
     private fun handleSelectingConfig() {
-        this._profiles = profileDb.getProfiles()
-        if (_profiles.isNotEmpty()) {
-            startFragment(SelectProfileFragment.newInstance())
+        if (_configuration != null) {
+            val config = _configuration
+            if (config != null) {
+                val profile = Profile(
+                    gain = config.gain,
+                    name = "",
+                    sampleRate = config.sampleRate,
+                    recordingDuration = config.recordingDuration,
+                    sleepDuration = config.sleepDuration,
+                    recordingPeriodList = config.recordingPeriodList,
+                    durationSelected = config.durationSelected
+                )
+                startSetupConfigure(profile)
+            }
         } else {
-            startSetupConfigure(Profile.default())
+            this._profiles = profileDb.getProfiles()
+            if (_profiles.isNotEmpty()) {
+                startFragment(SelectProfileFragment.newInstance())
+            } else {
+                startSetupConfigure(Profile.default())
+            }
         }
     }
 
@@ -257,9 +292,16 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
 
     companion object {
         const val loadingDialogTag = "LoadingDialog"
+        const val DEPLOYMENT_ID = "DEPLOYMENT_ID"
 
         fun startActivity(context: Context) {
             val intent = Intent(context, DeploymentActivity::class.java)
+            context.startActivity(intent)
+        }
+
+        fun startActivity(context: Context, deploymentId: Int) {
+            val intent = Intent(context, DeploymentActivity::class.java)
+            intent.putExtra(DEPLOYMENT_ID, deploymentId)
             context.startActivity(intent)
         }
     }

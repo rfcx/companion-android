@@ -18,13 +18,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.40" />
+        app:layout_constraintGuide_percent="0.35" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/configImageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_margin="@dimen/margin_padding_xlarge"
+        android:layout_margin="@dimen/margin_padding_normal"
         android:src="@drawable/rfcx_edge_record"
         app:layout_constraintBottom_toBottomOf="@id/guidelineHorizontal"
         app:layout_constraintEnd_toEndOf="parent"
@@ -59,12 +59,13 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/takePhotosTextView"
-        style="@style/AudioMothText.Subhead.Bold"
+        style="@style/AudioMothText.Subhead"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginTop="@dimen/margin_padding_normal"
         android:layout_marginEnd="@dimen/margin_padding_large"
+        android:gravity="center"
         android:text="@string/take_photos"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

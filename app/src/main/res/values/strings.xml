@@ -130,7 +130,7 @@
     <!--  DeployFragment  -->
     <string name="almost_there">Almost there!</string>
     <string name="switch_to_deploy">Switch your device to DEPLOY</string>
-    <string name="take_photos">Take some photos of the deploy location (optional)</string>
+    <string name="take_photos">Take some photos of the deploy \nlocation (optional)</string>
 
     <string name="camera_permission_msg">Deploy App would like to use your camera</string>
     <string name="read_storage_permission_msg">Deploy App would like to read your storage</string>

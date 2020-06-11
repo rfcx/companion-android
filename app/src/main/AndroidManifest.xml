@@ -32,7 +32,7 @@
         </provider>
 
         <activity
-            android:name=".view.configure.FeedbackActivity"
+            android:name=".view.profile.FeedbackActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".view.LoginActivity"
@@ -44,7 +44,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".view.configure.TutorialActivity"
+            android:name=".view.TutorialActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".MainActivity"

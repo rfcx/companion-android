@@ -46,6 +46,8 @@ class SyncFragment : Fragment() {
     }
 
     private fun beforeSync() {
+        deploymentProtocol?.hideCompleteButton()
+
         nextButton.setOnClickListener {
             deploymentProtocol?.startSyncing(SYNCING)
         }

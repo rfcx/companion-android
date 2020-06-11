@@ -19,8 +19,8 @@ import org.rfcx.audiomoth.util.Preferences
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.util.asLiveData
 import org.rfcx.audiomoth.view.LoginActivity
-import org.rfcx.audiomoth.view.configure.MapFragment
-import org.rfcx.audiomoth.view.configure.ProfileFragment
+import org.rfcx.audiomoth.view.map.MapFragment
+import org.rfcx.audiomoth.view.profile.ProfileFragment
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity
 import org.rfcx.audiomoth.widget.BottomNavigationMenuItem
 
@@ -37,6 +37,12 @@ open class MainActivity : AppCompatActivity(), MainActivityListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         locationPermissions.handleActivityResult(requestCode, resultCode)
+
+        currentFragment?.let {
+            if (it is MapFragment) {
+                it.onActivityResult(requestCode, resultCode, data)
+            }
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -46,6 +52,12 @@ open class MainActivity : AppCompatActivity(), MainActivityListener {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         locationPermissions.handleRequestResult(requestCode, grantResults)
+
+        currentFragment?.let {
+            if (it is MapFragment) {
+                it.onRequestPermissionsResult(requestCode, permissions, grantResults)
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,11 +91,7 @@ open class MainActivity : AppCompatActivity(), MainActivityListener {
 
     private fun updateSyncingView(imageCount: Int, imageUnsentCount: Int) {
         // TODO: implement logic display syncing view
-        imageSyncTextView.visibility = if (imageCount >= imageUnsentCount) {
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
+        imageSyncTextView.visibility = View.GONE
 
         imageSyncTextView.text = getString(
             if (imageCount > 1) R.string.format_images_unsync else R.string.format_image_unsync,

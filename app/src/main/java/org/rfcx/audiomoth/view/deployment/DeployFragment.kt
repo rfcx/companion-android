@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_deploy.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.view.configure.BaseImageFragment
 
 class DeployFragment : BaseImageFragment() {
 
@@ -29,6 +28,7 @@ class DeployFragment : BaseImageFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        deploymentProtocol?.hideCompleteButton()
         setupImageRecycler()
         finishButton.setOnClickListener {
             val images = imageAdapter.getNewAttachImage()
