@@ -19,6 +19,8 @@ class ConnectGuardianFragment : Fragment(), (ScanResult) -> Unit {
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
     private lateinit var wifiHotspotManager: WifiHotspotManager
 
+    private var guardianHotspot: ScanResult? = null
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         deploymentProtocol = (context as GuardianDeploymentProtocol)
@@ -61,8 +63,9 @@ class ConnectGuardianFragment : Fragment(), (ScanResult) -> Unit {
         }
     }
 
-    override fun invoke(p1: ScanResult) {
-        TODO("Not yet implemented")
+    override fun invoke(hotspot: ScanResult) {
+        guardianHotspot = hotspot
+        enableConnectButton()
     }
 
     private fun showLoading() {
@@ -73,6 +76,10 @@ class ConnectGuardianFragment : Fragment(), (ScanResult) -> Unit {
     private fun hideLoading() {
         connectGuardianLoading.visibility = View.GONE
         connectGuardianButton.visibility = View.VISIBLE
+    }
+
+    private fun enableConnectButton() {
+        connectGuardianButton.isEnabled = true
     }
 
     override fun onDestroyView() {

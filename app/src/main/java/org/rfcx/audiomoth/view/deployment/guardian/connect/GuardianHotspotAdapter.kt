@@ -1,5 +1,6 @@
 package org.rfcx.audiomoth.view.deployment.guardian.connect
 
+import android.graphics.Color
 import android.net.wifi.ScanResult
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,8 @@ import kotlinx.android.synthetic.main.item_guardian_hotspot.view.*
 import org.rfcx.audiomoth.R
 
 class GuardianHotspotAdapter(private val onHotspotClickListener: (ScanResult) -> Unit): RecyclerView.Adapter<GuardianHotspotAdapter.GuardianHotspotViewHolder>() {
+
+    var selectedPosition = -1
 
     var items: List<ScanResult> = arrayListOf()
         set(value) {
@@ -24,10 +27,17 @@ class GuardianHotspotAdapter(private val onHotspotClickListener: (ScanResult) ->
     override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: GuardianHotspotViewHolder, position: Int) {
+        if (selectedPosition == position) {
+            holder.itemView.setBackgroundColor(Color.parseColor("#B57BBD89"))
+        } else {
+            holder.itemView.setBackgroundColor(Color.parseColor("#FFFFFF"))
+        }
         val hotspot = items[position]
         holder.bind(hotspot)
         holder.itemView.setOnClickListener {
-//            this.onHotspotClickListener(hotspot)
+            selectedPosition = position
+            notifyDataSetChanged()
+            this.onHotspotClickListener(hotspot)
         }
     }
 
@@ -38,7 +48,7 @@ class GuardianHotspotAdapter(private val onHotspotClickListener: (ScanResult) ->
         fun bind(hotspot: ScanResult) {
             hotspotName.text = hotspot.SSID
             deployStatus.text = "not deployed"
-            //TODO: make item feel like radiobutton but highlight instead
+            //TODO: if deploy then show deployed text
         }
     }
 
