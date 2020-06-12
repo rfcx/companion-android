@@ -25,7 +25,7 @@ class WifiHotspotManager(private val context: Context) {
         context.unregisterReceiver(WifiScanReceiver(null))
     }
 
-    inner class WifiScanReceiver(private val onScanReceiver: OnScanReceiver?) : BroadcastReceiver() {
+    private inner class WifiScanReceiver(private val onScanReceiver: OnScanReceiver?) : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent!!.action == WifiManager.SCAN_RESULTS_AVAILABLE_ACTION) {
                 val scanResult = wifiManager!!.scanResults
