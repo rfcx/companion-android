@@ -67,18 +67,16 @@ class ConnectGuardianFragment : Fragment(), (ScanResult) -> Unit {
 
     private fun showLoading() {
         connectGuardianLoading.visibility = View.VISIBLE
-        nearbyGuardianTextView.visibility = View.GONE
         connectGuardianButton.visibility = View.GONE
     }
 
     private fun hideLoading() {
         connectGuardianLoading.visibility = View.GONE
-        nearbyGuardianTextView.visibility = View.VISIBLE
         connectGuardianButton.visibility = View.VISIBLE
     }
 
-    override fun onDetach() {
-        super.onDetach()
+    override fun onDestroyView() {
+        super.onDestroyView()
         wifiHotspotManager.unRegisterReceiver()
     }
 
