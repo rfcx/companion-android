@@ -67,23 +67,34 @@ open class MainActivity : AppCompatActivity(), MainActivityListener {
             DeploymentActivity.startActivity(this)
         }
 
-        SimpleTooltip.Builder(this)
-            .arrowColor(resources.getColor(R.color.white))
-            .anchorView(createLocationButton)
-            .text(getString(R.string.setup_first_device, this.getUserNickname()))
-            .gravity(Gravity.TOP)
-            .animationPadding(10F)
-            .contentView(R.layout.tooltip_custom, R.id.tv_text)
-            .animated(true)
-            .transparentOverlay(false)
-            .build()
-            .show()
-
+        setupSimpleTooltip()
         setupBottomMenu()
+
         if (savedInstanceState == null) {
             setupFragments()
         }
         fetchData()
+    }
+
+    private fun setupSimpleTooltip() {
+        val preferences = Preferences.getInstance(this)
+        val isFirstTime = preferences.getBoolean(Preferences.IS_FIRST_TIME, true)
+
+        if (isFirstTime) {
+            preferences.putBoolean(Preferences.IS_FIRST_TIME, false)
+
+            SimpleTooltip.Builder(this)
+                .arrowColor(resources.getColor(R.color.white))
+                .anchorView(createLocationButton)
+                .text(getString(R.string.setup_first_device, this.getUserNickname()))
+                .gravity(Gravity.TOP)
+                .animationPadding(10F)
+                .contentView(R.layout.tooltip_custom, R.id.tv_text)
+                .animated(true)
+                .transparentOverlay(false)
+                .build()
+                .show()
+        }
     }
 
     private fun fetchData() {
