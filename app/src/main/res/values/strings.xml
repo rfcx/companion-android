@@ -143,6 +143,11 @@
     <string name="this_photo_already_exists">This photo already exists</string>
     <string name="can_not_create_image">Can\'t create image file</string>
 
+    <!--  ChooseDeviceFragment  -->
+    <string name="choose_your_device">Choose your device</string>
+    <string name="rfcx_edge">RFCx Edge</string>
+    <string name="rfcx_guardian">RFCx Guardian</string>
+
     <string name="location_permission_msg">Deploy App would like to use your location</string>
     <string name="notification_location_not_availability">Please enable your device\'s location settings</string>
 

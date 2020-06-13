@@ -77,6 +77,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
 
+        deploymentProtocol?.showStepView()
         deploymentProtocol?.hideCompleteButton()
 
         finishButton.setOnClickListener {
