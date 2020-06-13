@@ -10,7 +10,9 @@ import java.util.*
 open class DeploymentImage(
     @PrimaryKey
     var id: Int = 0,
+    @Expose(serialize = false)
     var deploymentId: Int = 0,
+    var deploymentServerId: String? = null,
     @Expose(serialize = false)
     var localPath: String = "",
     var remotePath: String? = null,
