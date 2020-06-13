@@ -4,7 +4,6 @@ package org.rfcx.audiomoth.view.map
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.PointF
-import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -68,7 +67,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private lateinit var deployLiveData: LiveData<List<Deployment>>
     private lateinit var locateLiveData: LiveData<List<Locate>>
 
-
     private val locationPermissions by lazy { activity?.let { LocationPermissions(it) } }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -121,9 +119,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 val features = mapboxMap.queryRenderedFeatures(screenPoint, WINDOW_DEPLOYMENT_ID)
                 if (features.isNotEmpty()) {
                     val feature = features[0]
-                    val symbolScreenPoint =
-                        mapboxMap.projection.toScreenLocation(convertToLatLng(feature))
-                    handleClickCallout(feature, screenPoint, symbolScreenPoint)
+                    handleClickCallout(feature)
                 } else {
                     handleClickIcon(mapboxMap.projection.toScreenLocation(latLng))
                 }
@@ -191,40 +187,20 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         style.addLayer(markerLayer)
     }
 
-    private fun handleClickCallout(
-        feature: Feature,
-        screenPoint: PointF,
-        symbolScreenPoint: PointF
-    ): Boolean {
-        val view = mapInfoViews[feature.getStringProperty(PROPERTY_MARKER_LOCATION_ID)]
-        val textContainer =
-            view?.findViewById<View>(R.id.infoWindowTitle)
-
-        val hitRectText = Rect()
-        textContainer?.getHitRect(hitRectText)
-
-        // move hitbox to location of symbol
-        hitRectText.offset(symbolScreenPoint.x.toInt(), symbolScreenPoint.y.toInt())
-        hitRectText.offset(0, -(view?.measuredHeight ?: 0))
-
-        val x = screenPoint.x.toInt()
-        val y = screenPoint.y.toInt()
-
-        if (hitRectText.contains(x, y)) {
-            val deployment = deploymentDb.getDeploymentById(feature.getProperty(PROPERTY_MARKER_DEPLOYMENT_ID).asInt)
-            if(deployment != null) {
-                if (deployment.state != 6) {
-                    context?.let {
-                        DeploymentActivity.startActivity(
-                            it,
-                            feature.getProperty(PROPERTY_MARKER_DEPLOYMENT_ID).asInt
-                        )
-                    }
+    private fun handleClickCallout(feature: Feature): Boolean {
+        val deployment =
+            deploymentDb.getDeploymentById(feature.getProperty(PROPERTY_MARKER_DEPLOYMENT_ID).asInt)
+        if (deployment != null) {
+            if (deployment.state != 6) {
+                context?.let {
+                    DeploymentActivity.startActivity(
+                        it,
+                        feature.getProperty(PROPERTY_MARKER_DEPLOYMENT_ID).asInt
+                    )
                 }
             }
-            return true
         }
-        return false
+        return true
     }
 
     private fun handleClickIcon(screenPoint: PointF): Boolean {
