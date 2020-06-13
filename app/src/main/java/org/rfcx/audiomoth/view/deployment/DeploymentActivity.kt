@@ -94,7 +94,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     }
 
     override fun hideStepView() {
-        stepView.visibility = View.INVISIBLE
+        stepView.visibility = View.GONE
     }
 
     override fun showCompleteButton() {
