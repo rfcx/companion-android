@@ -10,6 +10,7 @@ import java.util.*
 open class Deployment(
     @PrimaryKey
     var id: Int = 0,
+    var serverId: String? = null,
     var batteryDepletedAt: Date = Date(),
     var deployedAt: Date = Date(),
     var batteryLevel: Int = 0,

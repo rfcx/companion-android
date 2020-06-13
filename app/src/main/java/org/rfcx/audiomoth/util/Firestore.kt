@@ -6,6 +6,7 @@ import com.google.firebase.ktx.Firebase
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.Deployment.Companion.PHOTOS
 import org.rfcx.audiomoth.entity.User
+import org.rfcx.audiomoth.entity.request.toRequestBody
 import org.rfcx.audiomoth.localdb.DeploymentDb
 import java.sql.Timestamp
 
@@ -32,14 +33,15 @@ class Firestore(val context: Context) {
             }
     }
 
-    fun saveDeployment(deploymentDb: DeploymentDb, deployment: Deployment, callback: (String?, Boolean) -> Unit) {
+    fun sendDeployment(deploymentDb: DeploymentDb, deployment: Deployment, callback: (String?, Boolean) -> Unit) {
         // set uploaded
         deploymentDb.markUploading(deployment.id)
 
         db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_DEPLOYMENTS)
-            .add(deployment)
+            .add(deployment.toRequestBody())
             .addOnSuccessListener { documentReference ->
-                deploymentDb.markUploaded(deployment.id)
+                val serverId = documentReference.id
+                deploymentDb.markSent(serverId, deployment.id)
                 callback(documentReference.id, true)
             }
             .addOnFailureListener { e ->

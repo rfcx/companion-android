@@ -12,6 +12,7 @@ import java.util.*
 open class Profile(
     @PrimaryKey
     var id: Int = 0,
+    var serverId: String? = null,
     var gain: Int = 0,
     var name: String = "",
     var sampleRate: Int = 0,

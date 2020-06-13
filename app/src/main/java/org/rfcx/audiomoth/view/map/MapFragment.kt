@@ -57,7 +57,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     // database manager
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val deploymentDb by lazy { DeploymentDb(realm) }
+    private val deploymentDb by lazy {
+        DeploymentDb(
+            realm
+        )
+    }
     private val locateDb by lazy { LocateDb(realm) }
 
     // data

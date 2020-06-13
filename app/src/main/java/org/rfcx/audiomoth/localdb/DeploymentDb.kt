@@ -1,12 +1,10 @@
 package org.rfcx.audiomoth.localdb
 
+import android.util.Log
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
-import org.rfcx.audiomoth.entity.Deployment
-import org.rfcx.audiomoth.entity.DeploymentLocation
-import org.rfcx.audiomoth.entity.DeploymentState
-import org.rfcx.audiomoth.entity.SyncState
+import org.rfcx.audiomoth.entity.*
 
 /**
  * For Manage the saving and sending of deployment from the local database
@@ -45,18 +43,21 @@ class DeploymentDb(private val realm: Realm) {
         mark(id = id, syncState = SyncState.Unsent.key)
     }
 
-    fun markUploaded(id: Int) {
-        mark(id, SyncState.Sent.key)
+    fun markSent(serverId: String, id: Int) {
+        mark(id, serverId, SyncState.Sent.key)
+        saveDeploymentServerIdToImage(serverId, id)
     }
 
     fun markUploading(id: Int) {
-        mark(id, SyncState.Uploading.key)
+        mark(id = id, syncState = SyncState.Uploading.key)
     }
 
-    private fun mark(id: Int, syncState: Int) {
+    private fun mark(id: Int, serverId: String? = null, syncState: Int) {
         realm.executeTransaction {
-            val deployment = it.where(Deployment::class.java).equalTo(Deployment.FIELD_ID, id).findFirst()
+            val deployment =
+                it.where(Deployment::class.java).equalTo(Deployment.FIELD_ID, id).findFirst()
             if (deployment != null) {
+                deployment.serverId = serverId
                 deployment.syncState = syncState
             }
         }
@@ -76,4 +77,22 @@ class DeploymentDb(private val realm: Realm) {
         }
         return null
     }
+
+    private fun saveDeploymentServerIdToImage(serverId: String, deploymentId: Int) {
+        val images =
+            realm.where(DeploymentImage::class.java).equalTo(DeploymentImage.FIELD_ID, deploymentId)
+                .findAll()
+        images?.forEach {
+            Log.i("saveDeploymentIdToImage", it.localPath)
+        }
+        realm.executeTransaction { transition ->
+            images?.forEach {
+                val image = it.apply {
+                    this.deploymentServerId = serverId
+                }
+                transition.insertOrUpdate(image)
+            }
+        }
+    }
+
 }

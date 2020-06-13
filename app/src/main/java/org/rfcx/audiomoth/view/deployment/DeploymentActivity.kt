@@ -33,7 +33,11 @@ import java.util.*
 class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val deploymentDb by lazy { DeploymentDb(realm) }
+    private val deploymentDb by lazy {
+        DeploymentDb(
+            realm
+        )
+    }
     private val locateDb by lazy { LocateDb(realm) }
     private val profileDb by lazy { ProfileDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
@@ -252,7 +256,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     }
 
     private fun saveDevelopment(deployment: Deployment) {
-        Firestore(this).saveDeployment(deploymentDb, deployment) { string, isSuccess ->
+        Firestore(this).sendDeployment(deploymentDb, deployment) { string, isSuccess ->
             if (isSuccess) {
                 Toast.makeText(
                     this,
