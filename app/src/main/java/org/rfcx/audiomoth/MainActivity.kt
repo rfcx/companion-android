@@ -3,12 +3,14 @@ package org.rfcx.audiomoth
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
+import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
@@ -67,6 +69,15 @@ open class MainActivity : AppCompatActivity(), MainActivityListener {
         createLocationButton.setOnClickListener {
             DeploymentActivity.startActivity(this)
         }
+
+        SimpleTooltip.Builder(this)
+            .anchorView(createLocationButton)
+            .text("Welcome! Setup your first RFCX device here")
+            .gravity(Gravity.TOP)
+            .animated(true)
+            .transparentOverlay(false)
+            .build()
+            .show()
 
         setupBottomMenu()
         if (savedInstanceState == null) {
