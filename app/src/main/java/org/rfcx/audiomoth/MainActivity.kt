@@ -16,14 +16,11 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
 import org.rfcx.audiomoth.entity.DeploymentImage
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
-import org.rfcx.audiomoth.util.LocationPermissions
-import org.rfcx.audiomoth.util.Preferences
-import org.rfcx.audiomoth.util.RealmHelper
-import org.rfcx.audiomoth.util.asLiveData
+import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.LoginActivity
+import org.rfcx.audiomoth.view.deployment.DeploymentActivity
 import org.rfcx.audiomoth.view.map.MapFragment
 import org.rfcx.audiomoth.view.profile.ProfileFragment
-import org.rfcx.audiomoth.view.deployment.DeploymentActivity
 import org.rfcx.audiomoth.widget.BottomNavigationMenuItem
 
 open class MainActivity : AppCompatActivity(), MainActivityListener {
@@ -71,9 +68,12 @@ open class MainActivity : AppCompatActivity(), MainActivityListener {
         }
 
         SimpleTooltip.Builder(this)
+            .arrowColor(resources.getColor(R.color.white))
             .anchorView(createLocationButton)
-            .text("Welcome! Setup your first RFCX device here")
+            .text(getString(R.string.setup_first_device, this.getUserNickname()))
             .gravity(Gravity.TOP)
+            .animationPadding(10F)
+            .contentView(R.layout.tooltip_custom, R.id.tv_text)
             .animated(true)
             .transparentOverlay(false)
             .build()

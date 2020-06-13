@@ -24,6 +24,7 @@
     <string name="format_deploy_unsync">%s deploy (%s not yet synced)</string>
     <string name="menu_map">MAP</string>
     <string name="menu_profile">PROFILE</string>
+    <string name="setup_first_device">Welcome! %s \nSetup your first RFCx device here</string>
 
     <!--  CreateStreamActivity  -->
     <string name="create_stream">Create Stream</string>
