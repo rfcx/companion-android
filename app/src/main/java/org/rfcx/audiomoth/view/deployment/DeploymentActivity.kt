@@ -141,6 +141,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         _deployment?.let { deploymentDb.updateDeployment(it) }
         // update profile
         if (profile.name.isNotEmpty()) {
+            Firestore(this).saveProfile(profileDb, profile)
             profileDb.insertOrUpdateProfile(profile)
         }
 
@@ -158,7 +159,6 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         this._deployLocation = locate.asDeploymentLocation()
         val deploymentId = deploymentDb.insertOrUpdateDeployment(deployment, _deployLocation!!)
         locateDb.insertOrUpdateLocate(deploymentId, locate) // update locate - last deployment
-
         setDeployment(deployment)
     }
 
