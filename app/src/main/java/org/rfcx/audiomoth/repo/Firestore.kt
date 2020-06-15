@@ -1,18 +1,13 @@
 package org.rfcx.audiomoth.repo
 
 import android.content.Context
-import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.tasks.await
-import org.rfcx.audiomoth.entity.*
+import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.Deployment.Companion.PHOTOS
+import org.rfcx.audiomoth.entity.User
 import org.rfcx.audiomoth.entity.request.toRequestBody
 import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.util.Preferences
@@ -35,23 +30,6 @@ class Firestore(val context: Context) {
                 callback(null, true)
             }
             .addOnFailureListener { e ->
-                callback(e.message, false)
-            }
-    }
-
-    fun sendDeployment(deploymentDb: DeploymentDb, deployment: Deployment, callback: (String?, Boolean) -> Unit) {
-        // set uploaded
-        deploymentDb.markUploading(deployment.id)
-
-        db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_DEPLOYMENTS)
-            .add(deployment.toRequestBody())
-            .addOnSuccessListener { documentReference ->
-                val serverId = documentReference.id
-                deploymentDb.markSent(serverId, deployment.id)
-                callback(documentReference.id, true)
-            }
-            .addOnFailureListener { e ->
-                deploymentDb.markUnsent(deployment.id)
                 callback(e.message, false)
             }
     }
@@ -84,11 +62,11 @@ class Firestore(val context: Context) {
                 if (uris != null) {
                     Storage(context)
                         .uploadImagesOfFeedback(uris) { success, pathImages ->
-                        if (success) {
-                            val docData = hashMapOf("pathImages" to pathImages)
-                            it.update(docData as Map<String, Any>)
+                            if (success) {
+                                val docData = hashMapOf("pathImages" to pathImages)
+                                it.update(docData as Map<String, Any>)
+                            }
                         }
-                    }
                 }
             }.addOnFailureListener { callback(false) }
     }

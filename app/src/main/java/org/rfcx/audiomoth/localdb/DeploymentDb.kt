@@ -48,10 +48,6 @@ class DeploymentDb(private val realm: Realm) {
         saveDeploymentServerIdToImage(serverId, id)
     }
 
-    fun markUploading(id: Int) {
-        mark(id = id, syncState = SyncState.Sending.key)
-    }
-
     private fun mark(id: Int, serverId: String? = null, syncState: Int) {
         realm.executeTransaction {
             val deployment =
@@ -105,7 +101,7 @@ class DeploymentDb(private val realm: Realm) {
 
     private fun saveDeploymentServerIdToImage(serverId: String, deploymentId: Int) {
         val images =
-            realm.where(DeploymentImage::class.java).equalTo(DeploymentImage.FIELD_ID, deploymentId)
+            realm.where(DeploymentImage::class.java).equalTo(DeploymentImage.FIELD_DEPLOYMENT_ID, deploymentId)
                 .findAll()
         images?.forEach {
             Log.i("saveDeploymentIdToImage", it.localPath)

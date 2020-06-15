@@ -5,9 +5,6 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import io.realm.Realm
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.withContext
 import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.util.RealmHelper
