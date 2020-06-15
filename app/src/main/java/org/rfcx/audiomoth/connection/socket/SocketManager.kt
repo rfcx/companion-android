@@ -1,5 +1,7 @@
 package org.rfcx.audiomoth.connection.socket
 
+import android.app.Activity
+import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
 import org.json.JSONObject
@@ -18,25 +20,29 @@ object SocketManager {
 
     private val LOGTAG = "Client-SocketManager"
 
+    private val CONNECTION = "connection"
+    private val DIAGNOSTIC = "diagnostic"
+    private val CONFIGURE = "configure"
+
     fun connect(onReceiveRespoonse: OnReceiveResponse) {
-        val data = gson.toJson(SocketRequest(SocketType.CONNECTION.name))
+        val data = gson.toJson(SocketRequest(CONNECTION))
         sendData(data, onReceiveRespoonse)
     }
 
     fun getDiagnosticData(onReceiveRespoonse: OnReceiveResponse) {
-        val data = gson.toJson(SocketRequest(SocketType.DIAGNOSTIC.name))
+        val data = gson.toJson(SocketRequest(DIAGNOSTIC))
         sendData(data, onReceiveRespoonse)
     }
 
     fun getCurrentConfiguration(onReceiveRespoonse: OnReceiveResponse) {
-        val data = gson.toJson(SocketRequest(SocketType.CONFIGURE.name))
+        val data = gson.toJson(SocketRequest(CONFIGURE))
         sendData(data, onReceiveRespoonse)
     }
 
     private fun sendData(data: String, onReceiveRespoonse: OnReceiveResponse) {
         clientThread = Thread(Runnable {
             try {
-                socket = Socket("192.168.1.43", 9090)
+                socket = Socket("192.168.43.1", 9999)
 
                 while (true) {
                     outputStream = DataOutputStream(socket.getOutputStream())
@@ -55,16 +61,16 @@ object SocketManager {
 
                         val keys = jsonIterator.asSequence().toList()
                         when (keys[0].toString()) {
-                            SocketType.CONFIGURE.name -> {
+                            CONFIGURE -> {
                                 val response = gson.fromJson(dataInput, ConfigureResponse::class.java)
                                 Log.d(LOGTAG, "Configure response: ${response.configure}")
                             }
-                            SocketType.DIAGNOSTIC.name -> {
+                            DIAGNOSTIC -> {
                                 val response = gson.fromJson(dataInput, DiagnosticResponse::class.java)
                                 Log.d(LOGTAG, "Diagnostic response: ${response.diagnostic}")
                                 onReceiveRespoonse.onReceive(response)
                             }
-                            SocketType.CONNECTION.name -> {
+                            CONNECTION -> {
                                 val response = gson.fromJson(dataInput, ConnectionResponse::class.java)
                                 Log.d(LOGTAG, "Connection status: ${response.connection.status}")
                                 onReceiveRespoonse.onReceive(response)
@@ -74,6 +80,7 @@ object SocketManager {
                 }
             } catch (e: Exception) {
                 Log.e(LOGTAG, e.toString())
+                onReceiveRespoonse.onFailed()
             }
         })
 
@@ -90,10 +97,5 @@ object SocketManager {
 
 interface OnReceiveResponse {
     fun onReceive(response: SocketResposne)
-}
-
-enum class SocketType(value: String) {
-    CONNECTION("connection"),
-    DIAGNOSTIC("diagnostic"),
-    CONFIGURE("configure")
+    fun onFailed()
 }
