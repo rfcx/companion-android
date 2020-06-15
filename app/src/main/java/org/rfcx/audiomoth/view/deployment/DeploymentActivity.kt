@@ -143,7 +143,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         this._deployLocation = locate.asDeploymentLocation()
         val deploymentId = deploymentDb.insertOrUpdateDeployment(deployment, _deployLocation!!)
         locateDb.insertOrUpdateLocate(deploymentId, locate) // update locate - last deployment
-
+        Firestore(this).saveLocate(locateDb, locate)
         setDeployment(deployment)
     }
 
