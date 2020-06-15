@@ -4,6 +4,7 @@ import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
 import org.rfcx.audiomoth.entity.Locate
+import org.rfcx.audiomoth.entity.SyncState
 
 class LocateDb(private val realm: Realm) {
 
@@ -20,6 +21,29 @@ class LocateDb(private val realm: Realm) {
     fun getLocateById(id: Int): Locate? {
         return realm.where(Locate::class.java).equalTo(Locate.FIELD_ID, id)
             .findFirst()
+    }
+
+    fun markUnsent(id: Int) {
+        mark(id = id, syncState = SyncState.Unsent.key)
+    }
+
+    fun markSent(serverId: String, id: Int) {
+        mark(id, serverId, SyncState.Sent.key)
+    }
+
+    fun markUploading(id: Int) {
+        mark(id = id, syncState = SyncState.Uploading.key)
+    }
+
+    private fun mark(id: Int, serverId: String? = null, syncState: Int) {
+        realm.executeTransaction {
+            val locate =
+                it.where(Locate::class.java).equalTo(Locate.FIELD_ID, id).findFirst()
+            if (locate != null) {
+                locate.serverId = serverId
+                locate.syncState = syncState
+            }
+        }
     }
 
     fun insertOrUpdateLocate(deploymentId: Int, locate: Locate) {

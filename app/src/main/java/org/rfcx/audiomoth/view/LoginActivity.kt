@@ -200,7 +200,7 @@ class LoginActivity : AppCompatActivity() {
                 ) {
                     response.body()?.let {
                         if (it.success) {
-                            TutorialActivity.startActivity(this@LoginActivity)
+                            MainActivity.startActivity(this@LoginActivity)
                             finish()
                         } else {
                             loading(false)
