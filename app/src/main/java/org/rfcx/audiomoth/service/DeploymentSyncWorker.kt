@@ -40,7 +40,6 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
             }
         }
 
-        // TODO: upload attaches image
         ImageSyncWorker.enqueue(context)
 
         return if (someFailed) Result.retry() else Result.success()

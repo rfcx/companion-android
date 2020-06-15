@@ -6,7 +6,6 @@ import androidx.lifecycle.LiveData
 import androidx.work.*
 import io.realm.Realm
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
-import org.rfcx.audiomoth.service.DeploymentSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.util.Storage
 
@@ -27,10 +26,10 @@ class ImageSyncWorker (val context: Context, params: WorkerParameters) :
             val result = storage.sendImage(it.localPath)
 
             if (result != null) {
-                Log.d(TAG, "doWork: success ${result}")
-//                db.markSent(result.id, it.id)
+                Log.d(TAG, "doWork: success $result")
+                db.markSent(it.id, result)
             } else {
-//                db.markUnsent(it.id)
+                db.markUnsent(it.id)
                 someFailed = true
             }
         }
@@ -39,7 +38,7 @@ class ImageSyncWorker (val context: Context, params: WorkerParameters) :
     }
 
     companion object {
-        private const val TAG = "DeploymentSyncWorker"
+        private const val TAG = "ImageSyncWorker"
         private const val UNIQUE_WORK_KEY = "DeploymentSyncWorkerUniqueKey"
 
         fun enqueue(context: Context) {

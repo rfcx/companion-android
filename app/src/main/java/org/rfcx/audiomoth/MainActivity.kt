@@ -28,19 +28,8 @@ enum class SyncInfo { WaitingNetwork, Starting, Uploading, Uploaded }
 class MainActivity : AppCompatActivity(), MainActivityListener {
     // database manager
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
-
     private var currentFragment: Fragment? = null
     private val locationPermissions by lazy { LocationPermissions(this) }
-
-    private lateinit var deployImageLiveData: LiveData<List<DeploymentImage>>
-
-    // observer
-    private val deploymentImageObserver = Observer<List<DeploymentImage>> {
-        val imageCount = it.size
-        val imageUnsentCount = deploymentImageDb.unsentCount().toInt()
-        updateSyncingView(imageCount, imageUnsentCount)
-    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -80,26 +69,6 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         if (savedInstanceState == null) {
             setupFragments()
         }
-        fetchData()
-    }
-
-    private fun fetchData() {
-        deployImageLiveData =
-            Transformations.map(deploymentImageDb.getAllResultsAsync().asLiveData()) {
-                it
-            }
-        deployImageLiveData.observeForever(deploymentImageObserver)
-    }
-
-    private fun updateSyncingView(imageCount: Int, imageUnsentCount: Int) {
-        // TODO: implement logic display syncing view
-        imageSyncTextView.visibility = View.GONE
-
-        imageSyncTextView.text = getString(
-            if (imageCount > 1) R.string.format_images_unsync else R.string.format_image_unsync,
-            imageCount.toString(),
-            imageUnsentCount.toString()
-        )
     }
 
     private fun setupBottomMenu() {
@@ -172,11 +141,6 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
             .commit()
 
         menuMap.performClick()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        deployImageLiveData.removeObserver(deploymentImageObserver)
     }
 
     override fun onLogout() {

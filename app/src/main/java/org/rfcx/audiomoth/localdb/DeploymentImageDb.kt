@@ -5,7 +5,9 @@ import io.realm.RealmResults
 import io.realm.Sort
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.DeploymentImage
+import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_ID
 import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_SERVER_ID
+import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_ID
 import org.rfcx.audiomoth.entity.DeploymentState
 import org.rfcx.audiomoth.entity.SyncState
 
@@ -32,6 +34,25 @@ class DeploymentImageDb(private val realm: Realm) {
             }
         }
         return unsentCopied
+    }
+
+    fun markUnsent(id: Int) {
+        realm.executeTransaction {
+            val report = it.where(DeploymentImage::class.java).equalTo(FIELD_ID, id).findFirst()
+            if (report != null) {
+                report.syncState = SyncState.Unsent.key
+            }
+        }
+    }
+
+    fun markSent(id: Int, remotePath: String?) {
+        realm.executeTransaction {
+            val report = it.where(DeploymentImage::class.java).equalTo(FIELD_ID, id).findFirst()
+            if (report != null) {
+                report.syncState = SyncState.Sent.key
+                report.remotePath = remotePath
+            }
+        }
     }
 
     fun getAllResultsAsync(sort: Sort = Sort.DESCENDING): RealmResults<DeploymentImage> {
