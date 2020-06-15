@@ -33,7 +33,11 @@ import java.util.*
 class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val deploymentDb by lazy { DeploymentDb(realm) }
+    private val deploymentDb by lazy {
+        DeploymentDb(
+            realm
+        )
+    }
     private val locateDb by lazy { LocateDb(realm) }
     private val profileDb by lazy { ProfileDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
@@ -66,8 +70,16 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
                 handleFragment(currentStep)
             }
         } else {
-            setupView()
+            startFragment(ChooseDeviceFragment.newInstance())
         }
+    }
+
+    override fun openWithEdgeDevice(){
+        setupView()
+    }
+
+    override fun openWithGuardianDevice(){
+        finish()
     }
 
     private fun setupView() {
@@ -79,6 +91,14 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
 
     override fun hideCompleteButton() {
         completeStepButton.visibility = View.INVISIBLE
+    }
+
+    override fun showStepView() {
+        stepView.visibility = View.VISIBLE
+    }
+
+    override fun hideStepView() {
+        stepView.visibility = View.GONE
     }
 
     override fun showCompleteButton() {
@@ -121,6 +141,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         _deployment?.let { deploymentDb.updateDeployment(it) }
         // update profile
         if (profile.name.isNotEmpty()) {
+            Firestore(this).saveProfile(profileDb, profile)
             profileDb.insertOrUpdateProfile(profile)
         }
 
@@ -138,7 +159,6 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         this._deployLocation = locate.asDeploymentLocation()
         val deploymentId = deploymentDb.insertOrUpdateDeployment(deployment, _deployLocation!!)
         locateDb.insertOrUpdateLocate(deploymentId, locate) // update locate - last deployment
-
         setDeployment(deployment)
     }
 
@@ -252,7 +272,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     }
 
     private fun saveDevelopment(deployment: Deployment) {
-        Firestore(this).saveDeployment(deploymentDb, deployment) { string, isSuccess ->
+        Firestore(this).sendDeployment(deploymentDb, deployment) { string, isSuccess ->
             if (isSuccess) {
                 Toast.makeText(
                     this,
@@ -308,6 +328,8 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
 }
 
 interface DeploymentProtocol : BaseDeploymentProtocal {
+    fun openWithEdgeDevice()
+    fun openWithGuardianDevice()
     fun startSetupConfigure(profile: Profile)
     fun startSyncing(status: String)
     fun startCheckBattery(status: String, level: Int?)

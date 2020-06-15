@@ -49,9 +49,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".view.TutorialActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait" />
         <activity
