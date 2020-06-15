@@ -6,6 +6,7 @@ import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.Task
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
+import org.rfcx.audiomoth.repo.Firestore
 import java.io.File
 
 class Storage(val context: Context) {
@@ -43,7 +44,8 @@ class Storage(val context: Context) {
                     callback(uris.size, count)
                     pathImages.add(downloadUri.toString())
                     if (count == 0) {
-                        Firestore(context).updateDeployment(deploymentId, pathImages)
+                        Firestore(context)
+                            .updateDeployment(deploymentId, pathImages)
                     }
                 }
             }

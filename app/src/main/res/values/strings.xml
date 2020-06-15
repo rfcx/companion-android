@@ -150,5 +150,6 @@
     <string name="format_in_progress_step">Not yet deploy [%s]</string>
     <string name="error_upload_deployment">Something went wrong.</string>
     <string name="deployment_uploaded">Deployment uploaded!</string>
+    <string name="deployment_saved">Deployment saved!</string>
 
 </resources>

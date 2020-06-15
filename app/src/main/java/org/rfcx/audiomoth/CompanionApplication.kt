@@ -3,6 +3,7 @@ package org.rfcx.audiomoth
 import android.app.Application
 import io.realm.Realm
 import io.realm.exceptions.RealmMigrationNeededException
+import org.rfcx.audiomoth.service.DeploymentCleanupWorker
 import org.rfcx.audiomoth.util.RealmHelper
 
 class CompanionApplication : Application() {
@@ -11,6 +12,7 @@ class CompanionApplication : Application() {
 
         Realm.init(this)
         setupRealm()
+        DeploymentCleanupWorker.enqueuePeriodically(this)
     }
 
     private fun setupRealm() {

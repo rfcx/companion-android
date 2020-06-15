@@ -16,7 +16,8 @@ import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.ProfileDb
-import org.rfcx.audiomoth.util.Firestore
+import org.rfcx.audiomoth.repo.Firestore
+import org.rfcx.audiomoth.service.DeploymentSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.util.showCommonDialog
 import org.rfcx.audiomoth.view.LoadingDialogFragment
@@ -174,7 +175,10 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
 
             deploymentImageDb.insertImage(it, images)
             deploymentDb.updateDeployment(it)
-            saveDevelopment(it)
+
+            DeploymentSyncWorker.enqueue(this@DeploymentActivity)
+            Toast.makeText(this, R.string.deployment_saved, Toast.LENGTH_SHORT).show()
+            finish()
         }
     }
 
@@ -253,30 +257,6 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     private fun updateDeploymentState(state: DeploymentState) {
         this._deployment?.state = state.key
         this._deployment?.let { deploymentDb.updateDeployment(it) }
-    }
-
-    private fun saveDevelopment(deployment: Deployment) {
-        Firestore(this).sendDeployment(deploymentDb, deployment) { string, isSuccess ->
-            if (isSuccess) {
-                Toast.makeText(
-                    this,
-                    getString(R.string.deployment_uploaded),
-                    Toast.LENGTH_SHORT
-                ).show()
-                hideLoading()
-                finish()
-            } else {
-                hideLoading()
-                showCommonDialog(
-                    title = "",
-                    message = string ?: getString(R.string.error_upload_deployment),
-                    onClick = DialogInterface.OnClickListener { dialog, _ ->
-                        dialog.dismiss()
-                        finish()
-                    }
-                )
-            }
-        }
     }
 
     private fun showLoading() {
