@@ -1,47 +1,39 @@
-package org.rfcx.audiomoth.service
+package org.rfcx.audiomoth.service.images
 
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import io.realm.Realm
-import org.rfcx.audiomoth.localdb.DeploymentDb
-import org.rfcx.audiomoth.repo.Firestore
-import org.rfcx.audiomoth.service.images.ImageSyncWorker
+import org.rfcx.audiomoth.localdb.DeploymentImageDb
+import org.rfcx.audiomoth.service.DeploymentSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
+import org.rfcx.audiomoth.util.Storage
 
-/**
- * For syncing data to server. ref from Ranger Android App
- */
-class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
+class ImageSyncWorker (val context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
-        Log.d(TAG, "doWork")
+        Log.d(TAG, "doWork ImageSyncWorker")
 
-        val db = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
-        val firestore = Firestore(context)
-        val deployments = db.lockUnsent()
+        val db = DeploymentImageDb(Realm.getInstance(RealmHelper.migrationConfig()))
+        val storage = Storage(context)
+        val deploymentImage = db.lockUnsent()
 
-        Log.d(TAG, "doWork: found ${deployments.size} unsent")
+        Log.d(TAG, "doWork: found ${deploymentImage.size} unsent")
         var someFailed = false
 
-        deployments.forEach {
-            Log.d(TAG, "doWork: sending id ${it.id}")
-            val result = firestore.sendDeployment(it)
+        deploymentImage.forEach {
+            val result = storage.sendImage(it.localPath)
 
             if (result != null) {
-                Log.d(TAG, "doWork: success ${it.id}")
-                db.markSent(result.id, it.id)
+                Log.d(TAG, "doWork: success ${result}")
+//                db.markSent(result.id, it.id)
             } else {
-                Log.d(TAG, "doWork: failed ${it.id}")
-                db.markUnsent(it.id)
+//                db.markUnsent(it.id)
                 someFailed = true
             }
         }
-
-        // TODO: upload attaches image
-        ImageSyncWorker.enqueue(context)
 
         return if (someFailed) Result.retry() else Result.success()
     }
@@ -54,7 +46,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
             val constraints =
                 Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
             val workRequest =
-                OneTimeWorkRequestBuilder<DeploymentSyncWorker>().setConstraints(constraints)
+                OneTimeWorkRequestBuilder<ImageSyncWorker>().setConstraints(constraints)
                     .build()
             WorkManager.getInstance(context)
                 .enqueueUniqueWork(UNIQUE_WORK_KEY, ExistingWorkPolicy.REPLACE, workRequest)

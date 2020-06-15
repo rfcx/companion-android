@@ -6,7 +6,7 @@ import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.Task
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
-import org.rfcx.audiomoth.repo.Firestore
+import kotlinx.coroutines.tasks.await
 import java.io.File
 
 class Storage(val context: Context) {
@@ -15,41 +15,26 @@ class Storage(val context: Context) {
     private val preferences = Preferences.getInstance(context)
     private val guid = preferences.getString(Preferences.USER_GUID, "images")
 
-    fun uploadImage(uris: List<String>, deploymentId: String, callback: (Int, Int) -> Unit) {
-        var count = uris.size
-        val pathImages = arrayListOf<String>()
-
-        uris.forEach {
-            callback(uris.size, count)
-
-            val file = Uri.fromFile(File(it))
-
-            val ref =
-                file.lastPathSegment?.let {
-                    storageRef.child("$guid/${file.lastPathSegment}")
-                }
-            val uploadTask = ref?.putFile(file)
-
-            uploadTask?.continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
-                if (!task.isSuccessful) {
-                    task.exception?.let {
-                        throw it
-                    }
-                }
-                return@Continuation ref.downloadUrl
-            })?.addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    count -= 1
-                    val downloadUri = task.result
-                    callback(uris.size, count)
-                    pathImages.add(downloadUri.toString())
-                    if (count == 0) {
-                        Firestore(context)
-                            .updateDeployment(deploymentId, pathImages)
-                    }
+    suspend fun sendImage(uri: String): String? {
+        val file = Uri.fromFile(File(uri))
+        val ref = file.lastPathSegment?.let { storageRef.child("$guid/${file.lastPathSegment}") }
+        val uploadTask = ref?.putFile(file)
+        var uriDownload: String? = null
+        uploadTask?.continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
+            if (!task.isSuccessful) {
+                task.exception?.let {
+                    throw it
                 }
             }
-        }
+            return@Continuation ref.downloadUrl
+        })?.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val downloadUri = task.result
+                uriDownload = downloadUri.toString()
+            }
+        }?.await()
+
+        return uriDownload
     }
 
     fun uploadImagesOfFeedback(
