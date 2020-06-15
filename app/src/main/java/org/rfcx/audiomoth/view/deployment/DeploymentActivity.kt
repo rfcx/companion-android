@@ -330,14 +330,6 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
 interface DeploymentProtocol : BaseDeploymentProtocal {
     fun openWithEdgeDevice()
     fun openWithGuardianDevice()
-    fun setCompleteTextButton(text: String)
-    fun hideCompleteButton()
-    fun showCompleteButton()
-    fun hideStepView()
-    fun showStepView()
-    fun nextStep()
-    fun backStep()
-
     fun startSetupConfigure(profile: Profile)
     fun startSyncing(status: String)
     fun startCheckBattery(status: String, level: Int?)
