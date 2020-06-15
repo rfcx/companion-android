@@ -28,6 +28,7 @@ class Preferences(context: Context) {
         const val ROLES = "${PREFIX}ROLES"
         const val ACCESSIBLE_SITES = "${PREFIX}ACCESSIBLE_SITES"
         const val DEFAULT_SITE = "${PREFIX}DEFAULT_SITE"
+        const val IS_FIRST_TIME = "${PREFIX}IS_FIRST_TIME"
     }
 
     init {
@@ -41,6 +42,14 @@ class Preferences(context: Context) {
 
     fun getString(key: String): String? {
         return sharedPreferences.getString(key, null)
+    }
+
+    fun getBoolean(key: String, defaultValue: Boolean = false): Boolean {
+        return sharedPreferences.getBoolean(key, defaultValue)
+    }
+
+    fun putBoolean(key: String, value: Boolean) {
+        sharedPreferences.edit().putBoolean(key, value).apply()
     }
 
     fun putStringSet(key: String, value: Set<String>) {

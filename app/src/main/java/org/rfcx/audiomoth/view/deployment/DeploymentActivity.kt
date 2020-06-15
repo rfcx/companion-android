@@ -70,8 +70,16 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
                 handleFragment(currentStep)
             }
         } else {
-            setupView()
+            startFragment(ChooseDeviceFragment.newInstance())
         }
+    }
+
+    override fun openWithEdgeDevice(){
+        setupView()
+    }
+
+    override fun openWithGuardianDevice(){
+        finish()
     }
 
     private fun setupView() {
@@ -83,6 +91,14 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
 
     override fun hideCompleteButton() {
         completeStepButton.visibility = View.INVISIBLE
+    }
+
+    override fun showStepView() {
+        stepView.visibility = View.VISIBLE
+    }
+
+    override fun hideStepView() {
+        stepView.visibility = View.GONE
     }
 
     override fun showCompleteButton() {
@@ -312,9 +328,13 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
 }
 
 interface DeploymentProtocol {
+    fun openWithEdgeDevice()
+    fun openWithGuardianDevice()
     fun setCompleteTextButton(text: String)
     fun hideCompleteButton()
     fun showCompleteButton()
+    fun hideStepView()
+    fun showStepView()
     fun nextStep()
     fun backStep()
 
