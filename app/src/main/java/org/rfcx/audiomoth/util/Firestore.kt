@@ -5,9 +5,11 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.Deployment.Companion.PHOTOS
+import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.entity.User
 import org.rfcx.audiomoth.entity.request.toRequestBody
 import org.rfcx.audiomoth.localdb.DeploymentDb
+import org.rfcx.audiomoth.localdb.ProfileDb
 import java.sql.Timestamp
 
 interface FirestoreResponseCallback<T> {
@@ -56,6 +58,19 @@ class Firestore(val context: Context) {
             .update(PHOTOS, photos)
     }
 
+    fun saveProfile(profileDb: ProfileDb, profile: Profile) {
+        // set uploaded
+        profileDb.markUploading(profile.id)
+        db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_PROFILES)
+            .add(profile.toRequestBody())
+            .addOnSuccessListener { documentReference ->
+                val serverId = documentReference.id
+                profileDb.markSent(serverId, profile.id)
+            }
+            .addOnFailureListener { e ->
+                profileDb.markUnsent(profile.id)
+            }
+    }
 
     fun saveFeedback(
         text: String, uris: List<String>?, callback: (Boolean) -> Unit
