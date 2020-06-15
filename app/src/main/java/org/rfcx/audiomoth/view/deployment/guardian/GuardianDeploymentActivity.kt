@@ -99,7 +99,13 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         stepView.go(stepView.currentStep - 1, true)
     }
 
-//    override fun getDeployment(): Deployment? = this._deployment
+    override fun hideStepView() {
+    }
+
+    override fun showStepView() {
+    }
+
+    //    override fun getDeployment(): Deployment? = this._deployment
 //
 //    override fun setDeployment(deployment: Deployment) {
 //        this._deployment = deployment

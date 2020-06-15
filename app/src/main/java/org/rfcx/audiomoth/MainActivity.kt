@@ -3,25 +3,24 @@ package org.rfcx.audiomoth
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
+import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
 import org.rfcx.audiomoth.entity.DeploymentImage
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
-import org.rfcx.audiomoth.util.LocationPermissions
-import org.rfcx.audiomoth.util.Preferences
-import org.rfcx.audiomoth.util.RealmHelper
-import org.rfcx.audiomoth.util.asLiveData
+import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.LoginActivity
+import org.rfcx.audiomoth.view.deployment.DeploymentActivity
 import org.rfcx.audiomoth.view.map.MapFragment
 import org.rfcx.audiomoth.view.profile.ProfileFragment
-import org.rfcx.audiomoth.view.deployment.DeploymentActivity
 import org.rfcx.audiomoth.widget.BottomNavigationMenuItem
 
 open class MainActivity : AppCompatActivity(), MainActivityListener {
@@ -68,11 +67,34 @@ open class MainActivity : AppCompatActivity(), MainActivityListener {
             DeploymentActivity.startActivity(this)
         }
 
+        setupSimpleTooltip()
         setupBottomMenu()
+
         if (savedInstanceState == null) {
             setupFragments()
         }
         fetchData()
+    }
+
+    private fun setupSimpleTooltip() {
+        val preferences = Preferences.getInstance(this)
+        val isFirstTime = preferences.getBoolean(Preferences.IS_FIRST_TIME, true)
+
+        if (isFirstTime) {
+            preferences.putBoolean(Preferences.IS_FIRST_TIME, false)
+
+            SimpleTooltip.Builder(this)
+                .arrowColor(resources.getColor(R.color.white))
+                .anchorView(createLocationButton)
+                .text(getString(R.string.setup_first_device, this.getUserNickname()))
+                .gravity(Gravity.TOP)
+                .animationPadding(10F)
+                .contentView(R.layout.tooltip_custom, R.id.tv_text)
+                .animated(true)
+                .transparentOverlay(false)
+                .build()
+                .show()
+        }
     }
 
     private fun fetchData() {
@@ -178,8 +200,7 @@ open class MainActivity : AppCompatActivity(), MainActivityListener {
     }
 
     override fun onLogout() {
-        Preferences.getInstance(this).clear()
-        LoginActivity.startActivity(this)
+        this.logout()
         finish()
     }
 

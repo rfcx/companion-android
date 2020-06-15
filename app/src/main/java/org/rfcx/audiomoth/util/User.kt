@@ -1,6 +1,8 @@
 package org.rfcx.audiomoth.util
 
 import android.content.Context
+import io.realm.Realm
+import org.rfcx.audiomoth.view.LoginActivity
 
 fun Context?.getUserNickname(): String {
     val preferences = this?.let { Preferences.getInstance(it) }
@@ -19,3 +21,16 @@ fun Context.getEmailUser(): String {
     return email ?: getUserNickname()
 }
 
+fun Context.logout() {
+    Preferences.getInstance(this).clear()
+    Realm.getInstance(RealmHelper.migrationConfig()).use { realm ->
+        realm.executeTransactionAsync({ bgRealm ->
+            bgRealm.deleteAll()
+        }, {
+            realm.close()
+            LoginActivity.startActivity(this)
+        }, {
+            realm.close()
+        })
+    }
+}
