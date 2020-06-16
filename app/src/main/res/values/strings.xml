@@ -21,7 +21,8 @@
     <string name="red_pin">Red = <![CDATA[<]]>1 day</string>
     <string name="format_image_unsync">%s photo not yet synced</string>
     <string name="format_images_unsync">%s photos not yet synced</string>
-    <string name="format_deploy_unsync">%s deploy (%s not yet synced)</string>
+    <string name="format_deploy_unsync">%s deploy not yet synced</string>
+    <string name="format_deploys_unsync">%s deploys not yet synced</string>
     <string name="menu_map">MAP</string>
     <string name="menu_profile">PROFILE</string>
     <string name="setup_first_device">Welcome! %s \nSetup your first RFCx device here</string>

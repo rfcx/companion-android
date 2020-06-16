@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.PointF
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -50,7 +49,6 @@ import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
-import org.rfcx.audiomoth.service.images.ImageSyncWorker
 import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity
 
@@ -100,7 +98,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val deploymentImageObserver = Observer<List<DeploymentImage>> {
         val imageUnsentCount = deploymentImageDb.unsentCount().toInt()
         updateSyncingView(imageUnsentCount)
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -275,6 +272,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private val deploymentObserve = Observer<List<Deployment>> {
+        val unsentCount = deploymentDb.unsentCount().toInt()
+        updateDeploymentSyncingView(unsentCount)
+
         this.deployments = it
         combinedData()
     }
@@ -333,6 +333,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         imageSyncTextView.text = getString(
             if (imageUnsentCount > 1) R.string.format_images_unsync else R.string.format_image_unsync,
             imageUnsentCount.toString()
+        )
+    }
+
+    private fun updateDeploymentSyncingView(unsentCount: Int) {
+        deploymentSyncTextView.visibility = if (unsentCount > 0) View.VISIBLE else View.GONE
+
+        deploymentSyncTextView.text = getString(
+            if (unsentCount > 1) R.string.format_deploys_unsync else R.string.format_deploy_unsync,
+            unsentCount.toString()
         )
     }
 
