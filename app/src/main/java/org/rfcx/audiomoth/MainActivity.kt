@@ -21,7 +21,6 @@ enum class SyncInfo { WaitingNetwork, Starting, Uploading, Uploaded }
 
 class MainActivity : AppCompatActivity(), MainActivityListener {
     // database manager
-    private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private var currentFragment: Fragment? = null
     private val locationPermissions by lazy { LocationPermissions(this) }
 

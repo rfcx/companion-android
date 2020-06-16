@@ -6,13 +6,8 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 import org.rfcx.audiomoth.entity.Deployment
-import org.rfcx.audiomoth.entity.Deployment.Companion.PHOTOS
-import org.rfcx.audiomoth.entity.Locate
-import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.entity.User
-import org.rfcx.audiomoth.entity.request.toRequestBody
-import org.rfcx.audiomoth.localdb.LocateDb
-import org.rfcx.audiomoth.localdb.ProfileDb
+import org.rfcx.audiomoth.entity.request.ProfileRequest
 import org.rfcx.audiomoth.util.Preferences
 import org.rfcx.audiomoth.util.Storage
 import org.rfcx.audiomoth.util.getEmailUser
@@ -42,38 +37,9 @@ class Firestore(val context: Context) {
         return userDocument.collection(COLLECTION_DEPLOYMENTS).add(deployment).await()
     }
 
-    fun updateDeployment(deploymentId: String, photos: ArrayList<String>) {
-        db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_DEPLOYMENTS)
-            .document(deploymentId)
-            .update(PHOTOS, photos)
-    }
-
-    fun saveProfile(profileDb: ProfileDb, profile: Profile) {
-        // set uploaded
-        profileDb.markUploading(profile.id)
-        db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_PROFILES)
-            .add(profile.toRequestBody())
-            .addOnSuccessListener { documentReference ->
-                val serverId = documentReference.id
-                profileDb.markSent(serverId, profile.id)
-            }
-            .addOnFailureListener { e ->
-                profileDb.markUnsent(profile.id)
-            }
-    }
-
-    fun saveLocate(locateDb: LocateDb, locate: Locate) {
-        // set uploaded
-        locateDb.markUploading(locate.id)
-        db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_LOCATIONS)
-            .add(locate.toRequestBody())
-            .addOnSuccessListener { documentReference ->
-                val serverId = documentReference.id
-                locateDb.markSent(serverId, locate.id)
-            }
-            .addOnFailureListener { e ->
-                locateDb.markUnsent(locate.id)
-            }
+    suspend fun sendProfile(profile: ProfileRequest): DocumentReference? {
+        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        return userDocument.collection(COLLECTION_PROFILES).add(profile).await()
     }
 
     fun saveFeedback(

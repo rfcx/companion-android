@@ -1,7 +1,6 @@
 package org.rfcx.audiomoth.view.deployment
 
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -16,10 +15,8 @@ import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.ProfileDb
-import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
-import org.rfcx.audiomoth.util.showCommonDialog
 import org.rfcx.audiomoth.view.LoadingDialogFragment
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
 import org.rfcx.audiomoth.view.deployment.configure.SelectProfileFragment
@@ -75,11 +72,11 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         }
     }
 
-    override fun openWithEdgeDevice(){
+    override fun openWithEdgeDevice() {
         setupView()
     }
 
-    override fun openWithGuardianDevice(){
+    override fun openWithGuardianDevice() {
         finish()
     }
 
@@ -142,7 +139,6 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         _deployment?.let { deploymentDb.updateDeployment(it) }
         // update profile
         if (profile.name.isNotEmpty()) {
-            Firestore(this).saveProfile(profileDb, profile)
             profileDb.insertOrUpdateProfile(profile)
         }
 
