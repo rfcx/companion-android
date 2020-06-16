@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.work.*
 import io.realm.Realm
 import org.rfcx.audiomoth.localdb.DeploymentDb
+import org.rfcx.audiomoth.localdb.ProfileDb
+import org.rfcx.audiomoth.service.profile.ProfileSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
 import java.util.concurrent.TimeUnit
 
@@ -20,14 +22,22 @@ class DeploymentCleanupWorker(val context: Context, params: WorkerParameters) :
     }
 
     private fun resendIfRequired() {
-        val db = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
-        val unsent = db.unsentCount()
+        val realm = Realm.getInstance(RealmHelper.migrationConfig())
+        val deploymentDb = DeploymentDb(realm)
+        val unsent = deploymentDb.unsentCount()
         Log.d(TAG, "resendIfRequired: found $unsent unsent")
 
         // In case any failed sending, we can resend (same ranger app)
-        db.unlockSending()
+        deploymentDb.unlockSending()
         if (unsent > 0) {
             DeploymentSyncWorker.enqueue(context)
+        }
+
+        val profileDb = ProfileDb(realm)
+        val profileUnsent = profileDb.unsentCount()
+        profileDb.unlockSending()
+        if (profileUnsent > 0) {
+            ProfileSyncWorker.enqueue(context)
         }
     }
 
