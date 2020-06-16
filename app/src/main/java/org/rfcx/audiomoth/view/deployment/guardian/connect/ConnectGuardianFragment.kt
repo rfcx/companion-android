@@ -1,17 +1,31 @@
 package org.rfcx.audiomoth.view.deployment.guardian.connect
 
+import android.app.Activity
 import android.content.Context
+import android.net.wifi.ScanResult
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_connect_guardian.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.connection.socket.OnReceiveResponse
+import org.rfcx.audiomoth.connection.socket.SocketManager
+import org.rfcx.audiomoth.connection.wifi.OnWifiListener
+import org.rfcx.audiomoth.connection.wifi.WifiHotspotManager
+import org.rfcx.audiomoth.entity.socket.ConnectionResponse
+import org.rfcx.audiomoth.entity.socket.SocketResposne
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 
-class ConnectGuardianFragment : Fragment() {
+class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit {
+    private val guardianHotspotAdapter by lazy { GuardianHotspotAdapter(this) }
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
+    private lateinit var wifiHotspotManager: WifiHotspotManager
+
+    private var guardianHotspot: ScanResult? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -26,36 +40,75 @@ class ConnectGuardianFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         deploymentProtocol?.hideCompleteButton()
+        showLoading()
+
+        guardianHotspotRecyclerView.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = guardianHotspotAdapter
+        }
+
+        wifiHotspotManager = WifiHotspotManager(context!!.applicationContext)
+        wifiHotspotManager.nearbyHotspot(this)
 
         connectGuardianButton.setOnClickListener {
-            //TODO: Call Socket command to get response back
             showLoading()
-
-            val connectionState = ConnectionState.SUCCESS // replace with socket calling
-            if (connectionState == ConnectionState.SUCCESS) {
-                deploymentProtocol!!.nextStep()
-            } else {
-                //TODO: Show warning that connection is failed
-                hideLoading()
-            }
+            wifiHotspotManager.connectTo(guardianHotspot!!, this)
         }
+    }
+
+    override fun invoke(hotspot: ScanResult) {
+        guardianHotspot = hotspot
+        enableConnectButton()
+    }
+
+    override fun onScanReceive(result: List<ScanResult>) {
+        hideLoading()
+        guardianHotspotAdapter.items = result
+    }
+
+    override fun onWifiConnected() {
+        SocketManager.connect(object: OnReceiveResponse{
+            override fun onReceive(response: SocketResposne) {
+                activity!!.runOnUiThread {
+                    val connection = response as ConnectionResponse
+                    Log.d("ConenctionGuardian", connection.connection.status)
+                    if (connection.connection.status == CONNECTION_SUCCESS) {
+                        deploymentProtocol!!.nextStep()
+                    } else {
+                        hideLoading()
+                    }
+                }
+            }
+
+            override fun onFailed() {
+                activity!!.runOnUiThread {
+                    hideLoading()
+                }
+            }
+        })
     }
 
     private fun showLoading() {
         connectGuardianLoading.visibility = View.VISIBLE
-        nearbyGuardianTextView.visibility = View.GONE
         connectGuardianButton.visibility = View.GONE
     }
 
     private fun hideLoading() {
         connectGuardianLoading.visibility = View.GONE
-        nearbyGuardianTextView.visibility = View.VISIBLE
         connectGuardianButton.visibility = View.VISIBLE
     }
 
+    private fun enableConnectButton() {
+        connectGuardianButton.isEnabled = true
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        wifiHotspotManager.unRegisterReceiver()
+    }
+
     companion object {
-        val TAG = "ConnectGuardianFragment"
-        enum class ConnectionState { SUCCESS, FAILED}
+        private val CONNECTION_SUCCESS = "success"
 
         fun newInstance(): ConnectGuardianFragment {
             return ConnectGuardianFragment()
