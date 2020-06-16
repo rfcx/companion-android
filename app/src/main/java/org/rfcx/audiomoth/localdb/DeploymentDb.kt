@@ -48,10 +48,6 @@ class DeploymentDb(private val realm: Realm) {
         saveDeploymentServerIdToImage(serverId, id)
     }
 
-    fun markUploading(id: Int) {
-        mark(id = id, syncState = SyncState.Uploading.key)
-    }
-
     private fun mark(id: Int, serverId: String? = null, syncState: Int) {
         realm.executeTransaction {
             val deployment =
@@ -78,9 +74,34 @@ class DeploymentDb(private val realm: Realm) {
         return null
     }
 
+    fun lockUnsent(): List<Deployment> {
+        var unsentCopied: List<Deployment> = listOf()
+        realm.executeTransaction {
+            val unsent = it.where(Deployment::class.java)
+                .equalTo(Deployment.FIELD_STATE, DeploymentState.ReadyToUpload.key)
+                .and()
+                .equalTo(Deployment.FIELD_SYNC_STATE, SyncState.Unsent.key).findAll()
+                .createSnapshot()
+            unsentCopied = unsent.toList()
+            unsent.forEach {d->
+                d.syncState = SyncState.Sending.key
+            }
+        }
+        return unsentCopied
+    }
+
+    fun unlockSending() {
+        realm.executeTransaction {
+            val snapshot = it.where(Deployment::class.java).equalTo(Deployment.FIELD_SYNC_STATE, SyncState.Sending.key).findAll().createSnapshot()
+            snapshot.forEach {
+                it.syncState = SyncState.Unsent.key
+            }
+        }
+    }
+
     private fun saveDeploymentServerIdToImage(serverId: String, deploymentId: Int) {
         val images =
-            realm.where(DeploymentImage::class.java).equalTo(DeploymentImage.FIELD_ID, deploymentId)
+            realm.where(DeploymentImage::class.java).equalTo(DeploymentImage.FIELD_DEPLOYMENT_ID, deploymentId)
                 .findAll()
         images?.forEach {
             Log.i("saveDeploymentIdToImage", it.localPath)
@@ -94,5 +115,4 @@ class DeploymentDb(private val realm: Realm) {
             }
         }
     }
-
 }

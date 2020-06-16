@@ -3,6 +3,7 @@ package org.rfcx.audiomoth.localdb
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
+import org.rfcx.audiomoth.SyncInfo
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.SyncState
 
@@ -32,7 +33,7 @@ class LocateDb(private val realm: Realm) {
     }
 
     fun markUploading(id: Int) {
-        mark(id = id, syncState = SyncState.Uploading.key)
+        mark(id = id, syncState = SyncState.Sending.key)
     }
 
     private fun mark(id: Int, serverId: String? = null, syncState: Int) {

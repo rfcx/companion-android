@@ -18,4 +18,14 @@
         android:layout_gravity="center"
         android:layout_margin="@dimen/margin_padding_large" />
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/imageSyncTextView"
+        style="@style/AudioMothText.Body.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|start"
+        android:layout_marginStart="@dimen/margin_padding_small"
+        android:layout_marginTop="@dimen/margin_padding_xsmall"
+        tools:text="3 photos (2 not yet synced)" />
+
 </FrameLayout>

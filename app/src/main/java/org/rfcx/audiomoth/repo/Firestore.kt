@@ -1,29 +1,29 @@
-package org.rfcx.audiomoth.util
+package org.rfcx.audiomoth.repo
 
 import android.content.Context
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.tasks.await
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.Deployment.Companion.PHOTOS
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.entity.User
 import org.rfcx.audiomoth.entity.request.toRequestBody
-import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.ProfileDb
+import org.rfcx.audiomoth.util.Preferences
+import org.rfcx.audiomoth.util.Storage
+import org.rfcx.audiomoth.util.getEmailUser
 import java.sql.Timestamp
-
-interface FirestoreResponseCallback<T> {
-    fun onSuccessListener(response: T)
-    fun addOnFailureListener(exception: Exception)
-}
 
 class Firestore(val context: Context) {
     val db = Firebase.firestore
 
     /* TODO: update get user */
-    private val preferences = Preferences.getInstance(context)
+    private val preferences =
+        Preferences.getInstance(context)
     private val guid = preferences.getString(Preferences.USER_GUID, "")
     private val feedbackDocument = db.collection(COLLECTION_FEEDBACK)
 
@@ -37,21 +37,9 @@ class Firestore(val context: Context) {
             }
     }
 
-    fun sendDeployment(deploymentDb: DeploymentDb, deployment: Deployment, callback: (String?, Boolean) -> Unit) {
-        // set uploaded
-        deploymentDb.markUploading(deployment.id)
-
-        db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_DEPLOYMENTS)
-            .add(deployment.toRequestBody())
-            .addOnSuccessListener { documentReference ->
-                val serverId = documentReference.id
-                deploymentDb.markSent(serverId, deployment.id)
-                callback(documentReference.id, true)
-            }
-            .addOnFailureListener { e ->
-                deploymentDb.markUnsent(deployment.id)
-                callback(e.message, false)
-            }
+    suspend fun sendDeployment(deployment: Deployment): DocumentReference? {
+        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        return userDocument.collection(COLLECTION_DEPLOYMENTS).add(deployment).await()
     }
 
     fun updateDeployment(deploymentId: String, photos: ArrayList<String>) {
@@ -103,12 +91,13 @@ class Firestore(val context: Context) {
             .addOnSuccessListener {
                 callback(true)
                 if (uris != null) {
-                    Storage(context).uploadImagesOfFeedback(uris) { success, pathImages ->
-                        if (success) {
-                            val docData = hashMapOf("pathImages" to pathImages)
-                            it.update(docData as Map<String, Any>)
+                    Storage(context)
+                        .uploadImagesOfFeedback(uris) { success, pathImages ->
+                            if (success) {
+                                val docData = hashMapOf("pathImages" to pathImages)
+                                it.update(docData as Map<String, Any>)
+                            }
                         }
-                    }
                 }
             }.addOnFailureListener { callback(false) }
     }

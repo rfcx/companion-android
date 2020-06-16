@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.PointF
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
+import androidx.work.WorkInfo
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
@@ -39,11 +41,16 @@ import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_map_window_info.view.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.SyncInfo
 import org.rfcx.audiomoth.entity.Deployment
+import org.rfcx.audiomoth.entity.DeploymentImage
 import org.rfcx.audiomoth.entity.DeploymentState
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.localdb.DeploymentDb
+import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.LocateDb
+import org.rfcx.audiomoth.service.DeploymentSyncWorker
+import org.rfcx.audiomoth.service.images.ImageSyncWorker
 import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity
 
@@ -57,11 +64,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     // database manager
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val deploymentDb by lazy {
-        DeploymentDb(
-            realm
-        )
-    }
+    private val deploymentDb by lazy { DeploymentDb(realm) }
+    private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
 
     // data
@@ -70,8 +74,34 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var deployLiveData: LiveData<List<Deployment>>
     private lateinit var locateLiveData: LiveData<List<Locate>>
+    private lateinit var deploymentWorkInfoLiveData: LiveData<List<WorkInfo>>
+    private lateinit var deployImageLiveData: LiveData<List<DeploymentImage>>
 
     private val locationPermissions by lazy { activity?.let { LocationPermissions(it) } }
+
+    // observer
+    private val workInfoObserve = Observer<List<WorkInfo>> {
+        val currentWorkStatus = it?.getOrNull(0)
+        if (currentWorkStatus != null) {
+            when (currentWorkStatus.state) {
+                WorkInfo.State.RUNNING -> {
+                    updateSyncInfo(SyncInfo.Uploading)
+                }
+                WorkInfo.State.SUCCEEDED -> {
+                    updateSyncInfo(SyncInfo.Uploaded)
+                }
+                else -> {
+                    updateSyncInfo()
+                }
+            }
+        }
+    }
+
+    private val deploymentImageObserver = Observer<List<DeploymentImage>> {
+        val imageUnsentCount = deploymentImageDb.unsentCount().toInt()
+        updateSyncingView(imageUnsentCount)
+
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -104,7 +134,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mapView = view.findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
-
+        fetchJobSyncing()
         progressBar.visibility = View.VISIBLE
     }
 
@@ -277,6 +307,33 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             it
         }
         locateLiveData.observeForever(locateObserve)
+
+        deployImageLiveData =
+            Transformations.map(deploymentImageDb.getAllResultsAsync().asLiveData()) { it }
+        deployImageLiveData.observeForever(deploymentImageObserver)
+    }
+
+    private fun fetchJobSyncing() {
+        context ?: return
+        deploymentWorkInfoLiveData = DeploymentSyncWorker.workInfos(context!!)
+        deploymentWorkInfoLiveData.observeForever(workInfoObserve)
+    }
+
+    private fun updateSyncInfo(syncInfo: SyncInfo? = null) {
+        val status = syncInfo
+            ?: if (context.isNetworkAvailable()) SyncInfo.Starting else SyncInfo.WaitingNetwork
+        if (status == SyncInfo.Uploaded) return
+
+        // TODO: update ui syncing
+    }
+
+    private fun updateSyncingView(imageUnsentCount: Int) {
+        imageSyncTextView.visibility = if (imageUnsentCount > 0) View.VISIBLE else View.GONE
+
+        imageSyncTextView.text = getString(
+            if (imageUnsentCount > 1) R.string.format_images_unsync else R.string.format_image_unsync,
+            imageUnsentCount.toString()
+        )
     }
 
     private fun handleMarkerDeployment(deployments: List<Deployment>) {
@@ -433,9 +490,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onDestroy() {
         super.onDestroy()
-        mapView.onDestroy()
+        deploymentWorkInfoLiveData.removeObserver(workInfoObserve)
         deployLiveData.removeObserver(deploymentObserve)
         locateLiveData.removeObserver(locateObserve)
+        deployImageLiveData.removeObserver(deploymentImageObserver)
+        mapView.onDestroy()
     }
 
     companion object {
