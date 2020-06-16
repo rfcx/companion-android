@@ -7,9 +7,12 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.Deployment.Companion.PHOTOS
+import org.rfcx.audiomoth.entity.Locate
+import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.entity.User
 import org.rfcx.audiomoth.entity.request.toRequestBody
-import org.rfcx.audiomoth.localdb.DeploymentDb
+import org.rfcx.audiomoth.localdb.LocateDb
+import org.rfcx.audiomoth.localdb.ProfileDb
 import org.rfcx.audiomoth.util.Preferences
 import org.rfcx.audiomoth.util.Storage
 import org.rfcx.audiomoth.util.getEmailUser
@@ -43,6 +46,34 @@ class Firestore(val context: Context) {
         db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_DEPLOYMENTS)
             .document(deploymentId)
             .update(PHOTOS, photos)
+    }
+
+    fun saveProfile(profileDb: ProfileDb, profile: Profile) {
+        // set uploaded
+        profileDb.markUploading(profile.id)
+        db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_PROFILES)
+            .add(profile.toRequestBody())
+            .addOnSuccessListener { documentReference ->
+                val serverId = documentReference.id
+                profileDb.markSent(serverId, profile.id)
+            }
+            .addOnFailureListener { e ->
+                profileDb.markUnsent(profile.id)
+            }
+    }
+
+    fun saveLocate(locateDb: LocateDb, locate: Locate) {
+        // set uploaded
+        locateDb.markUploading(locate.id)
+        db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_LOCATIONS)
+            .add(locate.toRequestBody())
+            .addOnSuccessListener { documentReference ->
+                val serverId = documentReference.id
+                locateDb.markSent(serverId, locate.id)
+            }
+            .addOnFailureListener { e ->
+                locateDb.markUnsent(locate.id)
+            }
     }
 
     fun saveFeedback(

@@ -71,8 +71,16 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
                 handleFragment(currentStep)
             }
         } else {
-            setupView()
+            startFragment(ChooseDeviceFragment.newInstance())
         }
+    }
+
+    override fun openWithEdgeDevice(){
+        setupView()
+    }
+
+    override fun openWithGuardianDevice(){
+        finish()
     }
 
     private fun setupView() {
@@ -84,6 +92,14 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
 
     override fun hideCompleteButton() {
         completeStepButton.visibility = View.INVISIBLE
+    }
+
+    override fun showStepView() {
+        stepView.visibility = View.VISIBLE
+    }
+
+    override fun hideStepView() {
+        stepView.visibility = View.GONE
     }
 
     override fun showCompleteButton() {
@@ -126,6 +142,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         _deployment?.let { deploymentDb.updateDeployment(it) }
         // update profile
         if (profile.name.isNotEmpty()) {
+            Firestore(this).saveProfile(profileDb, profile)
             profileDb.insertOrUpdateProfile(profile)
         }
 
@@ -143,7 +160,6 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         this._deployLocation = locate.asDeploymentLocation()
         val deploymentId = deploymentDb.insertOrUpdateDeployment(deployment, _deployLocation!!)
         locateDb.insertOrUpdateLocate(deploymentId, locate) // update locate - last deployment
-
         setDeployment(deployment)
     }
 
@@ -292,9 +308,13 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
 }
 
 interface DeploymentProtocol {
+    fun openWithEdgeDevice()
+    fun openWithGuardianDevice()
     fun setCompleteTextButton(text: String)
     fun hideCompleteButton()
     fun showCompleteButton()
+    fun hideStepView()
+    fun showStepView()
     fun nextStep()
     fun backStep()
 

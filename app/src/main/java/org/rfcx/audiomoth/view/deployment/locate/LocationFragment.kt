@@ -34,6 +34,7 @@ import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.localdb.LocateDb
+import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 
@@ -77,6 +78,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
 
+        deploymentProtocol?.showStepView()
         deploymentProtocol?.hideCompleteButton()
 
         finishButton.setOnClickListener {

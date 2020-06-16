@@ -24,6 +24,7 @@
     <string name="format_deploy_unsync">%s deploy (%s not yet synced)</string>
     <string name="menu_map">MAP</string>
     <string name="menu_profile">PROFILE</string>
+    <string name="setup_first_device">Welcome! %s \nSetup your first RFCx device here</string>
 
     <!--  CreateStreamActivity  -->
     <string name="create_stream">Create Stream</string>
@@ -141,6 +142,11 @@
     <string name="these_photos_already_exists">These photos already exist</string>
     <string name="this_photo_already_exists">This photo already exists</string>
     <string name="can_not_create_image">Can\'t create image file</string>
+
+    <!--  ChooseDeviceFragment  -->
+    <string name="choose_your_device">Choose your device</string>
+    <string name="rfcx_edge">RFCx Edge</string>
+    <string name="rfcx_guardian">RFCx Guardian</string>
 
     <string name="location_permission_msg">Deploy App would like to use your location</string>
     <string name="notification_location_not_availability">Please enable your device\'s location settings</string>
