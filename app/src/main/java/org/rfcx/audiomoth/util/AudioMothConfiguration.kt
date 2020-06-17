@@ -42,7 +42,7 @@ class AudioMothConfiguration {
 
     var enableLowVoltageCutoff: Boolean = true
 
-    var startStopPeriods: Array<StartStopPeriod>? = arrayOf(StartStopPeriod(0, 1440))
+    var startStopPeriods: Array<StartStopPeriod>? = arrayOf(StartStopPeriod(0, 59), StartStopPeriod(60, 119))
 
     var firstRecordingDate: RecordingDate? = null
 

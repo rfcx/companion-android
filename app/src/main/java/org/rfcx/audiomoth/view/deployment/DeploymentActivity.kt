@@ -16,10 +16,7 @@ import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.ProfileDb
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
-import org.rfcx.audiomoth.util.AudioMothChimeConnector
-import org.rfcx.audiomoth.util.AudioMothConfiguration
-import org.rfcx.audiomoth.util.AudioMothConnector
-import org.rfcx.audiomoth.util.RealmHelper
+import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.LoadingDialogFragment
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
 import org.rfcx.audiomoth.view.deployment.configure.SelectProfileFragment
@@ -213,6 +210,8 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     }
 
     override fun playSyncSound() {
+        convertProfileToAudioMothConfiguration()
+        configuration.sampleRate = AudioMothConfiguration.SampleRate.SAMPLE_RATE_96KHZ
         Thread {
             audioMothConnector.setConfiguration(
                 calendar,
@@ -223,6 +222,14 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
                 startSyncing(SyncFragment.AFTER_SYNC)
             }
         }.start()
+    }
+
+    private fun convertProfileToAudioMothConfiguration() {
+        if (_deployment != null) {
+            configuration.sampleRate = _deployment!!.getSampleRate()
+            configuration.gain = _deployment!!.getGain()
+            configuration.sleepRecordCycle = _deployment!!.getSleepRecordCycle()
+        }
     }
 
     override fun playCheckBatterySound() {
