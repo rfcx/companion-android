@@ -47,34 +47,17 @@ class SyncFragment : Fragment() {
 
     private fun beforeSync() {
         deploymentProtocol?.hideCompleteButton()
+        nextButton.isSoundEffectsEnabled = false
 
         nextButton.setOnClickListener {
+            deploymentProtocol?.playSyncSound()
             deploymentProtocol?.startSyncing(SYNCING)
         }
     }
 
     private fun syncing() {
-        var i = 0
-        val handler = Handler()
-
-        val timerRunnable = object : Runnable {
-            override fun run() {
-                if (i != 100) {
-                    i += 20
-                    if (progressBarHorizontal != null && percentSyncTextView != null) {
-                        progressBarHorizontal.progress = i
-                        percentSyncTextView.text = "$i %"
-                    }
-                    handler.postDelayed(this, 500)
-                } else {
-                    deploymentProtocol?.startSyncing(AFTER_SYNC)
-                }
-            }
-        }
-        handler.postDelayed(timerRunnable, 0)
-
+        progressBarHorizontal.visibility = View.GONE
         cancelButton.setOnClickListener {
-            handler.removeCallbacks(timerRunnable)
             deploymentProtocol?.startSyncing(BEFORE_SYNC)
         }
     }
@@ -90,9 +73,9 @@ class SyncFragment : Fragment() {
     }
 
     companion object {
-        private const val STATUS = "STATUS"
-        private const val SYNCING = "SYNCING"
-        private const val AFTER_SYNC = "AFTER_SYNC"
+        const val STATUS = "STATUS"
+        const val SYNCING = "SYNCING"
+        const val AFTER_SYNC = "AFTER_SYNC"
         const val BEFORE_SYNC = "BEFORE_SYNC"
 
         @JvmStatic

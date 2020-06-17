@@ -16,6 +16,9 @@ import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.ProfileDb
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
+import org.rfcx.audiomoth.util.AudioMothChimeConnector
+import org.rfcx.audiomoth.util.AudioMothConfiguration
+import org.rfcx.audiomoth.util.AudioMothConnector
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.view.LoadingDialogFragment
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
@@ -46,6 +49,10 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     private var _deployment: Deployment? = null
     private var _deployLocation: DeploymentLocation? = null
     private var _configuration: Configuration? = null
+
+    private val audioMothConnector: AudioMothConnector = AudioMothChimeConnector()
+    private val configuration = AudioMothConfiguration()
+    private val calendar = Calendar.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -205,6 +212,23 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         startFragment(SyncFragment.newInstance(status))
     }
 
+    override fun playSyncSound() {
+        Thread {
+            audioMothConnector.setConfiguration(
+                calendar,
+                configuration,
+                arrayOf(0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08)
+            )
+            this@DeploymentActivity.runOnUiThread {
+                startSyncing(SyncFragment.AFTER_SYNC)
+            }
+        }.start()
+    }
+
+    override fun playCheckBatterySound() {
+        Thread { audioMothConnector.getBatteryState() }.start()
+    }
+
     override fun startCheckBattery(status: String, level: Int?) {
         startFragment(PerformBatteryFragment.newInstance(status, level))
     }
@@ -330,4 +354,7 @@ interface DeploymentProtocol {
     fun setDeploymentConfigure(profile: Profile)
     fun setPerformBattery(batteryDepletedAt: Timestamp, batteryLevel: Int)
     fun setReadyToDeploy(images: List<String>)
+
+    fun playSyncSound()
+    fun playCheckBatterySound()
 }
