@@ -210,7 +210,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     }
 
     override fun playSyncSound() {
-        convertProfileToAudioMothConfiguration()
+//        convertProfileToAudioMothConfiguration()
         Thread {
             audioMothConnector.setConfiguration(
                 calendar,
@@ -224,11 +224,12 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     }
 
     private fun convertProfileToAudioMothConfiguration() {
-        if (_deployment != null) {
-            configuration.sampleRate = _deployment!!.getSampleRate()
-            configuration.gain = _deployment!!.getGain()
-            configuration.sleepRecordCycle = _deployment!!.getSleepRecordCycle()
-            configuration.startStopPeriods = _deployment!!.getStartStopPeriods()
+        val deployment = _deployment
+        if (deployment != null) {
+            configuration.sampleRate = deployment.getSampleRate()
+            configuration.gain = deployment.getGain()
+            configuration.sleepRecordCycle = deployment.getSleepRecordCycle()
+            configuration.startStopPeriods = deployment.getStartStopPeriods()
         }
     }
 
@@ -334,34 +335,3 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     }
 }
 
-interface DeploymentProtocol {
-    fun openWithEdgeDevice()
-    fun openWithGuardianDevice()
-    fun setCompleteTextButton(text: String)
-    fun hideCompleteButton()
-    fun showCompleteButton()
-    fun hideStepView()
-    fun showStepView()
-    fun nextStep()
-    fun backStep()
-
-    fun startSetupConfigure(profile: Profile)
-    fun startSyncing(status: String)
-    fun startCheckBattery(status: String, level: Int?)
-
-    fun getProfiles(): List<Profile>
-    fun getProfile(): Profile?
-    fun getDeployment(): Deployment?
-    fun geConfiguration(): Configuration?
-    fun getDeploymentLocation(): DeploymentLocation?
-
-    fun setDeployment(deployment: Deployment)
-    fun setDeployLocation(locate: Locate)
-    fun setProfile(profile: Profile)
-    fun setDeploymentConfigure(profile: Profile)
-    fun setPerformBattery(batteryDepletedAt: Timestamp, batteryLevel: Int)
-    fun setReadyToDeploy(images: List<String>)
-
-    fun playSyncSound()
-    fun playCheckBatterySound()
-}
