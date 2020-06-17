@@ -211,7 +211,6 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
 
     override fun playSyncSound() {
         convertProfileToAudioMothConfiguration()
-        configuration.sampleRate = AudioMothConfiguration.SampleRate.SAMPLE_RATE_96KHZ
         Thread {
             audioMothConnector.setConfiguration(
                 calendar,
@@ -229,6 +228,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
             configuration.sampleRate = _deployment!!.getSampleRate()
             configuration.gain = _deployment!!.getGain()
             configuration.sleepRecordCycle = _deployment!!.getSleepRecordCycle()
+            configuration.startStopPeriods = _deployment!!.getStartStopPeriods()
         }
     }
 
