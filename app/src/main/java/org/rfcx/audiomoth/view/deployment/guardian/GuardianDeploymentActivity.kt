@@ -10,6 +10,8 @@ import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_deployment.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.*
+import org.rfcx.audiomoth.entity.guardian.GuardianConfiguration
+import org.rfcx.audiomoth.entity.guardian.GuardianProfile
 import org.rfcx.audiomoth.view.LoadingDialogFragment
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
 import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianConfigureFragment
@@ -32,8 +34,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 //    private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
 
     private var currentStep = 0
-    private var _profiles: List<Profile> = listOf()
-    private var _profile: Profile? = null
+    private var _profiles: List<GuardianProfile> = listOf()
+    private var _profile: GuardianProfile? = null
     private var _deployment: Deployment? = null
     private var _deployLocation: DeploymentLocation? = null
     private var _configuration: Configuration? = null
@@ -105,6 +107,14 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     override fun showStepView() {
     }
 
+    override fun getProfiles(): List<GuardianProfile> = _profiles
+
+    override fun getProfile(): GuardianProfile? = _profile
+
+    override fun setProfile(profile: GuardianProfile) {
+        this._profile = profile
+    }
+
     //    override fun getDeployment(): Deployment? = this._deployment
 //
 //    override fun setDeployment(deployment: Deployment) {
@@ -142,13 +152,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 //        setDeployment(deployment)
     }
 
-//    override fun getProfiles(): List<Profile> = this._profiles
 //
-//    override fun getProfile(): Profile? = this._profile
-//
-//    override fun setProfile(profile: Profile) {
-//        this._profile = profile
-//    }
 //
 //    override fun setPerformBattery(batteryDepletedAt: Timestamp, batteryLevel: Int) {
 //        this._deployment?.let {
@@ -174,7 +178,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 //        saveDevelopment(it)
     }
 
-    override fun startSetupConfigure() {
+    override fun startSetupConfigure(profile: GuardianProfile) {
+        setProfile(profile)
         currentStep = 2
         stepView.go(currentStep, true)
         startFragment(GuardianConfigureFragment.newInstance())
@@ -197,6 +202,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             }
             2 -> {
                 updateDeploymentState(DeploymentState.Guardian.Config)
+
+                //this._profiles = profileDb.getProfiles()
                 startFragment(GuardianSelectProfileFragment.newInstance())
             }
             3 -> {
@@ -209,31 +216,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             }
         }
     }
-
-//    private fun handleSelectingConfig() {
-//        if (_configuration != null) {
-//            val config = _configuration
-//            if (config != null) {
-//                val profile = Profile(
-//                    gain = config.gain,
-//                    name = "",
-//                    sampleRate = config.sampleRate,
-//                    recordingDuration = config.recordingDuration,
-//                    sleepDuration = config.sleepDuration,
-//                    recordingPeriodList = config.recordingPeriodList,
-//                    durationSelected = config.durationSelected
-//                )
-//                startSetupConfigure(profile)
-//            }
-//        } else {
-////            this._profiles = profileDb.getProfiles()
-//            if (_profiles.isNotEmpty()) {
-//                startFragment(SelectProfileFragment.newInstance())
-//            } else {
-//                startSetupConfigure(Profile.default())
-//            }
-//        }
-//    }
 
     private fun startFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()

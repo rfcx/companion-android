@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
 import org.json.JSONObject
+import org.rfcx.audiomoth.entity.guardian.GuardianConfiguration
 import org.rfcx.audiomoth.entity.socket.*
 import java.io.DataInputStream
 import java.io.DataOutputStream
@@ -62,8 +63,8 @@ object SocketManager {
                         val keys = jsonIterator.asSequence().toList()
                         when (keys[0].toString()) {
                             CONFIGURE -> {
-                                val response = gson.fromJson(dataInput, ConfigureResponse::class.java)
-                                Log.d(LOGTAG, "Configure response: ${response.configure}")
+                                val response = gson.fromJson(dataInput, ConfigurationResponse::class.java)
+                                Log.d(LOGTAG, "Configure response: $response")
                             }
                             DIAGNOSTIC -> {
                                 val response = gson.fromJson(dataInput, DiagnosticResponse::class.java)

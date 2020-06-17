@@ -8,16 +8,25 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.fragment_select_profile.*
+import kotlinx.android.synthetic.main.fragment_guardian_select_profile.*
+import kotlinx.android.synthetic.main.fragment_select_profile.createNewButton
+import kotlinx.android.synthetic.main.fragment_select_profile.profileProgressBar
+import kotlinx.android.synthetic.main.fragment_select_profile.profileRecyclerView
+import kotlinx.android.synthetic.main.fragment_select_profile.tryAgainTextView
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.Profile
+import org.rfcx.audiomoth.connection.socket.OnReceiveResponse
+import org.rfcx.audiomoth.connection.socket.SocketManager
+import org.rfcx.audiomoth.entity.guardian.GuardianProfile
+import org.rfcx.audiomoth.entity.socket.ConfigurationResponse
+import org.rfcx.audiomoth.entity.socket.SocketResposne
 import org.rfcx.audiomoth.view.deployment.configure.ProfilesAdapter
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 
-class GuardianSelectProfileFragment : Fragment(), (Profile) -> Unit {
-    private val profilesAdapter by lazy { ProfilesAdapter(this) }
+class GuardianSelectProfileFragment : Fragment(), (GuardianProfile) -> Unit {
+    private val profilesAdapter by lazy { GuardianProfilesAdapter(this) }
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
-//    private var profiles = listOf<Profile>()
+    private var profiles = listOf<GuardianProfile>()
+    private var currentProfile: GuardianProfile? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,19 +43,19 @@ class GuardianSelectProfileFragment : Fragment(), (Profile) -> Unit {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupView()
-        retrieveProfiles()
+        getCurrentConfiguration()
     }
 
     // @{ProfilesAdapter.itemClickListener}
-    override fun invoke(profile: Profile) {
-//        deploymentProtocol?.startSetupConfigure(profile)
+    override fun invoke(profile: GuardianProfile) {
+        deploymentProtocol?.startSetupConfigure(profile)
     }
 
     private fun setupView() {
         deploymentProtocol?.hideCompleteButton()
 
         createNewButton.setOnClickListener {
-            deploymentProtocol?.startSetupConfigure() // new profile
+            deploymentProtocol?.startSetupConfigure(GuardianProfile.default()) // new profile
         }
 
         profileRecyclerView.apply {
@@ -54,21 +63,51 @@ class GuardianSelectProfileFragment : Fragment(), (Profile) -> Unit {
             adapter = profilesAdapter
         }
 
+        defaultProfileLayout.setOnClickListener {
+            deploymentProtocol?.startSetupConfigure(currentProfile!!)
+        }
+
         tryAgainTextView.setOnClickListener {
-            retrieveProfiles()
+            getCurrentConfiguration()
         }
     }
 
+    private fun getCurrentConfiguration() {
+        checkState(SHOW_LOADING)
+        SocketManager.getCurrentConfiguration(object : OnReceiveResponse {
+            override fun onReceive(response: SocketResposne) {
+                val config = response as ConfigurationResponse
+                setCurrentConfiguration(config)
+                retrieveProfiles()
+
+                currentProfile = GuardianProfile(
+                    sampleRate = config.sampleRate,
+                    bitrate = config.bitrate,
+                    fileFormat = config.fileFormat,
+                    duration = config.duration
+                )
+            }
+
+            override fun onFailed() {
+                checkState(SHOW_TRY_AGAIN)
+            }
+        })
+    }
+
+    private fun setCurrentConfiguration(config: ConfigurationResponse) {
+        defaultDetailTextView.text = context!!.getString(
+            R.string.configuration_details,
+            config.fileFormat,
+            config.sampleRate,
+            config.bitrate,
+            config.duration
+        )
+    }
+
     private fun retrieveProfiles() {
-        //TODO: getting guardian profile from guardian db
-//        checkState(SHOW_LOADING)
-//        this.profiles = deploymentProtocol?.getProfiles() ?: arrayListOf()
-//        if (profiles.isNotEmpty()) {
-//            profilesAdapter.items = profiles
-            checkState(SHOW_LIST_PROFILE)
-//        } else {
-//            checkState(SHOW_TRY_AGAIN)
-//        }
+        this.profiles = deploymentProtocol?.getProfiles() ?: arrayListOf()
+        profilesAdapter.items = profiles
+        checkState(SHOW_LIST_PROFILE)
     }
 
     private fun checkState(state: String) {

@@ -163,6 +163,7 @@
 
     <!-- GuardianSelectProfileFragment -->
     <string name="profile_default">Default</string>
+    <string name="configuration_details">%s, %d kHz, %d kbs, %d secs</string>
 
     <!-- GuardianConfigureFragment -->
     <string name="bitrate">Bitrate</string>
