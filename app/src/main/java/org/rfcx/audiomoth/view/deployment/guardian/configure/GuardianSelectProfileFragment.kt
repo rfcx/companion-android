@@ -3,6 +3,7 @@ package org.rfcx.audiomoth.view.deployment.guardian.configure
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +17,7 @@ import kotlinx.android.synthetic.main.fragment_select_profile.tryAgainTextView
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.OnReceiveResponse
 import org.rfcx.audiomoth.connection.socket.SocketManager
+import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.entity.guardian.GuardianProfile
 import org.rfcx.audiomoth.entity.socket.ConfigurationResponse
 import org.rfcx.audiomoth.entity.socket.SocketResposne
@@ -77,14 +79,16 @@ class GuardianSelectProfileFragment : Fragment(), (GuardianProfile) -> Unit {
         SocketManager.getCurrentConfiguration(object : OnReceiveResponse {
             override fun onReceive(response: SocketResposne) {
                 val config = response as ConfigurationResponse
-                setCurrentConfiguration(config)
-                retrieveProfiles()
 
+                activity!!.runOnUiThread {
+                    setCurrentConfiguration(config)
+                    retrieveProfiles()
+                }
                 currentProfile = GuardianProfile(
-                    sampleRate = config.sampleRate,
-                    bitrate = config.bitrate,
-                    fileFormat = config.fileFormat,
-                    duration = config.duration
+                    sampleRate = config.configure.sampleRate,
+                    bitrate = config.configure.bitrate,
+                    fileFormat = config.configure.fileFormat,
+                    duration = config.configure.duration
                 )
             }
 
@@ -97,10 +101,10 @@ class GuardianSelectProfileFragment : Fragment(), (GuardianProfile) -> Unit {
     private fun setCurrentConfiguration(config: ConfigurationResponse) {
         defaultDetailTextView.text = context!!.getString(
             R.string.configuration_details,
-            config.fileFormat,
-            config.sampleRate,
-            config.bitrate,
-            config.duration
+            config.configure.fileFormat,
+            config.configure.sampleRate,
+            config.configure.bitrate,
+            config.configure.duration
         )
     }
 

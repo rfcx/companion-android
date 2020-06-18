@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_guardian_configure.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.guardian.GuardianProfile
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianConfigureFragment : Fragment() {
@@ -26,6 +27,8 @@ class GuardianConfigureFragment : Fragment() {
     private var sampleRate = 8      // default sampleRate is 8
     private var bitrate = 0
     private var fileFormat = ""
+
+    private var profile: GuardianProfile? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -41,10 +44,13 @@ class GuardianConfigureFragment : Fragment() {
 
         deploymentProtocol?.hideCompleteButton()
 
+        profile = deploymentProtocol?.getProfile()
+
         setNextButton(true)
         setFileFormatLayout()
         setSampleRateLayout()
         setBitrateLayout()
+        setDuration()
         createNotificationChannel()
         setNextOnClick()
     }
@@ -83,8 +89,7 @@ class GuardianConfigureFragment : Fragment() {
 
     private fun setBitrateLayout() {
 
-        //TODO: get data from db
-        bitrateValueTextView.text = "14kbs"
+        bitrateValueTextView.text = profile!!.bitrate.toString()
 
         bitrateValueTextView.setOnClickListener {
             val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
@@ -106,8 +111,7 @@ class GuardianConfigureFragment : Fragment() {
 
     private fun setFileFormatLayout() {
 
-        //TODO: get data from db
-        fileFormatValueTextView.text = "OPUS"
+        fileFormatValueTextView.text = profile!!.fileFormat
 
         fileFormatValueTextView.setOnClickListener {
             val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
@@ -129,8 +133,7 @@ class GuardianConfigureFragment : Fragment() {
 
     private fun setSampleRateLayout() {
 
-        //TODO: get data from db
-        sampleRateValueTextView.text = getString(R.string.kilohertz, "14")
+        sampleRateValueTextView.text = getString(R.string.kilohertz, profile!!.sampleRate.toString())
 
         sampleRateValueTextView.setOnClickListener {
             val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
@@ -149,6 +152,10 @@ class GuardianConfigureFragment : Fragment() {
                 dialog.show()
             }
         }
+    }
+
+    private fun setDuration() {
+        durationValueTextView.text = profile!!.duration.toString()
     }
 
     companion object {
