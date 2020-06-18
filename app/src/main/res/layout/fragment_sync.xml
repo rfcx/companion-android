@@ -18,13 +18,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.60" />
+        app:layout_constraintGuide_percent="0.40" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/configImageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_margin="@dimen/margin_padding_xlarge"
         android:src="@drawable/edge_config"
         app:layout_constraintBottom_toBottomOf="@id/guidelineHorizontal"
         app:layout_constraintEnd_toEndOf="parent"
@@ -47,6 +46,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:layout_marginTop="@dimen/margin_padding_large"
         android:text="Syncing..."
         app:layout_constraintTop_toBottomOf="@id/progressBarHorizontal" />
 
@@ -62,7 +62,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/cancelButton"
-        style="@style/AudioMothButton.GreenButton"
+        style="@style/AudioMothButton.GreyButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"

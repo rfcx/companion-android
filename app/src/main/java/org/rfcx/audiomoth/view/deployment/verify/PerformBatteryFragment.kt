@@ -105,13 +105,13 @@ class PerformBatteryFragment : Fragment() {
         }
 
         when (level) {
-            5 -> {
+            1 -> {
                 numberOfDays = 0
                 batteryLevel = 20
                 days = getString(R.string.day, "<1")
                 percent = getString(R.string.charged, "20%")
             }
-            4 -> {
+            2 -> {
                 numberOfDays = 1
                 batteryLevel = 40
                 days = getString(R.string.day, "1")
@@ -123,13 +123,13 @@ class PerformBatteryFragment : Fragment() {
                 days = getString(R.string.days, "2")
                 percent = getString(R.string.charged, "60%")
             }
-            2 -> {
+            4 -> {
                 numberOfDays = 4
                 batteryLevel = 80
                 days = getString(R.string.days, "4")
                 percent = getString(R.string.charged, "80%")
             }
-            1 -> {
+            5 -> {
                 numberOfDays = 6
                 batteryLevel = 100
                 days = getString(R.string.days, "6")
@@ -154,14 +154,14 @@ class PerformBatteryFragment : Fragment() {
 
     private fun setBatteryView(level: Int) {
         when (level) {
-            5 -> {
+            1 -> {
                 batteryLevel1View.visibility = View.VISIBLE
                 batteryLevel2View.visibility = View.INVISIBLE
                 batteryLevel3View.visibility = View.INVISIBLE
                 batteryLevel4View.visibility = View.INVISIBLE
                 batteryLevel5View.visibility = View.INVISIBLE
             }
-            4 -> {
+            2 -> {
                 batteryLevel1View.visibility = View.VISIBLE
                 batteryLevel2View.visibility = View.VISIBLE
                 batteryLevel3View.visibility = View.INVISIBLE
@@ -175,14 +175,14 @@ class PerformBatteryFragment : Fragment() {
                 batteryLevel4View.visibility = View.INVISIBLE
                 batteryLevel5View.visibility = View.INVISIBLE
             }
-            2 -> {
+            4 -> {
                 batteryLevel1View.visibility = View.VISIBLE
                 batteryLevel2View.visibility = View.VISIBLE
                 batteryLevel3View.visibility = View.VISIBLE
                 batteryLevel4View.visibility = View.VISIBLE
                 batteryLevel5View.visibility = View.INVISIBLE
             }
-            1 -> {
+            5 -> {
                 batteryLevel1View.visibility = View.VISIBLE
                 batteryLevel2View.visibility = View.VISIBLE
                 batteryLevel3View.visibility = View.VISIBLE
