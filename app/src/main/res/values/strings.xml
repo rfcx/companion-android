@@ -61,9 +61,9 @@
     <!--    SyncFragment-->
     <string name="sync">Sync</string>
     <string name="syncing">Syncing</string>
-    <string name="switch_to_config">1. Switch your device to CONFIG</string>
-    <string name="max_volume">2. Max volume of your phone</string>
-    <string name="hold_device">3. Hold the device less than 50 cm apart</string>
+    <string name="switch_to_config">Ready to send the configuration to the device</string>
+    <string name="max_volume">Set the volume of your phone to low-middle level</string>
+    <string name="hold_device">Hold the device close to your phone speaker</string>
     <string name="no_retry">No, Retry</string>
     <string name="did_green_flash">Did the green LED flash on completion?</string>
     <string name="yes">Yes</string>
@@ -93,7 +93,7 @@
     <string name="longitude">Longitude</string>
     <string name="finish">finish</string>
     <string name="name_location">Name Location</string>
-    <string name="deploying_the_device">Where are you deploying the device?</string>
+    <string name="deploying_the_device">Define the precise device location</string>
     <string name="new_location">New location</string>
     <string name="existing">Existing</string>
     <string name="next">Next</string>
