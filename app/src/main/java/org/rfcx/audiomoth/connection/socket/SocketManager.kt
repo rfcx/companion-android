@@ -65,6 +65,7 @@ object SocketManager {
                             CONFIGURE -> {
                                 val response = gson.fromJson(dataInput, ConfigurationResponse::class.java)
                                 Log.d(LOGTAG, "Configure response: $response")
+                                onReceiveRespoonse.onReceive(response)
                             }
                             DIAGNOSTIC -> {
                                 val response = gson.fromJson(dataInput, DiagnosticResponse::class.java)
@@ -81,7 +82,6 @@ object SocketManager {
                 }
             } catch (e: Exception) {
                 Log.e(LOGTAG, e.toString())
-                onReceiveRespoonse.onFailed()
             }
         })
 
