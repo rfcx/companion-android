@@ -22,8 +22,8 @@ class WifiHotspotManager(private val context: Context) {
     private lateinit var wifiScanReceiver: WifiScanReceiver
     private lateinit var wifiConnectionReceiver: WifiConnectionReceiver
 
-    private var isWifiScanUnregistered = false
-    private var isWifiConnectionUnregistered = false
+    private var isWifiScanUnregistered: Boolean? = null
+    private var isWifiConnectionUnregistered: Boolean? = null
 
     fun nearbyHotspot(onWifiListener: OnWifiListener) {
         wifiManager =
@@ -89,10 +89,10 @@ class WifiHotspotManager(private val context: Context) {
 
     fun unRegisterReceiver() {
         try {
-            if (!isWifiScanUnregistered) {
+            if (isWifiScanUnregistered != null && isWifiScanUnregistered!!) {
                 context.unregisterReceiver(wifiScanReceiver)
             }
-            if (!isWifiConnectionUnregistered) {
+            if (isWifiConnectionUnregistered != null && isWifiScanUnregistered!!) {
                 context.unregisterReceiver(wifiConnectionReceiver)
             }
         } catch (e: IllegalArgumentException) {
@@ -110,7 +110,6 @@ class WifiHotspotManager(private val context: Context) {
                 }
                 if (guardianWifiHotspot.isNotEmpty()) {
                     onWifiListener.onScanReceive(guardianWifiHotspot)
-                    context!!.unregisterReceiver(wifiScanReceiver)
                     isWifiScanUnregistered = true
                 }
             }
@@ -126,7 +125,6 @@ class WifiHotspotManager(private val context: Context) {
             if (netInfo != null && netInfo.isConnected && netInfo.type == ConnectivityManager.TYPE_WIFI) {
                 Log.d("WifiHotspot", "Connected to hotspot")
                 onWifiListener.onWifiConnected()
-                context.unregisterReceiver(wifiConnectionReceiver)
                 isWifiConnectionUnregistered = true
             }
         }

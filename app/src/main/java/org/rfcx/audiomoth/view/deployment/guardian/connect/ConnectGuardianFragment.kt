@@ -102,8 +102,8 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
         connectGuardianButton.isEnabled = true
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
+    override fun onDestroy() {
+        super.onDestroy()
         wifiHotspotManager.unRegisterReceiver()
     }
 
