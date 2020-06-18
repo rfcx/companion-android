@@ -213,7 +213,6 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     override fun playSyncSound() {
         convertProfileToAudioMothConfiguration()
         Thread {
-            Log.d("playSyncSound","${configuration.sleepRecordCycle}")
             audioMothConnector.setConfiguration(
                 calendar,
                 configuration,
@@ -228,10 +227,10 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     private fun convertProfileToAudioMothConfiguration() {
         val deployment = _deployment
         if (deployment != null) {
-//            configuration.sampleRate = deployment.getSampleRate()
-//            configuration.gain = deployment.getGain()
+            configuration.sampleRate = deployment.getSampleRate()
+            configuration.gain = deployment.getGain()
             configuration.sleepRecordCycle = deployment.getSleepRecordCycle()
-//            configuration.startStopPeriods = deployment.getStartStopPeriods()
+            configuration.startStopPeriods = deployment.getStartStopPeriods()
         }
     }
 

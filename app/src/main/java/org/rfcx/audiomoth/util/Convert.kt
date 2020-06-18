@@ -65,18 +65,32 @@ fun Deployment.getStartStopPeriods(): Array<AudioMothConfiguration.StartStopPeri
         "22:00",
         "23:00"
     )
-    var i = 0
     recordingPeriodList?.let {
         val arrayStartStopPeriod = arrayListOf<AudioMothConfiguration.StartStopPeriod>()
-
-
-
-
-        for (time in timeList) {
-            if (it.contains(time)) {
-                arrayStartStopPeriod.add(AudioMothConfiguration.StartStopPeriod(i, i + 60))
+        var timeCount = 0
+        for (time in it) {
+            val index = timeList.indexOf(time)
+            if (index == timeList.size - 1) {
+                arrayStartStopPeriod.add(
+                    AudioMothConfiguration.StartStopPeriod(
+                        (index - timeCount) * 60,
+                        (index * 60) + 60
+                    )
+                )
+                timeCount = 0
+            } else {
+                if (!it.contains(timeList[index + 1])) {
+                    arrayStartStopPeriod.add(
+                        AudioMothConfiguration.StartStopPeriod(
+                            (index - timeCount) * 60,
+                            (index * 60) + 60
+                        )
+                    )
+                    timeCount = 0
+                } else {
+                    timeCount += 1
+                }
             }
-            i += 60
         }
         array = arrayStartStopPeriod.toTypedArray()
     }
