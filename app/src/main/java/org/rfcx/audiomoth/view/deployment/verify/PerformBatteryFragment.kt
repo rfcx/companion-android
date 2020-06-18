@@ -99,7 +99,6 @@ class PerformBatteryFragment : Fragment() {
         var days = ""
         var numberOfDays = 0
         var batteryLevel = 0
-        var percent = ""
         arguments?.let {
             level = it.getInt(LEVEL)
         }
@@ -109,37 +108,31 @@ class PerformBatteryFragment : Fragment() {
                 numberOfDays = 0
                 batteryLevel = 20
                 days = getString(R.string.day, "<1")
-                percent = getString(R.string.charged, "20%")
             }
             2 -> {
                 numberOfDays = 1
                 batteryLevel = 40
                 days = getString(R.string.day, "1")
-                percent = getString(R.string.charged, "40%")
             }
             3 -> {
                 numberOfDays = 2
                 batteryLevel = 60
                 days = getString(R.string.days, "2")
-                percent = getString(R.string.charged, "60%")
             }
             4 -> {
                 numberOfDays = 4
                 batteryLevel = 80
                 days = getString(R.string.days, "4")
-                percent = getString(R.string.charged, "80%")
             }
             5 -> {
                 numberOfDays = 6
                 batteryLevel = 100
                 days = getString(R.string.days, "6")
-                percent = getString(R.string.charged, "100%")
             }
         }
 
         setBatteryView(level)
         daysTextView.text = days
-        chargedTextView.text = percent
 
         nextButton.setOnClickListener {
             val batteryDepletedAt = Timestamp(System.currentTimeMillis() + (day * numberOfDays))
@@ -226,12 +219,12 @@ class PerformBatteryFragment : Fragment() {
         @JvmStatic
         fun newInstance(page: String, level: Int?) = PerformBatteryFragment()
             .apply {
-            arguments = Bundle().apply {
-                putString(STATUS, page)
-                if (level != null) {
-                    putInt(LEVEL, level)
+                arguments = Bundle().apply {
+                    putString(STATUS, page)
+                    if (level != null) {
+                        putInt(LEVEL, level)
+                    }
                 }
             }
-        }
     }
 }

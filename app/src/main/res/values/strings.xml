@@ -36,6 +36,7 @@
 
     <!--    ConfigureFragment-->
     <string name="configure">Configure</string>
+    <string name="let_configure">Let’s configure the device</string>
     <string name="sample_rate">Sample rate</string>
     <string name="gain">Gain</string>
     <string name="sleep_duration">Sleep (second)</string>
@@ -83,16 +84,16 @@
     <string name="it_full">or, if it is full then:</string>
     <string name="how_many_time">How many time did the green LED flash?</string>
     <string name="try_again">try again</string>
-    <string name="how_long_battery">How long will the battery last?</string>
-    <string name="days">%s days</string>
-    <string name="day">%s day</string>
-    <string name="charged">%s charged</string>
+    <string name="how_long_battery">Device configured! \nNow let’s verify the battery level</string>
+    <string name="days">Estimated battery duration: %s days</string>
+    <string name="day">Estimated battery duration: %s day</string>
+    <string name="notification">A notification will be sent a day before \nthe battery is due to run out</string>
 
     <!--  LocationFragment  -->
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
     <string name="finish">finish</string>
-    <string name="name_location">Name Location</string>
+    <string name="name_location">Location name</string>
     <string name="deploying_the_device">Define the precise device location</string>
     <string name="new_location">New location</string>
     <string name="existing">Existing</string>
@@ -130,7 +131,7 @@
     <string name="snackbar_retry">RETRY</string>
 
     <!--  DeployFragment  -->
-    <string name="almost_there">Almost there!</string>
+    <string name="almost_there">Almost there! \nThe deployment will be uploaded to your account</string>
     <string name="switch_to_deploy">Switch your device to DEPLOY</string>
     <string name="take_photos">Take some photos of the deploy \nlocation (optional)</string>
 
