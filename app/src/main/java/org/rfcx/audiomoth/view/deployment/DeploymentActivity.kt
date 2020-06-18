@@ -3,6 +3,7 @@ package org.rfcx.audiomoth.view.deployment
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -16,7 +17,7 @@ import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.ProfileDb
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
-import org.rfcx.audiomoth.util.RealmHelper
+import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.LoadingDialogFragment
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
 import org.rfcx.audiomoth.view.deployment.configure.SelectProfileFragment
@@ -46,6 +47,10 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     private var _deployment: Deployment? = null
     private var _deployLocation: DeploymentLocation? = null
     private var _configuration: Configuration? = null
+
+    private val audioMothConnector: AudioMothConnector = AudioMothChimeConnector()
+    private val configuration = AudioMothConfiguration()
+    private val calendar = Calendar.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -205,6 +210,34 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         startFragment(SyncFragment.newInstance(status))
     }
 
+    override fun playSyncSound() {
+        convertProfileToAudioMothConfiguration()
+        Thread {
+            audioMothConnector.setConfiguration(
+                calendar,
+                configuration,
+                arrayOf(0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08)
+            )
+            this@DeploymentActivity.runOnUiThread {
+                startSyncing(SyncFragment.AFTER_SYNC)
+            }
+        }.start()
+    }
+
+    private fun convertProfileToAudioMothConfiguration() {
+        val deployment = _deployment
+        if (deployment != null) {
+            configuration.sampleRate = deployment.getSampleRate()
+            configuration.gain = deployment.getGain()
+            configuration.sleepRecordCycle = deployment.getSleepRecordCycle()
+            configuration.startStopPeriods = deployment.getStartStopPeriods()
+        }
+    }
+
+    override fun playCheckBatterySound() {
+        Thread { audioMothConnector.getBatteryState() }.start()
+    }
+
     override fun startCheckBattery(status: String, level: Int?) {
         startFragment(PerformBatteryFragment.newInstance(status, level))
     }
@@ -303,31 +336,3 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     }
 }
 
-interface DeploymentProtocol {
-    fun openWithEdgeDevice()
-    fun openWithGuardianDevice()
-    fun setCompleteTextButton(text: String)
-    fun hideCompleteButton()
-    fun showCompleteButton()
-    fun hideStepView()
-    fun showStepView()
-    fun nextStep()
-    fun backStep()
-
-    fun startSetupConfigure(profile: Profile)
-    fun startSyncing(status: String)
-    fun startCheckBattery(status: String, level: Int?)
-
-    fun getProfiles(): List<Profile>
-    fun getProfile(): Profile?
-    fun getDeployment(): Deployment?
-    fun geConfiguration(): Configuration?
-    fun getDeploymentLocation(): DeploymentLocation?
-
-    fun setDeployment(deployment: Deployment)
-    fun setDeployLocation(locate: Locate)
-    fun setProfile(profile: Profile)
-    fun setDeploymentConfigure(profile: Profile)
-    fun setPerformBattery(batteryDepletedAt: Timestamp, batteryLevel: Int)
-    fun setReadyToDeploy(images: List<String>)
-}
