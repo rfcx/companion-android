@@ -36,7 +36,12 @@ fun Deployment.getSleepRecordCycle(): AudioMothConfiguration.SleepRecordCycle? {
 
 fun Deployment.getStartStopPeriods(): Array<AudioMothConfiguration.StartStopPeriod>? {
     val recordingPeriodList = this.configuration?.recordingPeriodList
-    if (recordingPeriodList?.size == 0) return null
+    if (recordingPeriodList?.size == 0) return arrayOf(
+        AudioMothConfiguration.StartStopPeriod(
+            0,
+            1440
+        )
+    )
     val recordingPeriods = recordingPeriodList?.map { it.toDate().toIsoString() }
     var array: Array<AudioMothConfiguration.StartStopPeriod> = arrayOf()
 

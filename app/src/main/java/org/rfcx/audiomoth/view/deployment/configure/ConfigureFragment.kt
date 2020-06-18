@@ -231,12 +231,12 @@ class ConfigureFragment : Fragment(),
 
         when (durationSelected) {
             RECOMMENDED -> {
-                recordingDuration = 5
-                sleepDuration = 10
+                recordingDuration = 300
+                sleepDuration = 600
             }
 
             CONTINUOUS -> {
-                recordingDuration = 0
+                recordingDuration = 60
                 sleepDuration = 0
             }
 
