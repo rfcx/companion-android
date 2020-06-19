@@ -9,6 +9,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_sync.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.connection.socket.OnReceiveResponse
+import org.rfcx.audiomoth.connection.socket.SocketManager
+import org.rfcx.audiomoth.entity.guardian.GuardianConfiguration
+import org.rfcx.audiomoth.entity.socket.SocketResposne
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianSyncFragment : Fragment() {
@@ -20,35 +24,25 @@ class GuardianSyncFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        //TODO: create seperate layout for guardian
         return inflater.inflate(R.layout.fragment_guardian_sync, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        syncing()
+        val config = deploymentProtocol?.getConfiguration()
+        syncing(config!!)
     }
 
-    private fun syncing() {
-        var i = 0
-        val handler = Handler()
-
-        //TODO: implement Socket data transfer here and use response back to continue next step
-        val timerRunnable = object : Runnable {
-            override fun run() {
-                if (i != 100) {
-                    i += 20
-                    if (progressBarHorizontal != null && percentSyncTextView != null) {
-                        progressBarHorizontal.progress = i
-                        percentSyncTextView.text = "$i %"
-                    }
-                    handler.postDelayed(this, 500)
-                } else {
-                    deploymentProtocol?.nextStep()
-                }
+    private fun syncing(config: GuardianConfiguration) {
+        SocketManager.syncConfiguration(config, object : OnReceiveResponse{
+            override fun onReceive(response: SocketResposne) {
+                deploymentProtocol?.nextStep()
             }
-        }
-        handler.postDelayed(timerRunnable, 0)
+
+            override fun onFailed() {
+                TODO("Not yet implemented")
+            }
+        })
     }
 
     companion object {
