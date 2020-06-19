@@ -1,11 +1,8 @@
 package org.rfcx.audiomoth.connection.socket
 
-import android.app.Activity
-import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
 import org.json.JSONObject
-import org.rfcx.audiomoth.entity.guardian.GuardianConfiguration
 import org.rfcx.audiomoth.entity.socket.*
 import java.io.DataInputStream
 import java.io.DataOutputStream
@@ -41,8 +38,8 @@ object SocketManager {
         sendData(data, onReceiveResponse)
     }
 
-    fun syncConfiguration(config: GuardianConfiguration, onReceiveResponse: OnReceiveResponse) {
-        val jsonString = gson.toJson(config)
+    fun syncConfiguration(config: List<String>, onReceiveResponse: OnReceiveResponse) {
+        val jsonString = gson.toJson(SyncConfigurationRequest(SyncConfiguration(config)))
         sendData(jsonString, onReceiveResponse)
     }
 
@@ -86,7 +83,11 @@ object SocketManager {
                             SYNC -> {
                                 val response = gson.fromJson(dataInput, SyncConfigurationResponse::class.java)
                                 Log.d(LOGTAG, "Sync status: ${response.sync.status}")
-                                onReceiveResponse.onReceive(response)
+                                if (response.sync.status == "success"){
+                                    onReceiveResponse.onReceive(response)
+                                } else {
+                                    onReceiveResponse.onFailed()
+                                }
                             }
                         }
                     }

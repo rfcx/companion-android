@@ -1,5 +1,6 @@
 package org.rfcx.audiomoth.entity.guardian
 
+import com.google.gson.JsonArray
 import com.google.gson.annotations.SerializedName
 import io.realm.RealmModel
 import io.realm.annotations.RealmClass
@@ -13,3 +14,12 @@ open class GuardianConfiguration(
     var fileFormat: String = "OPUS",
     var duration: Int = 90
 ) : RealmModel
+
+fun GuardianConfiguration.toListForGuardian(): List<String> {
+    return listOf(
+        "audio_sample_rate|$sampleRate",
+        "audio_encode_bitrate|$bitrate",
+        "audio_encode_codec|$fileFormat",
+        "audio_cycle_duration|$duration"
+    )
+}

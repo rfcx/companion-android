@@ -51,21 +51,21 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         setContentView(R.layout.activity_guardian_deployment)
         val deploymentId = intent.extras?.getInt(DEPLOYMENT_ID)
         if (deploymentId != null) {
-//            val deployment = deploymentDb.getDeploymentById(deploymentId)
-//            if (deployment != null) {
-//                setDeployment(deployment)
-//
-//                if (deployment.location != null) {
-//                    _deployLocation = deployment.location
-//                }
-//
-//                if (deployment.configuration != null) {
-//                    _configuration = deployment.configuration
-//                }
-//                currentStep = deployment.state - 1
-//                stepView.go(currentStep, true)
-//                handleFragment(currentStep)
-//            }
+            val deployment = deploymentDb.getDeploymentById(deploymentId)
+            if (deployment != null) {
+                setDeployment(deployment)
+
+                if (deployment.location != null) {
+                    _deployLocation = deployment.location
+                }
+
+                if (deployment.configuration != null) {
+                    _configuration = deployment.configuration
+                }
+                currentStep = deployment.state - 1
+                stepView.go(currentStep, true)
+                handleFragment(currentStep)
+            }
         } else {
             setupView()
         }
@@ -180,6 +180,12 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun startSyncing(status: String) {
         startFragment(GuardianSyncFragment.newInstance(status))
+    }
+
+    override fun backToConfigure() {
+        currentStep = 2
+        stepView.go(currentStep, true)
+        startFragment(GuardianConfigureFragment.newInstance())
     }
 
     private fun handleFragment(currentStep: Int) {
