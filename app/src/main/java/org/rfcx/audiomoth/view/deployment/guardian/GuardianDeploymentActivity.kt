@@ -7,11 +7,17 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_deployment.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.*
 import org.rfcx.audiomoth.entity.guardian.GuardianConfiguration
+import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
 import org.rfcx.audiomoth.entity.guardian.GuardianProfile
+import org.rfcx.audiomoth.localdb.LocateDb
+import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
+import org.rfcx.audiomoth.localdb.guardian.GuardianProfileDb
+import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.view.LoadingDialogFragment
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
 import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianConfigureFragment
@@ -27,18 +33,18 @@ import java.util.*
 class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtocol {
     // manager database
     // TODO: need to implement db for guardian
-//    private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
+    private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
 //    private val deploymentDb by lazy { DeploymentDb(realm) }
-//    private val locateDb by lazy { LocateDb(realm) }
-//    private val profileDb by lazy { ProfileDb(realm) }
-//    private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
+    private val locateDb by lazy { LocateDb(realm) }
+    private val profileDb by lazy { GuardianProfileDb(realm) }
+    private val deploymentDb by lazy { GuardianDeploymentDb(realm) }
 
     private var currentStep = 0
     private var _profiles: List<GuardianProfile> = listOf()
     private var _profile: GuardianProfile? = null
-    private var _deployment: Deployment? = null
+    private var _deployment: GuardianDeployment? = null
     private var _deployLocation: DeploymentLocation? = null
-    private var _configuration: Configuration? = null
+    private var _configuration: GuardianConfiguration? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -115,54 +121,41 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         this._profile = profile
     }
 
-    //    override fun getDeployment(): Deployment? = this._deployment
-//
-//    override fun setDeployment(deployment: Deployment) {
-//        this._deployment = deployment
-//    }
-//
-    override fun setDeploymentConfigure() {
-        //TODO: retrieve configure data from configure fragment and make it with guardian db
-//        setProfile(profile)
-//        this._configuration = profile.asConfiguration()
-//        this._deployment?.configuration = _configuration
+    override fun getDeployment(): GuardianDeployment? = this._deployment
 
-        // update deployment
-//        _deployment?.let { deploymentDb.updateDeployment(it) }
-        // update profile
-//        if (profile.name.isNotEmpty()) {
-//            profileDb.insertOrUpdateProfile(profile)
-//        }
+    override fun setDeployment(deployment: GuardianDeployment) {
+        this._deployment = deployment
+    }
+
+    override fun setDeploymentConfigure(profile: GuardianProfile) {
+        setProfile(profile)
+        this._configuration = profile.asConfiguration()
+        this._deployment?.configuration = _configuration
+
+//         update deployment
+        _deployment?.let { deploymentDb.updateDeployment(it) }
+//         update profile
+        if (profile.name.isNotEmpty()) {
+            profileDb.insertOrUpdateProfile(profile)
+        }
 
         nextStep()
     }
 
-//    override fun geConfiguration(): Configuration? = _configuration
-//
+    override fun getConfiguration(): GuardianConfiguration? = _configuration
+
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
     override fun setDeployLocation(locate: Locate) {
-        val deployment = _deployment ?: Deployment()
+        val deployment = _deployment ?: GuardianDeployment()
         deployment.state = DeploymentState.Guardian.Locate.key // state
 
         this._deployLocation = locate.asDeploymentLocation()
-//        val deploymentId = deploymentDb.insertOrUpdateDeployment(deployment, _deployLocation!!)
-//        locateDb.insertOrUpdateLocate(deploymentId, locate) // update locate - last deployment
+        val deploymentId = deploymentDb.insertOrUpdateDeployment(deployment, _deployLocation!!)
+        locateDb.insertOrUpdateLocate(deploymentId, locate) // update locate - last deployment
 
-//        setDeployment(deployment)
+        setDeployment(deployment)
     }
-
-//
-//
-//    override fun setPerformBattery(batteryDepletedAt: Timestamp, batteryLevel: Int) {
-//        this._deployment?.let {
-//            it.batteryDepletedAt = batteryDepletedAt
-//            it.batteryLevel = batteryLevel
-//
-//            // update about battery
-////            this.deploymentDb.updateDeployment(it)
-//        }
-//    }
 
     override fun setReadyToDeploy(images: List<String>) {
         stepView.done(true)
@@ -202,8 +195,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             }
             2 -> {
                 updateDeploymentState(DeploymentState.Guardian.Config)
-
-                //this._profiles = profileDb.getProfiles()
                 startFragment(GuardianSelectProfileFragment.newInstance())
             }
             3 -> {
@@ -225,7 +216,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     private fun updateDeploymentState(state: DeploymentState.Guardian) {
         this._deployment?.state = state.key
-//        this._deployment?.let { deploymentDb.updateDeployment(it) }
+        this._deployment?.let { deploymentDb.updateDeployment(it) }
     }
 
     private fun saveDevelopment(deployment: Deployment) {
