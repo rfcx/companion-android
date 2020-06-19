@@ -237,7 +237,7 @@ class ConfigureFragment : Fragment(),
 
             CONTINUOUS -> {
                 recordingDuration = 60
-                sleepDuration = 0
+                sleepDuration = 5
             }
 
             CUSTOM -> {
