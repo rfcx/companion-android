@@ -3,8 +3,10 @@ package org.rfcx.audiomoth.entity.guardian
 import com.google.gson.annotations.Expose
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
+import io.realm.annotations.RealmClass
 import java.util.*
 
+@RealmClass
 open class GuardianProfile(
     @PrimaryKey
     var id: Int = 0,
@@ -48,8 +50,8 @@ open class GuardianProfile(
 
         fun default() = GuardianProfile(
             name = "",
-            sampleRate = 28672,
-            bitrate = 24000,
+            sampleRate = 24000,
+            bitrate = 28672,
             fileFormat = "OPUS",
             duration = 90
         )

@@ -86,6 +86,7 @@ class GuardianConfigureFragment : Fragment() {
             name = profileName?.trim()?.toString() ?: "",
             sampleRate = sampleRate,
             bitrate = bitrate,
+            fileFormat = fileFormat,
             duration = durationValueEditText.text.toString().toInt()
 
         )
@@ -122,7 +123,7 @@ class GuardianConfigureFragment : Fragment() {
             bitrate = profile?.bitrate ?: 28672
         }
         val indexOfValue = bitrateValues?.indexOf(bitrate.toString()) ?: 6
-        bitrateValueTextView.text = getString(R.string.kilobytes, bitrateEntries!![indexOfValue])
+        bitrateValueTextView.text = bitrateEntries!![indexOfValue]
 
         bitrateValueTextView.setOnClickListener {
             val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
@@ -173,7 +174,7 @@ class GuardianConfigureFragment : Fragment() {
             sampleRate = profile?.sampleRate ?: 24000
         }
         val indexOfValue = sampleRateValues?.indexOf(sampleRate.toString()) ?: 3
-        sampleRateValueTextView.text = getString(R.string.kilohertz, sampleRateEntries!![indexOfValue])
+        sampleRateValueTextView.text = sampleRateEntries!![indexOfValue]
 
         sampleRateValueTextView.setOnClickListener {
             val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
@@ -181,8 +182,7 @@ class GuardianConfigureFragment : Fragment() {
                 builder.setTitle(R.string.choose_sample_rate)
                     ?.setItems(sampleRateEntries) { dialog, i ->
                         try {
-                            sampleRateValueTextView.text =
-                                getString(R.string.kilohertz, sampleRateEntries!![i])
+                            sampleRateValueTextView.text = sampleRateEntries!![i]
                             sampleRate = sampleRateValues!![i].toInt()
                         } catch (e: IllegalArgumentException) {
                             dialog.dismiss()
