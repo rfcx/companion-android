@@ -170,5 +170,6 @@
     <string name="duration">Duration (per audio)</string>
     <string name="choose_bitrate">Choose bitrate (kbs)</string>
     <string name="choose_file_format">Choose file format</string>
+    <string name="kilobytes">%s kbs</string>
 
 </resources>

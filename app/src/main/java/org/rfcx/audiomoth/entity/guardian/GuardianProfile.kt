@@ -48,8 +48,8 @@ open class GuardianProfile(
 
         fun default() = GuardianProfile(
             name = "",
-            sampleRate = 14,
-            bitrate = 14,
+            sampleRate = 28672,
+            bitrate = 24000,
             fileFormat = "OPUS",
             duration = 90
         )

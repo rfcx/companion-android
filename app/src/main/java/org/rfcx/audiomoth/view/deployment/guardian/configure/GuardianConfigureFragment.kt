@@ -20,19 +20,24 @@ class GuardianConfigureFragment : Fragment() {
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
 
-    private val sampleRateList = arrayOf("8", "16", "32", "48", "96", "192", "256", "384")
-    private val bitrateList = arrayOf("8", "16", "32", "48", "96", "192", "256", "384")
-    private val fileFormatList = arrayOf("OPUS", "FLAC")
+    //Predefined configuration values
+    private var sampleRateEntries: Array<String>? = null
+    private var sampleRateValues: Array<String>? = null
+    private var bitrateEntries: Array<String>? = null
+    private var bitrateValues: Array<String>? = null
+    private var fileFormatList: Array<String>? = null
 
-    private var sampleRate = 8      // default sampleRate is 8
-    private var bitrate = 0
-    private var fileFormat = ""
+    private var sampleRate = 24000      // default guardian sampleRate is 24000
+    private var bitrate = 28672         // default guardian bitrate is 28672
+    private var fileFormat = "OPUS"     // default guardian file format is OPUS
+    private var duration = 90           // default guardian duration is 90
 
     private var profile: GuardianProfile? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         deploymentProtocol = context as GuardianDeploymentProtocol
+        setPredefinedConfiguration(context)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -55,6 +60,14 @@ class GuardianConfigureFragment : Fragment() {
         setNextOnClick()
     }
 
+    private fun setPredefinedConfiguration(context: Context) {
+        sampleRateEntries = context.resources.getStringArray(R.array.sample_rate_entries)
+        sampleRateValues = context.resources.getStringArray(R.array.sample_rate_values)
+        bitrateEntries = context.resources.getStringArray(R.array.bitrate_entries)
+        bitrateValues = context.resources.getStringArray(R.array.bitrate_values)
+        fileFormatList = context.resources.getStringArray(R.array.audio_codec)
+    }
+
     private fun setNextButton(show: Boolean) {
         nextButton.visibility = if (show) View.VISIBLE else View.GONE
         configProgressBar.visibility = if (!show) View.VISIBLE else View.GONE
@@ -69,8 +82,24 @@ class GuardianConfigureFragment : Fragment() {
 
     private fun updateProfile() {
         val profileName = profileEditText.text
+        val profileTemp = GuardianProfile(
+            name = profileName?.trim()?.toString() ?: "",
+            sampleRate = sampleRate,
+            bitrate = bitrate,
+            duration = durationValueEditText.text.toString().toInt()
 
-        deploymentProtocol?.setDeploymentConfigure()
+        )
+
+        val newProfile = profile?.let {
+            if (it.name == profileTemp.name) {
+                profileTemp.id = it.id
+            }
+            profileTemp
+        } ?: kotlin.run {
+            profileTemp
+        }
+
+        deploymentProtocol?.setDeploymentConfigure(newProfile)
     }
 
     private fun createNotificationChannel() {
@@ -89,16 +118,20 @@ class GuardianConfigureFragment : Fragment() {
 
     private fun setBitrateLayout() {
 
-        bitrateValueTextView.text = profile!!.bitrate.toString()
+        if (profile != null) {
+            bitrate = profile?.bitrate ?: 28672
+        }
+        val indexOfValue = bitrateValues?.indexOf(bitrate.toString()) ?: 6
+        bitrateValueTextView.text = getString(R.string.kilobytes, bitrateEntries!![indexOfValue])
 
         bitrateValueTextView.setOnClickListener {
             val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
             if (builder != null) {
                 builder.setTitle(R.string.choose_bitrate)
-                    ?.setItems(bitrateList) { dialog, i ->
+                    ?.setItems(bitrateEntries) { dialog, i ->
                         try {
-                            bitrateValueTextView.text = bitrateList[i]
-                            bitrate = bitrateList[i].toInt()
+                            bitrateValueTextView.text = bitrateEntries!![i]
+                            bitrate = bitrateValues!![i].toInt()
                         } catch (e: IllegalArgumentException) {
                             dialog.dismiss()
                         }
@@ -111,7 +144,10 @@ class GuardianConfigureFragment : Fragment() {
 
     private fun setFileFormatLayout() {
 
-        fileFormatValueTextView.text = profile!!.fileFormat
+        if (profile != null) {
+            fileFormat = profile?.fileFormat ?: "OPUS"
+        }
+        fileFormatValueTextView.text = fileFormat
 
         fileFormatValueTextView.setOnClickListener {
             val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
@@ -119,8 +155,8 @@ class GuardianConfigureFragment : Fragment() {
                 builder.setTitle(R.string.choose_file_format)
                     ?.setItems(fileFormatList) { dialog, i ->
                         try {
-                            fileFormatValueTextView.text = fileFormatList[i]
-                            fileFormat = fileFormatList[i]
+                            fileFormatValueTextView.text = fileFormatList!![i]
+                            fileFormat = fileFormatList!![i]
                         } catch (e: IllegalArgumentException) {
                             dialog.dismiss()
                         }
@@ -133,17 +169,21 @@ class GuardianConfigureFragment : Fragment() {
 
     private fun setSampleRateLayout() {
 
-        sampleRateValueTextView.text = getString(R.string.kilohertz, profile!!.sampleRate.toString())
+        if (profile != null) {
+            sampleRate = profile?.sampleRate ?: 24000
+        }
+        val indexOfValue = sampleRateValues?.indexOf(sampleRate.toString()) ?: 3
+        sampleRateValueTextView.text = getString(R.string.kilohertz, sampleRateEntries!![indexOfValue])
 
         sampleRateValueTextView.setOnClickListener {
             val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
             if (builder != null) {
                 builder.setTitle(R.string.choose_sample_rate)
-                    ?.setItems(sampleRateList) { dialog, i ->
+                    ?.setItems(sampleRateEntries) { dialog, i ->
                         try {
                             sampleRateValueTextView.text =
-                                getString(R.string.kilohertz, sampleRateList[i])
-                            sampleRate = sampleRateList[i].toInt()
+                                getString(R.string.kilohertz, sampleRateEntries!![i])
+                            sampleRate = sampleRateValues!![i].toInt()
                         } catch (e: IllegalArgumentException) {
                             dialog.dismiss()
                         }
@@ -155,7 +195,10 @@ class GuardianConfigureFragment : Fragment() {
     }
 
     private fun setDuration() {
-        durationValueTextView.text = profile!!.duration.toString()
+        if (profile != null) {
+            duration = profile?.duration ?: 90
+        }
+        durationValueEditText.setText(duration.toString())
     }
 
     companion object {
