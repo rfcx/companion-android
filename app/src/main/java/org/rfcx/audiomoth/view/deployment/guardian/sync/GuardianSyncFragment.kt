@@ -22,7 +22,11 @@ class GuardianSyncFragment : Fragment() {
         deploymentProtocol = (context as GuardianDeploymentProtocol)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_guardian_sync, container, false)
     }
 
@@ -33,19 +37,23 @@ class GuardianSyncFragment : Fragment() {
     }
 
     private fun syncing(config: GuardianConfiguration) {
-        SocketManager.syncConfiguration(config.toListForGuardian(), object : OnReceiveResponse{
+        SocketManager.syncConfiguration(config.toListForGuardian(), object : OnReceiveResponse {
             override fun onReceive(response: SocketResposne) {
-                deploymentProtocol?.nextStep()
+                activity!!.runOnUiThread {
+                    deploymentProtocol?.nextStep()
+                }
             }
 
             override fun onFailed() {
-                deploymentProtocol?.backToConfigure()
+                activity!!.runOnUiThread {
+                    deploymentProtocol?.backToConfigure()
+                }
             }
         })
     }
 
     companion object {
-        fun newInstance(page: String) : GuardianSyncFragment {
+        fun newInstance(page: String): GuardianSyncFragment {
             return GuardianSyncFragment()
         }
     }
