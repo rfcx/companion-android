@@ -32,17 +32,17 @@
                 style="@style/AudioMothText.Subhead.Bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingTop="@dimen/margin_padding_normal"
+                android:padding="@dimen/margin_padding_normal"
                 android:text="@string/let_configure"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <View
                 android:id="@+id/view0"
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/margin_padding_normal"
-                android:background="@color/gray_30"
+                android:layout_height="4dp"
+                android:background="@color/colorPrimary"
                 app:layout_constraintTop_toBottomOf="@id/letConfigureTextView" />
 
             <LinearLayout
@@ -71,6 +71,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingBottom="@dimen/margin_padding_small"
+                    android:textSize="@dimen/text_xsmall"
                     tools:text="8kHz (default)" />
 
                 <View
@@ -104,6 +105,7 @@
                     style="@style/AudioMothText.Body.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_xsmall"
                     tools:text="3 (default)" />
 
                 <View
@@ -132,7 +134,8 @@
                     android:id="@+id/recommendedRadioButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/recommended" />
+                    android:text="@string/recommended"
+                    android:textSize="@dimen/text_small" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/recommendedTextView"
@@ -140,13 +143,14 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_padding_xlarge"
                     android:text="@string/recommended_text"
-                    android:textSize="@dimen/text_small" />
+                    android:textSize="@dimen/text_xsmall" />
 
                 <androidx.appcompat.widget.AppCompatRadioButton
                     android:id="@+id/continuousRadioButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/continuous" />
+                    android:text="@string/continuous"
+                    android:textSize="@dimen/text_small" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/continuousTextView"
@@ -154,13 +158,14 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_padding_xlarge"
                     android:text="@string/always_recording"
-                    android:textSize="@dimen/text_small" />
+                    android:textSize="@dimen/text_xsmall" />
 
                 <androidx.appcompat.widget.AppCompatRadioButton
                     android:id="@+id/customRadioButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/custom" />
+                    android:text="@string/custom"
+                    android:textSize="@dimen/text_small" />
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
@@ -183,7 +188,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="number"
-                            android:maxLines="1" />
+                            android:maxLines="1"
+                            android:textSize="@dimen/text_xsmall" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -203,7 +209,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="number"
-                            android:maxLines="1" />
+                            android:maxLines="1"
+                            android:textSize="@dimen/text_xsmall" />
                     </com.google.android.material.textfield.TextInputLayout>
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -228,6 +235,7 @@
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:layout_weight="1"
                     android:orientation="vertical">
 
@@ -245,6 +253,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/always_recording"
+                        android:textSize="@dimen/text_xsmall"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/customRecordingPeriodLayout" />
@@ -284,17 +293,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_padding_normal"
-                android:paddingBottom="@dimen/margin_padding_normal"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:hint="@string/profile_name"
+                android:paddingBottom="@dimen/margin_padding_normal"
                 app:layout_constraintTop_toBottomOf="@+id/recordingPeriodView">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/profileEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxLines="1" />
+                    android:maxLines="1"
+                    android:textSize="@dimen/text_small" />
             </com.google.android.material.textfield.TextInputLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
