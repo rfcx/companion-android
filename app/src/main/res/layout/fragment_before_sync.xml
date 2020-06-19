@@ -9,7 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.07" />
+        app:layout_constraintGuide_percent="0.1" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guidelineHorizontal"
@@ -24,6 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="@dimen/margin_padding_normal"
+        android:gravity="center"
         android:text="@string/ready_send_configuration"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -32,7 +33,7 @@
     <View
         android:id="@+id/view0"
         android:layout_width="match_parent"
-        android:layout_height="4dp"
+        android:layout_height="2dp"
         android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginEnd="@dimen/margin_padding_large"
         android:background="@color/colorPrimary"
@@ -51,7 +52,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/switchToConfigTextView"
-        style="@style/AudioMothText.Subhead.Bold"
+        style="@style/AudioMothText.Subhead.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"
@@ -63,7 +64,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/maxVolumeTextView"
-        style="@style/AudioMothText.Subhead.Bold"
+        style="@style/AudioMothText.Subhead.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"
@@ -75,7 +76,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/holdDeviceTextView"
-        style="@style/AudioMothText.Subhead.Bold"
+        style="@style/AudioMothText.Subhead.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"

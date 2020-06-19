@@ -41,7 +41,7 @@
             <View
                 android:id="@+id/view0"
                 android:layout_width="match_parent"
-                android:layout_height="4dp"
+                android:layout_height="2dp"
                 android:background="@color/colorPrimary"
                 app:layout_constraintTop_toBottomOf="@id/letConfigureTextView" />
 
@@ -60,7 +60,7 @@
 
                 <TextView
                     android:id="@+id/sampleRateTextView"
-                    style="@style/AudioMothText.Subhead.Bold"
+                    style="@style/AudioMothText.Body.Small"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/sample_rate" />
@@ -95,7 +95,7 @@
 
                 <TextView
                     android:id="@+id/gainTextView"
-                    style="@style/AudioMothText.Subhead.Bold"
+                    style="@style/AudioMothText.Body.Small"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/gain" />
@@ -117,7 +117,7 @@
 
             <TextView
                 android:id="@+id/durationTextView"
-                style="@style/AudioMothText.Subhead.Bold"
+                style="@style/AudioMothText.Body.Small"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_padding_normal"
@@ -135,6 +135,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/recommended"
+                    android:textColor="@color/text_primary"
                     android:textSize="@dimen/text_small" />
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -150,6 +151,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/continuous"
+                    android:textColor="@color/text_primary"
                     android:textSize="@dimen/text_small" />
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -165,6 +167,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/custom"
+                    android:textColor="@color/text_primary"
                     android:textSize="@dimen/text_small" />
 
                 <androidx.appcompat.widget.LinearLayoutCompat
@@ -189,6 +192,7 @@
                             android:layout_height="wrap_content"
                             android:inputType="number"
                             android:maxLines="1"
+                            android:textColor="@color/text_primary"
                             android:textSize="@dimen/text_xsmall" />
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -210,6 +214,7 @@
                             android:layout_height="wrap_content"
                             android:inputType="number"
                             android:maxLines="1"
+                            android:textColor="@color/text_primary"
                             android:textSize="@dimen/text_xsmall" />
                     </com.google.android.material.textfield.TextInputLayout>
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -241,7 +246,7 @@
 
                     <TextView
                         android:id="@+id/customRecordingPeriodTextView"
-                        style="@style/AudioMothText.Subhead.Bold"
+                        style="@style/AudioMothText.Body.Small"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
@@ -304,6 +309,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:maxLines="1"
+                    android:textColor="@color/text_primary"
                     android:textSize="@dimen/text_small" />
             </com.google.android.material.textfield.TextInputLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>

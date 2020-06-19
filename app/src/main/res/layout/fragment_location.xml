@@ -20,7 +20,7 @@
     <View
         android:id="@+id/view1"
         android:layout_width="match_parent"
-        android:layout_height="4dp"
+        android:layout_height="2dp"
         android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginEnd="@dimen/margin_padding_large"
         android:background="@color/colorPrimary"
@@ -42,6 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/new_location"
+            android:textColor="@color/text_primary"
             android:textSize="@dimen/text_small" />
 
         <androidx.appcompat.widget.AppCompatRadioButton
@@ -50,6 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/existing"
+            android:textColor="@color/text_primary"
             android:textSize="@dimen/text_small" />
 
     </RadioGroup>
@@ -72,12 +74,13 @@
             android:id="@+id/locationNameEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="@color/text_primary"
             android:textSize="@dimen/text_small" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <androidx.appcompat.widget.AppCompatSpinner
         android:id="@+id/locationNameSpinner"
-        style="@style/Base.Widget.AppCompat.Spinner"
+        style="@style/spinnerItemStyle"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginStart="@dimen/margin_padding_large"
@@ -121,6 +124,7 @@
             android:layout_height="wrap_content"
             android:digits="@string/input_format_number"
             android:maxLines="1"
+            android:textColor="@color/text_primary"
             android:textSize="@dimen/text_small" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -147,6 +151,7 @@
             android:layout_height="wrap_content"
             android:digits="@string/input_format_number"
             android:maxLines="1"
+            android:textColor="@color/text_primary"
             android:textSize="@dimen/text_small" />
     </com.google.android.material.textfield.TextInputLayout>
 
