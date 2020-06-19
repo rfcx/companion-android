@@ -85,10 +85,11 @@
     <string name="it_full">or, if it is full then:</string>
     <string name="how_many_time">How many time did the green and red LED flash?</string>
     <string name="try_again">try again</string>
+    <string name="device_configured">Device configured! \nNow let’s verify the battery level</string>
     <string name="how_long_battery">How long will the battery last?</string>
-    <string name="days">%s days</string>
-    <string name="day">%s day</string>
-    <string name="charged">%s charged</string>
+    <string name="days">Estimated battery duration: %s days</string>
+    <string name="day">Estimated battery duration: %s day</string>
+    <string name="notification">A notification will be sent a day \nbefore the battery is due to run out</string>
 
     <!--  LocationFragment  -->
     <string name="latitude">Latitude</string>
