@@ -8,7 +8,8 @@ data class LocateRequest(
     var latitude: Double = 0.0,
     var longitude: Double = 0.0,
     var createdAt: Date = Date(),
-    var lastDeployment: Int = 0
+    var lastDeployment: Int = 0,
+    var lastDeploymentServerId: String? = null
 )
 
 fun Locate.toRequestBody(): LocateRequest {
