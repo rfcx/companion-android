@@ -24,7 +24,7 @@ class CompanionApplication : Application() {
         }
 
         // Falback for release (delete realm on error)
-        if (realmNeedsMigration && !BuildConfig.DEBUG) {
+        if (realmNeedsMigration && BuildConfig.DEBUG) {
             try {
                 val realm = Realm.getInstance(RealmHelper.fallbackConfig())
                 realm.close()
