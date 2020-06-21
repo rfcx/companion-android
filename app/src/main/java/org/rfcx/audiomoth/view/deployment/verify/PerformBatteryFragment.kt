@@ -62,6 +62,7 @@ class PerformBatteryFragment : Fragment() {
 
     private fun checkBattery() {
         testButton.setOnClickListener {
+            deploymentProtocol?.playCheckBatterySound()
             deploymentProtocol?.startCheckBattery(TIME_LED_FLASH, null)
         }
 
@@ -76,6 +77,10 @@ class PerformBatteryFragment : Fragment() {
     }
 
     private fun timeFlash() {
+        tryAgainButton.setOnClickListener {
+            deploymentProtocol?.playCheckBatterySound()
+        }
+
         batteryLv1Button.setOnClickListener {
             deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 1)
         }
