@@ -209,7 +209,7 @@ class ConfigureFragment : Fragment(),
     private fun isChecked(isChecked: Boolean) {
         if (isChecked) {
             timeRecyclerView.visibility = View.VISIBLE
-            alwaysRecordingTextView.visibility = View.GONE
+            alwaysRecordingTextView.visibility = View.INVISIBLE
         } else {
             timeRecyclerView.visibility = View.GONE
             alwaysRecordingTextView.visibility = View.VISIBLE
@@ -231,13 +231,13 @@ class ConfigureFragment : Fragment(),
 
         when (durationSelected) {
             RECOMMENDED -> {
-                recordingDuration = 5
-                sleepDuration = 10
+                recordingDuration = 300
+                sleepDuration = 600
             }
 
             CONTINUOUS -> {
-                recordingDuration = 0
-                sleepDuration = 0
+                recordingDuration = 60
+                sleepDuration = 5
             }
 
             CUSTOM -> {

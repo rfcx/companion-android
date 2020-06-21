@@ -4,19 +4,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:minHeight="180dp"
-    android:padding="@dimen/margin_padding_large">
+    android:paddingStart="@dimen/margin_padding_large"
+    android:paddingBottom="@dimen/margin_padding_large"
+    android:paddingEnd="@dimen/margin_padding_large">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/BatteryLevelLabel"
-        style="@style/TextAppearance.AppCompat.Subhead"
+        style="@style/AudioMothText.Body.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/how_many_time"
         android:textStyle="bold"
+        android:layout_marginTop="@dimen/margin_padding_normal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/batteryLv1Button"

@@ -11,12 +11,20 @@
         style="@style/AudioMothText.Subhead.Bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingStart="@dimen/margin_padding_large"
-        android:paddingTop="@dimen/margin_padding_normal"
-        android:paddingEnd="@dimen/margin_padding_large"
-        android:text="@string/deploying_the_device"
+        android:padding="@dimen/margin_padding_normal"
+        android:text="@string/define_the_precise"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/view1"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginEnd="@dimen/margin_padding_large"
+        android:background="@color/colorPrimary"
+        app:layout_constraintTop_toBottomOf="@id/deployDeviceTextView" />
 
     <RadioGroup
         android:id="@+id/radioGroup"
@@ -24,9 +32,9 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:paddingStart="@dimen/margin_padding_large"
-        android:paddingTop="@dimen/margin_padding_normal"
+        android:paddingTop="@dimen/margin_padding_small"
         android:paddingEnd="@dimen/margin_padding_large"
-        app:layout_constraintTop_toBottomOf="@id/deployDeviceTextView">
+        app:layout_constraintTop_toBottomOf="@id/view1">
 
         <androidx.appcompat.widget.AppCompatRadioButton
             android:id="@+id/newLocationRadioButton"
@@ -34,6 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/new_location"
+            android:textColor="@color/text_primary"
             android:textSize="@dimen/text_small" />
 
         <androidx.appcompat.widget.AppCompatRadioButton
@@ -42,6 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/existing"
+            android:textColor="@color/text_primary"
             android:textSize="@dimen/text_small" />
 
     </RadioGroup>
@@ -52,7 +62,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"
-        android:layout_marginTop="@dimen/margin_padding_normal"
         android:layout_marginEnd="@dimen/margin_padding_large"
         android:hint="@string/name_location"
         android:visibility="gone"
@@ -64,16 +73,17 @@
             android:id="@+id/locationNameEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxLines="1" />
+            android:maxLines="1"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_small" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <androidx.appcompat.widget.AppCompatSpinner
         android:id="@+id/locationNameSpinner"
-        style="@style/Base.Widget.AppCompat.Spinner"
+        style="@style/spinnerItemStyle"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginStart="@dimen/margin_padding_large"
-        android:layout_marginTop="@dimen/margin_padding_normal"
         android:layout_marginEnd="@dimen/margin_padding_large"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
@@ -113,7 +123,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:digits="@string/input_format_number"
-            android:maxLines="1" />
+            android:maxLines="1"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_small" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -138,7 +150,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:digits="@string/input_format_number"
-            android:maxLines="1" />
+            android:maxLines="1"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_small" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <androidx.appcompat.widget.AppCompatButton

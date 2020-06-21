@@ -9,7 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.05" />
+        app:layout_constraintGuide_percent="0.1" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guidelineHorizontal"
@@ -18,32 +18,53 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.40" />
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/readySendConfigureTextView"
+        style="@style/AudioMothText.Subhead.Bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="@dimen/margin_padding_normal"
+        android:text="@string/ready_send_configuration"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/view0"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginEnd="@dimen/margin_padding_large"
+        android:background="@color/colorPrimary"
+        app:layout_constraintTop_toBottomOf="@id/readySendConfigureTextView" />
+
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/configImageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:src="@drawable/edge_config"
+        android:layout_margin="@dimen/margin_padding_small"
         app:layout_constraintBottom_toBottomOf="@id/guidelineHorizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/guidelineHorizontalTop" />
+        app:layout_constraintTop_toBottomOf="@id/guidelineHorizontalTop" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/switchToConfigTextView"
-        style="@style/AudioMothText.Subhead.Bold"
+        style="@style/AudioMothText.Subhead.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginTop="@dimen/margin_padding_normal"
         android:layout_marginEnd="@dimen/margin_padding_large"
         android:text="@string/switch_to_config"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/guidelineHorizontal" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/maxVolumeTextView"
-        style="@style/AudioMothText.Subhead.Bold"
+        style="@style/AudioMothText.Subhead.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"
@@ -56,7 +77,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/holdDeviceTextView"
-        style="@style/AudioMothText.Subhead.Bold"
+        style="@style/AudioMothText.Subhead.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"

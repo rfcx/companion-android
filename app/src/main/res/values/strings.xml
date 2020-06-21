@@ -62,12 +62,14 @@
     <!--    SyncFragment-->
     <string name="sync">Sync</string>
     <string name="syncing">Syncing</string>
-    <string name="switch_to_config">Ready to send the configuration to the device</string>
-    <string name="max_volume">Set the volume of your phone to low-middle level</string>
-    <string name="hold_device">Hold the device close to your phone speaker</string>
+    <string name="ready_to_send">Ready to send the configuration to the device</string>
+    <string name="switch_to_config">1. Switch your device to CONFIG</string>
+    <string name="max_volume">2. Set the volume of your phone to low-middle level</string>
+    <string name="hold_device">3. Hold the device close to your phone speaker</string>
     <string name="no_retry">No, Retry</string>
     <string name="did_green_flash">Did the green LED flash on completion?</string>
     <string name="yes">Yes</string>
+    <string name="ready_send_configuration">Ready to send the configuration to the device</string>
 
     <!--    VerifySyncFragment-->
     <string name="what_light_you_see">What light do you see now?</string>
@@ -82,19 +84,19 @@
     <string name="test">test</string>
     <string name="skip">Skip</string>
     <string name="it_full">or, if it is full then:</string>
-    <string name="how_many_time">How many time did the green LED flash?</string>
+    <string name="how_many_time">How many time did the green and red LED flash?</string>
     <string name="try_again">try again</string>
-    <string name="how_long_battery">Device configured! \nNow let’s verify the battery level</string>
+    <string name="device_configured">Device configured! \nNow let’s verify the battery level</string>
     <string name="days">Estimated battery duration: %s days</string>
     <string name="day">Estimated battery duration: %s day</string>
-    <string name="notification">A notification will be sent a day before \nthe battery is due to run out</string>
+    <string name="notification">A notification will be sent a day \nbefore the battery is due to run out</string>
 
     <!--  LocationFragment  -->
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
     <string name="finish">finish</string>
     <string name="name_location">Location name</string>
-    <string name="deploying_the_device">Define the precise device location</string>
+    <string name="define_the_precise">Define the precise device location</string>
     <string name="new_location">New location</string>
     <string name="existing">Existing</string>
     <string name="next">Next</string>
@@ -131,7 +133,8 @@
     <string name="snackbar_retry">RETRY</string>
 
     <!--  DeployFragment  -->
-    <string name="almost_there">Almost there! \nThe deployment will be uploaded to your account</string>
+    <string name="deployment_will_uploaded">The deployment will be uploaded to your account</string>
+    <string name="almost_there">Almost there!</string>
     <string name="switch_to_deploy">Switch your device to DEPLOY</string>
     <string name="take_photos">Take some photos of the deploy \nlocation (optional)</string>
 

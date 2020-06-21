@@ -15,6 +15,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:textSize="@dimen/text_small"
+        android:textColor="@color/text_primary"
         tools:text="Profile 01" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -24,6 +26,7 @@
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:maxLines="1"
+        android:textSize="@dimen/text_xsmall"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/nameProfileTextView"
         tools:text="12 kHz, medium, 60 sec/120 sec" />

@@ -36,7 +36,13 @@ fun Deployment.getSleepRecordCycle(): AudioMothConfiguration.SleepRecordCycle? {
 
 fun Deployment.getStartStopPeriods(): Array<AudioMothConfiguration.StartStopPeriod>? {
     val recordingPeriodList = this.configuration?.recordingPeriodList
-    if (recordingPeriodList?.size == 0) return null
+    if (recordingPeriodList?.size == 0) return arrayOf(
+        AudioMothConfiguration.StartStopPeriod(
+            0,
+            1440
+        )
+    )
+    val recordingPeriods = recordingPeriodList?.map { it.toDate().toIsoString() }
     var array: Array<AudioMothConfiguration.StartStopPeriod> = arrayOf()
 
     val timeList = arrayListOf(
@@ -65,12 +71,28 @@ fun Deployment.getStartStopPeriods(): Array<AudioMothConfiguration.StartStopPeri
         "22:00",
         "23:00"
     )
-    recordingPeriodList?.let {
+    recordingPeriods?.let {
         val arrayStartStopPeriod = arrayListOf<AudioMothConfiguration.StartStopPeriod>()
         var timeCount = 0
         for (time in it) {
             val index = timeList.indexOf(time)
-            if (index == timeList.size - 1) {
+            if (time == it[it.size - 1]) {
+                arrayStartStopPeriod.add(
+                    AudioMothConfiguration.StartStopPeriod(
+                        (index - timeCount) * 60,
+                        (index * 60) + 60
+                    )
+                )
+                timeCount = 0
+            } else if (index == 23) {
+                arrayStartStopPeriod.add(
+                    AudioMothConfiguration.StartStopPeriod(
+                        (index - timeCount) * 60,
+                        (index * 60) + 60
+                    )
+                )
+                timeCount = 0
+            } else if (!it.contains(timeList[index + 1])) {
                 arrayStartStopPeriod.add(
                     AudioMothConfiguration.StartStopPeriod(
                         (index - timeCount) * 60,
@@ -79,21 +101,10 @@ fun Deployment.getStartStopPeriods(): Array<AudioMothConfiguration.StartStopPeri
                 )
                 timeCount = 0
             } else {
-                if (!it.contains(timeList[index + 1])) {
-                    arrayStartStopPeriod.add(
-                        AudioMothConfiguration.StartStopPeriod(
-                            (index - timeCount) * 60,
-                            (index * 60) + 60
-                        )
-                    )
-                    timeCount = 0
-                } else {
-                    timeCount += 1
-                }
+                timeCount += 1
             }
         }
         array = arrayStartStopPeriod.toTypedArray()
     }
-
     return array
 }
