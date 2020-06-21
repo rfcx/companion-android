@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import io.realm.Realm
@@ -189,7 +188,6 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
             deploymentDb.updateDeployment(it)
 
             DeploymentSyncWorker.enqueue(this@DeploymentActivity)
-            Toast.makeText(this, R.string.deployment_saved, Toast.LENGTH_SHORT).show()
             finish()
         }
     }

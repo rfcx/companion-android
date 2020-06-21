@@ -44,7 +44,6 @@ import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_map_window_info.view.*
 import org.rfcx.audiomoth.MainActivityListener
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.SyncInfo
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.DeploymentState
 import org.rfcx.audiomoth.entity.Locate
@@ -72,6 +71,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     // data
     private var deployments = listOf<Deployment>()
     private var locations = listOf<Locate>()
+    private var lastSyncingInfo: SyncInfo? = null
 
     private lateinit var deployLiveData: LiveData<List<Deployment>>
     private lateinit var locateLiveData: LiveData<List<Locate>>
@@ -318,15 +318,34 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private fun updateSyncInfo(syncInfo: SyncInfo? = null) {
         val status = syncInfo
             ?: if (context.isNetworkAvailable()) SyncInfo.Starting else SyncInfo.WaitingNetwork
-        if (status == SyncInfo.Uploaded) return
+        if (this.lastSyncingInfo == SyncInfo.Uploaded && status == SyncInfo.Uploaded) return
 
-        Log.d("Map", "SyncInfo $status")
+        this.lastSyncingInfo = status
+
         val deploymentUnsentCount = deploymentDb.unsentCount().toInt()
-        val msg = getString(
-            if (deploymentUnsentCount > 1) R.string.format_deploys_unsync else R.string.format_deploy_unsync,
-            deploymentUnsentCount.toString()
-        )
-        listener?.showSnackbar(msg, Snackbar.LENGTH_INDEFINITE)
+        when (status) {
+            SyncInfo.Starting, SyncInfo.Uploading -> {
+                val msg = if (deploymentUnsentCount > 1) {
+                    getString(R.string.format_deploys_uploading, deploymentUnsentCount.toString())
+                } else {
+                    getString(R.string.format_deploy_uploading)
+                }
+                listener?.showSnackbar(msg, Snackbar.LENGTH_INDEFINITE)
+            }
+            SyncInfo.Uploaded -> {
+                val msg = getString(R.string.format_deploys_uploaded)
+                listener?.showSnackbar(msg, Snackbar.LENGTH_SHORT)
+            }
+            // else also waiting network
+            else -> {
+                val msg = if (deploymentUnsentCount > 1) {
+                    getString(R.string.format_deploys_waiting_network, deploymentUnsentCount.toString())
+                } else {
+                    getString(R.string.format_deploy_waiting_network)
+                }
+                listener?.showSnackbar(msg, Snackbar.LENGTH_LONG)
+            }
+        }
 
     }
 
