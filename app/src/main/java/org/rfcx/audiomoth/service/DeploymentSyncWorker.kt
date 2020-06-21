@@ -12,7 +12,7 @@ import org.rfcx.audiomoth.service.images.ImageSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
 
 /**
- * For syncing data to server. ref from Ranger Android App
+ * For syncing data to server. Ref from Ranger Android App
  */
 class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {

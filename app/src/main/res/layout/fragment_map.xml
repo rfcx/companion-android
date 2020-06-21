@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
@@ -21,27 +22,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/deploymentSyncTextView"
-        style="@style/AudioMothText.Body.Secondary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_small"
-        android:layout_marginTop="@dimen/margin_padding_xsmall"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="3 deployment not yet synced" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/imageSyncTextView"
-        style="@style/AudioMothText.Body.Secondary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_small"
-        android:layout_marginTop="@dimen/margin_padding_xsmall"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/deploymentSyncTextView"
-        tools:text="3 photos not yet synced" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

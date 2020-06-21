@@ -7,11 +7,15 @@ import android.view.Gravity
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.google.android.material.snackbar.Snackbar
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
-import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
-import org.rfcx.audiomoth.util.*
+import org.rfcx.audiomoth.util.LocationPermissions
+import org.rfcx.audiomoth.util.Preferences
+import org.rfcx.audiomoth.util.getUserNickname
+import org.rfcx.audiomoth.util.logout
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity
 import org.rfcx.audiomoth.view.map.MapFragment
 import org.rfcx.audiomoth.view.profile.ProfileFragment
@@ -23,6 +27,8 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
     // database manager
     private var currentFragment: Fragment? = null
     private val locationPermissions by lazy { LocationPermissions(this) }
+
+    private var snackbar: Snackbar? = null
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -159,6 +165,16 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         menuMap.performClick()
     }
 
+    override fun showSnackbar(msg: String, duration: Int) {
+        snackbar = Snackbar.make(rootView, msg, duration)
+        snackbar?.anchorView = createLocationButton
+        snackbar?.show()
+    }
+
+    override fun hideSnackbar() {
+        snackbar?.dismiss()
+    }
+
     override fun onLogout() {
         this.logout()
         finish()
@@ -182,5 +198,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
 }
 
 interface MainActivityListener {
+    fun showSnackbar(msg: String, duration: Int)
+    fun hideSnackbar()
     fun onLogout()
 }
