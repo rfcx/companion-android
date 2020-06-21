@@ -7,6 +7,7 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.User
+import org.rfcx.audiomoth.entity.request.DeploymentRequest
 import org.rfcx.audiomoth.entity.request.ProfileRequest
 import org.rfcx.audiomoth.util.Preferences
 import org.rfcx.audiomoth.util.Storage
@@ -32,7 +33,7 @@ class Firestore(val context: Context) {
             }
     }
 
-    suspend fun sendDeployment(deployment: Deployment): DocumentReference? {
+    suspend fun sendDeployment(deployment: DeploymentRequest): DocumentReference? {
         val userDocument = db.collection(COLLECTION_USERS).document(guid)
         return userDocument.collection(COLLECTION_DEPLOYMENTS).add(deployment).await()
     }
