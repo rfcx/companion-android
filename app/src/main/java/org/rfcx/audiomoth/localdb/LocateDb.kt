@@ -32,7 +32,7 @@ class LocateDb(private val realm: Realm) {
     }
 
     fun markUploading(id: Int) {
-        mark(id = id, syncState = SyncState.Uploading.key)
+        mark(id = id, syncState = SyncState.Sending.key)
     }
 
     private fun mark(id: Int, serverId: String? = null, syncState: Int) {

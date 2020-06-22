@@ -22,7 +22,7 @@ import org.rfcx.audiomoth.entity.*
 import org.rfcx.audiomoth.repo.ApiManager
 import org.rfcx.audiomoth.util.CredentialKeeper
 import org.rfcx.audiomoth.util.CredentialVerifier
-import org.rfcx.audiomoth.util.Firestore
+import org.rfcx.audiomoth.repo.Firestore
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -111,9 +111,11 @@ class LoginActivity : AppCompatActivity() {
 
     private fun saveUserToFirestore(result: UserAuthResponse) {
         val name = result.nickname ?: "Companion"
-        val user = User(name)
+        val email = result.email ?: "Email"
+        val user = User(name, email)
 
-        Firestore(this@LoginActivity).saveUser(user, result.guid) { string, isSuccess ->
+        Firestore(this@LoginActivity)
+            .saveUser(user, result.guid) { string, isSuccess ->
             if (isSuccess) {
                 userTouch(result.idToken)
                 CredentialKeeper(this@LoginActivity).save(result)

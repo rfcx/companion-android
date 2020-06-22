@@ -7,31 +7,28 @@ import android.view.Gravity
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.Transformations
+import com.google.android.material.snackbar.Snackbar
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
-import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
-import org.rfcx.audiomoth.entity.DeploymentImage
-import org.rfcx.audiomoth.localdb.DeploymentImageDb
-import org.rfcx.audiomoth.util.*
-import org.rfcx.audiomoth.view.LoginActivity
+import org.rfcx.audiomoth.util.LocationPermissions
+import org.rfcx.audiomoth.util.Preferences
+import org.rfcx.audiomoth.util.getUserNickname
+import org.rfcx.audiomoth.util.logout
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity
 import org.rfcx.audiomoth.view.map.MapFragment
 import org.rfcx.audiomoth.view.profile.ProfileFragment
 import org.rfcx.audiomoth.widget.BottomNavigationMenuItem
 
-open class MainActivity : AppCompatActivity(), MainActivityListener {
-    // database manager
-    private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
+enum class SyncInfo { WaitingNetwork, Starting, Uploading, Uploaded }
 
+class MainActivity : AppCompatActivity(), MainActivityListener {
+    // database manager
     private var currentFragment: Fragment? = null
     private val locationPermissions by lazy { LocationPermissions(this) }
 
-    private lateinit var deployImageLiveData: LiveData<List<DeploymentImage>>
+    private var snackbar: Snackbar? = null
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -73,7 +70,6 @@ open class MainActivity : AppCompatActivity(), MainActivityListener {
         if (savedInstanceState == null) {
             setupFragments()
         }
-        fetchData()
     }
 
     private fun setupSimpleTooltip() {
@@ -95,31 +91,6 @@ open class MainActivity : AppCompatActivity(), MainActivityListener {
                 .build()
                 .show()
         }
-    }
-
-    private fun fetchData() {
-        deployImageLiveData =
-            Transformations.map(deploymentImageDb.getAllResultsAsync().asLiveData()) {
-                it
-            }
-        deployImageLiveData.observeForever(deploymentImageObserver)
-    }
-
-    private val deploymentImageObserver = Observer<List<DeploymentImage>> {
-        val imageCount = it.size
-        val imageUnsentCount = deploymentImageDb.unsentCount().toInt()
-        updateSyncingView(imageCount, imageUnsentCount)
-    }
-
-    private fun updateSyncingView(imageCount: Int, imageUnsentCount: Int) {
-        // TODO: implement logic display syncing view
-        imageSyncTextView.visibility = View.GONE
-
-        imageSyncTextView.text = getString(
-            if (imageCount > 1) R.string.format_images_unsync else R.string.format_image_unsync,
-            imageCount.toString(),
-            imageUnsentCount.toString()
-        )
     }
 
     private fun setupBottomMenu() {
@@ -194,9 +165,14 @@ open class MainActivity : AppCompatActivity(), MainActivityListener {
         menuMap.performClick()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        deployImageLiveData.removeObserver(deploymentImageObserver)
+    override fun showSnackbar(msg: String, duration: Int) {
+        snackbar = Snackbar.make(rootView, msg, duration)
+        snackbar?.anchorView = createLocationButton
+        snackbar?.show()
+    }
+
+    override fun hideSnackbar() {
+        snackbar?.dismiss()
     }
 
     override fun onLogout() {
@@ -222,5 +198,7 @@ open class MainActivity : AppCompatActivity(), MainActivityListener {
 }
 
 interface MainActivityListener {
+    fun showSnackbar(msg: String, duration: Int)
+    fun hideSnackbar()
     fun onLogout()
 }

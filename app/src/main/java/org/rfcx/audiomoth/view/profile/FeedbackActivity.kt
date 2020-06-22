@@ -25,6 +25,7 @@ import com.zhihu.matisse.MimeType
 import kotlinx.android.synthetic.main.activity_feedback.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.adapter.BaseListItem
+import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.util.*
 import java.io.File
 
@@ -219,7 +220,8 @@ class FeedbackActivity : AppCompatActivity() {
         setEnableSendFeedbackView(false)
         sendFeedbackView.hideKeyboard()
 
-        Firestore(this).saveFeedback(feedbackInput, pathListArray) { success ->
+        Firestore(this)
+            .saveFeedback(feedbackInput, pathListArray) { success ->
             if (success) {
                 val intent = Intent()
                 setResult(ProfileFragment.RESULT_CODE, intent)

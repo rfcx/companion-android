@@ -1,11 +1,9 @@
 package org.rfcx.audiomoth.view.deployment
 
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import io.realm.Realm
@@ -16,9 +14,8 @@ import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.ProfileDb
-import org.rfcx.audiomoth.util.Firestore
-import org.rfcx.audiomoth.util.RealmHelper
-import org.rfcx.audiomoth.util.showCommonDialog
+import org.rfcx.audiomoth.service.DeploymentSyncWorker
+import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.LoadingDialogFragment
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
 import org.rfcx.audiomoth.view.deployment.configure.SelectProfileFragment
@@ -49,6 +46,10 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     private var _deployLocation: DeploymentLocation? = null
     private var _configuration: Configuration? = null
 
+    private val audioMothConnector: AudioMothConnector = AudioMothChimeConnector()
+    private val configuration = AudioMothConfiguration()
+    private val calendar = Calendar.getInstance()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_deployment)
@@ -74,11 +75,11 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         }
     }
 
-    override fun openWithEdgeDevice(){
+    override fun openWithEdgeDevice() {
         setupView()
     }
 
-    override fun openWithGuardianDevice(){
+    override fun openWithGuardianDevice() {
         finish()
     }
 
@@ -141,7 +142,6 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         _deployment?.let { deploymentDb.updateDeployment(it) }
         // update profile
         if (profile.name.isNotEmpty()) {
-            Firestore(this).saveProfile(profileDb, profile)
             profileDb.insertOrUpdateProfile(profile)
         }
 
@@ -190,7 +190,9 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
 
             deploymentImageDb.insertImage(it, images)
             deploymentDb.updateDeployment(it)
-            saveDevelopment(it)
+
+            DeploymentSyncWorker.enqueue(this@DeploymentActivity)
+            finish()
         }
     }
 
@@ -203,6 +205,34 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
 
     override fun startSyncing(status: String) {
         startFragment(SyncFragment.newInstance(status))
+    }
+
+    override fun playSyncSound() {
+        convertProfileToAudioMothConfiguration()
+        Thread {
+            audioMothConnector.setConfiguration(
+                calendar,
+                configuration,
+                arrayOf(0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08)
+            )
+            this@DeploymentActivity.runOnUiThread {
+                startSyncing(SyncFragment.AFTER_SYNC)
+            }
+        }.start()
+    }
+
+    private fun convertProfileToAudioMothConfiguration() {
+        val deployment = _deployment
+        if (deployment != null) {
+            configuration.sampleRate = deployment.getSampleRate()
+            configuration.gain = deployment.getGain()
+            configuration.sleepRecordCycle = deployment.getSleepRecordCycle()
+            configuration.startStopPeriods = deployment.getStartStopPeriods()
+        }
+    }
+
+    override fun playCheckBatterySound() {
+        Thread { audioMothConnector.getBatteryState() }.start()
     }
 
     override fun startCheckBattery(status: String, level: Int?) {
@@ -271,30 +301,6 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         this._deployment?.let { deploymentDb.updateDeployment(it) }
     }
 
-    private fun saveDevelopment(deployment: Deployment) {
-        Firestore(this).sendDeployment(deploymentDb, deployment) { string, isSuccess ->
-            if (isSuccess) {
-                Toast.makeText(
-                    this,
-                    getString(R.string.deployment_uploaded),
-                    Toast.LENGTH_SHORT
-                ).show()
-                hideLoading()
-                finish()
-            } else {
-                hideLoading()
-                showCommonDialog(
-                    title = "",
-                    message = string ?: getString(R.string.error_upload_deployment),
-                    onClick = DialogInterface.OnClickListener { dialog, _ ->
-                        dialog.dismiss()
-                        finish()
-                    }
-                )
-            }
-        }
-    }
-
     private fun showLoading() {
         val loadingDialog: LoadingDialogFragment =
             supportFragmentManager.findFragmentByTag(loadingDialogTag) as LoadingDialogFragment?
@@ -325,22 +331,4 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
             context.startActivity(intent)
         }
     }
-}
-
-interface DeploymentProtocol : BaseDeploymentProtocal {
-    fun openWithEdgeDevice()
-    fun openWithGuardianDevice()
-    fun startSetupConfigure(profile: Profile)
-    fun startSyncing(status: String)
-    fun startCheckBattery(status: String, level: Int?)
-
-    fun getProfiles(): List<Profile>
-    fun getProfile(): Profile?
-    fun getDeployment(): Deployment?
-    fun geConfiguration(): Configuration?
-
-    fun setDeployment(deployment: Deployment)
-    fun setProfile(profile: Profile)
-    fun setDeploymentConfigure(profile: Profile)
-    fun setPerformBattery(batteryDepletedAt: Timestamp, batteryLevel: Int)
 }

@@ -34,7 +34,7 @@ import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.localdb.LocateDb
-import org.rfcx.audiomoth.util.Firestore
+import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.view.deployment.BaseDeploymentProtocal
 import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
@@ -118,7 +118,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         val lat = latitudeEditText.text.toString().toDouble()
         val lng = longitudeEditText.text.toString().toDouble()
         val locate = Locate(name = name, latitude = lat, longitude = lng)
-        context?.let { Firestore(it).saveLocate(locateDb, locate) }
         deploymentProtocol?.setDeployLocation(locate)
         deploymentProtocol?.nextStep()
     }

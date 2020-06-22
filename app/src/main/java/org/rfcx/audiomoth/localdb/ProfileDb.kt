@@ -1,17 +1,34 @@
 package org.rfcx.audiomoth.localdb
 
 import io.realm.Realm
+import org.rfcx.audiomoth.entity.Deployment
+import org.rfcx.audiomoth.entity.DeploymentState
 import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.entity.SyncState
 
 class ProfileDb(private val realm: Realm) {
+
+    fun unsentCount(): Long {
+        return realm.where(Profile::class.java)
+            .notEqualTo(Profile.FIELD_SYNC_STATE, SyncState.Sent.key)
+            .count()
+    }
+
+    fun unlockSending() {
+        realm.executeTransaction {
+            val snapshot = it.where(Profile::class.java).equalTo(Profile.FIELD_SYNC_STATE, SyncState.Sending.key).findAll().createSnapshot()
+            snapshot.forEach {
+                it.syncState = SyncState.Unsent.key
+            }
+        }
+    }
 
     fun getProfiles(): List<Profile> {
         return realm.where(Profile::class.java).findAll() ?: arrayListOf()
     }
 
     fun markUploading(id: Int) {
-        mark(id = id, syncState = SyncState.Uploading.key)
+        mark(id = id, syncState = SyncState.Sending.key)
     }
 
     fun markUnsent(id: Int) {
@@ -30,6 +47,20 @@ class ProfileDb(private val realm: Realm) {
                 profile.syncState = syncState
             }
         }
+    }
+
+    fun lockUnsent(): List<Profile> {
+        var unsentCopied: List<Profile> = listOf()
+        realm.executeTransaction {
+            val unsent = it.where(Profile::class.java)
+                .equalTo(Profile.FIELD_SYNC_STATE, SyncState.Unsent.key).findAll()
+                .createSnapshot()
+            unsentCopied = unsent.toList()
+            unsent.forEach {d->
+                d.syncState = SyncState.Sending.key
+            }
+        }
+        return unsentCopied
     }
 
     fun insertOrUpdateProfile(profile: Profile){
