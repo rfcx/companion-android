@@ -15,7 +15,6 @@ import org.rfcx.audiomoth.MainActivityListener
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.util.getDefaultSiteName
 import org.rfcx.audiomoth.util.getUserNickname
-import org.rfcx.audiomoth.view.profile.coordinates.CoordinatesActivity
 
 class ProfileFragment : Fragment() {
     lateinit var listener: MainActivityListener
@@ -53,10 +52,6 @@ class ProfileFragment : Fragment() {
 
         logoutTextView.setOnClickListener {
             listener.onLogout()
-        }
-
-        coordinatesLinearLayout.setOnClickListener {
-            context?.let { it1 -> CoordinatesActivity.startActivity(it1) }
         }
     }
 

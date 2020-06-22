@@ -125,15 +125,6 @@
     <string name="profile_sign_out_label">Sign out</string>
     <string name="version_app">%s (%s)</string>
     <string name="profile_feedback_label">Feedback</string>
-    <string name="coordinates">Coordinates</string>
-    <string name="location">Location</string>
-
-    <string name="dd_coordinates">DD</string>
-    <string name="ddm_coordinates">DDM</string>
-    <string name="dms_coordinates">DMS</string>
-    <string name="dd_coordinates_format">0.00000°N 0.00000°E</string>
-    <string name="ddm_coordinates_format">0°0.0000\'N 0°0.0000\'E</string>
-    <string name="dms_coordinates_format">0°0\'0.0\"N 0°0\'0.0\"E</string>
 
     <!--  FeedbackActivity  -->
     <string name="app_feedback_share_ideas">Leave app feedback or share your ideas</string>

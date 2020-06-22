@@ -61,7 +61,7 @@
     </LinearLayout>
 
     <View
-        android:id="@+id/view"
+        android:id="@+id/view1"
         android:layout_width="match_parent"
         android:layout_height="10dp"
         android:layout_marginTop="@dimen/margin_padding_normal"
@@ -69,59 +69,11 @@
         app:layout_constraintTop_toBottomOf="@id/userProfileLayout" />
 
     <TextView
-        android:id="@+id/locationTextView"
-        style="@style/AudioMothText.Title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/margin_padding_normal"
-        android:text="@string/location"
-        android:textAllCaps="true"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/view" />
-
-    <LinearLayout
-        android:id="@+id/coordinatesLinearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground"
-        android:orientation="vertical"
-        android:paddingTop="@dimen/margin_padding_normal"
-        android:paddingBottom="@dimen/margin_padding_small"
-        app:layout_constraintTop_toBottomOf="@id/locationTextView">
-
-        <TextView
-            android:id="@+id/coordinatesTextViewTextView"
-            style="@style/AudioMothText.SubTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_padding_normal"
-            android:layout_marginEnd="@dimen/margin_padding_small"
-            android:text="@string/coordinates" />
-
-        <TextView
-            android:id="@+id/formatCoordinatesTextView"
-            style="@style/AudioMothText.Body.Secondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_padding_normal"
-            android:layout_marginEnd="@dimen/margin_padding_small"
-            tools:text="DD" />
-
-    </LinearLayout>
-
-    <View
-        android:id="@+id/view1"
-        android:layout_width="match_parent"
-        android:layout_height="10dp"
-        android:background="@color/grey_light"
-        app:layout_constraintTop_toBottomOf="@id/coordinatesLinearLayout" />
-
-    <TextView
         android:id="@+id/additionalTextView"
         style="@style/AudioMothText.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="@dimen/margin_padding_normal"
+        android:layout_margin="@dimen/margin_padding_normal"
         android:text="@string/profile_aditional_label"
         android:textAllCaps="true"
         app:layout_constraintStart_toStartOf="parent"
@@ -174,7 +126,7 @@
         style="@style/AudioMothText.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="@dimen/margin_padding_normal"
+        android:layout_margin="@dimen/margin_padding_normal"
         android:text="@string/account"
         android:textAllCaps="true"
         app:layout_constraintStart_toStartOf="parent"
