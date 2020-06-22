@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_deployment.*
+import org.rfcx.audiomoth.BuildConfig
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.*
 import org.rfcx.audiomoth.localdb.DeploymentDb
@@ -52,23 +53,13 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         setContentView(R.layout.activity_deployment)
         val deploymentId = intent.extras?.getInt(DEPLOYMENT_ID)
         if (deploymentId != null) {
-            val deployment = deploymentDb.getDeploymentById(deploymentId)
-            if (deployment != null) {
-                setDeployment(deployment)
-
-                if (deployment.location != null) {
-                    _deployLocation = deployment.location
-                }
-
-                if (deployment.configuration != null) {
-                    _configuration = deployment.configuration
-                }
-                currentStep = deployment.state - 1
-                stepView.go(currentStep, true)
-                handleFragment(currentStep)
-            }
+            handleDeploymentStep(deploymentId)
         } else {
-            startFragment(ChooseDeviceFragment.newInstance())
+            if (BuildConfig.ENABLE_ALL) {
+                startFragment(ChooseDeviceFragment.newInstance())
+            } else {
+                openWithEdgeDevice()
+            }
         }
     }
 
@@ -78,13 +69,6 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
 
     override fun openWithGuardianDevice() {
         finish()
-    }
-
-    private fun setupView() {
-        handleFragment(currentStep) // start page
-        completeStepButton.setOnClickListener {
-            nextStep()
-        }
     }
 
     override fun hideCompleteButton() {
@@ -207,6 +191,31 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
 
     override fun startCheckBattery(status: String, level: Int?) {
         startFragment(PerformBatteryFragment.newInstance(status, level))
+    }
+
+    private fun setupView() {
+        handleFragment(currentStep) // start page
+        completeStepButton.setOnClickListener {
+            nextStep()
+        }
+    }
+
+    private fun handleDeploymentStep(deploymentId: Int) {
+        val deployment = deploymentDb.getDeploymentById(deploymentId)
+        if (deployment != null) {
+            setDeployment(deployment)
+
+            if (deployment.location != null) {
+                _deployLocation = deployment.location
+            }
+
+            if (deployment.configuration != null) {
+                _configuration = deployment.configuration
+            }
+            currentStep = deployment.state - 1
+            stepView.go(currentStep, true)
+            handleFragment(currentStep)
+        }
     }
 
     private fun handleFragment(currentStep: Int) {
