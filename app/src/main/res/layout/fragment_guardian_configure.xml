@@ -101,10 +101,10 @@
                     android:layout_height="wrap_content"
                     android:text="@string/duration" />
 
-                <TextView
-                    android:id="@+id/durationValueTextView"
+                <EditText
+                    android:id="@+id/durationValueEditText"
                     style="@style/AudioMothText.Body.Secondary"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingBottom="@dimen/margin_padding_small"
                     tools:text="90" />
