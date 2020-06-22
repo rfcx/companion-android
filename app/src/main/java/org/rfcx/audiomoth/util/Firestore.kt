@@ -8,14 +8,10 @@ import org.rfcx.audiomoth.entity.Deployment.Companion.PHOTOS
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.entity.User
-import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
-import org.rfcx.audiomoth.entity.guardian.GuardianProfile
 import org.rfcx.audiomoth.entity.request.toRequestBody
 import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.ProfileDb
-import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
-import org.rfcx.audiomoth.localdb.guardian.GuardianProfileDb
 import java.sql.Timestamp
 
 interface FirestoreResponseCallback<T> {
@@ -58,24 +54,6 @@ class Firestore(val context: Context) {
             }
     }
 
-    //TODO: Make it for guardian deployment
-//    fun sendDeployment(deploymentDb: GuardianDeploymentDb, deployment: GuardianDeployment, callback: (String?, Boolean) -> Unit) {
-//        // set uploaded
-//        deploymentDb.markUploading(deployment.id)
-//
-//        db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_DEPLOYMENTS)
-//            .add(deployment.toRequestBody())
-//            .addOnSuccessListener { documentReference ->
-//                val serverId = documentReference.id
-//                deploymentDb.markSent(serverId, deployment.id)
-//                callback(documentReference.id, true)
-//            }
-//            .addOnFailureListener { e ->
-//                deploymentDb.markUnsent(deployment.id)
-//                callback(e.message, false)
-//            }
-//    }
-
     fun updateDeployment(deploymentId: String, photos: ArrayList<String>) {
         db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_DEPLOYMENTS)
             .document(deploymentId)
@@ -95,21 +73,6 @@ class Firestore(val context: Context) {
                 profileDb.markUnsent(profile.id)
             }
     }
-
-    //TODO: Make it for guardian profile
-//    fun saveProfile(profileDb: GuardianProfileDb, profile: GuardianProfile) {
-//        // set uploaded
-//        profileDb.markUploading(profile.id)
-//        db.collection(COLLECTION_USERS).document(guid).collection(COLLECTION_PROFILES)
-//            .add(profile.toRequestBody())
-//            .addOnSuccessListener { documentReference ->
-//                val serverId = documentReference.id
-//                profileDb.markSent(serverId, profile.id)
-//            }
-//            .addOnFailureListener { e ->
-//                profileDb.markUnsent(profile.id)
-//            }
-//    }
 
     fun saveLocate(locateDb: LocateDb, locate: Locate) {
         // set uploaded
