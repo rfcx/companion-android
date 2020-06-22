@@ -227,27 +227,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     //TODO: Make it for guardian deployment
     private fun saveDevelopment(deployment: GuardianDeployment) {
-//        Firestore(this).sendDeployment(deploymentDb, deployment) { string, isSuccess ->
-//            if (isSuccess) {
-//                Toast.makeText(
-//                    this,
-//                    getString(R.string.deployment_uploaded),
-//                    Toast.LENGTH_SHORT
-//                ).show()
-//                hideLoading()
-//                finish()
-//            } else {
-//                hideLoading()
-//                showCommonDialog(
-//                    title = "",
-//                    message = string ?: getString(R.string.error_upload_deployment),
-//                    onClick = DialogInterface.OnClickListener { dialog, _ ->
-//                        dialog.dismiss()
-//                        finish()
-//                    }
-//                )
-//            }
-//        }
         hideLoading()
         finish()
     }
