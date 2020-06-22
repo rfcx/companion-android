@@ -1,6 +1,5 @@
 package org.rfcx.audiomoth.view.deployment.guardian
 
-import org.rfcx.audiomoth.view.deployment.DeployFragment
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -10,34 +9,34 @@ import androidx.fragment.app.Fragment
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_deployment.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.*
+import org.rfcx.audiomoth.entity.DeploymentLocation
+import org.rfcx.audiomoth.entity.DeploymentState
+import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.guardian.GuardianConfiguration
 import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
 import org.rfcx.audiomoth.entity.guardian.GuardianProfile
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
+import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentImageDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianProfileDb
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.view.LoadingDialogFragment
-import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
 import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianConfigureFragment
 import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianSelectProfileFragment
 import org.rfcx.audiomoth.view.deployment.guardian.connect.ConnectGuardianFragment
 import org.rfcx.audiomoth.view.deployment.guardian.deploy.GuardianDeployFragment
 import org.rfcx.audiomoth.view.deployment.guardian.sync.GuardianSyncFragment
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
-import org.rfcx.audiomoth.view.deployment.sync.SyncFragment
 import org.rfcx.audiomoth.view.deployment.sync.SyncFragment.Companion.BEFORE_SYNC
 import java.util.*
 
 class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtocol {
     // manager database
-    // TODO: need to implement db for guardian
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-//    private val deploymentDb by lazy { DeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
     private val profileDb by lazy { GuardianProfileDb(realm) }
     private val deploymentDb by lazy { GuardianDeploymentDb(realm) }
+    private val deploymentImageDb by lazy { GuardianDeploymentImageDb(realm) }
 
     private var currentStep = 0
     private var _profiles: List<GuardianProfile> = listOf()
@@ -160,15 +159,16 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     override fun setReadyToDeploy(images: List<String>) {
         stepView.done(true)
         showLoading()
-//        _deployment?.let {
-//            it.deployedAt = Date()
-//            it.state = DeploymentState.Guardian.ReadyToUpload.key
-//            setDeployment(it)
+        _deployment?.let {
+            it.deployedAt = Date()
+            it.state = DeploymentState.Guardian.ReadyToUpload.key
+            setDeployment(it)
 
-//            deploymentImageDb.insertImage(it, images)
-//            deploymentDb.updateDeployment(it)
-//        }
-//        saveDevelopment(it)
+            deploymentImageDb.insertImage(it, images)
+            deploymentDb.updateDeployment(it)
+
+            saveDevelopment(it)
+        }
     }
 
     override fun startSetupConfigure(profile: GuardianProfile) {
@@ -225,28 +225,10 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         this._deployment?.let { deploymentDb.updateDeployment(it) }
     }
 
-    private fun saveDevelopment(deployment: Deployment) {
-//        Firestore(this).saveDeployment(deploymentDb, deployment) { string, isSuccess ->
-//            if (isSuccess) {
-//                Toast.makeText(
-//                    this,
-//                    getString(R.string.deployment_uploaded),
-//                    Toast.LENGTH_SHORT
-//                ).show()
-//                hideLoading()
-//                finish()
-//            } else {
-//                hideLoading()
-//                showCommonDialog(
-//                    title = "",
-//                    message = string ?: getString(R.string.error_upload_deployment),
-//                    onClick = DialogInterface.OnClickListener { dialog, _ ->
-//                        dialog.dismiss()
-//                        finish()
-//                    }
-//                )
-//            }
-//        }
+    //TODO: Make it for guardian deployment
+    private fun saveDevelopment(deployment: GuardianDeployment) {
+        hideLoading()
+        finish()
     }
 
     private fun showLoading() {
