@@ -19,7 +19,6 @@ import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.LoginActivity
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity
-import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.audiomoth.view.map.MapFragment
 import org.rfcx.audiomoth.view.profile.ProfileFragment
 import org.rfcx.audiomoth.widget.BottomNavigationMenuItem
@@ -65,7 +64,7 @@ open class MainActivity : AppCompatActivity(), MainActivityListener {
         setContentView(R.layout.activity_main)
 
         createLocationButton.setOnClickListener {
-            GuardianDeploymentActivity.startActivity(this)
+            DeploymentActivity.startActivity(this)
         }
 
         setupSimpleTooltip()
