@@ -1,11 +1,8 @@
 package org.rfcx.audiomoth.connection.socket
 
-import android.app.Activity
-import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
 import org.json.JSONObject
-import org.rfcx.audiomoth.entity.guardian.GuardianConfiguration
 import org.rfcx.audiomoth.entity.socket.*
 import java.io.DataInputStream
 import java.io.DataOutputStream
@@ -24,23 +21,29 @@ object SocketManager {
     private val CONNECTION = "connection"
     private val DIAGNOSTIC = "diagnostic"
     private val CONFIGURE = "configure"
+    private val SYNC = "sync"
 
-    fun connect(onReceiveRespoonse: OnReceiveResponse) {
+    fun connect(onReceiveResponse: OnReceiveResponse) {
         val data = gson.toJson(SocketRequest(CONNECTION))
-        sendData(data, onReceiveRespoonse)
+        sendData(data, onReceiveResponse)
     }
 
-    fun getDiagnosticData(onReceiveRespoonse: OnReceiveResponse) {
+    fun getDiagnosticData(onReceiveResponse: OnReceiveResponse) {
         val data = gson.toJson(SocketRequest(DIAGNOSTIC))
-        sendData(data, onReceiveRespoonse)
+        sendData(data, onReceiveResponse)
     }
 
-    fun getCurrentConfiguration(onReceiveRespoonse: OnReceiveResponse) {
+    fun getCurrentConfiguration(onReceiveResponse: OnReceiveResponse) {
         val data = gson.toJson(SocketRequest(CONFIGURE))
-        sendData(data, onReceiveRespoonse)
+        sendData(data, onReceiveResponse)
     }
 
-    private fun sendData(data: String, onReceiveRespoonse: OnReceiveResponse) {
+    fun syncConfiguration(config: List<String>, onReceiveResponse: OnReceiveResponse) {
+        val jsonString = gson.toJson(SyncConfigurationRequest(SyncConfiguration(config)))
+        sendData(jsonString, onReceiveResponse)
+    }
+
+    private fun sendData(data: String, onReceiveResponse: OnReceiveResponse) {
         clientThread = Thread(Runnable {
             try {
                 socket = Socket("192.168.43.1", 9999)
@@ -65,17 +68,26 @@ object SocketManager {
                             CONFIGURE -> {
                                 val response = gson.fromJson(dataInput, ConfigurationResponse::class.java)
                                 Log.d(LOGTAG, "Configure response: $response")
-                                onReceiveRespoonse.onReceive(response)
+                                onReceiveResponse.onReceive(response)
                             }
                             DIAGNOSTIC -> {
                                 val response = gson.fromJson(dataInput, DiagnosticResponse::class.java)
                                 Log.d(LOGTAG, "Diagnostic response: ${response.diagnostic}")
-                                onReceiveRespoonse.onReceive(response)
+                                onReceiveResponse.onReceive(response)
                             }
                             CONNECTION -> {
                                 val response = gson.fromJson(dataInput, ConnectionResponse::class.java)
                                 Log.d(LOGTAG, "Connection status: ${response.connection.status}")
-                                onReceiveRespoonse.onReceive(response)
+                                onReceiveResponse.onReceive(response)
+                            }
+                            SYNC -> {
+                                val response = gson.fromJson(dataInput, SyncConfigurationResponse::class.java)
+                                Log.d(LOGTAG, "Sync status: ${response.sync.status}")
+                                if (response.sync.status == "success"){
+                                    onReceiveResponse.onReceive(response)
+                                } else {
+                                    onReceiveResponse.onFailed()
+                                }
                             }
                         }
                     }

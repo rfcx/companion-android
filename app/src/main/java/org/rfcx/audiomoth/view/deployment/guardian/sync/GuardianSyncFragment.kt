@@ -2,13 +2,16 @@ package org.rfcx.audiomoth.view.deployment.guardian.sync
 
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import kotlinx.android.synthetic.main.fragment_sync.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.connection.socket.OnReceiveResponse
+import org.rfcx.audiomoth.connection.socket.SocketManager
+import org.rfcx.audiomoth.entity.guardian.GuardianConfiguration
+import org.rfcx.audiomoth.entity.guardian.toListForGuardian
+import org.rfcx.audiomoth.entity.socket.SocketResposne
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianSyncFragment : Fragment() {
@@ -19,40 +22,38 @@ class GuardianSyncFragment : Fragment() {
         deploymentProtocol = (context as GuardianDeploymentProtocol)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        //TODO: create seperate layout for guardian
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_guardian_sync, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        syncing()
+        val config = deploymentProtocol?.getConfiguration()
+        syncing(config!!)
     }
 
-    private fun syncing() {
-        var i = 0
-        val handler = Handler()
-
-        //TODO: implement Socket data transfer here and use response back to continue next step
-        val timerRunnable = object : Runnable {
-            override fun run() {
-                if (i != 100) {
-                    i += 20
-                    if (progressBarHorizontal != null && percentSyncTextView != null) {
-                        progressBarHorizontal.progress = i
-                        percentSyncTextView.text = "$i %"
-                    }
-                    handler.postDelayed(this, 500)
-                } else {
+    private fun syncing(config: GuardianConfiguration) {
+        SocketManager.syncConfiguration(config.toListForGuardian(), object : OnReceiveResponse {
+            override fun onReceive(response: SocketResposne) {
+                activity!!.runOnUiThread {
                     deploymentProtocol?.nextStep()
                 }
             }
-        }
-        handler.postDelayed(timerRunnable, 0)
+
+            override fun onFailed() {
+                activity!!.runOnUiThread {
+                    deploymentProtocol?.backToConfigure()
+                }
+            }
+        })
     }
 
     companion object {
-        fun newInstance(page: String) : GuardianSyncFragment {
+        fun newInstance(page: String): GuardianSyncFragment {
             return GuardianSyncFragment()
         }
     }
