@@ -248,6 +248,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 //                )
 //            }
 //        }
+        hideLoading()
+        finish()
     }
 
     private fun showLoading() {
