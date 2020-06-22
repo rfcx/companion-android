@@ -12,11 +12,25 @@
         app:layout_constraintGuide_percent="0.1" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guidelineHorizontal"
+        android:id="@+id/guidelineHorizontal3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.40" />
+        app:layout_constraintGuide_percent="0.30" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineHorizontal5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.55" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineHorizontal9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.90" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/readySendConfigureTextView"
@@ -39,17 +53,6 @@
         android:background="@color/colorPrimary"
         app:layout_constraintTop_toBottomOf="@id/readySendConfigureTextView" />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/configImageView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:src="@drawable/edge_config"
-        android:layout_margin="@dimen/margin_padding_small"
-        app:layout_constraintBottom_toBottomOf="@id/guidelineHorizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/guidelineHorizontalTop" />
-
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/switchToConfigTextView"
         style="@style/AudioMothText.Subhead.Small"
@@ -60,7 +63,18 @@
         android:layout_marginEnd="@dimen/margin_padding_large"
         android:text="@string/switch_to_config"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/guidelineHorizontal" />
+        app:layout_constraintTop_toBottomOf="@id/guidelineHorizontalTop" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/configImageView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/config_zoom"
+        android:layout_margin="@dimen/margin_padding_small"
+        app:layout_constraintBottom_toBottomOf="@id/guidelineHorizontal3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/switchToConfigTextView" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/maxVolumeTextView"
@@ -71,9 +85,19 @@
         android:layout_marginTop="@dimen/margin_padding_normal"
         android:layout_marginEnd="@dimen/margin_padding_large"
         android:text="@string/max_volume"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/guidelineHorizontal3" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/volumeImageView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/volume"
+        android:layout_margin="@dimen/margin_padding_small"
+        app:layout_constraintBottom_toBottomOf="@id/guidelineHorizontal5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/switchToConfigTextView" />
+        app:layout_constraintTop_toBottomOf="@id/maxVolumeTextView" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/holdDeviceTextView"
@@ -83,10 +107,20 @@
         android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginTop="@dimen/margin_padding_normal"
         android:layout_marginEnd="@dimen/margin_padding_large"
-        app:layout_constraintEnd_toEndOf="parent"
         android:text="@string/hold_device"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/maxVolumeTextView" />
+        app:layout_constraintTop_toBottomOf="@id/guidelineHorizontal5" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/deviceCloseImageView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/device__close"
+        android:layout_margin="@dimen/margin_padding_small"
+        app:layout_constraintBottom_toBottomOf="@id/guidelineHorizontal9"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/holdDeviceTextView" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/nextButton"
