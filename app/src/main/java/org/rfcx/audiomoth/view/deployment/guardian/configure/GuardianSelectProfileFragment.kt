@@ -3,7 +3,6 @@ package org.rfcx.audiomoth.view.deployment.guardian.configure
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,11 +16,9 @@ import kotlinx.android.synthetic.main.fragment_select_profile.tryAgainTextView
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.OnReceiveResponse
 import org.rfcx.audiomoth.connection.socket.SocketManager
-import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.entity.guardian.GuardianProfile
 import org.rfcx.audiomoth.entity.socket.ConfigurationResponse
 import org.rfcx.audiomoth.entity.socket.SocketResposne
-import org.rfcx.audiomoth.view.deployment.configure.ProfilesAdapter
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianSelectProfileFragment : Fragment(), (GuardianProfile) -> Unit {
