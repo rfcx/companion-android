@@ -34,8 +34,9 @@ import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.localdb.LocateDb
-import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.util.RealmHelper
+import org.rfcx.audiomoth.util.latitudeCoordinates
+import org.rfcx.audiomoth.util.longitudeCoordinates
 import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 
 class LocationFragment : Fragment(), OnMapReadyCallback {
@@ -139,7 +140,13 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 R.id.existingRadioButton -> {
                     locateItem?.let {
                         setPinOnMap(it.getLatLng())
-                        setupView(it.latitude.toString(), it.longitude.toString(), false)
+                        context?.let { context ->
+                            setupView(
+                                locateItem?.latitude.latitudeCoordinates(context),
+                                locateItem?.longitude.longitudeCoordinates(context),
+                                false
+                            )
+                        }
                     }
                     locationNameTextInput.visibility = View.GONE
                     locationNameSpinner.visibility = View.VISIBLE
@@ -173,11 +180,13 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             ) {
                 locateItem = locateItems[position]
                 setPinOnMap(locateItem!!.getLatLng())
-                setupView(
-                    locateItem?.latitude.toString(),
-                    locateItem?.longitude.toString(),
-                    false
-                )
+                context?.let {
+                    setupView(
+                        locateItem?.latitude.latitudeCoordinates(it),
+                        locateItem?.longitude.longitudeCoordinates(it),
+                        false
+                    )
+                }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -225,11 +234,13 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     String.format("%.6f", lastLocation.longitude), true
                 )
             }
-            setupInputLocation()
             setupLocationOptions()
 
             getLastLocation()
             retrieveDeployLocations()
+
+            // TODO: setup pin map when enter location
+
         }
     }
 

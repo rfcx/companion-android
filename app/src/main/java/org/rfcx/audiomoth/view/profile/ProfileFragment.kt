@@ -13,6 +13,7 @@ import kotlinx.android.synthetic.main.fragment_profile.*
 import org.rfcx.audiomoth.BuildConfig
 import org.rfcx.audiomoth.MainActivityListener
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.util.getCoordinatesFormat
 import org.rfcx.audiomoth.util.getDefaultSiteName
 import org.rfcx.audiomoth.util.getUserNickname
 import org.rfcx.audiomoth.view.profile.coordinates.CoordinatesActivity
@@ -45,6 +46,7 @@ class ProfileFragment : Fragment() {
             BuildConfig.VERSION_NAME,
             BuildConfig.VERSION_CODE.toString()
         )
+        formatCoordinatesTextView.text = context?.getCoordinatesFormat()
 
         feedbackTextView.setOnClickListener {
             val intent = Intent(activity, FeedbackActivity::class.java)
@@ -68,6 +70,11 @@ class ProfileFragment : Fragment() {
                 .setAnimationMode(Snackbar.ANIMATION_MODE_SLIDE)
                 .setAnchorView(R.id.createLocationButton).show()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        formatCoordinatesTextView.text = context?.getCoordinatesFormat()
     }
 
     companion object {
