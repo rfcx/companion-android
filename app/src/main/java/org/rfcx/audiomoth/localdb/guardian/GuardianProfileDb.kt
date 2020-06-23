@@ -11,7 +11,7 @@ class GuardianProfileDb(private val realm: Realm) {
     }
 
     fun markUploading(id: Int) {
-        mark(id = id, syncState = SyncState.Uploading.key)
+        mark(id = id, syncState = SyncState.Sending.key)
     }
 
     fun markUnsent(id: Int) {

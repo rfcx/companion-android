@@ -78,7 +78,7 @@ class DeploymentDb(private val realm: Realm) {
         var unsentCopied: List<Deployment> = listOf()
         realm.executeTransaction {
             val unsent = it.where(Deployment::class.java)
-                .equalTo(Deployment.FIELD_STATE, DeploymentState.ReadyToUpload.key)
+                .equalTo(Deployment.FIELD_STATE, DeploymentState.AudioMoth.ReadyToUpload.key)
                 .and()
                 .equalTo(Deployment.FIELD_SYNC_STATE, SyncState.Unsent.key).findAll()
                 .createSnapshot()

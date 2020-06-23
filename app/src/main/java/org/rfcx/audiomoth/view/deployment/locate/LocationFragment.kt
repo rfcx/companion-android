@@ -3,6 +3,7 @@ package org.rfcx.audiomoth.view.deployment.locate
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
@@ -17,11 +18,15 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
+import com.mapbox.mapboxsdk.location.LocationComponentOptions
+import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
@@ -34,9 +39,8 @@ import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.localdb.LocateDb
-import org.rfcx.audiomoth.repo.Firestore
+import org.rfcx.audiomoth.util.LocationPermissions
 import org.rfcx.audiomoth.util.RealmHelper
-import org.rfcx.audiomoth.view.deployment.BaseDeploymentProtocal
 import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 
 class LocationFragment : Fragment(), OnMapReadyCallback {
@@ -54,11 +58,17 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var locateItem: Locate? = null
     private var locateAdapter: ArrayAdapter<String>? = null
 
-    private var deploymentProtocol: BaseDeploymentProtocal? = null
+    private var deploymentProtocol: DeploymentProtocol? = null
+    private val locationPermissions by lazy { activity?.let { LocationPermissions(it) } }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        locationPermissions?.handleActivityResult(requestCode, resultCode)
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        deploymentProtocol = context as BaseDeploymentProtocal
+        deploymentProtocol = context as DeploymentProtocol
     }
 
     override fun onCreateView(
@@ -230,9 +240,46 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             setupLocationOptions()
 
             getLastLocation()
+            checkThenAcquireLocation(it)
             retrieveDeployLocations()
         }
     }
+
+    private fun checkThenAcquireLocation(style: Style) {
+        locationPermissions?.check { isAllowed: Boolean ->
+            if (isAllowed) {
+                enableLocationComponent(style)
+            }
+        }
+    }
+
+    private fun enableLocationComponent(style: Style) {
+        val customLocationComponentOptions = context?.let {
+            LocationComponentOptions.builder(it)
+                .trackingGesturesManagement(true)
+                .accuracyColor(ContextCompat.getColor(it, R.color.colorPrimary))
+                .build()
+        }
+
+        val locationComponentActivationOptions =
+            context?.let {
+                LocationComponentActivationOptions.builder(it, style)
+                    .locationComponentOptions(customLocationComponentOptions)
+                    .build()
+            }
+
+        mapboxMap?.let { it ->
+            it.locationComponent.apply {
+                if (locationComponentActivationOptions != null) {
+                    activateLocationComponent(locationComponentActivationOptions)
+                }
+
+                isLocationComponentEnabled = true
+                renderMode = RenderMode.COMPASS
+            }
+        }
+    }
+
 
     private fun setPinOnMap(latLng: LatLng) {
         symbolManager.deleteAll()
@@ -359,6 +406,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         permissions: Array<String>,
         grantResults: IntArray
     ) {
+        locationPermissions?.handleRequestResult(requestCode, grantResults)
+
         if (requestCode == REQUEST_PERMISSIONS_REQUEST_CODE) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 getLastLocation()
