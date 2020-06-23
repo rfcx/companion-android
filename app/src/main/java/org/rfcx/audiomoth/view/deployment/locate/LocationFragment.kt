@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -122,8 +123,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private fun setLocate() {
         when (context.getCoordinatesFormat()) {
             CoordinatesActivity.DD_FORMAT -> {
-                if (latitudeEditText.text.toString().matches(FORMAT_LATITUDE.toRegex())) {
-                    if (longitudeEditText.text.toString().matches(FORMAT_LONGITUDE.toRegex())) {
+                if (latitudeEditText.text.toString().matches(FORMAT_LATITUDE_DD.toRegex())) {
+                    if (longitudeEditText.text.toString().matches(FORMAT_LONGITUDE_DD.toRegex())) {
                         handleNewLocate(
                             latitudeEditText.text.toString().replaceDDToNumber(),
                             longitudeEditText.text.toString().replaceDDToNumber()
@@ -136,6 +137,18 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 }
             }
             CoordinatesActivity.DDM_FORMAT -> {
+                if (latitudeEditText.text.toString().matches(FORMAT_LATITUDE_DDM.toRegex())) {
+                    if (longitudeEditText.text.toString().matches(FORMAT_LONGITUDE_DDM.toRegex())) {
+                        handleNewLocate(
+                            latitudeEditText.text.toString().replaceDDMToNumber(),
+                            longitudeEditText.text.toString().replaceDDMToNumber()
+                        )
+                    } else {
+                        longitudeEditText.error = getString(R.string.wrong_format)
+                    }
+                } else {
+                    latitudeEditText.error = getString(R.string.wrong_format)
+                }
             }
             CoordinatesActivity.DMS_FORMAT -> {
             }
@@ -319,7 +332,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     fun convertInputLatitude(latitude: String) {
         when (context.getCoordinatesFormat()) {
             CoordinatesActivity.DD_FORMAT -> {
-                if (latitude.matches(FORMAT_LATITUDE.toRegex())) {
+                if (latitude.matches(FORMAT_LATITUDE_DD.toRegex())) {
                     setPinOnMap(
                         LatLng(
                             latitude.replaceDDToNumber(),
@@ -331,6 +344,16 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 }
             }
             CoordinatesActivity.DDM_FORMAT -> {
+                if (latitude.matches(FORMAT_LATITUDE_DDM.toRegex())) {
+                    setPinOnMap(
+                        LatLng(
+                            latitude.replaceDDMToNumber(),
+                            longitudeEditText.text.toString().replaceDDMToNumber()
+                        )
+                    )
+                } else {
+                    latitudeEditText.error = getString(R.string.wrong_format)
+                }
             }
             CoordinatesActivity.DMS_FORMAT -> {
             }
@@ -340,7 +363,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     fun convertInputLongitude(longitude: String) {
         when (context.getCoordinatesFormat()) {
             CoordinatesActivity.DD_FORMAT -> {
-                if (longitude.matches(FORMAT_LONGITUDE.toRegex())) {
+                if (longitude.matches(FORMAT_LONGITUDE_DD.toRegex())) {
                     setPinOnMap(
                         LatLng(
                             latitudeEditText.text.toString().replaceDDToNumber(),
@@ -352,6 +375,16 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 }
             }
             CoordinatesActivity.DDM_FORMAT -> {
+                if (longitude.matches(FORMAT_LONGITUDE_DDM.toRegex())) {
+                    setPinOnMap(
+                        LatLng(
+                            latitudeEditText.text.toString().replaceDDMToNumber(),
+                            longitude.replaceDDMToNumber()
+                        )
+                    )
+                } else {
+                    longitudeEditText.error = getString(R.string.wrong_format)
+                }
             }
             CoordinatesActivity.DMS_FORMAT -> {
             }
@@ -465,9 +498,13 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         const val TAG = "LocationFragment"
         const val REQUEST_PERMISSIONS_REQUEST_CODE = 34
         const val PIN_MAP = "pin-map"
-        const val FORMAT_LATITUDE = "^(([1-8]?[0-9])(\\.[0-9]{1,6})?|90(\\.0{1,6})?)(\\°)([NSns])\$"
-        const val FORMAT_LONGITUDE =
+        const val FORMAT_LATITUDE_DD = "^(([1-8]?[0-9])(\\.[0-9]{1,6})?|90(\\.0{1,6})?)(\\°)([NSns])\$"
+        const val FORMAT_LONGITUDE_DD =
             "^((([1-9]?[0-9]|1[0-7][0-9])(\\.[0-9]{1,6})?)|180(\\.0{1,6})?)(\\°)([EWew])\$"
+
+        const val FORMAT_LATITUDE_DDM = "^(([1-8]?[0-9])(\\°[1-5]?[0-9])(\\.[0-9]{1,6})?|90(\\°0{1,6})?|([1-8]?[0-9])(\\°0{1,6})?)(\\')([NSns])\$"
+        const val FORMAT_LONGITUDE_DDM =
+            "^(([1-9]?[0-9]|1[0-7][0-9])(\\°[1-5]?[0-9])(\\.[0-9]{1,6})?|180(\\°0{1,6})?|([1-9]?[0-9]|1[0-7][0-9])(\\°0{1,6})?)(\\')([EWew])\$"
 
         fun newInstance(): LocationFragment {
             return LocationFragment()
