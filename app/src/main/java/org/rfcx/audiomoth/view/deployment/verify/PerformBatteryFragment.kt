@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.confirm_perform_battery.*
 import kotlinx.android.synthetic.main.fragment_battery_level.*
 import kotlinx.android.synthetic.main.fragment_perform_battery.*
@@ -20,11 +21,16 @@ import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 import java.sql.Timestamp
 import java.util.*
 
-class PerformBatteryFragment : Fragment() {
+class PerformBatteryFragment : Fragment(), OnItemClickListener {
     private var status: String? = null
     private var deploymentProtocol: DeploymentProtocol? = null
     private var location: DeploymentLocation? = null
-
+    private val levelAdapter by lazy {
+        BatteryLevelAdapter(
+            this,
+            context
+        )
+    }
     private val day = 24 * 60 * 60 * 1000
 
     override fun onAttach(context: Context) {
@@ -80,22 +86,32 @@ class PerformBatteryFragment : Fragment() {
         tryAgainButton.setOnClickListener {
             deploymentProtocol?.playCheckBatterySound()
         }
+        setLevelRecyclerView()
+//        batteryLv1Button.setOnClickListener {
+//            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 1)
+//        }
+//        batteryLv2Button.setOnClickListener {
+//            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 2)
+//        }
+//        batteryLv3Button.setOnClickListener {
+//            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 3)
+//        }
+//        batteryLv4Button.setOnClickListener {
+//            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 4)
+//        }
+//        batteryLv5Button.setOnClickListener {
+//            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 5)
+//        }
 
-        batteryLv1Button.setOnClickListener {
-            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 1)
+
+    }
+
+    private fun setLevelRecyclerView() {
+        recyclerView.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = levelAdapter
         }
-        batteryLv2Button.setOnClickListener {
-            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 2)
-        }
-        batteryLv3Button.setOnClickListener {
-            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 3)
-        }
-        batteryLv4Button.setOnClickListener {
-            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 4)
-        }
-        batteryLv5Button.setOnClickListener {
-            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 5)
-        }
+        levelAdapter.items = arrayListOf("1", "2", "3", "4", "5", "6")
     }
 
     private fun knowBatteryLevel() {
@@ -223,12 +239,27 @@ class PerformBatteryFragment : Fragment() {
         @JvmStatic
         fun newInstance(page: String, level: Int?) = PerformBatteryFragment()
             .apply {
-            arguments = Bundle().apply {
-                putString(STATUS, page)
-                if (level != null) {
-                    putInt(LEVEL, level)
+                arguments = Bundle().apply {
+                    putString(STATUS, page)
+                    if (level != null) {
+                        putInt(LEVEL, level)
+                    }
                 }
             }
+    }
+
+    override fun onLevelItemClick(item: String) {
+        when (item) {
+            "1" -> deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 1)
+            "2" -> deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 2)
+            "3" -> deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 3)
+            "4" -> deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 4)
+            "5" -> deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 5)
+            "6" -> deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 5)
         }
     }
+}
+
+interface OnItemClickListener {
+    fun onLevelItemClick(item: String)
 }
