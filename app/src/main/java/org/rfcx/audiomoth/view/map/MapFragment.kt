@@ -358,7 +358,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 Pair(PROPERTY_MARKER_LOCATION_ID, location.name),
                 Pair(
                     PROPERTY_MARKER_IMAGE,
-                    if (it.state == DeploymentState.AudioMoth.ReadyToUpload.key)
+                    if (it.state == AudioMoth.ReadyToUpload.key)
                         Battery.getBatteryPinImage(it.batteryDepletedAt.time)
                     else
                         Battery.BATTERY_PIN_GREY
@@ -367,13 +367,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 Pair(PROPERTY_MARKER_DEPLOYMENT_ID, it.id.toString()),
                 Pair(
                     PROPERTY_MARKER_CAPTION,
-                    if (it.state >= DeploymentState.AudioMoth.ReadyToUpload.key)
+                    if (it.state >=AudioMoth.ReadyToUpload.key)
                         Battery.getPredictionBattery(it.batteryDepletedAt.time)
                     else
-                        getString(
-                            R.string.format_in_progress_step,
-                            DeploymentState.AudioMoth.fromInt(it.state)
-                        )
+                        getString(R.string.format_in_progress_step)
                 )
             )
             Feature.fromGeometry(

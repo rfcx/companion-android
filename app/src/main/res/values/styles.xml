@@ -57,6 +57,12 @@
         <item name="android:textColor">@android:color/black</item>
     </style>
 
+    <style name="AudioMothButton.GreenButton.Line" parent="AudioMothButton">
+        <item name="android:background">@drawable/bg_button_green</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+    </style>
+
     <!-- TextView -->
     <style name="AudioMothText" parent="Widget.AppCompat.TextView"/>
 

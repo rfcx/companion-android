@@ -24,7 +24,6 @@ class PerformBatteryFragment : Fragment() {
     private var status: String? = null
     private var deploymentProtocol: DeploymentProtocol? = null
     private var location: DeploymentLocation? = null
-
     private val day = 24 * 60 * 60 * 1000
 
     override fun onAttach(context: Context) {
@@ -80,7 +79,6 @@ class PerformBatteryFragment : Fragment() {
         tryAgainButton.setOnClickListener {
             deploymentProtocol?.playCheckBatterySound()
         }
-
         batteryLv1Button.setOnClickListener {
             deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 1)
         }
@@ -96,6 +94,9 @@ class PerformBatteryFragment : Fragment() {
         batteryLv5Button.setOnClickListener {
             deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 5)
         }
+        batteryLv6Button.setOnClickListener {
+            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 6)
+        }
     }
 
     private fun knowBatteryLevel() {
@@ -108,27 +109,32 @@ class PerformBatteryFragment : Fragment() {
         }
 
         when (level) {
-            5 -> {
-                numberOfDays = 0
-                batteryLevel = 20
-                days = getString(R.string.day, "<1")
-            }
-            4 -> {
+            1 -> {
                 numberOfDays = 1
-                batteryLevel = 40
+                batteryLevel = 15
                 days = getString(R.string.day, "1")
             }
-            3 -> {
-                numberOfDays = 2
-                batteryLevel = 60
-                days = getString(R.string.days, "2")
-            }
             2 -> {
+                numberOfDays = 2
+                batteryLevel = 30
+                days = getString(R.string.day, "2")
+            }
+            3 -> {
+                numberOfDays = 3
+                batteryLevel = 45
+                days = getString(R.string.days, "3")
+            }
+            4 -> {
                 numberOfDays = 4
-                batteryLevel = 80
+                batteryLevel = 60
                 days = getString(R.string.days, "4")
             }
-            1 -> {
+            5 -> {
+                numberOfDays = 5
+                batteryLevel = 75
+                days = getString(R.string.days, "5")
+            }
+            6 -> {
                 numberOfDays = 6
                 batteryLevel = 100
                 days = getString(R.string.days, "6")
@@ -151,19 +157,21 @@ class PerformBatteryFragment : Fragment() {
 
     private fun setBatteryView(level: Int) {
         when (level) {
-            5 -> {
+            1 -> {
                 batteryLevel1View.visibility = View.VISIBLE
                 batteryLevel2View.visibility = View.INVISIBLE
                 batteryLevel3View.visibility = View.INVISIBLE
                 batteryLevel4View.visibility = View.INVISIBLE
                 batteryLevel5View.visibility = View.INVISIBLE
+                batteryLevel6View.visibility = View.INVISIBLE
             }
-            4 -> {
+            2 -> {
                 batteryLevel1View.visibility = View.VISIBLE
                 batteryLevel2View.visibility = View.VISIBLE
                 batteryLevel3View.visibility = View.INVISIBLE
                 batteryLevel4View.visibility = View.INVISIBLE
                 batteryLevel5View.visibility = View.INVISIBLE
+                batteryLevel6View.visibility = View.INVISIBLE
             }
             3 -> {
                 batteryLevel1View.visibility = View.VISIBLE
@@ -171,20 +179,31 @@ class PerformBatteryFragment : Fragment() {
                 batteryLevel3View.visibility = View.VISIBLE
                 batteryLevel4View.visibility = View.INVISIBLE
                 batteryLevel5View.visibility = View.INVISIBLE
+                batteryLevel6View.visibility = View.INVISIBLE
             }
-            2 -> {
+            4 -> {
                 batteryLevel1View.visibility = View.VISIBLE
                 batteryLevel2View.visibility = View.VISIBLE
                 batteryLevel3View.visibility = View.VISIBLE
                 batteryLevel4View.visibility = View.VISIBLE
                 batteryLevel5View.visibility = View.INVISIBLE
+                batteryLevel6View.visibility = View.INVISIBLE
             }
-            1 -> {
+            5 -> {
                 batteryLevel1View.visibility = View.VISIBLE
                 batteryLevel2View.visibility = View.VISIBLE
                 batteryLevel3View.visibility = View.VISIBLE
                 batteryLevel4View.visibility = View.VISIBLE
                 batteryLevel5View.visibility = View.VISIBLE
+                batteryLevel6View.visibility = View.INVISIBLE
+            }
+            6-> {
+                batteryLevel1View.visibility = View.VISIBLE
+                batteryLevel2View.visibility = View.VISIBLE
+                batteryLevel3View.visibility = View.VISIBLE
+                batteryLevel4View.visibility = View.VISIBLE
+                batteryLevel5View.visibility = View.VISIBLE
+                batteryLevel6View.visibility = View.VISIBLE
             }
         }
     }
@@ -223,12 +242,12 @@ class PerformBatteryFragment : Fragment() {
         @JvmStatic
         fun newInstance(page: String, level: Int?) = PerformBatteryFragment()
             .apply {
-            arguments = Bundle().apply {
-                putString(STATUS, page)
-                if (level != null) {
-                    putInt(LEVEL, level)
+                arguments = Bundle().apply {
+                    putString(STATUS, page)
+                    if (level != null) {
+                        putInt(LEVEL, level)
+                    }
                 }
             }
-        }
     }
 }
