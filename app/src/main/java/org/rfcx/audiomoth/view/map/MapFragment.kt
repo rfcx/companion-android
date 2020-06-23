@@ -46,6 +46,7 @@ import org.rfcx.audiomoth.MainActivityListener
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.DeploymentState
+import org.rfcx.audiomoth.entity.DeploymentState.AudioMoth
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
@@ -357,7 +358,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 Pair(PROPERTY_MARKER_LOCATION_ID, location.name),
                 Pair(
                     PROPERTY_MARKER_IMAGE,
-                    if (it.state == DeploymentState.ReadyToUpload.key)
+                    if (it.state == AudioMoth.ReadyToUpload.key)
                         Battery.getBatteryPinImage(it.batteryDepletedAt.time)
                     else
                         Battery.BATTERY_PIN_GREY
@@ -366,7 +367,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 Pair(PROPERTY_MARKER_DEPLOYMENT_ID, it.id.toString()),
                 Pair(
                     PROPERTY_MARKER_CAPTION,
-                    if (it.state >= DeploymentState.ReadyToUpload.key)
+                    if (it.state >=AudioMoth.ReadyToUpload.key)
                         Battery.getPredictionBattery(it.batteryDepletedAt.time)
                     else
                         getString(R.string.format_in_progress_step)
