@@ -104,6 +104,7 @@
     <string name="next">Next</string>
     <string name="please_fill_information">Please fill your information completely</string>
     <string name="latitude_must_between">Latitude must be between -90 and 90</string>
+    <string name="wrong_format">Wrong format</string>
 
     <!--  SelectProfileFragment  -->
     <string name="use_an_existing">Use an existing profile</string>

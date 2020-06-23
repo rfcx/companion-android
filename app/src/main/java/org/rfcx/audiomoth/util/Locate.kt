@@ -96,6 +96,6 @@ private fun replaceDelimitersDDM(str: String): String {
 fun String.replaceDDToNumber(): Double {
     val strDDFormat = this
     val arr = strDDFormat.split("°")
-    val value = if (arr[1] == "S" || arr[1] == "s") "-" else ""
+    val value = if (arr[1] == "S" || arr[1] == "s" || arr[1] == "W" || arr[1] == "w") "-" else ""
     return (value + arr[0]).toDouble()
 }

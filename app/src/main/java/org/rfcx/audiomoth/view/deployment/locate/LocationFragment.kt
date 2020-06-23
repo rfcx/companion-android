@@ -10,7 +10,6 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,11 +34,9 @@ import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.localdb.LocateDb
-import org.rfcx.audiomoth.util.RealmHelper
-import org.rfcx.audiomoth.util.latitudeCoordinates
-import org.rfcx.audiomoth.util.longitudeCoordinates
-import org.rfcx.audiomoth.util.replaceDDToNumber
+import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
+import org.rfcx.audiomoth.view.profile.coordinates.CoordinatesActivity
 
 class LocationFragment : Fragment(), OnMapReadyCallback {
     private val locateDb by lazy {
@@ -276,30 +273,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         latitudeEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
                 if (p0 != null) {
-
-                    Log.d("afterTextChanged","${p0.matches("^[+-]?(([1-8]?[0-9])(\\.[0-9]{1,6})?|90(\\.0{1,6})?)(°)([NSns])\$".toRegex())}")
-                    if (p0.matches("^[+-]?(([1-8]?[0-9])(\\.[0-9]{1,6})?|90(\\.0{1,6})?)(\\°)([NSns])\$".toRegex())) {
-                        Log.d("afterTextChanged", "${p0.toString().replaceDDToNumber()}")
-                    }
-
-//                    if (p0.toString() != "-" && p0.isNotEmpty() && p0.toString() != "." && longitudeEditText.text.toString()
-//                            .isNotEmpty()
-//                    ) {
-//                        if (p0.toString().toDouble() >= -90.0 && p0.toString().toDouble() <= 90) {
-//                            setPinOnMap(
-//                                LatLng(
-//                                    p0.toString().toDouble(),
-//                                    longitudeEditText.text.toString().toDouble()
-//                                )
-//                            )
-//                        } else {
-//                            Toast.makeText(
-//                                context,
-//                                getString(R.string.latitude_must_between),
-//                                Toast.LENGTH_SHORT
-//                            ).show()
-//                        }
-//                    }
+                    convertInputLatitude(p0.toString())
                 }
             }
 
@@ -308,37 +282,59 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
         })
 
-//        longitudeEditText.addTextChangedListener(object : TextWatcher {
-//            override fun afterTextChanged(p0: Editable?) {
-//                if (p0 != null) {
-//                    if (p0.toString() != "-" && p0.isNotEmpty() && p0.toString() != "." && latitudeEditText.text.toString()
-//                            .isNotEmpty()
-//                    ) {
-//                        if (latitudeEditText.text.toString()
-//                                .toDouble() >= -90.0 && latitudeEditText.text.toString()
-//                                .toDouble() <= 90
-//                        ) {
-//                            setPinOnMap(
-//                                LatLng(
-//                                    latitudeEditText.text.toString().toDouble(),
-//                                    p0.toString().toDouble()
-//                                )
-//                            )
-//                        } else {
-//                            Toast.makeText(
-//                                context,
-//                                getString(R.string.latitude_must_between),
-//                                Toast.LENGTH_SHORT
-//                            ).show()
-//                        }
-//                    }
-//                }
-//            }
-//
-//            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-//
-//            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-//        })
+        longitudeEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {
+                if (p0 != null) {
+                    convertInputLongitude(p0.toString())
+                }
+            }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+        })
+    }
+
+    fun convertInputLatitude(latitude: String) {
+        when (context.getCoordinatesFormat()) {
+            CoordinatesActivity.DD_FORMAT -> {
+                if (latitude.matches("^[+-]?(([1-8]?[0-9])(\\.[0-9]{1,6})?|90(\\.0{1,6})?)(\\°)([NSns])\$".toRegex())) {
+                    setPinOnMap(
+                        LatLng(
+                            latitude.replaceDDToNumber(),
+                            longitudeEditText.text.toString().replaceDDToNumber()
+                        )
+                    )
+                } else {
+                    latitudeEditText.error = getString(R.string.wrong_format)
+                }
+            }
+            CoordinatesActivity.DDM_FORMAT -> {
+            }
+            CoordinatesActivity.DMS_FORMAT -> {
+            }
+        }
+    }
+
+    fun convertInputLongitude(longitude: String) {
+        when (context.getCoordinatesFormat()) {
+            CoordinatesActivity.DD_FORMAT -> {
+                if (longitude.matches("^[+-]?((([1-9]?[0-9]|1[0-7][0-9])(\\.[0-9]{1,6})?)|180(\\.0{1,6})?)(\\°)([EWew])\$".toRegex())) {
+                    setPinOnMap(
+                        LatLng(
+                            latitudeEditText.text.toString().replaceDDToNumber(),
+                            longitude.replaceDDToNumber()
+                        )
+                    )
+                } else {
+                    longitudeEditText.error = getString(R.string.wrong_format)
+                }
+            }
+            CoordinatesActivity.DDM_FORMAT -> {
+            }
+            CoordinatesActivity.DMS_FORMAT -> {
+            }
+        }
     }
 
     private val locationListener = object : android.location.LocationListener {
