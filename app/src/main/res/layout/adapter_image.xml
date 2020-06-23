@@ -15,7 +15,7 @@
         android:adjustViewBounds="true"
         android:contentDescription="@string/app_name"
         android:scaleType="centerCrop"
-        tools:src="@drawable/rfcx_edge" />
+        tools:src="@drawable/bg_grey_light" />
 
     <ImageButton
         android:id="@+id/deleteImageButton"

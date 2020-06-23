@@ -34,6 +34,9 @@ class ImageSyncWorker (val context: Context, params: WorkerParameters) :
             }
         }
 
+
+        ImageSyncToFireStoreWorker.enqueue(context)
+
         return if (someFailed) Result.retry() else Result.success()
     }
 

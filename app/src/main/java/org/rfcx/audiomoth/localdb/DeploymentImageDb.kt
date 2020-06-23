@@ -5,10 +5,8 @@ import io.realm.RealmResults
 import io.realm.Sort
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.DeploymentImage
-import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_ID
 import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_SERVER_ID
 import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_ID
-import org.rfcx.audiomoth.entity.DeploymentState
 import org.rfcx.audiomoth.entity.SyncState
 
 class DeploymentImageDb(private val realm: Realm) {
@@ -20,6 +18,9 @@ class DeploymentImageDb(private val realm: Realm) {
         ).count()
     }
 
+    /**
+     * return DeploymentImage that not be sync to Firebase Storage
+     */
     fun lockUnsent(): List<DeploymentImage> {
         var unsentCopied: List<DeploymentImage> = listOf()
         realm.executeTransaction {
@@ -29,13 +30,16 @@ class DeploymentImageDb(private val realm: Realm) {
                 .findAll()
                 .createSnapshot()
             unsentCopied = unsent.toList()
-            unsent.forEach {d->
+            unsent.forEach { d ->
                 d.syncState = SyncState.Sending.key
             }
         }
         return unsentCopied
     }
 
+    /**
+     * Mark DeploymentImage.syncState to Unsent
+     */
     fun markUnsent(id: Int) {
         realm.executeTransaction {
             val report = it.where(DeploymentImage::class.java).equalTo(FIELD_ID, id).findFirst()
@@ -45,6 +49,9 @@ class DeploymentImageDb(private val realm: Realm) {
         }
     }
 
+    /**
+     * Mark DeploymentImage.syncState to Sent
+     */
     fun markSent(id: Int, remotePath: String?) {
         realm.executeTransaction {
             val report = it.where(DeploymentImage::class.java).equalTo(FIELD_ID, id).findFirst()
@@ -76,6 +83,52 @@ class DeploymentImageDb(private val realm: Realm) {
                     createdAt = imageCreateAt
                 )
                 it.insertOrUpdate(deploymentImage)
+            }
+        }
+    }
+
+    /**
+     * Return of DeploymentImage that need to upload into firebase firestore
+     */
+
+    fun lockUnsentForFireStore(): List<DeploymentImage> {
+        var unsentCopied: List<DeploymentImage> = listOf()
+        realm.executeTransaction {
+            val unsent = it.where(DeploymentImage::class.java)
+                .equalTo(DeploymentImage.FIELD_SYNC_STATE, SyncState.Sent.key)
+                .isNotNull(FIELD_DEPLOYMENT_SERVER_ID)
+                .isNotNull("remotePath")
+                .isNotEmpty("remotePath")
+                .findAll()
+            unsentCopied = unsent.createSnapshot()
+            unsent.forEach { d ->
+                d.syncState = SyncState.Sending.key
+            }
+        }
+        return unsentCopied
+    }
+
+    /**
+     * Mark DeploymentImage.syncToFireStoreState to Unsent
+     */
+    fun markUnsentFireStore(id: Int) {
+        realm.executeTransaction {
+            val report = it.where(DeploymentImage::class.java).equalTo(FIELD_ID, id).findFirst()
+            if (report != null) {
+                report.syncToFireStoreState = SyncState.Unsent.key
+            }
+        }
+    }
+
+    /**
+     * Mark DeploymentImage.syncToFireStoreState to Sent
+     */
+    fun markSentFireStore(id: Int) {
+        realm.executeTransaction {
+            val report = it.where(DeploymentImage::class.java).equalTo(FIELD_ID, id).findFirst()
+            if (report != null) {
+                report.syncToFireStoreState = SyncState.Sent.key
+
             }
         }
     }

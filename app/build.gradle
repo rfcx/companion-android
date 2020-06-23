@@ -4,6 +4,7 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'realm-android'
+apply plugin: 'com.google.firebase.crashlytics'
 
 android {
     compileSdkVersion 29
@@ -19,9 +20,27 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+            debuggable true
+            manifestPlaceholders = [enableCrashReporting:"false"]
+        }
+        
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            manifestPlaceholders = [enableCrashReporting:"true"]
+        }
+    }
+    productFlavors {
+        flavorDimensions("edge")
+        edge {
+            manifestPlaceholders = [applicationLabel: "RFCx Companion - Edge"]
+            buildConfigField 'boolean', 'ENABLE_ALL', 'false'
+        }
+        flavorDimensions("guardian")
+        guardian {
+            manifestPlaceholders = [applicationLabel: "RFCx Companion - Guardian"]
+            buildConfigField 'boolean', 'ENABLE_ALL', 'true'
         }
     }
     compileOptions {
@@ -50,6 +69,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics:17.4.1'
     implementation 'com.google.firebase:firebase-firestore-ktx:21.4.0'
     implementation 'com.google.firebase:firebase-storage:19.1.1'
+    implementation 'com.google.firebase:firebase-crashlytics:17.1.0'
 
     // Kotlin Coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.5'

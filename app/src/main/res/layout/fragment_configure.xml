@@ -33,6 +33,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="@dimen/margin_padding_normal"
+                android:paddingTop="@dimen/margin_padding_normal"
                 android:text="@string/let_configure"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

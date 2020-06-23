@@ -2,6 +2,7 @@ package org.rfcx.audiomoth.view.deployment.locate
 
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
@@ -452,6 +453,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         override fun onProviderDisabled(p0: String?) {}
     }
 
+    @SuppressLint("MissingPermission")
     private fun getLastLocation() {
         if (checkPermissions()) {
             locationManager?.removeUpdates(locationListener)

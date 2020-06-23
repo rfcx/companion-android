@@ -18,8 +18,10 @@ open class DeploymentImage(
     var remotePath: String? = null,
     var createdAt: Date = Date(),
     @Expose(serialize = false)
-    var syncState: Int = 0
-) : RealmModel {
+    var syncState: Int = 0,
+    @Expose(serialize = false)
+    var syncToFireStoreState: Int = 0
+    ) : RealmModel {
     companion object {
         const val FIELD_ID = "id"
         const val FIELD_DEPLOYMENT_ID = "deploymentId"

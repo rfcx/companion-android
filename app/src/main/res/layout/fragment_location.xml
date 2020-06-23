@@ -64,7 +64,6 @@
         android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginEnd="@dimen/margin_padding_large"
         android:hint="@string/name_location"
-        android:maxLines="1"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -74,6 +73,7 @@
             android:id="@+id/locationNameEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:maxLines="1"
             android:textColor="@color/text_primary"
             android:textSize="@dimen/text_small" />
     </com.google.android.material.textfield.TextInputLayout>
