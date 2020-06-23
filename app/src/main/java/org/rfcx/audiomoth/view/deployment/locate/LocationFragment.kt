@@ -95,7 +95,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             && latitudeEditText.text.toString().isNotEmpty()
             && longitudeEditText.text.toString().isNotEmpty()
         ) {
-            handleNewLocate()
+            setLocate()
         } else {
             Toast.makeText(
                 context,
@@ -112,13 +112,34 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun handleNewLocate() {
+    private fun handleNewLocate(lat: Double, lng: Double) {
         val name = locationNameEditText.text.toString()
-        val lat = latitudeEditText.text.toString().toDouble()
-        val lng = longitudeEditText.text.toString().toDouble()
         val locate = Locate(name = name, latitude = lat, longitude = lng)
         deploymentProtocol?.setDeployLocation(locate)
         deploymentProtocol?.nextStep()
+    }
+
+    private fun setLocate() {
+        when (context.getCoordinatesFormat()) {
+            CoordinatesActivity.DD_FORMAT -> {
+                if (latitudeEditText.text.toString().matches(FORMAT_LATITUDE.toRegex())) {
+                    if (longitudeEditText.text.toString().matches(FORMAT_LONGITUDE.toRegex())) {
+                        handleNewLocate(
+                            latitudeEditText.text.toString().replaceDDToNumber(),
+                            longitudeEditText.text.toString().replaceDDToNumber()
+                        )
+                    } else {
+                        longitudeEditText.error = getString(R.string.wrong_format)
+                    }
+                } else {
+                    latitudeEditText.error = getString(R.string.wrong_format)
+                }
+            }
+            CoordinatesActivity.DDM_FORMAT -> {
+            }
+            CoordinatesActivity.DMS_FORMAT -> {
+            }
+        }
     }
 
     private fun setupLocationOptions() {
@@ -298,7 +319,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     fun convertInputLatitude(latitude: String) {
         when (context.getCoordinatesFormat()) {
             CoordinatesActivity.DD_FORMAT -> {
-                if (latitude.matches("^[+-]?(([1-8]?[0-9])(\\.[0-9]{1,6})?|90(\\.0{1,6})?)(\\°)([NSns])\$".toRegex())) {
+                if (latitude.matches(FORMAT_LATITUDE.toRegex())) {
                     setPinOnMap(
                         LatLng(
                             latitude.replaceDDToNumber(),
@@ -319,7 +340,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     fun convertInputLongitude(longitude: String) {
         when (context.getCoordinatesFormat()) {
             CoordinatesActivity.DD_FORMAT -> {
-                if (longitude.matches("^[+-]?((([1-9]?[0-9]|1[0-7][0-9])(\\.[0-9]{1,6})?)|180(\\.0{1,6})?)(\\°)([EWew])\$".toRegex())) {
+                if (longitude.matches(FORMAT_LONGITUDE.toRegex())) {
                     setPinOnMap(
                         LatLng(
                             latitudeEditText.text.toString().replaceDDToNumber(),
@@ -444,6 +465,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         const val TAG = "LocationFragment"
         const val REQUEST_PERMISSIONS_REQUEST_CODE = 34
         const val PIN_MAP = "pin-map"
+        const val FORMAT_LATITUDE = "^(([1-8]?[0-9])(\\.[0-9]{1,6})?|90(\\.0{1,6})?)(\\°)([NSns])\$"
+        const val FORMAT_LONGITUDE =
+            "^((([1-9]?[0-9]|1[0-7][0-9])(\\.[0-9]{1,6})?)|180(\\.0{1,6})?)(\\°)([EWew])\$"
 
         fun newInstance(): LocationFragment {
             return LocationFragment()
