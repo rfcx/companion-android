@@ -92,3 +92,10 @@ private fun replaceDelimitersDDM(str: String): String {
     strDDMFormat += "\'"
     return strDDMFormat
 }
+
+fun String.replaceDDToNumber(): Double {
+    val strDDFormat = this
+    val arr = strDDFormat.split("°")
+    val value = if (arr[1] == "S" || arr[1] == "s") "-" else ""
+    return (value + arr[0]).toDouble()
+}

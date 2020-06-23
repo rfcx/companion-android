@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,6 +38,7 @@ import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.util.latitudeCoordinates
 import org.rfcx.audiomoth.util.longitudeCoordinates
+import org.rfcx.audiomoth.util.replaceDDToNumber
 import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 
 class LocationFragment : Fragment(), OnMapReadyCallback {
@@ -127,10 +129,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             when (checkedId) {
                 R.id.newLocationRadioButton -> {
                     lastLocation?.let { lastLocation ->
-                        setupView(
-                            String.format("%.6f", lastLocation.latitude),
-                            String.format("%.6f", lastLocation.longitude), true
-                        )
+                        context?.let { context ->
+                            setupView(
+                                lastLocation.latitude.latitudeCoordinates(context),
+                                lastLocation.longitude.longitudeCoordinates(context), true
+                            )
+                        }
                         setPinOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
                     }
                     locationNameTextInput.visibility = View.VISIBLE
@@ -240,7 +244,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             retrieveDeployLocations()
 
             // TODO: setup pin map when enter location
-
+            setupInputLocation()
         }
     }
 
@@ -272,24 +276,30 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         latitudeEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
                 if (p0 != null) {
-                    if (p0.toString() != "-" && p0.isNotEmpty() && p0.toString() != "." && longitudeEditText.text.toString()
-                            .isNotEmpty()
-                    ) {
-                        if (p0.toString().toDouble() >= -90.0 && p0.toString().toDouble() <= 90) {
-                            setPinOnMap(
-                                LatLng(
-                                    p0.toString().toDouble(),
-                                    longitudeEditText.text.toString().toDouble()
-                                )
-                            )
-                        } else {
-                            Toast.makeText(
-                                context,
-                                getString(R.string.latitude_must_between),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
+
+                    Log.d("afterTextChanged","${p0.matches("^[+-]?(([1-8]?[0-9])(\\.[0-9]{1,6})?|90(\\.0{1,6})?)(°)([NSns])\$".toRegex())}")
+                    if (p0.matches("^[+-]?(([1-8]?[0-9])(\\.[0-9]{1,6})?|90(\\.0{1,6})?)(\\°)([NSns])\$".toRegex())) {
+                        Log.d("afterTextChanged", "${p0.toString().replaceDDToNumber()}")
                     }
+
+//                    if (p0.toString() != "-" && p0.isNotEmpty() && p0.toString() != "." && longitudeEditText.text.toString()
+//                            .isNotEmpty()
+//                    ) {
+//                        if (p0.toString().toDouble() >= -90.0 && p0.toString().toDouble() <= 90) {
+//                            setPinOnMap(
+//                                LatLng(
+//                                    p0.toString().toDouble(),
+//                                    longitudeEditText.text.toString().toDouble()
+//                                )
+//                            )
+//                        } else {
+//                            Toast.makeText(
+//                                context,
+//                                getString(R.string.latitude_must_between),
+//                                Toast.LENGTH_SHORT
+//                            ).show()
+//                        }
+//                    }
                 }
             }
 
@@ -298,37 +308,37 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
         })
 
-        longitudeEditText.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(p0: Editable?) {
-                if (p0 != null) {
-                    if (p0.toString() != "-" && p0.isNotEmpty() && p0.toString() != "." && latitudeEditText.text.toString()
-                            .isNotEmpty()
-                    ) {
-                        if (latitudeEditText.text.toString()
-                                .toDouble() >= -90.0 && latitudeEditText.text.toString()
-                                .toDouble() <= 90
-                        ) {
-                            setPinOnMap(
-                                LatLng(
-                                    latitudeEditText.text.toString().toDouble(),
-                                    p0.toString().toDouble()
-                                )
-                            )
-                        } else {
-                            Toast.makeText(
-                                context,
-                                getString(R.string.latitude_must_between),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
-                }
-            }
-
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-        })
+//        longitudeEditText.addTextChangedListener(object : TextWatcher {
+//            override fun afterTextChanged(p0: Editable?) {
+//                if (p0 != null) {
+//                    if (p0.toString() != "-" && p0.isNotEmpty() && p0.toString() != "." && latitudeEditText.text.toString()
+//                            .isNotEmpty()
+//                    ) {
+//                        if (latitudeEditText.text.toString()
+//                                .toDouble() >= -90.0 && latitudeEditText.text.toString()
+//                                .toDouble() <= 90
+//                        ) {
+//                            setPinOnMap(
+//                                LatLng(
+//                                    latitudeEditText.text.toString().toDouble(),
+//                                    p0.toString().toDouble()
+//                                )
+//                            )
+//                        } else {
+//                            Toast.makeText(
+//                                context,
+//                                getString(R.string.latitude_must_between),
+//                                Toast.LENGTH_SHORT
+//                            ).show()
+//                        }
+//                    }
+//                }
+//            }
+//
+//            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+//
+//            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+//        })
     }
 
     private val locationListener = object : android.location.LocationListener {
