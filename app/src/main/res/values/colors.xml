@@ -27,4 +27,6 @@
 
     <color name="button_facebook_login">#37509f</color>
     <color name="transparent">@android:color/transparent</color>
+
+    <color name="item_highlight">#B57BBD89</color>
 </resources>

@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_deployment.*
+import org.rfcx.audiomoth.BuildConfig
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.*
 import org.rfcx.audiomoth.localdb.DeploymentDb
@@ -55,23 +56,13 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         setContentView(R.layout.activity_deployment)
         val deploymentId = intent.extras?.getInt(DEPLOYMENT_ID)
         if (deploymentId != null) {
-            val deployment = deploymentDb.getDeploymentById(deploymentId)
-            if (deployment != null) {
-                setDeployment(deployment)
-
-                if (deployment.location != null) {
-                    _deployLocation = deployment.location
-                }
-
-                if (deployment.configuration != null) {
-                    _configuration = deployment.configuration
-                }
-                currentStep = deployment.state - 1
-                stepView.go(currentStep, true)
-                handleFragment(currentStep)
-            }
+            handleDeploymentStep(deploymentId)
         } else {
-            startFragment(ChooseDeviceFragment.newInstance())
+            if (BuildConfig.ENABLE_ALL) {
+                startFragment(ChooseDeviceFragment.newInstance())
+            } else {
+                openWithEdgeDevice()
+            }
         }
     }
 
@@ -81,13 +72,6 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
 
     override fun openWithGuardianDevice() {
         finish()
-    }
-
-    private fun setupView() {
-        handleFragment(currentStep) // start page
-        completeStepButton.setOnClickListener {
-            nextStep()
-        }
     }
 
     override fun hideCompleteButton() {
@@ -154,7 +138,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
 
     override fun setDeployLocation(locate: Locate) {
         val deployment = _deployment ?: Deployment()
-        deployment.state = DeploymentState.Locate.key // state
+        deployment.state = DeploymentState.AudioMoth.Locate.key // state
 
         this._deployLocation = locate.asDeploymentLocation()
         val deploymentId = deploymentDb.insertOrUpdateDeployment(deployment, _deployLocation!!)
@@ -185,7 +169,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         showLoading()
         _deployment?.let {
             it.deployedAt = Date()
-            it.state = DeploymentState.ReadyToUpload.key
+            it.state = DeploymentState.AudioMoth.ReadyToUpload.key
             setDeployment(it)
 
             deploymentImageDb.insertImage(it, images)
@@ -239,27 +223,52 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         startFragment(PerformBatteryFragment.newInstance(status, level))
     }
 
+    private fun setupView() {
+        handleFragment(currentStep) // start page
+        completeStepButton.setOnClickListener {
+            nextStep()
+        }
+    }
+
+    private fun handleDeploymentStep(deploymentId: Int) {
+        val deployment = deploymentDb.getDeploymentById(deploymentId)
+        if (deployment != null) {
+            setDeployment(deployment)
+
+            if (deployment.location != null) {
+                _deployLocation = deployment.location
+            }
+
+            if (deployment.configuration != null) {
+                _configuration = deployment.configuration
+            }
+            currentStep = deployment.state - 1
+            stepView.go(currentStep, true)
+            handleFragment(currentStep)
+        }
+    }
+
     private fun handleFragment(currentStep: Int) {
         // setup fragment for current step
         when (currentStep) {
             0 -> {
-                updateDeploymentState(DeploymentState.Locate)
+                updateDeploymentState(DeploymentState.AudioMoth.Locate)
                 startFragment(LocationFragment.newInstance())
             }
             1 -> {
-                updateDeploymentState(DeploymentState.Config)
+                updateDeploymentState(DeploymentState.AudioMoth.Config)
                 handleSelectingConfig()
             }
             2 -> {
-                updateDeploymentState(DeploymentState.Sync)
+                updateDeploymentState(DeploymentState.AudioMoth.Sync)
                 startFragment(SyncFragment.newInstance(BEFORE_SYNC))
             }
             3 -> {
-                updateDeploymentState(DeploymentState.Verify)
+                updateDeploymentState(DeploymentState.AudioMoth.Verify)
                 startFragment(PerformBatteryFragment.newInstance(TEST_BATTERY, null))
             }
             4 -> {
-                updateDeploymentState(DeploymentState.Deploy)
+                updateDeploymentState(DeploymentState.AudioMoth.Deploy)
                 startFragment(DeployFragment.newInstance())
             }
         }
@@ -296,7 +305,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
             .commit()
     }
 
-    private fun updateDeploymentState(state: DeploymentState) {
+    private fun updateDeploymentState(state: DeploymentState.AudioMoth) {
         this._deployment?.state = state.key
         this._deployment?.let { deploymentDb.updateDeployment(it) }
     }
@@ -332,4 +341,3 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         }
     }
 }
-

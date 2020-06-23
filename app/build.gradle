@@ -24,11 +24,23 @@ android {
             debuggable true
             manifestPlaceholders = [enableCrashReporting:"false"]
         }
-
+        
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             manifestPlaceholders = [enableCrashReporting:"true"]
+        }
+    }
+    productFlavors {
+        flavorDimensions("edge")
+        edge {
+            manifestPlaceholders = [applicationLabel: "RFCx Companion - Edge"]
+            buildConfigField 'boolean', 'ENABLE_ALL', 'false'
+        }
+        flavorDimensions("guardian")
+        guardian {
+            manifestPlaceholders = [applicationLabel: "RFCx Companion - Guardian"]
+            buildConfigField 'boolean', 'ENABLE_ALL', 'true'
         }
     }
     compileOptions {

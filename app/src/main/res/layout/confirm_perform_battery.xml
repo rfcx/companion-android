@@ -23,7 +23,7 @@
         android:layout_width="40dp"
         android:layout_height="12dp"
         android:background="@color/text_black"
-        app:layout_constraintBottom_toTopOf="@id/batteryLevel5View"
+        app:layout_constraintBottom_toTopOf="@id/batteryLevel6View"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -95,11 +95,25 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="@dimen/margin_padding_xsmall"
-        android:layout_marginTop="@dimen/margin_padding_xsmall"
         android:layout_marginEnd="@dimen/margin_padding_xsmall"
         android:layout_marginBottom="@dimen/margin_padding_xsmall"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@id/batteryLevel4View"
+        app:layout_constraintEnd_toEndOf="@id/batteryView"
+        app:layout_constraintStart_toStartOf="@id/batteryView"
+        app:layout_constraintTop_toBottomOf="@id/batteryLevel6View" />
+
+    <View
+        android:id="@+id/batteryLevel6View"
+        style="@style/AudioMothButton.GreenButton.Radius5"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/margin_padding_xsmall"
+        android:layout_marginTop="@dimen/margin_padding_xsmall"
+        android:layout_marginEnd="@dimen/margin_padding_xsmall"
+        android:layout_marginBottom="@dimen/margin_padding_xsmall"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@id/batteryLevel5View"
         app:layout_constraintEnd_toEndOf="@id/batteryView"
         app:layout_constraintStart_toStartOf="@id/batteryView"
         app:layout_constraintTop_toTopOf="@id/batteryView" />
@@ -120,8 +134,11 @@
         style="@style/AudioMothText.Body.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_padding_normal"
         android:gravity="center"
+        android:paddingStart="@dimen/margin_padding_normal"
+        android:paddingTop="@dimen/margin_padding_normal"
+        android:paddingEnd="@dimen/margin_padding_normal"
+        android:layout_marginTop="@dimen/margin_padding_normal"
         android:text="@string/notification"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
