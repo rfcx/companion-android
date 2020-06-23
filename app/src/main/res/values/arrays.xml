@@ -1,10 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="steps">
+    <string-array name="audiomoth_steps">
         <item>Locate</item>
         <item>Config</item>
         <item>Sync</item>
         <item>Verify</item>
         <item>Deploy</item>
+    </string-array>
+
+    <string-array name="guardian_steps">
+        <item>Connect</item>
+        <item>Locate</item>
+        <item>Config</item>
+        <item>Sync</item>
+        <item>Deploy</item>
+    </string-array>
+
+    <string-array name="bitrate_entries">
+        <item>4 kbps</item>
+        <item>8 kbps</item>
+        <item>12 kbps</item>
+        <item>16 kbps</item>
+        <item>20 kbps</item>
+        <item>24 kbps</item>
+        <item>28 kbps</item>
+        <item>32 kbps</item>
+        <item>40 kbps</item>
+        <item>48 kbps</item>
+        <item>64 kbps</item>
+        <item>80 kbps</item>
+        <item>96 kbps</item>
+        <item>112 kbps</item>
+        <item>128 kbps</item>
+    </string-array>
+
+    <string-array name="bitrate_values">
+        <item>4096</item>
+        <item>8192</item>
+        <item>12288</item>
+        <item>16384</item>
+        <item>20480</item>
+        <item>24576</item>
+        <item>28672</item>
+        <item>32768</item>
+        <item>40960</item>
+        <item>49152</item>
+        <item>65536</item>
+        <item>81920</item>
+        <item>98304</item>
+        <item>114688</item>
+        <item>131072</item>
+    </string-array>
+
+    <string-array name="sample_rate_entries">
+        <item>8 kHz</item>
+        <item>12 kHz</item>
+        <item>16 kHz</item>
+        <item>24 kHz</item>
+        <item>48 kHz</item>
+    </string-array>
+
+    <string-array name="sample_rate_values">
+        <item>8000</item>
+        <item>12000</item>
+        <item>16000</item>
+        <item>24000</item>
+        <item>48000</item>
+    </string-array>
+
+    <string-array name="audio_codec">
+        <item>OPUS</item>
+        <item>FLAC</item>
     </string-array>
 </resources>
