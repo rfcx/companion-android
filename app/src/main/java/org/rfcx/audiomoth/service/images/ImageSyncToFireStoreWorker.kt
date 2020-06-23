@@ -5,50 +5,43 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import io.realm.Realm
+import org.rfcx.audiomoth.entity.request.toRequestBody
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
+import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.util.RealmHelper
-import org.rfcx.audiomoth.util.Storage
 
-class ImageSyncWorker (val context: Context, params: WorkerParameters) :
+class ImageSyncToFireStoreWorker(context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
 
+    private val fireStore = Firestore(context)
     override suspend fun doWork(): Result {
-        Log.d(TAG, "doWork ImageSyncWorker")
-
         val db = DeploymentImageDb(Realm.getInstance(RealmHelper.migrationConfig()))
-        val storage = Storage(context)
-        val deploymentImage = db.lockUnsent()
+        val deploymentImages = db.lockUnsentForFireStore()
 
-        Log.d(TAG, "doWork: found ${deploymentImage.size} unsent")
         var someFailed = false
-
-        deploymentImage.forEach {
-            val result = storage.sendImage(it.localPath)
-
+        deploymentImages.forEach { deploymentImage ->
+            val result = fireStore.sendImage(deploymentImage.toRequestBody())
             if (result != null) {
                 Log.d(TAG, "doWork: success $result")
-                db.markSent(it.id, result)
+                db.markSentFireStore(deploymentImage.id)
             } else {
-                db.markUnsent(it.id)
+                db.markUnsentFireStore(deploymentImage.id)
                 someFailed = true
             }
+            someFailed = result == null
         }
-
-
-        ImageSyncToFireStoreWorker.enqueue(context)
-
         return if (someFailed) Result.retry() else Result.success()
     }
 
     companion object {
-        private const val TAG = "ImageSyncWorker"
-        private const val UNIQUE_WORK_KEY = "ImageSyncWorkerUniqueKey"
+        private const val TAG = "ImageFireStoreWorker"
+        private const val UNIQUE_WORK_KEY = "ImageSyncToFireStoreWorkerUniqueKey"
 
         fun enqueue(context: Context) {
             val constraints =
                 Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
             val workRequest =
-                OneTimeWorkRequestBuilder<ImageSyncWorker>().setConstraints(constraints)
+                OneTimeWorkRequestBuilder<ImageSyncToFireStoreWorker>().setConstraints(constraints)
                     .build()
             WorkManager.getInstance(context)
                 .enqueueUniqueWork(UNIQUE_WORK_KEY, ExistingWorkPolicy.REPLACE, workRequest)
@@ -59,4 +52,5 @@ class ImageSyncWorker (val context: Context, params: WorkerParameters) :
                 .getWorkInfosForUniqueWorkLiveData(UNIQUE_WORK_KEY)
         }
     }
+
 }
