@@ -19,9 +19,24 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+            debuggable true
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    productFlavors {
+        flavorDimensions("edge")
+        edge {
+            manifestPlaceholders = [applicationLabel: "RFCx Companion - Edge"]
+            buildConfigField 'boolean', 'ENABLE_ALL', 'false'
+        }
+        flavorDimensions("guardian")
+        guardian {
+            manifestPlaceholders = [applicationLabel: "RFCx Companion - Guardian"]
+            buildConfigField 'boolean', 'ENABLE_ALL', 'true'
         }
     }
     compileOptions {
