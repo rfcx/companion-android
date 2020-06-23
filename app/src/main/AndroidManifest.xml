@@ -52,7 +52,6 @@
         <activity
             android:name=".view.deployment.DeploymentActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".view.configure.ConnectDeviceActivity" />
 
         <receiver
             android:name=".util.NotificationBroadcastReceiver"
