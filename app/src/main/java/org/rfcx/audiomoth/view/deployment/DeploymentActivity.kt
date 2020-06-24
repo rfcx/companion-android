@@ -17,7 +17,6 @@ import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.ProfileDb
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
 import org.rfcx.audiomoth.util.*
-import org.rfcx.audiomoth.view.LoadingDialogFragment
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
 import org.rfcx.audiomoth.view.deployment.configure.SelectProfileFragment
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
@@ -25,10 +24,13 @@ import org.rfcx.audiomoth.view.deployment.sync.SyncFragment
 import org.rfcx.audiomoth.view.deployment.sync.SyncFragment.Companion.BEFORE_SYNC
 import org.rfcx.audiomoth.view.deployment.verify.PerformBatteryFragment
 import org.rfcx.audiomoth.view.deployment.verify.PerformBatteryFragment.Companion.TEST_BATTERY
+import org.rfcx.audiomoth.view.dialog.CompleteFragment
+import org.rfcx.audiomoth.view.dialog.CompleteListener
+import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
 import java.sql.Timestamp
 import java.util.*
 
-class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
+class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteListener {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val deploymentDb by lazy {
@@ -176,7 +178,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
             deploymentDb.updateDeployment(it)
 
             DeploymentSyncWorker.enqueue(this@DeploymentActivity)
-            finish()
+            showComplete()
         }
     }
 
@@ -319,10 +321,23 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         loadingDialog.show(supportFragmentManager, loadingDialogTag)
     }
 
+    private fun showComplete() {
+        val completeFragment: CompleteFragment =
+            supportFragmentManager.findFragmentByTag(CompleteFragment.tag) as CompleteFragment?
+                ?: run {
+                    CompleteFragment()
+                }
+        completeFragment.show(supportFragmentManager, CompleteFragment.tag)
+    }
+
     private fun hideLoading() {
         val loadingDialog: LoadingDialogFragment? =
             supportFragmentManager.findFragmentByTag(loadingDialogTag) as LoadingDialogFragment?
         loadingDialog?.dismissDialog()
+    }
+
+    override fun onAnimationEnd() {
+        finish()
     }
 
     companion object {
