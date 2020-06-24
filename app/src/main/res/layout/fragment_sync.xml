@@ -63,7 +63,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/cancelButton"
-        style="@style/AudioMothButton.GreenButton.Line"
+        style="@style/AudioMothButton.GreyButton.Line"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"
