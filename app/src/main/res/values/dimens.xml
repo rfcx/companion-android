@@ -21,5 +21,6 @@
     <dimen name="button_battery">70dp</dimen>
     <dimen name="progress_bar">40dp</dimen>
     <dimen name="button_height">44dp</dimen>
+    <dimen name="size_complete">150dp</dimen>
 
 </resources>

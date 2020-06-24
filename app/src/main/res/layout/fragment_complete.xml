@@ -8,9 +8,9 @@
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/animationView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/size_complete"
+        android:layout_height="@dimen/size_complete"
         app:lottie_autoPlay="true"
-        app:lottie_rawRes="@raw/checkmark" />
+        app:lottie_rawRes="@raw/complete" />
 
 </FrameLayout>
