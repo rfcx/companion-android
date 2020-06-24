@@ -71,7 +71,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/createNewButton"
-        style="@style/AudioMothButton.GreenButton"
+        style="@style/AudioMothButton.GreenButton.Line"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"
