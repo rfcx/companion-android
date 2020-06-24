@@ -89,7 +89,7 @@ class GuardianSelectProfileFragment : Fragment(), (GuardianProfile) -> Unit {
                 )
             }
 
-            override fun onFailed() {
+            override fun onFailed(message: String) {
                 checkState(SHOW_TRY_AGAIN)
             }
         })
@@ -117,16 +117,19 @@ class GuardianSelectProfileFragment : Fragment(), (GuardianProfile) -> Unit {
                 tryAgainTextView.visibility = View.GONE
                 profileRecyclerView.visibility = View.GONE
                 profileProgressBar.visibility = View.VISIBLE
+                defaultProfileLayout.visibility = View.GONE
             }
             SHOW_TRY_AGAIN -> {
                 tryAgainTextView.visibility = View.VISIBLE
                 profileRecyclerView.visibility = View.GONE
                 profileProgressBar.visibility = View.GONE
+                defaultProfileLayout.visibility = View.GONE
             }
             SHOW_LIST_PROFILE -> {
                 tryAgainTextView.visibility = View.GONE
                 profileRecyclerView.visibility = View.VISIBLE
                 profileProgressBar.visibility = View.GONE
+                defaultProfileLayout.visibility = View.VISIBLE
             }
         }
     }

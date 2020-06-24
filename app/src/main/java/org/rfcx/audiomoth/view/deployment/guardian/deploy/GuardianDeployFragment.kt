@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_deploy.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.view.deployment.BaseImageFragment
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 
@@ -32,6 +33,7 @@ class GuardianDeployFragment : BaseImageFragment() {
         finishButton.setOnClickListener {
             val images = imageAdapter.getNewAttachImage()
             deploymentProtocol?.setReadyToDeploy(images)
+            SocketManager.stopConnection()
         }
     }
 
