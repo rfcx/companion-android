@@ -19,6 +19,7 @@ import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentImageDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianProfileDb
+import org.rfcx.audiomoth.service.GuardianDeploymentSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.view.LoadingDialogFragment
 import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianConfigureFragment
@@ -167,7 +168,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             deploymentImageDb.insertImage(it, images)
             deploymentDb.updateDeployment(it)
 
-            saveDevelopment(it)
+            GuardianDeploymentSyncWorker.enqueue(this@GuardianDeploymentActivity)
+            finish()
         }
     }
 
@@ -224,12 +226,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private fun updateDeploymentState(state: DeploymentState.Guardian) {
         this._deployment?.state = state.key
         this._deployment?.let { deploymentDb.updateDeployment(it) }
-    }
-
-    //TODO: Make it for guardian deployment
-    private fun saveDevelopment(deployment: GuardianDeployment) {
-        hideLoading()
-        finish()
     }
 
     private fun showLoading() {
