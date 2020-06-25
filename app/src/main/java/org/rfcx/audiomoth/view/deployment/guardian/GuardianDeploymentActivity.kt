@@ -200,6 +200,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                 startFragment(LocationFragment.newInstance())
             }
             2 -> {
+                this._profiles = profileDb.getProfiles()
                 updateDeploymentState(DeploymentState.Guardian.Config)
                 startFragment(GuardianSelectProfileFragment.newInstance())
             }

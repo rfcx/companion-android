@@ -78,7 +78,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/skipButton"
-        style="@style/AudioMothButton.GreyButton"
+        style="@style/AudioMothButton.GreyButton.Line"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"
