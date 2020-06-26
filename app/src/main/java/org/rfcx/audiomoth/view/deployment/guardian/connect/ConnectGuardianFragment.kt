@@ -30,6 +30,8 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
 
     private lateinit var countDownTimer: CountDownTimer
 
+    private var connectionCount = 0
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         deploymentProtocol = (context as GuardianDeploymentProtocol)
@@ -89,8 +91,9 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
                 activity!!.runOnUiThread {
                     val connection = response as ConnectionResponse
                     Log.d("ConenctionGuardian", connection.connection.status)
-                    if (connection.connection.status == CONNECTION_SUCCESS) {
+                    if (connection.connection.status == CONNECTION_SUCCESS && connectionCount == 0) {
                         deploymentProtocol!!.nextStep()
+                        connectionCount += 1
                     } else {
                         hideLoading()
                     }
