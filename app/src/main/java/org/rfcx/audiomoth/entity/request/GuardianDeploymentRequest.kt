@@ -1,6 +1,7 @@
 package org.rfcx.audiomoth.entity.request
 
 import org.rfcx.audiomoth.entity.DeploymentLocation
+import org.rfcx.audiomoth.entity.Device
 import org.rfcx.audiomoth.entity.guardian.GuardianConfiguration
 import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
 import java.util.*
@@ -15,7 +16,7 @@ data class GuardianDeploymentRequest(
 
 fun GuardianDeployment.toRequestBody(): GuardianDeploymentRequest {
     return GuardianDeploymentRequest(
-        device = "guardian",
+        device = Device.GUARDIAN.value,
         deployedAt = this.deployedAt,
         configuration = this.configuration,
         location = this.location,
