@@ -4,6 +4,7 @@ package org.rfcx.audiomoth.view.deployment.locate
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
@@ -36,6 +37,9 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.util.*
+import org.rfcx.audiomoth.util.LocationPermissions
+import org.rfcx.audiomoth.util.RealmHelper
+import org.rfcx.audiomoth.view.deployment.BaseDeploymentProtocal
 import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 import org.rfcx.audiomoth.view.profile.coordinates.CoordinatesActivity
 
@@ -54,7 +58,13 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var locateItem: Locate? = null
     private var locateAdapter: ArrayAdapter<String>? = null
 
-    private var deploymentProtocol: DeploymentProtocol? = null
+    private var deploymentProtocol: BaseDeploymentProtocal? = null
+    private val locationPermissions by lazy { activity?.let { LocationPermissions(it) } }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        locationPermissions?.handleActivityResult(requestCode, resultCode)
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
