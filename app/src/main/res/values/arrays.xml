@@ -69,7 +69,7 @@
     </string-array>
 
     <string-array name="audio_codec">
-        <item>OPUS</item>
-        <item>FLAC</item>
+        <item>opus</item>
+        <item>flac</item>
     </string-array>
 </resources>
