@@ -53,7 +53,7 @@ open class GuardianProfile(
             name = "",
             sampleRate = 24000,
             bitrate = 28672,
-            fileFormat = "OPUS",
+            fileFormat = "opus",
             duration = 90
         )
     }
