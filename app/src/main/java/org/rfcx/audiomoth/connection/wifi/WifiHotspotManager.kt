@@ -77,6 +77,7 @@ class WifiHotspotManager(private val context: Context) {
 
             Log.d("wifihotspot", "Connecting to ${wifiConfig.SSID}")
             val netId = wifiManager!!.addNetwork(wifiConfig)
+            wifiManager!!.disconnect()
             wifiManager!!.enableNetwork(netId, true)
             wifiManager!!.reconnect()
         }
