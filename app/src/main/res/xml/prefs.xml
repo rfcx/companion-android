@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <androidx.preference.ListPreference
+        android:defaultValue="@string/prefs_value_default_show_ui"
+        android:dialogTitle="show_ui"
+        android:entries="@array/prefs_values_true_or_false"
+        android:entryValues="@array/prefs_values_true_or_false"
+        android:key="show_ui"
+        android:summary="string - true/false"
+        android:title="show_ui" />
+
+    <androidx.preference.ListPreference
+        android:defaultValue="@string/prefs_value_default_enable_audio_capture"
+        android:dialogTitle="enable_audio_capture"
+        android:entries="@array/prefs_values_true_or_false"
+        android:entryValues="@array/prefs_values_true_or_false"
+        android:key="enable_audio_capture"
+        android:summary="string - true/false"
+        android:title="enable_audio_capture" />
+
+    <androidx.preference.ListPreference
+        android:defaultValue="@string/prefs_value_default_enable_checkin_publish"
+        android:dialogTitle="enable_checkin_publish"
+        android:entries="@array/prefs_values_true_or_false"
+        android:entryValues="@array/prefs_values_true_or_false"
+        android:key="enable_checkin_publish"
+        android:summary="string - true/false"
+        android:title="enable_checkin_publish" />
+
+    <androidx.preference.ListPreference
+        android:defaultValue="@string/prefs_value_default_enable_cutoffs_battery"
+        android:dialogTitle="enable_cutoffs_battery"
+        android:entries="@array/prefs_values_true_or_false"
+        android:entryValues="@array/prefs_values_true_or_false"
+        android:key="enable_cutoffs_battery"
+        android:summary="string - true/false"
+        android:title="enable_cutoffs_battery" />
+
+    <androidx.preference.ListPreference
+        android:defaultValue="@string/prefs_value_default_enable_cutoffs_schedule_off_hours"
+        android:dialogTitle="enable_cutoffs_schedule_off_hours"
+        android:entries="@array/prefs_values_true_or_false"
+        android:entryValues="@array/prefs_values_true_or_false"
+        android:key="enable_cutoffs_schedule_off_hours"
+        android:summary="string - true/false"
+        android:title="enable_cutoffs_schedule_off_hours" />
+
+    <EditTextPreference
+        android:defaultValue="@string/prefs_value_default_api_rest_host"
+        android:enabled="true"
+        android:key="api_rest_host"
+        android:summary="string - rest api address"
+        android:title="api_rest_host" />
+
+    <androidx.preference.ListPreference
+        android:defaultValue="@string/prefs_value_default_api_rest_protocol"
+        android:dialogTitle="api_rest_protocol"
+        android:entries="@array/prefs_values_http_or_https"
+        android:entryValues="@array/prefs_values_http_or_https"
+        android:key="api_rest_protocol"
+        android:summary="string - rest api protocol"
+        android:title="api_rest_protocol" />
+
+    <EditTextPreference
+        android:defaultValue="@string/prefs_value_default_api_checkin_host"
+        android:enabled="true"
+        android:key="api_checkin_host"
+        android:summary="string - checkin api address (mqtt)"
+        android:title="api_checkin_host" />
+
+    <androidx.preference.ListPreference
+        android:defaultValue="@string/prefs_value_default_api_checkin_protocol"
+        android:dialogTitle="api_checkin_protocol"
+        android:entries="@array/prefs_values_tcp_or_ssl"
+        android:entryValues="@array/prefs_values_tcp_or_ssl"
+        android:key="api_checkin_protocol"
+        android:summary="string - checkin api protocol (mqtt)"
+        android:title="api_checkin_protocol" />
+
+    <EditTextPreference
+        android:defaultValue="@string/prefs_value_default_api_checkin_port"
+        android:enabled="true"
+        android:key="api_checkin_port"
+        android:summary="string - checkin api port (mqtt)"
+        android:title="api_checkin_port" />
+
+    <EditTextPreference
+        android:defaultValue="@string/prefs_value_default_api_ntp_host"
+        android:enabled="true"
+        android:key="api_ntp_host"
+        android:summary="string - hostname"
+        android:title="api_ntp_host" />
+
+    <EditTextPreference
+        android:defaultValue="@string/prefs_value_default_api_sms_address"
+        android:enabled="true"
+        android:key="api_sms_address"
+        android:summary="string - phone number/code"
+        android:title="api_sms_address" />
+
+    <EditTextPreference
+        android:defaultValue="@string/prefs_value_default_reboot_forced_daily_at"
+        android:enabled="true"
+        android:key="reboot_forced_daily_at"
+        android:summary="string - time"
+        android:title="reboot_forced_daily_at" />
+
+    <!-- Audio Capture Controls -->
+
+    <EditTextPreference
+        android:defaultValue="@string/prefs_value_default_audio_cycle_duration"
+        android:enabled="true"
+        android:key="audio_cycle_duration"
+        android:summary="int - seconds"
+        android:title="audio_cycle_duration" />
+
+    <EditTextPreference
+        android:defaultValue="@string/prefs_value_default_audio_schedule_off_hours"
+        android:enabled="true"
+        android:key="audio_schedule_off_hours"
+        android:summary="string - time ranges, comma separated"
+        android:title="audio_schedule_off_hours" />
+
+    <!-- Audio Capture Formatting -->
+
+    <androidx.preference.ListPreference
+        android:defaultValue="@string/prefs_value_default_audio_encode_codec"
+        android:dialogTitle="audio_encode_codec"
+        android:entries="@array/audio_codec"
+        android:entryValues="@array/audio_codec"
+        android:key="audio_encode_codec"
+        android:summary="string - codec"
+        android:title="audio_encode_codec" />
+
+    <androidx.preference.ListPreference
+        android:defaultValue="@string/prefs_value_default_audio_encode_bitrate"
+        android:dialogTitle="audio_encode_bitrate"
+        android:entries="@array/bitrate_entries"
+        android:entryValues="@array/bitrate_values"
+        android:key="audio_encode_bitrate"
+        android:summary="int - kbits per second"
+        android:title="audio_encode_bitrate" />
+
+    <androidx.preference.ListPreference
+        android:defaultValue="@string/prefs_value_default_audio_sample_rate"
+        android:dialogTitle="audio_sample_rate"
+        android:entries="@array/sample_rate_entries"
+        android:entryValues="@array/sample_rate_values"
+        android:key="audio_sample_rate"
+        android:summary="int - hertz"
+        android:title="audio_sample_rate" />
+
+    <!-- Battery Cutoff Thresholds -->
+
+    <androidx.preference.ListPreference
+        android:defaultValue="@string/prefs_value_default_checkin_battery_cutoff"
+        android:dialogTitle="checkin_battery_cutoff"
+        android:entries="@array/prefs_labels_percent"
+        android:entryValues="@array/prefs_values_percent"
+        android:key="checkin_battery_cutoff"
+        android:summary="int - percentage"
+        android:title="checkin_battery_cutoff" />
+
+    <androidx.preference.ListPreference
+        android:defaultValue="@string/prefs_value_default_audio_battery_cutoff"
+        android:dialogTitle="audio_battery_cutoff"
+        android:entries="@array/prefs_labels_percent"
+        android:entryValues="@array/prefs_values_percent"
+        android:key="audio_battery_cutoff"
+        android:summary="int - percentage"
+        android:title="audio_battery_cutoff" />
+
+    <!-- CheckIn Triggering Controls -->
+
+    <EditTextPreference
+        android:defaultValue="@string/prefs_value_default_checkin_failure_thresholds"
+        android:enabled="true"
+        android:key="checkin_failure_thresholds"
+        android:summary="string - minutes, comma separated"
+        android:title="checkin_failure_thresholds" />
+
+    <EditTextPreference
+        android:defaultValue="@string/prefs_value_default_checkin_skip_threshold"
+        android:enabled="true"
+        android:key="checkin_skip_threshold"
+        android:summary="int - count"
+        android:title="checkin_skip_threshold" />
+
+    <EditTextPreference
+        android:defaultValue="@string/prefs_value_default_checkin_stash_threshold"
+        android:enabled="true"
+        android:key="checkin_stash_threshold"
+        android:summary="int - count"
+        android:title="checkin_stash_threshold" />
+
+    <EditTextPreference
+        android:defaultValue="@string/prefs_value_default_checkin_archive_threshold"
+        android:enabled="true"
+        android:key="checkin_archive_threshold"
+        android:summary="int - count"
+        android:title="checkin_archive_threshold" />
+
+    <!-- Admin Controls -->
+
+    <EditTextPreference
+        android:defaultValue="@string/prefs_value_default_admin_log_capture_cycle"
+        android:enabled="true"
+        android:key="admin_log_capture_cycle"
+        android:summary="int - minutes"
+        android:title="admin_log_capture_cycle" />
+
+    <androidx.preference.ListPreference
+        android:defaultValue="@string/prefs_value_default_admin_log_capture_level"
+        android:enabled="true"
+        android:entries="@array/prefs_values_logcat_log_levels"
+        android:entryValues="@array/prefs_values_logcat_log_levels"
+        android:key="admin_log_capture_level"
+        android:summary="string - log verbosity level"
+        android:title="admin_log_capture_level" />
+
+    <androidx.preference.ListPreference
+        android:defaultValue="@string/prefs_value_default_admin_enable_log_capture"
+        android:dialogTitle="admin_enable_log_capture"
+        android:entries="@array/prefs_values_true_or_false"
+        android:entryValues="@array/prefs_values_true_or_false"
+        android:key="admin_enable_log_capture"
+        android:summary="string - true/false"
+        android:title="admin_enable_log_capture" />
+
+    <EditTextPreference
+        android:defaultValue="@string/prefs_value_default_admin_screenshot_capture_cycle"
+        android:enabled="true"
+        android:key="admin_screenshot_capture_cycle"
+        android:summary="int - minutes"
+        android:title="admin_screenshot_capture_cycle" />
+
+    <androidx.preference.ListPreference
+        android:defaultValue="@string/prefs_value_default_admin_enable_screenshot_capture"
+        android:dialogTitle="admin_enable_screenshot_capture"
+        android:entries="@array/prefs_values_true_or_false"
+        android:entryValues="@array/prefs_values_true_or_false"
+        android:key="admin_enable_screenshot_capture"
+        android:summary="string - true/false"
+        android:title="admin_enable_screenshot_capture" />
+
+    <androidx.preference.ListPreference
+        android:defaultValue="@string/prefs_value_default_admin_enable_bluetooth"
+        android:dialogTitle="admin_enable_bluetooth"
+        android:entries="@array/prefs_values_true_or_false"
+        android:entryValues="@array/prefs_values_true_or_false"
+        android:key="admin_enable_bluetooth"
+        android:summary="string - true/false"
+        android:title="admin_enable_bluetooth" />
+
+    <androidx.preference.ListPreference
+        android:defaultValue="@string/prefs_value_default_admin_enable_wifi"
+        android:dialogTitle="admin_enable_wifi"
+        android:entries="@array/prefs_values_true_or_false"
+        android:entryValues="@array/prefs_values_true_or_false"
+        android:key="admin_enable_wifi"
+        android:summary="string - true/false"
+        android:title="admin_enable_wifi" />
+
+    <androidx.preference.ListPreference
+        android:defaultValue="@string/prefs_value_default_admin_enable_tcp_adb"
+        android:dialogTitle="admin_enable_tcp_adb"
+        android:entries="@array/prefs_values_true_or_false"
+        android:entryValues="@array/prefs_values_true_or_false"
+        android:key="admin_enable_tcp_adb"
+        android:summary="string - true/false"
+        android:title="admin_enable_tcp_adb" />
+
+    <androidx.preference.ListPreference
+        android:defaultValue="@string/prefs_value_default_admin_enable_sentinel_capture"
+        android:dialogTitle="admin_enable_sentinel_capture"
+        android:entries="@array/prefs_values_true_or_false"
+        android:entryValues="@array/prefs_values_true_or_false"
+        android:key="admin_enable_sentinel_capture"
+        android:summary="string - true/false"
+        android:title="admin_enable_sentinel_capture" />
+
+    <androidx.preference.ListPreference
+        android:defaultValue="@string/prefs_value_default_admin_system_timezone"
+        android:dialogTitle="admin_system_timezone"
+        android:entries="@array/tz_timezones"
+        android:entryValues="@array/tz_timezones"
+        android:key="admin_system_timezone"
+        android:summary="string - Region/Zone"
+        android:title="admin_system_timezone" />
+
+    <androidx.preference.ListPreference
+        android:defaultValue="@string/prefs_value_default_admin_enable_ssh_server"
+        android:dialogTitle="admin_ssh_server_state"
+        android:entries="@array/prefs_values_true_or_false"
+        android:entryValues="@array/prefs_values_true_or_false"
+        android:key="admin_enable_ssh_server"
+        android:summary="string - On/Off"
+        android:title="admin_ssh_server_state" />
+
+    <androidx.preference.ListPreference
+        android:defaultValue="@string/prefs_value_default_admin_enable_ssh_server"
+        android:dialogTitle="admin_wifi_socket_state"
+        android:entries="@array/prefs_values_true_or_false"
+        android:entryValues="@array/prefs_values_true_or_false"
+        android:key="admin_enable_wifi_socket"
+        android:summary="string - On/Off"
+        android:title="admin_wifi_socket_state" />
+
+</androidx.preference.PreferenceScreen>
