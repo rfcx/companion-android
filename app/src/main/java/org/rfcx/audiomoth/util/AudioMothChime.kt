@@ -1,3 +1,9 @@
+/****************************************************************************
+ * AudioMothChime.kt
+ * openacousticdevices.info
+ * June 2020
+ *****************************************************************************/
+
 package org.rfcx.audiomoth.util
 
 import android.media.AudioAttributes
@@ -8,11 +14,23 @@ import android.os.Build
 
 import kotlin.math.*
 
+/* Global constants */
+
 class AudioMothChime {
+
+    /* General constants */
+
+    private val SPEED_FACTOR: Float = 2.0f
+
+    private val USE_HAMMING_CODE: Boolean = false
 
     private val CARRIER_FREQUENCY: Int = 18000
 
-    private val SPEED_FACTOR: Float = 2.0f
+    private val NUMBER_OF_STOP_BITS: Int = 8
+
+    private val NUMBER_OF_START_BITS: Int = 16
+
+    /* Tone timing constants */
 
     private val BIT_RISE: Float = 0.0005f / SPEED_FACTOR
     private val BIT_FALL: Float = 0.0005f / SPEED_FACTOR
@@ -21,34 +39,15 @@ class AudioMothChime {
     private val HIGH_BIT_SUSTAIN: Float = 0.009f / SPEED_FACTOR
     private val START_STOP_BIT_SUSTAIN: Float = 0.0065f / SPEED_FACTOR
 
-    private val NUMBER_OF_START_AND_STOP_BITS: Int = 16
-
     private val NOTE_RISE_DURATION: Float = 0.030f / SPEED_FACTOR
     private val NOTE_FALL_DURATION: Float = 0.030f / SPEED_FACTOR
     private val NOTE_LONG_FALL_DURATION: Float = 0.090f / SPEED_FACTOR
 
+    /* Note parsing constants */
+
     private val REGEX = Regex(
         "^(C|C#|Db|D|D#|Eb|E|F|F#|Gb|G|G#|Ab|A|A#|Bb|B)([0-9]):([1-9])$",
         RegexOption.IGNORE_CASE
-    )
-
-    private val HAMMING_CODE = arrayOf(
-        arrayOf(0, 0, 0, 0, 0, 0, 0),
-        arrayOf(1, 1, 1, 0, 0, 0, 0),
-        arrayOf(1, 0, 0, 1, 1, 0, 0),
-        arrayOf(0, 1, 1, 1, 1, 0, 0),
-        arrayOf(0, 1, 0, 1, 0, 1, 0),
-        arrayOf(1, 0, 1, 1, 0, 1, 0),
-        arrayOf(1, 1, 0, 0, 1, 1, 0),
-        arrayOf(0, 0, 1, 0, 1, 1, 0),
-        arrayOf(1, 1, 0, 1, 0, 0, 1),
-        arrayOf(0, 0, 1, 1, 0, 0, 1),
-        arrayOf(0, 1, 0, 0, 1, 0, 1),
-        arrayOf(1, 0, 1, 0, 1, 0, 1),
-        arrayOf(1, 0, 0, 0, 0, 1, 1),
-        arrayOf(0, 1, 1, 0, 0, 1, 1),
-        arrayOf(0, 0, 0, 1, 1, 1, 1),
-        arrayOf(1, 1, 1, 1, 1, 1, 1)
     )
 
     private val FREQUENCY_LOOKUP = mapOf(
@@ -224,6 +223,27 @@ class AudioMothChime {
         "B9" to 15804
     )
 
+    /* Encoding constant */
+
+    private val HAMMING_CODE = arrayOf(
+        arrayOf(0, 0, 0, 0, 0, 0, 0),
+        arrayOf(1, 1, 1, 0, 0, 0, 0),
+        arrayOf(1, 0, 0, 1, 1, 0, 0),
+        arrayOf(0, 1, 1, 1, 1, 0, 0),
+        arrayOf(0, 1, 0, 1, 0, 1, 0),
+        arrayOf(1, 0, 1, 1, 0, 1, 0),
+        arrayOf(1, 1, 0, 0, 1, 1, 0),
+        arrayOf(0, 0, 1, 0, 1, 1, 0),
+        arrayOf(1, 1, 0, 1, 0, 0, 1),
+        arrayOf(0, 0, 1, 1, 0, 0, 1),
+        arrayOf(0, 1, 0, 0, 1, 0, 1),
+        arrayOf(1, 0, 1, 0, 1, 0, 1),
+        arrayOf(1, 0, 0, 0, 0, 1, 1),
+        arrayOf(0, 1, 1, 0, 0, 1, 1),
+        arrayOf(0, 0, 0, 1, 1, 1, 1),
+        arrayOf(1, 1, 1, 1, 1, 1, 1)
+    )
+
     /* Data classes */
 
     private data class State(
@@ -279,12 +299,26 @@ class AudioMothChime {
 
         bytes.forEach {
 
-            val low: Int = (it and 0x0F)
-            val high: Int = (it and 0xF0) shr 4
+            if (USE_HAMMING_CODE) {
 
-            for (x in 0 until 7) {
-                bitSequence.add(HAMMING_CODE[low][x])
-                bitSequence.add(HAMMING_CODE[high][x])
+                val low: Int = (it and 0x0F)
+                val high: Int = (it and 0xF0) shr 4
+
+                for (x in 0 until 7) {
+                    bitSequence.add(HAMMING_CODE[low][x])
+                    bitSequence.add(HAMMING_CODE[high][x])
+                }
+
+            } else {
+
+                for (x in 0 until 8) {
+
+                    val mask = (0x01 shl x)
+
+                    bitSequence.add(if ((it and mask) == mask) 1 else 0)
+
+                }
+
             }
 
         }
@@ -411,7 +445,7 @@ class AudioMothChime {
 
         /* Initial start bits */
 
-        for (i in 0 until NUMBER_OF_START_AND_STOP_BITS) {
+        for (i in 0 until NUMBER_OF_START_BITS) {
 
             createWaveformComponent(
                 waveform1,
@@ -451,7 +485,7 @@ class AudioMothChime {
 
         /* Stop bits */
 
-        for (i in 0 until NUMBER_OF_START_AND_STOP_BITS) {
+        for (i in 0 until NUMBER_OF_STOP_BITS) {
 
             createWaveformComponent(
                 waveform1,
@@ -485,19 +519,19 @@ class AudioMothChime {
 
         notes.forEachIndexed { index, note ->
 
-            val noteFallDuration =
-                if (index == notes.size - 1) NOTE_LONG_FALL_DURATION else NOTE_FALL_DURATION
+                val noteFallDuration =
+                    if (index == notes.size - 1) NOTE_LONG_FALL_DURATION else NOTE_FALL_DURATION
 
-            createWaveformComponent(
-                waveform2,
-                state,
-                sampleRate,
-                note.frequency,
-                1.0f,
-                NOTE_RISE_DURATION,
-                noteDuration * note.duration,
-                noteFallDuration
-            )
+                createWaveformComponent(
+                    waveform2,
+                    state,
+                    sampleRate,
+                    note.frequency,
+                    1.0f,
+                    NOTE_RISE_DURATION,
+                    noteDuration * note.duration,
+                    noteFallDuration
+                )
 
         }
 

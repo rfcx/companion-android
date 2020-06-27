@@ -1,6 +1,13 @@
+/****************************************************************************
+ * AudioMothChimeConnector.kt
+ * openacousticdevices.info
+ * June 2020
+ *****************************************************************************/
+
 package org.rfcx.audiomoth.util
 
 import java.util.Calendar
+
 import kotlin.random.Random
 import kotlin.math.*
 
@@ -26,7 +33,7 @@ class AudioMothChimeConnector : AudioMothConnector {
     private val COMPRESSED_CONFIGURATION_LENGTH: Int = 8
     private val MAXIMUM_SET_CONFIGURATION_MESSAGE_LENGTH: Int = 54
 
-    private val UNIQUE_ID_LENGTH: Int = 8
+    private val DEPLOYMENT_ID_LENGTH: Int = 8
     private val MAX_START_STOP_PERIODS: Int = 5
 
     private val MINIMUM_SLEEP_DURATION: Int = 5
@@ -94,7 +101,7 @@ class AudioMothChimeConnector : AudioMothConnector {
 
     override fun getPacketLength(configuration: AudioMothConfiguration): Int {
 
-        var packetLength: Int = COMPRESSED_CONFIGURATION_LENGTH + UNIQUE_ID_LENGTH
+        var packetLength: Int = COMPRESSED_CONFIGURATION_LENGTH + DEPLOYMENT_ID_LENGTH
 
         packetLength += if (configuration.sleepRecordCycle == null) 0 else 2 * BITS_IN_INT16 / BITS_PER_BYTE
 
@@ -300,13 +307,13 @@ class AudioMothChimeConnector : AudioMothConnector {
 
         }
 
-        /* Unique ID */
+        /* Deployment ID */
 
-        val length = state.index / BITS_PER_BYTE + UNIQUE_ID_LENGTH
+        val length = state.index / BITS_PER_BYTE + DEPLOYMENT_ID_LENGTH
 
         if (id != null) {
 
-            for (i in 0 until min(UNIQUE_ID_LENGTH, id.size)) {
+            for (i in 0 until min(DEPLOYMENT_ID_LENGTH, id.size)) {
 
                 data[length - 1 - i] = id[i] and 0xFF
 
