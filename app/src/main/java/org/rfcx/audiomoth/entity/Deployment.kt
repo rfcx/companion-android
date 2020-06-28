@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
+import org.rfcx.audiomoth.entity.response.DeploymentResponse
 import java.util.*
 
 @RealmClass
@@ -27,6 +28,8 @@ open class Deployment(
         const val FIELD_ID = "id"
         const val FIELD_STATE = "state"
         const val FIELD_SYNC_STATE = "syncState"
+        const val FIELD_SERVER_ID = "serverId"
+
         const val PHOTOS = "photos"
     }
 }

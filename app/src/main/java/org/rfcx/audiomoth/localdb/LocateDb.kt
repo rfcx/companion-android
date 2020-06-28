@@ -4,8 +4,13 @@ import android.util.Log
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
+import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.SyncState
+import org.rfcx.audiomoth.entity.response.LocationResponse
+import org.rfcx.audiomoth.entity.response.toDeployment
+import org.rfcx.audiomoth.entity.response.toLocate
+import java.util.*
 
 class LocateDb(private val realm: Realm) {
 
@@ -88,6 +93,30 @@ class LocateDb(private val realm: Realm) {
                     // set sync state to unsent after deploymentServerId have been change
                     syncState = SyncState.Unsent.key
                 }
+        }
+    }
+
+    fun insertOrUpdate(locationResponse: LocationResponse) {
+        realm.executeTransaction {
+            val location =
+                it.where(Locate::class.java)
+                    .equalTo(Locate.FIELD_SERVER_ID, locationResponse.serverId)
+                    .findFirst()
+
+            if (location != null) {
+                location.serverId = locationResponse.serverId
+                location.name = locationResponse.name ?: location.name
+                location.latitude = locationResponse.latitude ?:location.latitude
+                location.longitude = locationResponse.longitude ?: location.longitude
+                location.createdAt = locationResponse.createdAt ?: location.createdAt
+                location.lastDeploymentServerId = locationResponse.lastDeploymentServerId
+            } else {
+                val locate = locationResponse.toLocate()
+                val id = (it.where(Locate::class.java).max(Deployment.FIELD_ID)
+                    ?.toInt() ?: 0) + 1
+                locate.id = id
+                it.insert(locate)
+            }
         }
     }
 }

@@ -6,7 +6,6 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.PointF
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,15 +44,19 @@ import kotlinx.android.synthetic.main.layout_map_window_info.view.*
 import org.rfcx.audiomoth.MainActivityListener
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Deployment
-import org.rfcx.audiomoth.entity.DeploymentState
 import org.rfcx.audiomoth.entity.DeploymentState.AudioMoth
 import org.rfcx.audiomoth.entity.Locate
+import org.rfcx.audiomoth.entity.response.DeploymentResponse
+import org.rfcx.audiomoth.entity.response.LocationResponse
 import org.rfcx.audiomoth.localdb.DeploymentDb
-import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.LocateDb
+import org.rfcx.audiomoth.repo.Firestore
+import org.rfcx.audiomoth.repo.ResponseCallback
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
 import org.rfcx.audiomoth.util.*
+import org.rfcx.audiomoth.view.LoadingDialogFragment
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity
+import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentActivity
 
 class MapFragment : Fragment(), OnMapReadyCallback {
     // map
@@ -288,10 +291,18 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         // hide loading progress
         progressBar.visibility = View.INVISIBLE
 
-        val showLocations = locations.filter { it.lastDeployment != 0 }
-        val showDeployIds = showLocations.mapTo(arrayListOf(), { it.lastDeployment })
+        val showLocations =
+            locations.filter { it.lastDeployment != 0 || it.lastDeploymentServerId != null }
+        val showDeployIds = showLocations.mapTo(arrayListOf(), {
+            if (it.lastDeploymentServerId != null) {
+                it.lastDeploymentServerId
+            } else {
+                it.lastDeployment
+            }
+        })
+
         val showDeployments = this.deployments.filter {
-            showDeployIds.contains(it.id)
+            showDeployIds.contains(it.id) || showDeployIds.contains(it.serverId)
         }
 
         handleMarkerDeployment(showDeployments)
@@ -307,6 +318,39 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             it
         }
         locateLiveData.observeForever(locateObserve)
+
+        context?.let {
+            retrieveDeployments(it)
+        }
+    }
+
+    private fun retrieveDeployments(context: Context) {
+        showLoading()
+        Firestore(context).retrieveDeployments(deploymentDb,
+            object : ResponseCallback<List<DeploymentResponse>> {
+                override fun onSuccessCallback(response: List<DeploymentResponse>) {
+                    retrieveLocations(context)
+                }
+
+                override fun onFailureCallback(errorMessage: String?) {
+                    hideLoading()
+                }
+            })
+    }
+
+    private fun retrieveLocations(context: Context) {
+        Firestore(context).retrieveLocations(
+            locateDb,
+            object : ResponseCallback<List<LocationResponse>> {
+                override fun onSuccessCallback(response: List<LocationResponse>) {
+                    hideLoading()
+                    // update map
+                }
+
+                override fun onFailureCallback(errorMessage: String?) {
+                    hideLoading()
+                }
+            })
     }
 
     private fun fetchJobSyncing() {
@@ -339,7 +383,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             // else also waiting network
             else -> {
                 val msg = if (deploymentUnsentCount > 1) {
-                    getString(R.string.format_deploys_waiting_network, deploymentUnsentCount.toString())
+                    getString(
+                        R.string.format_deploys_waiting_network,
+                        deploymentUnsentCount.toString()
+                    )
                 } else {
                     getString(R.string.format_deploy_waiting_network)
                 }
@@ -366,7 +413,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 Pair(PROPERTY_MARKER_DEPLOYMENT_ID, it.id.toString()),
                 Pair(
                     PROPERTY_MARKER_CAPTION,
-                    if (it.state >=AudioMoth.ReadyToUpload.key)
+                    if (it.state >= AudioMoth.ReadyToUpload.key)
                         Battery.getPredictionBattery(it.batteryDepletedAt.time)
                     else
                         getString(R.string.format_in_progress_step)
@@ -499,6 +546,21 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         deployLiveData.removeObserver(deploymentObserve)
         locateLiveData.removeObserver(locateObserve)
         mapView.onDestroy()
+    }
+
+    private fun showLoading() {
+        val loadingDialog: LoadingDialogFragment =
+            childFragmentManager.findFragmentByTag(GuardianDeploymentActivity.loadingDialogTag) as LoadingDialogFragment?
+                ?: run {
+                    LoadingDialogFragment()
+                }
+        loadingDialog.show(childFragmentManager, GuardianDeploymentActivity.loadingDialogTag)
+    }
+
+    private fun hideLoading() {
+        val loadingDialog: LoadingDialogFragment? =
+            childFragmentManager.findFragmentByTag(GuardianDeploymentActivity.loadingDialogTag) as LoadingDialogFragment?
+        loadingDialog?.dismissDialog()
     }
 
     companion object {

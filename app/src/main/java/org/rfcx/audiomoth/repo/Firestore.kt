@@ -1,6 +1,7 @@
 package org.rfcx.audiomoth.repo
 
 import android.content.Context
+import android.util.Log
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -10,6 +11,10 @@ import org.rfcx.audiomoth.entity.request.DeploymentRequest
 import org.rfcx.audiomoth.entity.request.ImageRequest
 import org.rfcx.audiomoth.entity.request.LocateRequest
 import org.rfcx.audiomoth.entity.request.ProfileRequest
+import org.rfcx.audiomoth.entity.response.DeploymentResponse
+import org.rfcx.audiomoth.entity.response.LocationResponse
+import org.rfcx.audiomoth.localdb.DeploymentDb
+import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.util.Preferences
 import org.rfcx.audiomoth.util.Storage
 import org.rfcx.audiomoth.util.getEmailUser
@@ -58,6 +63,55 @@ class Firestore(val context: Context) {
         val userDocument = db.collection(COLLECTION_USERS).document(guid)
         userDocument.collection(COLLECTION_LOCATIONS).document(locateServerId)
             .set(locateRequest).await()
+    }
+
+    fun retrieveDeployments(
+        deploymentDb: DeploymentDb,
+        callback: ResponseCallback<List<DeploymentResponse>>
+    ) {
+        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        userDocument.collection(COLLECTION_DEPLOYMENTS).get()
+            .addOnSuccessListener {
+                val deploymentResponses = arrayListOf<DeploymentResponse>()
+                it.documents.forEach { doc ->
+                    if (doc != null) {
+                        val deploymentResponse = doc.toObject(DeploymentResponse::class.java)
+                        deploymentResponse?.serverId = doc.id
+                        deploymentResponse?.let { it1 -> deploymentResponses.add(it1) }
+                    }
+                }
+
+                // verify response and store deployment
+                deploymentResponses.forEach { dr ->
+                    deploymentDb.insertOrUpdate(dr)
+                }
+                callback.onSuccessCallback(deploymentResponses)
+            }
+            .addOnFailureListener {
+                callback.onFailureCallback(it.localizedMessage)
+            }
+    }
+
+    fun retrieveLocations(locateDb: LocateDb, callback: ResponseCallback<List<LocationResponse>>) {
+        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        userDocument.collection(COLLECTION_LOCATIONS).get()
+            .addOnSuccessListener {
+                val locationResponses = arrayListOf<LocationResponse>()
+                it.documents.forEach { doc ->
+                    val locationResponse = doc.toObject(LocationResponse::class.java)
+                    locationResponse?.serverId = doc.id
+                    locationResponse?.let { it1 -> locationResponses.add(it1) }
+                }
+
+                // verify response and store deployment
+                locationResponses.forEach { lr ->
+                    locateDb.insertOrUpdate(lr)
+                }
+                callback.onSuccessCallback(locationResponses)
+            }
+            .addOnFailureListener {
+                callback.onFailureCallback(it.localizedMessage)
+            }
     }
 
     fun saveFeedback(

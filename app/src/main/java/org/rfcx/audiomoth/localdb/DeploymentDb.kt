@@ -5,6 +5,8 @@ import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
 import org.rfcx.audiomoth.entity.*
+import org.rfcx.audiomoth.entity.response.DeploymentResponse
+import org.rfcx.audiomoth.entity.response.toDeployment
 
 /**
  * For Manage the saving and sending of deployment from the local database
@@ -29,7 +31,7 @@ class DeploymentDb(private val realm: Realm) {
         var id = deployment.id
         realm.executeTransaction {
             if (deployment.id == 0) {
-                id = (realm.where(Deployment::class.java).max(Deployment.FIELD_ID)
+                id = (it.where(Deployment::class.java).max(Deployment.FIELD_ID)
                     ?.toInt() ?: 0) + 1
                 deployment.id = id
             }
@@ -37,6 +39,48 @@ class DeploymentDb(private val realm: Realm) {
             it.insertOrUpdate(deployment)
         }
         return id
+    }
+
+    fun insertOrUpdate(deploymentResponse: DeploymentResponse) {
+        realm.executeTransaction {
+            val deployment =
+                it.where(Deployment::class.java)
+                    .equalTo(Deployment.FIELD_SERVER_ID, deploymentResponse.serverId)
+                    .findFirst()
+
+            if (deployment != null) {
+                deployment.serverId = deploymentResponse.serverId
+                deployment.batteryDepletedAt =
+                    deploymentResponse.batteryDepletedAt ?: deployment.batteryDepletedAt
+                deployment.deployedAt = deploymentResponse.deployedAt ?: deployment.deployedAt
+                deployment.batteryLevel = deploymentResponse.batteryLevel ?: deployment.batteryLevel
+
+                val newConfig = deploymentResponse.configuration?.toConfiguration()
+                if (newConfig != null) {
+                    deployment.configuration = it.copyToRealm(newConfig)
+                }
+
+                val newLocation = deploymentResponse.location
+                if (newLocation != null) {
+                    deployment.location = it.copyToRealm(newLocation)
+                }
+
+                deployment.createdAt = deploymentResponse.createdAt ?: deployment.createdAt
+            } else {
+                val deploymentObj = deploymentResponse.toDeployment()
+                val id = (it.where(Deployment::class.java).max(Deployment.FIELD_ID)
+                    ?.toInt() ?: 0) + 1
+                deploymentObj.id = id
+                it.insert(deploymentObj)
+            }
+        }
+    }
+
+    fun updateDeployment(deploymentResponse: DeploymentResponse) {
+        realm.executeTransaction {
+
+
+        }
     }
 
     fun markUnsent(id: Int) {
@@ -83,7 +127,7 @@ class DeploymentDb(private val realm: Realm) {
                 .equalTo(Deployment.FIELD_SYNC_STATE, SyncState.Unsent.key).findAll()
                 .createSnapshot()
             unsentCopied = unsent.toList()
-            unsent.forEach {d->
+            unsent.forEach { d ->
                 d.syncState = SyncState.Sending.key
             }
         }
@@ -92,7 +136,9 @@ class DeploymentDb(private val realm: Realm) {
 
     fun unlockSending() {
         realm.executeTransaction {
-            val snapshot = it.where(Deployment::class.java).equalTo(Deployment.FIELD_SYNC_STATE, SyncState.Sending.key).findAll().createSnapshot()
+            val snapshot = it.where(Deployment::class.java)
+                .equalTo(Deployment.FIELD_SYNC_STATE, SyncState.Sending.key).findAll()
+                .createSnapshot()
             snapshot.forEach {
                 it.syncState = SyncState.Unsent.key
             }
@@ -101,7 +147,8 @@ class DeploymentDb(private val realm: Realm) {
 
     private fun saveDeploymentServerIdToImage(serverId: String, deploymentId: Int) {
         val images =
-            realm.where(DeploymentImage::class.java).equalTo(DeploymentImage.FIELD_DEPLOYMENT_ID, deploymentId)
+            realm.where(DeploymentImage::class.java)
+                .equalTo(DeploymentImage.FIELD_DEPLOYMENT_ID, deploymentId)
                 .findAll()
         images?.forEach {
             Log.i("saveDeploymentIdToImage", it.localPath)
