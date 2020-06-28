@@ -21,8 +21,11 @@
     <string name="red_pin">Red = <![CDATA[<]]>1 day</string>
     <string name="format_image_unsync">%s photo not yet synced</string>
     <string name="format_images_unsync">%s photos not yet synced</string>
-    <string name="format_deploy_unsync">%s deploy not yet synced</string>
-    <string name="format_deploys_unsync">%s deploys not yet synced</string>
+    <string name="format_deploy_uploading">Syncing a deployment.</string>
+    <string name="format_deploys_uploading">Syncing %s deployments.</string>
+    <string name="format_deploy_waiting_network">No connection. a deployment will synced later.</string>
+    <string name="format_deploys_waiting_network">No connection. %s deployments will synced later.</string>
+    <string name="format_deploys_uploaded">All deployment synced.</string>
     <string name="menu_map">MAP</string>
     <string name="menu_profile">PROFILE</string>
     <string name="setup_first_device">Welcome! %s \nSetup your first RFCx device here</string>
@@ -36,6 +39,7 @@
 
     <!--    ConfigureFragment-->
     <string name="configure">Configure</string>
+    <string name="let_configure">Let’s configure the device</string>
     <string name="sample_rate">Sample rate</string>
     <string name="gain">Gain</string>
     <string name="sleep_duration">Sleep (second)</string>
@@ -61,12 +65,14 @@
     <!--    SyncFragment-->
     <string name="sync">Sync</string>
     <string name="syncing">Syncing</string>
+    <string name="ready_to_send">Ready to send the configuration to the device</string>
     <string name="switch_to_config">1. Switch your device to CONFIG</string>
-    <string name="max_volume">2. Max volume of your phone</string>
-    <string name="hold_device">3. Hold the device less than 50 cm apart</string>
+    <string name="max_volume">2. Set the volume of your phone to low-middle level</string>
+    <string name="hold_device">3. Hold the device close to your phone speaker</string>
     <string name="no_retry">No, Retry</string>
     <string name="did_green_flash">Did the green LED flash on completion?</string>
     <string name="yes">Yes</string>
+    <string name="ready_send_configuration">Ready to send the configuration to the device</string>
 
     <!--    VerifySyncFragment-->
     <string name="what_light_you_see">What light do you see now?</string>
@@ -81,19 +87,19 @@
     <string name="test">test</string>
     <string name="skip">Skip</string>
     <string name="it_full">or, if it is full then:</string>
-    <string name="how_many_time">How many time did the green LED flash?</string>
+    <string name="how_many_time">How many time did the green and red LED flash?</string>
     <string name="try_again">try again</string>
-    <string name="how_long_battery">How long will the battery last?</string>
-    <string name="days">%s days</string>
-    <string name="day">%s day</string>
-    <string name="charged">%s charged</string>
+    <string name="device_configured">Device configured! \nNow let’s verify the battery level</string>
+    <string name="days">Estimated battery duration: %s days</string>
+    <string name="day">Estimated battery duration: %s day</string>
+    <string name="notification">A notification will be sent a day \nbefore the battery is due to run out</string>
 
     <!--  LocationFragment  -->
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
     <string name="finish">finish</string>
-    <string name="name_location">Name Location</string>
-    <string name="deploying_the_device">Where are you deploying the device?</string>
+    <string name="name_location">Location name</string>
+    <string name="define_the_precise">Define the precise device location</string>
     <string name="new_location">New location</string>
     <string name="existing">Existing</string>
     <string name="next">Next</string>
@@ -130,6 +136,7 @@
     <string name="snackbar_retry">RETRY</string>
 
     <!--  DeployFragment  -->
+    <string name="deployment_will_uploaded">The deployment will be uploaded to your account</string>
     <string name="almost_there">Almost there!</string>
     <string name="switch_to_deploy">Switch your device to DEPLOY</string>
     <string name="take_photos">Take some photos of the deploy \nlocation (optional)</string>
@@ -154,9 +161,24 @@
 
     <string name="an_error_occurred">Service unavailable</string>
     <string name="error_has_occurred">An error has occurred Please try again later</string>
-    <string name="format_in_progress_step">Not yet deploy [%s]</string>
+    <string name="format_in_progress_step">Not yet deployed</string>
     <string name="error_upload_deployment">Something went wrong.</string>
     <string name="deployment_uploaded">Deployment uploaded!</string>
     <string name="deployment_saved">Deployment saved!</string>
+
+    <!-- ConnectGuardianFragment -->
+    <string name="nearby_guardians">Nearby Guardian(s)</string>
+    <string name="connect">Connect</string>
+
+    <!-- GuardianSelectProfileFragment -->
+    <string name="profile_default">Default</string>
+    <string name="configuration_details">%s, %d kHz, %d kbs, %d secs</string>
+
+    <!-- GuardianConfigureFragment -->
+    <string name="bitrate">Bitrate</string>
+    <string name="duration">Duration (per audio)</string>
+    <string name="choose_bitrate">Choose bitrate (kbs)</string>
+    <string name="choose_file_format">Choose file format</string>
+    <string name="kilobytes">%s kbs</string>
 
 </resources>

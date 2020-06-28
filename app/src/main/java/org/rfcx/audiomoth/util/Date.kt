@@ -18,6 +18,12 @@ private val outputStandardDateSdf by lazy {
     sdf
 }
 
+private val isoSdf by lazy {
+    val sdf = SimpleDateFormat("HH:mm", Locale.US)
+    sdf.timeZone = TimeZone.getTimeZone("UTC")
+    sdf
+}
+
 fun Date.toDateTimeString(): String {
     return outputStandardDateSdf.format(this)
 }
@@ -28,4 +34,12 @@ fun Calendar.toTimeString(): String {
 
 fun getCalendar() : Calendar {
     return Calendar.getInstance()
+}
+
+fun Date.toIsoString(): String {
+    return isoSdf.format(this)
+}
+
+fun String.toDate(): Date {
+    return outputTimeSdf.parse(this)
 }

@@ -7,12 +7,13 @@ import androidx.work.*
 import io.realm.Realm
 import org.rfcx.audiomoth.entity.request.toRequestBody
 import org.rfcx.audiomoth.localdb.DeploymentDb
+import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.service.images.ImageSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
 
 /**
- * For syncing data to server. ref from Ranger Android App
+ * For syncing data to server. Ref from Ranger Android App
  */
 class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
@@ -20,7 +21,9 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
     override suspend fun doWork(): Result {
         Log.d(TAG, "doWork")
 
+
         val db = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
+        val locateDb = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val firestore = Firestore(context)
         val deployments = db.lockUnsent()
 
@@ -34,6 +37,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
             if (result != null) {
                 Log.d(TAG, "doWork: success ${it.id}")
                 db.markSent(result.id, it.id)
+                locateDb.updateDeploymentServerId(it.id, result.id)
             } else {
                 Log.d(TAG, "doWork: failed ${it.id}")
                 db.markUnsent(it.id)
@@ -42,6 +46,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
         }
 
         ImageSyncWorker.enqueue(context)
+        LocationSyncWorker.enqueue(context)
 
         return if (someFailed) Result.retry() else Result.success()
     }

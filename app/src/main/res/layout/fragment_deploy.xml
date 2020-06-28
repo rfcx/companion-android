@@ -11,34 +11,57 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.05" />
+        app:layout_constraintGuide_percent="0.1" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guidelineHorizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.35" />
+        app:layout_constraintGuide_percent="0.40" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/deploymentWillUploadedTextView"
+        style="@style/AudioMothText.Subhead.Bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="@dimen/margin_padding_normal"
+        android:text="@string/deployment_will_uploaded"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/view0"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginEnd="@dimen/margin_padding_large"
+        android:background="@color/colorPrimary"
+        app:layout_constraintTop_toBottomOf="@id/deploymentWillUploadedTextView" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/configImageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_margin="@dimen/margin_padding_normal"
-        android:src="@drawable/rfcx_edge_record"
+        android:src="@drawable/edge_deploy"
+        android:layout_margin="@dimen/margin_padding_small"
         app:layout_constraintBottom_toBottomOf="@id/guidelineHorizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/guidelineHorizontalTop" />
+        app:layout_constraintTop_toBottomOf="@id/guidelineHorizontalTop" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/almostThereTextView"
-        style="@style/AudioMothText.Subhead.Bold"
+        style="@style/AudioMothText.Body.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginTop="@dimen/margin_padding_normal"
         android:layout_marginEnd="@dimen/margin_padding_large"
+        android:gravity="center"
         android:text="@string/almost_there"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -46,7 +69,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/switchToConfigTextView"
-        style="@style/AudioMothText.Subhead.Bold"
+        style="@style/AudioMothText.Body.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"
@@ -59,7 +82,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/takePhotosTextView"
-        style="@style/AudioMothText.Subhead"
+        style="@style/AudioMothText.Subhead.Small"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"

@@ -57,6 +57,18 @@
         <item name="android:textColor">@android:color/black</item>
     </style>
 
+    <style name="AudioMothButton.GreyButton.Line" parent="AudioMothButton">
+        <item name="android:background">@drawable/bg_button_grey</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/dark_gray</item>
+    </style>
+
+    <style name="AudioMothButton.RedButton.Line" parent="AudioMothButton">
+        <item name="android:background">@drawable/bg_button_red</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text_error</item>
+    </style>
+
     <!-- TextView -->
     <style name="AudioMothText" parent="Widget.AppCompat.TextView"/>
 
@@ -64,8 +76,12 @@
         <item name="android:textColor">@color/text_black</item>
     </style>
 
-    <style name="AudioMothText.Subhead.Bold" parent="Base.TextAppearance.AppCompat.Subhead">
+    <style name="AudioMothText.Subhead.Bold" parent="Base.TextAppearance.AppCompat.Small">
+        <item name="android:textColor">@color/text_black</item>
         <item name="android:textStyle">bold</item>
+    </style>
+    <style name="AudioMothText.Subhead.Small" parent="Base.TextAppearance.AppCompat.Small">
+        <item name="android:textColor">@color/text_primary</item>
     </style>
 
     <style name="AudioMothText.Body.Secondary" parent="TextAppearance.AppCompat.Body1">
@@ -94,6 +110,11 @@
         <item name="android:textAllCaps">true</item>
     </style>
 
+    <style name="AudioMothText.Body.Small" parent="TextAppearance.AppCompat.Body2">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">@dimen/text_small</item>
+    </style>
+
     <style name="AudioMothText.SubTitle" parent="Base.TextAppearance.AppCompat.Title">
         <item name="android:textColor">@color/text_black</item>
         <item name="android:textSize">@dimen/text_small</item>
@@ -116,6 +137,11 @@
     <style name="AudioMothEditText.NoBackground" parent="AudioMothEditText">
         <item name="android:padding">@dimen/margin_padding_normal</item>
         <item name="android:background">@color/transparent</item>
+    </style>
+
+    <style name="spinnerItemStyle" parent="ThemeOverlay.AppCompat.Dark">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">@dimen/text_small</item>
     </style>
 
 </resources>

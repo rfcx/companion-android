@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guidelineHorizontalTop"
         android:layout_width="wrap_content"
@@ -18,24 +17,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.60" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/howLongBatteryTextView"
-        style="@style/AudioMothText.Subhead.Bold"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_large"
-        android:layout_marginTop="@dimen/margin_padding_normal"
-        android:text="@string/how_long_battery"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintGuide_percent="0.50" />
 
     <View
         android:layout_width="40dp"
         android:layout_height="12dp"
         android:background="@color/text_black"
-        app:layout_constraintBottom_toTopOf="@id/batteryLevel5View"
+        app:layout_constraintBottom_toTopOf="@id/batteryLevel6View"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -107,18 +95,32 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="@dimen/margin_padding_xsmall"
-        android:layout_marginTop="@dimen/margin_padding_xsmall"
         android:layout_marginEnd="@dimen/margin_padding_xsmall"
         android:layout_marginBottom="@dimen/margin_padding_xsmall"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@id/batteryLevel4View"
         app:layout_constraintEnd_toEndOf="@id/batteryView"
         app:layout_constraintStart_toStartOf="@id/batteryView"
+        app:layout_constraintTop_toBottomOf="@id/batteryLevel6View" />
+
+    <View
+        android:id="@+id/batteryLevel6View"
+        style="@style/AudioMothButton.GreenButton.Radius5"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/margin_padding_xsmall"
+        android:layout_marginTop="@dimen/margin_padding_xsmall"
+        android:layout_marginEnd="@dimen/margin_padding_xsmall"
+        android:layout_marginBottom="@dimen/margin_padding_xsmall"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@id/batteryLevel5View"
+        app:layout_constraintEnd_toEndOf="@id/batteryView"
+        app:layout_constraintStart_toStartOf="@id/batteryView"
         app:layout_constraintTop_toTopOf="@id/batteryView" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/daysTextView"
-        style="@style/AudioMothText.Subhead.Bold"
+        style="@style/AudioMothText.Body.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_padding_normal"
@@ -129,11 +131,15 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/chargedTextView"
-        style="@style/AudioMothText.Subhead.Bold"
+        style="@style/AudioMothText.Body.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingStart="@dimen/margin_padding_normal"
+        android:paddingTop="@dimen/margin_padding_normal"
+        android:paddingEnd="@dimen/margin_padding_normal"
         android:layout_marginTop="@dimen/margin_padding_normal"
-        android:text="@string/charged"
+        android:text="@string/notification"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/daysTextView" />

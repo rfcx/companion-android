@@ -1,9 +1,9 @@
 package org.rfcx.audiomoth.localdb
 
+import android.util.Log
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
-import org.rfcx.audiomoth.SyncInfo
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.SyncState
 
@@ -22,6 +22,25 @@ class LocateDb(private val realm: Realm) {
     fun getLocateById(id: Int): Locate? {
         return realm.where(Locate::class.java).equalTo(Locate.FIELD_ID, id)
             .findFirst()
+    }
+
+    fun unlockSent(): List<Locate> {
+        var unsentCopied: List<Locate> = listOf()
+        realm.executeTransaction {
+            val unsent = it.where(Locate::class.java)
+                .equalTo("syncState", SyncState.Unsent.key)
+                .and()
+                .isNotNull("lastDeploymentServerId")
+                .and()
+                .isNotEmpty("lastDeploymentServerId")
+                .findAll()
+                .createSnapshot()
+            unsentCopied = unsent.toList()
+            unsent.forEach { locate ->
+                locate.syncState = SyncState.Sending.key
+            }
+        }
+        return unsentCopied
     }
 
     fun markUnsent(id: Int) {
@@ -57,6 +76,18 @@ class LocateDb(private val realm: Realm) {
             // update last deployment
             locate.lastDeployment = deploymentId
             it.insertOrUpdate(locate)
+        }
+    }
+
+    fun updateDeploymentServerId(deploymentId: Int, deploymentServerId: String) {
+        Log.e("LocationSyncWorker","$deploymentId  $deploymentServerId")
+        realm.executeTransaction {
+            it.where(Locate::class.java).equalTo("lastDeployment", deploymentId)
+                .findFirst()?.apply {
+                    lastDeploymentServerId = deploymentServerId
+                    // set sync state to unsent after deploymentServerId have been change
+                    syncState = SyncState.Unsent.key
+                }
         }
     }
 }

@@ -10,6 +10,11 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+    <!-- Wifi scanning & connecting-->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
     <application
         android:name=".CompanionApplication"
         android:allowBackup="true"
@@ -20,6 +25,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+
+        <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="${enableCrashReporting}" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -49,6 +56,8 @@
         <activity
             android:name=".view.deployment.DeploymentActivity"
             android:screenOrientation="portrait" />
+        <activity android:name=".view.deployment.guardian.GuardianDeploymentActivity"
+            android:screenOrientation="portrait"/>
         <activity android:name=".view.configure.ConnectDeviceActivity" />
 
         <receiver
