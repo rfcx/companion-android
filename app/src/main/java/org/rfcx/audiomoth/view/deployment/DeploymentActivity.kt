@@ -58,7 +58,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
         if (deploymentId != null) {
             handleDeploymentStep(deploymentId)
         } else {
-            if (BuildConfig.ENABLE_ALL) {
+            if (BuildConfig.ENABLE_GUARDIAN) {
                 startFragment(ChooseDeviceFragment.newInstance())
             } else {
                 openWithEdgeDevice()
