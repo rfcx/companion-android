@@ -288,8 +288,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         // hide loading progress
         progressBar.visibility = View.INVISIBLE
 
-        val showLocations = locations.filter { it.lastDeployment != 0 }
-        val showDeployIds = showLocations.mapTo(arrayListOf(), { it.lastDeployment })
+        val showLocations = locations.filter { it.lastDeploymentId != 0 }
+        val showDeployIds = showLocations.mapTo(arrayListOf(), { it.lastDeploymentId })
         val showDeployments = this.deployments.filter {
             showDeployIds.contains(it.id)
         }
