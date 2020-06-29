@@ -19,6 +19,7 @@ import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.entity.guardian.GuardianProfile
 import org.rfcx.audiomoth.entity.socket.ConfigurationResponse
 import org.rfcx.audiomoth.entity.socket.SocketResposne
+import org.rfcx.audiomoth.entity.socket.toReadableFormat
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianSelectProfileFragment : Fragment(), (GuardianProfile) -> Unit {
@@ -89,24 +90,30 @@ class GuardianSelectProfileFragment : Fragment(), (GuardianProfile) -> Unit {
                 )
             }
 
-            override fun onFailed() {
+            override fun onFailed(message: String) {
                 checkState(SHOW_TRY_AGAIN)
             }
         })
     }
 
     private fun setCurrentConfiguration(config: ConfigurationResponse) {
+        val readableConfig = config.toReadableFormat()
         defaultDetailTextView.text = context!!.getString(
             R.string.configuration_details,
-            config.configure.fileFormat,
-            config.configure.sampleRate,
-            config.configure.bitrate,
-            config.configure.duration
+            readableConfig.configure.fileFormat,
+            readableConfig.configure.sampleRate,
+            readableConfig.configure.bitrate,
+            readableConfig.configure.duration
         )
     }
 
     private fun retrieveProfiles() {
-        this.profiles = deploymentProtocol?.getProfiles() ?: arrayListOf()
+        val guardianProfiles = deploymentProtocol?.getProfiles()
+        if (guardianProfiles!!.isNotEmpty()) {
+            this.profiles = guardianProfiles
+        } else {
+            this.profiles = arrayListOf()
+        }
         profilesAdapter.items = profiles
         checkState(SHOW_LIST_PROFILE)
     }
@@ -117,16 +124,19 @@ class GuardianSelectProfileFragment : Fragment(), (GuardianProfile) -> Unit {
                 tryAgainTextView.visibility = View.GONE
                 profileRecyclerView.visibility = View.GONE
                 profileProgressBar.visibility = View.VISIBLE
+                defaultProfileLayout.visibility = View.GONE
             }
             SHOW_TRY_AGAIN -> {
                 tryAgainTextView.visibility = View.VISIBLE
                 profileRecyclerView.visibility = View.GONE
                 profileProgressBar.visibility = View.GONE
+                defaultProfileLayout.visibility = View.GONE
             }
             SHOW_LIST_PROFILE -> {
                 tryAgainTextView.visibility = View.GONE
                 profileRecyclerView.visibility = View.VISIBLE
                 profileProgressBar.visibility = View.GONE
+                defaultProfileLayout.visibility = View.VISIBLE
             }
         }
     }

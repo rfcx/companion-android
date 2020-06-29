@@ -38,6 +38,32 @@
         android:text="@string/connect"
         app:layout_constraintBottom_toBottomOf="parent" />
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/notFoundTextView"
+        style="@style/AudioMothText.Label.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:text="@string/not_found"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/retryGuardianButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/nearbyGuardianTextView" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/retryGuardianButton"
+        style="@style/AudioMothButton.GreenButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginEnd="@dimen/margin_padding_large"
+        android:layout_marginBottom="@dimen/margin_padding_normal"
+        android:text="@string/retry"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
     <ProgressBar
         android:id="@+id/connectGuardianLoading"
         android:layout_width="wrap_content"
