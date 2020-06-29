@@ -44,7 +44,7 @@ class GuardianPrefsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSh
                 }
             }
 
-            override fun onFailed() {}
+            override fun onFailed(message: String) {}
         })
     }
 
@@ -62,7 +62,7 @@ class GuardianPrefsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSh
                     //TODO: show message(Toast or Snackbar) on DiagnosticPage
                 }
 
-                override fun onFailed() {
+                override fun onFailed(message: String) {
                     //TODO: show message(Toast or Snackbar) on DiagnosticPage
                 }
             })
