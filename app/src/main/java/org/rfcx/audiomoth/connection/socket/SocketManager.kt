@@ -19,10 +19,11 @@ object SocketManager {
 
     private val LOGTAG = "Client-SocketManager"
 
-    private val CONNECTION = "connection"
-    private val DIAGNOSTIC = "diagnostic"
-    private val CONFIGURE = "configure"
-    private val SYNC = "sync"
+    private const val CONNECTION = "connection"
+    private const val DIAGNOSTIC = "diagnostic"
+    private const val CONFIGURE = "configure"
+    private const val SYNC = "sync"
+    private const val PREFS = "prefs"
 
     fun connect(onReceiveResponse: OnReceiveResponse) {
         val data = gson.toJson(SocketRequest(CONNECTION))
@@ -42,6 +43,11 @@ object SocketManager {
     fun syncConfiguration(config: List<String>, onReceiveResponse: OnReceiveResponse) {
         val jsonString = gson.toJson(SyncConfigurationRequest(SyncConfiguration(config)))
         sendData(jsonString, onReceiveResponse)
+    }
+
+    fun getAllCurrentPrefs(onReceiveResponse: OnReceiveResponse) {
+        val data = gson.toJson(SocketRequest(PREFS))
+        sendData(data, onReceiveResponse)
     }
 
     private fun sendData(data: String, onReceiveResponse: OnReceiveResponse) {
@@ -93,6 +99,11 @@ object SocketManager {
                                 } else {
                                     onReceiveResponse.onFailed("Sync failed, there is something wrong on the server")
                                 }
+                            }
+                            PREFS -> {
+                                val response = gson.fromJson(dataInput, PrefsResponse::class.java)
+                                Log.d(LOGTAG, "Prefs status: ${response.prefs}")
+                                onReceiveResponse.onReceive(response)
                             }
                         }
                     }

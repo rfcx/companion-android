@@ -183,4 +183,53 @@
     <string name="choose_file_format">Choose file format</string>
     <string name="kilobytes">%s kbs</string>
 
+    <!-- GuardianPreferences -->
+    <string name="prefs_value_default_show_ui">true</string>
+    <string name="prefs_value_default_enable_audio_capture">true</string>
+    <string name="prefs_value_default_enable_checkin_publish">true</string>
+    <string name="prefs_value_default_enable_cutoffs_battery">true</string>
+    <string name="prefs_value_default_enable_cutoffs_schedule_off_hours">true</string>
+    <string name="prefs_value_default_admin_enable_ssh_server">false</string>
+    <string name="prefs_value_default_admin_enable_wifi_socket">false</string>
+
+    <string name="prefs_value_default_api_rest_host">api.rfcx.org</string>
+    <string name="prefs_value_default_api_rest_protocol">https</string>
+
+    <string name="prefs_value_default_api_checkin_host">checkin.rfcx.org</string>
+    <string name="prefs_value_default_api_checkin_protocol">ssl</string>
+    <string name="prefs_value_default_api_checkin_port">8883</string>
+
+    <string name="prefs_value_default_api_ntp_host">time.apple.com</string>
+    <string name="prefs_value_default_api_sms_address">+14154803657</string>
+
+    <string name="prefs_value_default_reboot_forced_daily_at">23:54:00</string>
+
+    <string name="prefs_value_default_audio_cycle_duration">90</string>
+    <string name="prefs_value_default_audio_schedule_off_hours">23:56-23:58,23:58-00:00</string>
+    <string name="prefs_value_default_audio_encode_codec">opus</string>
+    <string name="prefs_value_default_audio_encode_bitrate">28672</string>
+    <string name="prefs_value_default_audio_sample_rate">24000</string>
+
+    <string name="prefs_value_default_checkin_battery_cutoff">90</string>
+    <string name="prefs_value_default_audio_battery_cutoff">80</string>
+
+    <string name="prefs_value_default_checkin_failure_thresholds">12,25,40,60,80</string>
+    <string name="prefs_value_default_checkin_skip_threshold">5</string>
+    <string name="prefs_value_default_checkin_stash_threshold">240</string>
+    <string name="prefs_value_default_checkin_archive_threshold">160</string>
+
+    <string name="prefs_value_default_admin_enable_log_capture">false</string>
+    <string name="prefs_value_default_admin_log_capture_level">Warn</string>
+    <string name="prefs_value_default_admin_log_capture_cycle">30</string>
+
+    <string name="prefs_value_default_admin_enable_screenshot_capture">true</string>
+    <string name="prefs_value_default_admin_screenshot_capture_cycle">180</string>
+
+    <string name="prefs_value_default_admin_enable_tcp_adb">true</string>
+    <string name="prefs_value_default_admin_enable_wifi">false</string>
+    <string name="prefs_value_default_admin_enable_bluetooth">false</string>
+
+    <string name="prefs_value_default_admin_system_timezone">[ Not Set ]</string>
+    <string name="prefs_value_default_admin_enable_sentinel_capture">true</string>
+
 </resources>
