@@ -19,6 +19,7 @@ android {
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+    flavorDimensions "mode"
     buildTypes {
         debug {
             debuggable true
@@ -32,14 +33,12 @@ android {
         }
     }
     productFlavors {
-        flavorDimensions("edge")
-        edge {
-            manifestPlaceholders = [applicationLabel: "RFCx Companion - Edge"]
+        common {
+            manifestPlaceholders = [applicationLabel: "RFCx Companion"]
             buildConfigField 'boolean', 'ENABLE_GUARDIAN', 'false'
         }
-        flavorDimensions("guardian")
-        guardian {
-            manifestPlaceholders = [applicationLabel: "RFCx Companion - Guardian"]
+        internal {
+            manifestPlaceholders = [applicationLabel: "RFCx Companion"]
             buildConfigField 'boolean', 'ENABLE_GUARDIAN', 'true'
         }
     }
