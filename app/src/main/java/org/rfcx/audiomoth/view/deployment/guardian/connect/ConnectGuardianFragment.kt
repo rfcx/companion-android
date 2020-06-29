@@ -88,7 +88,7 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
     override fun onWifiConnected() {
         SocketManager.connect(object: OnReceiveResponse{
             override fun onReceive(response: SocketResposne) {
-                activity!!.runOnUiThread {
+                activity?.runOnUiThread {
                     val connection = response as ConnectionResponse
                     Log.d("ConenctionGuardian", connection.connection.status)
                     if (connection.connection.status == CONNECTION_SUCCESS && connectionCount == 0) {
@@ -101,7 +101,7 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
             }
 
             override fun onFailed(message: String) {
-                activity!!.runOnUiThread {
+                activity?.runOnUiThread {
                     hideLoading()
                 }
             }

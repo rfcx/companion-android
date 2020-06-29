@@ -51,7 +51,7 @@ class DeploymentCleanupWorker(val context: Context, params: WorkerParameters) :
         }
 
         val guardianProfileDb = GuardianProfileDb(realm)
-        val guardianProfileUnsent = profileDb.unsentCount()
+        val guardianProfileUnsent = guardianProfileDb.unsentCount()
         guardianProfileDb.unlockSending()
         if (guardianProfileUnsent > 0) {
             GuardianProfileSyncWorker.enqueue(context)

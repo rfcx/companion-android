@@ -30,7 +30,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
         var id = deployment.id
         realm.executeTransaction {
             if (deployment.id == 0) {
-                id = (realm.where(Deployment::class.java).max(GuardianDeployment.FIELD_ID)
+                id = (realm.where(GuardianDeployment::class.java).max(GuardianDeployment.FIELD_ID)
                     ?.toInt() ?: 0) + 1
                 deployment.id = id
             }
@@ -52,7 +52,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
     private fun mark(id: Int, serverId: String? = null, syncState: Int) {
         realm.executeTransaction {
             val deployment =
-                it.where(Deployment::class.java).equalTo(GuardianDeployment.FIELD_ID, id)
+                it.where(GuardianDeployment::class.java).equalTo(GuardianDeployment.FIELD_ID, id)
                     .findFirst()
             if (deployment != null) {
                 deployment.serverId = serverId
