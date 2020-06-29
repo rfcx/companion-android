@@ -1,3 +1,9 @@
+/****************************************************************************
+ * AudioMothConfiguration.kt
+ * openacousticdevices.info
+ * June 2020
+ *****************************************************************************/
+
 package org.rfcx.audiomoth.util
 
 class AudioMothConfiguration {

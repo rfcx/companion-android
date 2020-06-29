@@ -18,6 +18,7 @@ fun Locate.toRequestBody(): LocateRequest {
         latitude = this.latitude,
         longitude = this.longitude,
         createdAt = this.createdAt,
-        lastDeployment = this.lastDeployment
+        lastDeployment = this.lastDeployment,
+        lastDeploymentServerId =  this.lastDeploymentServerId
     )
 }
