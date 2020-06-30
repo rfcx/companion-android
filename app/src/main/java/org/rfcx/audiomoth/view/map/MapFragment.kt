@@ -54,9 +54,9 @@ import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.repo.ResponseCallback
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
 import org.rfcx.audiomoth.util.*
-import org.rfcx.audiomoth.view.LoadingDialogFragment
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentActivity
+import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
 
 class MapFragment : Fragment(), OnMapReadyCallback {
     // map
