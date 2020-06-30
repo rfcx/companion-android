@@ -1,16 +1,12 @@
 package org.rfcx.audiomoth.repo
 
 import android.content.Context
-import android.util.Log
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 import org.rfcx.audiomoth.entity.User
-import org.rfcx.audiomoth.entity.request.DeploymentRequest
-import org.rfcx.audiomoth.entity.request.ImageRequest
-import org.rfcx.audiomoth.entity.request.LocateRequest
-import org.rfcx.audiomoth.entity.request.ProfileRequest
+import org.rfcx.audiomoth.entity.request.*
 import org.rfcx.audiomoth.entity.response.DeploymentResponse
 import org.rfcx.audiomoth.entity.response.LocationResponse
 import org.rfcx.audiomoth.localdb.DeploymentDb
@@ -44,7 +40,17 @@ class Firestore(val context: Context) {
         return userDocument.collection(COLLECTION_DEPLOYMENTS).add(deployment).await()
     }
 
+    suspend fun sendDeployment(deployment: GuardianDeploymentRequest): DocumentReference? {
+        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        return userDocument.collection(COLLECTION_DEPLOYMENTS).add(deployment).await()
+    }
+
     suspend fun sendProfile(profile: ProfileRequest): DocumentReference? {
+        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        return userDocument.collection(COLLECTION_PROFILES).add(profile).await()
+    }
+
+    suspend fun sendProfile(profile: GuardianProfileRequest): DocumentReference? {
         val userDocument = db.collection(COLLECTION_USERS).document(guid)
         return userDocument.collection(COLLECTION_PROFILES).add(profile).await()
     }

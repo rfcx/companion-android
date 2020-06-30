@@ -8,6 +8,7 @@ import kotlinx.android.synthetic.main.item_profile.view.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.entity.guardian.GuardianProfile
+import org.rfcx.audiomoth.entity.guardian.toReadableFormat
 
 class GuardianProfilesAdapter(private val itemClickListener: (GuardianProfile) -> Unit) :
     RecyclerView.Adapter<GuardianProfilesAdapter.GuardianProfilesAdapterViewHolder>() {
@@ -38,7 +39,8 @@ class GuardianProfilesAdapter(private val itemClickListener: (GuardianProfile) -
         private val detailProfile = itemView.detailProfileTextView
 
         fun bind(profile: GuardianProfile) {
-            detailProfile.text = itemView.context.getString(R.string.configuration_details, profile.fileFormat, profile.sampleRate, profile.bitrate, profile.duration)
+            val readableProfile = profile.asConfiguration().toReadableFormat()
+            detailProfile.text = itemView.context.getString(R.string.configuration_details, readableProfile.fileFormat, readableProfile.sampleRate, readableProfile.bitrate, readableProfile.duration)
             nameProfile.text = profile.name
         }
     }

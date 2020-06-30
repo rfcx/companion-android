@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_deploy.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.view.deployment.BaseImageFragment
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 
@@ -21,7 +22,6 @@ class GuardianDeployFragment : BaseImageFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        //TODO: create seperate layout for guardian
         return inflater.inflate(R.layout.fragment_guardian_deploy, container, false)
     }
 
@@ -32,6 +32,7 @@ class GuardianDeployFragment : BaseImageFragment() {
         finishButton.setOnClickListener {
             val images = imageAdapter.getNewAttachImage()
             deploymentProtocol?.setReadyToDeploy(images)
+            SocketManager.stopConnection()
         }
     }
 

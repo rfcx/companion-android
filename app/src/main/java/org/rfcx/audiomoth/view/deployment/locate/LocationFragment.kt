@@ -69,7 +69,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        deploymentProtocol = context as DeploymentProtocol
+        deploymentProtocol = context as BaseDeploymentProtocal
     }
 
     override fun onCreateView(

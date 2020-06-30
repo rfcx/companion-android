@@ -1,4 +1,4 @@
-package org.rfcx.audiomoth.view
+package org.rfcx.audiomoth.view.dialog
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable

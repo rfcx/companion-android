@@ -33,12 +33,10 @@ class ChooseDeviceFragment : Fragment() {
         }
 
         guardianImageView.setOnClickListener {
-            Toast.makeText(context, getString(R.string.rfcx_guardian), Toast.LENGTH_SHORT).show()
             deploymentProtocol?.openWithGuardianDevice()
         }
 
         guardianTextview.setOnClickListener {
-            Toast.makeText(context, getString(R.string.rfcx_guardian), Toast.LENGTH_SHORT).show()
             deploymentProtocol?.openWithGuardianDevice()
         }
     }

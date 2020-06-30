@@ -29,7 +29,7 @@ class GuardianConfigureFragment : Fragment() {
 
     private var sampleRate = 24000      // default guardian sampleRate is 24000
     private var bitrate = 28672         // default guardian bitrate is 28672
-    private var fileFormat = "OPUS"     // default guardian file format is OPUS
+    private var fileFormat = "opus"     // default guardian file format is opus
     private var duration = 90           // default guardian duration is 90
 
     private var profile: GuardianProfile? = null
@@ -146,7 +146,7 @@ class GuardianConfigureFragment : Fragment() {
     private fun setFileFormatLayout() {
 
         if (profile != null) {
-            fileFormat = profile?.fileFormat ?: "OPUS"
+            fileFormat = profile?.fileFormat ?: "opus"
         }
         fileFormatValueTextView.text = fileFormat
 

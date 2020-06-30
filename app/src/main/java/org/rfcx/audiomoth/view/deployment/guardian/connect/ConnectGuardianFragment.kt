@@ -1,13 +1,14 @@
 package org.rfcx.audiomoth.view.deployment.guardian.connect
 
-import android.app.Activity
 import android.content.Context
 import android.net.wifi.ScanResult
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_connect_guardian.*
@@ -27,6 +28,10 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
 
     private var guardianHotspot: ScanResult? = null
 
+    private lateinit var countDownTimer: CountDownTimer
+
+    private var connectionCount = 0
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         deploymentProtocol = (context as GuardianDeploymentProtocol)
@@ -41,6 +46,7 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
 
         deploymentProtocol?.hideCompleteButton()
         showLoading()
+        retryCountdown(SCAN)
 
         guardianHotspotRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
@@ -52,7 +58,16 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
 
         connectGuardianButton.setOnClickListener {
             showLoading()
+            retryCountdown(CONNECT)
             wifiHotspotManager.connectTo(guardianHotspot!!, this)
+        }
+
+        retryGuardianButton.setOnClickListener {
+            showLoading()
+            hideRetry()
+            hideNotFound()
+            retryCountdown(SCAN)
+            wifiHotspotManager.nearbyHotspot(this)
         }
     }
 
@@ -63,25 +78,30 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
 
     override fun onScanReceive(result: List<ScanResult>) {
         hideLoading()
+        hideNotFound()
+        hideRetry()
+        wifiHotspotManager.unRegisterReceiver()
+        countDownTimer.cancel()
         guardianHotspotAdapter.items = result
     }
 
     override fun onWifiConnected() {
         SocketManager.connect(object: OnReceiveResponse{
             override fun onReceive(response: SocketResposne) {
-                activity!!.runOnUiThread {
+                activity?.runOnUiThread {
                     val connection = response as ConnectionResponse
                     Log.d("ConenctionGuardian", connection.connection.status)
-                    if (connection.connection.status == CONNECTION_SUCCESS) {
+                    if (connection.connection.status == CONNECTION_SUCCESS && connectionCount == 0) {
                         deploymentProtocol!!.nextStep()
+                        connectionCount += 1
                     } else {
                         hideLoading()
                     }
                 }
             }
 
-            override fun onFailed() {
-                activity!!.runOnUiThread {
+            override fun onFailed(message: String) {
+                activity?.runOnUiThread {
                     hideLoading()
                 }
             }
@@ -89,7 +109,7 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
     }
 
     private fun showLoading() {
-        connectGuardianLoading.visibility = View.VISIBLE
+        connectGuardianLoading?.visibility = View.VISIBLE
         connectGuardianButton.visibility = View.GONE
     }
 
@@ -98,17 +118,56 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
         connectGuardianButton.visibility = View.VISIBLE
     }
 
+    private fun showRetry() {
+        retryGuardianButton.visibility = View.VISIBLE
+        connectGuardianLoading.visibility = View.GONE
+        connectGuardianButton.visibility = View.GONE
+    }
+
+    private fun hideRetry() {
+        retryGuardianButton.visibility = View.GONE
+    }
+
+    private fun showNotFound() {
+        notFoundTextView.visibility = View.VISIBLE
+    }
+
+    private fun hideNotFound() {
+        notFoundTextView.visibility = View.GONE
+    }
+
+    private fun retryCountdown(state: String) {
+        countDownTimer = object: CountDownTimer(10000, 1000) {
+            override fun onFinish() {
+                if (state == SCAN) {
+                    showNotFound()
+                    showRetry()
+                    wifiHotspotManager.unRegisterReceiver()
+                } else {
+                    hideLoading()
+                    Toast.makeText(activity!!, "Connection failed", Toast.LENGTH_LONG).show()
+                }
+            }
+
+            override fun onTick(millisUntilFinished: Long) {}
+        }
+        countDownTimer.start()
+    }
+
     private fun enableConnectButton() {
         connectGuardianButton.isEnabled = true
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDetach() {
+        super.onDetach()
         wifiHotspotManager.unRegisterReceiver()
+        countDownTimer.cancel()
     }
 
     companion object {
         private val CONNECTION_SUCCESS = "success"
+        private val SCAN = "scan"
+        private val CONNECT = "connect"
 
         fun newInstance(): ConnectGuardianFragment {
             return ConnectGuardianFragment()
