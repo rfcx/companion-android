@@ -34,11 +34,9 @@ android {
     }
     productFlavors {
         common {
-            manifestPlaceholders = [applicationLabel: "RFCx Companion"]
             buildConfigField 'boolean', 'ENABLE_GUARDIAN', 'false'
         }
         internal {
-            manifestPlaceholders = [applicationLabel: "RFCx Companion"]
             buildConfigField 'boolean', 'ENABLE_GUARDIAN', 'true'
         }
     }
