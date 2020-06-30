@@ -6,6 +6,9 @@ import androidx.work.*
 import io.realm.Realm
 import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.localdb.ProfileDb
+import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
+import org.rfcx.audiomoth.localdb.guardian.GuardianProfileDb
+import org.rfcx.audiomoth.service.profile.GuardianProfileSyncWorker
 import org.rfcx.audiomoth.service.profile.ProfileSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
 import java.util.concurrent.TimeUnit
@@ -39,6 +42,22 @@ class DeploymentCleanupWorker(val context: Context, params: WorkerParameters) :
         if (profileUnsent > 0) {
             ProfileSyncWorker.enqueue(context)
         }
+
+        val guardianDeploymentDb = GuardianDeploymentDb(realm)
+        val guardianDeploymentUnsent = guardianDeploymentDb.unsentCount()
+        guardianDeploymentDb.unlockSending()
+        if (guardianDeploymentUnsent > 0) {
+            GuardianDeploymentSyncWorker.enqueue(context)
+        }
+
+        val guardianProfileDb = GuardianProfileDb(realm)
+        val guardianProfileUnsent = guardianProfileDb.unsentCount()
+        guardianProfileDb.unlockSending()
+        if (guardianProfileUnsent > 0) {
+            GuardianProfileSyncWorker.enqueue(context)
+        }
+
+
     }
 
     companion object {

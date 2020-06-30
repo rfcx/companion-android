@@ -22,7 +22,6 @@ class GuardianDeployFragment : BaseImageFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        //TODO: create seperate layout for guardian
         return inflater.inflate(R.layout.fragment_guardian_deploy, container, false)
     }
 
