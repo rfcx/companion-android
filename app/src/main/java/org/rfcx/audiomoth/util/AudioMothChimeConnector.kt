@@ -23,6 +23,7 @@ class AudioMothChimeConnector : AudioMothConnector {
 
     private val HOURS_IN_DAY: Int = 24
     private val MINUTES_IN_HOUR: Int = 60
+    private val MINUTES_IN_DAY: Int = 1440
     private val SECONDS_IN_MINUTE: Int = 60
 
     private val MILLISECONDS_IN_SECOND: Int = 1000
@@ -41,7 +42,6 @@ class AudioMothChimeConnector : AudioMothConnector {
 
     private val MAXIMUM_DURATION: Int = 43200
     private val MAXIMUM_FILTER_THRESHOLD: Int = 32768
-    private val MAXIMUM_START_STOP_MINUTES: Int = 1440
     private val MAXIMUM_FILTER_FREQUENCY: Int = 192000
 
     private val FILTER_FREQUENCY_FACTOR: Int = 100
@@ -80,6 +80,18 @@ class AudioMothChimeConnector : AudioMothConnector {
             setBit(state, (value and mask) == mask)
 
         }
+
+    }
+
+    private fun normaliseMinutes(minutes: Int) : Int {
+
+        var mins = minutes
+
+        while (mins < 0) mins += MINUTES_IN_DAY
+
+        while (mins > MINUTES_IN_DAY) mins -= MINUTES_IN_DAY
+
+        return mins
 
     }
 
@@ -169,13 +181,60 @@ class AudioMothChimeConnector : AudioMothConnector {
 
         /* Active start stop periods */
 
-        var activeStartStopPeriods: Int = 0
+        val startStopPeriods = arrayListOf<AudioMothConfiguration.StartStopPeriod>()
 
         if (configuration.startStopPeriods != null) {
 
-            activeStartStopPeriods = min(MAX_START_STOP_PERIODS, (configuration.startStopPeriods as Array<AudioMothConfiguration.StartStopPeriod>).size)
+            val periods =
+                configuration.startStopPeriods as Array<AudioMothConfiguration.StartStopPeriod>
+
+            if (periods.size == 1 && periods[0].startMinutes == 0 && periods[0].stopMinutes == MINUTES_IN_DAY) {
+
+                startStopPeriods.add(AudioMothConfiguration.StartStopPeriod(0, MINUTES_IN_DAY))
+
+            } else {
+
+                periods.forEach {
+
+                    val startMinutes: Int = normaliseMinutes(it.startMinutes - timezoneMinutes)
+
+                    val stopMinutes: Int = normaliseMinutes(it.stopMinutes - timezoneMinutes)
+
+                    if (startMinutes > stopMinutes) {
+
+                        if (startMinutes < MINUTES_IN_DAY) startStopPeriods.add(
+                            AudioMothConfiguration.StartStopPeriod(
+                                startMinutes,
+                                MINUTES_IN_DAY
+                            )
+                        )
+                        if (stopMinutes > 0) startStopPeriods.add(
+                            AudioMothConfiguration.StartStopPeriod(
+                                0,
+                                stopMinutes
+                            )
+                        )
+
+                    } else {
+
+                        startStopPeriods.add(
+                            AudioMothConfiguration.StartStopPeriod(
+                                startMinutes,
+                                stopMinutes
+                            )
+                        )
+
+                    }
+
+                }
+
+            }
+
+            startStopPeriods.sortWith(compareBy({ it.startMinutes }))
 
         }
+
+        val activeStartStopPeriods = min(MAX_START_STOP_PERIODS, startStopPeriods.size)
 
         setBits(state, activeStartStopPeriods, 3)
 
@@ -209,17 +268,11 @@ class AudioMothChimeConnector : AudioMothConnector {
 
         /* Start stop periods */
 
-        if (activeStartStopPeriods > 0) {
+        for (i in 0 until activeStartStopPeriods) {
 
-            val startStopPeriods = configuration.startStopPeriods as Array<AudioMothConfiguration.StartStopPeriod>
+            setBits(state, startStopPeriods[i].startMinutes, BITS_IN_INT16)
 
-            for (i in 0 until activeStartStopPeriods) {
-
-                setBits(state, max(0, min(MAXIMUM_START_STOP_MINUTES, startStopPeriods[i].startMinutes)), BITS_IN_INT16)
-
-                setBits(state, max(0, min(MAXIMUM_START_STOP_MINUTES, startStopPeriods[i].stopMinutes)), BITS_IN_INT16)
-
-            }
+            setBits(state, startStopPeriods[i].stopMinutes, BITS_IN_INT16)
 
         }
 
