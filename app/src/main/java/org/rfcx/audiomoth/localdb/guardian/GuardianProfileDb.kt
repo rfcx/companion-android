@@ -6,6 +6,35 @@ import org.rfcx.audiomoth.entity.guardian.GuardianProfile
 
 class GuardianProfileDb(private val realm: Realm) {
 
+    fun unsentCount(): Long {
+        return realm.where(GuardianProfile::class.java)
+            .notEqualTo(GuardianProfile.FIELD_SYNC_STATE, SyncState.Sent.key)
+            .count()
+    }
+
+    fun unlockSending() {
+        realm.executeTransaction {
+            val snapshot = it.where(GuardianProfile::class.java).equalTo(GuardianProfile.FIELD_SYNC_STATE, SyncState.Sending.key).findAll().createSnapshot()
+            snapshot.forEach { profile ->
+                profile.syncState = SyncState.Unsent.key
+            }
+        }
+    }
+
+    fun lockUnsent(): List<GuardianProfile> {
+        var unsentCopied: List<GuardianProfile> = listOf()
+        realm.executeTransaction {
+            val unsent = it.where(GuardianProfile::class.java)
+                .equalTo(GuardianProfile.FIELD_SYNC_STATE, SyncState.Unsent.key).findAll()
+                .createSnapshot()
+            unsentCopied = unsent.toList()
+            unsent.forEach {d->
+                d.syncState = SyncState.Sending.key
+            }
+        }
+        return unsentCopied
+    }
+
     fun getProfiles(): List<GuardianProfile> {
         return realm.where(GuardianProfile::class.java).findAll() ?: arrayListOf()
     }

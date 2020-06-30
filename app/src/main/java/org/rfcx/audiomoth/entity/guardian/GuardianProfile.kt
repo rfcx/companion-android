@@ -47,6 +47,7 @@ open class GuardianProfile(
 
     companion object {
         const val FIELD_ID = "id"
+        const val FIELD_SYNC_STATE = "syncState"
 
         fun default() = GuardianProfile(
             name = "",
