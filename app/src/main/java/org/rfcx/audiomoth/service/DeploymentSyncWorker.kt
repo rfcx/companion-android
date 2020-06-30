@@ -4,9 +4,12 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.work.*
+import androidx.work.impl.utils.taskexecutor.TaskExecutor
 import io.realm.Realm
+import kotlinx.coroutines.CoroutineDispatcher
 import org.rfcx.audiomoth.entity.request.toRequestBody
 import org.rfcx.audiomoth.localdb.DeploymentDb
+import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.service.images.ImageSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
@@ -20,7 +23,10 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
     override suspend fun doWork(): Result {
         Log.d(TAG, "doWork")
 
+
+
         val db = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
+        val locateDb = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val firestore = Firestore(context)
         val deployments = db.lockUnsent()
 
@@ -34,6 +40,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
             if (result != null) {
                 Log.d(TAG, "doWork: success ${it.id}")
                 db.markSent(result.id, it.id)
+                locateDb.updateDeploymentServerId(it.id, result.id)
             } else {
                 Log.d(TAG, "doWork: failed ${it.id}")
                 db.markUnsent(it.id)
@@ -42,6 +49,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
         }
 
         ImageSyncWorker.enqueue(context)
+        LocationSyncWorker.enqueue(context)
 
         return if (someFailed) Result.retry() else Result.success()
     }
@@ -64,5 +72,9 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
             return WorkManager.getInstance(context)
                 .getWorkInfosForUniqueWorkLiveData(UNIQUE_WORK_KEY)
         }
+    }
+
+    override fun getTaskExecutor(): TaskExecutor {
+        return super.getTaskExecutor()
     }
 }

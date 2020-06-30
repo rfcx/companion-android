@@ -8,6 +8,7 @@ import kotlinx.coroutines.tasks.await
 import org.rfcx.audiomoth.entity.User
 import org.rfcx.audiomoth.entity.request.DeploymentRequest
 import org.rfcx.audiomoth.entity.request.ImageRequest
+import org.rfcx.audiomoth.entity.request.LocateRequest
 import org.rfcx.audiomoth.entity.request.ProfileRequest
 import org.rfcx.audiomoth.util.Preferences
 import org.rfcx.audiomoth.util.Storage
@@ -43,9 +44,20 @@ class Firestore(val context: Context) {
         return userDocument.collection(COLLECTION_PROFILES).add(profile).await()
     }
 
-    suspend fun sendImage(imageRequest: ImageRequest) :DocumentReference?{
+    suspend fun sendImage(imageRequest: ImageRequest): DocumentReference? {
         val userDocument = db.collection(COLLECTION_USERS).document(guid)
-        return  userDocument.collection(COLLECTION_IMAGES).add(imageRequest).await()
+        return userDocument.collection(COLLECTION_IMAGES).add(imageRequest).await()
+    }
+
+    suspend fun sendLocation(locateRequest: LocateRequest): DocumentReference? {
+        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        return userDocument.collection(COLLECTION_LOCATIONS).add(locateRequest).await()
+    }
+
+    suspend fun updateLocation(locateServerId: String, locateRequest: LocateRequest) {
+        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        userDocument.collection(COLLECTION_LOCATIONS).document(locateServerId)
+            .set(locateRequest).await()
     }
 
     fun saveFeedback(

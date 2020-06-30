@@ -20,6 +20,7 @@ import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.LoadingDialogFragment
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
 import org.rfcx.audiomoth.view.deployment.configure.SelectProfileFragment
+import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
 import org.rfcx.audiomoth.view.deployment.sync.SyncFragment
 import org.rfcx.audiomoth.view.deployment.sync.SyncFragment.Companion.BEFORE_SYNC
@@ -71,6 +72,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol {
     }
 
     override fun openWithGuardianDevice() {
+        GuardianDeploymentActivity.startActivity(this)
         finish()
     }
 
