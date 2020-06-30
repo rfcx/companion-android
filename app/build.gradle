@@ -10,7 +10,7 @@ android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
     defaultConfig {
-        applicationId "org.rfcx.audiomoth"
+        applicationId "org.rfcx.companion"
         manifestPlaceholders = [auth0Domain: "@string/auth0_domain", auth0Scheme: "@string/auth0_scheme"]
         minSdkVersion 19
         targetSdkVersion 29
@@ -19,6 +19,7 @@ android {
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+    flavorDimensions "mode"
     buildTypes {
         debug {
             debuggable true
@@ -32,15 +33,11 @@ android {
         }
     }
     productFlavors {
-        flavorDimensions("edge")
-        edge {
-            manifestPlaceholders = [applicationLabel: "RFCx Companion - Edge"]
-            buildConfigField 'boolean', 'ENABLE_ALL', 'false'
+        common {
+            buildConfigField 'boolean', 'ENABLE_GUARDIAN', 'false'
         }
-        flavorDimensions("guardian")
-        guardian {
-            manifestPlaceholders = [applicationLabel: "RFCx Companion - Guardian"]
-            buildConfigField 'boolean', 'ENABLE_ALL', 'true'
+        internal {
+            buildConfigField 'boolean', 'ENABLE_GUARDIAN', 'true'
         }
     }
     compileOptions {
