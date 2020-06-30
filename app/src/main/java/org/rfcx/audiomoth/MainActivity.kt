@@ -21,8 +21,6 @@ import org.rfcx.audiomoth.view.map.MapFragment
 import org.rfcx.audiomoth.view.profile.ProfileFragment
 import org.rfcx.audiomoth.widget.BottomNavigationMenuItem
 
-enum class SyncInfo { WaitingNetwork, Starting, Uploading, Uploaded }
-
 class MainActivity : AppCompatActivity(), MainActivityListener {
     // database manager
     private var currentFragment: Fragment? = null
