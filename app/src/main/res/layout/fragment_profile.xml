@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".view.profile.ProfileFragment">
+    android:background="@color/white">
 
     <LinearLayout
         android:id="@+id/userProfileLayout"
@@ -61,7 +60,7 @@
     </LinearLayout>
 
     <View
-        android:id="@+id/view1"
+        android:id="@+id/view"
         android:layout_width="match_parent"
         android:layout_height="10dp"
         android:layout_marginTop="@dimen/margin_padding_normal"
@@ -69,11 +68,63 @@
         app:layout_constraintTop_toBottomOf="@id/userProfileLayout" />
 
     <TextView
+        android:id="@+id/locationTextView"
+        style="@style/AudioMothText.Title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_small"
+        android:padding="@dimen/margin_padding_small"
+        android:text="@string/location"
+        android:textAllCaps="true"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/view" />
+
+    <LinearLayout
+        android:id="@+id/coordinatesLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/margin_padding_normal"
+        android:paddingBottom="@dimen/margin_padding_small"
+        app:layout_constraintTop_toBottomOf="@id/locationTextView">
+
+        <TextView
+            android:id="@+id/coordinatesTextViewTextView"
+            style="@style/AudioMothText.SubTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_padding_normal"
+            android:layout_marginEnd="@dimen/margin_padding_small"
+            android:text="@string/coordinates" />
+
+        <TextView
+            android:id="@+id/formatCoordinatesTextView"
+            style="@style/AudioMothText.Body.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_padding_normal"
+            android:layout_marginEnd="@dimen/margin_padding_small"
+            tools:text="DD" />
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/view1"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:background="@color/grey_light"
+        app:layout_constraintTop_toBottomOf="@id/coordinatesLinearLayout" />
+
+    <TextView
+
         android:id="@+id/additionalTextView"
         style="@style/AudioMothText.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_padding_normal"
+        android:layout_margin="@dimen/margin_padding_small"
+        android:layout_marginStart="@dimen/margin_padding_small"
+        android:padding="@dimen/margin_padding_small"
         android:text="@string/profile_aditional_label"
         android:textAllCaps="true"
         app:layout_constraintStart_toStartOf="parent"
@@ -126,7 +177,9 @@
         style="@style/AudioMothText.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_padding_normal"
+        android:layout_margin="@dimen/margin_padding_small"
+        android:layout_marginStart="@dimen/margin_padding_small"
+        android:padding="@dimen/margin_padding_small"
         android:text="@string/account"
         android:textAllCaps="true"
         app:layout_constraintStart_toStartOf="parent"
@@ -147,8 +200,8 @@
         android:id="@+id/view3"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         android:background="@color/grey_light"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/logoutTextView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

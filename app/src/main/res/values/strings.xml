@@ -15,7 +15,6 @@
     <string name="ok">OK</string>
     <string name="got_it">Got it</string>
     <string name="cancel">CANCEL</string>
-    <string name="input_format_number">1234567890.-</string>
     <string name="green_pin">Green = 3+ days</string>
     <string name="orange_pin">Orange = 1–2 days</string>
     <string name="red_pin">Red = <![CDATA[<]]>1 day</string>
@@ -105,6 +104,7 @@
     <string name="next">Next</string>
     <string name="please_fill_information">Please fill your information completely</string>
     <string name="latitude_must_between">Latitude must be between -90 and 90</string>
+    <string name="wrong_format">Wrong format</string>
 
     <!--  SelectProfileFragment  -->
     <string name="use_an_existing">Use an existing profile</string>
@@ -125,6 +125,15 @@
     <string name="profile_sign_out_label">Sign out</string>
     <string name="version_app">%s (%s)</string>
     <string name="profile_feedback_label">Feedback</string>
+    <string name="coordinates">Coordinates</string>
+    <string name="location">Location</string>
+
+    <string name="dd_coordinates">DD</string>
+    <string name="ddm_coordinates">DDM</string>
+    <string name="dms_coordinates">DMS</string>
+    <string name="dd_coordinates_format">0.00000°N 0.00000°E</string>
+    <string name="ddm_coordinates_format">0°0.0000\'N 0°0.0000\'E</string>
+    <string name="dms_coordinates_format">0°0\'0.0\"N 0°0\'0.0\"E</string>
 
     <!--  FeedbackActivity  -->
     <string name="app_feedback_share_ideas">Leave app feedback or share your ideas</string>
