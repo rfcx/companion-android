@@ -11,9 +11,9 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <!-- Wifi scanning & connecting-->
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:name=".CompanionApplication"
@@ -21,12 +21,15 @@
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
 
-        <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="${enableCrashReporting}" />
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="${enableCrashReporting}" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -56,8 +59,9 @@
         <activity
             android:name=".view.deployment.DeploymentActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".view.deployment.guardian.GuardianDeploymentActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".view.deployment.guardian.GuardianDeploymentActivity"
+            android:screenOrientation="portrait" />
         <activity android:name=".view.configure.ConnectDeviceActivity" />
         <activity android:name=".view.prefs.GuardianPrefsActivity" />
 
