@@ -91,7 +91,7 @@ dependencies {
     implementation 'com.zhihu.android:matisse:0.5.3-beta3'
 
     implementation 'com.github.douglasjunior:android-simple-tooltip:0.2.3'
-
+    implementation "com.airbnb.android:lottie:3.4.1"
     /* retrofit */
     implementation 'com.squareup.retrofit2:retrofit:2.7.1'
     implementation 'com.squareup.retrofit2:converter-gson:2.7.1'
