@@ -7,6 +7,8 @@ import android.content.Context
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -118,6 +120,37 @@ class ConfigureFragment : Fragment(),
         createNotificationChannel()
         setNextOnClick()
         setRadioGroup()
+        checkMinimumOfDuration()
+    }
+
+    private fun checkMinimumOfDuration() {
+        recordingDurationEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {
+                if (p0 != null && p0.toString() != "") {
+                    if(p0.toString().toInt() < 1){
+                        recordingDurationEditText.error = getString(R.string.minimum_1_second)
+                    }
+                }
+            }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+        })
+
+        sleepDurationEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {
+                if (p0 != null && p0.toString() != "") {
+                    if(p0.toString().toInt() < 5){
+                        sleepDurationEditText.error = getString(R.string.minimum_5_second)
+                    }
+                }
+            }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+        })
     }
 
     private fun setRadioGroup() {
