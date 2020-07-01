@@ -59,7 +59,7 @@ class ConfigureFragment : Fragment(),
     )
 
     private var gain = 0
-    private var sampleRate = 8      // default sampleRate is 8
+    private var sampleRate = 48      // default sampleRate is 48
     private var sleepDuration = 0
     private var recordingDuration = 0
     private var recordingPeriod = ArrayList<String>()
