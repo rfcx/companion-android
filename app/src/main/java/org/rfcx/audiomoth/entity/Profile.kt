@@ -62,9 +62,9 @@ open class Profile(
         fun default() = Profile(
             gain = 3,
             name = "",
-            sampleRate = 8,
-            recordingDuration = 5,
-            sleepDuration = 10,
+            sampleRate = 48,
+            recordingDuration = 1,
+            sleepDuration = 5,
             durationSelected = ConfigureFragment.RECOMMENDED
         )
     }
