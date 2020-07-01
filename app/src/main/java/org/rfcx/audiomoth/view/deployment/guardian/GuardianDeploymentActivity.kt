@@ -104,12 +104,28 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     }
 
     override fun backStep() {
-        if (currentStep == 0) {
-            finish()
-        } else {
-            currentStep = stepView.currentStep - 1
-            stepView.go(currentStep, true)
-            handleFragment(currentStep)
+        when (currentStep) {
+            0 -> finish()
+            2 -> {
+                val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
+                if (container is GuardianConfigureFragment) {
+                    startFragment(GuardianSelectProfileFragment.newInstance())
+                } else {
+                    currentStep = stepView.currentStep - 1
+                    stepView.go(currentStep, true)
+                    handleFragment(currentStep)
+                }
+            }
+            4 -> {
+                currentStep = 2
+                stepView.go(currentStep, true)
+                startFragment(GuardianConfigureFragment.newInstance())
+            }
+            else -> {
+                currentStep = stepView.currentStep - 1
+                stepView.go(currentStep, true)
+                handleFragment(currentStep)
+            }
         }
     }
 
