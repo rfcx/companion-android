@@ -30,9 +30,10 @@ import org.rfcx.audiomoth.view.deployment.guardian.sync.GuardianSyncFragment
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
 import org.rfcx.audiomoth.view.deployment.sync.SyncFragment.Companion.BEFORE_SYNC
 import org.rfcx.audiomoth.view.dialog.CompleteFragment
+import org.rfcx.audiomoth.view.dialog.CompleteListener
 import java.util.*
 
-class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtocol {
+class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtocol, CompleteListener {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val locateDb by lazy { LocateDb(realm) }
@@ -251,6 +252,10 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         val loadingDialog: LoadingDialogFragment? =
             supportFragmentManager.findFragmentByTag(loadingDialogTag) as LoadingDialogFragment?
         loadingDialog?.dismissDialog()
+    }
+
+    override fun onAnimationEnd() {
+        finish()
     }
 
     companion object {
