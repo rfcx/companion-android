@@ -60,7 +60,7 @@ open class Profile(
         const val FIELD_SYNC_STATE = "syncState"
 
         fun default() = Profile(
-            gain = 3,
+            gain = 2,
             name = "",
             sampleRate = 48,
             recordingDuration = 1,

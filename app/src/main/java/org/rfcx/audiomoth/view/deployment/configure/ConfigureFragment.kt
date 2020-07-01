@@ -32,7 +32,7 @@ class ConfigureFragment : Fragment(),
     }
 
     private val sampleRateList = arrayOf("8", "16", "32", "48", "96", "192", "256", "384")
-    private val gainList = arrayOf("1 - Lowest", "2 - Low", "3 - Medium", "4 - High", "5 - Highest")
+    private val gainList = arrayOf("Low", "Low - Medium", "Medium", "Medium - High", "High")
     private var timeList = arrayListOf(
         "00:00",
         "01:00",
@@ -366,7 +366,7 @@ class ConfigureFragment : Fragment(),
     private fun setGainLayout() {
         if (profile != null) {
             profile?.let {
-                gainValueTextView.text = gainList[it.gain - 1]
+                gainValueTextView.text = gainList[it.gain]
                 gain = it.gain
             }
         } else {
@@ -379,7 +379,7 @@ class ConfigureFragment : Fragment(),
                 builder.setTitle(R.string.choose_gain)?.setItems(gainList) { dialog, i ->
                     try {
                         gainValueTextView.text = gainList[i]
-                        gain = i + 1
+                        gain = i
                     } catch (e: IllegalArgumentException) {
                         dialog.dismiss()
                     }
