@@ -43,8 +43,6 @@
         style="@style/AudioMothText.Label.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_large"
-        android:layout_marginTop="@dimen/margin_padding_normal"
         android:text="@string/not_found"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/retryGuardianButton"

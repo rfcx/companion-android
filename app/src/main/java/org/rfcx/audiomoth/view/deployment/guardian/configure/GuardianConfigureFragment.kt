@@ -26,6 +26,8 @@ class GuardianConfigureFragment : Fragment() {
     private var bitrateEntries: Array<String>? = null
     private var bitrateValues: Array<String>? = null
     private var fileFormatList: Array<String>? = null
+    private var durationEntries: Array<String>? = null
+    private var durationValues: Array<String>? = null
 
     private var sampleRate = 24000      // default guardian sampleRate is 24000
     private var bitrate = 28672         // default guardian bitrate is 28672
@@ -66,6 +68,8 @@ class GuardianConfigureFragment : Fragment() {
         bitrateEntries = context.resources.getStringArray(R.array.bitrate_entries)
         bitrateValues = context.resources.getStringArray(R.array.bitrate_values)
         fileFormatList = context.resources.getStringArray(R.array.audio_codec)
+        durationEntries = context.resources.getStringArray(R.array.duration_cycle_entries)
+        durationValues = context.resources.getStringArray(R.array.duration_cycle_values)
     }
 
     private fun setNextButton(show: Boolean) {
@@ -87,7 +91,7 @@ class GuardianConfigureFragment : Fragment() {
             sampleRate = sampleRate,
             bitrate = bitrate,
             fileFormat = fileFormat,
-            duration = durationValueEditText.text.toString().toInt()
+            duration = duration
 
         )
 
@@ -198,7 +202,25 @@ class GuardianConfigureFragment : Fragment() {
         if (profile != null) {
             duration = profile?.duration ?: 90
         }
-        durationValueEditText.setText(duration.toString())
+        val indexOfValue = durationValues?.indexOf(duration.toString()) ?: 3
+        durationValueTextView.text = durationEntries!![indexOfValue]
+
+        durationValueTextView.setOnClickListener {
+            val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
+            if (builder != null) {
+                builder.setTitle(R.string.choose_duration_cycle)
+                    ?.setItems(durationEntries) { dialog, i ->
+                        try {
+                            durationValueTextView.text = durationEntries!![i]
+                            duration = durationValues!![i].toInt()
+                        } catch (e: IllegalArgumentException) {
+                            dialog.dismiss()
+                        }
+                    }
+                val dialog = builder.create()
+                dialog.show()
+            }
+        }
     }
 
     companion object {

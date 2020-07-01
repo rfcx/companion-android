@@ -19,14 +19,13 @@ import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.entity.guardian.GuardianProfile
 import org.rfcx.audiomoth.entity.socket.ConfigurationResponse
 import org.rfcx.audiomoth.entity.socket.SocketResposne
-import org.rfcx.audiomoth.entity.socket.toReadableFormat
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianSelectProfileFragment : Fragment(), (GuardianProfile) -> Unit {
     private val profilesAdapter by lazy { GuardianProfilesAdapter(this) }
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
     private var profiles = listOf<GuardianProfile>()
-    private var currentProfile: GuardianProfile? = null
+    private var currentProfile: List<GuardianProfile>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -63,10 +62,6 @@ class GuardianSelectProfileFragment : Fragment(), (GuardianProfile) -> Unit {
             adapter = profilesAdapter
         }
 
-        defaultProfileLayout.setOnClickListener {
-            deploymentProtocol?.startSetupConfigure(currentProfile!!)
-        }
-
         tryAgainTextView.setOnClickListener {
             getCurrentConfiguration()
         }
@@ -78,33 +73,23 @@ class GuardianSelectProfileFragment : Fragment(), (GuardianProfile) -> Unit {
             override fun onReceive(response: SocketResposne) {
                 val config = response as ConfigurationResponse
 
-                activity!!.runOnUiThread {
-                    setCurrentConfiguration(config)
-                    retrieveProfiles()
-                }
-                currentProfile = GuardianProfile(
+                currentProfile = listOf(GuardianProfile(
+                    name = "Current configuration",
                     sampleRate = config.configure.sampleRate,
                     bitrate = config.configure.bitrate,
                     fileFormat = config.configure.fileFormat,
                     duration = config.configure.duration
-                )
+                ))
+
+                activity!!.runOnUiThread {
+                    retrieveProfiles()
+                }
             }
 
             override fun onFailed(message: String) {
                 checkState(SHOW_TRY_AGAIN)
             }
         })
-    }
-
-    private fun setCurrentConfiguration(config: ConfigurationResponse) {
-        val readableConfig = config.toReadableFormat()
-        defaultDetailTextView.text = context!!.getString(
-            R.string.configuration_details,
-            readableConfig.configure.fileFormat,
-            readableConfig.configure.sampleRate,
-            readableConfig.configure.bitrate,
-            readableConfig.configure.duration
-        )
     }
 
     private fun retrieveProfiles() {
@@ -114,7 +99,12 @@ class GuardianSelectProfileFragment : Fragment(), (GuardianProfile) -> Unit {
         } else {
             this.profiles = arrayListOf()
         }
-        profilesAdapter.items = profiles
+
+        if (currentProfile != null) {
+            profilesAdapter.items = currentProfile!! + profiles
+        } else {
+            profilesAdapter.items = profiles
+        }
         checkState(SHOW_LIST_PROFILE)
     }
 
@@ -124,19 +114,16 @@ class GuardianSelectProfileFragment : Fragment(), (GuardianProfile) -> Unit {
                 tryAgainTextView.visibility = View.GONE
                 profileRecyclerView.visibility = View.GONE
                 profileProgressBar.visibility = View.VISIBLE
-                defaultProfileLayout.visibility = View.GONE
             }
             SHOW_TRY_AGAIN -> {
                 tryAgainTextView.visibility = View.VISIBLE
                 profileRecyclerView.visibility = View.GONE
                 profileProgressBar.visibility = View.GONE
-                defaultProfileLayout.visibility = View.GONE
             }
             SHOW_LIST_PROFILE -> {
                 tryAgainTextView.visibility = View.GONE
                 profileRecyclerView.visibility = View.VISIBLE
                 profileProgressBar.visibility = View.GONE
-                defaultProfileLayout.visibility = View.VISIBLE
             }
         }
     }
