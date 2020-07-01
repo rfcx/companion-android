@@ -104,7 +104,13 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     }
 
     override fun backStep() {
-        stepView.go(stepView.currentStep - 1, true)
+        if (currentStep == 0) {
+            finish()
+        } else {
+            currentStep = stepView.currentStep - 1
+            stepView.go(currentStep, true)
+            handleFragment(currentStep)
+        }
     }
 
     override fun hideStepView() {
@@ -241,6 +247,10 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         val loadingDialog: LoadingDialogFragment? =
             supportFragmentManager.findFragmentByTag(loadingDialogTag) as LoadingDialogFragment?
         loadingDialog?.dismissDialog()
+    }
+
+    override fun onBackPressed() {
+        backStep()
     }
 
     companion object {
