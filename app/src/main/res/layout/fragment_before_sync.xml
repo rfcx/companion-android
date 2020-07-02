@@ -79,56 +79,38 @@
         android:id="@+id/configImageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_margin="@dimen/margin_padding_small"
+        android:layout_margin="@dimen/margin_padding_normal"
         android:src="@drawable/set_config"
         app:layout_constraintBottom_toBottomOf="@id/guidelineHorizontal3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/guidelineVertical"
         app:layout_constraintTop_toBottomOf="@id/guidelineHorizontalTop" />
 
-    <View
-        android:id="@+id/view1"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginStart="@dimen/margin_padding_large"
-        android:layout_marginEnd="@dimen/margin_padding_large"
-        android:background="@color/gray_30"
-        app:layout_constraintTop_toBottomOf="@id/guidelineHorizontal3" />
-
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/maxVolumeTextView"
         style="@style/AudioMothText.Subhead.Small"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginStart="@dimen/margin_padding_small"
         android:layout_marginTop="@dimen/margin_padding_normal"
-        android:layout_marginEnd="@dimen/margin_padding_small"
+        android:layout_marginEnd="@dimen/margin_padding_large"
         android:gravity="center"
         android:text="@string/max_volume"
         app:layout_constraintBottom_toTopOf="@+id/guidelineHorizontal5"
-        app:layout_constraintEnd_toEndOf="@id/guidelineVertical"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guidelineVertical"
         app:layout_constraintTop_toBottomOf="@id/guidelineHorizontal3" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/volumeImageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_margin="@dimen/margin_padding_small"
+        android:layout_margin="@dimen/margin_padding_normal"
         android:src="@drawable/set_volume"
         app:layout_constraintBottom_toBottomOf="@id/guidelineHorizontal5"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/guidelineVertical"
+        app:layout_constraintEnd_toEndOf="@id/guidelineVertical"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/guidelineHorizontal3" />
-
-    <View
-        android:id="@+id/view2"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginStart="@dimen/margin_padding_large"
-        android:layout_marginEnd="@dimen/margin_padding_large"
-        android:background="@color/gray_30"
-        app:layout_constraintTop_toBottomOf="@id/guidelineHorizontal5" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/holdDeviceTextView"
@@ -149,9 +131,7 @@
         android:id="@+id/deviceCloseImageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_margin="@dimen/margin_padding_small"
-        android:paddingStart="@dimen/margin_padding_normal"
-        android:paddingEnd="@dimen/margin_padding_normal"
+        android:layout_margin="@dimen/margin_padding_normal"
         android:src="@drawable/set_position"
         app:layout_constraintBottom_toBottomOf="@id/guidelineHorizontal9"
         app:layout_constraintEnd_toEndOf="parent"
