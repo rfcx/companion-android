@@ -242,4 +242,14 @@
     <string name="prefs_value_default_admin_system_timezone">[ Not Set ]</string>
     <string name="prefs_value_default_admin_enable_sentinel_capture">true</string>
 
+    <!-- GuardianDiagnostic -->
+    <string name="diagnostic">Diagnostic</string>
+    <string name="record">Record</string>
+    <string name="checkin">Checkin</string>
+    <string name="total_size">Total size</string>
+    <string name="total_time">Total time</string>
+    <string name="configuration">Configuration</string>
+    <string name="file_format">File format</string>
+    <string name="advanced">Advanced</string>
+
 </resources>

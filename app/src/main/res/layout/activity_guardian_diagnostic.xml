@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/diagnosticToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/separateLine1"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/grey"
+        app:layout_constraintTop_toBottomOf="@id/diagnosticToolbar" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/separateLine1"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/diagnosticLocationLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_padding_xsmall"
+                app:layout_constraintTop_toBottomOf="@id/separateLine1">
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guidelineVertical1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.50" />
+
+                <TextView
+                    android:id="@+id/diagnosticLocationTitle"
+                    style="@style/GuardianText.Title.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/location"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/locationLongitudeLabel"
+                    style="@style/GuardianText.Label.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/longitude"
+                    app:layout_constraintStart_toStartOf="@id/diagnosticLocationTitle"
+                    app:layout_constraintTop_toBottomOf="@id/diagnosticLocationTitle" />
+
+                <TextView
+                    android:id="@+id/locationLongitudeValue"
+                    style="@style/GuardianText.Label.Value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="@id/locationLongitudeLabel"
+                    app:layout_constraintTop_toBottomOf="@id/locationLongitudeLabel"
+                    tools:text="100.000" />
+
+                <TextView
+                    android:id="@+id/locationLatitudeLabel"
+                    style="@style/GuardianText.Label.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="0dp"
+                    android:text="@string/latitude"
+                    app:layout_constraintStart_toEndOf="@id/guidelineVertical1"
+                    app:layout_constraintTop_toBottomOf="@id/diagnosticLocationTitle" />
+
+                <TextView
+                    android:id="@+id/locationLatgitudeValue"
+                    style="@style/GuardianText.Label.Value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="@id/locationLatitudeLabel"
+                    app:layout_constraintTop_toBottomOf="@id/locationLatitudeLabel"
+                    tools:text="100.000" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <View
+                android:id="@+id/separateLine2"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:background="@color/grey"
+                app:layout_constraintTop_toBottomOf="@id/diagnosticLocationLayout" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/diagnosticDetailLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_padding_xsmall"
+                app:layout_constraintTop_toBottomOf="@id/separateLine2">
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guidelineVertical2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.50" />
+
+                <TextView
+                    android:id="@+id/diagnosticDetailTitle"
+                    style="@style/GuardianText.Title.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/diagnostic"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/detailRecordLabel"
+                    style="@style/GuardianText.Label.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/record"
+                    app:layout_constraintStart_toStartOf="@id/diagnosticDetailTitle"
+                    app:layout_constraintTop_toBottomOf="@id/diagnosticDetailTitle" />
+
+                <TextView
+                    android:id="@+id/detailRecordValue"
+                    style="@style/GuardianText.Label.Value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="@id/detailRecordLabel"
+                    app:layout_constraintTop_toBottomOf="@id/detailRecordLabel"
+                    tools:text="100 files" />
+
+                <TextView
+                    android:id="@+id/detailCheckInLabel"
+                    style="@style/GuardianText.Label.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="0dp"
+                    android:text="@string/checkin"
+                    app:layout_constraintStart_toEndOf="@id/guidelineVertical2"
+                    app:layout_constraintTop_toBottomOf="@id/diagnosticDetailTitle" />
+
+                <TextView
+                    android:id="@+id/detailCheckInValue"
+                    style="@style/GuardianText.Label.Value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="@id/detailCheckInLabel"
+                    app:layout_constraintTop_toBottomOf="@id/detailCheckInLabel"
+                    tools:text="150 files" />
+
+                <TextView
+                    android:id="@+id/detailTotalSizeLabel"
+                    style="@style/GuardianText.Label.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="0dp"
+                    android:text="@string/total_size"
+                    app:layout_constraintStart_toStartOf="@id/detailRecordValue"
+                    app:layout_constraintTop_toBottomOf="@id/detailRecordValue" />
+
+                <TextView
+                    android:id="@+id/detailTotalSizeValue"
+                    style="@style/GuardianText.Label.Value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="@id/detailTotalSizeLabel"
+                    app:layout_constraintTop_toBottomOf="@id/detailTotalSizeLabel"
+                    tools:text="35 MBs" />
+
+                <TextView
+                    android:id="@+id/detailTotalTimeLabel"
+                    style="@style/GuardianText.Label.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="0dp"
+                    android:text="@string/total_time"
+                    app:layout_constraintStart_toEndOf="@id/guidelineVertical2"
+                    app:layout_constraintTop_toBottomOf="@id/detailCheckInValue" />
+
+                <TextView
+                    android:id="@+id/detailTotalTimeLabelValue"
+                    style="@style/GuardianText.Label.Value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="@id/detailTotalTimeLabel"
+                    app:layout_constraintTop_toBottomOf="@id/detailTotalTimeLabel"
+                    tools:text="1 day" />
+
+                <TextView
+                    android:id="@+id/detailBatteryLabel"
+                    style="@style/GuardianText.Label.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="0dp"
+                    android:text="@string/total_size"
+                    app:layout_constraintStart_toStartOf="@id/detailTotalSizeValue"
+                    app:layout_constraintTop_toBottomOf="@id/detailTotalSizeValue" />
+
+                <TextView
+                    android:id="@+id/detailBatteryValue"
+                    style="@style/GuardianText.Label.Value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="@id/detailBatteryLabel"
+                    app:layout_constraintTop_toBottomOf="@id/detailBatteryLabel"
+                    tools:text="87 %" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <View
+                android:id="@+id/separateLine3"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:background="@color/grey"
+                app:layout_constraintTop_toBottomOf="@id/diagnosticDetailLayout" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/diagnosticConfigurationLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_padding_xsmall"
+                app:layout_constraintTop_toBottomOf="@id/separateLine3">
+
+
+                <TextView
+                    android:id="@+id/diagnosticConfigurationTitle"
+                    style="@style/GuardianText.Title.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/configuration"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/configFileFormatLabel"
+                    style="@style/GuardianText.Label.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/file_format"
+                    app:layout_constraintStart_toStartOf="@id/diagnosticConfigurationTitle"
+                    app:layout_constraintTop_toBottomOf="@id/diagnosticConfigurationTitle" />
+
+                <TextView
+                    android:id="@+id/configFileFormatValue"
+                    style="@style/GuardianText.Label.Value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="@id/configFileFormatLabel"
+                    app:layout_constraintTop_toBottomOf="@id/configFileFormatLabel"
+                    tools:text="OPUS" />
+
+                <TextView
+                    android:id="@+id/configSampleRateLabel"
+                    style="@style/GuardianText.Label.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="0dp"
+                    android:text="@string/sample_rate"
+                    app:layout_constraintStart_toStartOf="@id/configFileFormatValue"
+                    app:layout_constraintTop_toBottomOf="@id/configFileFormatValue" />
+
+                <TextView
+                    android:id="@+id/configSampleRateValue"
+                    style="@style/GuardianText.Label.Value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="@id/configSampleRateLabel"
+                    app:layout_constraintTop_toBottomOf="@id/configSampleRateLabel"
+                    tools:text="16 kHz" />
+
+                <TextView
+                    android:id="@+id/configBitrateLabel"
+                    style="@style/GuardianText.Label.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="0dp"
+                    android:text="@string/bitrate"
+                    app:layout_constraintStart_toStartOf="@id/configSampleRateValue"
+                    app:layout_constraintTop_toBottomOf="@id/configSampleRateValue" />
+
+                <TextView
+                    android:id="@+id/configBitrateValue"
+                    style="@style/GuardianText.Label.Value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="@id/configBitrateLabel"
+                    app:layout_constraintTop_toBottomOf="@id/configBitrateLabel"
+                    tools:text="16 kbs" />
+
+                <TextView
+                    android:id="@+id/configDurationLabel"
+                    style="@style/GuardianText.Label.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="0dp"
+                    android:text="@string/duration"
+                    app:layout_constraintStart_toStartOf="@id/configBitrateValue"
+                    app:layout_constraintTop_toBottomOf="@id/configBitrateValue" />
+
+                <TextView
+                    android:id="@+id/configDurationValue"
+                    style="@style/GuardianText.Label.Value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="@id/configDurationLabel"
+                    app:layout_constraintTop_toBottomOf="@id/configDurationLabel"
+                    tools:text="90 secs" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <View
+                android:id="@+id/separateLine4"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:background="@color/grey"
+                app:layout_constraintTop_toBottomOf="@id/diagnosticConfigurationLayout" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/diagnosticAdvanceLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_padding_xsmall"
+                app:layout_constraintTop_toBottomOf="@id/separateLine4">
+
+                    <TextView
+                        android:id="@+id/advanceCollapseIcon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/margin_padding_small"
+                        android:text="V"
+                        app:layout_constraintBottom_toBottomOf="@id/diagnosticAdvanceTitle"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/diagnosticAdvanceTitle" />
+
+                    <TextView
+                        android:id="@+id/diagnosticAdvanceTitle"
+                        style="@style/GuardianText.Title.Bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/margin_padding_small"
+                        android:text="@string/advanced"
+                        app:layout_constraintStart_toEndOf="@id/advanceCollapseIcon"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <FrameLayout
+                android:id="@+id/advancedContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:animateLayoutChanges="true"
+                app:layout_constraintTop_toBottomOf="@id/diagnosticAdvanceLayout" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
