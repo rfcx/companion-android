@@ -132,7 +132,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="@dimen/margin_padding_normal"
-        android:src="@drawable/set_position"
+        android:src="@drawable/edge_phone"
         app:layout_constraintBottom_toBottomOf="@id/guidelineHorizontal9"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/guidelineVertical"
