@@ -2,10 +2,12 @@ package org.rfcx.audiomoth.view.diagnostic
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.preference.PreferenceManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonArray
 import kotlinx.android.synthetic.main.activity_guardian_diagnostic.*
@@ -25,6 +27,23 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
 
     private var collapseAdvanced = false
     private var prefsChanges: Map<String, String>? = null
+    private var prefsEditor: SharedPreferences.Editor? = null
+
+    private var switchPrefs = listOf(
+        "show_ui",
+        "enable_audio_capture",
+        "enable_checkin_publish",
+        "enable_cutoffs_battery",
+        "enable_cutoffs_schedule_off_hours",
+        "admin_enable_log_capture",
+        "admin_enable_screenshot_capture",
+        "admin_enable_bluetooth",
+        "admin_enable_wifi",
+        "admin_enable_tcp_adb",
+        "admin_enable_sentinel_capture",
+        "admin_enable_ssh_server",
+        "admin_enable_wifi_socket"
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,8 +54,8 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
         setupSyncButton()
     }
 
-    private fun setupAdvancedSetting(prefs: JsonArray) {
-        val fragment = GuardianPrefsFragment(prefs)
+    private fun setupAdvancedSetting() {
+        val fragment = GuardianPrefsFragment()
         diagnosticAdvanceLayout.setOnClickListener {
             if (!collapseAdvanced) {
                 supportFragmentManager.beginTransaction()
@@ -99,7 +118,8 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
                     configDurationValue.text =
                         getString(R.string.detail_secs, configurationData.duration)
 
-                    setupAdvancedSetting(prefsData)
+                    setupAdvancedSetting()
+                    setupCurrentPrefs(prefsData)
                     hideLoading()
                 }
             }
@@ -111,6 +131,20 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
             }
 
         })
+    }
+
+    private fun setupCurrentPrefs(prefs: JsonArray) {
+        val prefsEditor = PreferenceManager.getDefaultSharedPreferences(this).edit()
+        prefs.forEach {
+            val pref = it.asJsonObject
+            val key = ArrayList<String>(pref.keySet())[0]
+            val value = pref.get(key).asString.replace("\"", "")
+            if (switchPrefs.contains(key)) {
+                prefsEditor.putBoolean(key, value.toBoolean()).apply()
+            } else {
+                prefsEditor.putString(key, value).apply()
+            }
+        }
     }
 
     private fun setupSyncButton() {
@@ -183,9 +217,18 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
             .show()
     }
 
+    override fun setEditor(editor: SharedPreferences.Editor) {
+       this.prefsEditor = editor
+    }
+
     override fun onBackPressed() {
         super.onBackPressed()
         finish()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        this.prefsEditor!!.clear().apply()
     }
 
 

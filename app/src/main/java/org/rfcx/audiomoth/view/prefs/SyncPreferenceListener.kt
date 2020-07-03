@@ -1,5 +1,7 @@
 package org.rfcx.audiomoth.view.prefs
 
+import android.content.SharedPreferences
+
 interface SyncPreferenceListener {
     fun setPrefsChanges(prefs: Map<String, String>)
     fun showSyncButton()
@@ -7,4 +9,5 @@ interface SyncPreferenceListener {
     fun syncPrefs(prefs: Map<String, String>)
     fun showSuccessResponse()
     fun showFailedResponse()
+    fun setEditor(editor: SharedPreferences.Editor)
 }

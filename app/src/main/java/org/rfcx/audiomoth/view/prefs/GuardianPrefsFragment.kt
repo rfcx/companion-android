@@ -8,7 +8,7 @@ import androidx.preference.PreferenceFragmentCompat
 import com.google.gson.JsonArray
 import org.rfcx.audiomoth.R
 
-class GuardianPrefsFragment(private val currentPrefs: JsonArray) : PreferenceFragmentCompat(),
+class GuardianPrefsFragment() : PreferenceFragmentCompat(),
     SharedPreferences.OnSharedPreferenceChangeListener {
 
     private val LOGTAG = "GuardianPrefsFragment"
@@ -17,8 +17,6 @@ class GuardianPrefsFragment(private val currentPrefs: JsonArray) : PreferenceFra
 
     private var syncPreferenceListener: SyncPreferenceListener? = null
 
-    private var onFirstLoadPrefs = false
-    
     private var switchPrefs = listOf(
         "show_ui",
         "enable_audio_capture",
@@ -47,32 +45,7 @@ class GuardianPrefsFragment(private val currentPrefs: JsonArray) : PreferenceFra
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.prefs)
-        setCurrentGuardianPrefs()
-    }
-
-    private fun setCurrentGuardianPrefs() {
-        val prefsScreen = preferenceScreen
-        val prefsEditor = prefsScreen.sharedPreferences.edit()
-
-        val listOfPrefs = currentPrefs.asJsonArray
-
-        listOfPrefs.forEach {
-            val pref = it.asJsonObject
-            val key = ArrayList<String>(pref.keySet())[0]
-            val value = pref.get(key).asString.replace("\"", "")
-            if (switchPrefs.contains(key)) {
-                prefsEditor.putBoolean(key, value.toBoolean()).apply()
-            } else {
-                prefsEditor.putString(key, value).apply()
-            }
-        }
-
-        //update data in prefs
-        if (!onFirstLoadPrefs) {
-            preferenceScreen = null
-            addPreferencesFromResource(R.xml.prefs)
-            onFirstLoadPrefs = true
-        }
+        syncPreferenceListener?.setEditor(preferenceScreen.sharedPreferences.edit())
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
@@ -92,12 +65,6 @@ class GuardianPrefsFragment(private val currentPrefs: JsonArray) : PreferenceFra
     override fun onPause() {
         super.onPause()
         preferenceScreen.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        preferenceScreen.sharedPreferences.edit().clear().apply()
-        onFirstLoadPrefs = false
     }
 
 }
