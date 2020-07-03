@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/diagRootView"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -22,8 +23,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fillViewport="true"
-        app:layout_constraintTop_toBottomOf="@id/separateLine1"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/separateLine1">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -104,7 +105,6 @@
                 android:id="@+id/diagnosticDetailLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_padding_xsmall"
                 app:layout_constraintTop_toBottomOf="@id/separateLine2">
 
                 <androidx.constraintlayout.widget.Guideline
@@ -190,7 +190,7 @@
                     app:layout_constraintTop_toBottomOf="@id/detailCheckInValue" />
 
                 <TextView
-                    android:id="@+id/detailTotalTimeLabelValue"
+                    android:id="@+id/detailTotalTimeValue"
                     style="@style/GuardianText.Label.Value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -336,25 +336,39 @@
                 android:layout_marginTop="@dimen/margin_padding_xsmall"
                 app:layout_constraintTop_toBottomOf="@id/separateLine4">
 
-                    <TextView
-                        android:id="@+id/advanceCollapseIcon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/margin_padding_small"
-                        android:text="V"
-                        app:layout_constraintBottom_toBottomOf="@id/diagnosticAdvanceTitle"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/diagnosticAdvanceTitle" />
+                <TextView
+                    android:id="@+id/advanceCollapseIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ic_drop_down"
+                    app:layout_constraintBottom_toBottomOf="@id/diagnosticAdvanceTitle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/diagnosticAdvanceTitle" />
 
-                    <TextView
-                        android:id="@+id/diagnosticAdvanceTitle"
-                        style="@style/GuardianText.Title.Bold"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/margin_padding_small"
-                        android:text="@string/advanced"
-                        app:layout_constraintStart_toEndOf="@id/advanceCollapseIcon"
-                        app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:id="@+id/diagnosticAdvanceTitle"
+                    style="@style/GuardianText.Title.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="1dp"
+                    android:text="@string/advanced"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/advanceCollapseIcon"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/syncButton"
+                    style="@style/GuardianButton.GreenButton.Line"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/margin_padding_normal"
+                    android:minWidth="60dp"
+                    android:minHeight="30dp"
+                    android:text="@string/sync"
+                    android:visibility="invisible"
+                    app:layout_constraintBottom_toBottomOf="@id/diagnosticAdvanceTitle"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/diagnosticAdvanceTitle" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -2,8 +2,8 @@
 <androidx.preference.PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <androidx.preference.ListPreference
-        android:defaultValue="@string/prefs_value_default_show_ui"
+    <androidx.preference.SwitchPreference
+        android:defaultValue="@bool/prefs_value_default_show_ui"
         android:dialogTitle="show_ui"
         android:entries="@array/prefs_values_true_or_false"
         android:entryValues="@array/prefs_values_true_or_false"
@@ -11,8 +11,8 @@
         android:summary="string - true/false"
         android:title="show_ui" />
 
-    <androidx.preference.ListPreference
-        android:defaultValue="@string/prefs_value_default_enable_audio_capture"
+    <androidx.preference.SwitchPreference
+        android:defaultValue="@bool/prefs_value_default_enable_audio_capture"
         android:dialogTitle="enable_audio_capture"
         android:entries="@array/prefs_values_true_or_false"
         android:entryValues="@array/prefs_values_true_or_false"
@@ -20,8 +20,8 @@
         android:summary="string - true/false"
         android:title="enable_audio_capture" />
 
-    <androidx.preference.ListPreference
-        android:defaultValue="@string/prefs_value_default_enable_checkin_publish"
+    <androidx.preference.SwitchPreference
+        android:defaultValue="@bool/prefs_value_default_enable_checkin_publish"
         android:dialogTitle="enable_checkin_publish"
         android:entries="@array/prefs_values_true_or_false"
         android:entryValues="@array/prefs_values_true_or_false"
@@ -29,8 +29,8 @@
         android:summary="string - true/false"
         android:title="enable_checkin_publish" />
 
-    <androidx.preference.ListPreference
-        android:defaultValue="@string/prefs_value_default_enable_cutoffs_battery"
+    <androidx.preference.SwitchPreference
+        android:defaultValue="@bool/prefs_value_default_enable_cutoffs_battery"
         android:dialogTitle="enable_cutoffs_battery"
         android:entries="@array/prefs_values_true_or_false"
         android:entryValues="@array/prefs_values_true_or_false"
@@ -38,8 +38,8 @@
         android:summary="string - true/false"
         android:title="enable_cutoffs_battery" />
 
-    <androidx.preference.ListPreference
-        android:defaultValue="@string/prefs_value_default_enable_cutoffs_schedule_off_hours"
+    <androidx.preference.SwitchPreference
+        android:defaultValue="@bool/prefs_value_default_enable_cutoffs_schedule_off_hours"
         android:dialogTitle="enable_cutoffs_schedule_off_hours"
         android:entries="@array/prefs_values_true_or_false"
         android:entryValues="@array/prefs_values_true_or_false"
@@ -220,8 +220,8 @@
         android:summary="string - log verbosity level"
         android:title="admin_log_capture_level" />
 
-    <androidx.preference.ListPreference
-        android:defaultValue="@string/prefs_value_default_admin_enable_log_capture"
+    <androidx.preference.SwitchPreference
+        android:defaultValue="@bool/prefs_value_default_admin_enable_log_capture"
         android:dialogTitle="admin_enable_log_capture"
         android:entries="@array/prefs_values_true_or_false"
         android:entryValues="@array/prefs_values_true_or_false"
@@ -236,8 +236,8 @@
         android:summary="int - minutes"
         android:title="admin_screenshot_capture_cycle" />
 
-    <androidx.preference.ListPreference
-        android:defaultValue="@string/prefs_value_default_admin_enable_screenshot_capture"
+    <androidx.preference.SwitchPreference
+        android:defaultValue="@bool/prefs_value_default_admin_enable_screenshot_capture"
         android:dialogTitle="admin_enable_screenshot_capture"
         android:entries="@array/prefs_values_true_or_false"
         android:entryValues="@array/prefs_values_true_or_false"
@@ -245,8 +245,8 @@
         android:summary="string - true/false"
         android:title="admin_enable_screenshot_capture" />
 
-    <androidx.preference.ListPreference
-        android:defaultValue="@string/prefs_value_default_admin_enable_bluetooth"
+    <androidx.preference.SwitchPreference
+        android:defaultValue="@bool/prefs_value_default_admin_enable_bluetooth"
         android:dialogTitle="admin_enable_bluetooth"
         android:entries="@array/prefs_values_true_or_false"
         android:entryValues="@array/prefs_values_true_or_false"
@@ -254,8 +254,8 @@
         android:summary="string - true/false"
         android:title="admin_enable_bluetooth" />
 
-    <androidx.preference.ListPreference
-        android:defaultValue="@string/prefs_value_default_admin_enable_wifi"
+    <androidx.preference.SwitchPreference
+        android:defaultValue="@bool/prefs_value_default_admin_enable_wifi"
         android:dialogTitle="admin_enable_wifi"
         android:entries="@array/prefs_values_true_or_false"
         android:entryValues="@array/prefs_values_true_or_false"
@@ -263,8 +263,8 @@
         android:summary="string - true/false"
         android:title="admin_enable_wifi" />
 
-    <androidx.preference.ListPreference
-        android:defaultValue="@string/prefs_value_default_admin_enable_tcp_adb"
+    <androidx.preference.SwitchPreference
+        android:defaultValue="@bool/prefs_value_default_admin_enable_tcp_adb"
         android:dialogTitle="admin_enable_tcp_adb"
         android:entries="@array/prefs_values_true_or_false"
         android:entryValues="@array/prefs_values_true_or_false"
@@ -272,8 +272,8 @@
         android:summary="string - true/false"
         android:title="admin_enable_tcp_adb" />
 
-    <androidx.preference.ListPreference
-        android:defaultValue="@string/prefs_value_default_admin_enable_sentinel_capture"
+    <androidx.preference.SwitchPreference
+        android:defaultValue="@bool/prefs_value_default_admin_enable_sentinel_capture"
         android:dialogTitle="admin_enable_sentinel_capture"
         android:entries="@array/prefs_values_true_or_false"
         android:entryValues="@array/prefs_values_true_or_false"
@@ -290,8 +290,8 @@
         android:summary="string - Region/Zone"
         android:title="admin_system_timezone" />
 
-    <androidx.preference.ListPreference
-        android:defaultValue="@string/prefs_value_default_admin_enable_ssh_server"
+    <androidx.preference.SwitchPreference
+        android:defaultValue="@bool/prefs_value_default_admin_enable_ssh_server"
         android:dialogTitle="admin_ssh_server_state"
         android:entries="@array/prefs_values_true_or_false"
         android:entryValues="@array/prefs_values_true_or_false"
@@ -299,8 +299,8 @@
         android:summary="string - On/Off"
         android:title="admin_ssh_server_state" />
 
-    <androidx.preference.ListPreference
-        android:defaultValue="@string/prefs_value_default_admin_enable_ssh_server"
+    <androidx.preference.SwitchPreference
+        android:defaultValue="@bool/prefs_value_default_admin_enable_ssh_server"
         android:dialogTitle="admin_wifi_socket_state"
         android:entries="@array/prefs_values_true_or_false"
         android:entryValues="@array/prefs_values_true_or_false"

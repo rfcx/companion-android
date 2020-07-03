@@ -66,7 +66,6 @@
         <activity android:name=".view.deployment.guardian.GuardianDeploymentActivity"
             android:screenOrientation="portrait"/>
 
-        <activity android:name=".view.prefs.GuardianPrefsActivity" />
         <activity android:name=".view.diagnostic.DiagnosticActivity" />
 
         <receiver

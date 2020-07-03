@@ -1,26 +1,48 @@
 package org.rfcx.audiomoth.view.prefs
 
+import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import androidx.preference.PreferenceFragmentCompat
+import com.google.gson.JsonArray
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.connection.socket.OnReceiveResponse
-import org.rfcx.audiomoth.connection.socket.SocketManager
-import org.rfcx.audiomoth.entity.socket.PrefsResponse
-import org.rfcx.audiomoth.entity.socket.SocketResposne
 
-class GuardianPrefsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
+class GuardianPrefsFragment(private val currentPrefs: JsonArray) : PreferenceFragmentCompat(),
+    SharedPreferences.OnSharedPreferenceChangeListener {
 
     private val LOGTAG = "GuardianPrefsFragment"
 
     private val prefsChanges = mutableMapOf<String, String>()
 
-    private var onFirstTime = false
+    private var syncPreferenceListener: SyncPreferenceListener? = null
+
+    private var onFirstLoadPrefs = false
+    
+    private var switchPrefs = listOf(
+        "show_ui",
+        "enable_audio_capture",
+        "enable_checkin_publish",
+        "enable_cutoffs_battery",
+        "enable_cutoffs_schedule_off_hours",
+        "admin_enable_log_capture",
+        "admin_enable_screenshot_capture",
+        "admin_enable_bluetooth",
+        "admin_enable_wifi",
+        "admin_enable_tcp_adb",
+        "admin_enable_sentinel_capture",
+        "admin_enable_ssh_server",
+        "admin_enable_wifi_socket"
+    )
 
     override fun onResume() {
         super.onResume()
         preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        syncPreferenceListener = context as SyncPreferenceListener
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -31,55 +53,40 @@ class GuardianPrefsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSh
     private fun setCurrentGuardianPrefs() {
         val prefsScreen = preferenceScreen
         val prefsEditor = prefsScreen.sharedPreferences.edit()
-        SocketManager.getAllCurrentPrefs(object : OnReceiveResponse{
-            override fun onReceive(response: SocketResposne) {
-                val currentPrefs = response as PrefsResponse
-                val listOfPrefs = currentPrefs.prefs.asJsonArray
 
-                listOfPrefs.forEach {
-                    val pref = it.asJsonObject
-                    val key = ArrayList<String>(pref.keySet())[0]
-                    val value = pref.get(key).asString.replace("\"", "")
-                    prefsEditor.putString(key, value).apply()
-                }
+        val listOfPrefs = currentPrefs.asJsonArray
+
+        listOfPrefs.forEach {
+            val pref = it.asJsonObject
+            val key = ArrayList<String>(pref.keySet())[0]
+            val value = pref.get(key).asString.replace("\"", "")
+            if (switchPrefs.contains(key)) {
+                prefsEditor.putBoolean(key, value.toBoolean()).apply()
+            } else {
+                prefsEditor.putString(key, value).apply()
             }
+        }
 
-            override fun onFailed(message: String) {}
-        })
-    }
-
-    private fun sendChangedPrefs() {
-        if(prefsChanges.isNotEmpty()) {
-            val listForGuardian = mutableListOf<String>()
-            prefsChanges.forEach {
-                listForGuardian.add("${it.key}|${it.value}")
-            }
-
-            Log.d(LOGTAG, "Syncing Prefs: $listForGuardian")
-
-            SocketManager.syncConfiguration(listForGuardian, object: OnReceiveResponse{
-                override fun onReceive(response: SocketResposne) {
-                    //TODO: show message(Toast or Snackbar) on DiagnosticPage
-                }
-
-                override fun onFailed(message: String) {
-                    //TODO: show message(Toast or Snackbar) on DiagnosticPage
-                }
-            })
+        //update data in prefs
+        if (!onFirstLoadPrefs) {
+            preferenceScreen = null
+            addPreferencesFromResource(R.xml.prefs)
+            onFirstLoadPrefs = true
         }
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        val value = sharedPreferences!!.getString(key, "")
-        prefsChanges[key!!] = value!!
+        val value = if (switchPrefs.contains(key)) {
+            sharedPreferences?.getBoolean(key, false).toString()
+        } else {
+            sharedPreferences?.getString(key, "") ?: ""
+        }
+
+        prefsChanges[key!!] = value
         Log.d(LOGTAG, "Prefs changed: $key | $value")
 
-        //update data in prefs
-        if (!onFirstTime) {
-            preferenceScreen = null
-            addPreferencesFromResource(R.xml.prefs)
-            onFirstTime = true
-        }
+        syncPreferenceListener?.showSyncButton()
+        syncPreferenceListener?.setPrefsChanges(prefsChanges)
     }
 
     override fun onPause() {
@@ -89,14 +96,8 @@ class GuardianPrefsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSh
 
     override fun onDetach() {
         super.onDetach()
-        sendChangedPrefs()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        //clear all guardian prefs when exit
-        Log.d(LOGTAG, "Cleared all guardian prefs")
         preferenceScreen.sharedPreferences.edit().clear().apply()
+        onFirstLoadPrefs = false
     }
 
 }

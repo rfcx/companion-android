@@ -81,7 +81,7 @@ object SocketManager {
                             DIAGNOSTIC -> {
                                 val response =
                                     gson.fromJson(dataInput, DiagnosticResponse::class.java)
-                                Log.d(LOGTAG, "Diagnostic response: ${response.diagnostic}")
+                                Log.d(LOGTAG, "Diagnostic response: $response")
                                 onReceiveResponse.onReceive(response)
                             }
                             CONNECTION -> {

@@ -194,13 +194,13 @@
     <string name="kilobytes">%s kbs</string>
 
     <!-- GuardianPreferences -->
-    <string name="prefs_value_default_show_ui">true</string>
-    <string name="prefs_value_default_enable_audio_capture">true</string>
-    <string name="prefs_value_default_enable_checkin_publish">true</string>
-    <string name="prefs_value_default_enable_cutoffs_battery">true</string>
-    <string name="prefs_value_default_enable_cutoffs_schedule_off_hours">true</string>
-    <string name="prefs_value_default_admin_enable_ssh_server">false</string>
-    <string name="prefs_value_default_admin_enable_wifi_socket">false</string>
+    <bool name="prefs_value_default_show_ui">true</bool>
+    <bool name="prefs_value_default_enable_audio_capture">true</bool>
+    <bool name="prefs_value_default_enable_checkin_publish">true</bool>
+    <bool name="prefs_value_default_enable_cutoffs_battery">true</bool>
+    <bool name="prefs_value_default_enable_cutoffs_schedule_off_hours">true</bool>
+    <bool name="prefs_value_default_admin_enable_ssh_server">false</bool>
+    <bool name="prefs_value_default_admin_enable_wifi_socket">false</bool>
 
     <string name="prefs_value_default_api_rest_host">api.rfcx.org</string>
     <string name="prefs_value_default_api_rest_protocol">https</string>
@@ -228,19 +228,19 @@
     <string name="prefs_value_default_checkin_stash_threshold">240</string>
     <string name="prefs_value_default_checkin_archive_threshold">160</string>
 
-    <string name="prefs_value_default_admin_enable_log_capture">false</string>
+    <bool name="prefs_value_default_admin_enable_log_capture">false</bool>
     <string name="prefs_value_default_admin_log_capture_level">Warn</string>
     <string name="prefs_value_default_admin_log_capture_cycle">30</string>
 
-    <string name="prefs_value_default_admin_enable_screenshot_capture">true</string>
+    <bool name="prefs_value_default_admin_enable_screenshot_capture">true</bool>
     <string name="prefs_value_default_admin_screenshot_capture_cycle">180</string>
 
-    <string name="prefs_value_default_admin_enable_tcp_adb">true</string>
-    <string name="prefs_value_default_admin_enable_wifi">false</string>
-    <string name="prefs_value_default_admin_enable_bluetooth">false</string>
+    <bool name="prefs_value_default_admin_enable_tcp_adb">true</bool>
+    <bool name="prefs_value_default_admin_enable_wifi">false</bool>
+    <bool name="prefs_value_default_admin_enable_bluetooth">false</bool>
 
     <string name="prefs_value_default_admin_system_timezone">[ Not Set ]</string>
-    <string name="prefs_value_default_admin_enable_sentinel_capture">true</string>
+    <bool name="prefs_value_default_admin_enable_sentinel_capture">true</bool>
 
     <!-- GuardianDiagnostic -->
     <string name="diagnostic">Diagnostic</string>
@@ -251,5 +251,14 @@
     <string name="configuration">Configuration</string>
     <string name="file_format">File format</string>
     <string name="advanced">Advanced</string>
+    <string name="detail_file">%d files</string>
+    <string name="detail_size">%d MBs</string>
+    <string name="detail_secs">%d seconds</string>
+    <string name="detail_minutes">%d minutes</string>
+    <string name="detail_hours">%d hours</string>
+    <string name="detail_full">%d hours %d minutes</string>
+    <string name="detail_percentage">%d %%</string>
+    <string name="detail_khz">%d kHz</string>
+    <string name="detail_kbs">%d kbs</string>
 
 </resources>
