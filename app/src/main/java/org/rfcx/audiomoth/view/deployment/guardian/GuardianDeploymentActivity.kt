@@ -278,7 +278,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun onBackPressed() {
         backStep()
-      
+    }
+    
     override fun onAnimationEnd() {
         finish()
     }
