@@ -112,7 +112,13 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
     }
 
     override fun backStep() {
-        stepView.go(stepView.currentStep - 1, true)
+        if (currentStep == 0) {
+            finish()
+        } else {
+            currentStep = stepView.currentStep - 1
+            stepView.go(currentStep, true)
+            handleFragment(currentStep)
+        }
     }
 
     override fun getDeployment(): Deployment? = this._deployment
@@ -340,6 +346,10 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
 
     override fun onAnimationEnd() {
         finish()
+    }
+
+    override fun onBackPressed() {
+        backStep()
     }
 
     companion object {
