@@ -8,9 +8,7 @@ import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.SyncState
 import org.rfcx.audiomoth.entity.response.LocationResponse
-import org.rfcx.audiomoth.entity.response.toDeployment
 import org.rfcx.audiomoth.entity.response.toLocate
-import java.util.*
 
 class LocateDb(private val realm: Realm) {
 
@@ -79,17 +77,25 @@ class LocateDb(private val realm: Realm) {
                 locate.id = id
             }
             // update last deployment
-            locate.lastDeployment = deploymentId
+            locate.lastDeploymentId = deploymentId
             it.insertOrUpdate(locate)
         }
     }
 
-    fun updateDeploymentServerId(deploymentId: Int, deploymentServerId: String) {
-        Log.e("LocationSyncWorker","$deploymentId  $deploymentServerId")
+    fun updateDeploymentServerId(
+        deploymentId: Int,
+        deploymentServerId: String,
+        isGuardian: Boolean = false
+    ) {
+        Log.e("LocationSyncWorker", "$deploymentId  $deploymentServerId")
         realm.executeTransaction {
             it.where(Locate::class.java).equalTo("lastDeployment", deploymentId)
                 .findFirst()?.apply {
-                    lastDeploymentServerId = deploymentServerId
+                    if (!isGuardian) {
+                        lastDeploymentServerId = deploymentServerId
+                    } else {
+                        lastGuardianDeploymentServerId = deploymentServerId
+                    }
                     // set sync state to unsent after deploymentServerId have been change
                     syncState = SyncState.Unsent.key
                 }
@@ -106,7 +112,7 @@ class LocateDb(private val realm: Realm) {
             if (location != null) {
                 location.serverId = locationResponse.serverId
                 location.name = locationResponse.name ?: location.name
-                location.latitude = locationResponse.latitude ?:location.latitude
+                location.latitude = locationResponse.latitude ?: location.latitude
                 location.longitude = locationResponse.longitude ?: location.longitude
                 location.createdAt = locationResponse.createdAt ?: location.createdAt
                 location.lastDeploymentServerId = locationResponse.lastDeploymentServerId

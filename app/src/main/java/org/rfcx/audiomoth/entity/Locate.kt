@@ -16,8 +16,10 @@ open class Locate(
     var latitude: Double = 0.0,
     var longitude: Double = 0.0,
     var createdAt: Date = Date(),
-    var lastDeployment: Int = 0,
+    var lastDeploymentId: Int = 0,
     var lastDeploymentServerId: String? = null,
+    var lastGuardianDeploymentId: Int = 0,
+    var lastGuardianDeploymentServerId: String? = null,
     @Expose(serialize = false)
     var syncState: Int = 0
 ) : RealmModel {

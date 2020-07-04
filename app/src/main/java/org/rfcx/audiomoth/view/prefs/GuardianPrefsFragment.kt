@@ -43,7 +43,6 @@ class GuardianPrefsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSh
                     prefsEditor.putString(key, value).apply()
                 }
             }
-
             override fun onFailed(message: String) {}
         })
     }

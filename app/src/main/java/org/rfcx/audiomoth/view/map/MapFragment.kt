@@ -292,12 +292,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         progressBar.visibility = View.INVISIBLE
 
         val showLocations =
-            locations.filter { it.lastDeployment != 0 || it.lastDeploymentServerId != null }
+            locations.filter { it.lastDeploymentId != 0 || it.lastDeploymentServerId != null }
         val showDeployIds = showLocations.mapTo(arrayListOf(), {
             if (it.lastDeploymentServerId != null) {
                 it.lastDeploymentServerId
             } else {
-                it.lastDeployment
+                it.lastDeploymentId
             }
         })
 
