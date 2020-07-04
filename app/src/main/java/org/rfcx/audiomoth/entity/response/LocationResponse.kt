@@ -1,0 +1,29 @@
+package org.rfcx.audiomoth.entity.response
+
+import org.rfcx.audiomoth.entity.Locate
+import org.rfcx.audiomoth.entity.SyncState
+import java.util.*
+
+/**
+ * Firestore response for getting a location
+ */
+data class LocationResponse(
+    var serverId: String? = null,
+    var name: String? = null,
+    var latitude: Double? = null,
+    var longitude: Double? = null,
+    var createdAt: Date? = null,
+    var lastDeploymentServerId: String? = null
+)
+
+fun LocationResponse.toLocate(): Locate {
+    return Locate(
+        serverId = this.serverId,
+        name = this.name ?: "-",
+        latitude = this.latitude ?: 0.0,
+        longitude = this.longitude ?: 0.0,
+        createdAt = this.createdAt ?: Date(),
+        lastDeploymentServerId = this.lastDeploymentServerId,
+        syncState = SyncState.Sent.key
+    )
+}

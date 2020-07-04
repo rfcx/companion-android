@@ -4,9 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.work.*
-import androidx.work.impl.utils.taskexecutor.TaskExecutor
 import io.realm.Realm
-import kotlinx.coroutines.CoroutineDispatcher
 import org.rfcx.audiomoth.entity.request.toRequestBody
 import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
@@ -22,7 +20,6 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
 
     override suspend fun doWork(): Result {
         Log.d(TAG, "doWork")
-
 
 
         val db = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
@@ -72,9 +69,5 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
             return WorkManager.getInstance(context)
                 .getWorkInfosForUniqueWorkLiveData(UNIQUE_WORK_KEY)
         }
-    }
-
-    override fun getTaskExecutor(): TaskExecutor {
-        return super.getTaskExecutor()
     }
 }

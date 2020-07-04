@@ -3,6 +3,7 @@ package org.rfcx.audiomoth.util
 import android.content.Context
 import io.realm.Realm
 import org.rfcx.audiomoth.view.LoginActivity
+import org.rfcx.audiomoth.view.profile.coordinates.CoordinatesActivity.Companion.DD_FORMAT
 
 fun Context?.getUserNickname(): String {
     val preferences = this?.let { Preferences.getInstance(it) }
@@ -33,4 +34,9 @@ fun Context.logout() {
             realm.close()
         })
     }
+}
+
+fun Context?.getCoordinatesFormat(): String? {
+    val preferences = this?.let { Preferences.getInstance(it) }
+    return preferences?.getString(Preferences.COORDINATES_FORMAT, DD_FORMAT)
 }

@@ -29,6 +29,7 @@ class Preferences(context: Context) {
         const val ACCESSIBLE_SITES = "${PREFIX}ACCESSIBLE_SITES"
         const val DEFAULT_SITE = "${PREFIX}DEFAULT_SITE"
         const val IS_FIRST_TIME = "${PREFIX}IS_FIRST_TIME"
+        const val COORDINATES_FORMAT = "${PREFIX}COORDINATES_FORMAT"
     }
 
     init {

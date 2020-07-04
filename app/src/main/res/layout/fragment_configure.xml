@@ -191,8 +191,9 @@
                             android:id="@+id/recordingDurationEditText"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:imeOptions="actionDone"
                             android:inputType="number"
-                            android:maxLines="1"
+                            android:lines="1"
                             android:textColor="@color/text_primary"
                             android:textSize="@dimen/text_xsmall" />
                     </com.google.android.material.textfield.TextInputLayout>
@@ -204,7 +205,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/margin_padding_small"
                         android:layout_weight="1"
-
                         android:focusable="true"
                         android:focusableInTouchMode="true"
                         android:hint="@string/sleep_duration">
@@ -213,8 +213,9 @@
                             android:id="@+id/sleepDurationEditText"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:imeOptions="actionDone"
                             android:inputType="number"
-                            android:maxLines="1"
+                            android:lines="1"
                             android:textColor="@color/text_primary"
                             android:textSize="@dimen/text_xsmall" />
                     </com.google.android.material.textfield.TextInputLayout>
@@ -309,7 +310,9 @@
                     android:id="@+id/profileEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxLines="1"
+                    android:imeOptions="actionDone"
+                    android:inputType="text"
+                    android:lines="1"
                     android:textColor="@color/text_primary"
                     android:textSize="@dimen/text_small" />
             </com.google.android.material.textfield.TextInputLayout>

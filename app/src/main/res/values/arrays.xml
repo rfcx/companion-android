@@ -73,6 +73,28 @@
         <item>flac</item>
     </string-array>
 
+    <string-array name="duration_cycle_entries">
+        <item>15 secs</item>
+        <item>30 secs</item>
+        <item>45 secs</item>
+        <item>60 secs</item>
+        <item>90 secs</item>
+        <item>120 secs</item>
+        <item>150 secs</item>
+        <item>180 secs</item>
+    </string-array>
+
+    <string-array name="duration_cycle_values">
+        <item>15</item>
+        <item>30</item>
+        <item>45</item>
+        <item>60</item>
+        <item>90</item>
+        <item>120</item>
+        <item>150</item>
+        <item>180</item>
+    </string-array>
+
     <string-array name="prefs_values_true_or_false">
         <item>true</item>
         <item>false</item>
