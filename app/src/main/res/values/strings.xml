@@ -66,7 +66,7 @@
     <string name="syncing">Syncing</string>
     <string name="ready_to_send">Ready to send the configuration to the device</string>
     <string name="switch_to_config">1. Switch your device to CONFIG</string>
-    <string name="max_volume">2. Set the volume of your phone to low-middle level</string>
+    <string name="max_volume">2. Set the volume of your phone to high level</string>
     <string name="hold_device">3. Hold the device close to your phone speaker</string>
     <string name="no_retry">No, Retry</string>
     <string name="did_green_flash">Did the green LED flash on completion?</string>
