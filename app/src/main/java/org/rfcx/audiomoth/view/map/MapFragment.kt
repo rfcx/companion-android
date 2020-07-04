@@ -46,10 +46,12 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.DeploymentState.AudioMoth
 import org.rfcx.audiomoth.entity.Locate
+import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
 import org.rfcx.audiomoth.entity.response.DeploymentResponse
 import org.rfcx.audiomoth.entity.response.LocationResponse
 import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
+import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.repo.ResponseCallback
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
@@ -69,13 +71,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     // database manager
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val deploymentDb by lazy { DeploymentDb(realm) }
+    private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
 
     // data
+    private var guardianDeployments = listOf<GuardianDeployment>()
     private var deployments = listOf<Deployment>()
     private var locations = listOf<Locate>()
     private var lastSyncingInfo: SyncInfo? = null
 
+    private lateinit var guardianDeployLiveData: LiveData<List<GuardianDeployment>>
     private lateinit var deployLiveData: LiveData<List<Deployment>>
     private lateinit var locateLiveData: LiveData<List<Locate>>
     private lateinit var deploymentWorkInfoLiveData: LiveData<List<WorkInfo>>
@@ -171,6 +176,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setupImages(style: Style) {
+        val drawablePinGuardian =
+            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map, null)
+        val mBitmapPinGuardian = BitmapUtils.getBitmapFromDrawable(drawablePinGuardian)
+        if (mBitmapPinGuardian != null) {
+            style.addImage(PROPERTY_MARKER_GUARDIAN_PIN, mBitmapPinGuardian)
+        }
         val drawablePinMapGreen =
             ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map, null)
         val mBitmapPinMapGreen = BitmapUtils.getBitmapFromDrawable(drawablePinMapGreen)
@@ -277,6 +288,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    private val guardianDeploymentObserve = Observer<List<GuardianDeployment>> {
+        this.guardianDeployments = it
+        combinedData()
+    }
+
     private val deploymentObserve = Observer<List<Deployment>> {
         this.deployments = it
         combinedData()
@@ -309,6 +325,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun fetchData() {
+        guardianDeployLiveData = Transformations.map(guardianDeploymentDb.getAllResultsAsync().asLiveData()) {
+            it
+        }
+        guardianDeployLiveData.observeForever(guardianDeploymentObserve)
+
         deployLiveData = Transformations.map(deploymentDb.getAllResultsAsync().asLiveData()) {
             it
         }
@@ -543,6 +564,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     override fun onDestroy() {
         super.onDestroy()
         deploymentWorkInfoLiveData.removeObserver(workInfoObserve)
+        guardianDeployLiveData.removeObserver(guardianDeploymentObserve)
         deployLiveData.removeObserver(deploymentObserve)
         locateLiveData.removeObserver(locateObserve)
         mapView.onDestroy()
@@ -575,7 +597,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         private const val PROPERTY_MARKER_TITLE = "title"
         private const val PROPERTY_MARKER_DEPLOYMENT_ID = "deployment"
         private const val PROPERTY_MARKER_CAPTION = "caption"
-        private const val PROPERTY_MARKER_IMAGE = "marker-image"
+        private const val PROPERTY_MARKER_IMAGE = "marker.image"
+        private const val PROPERTY_MARKER_GUARDIAN_PIN = "marker.guardian.pin"
 
         fun newInstance(): MapFragment {
             return MapFragment()
