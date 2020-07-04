@@ -69,7 +69,7 @@
     <string name="max_volume">2. Set the volume of your phone to high level</string>
     <string name="hold_device">3. Hold the device close to your phone speaker</string>
     <string name="no_retry">No, Retry</string>
-    <string name="did_green_flash">Did the green LED flash on completion?</string>
+    <string name="did_green_flash">Did you see the solid green light on completion?</string>
     <string name="yes">Yes</string>
     <string name="ready_send_configuration">Ready to send the configuration to the device</string>
 
@@ -86,7 +86,7 @@
     <string name="test">test</string>
     <string name="skip">Skip</string>
     <string name="it_full">or, if it is full then:</string>
-    <string name="how_many_time">How many time did the green and red LED flash?</string>
+    <string name="red_flash">How many time did the red LED flash?</string>
     <string name="try_again">try again</string>
     <string name="device_configured">Device configured! \nNow let’s verify the battery level</string>
     <string name="days">Estimated battery duration: %s days</string>
