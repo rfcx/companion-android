@@ -29,9 +29,11 @@ import org.rfcx.audiomoth.view.deployment.guardian.deploy.GuardianDeployFragment
 import org.rfcx.audiomoth.view.deployment.guardian.sync.GuardianSyncFragment
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
 import org.rfcx.audiomoth.view.deployment.sync.SyncFragment.Companion.BEFORE_SYNC
+import org.rfcx.audiomoth.view.dialog.CompleteFragment
+import org.rfcx.audiomoth.view.dialog.CompleteListener
 import java.util.*
 
-class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtocol {
+class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtocol, CompleteListener {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val locateDb by lazy { LocateDb(realm) }
@@ -169,7 +171,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             deploymentDb.updateDeployment(it)
 
             GuardianDeploymentSyncWorker.enqueue(this@GuardianDeploymentActivity)
-            finish()
+            showComplete()
         }
     }
 
@@ -237,10 +239,23 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         loadingDialog.show(supportFragmentManager, loadingDialogTag)
     }
 
+    private fun showComplete() {
+        val completeFragment: CompleteFragment =
+            supportFragmentManager.findFragmentByTag(CompleteFragment.tag) as CompleteFragment?
+                ?: run {
+                    CompleteFragment()
+                }
+        completeFragment.show(supportFragmentManager, CompleteFragment.tag)
+    }
+
     private fun hideLoading() {
         val loadingDialog: LoadingDialogFragment? =
             supportFragmentManager.findFragmentByTag(loadingDialogTag) as LoadingDialogFragment?
         loadingDialog?.dismissDialog()
+    }
+
+    override fun onAnimationEnd() {
+        finish()
     }
 
     companion object {
