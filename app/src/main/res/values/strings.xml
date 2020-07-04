@@ -66,10 +66,10 @@
     <string name="syncing">Syncing</string>
     <string name="ready_to_send">Ready to send the configuration to the device</string>
     <string name="switch_to_config">1. Switch your device to CONFIG</string>
-    <string name="max_volume">2. Set the volume of your phone to low-middle level</string>
+    <string name="max_volume">2. Set the volume of your phone to high level</string>
     <string name="hold_device">3. Hold the device close to your phone speaker</string>
     <string name="no_retry">No, Retry</string>
-    <string name="did_green_flash">Did the green LED flash on completion?</string>
+    <string name="did_green_flash">Did you see the solid green light on completion?</string>
     <string name="yes">Yes</string>
     <string name="ready_send_configuration">Ready to send the configuration to the device</string>
 
@@ -86,7 +86,7 @@
     <string name="test">test</string>
     <string name="skip">Skip</string>
     <string name="it_full">or, if it is full then:</string>
-    <string name="how_many_time">How many time did the green and red LED flash?</string>
+    <string name="red_flash">How many time did the red LED flash?</string>
     <string name="try_again">try again</string>
     <string name="device_configured">Device configured! \nNow let’s verify the battery level</string>
     <string name="days">Estimated battery duration: %s days</string>
@@ -182,7 +182,7 @@
     <string name="not_found">Not found any guardians nearby</string>
 
     <!-- GuardianSelectProfileFragment -->
-    <string name="profile_default">Default</string>
+    <string name="profile_default">Current configuration</string>
     <string name="configuration_details">%s, %d kHz, %d kbs, %d secs</string>
 
     <!-- GuardianConfigureFragment -->
@@ -190,6 +190,7 @@
     <string name="duration">Duration (per audio)</string>
     <string name="choose_bitrate">Choose bitrate (kbs)</string>
     <string name="choose_file_format">Choose file format</string>
+    <string name="choose_duration_cycle">Choose record duration cycle (secs)</string>
     <string name="kilobytes">%s kbs</string>
 
     <!-- GuardianPreferences -->

@@ -101,13 +101,13 @@
                     android:layout_height="wrap_content"
                     android:text="@string/duration" />
 
-                <EditText
-                    android:id="@+id/durationValueEditText"
+                <TextView
+                    android:id="@+id/durationValueTextView"
                     style="@style/AudioMothText.Body.Secondary"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingBottom="@dimen/margin_padding_small"
-                    tools:text="90" />
+                    tools:text="90 secs" />
 
                 <View
                     android:layout_width="match_parent"

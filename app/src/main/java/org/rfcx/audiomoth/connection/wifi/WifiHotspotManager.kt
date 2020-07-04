@@ -21,6 +21,7 @@ class WifiHotspotManager(private val context: Context) {
     private var wifiManager: WifiManager? = null
     private lateinit var wifiScanReceiver: WifiScanReceiver
     private lateinit var wifiConnectionReceiver: WifiConnectionReceiver
+    private var isConnected = false
 
     fun nearbyHotspot(onWifiListener: OnWifiListener) {
         wifiManager =
@@ -116,7 +117,10 @@ class WifiHotspotManager(private val context: Context) {
             val netInfo = conManager.activeNetworkInfo
             if (netInfo != null && netInfo.isConnected && netInfo.type == ConnectivityManager.TYPE_WIFI) {
                 Log.d("WifiHotspot", "Connected to hotspot")
-                onWifiListener.onWifiConnected()
+                if (!isConnected) {
+                    onWifiListener.onWifiConnected()
+                    isConnected = true
+                }
             }
         }
 
