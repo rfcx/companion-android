@@ -27,7 +27,7 @@ class DeploymentDb(private val realm: Realm) {
             .findAllAsync()
     }
 
-    fun insertOrUpdateDeployment(deployment: Deployment, location: DeploymentLocation): Int {
+    fun insertOrUpdate(deployment: Deployment, location: DeploymentLocation): Int {
         var id = deployment.id
         realm.executeTransaction {
             if (deployment.id == 0) {
@@ -73,13 +73,6 @@ class DeploymentDb(private val realm: Realm) {
                 deploymentObj.id = id
                 it.insert(deploymentObj)
             }
-        }
-    }
-
-    fun updateDeployment(deploymentResponse: DeploymentResponse) {
-        realm.executeTransaction {
-
-
         }
     }
 

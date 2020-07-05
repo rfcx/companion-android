@@ -5,12 +5,15 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
+import org.rfcx.audiomoth.entity.Device
 import org.rfcx.audiomoth.entity.User
 import org.rfcx.audiomoth.entity.request.*
 import org.rfcx.audiomoth.entity.response.DeploymentResponse
+import org.rfcx.audiomoth.entity.response.GuardianDeploymentResponse
 import org.rfcx.audiomoth.entity.response.LocationResponse
 import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
+import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.audiomoth.util.Preferences
 import org.rfcx.audiomoth.util.Storage
 import org.rfcx.audiomoth.util.getEmailUser
@@ -73,17 +76,25 @@ class Firestore(val context: Context) {
 
     fun retrieveDeployments(
         deploymentDb: DeploymentDb,
-        callback: ResponseCallback<List<DeploymentResponse>>
+        guardianDeploymentDb: GuardianDeploymentDb,
+        callback: ResponseCallback<Boolean>? = null
     ) {
         val userDocument = db.collection(COLLECTION_USERS).document(guid)
         userDocument.collection(COLLECTION_DEPLOYMENTS).get()
             .addOnSuccessListener {
                 val deploymentResponses = arrayListOf<DeploymentResponse>()
+                val gdResponses = arrayListOf<GuardianDeploymentResponse>()
                 it.documents.forEach { doc ->
-                    if (doc != null) {
-                        val deploymentResponse = doc.toObject(DeploymentResponse::class.java)
-                        deploymentResponse?.serverId = doc.id
-                        deploymentResponse?.let { it1 -> deploymentResponses.add(it1) }
+                    if (doc == null) return@forEach
+
+                    if (doc.getString("device") == Device.GUARDIAN.value) {
+                        val response = doc.toObject(GuardianDeploymentResponse::class.java)
+                        response?.serverId = doc.id
+                        response?.let { it1 -> gdResponses.add(it1) }
+                    } else {
+                        val response = doc.toObject(DeploymentResponse::class.java)
+                        response?.serverId = doc.id
+                        response?.let { it1 -> deploymentResponses.add(it1) }
                     }
                 }
 
@@ -91,14 +102,23 @@ class Firestore(val context: Context) {
                 deploymentResponses.forEach { dr ->
                     deploymentDb.insertOrUpdate(dr)
                 }
-                callback.onSuccessCallback(deploymentResponses)
+
+                // verify response and store guardian deployment
+                gdResponses.forEach { dr ->
+                    guardianDeploymentDb.insertOrUpdate(dr)
+                }
+
+                callback?.onSuccessCallback(true)
             }
             .addOnFailureListener {
-                callback.onFailureCallback(it.localizedMessage)
+                callback?.onFailureCallback(it.localizedMessage)
             }
     }
 
-    fun retrieveLocations(locateDb: LocateDb, callback: ResponseCallback<List<LocationResponse>>) {
+    fun retrieveLocations(
+        locateDb: LocateDb,
+        callback: ResponseCallback<List<LocationResponse>>? = null
+    ) {
         val userDocument = db.collection(COLLECTION_USERS).document(guid)
         userDocument.collection(COLLECTION_LOCATIONS).get()
             .addOnSuccessListener {
@@ -113,10 +133,10 @@ class Firestore(val context: Context) {
                 locationResponses.forEach { lr ->
                     locateDb.insertOrUpdate(lr)
                 }
-                callback.onSuccessCallback(locationResponses)
+                callback?.onSuccessCallback(locationResponses)
             }
             .addOnFailureListener {
-                callback.onFailureCallback(it.localizedMessage)
+                callback?.onFailureCallback(it.localizedMessage)
             }
     }
 

@@ -21,7 +21,6 @@ import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentImageDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianProfileDb
 import org.rfcx.audiomoth.service.GuardianDeploymentSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
-import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
 import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianConfigureFragment
 import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianSelectProfileFragment
 import org.rfcx.audiomoth.view.deployment.guardian.connect.ConnectGuardianFragment
@@ -29,9 +28,13 @@ import org.rfcx.audiomoth.view.deployment.guardian.deploy.GuardianDeployFragment
 import org.rfcx.audiomoth.view.deployment.guardian.sync.GuardianSyncFragment
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
 import org.rfcx.audiomoth.view.deployment.sync.SyncFragment.Companion.BEFORE_SYNC
+import org.rfcx.audiomoth.view.dialog.CompleteFragment
+import org.rfcx.audiomoth.view.dialog.CompleteListener
+import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
 import java.util.*
 
-class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtocol {
+class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtocol,
+    CompleteListener {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val locateDb by lazy { LocateDb(realm) }
@@ -104,7 +107,29 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     }
 
     override fun backStep() {
-        stepView.go(stepView.currentStep - 1, true)
+        when (currentStep) {
+            0 -> finish()
+            2 -> {
+                val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
+                if (container is GuardianConfigureFragment) {
+                    startFragment(GuardianSelectProfileFragment.newInstance())
+                } else {
+                    currentStep = stepView.currentStep - 1
+                    stepView.go(currentStep, true)
+                    handleFragment(currentStep)
+                }
+            }
+            4 -> {
+                currentStep = 2
+                stepView.go(currentStep, true)
+                startFragment(GuardianConfigureFragment.newInstance())
+            }
+            else -> {
+                currentStep = stepView.currentStep - 1
+                stepView.go(currentStep, true)
+                handleFragment(currentStep)
+            }
+        }
     }
 
     override fun hideStepView() {
@@ -169,7 +194,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             deploymentDb.updateDeployment(it)
 
             GuardianDeploymentSyncWorker.enqueue(this@GuardianDeploymentActivity)
-            finish()
+            showComplete()
         }
     }
 
@@ -237,10 +262,27 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         loadingDialog.show(supportFragmentManager, loadingDialogTag)
     }
 
+    private fun showComplete() {
+        val completeFragment: CompleteFragment =
+            supportFragmentManager.findFragmentByTag(CompleteFragment.tag) as CompleteFragment?
+                ?: run {
+                    CompleteFragment()
+                }
+        completeFragment.show(supportFragmentManager, CompleteFragment.tag)
+    }
+
     private fun hideLoading() {
         val loadingDialog: LoadingDialogFragment? =
             supportFragmentManager.findFragmentByTag(loadingDialogTag) as LoadingDialogFragment?
         loadingDialog?.dismissDialog()
+    }
+
+    override fun onBackPressed() {
+        backStep()
+    }
+
+    override fun onAnimationEnd() {
+        finish()
     }
 
     companion object {

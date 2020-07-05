@@ -75,8 +75,10 @@
             android:id="@+id/locationNameEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxLines="1"
             android:textColor="@color/text_primary"
+            android:lines="1"
+            android:inputType="text"
+            android:imeOptions="actionDone"
             android:textSize="@dimen/text_small" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -124,7 +126,9 @@
             android:id="@+id/latitudeEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxLines="1"
+            android:lines="1"
+            android:inputType="text"
+            android:imeOptions="actionDone"
             android:textColor="@color/text_primary"
             android:textSize="@dimen/text_small" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -150,7 +154,9 @@
             android:id="@+id/longitudeEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxLines="1"
+            android:lines="1"
+            android:inputType="text"
+            android:imeOptions="actionDone"
             android:textColor="@color/text_primary"
             android:textSize="@dimen/text_small" />
     </com.google.android.material.textfield.TextInputLayout>

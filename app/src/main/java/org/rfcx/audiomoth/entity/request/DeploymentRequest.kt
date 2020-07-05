@@ -3,9 +3,11 @@ package org.rfcx.audiomoth.entity.request
 import org.rfcx.audiomoth.entity.Configuration
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.DeploymentLocation
+import org.rfcx.audiomoth.entity.Device
 import java.util.*
 
 data class DeploymentRequest(
+    var device: String,
     var batteryDepletedAt: Date = Date(),
     var batteryLevel: Int = 0,
     var deployedAt: Date = Date(),
@@ -16,6 +18,7 @@ data class DeploymentRequest(
 
 fun Deployment.toRequestBody(): DeploymentRequest {
     return DeploymentRequest(
+        device = Device.EDGE.value,
         batteryDepletedAt = this.batteryDepletedAt,
         batteryLevel = this.batteryLevel,
         deployedAt = this.deployedAt,

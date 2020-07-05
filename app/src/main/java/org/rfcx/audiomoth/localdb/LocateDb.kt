@@ -1,6 +1,5 @@
 package org.rfcx.audiomoth.localdb
 
-import android.util.Log
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
@@ -8,9 +7,7 @@ import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.SyncState
 import org.rfcx.audiomoth.entity.response.LocationResponse
-import org.rfcx.audiomoth.entity.response.toDeployment
 import org.rfcx.audiomoth.entity.response.toLocate
-import java.util.*
 
 class LocateDb(private val realm: Realm) {
 
@@ -71,25 +68,43 @@ class LocateDb(private val realm: Realm) {
         }
     }
 
-    fun insertOrUpdateLocate(deploymentId: Int, locate: Locate) {
+    fun insertOrUpdateLocate(deploymentId: Int, locate: Locate, isGuardian: Boolean = false) {
         realm.executeTransaction {
             if (locate.id == 0) {
                 val id = (realm.where(Locate::class.java).max(Locate.FIELD_ID)
                     ?.toInt() ?: 0) + 1
                 locate.id = id
             }
-            // update last deployment
-            locate.lastDeployment = deploymentId
+            // new last deployment?
+            if (!isGuardian) {
+                locate.lastDeploymentId = deploymentId
+                locate.lastGuardianDeploymentId = 0
+                locate.lastGuardianDeploymentServerId = null
+            } else {
+                locate.lastGuardianDeploymentId = deploymentId
+                locate.lastDeploymentId = 0
+                locate.lastGuardianDeploymentServerId = null
+            }
             it.insertOrUpdate(locate)
         }
     }
 
-    fun updateDeploymentServerId(deploymentId: Int, deploymentServerId: String) {
-        Log.e("LocationSyncWorker","$deploymentId  $deploymentServerId")
+    fun updateDeploymentServerId(
+        deploymentId: Int,
+        deploymentServerId: String,
+        isGuardian: Boolean = false
+    ) {
         realm.executeTransaction {
-            it.where(Locate::class.java).equalTo("lastDeployment", deploymentId)
+            it.where(Locate::class.java).equalTo(
+                if (!isGuardian) "lastDeploymentId" else "lastGuardianDeploymentId",
+                deploymentId
+            )
                 .findFirst()?.apply {
-                    lastDeploymentServerId = deploymentServerId
+                    if (!isGuardian) {
+                        lastDeploymentServerId = deploymentServerId
+                    } else {
+                        lastGuardianDeploymentServerId = deploymentServerId
+                    }
                     // set sync state to unsent after deploymentServerId have been change
                     syncState = SyncState.Unsent.key
                 }
@@ -106,10 +121,11 @@ class LocateDb(private val realm: Realm) {
             if (location != null) {
                 location.serverId = locationResponse.serverId
                 location.name = locationResponse.name ?: location.name
-                location.latitude = locationResponse.latitude ?:location.latitude
+                location.latitude = locationResponse.latitude ?: location.latitude
                 location.longitude = locationResponse.longitude ?: location.longitude
                 location.createdAt = locationResponse.createdAt ?: location.createdAt
                 location.lastDeploymentServerId = locationResponse.lastDeploymentServerId
+                location.lastGuardianDeploymentServerId = locationResponse.lastDeploymentServerId
             } else {
                 val locate = locationResponse.toLocate()
                 val id = (it.where(Locate::class.java).max(Deployment.FIELD_ID)

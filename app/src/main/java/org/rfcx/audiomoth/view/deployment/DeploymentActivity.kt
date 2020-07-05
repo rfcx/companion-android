@@ -112,7 +112,13 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
     }
 
     override fun backStep() {
-        stepView.go(stepView.currentStep - 1, true)
+        if (currentStep == 0) {
+            finish()
+        } else {
+            currentStep = stepView.currentStep - 1
+            stepView.go(currentStep, true)
+            handleFragment(currentStep)
+        }
     }
 
     override fun getDeployment(): Deployment? = this._deployment
@@ -145,7 +151,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         deployment.state = DeploymentState.AudioMoth.Locate.key // state
 
         this._deployLocation = locate.asDeploymentLocation()
-        val deploymentId = deploymentDb.insertOrUpdateDeployment(deployment, _deployLocation!!)
+        val deploymentId = deploymentDb.insertOrUpdate(deployment, _deployLocation!!)
         locateDb.insertOrUpdateLocate(deploymentId, locate) // update locate - last deployment
         setDeployment(deployment)
     }
@@ -340,6 +346,10 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
 
     override fun onAnimationEnd() {
         finish()
+    }
+
+    override fun onBackPressed() {
+        backStep()
     }
 
     companion object {

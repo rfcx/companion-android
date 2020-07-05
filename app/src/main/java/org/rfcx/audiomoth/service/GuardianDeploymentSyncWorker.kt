@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.work.*
 import io.realm.Realm
 import org.rfcx.audiomoth.entity.request.toRequestBody
-import org.rfcx.audiomoth.localdb.DeploymentDb
+import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.service.images.ImageSyncWorker
@@ -22,6 +22,7 @@ class GuardianDeploymentSyncWorker(val context: Context, params: WorkerParameter
         Log.d(TAG, "doWork")
 
         val db = GuardianDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
+        val locateDb = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val firestore = Firestore(context)
         val deployments = db.lockUnsent()
 
@@ -35,6 +36,7 @@ class GuardianDeploymentSyncWorker(val context: Context, params: WorkerParameter
             if (result != null) {
                 Log.d(TAG, "doWork: success ${it.id}")
                 db.markSent(result.id, it.id)
+                locateDb.updateDeploymentServerId(it.id, result.id, true)
             } else {
                 Log.d(TAG, "doWork: failed ${it.id}")
                 db.markUnsent(it.id)
@@ -43,6 +45,7 @@ class GuardianDeploymentSyncWorker(val context: Context, params: WorkerParameter
         }
 
         ImageSyncWorker.enqueue(context)
+        LocationSyncWorker.enqueue(context)
 
         return if (someFailed) Result.retry() else Result.success()
     }

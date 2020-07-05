@@ -217,16 +217,10 @@ class ConfigureFragment : Fragment(),
     }
 
     private fun setupData() {
-        val timeRecordingPeriod = arrayListOf<String>()
-        recordingPeriod = if (customRecordingPeriod) {
-            timeState.forEach { timeStatus ->
-                if (timeStatus.state) {
-                    timeRecordingPeriod.add(timeStatus.time)
-                }
+        timeState.forEach { timeStatus ->
+            if (timeStatus.state) {
+                recordingPeriod.add(timeStatus.time)
             }
-            timeRecordingPeriod
-        } else {
-            arrayListOf()
         }
 
         when (durationSelected) {
