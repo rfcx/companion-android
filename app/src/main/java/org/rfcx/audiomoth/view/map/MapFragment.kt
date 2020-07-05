@@ -418,7 +418,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 Pair(PROPERTY_MARKER_TITLE, it.locationName),
                 Pair(PROPERTY_MARKER_DEPLOYMENT_ID, it.id.toString()),
                 Pair(PROPERTY_MARKER_CAPTION, it.description),
-                Pair(PROPERTY_MARKER_DEVICE, Device.EDGE.value)
+                Pair(PROPERTY_MARKER_DEVICE, it.device)
             )
             Feature.fromGeometry(
                 Point.fromLngLat(it.longitude, it.latitude), properties.toJsonObject()
@@ -471,7 +471,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun moveCamera(latLng: LatLng) {
-        Log.d("Map", "move camera $latLng")
         mapboxMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0))
     }
 
