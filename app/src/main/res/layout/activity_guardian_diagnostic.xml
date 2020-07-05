@@ -83,7 +83,7 @@
                     app:layout_constraintTop_toBottomOf="@id/diagnosticLocationTitle" />
 
                 <TextView
-                    android:id="@+id/locationLatgitudeValue"
+                    android:id="@+id/locationLatitudeValue"
                     style="@style/GuardianText.Label.Value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

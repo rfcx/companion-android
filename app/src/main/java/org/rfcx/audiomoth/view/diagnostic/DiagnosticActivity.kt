@@ -14,6 +14,7 @@ import kotlinx.android.synthetic.main.activity_guardian_diagnostic.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.OnReceiveResponse
 import org.rfcx.audiomoth.connection.socket.SocketManager
+import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.guardian.toReadableFormat
 import org.rfcx.audiomoth.entity.socket.DiagnosticResponse
 import org.rfcx.audiomoth.entity.socket.SocketResposne
@@ -74,18 +75,18 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
     }
 
     private fun setupToolbar() {
-        //TODO: waiting for pin feature work, so we can use location name here
         setSupportActionBar(diagnosticToolbar)
         supportActionBar?.apply {
             setDisplayShowTitleEnabled(true)
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
-            title = "Location1"
+            title = intent.extras?.getString(LOCATION_NAME)
         }
     }
 
     private fun setupLocationData() {
-        //TODO: waiting for pin feature work, so we can use latitude longitude here
+        locationLongitudeValue.text = intent.extras?.getDouble(LONG).toString()
+        locationLatitudeValue.text = intent.extras?.getDouble(LAT).toString()
     }
 
     private fun retrieveDiagnosticInfo() {
@@ -228,13 +229,25 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        this.prefsEditor!!.clear().apply()
+        this.prefsEditor?.clear()?.apply()
     }
 
 
     companion object {
+        const val LAT = "latitude"
+        const val LONG = "longitude"
+        const val LOCATION_NAME = "location_name"
+
         fun startActivity(context: Context) {
             val intent = Intent(context, DiagnosticActivity::class.java)
+            context.startActivity(intent)
+        }
+
+        fun startActivity(context: Context, location: DeploymentLocation) {
+            val intent = Intent(context, DiagnosticActivity::class.java)
+            intent.putExtra(LOCATION_NAME, location.name)
+            intent.putExtra(LAT, location.latitude)
+            intent.putExtra(LONG, location.longitude)
             context.startActivity(intent)
         }
     }
