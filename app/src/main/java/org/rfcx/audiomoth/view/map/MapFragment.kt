@@ -408,6 +408,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun handleMarkerDeployment(deploymentMarkers: List<DeploymentMarker>) {
+        Log.d("Map", "handleMarkerDeployment ${deploymentMarkers.size}")
+
         // Create point
         val pointFeatures = deploymentMarkers.map {
             val properties = mapOf(
@@ -452,14 +454,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         deploymentFeatures = FeatureCollection.fromFeatures(pointFeatures)
         refreshSource()
 
-        val lastDeployment = deployments.lastOrNull()
-        if (lastDeployment?.location != null) {
-            moveCamera(
-                LatLng(
-                    lastDeployment.location!!.latitude,
-                    lastDeployment.location!!.longitude
-                )
-            )
+        val lastDeployment = deploymentMarkers.lastOrNull()
+        if (lastDeployment != null) {
+            moveCamera(LatLng(lastDeployment.latitude, lastDeployment.longitude))
         }
     }
 
@@ -474,6 +471,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun moveCamera(latLng: LatLng) {
+        Log.d("Map", "move camera $latLng")
         mapboxMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0))
     }
 
