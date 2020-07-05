@@ -25,7 +25,7 @@ class Firestore(val context: Context) {
     /* TODO: update get user */
     private val preferences =
         Preferences.getInstance(context)
-    private val guid = preferences.getString(Preferences.USER_GUID, "")
+    private val guid = "b256f832-dc4b-44d8-a6f9-c5a55bb5f5c1"
     private val feedbackDocument = db.collection(COLLECTION_FEEDBACK)
 
     fun saveUser(user: User, guid: String, callback: (String?, Boolean) -> Unit) {

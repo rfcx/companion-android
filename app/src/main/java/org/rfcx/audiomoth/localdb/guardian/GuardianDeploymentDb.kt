@@ -46,7 +46,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
         realm.executeTransaction {
             val deployment =
                 it.where(GuardianDeployment::class.java)
-                    .equalTo(Deployment.FIELD_SERVER_ID, deploymentResponse.serverId)
+                    .equalTo(GuardianDeployment.FIELD_SERVER_ID, deploymentResponse.serverId)
                     .findFirst()
 
             if (deployment != null) {

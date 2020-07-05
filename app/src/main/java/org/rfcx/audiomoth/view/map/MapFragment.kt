@@ -46,7 +46,7 @@ import kotlinx.android.synthetic.main.layout_map_window_info.view.*
 import org.rfcx.audiomoth.MainActivityListener
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Deployment
-import org.rfcx.audiomoth.entity.DeploymentState.AudioMoth
+import org.rfcx.audiomoth.entity.DeploymentState.Edge
 import org.rfcx.audiomoth.entity.Device
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
@@ -546,12 +546,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun Deployment.toMark(): DeploymentMarker {
-        val pinImage = if (state == AudioMoth.ReadyToUpload.key)
+        val pinImage = if (state == Edge.ReadyToUpload.key)
             Battery.getBatteryPinImage(batteryDepletedAt.time)
         else
             Battery.BATTERY_PIN_GREY
 
-        val description = if (state >= AudioMoth.ReadyToUpload.key)
+        val description = if (state >= Edge.ReadyToUpload.key)
             Battery.getPredictionBattery(batteryDepletedAt.time)
         else
             getString(R.string.format_in_progress_step)

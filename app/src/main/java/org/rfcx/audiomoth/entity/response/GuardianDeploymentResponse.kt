@@ -19,7 +19,7 @@ fun GuardianDeploymentResponse.toGuardianDeployment(): GuardianDeployment {
     return GuardianDeployment(
         serverId = this.serverId,
         deployedAt = this.deployedAt ?: Date(),
-        state = DeploymentState.AudioMoth.ReadyToUpload.key,
+        state = DeploymentState.Guardian.ReadyToUpload.key,
         configuration = this.configuration,
         location = this.location,
         createdAt = this.createdAt ?: Date(),

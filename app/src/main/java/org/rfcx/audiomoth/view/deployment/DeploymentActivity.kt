@@ -148,7 +148,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
 
     override fun setDeployLocation(locate: Locate) {
         val deployment = _deployment ?: Deployment()
-        deployment.state = DeploymentState.AudioMoth.Locate.key // state
+        deployment.state = DeploymentState.Edge.Locate.key // state
 
         this._deployLocation = locate.asDeploymentLocation()
         val deploymentId = deploymentDb.insertOrUpdate(deployment, _deployLocation!!)
@@ -179,7 +179,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         showLoading()
         _deployment?.let {
             it.deployedAt = Date()
-            it.state = DeploymentState.AudioMoth.ReadyToUpload.key
+            it.state = DeploymentState.Edge.ReadyToUpload.key
             setDeployment(it)
 
             deploymentImageDb.insertImage(it, images)
@@ -262,23 +262,23 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         // setup fragment for current step
         when (currentStep) {
             0 -> {
-                updateDeploymentState(DeploymentState.AudioMoth.Locate)
+                updateDeploymentState(DeploymentState.Edge.Locate)
                 startFragment(LocationFragment.newInstance())
             }
             1 -> {
-                updateDeploymentState(DeploymentState.AudioMoth.Config)
+                updateDeploymentState(DeploymentState.Edge.Config)
                 handleSelectingConfig()
             }
             2 -> {
-                updateDeploymentState(DeploymentState.AudioMoth.Sync)
+                updateDeploymentState(DeploymentState.Edge.Sync)
                 startFragment(SyncFragment.newInstance(BEFORE_SYNC))
             }
             3 -> {
-                updateDeploymentState(DeploymentState.AudioMoth.Verify)
+                updateDeploymentState(DeploymentState.Edge.Verify)
                 startFragment(PerformBatteryFragment.newInstance(TEST_BATTERY, null))
             }
             4 -> {
-                updateDeploymentState(DeploymentState.AudioMoth.Deploy)
+                updateDeploymentState(DeploymentState.Edge.Deploy)
                 startFragment(DeployFragment.newInstance())
             }
         }
@@ -315,7 +315,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
             .commit()
     }
 
-    private fun updateDeploymentState(state: DeploymentState.AudioMoth) {
+    private fun updateDeploymentState(state: DeploymentState.Edge) {
         this._deployment?.state = state.key
         this._deployment?.let { deploymentDb.updateDeployment(it) }
     }
