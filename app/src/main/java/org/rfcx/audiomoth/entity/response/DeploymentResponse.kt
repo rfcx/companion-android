@@ -38,7 +38,6 @@ data class ConfigurationResponse(
     }
 }
 
-
 fun DeploymentResponse.toDeployment(): Deployment {
     return Deployment(
         serverId = this.serverId,

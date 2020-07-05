@@ -6,9 +6,11 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.PointF
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
@@ -45,20 +47,16 @@ import org.rfcx.audiomoth.MainActivityListener
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.DeploymentState.AudioMoth
+import org.rfcx.audiomoth.entity.Device
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
-import org.rfcx.audiomoth.entity.response.DeploymentResponse
-import org.rfcx.audiomoth.entity.response.LocationResponse
 import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.audiomoth.repo.Firestore
-import org.rfcx.audiomoth.repo.ResponseCallback
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
 import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity
-import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentActivity
-import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
 
 class MapFragment : Fragment(), OnMapReadyCallback {
     // map
@@ -161,7 +159,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 val features = mapboxMap.queryRenderedFeatures(screenPoint, WINDOW_DEPLOYMENT_ID)
                 if (features.isNotEmpty()) {
                     val feature = features[0]
-                    handleClickCallout(feature)
+                    val device = feature.getStringProperty(PROPERTY_MARKER_DEVICE)
+                    if (device == Device.EDGE.value) {
+                        handlePressedDeployment(feature)
+                    } else {
+                        handlePressedGuardianDeployment(feature)
+                    }
+                    true
                 } else {
                     handleClickIcon(mapboxMap.projection.toScreenLocation(latLng))
                 }
@@ -180,8 +184,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map, null)
         val mBitmapPinGuardian = BitmapUtils.getBitmapFromDrawable(drawablePinGuardian)
         if (mBitmapPinGuardian != null) {
-            style.addImage(PROPERTY_MARKER_GUARDIAN_PIN, mBitmapPinGuardian)
+            style.addImage(MARKER_GUARDIAN_PIN, mBitmapPinGuardian)
         }
+
         val drawablePinMapGreen =
             ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map, null)
         val mBitmapPinMapGreen = BitmapUtils.getBitmapFromDrawable(drawablePinMapGreen)
@@ -235,7 +240,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         style.addLayer(markerLayer)
     }
 
-    private fun handleClickCallout(feature: Feature): Boolean {
+    private fun handlePressedGuardianDeployment(feature: Feature) {
+        Toast.makeText(context, "Pressed GuardianDeployment", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun handlePressedDeployment(feature: Feature) {
         val deployment =
             deploymentDb.getDeploymentById(feature.getProperty(PROPERTY_MARKER_DEPLOYMENT_ID).asInt)
         if (deployment != null) {
@@ -248,7 +257,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 }
             }
         }
-        return true
     }
 
     private fun handleClickIcon(screenPoint: PointF): Boolean {
@@ -307,27 +315,30 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         // hide loading progress
         progressBar.visibility = View.INVISIBLE
 
-        val showLocations =
-            locations.filter { it.lastDeploymentId != 0 || it.lastDeploymentServerId != null }
+        val showLocations = locations.filter { it.isCompleted() }
         val showDeployIds = showLocations.mapTo(arrayListOf(), {
-            if (it.lastDeploymentServerId != null) {
-                it.lastDeploymentServerId
-            } else {
-                it.lastDeploymentId
-            }
+            it.getLastDeploymentId()
         })
 
         val showDeployments = this.deployments.filter {
-            showDeployIds.contains(it.id) || showDeployIds.contains(it.serverId)
+            showDeployIds.contains(it.serverId) || showDeployIds.contains(it.id.toString())
         }
 
-        handleMarkerDeployment(showDeployments)
+        val showGuardianDeployments = this.guardianDeployments.filter {
+            showDeployIds.contains(it.serverId) || showDeployIds.contains(it.id.toString())
+        }
+
+        val deploymentMarkers = showDeployments.map { it.toMark() }
+        val guardianDeploymentMarkers = showGuardianDeployments.map { it.toMark() }
+
+        handleMarkerDeployment(deploymentMarkers + guardianDeploymentMarkers)
     }
 
     private fun fetchData() {
-        guardianDeployLiveData = Transformations.map(guardianDeploymentDb.getAllResultsAsync().asLiveData()) {
-            it
-        }
+        guardianDeployLiveData =
+            Transformations.map(guardianDeploymentDb.getAllResultsAsync().asLiveData()) {
+                it
+            }
         guardianDeployLiveData.observeForever(guardianDeploymentObserve)
 
         deployLiveData = Transformations.map(deploymentDb.getAllResultsAsync().asLiveData()) {
@@ -342,36 +353,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         context?.let {
             retrieveDeployments(it)
+            retrieveLocations(it)
         }
     }
 
     private fun retrieveDeployments(context: Context) {
-        showLoading()
-        Firestore(context).retrieveDeployments(deploymentDb,
-            object : ResponseCallback<List<DeploymentResponse>> {
-                override fun onSuccessCallback(response: List<DeploymentResponse>) {
-                    retrieveLocations(context)
-                }
-
-                override fun onFailureCallback(errorMessage: String?) {
-                    hideLoading()
-                }
-            })
+        Firestore(context).retrieveDeployments(deploymentDb, guardianDeploymentDb)
     }
 
     private fun retrieveLocations(context: Context) {
-        Firestore(context).retrieveLocations(
-            locateDb,
-            object : ResponseCallback<List<LocationResponse>> {
-                override fun onSuccessCallback(response: List<LocationResponse>) {
-                    hideLoading()
-                    // update map
-                }
-
-                override fun onFailureCallback(errorMessage: String?) {
-                    hideLoading()
-                }
-            })
+        Firestore(context).retrieveLocations(locateDb)
     }
 
     private fun fetchJobSyncing() {
@@ -414,35 +405,21 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 listener?.showSnackbar(msg, Snackbar.LENGTH_LONG)
             }
         }
-
     }
 
-    private fun handleMarkerDeployment(deployments: List<Deployment>) {
+    private fun handleMarkerDeployment(deploymentMarkers: List<DeploymentMarker>) {
         // Create point
-        val pointFeatures = deployments.map {
-            val location = it.location!!
+        val pointFeatures = deploymentMarkers.map {
             val properties = mapOf(
-                Pair(PROPERTY_MARKER_LOCATION_ID, location.name),
-                Pair(
-                    PROPERTY_MARKER_IMAGE,
-                    if (it.state == AudioMoth.ReadyToUpload.key)
-                        Battery.getBatteryPinImage(it.batteryDepletedAt.time)
-                    else
-                        Battery.BATTERY_PIN_GREY
-                ),
-                Pair(PROPERTY_MARKER_TITLE, location.name),
+                Pair(PROPERTY_MARKER_LOCATION_ID, it.locationName),
+                Pair(PROPERTY_MARKER_IMAGE, it.pin),
+                Pair(PROPERTY_MARKER_TITLE, it.locationName),
                 Pair(PROPERTY_MARKER_DEPLOYMENT_ID, it.id.toString()),
-                Pair(
-                    PROPERTY_MARKER_CAPTION,
-                    if (it.state >= AudioMoth.ReadyToUpload.key)
-                        Battery.getPredictionBattery(it.batteryDepletedAt.time)
-                    else
-                        getString(R.string.format_in_progress_step)
-                )
+                Pair(PROPERTY_MARKER_CAPTION, it.description),
+                Pair(PROPERTY_MARKER_DEVICE, Device.EDGE.value)
             )
             Feature.fromGeometry(
-                Point.fromLngLat(location.longitude, location.latitude),
-                properties.toJsonObject()
+                Point.fromLngLat(it.longitude, it.latitude), properties.toJsonObject()
             )
         }
 
@@ -570,19 +547,35 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mapView.onDestroy()
     }
 
-    private fun showLoading() {
-        val loadingDialog: LoadingDialogFragment =
-            childFragmentManager.findFragmentByTag(GuardianDeploymentActivity.loadingDialogTag) as LoadingDialogFragment?
-                ?: run {
-                    LoadingDialogFragment()
-                }
-        loadingDialog.show(childFragmentManager, GuardianDeploymentActivity.loadingDialogTag)
+    private fun Deployment.toMark(): DeploymentMarker {
+        val pinImage = if (state == AudioMoth.ReadyToUpload.key)
+            Battery.getBatteryPinImage(batteryDepletedAt.time)
+        else
+            Battery.BATTERY_PIN_GREY
+
+        val description = if (state >= AudioMoth.ReadyToUpload.key)
+            Battery.getPredictionBattery(batteryDepletedAt.time)
+        else
+            getString(R.string.format_in_progress_step)
+
+        return DeploymentMarker(
+            id, location?.name ?: "",
+            location?.longitude ?: 0.0,
+            location?.latitude ?: 0.0,
+            pinImage, description, Device.EDGE.value
+        )
     }
 
-    private fun hideLoading() {
-        val loadingDialog: LoadingDialogFragment? =
-            childFragmentManager.findFragmentByTag(GuardianDeploymentActivity.loadingDialogTag) as LoadingDialogFragment?
-        loadingDialog?.dismissDialog()
+    private fun GuardianDeployment.toMark(): DeploymentMarker {
+        return DeploymentMarker(
+            id,
+            location?.name ?: "",
+            location?.longitude ?: 0.0,
+            location?.latitude ?: 0.0,
+            MARKER_GUARDIAN_PIN,
+            "-",
+            Device.GUARDIAN.value
+        )
     }
 
     companion object {
@@ -593,12 +586,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         private const val WINDOW_DEPLOYMENT_ID = "info.deployment"
 
         private const val PROPERTY_SELECTED = "selected"
+        private const val PROPERTY_MARKER_DEVICE = "device"
         private const val PROPERTY_MARKER_LOCATION_ID = "location"
         private const val PROPERTY_MARKER_TITLE = "title"
         private const val PROPERTY_MARKER_DEPLOYMENT_ID = "deployment"
         private const val PROPERTY_MARKER_CAPTION = "caption"
         private const val PROPERTY_MARKER_IMAGE = "marker.image"
-        private const val PROPERTY_MARKER_GUARDIAN_PIN = "marker.guardian.pin"
+        private const val MARKER_GUARDIAN_PIN = "guardian_pin"
 
         fun newInstance(): MapFragment {
             return MapFragment()

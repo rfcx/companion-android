@@ -24,6 +24,28 @@ open class Locate(
     var syncState: Int = 0
 ) : RealmModel {
 
+    fun isCompleted(): Boolean {
+        return lastDeploymentId != 0 || lastDeploymentServerId != null
+                || lastGuardianDeploymentId != 0 || lastGuardianDeploymentServerId != null
+    }
+
+    fun getLastDeploymentId(): String {
+        return when {
+            lastDeploymentServerId != null -> {
+                lastDeploymentServerId
+            }
+            lastDeploymentId != 0 -> {
+                lastDeploymentId
+            }
+            lastGuardianDeploymentServerId != null -> {
+                lastGuardianDeploymentServerId
+            }
+            else -> {
+                lastGuardianDeploymentId
+            }
+        }.toString()
+    }
+
     fun getLatLng(): LatLng = LatLng(latitude, longitude)
 
     fun asDeploymentLocation(): DeploymentLocation {

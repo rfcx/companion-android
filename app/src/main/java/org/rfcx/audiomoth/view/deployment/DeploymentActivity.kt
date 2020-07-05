@@ -151,7 +151,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         deployment.state = DeploymentState.AudioMoth.Locate.key // state
 
         this._deployLocation = locate.asDeploymentLocation()
-        val deploymentId = deploymentDb.insertOrUpdateDeployment(deployment, _deployLocation!!)
+        val deploymentId = deploymentDb.insertOrUpdate(deployment, _deployLocation!!)
         locateDb.insertOrUpdateLocate(deploymentId, locate) // update locate - last deployment
         setDeployment(deployment)
     }
