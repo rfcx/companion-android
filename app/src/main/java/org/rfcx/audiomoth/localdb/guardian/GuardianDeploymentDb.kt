@@ -6,6 +6,8 @@ import io.realm.RealmResults
 import io.realm.Sort
 import org.rfcx.audiomoth.entity.*
 import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
+import org.rfcx.audiomoth.entity.response.GuardianDeploymentResponse
+import org.rfcx.audiomoth.entity.response.toGuardianDeployment
 
 class GuardianDeploymentDb(private val realm: Realm) {
 
@@ -38,6 +40,38 @@ class GuardianDeploymentDb(private val realm: Realm) {
             it.insertOrUpdate(deployment)
         }
         return id
+    }
+
+    fun insertOrUpdate(deploymentResponse: GuardianDeploymentResponse) {
+        realm.executeTransaction {
+            val deployment =
+                it.where(GuardianDeployment::class.java)
+                    .equalTo(GuardianDeployment.FIELD_SERVER_ID, deploymentResponse.serverId)
+                    .findFirst()
+
+            if (deployment != null) {
+                deployment.serverId = deploymentResponse.serverId
+                deployment.deployedAt = deploymentResponse.deployedAt ?: deployment.deployedAt
+
+                val newConfig = deploymentResponse.configuration
+                if (newConfig != null) {
+                    deployment.configuration = it.copyToRealm(newConfig)
+                }
+
+                val newLocation = deploymentResponse.location
+                if (newLocation != null) {
+                    deployment.location = it.copyToRealm(newLocation)
+                }
+
+                deployment.createdAt = deploymentResponse.createdAt ?: deployment.createdAt
+            } else {
+                val deploymentObj = deploymentResponse.toGuardianDeployment()
+                val id = (it.where(GuardianDeployment::class.java).max(GuardianDeployment.FIELD_ID)
+                    ?.toInt() ?: 0) + 1
+                deploymentObj.id = id
+                it.insert(deploymentObj)
+            }
+        }
     }
 
     fun markUnsent(id: Int) {

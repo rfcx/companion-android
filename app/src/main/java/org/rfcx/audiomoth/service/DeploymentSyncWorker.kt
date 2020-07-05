@@ -21,7 +21,6 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
     override suspend fun doWork(): Result {
         Log.d(TAG, "doWork")
 
-
         val db = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val locateDb = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val firestore = Firestore(context)

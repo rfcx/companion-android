@@ -38,14 +38,13 @@ data class ConfigurationResponse(
     }
 }
 
-
 fun DeploymentResponse.toDeployment(): Deployment {
     return Deployment(
         serverId = this.serverId,
         batteryDepletedAt = this.batteryDepletedAt ?: Date(),
         deployedAt = this.deployedAt ?: Date(),
         batteryLevel = this.batteryLevel ?: 0,
-        state = DeploymentState.AudioMoth.ReadyToUpload.key,
+        state = DeploymentState.Edge.ReadyToUpload.key,
         configuration = this.configuration?.toConfiguration(),
         location = this.location,
         createdAt = this.createdAt ?: Date(),

@@ -15,7 +15,7 @@ class DeploymentDb(private val realm: Realm) {
 
     fun unsentCount(): Long {
         return realm.where(Deployment::class.java)
-            .equalTo(Deployment.FIELD_STATE, DeploymentState.AudioMoth.ReadyToUpload.key)
+            .equalTo(Deployment.FIELD_STATE, DeploymentState.Edge.ReadyToUpload.key)
             .and()
             .notEqualTo(Deployment.FIELD_SYNC_STATE, SyncState.Sent.key)
             .count()
@@ -27,7 +27,7 @@ class DeploymentDb(private val realm: Realm) {
             .findAllAsync()
     }
 
-    fun insertOrUpdateDeployment(deployment: Deployment, location: DeploymentLocation): Int {
+    fun insertOrUpdate(deployment: Deployment, location: DeploymentLocation): Int {
         var id = deployment.id
         realm.executeTransaction {
             if (deployment.id == 0) {
@@ -76,13 +76,6 @@ class DeploymentDb(private val realm: Realm) {
         }
     }
 
-    fun updateDeployment(deploymentResponse: DeploymentResponse) {
-        realm.executeTransaction {
-
-
-        }
-    }
-
     fun markUnsent(id: Int) {
         mark(id = id, syncState = SyncState.Unsent.key)
     }
@@ -122,7 +115,7 @@ class DeploymentDb(private val realm: Realm) {
         var unsentCopied: List<Deployment> = listOf()
         realm.executeTransaction {
             val unsent = it.where(Deployment::class.java)
-                .equalTo(Deployment.FIELD_STATE, DeploymentState.AudioMoth.ReadyToUpload.key)
+                .equalTo(Deployment.FIELD_STATE, DeploymentState.Edge.ReadyToUpload.key)
                 .and()
                 .equalTo(Deployment.FIELD_SYNC_STATE, SyncState.Unsent.key).findAll()
                 .createSnapshot()

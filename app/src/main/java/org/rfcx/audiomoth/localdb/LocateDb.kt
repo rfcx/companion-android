@@ -1,6 +1,5 @@
 package org.rfcx.audiomoth.localdb
 
-import android.util.Log
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
@@ -69,15 +68,23 @@ class LocateDb(private val realm: Realm) {
         }
     }
 
-    fun insertOrUpdateLocate(deploymentId: Int, locate: Locate) {
+    fun insertOrUpdateLocate(deploymentId: Int, locate: Locate, isGuardian: Boolean = false) {
         realm.executeTransaction {
             if (locate.id == 0) {
                 val id = (realm.where(Locate::class.java).max(Locate.FIELD_ID)
                     ?.toInt() ?: 0) + 1
                 locate.id = id
             }
-            // update last deployment
-            locate.lastDeploymentId = deploymentId
+            // new last deployment?
+            if (!isGuardian) {
+                locate.lastDeploymentId = deploymentId
+                locate.lastGuardianDeploymentId = 0
+                locate.lastGuardianDeploymentServerId = null
+            } else {
+                locate.lastGuardianDeploymentId = deploymentId
+                locate.lastDeploymentId = 0
+                locate.lastGuardianDeploymentServerId = null
+            }
             it.insertOrUpdate(locate)
         }
     }
@@ -87,9 +94,11 @@ class LocateDb(private val realm: Realm) {
         deploymentServerId: String,
         isGuardian: Boolean = false
     ) {
-        Log.e("LocationSyncWorker", "$deploymentId  $deploymentServerId")
         realm.executeTransaction {
-            it.where(Locate::class.java).equalTo("lastDeployment", deploymentId)
+            it.where(Locate::class.java).equalTo(
+                if (!isGuardian) "lastDeploymentId" else "lastGuardianDeploymentId",
+                deploymentId
+            )
                 .findFirst()?.apply {
                     if (!isGuardian) {
                         lastDeploymentServerId = deploymentServerId
@@ -116,6 +125,7 @@ class LocateDb(private val realm: Realm) {
                 location.longitude = locationResponse.longitude ?: location.longitude
                 location.createdAt = locationResponse.createdAt ?: location.createdAt
                 location.lastDeploymentServerId = locationResponse.lastDeploymentServerId
+                location.lastGuardianDeploymentServerId = locationResponse.lastDeploymentServerId
             } else {
                 val locate = locationResponse.toLocate()
                 val id = (it.where(Locate::class.java).max(Deployment.FIELD_ID)
