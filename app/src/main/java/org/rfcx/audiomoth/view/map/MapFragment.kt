@@ -57,6 +57,7 @@ import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
 import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity
+import org.rfcx.audiomoth.view.diagnostic.DiagnosticActivity
 
 class MapFragment : Fragment(), OnMapReadyCallback {
     // map
@@ -241,7 +242,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun handlePressedGuardianDeployment(feature: Feature) {
-        Toast.makeText(context, "Pressed GuardianDeployment", Toast.LENGTH_SHORT).show()
+        val deployment =
+            guardianDeploymentDb.getDeploymentById(feature.getProperty(PROPERTY_MARKER_DEPLOYMENT_ID).asInt)
+        if (deployment != null) {
+            context?.let {
+                DiagnosticActivity.startActivity(
+                    it,
+                    deployment.location!!
+                )
+            }
+        }
     }
 
     private fun handlePressedDeployment(feature: Feature) {

@@ -1,6 +1,5 @@
 package org.rfcx.audiomoth.connection.socket
 
-import android.util.Log
 import com.google.gson.Gson
 import org.json.JSONObject
 import org.rfcx.audiomoth.entity.socket.*
@@ -16,8 +15,6 @@ object SocketManager {
     private lateinit var clientThread: Thread
 
     private val gson = Gson()
-
-    private val LOGTAG = "Client-SocketManager"
 
     private const val CONNECTION = "connection"
     private const val DIAGNOSTIC = "diagnostic"
@@ -65,8 +62,6 @@ object SocketManager {
                     val dataInput = DataInputStream(socket.getInputStream()).readUTF()
                     if (!dataInput.isNullOrBlank()) {
 
-                        Log.d(LOGTAG, "Receiving data from Server: $dataInput")
-
                         val receiveJson = JSONObject(dataInput)
                         val jsonIterator = receiveJson.keys()
 
@@ -75,25 +70,21 @@ object SocketManager {
                             CONFIGURE -> {
                                 val response =
                                     gson.fromJson(dataInput, ConfigurationResponse::class.java)
-                                Log.d(LOGTAG, "Configure response: $response")
                                 onReceiveResponse.onReceive(response)
                             }
                             DIAGNOSTIC -> {
                                 val response =
                                     gson.fromJson(dataInput, DiagnosticResponse::class.java)
-                                Log.d(LOGTAG, "Diagnostic response: ${response.diagnostic}")
                                 onReceiveResponse.onReceive(response)
                             }
                             CONNECTION -> {
                                 val response =
                                     gson.fromJson(dataInput, ConnectionResponse::class.java)
-                                Log.d(LOGTAG, "Connection status: ${response.connection.status}")
                                 onReceiveResponse.onReceive(response)
                             }
                             SYNC -> {
                                 val response =
                                     gson.fromJson(dataInput, SyncConfigurationResponse::class.java)
-                                Log.d(LOGTAG, "Sync status: ${response.sync.status}")
                                 if (response.sync.status == "success") {
                                     onReceiveResponse.onReceive(response)
                                 } else {
@@ -102,14 +93,12 @@ object SocketManager {
                             }
                             PREFS -> {
                                 val response = gson.fromJson(dataInput, PrefsResponse::class.java)
-                                Log.d(LOGTAG, "Prefs status: ${response.prefs}")
                                 onReceiveResponse.onReceive(response)
                             }
                         }
                     }
                 }
             } catch (e: Exception) {
-                Log.e(LOGTAG, e.toString())
                 if (e is ConnectException) {
                     onReceiveResponse.onFailed("failed to connect to the server")
                 }
