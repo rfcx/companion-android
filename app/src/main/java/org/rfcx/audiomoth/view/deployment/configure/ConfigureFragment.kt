@@ -7,6 +7,8 @@ import android.content.Context
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +17,11 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_configure.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.DURATION_SELECTED_DEFAULT
+import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.GAIN_DEFAULT
+import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.RECORDING_DURATION_DEFAULT
+import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.SAMPLE_RATE_DEFAULT
+import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.SLEEP_DURATION_DEFAULT
 import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 
@@ -30,7 +37,7 @@ class ConfigureFragment : Fragment(),
     }
 
     private val sampleRateList = arrayOf("8", "16", "32", "48", "96", "192", "256", "384")
-    private val gainList = arrayOf("1 - Lowest", "2 - Low", "3 - Medium", "4 - High", "5 - Highest")
+    private val gainList = arrayOf("Low", "Low - Medium", "Medium", "Medium - High", "High")
     private var timeList = arrayListOf(
         "00:00",
         "01:00",
@@ -58,14 +65,13 @@ class ConfigureFragment : Fragment(),
         "23:00"
     )
 
-    private var gain = 0
-    private var sampleRate = 8      // default sampleRate is 8
-    private var sleepDuration = 0
-    private var recordingDuration = 0
+    private var gain = GAIN_DEFAULT
+    private var sampleRate = SAMPLE_RATE_DEFAULT
+    private var sleepDuration = RECORDING_DURATION_DEFAULT
+    private var recordingDuration = SLEEP_DURATION_DEFAULT
     private var recordingPeriod = ArrayList<String>()
     private var customRecordingPeriod = recordingPeriod.isNotEmpty()
-    private var durationSelected =
-        RECOMMENDED
+    private var durationSelected = DURATION_SELECTED_DEFAULT
     private var profile: Profile? = null
     private var timeState = ArrayList<TimeItem>()
 
@@ -118,6 +124,37 @@ class ConfigureFragment : Fragment(),
         createNotificationChannel()
         setNextOnClick()
         setRadioGroup()
+        checkMinimumOfDuration()
+    }
+
+    private fun checkMinimumOfDuration() {
+        recordingDurationEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {
+                if (p0 != null && p0.toString() != "") {
+                    if(p0.toString().toInt() < MINIMUM_RECORDING_DURATION){
+                        recordingDurationEditText.error = getString(R.string.minimum_1_second)
+                    }
+                }
+            }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+        })
+
+        sleepDurationEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {
+                if (p0 != null && p0.toString() != "") {
+                    if(p0.toString().toInt() < MINIMUM_SLEEP_DURATION){
+                        sleepDurationEditText.error = getString(R.string.minimum_5_second)
+                    }
+                }
+            }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+        })
     }
 
     private fun setRadioGroup() {
@@ -327,7 +364,7 @@ class ConfigureFragment : Fragment(),
     private fun setGainLayout() {
         if (profile != null) {
             profile?.let {
-                gainValueTextView.text = gainList[it.gain - 1]
+                gainValueTextView.text = gainList[it.gain]
                 gain = it.gain
             }
         } else {
@@ -340,7 +377,7 @@ class ConfigureFragment : Fragment(),
                 builder.setTitle(R.string.choose_gain)?.setItems(gainList) { dialog, i ->
                     try {
                         gainValueTextView.text = gainList[i]
-                        gain = i + 1
+                        gain = i
                     } catch (e: IllegalArgumentException) {
                         dialog.dismiss()
                     }
@@ -362,6 +399,8 @@ class ConfigureFragment : Fragment(),
         const val CUSTOM = "CUSTOM"
         const val CHANNEL_ID = "AudioMoth Notification"
         const val CHANNEL_NAME = "Notification"
+        const val MINIMUM_RECORDING_DURATION = 1
+        const val MINIMUM_SLEEP_DURATION = 5
 
         fun newInstance(): ConfigureFragment {
             return ConfigureFragment()

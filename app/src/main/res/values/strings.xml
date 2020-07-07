@@ -60,6 +60,8 @@
     <string name="recommended_text">Record for 5 minutes, sleep for 10 minutes</string>
     <string name="will_run_out_on">The battery at %s location will run out on %s</string>
     <string name="edge_device_battery">RFCx Edge device battery</string>
+    <string name="minimum_1_second">The minimum is 1 second</string>
+    <string name="minimum_5_second">The minimum is 5 seconds</string>
 
     <!--    SyncFragment-->
     <string name="sync">Sync</string>

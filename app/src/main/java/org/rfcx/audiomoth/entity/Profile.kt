@@ -5,7 +5,11 @@ import io.realm.RealmList
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
-import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
+import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.DURATION_SELECTED_DEFAULT
+import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.GAIN_DEFAULT
+import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.RECORDING_DURATION_DEFAULT
+import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.SAMPLE_RATE_DEFAULT
+import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.SLEEP_DURATION_DEFAULT
 import java.util.*
 
 @RealmClass
@@ -60,12 +64,12 @@ open class Profile(
         const val FIELD_SYNC_STATE = "syncState"
 
         fun default() = Profile(
-            gain = 3,
+            gain = GAIN_DEFAULT,
             name = "",
-            sampleRate = 8,
-            recordingDuration = 5,
-            sleepDuration = 10,
-            durationSelected = ConfigureFragment.RECOMMENDED
+            sampleRate = SAMPLE_RATE_DEFAULT,
+            recordingDuration = RECORDING_DURATION_DEFAULT,
+            sleepDuration = SLEEP_DURATION_DEFAULT,
+            durationSelected = DURATION_SELECTED_DEFAULT
         )
     }
 }
