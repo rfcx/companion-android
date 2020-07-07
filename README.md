@@ -16,10 +16,10 @@
 
 #### Select build variant
 ##### Common
-- Support RFCx Edge 1.2.0-rc.1
-- Support RFCx Edge firmware [audiomoth-rfcx-0.0.6.bin]()
+- Support RFCx Edge 1.2.0-rc.1, AudioMoth 1.1.0
+- Support RFCx Edge firmware audiomoth-rfcx-0.0.6.bin
 ##### Internal
-- Support RFCx Guardain (orange pi 3g-iot) [see](https://github.com/rfcx/guardian-opi-android-source)
+- Support RFCx Guardain (orange pi 3g-iot) [guardian-opi-android-source](https://github.com/rfcx/guardian-opi-android-source)
 
 ```java
  productFlavors {
