@@ -17,6 +17,11 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_configure.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.Configuration.Companion.DURATION_SELECTED_DEFAULT
+import org.rfcx.audiomoth.entity.Configuration.Companion.GAIN_DEFAULT
+import org.rfcx.audiomoth.entity.Configuration.Companion.RECORDING_DURATION_DEFAULT
+import org.rfcx.audiomoth.entity.Configuration.Companion.SAMPLE_RATE_DEFAULT
+import org.rfcx.audiomoth.entity.Configuration.Companion.SLEEP_DURATION_DEFAULT
 import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 
@@ -60,14 +65,13 @@ class ConfigureFragment : Fragment(),
         "23:00"
     )
 
-    private var gain = 0
-    private var sampleRate = 48      // default sampleRate is 48
-    private var sleepDuration = 0
-    private var recordingDuration = 0
+    private var gain = GAIN_DEFAULT
+    private var sampleRate = SAMPLE_RATE_DEFAULT
+    private var sleepDuration = RECORDING_DURATION_DEFAULT
+    private var recordingDuration = SLEEP_DURATION_DEFAULT
     private var recordingPeriod = ArrayList<String>()
     private var customRecordingPeriod = recordingPeriod.isNotEmpty()
-    private var durationSelected =
-        RECOMMENDED
+    private var durationSelected = DURATION_SELECTED_DEFAULT
     private var profile: Profile? = null
     private var timeState = ArrayList<TimeItem>()
 
