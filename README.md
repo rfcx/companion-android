@@ -11,23 +11,16 @@
 #### Get the code
 
 - Checkout the repo [https://github.com/rfcx/companion-android.git](https://github.com/rfcx/companion-android.git) from GitHub.
-- Open Android Studio and import project.
+- Open the project in Android Studio.
 - Perform a Gradle sync (File -> Sync Project with Gradle).
+- Connect a device and Run.
 
-#### Select build variant
-##### Common
-- Support RFCx Edge 1.2.0-rc.1, AudioMoth 1.1.0
-- Support RFCx Edge firmware audiomoth-rfcx-0.0.6.bin
+#### Build variants
+
+The companion app supports build variants for different deployment devices. Choose the build variant via View -> Tool Windows -> Build Variants.
+
+##### Common (Default)
+- Supports RFCx Edge 1.2.0-rc.1 and AudioMoth 1.1.0 (firmware audiomoth-rfcx-0.0.6.bin)
+
 ##### Internal
-- Support RFCx Guardain (orange pi 3g-iot) [guardian-opi-android-source](https://github.com/rfcx/guardian-opi-android-source)
-
-```java
- productFlavors {
-        common {
-            buildConfigField 'boolean', 'ENABLE_GUARDIAN', 'false'
-        }
-        internal {
-            buildConfigField 'boolean', 'ENABLE_GUARDIAN', 'true'
-        }
-    }
-```
+- Supports RFCx Guardian (OrangePi 3G-IOT) [guardian-opi-android-source](https://github.com/rfcx/guardian-opi-android-source)
