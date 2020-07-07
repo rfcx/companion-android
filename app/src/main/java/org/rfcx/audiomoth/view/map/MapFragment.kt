@@ -140,11 +140,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
         fetchJobSyncing()
+        fetchData()
         progressBar.visibility = View.VISIBLE
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
+        context?.let {
+            retrieveDeployments(it)
+            retrieveLocations(it)
+        }
         mapboxMap.setStyle(Style.OUTDOORS) {
             checkThenAccquireLocation(it)
             setupSources(it)
@@ -152,7 +157,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             setupMarkerLayers(it)
             setupWindowInfo(it)
 
-            fetchData()
             mapboxMap.addOnMapClickListener { latLng ->
                 val screenPoint = mapboxMap.projection.toScreenLocation(latLng)
                 val features = mapboxMap.queryRenderedFeatures(screenPoint, WINDOW_DEPLOYMENT_ID)
@@ -358,11 +362,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             it
         }
         locateLiveData.observeForever(locateObserve)
-
-        context?.let {
-            retrieveDeployments(it)
-            retrieveLocations(it)
-        }
     }
 
     private fun retrieveDeployments(context: Context) {
