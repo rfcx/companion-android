@@ -23,4 +23,4 @@ The companion app supports build variants for different deployment devices. Choo
 - Supports RFCx Edge 1.2.0-rc.1 and AudioMoth 1.1.0 (firmware audiomoth-rfcx-0.0.6.bin)
 
 ##### Internal
-- Supports RFCx Guardian (OrangePi 3G-IOT) [guardian-opi-android-source](https://github.com/rfcx/guardian-opi-android-source)
+- Supports RFCx Guardian (OrangePi 3G-IOT) [rfcx-guardian-android](https://github.com/rfcx/rfcx-guardian-android)
