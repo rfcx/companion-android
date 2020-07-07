@@ -3,7 +3,11 @@ package org.rfcx.audiomoth.entity
 import io.realm.RealmList
 import io.realm.RealmModel
 import io.realm.annotations.RealmClass
-import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
+import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.DURATION_SELECTED_DEFAULT
+import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.GAIN_DEFAULT
+import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.RECORDING_DURATION_DEFAULT
+import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.SAMPLE_RATE_DEFAULT
+import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.SLEEP_DURATION_DEFAULT
 
 @RealmClass
 open class Configuration(
@@ -13,12 +17,4 @@ open class Configuration(
     var sleepDuration: Int = SLEEP_DURATION_DEFAULT,
     var recordingPeriodList: RealmList<String> = RealmList(),
     var durationSelected: String = DURATION_SELECTED_DEFAULT
-) : RealmModel {
-    companion object {
-        const val GAIN_DEFAULT = 2
-        const val SAMPLE_RATE_DEFAULT = 48
-        const val RECORDING_DURATION_DEFAULT = 1
-        const val SLEEP_DURATION_DEFAULT = 5
-        const val DURATION_SELECTED_DEFAULT = ConfigureFragment.RECOMMENDED
-    }
-}
+) : RealmModel

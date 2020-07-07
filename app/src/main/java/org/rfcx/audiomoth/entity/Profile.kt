@@ -5,12 +5,11 @@ import io.realm.RealmList
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
-import org.rfcx.audiomoth.entity.Configuration.Companion.DURATION_SELECTED_DEFAULT
-import org.rfcx.audiomoth.entity.Configuration.Companion.GAIN_DEFAULT
-import org.rfcx.audiomoth.entity.Configuration.Companion.RECORDING_DURATION_DEFAULT
-import org.rfcx.audiomoth.entity.Configuration.Companion.SAMPLE_RATE_DEFAULT
-import org.rfcx.audiomoth.entity.Configuration.Companion.SLEEP_DURATION_DEFAULT
-import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
+import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.DURATION_SELECTED_DEFAULT
+import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.GAIN_DEFAULT
+import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.RECORDING_DURATION_DEFAULT
+import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.SAMPLE_RATE_DEFAULT
+import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.SLEEP_DURATION_DEFAULT
 import java.util.*
 
 @RealmClass

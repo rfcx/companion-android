@@ -17,11 +17,11 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_configure.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.Configuration.Companion.DURATION_SELECTED_DEFAULT
-import org.rfcx.audiomoth.entity.Configuration.Companion.GAIN_DEFAULT
-import org.rfcx.audiomoth.entity.Configuration.Companion.RECORDING_DURATION_DEFAULT
-import org.rfcx.audiomoth.entity.Configuration.Companion.SAMPLE_RATE_DEFAULT
-import org.rfcx.audiomoth.entity.Configuration.Companion.SLEEP_DURATION_DEFAULT
+import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.DURATION_SELECTED_DEFAULT
+import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.GAIN_DEFAULT
+import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.RECORDING_DURATION_DEFAULT
+import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.SAMPLE_RATE_DEFAULT
+import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.SLEEP_DURATION_DEFAULT
 import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 
