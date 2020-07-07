@@ -41,8 +41,8 @@
     <string name="let_configure">Let’s configure the device</string>
     <string name="sample_rate">Sample rate</string>
     <string name="gain">Gain</string>
-    <string name="sleep_duration">Sleep (second)</string>
-    <string name="recording_duration">Recording (second)</string>
+    <string name="sleep_duration">Sleep (seconds)</string>
+    <string name="recording_duration">Recording (seconds)</string>
     <string name="profile_name">Profile name (optional)</string>
     <string name="recording_duration_title">Recording duration</string>
     <string name="choose_sample_rate">Choose sample rate (kHz)</string>
