@@ -38,9 +38,11 @@ import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.localdb.LocateDb
-import org.rfcx.audiomoth.util.*
+import org.rfcx.audiomoth.util.LocationPermissions
+import org.rfcx.audiomoth.util.RealmHelper
+import org.rfcx.audiomoth.util.latitudeCoordinates
+import org.rfcx.audiomoth.util.longitudeCoordinates
 import org.rfcx.audiomoth.view.deployment.BaseDeploymentProtocal
-import org.rfcx.audiomoth.view.profile.coordinates.CoordinatesActivity
 
 class LocationFragment : Fragment(), OnMapReadyCallback {
     private val locateDb by lazy {
@@ -133,7 +135,10 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             && latitudeEditText.text.toString().isNotEmpty()
             && longitudeEditText.text.toString().isNotEmpty()
         ) {
-            setLocate()
+            handleNewLocate(
+                latitudeEditText.text.toString().toDouble(),
+                longitudeEditText.text.toString().toDouble()
+            )
         } else {
             Toast.makeText(
                 context,
@@ -157,53 +162,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         deploymentProtocol?.nextStep()
     }
 
-    private fun setLocate() {
-        when (context.getCoordinatesFormat()) {
-            CoordinatesActivity.DD_FORMAT -> {
-                if (latitudeEditText.text.toString().matches(FORMAT_LATITUDE_DD.toRegex())) {
-                    if (longitudeEditText.text.toString().matches(FORMAT_LONGITUDE_DD.toRegex())) {
-                        handleNewLocate(
-                            latitudeEditText.text.toString().replaceDDToNumber(),
-                            longitudeEditText.text.toString().replaceDDToNumber()
-                        )
-                    } else {
-                        longitudeEditText.error = getString(R.string.wrong_format)
-                    }
-                } else {
-                    latitudeEditText.error = getString(R.string.wrong_format)
-                }
-            }
-            CoordinatesActivity.DDM_FORMAT -> {
-                if (latitudeEditText.text.toString().matches(FORMAT_LATITUDE_DDM.toRegex())) {
-                    if (longitudeEditText.text.toString().matches(FORMAT_LONGITUDE_DDM.toRegex())) {
-                        handleNewLocate(
-                            latitudeEditText.text.toString().replaceDDMToNumber(),
-                            longitudeEditText.text.toString().replaceDDMToNumber()
-                        )
-                    } else {
-                        longitudeEditText.error = getString(R.string.wrong_format)
-                    }
-                } else {
-                    latitudeEditText.error = getString(R.string.wrong_format)
-                }
-            }
-            CoordinatesActivity.DMS_FORMAT -> {
-                if (latitudeEditText.text.toString().matches(FORMAT_LATITUDE_DMS.toRegex())) {
-                    if (longitudeEditText.text.toString().matches(FORMAT_LONGITUDE_DMS.toRegex())) {
-                        handleNewLocate(
-                            latitudeEditText.text.toString().replaceDMSToNumber(),
-                            longitudeEditText.text.toString().replaceDMSToNumber()
-                        )
-                    } else {
-                        longitudeEditText.error = getString(R.string.wrong_format)
-                    }
-                } else {
-                    latitudeEditText.error = getString(R.string.wrong_format)
-                }
-            }
-        }
-    }
-
     private fun setupLocationOptions() {
         radioGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
@@ -211,8 +169,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     lastLocation?.let { lastLocation ->
                         context?.let { context ->
                             setupView(
-                                lastLocation.latitude.latitudeCoordinates(context),
-                                lastLocation.longitude.longitudeCoordinates(context), true
+                                String.format("%.6f", lastLocation.latitude),
+                                String.format("%.6f", lastLocation.longitude), true
                             )
                         }
                         setPinOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
@@ -327,11 +285,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 )
             }
             setupLocationOptions()
-
             getLastLocation()
             retrieveDeployLocations()
 
-            setupInputLocation()
         }
     }
 
@@ -363,7 +319,11 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         latitudeEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
                 if (p0 != null) {
-                    convertInputLatitude(p0.toString())
+                    if (newLocationRadioButton.isChecked) {
+                        if (p0[0] != '.' && p0.last() != '.' && !(p0[0] == '-' && p0.length == 1) && p0.last() != '-') {
+                            convertInputLatitude(p0.toString())
+                        }
+                    }
                 }
             }
 
@@ -375,7 +335,11 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         longitudeEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
                 if (p0 != null) {
-                    convertInputLongitude(p0.toString())
+                    if (newLocationRadioButton.isChecked) {
+                        if (p0[0] != '.' && p0.last() != '.' && !(p0[0] == '-' && p0.length == 1) && p0.last() != '-') {
+                            convertInputLongitude(p0.toString())
+                        }
+                    }
                 }
             }
 
@@ -386,108 +350,41 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     fun convertInputLatitude(latitude: String) {
-        when (context.getCoordinatesFormat()) {
-            CoordinatesActivity.DD_FORMAT -> {
-                if (latitude.matches(FORMAT_LATITUDE_DD.toRegex())) {
-                    if (latitude.replaceDDToNumber() > 90.0) {
-                        Toast.makeText(
-                            context,
-                            getString(R.string.latitude_must_between),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    } else {
-                        setPinOnMap(
-                            LatLng(
-                                latitude.replaceDDToNumber(),
-                                longitudeEditText.text.toString().replaceDDToNumber()
-                            )
-                        )
-                    }
-                } else {
-                    latitudeEditText.error = getString(R.string.wrong_format)
-                }
-            }
-            CoordinatesActivity.DDM_FORMAT -> {
-                if (latitude.matches(FORMAT_LATITUDE_DDM.toRegex())) {
-                    if (latitude.replaceDDMToNumber() > 90.0) {
-                        Toast.makeText(
-                            context,
-                            getString(R.string.latitude_must_between),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    } else {
-                        setPinOnMap(
-                            LatLng(
-                                latitude.replaceDDMToNumber(),
-                                longitudeEditText.text.toString().replaceDDMToNumber()
-                            )
-                        )
-                    }
-                } else {
-                    latitudeEditText.error = getString(R.string.wrong_format)
-                }
-            }
-            CoordinatesActivity.DMS_FORMAT -> {
-                if (latitude.matches(FORMAT_LATITUDE_DMS.toRegex())) {
-                    if (latitude.replaceDMSToNumber() > 90.0) {
-                        Toast.makeText(
-                            context,
-                            getString(R.string.latitude_must_between),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    } else {
-                        setPinOnMap(
-                            LatLng(
-                                latitude.replaceDMSToNumber(),
-                                longitudeEditText.text.toString().replaceDMSToNumber()
-                            )
-                        )
-                    }
-                } else {
-                    latitudeEditText.error = getString(R.string.wrong_format)
-                }
+        val lat = latitude.toDouble()
+        val long = longitudeEditText.text.toString()
+        if (long.last() != 'E' && long.last() != 'W') {
+            if (lat < 90 && lat > -90) {
+                setPinOnMap(
+                    LatLng(
+                        latitude.toDouble(),
+                        longitudeEditText.text.toString().toDouble()
+                    )
+                )
+            } else {
+                Toast.makeText(
+                    context,
+                    getString(R.string.latitude_must_between),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
 
     fun convertInputLongitude(longitude: String) {
-        when (context.getCoordinatesFormat()) {
-            CoordinatesActivity.DD_FORMAT -> {
-                if (longitude.matches(FORMAT_LONGITUDE_DD.toRegex())) {
-                    setPinOnMap(
-                        LatLng(
-                            latitudeEditText.text.toString().replaceDDToNumber(),
-                            longitude.replaceDDToNumber()
-                        )
-                    )
-                } else {
-                    longitudeEditText.error = getString(R.string.wrong_format)
-                }
-            }
-            CoordinatesActivity.DDM_FORMAT -> {
-                if (longitude.matches(FORMAT_LONGITUDE_DDM.toRegex())) {
-                    setPinOnMap(
-                        LatLng(
-                            latitudeEditText.text.toString().replaceDDMToNumber(),
-                            longitude.replaceDDMToNumber()
-                        )
-                    )
-                } else {
-                    longitudeEditText.error = getString(R.string.wrong_format)
-                }
-            }
-            CoordinatesActivity.DMS_FORMAT -> {
-                if (longitude.matches(FORMAT_LONGITUDE_DMS.toRegex())) {
-                    setPinOnMap(
-                        LatLng(
-                            latitudeEditText.text.toString().replaceDMSToNumber(),
-                            longitude.replaceDMSToNumber()
-                        )
-                    )
-                } else {
-                    longitudeEditText.error = getString(R.string.wrong_format)
-                }
-            }
+        val long = longitude.toDouble()
+        if (long < 180 && long > -180) {
+            setPinOnMap(
+                LatLng(
+                    latitudeEditText.text.toString().toDouble(),
+                    longitude.toDouble()
+                )
+            )
+        } else {
+            Toast.makeText(
+                context,
+                getString(R.string.longitude_must_between),
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -563,6 +460,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         latitudeEditText.isEnabled = enabled
         longitudeEditText.setText(longitudeText)
         longitudeEditText.isEnabled = enabled
+        if (newLocationRadioButton.isChecked) {
+            setupInputLocation()
+        }
     }
 
     override fun onStart() {
