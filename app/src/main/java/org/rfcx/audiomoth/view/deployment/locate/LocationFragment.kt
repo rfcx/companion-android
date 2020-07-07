@@ -37,10 +37,7 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.util.*
-import org.rfcx.audiomoth.util.LocationPermissions
-import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.view.deployment.BaseDeploymentProtocal
-import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 import org.rfcx.audiomoth.view.profile.coordinates.CoordinatesActivity
 
 class LocationFragment : Fragment(), OnMapReadyCallback {
@@ -225,6 +222,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         newLocationRadioButton.isChecked = locateItems.isEmpty()
         existingRadioButton.isEnabled = locateItems.isNotEmpty()
         existingRadioButton.isChecked = locateItems.isNotEmpty()
+
+        val deploymentLocation = deploymentProtocol?.getDeploymentLocation()
+        if(deploymentLocation != null && locateAdapter != null){
+            val spinnerPosition= locateAdapter!!.getPosition(deploymentLocation.name)
+            locationNameSpinner.setSelection(spinnerPosition)
+        }
     }
 
     private fun setLocationSpinner() {
