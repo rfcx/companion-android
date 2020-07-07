@@ -131,7 +131,7 @@ class ConfigureFragment : Fragment(),
         recordingDurationEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
                 if (p0 != null && p0.toString() != "") {
-                    if(p0.toString().toInt() < 1){
+                    if(p0.toString().toInt() < MINIMUM_RECORDING_DURATION){
                         recordingDurationEditText.error = getString(R.string.minimum_1_second)
                     }
                 }
@@ -145,7 +145,7 @@ class ConfigureFragment : Fragment(),
         sleepDurationEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
                 if (p0 != null && p0.toString() != "") {
-                    if(p0.toString().toInt() < 5){
+                    if(p0.toString().toInt() < MINIMUM_SLEEP_DURATION){
                         sleepDurationEditText.error = getString(R.string.minimum_5_second)
                     }
                 }
@@ -405,6 +405,8 @@ class ConfigureFragment : Fragment(),
         const val CUSTOM = "CUSTOM"
         const val CHANNEL_ID = "AudioMoth Notification"
         const val CHANNEL_NAME = "Notification"
+        const val MINIMUM_RECORDING_DURATION = 1
+        const val MINIMUM_SLEEP_DURATION = 5
 
         fun newInstance(): ConfigureFragment {
             return ConfigureFragment()
