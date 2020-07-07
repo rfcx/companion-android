@@ -5,6 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
     tools:context=".view.deployment.configure.ConfigureFragment">
 
     <ScrollView
@@ -183,8 +185,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="@dimen/margin_padding_small"
                         android:layout_weight="1"
-                        android:focusable="true"
-                        android:focusableInTouchMode="true"
                         android:hint="@string/recording_duration">
 
                         <com.google.android.material.textfield.TextInputEditText
@@ -205,8 +205,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/margin_padding_small"
                         android:layout_weight="1"
-                        android:focusable="true"
-                        android:focusableInTouchMode="true"
                         android:hint="@string/sleep_duration">
 
                         <com.google.android.material.textfield.TextInputEditText

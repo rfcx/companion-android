@@ -15,6 +15,8 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
@@ -89,12 +91,40 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         deploymentProtocol?.showStepView()
         deploymentProtocol?.hideCompleteButton()
 
+        setHideKeyboard()
+
         finishButton.setOnClickListener {
             if (existingRadioButton.isChecked) {
                 handleExistLocate()
             } else if (newLocationRadioButton.isChecked) {
                 verifyInput()
             }
+        }
+    }
+
+    private fun setHideKeyboard() {
+        latitudeEditText.setOnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                latitudeEditText.clearFocus()
+                latitudeEditText.hideKeyboard()
+            }
+            false
+        }
+
+        longitudeEditText.setOnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                longitudeEditText.clearFocus()
+                longitudeEditText.hideKeyboard()
+            }
+            false
+        }
+
+        locationNameEditText.setOnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                locationNameEditText.clearFocus()
+                locationNameEditText.hideKeyboard()
+            }
+            false
         }
     }
 
@@ -224,8 +254,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         existingRadioButton.isChecked = locateItems.isNotEmpty()
 
         val deploymentLocation = deploymentProtocol?.getDeploymentLocation()
-        if(deploymentLocation != null && locateAdapter != null){
-            val spinnerPosition= locateAdapter!!.getPosition(deploymentLocation.name)
+        if (deploymentLocation != null && locateAdapter != null) {
+            val spinnerPosition = locateAdapter!!.getPosition(deploymentLocation.name)
             locationNameSpinner.setSelection(spinnerPosition)
         }
     }
@@ -563,6 +593,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     override fun onDestroy() {
         super.onDestroy()
         mapView.onDestroy()
+    }
+
+    private fun View.hideKeyboard() = this.let {
+        val inputManager =
+            context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputManager.hideSoftInputFromWindow(windowToken, 0)
     }
 
     companion object {

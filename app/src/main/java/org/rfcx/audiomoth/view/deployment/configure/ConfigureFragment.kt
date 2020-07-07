@@ -12,10 +12,14 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_configure.*
+import kotlinx.android.synthetic.main.fragment_configure.radioGroup
+import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.DURATION_SELECTED_DEFAULT
 import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.GAIN_DEFAULT
@@ -125,6 +129,33 @@ class ConfigureFragment : Fragment(),
         setNextOnClick()
         setRadioGroup()
         checkMinimumOfDuration()
+        setHideKeyboard()
+    }
+
+    private fun setHideKeyboard() {
+        recordingDurationEditText.setOnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                recordingDurationEditText.clearFocus()
+                recordingDurationEditText.hideKeyboard()
+            }
+            false
+        }
+
+        sleepDurationEditText.setOnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                sleepDurationEditText.clearFocus()
+                sleepDurationEditText.hideKeyboard()
+            }
+            false
+        }
+
+        profileEditText.setOnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                profileEditText.clearFocus()
+                profileEditText.hideKeyboard()
+            }
+            false
+        }
     }
 
     private fun checkMinimumOfDuration() {
@@ -391,6 +422,12 @@ class ConfigureFragment : Fragment(),
     override fun onTimeItemClick(item: TimeItem, position: Int) {
         timeState[position] = TimeItem(item.time, !item.state)
         timeAdapter.items = timeState
+    }
+
+    private fun View.hideKeyboard() = this.let {
+        val inputManager =
+            context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputManager.hideSoftInputFromWindow(windowToken, 0)
     }
 
     companion object {
