@@ -279,6 +279,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
+        mapboxMap.uiSettings.setAllGesturesEnabled(false)
+
         mapboxMap.setStyle(Style.OUTDOORS) {
             symbolManager = SymbolManager(mapView, mapboxMap, it)
             symbolManager.iconAllowOverlap = true

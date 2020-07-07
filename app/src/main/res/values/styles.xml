@@ -45,8 +45,8 @@
         <item name="android:textColor">@android:color/white</item>
     </style>
 
-    <style name="AudioMothButton.BlackButton" parent="Widget.AppCompat.Button">
-        <item name="android:background">@drawable/bg_color_black_button</item>
+    <style name="AudioMothButton.GrayButton" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/bg_color_gray_button</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@android:color/white</item>
     </style>

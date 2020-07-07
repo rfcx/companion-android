@@ -6,11 +6,9 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.PointF
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
@@ -418,8 +416,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun handleMarkerDeployment(deploymentMarkers: List<DeploymentMarker>) {
-        Log.d("Map", "handleMarkerDeployment ${deploymentMarkers.size}")
-
         // Create point
         val pointFeatures = deploymentMarkers.map {
             val properties = mapOf(

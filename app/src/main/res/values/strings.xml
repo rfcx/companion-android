@@ -91,6 +91,7 @@
     <string name="red_flash">How many time did the red LED flash?</string>
     <string name="try_again">try again</string>
     <string name="device_configured">Device configured! \nNow let’s verify the battery level</string>
+    <string name="question_mark">\?</string>
     <string name="days">Estimated battery duration: %s days</string>
     <string name="day">Estimated battery duration: %s day</string>
     <string name="notification">A notification will be sent a day \nbefore the battery is due to run out</string>
