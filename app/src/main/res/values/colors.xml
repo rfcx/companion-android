@@ -29,4 +29,7 @@
     <color name="transparent">@android:color/transparent</color>
 
     <color name="item_highlight">#B57BBD89</color>
+
+    <color name="signal_stroke">#5A6978</color>
+    <color name="signal_filled">#2AA841</color>
 </resources>
