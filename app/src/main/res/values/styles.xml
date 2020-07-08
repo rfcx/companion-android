@@ -45,6 +45,10 @@
         <item name="android:textColor">@android:color/black</item>
     </style>
 
+    <style name="AudioMothButton.RedButton.Radius5" parent="AudioMothButton">
+        <item name="android:background">@drawable/bg_red_button_radius_5</item>
+    </style>
+
     <style name="GuardianButton.GreenButton.Line" parent="AudioMothButton">
         <item name="android:background">@drawable/bg_button_green</item>
         <item name="android:textStyle">normal</item>

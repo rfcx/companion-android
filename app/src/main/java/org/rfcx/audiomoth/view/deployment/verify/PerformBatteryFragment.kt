@@ -67,7 +67,7 @@ class PerformBatteryFragment : Fragment() {
         }
 
         skipButton.setOnClickListener {
-            val batteryDepletedAt = Timestamp(System.currentTimeMillis() + (day * 12))
+            val batteryDepletedAt = Timestamp(System.currentTimeMillis() + (day * 8))
             if (location != null) {
                 notification(batteryDepletedAt, location!!.name)
                 deploymentProtocol?.setPerformBattery(batteryDepletedAt, 100)
@@ -81,40 +81,31 @@ class PerformBatteryFragment : Fragment() {
             deploymentProtocol?.playCheckBatterySound()
         }
         batteryLv1Button.setOnClickListener {
-            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 12)
-        }
-        batteryLv2Button.setOnClickListener {
-            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 11)
-        }
-        batteryLv3Button.setOnClickListener {
-            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 10)
-        }
-        batteryLv4Button.setOnClickListener {
-            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 9)
-        }
-        batteryLv5Button.setOnClickListener {
             deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 8)
         }
-        batteryLv6Button.setOnClickListener {
+        batteryLv2Button.setOnClickListener {
             deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 7)
         }
-        batteryLv7Button.setOnClickListener {
+        batteryLv3Button.setOnClickListener {
             deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 6)
         }
-        batteryLv8Button.setOnClickListener {
+        batteryLv4Button.setOnClickListener {
             deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 5)
         }
-        batteryLv9Button.setOnClickListener {
+        batteryLv5Button.setOnClickListener {
             deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 4)
         }
-        batteryLv10Button.setOnClickListener {
+        batteryLv6Button.setOnClickListener {
             deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 3)
         }
-        batteryLv11Button.setOnClickListener {
+        batteryLv7Button.setOnClickListener {
             deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 2)
         }
-        batteryLv12Button.setOnClickListener {
+        batteryLv8Button.setOnClickListener {
             deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 1)
+        }
+        batteryLv9Button.setOnClickListener {
+            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 0)
         }
     }
 
@@ -125,8 +116,9 @@ class PerformBatteryFragment : Fragment() {
         }
         val batteryDetail = setData(level)
         setBatteryView(level)
-        daysTextView.text = batteryDetail.days
-
+        daysTextView.text = if (level == 0) getString(R.string.recharging) else batteryDetail.days
+        chargedTextView.text =
+            if (level == 0) getString(R.string.too_low_battery) else getString(R.string.notification)
         nextButton.setOnClickListener {
             val batteryDepletedAt =
                 Timestamp(System.currentTimeMillis() + (day * batteryDetail.numberOfDays))
@@ -143,70 +135,84 @@ class PerformBatteryFragment : Fragment() {
         return BatteryDetail(
             days = getString(
                 if (level == 1) R.string.day else R.string.days,
-                level.toString()
+                if (level == 0) ">1" else level.toString()
             ),
             numberOfDays = level,
-            batteryLevel = if (level == 12) 100 else (100 / 12) * level
+            batteryLevel = if (level == 8) 100 else (100 / 8) * level
         )
     }
 
     private fun setBatteryView(level: Int) {
         when (level) {
-            1, 2 -> {
-                batteryLevel1View.visibility = View.VISIBLE
-                batteryLevel2View.visibility = View.INVISIBLE
-                batteryLevel3View.visibility = View.INVISIBLE
-                batteryLevel4View.visibility = View.INVISIBLE
-                batteryLevel5View.visibility = View.INVISIBLE
-                batteryLevel6View.visibility = View.INVISIBLE
+            0 -> {
+                batteryLevelLowView.visibility = View.VISIBLE
+                setBatteryLevel()
             }
-            3, 4 -> {
-                batteryLevel1View.visibility = View.VISIBLE
-                batteryLevel2View.visibility = View.VISIBLE
-                batteryLevel3View.visibility = View.INVISIBLE
-                batteryLevel4View.visibility = View.INVISIBLE
-                batteryLevel5View.visibility = View.INVISIBLE
-                batteryLevel6View.visibility = View.INVISIBLE
-            }
-            5, 6 -> {
-                batteryLevel1View.visibility = View.VISIBLE
-                batteryLevel2View.visibility = View.VISIBLE
-                batteryLevel3View.visibility = View.VISIBLE
-                batteryLevel4View.visibility = View.INVISIBLE
-                batteryLevel5View.visibility = View.INVISIBLE
-                batteryLevel6View.visibility = View.INVISIBLE
-            }
-            7, 8 -> {
-                batteryLevel1View.visibility = View.VISIBLE
-                batteryLevel2View.visibility = View.VISIBLE
-                batteryLevel3View.visibility = View.VISIBLE
-                batteryLevel4View.visibility = View.VISIBLE
-                batteryLevel5View.visibility = View.INVISIBLE
-                batteryLevel6View.visibility = View.INVISIBLE
-            }
-            9, 10 -> {
-                batteryLevel1View.visibility = View.VISIBLE
-                batteryLevel2View.visibility = View.VISIBLE
-                batteryLevel3View.visibility = View.VISIBLE
-                batteryLevel4View.visibility = View.VISIBLE
-                batteryLevel5View.visibility = View.VISIBLE
-                batteryLevel6View.visibility = View.INVISIBLE
-            }
-            11, 12 -> {
-                batteryLevel1View.visibility = View.VISIBLE
-                batteryLevel2View.visibility = View.VISIBLE
-                batteryLevel3View.visibility = View.VISIBLE
-                batteryLevel4View.visibility = View.VISIBLE
-                batteryLevel5View.visibility = View.VISIBLE
-                batteryLevel6View.visibility = View.VISIBLE
-            }
+            1 -> setBatteryLevel(view1 = true)
+            2 -> setBatteryLevel(view1 = true, view2 = true)
+            3 -> setBatteryLevel(view1 = true, view2 = true, view3 = true)
+            4 -> setBatteryLevel(view1 = true, view2 = true, view3 = true, view4 = true)
+            5 -> setBatteryLevel(
+                view1 = true,
+                view2 = true,
+                view3 = true,
+                view4 = true,
+                view5 = true
+            )
+            6 -> setBatteryLevel(
+                view1 = true,
+                view2 = true,
+                view3 = true,
+                view4 = true,
+                view5 = true,
+                view6 = true
+            )
+            7 -> setBatteryLevel(
+                view1 = true,
+                view2 = true,
+                view3 = true,
+                view4 = true,
+                view5 = true,
+                view6 = true,
+                view7 = true
+            )
+            8 -> setBatteryLevel(
+                view1 = true,
+                view2 = true,
+                view3 = true,
+                view4 = true,
+                view5 = true,
+                view6 = true,
+                view7 = true,
+                view8 = true
+            )
         }
+    }
+
+    private fun setBatteryLevel(
+        view1: Boolean = false,
+        view2: Boolean = false,
+        view3: Boolean = false,
+        view4: Boolean = false,
+        view5: Boolean = false,
+        view6: Boolean = false,
+        view7: Boolean = false,
+        view8: Boolean = false
+    ) {
+        batteryLevel1View.visibility = if (view1) View.VISIBLE else View.INVISIBLE
+        batteryLevel2View.visibility = if (view2) View.VISIBLE else View.INVISIBLE
+        batteryLevel3View.visibility = if (view3) View.VISIBLE else View.INVISIBLE
+        batteryLevel4View.visibility = if (view4) View.VISIBLE else View.INVISIBLE
+        batteryLevel5View.visibility = if (view5) View.VISIBLE else View.INVISIBLE
+        batteryLevel6View.visibility = if (view6) View.VISIBLE else View.INVISIBLE
+        batteryLevel7View.visibility = if (view7) View.VISIBLE else View.INVISIBLE
+        batteryLevel8View.visibility = if (view8) View.VISIBLE else View.INVISIBLE
     }
 
     private fun notification(batteryDepletedAt: Timestamp, locationName: String) {
         val intent = Intent(context, NotificationBroadcastReceiver::class.java)
         val date = Date(batteryDepletedAt.time)
-        val dateAlarm = Date(batteryDepletedAt.time - day)
+        val dateAlarm = Date((batteryDepletedAt.time) - day)
         intent.putExtra(BATTERY_DEPLETED_AT, date.toDateTimeString())
         intent.putExtra(LOCATION_NAME, locationName)
 
@@ -215,13 +221,14 @@ class PerformBatteryFragment : Fragment() {
 
         val cal = Calendar.getInstance()
         cal.time = dateAlarm
-
-        val alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmManager.setExact(
-            AlarmManager.RTC_WAKEUP,
-            cal.timeInMillis,
-            pendingIntent
-        )
+        if (dateAlarm.time > System.currentTimeMillis()) {
+            val alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            alarmManager.setExact(
+                AlarmManager.RTC_WAKEUP,
+                cal.timeInMillis,
+                pendingIntent
+            )
+        }
     }
 
     companion object {

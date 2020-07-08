@@ -96,6 +96,8 @@
     <string name="days">Estimated battery duration: %s days</string>
     <string name="day">Estimated battery duration: %s day</string>
     <string name="notification">A notification will be sent a day \nbefore the battery is due to run out</string>
+    <string name="too_low_battery">The battery level is too low \nto estimate the recording duration</string>
+    <string name="recharging">Batteries need recharging!</string>
 
     <!--  LocationFragment  -->
     <string name="latitude">Latitude</string>
