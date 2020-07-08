@@ -146,6 +146,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
+        mapboxMap.uiSettings.isAttributionEnabled = false
+        mapboxMap.uiSettings.isLogoEnabled = false
+
         context?.let {
             retrieveDeployments(it)
             retrieveLocations(it)

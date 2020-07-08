@@ -271,6 +271,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
         mapboxMap.uiSettings.setAllGesturesEnabled(false)
+        mapboxMap.uiSettings.isAttributionEnabled = false
+        mapboxMap.uiSettings.isLogoEnabled = false
 
         mapboxMap.setStyle(Style.OUTDOORS) {
             symbolManager = SymbolManager(mapView, mapboxMap, it)
