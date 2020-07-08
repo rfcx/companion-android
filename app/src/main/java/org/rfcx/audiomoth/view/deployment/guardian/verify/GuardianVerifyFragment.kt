@@ -2,21 +2,29 @@ package org.rfcx.audiomoth.view.deployment.guardian.verify
 
 import android.content.Context
 import android.graphics.drawable.GradientDrawable
-import android.graphics.drawable.ShapeDrawable
-import android.graphics.drawable.StateListDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_guardian_verify.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.connection.socket.OnReceiveResponse
+import org.rfcx.audiomoth.connection.socket.SocketManager
+import org.rfcx.audiomoth.entity.socket.SignalResponse
+import org.rfcx.audiomoth.entity.socket.SocketResposne
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
+import java.util.*
 
-class GuardianVerifyFragment : Fragment() {
+class GuardianVerifyFragment : Fragment(), OnReceiveResponse {
     private val listOfSignal by lazy {
         listOf(signalStrength1, signalStrength2, signalStrength3, signalStrength4)
+    }
+
+    private val timer by lazy {
+        Timer()
     }
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
@@ -36,6 +44,7 @@ class GuardianVerifyFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        deploymentProtocol?.showLoading()
         retrieveGuardianSignal()
 
         finishButton.setOnClickListener {
@@ -44,31 +53,11 @@ class GuardianVerifyFragment : Fragment() {
     }
 
     private fun retrieveGuardianSignal() {
-        //TODO: need to be from guardian instead
-        val strength = 21 // mock
-        when {
-            strength > 80 -> {
-                showSignalStrength(SignalState.MAX)
-                signalDescText.text = getString(R.string.signal_text_4)
+        timer.schedule(object : TimerTask(){
+            override fun run() {
+                SocketManager.getSignalStrength(this@GuardianVerifyFragment)
             }
-            strength > 60 -> {
-                showSignalStrength(SignalState.HIGH)
-                signalDescText.text = getString(R.string.signal_text_3)
-            }
-            strength > 40 -> {
-                showSignalStrength(SignalState.NORMAL)
-                signalDescText.text = getString(R.string.signal_text_2)
-            }
-            strength > 20 -> {
-                showSignalStrength(SignalState.LOW)
-                signalDescText.text = getString(R.string.signal_text_1)
-            }
-            else -> {
-                showSignalStrength(SignalState.NONE)
-                signalDescText.text = getString(R.string.signal_text_0)
-            }
-        }
-        signalValue.text = strength.toString()
+        }, DELAY, MILLI_PERIOD)
     }
 
     private fun showSignalStrength(state: SignalState) {
@@ -79,8 +68,53 @@ class GuardianVerifyFragment : Fragment() {
         }
     }
 
+    override fun onReceive(response: SocketResposne) {
+        deploymentProtocol?.hideLoading()
+        val signalResponse = response as SignalResponse
+        val strength = signalResponse.signal.strength
+        requireActivity().runOnUiThread {
+            when {
+                strength > 80 -> {
+                    showSignalStrength(SignalState.MAX)
+                    signalDescText.text = getString(R.string.signal_text_4)
+                }
+                strength > 60 -> {
+                    showSignalStrength(SignalState.HIGH)
+                    signalDescText.text = getString(R.string.signal_text_3)
+                }
+                strength > 40 -> {
+                    showSignalStrength(SignalState.NORMAL)
+                    signalDescText.text = getString(R.string.signal_text_2)
+                }
+                strength > 20 -> {
+                    showSignalStrength(SignalState.LOW)
+                    signalDescText.text = getString(R.string.signal_text_1)
+                }
+                else -> {
+                    showSignalStrength(SignalState.NONE)
+                    signalDescText.text = getString(R.string.signal_text_0)
+                }
+            }
+            signalValue.text = getString(R.string.signal_value, strength)
+        }
+    }
+
+    override fun onFailed(message: String) {
+        requireActivity().runOnUiThread {
+            Toast.makeText(requireContext(), "Getting signal failed", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        timer.cancel()
+    }
+
     companion object {
-        enum class SignalState(val value: Int) {
+        private const val DELAY = 0L
+        private const val MILLI_PERIOD = 1000L
+
+        private enum class SignalState(val value: Int) {
             NONE(0), LOW(1), NORMAL(2), HIGH(3), MAX(4)
         }
 

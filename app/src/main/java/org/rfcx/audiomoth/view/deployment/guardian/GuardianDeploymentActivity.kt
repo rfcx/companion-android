@@ -25,10 +25,8 @@ import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianConfigureFr
 import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianSelectProfileFragment
 import org.rfcx.audiomoth.view.deployment.guardian.connect.ConnectGuardianFragment
 import org.rfcx.audiomoth.view.deployment.guardian.deploy.GuardianDeployFragment
-import org.rfcx.audiomoth.view.deployment.guardian.sync.GuardianSyncFragment
 import org.rfcx.audiomoth.view.deployment.guardian.verify.GuardianVerifyFragment
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
-import org.rfcx.audiomoth.view.deployment.sync.SyncFragment.Companion.BEFORE_SYNC
 import org.rfcx.audiomoth.view.dialog.CompleteFragment
 import org.rfcx.audiomoth.view.dialog.CompleteListener
 import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
@@ -215,7 +213,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         when (currentStep) {
             0 -> {
                 updateDeploymentState(DeploymentState.Guardian.Connect)
-                startFragment(ConnectGuardianFragment.newInstance())
+                startFragment(GuardianVerifyFragment.newInstance())
             }
             1 -> {
                 updateDeploymentState(DeploymentState.Guardian.Locate)
@@ -248,7 +246,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         this._deployment?.let { deploymentDb.updateDeployment(it) }
     }
 
-    private fun showLoading() {
+    override fun showLoading() {
         val loadingDialog: LoadingDialogFragment =
             supportFragmentManager.findFragmentByTag(loadingDialogTag) as LoadingDialogFragment?
                 ?: run {
@@ -266,7 +264,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         completeFragment.show(supportFragmentManager, CompleteFragment.tag)
     }
 
-    private fun hideLoading() {
+    override fun hideLoading() {
         val loadingDialog: LoadingDialogFragment? =
             supportFragmentManager.findFragmentByTag(loadingDialogTag) as LoadingDialogFragment?
         loadingDialog?.dismissDialog()

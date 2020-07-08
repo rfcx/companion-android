@@ -17,4 +17,7 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocal {
     fun getConfiguration(): GuardianConfiguration?
 
     fun setProfile(profile: GuardianProfile)
+
+    fun showLoading()
+    fun hideLoading()
 }
