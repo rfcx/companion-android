@@ -18,8 +18,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_configure.*
-import kotlinx.android.synthetic.main.fragment_configure.radioGroup
-import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.DURATION_SELECTED_DEFAULT
 import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.GAIN_DEFAULT
@@ -98,8 +96,14 @@ class ConfigureFragment : Fragment(),
         profile = deploymentProtocol?.getProfile()
         deploymentProtocol?.hideCompleteButton()
 
-        if(profile?.name != null){
+        if (profile?.name != null) {
             profileEditText.setText(profile?.name)
+        }
+
+        profile?.durationSelected.let {
+            if (it != null) {
+                durationSelected = it
+            }
         }
 
         for (time in timeList) {
