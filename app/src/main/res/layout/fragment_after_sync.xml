@@ -55,7 +55,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/noButton"
-        style="@style/AudioMothButton.RedButton.Line"
+        style="@style/GuardianButton.GreenButton.Line"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"

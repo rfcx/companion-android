@@ -136,7 +136,9 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         _deployment?.let { deploymentDb.updateDeployment(it) }
         // update profile
         if (profile.name.isNotEmpty()) {
-            profileDb.insertOrUpdateProfile(profile)
+            if (!profileDb.isExistingProfile(profile.name)) {
+                profileDb.insertOrUpdateProfile(profile)
+            }
         }
 
         nextStep()
@@ -285,18 +287,9 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
     }
 
     private fun handleSelectingConfig() {
-        if (_configuration != null) {
-            val config = _configuration
-            if (config != null) {
-                val profile = Profile(
-                    gain = config.gain,
-                    name = "",
-                    sampleRate = config.sampleRate,
-                    recordingDuration = config.recordingDuration,
-                    sleepDuration = config.sleepDuration,
-                    recordingPeriodList = config.recordingPeriodList,
-                    durationSelected = config.durationSelected
-                )
+        if (_profile != null) {
+            val profile = _profile
+            if (profile != null) {
                 startSetupConfigure(profile)
             }
         } else {

@@ -26,8 +26,8 @@
         android:id="@+id/configImageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:src="@drawable/edge_red"
         android:layout_margin="@dimen/margin_padding_small"
+        android:src="@drawable/edge_red"
         app:layout_constraintBottom_toBottomOf="@id/guidelineHorizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -43,15 +43,16 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/configImageView"/>
+        app:layout_constraintTop_toBottomOf="@id/configImageView" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/batteryLv1Button"
         style="@style/AudioMothButton.GreenButton"
-        android:layout_width="@dimen/button_battery_lv"
-        android:layout_height="@dimen/button_battery_lv"
-        android:layout_marginTop="@dimen/margin_padding_large"
+        android:layout_width="@dimen/button_battery"
+        android:layout_height="@dimen/button_battery"
+        android:layout_marginTop="@dimen/margin_padding_normal"
         android:text="1"
+        android:textSize="@dimen/text_small"
         app:layout_constraintEnd_toStartOf="@id/batteryLv2Button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/BatteryLevelLabel" />
@@ -59,10 +60,11 @@
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/batteryLv2Button"
         style="@style/AudioMothButton.GreenButton"
-        android:layout_width="@dimen/button_battery_lv"
-        android:layout_height="@dimen/button_battery_lv"
-        android:layout_marginTop="@dimen/margin_padding_large"
+        android:layout_width="@dimen/button_battery"
+        android:layout_height="@dimen/button_battery"
+        android:layout_marginTop="@dimen/margin_padding_normal"
         android:text="2"
+        android:textSize="@dimen/text_small"
         app:layout_constraintEnd_toStartOf="@id/batteryLv3Button"
         app:layout_constraintStart_toEndOf="@id/batteryLv1Button"
         app:layout_constraintTop_toBottomOf="@id/BatteryLevelLabel" />
@@ -70,10 +72,11 @@
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/batteryLv3Button"
         style="@style/AudioMothButton.GreenButton"
-        android:layout_width="@dimen/button_battery_lv"
-        android:layout_height="@dimen/button_battery_lv"
-        android:layout_marginTop="@dimen/margin_padding_large"
+        android:layout_width="@dimen/button_battery"
+        android:layout_height="@dimen/button_battery"
+        android:layout_marginTop="@dimen/margin_padding_normal"
         android:text="3"
+        android:textSize="@dimen/text_small"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/batteryLv2Button"
         app:layout_constraintTop_toBottomOf="@id/BatteryLevelLabel" />
@@ -81,39 +84,79 @@
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/batteryLv4Button"
         style="@style/AudioMothButton.GreenButton"
-        android:layout_width="@dimen/button_battery_lv"
-        android:layout_height="@dimen/button_battery_lv"
+        android:layout_width="@dimen/button_battery"
+        android:layout_height="@dimen/button_battery"
         android:layout_marginTop="@dimen/margin_padding_normal"
-        app:layout_constraintEnd_toStartOf="@id/batteryLv5Button"
+        android:text="4"
+        android:textSize="@dimen/text_small"
+        app:layout_constraintEnd_toStartOf="@id/batteryLv2Button"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/batteryLv1Button"
-        android:text="4" />
+        app:layout_constraintTop_toBottomOf="@id/batteryLv1Button" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/batteryLv5Button"
         style="@style/AudioMothButton.GreenButton"
-        android:layout_width="@dimen/button_battery_lv"
-        android:layout_height="@dimen/button_battery_lv"
+        android:layout_width="@dimen/button_battery"
+        android:layout_height="@dimen/button_battery"
         android:layout_marginTop="@dimen/margin_padding_normal"
-        app:layout_constraintEnd_toStartOf="@id/batteryLv6Button"
-        app:layout_constraintStart_toEndOf="@id/batteryLv4Button"
-        app:layout_constraintTop_toBottomOf="@id/batteryLv2Button"
-        android:text="5" />
+        android:text="5"
+        android:textSize="@dimen/text_small"
+        app:layout_constraintEnd_toStartOf="@id/batteryLv3Button"
+        app:layout_constraintStart_toEndOf="@id/batteryLv1Button"
+        app:layout_constraintTop_toBottomOf="@id/batteryLv1Button" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/batteryLv6Button"
         style="@style/AudioMothButton.GreenButton"
-        android:layout_width="@dimen/button_battery_lv"
-        android:layout_height="@dimen/button_battery_lv"
+        android:layout_width="@dimen/button_battery"
+        android:layout_height="@dimen/button_battery"
         android:layout_marginTop="@dimen/margin_padding_normal"
+        android:text="6"
+        android:textSize="@dimen/text_small"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/batteryLv2Button"
-        app:layout_constraintTop_toBottomOf="@id/batteryLv3Button"
-        android:text="6" />
+        app:layout_constraintStart_toEndOf="@id/batteryLv5Button"
+        app:layout_constraintTop_toBottomOf="@id/batteryLv1Button" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/batteryLv7Button"
+        style="@style/AudioMothButton.GreenButton"
+        android:layout_width="@dimen/button_battery"
+        android:layout_height="@dimen/button_battery"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:text="7"
+        android:textSize="@dimen/text_small"
+        app:layout_constraintEnd_toStartOf="@id/batteryLv2Button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/batteryLv5Button" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/batteryLv8Button"
+        style="@style/AudioMothButton.GreenButton"
+        android:layout_width="@dimen/button_battery"
+        android:layout_height="@dimen/button_battery"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:text="8"
+        android:textSize="@dimen/text_small"
+        app:layout_constraintEnd_toStartOf="@id/batteryLv3Button"
+        app:layout_constraintStart_toEndOf="@id/batteryLv1Button"
+        app:layout_constraintTop_toBottomOf="@id/batteryLv5Button" />
+
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/batteryLv9Button"
+        style="@style/AudioMothButton.GreenButton"
+        android:layout_width="@dimen/button_battery"
+        android:layout_height="@dimen/button_battery"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:text="9+"
+        android:textSize="@dimen/text_small"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/batteryLv8Button"
+        app:layout_constraintTop_toBottomOf="@id/batteryLv5Button" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/tryAgainButton"
-        style="@style/AudioMothButton.GreyButton.Line"
+        style="@style/GuardianButton.GreenButton.Line"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/margin_padding_small"

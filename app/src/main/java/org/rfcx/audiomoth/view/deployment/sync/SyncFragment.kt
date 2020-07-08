@@ -40,7 +40,6 @@ class SyncFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         when (status) {
             BEFORE_SYNC -> beforeSync()
-            SYNCING -> syncing()
             AFTER_SYNC -> afterSync()
         }
     }
@@ -52,13 +51,6 @@ class SyncFragment : Fragment() {
         nextButton.setOnClickListener {
             deploymentProtocol?.playSyncSound()
             deploymentProtocol?.startSyncing(SYNCING)
-        }
-    }
-
-    private fun syncing() {
-        progressBarHorizontal.visibility = View.GONE
-        cancelButton.setOnClickListener {
-            deploymentProtocol?.startSyncing(BEFORE_SYNC)
         }
     }
 
