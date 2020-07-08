@@ -22,10 +22,10 @@ class ProfileDb(private val realm: Realm) {
         }
     }
 
-    fun checkProfileExisting(name: String): Boolean {
+    fun isExistingProfile(name: String): Boolean {
         val count = realm.where(Profile::class.java)
             .equalTo(Profile.FIELD_NAME, name).count()
-        return count.toInt() == 0
+        return count.toInt() != 0
     }
 
     fun getProfiles(): List<Profile> {

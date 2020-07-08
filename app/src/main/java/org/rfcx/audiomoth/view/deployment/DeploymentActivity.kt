@@ -136,7 +136,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         _deployment?.let { deploymentDb.updateDeployment(it) }
         // update profile
         if (profile.name.isNotEmpty()) {
-            if (profileDb.checkProfileExisting(profile.name)) {
+            if (!profileDb.isExistingProfile(profile.name)) {
                 profileDb.insertOrUpdateProfile(profile)
             }
         }
@@ -290,16 +290,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         if (_profile != null) {
             val profile = _profile
             if (profile != null) {
-                val newProfile = Profile(
-                    gain = profile.gain,
-                    name = profile.name,
-                    sampleRate = profile.sampleRate,
-                    recordingDuration = profile.recordingDuration,
-                    sleepDuration = profile.sleepDuration,
-                    recordingPeriodList = profile.recordingPeriodList,
-                    durationSelected = profile.durationSelected
-                )
-                startSetupConfigure(newProfile)
+                startSetupConfigure(profile)
             }
         } else {
             this._profiles = profileDb.getProfiles()
