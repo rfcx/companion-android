@@ -98,6 +98,10 @@ class ConfigureFragment : Fragment(),
         profile = deploymentProtocol?.getProfile()
         deploymentProtocol?.hideCompleteButton()
 
+        if(profile?.name != null){
+            profileEditText.setText(profile?.name)
+        }
+
         for (time in timeList) {
             profile?.let {
                 timeState.add(

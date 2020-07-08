@@ -285,19 +285,19 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
     }
 
     private fun handleSelectingConfig() {
-        if (_configuration != null) {
-            val config = _configuration
-            if (config != null) {
-                val profile = Profile(
-                    gain = config.gain,
-                    name = "",
-                    sampleRate = config.sampleRate,
-                    recordingDuration = config.recordingDuration,
-                    sleepDuration = config.sleepDuration,
-                    recordingPeriodList = config.recordingPeriodList,
-                    durationSelected = config.durationSelected
+        if (_profile != null) {
+            val profile = _profile
+            if (profile != null) {
+                val newProfile = Profile(
+                    gain = profile.gain,
+                    name = profile.name,
+                    sampleRate = profile.sampleRate,
+                    recordingDuration = profile.recordingDuration,
+                    sleepDuration = profile.sleepDuration,
+                    recordingPeriodList = profile.recordingPeriodList,
+                    durationSelected = profile.durationSelected
                 )
-                startSetupConfigure(profile)
+                startSetupConfigure(newProfile)
             }
         } else {
             this._profiles = profileDb.getProfiles()

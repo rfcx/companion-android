@@ -38,7 +38,16 @@ class SelectProfileFragment : Fragment(), (Profile) -> Unit {
 
     // @{ProfilesAdapter.itemClickListener}
     override fun invoke(profile: Profile) {
-        deploymentProtocol?.startSetupConfigure(profile)
+        val profileFromSelect = Profile(
+            gain = profile.gain,
+            name = "",
+            sampleRate = profile.sampleRate,
+            recordingDuration = profile.recordingDuration,
+            sleepDuration = profile.sleepDuration,
+            recordingPeriodList = profile.recordingPeriodList,
+            durationSelected = profile.durationSelected
+        )
+        deploymentProtocol?.startSetupConfigure(profileFromSelect)
     }
 
     private fun setupView() {
