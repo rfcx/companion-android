@@ -136,7 +136,9 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         _deployment?.let { deploymentDb.updateDeployment(it) }
         // update profile
         if (profile.name.isNotEmpty()) {
-            profileDb.insertOrUpdateProfile(profile)
+            if (profileDb.checkProfileExisting(profile.name)) {
+                profileDb.insertOrUpdateProfile(profile)
+            }
         }
 
         nextStep()

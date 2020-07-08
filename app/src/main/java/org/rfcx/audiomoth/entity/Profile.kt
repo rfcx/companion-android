@@ -62,6 +62,7 @@ open class Profile(
     companion object {
         const val FIELD_ID = "id"
         const val FIELD_SYNC_STATE = "syncState"
+        const val FIELD_NAME = "name"
 
         fun default() = Profile(
             gain = GAIN_DEFAULT,
