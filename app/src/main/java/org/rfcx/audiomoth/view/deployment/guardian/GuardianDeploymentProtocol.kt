@@ -7,7 +7,6 @@ import org.rfcx.audiomoth.view.deployment.BaseDeploymentProtocal
 
 interface GuardianDeploymentProtocol : BaseDeploymentProtocal {
     fun startSetupConfigure(profile: GuardianProfile)
-    fun startSyncing(status: String)
     fun backToConfigure()
     fun setDeploymentConfigure(profile: GuardianProfile)
     fun setDeployment(deployment: GuardianDeployment)
