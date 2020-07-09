@@ -3,6 +3,7 @@ package org.rfcx.audiomoth.view.deployment.guardian.verify
 import android.content.Context
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -64,6 +65,8 @@ class GuardianVerifyFragment : Fragment(), OnReceiveResponse {
         listOfSignal.forEachIndexed { index, view ->
             if (index < state.value){
                 (view.background as GradientDrawable).setBackground(requireContext(), R.color.signal_filled)
+            } else {
+                (view.background as GradientDrawable).setBackground(requireContext(), R.color.white)
             }
         }
     }
@@ -71,22 +74,22 @@ class GuardianVerifyFragment : Fragment(), OnReceiveResponse {
     override fun onReceive(response: SocketResposne) {
         deploymentProtocol?.hideLoading()
         val signalResponse = response as SignalResponse
-        val strength = signalResponse.signal.strength
+        val strength = signalResponse.signal
         requireActivity().runOnUiThread {
             when {
-                strength > 80 -> {
+                strength > -70 -> {
                     showSignalStrength(SignalState.MAX)
                     signalDescText.text = getString(R.string.signal_text_4)
                 }
-                strength > 60 -> {
+                strength > -90 -> {
                     showSignalStrength(SignalState.HIGH)
                     signalDescText.text = getString(R.string.signal_text_3)
                 }
-                strength > 40 -> {
+                strength > -110 -> {
                     showSignalStrength(SignalState.NORMAL)
                     signalDescText.text = getString(R.string.signal_text_2)
                 }
-                strength > 20 -> {
+                strength > -130 -> {
                     showSignalStrength(SignalState.LOW)
                     signalDescText.text = getString(R.string.signal_text_1)
                 }

@@ -118,11 +118,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                     handleFragment(currentStep)
                 }
             }
-            4 -> {
-                currentStep = 2
-                stepView.go(currentStep, true)
-                startFragment(GuardianConfigureFragment.newInstance())
-            }
             else -> {
                 currentStep = stepView.currentStep - 1
                 stepView.go(currentStep, true)
@@ -213,7 +208,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         when (currentStep) {
             0 -> {
                 updateDeploymentState(DeploymentState.Guardian.Connect)
-                startFragment(GuardianVerifyFragment.newInstance())
+                startFragment(ConnectGuardianFragment.newInstance())
             }
             1 -> {
                 updateDeploymentState(DeploymentState.Guardian.Locate)
