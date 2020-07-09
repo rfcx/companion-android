@@ -22,6 +22,7 @@ object SocketManager {
     private const val SYNC = "sync"
     private const val PREFS = "prefs"
     private const val SIGNAL = "signal"
+    private const val SIGNAL_INFO = "signal_info"
 
     fun connect(onReceiveResponse: OnReceiveResponse) {
         val data = gson.toJson(SocketRequest(CONNECTION))
@@ -96,7 +97,7 @@ object SocketManager {
                                 val response = gson.fromJson(dataInput, PrefsResponse::class.java)
                                 onReceiveResponse.onReceive(response)
                             }
-                            SIGNAL -> {
+                            SIGNAL_INFO -> {
                                 val response = gson.fromJson(dataInput, SignalResponse::class.java)
                                 onReceiveResponse.onReceive(response)
                             }

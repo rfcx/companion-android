@@ -71,34 +71,62 @@ class GuardianVerifyFragment : Fragment(), OnReceiveResponse {
         }
     }
 
+    private fun showSignalInfo() {
+        signalDescText.visibility = View.VISIBLE
+        signalValue.visibility = View.VISIBLE
+    }
+
+    private fun hideSignalInfo() {
+        signalDescText.visibility = View.GONE
+        signalValue.visibility = View.GONE
+    }
+
+    private fun showSimError() {
+        signalErrorText.visibility = View.VISIBLE
+    }
+
+    private fun hideSimError() {
+        signalErrorText.visibility = View.GONE
+    }
+
     override fun onReceive(response: SocketResposne) {
         deploymentProtocol?.hideLoading()
         val signalResponse = response as SignalResponse
-        val strength = signalResponse.signal
+        val strength = signalResponse.signalInfo.signal
+        val simCard = signalResponse.signalInfo.simCard
         requireActivity().runOnUiThread {
-            when {
-                strength > -70 -> {
-                    showSignalStrength(SignalState.MAX)
-                    signalDescText.text = getString(R.string.signal_text_4)
+            if (simCard) {
+                hideSimError()
+                showSignalInfo()
+                when {
+                    strength > -70 -> {
+                        showSignalStrength(SignalState.MAX)
+                        signalDescText.text = getString(R.string.signal_text_4)
+                    }
+                    strength > -90 -> {
+                        showSignalStrength(SignalState.HIGH)
+                        signalDescText.text = getString(R.string.signal_text_3)
+                    }
+                    strength > -110 -> {
+                        showSignalStrength(SignalState.NORMAL)
+                        signalDescText.text = getString(R.string.signal_text_2)
+                    }
+                    strength > -130 -> {
+                        showSignalStrength(SignalState.LOW)
+                        signalDescText.text = getString(R.string.signal_text_1)
+                    }
+                    else -> {
+                        showSignalStrength(SignalState.NONE)
+                        signalDescText.text = getString(R.string.signal_text_0)
+                    }
                 }
-                strength > -90 -> {
-                    showSignalStrength(SignalState.HIGH)
-                    signalDescText.text = getString(R.string.signal_text_3)
-                }
-                strength > -110 -> {
-                    showSignalStrength(SignalState.NORMAL)
-                    signalDescText.text = getString(R.string.signal_text_2)
-                }
-                strength > -130 -> {
-                    showSignalStrength(SignalState.LOW)
-                    signalDescText.text = getString(R.string.signal_text_1)
-                }
-                else -> {
-                    showSignalStrength(SignalState.NONE)
-                    signalDescText.text = getString(R.string.signal_text_0)
-                }
+                signalValue.text = getString(R.string.signal_value, strength)
+            } else {
+                hideSignalInfo()
+                showSimError()
+                showSignalStrength(SignalState.NONE)
+                signalErrorText.text = getText(R.string.signal_sim_card)
             }
-            signalValue.text = getString(R.string.signal_value, strength)
         }
     }
 

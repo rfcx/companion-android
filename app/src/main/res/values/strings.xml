@@ -275,5 +275,6 @@
     <string name="signal_text_3">The signal strength is high</string>
     <string name="signal_text_4">The signal strength is very high or max</string>
     <string name="signal_value">%d dBm</string>
+    <string name="signal_sim_card">The device does not have sim card inserted.\nPlease insert it before deploy.</string>
 
 </resources>

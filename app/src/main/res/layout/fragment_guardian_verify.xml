@@ -90,6 +90,20 @@
         tools:text="The signal is good" />
 
     <TextView
+        android:id="@+id/signalErrorText"
+        style="@style/AudioMothText.Body.Headline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_padding_xlarge"
+        android:textSize="14sp"
+        android:textColor="@color/text_error"
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/signalStrengthLayout"
+        tools:text="The signal is good" />
+
+    <TextView
         android:id="@+id/signalValue"
         style="@style/AudioMothText.Body.Headline"
         android:layout_width="wrap_content"
