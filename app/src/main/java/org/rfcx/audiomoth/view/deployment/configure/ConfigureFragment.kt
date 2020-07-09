@@ -330,8 +330,7 @@ class ConfigureFragment : Fragment(),
                 updateProfile()
             }
         } else {
-            setNextButton(true)
-            Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT).show()
+            updateProfile()
         }
     }
 
