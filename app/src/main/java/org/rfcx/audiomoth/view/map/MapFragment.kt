@@ -186,11 +186,18 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setupImages(style: Style) {
-        val drawablePinGuardian =
+        val drawablePinConnectedGuardian =
             ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map, null)
-        val mBitmapPinGuardian = BitmapUtils.getBitmapFromDrawable(drawablePinGuardian)
-        if (mBitmapPinGuardian != null) {
-            style.addImage(MARKER_GUARDIAN_PIN, mBitmapPinGuardian)
+        val mBitmapPinConnectedGuardian = BitmapUtils.getBitmapFromDrawable(drawablePinConnectedGuardian)
+        if (mBitmapPinConnectedGuardian != null) {
+            style.addImage(GuardianPin.CONNECTED_GUARDIAN, mBitmapPinConnectedGuardian)
+        }
+
+        val drawablePinNotConnectedGuardian =
+            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map_grey, null)
+        val mBitmapPinNotConnectedGuardian = BitmapUtils.getBitmapFromDrawable(drawablePinNotConnectedGuardian)
+        if (mBitmapPinNotConnectedGuardian != null) {
+            style.addImage(GuardianPin.NOT_CONNECTED_GUARDIAN, mBitmapPinNotConnectedGuardian)
         }
 
         val drawablePinMapGreen =
@@ -572,12 +579,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun GuardianDeployment.toMark(): DeploymentMarker {
+        val pinImage = GuardianPin.getGuardianPinImage(requireContext(), this.wifiName!!)
         return DeploymentMarker(
             id,
             location?.name ?: "",
             location?.longitude ?: 0.0,
             location?.latitude ?: 0.0,
-            MARKER_GUARDIAN_PIN,
+            pinImage,
             "-",
             Device.GUARDIAN.value,
             createdAt

@@ -11,6 +11,7 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocal {
     fun backToConfigure()
     fun setDeploymentConfigure(profile: GuardianProfile)
     fun setDeployment(deployment: GuardianDeployment)
+    fun setDeploymentWifiName(name: String)
 
     fun getProfiles(): List<GuardianProfile>
     fun getProfile(): GuardianProfile?

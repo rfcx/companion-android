@@ -10,6 +10,7 @@ import java.util.*
 data class GuardianDeploymentResponse(
     var serverId: String? = null,
     var deployedAt: Date? = Date(),
+    var wifi: String? = null,
     var configuration: GuardianConfiguration? = null,
     var location: DeploymentLocation? = null,
     var createdAt: Date? = Date()
@@ -20,6 +21,7 @@ fun GuardianDeploymentResponse.toGuardianDeployment(): GuardianDeployment {
         serverId = this.serverId,
         deployedAt = this.deployedAt ?: Date(),
         state = DeploymentState.Guardian.ReadyToUpload.key,
+        wifiName = this.wifi,
         configuration = this.configuration,
         location = this.location,
         createdAt = this.createdAt ?: Date(),

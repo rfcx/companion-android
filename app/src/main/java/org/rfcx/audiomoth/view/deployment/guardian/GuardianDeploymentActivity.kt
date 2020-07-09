@@ -152,6 +152,12 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         this._deployment = deployment
     }
 
+    override fun setDeploymentWifiName(name: String) {
+        val deployment = _deployment ?: GuardianDeployment()
+        deployment.wifiName = name
+        setDeployment(deployment)
+    }
+
     override fun setDeploymentConfigure(profile: GuardianProfile) {
         setProfile(profile)
         this._configuration = profile.asConfiguration()
