@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,6 +26,7 @@ import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.RECORDING_DURATION_DEFA
 import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.SAMPLE_RATE_DEFAULT
 import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.SLEEP_DURATION_DEFAULT
 import org.rfcx.audiomoth.entity.Profile
+import org.rfcx.audiomoth.util.convertToStopStartPeriods
 import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 
 class ConfigureFragment : Fragment(),
@@ -170,7 +172,7 @@ class ConfigureFragment : Fragment(),
         recordingDurationEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
                 if (p0 != null && p0.toString() != "") {
-                    if(p0.toString().toInt() < MINIMUM_RECORDING_DURATION){
+                    if (p0.toString().toInt() < MINIMUM_RECORDING_DURATION) {
                         recordingDurationEditText.error = getString(R.string.minimum_1_second)
                     }
                 }
@@ -184,7 +186,7 @@ class ConfigureFragment : Fragment(),
         sleepDurationEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
                 if (p0 != null && p0.toString() != "") {
-                    if(p0.toString().toInt() < MINIMUM_SLEEP_DURATION){
+                    if (p0.toString().toInt() < MINIMUM_SLEEP_DURATION) {
                         sleepDurationEditText.error = getString(R.string.minimum_5_second)
                     }
                 }
@@ -293,7 +295,9 @@ class ConfigureFragment : Fragment(),
     }
 
     private fun setupData() {
+        val array = arrayListOf<Boolean>()
         timeState.forEach { timeStatus ->
+            array.add(timeStatus.state)
             if (timeStatus.state) {
                 recordingPeriod.add(timeStatus.time)
             }
@@ -316,6 +320,19 @@ class ConfigureFragment : Fragment(),
                 sleepDuration = sleepDurationEditText.text.toString().toInt()
             }
         }
+
+        val count = convertToStopStartPeriods(array.toTypedArray())?.size
+        if (count != null) {
+            if (count > 4) {
+                setNextButton(true)
+                Toast.makeText(context, R.string.maximum_ranges, Toast.LENGTH_LONG).show()
+            } else {
+                updateProfile()
+            }
+        } else {
+            setNextButton(true)
+            Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun setNextButton(show: Boolean) {
@@ -327,7 +344,6 @@ class ConfigureFragment : Fragment(),
         nextButton.setOnClickListener {
             setNextButton(false)
             setupData()
-            updateProfile()
         }
     }
 

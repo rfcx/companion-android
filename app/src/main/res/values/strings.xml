@@ -176,6 +176,7 @@
     <string name="location_permission_msg">Deploy App would like to use your location</string>
     <string name="notification_location_not_availability">Please enable your device\'s location settings</string>
 
+    <string name="maximum_ranges">Custom recording periods maximum 4 ranges</string>
     <string name="an_error_occurred">Service unavailable</string>
     <string name="error_has_occurred">An error has occurred Please try again later</string>
     <string name="format_in_progress_step">Not yet deployed</string>
