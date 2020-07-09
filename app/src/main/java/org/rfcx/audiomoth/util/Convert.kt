@@ -42,8 +42,6 @@ fun Deployment.getStartStopPeriods(): Array<AudioMothConfiguration.StartStopPeri
             1440
         )
     )
-    val recordingPeriods = recordingPeriodList?.map { it.toDate().toIsoString() }
-    var array: Array<AudioMothConfiguration.StartStopPeriod> = arrayOf()
 
     val timeList = arrayListOf(
         "00:00",
@@ -71,40 +69,56 @@ fun Deployment.getStartStopPeriods(): Array<AudioMothConfiguration.StartStopPeri
         "22:00",
         "23:00"
     )
-    recordingPeriods?.let {
-        val arrayStartStopPeriod = arrayListOf<AudioMothConfiguration.StartStopPeriod>()
-        var timeCount = 0
-        for (time in it) {
-            val index = timeList.indexOf(time)
-            if (time == it[it.size - 1]) {
-                arrayStartStopPeriod.add(
-                    AudioMothConfiguration.StartStopPeriod(
-                        (index - timeCount) * 60,
-                        (index * 60) + 60
-                    )
-                )
-                timeCount = 0
-            } else if (index == 23) {
-                arrayStartStopPeriod.add(
-                    AudioMothConfiguration.StartStopPeriod(
-                        (index - timeCount) * 60,
-                        (index * 60) + 60
-                    )
-                )
-                timeCount = 0
-            } else if (!it.contains(timeList[index + 1])) {
-                arrayStartStopPeriod.add(
-                    AudioMothConfiguration.StartStopPeriod(
-                        (index - timeCount) * 60,
-                        (index * 60) + 60
-                    )
-                )
-                timeCount = 0
-            } else {
-                timeCount += 1
+
+    val arrayTimeState = arrayListOf<Boolean>()
+    recordingPeriodList.let {
+        if (it != null) {
+            timeList.forEach { time ->
+                arrayTimeState.add(it.contains(time))
             }
         }
-        array = arrayStartStopPeriod.toTypedArray()
     }
-    return array
+    return convertToStopStartPeriods(arrayTimeState.toTypedArray())
+}
+
+fun convertToStopStartPeriods(hours: Array<Boolean>): Array<AudioMothConfiguration.StartStopPeriod>? {
+    val numberOfHours = 24
+    val minutesInHour = 60
+    val minutesInDay = 1440
+
+    val numberOfSelectedHours = hours.fold(0) { sum, element -> sum + if (element) 1 else 0 }
+
+    if (numberOfSelectedHours == 0) return null
+    /* Handle special case where all hours are selected */
+    if (numberOfSelectedHours == numberOfHours) return arrayOf(
+        AudioMothConfiguration.StartStopPeriod(
+            0,
+            minutesInDay
+        )
+    )
+    /* There is at least one start stop period */
+    var firstHour = 0
+    val startStopPeriods = arrayListOf<AudioMothConfiguration.StartStopPeriod>()
+    /* Skip the start stop period that passes midnight for now */
+    if (hours[numberOfHours - 1] && hours[firstHour]) while (hours[firstHour]) firstHour += 1
+    /* Generate start stop periods */
+    while (firstHour < numberOfHours) {
+        /* Find the start of the period */
+        if (!hours[firstHour]) {
+            firstHour += 1
+            continue
+        }
+        /* Find the end of the period */
+        var duration = 0
+        while (hours[(firstHour + duration) % numberOfHours]) duration += 1
+        /* Add the period to the list */
+        val startMinutes: Int = firstHour * minutesInHour
+        var stopMinutes: Int = startMinutes + duration * minutesInHour
+        if (stopMinutes > minutesInDay) stopMinutes -= minutesInDay
+        startStopPeriods.add(AudioMothConfiguration.StartStopPeriod(startMinutes, stopMinutes))
+        /* Look for the next one */
+        firstHour += duration
+    }
+    /* Return array */
+    return startStopPeriods.toTypedArray()
 }
