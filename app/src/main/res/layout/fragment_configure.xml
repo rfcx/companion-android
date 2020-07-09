@@ -13,12 +13,13 @@
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/nextButton"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/padding_bottom"
             android:layout_marginStart="@dimen/margin_padding_large"
             android:layout_marginEnd="@dimen/margin_padding_large">
 
@@ -327,11 +328,9 @@
         android:layout_marginEnd="@dimen/margin_padding_large"
         android:layout_marginBottom="@dimen/margin_padding_normal"
         android:text="@string/next"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/configProgressBar"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/scrollView" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ProgressBar
         android:id="@+id/configProgressBar"
