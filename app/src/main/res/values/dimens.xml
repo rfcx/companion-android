@@ -24,5 +24,6 @@
     <dimen name="button_height">44dp</dimen>
     <dimen name="size_complete">150dp</dimen>
     <dimen name="padding_bottom">78dp</dimen>
+    <dimen name="edge_width">150dp</dimen>
 
 </resources>
