@@ -21,6 +21,7 @@ open class DiagnosticInfo(
     companion object {
         const val FIELD_ID = "id"
         const val FIELD_SYNC_STATE = "syncState"
+        const val FIELD_DEPLOY_ID = "deploymentServerId"
         const val FIELD_SERVER_ID = "serverId"
     }
 }

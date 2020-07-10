@@ -1,14 +1,11 @@
 package org.rfcx.audiomoth.localdb.guardian
 
 import io.realm.Realm
-import org.rfcx.audiomoth.entity.Deployment
-import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.SyncState
 import org.rfcx.audiomoth.entity.guardian.Diagnostic
 import org.rfcx.audiomoth.entity.guardian.DiagnosticInfo
 import org.rfcx.audiomoth.entity.response.DiagnosticResponse
-import org.rfcx.audiomoth.entity.response.LocationResponse
-import org.rfcx.audiomoth.entity.response.toLocate
+import java.util.*
 
 class DiagnosticDb(private val realm: Realm) {
 
@@ -18,18 +15,47 @@ class DiagnosticDb(private val realm: Realm) {
             .count()
     }
 
-    fun insertOrUpdate(diagnostic: DiagnosticInfo): Int {
-        var id = diagnostic.id
+    private fun getIdByDeploymentServerId(deploymentServerId: String?): Int {
+        var id = 0
         realm.executeTransaction {
-            if (diagnostic.id == 0) {
-                id = (it.where(DiagnosticInfo::class.java).max(DiagnosticInfo.FIELD_ID)
-                    ?.toInt() ?: 0) + 1
-                diagnostic.id = id
-            }
-            diagnostic.syncState = SyncState.Unsent.key
-            it.insertOrUpdate(diagnostic)
+            id = it.where(DiagnosticInfo::class.java)
+                .equalTo(DiagnosticInfo.FIELD_DEPLOY_ID, deploymentServerId)
+                .max(DiagnosticInfo.FIELD_ID)?.toInt() ?: 0
         }
         return id
+    }
+
+    fun insertOrUpdate(diagnostic: Diagnostic, deploymentServerId: String?) {
+        var id = getIdByDeploymentServerId(deploymentServerId)
+        realm.executeTransaction {
+            if (id == 0) {
+                val diagnosticInfo =
+                    DiagnosticInfo(deploymentServerId = deploymentServerId, diagnostic = diagnostic)
+                id = (it.where(DiagnosticInfo::class.java).max(DiagnosticInfo.FIELD_ID)
+                    ?.toInt() ?: 0) + 1
+                diagnosticInfo.id = id
+                diagnosticInfo.syncState = SyncState.Unsent.key
+                it.insertOrUpdate(diagnosticInfo)
+
+            } else {
+                val diagnosticInfo =
+                    it.where(DiagnosticInfo::class.java)
+                        .equalTo(DiagnosticInfo.FIELD_ID, id)
+                        .findFirst()
+                if (diagnosticInfo != null) {
+                    val newDiagnosticInfo = DiagnosticInfo(
+                        diagnosticInfo.id,
+                        diagnosticInfo.serverId,
+                        diagnosticInfo.deploymentServerId,
+                        diagnostic,
+                        Date(),
+                        SyncState.Unsent.key
+                    )
+                    it.insertOrUpdate(newDiagnosticInfo)
+                }
+
+            }
+        }
     }
 
     fun markUnsent(id: Int) {
@@ -43,7 +69,8 @@ class DiagnosticDb(private val realm: Realm) {
     private fun mark(id: Int, serverId: String? = null, syncState: Int) {
         realm.executeTransaction {
             val diagnostic =
-                it.where(DiagnosticInfo::class.java).equalTo(DiagnosticInfo.FIELD_ID, id).findFirst()
+                it.where(DiagnosticInfo::class.java).equalTo(DiagnosticInfo.FIELD_ID, id)
+                    .findFirst()
             if (diagnostic != null) {
                 diagnostic.serverId = serverId
                 diagnostic.syncState = syncState

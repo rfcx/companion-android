@@ -213,6 +213,6 @@ class Firestore(val context: Context) {
         const val COLLECTION_LOCATIONS = "locations"
         const val COLLECTION_PROFILES = "profiles"
         const val COLLECTION_IMAGES = "images"
-        const val COLLECTION_DIAGNOSTIC = "diagnostic"
+        const val COLLECTION_DIAGNOSTIC = "diagnostics"
     }
 }
