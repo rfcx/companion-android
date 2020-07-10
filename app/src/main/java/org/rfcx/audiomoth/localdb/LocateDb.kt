@@ -129,7 +129,7 @@ class LocateDb(private val realm: Realm) {
                 location.longitude = locationResponse.longitude ?: location.longitude
                 location.createdAt = locationResponse.createdAt ?: location.createdAt
                 location.lastDeploymentServerId = locationResponse.lastDeploymentServerId
-                location.lastGuardianDeploymentServerId = locationResponse.lastDeploymentServerId
+                location.lastGuardianDeploymentServerId = locationResponse.lastGuardianDeploymentServerId
             } else {
                 val locate = locationResponse.toLocate()
                 val id = (it.where(Locate::class.java).max(Deployment.FIELD_ID)
