@@ -20,7 +20,7 @@
 The companion app supports build variants for different deployment devices. Choose the build variant via View -> Tool Windows -> Build Variants.
 
 ##### Common (Default)
-- Supports RFCx Edge 1.2.0-rc.1 and AudioMoth 1.1.0 firmware [audiomoth-rfcx-0.0.7.bin](https://drive.google.com/file/d/1l61qRu5jNar_Q31gWVByjcCOKilbkYOP/view?usp=sharing)
+- Supports RFCx Edge 1.2.0-rc.1 and AudioMoth 1.1.0 firmware [audiomoth-rfcx-0.0.7.bin](https://drive.google.com/file/d/1l61qRu5jNar_Q31gWVByjcCOKilbkYOP/view?usp=sharing) and [audiomoth-rfcx-0.0.8.bin](https://drive.google.com/file/d/1Xxd1XkEdoblzhRmehg8j2nD9Z_U6mdb2/view?usp=sharing)
 
 ##### Internal
 - Supports RFCx Guardian (OrangePi 3G-IOT) [rfcx-guardian-android](https://github.com/rfcx/rfcx-guardian-android)
