@@ -44,6 +44,7 @@ import kotlinx.android.synthetic.main.layout_map_window_info.view.*
 import org.rfcx.audiomoth.MainActivityListener
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Deployment
+import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.DeploymentState.Edge
 import org.rfcx.audiomoth.entity.Device
 import org.rfcx.audiomoth.entity.Locate
@@ -260,7 +261,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             context?.let {
                 DiagnosticActivity.startActivity(
                     it,
-                    deployment.location!!
+                    deployment.location ?: DeploymentLocation.default(),
+                    WifiHotspotUtils.isConnectedWithGuardian(requireContext(), deployment.wifiName ?: "")
                 )
             }
         }
