@@ -273,7 +273,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 }
             } else {
                 context?.let {
-                    DetailDeploymentActivity.startActivity(it)
+                    DetailDeploymentActivity.startActivity(it, deployment.id)
                 }
             }
         }

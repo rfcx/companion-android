@@ -4,13 +4,27 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_feedback.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.Deployment
+import org.rfcx.audiomoth.localdb.DeploymentDb
+import org.rfcx.audiomoth.util.RealmHelper
+import org.rfcx.audiomoth.view.deployment.DeploymentActivity.Companion.DEPLOYMENT_ID
 
 class DetailDeploymentActivity : AppCompatActivity() {
+    var deployment: Deployment? = null
+    private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
+    private val deploymentDb by lazy { DeploymentDb(realm) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail_deployment)
+
+        val deploymentId = intent.extras?.getInt(DEPLOYMENT_ID)
+        if (deploymentId != null) {
+            deployment = deploymentDb.getDeploymentById(deploymentId)
+        }
 
         setupToolbar()
     }
@@ -21,7 +35,7 @@ class DetailDeploymentActivity : AppCompatActivity() {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
             elevation = 0f
-            title = "Location name"
+            title = if (deployment != null) deployment?.location?.name else "Location name"
         }
     }
 
@@ -31,8 +45,9 @@ class DetailDeploymentActivity : AppCompatActivity() {
     }
 
     companion object {
-        fun startActivity(context: Context) {
+        fun startActivity(context: Context, deploymentId: Int) {
             val intent = Intent(context, DetailDeploymentActivity::class.java)
+            intent.putExtra(DEPLOYMENT_ID, deploymentId)
             context.startActivity(intent)
         }
     }
