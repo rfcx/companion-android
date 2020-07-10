@@ -82,6 +82,12 @@
     <string name="red">Red</string>
     <string name="none">None</string>
 
+    <!--    DetailDeploymentActivity-->
+    <string name="sleep_duration_title">Sleep duration</string>
+    <string name="estimated_battery_duration">Estimated battery duration</string>
+    <string name="photos">Photos</string>
+    <string name="detail_sec">%d second</string>
+
     <!--    DashboardStreamActivity-->
     <string name="dashboard">Dashboard</string>
 

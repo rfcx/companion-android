@@ -5,17 +5,21 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import io.realm.Realm
-import kotlinx.android.synthetic.main.activity_feedback.*
+import kotlinx.android.synthetic.main.activity_detail_deployment.*
+import kotlinx.android.synthetic.main.activity_feedback.toolbar
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.util.RealmHelper
+import org.rfcx.audiomoth.util.toDateTimeString
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity.Companion.DEPLOYMENT_ID
+import java.util.*
 
 class DetailDeploymentActivity : AppCompatActivity() {
     var deployment: Deployment? = null
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val deploymentDb by lazy { DeploymentDb(realm) }
+    private val gainList = arrayOf("Low", "Low - Medium", "Medium", "Medium - High", "High")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,6 +28,22 @@ class DetailDeploymentActivity : AppCompatActivity() {
         val deploymentId = intent.extras?.getInt(DEPLOYMENT_ID)
         if (deploymentId != null) {
             deployment = deploymentDb.getDeploymentById(deploymentId)
+            val location = deployment?.location
+            val configuration = deployment?.configuration
+
+            locationLongitudeValue.text = location?.longitude.toString()
+            locationLatitudeValue.text = location?.latitude.toString()
+
+            sampleRateValue.text =
+                getString(R.string.kilohertz, configuration?.sampleRate.toString())
+            gainValue.text = configuration?.gain?.let { gainList[it] }
+            recordingValue.text = getString(
+                if (configuration?.recordingDuration == 1) R.string.detail_sec else R.string.detail_secs,
+                configuration?.recordingDuration
+            )
+            sleepValue.text = getString(R.string.detail_secs, configuration?.sleepDuration)
+            estimatedBatteryDurationValue.text =
+                deployment?.batteryDepletedAt?.time?.let { Date(it).toDateTimeString() }
         }
 
         setupToolbar()
