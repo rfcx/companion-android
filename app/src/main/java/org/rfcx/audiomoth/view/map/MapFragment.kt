@@ -51,6 +51,7 @@ import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
 import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
+import org.rfcx.audiomoth.localdb.guardian.DiagnosticDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
@@ -71,6 +72,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val deploymentDb by lazy { DeploymentDb(realm) }
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
+    private val diagnosticDb by lazy { DiagnosticDb(realm) }
 
     // data
     private var guardianDeployments = listOf<GuardianDeployment>()
@@ -153,6 +155,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         context?.let {
             retrieveDeployments(it)
             retrieveLocations(it)
+            retrieveDiagnostics(it)
         }
         mapboxMap.setStyle(Style.OUTDOORS) {
             checkThenAccquireLocation(it)
@@ -382,6 +385,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun retrieveLocations(context: Context) {
         Firestore(context).retrieveLocations(locateDb)
+    }
+
+    private fun retrieveDiagnostics(context: Context) {
+        Firestore(context).retrieveDiagnostics(diagnosticDb)
     }
 
     private fun fetchJobSyncing() {

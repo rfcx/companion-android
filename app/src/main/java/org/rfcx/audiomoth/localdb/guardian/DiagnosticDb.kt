@@ -1,9 +1,14 @@
 package org.rfcx.audiomoth.localdb.guardian
 
 import io.realm.Realm
+import org.rfcx.audiomoth.entity.Deployment
+import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.SyncState
 import org.rfcx.audiomoth.entity.guardian.Diagnostic
 import org.rfcx.audiomoth.entity.guardian.DiagnosticInfo
+import org.rfcx.audiomoth.entity.response.DiagnosticResponse
+import org.rfcx.audiomoth.entity.response.LocationResponse
+import org.rfcx.audiomoth.entity.response.toLocate
 
 class DiagnosticDb(private val realm: Realm) {
 
@@ -21,6 +26,7 @@ class DiagnosticDb(private val realm: Realm) {
                     ?.toInt() ?: 0) + 1
                 diagnostic.id = id
             }
+            diagnostic.syncState = SyncState.Unsent.key
             it.insertOrUpdate(diagnostic)
         }
         return id
@@ -41,6 +47,43 @@ class DiagnosticDb(private val realm: Realm) {
             if (diagnostic != null) {
                 diagnostic.serverId = serverId
                 diagnostic.syncState = syncState
+            }
+        }
+    }
+
+    fun unlockSent(): List<DiagnosticInfo> {
+        var unsentCopied: List<DiagnosticInfo> = listOf()
+        realm.executeTransaction {
+            val unsent = it.where(DiagnosticInfo::class.java)
+                .equalTo(DiagnosticInfo.FIELD_SYNC_STATE, SyncState.Unsent.key)
+                .findAll()
+                .createSnapshot()
+            unsentCopied = unsent.toList()
+            unsent.forEach { diagnostic ->
+                diagnostic.syncState = SyncState.Sending.key
+            }
+        }
+        return unsentCopied
+    }
+
+    fun insertOrUpdate(diagnosticResponse: DiagnosticResponse) {
+        realm.executeTransaction {
+            val diagnostic =
+                it.where(DiagnosticInfo::class.java)
+                    .equalTo(DiagnosticInfo.FIELD_SERVER_ID, diagnosticResponse.serverId)
+                    .findFirst()
+
+            if (diagnostic != null) {
+                diagnostic.serverId = diagnosticResponse.serverId
+                diagnostic.deploymentServerId = diagnosticResponse.deploymentServerId
+                diagnostic.diagnostic = diagnostic.diagnostic
+                diagnostic.createdAt = diagnosticResponse.createdAt
+            } else {
+                val diagnosticInfo = diagnosticResponse.toDiagnostic()
+                val id = (it.where(DiagnosticInfo::class.java).max(DiagnosticInfo.FIELD_ID)
+                    ?.toInt() ?: 0) + 1
+                diagnosticInfo.id = id
+                it.insert(diagnosticInfo)
             }
         }
     }
