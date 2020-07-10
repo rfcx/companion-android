@@ -322,13 +322,9 @@ class ConfigureFragment : Fragment(),
         }
 
         val count = convertToStopStartPeriods(array.toTypedArray())?.size
-        if (count != null) {
-            if (count > 4) {
-                setNextButton(true)
-                Toast.makeText(context, R.string.maximum_ranges, Toast.LENGTH_LONG).show()
-            } else {
-                updateProfile()
-            }
+        if (count != null && count > 4) {
+            setNextButton(true)
+            Toast.makeText(context, R.string.maximum_ranges, Toast.LENGTH_LONG).show()
         } else {
             updateProfile()
         }
