@@ -9,7 +9,11 @@ import android.os.Build
 
 object WifiHotspotUtils {
 
-    fun getCurrentWifiName(context: Context): String {
+    fun isConnectedWithGuardian(context: Context, name: String): Boolean {
+        return name == getCurrentWifiName(context)
+    }
+
+    private fun getCurrentWifiName(context: Context): String {
         var wifiName = ""
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
