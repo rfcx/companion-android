@@ -11,15 +11,19 @@ import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonArray
+import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_guardian_diagnostic.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.OnReceiveResponse
 import org.rfcx.audiomoth.connection.socket.SocketManager
-import org.rfcx.audiomoth.entity.DeploymentLocation
+import org.rfcx.audiomoth.entity.guardian.Diagnostic
+import org.rfcx.audiomoth.entity.guardian.DiagnosticInfo
+import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
 import org.rfcx.audiomoth.entity.guardian.toReadableFormat
 import org.rfcx.audiomoth.entity.socket.DiagnosticResponse
 import org.rfcx.audiomoth.entity.socket.SocketResposne
-import org.rfcx.audiomoth.entity.socket.getRecordTime
+import org.rfcx.audiomoth.localdb.guardian.DiagnosticDb
+import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
 import org.rfcx.audiomoth.view.prefs.GuardianPrefsFragment
@@ -27,6 +31,9 @@ import org.rfcx.audiomoth.view.prefs.SyncPreferenceListener
 
 
 class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
+
+    private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
+    private val diagnosticDb: DiagnosticDb by lazy { DiagnosticDb(realm) }
 
     private var collapseAdvanced = false
     private var prefsChanges: Map<String, String>? = null
@@ -52,6 +59,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
     private var long: Double? = null
     private var locationName: String? = null
     private var isConnected: Boolean? = null
+    private var deploymentServerId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,6 +83,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
         long = intent.extras?.getDouble(LONG)
         locationName = intent.extras?.getString(LOCATION_NAME)
         isConnected = intent.extras?.getBoolean(IS_CONNECTED)
+        deploymentServerId = intent.extras?.getString(DEPLOYMENT_SERVER_ID)
     }
 
     private fun setupAdvancedSetting() {
@@ -147,6 +156,8 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
                         setupCurrentPrefs(prefsData)
                         hideLoading()
                     }
+
+                    saveNewDiagnostic(diagnosticData)
                 }
 
                 override fun onFailed(message: String) {
@@ -211,6 +222,12 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
                 disableAllComponent(child)
             }
         }
+    }
+
+    private fun saveNewDiagnostic(diagnostic: Diagnostic) {
+        val diagnosticInfo = DiagnosticInfo(diagnostic = diagnostic)
+        diagnosticInfo.deploymentServerId = this.deploymentServerId
+        diagnosticDb.insertOrUpdate(diagnosticInfo)
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -282,18 +299,20 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
         const val LONG = "longitude"
         const val LOCATION_NAME = "location_name"
         const val IS_CONNECTED = "is_connected"
+        const val DEPLOYMENT_SERVER_ID = "deployment_server_id"
 
         fun startActivity(context: Context) {
             val intent = Intent(context, DiagnosticActivity::class.java)
             context.startActivity(intent)
         }
 
-        fun startActivity(context: Context, location: DeploymentLocation, isConnected: Boolean) {
+        fun startActivity(context: Context, deployment: GuardianDeployment, isConnected: Boolean) {
             val intent = Intent(context, DiagnosticActivity::class.java)
-            intent.putExtra(LOCATION_NAME, location.name)
-            intent.putExtra(LAT, location.latitude)
-            intent.putExtra(LONG, location.longitude)
+            intent.putExtra(LOCATION_NAME, deployment.location?.name)
+            intent.putExtra(LAT, deployment.location?.latitude)
+            intent.putExtra(LONG, deployment.location?.longitude)
             intent.putExtra(IS_CONNECTED, isConnected)
+            intent.putExtra(DEPLOYMENT_SERVER_ID, deployment.serverId)
             context.startActivity(intent)
         }
     }
