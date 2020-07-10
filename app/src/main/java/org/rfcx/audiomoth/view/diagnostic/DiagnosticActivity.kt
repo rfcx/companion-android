@@ -219,6 +219,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
         if (view is ViewGroup) {
             for (i in 0 until view.childCount) {
                 val child = view.getChildAt(i)
+                child.alpha = 0.7f
                 disableAllComponent(child)
             }
         }
