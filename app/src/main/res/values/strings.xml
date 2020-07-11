@@ -87,6 +87,7 @@
     <string name="estimated_battery_duration">Estimated battery duration</string>
     <string name="photos">Photos</string>
     <string name="detail_sec">%d second</string>
+    <string name="reconfigure">Reconfigure</string>
 
     <!--    DashboardStreamActivity-->
     <string name="dashboard">Dashboard</string>

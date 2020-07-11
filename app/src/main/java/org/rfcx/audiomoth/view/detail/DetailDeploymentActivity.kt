@@ -3,7 +3,9 @@ package org.rfcx.audiomoth.view.detail
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_detail_deployment.*
 import kotlinx.android.synthetic.main.activity_feedback.toolbar
@@ -13,6 +15,7 @@ import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.util.toDateTimeString
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity.Companion.DEPLOYMENT_ID
+import org.rfcx.audiomoth.view.deployment.ImageAdapter
 import java.util.*
 
 class DetailDeploymentActivity : AppCompatActivity() {
@@ -20,6 +23,7 @@ class DetailDeploymentActivity : AppCompatActivity() {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val deploymentDb by lazy { DeploymentDb(realm) }
     private val gainList = arrayOf("Low", "Low - Medium", "Medium", "Medium - High", "High")
+    private val imageAdapter by lazy { ImageAdapter() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,7 +50,20 @@ class DetailDeploymentActivity : AppCompatActivity() {
                 deployment?.batteryDepletedAt?.time?.let { Date(it).toDateTimeString() }
         }
 
+        reconfigureButton.setOnClickListener {
+            Toast.makeText(this, R.string.reconfigure, Toast.LENGTH_LONG).show()
+        }
+
         setupToolbar()
+        setupImageRecycler()
+    }
+
+    private fun setupImageRecycler() {
+        attachImageRecycler.apply {
+            adapter = imageAdapter
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            setHasFixedSize(true)
+        }
     }
 
     private fun setupToolbar() {
