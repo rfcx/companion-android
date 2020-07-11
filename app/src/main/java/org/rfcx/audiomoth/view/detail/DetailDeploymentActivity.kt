@@ -24,6 +24,7 @@ class DetailDeploymentActivity : AppCompatActivity() {
     private val deploymentDb by lazy { DeploymentDb(realm) }
     private val gainList = arrayOf("Low", "Low - Medium", "Medium", "Medium - High", "High")
     private val imageAdapter by lazy { ImageAdapter() }
+    private val timeLineAdapter by lazy { TimeLineAdapter() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,6 +57,7 @@ class DetailDeploymentActivity : AppCompatActivity() {
 
         setupToolbar()
         setupImageRecycler()
+        setupTimeLineRecycler()
     }
 
     private fun setupImageRecycler() {
@@ -64,6 +66,17 @@ class DetailDeploymentActivity : AppCompatActivity() {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             setHasFixedSize(true)
         }
+    }
+
+    private fun setupTimeLineRecycler() {
+        timeLineRecycler.apply {
+            adapter = timeLineAdapter
+            layoutManager = LinearLayoutManager(context)
+        }
+        timeLineAdapter.items = arrayListOf(
+            "10:00 - 11:00 (UTC)", "10:00 - 11:00 (UTC)",
+            "10:00 - 11:00 (UTC)", "10:00 - 11:00 (UTC)"
+        )
     }
 
     private fun setupToolbar() {
