@@ -210,6 +210,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/sleep_duration_title"
+                android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/recordingLabel" />
 
@@ -221,6 +222,7 @@
                 android:layout_marginEnd="@dimen/margin_padding_large"
                 android:gravity="end"
                 android:textSize="@dimen/text_xsmall"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="@id/sleepLabel"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/sleepLabel"

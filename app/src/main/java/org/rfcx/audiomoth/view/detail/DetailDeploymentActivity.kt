@@ -19,6 +19,7 @@ import org.rfcx.audiomoth.util.toDateTimeString
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity.Companion.DEPLOYMENT_ID
 import org.rfcx.audiomoth.view.deployment.ImageAdapter
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
+import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment.Companion.CONTINUOUS
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -46,11 +47,19 @@ class DetailDeploymentActivity : AppCompatActivity() {
             sampleRateValue.text =
                 getString(R.string.kilohertz, configuration?.sampleRate.toString())
             gainValue.text = configuration?.gain?.let { gainList[it] }
-            recordingValue.text = getString(
+
+            val continuous = getString(R.string.continuous)
+            val isContinuous = configuration?.durationSelected == CONTINUOUS
+
+            val recordingDurationLabel = getString(
                 if (configuration?.recordingDuration == 1) R.string.detail_sec else R.string.detail_secs,
                 configuration?.recordingDuration
             )
+            recordingValue.text = if (isContinuous) continuous else recordingDurationLabel
             sleepValue.text = getString(R.string.detail_secs, configuration?.sleepDuration)
+            sleepValue.visibility = if (isContinuous) View.GONE else View.VISIBLE
+            sleepLabel.visibility = if (isContinuous) View.GONE else View.VISIBLE
+
             estimatedBatteryDurationValue.text =
                 deployment?.batteryDepletedAt?.time?.let { Date(it).toDateTimeString() }
             configuration?.recordingPeriodList?.let {
