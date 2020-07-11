@@ -11,36 +11,17 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         app:endLineColor="@color/colorAccent"
+        app:markerSize="@dimen/mark_size"
         app:marker="@drawable/bg_circle_green"
         app:startLineColor="@color/colorAccent" />
 
-    <com.google.android.material.card.MaterialCardView
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/timelineTextView"
+        style="@style/GuardianText.Label.Value"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginStart="@dimen/margin_padding_small"
-        android:layout_marginTop="@dimen/margin_padding_small"
-        android:layout_marginBottom="@dimen/margin_padding_small"
-        app:cardBackgroundColor="@color/grey_light"
-        app:contentPadding="@dimen/margin_padding_small">
+        android:layout_margin="@dimen/timeline_padding"
+        android:textSize="@dimen/text_xsmall"
+        tools:text="10:00 - 12:00" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/text_timeline_title"
-                style="@style/GuardianText.Label.Value"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_xsmall"
-                android:textColor="@android:color/black"
-                android:textSize="@dimen/text_xsmall"
-                tools:text="10:00 - 12:00 (UTC)" />
-
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
 </LinearLayout>

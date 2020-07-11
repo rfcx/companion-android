@@ -3,6 +3,7 @@ package org.rfcx.audiomoth.view.detail
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,10 +14,13 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.util.RealmHelper
+import org.rfcx.audiomoth.util.convertToStopStartPeriods
 import org.rfcx.audiomoth.util.toDateTimeString
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity.Companion.DEPLOYMENT_ID
 import org.rfcx.audiomoth.view.deployment.ImageAdapter
+import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
 import java.util.*
+import kotlin.collections.ArrayList
 
 class DetailDeploymentActivity : AppCompatActivity() {
     var deployment: Deployment? = null
@@ -49,6 +53,11 @@ class DetailDeploymentActivity : AppCompatActivity() {
             sleepValue.text = getString(R.string.detail_secs, configuration?.sleepDuration)
             estimatedBatteryDurationValue.text =
                 deployment?.batteryDepletedAt?.time?.let { Date(it).toDateTimeString() }
+            configuration?.recordingPeriodList?.let {
+                customRecordingLabel.visibility = if (it.size != 0) View.VISIBLE else View.GONE
+                timeLineRecycler.visibility = if (it.size != 0) View.VISIBLE else View.GONE
+                setupTimeLineRecycler(it.toTypedArray())
+            }
         }
 
         reconfigureButton.setOnClickListener {
@@ -57,7 +66,6 @@ class DetailDeploymentActivity : AppCompatActivity() {
 
         setupToolbar()
         setupImageRecycler()
-        setupTimeLineRecycler()
     }
 
     private fun setupImageRecycler() {
@@ -68,15 +76,25 @@ class DetailDeploymentActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupTimeLineRecycler() {
+    private fun setupTimeLineRecycler(selectTimeList: Array<String>) {
+        val timeList = ConfigureFragment().timeList
+        val array = ArrayList<Boolean>()
+
         timeLineRecycler.apply {
             adapter = timeLineAdapter
             layoutManager = LinearLayoutManager(context)
         }
-        timeLineAdapter.items = arrayListOf(
-            "10:00 - 11:00 (UTC)", "10:00 - 11:00 (UTC)",
-            "10:00 - 11:00 (UTC)", "10:00 - 11:00 (UTC)"
-        )
+
+        timeList.forEach {
+            array.add(selectTimeList.contains(it))
+        }
+
+        val recordingPeriod = convertToStopStartPeriods(array.toTypedArray())
+        val arrayRecordingPeriod = arrayListOf<String>()
+        recordingPeriod?.forEach {
+            arrayRecordingPeriod.add("${timeList[it.startMinutes / 60]} - ${if (it.stopMinutes / 60 == 24) timeList[0] else timeList[it.stopMinutes / 60]}")
+        }
+        timeLineAdapter.items = arrayRecordingPeriod
     }
 
     private fun setupToolbar() {

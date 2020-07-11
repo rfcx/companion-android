@@ -21,12 +21,13 @@
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/padding_bottom">
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guidelineVertical"
@@ -34,13 +35,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 app:layout_constraintGuide_percent="0.50" />
-
-            <View
-                android:id="@+id/separateLine1"
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="@color/grey"
-                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/deploymentLocationTitle"
@@ -115,7 +109,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
                 android:layout_marginTop="@dimen/margin_padding_normal"
-                android:background="@color/grey"
+                android:background="@color/grey_light"
                 app:layout_constraintTop_toBottomOf="@id/latitudeLayout" />
 
             <TextView
@@ -239,6 +233,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/custom_recording_period"
+                android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/sleepLabel" />
 
@@ -250,7 +245,7 @@
                 android:layout_marginTop="@dimen/margin_padding_normal"
                 android:layout_marginEnd="@dimen/margin_padding_large"
                 android:clipToPadding="false"
-                android:visibility="visible"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/customRecordingLabel"
@@ -285,6 +280,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/photos"
+                android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/estimatedBatteryDurationValue" />
 
@@ -296,30 +292,28 @@
                 android:layout_marginTop="@dimen/margin_padding_normal"
                 android:layout_marginEnd="@dimen/margin_padding_large"
                 android:clipToPadding="false"
-                android:visibility="visible"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/photoLabel"
                 tools:layoutManager="android.support.v7.widget.LinearLayoutManager"
                 tools:orientation="horizontal" />
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/reconfigureButton"
-                style="@style/AudioMothButton.GreenButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_large"
-                android:layout_marginTop="@dimen/margin_padding_normal"
-                android:layout_marginEnd="@dimen/margin_padding_large"
-                android:layout_marginBottom="@dimen/margin_padding_normal"
-                android:text="@string/reconfigure"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/attachImageRecycler" />
-
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/reconfigureButton"
+        style="@style/AudioMothButton.GreenButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:layout_marginEnd="@dimen/margin_padding_large"
+        android:layout_marginBottom="@dimen/margin_padding_normal"
+        android:text="@string/reconfigure"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

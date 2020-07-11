@@ -31,7 +31,7 @@ class TimeLineAdapter : RecyclerView.Adapter<TimeLineAdapter.TimeLineViewHolder>
 
     class TimeLineViewHolder(itemView: View, viewType: Int) :
         RecyclerView.ViewHolder(itemView) {
-        private val customRecording = itemView.text_timeline_title
+        private val customRecording = itemView.timelineTextView
         private val timeline = itemView.timeline
 
         fun bind(item: String) {
