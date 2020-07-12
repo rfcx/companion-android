@@ -417,6 +417,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     fun convertInputLongitude(longitude: String) {
         val long = longitude.toDouble()
+        val latitude = latitudeEditText.text?.trim()
+        if (latitude == null || latitude.isBlank()) return
+
         if (long < 180 && long > -180) {
             setPinOnMap(
                 LatLng(
