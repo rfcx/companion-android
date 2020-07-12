@@ -15,9 +15,6 @@
     <string name="ok">OK</string>
     <string name="got_it">Got it</string>
     <string name="cancel">CANCEL</string>
-    <string name="green_pin">Green = 3+ days</string>
-    <string name="orange_pin">Orange = 1–2 days</string>
-    <string name="red_pin">Red = <![CDATA[<]]>1 day</string>
     <string name="format_image_unsync">%s photo not yet synced</string>
     <string name="format_images_unsync">%s photos not yet synced</string>
     <string name="format_deploy_uploading">Syncing a deployment.</string>
@@ -51,9 +48,6 @@
     <string name="continuous">Continuous</string>
     <string name="sync_to_device">Sync to Device</string>
     <string name="custom_recording_period">Custom recording period</string>
-    <string name="add_recording_period">Add recording period</string>
-    <string name="start_period">Start recording:</string>
-    <string name="end_period">End recording:</string>
     <string name="always_recording">Always recording</string>
     <string name="recommended">Recommended</string>
     <string name="custom">Custom</string>
@@ -76,21 +70,12 @@
     <string name="play_syncing">Syncing...</string>
     <string name="ready_send_configuration">Ready to send the configuration to the device</string>
 
-    <!--    VerifySyncFragment-->
-    <string name="what_light_you_see">What light do you see now?</string>
-    <string name="green">Green</string>
-    <string name="red">Red</string>
-    <string name="none">None</string>
-
     <!--    DetailDeploymentActivity-->
     <string name="sleep_duration_title">Sleep duration</string>
     <string name="estimated_battery_duration">Estimated battery duration</string>
     <string name="photos">Photos</string>
     <string name="detail_sec">%d second</string>
     <string name="reconfigure">Reconfigure</string>
-
-    <!--    DashboardStreamActivity-->
-    <string name="dashboard">Dashboard</string>
 
     <!--  Perform Battery  -->
     <string name="test">test</string>
@@ -99,7 +84,6 @@
     <string name="red_flash">How many time did the red LED flash?</string>
     <string name="try_again">try again</string>
     <string name="device_configured">Device configured! \nNow let’s verify the battery level</string>
-    <string name="question_mark">\?</string>
     <string name="days">Estimated battery duration: %s days</string>
     <string name="day">Estimated battery duration: %s day</string>
     <string name="notification">A notification will be sent a day \nbefore the battery is due to run out</string>
@@ -118,7 +102,6 @@
     <string name="please_fill_information">Please fill your information completely</string>
     <string name="latitude_must_between">Latitude must be between -90 and 90</string>
     <string name="longitude_must_between">Longitude must be between -180 and 180</string>
-    <string name="wrong_format">Wrong format</string>
     <string name="digits">0123456789-.</string>
 
     <!--  SelectProfileFragment  -->
@@ -165,7 +148,6 @@
     <string name="switch_to_deploy">Switch your device to DEPLOY</string>
     <string name="take_photos">Take some photos of the deploy \nlocation (optional)</string>
 
-    <string name="camera_permission_msg">Deploy App would like to use your camera</string>
     <string name="read_storage_permission_msg">Deploy App would like to read your storage</string>
     <string name="go_to_setting">Settings</string>
     <string name="menu_camera">Camera</string>
@@ -180,7 +162,7 @@
     <string name="rfcx_edge">RFCx Edge</string>
     <string name="rfcx_guardian">RFCx Guardian</string>
 
-    <string name="location_permission_msg">Deploy App would like to use your location</string>
+    <string name="location_permission_msg">Companion App would like to use your location</string>
     <string name="notification_location_not_availability">Please enable your device\'s location settings</string>
 
     <string name="maximum_ranges">Custom recording periods maximum 4 ranges</string>
@@ -188,8 +170,6 @@
     <string name="error_has_occurred">An error has occurred Please try again later</string>
     <string name="format_in_progress_step">Not yet deployed</string>
     <string name="error_upload_deployment">Something went wrong.</string>
-    <string name="deployment_uploaded">Deployment uploaded!</string>
-    <string name="deployment_saved">Deployment saved!</string>
 
     <!-- ConnectGuardianFragment -->
     <string name="nearby_guardians">Nearby Guardian(s)</string>
