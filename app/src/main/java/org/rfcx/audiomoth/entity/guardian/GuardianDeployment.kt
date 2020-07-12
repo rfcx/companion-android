@@ -6,6 +6,7 @@ import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
 import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.Device
+import java.io.Serializable
 import java.util.*
 
 @RealmClass
@@ -23,7 +24,7 @@ open class GuardianDeployment(
     var createdAt: Date = Date(),
     @Expose(serialize = false)
     var syncState: Int = 0
-) : RealmModel {
+) : RealmModel, Serializable {
 
     companion object {
         const val FIELD_ID = "id"
