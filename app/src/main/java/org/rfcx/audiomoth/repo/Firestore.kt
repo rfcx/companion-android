@@ -141,7 +141,7 @@ class Firestore(val context: Context) {
             }
     }
 
-    fun getRemotePathByServerId(serverId: String, callback: (List<String>?) -> Unit) {
+    fun getRemotePathByServerId(serverId: String, callback: (ArrayList<String>?) -> Unit) {
         val userDocument = db.collection(COLLECTION_USERS).document(guid)
         userDocument.collection(COLLECTION_IMAGES)
             .whereEqualTo(FIELD_DEPLOYMENT_SERVER_ID, serverId).get()

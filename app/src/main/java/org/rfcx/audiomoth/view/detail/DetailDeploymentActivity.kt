@@ -3,7 +3,6 @@ package org.rfcx.audiomoth.view.detail
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -19,7 +18,6 @@ import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.util.convertToStopStartPeriods
 import org.rfcx.audiomoth.util.toDateTimeString
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity.Companion.DEPLOYMENT_ID
-import org.rfcx.audiomoth.view.deployment.ImageAdapter
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment.Companion.CONTINUOUS
 import java.util.*
@@ -30,7 +28,7 @@ class DetailDeploymentActivity : AppCompatActivity() {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val deploymentDb by lazy { DeploymentDb(realm) }
     private val gainList = arrayOf("Low", "Low - Medium", "Medium", "Medium - High", "High")
-    private val imageAdapter by lazy { ImageAdapter() }
+    private val imageAdapter by lazy { ImageDetailAdapter() }
     private val timeLineAdapter by lazy { TimeLineAdapter() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,8 +68,13 @@ class DetailDeploymentActivity : AppCompatActivity() {
                 setupTimeLineRecycler(it.toTypedArray())
             }
             deployment?.serverId?.let {
-                Firestore(this).getRemotePathByServerId(it) { remotePath ->
-                    Log.d("serverId", "$remotePath")
+                setupImageRecycler()
+                Firestore(this).getRemotePathByServerId(it) { remotePathList ->
+                    if (remotePathList != null) {
+                        photoLabel.visibility = if(remotePathList.size > 0) View.VISIBLE else View.GONE
+                        attachImageRecycler.visibility = if(remotePathList.size > 0) View.VISIBLE else View.GONE
+                        imageAdapter.items = remotePathList
+                    }
                 }
             }
         }
@@ -81,7 +84,7 @@ class DetailDeploymentActivity : AppCompatActivity() {
         }
 
         setupToolbar()
-        setupImageRecycler()
+
     }
 
     private fun setupImageRecycler() {
