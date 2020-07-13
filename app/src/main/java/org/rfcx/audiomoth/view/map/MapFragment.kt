@@ -44,12 +44,14 @@ import kotlinx.android.synthetic.main.layout_map_window_info.view.*
 import org.rfcx.audiomoth.MainActivityListener
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Deployment
+import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.DeploymentState.Edge
 import org.rfcx.audiomoth.entity.Device
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
 import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
+import org.rfcx.audiomoth.localdb.guardian.DiagnosticDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
@@ -71,6 +73,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val deploymentDb by lazy { DeploymentDb(realm) }
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
+    private val diagnosticDb by lazy { DiagnosticDb(realm) }
 
     // data
     private var guardianDeployments = listOf<GuardianDeployment>()
@@ -153,6 +156,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         context?.let {
             retrieveDeployments(it)
             retrieveLocations(it)
+            retrieveDiagnostics(it)
         }
         mapboxMap.setStyle(Style.OUTDOORS) {
             checkThenAccquireLocation(it)
@@ -187,11 +191,18 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setupImages(style: Style) {
-        val drawablePinGuardian =
+        val drawablePinConnectedGuardian =
             ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map, null)
-        val mBitmapPinGuardian = BitmapUtils.getBitmapFromDrawable(drawablePinGuardian)
-        if (mBitmapPinGuardian != null) {
-            style.addImage(MARKER_GUARDIAN_PIN, mBitmapPinGuardian)
+        val mBitmapPinConnectedGuardian = BitmapUtils.getBitmapFromDrawable(drawablePinConnectedGuardian)
+        if (mBitmapPinConnectedGuardian != null) {
+            style.addImage(GuardianPin.CONNECTED_GUARDIAN, mBitmapPinConnectedGuardian)
+        }
+
+        val drawablePinNotConnectedGuardian =
+            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map_grey, null)
+        val mBitmapPinNotConnectedGuardian = BitmapUtils.getBitmapFromDrawable(drawablePinNotConnectedGuardian)
+        if (mBitmapPinNotConnectedGuardian != null) {
+            style.addImage(GuardianPin.NOT_CONNECTED_GUARDIAN, mBitmapPinNotConnectedGuardian)
         }
 
         val drawablePinMapGreen =
@@ -254,7 +265,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             context?.let {
                 DiagnosticActivity.startActivity(
                     it,
-                    deployment.location!!
+                    deployment,
+                    WifiHotspotUtils.isConnectedWithGuardian(requireContext(), deployment.wifiName ?: "")
                 )
             }
         }
@@ -377,6 +389,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun retrieveLocations(context: Context) {
         Firestore(context).retrieveLocations(locateDb)
+    }
+
+    private fun retrieveDiagnostics(context: Context) {
+        Firestore(context).retrieveDiagnostics(diagnosticDb)
     }
 
     private fun fetchJobSyncing() {
@@ -576,12 +592,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun GuardianDeployment.toMark(): DeploymentMarker {
+        val pinImage = GuardianPin.getGuardianPinImage(requireContext(), this.wifiName!!)
         return DeploymentMarker(
             id,
             location?.name ?: "",
             location?.longitude ?: 0.0,
             location?.latitude ?: 0.0,
-            MARKER_GUARDIAN_PIN,
+            pinImage,
             "-",
             Device.GUARDIAN.value,
             createdAt

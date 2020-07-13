@@ -35,6 +35,10 @@ class LocateDb(private val realm: Realm) {
                 .isNotNull("lastDeploymentServerId")
                 .and()
                 .isNotEmpty("lastDeploymentServerId")
+                .or()
+                .isNotNull("lastGuardianDeploymentServerId")
+                .and()
+                .isNotEmpty("lastGuardianDeploymentServerId")
                 .findAll()
                 .createSnapshot()
             unsentCopied = unsent.toList()
@@ -125,7 +129,7 @@ class LocateDb(private val realm: Realm) {
                 location.longitude = locationResponse.longitude ?: location.longitude
                 location.createdAt = locationResponse.createdAt ?: location.createdAt
                 location.lastDeploymentServerId = locationResponse.lastDeploymentServerId
-                location.lastGuardianDeploymentServerId = locationResponse.lastDeploymentServerId
+                location.lastGuardianDeploymentServerId = locationResponse.lastGuardianDeploymentServerId
             } else {
                 val locate = locationResponse.toLocate()
                 val id = (it.where(Locate::class.java).max(Deployment.FIELD_ID)

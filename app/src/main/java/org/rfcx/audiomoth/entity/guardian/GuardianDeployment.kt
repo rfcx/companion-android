@@ -5,6 +5,7 @@ import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
 import org.rfcx.audiomoth.entity.DeploymentLocation
+import org.rfcx.audiomoth.entity.Device
 import java.util.*
 
 @RealmClass
@@ -15,6 +16,8 @@ open class GuardianDeployment(
     var deployedAt: Date = Date(),
     @Expose(serialize = false)
     var state: Int = 0, // 1 = Locate, 2 = Config, 3 = Sync, 4 = Verify, 5 = Deploy, 6 = Ready To Upload
+    var device: String? = Device.GUARDIAN.value,
+    var wifiName: String? = null,
     var configuration: GuardianConfiguration? = null,
     var location: DeploymentLocation? = null,
     var createdAt: Date = Date(),

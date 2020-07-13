@@ -9,22 +9,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.08" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guidelineHorizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.40" />
+        app:layout_constraintGuide_percent="0.1" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/configImageView"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="@dimen/edge_width"
         android:src="@drawable/edge_green"
         android:layout_margin="@dimen/margin_padding_small"
-        app:layout_constraintBottom_toBottomOf="@id/guidelineHorizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/guidelineHorizontalTop" />
@@ -40,7 +32,7 @@
         android:text="@string/did_green_flash"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/guidelineHorizontal" />
+        app:layout_constraintTop_toBottomOf="@id/configImageView" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/yesButton"
