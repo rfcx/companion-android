@@ -53,7 +53,7 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
             adapter = guardianHotspotAdapter
         }
 
-        wifiHotspotManager = WifiHotspotManager(context!!.applicationContext)
+        wifiHotspotManager = WifiHotspotManager(requireContext().applicationContext)
         wifiHotspotManager.nearbyHotspot(this)
 
         connectGuardianButton.setOnClickListener {
@@ -93,7 +93,8 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
                     Log.d("ConenctionGuardian", connection.connection.status)
                     if (connection.connection.status == CONNECTION_SUCCESS) {
                         if (connectionCount == 0) {
-                            deploymentProtocol!!.nextStep()
+                            deploymentProtocol?.setDeploymentWifiName(guardianHotspot!!.SSID)
+                            deploymentProtocol?.nextStep()
                         }
                         connectionCount += 1
                     } else {

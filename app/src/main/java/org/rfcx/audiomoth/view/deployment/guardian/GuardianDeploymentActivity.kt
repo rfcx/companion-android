@@ -146,6 +146,12 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         this._deployment = deployment
     }
 
+    override fun setDeploymentWifiName(name: String) {
+        val deployment = _deployment ?: GuardianDeployment()
+        deployment.wifiName = name
+        setDeployment(deployment)
+    }
+
     override fun setDeploymentConfigure(profile: GuardianProfile) {
         setProfile(profile)
         this._configuration = profile.asConfiguration()
@@ -169,7 +175,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
         this._deployLocation = locate.asDeploymentLocation()
         val deploymentId = deploymentDb.insertOrUpdateDeployment(deployment, _deployLocation!!)
-        locateDb.insertOrUpdateLocate(deploymentId, locate) // update locate - last deployment
+        locateDb.insertOrUpdateLocate(deploymentId, locate, true) // update locate - last deployment
 
         setDeployment(deployment)
     }
