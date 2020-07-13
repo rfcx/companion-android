@@ -392,7 +392,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     fun convertInputLatitude(latitude: String) {
         val longitude = longitudeEditText.text?.trim()
-        if (longitude == null || longitude.isBlank()) return
+        if (longitude == null || longitude.isBlank() || longitude.last() == '-' || longitude.last() == '.') return
 
         val lat = latitude.toDouble()
         val long = longitude.toString()
@@ -400,10 +400,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         if (long.last() != 'E' && long.last() != 'W') {
             if (lat < 90 && lat > -90) {
                 setPinOnMap(
-                    LatLng(
-                        latitude.toDouble(),
-                        longitudeEditText.text.toString().toDouble()
-                    )
+                    LatLng(lat, longitudeEditText.text.toString().toDouble())
                 )
             } else {
                 Toast.makeText(
@@ -416,16 +413,16 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     fun convertInputLongitude(longitude: String) {
+        val latitude = latitudeEditText.text?.trim()
+        if (latitude == null || latitude.isBlank() || latitude.last() == '-' || latitude.last() == '.') return
+
         val long = longitude.toDouble()
         val latitude = latitudeEditText.text?.trim()
         if (latitude == null || latitude.isBlank()) return
 
         if (long < 180 && long > -180) {
             setPinOnMap(
-                LatLng(
-                    latitudeEditText.text.toString().toDouble(),
-                    longitude.toDouble()
-                )
+                LatLng(latitudeEditText.text.toString().toDouble(), long)
             )
         } else {
             Toast.makeText(
