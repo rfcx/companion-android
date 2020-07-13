@@ -261,7 +261,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             context?.let {
                 DiagnosticActivity.startActivity(
                     it,
-                    deployment.location ?: DeploymentLocation.default(),
+                    deployment,
                     WifiHotspotUtils.isConnectedWithGuardian(requireContext(), deployment.wifiName ?: "")
                 )
             }
