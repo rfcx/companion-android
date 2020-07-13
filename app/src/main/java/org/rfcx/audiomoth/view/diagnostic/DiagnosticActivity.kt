@@ -17,12 +17,13 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.OnReceiveResponse
 import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.entity.guardian.Diagnostic
-import org.rfcx.audiomoth.entity.guardian.DiagnosticInfo
 import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
+import org.rfcx.audiomoth.entity.guardian.getRecordTime
 import org.rfcx.audiomoth.entity.guardian.toReadableFormat
 import org.rfcx.audiomoth.entity.socket.DiagnosticResponse
 import org.rfcx.audiomoth.entity.socket.SocketResposne
 import org.rfcx.audiomoth.localdb.guardian.DiagnosticDb
+import org.rfcx.audiomoth.service.DiagnosticSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
@@ -226,9 +227,8 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
     }
 
     private fun saveNewDiagnostic(diagnostic: Diagnostic) {
-        val diagnosticInfo = DiagnosticInfo(diagnostic = diagnostic)
-        diagnosticInfo.deploymentServerId = this.deploymentServerId
-        diagnosticDb.insertOrUpdate(diagnosticInfo)
+        diagnosticDb.insertOrUpdate(diagnostic, this.deploymentServerId)
+        DiagnosticSyncWorker.enqueue(this)
     }
 
     override fun onSupportNavigateUp(): Boolean {

@@ -9,10 +9,12 @@ import org.rfcx.audiomoth.entity.Device
 import org.rfcx.audiomoth.entity.User
 import org.rfcx.audiomoth.entity.request.*
 import org.rfcx.audiomoth.entity.response.DeploymentResponse
+import org.rfcx.audiomoth.entity.response.DiagnosticResponse
 import org.rfcx.audiomoth.entity.response.GuardianDeploymentResponse
 import org.rfcx.audiomoth.entity.response.LocationResponse
 import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
+import org.rfcx.audiomoth.localdb.guardian.DiagnosticDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.audiomoth.util.Preferences
 import org.rfcx.audiomoth.util.Storage
@@ -72,6 +74,17 @@ class Firestore(val context: Context) {
         val userDocument = db.collection(COLLECTION_USERS).document(guid)
         userDocument.collection(COLLECTION_LOCATIONS).document(locateServerId)
             .set(locateRequest).await()
+    }
+
+    suspend fun sendDiagnostic(diagnosticRequest: DiagnosticRequest): DocumentReference? {
+        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        return userDocument.collection(COLLECTION_DIAGNOSTIC).add(diagnosticRequest).await()
+    }
+
+    suspend fun updateDiagnostic(diagnosticServerId: String, diagnosticRequest: DiagnosticRequest) {
+        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        userDocument.collection(COLLECTION_DIAGNOSTIC).document(diagnosticServerId)
+            .set(diagnosticRequest).await()
     }
 
     fun retrieveDeployments(
@@ -140,6 +153,30 @@ class Firestore(val context: Context) {
             }
     }
 
+    fun retrieveDiagnostics(
+        diagnosticDb: DiagnosticDb,
+        callback: ResponseCallback<List<DiagnosticResponse>>? = null
+    ) {
+        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        userDocument.collection(COLLECTION_DIAGNOSTIC).get()
+            .addOnSuccessListener {
+                val diagnosticResponses = arrayListOf<DiagnosticResponse>()
+                it.documents.forEach { doc ->
+                    val diagnosticResponse = doc.toObject(DiagnosticResponse::class.java)
+                    diagnosticResponse?.serverId = doc.id
+                    diagnosticResponse?.let { it1 -> diagnosticResponses.add(it1) }
+                }
+                // verify response and store diagnostic
+                diagnosticResponses.forEach { diagnostic ->
+                    diagnosticDb.insertOrUpdate(diagnostic)
+                }
+                callback?.onSuccessCallback(diagnosticResponses)
+            }
+            .addOnFailureListener {
+                callback?.onFailureCallback(it.localizedMessage)
+            }
+    }
+
     fun saveFeedback(
         text: String, uris: List<String>?, callback: (Boolean) -> Unit
     ) {
@@ -176,5 +213,6 @@ class Firestore(val context: Context) {
         const val COLLECTION_LOCATIONS = "locations"
         const val COLLECTION_PROFILES = "profiles"
         const val COLLECTION_IMAGES = "images"
+        const val COLLECTION_DIAGNOSTIC = "diagnostics"
     }
 }

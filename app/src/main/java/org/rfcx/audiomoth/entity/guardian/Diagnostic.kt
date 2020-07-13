@@ -16,23 +16,22 @@ open class Diagnostic(
     var totalFileSize: Int = 0,
     @SerializedName("battery_percentage")
     var batteryPercentage: Int = 0
-) : RealmModel {
+) : RealmModel
 
-    fun getRecordTime(): String {
-        var amountTime = ""
-        val minutes = this.totalRecordTime / 60
-        amountTime = if (minutes > 60L) {
-            val hours = minutes / 60
-            val min = minutes % 60
-            if (min == 0) {
-                "$hours hours"
-            } else {
-                "$hours hours $min minutes"
-            }
+fun Diagnostic.getRecordTime(): String {
+    var amountTime = ""
+    val minutes = this.totalRecordTime / 60
+    amountTime = if (minutes > 60L) {
+        val hours = minutes / 60
+        val min = minutes % 60
+        if (min == 0) {
+            "$hours hours"
         } else {
-            "$minutes minutes"
+            "$hours hours $min minutes"
         }
-
-        return amountTime
+    } else {
+        "$minutes minutes"
     }
+
+    return amountTime
 }
