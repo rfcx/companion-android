@@ -186,14 +186,16 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         deploymentProtocol?.nextStep()
     }
 
-    private fun setupLocationOptions() {
+    private fun setupLocationOptions(mapboxMap: MapboxMap) {
         radioGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.newLocationRadioButton -> {
+                    mapboxMap.uiSettings.setAllGesturesEnabled(true)
                     onPressedNewLocation()
                 }
 
                 R.id.existingRadioButton -> {
+                    mapboxMap.uiSettings.setAllGesturesEnabled(false)
                     onPressedExisting()
                 }
             }
@@ -310,7 +312,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
-        mapboxMap.uiSettings.setAllGesturesEnabled(false)
         mapboxMap.uiSettings.isAttributionEnabled = false
         mapboxMap.uiSettings.isLogoEnabled = false
 
@@ -326,9 +327,17 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     String.format(FORMAT_DISPLAY_LOCATION, lastLocation.longitude), true
                 )
             }
-            setupLocationOptions()
+            setupLocationOptions(mapboxMap)
             enableLocationComponent()
             retrieveDeployLocations()
+        }
+
+        mapboxMap.addOnCameraMoveListener {
+            val currentCameraPosition = mapboxMap.cameraPosition
+            setInputView(
+                String.format(FORMAT_DISPLAY_LOCATION, currentCameraPosition.target.latitude),
+                String.format(FORMAT_DISPLAY_LOCATION, currentCameraPosition.target.longitude), true
+            )
         }
     }
 
