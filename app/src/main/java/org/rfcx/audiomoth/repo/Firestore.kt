@@ -5,6 +5,7 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
+import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_SERVER_ID
 import org.rfcx.audiomoth.entity.Device
 import org.rfcx.audiomoth.entity.User
 import org.rfcx.audiomoth.entity.request.*
@@ -137,6 +138,22 @@ class Firestore(val context: Context) {
             }
             .addOnFailureListener {
                 callback?.onFailureCallback(it.localizedMessage)
+            }
+    }
+
+    fun getRemotePathByServerId(serverId: String, callback: (List<String>?) -> Unit) {
+        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        userDocument.collection(COLLECTION_IMAGES)
+            .whereEqualTo(FIELD_DEPLOYMENT_SERVER_ID, serverId).get()
+            .addOnSuccessListener {
+                val array = arrayListOf<String>()
+                it.documents.forEach { doc ->
+                    val remotePath = doc["remotePath"] as String
+                    array.add(remotePath)
+                }
+                callback(array)
+            }.addOnFailureListener {
+                callback(null)
             }
     }
 

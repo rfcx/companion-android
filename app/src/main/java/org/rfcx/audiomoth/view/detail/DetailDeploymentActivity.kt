@@ -3,6 +3,7 @@ package org.rfcx.audiomoth.view.detail
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -13,6 +14,7 @@ import kotlinx.android.synthetic.main.activity_feedback.toolbar
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.localdb.DeploymentDb
+import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.util.convertToStopStartPeriods
 import org.rfcx.audiomoth.util.toDateTimeString
@@ -66,6 +68,11 @@ class DetailDeploymentActivity : AppCompatActivity() {
                 customRecordingLabel.visibility = if (it.size != 0) View.VISIBLE else View.GONE
                 timeLineRecycler.visibility = if (it.size != 0) View.VISIBLE else View.GONE
                 setupTimeLineRecycler(it.toTypedArray())
+            }
+            deployment?.serverId?.let {
+                Firestore(this).getRemotePathByServerId(it) { remotePath ->
+                    Log.d("serverId", "$remotePath")
+                }
             }
         }
 
