@@ -45,7 +45,6 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
         }
 
         ImageSyncWorker.enqueue(context)
-        LocationSyncWorker.enqueue(context)
 
         return if (someFailed) Result.retry() else Result.success()
     }
