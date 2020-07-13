@@ -59,6 +59,9 @@ dependencies {
     implementation('com.journeyapps:zxing-android-embedded:4.1.0') { transitive = false }
     implementation 'com.google.zxing:core:3.3.0'
 
+    //timeLineView
+    implementation 'com.github.vipulasri:timelineview:1.1.5'
+
     //noinspection GradleCompatible
     implementation 'com.android.support:design:28.0.0'
 

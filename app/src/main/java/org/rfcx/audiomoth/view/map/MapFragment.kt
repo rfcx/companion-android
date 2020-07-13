@@ -57,6 +57,7 @@ import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
 import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity
+import org.rfcx.audiomoth.view.detail.DetailDeploymentActivity
 import org.rfcx.audiomoth.view.diagnostic.DiagnosticActivity
 
 class MapFragment : Fragment(), OnMapReadyCallback {
@@ -282,13 +283,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         feature.getProperty(PROPERTY_MARKER_DEPLOYMENT_ID).asInt
                     )
                 }
+            } else {
+                context?.let {
+                    DetailDeploymentActivity.startActivity(it, deployment.id)
+                }
             }
         }
     }
 
     private fun handleClickIcon(screenPoint: PointF): Boolean {
         val deploymentFeatures = mapboxMap?.queryRenderedFeatures(screenPoint, MARKER_DEPLOYMENT_ID)
-
         if (deploymentFeatures != null && deploymentFeatures.isNotEmpty()) {
             val selectedFeature = deploymentFeatures[0]
             val features = this.deploymentFeatures!!.features()!!
