@@ -24,7 +24,6 @@ import android.widget.ArrayAdapter
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import com.mapbox.android.core.location.*
 import com.mapbox.mapboxsdk.Mapbox
@@ -37,8 +36,6 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
-import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
-import com.mapbox.mapboxsdk.utils.BitmapUtils
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
@@ -204,7 +201,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private fun onPressedExisting() {
         locateItem?.let {
-            setPinOnMap(it.getLatLng())
+            moveCamera(it.getLatLng(), DEFAULT_ZOOM)
             context?.let { context ->
                 setInputView(
                     locateItem?.latitude.latitudeCoordinates(context),
@@ -225,7 +222,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 String.format(FORMAT_DISPLAY_LOCATION, lastLocation!!.latitude),
                 String.format(FORMAT_DISPLAY_LOCATION, lastLocation!!.longitude), true
             )
-            setPinOnMap(LatLng(lastLocation!!.latitude, lastLocation!!.longitude))
+            moveCamera(LatLng(lastLocation!!.latitude, lastLocation!!.longitude), DEFAULT_ZOOM)
         } else {
             // not found current location
             symbolManager.deleteAll()
@@ -269,7 +266,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 id: Long
             ) {
                 locateItem = locateItems[position]
-                setPinOnMap(locateItem!!.getLatLng())
+                moveCamera(locateItem!!.getLatLng(), DEFAULT_ZOOM)
                 context?.let {
                     setInputView(
                         locateItem?.latitude.latitudeCoordinates(it),
@@ -321,7 +318,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             symbolManager.iconIgnorePlacement = true
 
             lastLocation?.let { lastLocation ->
-                setPinOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
+                moveCamera(LatLng(lastLocation.latitude, lastLocation.longitude), DEFAULT_ZOOM)
                 setInputView(
                     String.format(FORMAT_DISPLAY_LOCATION, lastLocation.latitude),
                     String.format(FORMAT_DISPLAY_LOCATION, lastLocation.longitude), true
@@ -341,28 +338,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun setPinOnMap(latLng: LatLng) {
-        symbolManager.deleteAll()
-
-        val drawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map, null)
-        val mBitmap = BitmapUtils.getBitmapFromDrawable(drawable)
-        if (mBitmap != null) {
-            mapboxMap?.style?.addImage(PIN_MAP, mBitmap)
-        }
-
-        symbolManager.create(
-            SymbolOptions()
-                .withLatLng(latLng)
-                .withIconImage(PIN_MAP)
-                .withIconSize(1.0f)
-        )
-
-        mapboxMap?.moveCamera(
-            CameraUpdateFactory.newLatLngZoom(
-                latLng,
-                15.0
-            )
-        )
+    private fun moveCamera(latLng: LatLng, zoom: Double) {
+        mapboxMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom))
     }
 
     private fun setupInputLocation() {
@@ -408,9 +385,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
         if (long.last() != 'E' && long.last() != 'W') {
             if (lat < 90 && lat > -90) {
-                setPinOnMap(
-                    LatLng(lat, longitudeEditText.text.toString().toDouble())
-                )
+                mapboxMap?.let {
+                    moveCamera(
+                        LatLng(lat, longitudeEditText.text.toString().toDouble()),
+                        it.cameraPosition.zoom
+                    )
+                }
             } else {
                 Toast.makeText(
                     context,
@@ -428,9 +408,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         val long = longitude.toDouble()
 
         if (long < 180 && long > -180) {
-            setPinOnMap(
-                LatLng(latitudeEditText.text.toString().toDouble(), long)
-            )
+            mapboxMap?.let {
+                moveCamera(
+                    LatLng(latitudeEditText.text.toString().toDouble(), long),
+                    it.cameraPosition.zoom
+                )
+            }
         } else {
             Toast.makeText(
                 context,
@@ -570,6 +553,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         const val TAG = "LocationFragment"
         const val REQUEST_PERMISSIONS_REQUEST_CODE = 34
         const val PIN_MAP = "pin-map"
+        const val DEFAULT_ZOOM = 15.0
 
         private const val FORMAT_DISPLAY_LOCATION = "%.6f"
         private const val DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L
