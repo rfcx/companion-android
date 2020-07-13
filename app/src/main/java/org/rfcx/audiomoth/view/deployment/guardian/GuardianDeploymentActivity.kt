@@ -25,9 +25,8 @@ import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianConfigureFr
 import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianSelectProfileFragment
 import org.rfcx.audiomoth.view.deployment.guardian.connect.ConnectGuardianFragment
 import org.rfcx.audiomoth.view.deployment.guardian.deploy.GuardianDeployFragment
-import org.rfcx.audiomoth.view.deployment.guardian.sync.GuardianSyncFragment
+import org.rfcx.audiomoth.view.deployment.guardian.verify.GuardianVerifyFragment
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
-import org.rfcx.audiomoth.view.deployment.sync.SyncFragment.Companion.BEFORE_SYNC
 import org.rfcx.audiomoth.view.dialog.CompleteFragment
 import org.rfcx.audiomoth.view.dialog.CompleteListener
 import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
@@ -119,11 +118,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                     handleFragment(currentStep)
                 }
             }
-            4 -> {
-                currentStep = 2
-                stepView.go(currentStep, true)
-                startFragment(GuardianConfigureFragment.newInstance())
-            }
             else -> {
                 currentStep = stepView.currentStep - 1
                 stepView.go(currentStep, true)
@@ -163,8 +157,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         if (profile.name.isNotEmpty()) {
             profileDb.insertOrUpdateProfile(profile)
         }
-
-        nextStep()
     }
 
     override fun getConfiguration(): GuardianConfiguration? = _configuration
@@ -205,10 +197,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         startFragment(GuardianConfigureFragment.newInstance())
     }
 
-    override fun startSyncing(status: String) {
-        startFragment(GuardianSyncFragment.newInstance(status))
-    }
-
     override fun backToConfigure() {
         currentStep = 2
         stepView.go(currentStep, true)
@@ -233,7 +221,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             }
             3 -> {
                 updateDeploymentState(DeploymentState.Guardian.Sync)
-                startFragment(GuardianSyncFragment.newInstance(BEFORE_SYNC))
+                startFragment(GuardianVerifyFragment.newInstance())
             }
             4 -> {
                 updateDeploymentState(DeploymentState.Guardian.Deploy)
@@ -253,7 +241,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         this._deployment?.let { deploymentDb.updateDeployment(it) }
     }
 
-    private fun showLoading() {
+    override fun showLoading() {
         val loadingDialog: LoadingDialogFragment =
             supportFragmentManager.findFragmentByTag(loadingDialogTag) as LoadingDialogFragment?
                 ?: run {
@@ -271,7 +259,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         completeFragment.show(supportFragmentManager, CompleteFragment.tag)
     }
 
-    private fun hideLoading() {
+    override fun hideLoading() {
         val loadingDialog: LoadingDialogFragment? =
             supportFragmentManager.findFragmentByTag(loadingDialogTag) as LoadingDialogFragment?
         loadingDialog?.dismissDialog()

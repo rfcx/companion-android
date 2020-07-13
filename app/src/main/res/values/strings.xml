@@ -270,4 +270,15 @@
     <string name="detail_khz">%d kHz</string>
     <string name="detail_kbs">%d kbs</string>
 
+    <!-- GuardianVerifyFragment -->
+    <string name="position_the_device">Position the device</string>
+    <string name="network_strength_signal">Network strength signal</string>
+    <string name="signal_text_0">The signal strength is not detectable or very low</string>
+    <string name="signal_text_1">The signal strength is low</string>
+    <string name="signal_text_2">The signal strength is normal</string>
+    <string name="signal_text_3">The signal strength is high</string>
+    <string name="signal_text_4">The signal strength is very high or max</string>
+    <string name="signal_value">%d dBm</string>
+    <string name="signal_sim_card">The device does not have sim card inserted.\nPlease insert it before deploy.</string>
+
 </resources>

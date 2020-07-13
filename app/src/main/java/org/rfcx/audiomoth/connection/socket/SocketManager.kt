@@ -21,6 +21,8 @@ object SocketManager {
     private const val CONFIGURE = "configure"
     private const val SYNC = "sync"
     private const val PREFS = "prefs"
+    private const val SIGNAL = "signal"
+    private const val SIGNAL_INFO = "signal_info"
 
     fun connect(onReceiveResponse: OnReceiveResponse) {
         val data = gson.toJson(SocketRequest(CONNECTION))
@@ -42,8 +44,8 @@ object SocketManager {
         sendData(jsonString, onReceiveResponse)
     }
 
-    fun getAllCurrentPrefs(onReceiveResponse: OnReceiveResponse) {
-        val data = gson.toJson(SocketRequest(PREFS))
+    fun getSignalStrength(onReceiveResponse: OnReceiveResponse) {
+        val data = gson.toJson(SocketRequest(SIGNAL))
         sendData(data, onReceiveResponse)
     }
 
@@ -93,6 +95,10 @@ object SocketManager {
                             }
                             PREFS -> {
                                 val response = gson.fromJson(dataInput, PrefsResponse::class.java)
+                                onReceiveResponse.onReceive(response)
+                            }
+                            SIGNAL_INFO -> {
+                                val response = gson.fromJson(dataInput, SignalResponse::class.java)
                                 onReceiveResponse.onReceive(response)
                             }
                         }
