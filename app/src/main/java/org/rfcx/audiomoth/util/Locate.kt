@@ -57,6 +57,11 @@ fun Double?.longitudeCoordinates(context: Context): String {
     return this.toString()
 }
 
+fun String?.isCoordinates(): Boolean {
+    return this != null && this.isNotBlank() && this[0] != '.'
+            && this.last() != '.' && !(this[0] == '-' && this.length == 1) && this.last() != '-'
+}
+
 private fun replaceDelimitersDMS(str: String): String {
     var strDMSFormat = str
     strDMSFormat = strDMSFormat.replaceFirst(":".toRegex(), "°")

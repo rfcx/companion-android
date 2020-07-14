@@ -52,6 +52,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
             if (deployment != null) {
                 deployment.serverId = deploymentResponse.serverId
                 deployment.deployedAt = deploymentResponse.deployedAt ?: deployment.deployedAt
+                deployment.wifiName = deploymentResponse.wifi
 
                 val newConfig = deploymentResponse.configuration
                 if (newConfig != null) {

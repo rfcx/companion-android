@@ -6,109 +6,108 @@
     android:layout_height="match_parent"
     tools:context=".view.deployment.DeployFragment">
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guidelineHorizontalTop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.1" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guidelineHorizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.40" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/deploymentWillUploadedTextView"
-        style="@style/AudioMothText.Subhead.Bold"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:padding="@dimen/margin_padding_normal"
-        android:text="@string/deployment_will_uploaded"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <View
-        android:id="@+id/view0"
+    <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:layout_marginStart="@dimen/margin_padding_large"
-        android:layout_marginEnd="@dimen/margin_padding_large"
-        android:background="@color/colorPrimary"
-        app:layout_constraintTop_toBottomOf="@id/deploymentWillUploadedTextView" />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/configImageView"
-        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:src="@drawable/edge_deploy"
-        android:layout_margin="@dimen/margin_padding_small"
-        app:layout_constraintBottom_toBottomOf="@id/guidelineHorizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/guidelineHorizontalTop" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/almostThereTextView"
-        style="@style/AudioMothText.Body.Small"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_large"
-        android:layout_marginTop="@dimen/margin_padding_normal"
-        android:layout_marginEnd="@dimen/margin_padding_large"
-        android:gravity="center"
-        android:text="@string/almost_there"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/guidelineHorizontal" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/padding_bottom">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/switchToConfigTextView"
-        style="@style/AudioMothText.Body.Small"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_large"
-        android:layout_marginTop="@dimen/margin_padding_normal"
-        android:layout_marginEnd="@dimen/margin_padding_large"
-        android:text="@string/switch_to_deploy"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/almostThereTextView" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/deploymentWillUploadedTextView"
+                style="@style/AudioMothText.Subhead.Bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="@dimen/margin_padding_normal"
+                android:text="@string/deployment_will_uploaded"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/takePhotosTextView"
-        style="@style/AudioMothText.Subhead.Small"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_large"
-        android:layout_marginTop="@dimen/margin_padding_normal"
-        android:layout_marginEnd="@dimen/margin_padding_large"
-        android:gravity="center"
-        android:text="@string/take_photos"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/switchToConfigTextView" />
+            <View
+                android:id="@+id/view0"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginEnd="@dimen/margin_padding_large"
+                android:background="@color/colorPrimary"
+                app:layout_constraintTop_toBottomOf="@id/deploymentWillUploadedTextView" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/configImageView"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/edge_width"
+                android:layout_margin="@dimen/margin_padding_small"
+                android:src="@drawable/edge_deploy"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view0" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/almostThereTextView"
+                style="@style/AudioMothText.Body.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:layout_marginEnd="@dimen/margin_padding_large"
+                android:gravity="center"
+                android:text="@string/almost_there"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/configImageView" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/switchToConfigTextView"
+                style="@style/AudioMothText.Body.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:layout_marginEnd="@dimen/margin_padding_large"
+                android:text="@string/switch_to_deploy"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/almostThereTextView" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/takePhotosTextView"
+                style="@style/AudioMothText.Subhead.Small"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:layout_marginEnd="@dimen/margin_padding_large"
+                android:gravity="center"
+                android:text="@string/take_photos"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/switchToConfigTextView" />
 
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/attachImageRecycler"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_large"
-        android:layout_marginTop="@dimen/margin_padding_normal"
-        android:layout_marginEnd="@dimen/margin_padding_large"
-        android:clipToPadding="false"
-        android:visibility="visible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/takePhotosTextView"
-        tools:layoutManager="android.support.v7.widget.LinearLayoutManager"
-        tools:orientation="horizontal" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/attachImageRecycler"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:layout_marginEnd="@dimen/margin_padding_large"
+                android:clipToPadding="false"
+                android:visibility="visible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/takePhotosTextView"
+                tools:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                tools:orientation="horizontal" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/finishButton"

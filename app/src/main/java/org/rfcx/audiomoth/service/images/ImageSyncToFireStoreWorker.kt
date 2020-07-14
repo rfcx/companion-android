@@ -8,9 +8,10 @@ import io.realm.Realm
 import org.rfcx.audiomoth.entity.request.toRequestBody
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.repo.Firestore
+import org.rfcx.audiomoth.service.LocationSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
 
-class ImageSyncToFireStoreWorker(context: Context, params: WorkerParameters) :
+class ImageSyncToFireStoreWorker(val context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
 
     private val fireStore = Firestore(context)
@@ -30,6 +31,9 @@ class ImageSyncToFireStoreWorker(context: Context, params: WorkerParameters) :
             }
             someFailed = result == null
         }
+
+        LocationSyncWorker.enqueue(context)
+
         return if (someFailed) Result.retry() else Result.success()
     }
 

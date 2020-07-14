@@ -41,10 +41,7 @@ import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.localdb.LocateDb
-import org.rfcx.audiomoth.util.LocationPermissions
-import org.rfcx.audiomoth.util.RealmHelper
-import org.rfcx.audiomoth.util.latitudeCoordinates
-import org.rfcx.audiomoth.util.longitudeCoordinates
+import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.deployment.BaseDeploymentProtocal
 
 class LocationFragment : Fragment(), OnMapReadyCallback {
@@ -344,13 +341,14 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private fun setupInputLocation() {
         latitudeEditText.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(p0: Editable?) {
-                if (p0 != null && p0.isNotBlank()) {
-                    if (newLocationRadioButton.isChecked) {
-                        if (p0[0] != '.' && p0.last() != '.' && !(p0[0] == '-' && p0.length == 1) && p0.last() != '-') {
-                            convertInputLatitude(p0.toString())
-                        }
-                    }
+            override fun afterTextChanged(latitudeInput: Editable?) {
+                val longitudeInput = longitudeEditText.text?.trim()
+
+                if (newLocationRadioButton.isChecked &&
+                    latitudeInput != null && latitudeInput.toString().isCoordinates() &&
+                    longitudeInput != null && longitudeInput.toString().isCoordinates()
+                ) {
+                    convertInputLatitude(latitudeInput.toString(), longitudeInput.toString())
                 }
             }
 
@@ -360,13 +358,13 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         })
 
         longitudeEditText.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(p0: Editable?) {
-                if (p0 != null && p0.isNotBlank()) {
-                    if (newLocationRadioButton.isChecked) {
-                        if (p0[0] != '.' && p0.last() != '.' && !(p0[0] == '-' && p0.length == 1) && p0.last() != '-') {
-                            convertInputLongitude(p0.toString())
-                        }
-                    }
+            override fun afterTextChanged(input: Editable?) {
+                val latitudeInput = latitudeEditText.text?.trim()
+                if (newLocationRadioButton.isChecked &&
+                    input != null && input.toString().isCoordinates()
+                    && latitudeInput != null && latitudeInput.toString().isCoordinates()
+                ) {
+                    convertInputLongitude(input.toString())
                 }
             }
 
@@ -376,18 +374,14 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         })
     }
 
-    fun convertInputLatitude(latitude: String) {
-        val longitude = longitudeEditText.text?.trim()
-        if (longitude == null || longitude.isBlank() || longitude.last() == '-' || longitude.last() == '.') return
-
+    fun convertInputLatitude(latitude: String, longitude: String) {
         val lat = latitude.toDouble()
-        val long = longitude.toString()
 
-        if (long.last() != 'E' && long.last() != 'W') {
+        if (longitude.last() != 'E' && longitude.last() != 'W') {
             if (lat < 90 && lat > -90) {
                 mapboxMap?.let {
                     moveCamera(
-                        LatLng(lat, longitudeEditText.text.toString().toDouble()),
+                        LatLng(lat, longitude.toDouble()),
                         it.cameraPosition.zoom
                     )
                 }
@@ -402,9 +396,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     fun convertInputLongitude(longitude: String) {
-        val latitude = latitudeEditText.text?.trim()
-        if (latitude == null || latitude.isBlank() || latitude.last() == '-' || latitude.last() == '.') return
-
         val long = longitude.toDouble()
 
         if (long < 180 && long > -180) {
@@ -435,7 +426,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun checkPermissions(): Boolean {
+    private fun hasPermissions(): Boolean {
         val permissionState = context?.let {
             ActivityCompat.checkSelfPermission(
                 it,
@@ -458,7 +449,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     @SuppressLint("MissingPermission")
     private fun enableLocationComponent() {
-        if (checkPermissions()) {
+        if (hasPermissions()) {
             val loadedMapStyle = mapboxMap?.style
             val locationComponent = mapboxMap?.locationComponent
             // Activate the LocationComponent

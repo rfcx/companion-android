@@ -5,26 +5,36 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonArray
+import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_guardian_diagnostic.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.OnReceiveResponse
 import org.rfcx.audiomoth.connection.socket.SocketManager
-import org.rfcx.audiomoth.entity.DeploymentLocation
+import org.rfcx.audiomoth.entity.guardian.Diagnostic
+import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
+import org.rfcx.audiomoth.entity.guardian.getRecordTime
 import org.rfcx.audiomoth.entity.guardian.toReadableFormat
 import org.rfcx.audiomoth.entity.socket.DiagnosticResponse
 import org.rfcx.audiomoth.entity.socket.SocketResposne
-import org.rfcx.audiomoth.entity.socket.getRecordTime
+import org.rfcx.audiomoth.localdb.guardian.DiagnosticDb
+import org.rfcx.audiomoth.service.DiagnosticSyncWorker
+import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
 import org.rfcx.audiomoth.view.prefs.GuardianPrefsFragment
 import org.rfcx.audiomoth.view.prefs.SyncPreferenceListener
 
+
 class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
+
+    private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
+    private val diagnosticDb: DiagnosticDb by lazy { DiagnosticDb(realm) }
 
     private var collapseAdvanced = false
     private var prefsChanges: Map<String, String>? = null
@@ -46,13 +56,35 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
         "admin_enable_wifi_socket"
     )
 
+    private var lat: Double? = null
+    private var long: Double? = null
+    private var locationName: String? = null
+    private var isConnected: Boolean? = null
+    private var deploymentServerId: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_guardian_diagnostic)
+        getIntentExtra()
         setupToolbar()
+        setupUiByConnection()
         setupLocationData()
         retrieveDiagnosticInfo()
         setupSyncButton()
+    }
+
+    private fun setupUiByConnection() {
+        if (isConnected == false) {
+            disableAllComponent(diagnosticScrollView)
+        }
+    }
+
+    private fun getIntentExtra() {
+        lat = intent.extras?.getDouble(LAT)
+        long = intent.extras?.getDouble(LONG)
+        locationName = intent.extras?.getString(LOCATION_NAME)
+        isConnected = intent.extras?.getBoolean(IS_CONNECTED)
+        deploymentServerId = intent.extras?.getString(DEPLOYMENT_SERVER_ID)
     }
 
     private fun setupAdvancedSetting() {
@@ -69,7 +101,8 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
                     .remove(fragment)
                     .commit()
                 collapseAdvanced = false
-                advanceCollapseIcon.background = ContextCompat.getDrawable(this, R.drawable.ic_drop_down)
+                advanceCollapseIcon.background =
+                    ContextCompat.getDrawable(this, R.drawable.ic_drop_down)
             }
         }
     }
@@ -80,61 +113,71 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
             setDisplayShowTitleEnabled(true)
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
-            title = intent.extras?.getString(LOCATION_NAME)
+            title = if (isConnected != false) locationName else "$locationName (not connected)"
         }
     }
 
     private fun setupLocationData() {
-        locationLongitudeValue.text = intent.extras?.getDouble(LONG).toString()
-        locationLatitudeValue.text = intent.extras?.getDouble(LAT).toString()
+        locationLongitudeValue.text = long.toString()
+        locationLatitudeValue.text = lat.toString()
     }
 
     private fun retrieveDiagnosticInfo() {
-        showLoading()
-        SocketManager.getDiagnosticData(object : OnReceiveResponse {
-            override fun onReceive(response: SocketResposne) {
-                val diagnosticInfo = response as DiagnosticResponse
-                val diagnosticData = diagnosticInfo.diagnostic
-                val configurationData = diagnosticInfo.configure.toReadableFormat()
-                val prefsData = diagnosticInfo.prefs
+        if (isConnected == true) {
+            showLoading()
+            SocketManager.getDiagnosticData(object : OnReceiveResponse {
+                override fun onReceive(response: SocketResposne) {
+                    val diagnosticInfo = response as DiagnosticResponse
+                    val diagnosticData = diagnosticInfo.diagnostic
+                    val configurationData = diagnosticInfo.configure.toReadableFormat()
+                    val prefsData = diagnosticInfo.prefs
 
-                runOnUiThread {
-                    //set Diagnostic detail
-                    detailRecordValue.text =
-                        getString(R.string.detail_file, diagnosticData.totalLocal)
-                    detailCheckInValue.text =
-                        getString(R.string.detail_file, diagnosticData.totalCheckIn)
-                    detailTotalSizeValue.text =
-                        getString(R.string.detail_size, diagnosticData.totalFileSize / 1000)
-                    detailTotalTimeValue.text = diagnosticData.getRecordTime()
-                    detailBatteryValue.text =
-                        getString(R.string.detail_percentage, diagnosticData.batteryPercentage)
+                    runOnUiThread {
+                        //set Diagnostic detail
+                        detailRecordValue.text =
+                            getString(R.string.detail_file, diagnosticData.totalLocal)
+                        detailCheckInValue.text =
+                            getString(R.string.detail_file, diagnosticData.totalCheckIn)
+                        detailTotalSizeValue.text =
+                            getString(R.string.detail_size, diagnosticData.totalFileSize / 1000)
+                        detailTotalTimeValue.text = diagnosticData.getRecordTime()
+                        detailBatteryValue.text =
+                            getString(R.string.detail_percentage, diagnosticData.batteryPercentage)
 
-                    //set Configuration
-                    configFileFormatValue.text = configurationData.fileFormat
-                    configSampleRateValue.text =
-                        getString(R.string.detail_khz, configurationData.sampleRate)
-                    configBitrateValue.text =
-                        getString(R.string.detail_kbs, configurationData.bitrate)
-                    configDurationValue.text =
-                        getString(R.string.detail_secs, configurationData.duration)
+                        //set Configuration
+                        configFileFormatValue.text = configurationData.fileFormat
+                        configSampleRateValue.text =
+                            getString(R.string.detail_khz, configurationData.sampleRate)
+                        configBitrateValue.text =
+                            getString(R.string.detail_kbs, configurationData.bitrate)
+                        configDurationValue.text =
+                            getString(R.string.detail_secs, configurationData.duration)
 
-                    setupAdvancedSetting()
-                    setupCurrentPrefs(prefsData)
-                    hideLoading()
+                        setupAdvancedSetting()
+                        setupCurrentPrefs(prefsData)
+                        hideLoading()
+                    }
+
+                    saveNewDiagnostic(diagnosticData)
                 }
-            }
 
-            override fun onFailed(message: String) {
-                runOnUiThread {
-                    hideLoading()
-                    Snackbar.make(diagRootView, "Getting diagnostic data failed", Snackbar.LENGTH_LONG)
-                        .setAction(R.string.retry) { retrieveDiagnosticInfo() }
-                        .show()
+                override fun onFailed(message: String) {
+                    runOnUiThread {
+                        hideLoading()
+                        Snackbar.make(
+                            diagRootView,
+                            "Getting diagnostic data failed",
+                            Snackbar.LENGTH_LONG
+                        )
+                            .setAction(R.string.retry) { retrieveDiagnosticInfo() }
+                            .show()
+                    }
                 }
-            }
 
-        })
+            })
+        } else {
+            //TODO: getting last known diagnostic
+        }
     }
 
     private fun setupCurrentPrefs(prefs: JsonArray) {
@@ -172,13 +215,29 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
         loadingDialog?.dismissDialog()
     }
 
+    private fun disableAllComponent(view: View) {
+        view.isEnabled = false
+        if (view is ViewGroup) {
+            for (i in 0 until view.childCount) {
+                val child = view.getChildAt(i)
+                child.alpha = 0.7f
+                disableAllComponent(child)
+            }
+        }
+    }
+
+    private fun saveNewDiagnostic(diagnostic: Diagnostic) {
+        diagnosticDb.insertOrUpdate(diagnostic, this.deploymentServerId)
+        DiagnosticSyncWorker.enqueue(this)
+    }
+
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true
     }
 
     override fun setPrefsChanges(prefs: Map<String, String>) {
-       this.prefsChanges = prefs
+        this.prefsChanges = prefs
     }
 
     override fun showSyncButton() {
@@ -222,7 +281,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
     }
 
     override fun setEditor(editor: SharedPreferences.Editor) {
-       this.prefsEditor = editor
+        this.prefsEditor = editor
     }
 
     override fun onBackPressed() {
@@ -240,17 +299,21 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
         const val LAT = "latitude"
         const val LONG = "longitude"
         const val LOCATION_NAME = "location_name"
+        const val IS_CONNECTED = "is_connected"
+        const val DEPLOYMENT_SERVER_ID = "deployment_server_id"
 
         fun startActivity(context: Context) {
             val intent = Intent(context, DiagnosticActivity::class.java)
             context.startActivity(intent)
         }
 
-        fun startActivity(context: Context, location: DeploymentLocation) {
+        fun startActivity(context: Context, deployment: GuardianDeployment, isConnected: Boolean) {
             val intent = Intent(context, DiagnosticActivity::class.java)
-            intent.putExtra(LOCATION_NAME, location.name)
-            intent.putExtra(LAT, location.latitude)
-            intent.putExtra(LONG, location.longitude)
+            intent.putExtra(LOCATION_NAME, deployment.location?.name)
+            intent.putExtra(LAT, deployment.location?.latitude)
+            intent.putExtra(LONG, deployment.location?.longitude)
+            intent.putExtra(IS_CONNECTED, isConnected)
+            intent.putExtra(DEPLOYMENT_SERVER_ID, deployment.serverId)
             context.startActivity(intent)
         }
     }

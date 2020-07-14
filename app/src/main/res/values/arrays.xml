@@ -12,7 +12,7 @@
         <item>Connect</item>
         <item>Locate</item>
         <item>Config</item>
-        <item>Sync</item>
+        <item>Verify</item>
         <item>Deploy</item>
     </string-array>
 

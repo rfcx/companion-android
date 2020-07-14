@@ -102,6 +102,12 @@
         <item name="android:textSize">@dimen/text_small</item>
     </style>
 
+    <style name="AudioMothText.Body.Small.Label" parent="AudioMothText.Body.Small">
+        <item name="android:layout_marginTop">@dimen/margin_padding_normal</item>
+        <item name="android:layout_marginStart">@dimen/margin_padding_large</item>
+        <item name="android:layout_marginEnd">@dimen/margin_padding_normal</item>
+    </style>
+
     <style name="AudioMothText.SubTitle" parent="Base.TextAppearance.AppCompat.Title">
         <item name="android:textColor">@color/text_black</item>
         <item name="android:textSize">@dimen/text_small</item>

@@ -42,7 +42,7 @@ class ConfigureFragment : Fragment(),
 
     private val sampleRateList = arrayOf("8", "16", "32", "48", "96", "192", "256", "384")
     private val gainList = arrayOf("Low", "Low - Medium", "Medium", "Medium - High", "High")
-    private var timeList = arrayListOf(
+    var timeList = arrayListOf(
         "00:00",
         "01:00",
         "02:00",
