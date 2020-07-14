@@ -25,6 +25,9 @@ import org.rfcx.audiomoth.repo.ApiManager
 import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.util.CredentialKeeper
 import org.rfcx.audiomoth.util.CredentialVerifier
+import org.rfcx.audiomoth.util.Preferences
+import org.rfcx.audiomoth.util.Preferences.Companion.USER_FIREBASE_UID
+import org.rfcx.audiomoth.view.profile.coordinates.CoordinatesActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -237,10 +240,14 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun signInWithFirebaseToken(firebaseToken: String) {
+        val preferences = Preferences.getInstance(this)
+
         auth.signInWithCustomToken(firebaseToken)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     val user = auth.currentUser
+                    user?.uid?.let { preferences.putString(USER_FIREBASE_UID, it) }
+
                     MainActivity.startActivity(this@LoginActivity)
                     finish()
                 } else {
