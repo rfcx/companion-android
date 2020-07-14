@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
@@ -19,6 +20,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_configure.*
+import kotlinx.android.synthetic.main.fragment_configure.radioGroup
+import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.DURATION_SELECTED_DEFAULT
 import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.GAIN_DEFAULT
@@ -95,6 +98,8 @@ class ConfigureFragment : Fragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        view.viewTreeObserver.addOnGlobalLayoutListener { setOnFocusEditText() }
+
         profile = deploymentProtocol?.getProfile()
         deploymentProtocol?.hideCompleteButton()
 
@@ -140,6 +145,20 @@ class ConfigureFragment : Fragment(),
         setRadioGroup()
         checkMinimumOfDuration()
         setHideKeyboard()
+    }
+
+    private fun setOnFocusEditText() {
+        val screenHeight: Int = view?.rootView?.height ?: 0
+        val r = Rect()
+        view?.getWindowVisibleDisplayFrame(r)
+        val keypadHeight: Int = screenHeight - r.bottom
+        if (keypadHeight > screenHeight * 0.15) {
+            nextButton.visibility = View.GONE
+        } else {
+            if (nextButton != null) {
+                nextButton.visibility = View.VISIBLE
+            }
+        }
     }
 
     private fun setHideKeyboard() {
@@ -332,7 +351,6 @@ class ConfigureFragment : Fragment(),
 
     private fun setNextButton(show: Boolean) {
         nextButton.visibility = if (show) View.VISIBLE else View.GONE
-        configProgressBar.visibility = if (!show) View.VISIBLE else View.GONE
     }
 
     private fun setNextOnClick() {

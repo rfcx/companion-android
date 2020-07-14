@@ -6,6 +6,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Rect
 import android.location.Location
 import android.location.LocationManager
 import android.os.Build
@@ -119,6 +120,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         mapView = view.findViewById(R.id.mapBoxView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
+
+        view.viewTreeObserver.addOnGlobalLayoutListener { setOnFocusEditText() }
 
         deploymentProtocol?.showStepView()
         deploymentProtocol?.hideCompleteButton()
@@ -337,6 +340,20 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private fun moveCamera(latLng: LatLng, zoom: Double) {
         mapboxMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom))
+    }
+
+    private fun setOnFocusEditText() {
+        val screenHeight: Int = view?.rootView?.height ?: 0
+        val r = Rect()
+        view?.getWindowVisibleDisplayFrame(r)
+        val keypadHeight: Int = screenHeight - r.bottom
+        if (keypadHeight > screenHeight * 0.15) {
+            finishButton.visibility = View.GONE
+        } else {
+            if (finishButton != null) {
+                finishButton.visibility = View.VISIBLE
+            }
+        }
     }
 
     private fun setupInputLocation() {
