@@ -317,9 +317,6 @@ class ConfigureFragment : Fragment(),
         val array = arrayListOf<Boolean>()
         timeState.forEach { timeStatus ->
             array.add(timeStatus.state)
-            if (timeStatus.state) {
-                recordingPeriod.add(timeStatus.time)
-            }
         }
 
         when (durationSelected) {
@@ -345,6 +342,11 @@ class ConfigureFragment : Fragment(),
             setNextButton(true)
             Toast.makeText(context, R.string.maximum_ranges, Toast.LENGTH_LONG).show()
         } else {
+            timeState.forEach { timeStatus ->
+                if (timeStatus.state) {
+                    recordingPeriod.add(timeStatus.time)
+                }
+            }
             updateProfile()
         }
     }
