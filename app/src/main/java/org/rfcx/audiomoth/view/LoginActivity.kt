@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
@@ -19,10 +20,11 @@ import kotlinx.android.synthetic.main.activity_login.*
 import org.rfcx.audiomoth.MainActivity
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.*
+import org.rfcx.audiomoth.entity.response.FirebaseAuthResponse
 import org.rfcx.audiomoth.repo.ApiManager
+import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.util.CredentialKeeper
 import org.rfcx.audiomoth.util.CredentialVerifier
-import org.rfcx.audiomoth.repo.Firestore
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -116,14 +118,14 @@ class LoginActivity : AppCompatActivity() {
 
         Firestore(this@LoginActivity)
             .saveUser(user, result.guid) { string, isSuccess ->
-            if (isSuccess) {
-                userTouch(result.idToken)
-                CredentialKeeper(this@LoginActivity).save(result)
-            } else {
-                Toast.makeText(this@LoginActivity, string, Toast.LENGTH_SHORT).show()
-                loading(false)
+                if (isSuccess) {
+                    userTouch(result.idToken)
+                    CredentialKeeper(this@LoginActivity).save(result)
+                } else {
+                    Toast.makeText(this@LoginActivity, string, Toast.LENGTH_SHORT).show()
+                    loading(false)
+                }
             }
-        }
     }
 
     private fun loginWithFacebook() {
@@ -167,7 +169,7 @@ class LoginActivity : AppCompatActivity() {
                 override fun onFailure(exception: AuthenticationException) {
                     Toast.makeText(this@LoginActivity, exception.description, Toast.LENGTH_SHORT)
                         .show()
-                    loading (false)
+                    loading(false)
                 }
 
                 override fun onSuccess(credentials: Credentials) {
@@ -202,11 +204,30 @@ class LoginActivity : AppCompatActivity() {
                 ) {
                     response.body()?.let {
                         if (it.success) {
-                            MainActivity.startActivity(this@LoginActivity)
-                            finish()
+                            firebaseAuth(authUser)
+//                            MainActivity.startActivity(this@LoginActivity)
+//                            finish()
                         } else {
                             loading(false)
                         }
+                    }
+                }
+            })
+    }
+
+    private fun firebaseAuth(authUser: String) {
+        ApiManager.getInstance().apiFirebaseAuth.firebaseAuth(authUser)
+            .enqueue(object : Callback<FirebaseAuthResponse> {
+                override fun onFailure(call: Call<FirebaseAuthResponse>, t: Throwable) {
+                    Log.d("firebaseAuth", "onFailure ${t.message}")
+                }
+
+                override fun onResponse(
+                    call: Call<FirebaseAuthResponse>,
+                    response: Response<FirebaseAuthResponse>
+                ) {
+                    response.body()?.let {
+                        Log.d("firebaseAuth", "onResponse ${it.firebaseToken}")
                     }
                 }
             })
