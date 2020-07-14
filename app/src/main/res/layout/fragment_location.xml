@@ -118,6 +118,16 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/locationNameSpinner" />
 
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/pinDeploymentImageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_pin_map"
+                app:layout_constraintTop_toTopOf="@id/mapBoxView"
+                app:layout_constraintStart_toStartOf="@id/mapBoxView"
+                app:layout_constraintEnd_toEndOf="@id/mapBoxView"
+                app:layout_constraintBottom_toBottomOf="@id/mapBoxView"/>
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/latitudeTextInput"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"

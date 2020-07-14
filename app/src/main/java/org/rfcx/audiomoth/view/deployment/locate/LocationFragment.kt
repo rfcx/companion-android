@@ -6,6 +6,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Rect
 import android.location.Location
 import android.location.LocationManager
 import android.os.Build
@@ -24,7 +25,6 @@ import android.widget.ArrayAdapter
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import com.mapbox.android.core.location.*
 import com.mapbox.mapboxsdk.Mapbox
@@ -37,8 +37,6 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
-import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
-import com.mapbox.mapboxsdk.utils.BitmapUtils
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
@@ -123,6 +121,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
 
+        view.viewTreeObserver.addOnGlobalLayoutListener { setOnFocusEditText() }
+
         deploymentProtocol?.showStepView()
         deploymentProtocol?.hideCompleteButton()
 
@@ -183,14 +183,16 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         deploymentProtocol?.nextStep()
     }
 
-    private fun setupLocationOptions() {
+    private fun setupLocationOptions(mapboxMap: MapboxMap) {
         radioGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.newLocationRadioButton -> {
+                    mapboxMap.uiSettings.setAllGesturesEnabled(true)
                     onPressedNewLocation()
                 }
 
                 R.id.existingRadioButton -> {
+                    mapboxMap.uiSettings.setAllGesturesEnabled(false)
                     onPressedExisting()
                 }
             }
@@ -199,7 +201,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private fun onPressedExisting() {
         locateItem?.let {
-            setPinOnMap(it.getLatLng())
+            moveCamera(it.getLatLng(), DEFAULT_ZOOM)
             context?.let { context ->
                 setInputView(
                     locateItem?.latitude.latitudeCoordinates(context),
@@ -220,7 +222,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 String.format(FORMAT_DISPLAY_LOCATION, lastLocation!!.latitude),
                 String.format(FORMAT_DISPLAY_LOCATION, lastLocation!!.longitude), true
             )
-            setPinOnMap(LatLng(lastLocation!!.latitude, lastLocation!!.longitude))
+            moveCamera(LatLng(lastLocation!!.latitude, lastLocation!!.longitude), DEFAULT_ZOOM)
         } else {
             // not found current location
             symbolManager.deleteAll()
@@ -264,7 +266,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 id: Long
             ) {
                 locateItem = locateItems[position]
-                setPinOnMap(locateItem!!.getLatLng())
+                moveCamera(locateItem!!.getLatLng(), DEFAULT_ZOOM)
                 context?.let {
                     setInputView(
                         locateItem?.latitude.latitudeCoordinates(it),
@@ -307,7 +309,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
-        mapboxMap.uiSettings.setAllGesturesEnabled(false)
         mapboxMap.uiSettings.isAttributionEnabled = false
         mapboxMap.uiSettings.isLogoEnabled = false
 
@@ -317,40 +318,42 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             symbolManager.iconIgnorePlacement = true
 
             lastLocation?.let { lastLocation ->
-                setPinOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
+                moveCamera(LatLng(lastLocation.latitude, lastLocation.longitude), DEFAULT_ZOOM)
                 setInputView(
                     String.format(FORMAT_DISPLAY_LOCATION, lastLocation.latitude),
                     String.format(FORMAT_DISPLAY_LOCATION, lastLocation.longitude), true
                 )
             }
-            setupLocationOptions()
+            setupLocationOptions(mapboxMap)
             enableLocationComponent()
             retrieveDeployLocations()
         }
+
+        mapboxMap.addOnCameraMoveListener {
+            val currentCameraPosition = mapboxMap.cameraPosition
+            setInputView(
+                String.format(FORMAT_DISPLAY_LOCATION, currentCameraPosition.target.latitude),
+                String.format(FORMAT_DISPLAY_LOCATION, currentCameraPosition.target.longitude), true
+            )
+        }
     }
 
-    private fun setPinOnMap(latLng: LatLng) {
-        symbolManager.deleteAll()
+    private fun moveCamera(latLng: LatLng, zoom: Double) {
+        mapboxMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom))
+    }
 
-        val drawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map, null)
-        val mBitmap = BitmapUtils.getBitmapFromDrawable(drawable)
-        if (mBitmap != null) {
-            mapboxMap?.style?.addImage(PIN_MAP, mBitmap)
+    private fun setOnFocusEditText() {
+        val screenHeight: Int = view?.rootView?.height ?: 0
+        val r = Rect()
+        view?.getWindowVisibleDisplayFrame(r)
+        val keypadHeight: Int = screenHeight - r.bottom
+        if (keypadHeight > screenHeight * 0.15) {
+            finishButton.visibility = View.GONE
+        } else {
+            if (finishButton != null) {
+                finishButton.visibility = View.VISIBLE
+            }
         }
-
-        symbolManager.create(
-            SymbolOptions()
-                .withLatLng(latLng)
-                .withIconImage(PIN_MAP)
-                .withIconSize(1.0f)
-        )
-
-        mapboxMap?.moveCamera(
-            CameraUpdateFactory.newLatLngZoom(
-                latLng,
-                15.0
-            )
-        )
     }
 
     private fun setupInputLocation() {
@@ -393,9 +396,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
         if (longitude.last() != 'E' && longitude.last() != 'W') {
             if (lat < 90 && lat > -90) {
-                setPinOnMap(
-                    LatLng(lat, longitude.toDouble())
-                )
+                mapboxMap?.let {
+                    moveCamera(
+                        LatLng(lat, longitude.toDouble()),
+                        it.cameraPosition.zoom
+                    )
+                }
             } else {
                 Toast.makeText(
                     context,
@@ -408,10 +414,14 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     fun convertInputLongitude(longitude: String) {
         val long = longitude.toDouble()
+
         if (long < 180 && long > -180) {
-            setPinOnMap(
-                LatLng(latitudeEditText.text.toString().toDouble(), long)
-            )
+            mapboxMap?.let {
+                moveCamera(
+                    LatLng(latitudeEditText.text.toString().toDouble(), long),
+                    it.cameraPosition.zoom
+                )
+            }
         } else {
             Toast.makeText(
                 context,
@@ -551,6 +561,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         const val TAG = "LocationFragment"
         const val REQUEST_PERMISSIONS_REQUEST_CODE = 34
         const val PIN_MAP = "pin-map"
+        const val DEFAULT_ZOOM = 15.0
 
         private const val FORMAT_DISPLAY_LOCATION = "%.6f"
         private const val DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L
