@@ -433,7 +433,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun checkPermissions(): Boolean {
+    private fun hasPermissions(): Boolean {
         val permissionState = context?.let {
             ActivityCompat.checkSelfPermission(
                 it,
@@ -443,7 +443,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         return permissionState == PackageManager.PERMISSION_GRANTED
     }
 
-    private fun hasPermission() {
+    private fun requestPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             activity?.requestPermissions(
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
@@ -456,7 +456,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     @SuppressLint("MissingPermission")
     private fun enableLocationComponent() {
-        if (checkPermissions()) {
+        if (hasPermissions()) {
             val loadedMapStyle = mapboxMap?.style
             val locationComponent = mapboxMap?.locationComponent
             // Activate the LocationComponent
@@ -477,7 +477,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
             initLocationEngine()
         } else {
-            hasPermission()
+            requestPermissions()
         }
     }
 
