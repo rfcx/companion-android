@@ -4,7 +4,6 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
@@ -16,6 +15,7 @@ import com.auth0.android.callback.BaseCallback
 import com.auth0.android.provider.AuthCallback
 import com.auth0.android.provider.WebAuthProvider
 import com.auth0.android.result.Credentials
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_login.*
 import org.rfcx.audiomoth.MainActivity
 import org.rfcx.audiomoth.R
@@ -30,6 +30,8 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class LoginActivity : AppCompatActivity() {
+
+    private lateinit var auth: FirebaseAuth
 
     private val auth0 by lazy {
         val auth0 =
@@ -50,6 +52,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+        auth = FirebaseAuth.getInstance()
 
         if (CredentialKeeper(this).hasValidCredentials()) {
             MainActivity.startActivity(this@LoginActivity)
@@ -204,9 +207,7 @@ class LoginActivity : AppCompatActivity() {
                 ) {
                     response.body()?.let {
                         if (it.success) {
-                            firebaseAuth(authUser)
-//                            MainActivity.startActivity(this@LoginActivity)
-//                            finish()
+                            getFirebaseAuth(authUser)
                         } else {
                             loading(false)
                         }
@@ -215,11 +216,13 @@ class LoginActivity : AppCompatActivity() {
             })
     }
 
-    private fun firebaseAuth(authUser: String) {
+    private fun getFirebaseAuth(authUser: String) {
         ApiManager.getInstance().apiFirebaseAuth.firebaseAuth(authUser)
             .enqueue(object : Callback<FirebaseAuthResponse> {
                 override fun onFailure(call: Call<FirebaseAuthResponse>, t: Throwable) {
-                    Log.d("firebaseAuth", "onFailure ${t.message}")
+                    loading(false)
+                    Toast.makeText(baseContext, R.string.an_error_occurred, Toast.LENGTH_SHORT)
+                        .show()
                 }
 
                 override fun onResponse(
@@ -227,10 +230,25 @@ class LoginActivity : AppCompatActivity() {
                     response: Response<FirebaseAuthResponse>
                 ) {
                     response.body()?.let {
-                        Log.d("firebaseAuth", "onResponse ${it.firebaseToken}")
+                        signInWithFirebaseToken(it.firebaseToken)
                     }
                 }
             })
+    }
+
+    private fun signInWithFirebaseToken(firebaseToken: String) {
+        auth.signInWithCustomToken(firebaseToken)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    val user = auth.currentUser
+                    MainActivity.startActivity(this@LoginActivity)
+                    finish()
+                } else {
+                    loading(false)
+                    Toast.makeText(baseContext, R.string.an_error_occurred, Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
     }
 
     private fun loading(start: Boolean = true) {
