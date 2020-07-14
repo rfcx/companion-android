@@ -3,6 +3,7 @@ package org.rfcx.audiomoth.entity.guardian
 import com.google.gson.annotations.SerializedName
 import io.realm.RealmModel
 import io.realm.annotations.RealmClass
+import java.io.Serializable
 
 @RealmClass
 open class GuardianConfiguration(
@@ -12,7 +13,7 @@ open class GuardianConfiguration(
     @SerializedName("file_format")
     var fileFormat: String = "opus",
     var duration: Int = 90
-) : RealmModel
+) : RealmModel, Serializable
 
 fun GuardianConfiguration.toListForGuardian(): List<String> {
     return listOf(

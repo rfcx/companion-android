@@ -16,10 +16,7 @@ import kotlinx.android.synthetic.main.activity_guardian_diagnostic.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.OnReceiveResponse
 import org.rfcx.audiomoth.connection.socket.SocketManager
-import org.rfcx.audiomoth.entity.guardian.Diagnostic
-import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
-import org.rfcx.audiomoth.entity.guardian.getRecordTime
-import org.rfcx.audiomoth.entity.guardian.toReadableFormat
+import org.rfcx.audiomoth.entity.guardian.*
 import org.rfcx.audiomoth.entity.socket.DiagnosticResponse
 import org.rfcx.audiomoth.entity.socket.SocketResposne
 import org.rfcx.audiomoth.localdb.guardian.DiagnosticDb
@@ -29,6 +26,7 @@ import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
 import org.rfcx.audiomoth.view.prefs.GuardianPrefsFragment
 import org.rfcx.audiomoth.view.prefs.SyncPreferenceListener
+import java.security.Guard
 
 
 class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
@@ -60,7 +58,9 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
     private var long: Double? = null
     private var locationName: String? = null
     private var isConnected: Boolean? = null
+    private var deployment: GuardianDeployment? = null
     private var deploymentServerId: String? = null
+    private var configuration: GuardianConfiguration? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,11 +80,13 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
     }
 
     private fun getIntentExtra() {
-        lat = intent.extras?.getDouble(LAT)
-        long = intent.extras?.getDouble(LONG)
-        locationName = intent.extras?.getString(LOCATION_NAME)
         isConnected = intent.extras?.getBoolean(IS_CONNECTED)
-        deploymentServerId = intent.extras?.getString(DEPLOYMENT_SERVER_ID)
+        deployment = intent.extras?.getSerializable(DEPLOYMENT) as GuardianDeployment
+        lat = deployment?.location?.latitude ?: 0.0
+        long = deployment?.location?.longitude ?: 0.0
+        locationName = deployment?.location?.name ?: ""
+        deploymentServerId = deployment?.serverId ?: ""
+        configuration = deployment?.configuration ?: GuardianConfiguration()
     }
 
     private fun setupAdvancedSetting() {
@@ -176,8 +178,32 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
 
             })
         } else {
-            //TODO: getting last known diagnostic
+            setupLastKnownDiagnostic()
         }
+    }
+
+    private fun setupLastKnownDiagnostic() {
+        // diagnosticInfo from latest data in local db
+        val diagnosticInfo = diagnosticDb.getDiagnosticInfo(deploymentServerId)
+        detailRecordValue.text =
+            getString(R.string.detail_file, diagnosticInfo.diagnostic?.totalLocal)
+        detailCheckInValue.text =
+            getString(R.string.detail_file, diagnosticInfo.diagnostic?.totalCheckIn)
+        detailTotalSizeValue.text =
+            getString(R.string.detail_size, diagnosticInfo.diagnostic?.totalFileSize?.div(1000))
+        detailTotalTimeValue.text = diagnosticInfo.diagnostic?.getRecordTime()
+        detailBatteryValue.text =
+            getString(R.string.detail_percentage, diagnosticInfo.diagnostic?.batteryPercentage)
+
+        //configuration data from marker
+        val configurationInfo = configuration?.toReadableFormat()
+        configFileFormatValue.text = configurationInfo?.fileFormat
+        configSampleRateValue.text =
+            getString(R.string.detail_khz, configurationInfo?.sampleRate)
+        configBitrateValue.text =
+            getString(R.string.detail_kbs, configurationInfo?.bitrate)
+        configDurationValue.text =
+            getString(R.string.detail_secs, configurationInfo?.duration)
     }
 
     private fun setupCurrentPrefs(prefs: JsonArray) {
@@ -296,11 +322,8 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
 
 
     companion object {
-        const val LAT = "latitude"
-        const val LONG = "longitude"
-        const val LOCATION_NAME = "location_name"
         const val IS_CONNECTED = "is_connected"
-        const val DEPLOYMENT_SERVER_ID = "deployment_server_id"
+        const val DEPLOYMENT = "deployment"
 
         fun startActivity(context: Context) {
             val intent = Intent(context, DiagnosticActivity::class.java)
@@ -309,11 +332,8 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
 
         fun startActivity(context: Context, deployment: GuardianDeployment, isConnected: Boolean) {
             val intent = Intent(context, DiagnosticActivity::class.java)
-            intent.putExtra(LOCATION_NAME, deployment.location?.name)
-            intent.putExtra(LAT, deployment.location?.latitude)
-            intent.putExtra(LONG, deployment.location?.longitude)
             intent.putExtra(IS_CONNECTED, isConnected)
-            intent.putExtra(DEPLOYMENT_SERVER_ID, deployment.serverId)
+            intent.putExtra(DEPLOYMENT, deployment)
             context.startActivity(intent)
         }
     }

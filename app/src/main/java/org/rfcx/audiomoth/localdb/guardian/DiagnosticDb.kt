@@ -15,6 +15,16 @@ class DiagnosticDb(private val realm: Realm) {
             .count()
     }
 
+    fun getDiagnosticInfo(deploymentServerId: String?): DiagnosticInfo {
+        var diagnosticInfo: DiagnosticInfo? = null
+        realm.executeTransaction {
+            diagnosticInfo = it.where(DiagnosticInfo::class.java)
+                .equalTo(DiagnosticInfo.FIELD_DEPLOY_ID, deploymentServerId)
+                .findFirst()
+        }
+        return diagnosticInfo ?: DiagnosticInfo()
+    }
+
     private fun getIdByDeploymentServerId(deploymentServerId: String?): Int {
         var id = 0
         realm.executeTransaction {
