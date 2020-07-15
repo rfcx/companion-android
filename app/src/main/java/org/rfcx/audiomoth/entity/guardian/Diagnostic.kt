@@ -1,11 +1,8 @@
 package org.rfcx.audiomoth.entity.guardian
 
 import com.google.gson.annotations.SerializedName
-import io.realm.RealmModel
-import io.realm.annotations.RealmClass
 
-@RealmClass
-open class Diagnostic(
+data class Diagnostic(
     @SerializedName("total_local")
     var totalLocal: Int = 0,
     @SerializedName("total_checkin")
@@ -16,7 +13,7 @@ open class Diagnostic(
     var totalFileSize: Int = 0,
     @SerializedName("battery_percentage")
     var batteryPercentage: Int = 0
-) : RealmModel
+)
 
 fun Diagnostic.getRecordTime(): String {
     var amountTime = ""

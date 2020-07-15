@@ -2,18 +2,11 @@ package org.rfcx.audiomoth.localdb.guardian
 
 import io.realm.Realm
 import org.rfcx.audiomoth.entity.SyncState
-import org.rfcx.audiomoth.entity.guardian.Diagnostic
 import org.rfcx.audiomoth.entity.guardian.DiagnosticInfo
 import org.rfcx.audiomoth.entity.response.DiagnosticResponse
 import java.util.*
 
 class DiagnosticDb(private val realm: Realm) {
-
-    fun unsentCount(): Long {
-        return realm.where(Diagnostic::class.java)
-            .notEqualTo(DiagnosticInfo.FIELD_SYNC_STATE, SyncState.Sent.key)
-            .count()
-    }
 
     fun getDiagnosticInfo(deploymentServerId: String?): DiagnosticInfo {
         var diagnosticInfo: DiagnosticInfo? = null
@@ -35,12 +28,12 @@ class DiagnosticDb(private val realm: Realm) {
         return id
     }
 
-    fun insertOrUpdate(diagnostic: Diagnostic, deploymentServerId: String?) {
+    fun insertOrUpdate(deploymentServerId: String?) {
         var id = getIdByDeploymentServerId(deploymentServerId)
         realm.executeTransaction {
             if (id == 0) {
                 val diagnosticInfo =
-                    DiagnosticInfo(deploymentServerId = deploymentServerId, diagnostic = diagnostic)
+                    DiagnosticInfo(deploymentServerId = deploymentServerId)
                 id = (it.where(DiagnosticInfo::class.java).max(DiagnosticInfo.FIELD_ID)
                     ?.toInt() ?: 0) + 1
                 diagnosticInfo.id = id
@@ -57,7 +50,6 @@ class DiagnosticDb(private val realm: Realm) {
                         diagnosticInfo.id,
                         diagnosticInfo.serverId,
                         diagnosticInfo.deploymentServerId,
-                        diagnostic,
                         Date(),
                         SyncState.Unsent.key
                     )
@@ -113,8 +105,7 @@ class DiagnosticDb(private val realm: Realm) {
             if (diagnostic != null) {
                 diagnostic.serverId = diagnosticResponse.serverId
                 diagnostic.deploymentServerId = diagnosticResponse.deploymentServerId
-                diagnostic.diagnostic = diagnostic.diagnostic
-                diagnostic.createdAt = diagnosticResponse.createdAt
+                diagnostic.lastConnection = diagnosticResponse.lastConnection
             } else {
                 val diagnosticInfo = diagnosticResponse.toDiagnostic()
                 val id = (it.where(DiagnosticInfo::class.java).max(DiagnosticInfo.FIELD_ID)
