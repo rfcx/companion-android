@@ -102,6 +102,10 @@
     <string name="please_fill_information">Please fill your information completely</string>
     <string name="change">change</string>
 
+    <!--  MapPickerFragment  -->
+    <string name="select">Select</string>
+    <string name="selected_location">Selected location</string>
+
     <!--  SelectProfileFragment  -->
     <string name="use_an_existing">Use an existing profile</string>
     <string name="or_create_new">or create new</string>

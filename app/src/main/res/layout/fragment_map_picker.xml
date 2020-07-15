@@ -20,4 +20,49 @@
         app:layout_constraintStart_toStartOf="@id/mapBoxPickerView"
         app:layout_constraintTop_toTopOf="@id/mapBoxPickerView" />
 
+    <View
+        android:id="@+id/bottomView"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/selectLocationTextView"
+        style="@style/AudioMothText.Body.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:textAllCaps="true"
+        android:text="@string/selected_location"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/bottomView" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/locationTextView"
+        style="@style/AudioMothText.Body.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginTop="@dimen/margin_padding_small"
+        android:text="16.000, 100.000"
+        android:textSize="@dimen/text_xsmall"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/selectLocationTextView"
+        tools:text="16.000, 100.000" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        style="@style/GuardianButton.GreenButton.Line"
+        android:text="@string/select"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:textSize="@dimen/text_xsmall"
+        android:layout_marginEnd="@dimen/margin_padding_large"
+        app:layout_constraintBottom_toBottomOf="@id/locationTextView"
+        app:layout_constraintTop_toTopOf="@id/selectLocationTextView"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
