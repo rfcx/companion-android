@@ -12,8 +12,6 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Looper.getMainLooper
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -42,7 +40,10 @@ import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.localdb.LocateDb
-import org.rfcx.audiomoth.util.*
+import org.rfcx.audiomoth.util.LocationPermissions
+import org.rfcx.audiomoth.util.RealmHelper
+import org.rfcx.audiomoth.util.latitudeCoordinates
+import org.rfcx.audiomoth.util.longitudeCoordinates
 import org.rfcx.audiomoth.view.deployment.BaseDeploymentProtocal
 
 class LocationFragment : Fragment(), OnMapReadyCallback {
@@ -146,20 +147,18 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 }
                 false
             }
-        latitudeEditText.setOnEditorActionListener(editorActionListener)
-        longitudeEditText.setOnEditorActionListener(editorActionListener)
         locationNameEditText.setOnEditorActionListener(editorActionListener)
     }
 
     private fun verifyInput() {
-        if (locationNameEditText.text.toString().isNotEmpty()
-            && latitudeEditText.text.toString().isNotEmpty()
-            && longitudeEditText.text.toString().isNotEmpty()
-        ) {
-            handleNewLocate(
-                latitudeEditText.text.toString().toDouble(),
-                longitudeEditText.text.toString().toDouble()
-            )
+        val name = locationNameEditText.text.toString()
+        val locationValue = locationValueTextView.text.toString()
+        if (name.isNotEmpty() && locationValue.isNotEmpty() && lastLocation != null) {
+            lastLocation?.let {
+                val locate = Locate(name = name, latitude = it.latitude, longitude = it.longitude)
+                deploymentProtocol?.setDeployLocation(locate)
+                deploymentProtocol?.nextStep()
+            }
         } else {
             Toast.makeText(
                 context,
@@ -176,13 +175,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun handleNewLocate(lat: Double, lng: Double) {
-        val name = locationNameEditText.text.toString()
-        val locate = Locate(name = name, latitude = lat, longitude = lng)
-        deploymentProtocol?.setDeployLocation(locate)
-        deploymentProtocol?.nextStep()
-    }
-
     private fun setupLocationOptions() {
         radioGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
@@ -197,16 +189,17 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    private fun setLatLogLabel(location: LatLng) {
+        context?.let {
+            val latLng = "${location.latitude.latitudeCoordinates(it)}, ${location.longitude.longitudeCoordinates(it)}"
+            locationValueTextView.text = latLng
+        }
+    }
+
     private fun onPressedExisting() {
         locateItem?.let {
             moveCamera(it.getLatLng(), DEFAULT_ZOOM)
-            context?.let { context ->
-                setInputView(
-                    locateItem?.latitude.latitudeCoordinates(context),
-                    locateItem?.longitude.longitudeCoordinates(context),
-                    false
-                )
-            }
+            setLatLogLabel(it.getLatLng())
         }
         locationNameTextInput.visibility = View.GONE
         locationNameSpinner.visibility = View.VISIBLE
@@ -216,15 +209,15 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         isSelectedNewLocation = true
         lastLocation = currentUserLocation // get new current location
         if (lastLocation != null) {
-            setInputView(
-                String.format(FORMAT_DISPLAY_LOCATION, lastLocation!!.latitude),
-                String.format(FORMAT_DISPLAY_LOCATION, lastLocation!!.longitude), true
-            )
-            moveCamera(LatLng(lastLocation!!.latitude, lastLocation!!.longitude), DEFAULT_ZOOM)
+            lastLocation?.let {
+                val latLng = LatLng(it.latitude, it.longitude)
+                setLatLogLabel(latLng)
+                moveCamera(latLng, DEFAULT_ZOOM)
+            }
         } else {
             // not found current location
             symbolManager.deleteAll()
-            setInputView("", "", true)
+            setLatLogLabel(LatLng(0.0, 0.0))
         }
         locationNameTextInput.visibility = View.VISIBLE
         locationNameSpinner.visibility = View.GONE
@@ -264,13 +257,10 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 id: Long
             ) {
                 locateItem = locateItems[position]
-                moveCamera(locateItem!!.getLatLng(), DEFAULT_ZOOM)
-                context?.let {
-                    setInputView(
-                        locateItem?.latitude.latitudeCoordinates(it),
-                        locateItem?.longitude.longitudeCoordinates(it),
-                        false
-                    )
+                locateItem?.let {
+                    val latLng = it.getLatLng()
+                    moveCamera(latLng, DEFAULT_ZOOM)
+                    setLatLogLabel(latLng)
                 }
             }
 
@@ -317,11 +307,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             symbolManager.iconIgnorePlacement = true
 
             lastLocation?.let { lastLocation ->
-                moveCamera(LatLng(lastLocation.latitude, lastLocation.longitude), DEFAULT_ZOOM)
-                setInputView(
-                    String.format(FORMAT_DISPLAY_LOCATION, lastLocation.latitude),
-                    String.format(FORMAT_DISPLAY_LOCATION, lastLocation.longitude), true
-                )
+                val latLng = LatLng(lastLocation.latitude, lastLocation.longitude)
+                moveCamera(latLng, DEFAULT_ZOOM)
+                setLatLogLabel(latLng)
             }
             setupLocationOptions()
             enableLocationComponent()
@@ -344,81 +332,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             if (finishButton != null) {
                 finishButton.visibility = View.VISIBLE
             }
-        }
-    }
-
-    private fun setupInputLocation() {
-        latitudeEditText.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(latitudeInput: Editable?) {
-                val longitudeInput = longitudeEditText.text?.trim()
-
-                if (newLocationRadioButton.isChecked &&
-                    latitudeInput != null && latitudeInput.toString().isCoordinates() &&
-                    longitudeInput != null && longitudeInput.toString().isCoordinates()
-                ) {
-                    convertInputLatitude(latitudeInput.toString(), longitudeInput.toString())
-                }
-            }
-
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-        })
-
-        longitudeEditText.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(input: Editable?) {
-                val latitudeInput = latitudeEditText.text?.trim()
-                if (newLocationRadioButton.isChecked &&
-                    input != null && input.toString().isCoordinates()
-                    && latitudeInput != null && latitudeInput.toString().isCoordinates()
-                ) {
-                    convertInputLongitude(input.toString())
-                }
-            }
-
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-        })
-    }
-
-    fun convertInputLatitude(latitude: String, longitude: String) {
-        val lat = latitude.toDouble()
-
-        if (longitude.last() != 'E' && longitude.last() != 'W') {
-            if (lat < 90 && lat > -90) {
-                mapboxMap?.let {
-                    moveCamera(
-                        LatLng(lat, longitude.toDouble()),
-                        it.cameraPosition.zoom
-                    )
-                }
-            } else {
-                Toast.makeText(
-                    context,
-                    getString(R.string.latitude_must_between),
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-    }
-
-    fun convertInputLongitude(longitude: String) {
-        val long = longitude.toDouble()
-
-        if (long < 180 && long > -180) {
-            mapboxMap?.let {
-                moveCamera(
-                    LatLng(latitudeEditText.text.toString().toDouble(), long),
-                    it.cameraPosition.zoom
-                )
-            }
-        } else {
-            Toast.makeText(
-                context,
-                getString(R.string.longitude_must_between),
-                Toast.LENGTH_SHORT
-            ).show()
         }
     }
 
@@ -499,16 +412,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         )
 
         locationEngine?.getLastLocation(mapboxLocationChangeCallback)
-    }
-
-    private fun setInputView(latitudeText: String, longitudeText: String, enabled: Boolean) {
-        latitudeEditText.setText(latitudeText)
-        latitudeEditText.isEnabled = enabled
-        longitudeEditText.setText(longitudeText)
-        longitudeEditText.isEnabled = enabled
-        if (newLocationRadioButton.isChecked) {
-            setupInputLocation()
-        }
     }
 
     override fun onStart() {

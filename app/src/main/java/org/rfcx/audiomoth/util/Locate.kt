@@ -57,11 +57,6 @@ fun Double?.longitudeCoordinates(context: Context): String {
     return this.toString()
 }
 
-fun String?.isCoordinates(): Boolean {
-    return this != null && this.isNotBlank() && this[0] != '.'
-            && this.last() != '.' && !(this[0] == '-' && this.length == 1) && this.last() != '-'
-}
-
 private fun replaceDelimitersDMS(str: String): String {
     var strDMSFormat = str
     strDMSFormat = strDMSFormat.replaceFirst(":".toRegex(), "°")
@@ -96,32 +91,4 @@ private fun replaceDelimitersDDM(str: String): String {
     }
     strDDMFormat += "\'"
     return strDDMFormat
-}
-
-fun String.replaceDDToNumber(): Double {
-    val strDDFormat = this
-    val arr = strDDFormat.split("°")
-    val symbol = if (arr[1] == "S" || arr[1] == "s" || arr[1] == "W" || arr[1] == "w") "-" else ""
-    return (symbol + arr[0]).toDouble()
-}
-
-fun String.replaceDDMToNumber(): Double {
-    val strDDMFormat = this
-    val arr = strDDMFormat.split("°")
-    val arr2 = arr[1].split("'")
-    val symbol =
-        if (arr2[1] == "S" || arr2[1] == "s" || arr2[1] == "W" || arr2[1] == "w") "-" else ""
-    val value = arr[0].toDouble() + (arr2[0].toDouble() / 60)
-    return (symbol + value).toDouble()
-}
-
-fun String.replaceDMSToNumber(): Double {
-    val strDMSFormat = this
-    val arr = strDMSFormat.split("°")
-    val arr2 = arr[1].split("'")
-    val arr3 = arr2[1].split("\"")
-    val symbol =
-        if (arr3[1] == "S" || arr3[1] == "s" || arr3[1] == "W" || arr3[1] == "w") "-" else ""
-    val value = arr[0].toDouble() + (arr2[0].toDouble() / 60) + (arr3[0].toDouble() / 3600)
-    return (symbol + value).toDouble()
 }
