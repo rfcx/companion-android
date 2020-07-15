@@ -110,9 +110,9 @@
                 android:id="@+id/mapBoxView"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:paddingStart="@dimen/margin_padding_large"
-                android:paddingTop="@dimen/margin_padding_normal"
-                android:paddingEnd="@dimen/margin_padding_large"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:layout_marginEnd="@dimen/margin_padding_large"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
@@ -127,6 +127,15 @@
                 app:layout_constraintEnd_toEndOf="@id/mapBoxView"
                 app:layout_constraintStart_toStartOf="@id/mapBoxView"
                 app:layout_constraintTop_toTopOf="@id/mapBoxView" />
+
+            <View
+                android:id="@+id/viewOfMapBox"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintStart_toStartOf="@id/mapBoxView"
+                app:layout_constraintEnd_toEndOf="@id/mapBoxView"
+                app:layout_constraintTop_toTopOf="@id/mapBoxView"
+                app:layout_constraintBottom_toBottomOf="@id/mapBoxView"/>
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/locationTitleTextView"

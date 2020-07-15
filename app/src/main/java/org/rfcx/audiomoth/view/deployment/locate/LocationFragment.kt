@@ -136,6 +136,16 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 verifyInput()
             }
         }
+
+        changeTextView.setOnClickListener {
+            Toast.makeText(context, "Go to map picker screen", Toast.LENGTH_SHORT).show()
+        }
+
+        viewOfMapBox.setOnClickListener {
+            if (newLocationRadioButton.isChecked) {
+                Toast.makeText(context, "Go to map picker screen", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun setHideKeyboard() {
@@ -179,10 +189,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         radioGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.newLocationRadioButton -> {
+                    changeTextView.visibility = View.VISIBLE
                     onPressedNewLocation()
                 }
 
                 R.id.existingRadioButton -> {
+                    changeTextView.visibility = View.GONE
                     onPressedExisting()
                 }
             }
@@ -191,7 +203,10 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private fun setLatLogLabel(location: LatLng) {
         context?.let {
-            val latLng = "${location.latitude.latitudeCoordinates(it)}, ${location.longitude.longitudeCoordinates(it)}"
+            val latLng =
+                "${location.latitude.latitudeCoordinates(it)}, ${location.longitude.longitudeCoordinates(
+                    it
+                )}"
             locationValueTextView.text = latLng
         }
     }
@@ -454,10 +469,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     companion object {
         const val TAG = "LocationFragment"
         const val REQUEST_PERMISSIONS_REQUEST_CODE = 34
-        const val PIN_MAP = "pin-map"
         const val DEFAULT_ZOOM = 15.0
 
-        private const val FORMAT_DISPLAY_LOCATION = "%.6f"
         private const val DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L
         private const val DEFAULT_MAX_WAIT_TIME = DEFAULT_INTERVAL_IN_MILLISECONDS * 5
 
