@@ -34,7 +34,6 @@ import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
@@ -44,7 +43,7 @@ import org.rfcx.audiomoth.util.LocationPermissions
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.util.latitudeCoordinates
 import org.rfcx.audiomoth.util.longitudeCoordinates
-import org.rfcx.audiomoth.view.deployment.BaseDeploymentProtocal
+import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 
 class LocationFragment : Fragment(), OnMapReadyCallback {
     private val locateDb by lazy {
@@ -53,7 +52,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private var mapboxMap: MapboxMap? = null
     private lateinit var mapView: MapView
-    private lateinit var symbolManager: SymbolManager
     private var isSelectedNewLocation = false
     private var lastLocation: Location? = null
     private var locateItems = ArrayList<Locate>()
@@ -63,7 +61,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var currentUserLocation: Location? = null
     private var locationEngine: LocationEngine? = null
 
-    private var deploymentProtocol: BaseDeploymentProtocal? = null
+    private var deploymentProtocol: DeploymentProtocol? = null
     private val locationPermissions by lazy { activity?.let { LocationPermissions(it) } }
     private val mapboxLocationChangeCallback =
         object : LocationEngineCallback<LocationEngineResult> {
@@ -101,7 +99,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        deploymentProtocol = context as BaseDeploymentProtocal
+        deploymentProtocol = context as DeploymentProtocol
     }
 
     override fun onCreateView(
@@ -121,7 +119,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         mapView = view.findViewById(R.id.mapBoxView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
-
         view.viewTreeObserver.addOnGlobalLayoutListener { setOnFocusEditText() }
 
         deploymentProtocol?.showStepView()
@@ -138,12 +135,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
 
         changeTextView.setOnClickListener {
-            Toast.makeText(context, "Go to map picker screen", Toast.LENGTH_SHORT).show()
+            deploymentProtocol?.startMapPicker()
         }
 
         viewOfMapBox.setOnClickListener {
             if (newLocationRadioButton.isChecked) {
-                Toast.makeText(context, "Go to map picker screen", Toast.LENGTH_SHORT).show()
+                deploymentProtocol?.startMapPicker()
             }
         }
     }
@@ -231,7 +228,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             }
         } else {
             // not found current location
-            symbolManager.deleteAll()
             setLatLogLabel(LatLng(0.0, 0.0))
         }
         locationNameTextInput.visibility = View.VISIBLE
@@ -317,10 +313,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         mapboxMap.uiSettings.isLogoEnabled = false
 
         mapboxMap.setStyle(Style.OUTDOORS) {
-            symbolManager = SymbolManager(mapView, mapboxMap, it)
-            symbolManager.iconAllowOverlap = true
-            symbolManager.iconIgnorePlacement = true
-
             lastLocation?.let { lastLocation ->
                 val latLng = LatLng(lastLocation.latitude, lastLocation.longitude)
                 moveCamera(latLng, DEFAULT_ZOOM)

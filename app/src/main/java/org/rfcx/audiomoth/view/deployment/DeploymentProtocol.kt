@@ -10,6 +10,7 @@ interface DeploymentProtocol : BaseDeploymentProtocal {
     fun startSetupConfigure(profile: Profile)
     fun startSyncing(status: String)
     fun startCheckBattery(status: String, level: Int?)
+    fun startMapPicker()
 
     fun getProfiles(): List<Profile>
     fun getProfile(): Profile?
