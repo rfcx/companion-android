@@ -488,8 +488,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         const val LATITUDE_VALUE = "LATITUDE_VALUE"
         const val LONGITUDE_VALUE = "LONGITUDE_VALUE"
 
-        private const val DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L
-        private const val DEFAULT_MAX_WAIT_TIME = DEFAULT_INTERVAL_IN_MILLISECONDS * 5
+        const val DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L
+        const val DEFAULT_MAX_WAIT_TIME = DEFAULT_INTERVAL_IN_MILLISECONDS * 5
 
         fun newInstance(): LocationFragment {
             return LocationFragment()
