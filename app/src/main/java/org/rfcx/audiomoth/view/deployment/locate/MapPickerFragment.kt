@@ -49,8 +49,9 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback {
 
                     mapboxMap?.let {
                         this@MapPickerFragment.currentUserLocation = location
-                        currentLocationButton.visibility = View.VISIBLE
                     }
+
+                    showLoading(currentUserLocation == null)
 
                     if (selectedLocation == null) {
                         val latLng = LatLng(location.latitude, location.longitude)
@@ -96,7 +97,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback {
                 deploymentProtocol?.startLocation(it.latitude, it.longitude)
             }
         }
-        currentLocationButton.visibility = View.GONE
+
         currentLocationButton.setOnClickListener {
             selectedLocation = currentUserLocation
             selectedLocation?.let {
@@ -105,6 +106,11 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback {
                 setLatLogLabel(latLng)
             }
         }
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        fabProgress.visibility = if (isLoading) View.VISIBLE else View.INVISIBLE
+        currentLocationButton.isEnabled = !isLoading
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {

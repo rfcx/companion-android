@@ -20,16 +20,31 @@
         app:layout_constraintStart_toStartOf="@id/mapBoxPickerView"
         app:layout_constraintTop_toTopOf="@id/mapBoxPickerView" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/currentLocationButton"
-        android:layout_width="@dimen/button_battery_lv"
-        android:layout_height="@dimen/button_battery_lv"
-        android:layout_margin="@dimen/margin_padding_normal"
-        android:src="@drawable/ic_current_location"
-        app:backgroundTint="@color/white"
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
         app:layout_constraintBottom_toTopOf="@id/bottomView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:tint="@color/colorPrimary" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ProgressBar
+            android:id="@+id/fabProgress"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_centerHorizontal="true" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/currentLocationButton"
+            android:layout_width="@dimen/button_battery_lv"
+            android:layout_height="@dimen/button_battery_lv"
+            android:layout_margin="@dimen/margin_padding_normal"
+            android:src="@drawable/ic_current_location"
+            app:backgroundTint="@color/white"
+            app:tint="@color/colorPrimary" />
+
+    </RelativeLayout>
 
     <View
         android:id="@+id/bottomView"
@@ -66,7 +81,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/selectButton"
-        style="@style/GuardianButton.GreenButton.Line"
+        style="@style/AudioMothButton.GreenButton"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:layout_marginEnd="@dimen/margin_padding_normal"
