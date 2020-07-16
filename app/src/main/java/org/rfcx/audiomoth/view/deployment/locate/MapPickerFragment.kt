@@ -111,6 +111,10 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback {
     private fun showLoading(isLoading: Boolean) {
         fabProgress.visibility = if (isLoading) View.VISIBLE else View.INVISIBLE
         currentLocationButton.isEnabled = !isLoading
+        currentLocationButton.supportImageTintList =
+            if (isLoading) resources.getColorStateList(R.color.gray_30) else resources.getColorStateList(
+                R.color.colorPrimary
+            )
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
