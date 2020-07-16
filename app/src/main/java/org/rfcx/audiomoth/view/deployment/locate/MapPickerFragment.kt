@@ -49,6 +49,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback {
 
                     mapboxMap?.let {
                         this@MapPickerFragment.currentUserLocation = location
+                        currentLocationButton.visibility = View.VISIBLE
                     }
 
                     if (selectedLocation == null) {
@@ -93,6 +94,15 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback {
             val currentCameraPosition = mapboxMap?.cameraPosition?.target
             currentCameraPosition?.let {
                 deploymentProtocol?.startLocation(it.latitude, it.longitude)
+            }
+        }
+        currentLocationButton.visibility = View.GONE
+        currentLocationButton.setOnClickListener {
+            selectedLocation = currentUserLocation
+            selectedLocation?.let {
+                val latLng = LatLng(it.latitude, it.longitude)
+                moveCamera(latLng, DEFAULT_ZOOM)
+                setLatLogLabel(latLng)
             }
         }
     }

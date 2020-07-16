@@ -20,6 +20,17 @@
         app:layout_constraintStart_toStartOf="@id/mapBoxPickerView"
         app:layout_constraintTop_toTopOf="@id/mapBoxPickerView" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/currentLocationButton"
+        android:layout_width="@dimen/button_battery_lv"
+        android:layout_height="@dimen/button_battery_lv"
+        android:layout_margin="@dimen/margin_padding_normal"
+        android:src="@drawable/ic_current_location"
+        app:backgroundTint="@color/white"
+        app:layout_constraintBottom_toTopOf="@id/bottomView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:tint="@color/colorPrimary" />
+
     <View
         android:id="@+id/bottomView"
         android:layout_width="match_parent"
@@ -34,10 +45,10 @@
         style="@style/AudioMothText.Body.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginStart="@dimen/margin_padding_normal"
         android:layout_marginTop="@dimen/margin_padding_normal"
-        android:textAllCaps="true"
         android:text="@string/selected_location"
+        android:textAllCaps="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/bottomView" />
 
@@ -46,7 +57,7 @@
         style="@style/AudioMothText.Body.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginStart="@dimen/margin_padding_normal"
         android:layout_marginTop="@dimen/margin_padding_small"
         android:textSize="@dimen/text_xsmall"
         app:layout_constraintStart_toStartOf="parent"
@@ -56,13 +67,13 @@
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/selectButton"
         style="@style/GuardianButton.GreenButton.Line"
-        android:text="@string/select"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
+        android:layout_marginEnd="@dimen/margin_padding_normal"
+        android:text="@string/select"
         android:textSize="@dimen/text_xsmall"
-        android:layout_marginEnd="@dimen/margin_padding_large"
         app:layout_constraintBottom_toBottomOf="@id/locationTextView"
-        app:layout_constraintTop_toTopOf="@id/selectLocationTextView"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/selectLocationTextView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
