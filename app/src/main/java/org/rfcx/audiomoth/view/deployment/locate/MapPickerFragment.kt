@@ -1,5 +1,6 @@
 package org.rfcx.audiomoth.view.deployment.locate
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,10 +18,17 @@ import kotlinx.android.synthetic.main.fragment_map_picker.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.util.latitudeCoordinates
 import org.rfcx.audiomoth.util.longitudeCoordinates
+import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 
 class MapPickerFragment : Fragment(), OnMapReadyCallback {
     private var mapboxMap: MapboxMap? = null
     private lateinit var mapView: MapView
+    private var deploymentProtocol: DeploymentProtocol? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        deploymentProtocol = context as DeploymentProtocol
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,7 +49,10 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback {
         mapView.getMapAsync(this)
 
         selectButton.setOnClickListener {
-            Toast.makeText(context, "SETECT", Toast.LENGTH_SHORT).show()
+            val currentCameraPosition = mapboxMap?.cameraPosition?.target
+            currentCameraPosition?.let {
+                deploymentProtocol?.startLocation(it.latitude, it.longitude)
+            }
         }
     }
 

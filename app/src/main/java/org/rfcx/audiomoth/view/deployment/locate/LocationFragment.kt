@@ -60,6 +60,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var locateAdapter: ArrayAdapter<String>? = null
     private var currentUserLocation: Location? = null
     private var locationEngine: LocationEngine? = null
+    private var latLng: LatLng? = null
 
     private var deploymentProtocol: DeploymentProtocol? = null
     private val locationPermissions by lazy { activity?.let { LocationPermissions(it) } }
@@ -218,8 +219,24 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun onPressedNewLocation() {
+        var lat: Double? = null
+        var lng: Double? = null
         isSelectedNewLocation = true
-        lastLocation = currentUserLocation // get new current location
+
+        arguments?.let {
+            lat = it.getDouble(LATITUDE_VALUE)
+            lng = it.getDouble(LONGITUDE_VALUE)
+        }
+
+        if (lat != null && lng != null) {
+            val loc = Location(LocationManager.GPS_PROVIDER)
+            loc.latitude = lat as Double
+            loc.longitude = lng as Double
+            lastLocation = loc
+        } else {
+            lastLocation = currentUserLocation // get new current location
+        }
+
         if (lastLocation != null) {
             lastLocation?.let {
                 val latLng = LatLng(it.latitude, it.longitude)
@@ -248,9 +265,15 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         setLocationSpinner()
         setRecommendLocation()
 
-        newLocationRadioButton.isChecked = locateItems.isEmpty()
-        existingRadioButton.isEnabled = locateItems.isNotEmpty()
-        existingRadioButton.isChecked = locateItems.isNotEmpty()
+        val value = arguments?.getDouble(LATITUDE_VALUE)
+        if (value != null) {
+            newLocationRadioButton.isChecked = true
+            existingRadioButton.isChecked = false
+        } else {
+            newLocationRadioButton.isChecked = locateItems.isEmpty()
+            existingRadioButton.isEnabled = locateItems.isNotEmpty()
+            existingRadioButton.isChecked = locateItems.isNotEmpty()
+        }
 
         val deploymentLocation = deploymentProtocol?.getDeploymentLocation()
         if (deploymentLocation != null && locateAdapter != null) {
@@ -462,6 +485,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         const val TAG = "LocationFragment"
         const val REQUEST_PERMISSIONS_REQUEST_CODE = 34
         const val DEFAULT_ZOOM = 15.0
+        const val LATITUDE_VALUE = "LATITUDE_VALUE"
+        const val LONGITUDE_VALUE = "LONGITUDE_VALUE"
 
         private const val DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L
         private const val DEFAULT_MAX_WAIT_TIME = DEFAULT_INTERVAL_IN_MILLISECONDS * 5
@@ -469,5 +494,13 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         fun newInstance(): LocationFragment {
             return LocationFragment()
         }
+
+        fun newInstance(latitude: Double, longitude: Double) = LocationFragment()
+            .apply {
+                arguments = Bundle().apply {
+                    putDouble(LATITUDE_VALUE, latitude)
+                    putDouble(LONGITUDE_VALUE, longitude)
+                }
+            }
     }
 }

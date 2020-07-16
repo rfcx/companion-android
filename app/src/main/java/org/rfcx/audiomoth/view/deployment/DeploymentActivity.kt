@@ -204,6 +204,10 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         startFragment(SyncFragment.newInstance(status))
     }
 
+    override fun startLocation(latitude: Double, longitude: Double) {
+        startFragment(LocationFragment.newInstance(latitude, longitude))
+    }
+
     override fun playSyncSound() {
         convertProfileToAudioMothConfiguration()
         Thread {
