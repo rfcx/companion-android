@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_coordinates.*
-import kotlinx.android.synthetic.main.activity_feedback.toolbar
+import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.util.Preferences
 import org.rfcx.audiomoth.util.getCoordinatesFormat
@@ -64,7 +64,6 @@ class CoordinatesActivity : AppCompatActivity() {
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
-            elevation = 0f
             title = getString(R.string.coordinates)
         }
     }

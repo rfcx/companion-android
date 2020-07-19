@@ -6,16 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".view.profile.coordinates.CoordinatesActivity">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?android:actionBarSize"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        tools:title="←  Coordinates" />
+    <include android:id="@+id/toolbarLayout" layout="@layout/toolbar_default" />
 
     <LinearLayout
         android:id="@+id/ddLayout"
@@ -25,7 +16,7 @@
         android:orientation="horizontal"
         android:paddingTop="@dimen/margin_padding_normal"
         android:paddingBottom="@dimen/margin_padding_small"
-        app:layout_constraintTop_toBottomOf="@id/toolbar">
+        app:layout_constraintTop_toBottomOf="@id/toolbarLayout">
 
         <LinearLayout
             android:layout_width="0dp"

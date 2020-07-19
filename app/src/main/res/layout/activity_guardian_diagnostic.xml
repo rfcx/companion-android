@@ -6,18 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/diagnosticToolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <View
-        android:id="@+id/separateLine1"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@color/grey"
-        app:layout_constraintTop_toBottomOf="@id/diagnosticToolbar" />
+    <include android:id="@+id/toolbarLayout" layout="@layout/toolbar_default" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/diagnosticScrollView"
@@ -25,7 +14,7 @@
         android:layout_height="0dp"
         android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/separateLine1">
+        app:layout_constraintTop_toBottomOf="@id/toolbarLayout">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -36,8 +25,7 @@
                 android:id="@+id/diagnosticLocationLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_padding_xsmall"
-                app:layout_constraintTop_toBottomOf="@id/separateLine1">
+                android:layout_marginTop="@dimen/margin_padding_xsmall">
 
                 <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/guidelineVertical1"

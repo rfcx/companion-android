@@ -23,6 +23,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.zhihu.matisse.Matisse
 import com.zhihu.matisse.MimeType
 import kotlinx.android.synthetic.main.activity_feedback.*
+import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.adapter.BaseListItem
 import org.rfcx.audiomoth.repo.Firestore
@@ -253,7 +254,6 @@ class FeedbackActivity : AppCompatActivity() {
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
-            elevation = 0f
             title = getString(R.string.profile_send_feedback)
         }
     }

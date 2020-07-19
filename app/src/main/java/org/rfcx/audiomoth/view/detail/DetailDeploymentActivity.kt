@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_detail_deployment.*
-import kotlinx.android.synthetic.main.activity_feedback.toolbar
+import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.localdb.DeploymentDb
@@ -121,7 +121,6 @@ class DetailDeploymentActivity : AppCompatActivity() {
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
-            elevation = 0f
             title = if (deployment != null) deployment?.location?.name else "Location name"
         }
     }
