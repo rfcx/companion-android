@@ -21,6 +21,7 @@ import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
 import org.rfcx.audiomoth.view.deployment.configure.SelectProfileFragment
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
+import org.rfcx.audiomoth.view.deployment.locate.MapPickerFragment
 import org.rfcx.audiomoth.view.deployment.sync.SyncFragment
 import org.rfcx.audiomoth.view.deployment.sync.SyncFragment.Companion.BEFORE_SYNC
 import org.rfcx.audiomoth.view.deployment.verify.PerformBatteryFragment
@@ -203,6 +204,10 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         startFragment(SyncFragment.newInstance(status))
     }
 
+    override fun startLocation(latitude: Double, longitude: Double) {
+        startFragment(LocationFragment.newInstance(latitude, longitude))
+    }
+
     override fun playSyncSound() {
         convertProfileToAudioMothConfiguration()
         Thread {
@@ -233,6 +238,11 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
 
     override fun startCheckBattery(status: String, level: Int?) {
         startFragment(PerformBatteryFragment.newInstance(status, level))
+    }
+
+    override fun startMapPicker() {
+        hideStepView()
+        startFragment(MapPickerFragment.newInstance())
     }
 
     private fun setupView() {
