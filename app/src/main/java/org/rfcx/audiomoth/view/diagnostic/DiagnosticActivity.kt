@@ -13,6 +13,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonArray
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_guardian_diagnostic.*
+import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.OnReceiveResponse
 import org.rfcx.audiomoth.connection.socket.SocketManager
@@ -110,7 +111,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
     }
 
     private fun setupToolbar() {
-        setSupportActionBar(diagnosticToolbar)
+        setSupportActionBar(toolbar)
         supportActionBar?.apply {
             setDisplayShowTitleEnabled(true)
             setDisplayHomeAsUpEnabled(true)
