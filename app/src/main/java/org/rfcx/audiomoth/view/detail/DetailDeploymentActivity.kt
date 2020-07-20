@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.realm.Realm
@@ -17,7 +16,6 @@ import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.util.convertToStopStartPeriods
 import org.rfcx.audiomoth.util.toDateTimeString
-import org.rfcx.audiomoth.view.deployment.DeploymentActivity.Companion.DEPLOYMENT_ID
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment.Companion.CONTINUOUS
 import java.util.*
@@ -35,7 +33,7 @@ class DetailDeploymentActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail_deployment)
 
-        val deploymentId = intent.extras?.getInt(DEPLOYMENT_ID)
+        val deploymentId = intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
         if (deploymentId != null) {
             deployment = deploymentDb.getDeploymentById(deploymentId)
             val location = deployment?.location
@@ -71,8 +69,10 @@ class DetailDeploymentActivity : AppCompatActivity() {
                 setupImageRecycler()
                 Firestore(this).getRemotePathByServerId(it) { remotePathList ->
                     if (remotePathList != null) {
-                        photoLabel.visibility = if(remotePathList.size > 0) View.VISIBLE else View.GONE
-                        attachImageRecycler.visibility = if(remotePathList.size > 0) View.VISIBLE else View.GONE
+                        photoLabel.visibility =
+                            if (remotePathList.size > 0) View.VISIBLE else View.GONE
+                        attachImageRecycler.visibility =
+                            if (remotePathList.size > 0) View.VISIBLE else View.GONE
                         imageAdapter.items = remotePathList
                     }
                 }
@@ -80,7 +80,7 @@ class DetailDeploymentActivity : AppCompatActivity() {
         }
 
         reconfigureButton.setOnClickListener {
-            Toast.makeText(this, R.string.reconfigure, Toast.LENGTH_LONG).show()
+
         }
 
         setupToolbar()
@@ -131,9 +131,11 @@ class DetailDeploymentActivity : AppCompatActivity() {
     }
 
     companion object {
+        private const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
+
         fun startActivity(context: Context, deploymentId: Int) {
             val intent = Intent(context, DetailDeploymentActivity::class.java)
-            intent.putExtra(DEPLOYMENT_ID, deploymentId)
+            intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
             context.startActivity(intent)
         }
     }

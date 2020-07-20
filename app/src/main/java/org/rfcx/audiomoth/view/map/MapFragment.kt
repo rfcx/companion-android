@@ -397,7 +397,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun fetchJobSyncing() {
         context ?: return
-        deploymentWorkInfoLiveData = DeploymentSyncWorker.workInfos(context!!)
+        deploymentWorkInfoLiveData = DeploymentSyncWorker.workInfos(requireContext())
         deploymentWorkInfoLiveData.observeForever(workInfoObserve)
     }
 

@@ -35,11 +35,7 @@ import java.util.*
 class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteListener {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val deploymentDb by lazy {
-        DeploymentDb(
-            realm
-        )
-    }
+    private val deploymentDb by lazy { DeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
     private val profileDb by lazy { ProfileDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
@@ -50,6 +46,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
     private var _deployment: Deployment? = null
     private var _deployLocation: DeploymentLocation? = null
     private var _configuration: Configuration? = null
+    private var isReconfigure = false
 
     private val audioMothConnector: AudioMothConnector = AudioMothChimeConnector()
     private val configuration = AudioMothConfiguration()
@@ -58,7 +55,12 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_deployment)
-        val deploymentId = intent.extras?.getInt(DEPLOYMENT_ID)
+        initIntent()
+    }
+
+    private fun initIntent() {
+        val deploymentId = intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
+        isReconfigure = intent.extras?.getBoolean(EXTRA_RECONFIGURE) ?: false
         if (deploymentId != null) {
             handleDeploymentStep(deploymentId)
         } else {
@@ -264,7 +266,8 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
             if (deployment.configuration != null) {
                 _configuration = deployment.configuration
             }
-            currentStep = deployment.state - 1
+            // is reconfigure? should be start edit first step
+            currentStep = if (isReconfigure) 0 else deployment.state - 1
             stepView.go(currentStep, true)
             handleFragment(currentStep)
         }
@@ -319,7 +322,13 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
     }
 
     private fun updateDeploymentState(state: DeploymentState.Edge) {
-        this._deployment?.state = state.key
+        // isReconfigure don't update state
+        if (!isReconfigure) {
+            this._deployment?.state = state.key
+        } else if (isReconfigure && _deployment?.syncState == SyncState.Sent.key ) {
+            // is sent reset to unsent
+            this._deployment?.syncState = SyncState.Sent.key
+        }
         this._deployment?.let { deploymentDb.updateDeployment(it) }
     }
 
@@ -341,12 +350,6 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         completeFragment.show(supportFragmentManager, CompleteFragment.tag)
     }
 
-    private fun hideLoading() {
-        val loadingDialog: LoadingDialogFragment? =
-            supportFragmentManager.findFragmentByTag(loadingDialogTag) as LoadingDialogFragment?
-        loadingDialog?.dismissDialog()
-    }
-
     override fun onAnimationEnd() {
         finish()
     }
@@ -357,16 +360,18 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
 
     companion object {
         const val loadingDialogTag = "LoadingDialog"
-        const val DEPLOYMENT_ID = "DEPLOYMENT_ID"
+        private const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
+        private const val EXTRA_RECONFIGURE = "EXTRA_RECONFIGURE"
 
         fun startActivity(context: Context) {
             val intent = Intent(context, DeploymentActivity::class.java)
             context.startActivity(intent)
         }
 
-        fun startActivity(context: Context, deploymentId: Int) {
+        fun startActivity(context: Context, deploymentId: Int, isReconfigure: Boolean = false) {
             val intent = Intent(context, DeploymentActivity::class.java)
-            intent.putExtra(DEPLOYMENT_ID, deploymentId)
+            intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
+            intent.putExtra(EXTRA_RECONFIGURE, isReconfigure)
             context.startActivity(intent)
         }
     }
