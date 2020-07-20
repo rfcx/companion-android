@@ -16,6 +16,7 @@ import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.util.convertToStopStartPeriods
 import org.rfcx.audiomoth.util.toDateTimeString
+import org.rfcx.audiomoth.view.deployment.DeploymentActivity
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment.Companion.CONTINUOUS
 import java.util.*
@@ -36,55 +37,78 @@ class DetailDeploymentActivity : AppCompatActivity() {
         val deploymentId = intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
         if (deploymentId != null) {
             deployment = deploymentDb.getDeploymentById(deploymentId)
-            val location = deployment?.location
-            val configuration = deployment?.configuration
+            deployment?.let { updateDeploymentView(it) }
+        }
+        setupToolbar()
 
-            locationLongitudeValue.text = location?.longitude.toString()
-            locationLatitudeValue.text = location?.latitude.toString()
-
-            sampleRateValue.text =
-                getString(R.string.kilohertz, configuration?.sampleRate.toString())
-            gainValue.text = configuration?.gain?.let { gainList[it] }
-
-            val continuous = getString(R.string.continuous)
-            val isContinuous = configuration?.durationSelected == CONTINUOUS
-
-            val recordingDurationLabel = getString(
-                if (configuration?.recordingDuration == 1) R.string.detail_sec else R.string.detail_secs,
-                configuration?.recordingDuration
-            )
-            recordingValue.text = if (isContinuous) continuous else recordingDurationLabel
-            sleepValue.text = getString(R.string.detail_secs, configuration?.sleepDuration)
-            sleepValue.visibility = if (isContinuous) View.GONE else View.VISIBLE
-            sleepLabel.visibility = if (isContinuous) View.GONE else View.VISIBLE
-
-            estimatedBatteryDurationValue.text =
-                deployment?.batteryDepletedAt?.time?.let { Date(it).toDateTimeString() }
-            configuration?.recordingPeriodList?.let {
-                customRecordingLabel.visibility = if (it.size != 0) View.VISIBLE else View.GONE
-                timeLineRecycler.visibility = if (it.size != 0) View.VISIBLE else View.GONE
-                setupTimeLineRecycler(it.toTypedArray())
+        reconfigureButton.setOnClickListener {
+            deploymentId?.let { it1 ->
+                DeploymentActivity.startActivityForResult(
+                    this,
+                    it1,
+                    true,
+                    DEPLOYMENT_REQUEST_CODE
+                )
             }
-            deployment?.serverId?.let {
-                setupImageRecycler()
-                Firestore(this).getRemotePathByServerId(it) { remotePathList ->
-                    if (remotePathList != null) {
-                        photoLabel.visibility =
-                            if (remotePathList.size > 0) View.VISIBLE else View.GONE
-                        attachImageRecycler.visibility =
-                            if (remotePathList.size > 0) View.VISIBLE else View.GONE
-                        imageAdapter.items = remotePathList
-                    }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == DEPLOYMENT_REQUEST_CODE) {
+            forceUpdateDeployment()
+        }
+    }
+
+    private fun forceUpdateDeployment() {
+        if (this.deployment != null) {
+            this.deployment = deploymentDb.getDeploymentById(this.deployment!!.id)
+            this.deployment?.let { it1 -> updateDeploymentView(it1) }
+        }
+    }
+
+    private fun updateDeploymentView(deployment: Deployment) {
+        val location = deployment.location
+        val configuration = deployment.configuration
+
+        locationLongitudeValue.text = location?.longitude.toString()
+        locationLatitudeValue.text = location?.latitude.toString()
+
+        sampleRateValue.text =
+            getString(R.string.kilohertz, configuration?.sampleRate.toString())
+        gainValue.text = configuration?.gain?.let { gainList[it] }
+
+        val continuous = getString(R.string.continuous)
+        val isContinuous = configuration?.durationSelected == CONTINUOUS
+
+        val recordingDurationLabel = getString(
+            if (configuration?.recordingDuration == 1) R.string.detail_sec else R.string.detail_secs,
+            configuration?.recordingDuration
+        )
+        recordingValue.text = if (isContinuous) continuous else recordingDurationLabel
+        sleepValue.text = getString(R.string.detail_secs, configuration?.sleepDuration)
+        sleepValue.visibility = if (isContinuous) View.GONE else View.VISIBLE
+        sleepLabel.visibility = if (isContinuous) View.GONE else View.VISIBLE
+
+        estimatedBatteryDurationValue.text =
+            deployment.batteryDepletedAt.time.let { Date(it).toDateTimeString() }
+        configuration?.recordingPeriodList?.let {
+            customRecordingLabel.visibility = if (it.size != 0) View.VISIBLE else View.GONE
+            timeLineRecycler.visibility = if (it.size != 0) View.VISIBLE else View.GONE
+            setupTimeLineRecycler(it.toTypedArray())
+        }
+        deployment.serverId?.let {
+            setupImageRecycler()
+            Firestore(this).getRemotePathByServerId(it) { remotePathList ->
+                if (remotePathList != null) {
+                    photoLabel.visibility =
+                        if (remotePathList.size > 0) View.VISIBLE else View.GONE
+                    attachImageRecycler.visibility =
+                        if (remotePathList.size > 0) View.VISIBLE else View.GONE
+                    imageAdapter.items = remotePathList
                 }
             }
         }
-
-        reconfigureButton.setOnClickListener {
-
-        }
-
-        setupToolbar()
-
     }
 
     private fun setupImageRecycler() {
@@ -131,6 +155,7 @@ class DetailDeploymentActivity : AppCompatActivity() {
     }
 
     companion object {
+        private const val DEPLOYMENT_REQUEST_CODE = 1001
         private const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
 
         fun startActivity(context: Context, deploymentId: Int) {

@@ -1,5 +1,6 @@
 package org.rfcx.audiomoth.view.deployment
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -46,6 +47,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
     private var _deployment: Deployment? = null
     private var _deployLocation: DeploymentLocation? = null
     private var _configuration: Configuration? = null
+    private var _deploymentImages: List<DeploymentImage> = listOf()
     private var isReconfigure = false
 
     private val audioMothConnector: AudioMothConnector = AudioMothChimeConnector()
@@ -153,7 +155,9 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
 
     override fun setDeployLocation(locate: Locate) {
         val deployment = _deployment ?: Deployment()
-        deployment.state = DeploymentState.Edge.Locate.key // state
+        if (!isReconfigure) {
+            deployment.state = DeploymentState.Edge.Locate.key // state
+        }
 
         this._deployLocation = locate.asDeploymentLocation()
         val deploymentId = deploymentDb.insertOrUpdate(deployment, _deployLocation!!)
@@ -168,6 +172,8 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
     override fun setProfile(profile: Profile) {
         this._profile = profile
     }
+
+    override fun getDeploymentImage(): List<DeploymentImage> = this._deploymentImages
 
     override fun setPerformBattery(batteryDepletedAt: Timestamp, batteryLevel: Int) {
         this._deployment?.let {
@@ -258,6 +264,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         val deployment = deploymentDb.getDeploymentById(deploymentId)
         if (deployment != null) {
             setDeployment(deployment)
+            _deploymentImages = deploymentImageDb.getByDeploymentId(deploymentId)
 
             if (deployment.location != null) {
                 _deployLocation = deployment.location
@@ -325,9 +332,12 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         // isReconfigure don't update state
         if (!isReconfigure) {
             this._deployment?.state = state.key
-        } else if (isReconfigure && _deployment?.syncState == SyncState.Sent.key ) {
+        } else if (isReconfigure &&
+            state == DeploymentState.Edge.ReadyToUpload &&
+            _deployment?.syncState == SyncState.Sent.key
+        ) {
             // is sent reset to unsent
-            this._deployment?.syncState = SyncState.Sent.key
+            this._deployment?.syncState = SyncState.Unsent.key
         }
         this._deployment?.let { deploymentDb.updateDeployment(it) }
     }
@@ -368,11 +378,20 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
             context.startActivity(intent)
         }
 
-        fun startActivity(context: Context, deploymentId: Int, isReconfigure: Boolean = false) {
+        fun startActivity(context: Context, deploymentId: Int) {
+            val intent = Intent(context, DeploymentActivity::class.java)
+            intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
+            context.startActivity(intent)
+        }
+
+        fun startActivityForResult(
+            context: Context, deploymentId: Int,
+            isReconfigure: Boolean = false, requestCode: Int
+        ) {
             val intent = Intent(context, DeploymentActivity::class.java)
             intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
             intent.putExtra(EXTRA_RECONFIGURE, isReconfigure)
-            context.startActivity(intent)
+            (context as Activity).startActivityForResult(intent, requestCode)
         }
     }
 }

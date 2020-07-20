@@ -46,6 +46,12 @@ class Firestore(val context: Context) {
         return userDocument.collection(COLLECTION_DEPLOYMENTS).add(deployment).await()
     }
 
+    suspend fun updateDeployment(deployment: DeploymentRequest): Void {
+        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        return userDocument.collection(COLLECTION_DEPLOYMENTS).document(deployment.device)
+            .set(deployment).await()
+    }
+
     suspend fun sendDeployment(deployment: GuardianDeploymentRequest): DocumentReference? {
         val userDocument = db.collection(COLLECTION_USERS).document(guid)
         return userDocument.collection(COLLECTION_DEPLOYMENTS).add(deployment).await()

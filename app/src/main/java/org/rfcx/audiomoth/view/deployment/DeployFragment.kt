@@ -42,7 +42,7 @@ class DeployFragment : BaseImageFragment() {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             setHasFixedSize(true)
         }
-        imageAdapter.setImages(arrayListOf())
+        imageAdapter.setImages(deploymentProtocol?.getDeploymentImage() ?: arrayListOf())
     }
 
     override fun didAddImages(imagePaths: List<String>) {}

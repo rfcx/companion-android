@@ -17,6 +17,7 @@ interface DeploymentProtocol : BaseDeploymentProtocal {
     fun getProfile(): Profile?
     fun getDeployment(): Deployment?
     fun geConfiguration(): Configuration?
+    fun getDeploymentImage(): List<DeploymentImage>
 
     fun setDeployment(deployment: Deployment)
     fun setProfile(profile: Profile)

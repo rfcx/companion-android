@@ -21,26 +21,31 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
     override suspend fun doWork(): Result {
         Log.d(TAG, "doWork")
 
-        val db = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
+        val deploymentDb = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val locateDb = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val firestore = Firestore(context)
-        val deployments = db.lockUnsent()
+        val deployments = deploymentDb.lockUnsent()
 
         Log.d(TAG, "doWork: found ${deployments.size} unsent")
         var someFailed = false
 
         deployments.forEach {
             Log.d(TAG, "doWork: sending id ${it.id}")
-            val result = firestore.sendDeployment(it.toRequestBody())
-
-            if (result != null) {
-                Log.d(TAG, "doWork: success ${it.id}")
-                db.markSent(result.id, it.id)
-                locateDb.updateDeploymentServerId(it.id, result.id)
+            if (it.serverId == null) {
+                val result = firestore.sendDeployment(it.toRequestBody())
+                if (result != null) {
+                    Log.d(TAG, "doWork: success ${it.id}")
+                    deploymentDb.markSent(result.id, it.id)
+                    locateDb.updateDeploymentServerId(it.id, result.id)
+                } else {
+                    Log.d(TAG, "doWork: failed ${it.id}")
+                    deploymentDb.markUnsent(it.id)
+                    someFailed = true
+                }
             } else {
-                Log.d(TAG, "doWork: failed ${it.id}")
-                db.markUnsent(it.id)
-                someFailed = true
+                firestore.updateDeployment(it.toRequestBody())
+                deploymentDb.markSent(it.serverId!!, it.id)
+                locateDb.updateDeploymentServerId(it.id, it.serverId!!)
             }
         }
 

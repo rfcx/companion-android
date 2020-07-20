@@ -5,6 +5,7 @@ import io.realm.RealmResults
 import io.realm.Sort
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.DeploymentImage
+import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_ID
 import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_SERVER_ID
 import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_ID
 import org.rfcx.audiomoth.entity.SyncState
@@ -60,6 +61,14 @@ class DeploymentImageDb(private val realm: Realm) {
                 report.remotePath = remotePath
             }
         }
+    }
+
+    /**
+     * return DeploymentImage by deployment id
+     * */
+    fun getByDeploymentId(deploymentId: Int): List<DeploymentImage> {
+        return realm.where(DeploymentImage::class.java).equalTo(FIELD_DEPLOYMENT_ID, deploymentId)
+            .findAll() ?: arrayListOf()
     }
 
     fun getAllResultsAsync(sort: Sort = Sort.DESCENDING): RealmResults<DeploymentImage> {

@@ -1,6 +1,7 @@
 package org.rfcx.audiomoth.view.deployment
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,15 +29,11 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
         var index = 0
         images.forEach {
             if (it.remotePath != null) {
+                Log.d("tt", "remote ${it.remotePath}")
                 imagesSource.add(RemoteImageItem(index, it.remotePath!!, false))
             } else {
-                imagesSource.add(
-                    LocalImageItem(
-                        index,
-                        it.localPath,
-                        false
-                    )
-                )
+                Log.d("tt", "local ${it.localPath}")
+                imagesSource.add(LocalImageItem(index, it.localPath, false))
             }
             index++
         }
@@ -73,7 +70,6 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
         val groups = allLocalPathImages.groupBy { it }
         val localPathImages = groups.filter { it.value.size < 2 }
         val localPathImagesForAdd = ArrayList<String>()
-
         localPathImages.forEach {
             if (it.key !in getNewAttachImage()) {
                 localPathImagesForAdd.add(it.key)
@@ -159,6 +155,8 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
         private val onImageAdapterClickListener: OnImageAdapterClickListener?
     ) : RecyclerView.ViewHolder(itemView) {
         fun bind(imagePath: String, canDelete: Boolean) {
+            Log.d("tt", "ImageAdapterViewHolder $imagePath")
+
             Glide.with(itemView.image)
                 .load(imagePath)
                 .placeholder(R.drawable.bg_grey_light)
