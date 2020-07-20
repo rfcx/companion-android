@@ -9,10 +9,14 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Looper
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.mapbox.android.core.location.*
@@ -26,13 +30,17 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import kotlinx.android.synthetic.main.fragment_map_picker.*
+import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.util.latitudeCoordinates
 import org.rfcx.audiomoth.util.longitudeCoordinates
 import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment.Companion.DEFAULT_ZOOM
+import java.util.*
+import kotlin.concurrent.schedule
 
-class MapPickerFragment : Fragment(), OnMapReadyCallback {
+class MapPickerFragment : Fragment(), OnMapReadyCallback,
+    SearchResultFragment.OnSearchResultListener {
     private var mapboxMap: MapboxMap? = null
     private lateinit var mapView: MapView
     private var deploymentProtocol: DeploymentProtocol? = null
@@ -106,6 +114,8 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback {
                 setLatLogLabel(latLng)
             }
         }
+
+        setupSearch()
     }
 
     private fun showLoading(isLoading: Boolean) {
@@ -258,10 +268,121 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback {
         mapView.onDestroy()
     }
 
+
+    private fun setupSearch() {
+        searchLayoutCardView.setOnClickListener {
+            searchLayoutSearchEditText.requestFocus()
+        }
+
+        searchLayoutSearchEditText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                searchLayout.setBackgroundResource(R.color.white)
+                searchViewActionLeftButton.visibility = View.VISIBLE
+                showSearchFragment()
+            } else {
+                searchLayout.setBackgroundResource(R.color.transparent)
+                searchViewActionLeftButton.visibility = View.GONE
+                searchViewActionRightButton.visibility = View.GONE
+                hideSearchFragment()
+            }
+        }
+
+        searchViewActionRightButton.setOnClickListener {
+            searchLayoutSearchEditText.text = null
+        }
+
+        searchLayoutSearchEditText.addTextChangedListener(object : TextWatcher {
+            var timer: Timer = Timer()
+            override fun afterTextChanged(s: Editable?) {
+                if (s.isNullOrEmpty()) {
+                    searchViewActionRightButton.visibility = View.GONE
+                } else {
+                    searchViewActionRightButton.visibility = View.VISIBLE
+                }
+                timer.cancel()
+                timer = Timer()
+                timer.schedule(200L) {
+                    val searchFragment =
+                        childFragmentManager.findFragmentByTag(SearchResultFragment.tag) as SearchResultFragment?
+                    searchFragment?.search(if (s.isNullOrEmpty()) null else s.toString())
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // do nothing
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // do nothing
+            }
+
+        })
+
+        searchLayoutSearchEditText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                val imm: InputMethodManager? =
+                    context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
+                imm?.hideSoftInputFromWindow(searchLayoutSearchEditText.windowToken, 0)
+                return@setOnEditorActionListener true
+            }
+            false
+        }
+
+        searchViewActionLeftButton.setOnClickListener {
+            clearSearchInputAndHideSoftInput()
+        }
+
+    }
+
+    private fun showSearchFragment() {
+
+        childFragmentManager.beginTransaction().apply {
+            setCustomAnimations(R.anim.fragment_slide_in_up, 0, 0, R.anim.fragment_slide_out_up)
+        }.addToBackStack(null)
+            .replace(
+                searchResultListContainer.id,
+                SearchResultFragment.newInstance(searchLayoutSearchEditText.text?.toString()),
+                SearchResultFragment.tag
+            ).commitAllowingStateLoss()
+    }
+
+    private fun hideSearchFragment() {
+        try {
+            if (childFragmentManager.backStackEntryCount > 0) {
+                childFragmentManager.popBackStack()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun clearSearchInputAndHideSoftInput() {
+        val imm: InputMethodManager? =
+            context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
+        imm?.hideSoftInputFromWindow(searchLayoutSearchEditText.windowToken, 0)
+        searchLayoutSearchEditText.text = null
+        searchLayoutSearchEditText.clearFocus()
+    }
+
+
+    // callback from SearchResultFragment
+    override fun onLocationSelected(latLng: LatLng, placename: String) {
+        clearSearchInputAndHideSoftInput()
+        hideSearchFragment()
+        searchLayoutSearchEditText.setText(placename)
+        selectedLocation = Location("SEARCH").apply {
+            latitude = latLng.latitude
+            longitude = latLng.longitude
+        }
+        moveCamera(latLng, DEFAULT_ZOOM)
+        setLatLogLabel(latLng)
+    }
+
     companion object {
         @JvmStatic
         fun newInstance(): MapPickerFragment {
             return MapPickerFragment()
         }
     }
+
 }
