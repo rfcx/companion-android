@@ -1,7 +1,6 @@
 package org.rfcx.audiomoth.view.deployment
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +8,6 @@ import android.widget.Toast
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.adapter_image.view.*
 import kotlinx.android.synthetic.main.item_add_image.view.*
 import org.rfcx.audiomoth.R
@@ -18,6 +16,7 @@ import org.rfcx.audiomoth.adapter.BaseListItem
 import org.rfcx.audiomoth.adapter.LocalImageItem
 import org.rfcx.audiomoth.adapter.RemoteImageItem
 import org.rfcx.audiomoth.entity.DeploymentImage
+import org.rfcx.audiomoth.extension.setDeploymentImage
 
 class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAdapterDiffUtil()) {
     var onImageAdapterClickListener: OnImageAdapterClickListener? = null
@@ -29,10 +28,8 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
         var index = 0
         images.forEach {
             if (it.remotePath != null) {
-                Log.d("tt", "remote ${it.remotePath}")
                 imagesSource.add(RemoteImageItem(index, it.remotePath!!, false))
             } else {
-                Log.d("tt", "local ${it.localPath}")
                 imagesSource.add(LocalImageItem(index, it.localPath, false))
             }
             index++
@@ -143,10 +140,10 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is ImageAdapterViewHolder && getItem(position) is LocalImageItem) {
             val itemImage = getItem(position) as LocalImageItem
-            holder.bind(itemImage.localPath, itemImage.canDelete)
+            holder.bind(imagePath = itemImage.localPath, canDelete = itemImage.canDelete)
         } else if (holder is ImageAdapterViewHolder && getItem(position) is RemoteImageItem) {
             val itemImage = getItem(position) as RemoteImageItem
-            holder.bind(itemImage.remotePath, false)
+            holder.bind(imagePath = itemImage.remotePath, canDelete = false)
         }
     }
 
@@ -155,13 +152,7 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
         private val onImageAdapterClickListener: OnImageAdapterClickListener?
     ) : RecyclerView.ViewHolder(itemView) {
         fun bind(imagePath: String, canDelete: Boolean) {
-            Log.d("tt", "ImageAdapterViewHolder $imagePath")
-
-            Glide.with(itemView.image)
-                .load(imagePath)
-                .placeholder(R.drawable.bg_grey_light)
-                .error(R.drawable.bg_grey_light)
-                .into(itemView.image)
+            itemView.image.setDeploymentImage(imagePath)
             itemView.deleteImageButton.setOnClickListener {
                 onImageAdapterClickListener?.onDeleteImageClick(adapterPosition, imagePath)
             }
