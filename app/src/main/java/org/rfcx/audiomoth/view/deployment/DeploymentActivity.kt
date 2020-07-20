@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_deployment.*
 import org.rfcx.audiomoth.BuildConfig
@@ -352,7 +353,40 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
     }
 
     override fun onBackPressed() {
-        backStep()
+        if (currentStep == 0) {
+            val isFragmentPopped = handleNestedFragmentBackStack(supportFragmentManager)
+            if (!isFragmentPopped && supportFragmentManager.backStackEntryCount <= 1) {
+                // if top's fragment is  LocationFragment then finish else show LocationFragment fragment
+                if (supportFragmentManager.fragments.firstOrNull() is LocationFragment) {
+                    finish()
+                } else {
+                    handleFragment(0)
+                }
+            } else if (!isFragmentPopped) {
+                super.onBackPressed()
+            }
+        } else {
+            backStep()
+        }
+    }
+
+    private fun handleNestedFragmentBackStack(fragmentManager: FragmentManager): Boolean {
+        val childFragmentList = fragmentManager.fragments
+        if (childFragmentList.size > 0) {
+            for (index in childFragmentList.size - 1 downTo 0) {
+                val fragment = childFragmentList[index]
+                val isPopped = handleNestedFragmentBackStack(fragment.childFragmentManager)
+                return when {
+                    isPopped -> true
+                    fragmentManager.backStackEntryCount > 0 -> {
+                        fragmentManager.popBackStack()
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }
+        return false
     }
 
     companion object {

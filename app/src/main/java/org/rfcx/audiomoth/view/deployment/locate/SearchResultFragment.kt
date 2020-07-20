@@ -12,9 +12,11 @@ import com.mapbox.api.geocoding.v5.models.GeocodingResponse
 import com.mapbox.mapboxsdk.geometry.LatLng
 import kotlinx.android.synthetic.main.layout_search_result.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.adapter.BaseListItem
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.*
 
 class SearchResultFragment : Fragment() {
 
@@ -24,6 +26,9 @@ class SearchResultFragment : Fragment() {
         SearchLocationResultAdapter()
 
     private var searchQuery: String? = null
+
+    private val latLngRegex =
+        Regex("^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?),\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)\$")
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -88,13 +93,31 @@ class SearchResultFragment : Fragment() {
     }
 
     private fun showSearchResult(result: List<CarmenFeature>?) {
-
+        if (!isAdded || isDetached) return
         if (searchQuery.isNullOrEmpty()) {
             showInitialSearchItem()
             return
         }
 
-        if (result.isNullOrEmpty()) {
+        var locationFromSearchQuery: SearchResult? = null
+        searchQuery?.let {
+            val isLatLngPattern = latLngRegex.matches(it)
+            if (isLatLngPattern) {
+                val latLng = it.split(",").toTypedArray()
+                if (latLng.count() == 2) {
+                    try {
+                        val latitude: Double = latLng[0].toDouble()
+                        val longitude: Double = latLng[1].toDouble()
+                        locationFromSearchQuery =
+                            SearchResult(it, it, latitude, longitude)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+        }
+
+        if (result.isNullOrEmpty() && locationFromSearchQuery == null) {
             searchLocationResultAdapter.showError(
                 SearchResultError(
                     getString(R.string.search_not_found_title),
@@ -104,7 +127,7 @@ class SearchResultFragment : Fragment() {
             )
 
         } else {
-            val list: List<SearchResult> = result.mapNotNull { carmenFeature ->
+            val list: List<SearchResult> = result?.mapNotNull { carmenFeature ->
                 if (carmenFeature.center() != null && carmenFeature.placeName() != null) {
                     SearchResult(
                         id = carmenFeature.id(),
@@ -115,8 +138,13 @@ class SearchResultFragment : Fragment() {
                 } else {
                     null
                 }
+            } ?: listOf()
+            val arr = ArrayList<BaseListItem>(list)
+            // Add the last item with query location
+            locationFromSearchQuery?.let {
+                arr.add(it)
             }
-            searchLocationResultAdapter.submitList(list)
+            searchLocationResultAdapter.submitList(arr)
         }
     }
 
@@ -151,6 +179,11 @@ class SearchResultFragment : Fragment() {
                 putString(searchBundleKey, query)
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mapBoxGeoCoding?.cancelCall()
     }
 
     interface OnSearchResultListener {

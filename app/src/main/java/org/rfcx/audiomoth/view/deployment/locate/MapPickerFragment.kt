@@ -271,7 +271,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
 
     private fun setupSearch() {
         searchLayoutCardView.setOnClickListener {
-            searchLayoutSearchEditText.requestFocus()
+            searchLayoutSearchEditText.clearFocus()
         }
 
         searchLayoutSearchEditText.setOnFocusChangeListener { _, hasFocus ->
@@ -289,6 +289,12 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
 
         searchViewActionRightButton.setOnClickListener {
             searchLayoutSearchEditText.text = null
+        }
+
+        childFragmentManager.addOnBackStackChangedListener {
+            if (childFragmentManager.backStackEntryCount == 0) {
+                searchLayoutSearchEditText.clearFocus()
+            }
         }
 
         searchLayoutSearchEditText.addTextChangedListener(object : TextWatcher {
@@ -338,7 +344,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
 
         childFragmentManager.beginTransaction().apply {
             setCustomAnimations(R.anim.fragment_slide_in_up, 0, 0, R.anim.fragment_slide_out_up)
-        }.addToBackStack(null)
+        }.addToBackStack(SearchResultFragment.tag)
             .replace(
                 searchResultListContainer.id,
                 SearchResultFragment.newInstance(searchLayoutSearchEditText.text?.toString()),
@@ -363,7 +369,6 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
         searchLayoutSearchEditText.text = null
         searchLayoutSearchEditText.clearFocus()
     }
-
 
     // callback from SearchResultFragment
     override fun onLocationSelected(latLng: LatLng, placename: String) {
