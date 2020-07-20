@@ -5,9 +5,9 @@
     <string name="password">Password</string>
     <string name="login_sign_in_button_label">Sign in</string>
     <string name="powered_by">Powered by</string>
-    <string name="pls_fill_email">Please fill email</string>
-    <string name="pls_fill_password">Please fill password</string>
-    <string name="connect_with_facebook">Continue with facebook</string>
+    <string name="pls_fill_email">Missing email</string>
+    <string name="pls_fill_password">Missing password</string>
+    <string name="connect_with_facebook">Continue with Facebook</string>
     <string name="connect_with_sms">Continue with phone number</string>
     <string name="or">OR</string>
 
@@ -19,12 +19,11 @@
     <string name="format_images_unsync">%s photos not yet synced</string>
     <string name="format_deploy_uploading">Syncing a deployment.</string>
     <string name="format_deploys_uploading">Syncing %s deployments.</string>
-    <string name="format_deploy_waiting_network">No connection. a deployment will synced later.</string>
-    <string name="format_deploys_waiting_network">No connection. %s deployments will synced later.</string>
-    <string name="format_deploys_uploaded">All deployment synced.</string>
+    <string name="format_deploy_waiting_network">Unable to sync while there is no connection</string>
+    <string name="format_deploys_uploaded">All deployments synced</string>
     <string name="menu_map">MAP</string>
     <string name="menu_profile">PROFILE</string>
-    <string name="setup_first_device">Welcome! %s \nSetup your first RFCx device here</string>
+    <string name="setup_first_device">Welcome! %s \nGet started by adding your first \nRFCx device</string>
 
     <!--    ConfigureFragment-->
     <string name="configure">Configure</string>
@@ -35,8 +34,8 @@
     <string name="recording_duration">Recording (seconds)</string>
     <string name="profile_name">Profile name (optional)</string>
     <string name="recording_duration_title">Recording duration</string>
-    <string name="choose_sample_rate">Choose sample rate (kHz)</string>
-    <string name="choose_gain">Choose gain</string>
+    <string name="choose_sample_rate">Sample rate (kHz)</string>
+    <string name="choose_gain">Gain</string>
     <string name="kilohertz">%s kHz</string>
     <string name="continuous">Continuous</string>
     <string name="sync_to_device">Sync to Device</string>
@@ -92,17 +91,17 @@
     <string name="new_location">New location</string>
     <string name="existing">Existing</string>
     <string name="next">Next</string>
-    <string name="please_fill_information">Please fill your information completely</string>
     <string name="change">change</string>
 
     <!--  MapPickerFragment  -->
     <string name="select">Select</string>
     <string name="selected_location">Selected location</string>
+    <string name="please_fill_information">Location name is required.</string>
 
     <!--  SelectProfileFragment  -->
     <string name="use_an_existing">Use an existing profile</string>
     <string name="or_create_new">or create new</string>
-    <string name="can_not_get_profiles">Can\'t get profiles, try again</string>
+    <string name="can_not_get_profiles">Unable to download your profiles. \nPlease try again.</string>
     <string-array name="gainLabel">
         <item>Lowest</item>
         <item>Low</item>
@@ -131,7 +130,7 @@
     <!--  FeedbackActivity  -->
     <string name="app_feedback_share_ideas">Leave app feedback or share your ideas</string>
     <string name="from">From: %s</string>
-    <string name="maximum_number_of_attachments">You have reached max selectable. Try remove some items before adding more attachments.</string>
+    <string name="maximum_number_of_attachments">The maximum number of attachments is 5. Try removing some items before adding more.</string>
     <string name="feedback_submitted">Feedback submitted. Thank you for your time :)</string>
     <string name="profile_send_feedback">Send feedback</string>
     <string name="feedback_submission_failed">Feedback submission failed! Please try again.</string>
@@ -150,7 +149,7 @@
     <string name="some_photo_already_exists">Some photo already exists</string>
     <string name="these_photos_already_exists">These photos already exist</string>
     <string name="this_photo_already_exists">This photo already exists</string>
-    <string name="can_not_create_image">Can\'t create image file</string>
+    <string name="can_not_create_image">Unable to create image file.</string>
 
     <!--  ChooseDeviceFragment  -->
     <string name="choose_your_device">Choose your device</string>
@@ -160,9 +159,9 @@
     <string name="location_permission_msg">Companion App would like to use your location</string>
     <string name="notification_location_not_availability">Please enable your device\'s location settings</string>
 
-    <string name="maximum_ranges">Custom recording periods maximum 4 ranges</string>
+    <string name="maximum_ranges">The maximum number of recording ranges 4</string>
     <string name="an_error_occurred">Service unavailable</string>
-    <string name="error_has_occurred">An error has occurred Please try again later</string>
+    <string name="error_has_occurred">An error occurred. Please try again.</string>
     <string name="format_in_progress_step">Not yet deployed</string>
     <string name="error_upload_deployment">Something went wrong.</string>
 
@@ -170,7 +169,7 @@
     <string name="nearby_guardians">Nearby Guardian(s)</string>
     <string name="connect">Connect</string>
     <string name="retry">Retry</string>
-    <string name="not_found">Not found any guardians nearby</string>
+    <string name="not_found">No Guardians were detected nearby.</string>
 
     <!-- GuardianSelectProfileFragment -->
     <string name="profile_default">Current configuration</string>

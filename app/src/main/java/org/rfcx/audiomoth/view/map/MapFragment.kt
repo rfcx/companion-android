@@ -424,15 +424,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
             // else also waiting network
             else -> {
-                val msg = if (deploymentUnsentCount > 1) {
-                    getString(
-                        R.string.format_deploys_waiting_network,
-                        deploymentUnsentCount.toString()
-                    )
-                } else {
-                    getString(R.string.format_deploy_waiting_network)
-                }
-                listener?.showSnackbar(msg, Snackbar.LENGTH_LONG)
+                listener?.showSnackbar(getString(R.string.format_deploy_waiting_network), Snackbar.LENGTH_LONG)
             }
         }
     }
