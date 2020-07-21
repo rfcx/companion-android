@@ -28,4 +28,6 @@
     <dimen name="padding_bottom">78dp</dimen>
     <dimen name="edge_width">150dp</dimen>
 
+    <dimen name="search_input_padding">12dp</dimen>
+
 </resources>

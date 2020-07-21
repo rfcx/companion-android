@@ -262,4 +262,13 @@
     <string name="signal_value">%d dBm</string>
     <string name="signal_sim_card">The device does not have sim card inserted.\nPlease insert it before deploy.</string>
 
+    <!-- Search Location -->
+    <string name="search_box_hint">Search here</string>
+    <string name="search_title">Search</string>
+    <string name="search_message">by name/lat,long</string>
+    <string name="search_not_found_title">No results found</string>
+    <string name="search_not_found_message">Try searching something else</string>
+    <string name="search_error_title">An error has occurred</string>
+    <string name="search_error_message">Please try again later</string>
+
 </resources>

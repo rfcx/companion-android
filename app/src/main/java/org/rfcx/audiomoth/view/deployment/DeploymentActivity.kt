@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_deployment.*
 import org.rfcx.audiomoth.BuildConfig
@@ -54,6 +55,9 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
     private val audioMothConnector: AudioMothConnector = AudioMothChimeConnector()
     private val configuration = AudioMothConfiguration()
     private val calendar = Calendar.getInstance()
+
+    private var latitude = 0.0
+    private var longitude = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -165,6 +169,11 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
 
     override fun setProfile(profile: Profile) {
         this._profile = profile
+    }
+
+    override fun setLatLng(latitude: Double, longitude: Double) {
+        this.latitude = latitude
+        this.longitude = longitude
     }
 
     override fun setPerformBattery(batteryDepletedAt: Timestamp, batteryLevel: Int) {
@@ -352,7 +361,40 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
     }
 
     override fun onBackPressed() {
-        backStep()
+        if (currentStep == 0) {
+            val isFragmentPopped = handleNestedFragmentBackStack(supportFragmentManager)
+            if (!isFragmentPopped && supportFragmentManager.backStackEntryCount <= 1) {
+                // if top's fragment is  LocationFragment then finish else show LocationFragment fragment
+                if (supportFragmentManager.fragments.firstOrNull() is LocationFragment) {
+                    finish()
+                } else {
+                    startLocation(this.latitude, this.longitude)
+                }
+            } else if (!isFragmentPopped) {
+                super.onBackPressed()
+            }
+        } else {
+            backStep()
+        }
+    }
+
+    private fun handleNestedFragmentBackStack(fragmentManager: FragmentManager): Boolean {
+        val childFragmentList = fragmentManager.fragments
+        if (childFragmentList.size > 0) {
+            for (index in childFragmentList.size - 1 downTo 0) {
+                val fragment = childFragmentList[index]
+                val isPopped = handleNestedFragmentBackStack(fragment.childFragmentManager)
+                return when {
+                    isPopped -> true
+                    fragmentManager.backStackEntryCount > 0 -> {
+                        fragmentManager.popBackStack()
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }
+        return false
     }
 
     companion object {
