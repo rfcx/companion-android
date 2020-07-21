@@ -34,6 +34,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
 
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val diagnosticDb: DiagnosticDb by lazy { DiagnosticDb(realm) }
+    private val diagnosticInfo: DiagnosticInfo by lazy { diagnosticDb.getDiagnosticInfo(deploymentServerId) }
 
     private var collapseAdvanced = false
     private var prefsChanges: Map<String, String>? = null
@@ -116,7 +117,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
             setDisplayShowTitleEnabled(true)
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
-            title = if (isConnected != false) locationName else "$locationName (not connected)"
+            title = if (isConnected != false) locationName else "$locationName (${diagnosticInfo.getRelativeTimeSpan()})"
         }
     }
 
@@ -161,7 +162,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
                         hideLoading()
                     }
 
-                    saveNewDiagnostic(diagnosticData)
+                    saveNewDiagnostic()
                 }
 
                 override fun onFailed(message: String) {
@@ -184,18 +185,6 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
     }
 
     private fun setupLastKnownDiagnostic() {
-        // diagnosticInfo from latest data in local db
-        val diagnosticInfo = diagnosticDb.getDiagnosticInfo(deploymentServerId)
-        detailRecordValue.text =
-            getString(R.string.detail_file, diagnosticInfo.diagnostic?.totalLocal)
-        detailCheckInValue.text =
-            getString(R.string.detail_file, diagnosticInfo.diagnostic?.totalCheckIn)
-        detailTotalSizeValue.text =
-            getString(R.string.detail_size, diagnosticInfo.diagnostic?.totalFileSize?.div(1000))
-        detailTotalTimeValue.text = diagnosticInfo.diagnostic?.getRecordTime()
-        detailBatteryValue.text =
-            getString(R.string.detail_percentage, diagnosticInfo.diagnostic?.batteryPercentage)
-
         //configuration data from marker
         val configurationInfo = configuration?.toReadableFormat()
         configFileFormatValue.text = configurationInfo?.fileFormat
@@ -253,8 +242,8 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
         }
     }
 
-    private fun saveNewDiagnostic(diagnostic: Diagnostic) {
-        diagnosticDb.insertOrUpdate(diagnostic, this.deploymentServerId)
+    private fun saveNewDiagnostic() {
+        diagnosticDb.insertOrUpdate(this.deploymentServerId)
         DiagnosticSyncWorker.enqueue(this)
     }
 
