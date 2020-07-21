@@ -1,6 +1,7 @@
 package org.rfcx.audiomoth.repo
 
 import android.content.Context
+import android.util.Log
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -46,10 +47,11 @@ class Firestore(val context: Context) {
         return userDocument.collection(COLLECTION_DEPLOYMENTS).add(deployment).await()
     }
 
-    suspend fun updateDeployment(deployment: DeploymentRequest): Void {
+    suspend fun updateDeployment(serverId: String, deployment: DeploymentRequest) {
         val userDocument = db.collection(COLLECTION_USERS).document(guid)
-        return userDocument.collection(COLLECTION_DEPLOYMENTS).document(deployment.device)
-            .set(deployment).await()
+        val deploymentDocumentRef =
+            userDocument.collection(COLLECTION_DEPLOYMENTS).document(serverId)
+        deploymentDocumentRef.set(deployment).await()
     }
 
     suspend fun sendDeployment(deployment: GuardianDeploymentRequest): DocumentReference? {

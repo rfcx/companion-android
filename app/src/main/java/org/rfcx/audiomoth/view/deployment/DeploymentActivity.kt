@@ -193,6 +193,11 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
             it.state = DeploymentState.Edge.ReadyToUpload.key
             setDeployment(it)
 
+            // is Reconfigure?
+            if (isReconfigure && it.syncState == SyncState.Sent.key) {
+                it.syncState = SyncState.Unsent.key
+            }
+
             deploymentImageDb.insertImage(it, images)
             deploymentDb.updateDeployment(it)
 
@@ -335,13 +340,8 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         // isReconfigure don't update state
         if (!isReconfigure) {
             this._deployment?.state = state.key
-        } else if (isReconfigure &&
-            state == DeploymentState.Edge.ReadyToUpload &&
-            _deployment?.syncState == SyncState.Sent.key
-        ) {
-            // is sent reset to unsent
-            this._deployment?.syncState = SyncState.Unsent.key
         }
+
         this._deployment?.let { deploymentDb.updateDeployment(it) }
     }
 

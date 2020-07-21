@@ -43,7 +43,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                     someFailed = true
                 }
             } else {
-                firestore.updateDeployment(it.toRequestBody())
+                firestore.updateDeployment(it.serverId!!, it.toRequestBody())
                 deploymentDb.markSent(it.serverId!!, it.id)
                 locateDb.updateDeploymentServerId(it.id, it.serverId!!)
             }
