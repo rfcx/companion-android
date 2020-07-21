@@ -1,7 +1,6 @@
 package org.rfcx.audiomoth.view.deployment
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,8 +27,6 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
         imagesSource = arrayListOf()
         var index = 0
         images.forEach {
-            Log.d("ImageAdapter", "re - ${it.remotePath}, lo - ${it.localPath}")
-
             if (it.remotePath != null) {
                 imagesSource.add(RemoteImageItem(index, it.remotePath!!, false))
             } else {
