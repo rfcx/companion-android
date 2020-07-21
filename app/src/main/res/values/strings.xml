@@ -13,10 +13,6 @@
 
     <!--  MainActivity  -->
     <string name="ok">OK</string>
-    <string name="got_it">Got it</string>
-    <string name="cancel">CANCEL</string>
-    <string name="format_image_unsync">%s photo not yet synced</string>
-    <string name="format_images_unsync">%s photos not yet synced</string>
     <string name="format_deploy_uploading">Syncing a deployment.</string>
     <string name="format_deploys_uploading">Syncing %s deployments.</string>
     <string name="format_deploy_waiting_network">Unable to sync while there is no connection</string>
@@ -26,7 +22,6 @@
     <string name="setup_first_device">Welcome! %s \nGet started by adding your first \nRFCx device</string>
 
     <!--    ConfigureFragment-->
-    <string name="configure">Configure</string>
     <string name="let_configure">Let’s configure the device</string>
     <string name="sample_rate">Sample rate</string>
     <string name="gain">Gain</string>
@@ -38,7 +33,6 @@
     <string name="choose_gain">Gain</string>
     <string name="kilohertz">%s kHz</string>
     <string name="continuous">Continuous</string>
-    <string name="sync_to_device">Sync to Device</string>
     <string name="custom_recording_period">Custom recording period</string>
     <string name="always_recording">Always recording</string>
     <string name="recommended">Recommended</string>
@@ -51,8 +45,6 @@
 
     <!--    SyncFragment-->
     <string name="sync">Sync</string>
-    <string name="syncing">Syncing</string>
-    <string name="ready_to_send">Ready to send the configuration to the device</string>
     <string name="switch_to_config">1. Switch your device to CONFIG</string>
     <string name="max_volume">2. Set the volume of your phone to high level</string>
     <string name="hold_device">3. Hold the device close to your phone speaker</string>
@@ -157,13 +149,11 @@
     <string name="rfcx_guardian">RFCx Guardian</string>
 
     <string name="location_permission_msg">Companion App would like to use your location</string>
-    <string name="notification_location_not_availability">Please enable your device\'s location settings</string>
 
     <string name="maximum_ranges">The maximum number of recording ranges 4</string>
     <string name="an_error_occurred">Service unavailable</string>
     <string name="error_has_occurred">An error occurred. Please try again.</string>
     <string name="format_in_progress_step">Not yet deployed</string>
-    <string name="error_upload_deployment">Something went wrong.</string>
 
     <!-- ConnectGuardianFragment -->
     <string name="nearby_guardians">Nearby Guardian(s)</string>
@@ -172,7 +162,6 @@
     <string name="not_found">No Guardians were detected nearby.</string>
 
     <!-- GuardianSelectProfileFragment -->
-    <string name="profile_default">Current configuration</string>
     <string name="configuration_details">%s, %d kHz, %d kbs, %d secs</string>
 
     <!-- GuardianConfigureFragment -->
@@ -181,7 +170,6 @@
     <string name="choose_bitrate">Choose bitrate (kbs)</string>
     <string name="choose_file_format">Choose file format</string>
     <string name="choose_duration_cycle">Choose record duration cycle (secs)</string>
-    <string name="kilobytes">%s kbs</string>
 
     <!-- GuardianPreferences -->
     <bool name="prefs_value_default_show_ui">true</bool>
@@ -190,7 +178,6 @@
     <bool name="prefs_value_default_enable_cutoffs_battery">true</bool>
     <bool name="prefs_value_default_enable_cutoffs_schedule_off_hours">true</bool>
     <bool name="prefs_value_default_admin_enable_ssh_server">false</bool>
-    <bool name="prefs_value_default_admin_enable_wifi_socket">false</bool>
 
     <string name="prefs_value_default_api_rest_host">api.rfcx.org</string>
     <string name="prefs_value_default_api_rest_protocol">https</string>
@@ -244,9 +231,6 @@
     <string name="detail_file">%d files</string>
     <string name="detail_size">%d MBs</string>
     <string name="detail_secs">%d seconds</string>
-    <string name="detail_minutes">%d minutes</string>
-    <string name="detail_hours">%d hours</string>
-    <string name="detail_full">%d hours %d minutes</string>
     <string name="detail_percentage">%d %%</string>
     <string name="detail_khz">%d kHz</string>
     <string name="detail_kbs">%d kbs</string>
