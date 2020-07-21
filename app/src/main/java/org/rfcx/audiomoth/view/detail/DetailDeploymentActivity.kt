@@ -14,9 +14,7 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.repo.Firestore
-import org.rfcx.audiomoth.util.RealmHelper
-import org.rfcx.audiomoth.util.convertToStopStartPeriods
-import org.rfcx.audiomoth.util.toDateTimeString
+import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity.Companion.DEPLOYMENT_ID
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment.Companion.CONTINUOUS
@@ -41,8 +39,8 @@ class DetailDeploymentActivity : AppCompatActivity() {
             val location = deployment?.location
             val configuration = deployment?.configuration
 
-            locationLongitudeValue.text = location?.longitude.toString()
-            locationLatitudeValue.text = location?.latitude.toString()
+            locationLongitudeValue.text = location?.longitude.longitudeCoordinates(this)
+            locationLatitudeValue.text = location?.latitude.latitudeCoordinates(this)
 
             sampleRateValue.text =
                 getString(R.string.kilohertz, configuration?.sampleRate.toString())
