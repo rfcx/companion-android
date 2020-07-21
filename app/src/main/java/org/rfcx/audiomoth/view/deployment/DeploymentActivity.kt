@@ -56,6 +56,9 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
     private val configuration = AudioMothConfiguration()
     private val calendar = Calendar.getInstance()
 
+    private var latitude = 0.0
+    private var longitude = 0.0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_deployment)
@@ -166,6 +169,11 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
 
     override fun setProfile(profile: Profile) {
         this._profile = profile
+    }
+
+    override fun setLatLng(latitude: Double, longitude: Double) {
+        this.latitude = latitude
+        this.longitude = longitude
     }
 
     override fun setPerformBattery(batteryDepletedAt: Timestamp, batteryLevel: Int) {
@@ -360,7 +368,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
                 if (supportFragmentManager.fragments.firstOrNull() is LocationFragment) {
                     finish()
                 } else {
-                    handleFragment(0)
+                    startLocation(this.latitude, this.longitude)
                 }
             } else if (!isFragmentPopped) {
                 super.onBackPressed()

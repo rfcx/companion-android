@@ -246,6 +246,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         } else {
             // not found current location
             setLatLogLabel(LatLng(0.0, 0.0))
+            moveCamera(LatLng(0.0, 0.0), DEFAULT_ZOOM)
         }
         locationNameTextInput.visibility = View.VISIBLE
         locationNameSpinner.visibility = View.GONE

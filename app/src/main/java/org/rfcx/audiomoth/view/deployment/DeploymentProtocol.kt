@@ -22,6 +22,7 @@ interface DeploymentProtocol : BaseDeploymentProtocal {
     fun setProfile(profile: Profile)
     fun setDeploymentConfigure(profile: Profile)
     fun setPerformBattery(batteryDepletedAt: Timestamp, batteryLevel: Int)
+    fun setLatLng(latitude: Double, longitude: Double)
 
     fun playSyncSound()
     fun playCheckBatterySound()

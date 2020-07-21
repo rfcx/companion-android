@@ -57,6 +57,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
 
                     mapboxMap?.let {
                         this@MapPickerFragment.currentUserLocation = location
+                        deploymentProtocol?.setLatLng(location.latitude, location.longitude)
                     }
 
                     showLoading(currentUserLocation == null)
@@ -98,6 +99,10 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
         mapView.getMapAsync(this)
 
         enableLocationComponent()
+
+        showLoading(true)
+        setLatLogLabel(LatLng(0.0, 0.0))
+        moveCamera(LatLng(0.0, 0.0), DEFAULT_ZOOM)
 
         selectButton.setOnClickListener {
             val currentCameraPosition = mapboxMap?.cameraPosition?.target
