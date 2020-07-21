@@ -20,8 +20,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_configure.*
-import kotlinx.android.synthetic.main.fragment_configure.radioGroup
-import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.DURATION_SELECTED_DEFAULT
 import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.GAIN_DEFAULT
@@ -36,13 +34,7 @@ class ConfigureFragment : Fragment(),
     OnItemClickListener {
 
     private var deploymentProtocol: DeploymentProtocol? = null
-    private val timeAdapter by lazy {
-        TimeAdapter(
-            this,
-            context
-        )
-    }
-
+    private val timeAdapter by lazy { TimeAdapter(this, context) }
     private val sampleRateList = arrayOf("8", "16", "32", "48", "96", "192", "256", "384")
     private val gainList = arrayOf("Low", "Low - Medium", "Medium", "Medium - High", "High")
     var timeList = arrayListOf(
@@ -115,12 +107,7 @@ class ConfigureFragment : Fragment(),
 
         for (time in timeList) {
             profile?.let {
-                timeState.add(
-                    TimeItem(
-                        time,
-                        it.recordingPeriodList.contains(time)
-                    )
-                )
+                timeState.add(TimeItem(time, it.recordingPeriodList.contains(time)))
             }
         }
 

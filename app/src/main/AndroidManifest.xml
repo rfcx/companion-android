@@ -66,8 +66,9 @@
             android:name=".view.deployment.DeploymentActivity"
             android:screenOrientation="portrait" />
 
-        <activity android:name=".view.deployment.guardian.GuardianDeploymentActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".view.deployment.guardian.GuardianDeploymentActivity"
+            android:screenOrientation="portrait" />
 
         <activity android:name=".view.diagnostic.DiagnosticActivity" />
 

@@ -270,9 +270,12 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
                 _deployLocation = deployment.location
             }
 
-            if (deployment.configuration != null) {
-                _configuration = deployment.configuration
+            deployment.configuration?.let {
+                _configuration = it
+                val profile = it.toProfile()
+                setProfile(profile) // on Config page need Profile
             }
+
             // is reconfigure? should be start edit first step
             currentStep = if (isReconfigure) 0 else deployment.state - 1
             stepView.go(currentStep, true)

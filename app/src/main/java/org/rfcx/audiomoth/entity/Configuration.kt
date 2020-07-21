@@ -18,3 +18,14 @@ open class Configuration(
     var recordingPeriodList: RealmList<String> = RealmList(),
     var durationSelected: String = DURATION_SELECTED_DEFAULT
 ) : RealmModel
+
+fun Configuration.toProfile(): Profile {
+    return Profile(
+        gain = gain,
+        sampleRate = sampleRate,
+        recordingDuration = recordingDuration,
+        sleepDuration = sleepDuration,
+        recordingPeriodList = recordingPeriodList,
+        durationSelected = durationSelected
+    )
+}

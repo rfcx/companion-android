@@ -46,8 +46,6 @@ open class Profile(
         this.durationSelected = durationSelected
     }
 
-    fun isNew() = (this.id == 0)
-
     fun asConfiguration(): Configuration {
         return Configuration(
             gain = gain,
