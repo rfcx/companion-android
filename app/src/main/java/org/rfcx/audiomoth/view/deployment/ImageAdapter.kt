@@ -1,6 +1,7 @@
 package org.rfcx.audiomoth.view.deployment
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,6 +28,8 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
         imagesSource = arrayListOf()
         var index = 0
         images.forEach {
+            Log.d("ImageAdapter", "re - ${it.remotePath}, lo - ${it.localPath}")
+
             if (it.remotePath != null) {
                 imagesSource.add(RemoteImageItem(index, it.remotePath!!, false))
             } else {
@@ -151,12 +154,15 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
         itemView: View,
         private val onImageAdapterClickListener: OnImageAdapterClickListener?
     ) : RecyclerView.ViewHolder(itemView) {
+        private val imageView = itemView.image
+        private val deleteButton = itemView.deleteImageButton
+
         fun bind(imagePath: String, canDelete: Boolean) {
-            itemView.image.setDeploymentImage(imagePath)
-            itemView.deleteImageButton.setOnClickListener {
+            imageView.setDeploymentImage(imagePath)
+            deleteButton.setOnClickListener {
                 onImageAdapterClickListener?.onDeleteImageClick(adapterPosition, imagePath)
             }
-            itemView.image.visibility = if (canDelete) View.VISIBLE else View.INVISIBLE
+            deleteButton.visibility = if (canDelete) View.VISIBLE else View.INVISIBLE
         }
     }
 
