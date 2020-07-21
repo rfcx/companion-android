@@ -158,16 +158,21 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
         itemView: View,
         private val onImageAdapterClickListener: OnImageAdapterClickListener?
     ) : RecyclerView.ViewHolder(itemView) {
+        private val imageView = itemView.image
+        private val deleteButton = itemView.deleteImageButton
+
         fun bind(imagePath: String, canDelete: Boolean) {
-            Glide.with(itemView.image)
+            Glide.with(itemView.context)
                 .load(imagePath)
                 .placeholder(R.drawable.bg_grey_light)
                 .error(R.drawable.bg_grey_light)
-                .into(itemView.image)
-            itemView.deleteImageButton.setOnClickListener {
+                .into(imageView)
+
+
+            deleteButton.setOnClickListener {
                 onImageAdapterClickListener?.onDeleteImageClick(adapterPosition, imagePath)
             }
-            itemView.image.visibility = if (canDelete) View.VISIBLE else View.INVISIBLE
+            deleteButton.visibility = if (canDelete) View.VISIBLE else View.INVISIBLE
         }
     }
 

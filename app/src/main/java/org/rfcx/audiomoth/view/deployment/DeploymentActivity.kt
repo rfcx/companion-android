@@ -171,7 +171,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         this._profile = profile
     }
 
-    override fun setLatLng(latitude: Double, longitude: Double) {
+    private fun setLatLng(latitude: Double, longitude: Double) {
         this.latitude = latitude
         this.longitude = longitude
     }
@@ -249,9 +249,10 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         startFragment(PerformBatteryFragment.newInstance(status, level))
     }
 
-    override fun startMapPicker() {
+    override fun startMapPicker(latitude: Double, longitude: Double) {
         hideStepView()
-        startFragment(MapPickerFragment.newInstance())
+        setLatLng(latitude, longitude)
+        startFragment(MapPickerFragment.newInstance(latitude, longitude))
     }
 
     private fun setupView() {

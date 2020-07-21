@@ -60,7 +60,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var locateAdapter: ArrayAdapter<String>? = null
     private var currentUserLocation: Location? = null
     private var locationEngine: LocationEngine? = null
-    private var latLng: LatLng? = null
+    private var latitude: Double = 0.0
+    private var longitude: Double = 0.0
 
     private var deploymentProtocol: DeploymentProtocol? = null
     private val locationPermissions by lazy { activity?.let { LocationPermissions(it) } }
@@ -113,6 +114,14 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         context?.let { Mapbox.getInstance(it, getString(R.string.mapbox_token)) }
+        initIntent()
+    }
+
+    private fun initIntent() {
+        arguments?.let {
+            latitude = it.getDouble(LATITUDE_VALUE)
+            longitude = it.getDouble(LONGITUDE_VALUE)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -136,12 +145,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
 
         changeTextView.setOnClickListener {
-            deploymentProtocol?.startMapPicker()
+            deploymentProtocol?.startMapPicker(latitude, longitude)
         }
 
         viewOfMapBox.setOnClickListener {
             if (newLocationRadioButton.isChecked) {
-                deploymentProtocol?.startMapPicker()
+                deploymentProtocol?.startMapPicker(latitude, longitude)
             }
         }
     }
@@ -219,22 +228,17 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun onPressedNewLocation() {
-        var lat: Double? = null
-        var lng: Double? = null
         isSelectedNewLocation = true
 
-        arguments?.let {
-            lat = it.getDouble(LATITUDE_VALUE)
-            lng = it.getDouble(LONGITUDE_VALUE)
-        }
-
-        if (lat != null && lng != null) {
+        if (latitude != 0.0 && longitude != 0.0) {
             val loc = Location(LocationManager.GPS_PROVIDER)
-            loc.latitude = lat as Double
-            loc.longitude = lng as Double
+            loc.latitude = latitude
+            loc.longitude = longitude
             lastLocation = loc
         } else {
             lastLocation = currentUserLocation // get new current location
+            this.latitude = lastLocation?.latitude ?: 0.0
+            this.longitude = lastLocation?.longitude ?: 0.0
         }
 
         if (lastLocation != null) {
@@ -266,8 +270,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         setLocationSpinner()
         setRecommendLocation()
 
-        val value = arguments?.getDouble(LATITUDE_VALUE)
-        if (value != null) {
+        if (latitude != 0.0 && longitude != 0.0) {
             newLocationRadioButton.isChecked = true
             existingRadioButton.isChecked = false
         } else {

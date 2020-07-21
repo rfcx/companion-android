@@ -47,6 +47,8 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
     private var locationEngine: LocationEngine? = null
     private var currentUserLocation: Location? = null
     private var selectedLocation: Location? = null
+    private var latitude: Double = 0.0
+    private var longitude: Double = 0.0
 
     private val mapboxLocationChangeCallback =
         object : LocationEngineCallback<LocationEngineResult> {
@@ -57,16 +59,15 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
 
                     mapboxMap?.let {
                         this@MapPickerFragment.currentUserLocation = location
-                        deploymentProtocol?.setLatLng(location.latitude, location.longitude)
                     }
 
                     showLoading(currentUserLocation == null)
 
-                    if (selectedLocation == null) {
-                        val latLng = LatLng(location.latitude, location.longitude)
-                        moveCamera(latLng, DEFAULT_ZOOM)
-                        setLatLogLabel(latLng)
-                    }
+//                    if (selectedLocation == null) {
+//                        val latLng = LatLng(location.latitude, location.longitude)
+//                        moveCamera(latLng, DEFAULT_ZOOM)
+//                        setLatLogLabel(latLng)
+//                    }
                 }
             }
 
@@ -90,6 +91,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         context?.let { Mapbox.getInstance(it, getString(R.string.mapbox_token)) }
+        initIntent()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -97,8 +99,6 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
         mapView = view.findViewById(R.id.mapBoxPickerView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
-
-        enableLocationComponent()
 
         showLoading(true)
         setLatLogLabel(LatLng(0.0, 0.0))
@@ -119,8 +119,14 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
                 setLatLogLabel(latLng)
             }
         }
-
         setupSearch()
+    }
+
+    private fun initIntent() {
+        arguments?.let {
+            latitude = it.getDouble(ARG_LATITUDE)
+            longitude = it.getDouble(ARG_LONGITUDE)
+        }
     }
 
     private fun showLoading(isLoading: Boolean) {
@@ -136,7 +142,9 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
         this.mapboxMap = mapboxMap
         mapboxMap.uiSettings.isAttributionEnabled = false
         mapboxMap.uiSettings.isLogoEnabled = false
-        mapboxMap.setStyle(Style.OUTDOORS)
+        mapboxMap.setStyle(Style.OUTDOORS) {
+            enableLocationComponent()
+        }
 
         mapboxMap.addOnCameraMoveListener {
             val currentCameraPosition = mapboxMap.cameraPosition.target
@@ -167,10 +175,16 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
             locationComponent?.isLocationComponentEnabled = false
             locationComponent?.renderMode = RenderMode.COMPASS
 
-            val lastKnownLocation = locationComponent?.lastKnownLocation
-            lastKnownLocation?.let {
-                this.currentUserLocation = it
-                moveCamera(LatLng(it.latitude, it.longitude), DEFAULT_ZOOM)
+            if (latitude != 0.0 && longitude != 0.0) {
+                Log.d("location","$latitude $longitude")
+                moveCamera(LatLng(latitude, longitude), DEFAULT_ZOOM)
+                setLatLogLabel(LatLng(latitude, longitude))
+            } else {
+                val lastKnownLocation = locationComponent?.lastKnownLocation
+                lastKnownLocation?.let {
+                    this.currentUserLocation = it
+                    moveCamera(LatLng(it.latitude, it.longitude), DEFAULT_ZOOM)
+                }
             }
             initLocationEngine()
         } else {
@@ -389,10 +403,16 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
     }
 
     companion object {
-        @JvmStatic
-        fun newInstance(): MapPickerFragment {
-            return MapPickerFragment()
-        }
-    }
+        private const val ARG_LATITUDE = "ARG_LATITUDE"
+        private const val ARG_LONGITUDE = "ARG_LONGITUDE"
 
+        @JvmStatic
+        fun newInstance(lat: Double, lng: Double) = MapPickerFragment()
+            .apply {
+                arguments = Bundle().apply {
+                    putDouble(ARG_LATITUDE, lat)
+                    putDouble(ARG_LONGITUDE, lng)
+                }
+            }
+    }
 }

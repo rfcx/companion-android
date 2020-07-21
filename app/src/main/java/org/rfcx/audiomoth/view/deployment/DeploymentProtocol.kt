@@ -10,7 +10,7 @@ interface DeploymentProtocol : BaseDeploymentProtocal {
     fun startSetupConfigure(profile: Profile)
     fun startSyncing(status: String)
     fun startCheckBattery(status: String, level: Int?)
-    fun startMapPicker()
+    fun startMapPicker(latitude: Double, longitude: Double)
     fun startLocation(latitude: Double, longitude: Double)
 
     fun getProfiles(): List<Profile>
@@ -22,7 +22,6 @@ interface DeploymentProtocol : BaseDeploymentProtocal {
     fun setProfile(profile: Profile)
     fun setDeploymentConfigure(profile: Profile)
     fun setPerformBattery(batteryDepletedAt: Timestamp, batteryLevel: Int)
-    fun setLatLng(latitude: Double, longitude: Double)
 
     fun playSyncSound()
     fun playCheckBatterySound()
