@@ -15,19 +15,26 @@ import com.auth0.android.callback.BaseCallback
 import com.auth0.android.provider.AuthCallback
 import com.auth0.android.provider.WebAuthProvider
 import com.auth0.android.result.Credentials
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_login.*
 import org.rfcx.audiomoth.MainActivity
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.*
+import org.rfcx.audiomoth.entity.response.FirebaseAuthResponse
 import org.rfcx.audiomoth.repo.ApiManager
+import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.util.CredentialKeeper
 import org.rfcx.audiomoth.util.CredentialVerifier
-import org.rfcx.audiomoth.repo.Firestore
+import org.rfcx.audiomoth.util.Preferences
+import org.rfcx.audiomoth.util.Preferences.Companion.USER_FIREBASE_UID
+import org.rfcx.audiomoth.view.profile.coordinates.CoordinatesActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class LoginActivity : AppCompatActivity() {
+
+    private lateinit var auth: FirebaseAuth
 
     private val auth0 by lazy {
         val auth0 =
@@ -48,6 +55,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+        auth = FirebaseAuth.getInstance()
 
         if (CredentialKeeper(this).hasValidCredentials()) {
             MainActivity.startActivity(this@LoginActivity)
@@ -116,14 +124,14 @@ class LoginActivity : AppCompatActivity() {
 
         Firestore(this@LoginActivity)
             .saveUser(user, result.guid) { string, isSuccess ->
-            if (isSuccess) {
-                userTouch(result.idToken)
-                CredentialKeeper(this@LoginActivity).save(result)
-            } else {
-                Toast.makeText(this@LoginActivity, string, Toast.LENGTH_SHORT).show()
-                loading(false)
+                if (isSuccess) {
+                    userTouch(result.idToken)
+                    CredentialKeeper(this@LoginActivity).save(result)
+                } else {
+                    Toast.makeText(this@LoginActivity, string, Toast.LENGTH_SHORT).show()
+                    loading(false)
+                }
             }
-        }
     }
 
     private fun loginWithFacebook() {
@@ -167,7 +175,7 @@ class LoginActivity : AppCompatActivity() {
                 override fun onFailure(exception: AuthenticationException) {
                     Toast.makeText(this@LoginActivity, exception.description, Toast.LENGTH_SHORT)
                         .show()
-                    loading (false)
+                    loading(false)
                 }
 
                 override fun onSuccess(credentials: Credentials) {
@@ -202,14 +210,52 @@ class LoginActivity : AppCompatActivity() {
                 ) {
                     response.body()?.let {
                         if (it.success) {
-                            MainActivity.startActivity(this@LoginActivity)
-                            finish()
+                            getFirebaseAuth(authUser)
                         } else {
                             loading(false)
                         }
                     }
                 }
             })
+    }
+
+    private fun getFirebaseAuth(authUser: String) {
+        ApiManager.getInstance().apiFirebaseAuth.firebaseAuth(authUser)
+            .enqueue(object : Callback<FirebaseAuthResponse> {
+                override fun onFailure(call: Call<FirebaseAuthResponse>, t: Throwable) {
+                    loading(false)
+                    Toast.makeText(baseContext, R.string.an_error_occurred, Toast.LENGTH_SHORT)
+                        .show()
+                }
+
+                override fun onResponse(
+                    call: Call<FirebaseAuthResponse>,
+                    response: Response<FirebaseAuthResponse>
+                ) {
+                    response.body()?.let {
+                        signInWithFirebaseToken(it.firebaseToken)
+                    }
+                }
+            })
+    }
+
+    private fun signInWithFirebaseToken(firebaseToken: String) {
+        val preferences = Preferences.getInstance(this)
+
+        auth.signInWithCustomToken(firebaseToken)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    val user = auth.currentUser
+                    user?.uid?.let { preferences.putString(USER_FIREBASE_UID, it) }
+
+                    MainActivity.startActivity(this@LoginActivity)
+                    finish()
+                } else {
+                    loading(false)
+                    Toast.makeText(baseContext, R.string.an_error_occurred, Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
     }
 
     private fun loading(start: Boolean = true) {

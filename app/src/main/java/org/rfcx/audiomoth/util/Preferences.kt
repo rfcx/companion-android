@@ -30,6 +30,7 @@ class Preferences(context: Context) {
         const val DEFAULT_SITE = "${PREFIX}DEFAULT_SITE"
         const val IS_FIRST_TIME = "${PREFIX}IS_FIRST_TIME"
         const val COORDINATES_FORMAT = "${PREFIX}COORDINATES_FORMAT"
+        const val USER_FIREBASE_UID = "${PREFIX}USER_FIREBASE_UID"
     }
 
     init {
