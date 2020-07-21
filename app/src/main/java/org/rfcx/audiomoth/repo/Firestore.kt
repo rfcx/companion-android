@@ -1,7 +1,6 @@
 package org.rfcx.audiomoth.repo
 
 import android.content.Context
-import android.util.Log
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
