@@ -71,12 +71,9 @@ class DeploymentImageDb(private val realm: Realm) {
             .findAll() ?: arrayListOf()
     }
 
-    fun getAllResultsAsync(sort: Sort = Sort.DESCENDING): RealmResults<DeploymentImage> {
-        return realm.where(DeploymentImage::class.java)
-            .sort(DeploymentImage.FIELD_ID, sort)
-            .findAllAsync()
-    }
-
+    /**
+     * Insert DeploymentImage and attached deployment id and deployment serverId
+     */
     fun insertImage(deployment: Deployment, attachImages: List<String>) {
         val imageCreateAt = deployment.deployedAt
         realm.executeTransaction {
@@ -88,6 +85,7 @@ class DeploymentImageDb(private val realm: Realm) {
                 val deploymentImage = DeploymentImage(
                     id = imageId,
                     deploymentId = deployment.id,
+                    deploymentServerId = deployment.serverId,
                     localPath = attachImage,
                     createdAt = imageCreateAt
                 )
@@ -99,7 +97,6 @@ class DeploymentImageDb(private val realm: Realm) {
     /**
      * Return of DeploymentImage that need to upload into firebase firestore
      */
-
     fun lockUnsentForFireStore(): List<DeploymentImage> {
         var unsentCopied: List<DeploymentImage> = listOf()
         realm.executeTransaction {

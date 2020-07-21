@@ -264,7 +264,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         val deployment = deploymentDb.getDeploymentById(deploymentId)
         if (deployment != null) {
             setDeployment(deployment)
-            _deploymentImages = deploymentImageDb.getByDeploymentId(deploymentId)
+            _deploymentImages = deploymentImageDb.getByDeploymentId(deployment.id)
 
             if (deployment.location != null) {
                 _deployLocation = deployment.location
