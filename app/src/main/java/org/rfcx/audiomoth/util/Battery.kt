@@ -1,5 +1,7 @@
 package org.rfcx.audiomoth.util
 
+import kotlin.math.roundToInt
+
 object Battery {
     const val BATTERY_PIN_GREEN = "BATTERY_PIN_GREEN"
     const val BATTERY_PIN_ORANGE = "BATTERY_PIN_ORANGE"
@@ -22,14 +24,12 @@ object Battery {
 
     fun getPredictionBattery(timestamp: Long): String {
         val currentMillis = System.currentTimeMillis()
-        val threeDays = 3 * DAY
-        val daysLeft = if (timestamp > (currentMillis + threeDays)) {
-            "3+ days"
-        } else if (timestamp > (currentMillis + DAY) && timestamp < (currentMillis + threeDays)) {
-            "1-2 days"
+        val daysLeft = if (timestamp > currentMillis) {
+            val cal = ((timestamp - currentMillis) / (DAY).toDouble()).roundToInt()
+            if (cal > 1) "$cal days" else "$cal day"
         } else {
             "<1 day"
         }
-        return "$daysLeft (remaining)"
+        return "$daysLeft remaining"
     }
 }
