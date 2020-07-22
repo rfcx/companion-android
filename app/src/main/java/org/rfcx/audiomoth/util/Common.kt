@@ -17,3 +17,6 @@ internal fun Context?.isNetworkAvailable(): Boolean {
 fun Context.getIntColor(res: Int): Int {
     return ContextCompat.getColor(this, res)
 }
+
+private val chars = ('A'..'F') + ('0'..'9')
+fun randomDeploymentId(): String = List(16) { chars.random() }.joinToString("")

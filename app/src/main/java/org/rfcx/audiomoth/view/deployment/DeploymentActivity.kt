@@ -218,12 +218,14 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
     }
 
     override fun playSyncSound() {
+        val deploymentId = randomDeploymentId()
+
         convertProfileToAudioMothConfiguration()
         Thread {
             audioMothConnector.setConfiguration(
                 calendar,
                 configuration,
-                DeploymentIdentifier("A1B2C3D4E5F60000")
+                DeploymentIdentifier(deploymentId)
             )
             this@DeploymentActivity.runOnUiThread {
                 startSyncing(SyncFragment.AFTER_SYNC)
@@ -378,9 +380,6 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
             backStep()
         }
     }
-
-    private val chars = ('a'..'z') + ('A'..'Z') + ('0'..'9')
-    private fun randomID(): String = List(20) { chars.random() }.joinToString("")
 
     private fun handleNestedFragmentBackStack(fragmentManager: FragmentManager): Boolean {
         val childFragmentList = fragmentManager.fragments
