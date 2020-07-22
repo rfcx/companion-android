@@ -379,6 +379,9 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         }
     }
 
+    private val chars = ('a'..'z') + ('A'..'Z') + ('0'..'9')
+    private fun randomID(): String = List(20) { chars.random() }.joinToString("")
+
     private fun handleNestedFragmentBackStack(fragmentManager: FragmentManager): Boolean {
         val childFragmentList = fragmentManager.fragments
         if (childFragmentList.size > 0) {
