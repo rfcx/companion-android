@@ -17,9 +17,10 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <View
+        android:id="@+id/microphoneView"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:background="@drawable/ic_microphone"
+        android:background="@drawable/ic_microphone_green"
         android:layout_marginTop="@dimen/margin_padding_xlarge"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

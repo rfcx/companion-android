@@ -31,18 +31,18 @@ class GuardianMicrophoneFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         deploymentProtocol?.hideCompleteButton()
-        setButtonsByState(MicTestingState.READY)
+        setUiByState(MicTestingState.READY)
 
         listenAudioButton.setOnClickListener {
-            setButtonsByState(MicTestingState.LISTENING)
+            setUiByState(MicTestingState.LISTENING)
         }
 
         cancelAudioButton.setOnClickListener {
-            setButtonsByState(MicTestingState.FINISH)
+            setUiByState(MicTestingState.FINISH)
         }
 
         listenAgainAudioButton.setOnClickListener {
-            setButtonsByState(MicTestingState.LISTENING)
+            setUiByState(MicTestingState.LISTENING)
         }
 
         finishButton.setOnClickListener {
@@ -50,25 +50,28 @@ class GuardianMicrophoneFragment : Fragment() {
         }
     }
 
-    private fun setButtonsByState(state: MicTestingState) {
+    private fun setUiByState(state: MicTestingState) {
         when (state) {
             MicTestingState.READY -> {
                 listenAudioButton.visibility = View.VISIBLE
                 cancelAudioButton.visibility = View.GONE
                 listenAgainAudioButton.visibility = View.GONE
                 finishButton.visibility = View.GONE
+                microphoneView.setBackgroundResource(R.drawable.ic_microphone_grey)
             }
             MicTestingState.LISTENING -> {
                 listenAudioButton.visibility = View.GONE
                 cancelAudioButton.visibility = View.VISIBLE
                 listenAgainAudioButton.visibility = View.GONE
                 finishButton.visibility = View.GONE
+                microphoneView.setBackgroundResource(R.drawable.ic_microphone_green)
             }
             MicTestingState.FINISH -> {
                 listenAudioButton.visibility = View.GONE
                 cancelAudioButton.visibility = View.GONE
                 listenAgainAudioButton.visibility = View.VISIBLE
                 finishButton.visibility = View.VISIBLE
+                microphoneView.setBackgroundResource(R.drawable.ic_microphone_grey)
             }
         }
     }
