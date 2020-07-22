@@ -156,6 +156,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
     override fun setDeployLocation(locate: Locate) {
         val deployment = _deployment ?: Deployment()
         deployment.state = DeploymentState.Edge.Locate.key // state
+        deployment.deploymentId = randomDeploymentId()
 
         this._deployLocation = locate.asDeploymentLocation()
         val deploymentId = deploymentDb.insertOrUpdate(deployment, _deployLocation!!)
@@ -218,14 +219,13 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
     }
 
     override fun playSyncSound() {
-        val deploymentId = randomDeploymentId()
-
+        val deploymentId = getDeployment()?.deploymentId
         convertProfileToAudioMothConfiguration()
         Thread {
             audioMothConnector.setConfiguration(
                 calendar,
                 configuration,
-                DeploymentIdentifier(deploymentId)
+                deploymentId?.let { DeploymentIdentifier(it) }
             )
             this@DeploymentActivity.runOnUiThread {
                 startSyncing(SyncFragment.AFTER_SYNC)
