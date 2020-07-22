@@ -255,4 +255,11 @@
     <string name="search_error_title">An error has occurred</string>
     <string name="search_error_message">Please try again later</string>
 
+    <!-- GuardianMicrophoneTestingFragment -->
+    <string name="positioning_the_microphone">Positioning the microphone</string>
+    <string name="listen">Listen</string>
+    <string name="cancel">cancel</string>
+    <string name="listen_again">listen again</string>
+    <string name="don_t_forget_to_turn_speaker_on">*Don\'t forget to turn speaker on</string>
+
 </resources>

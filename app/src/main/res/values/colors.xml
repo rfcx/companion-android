@@ -18,6 +18,7 @@
     <color name="gray_30">#FFD6D6D6</color>
     <color name="grey_light">#F0F0F0</color>
     <color name="grey_active">#5A6978</color>
+    <color name="red">#e41a1a</color>
 
     <color name="button_facebook_login">#37509f</color>
     <color name="transparent">@android:color/transparent</color>

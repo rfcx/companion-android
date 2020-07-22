@@ -12,7 +12,8 @@
         <item>Connect</item>
         <item>Locate</item>
         <item>Config</item>
-        <item>Verify</item>
+        <item>Signal</item>
+        <item>Mic</item>
         <item>Deploy</item>
     </string-array>
 

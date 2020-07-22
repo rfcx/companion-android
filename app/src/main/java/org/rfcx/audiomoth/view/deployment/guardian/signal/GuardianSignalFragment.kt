@@ -1,16 +1,15 @@
-package org.rfcx.audiomoth.view.deployment.guardian.verify
+package org.rfcx.audiomoth.view.deployment.guardian.signal
 
 import android.content.Context
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import kotlinx.android.synthetic.main.fragment_guardian_verify.*
+import kotlinx.android.synthetic.main.fragment_guardian_signal.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.OnReceiveResponse
 import org.rfcx.audiomoth.connection.socket.SocketManager
@@ -19,7 +18,7 @@ import org.rfcx.audiomoth.entity.socket.SocketResposne
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 import java.util.*
 
-class GuardianVerifyFragment : Fragment(), OnReceiveResponse {
+class GuardianSignalFragment : Fragment(), OnReceiveResponse {
     private val listOfSignal by lazy {
         listOf(signalStrength1, signalStrength2, signalStrength3, signalStrength4)
     }
@@ -40,7 +39,7 @@ class GuardianVerifyFragment : Fragment(), OnReceiveResponse {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_guardian_verify, container, false)
+        return inflater.inflate(R.layout.fragment_guardian_signal, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -56,7 +55,7 @@ class GuardianVerifyFragment : Fragment(), OnReceiveResponse {
     private fun retrieveGuardianSignal() {
         timer.schedule(object : TimerTask(){
             override fun run() {
-                SocketManager.getSignalStrength(this@GuardianVerifyFragment)
+                SocketManager.getSignalStrength(this@GuardianSignalFragment)
             }
         }, DELAY, MILLI_PERIOD)
     }
@@ -153,6 +152,6 @@ class GuardianVerifyFragment : Fragment(), OnReceiveResponse {
             this.setColor(ContextCompat.getColor(context, color))
         }
 
-        fun newInstance(): GuardianVerifyFragment = GuardianVerifyFragment()
+        fun newInstance(): GuardianSignalFragment = GuardianSignalFragment()
     }
 }
