@@ -34,6 +34,7 @@ import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.util.latitudeCoordinates
 import org.rfcx.audiomoth.util.longitudeCoordinates
+import org.rfcx.audiomoth.view.deployment.BaseDeploymentProtocal
 import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment.Companion.DEFAULT_ZOOM
 import java.util.*
@@ -43,7 +44,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
     SearchResultFragment.OnSearchResultListener {
     private var mapboxMap: MapboxMap? = null
     private lateinit var mapView: MapView
-    private var deploymentProtocol: DeploymentProtocol? = null
+    private var deploymentProtocol: BaseDeploymentProtocal? = null
     private var locationEngine: LocationEngine? = null
     private var currentUserLocation: Location? = null
     private var selectedLocation: Location? = null
@@ -78,7 +79,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        deploymentProtocol = context as DeploymentProtocol
+        deploymentProtocol = context as BaseDeploymentProtocal
     }
 
     override fun onCreateView(
