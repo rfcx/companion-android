@@ -198,6 +198,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
             deploymentDb.updateDeployment(it)
 
             DeploymentSyncWorker.enqueue(this@DeploymentActivity)
+            hideLoading()
             showComplete()
         }
     }
@@ -348,6 +349,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
                 ?: run {
                     CompleteFragment()
                 }
+        completeFragment.isCancelable = false
         completeFragment.show(supportFragmentManager, CompleteFragment.tag)
     }
 
