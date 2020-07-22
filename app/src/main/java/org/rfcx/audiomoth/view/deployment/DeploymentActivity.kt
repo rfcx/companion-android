@@ -223,7 +223,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
             audioMothConnector.setConfiguration(
                 calendar,
                 configuration,
-                arrayOf(0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08)
+                DeploymentIdentifier("A1B2C3D4E5F60000")
             )
             this@DeploymentActivity.runOnUiThread {
                 startSyncing(SyncFragment.AFTER_SYNC)

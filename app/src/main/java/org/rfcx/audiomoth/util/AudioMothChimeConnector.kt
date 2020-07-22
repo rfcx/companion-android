@@ -139,7 +139,7 @@ class AudioMothChimeConnector : AudioMothConnector {
 
     }
 
-    override fun setConfiguration(calendar: Calendar, configuration: AudioMothConfiguration, id: Array<Int>?) {
+    override fun setConfiguration(calendar: Calendar, configuration: AudioMothConfiguration, id: DeploymentIdentifier?) {
 
         /* Calculate timestamp and offset */
 
@@ -364,14 +364,11 @@ class AudioMothChimeConnector : AudioMothConnector {
 
         val length = state.index / BITS_PER_BYTE + DEPLOYMENT_ID_LENGTH
 
-        if (id != null) {
-
-            for (i in 0 until min(DEPLOYMENT_ID_LENGTH, id.size)) {
-
-                data[length - 1 - i] = id[i] and 0xFF
-
+        if (id != null && id.isValid) {
+            val idArray = id.toByteArray
+            for (i in 0 until min(DEPLOYMENT_ID_LENGTH, idArray.size)) {
+                data[length - 1 - i] = idArray[i].toInt()
             }
-
         }
 
         /* Play the data */
