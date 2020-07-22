@@ -32,7 +32,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
         var id = deployment.id
         realm.executeTransaction {
             if (deployment.id == 0) {
-                id = (realm.where(GuardianDeployment::class.java).max(GuardianDeployment.FIELD_ID)
+                id = (it.where(GuardianDeployment::class.java).max(GuardianDeployment.FIELD_ID)
                     ?.toInt() ?: 0) + 1
                 deployment.id = id
             }
