@@ -65,7 +65,7 @@ class MapDetailBottomSheetFragment : Fragment() {
                     R.string.create_deployment
                 )
 
-            seeDetailTextView.setOnClickListener {
+            mapDetailBottomSheetView.setOnClickListener {
                 if (isStateReadyToUpload) {
                     context?.let { context ->
                         id?.let { id ->

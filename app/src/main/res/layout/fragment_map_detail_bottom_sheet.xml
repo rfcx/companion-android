@@ -11,14 +11,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/margin_padding_normal"
-        android:background="@drawable/bg_color_white"
-        android:padding="@dimen/margin_padding_normal">
+        android:background="@drawable/bg_color_white">
 
         <TextView
             android:id="@+id/locationNameTextView"
             style="@style/AudioMothText.Body.Small"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_padding_normal"
+            android:layout_marginTop="@dimen/margin_padding_normal"
             android:layout_marginEnd="@dimen/margin_padding_small"
             android:ellipsize="end"
             android:maxLines="1"
@@ -32,17 +33,21 @@
             style="@style/AudioMothText.Body.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_padding_normal"
+            android:layout_marginEnd="@dimen/margin_padding_normal"
             android:textSize="@dimen/text_xsmall"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="6h" />
+            tools:text="6 days" />
 
         <TextView
             android:id="@+id/dateTextView"
             style="@style/AudioMothText.Body.Secondary"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_padding_normal"
             android:layout_marginTop="@dimen/margin_padding_small"
+            android:layout_marginEnd="@dimen/margin_padding_normal"
             android:ellipsize="end"
             android:maxLines="1"
             android:text="@string/see_deployment_detail"
@@ -58,12 +63,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/viewpager_padding"
+            android:layout_marginBottom="@dimen/margin_padding_normal"
             android:text="@string/see_deployment_detail"
             android:textColor="@color/colorPrimary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/dateTextView" />
+
+        <View
+            android:id="@+id/mapDetailBottomSheetView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="@id/seeDetailTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>
