@@ -38,4 +38,13 @@
         app:maxImageSize="16dp"
         app:tint="#ffffff" />
 
+    <FrameLayout
+        android:id="@+id/bottomSheetContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:behavior_hideable="false"
+        app:behavior_peekHeight="0dp"
+        app:layout_anchorGravity="bottom"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

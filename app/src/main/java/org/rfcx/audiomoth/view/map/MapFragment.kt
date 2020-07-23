@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.PointF
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -44,7 +45,6 @@ import kotlinx.android.synthetic.main.layout_map_window_info.view.*
 import org.rfcx.audiomoth.MainActivityListener
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Deployment
-import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.DeploymentState.Edge
 import org.rfcx.audiomoth.entity.Device
 import org.rfcx.audiomoth.entity.Locate
@@ -193,14 +193,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private fun setupImages(style: Style) {
         val drawablePinConnectedGuardian =
             ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map, null)
-        val mBitmapPinConnectedGuardian = BitmapUtils.getBitmapFromDrawable(drawablePinConnectedGuardian)
+        val mBitmapPinConnectedGuardian =
+            BitmapUtils.getBitmapFromDrawable(drawablePinConnectedGuardian)
         if (mBitmapPinConnectedGuardian != null) {
             style.addImage(GuardianPin.CONNECTED_GUARDIAN, mBitmapPinConnectedGuardian)
         }
 
         val drawablePinNotConnectedGuardian =
             ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map_grey, null)
-        val mBitmapPinNotConnectedGuardian = BitmapUtils.getBitmapFromDrawable(drawablePinNotConnectedGuardian)
+        val mBitmapPinNotConnectedGuardian =
+            BitmapUtils.getBitmapFromDrawable(drawablePinNotConnectedGuardian)
         if (mBitmapPinNotConnectedGuardian != null) {
             style.addImage(GuardianPin.NOT_CONNECTED_GUARDIAN, mBitmapPinNotConnectedGuardian)
         }
@@ -266,7 +268,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 DiagnosticActivity.startActivity(
                     it,
                     deployment,
-                    WifiHotspotUtils.isConnectedWithGuardian(requireContext(), deployment.wifiName ?: "")
+                    WifiHotspotUtils.isConnectedWithGuardian(
+                        requireContext(),
+                        deployment.wifiName ?: ""
+                    )
                 )
             }
         }
@@ -302,12 +307,22 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     )
                 ) {
                     features[index]?.let { setFeatureSelectState(it, true) }
+                    val id =
+                        selectedFeature.getStringProperty(PROPERTY_MARKER_LOCATION_ID).split(".")[1]
+                    Log.d("features", "$id")
+
+                    (activity as MainActivityListener).showBottomSheet(
+                        DeploymentViewPagerFragment.newInstance(
+                            id.toInt()
+                        )
+                    )
                 } else {
                     features[index]?.let { setFeatureSelectState(it, false) }
                 }
             }
             return true
         }
+        (activity as MainActivityListener).hideBottomSheet()
 
         clearFeatureSelected()
         return false
@@ -424,7 +439,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
             // else also waiting network
             else -> {
-                listener?.showSnackbar(getString(R.string.format_deploy_waiting_network), Snackbar.LENGTH_LONG)
+                listener?.showSnackbar(
+                    getString(R.string.format_deploy_waiting_network),
+                    Snackbar.LENGTH_LONG
+                )
             }
         }
     }
@@ -527,6 +545,23 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 cameraMode = CameraMode.TRACKING
                 renderMode = RenderMode.COMPASS
             }
+        }
+    }
+
+    fun moveToDeploymentMarker(deployment: Deployment) {
+        val deploymentLocate = deployment.location
+        mapboxMap?.let {
+            deploymentLocate?.let { locate ->
+                it.moveCamera(
+                    CameraUpdateFactory.newLatLngZoom(
+                        LatLng(
+                            locate.latitude,
+                            locate.longitude
+                        ), it.cameraPosition.zoom
+                    )
+                )
+            }
+
         }
     }
 

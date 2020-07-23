@@ -27,5 +27,6 @@
     <dimen name="edge_width">150dp</dimen>
 
     <dimen name="search_input_padding">12dp</dimen>
+    ​<dimen name="viewpager_padding">48dp</dimen>
 
 </resources>

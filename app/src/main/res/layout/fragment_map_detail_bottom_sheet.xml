@@ -1,0 +1,44 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/transparent"
+    android:clickable="true"
+    android:focusable="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_padding_normal"
+        android:background="@drawable/bg_color_white"
+        android:padding="@dimen/margin_padding_normal">
+
+        <TextView
+            android:id="@+id/locationNameTextView"
+            style="@style/AudioMothText.Headline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_padding_normal"
+            android:layout_marginEnd="@dimen/margin_padding_normal"
+            android:textColor="@color/text_black"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Vehicle" />
+
+        <TextView
+            android:id="@+id/seeDetailTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_padding_normal"
+            android:padding="0dp"
+            android:text="@string/see_deployment_detail"
+            android:textColor="@color/colorPrimary"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/locationNameTextView"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:textStyle="bold" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>
