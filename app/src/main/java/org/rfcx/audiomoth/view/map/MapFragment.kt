@@ -217,20 +217,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             style.addImage(Battery.BATTERY_PIN_GREEN, mBitmapPinMapGreen)
         }
 
-        val drawablePinMapOrange =
-            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map_orange, null)
-        val mBitmapPinMapOrange = BitmapUtils.getBitmapFromDrawable(drawablePinMapOrange)
-        if (mBitmapPinMapOrange != null) {
-            style.addImage(Battery.BATTERY_PIN_ORANGE, mBitmapPinMapOrange)
-        }
-
-        val drawablePinMapRed =
-            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map_red, null)
-        val mBitmapPinMapRed = BitmapUtils.getBitmapFromDrawable(drawablePinMapRed)
-        if (mBitmapPinMapRed != null) {
-            style.addImage(Battery.BATTERY_PIN_RED, mBitmapPinMapRed)
-        }
-
         val drawablePinMapGrey =
             ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map_grey, null)
         val mBitmapPinMapGrey = BitmapUtils.getBitmapFromDrawable(drawablePinMapGrey)
@@ -604,7 +590,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun Deployment.toMark(): DeploymentMarker {
         val pinImage = if (state == Edge.ReadyToUpload.key)
-            Battery.getBatteryPinImage(batteryDepletedAt.time)
+            Battery.BATTERY_PIN_GREEN
         else
             Battery.BATTERY_PIN_GREY
 

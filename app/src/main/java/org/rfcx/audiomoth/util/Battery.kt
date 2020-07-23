@@ -10,18 +10,6 @@ object Battery {
 
     private const val DAY = 24 * 60 * 60 * 1000
 
-    fun getBatteryPinImage(timestamp: Long): String {
-        val currentMillis = System.currentTimeMillis()
-        val threeDays = 3 * DAY
-        return if (timestamp > (currentMillis + threeDays)) {
-            BATTERY_PIN_GREEN
-        } else if (timestamp > (currentMillis + DAY) && timestamp < (currentMillis + threeDays)) {
-            BATTERY_PIN_ORANGE
-        } else {
-            BATTERY_PIN_RED
-        }
-    }
-
     fun getPredictionBattery(timestamp: Long): String {
         val currentMillis = System.currentTimeMillis()
         val daysLeft = if (timestamp > currentMillis) {
