@@ -1,37 +1,29 @@
 package org.rfcx.audiomoth.view.map
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.Transformations
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
-import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_deployment_view_pager.*
+import org.rfcx.audiomoth.DeploymentListener
 import org.rfcx.audiomoth.MainActivity
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.Deployment
-import org.rfcx.audiomoth.localdb.DeploymentDb
-import org.rfcx.audiomoth.util.RealmHelper
-import org.rfcx.audiomoth.util.asLiveData
 
 class DeploymentViewPagerFragment : Fragment() {
-    private val deploymentDb = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
-    private lateinit var deployLiveData: LiveData<List<Deployment>>
-    private var deployments = listOf<Deployment>()
 
-    private val deploymentObserve = Observer<List<Deployment>> {
-        Log.d("features", "deploymentObserve ${it.size}")
-        this.deployments = it
-    }
-
+    private var deploymentListener: DeploymentListener? = null
     private var id: Int? = null
     private lateinit var viewPagerAdapter: DeploymentViewPagerAdapter
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        deploymentListener = context as DeploymentListener
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,41 +39,30 @@ class DeploymentViewPagerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.d("features", "DeploymentViewPagerFragment $id")
 
-        fetchData()
         initAdapter()
+        setViewPagerAdapter()
 
-        id?.let {
-
-            viewPagerAdapter.deployments = listOf(Deployment(), Deployment())
-            Log.d("features", "deployments.size ${deployments.size}")
-
-            val deploymentIndex = deployments.indexOf(deployments.find { it.id == this.id })
-            Log.d("features", "deploymentIndex $deploymentIndex")
-
-            deploymentViewPager.post {
-                deploymentViewPager.setCurrentItem(deploymentIndex, false)
-            }
-        }
     }
 
-    private fun fetchData() {
-        deployLiveData = Transformations.map(deploymentDb.getAllResultsAsync().asLiveData()) {
-            it
+    private fun setViewPagerAdapter() {
+        val showDeployments = deploymentListener?.getShowDeployments()
+        if (showDeployments != null) {
+            id?.let {
+                viewPagerAdapter.deployments = showDeployments
+
+                val deploymentIndex = showDeployments.indexOf(showDeployments.find { it.id == this.id })
+                deploymentViewPager.post {
+                    deploymentViewPager.setCurrentItem(deploymentIndex, false)
+                }
+            }
         }
-        deployLiveData.observeForever(deploymentObserve)
     }
 
     private fun initIntent() {
         arguments?.let {
             id = it.getInt(ARG_ID)
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        deployLiveData.removeObserver(deploymentObserve)
     }
 
     private fun initAdapter() {

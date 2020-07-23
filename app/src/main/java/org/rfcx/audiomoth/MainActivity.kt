@@ -16,6 +16,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
 import org.rfcx.audiomoth.entity.Deployment
+import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.util.LocationPermissions
 import org.rfcx.audiomoth.util.Preferences
 import org.rfcx.audiomoth.util.getUserNickname
@@ -25,13 +26,20 @@ import org.rfcx.audiomoth.view.map.MapFragment
 import org.rfcx.audiomoth.view.profile.ProfileFragment
 import org.rfcx.audiomoth.widget.BottomNavigationMenuItem
 
-class MainActivity : AppCompatActivity(), MainActivityListener {
+class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListener {
     // database manager
     private var currentFragment: Fragment? = null
     private val locationPermissions by lazy { LocationPermissions(this) }
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
 
     private var snackbar: Snackbar? = null
+    private var _showDeployments: List<Deployment> = listOf()
+
+    override fun getShowDeployments(): List<Deployment> = this._showDeployments
+
+    override fun setShowDeployments(deployments: List<Deployment>) {
+        this._showDeployments = deployments
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

@@ -9,8 +9,13 @@ import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_map_detail_bottom_sheet.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Deployment
+import org.rfcx.audiomoth.entity.DeploymentState
 import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.util.RealmHelper
+import org.rfcx.audiomoth.util.toDateTimeString
+import org.rfcx.audiomoth.view.deployment.DeploymentActivity
+import org.rfcx.audiomoth.view.detail.DetailDeploymentActivity
+import java.util.*
 
 class MapDetailBottomSheetFragment : Fragment() {
     private val deploymentDb = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
@@ -44,19 +49,36 @@ class MapDetailBottomSheetFragment : Fragment() {
     }
 
     private fun bindDeploymentView(deployment: Deployment?) {
-        locationNameTextView.text = "deployment"
+        if (deployment != null) {
+            locationNameTextView.text = deployment.location?.name
+            seeDetailTextView.text =
+                if (deployment.state == DeploymentState.Edge.ReadyToUpload.key) getString(R.string.see_deployment_detail) else getString(
+                    R.string.create_deployment
+                )
 
-//        if (deployment != null) {
-//            locationNameTextView.text = deployment.location?.name
-//
-//            seeDetailTextView.setOnClickListener {
-//                context?.let { context ->
-//                    id?.let { id ->
-//                        DetailDeploymentActivity.startActivity(context, id)
-//                    }
-//                }
-//            }
-//        }
+            dateTextView.text =
+                if (deployment.state == DeploymentState.Edge.ReadyToUpload.key) getString(
+                    R.string.deploy_at,
+                    Date(deployment.deployedAt.time).toDateTimeString()
+                ) else getString(
+                    R.string.create_at,
+                    Date(deployment.createdAt.time).toDateTimeString()
+                )
+
+            seeDetailTextView.setOnClickListener {
+                if (deployment.state == DeploymentState.Edge.ReadyToUpload.key) {
+                    context?.let { context ->
+                        id?.let { id ->
+                            DetailDeploymentActivity.startActivity(context, id)
+                        }
+                    }
+                } else {
+                    context?.let {
+                        DeploymentActivity.startActivity(it, deployment.id)
+                    }
+                }
+            }
+        }
     }
 
     companion object {

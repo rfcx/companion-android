@@ -145,6 +145,9 @@
 
     <!--  MapDetailBottomSheetFragment  -->
     <string name="see_deployment_detail">See Detail</string>
+    <string name="create_deployment">Create deployment</string>
+    <string name="create_at">Create at %s</string>
+    <string name="deploy_at">Deployed at %s</string>
 
     <!--  ChooseDeviceFragment  -->
     <string name="choose_your_device">Choose your device</string>

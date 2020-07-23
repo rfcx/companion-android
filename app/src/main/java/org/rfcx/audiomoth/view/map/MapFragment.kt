@@ -6,7 +6,6 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.PointF
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -42,6 +41,7 @@ import com.mapbox.mapboxsdk.utils.BitmapUtils
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_map_window_info.view.*
+import org.rfcx.audiomoth.DeploymentListener
 import org.rfcx.audiomoth.MainActivityListener
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Deployment
@@ -61,6 +61,7 @@ import org.rfcx.audiomoth.view.detail.DetailDeploymentActivity
 import org.rfcx.audiomoth.view.diagnostic.DiagnosticActivity
 
 class MapFragment : Fragment(), OnMapReadyCallback {
+
     // map
     private lateinit var mapView: MapView
     private var mapboxMap: MapboxMap? = null
@@ -88,6 +89,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private val locationPermissions by lazy { activity?.let { LocationPermissions(it) } }
     private var listener: MainActivityListener? = null
+    private var deploymentListener: DeploymentListener? = null
 
     // observer
     private val workInfoObserve = Observer<List<WorkInfo>> {
@@ -110,6 +112,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         this.listener = context as MainActivityListener
+        this.deploymentListener = context as DeploymentListener
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -309,7 +312,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     features[index]?.let { setFeatureSelectState(it, true) }
                     val id =
                         selectedFeature.getStringProperty(PROPERTY_MARKER_LOCATION_ID).split(".")[1]
-                    Log.d("features", "$id")
 
                     (activity as MainActivityListener).showBottomSheet(
                         DeploymentViewPagerFragment.newInstance(
@@ -369,6 +371,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val showDeployments = this.deployments.filter {
             showDeployIds.contains(it.serverId) || showDeployIds.contains(it.id.toString())
         }
+        deploymentListener?.setShowDeployments(showDeployments)
 
         val showGuardianDeployments = this.guardianDeployments.filter {
             showDeployIds.contains(it.serverId) || showDeployIds.contains(it.id.toString())
