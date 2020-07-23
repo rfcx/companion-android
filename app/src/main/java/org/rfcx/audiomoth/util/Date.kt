@@ -5,6 +5,7 @@ import java.util.*
 
 private const val timeFormat = "HH:mm"
 private const val standardDateFormat = "MMMM d, yyyy HH:mm"
+private const val dateFormat = "dd/MM/yyyy HH:mm"
 
 private val outputTimeSdf by lazy {
     val sdf = SimpleDateFormat(timeFormat, Locale.getDefault())
@@ -17,6 +18,11 @@ private val outputStandardDateSdf by lazy {
     sdf.timeZone = TimeZone.getDefault()
     sdf
 }
+private val outputDateSdf by lazy {
+    val sdf = SimpleDateFormat(dateFormat, Locale.getDefault())
+    sdf.timeZone = TimeZone.getDefault()
+    sdf
+}
 
 private val isoSdf by lazy {
     val sdf = SimpleDateFormat("HH:mm", Locale.US)
@@ -26,6 +32,10 @@ private val isoSdf by lazy {
 
 fun Date.toDateTimeString(): String {
     return outputStandardDateSdf.format(this)
+}
+
+fun Date.toDateString(): String {
+    return outputDateSdf.format(this)
 }
 
 fun Calendar.toTimeString(): String {

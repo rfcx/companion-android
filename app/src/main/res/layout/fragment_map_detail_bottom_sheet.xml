@@ -16,40 +16,50 @@
 
         <TextView
             android:id="@+id/locationNameTextView"
-            style="@style/AudioMothText.Subhead.Bold"
+            style="@style/AudioMothText.Body.Small"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_padding_normal"
-            android:layout_marginEnd="@dimen/margin_padding_normal"
+            android:layout_marginEnd="@dimen/margin_padding_small"
             android:ellipsize="end"
             android:maxLines="1"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/estimatedBatteryDurationTextView"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Location 1" />
 
         <TextView
-            android:id="@+id/dateTextView"
-            style="@style/AudioMothText.Subhead.Small"
+            android:id="@+id/estimatedBatteryDurationTextView"
+            style="@style/AudioMothText.Body.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textSize="@dimen/text_xsmall"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="6h" />
+
+        <TextView
+            android:id="@+id/dateTextView"
+            style="@style/AudioMothText.Body.Secondary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_padding_small"
-            android:layout_marginStart="@dimen/margin_padding_normal"
-            android:layout_marginEnd="@dimen/margin_padding_normal"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:text="@string/see_deployment_detail"
+            android:textSize="@dimen/text_xsmall"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/locationNameTextView"
             tools:text="Deployed at 11/03/2020 11:30" />
 
         <TextView
             android:id="@+id/seeDetailTextView"
+            style="@style/AudioMothText.Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/viewpager_padding"
             android:text="@string/see_deployment_detail"
             android:textColor="@color/colorPrimary"
-            android:textStyle="bold"
-            android:textAllCaps="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

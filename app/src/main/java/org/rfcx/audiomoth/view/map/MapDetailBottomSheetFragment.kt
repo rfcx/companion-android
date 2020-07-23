@@ -12,10 +12,12 @@ import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.DeploymentState
 import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.util.RealmHelper
+import org.rfcx.audiomoth.util.toDateString
 import org.rfcx.audiomoth.util.toDateTimeString
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity
 import org.rfcx.audiomoth.view.detail.DetailDeploymentActivity
 import java.util.*
+import kotlin.math.roundToInt
 
 class MapDetailBottomSheetFragment : Fragment() {
     private val deploymentDb = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
@@ -50,23 +52,21 @@ class MapDetailBottomSheetFragment : Fragment() {
 
     private fun bindDeploymentView(deployment: Deployment?) {
         if (deployment != null) {
+            val isStateReadyToUpload = deployment.state == DeploymentState.Edge.ReadyToUpload.key
             locationNameTextView.text = deployment.location?.name
+
+            dateTextView.text = if (isStateReadyToUpload) getString(
+                R.string.deploy_at,
+                Date(deployment.deployedAt.time).toDateString()
+            ) else getString(R.string.create_at, Date(deployment.createdAt.time).toDateString())
+
             seeDetailTextView.text =
-                if (deployment.state == DeploymentState.Edge.ReadyToUpload.key) getString(R.string.see_deployment_detail) else getString(
+                if (isStateReadyToUpload) getString(R.string.see_deployment_detail) else getString(
                     R.string.create_deployment
                 )
 
-            dateTextView.text =
-                if (deployment.state == DeploymentState.Edge.ReadyToUpload.key) getString(
-                    R.string.deploy_at,
-                    Date(deployment.deployedAt.time).toDateTimeString()
-                ) else getString(
-                    R.string.create_at,
-                    Date(deployment.createdAt.time).toDateTimeString()
-                )
-
             seeDetailTextView.setOnClickListener {
-                if (deployment.state == DeploymentState.Edge.ReadyToUpload.key) {
+                if (isStateReadyToUpload) {
                     context?.let { context ->
                         id?.let { id ->
                             DetailDeploymentActivity.startActivity(context, id)
@@ -78,11 +78,27 @@ class MapDetailBottomSheetFragment : Fragment() {
                     }
                 }
             }
+
+            estimatedBatteryDurationTextView.visibility =
+                if (isStateReadyToUpload) View.VISIBLE else View.GONE
+            estimatedBatteryDurationTextView.text =
+                getEstimatedBatteryDuration(deployment.batteryDepletedAt.time)
+        }
+    }
+
+    private fun getEstimatedBatteryDuration(timestamp: Long): String {
+        val currentMillis = System.currentTimeMillis()
+        return if (timestamp > currentMillis) {
+            val cal = ((timestamp - currentMillis) / (DAY).toDouble()).roundToInt()
+            if (cal > 1) "$cal days" else "$cal day"
+        } else {
+            "<1 day"
         }
     }
 
     companion object {
         private const val ARG_ID = "ARG_ID"
+        private const val DAY = 24 * 60 * 60 * 1000
 
         @JvmStatic
         fun newInstance(id: Int) =
