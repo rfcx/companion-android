@@ -6,14 +6,18 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_detail_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Deployment
+import org.rfcx.audiomoth.entity.DeploymentImage
 import org.rfcx.audiomoth.localdb.DeploymentDb
-import org.rfcx.audiomoth.repo.Firestore
+import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity.Companion.DEPLOYMENT_ID
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
@@ -25,9 +29,18 @@ class DetailDeploymentActivity : AppCompatActivity() {
     var deployment: Deployment? = null
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val deploymentDb by lazy { DeploymentDb(realm) }
+    private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val gainList = arrayOf("Low", "Low - Medium", "Medium", "Medium - High", "High")
-    private val imageAdapter by lazy { ImageDetailAdapter() }
+    private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
     private val timeLineAdapter by lazy { TimeLineAdapter() }
+
+    // data
+    private var deploymentImages = listOf<DeploymentImage>()
+    private lateinit var deployImageLiveData: LiveData<List<DeploymentImage>>
+    private val deploymentImageObserve = Observer<List<DeploymentImage>> {
+        deploymentImages = it
+        updateDeploymentImages(deploymentImages)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +48,10 @@ class DetailDeploymentActivity : AppCompatActivity() {
 
         val deploymentId = intent.extras?.getInt(DEPLOYMENT_ID)
         if (deploymentId != null) {
+            // setup deployment images view
+            setupImageRecycler()
+            observeDeploymentImage(deploymentId)
+
             deployment = deploymentDb.getDeploymentById(deploymentId)
             val location = deployment?.location
             val configuration = deployment?.configuration
@@ -65,16 +82,6 @@ class DetailDeploymentActivity : AppCompatActivity() {
                 timeLineRecycler.visibility = if (it.size != 0) View.VISIBLE else View.GONE
                 setupTimeLineRecycler(it.toTypedArray())
             }
-            deployment?.serverId?.let {
-                setupImageRecycler()
-                Firestore(this).getRemotePathByServerId(it) { remotePathList ->
-                    if (remotePathList != null) {
-                        photoLabel.visibility = if(remotePathList.size > 0) View.VISIBLE else View.GONE
-                        attachImageRecycler.visibility = if(remotePathList.size > 0) View.VISIBLE else View.GONE
-                        imageAdapter.items = remotePathList
-                    }
-                }
-            }
         }
 
         reconfigureButton.setOnClickListener {
@@ -85,9 +92,25 @@ class DetailDeploymentActivity : AppCompatActivity() {
 
     }
 
+    private fun observeDeploymentImage(deploymentId: Int) {
+        deployImageLiveData =
+            Transformations.map(deploymentImageDb.getAllResultsAsync(deploymentId).asLiveData()) {
+                it
+            }
+        deployImageLiveData.observeForever(deploymentImageObserve)
+    }
+
+    private fun updateDeploymentImages(deploymentImages: List<DeploymentImage>) {
+        photoLabel.visibility = if (deploymentImages.isNotEmpty()) View.VISIBLE else View.GONE
+        deploymentImageRecycler.visibility =
+            if (deploymentImages.isNotEmpty()) View.VISIBLE else View.GONE
+        val items = deploymentImages.map { it.toDeploymentImageView() }
+        deploymentImageAdapter.submitList(items)
+    }
+
     private fun setupImageRecycler() {
-        attachImageRecycler.apply {
-            adapter = imageAdapter
+        deploymentImageRecycler.apply {
+            adapter = deploymentImageAdapter
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             setHasFixedSize(true)
         }
@@ -126,6 +149,12 @@ class DetailDeploymentActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // remove observer
+        deployImageLiveData.removeObserver(deploymentImageObserve)
     }
 
     companion object {

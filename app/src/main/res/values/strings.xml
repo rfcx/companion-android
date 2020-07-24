@@ -254,5 +254,6 @@
     <string name="search_not_found_message">Try searching something else</string>
     <string name="search_error_title">An error has occurred</string>
     <string name="search_error_message">Please try again later</string>
+    <string name="desc_deployment_image">deployment image</string>
 
 </resources>

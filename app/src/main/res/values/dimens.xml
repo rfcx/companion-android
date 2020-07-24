@@ -27,5 +27,6 @@
     <dimen name="edge_width">150dp</dimen>
 
     <dimen name="search_input_padding">12dp</dimen>
+    <dimen name="min_deployment_image_size">72dp</dimen>
 
 </resources>
