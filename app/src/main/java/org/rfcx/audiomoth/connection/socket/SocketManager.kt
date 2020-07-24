@@ -1,12 +1,16 @@
 package org.rfcx.audiomoth.connection.socket
 
+import android.util.Base64
+import android.util.Log
 import com.google.gson.Gson
 import org.json.JSONObject
 import org.rfcx.audiomoth.entity.socket.*
+import org.rfcx.audiomoth.util.MicrophoneTestUtils
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.ConnectException
 import java.net.Socket
+import java.nio.ByteBuffer
 
 object SocketManager {
 
@@ -23,6 +27,9 @@ object SocketManager {
     private const val PREFS = "prefs"
     private const val SIGNAL = "signal"
     private const val SIGNAL_INFO = "signal_info"
+    private const val MICROPHONE_TEST = "microphone_test"
+
+    var end = false
 
     fun connect(onReceiveResponse: OnReceiveResponse) {
         val data = gson.toJson(SocketRequest(CONNECTION))
@@ -49,7 +56,12 @@ object SocketManager {
         sendData(data, onReceiveResponse)
     }
 
-    private fun sendData(data: String, onReceiveResponse: OnReceiveResponse) {
+    fun getLiveAudioBuffer(micTestUtils: MicrophoneTestUtils, onReceiveResponse: OnReceiveResponse) {
+        val data = gson.toJson(SocketRequest(MICROPHONE_TEST))
+        sendData(data, onReceiveResponse, micTestUtils)
+    }
+
+    private fun sendData(data: String, onReceiveResponse: OnReceiveResponse, micTestUtils: MicrophoneTestUtils? = null) {
         clientThread = Thread(Runnable {
             try {
                 socket = Socket("192.168.43.1", 9999)
@@ -61,49 +73,68 @@ object SocketManager {
                     outputStream.flush()
 
                     //receiving data
-                    val dataInput = DataInputStream(socket.getInputStream()).readUTF()
-                    if (!dataInput.isNullOrBlank()) {
+//                    if (micTestUtils == null) {
+                        val dataInput = DataInputStream(socket.getInputStream()).readUTF()
+                        if (!dataInput.isNullOrBlank()) {
 
-                        val receiveJson = JSONObject(dataInput)
-                        val jsonIterator = receiveJson.keys()
+                            val receiveJson = JSONObject(dataInput)
+                            val jsonIterator = receiveJson.keys()
 
-                        val keys = jsonIterator.asSequence().toList()
-                        when (keys[0].toString()) {
-                            CONFIGURE -> {
-                                val response =
-                                    gson.fromJson(dataInput, ConfigurationResponse::class.java)
-                                onReceiveResponse.onReceive(response)
-                            }
-                            DIAGNOSTIC -> {
-                                val response =
-                                    gson.fromJson(dataInput, DiagnosticResponse::class.java)
-                                onReceiveResponse.onReceive(response)
-                            }
-                            CONNECTION -> {
-                                val response =
-                                    gson.fromJson(dataInput, ConnectionResponse::class.java)
-                                onReceiveResponse.onReceive(response)
-                            }
-                            SYNC -> {
-                                val response =
-                                    gson.fromJson(dataInput, SyncConfigurationResponse::class.java)
-                                if (response.sync.status == "success") {
+                            val keys = jsonIterator.asSequence().toList()
+                            when (keys[0].toString()) {
+                                CONFIGURE -> {
+                                    val response =
+                                        gson.fromJson(dataInput, ConfigurationResponse::class.java)
                                     onReceiveResponse.onReceive(response)
-                                } else {
-                                    onReceiveResponse.onFailed("Sync failed, there is something wrong on the server")
                                 }
-                            }
-                            PREFS -> {
-                                val response = gson.fromJson(dataInput, PrefsResponse::class.java)
-                                onReceiveResponse.onReceive(response)
-                            }
-                            SIGNAL_INFO -> {
-                                val response = gson.fromJson(dataInput, SignalResponse::class.java)
-                                onReceiveResponse.onReceive(response)
+                                DIAGNOSTIC -> {
+                                    val response =
+                                        gson.fromJson(dataInput, DiagnosticResponse::class.java)
+                                    onReceiveResponse.onReceive(response)
+                                }
+                                CONNECTION -> {
+                                    val response =
+                                        gson.fromJson(dataInput, ConnectionResponse::class.java)
+                                    onReceiveResponse.onReceive(response)
+                                }
+                                SYNC -> {
+                                    val response =
+                                        gson.fromJson(
+                                            dataInput,
+                                            SyncConfigurationResponse::class.java
+                                        )
+                                    if (response.sync.status == "success") {
+                                        onReceiveResponse.onReceive(response)
+                                    } else {
+                                        onReceiveResponse.onFailed("Sync failed, there is something wrong on the server")
+                                    }
+                                }
+                                PREFS -> {
+                                    val response =
+                                        gson.fromJson(dataInput, PrefsResponse::class.java)
+                                    onReceiveResponse.onReceive(response)
+                                }
+                                SIGNAL_INFO -> {
+                                    val response =
+                                        gson.fromJson(dataInput, SignalResponse::class.java)
+                                    onReceiveResponse.onReceive(response)
+                                }
+                                MICROPHONE_TEST -> {
+                                    val response =
+                                        gson.fromJson(dataInput, MicrophoneTestResponse::class.java)
+                                    micTestUtils?.buffer = Base64.decode(response.audioBuffer.buffer, Base64.DEFAULT)
+                                    micTestUtils?.setTrack()
+                                }
                             }
                         }
                     }
-                }
+//                else {
+//                        val dataInput = DataInputStream(socket.getInputStream())
+//                        Log.d("Socket", dataInput.toString())
+//                        dataInput.readFully(micTestUtils.buffer)
+//                        micTestUtils.setTrack()
+//                    }
+//                }
             } catch (e: Exception) {
                 if (e is ConnectException) {
                     onReceiveResponse.onFailed("failed to connect to the server")
