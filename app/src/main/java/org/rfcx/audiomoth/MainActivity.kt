@@ -16,12 +16,13 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
 import org.rfcx.audiomoth.entity.Deployment
-import org.rfcx.audiomoth.entity.Profile
+import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.util.LocationPermissions
 import org.rfcx.audiomoth.util.Preferences
 import org.rfcx.audiomoth.util.getUserNickname
 import org.rfcx.audiomoth.util.logout
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity
+import org.rfcx.audiomoth.view.map.DeploymentBottomSheet
 import org.rfcx.audiomoth.view.map.MapFragment
 import org.rfcx.audiomoth.view.profile.ProfileFragment
 import org.rfcx.audiomoth.widget.BottomNavigationMenuItem
@@ -33,11 +34,11 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
 
     private var snackbar: Snackbar? = null
-    private var _showDeployments: List<Deployment> = listOf()
+    private var _showDeployments: List<DeploymentBottomSheet> = listOf()
 
-    override fun getShowDeployments(): List<Deployment> = this._showDeployments
+    override fun getShowDeployments(): List<DeploymentBottomSheet> = this._showDeployments
 
-    override fun setShowDeployments(deployments: List<Deployment>) {
+    override fun setShowDeployments(deployments: List<DeploymentBottomSheet>) {
         this._showDeployments = deployments
     }
 
@@ -210,10 +211,10 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         finish()
     }
 
-    override fun moveMapIntoReportMarker(deployment: Deployment) {
+    override fun moveMapIntoReportMarker(location: DeploymentLocation) {
         val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
         if (mapFragment is MapFragment) {
-            mapFragment.moveToDeploymentMarker(deployment)
+            mapFragment.moveToDeploymentMarker(location)
         }
     }
 
@@ -279,5 +280,5 @@ interface MainActivityListener {
     fun showSnackbar(msg: String, duration: Int)
     fun hideSnackbar()
     fun onLogout()
-    fun moveMapIntoReportMarker(deployment: Deployment)
+    fun moveMapIntoReportMarker(location: DeploymentLocation)
 }

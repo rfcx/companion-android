@@ -1,8 +1,8 @@
 package org.rfcx.audiomoth
 
-import org.rfcx.audiomoth.entity.Deployment
+import org.rfcx.audiomoth.view.map.DeploymentBottomSheet
 
 interface DeploymentListener {
-    fun getShowDeployments(): List<Deployment>
-    fun setShowDeployments(deployments: List<Deployment>)
+    fun getShowDeployments(): List<DeploymentBottomSheet>
+    fun setShowDeployments(deployments: List<DeploymentBottomSheet>)
 }

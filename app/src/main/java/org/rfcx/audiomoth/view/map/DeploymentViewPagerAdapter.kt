@@ -4,12 +4,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import org.rfcx.audiomoth.entity.Deployment
 
 class DeploymentViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Lifecycle) :
     FragmentStateAdapter(fragmentManager, lifecycle) {
 
-    var deployments = listOf<Deployment>()
+    var deployments = listOf<DeploymentBottomSheet>()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -18,6 +17,7 @@ class DeploymentViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Li
     override fun getItemCount(): Int = deployments.count()
 
     override fun createFragment(position: Int): Fragment {
-        return MapDetailBottomSheetFragment.newInstance(deployments[position].id)
+        val deployment = deployments[position]
+        return MapDetailBottomSheetFragment.newInstance(deployment.id, deployment.device)
     }
 }

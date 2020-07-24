@@ -2,23 +2,30 @@ package org.rfcx.audiomoth.view.map
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
+import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_deployment_view_pager.*
 import org.rfcx.audiomoth.DeploymentListener
 import org.rfcx.audiomoth.MainActivity
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.Device
+import org.rfcx.audiomoth.localdb.DeploymentDb
+import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
+import org.rfcx.audiomoth.util.RealmHelper
 
 class DeploymentViewPagerFragment : Fragment() {
 
     private var deploymentListener: DeploymentListener? = null
     private var id: Int? = null
     private lateinit var viewPagerAdapter: DeploymentViewPagerAdapter
+    private val deploymentDb = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
+    private val guardianDeploymentDb =
+        GuardianDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -50,8 +57,8 @@ class DeploymentViewPagerFragment : Fragment() {
         if (showDeployments != null) {
             id?.let {
                 viewPagerAdapter.deployments = showDeployments
-
-                val deploymentIndex = showDeployments.indexOf(showDeployments.find { it.id == this.id })
+                val deploymentIndex =
+                    showDeployments.indexOf(showDeployments.find { it.id == this.id })
                 deploymentViewPager.post {
                     deploymentViewPager.setCurrentItem(deploymentIndex, false)
                 }
@@ -83,9 +90,23 @@ class DeploymentViewPagerFragment : Fragment() {
             ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 if (activity is MainActivity && position < viewPagerAdapter.itemCount) {
-                    (activity as MainActivity).moveMapIntoReportMarker(
-                        viewPagerAdapter.deployments[position]
-                    )
+                    val deployment = viewPagerAdapter.deployments[position]
+                    if (deployment.device == Device.EDGE.value) {
+                        val edgeDeployment = deploymentDb.getDeploymentById(deployment.id)
+                        edgeDeployment?.location?.let {
+                            (activity as MainActivity).moveMapIntoReportMarker(
+                                it
+                            )
+                        }
+                    } else {
+                        val guardianDeployment =
+                            guardianDeploymentDb.getDeploymentById(deployment.id)
+                        guardianDeployment?.location?.let {
+                            (activity as MainActivity).moveMapIntoReportMarker(
+                                it
+                            )
+                        }
+                    }
                 }
             }
         })

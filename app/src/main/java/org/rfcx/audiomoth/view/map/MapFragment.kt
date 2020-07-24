@@ -45,6 +45,7 @@ import org.rfcx.audiomoth.DeploymentListener
 import org.rfcx.audiomoth.MainActivityListener
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Deployment
+import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.DeploymentState.Edge
 import org.rfcx.audiomoth.entity.Device
 import org.rfcx.audiomoth.entity.Locate
@@ -357,7 +358,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val showDeployments = this.deployments.filter {
             showDeployIds.contains(it.serverId) || showDeployIds.contains(it.id.toString())
         }
-        deploymentListener?.setShowDeployments(showDeployments)
 
         val showGuardianDeployments = this.guardianDeployments.filter {
             showDeployIds.contains(it.serverId) || showDeployIds.contains(it.id.toString())
@@ -367,6 +367,25 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val guardianDeploymentMarkers = showGuardianDeployments.map { it.toMark() }
 
         handleMarkerDeployment(deploymentMarkers + guardianDeploymentMarkers)
+        handleShowDeployment(showDeployments, showGuardianDeployments)
+    }
+
+    private fun handleShowDeployment(
+        deployments: List<Deployment>,
+        guardianDeployments: List<GuardianDeployment>
+    ) {
+        val showDeployments = arrayListOf<DeploymentBottomSheet>()
+        val showGuardianDeployments = arrayListOf<DeploymentBottomSheet>()
+
+        deployments.forEach {
+            showDeployments.add(DeploymentBottomSheet(it.id, Device.EDGE.value))
+        }
+
+        guardianDeployments.forEach {
+            showGuardianDeployments.add(DeploymentBottomSheet(it.id, Device.GUARDIAN.value))
+        }
+
+        deploymentListener?.setShowDeployments(showDeployments + showGuardianDeployments)
     }
 
     private fun fetchData() {
@@ -537,20 +556,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    fun moveToDeploymentMarker(deployment: Deployment) {
-        val deploymentLocate = deployment.location
+    fun moveToDeploymentMarker(location: DeploymentLocation) {
         mapboxMap?.let {
-            deploymentLocate?.let { locate ->
-                it.moveCamera(
-                    CameraUpdateFactory.newLatLngZoom(
-                        LatLng(
-                            locate.latitude,
-                            locate.longitude
-                        ), it.cameraPosition.zoom
-                    )
+            it.moveCamera(
+                CameraUpdateFactory.newLatLngZoom(
+                    LatLng(
+                        location.latitude,
+                        location.longitude
+                    ), it.cameraPosition.zoom
                 )
-            }
-
+            )
         }
     }
 
