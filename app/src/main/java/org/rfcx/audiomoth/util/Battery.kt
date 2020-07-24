@@ -4,8 +4,6 @@ import kotlin.math.roundToInt
 
 object Battery {
     const val BATTERY_PIN_GREEN = "BATTERY_PIN_GREEN"
-    const val BATTERY_PIN_ORANGE = "BATTERY_PIN_ORANGE"
-    const val BATTERY_PIN_RED = "BATTERY_PIN_RED"
     const val BATTERY_PIN_GREY = "BATTERY_PIN_GREY"
 
     private const val DAY = 24 * 60 * 60 * 1000
