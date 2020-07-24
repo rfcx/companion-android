@@ -36,7 +36,7 @@
             android:layout_marginTop="@dimen/margin_padding_normal"
             android:layout_marginEnd="@dimen/margin_padding_normal"
             android:textSize="@dimen/text_xsmall"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/guardianTextView"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="6 days" />
 
@@ -79,6 +79,23 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/guardianTextView"
+            style="@style/AudioMothText.Body.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin_padding_normal"
+            android:background="@drawable/bg_color_grey_active"
+            android:padding="@dimen/margin_padding_xsmall"
+            android:text="@string/guardian"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_xxsmall"
+            app:layout_constraintBottom_toBottomOf="@id/locationNameTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/locationNameTextView"
+            tools:text="GUARDIAN" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

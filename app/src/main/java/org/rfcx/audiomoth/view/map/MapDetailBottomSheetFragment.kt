@@ -94,6 +94,7 @@ class MapDetailBottomSheetFragment : Fragment() {
                 if (isStateReadyToUpload) View.VISIBLE else View.GONE
             estimatedBatteryDurationTextView.text =
                 getEstimatedBatteryDuration(deployment.batteryDepletedAt.time)
+            guardianTextView.visibility = View.GONE
         }
     }
 
@@ -102,6 +103,8 @@ class MapDetailBottomSheetFragment : Fragment() {
             locationNameTextView.text = guardianDeployment.location?.name
             seeDetailTextView.text = getString(R.string.see_deployment_detail)
             estimatedBatteryDurationTextView.visibility = View.GONE
+            guardianTextView.visibility = View.VISIBLE
+
             dateTextView.text = getString(
                 R.string.deploy_at,
                 Date(guardianDeployment.deployedAt.time).toDateString()

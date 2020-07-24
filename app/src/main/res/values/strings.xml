@@ -148,6 +148,7 @@
     <string name="create_deployment">Create deployment</string>
     <string name="create_at">Create at %s</string>
     <string name="deploy_at">Deployed at %s</string>
+    <string name="guardian">Guardian</string>
 
     <!--  ChooseDeviceFragment  -->
     <string name="choose_your_device">Choose your device</string>
