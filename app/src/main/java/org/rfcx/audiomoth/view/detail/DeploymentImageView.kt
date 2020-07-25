@@ -17,11 +17,18 @@ data class DeploymentImageView(
     }
 }
 
+/**
+ * @param syncState Return when wait upload, uploading to Firebase Storage and when uploaded to Firestore
+ * */
 fun DeploymentImage.toDeploymentImageView(): DeploymentImageView {
     return DeploymentImageView(
         id = this.id,
         localPath = this.localPath,
         remotePath = this.remotePath,
-        syncState = this.syncToFireStoreState
+        syncState = if (this.syncToFireStoreState != SyncState.Sent.key) {
+            this.syncState
+        } else {
+            this.syncToFireStoreState
+        }
     )
 }

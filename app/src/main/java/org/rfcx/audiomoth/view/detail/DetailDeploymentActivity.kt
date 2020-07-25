@@ -35,8 +35,8 @@ class DetailDeploymentActivity : AppCompatActivity() {
     private val timeLineAdapter by lazy { TimeLineAdapter() }
 
     // data
-    private var deploymentImages = listOf<DeploymentImage>()
     private lateinit var deployImageLiveData: LiveData<List<DeploymentImage>>
+    private var deploymentImages = listOf<DeploymentImage>()
     private val deploymentImageObserve = Observer<List<DeploymentImage>> {
         deploymentImages = it
         updateDeploymentImages(deploymentImages)

@@ -2,8 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="@dimen/min_deployment_image_size"
-    android:layout_height="@dimen/min_deployment_image_size"
+    android:layout_width="@dimen/size_deployment_image"
+    android:layout_height="@dimen/size_deployment_image"
     android:layout_marginStart="@dimen/margin_padding_xsmall"
     android:layout_marginEnd="@dimen/margin_padding_xsmall"
     android:orientation="vertical">
