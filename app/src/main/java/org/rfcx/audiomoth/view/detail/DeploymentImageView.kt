@@ -11,9 +11,9 @@ data class DeploymentImageView(
     var syncState: Int = 0 // syncToFireStoreState
 ) {
     val syncImage = when (syncState) {
-        SyncState.Unsent.key -> R.drawable.ic_cloud_queue_24px
-        SyncState.Sending.key -> R.drawable.ic_cloud_upload_24px
-        else -> R.drawable.ic_cloud_done_24px
+        SyncState.Unsent.key -> R.drawable.ic_cloud_queue_16dp
+        SyncState.Sending.key -> R.drawable.ic_cloud_upload_16dp
+        else -> R.drawable.ic_cloud_done_16dp
     }
 }
 
