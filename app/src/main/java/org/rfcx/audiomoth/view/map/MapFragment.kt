@@ -44,7 +44,6 @@ import kotlinx.android.synthetic.main.layout_map_window_info.view.*
 import org.rfcx.audiomoth.MainActivityListener
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Deployment
-import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.DeploymentState.Edge
 import org.rfcx.audiomoth.entity.Device
 import org.rfcx.audiomoth.entity.Locate
@@ -57,7 +56,7 @@ import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
 import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity
-import org.rfcx.audiomoth.view.detail.DetailDeploymentActivity
+import org.rfcx.audiomoth.view.detail.DeploymentDetailActivity
 import org.rfcx.audiomoth.view.diagnostic.DiagnosticActivity
 
 class MapFragment : Fragment(), OnMapReadyCallback {
@@ -285,7 +284,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 }
             } else {
                 context?.let {
-                    DetailDeploymentActivity.startActivity(it, deployment.id)
+                    DeploymentDetailActivity.startActivity(it, deployment.id)
                 }
             }
         }

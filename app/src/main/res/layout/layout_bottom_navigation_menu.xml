@@ -1,7 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/button_battery_lv"
+    android:layout_height="@dimen/size_battery_lv_button"
     android:weightSum="5">
 
     <org.rfcx.audiomoth.widget.BottomNavigationMenuItem

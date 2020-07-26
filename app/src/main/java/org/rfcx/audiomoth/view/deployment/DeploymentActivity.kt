@@ -62,7 +62,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_deployment)
-        val deploymentId = intent.extras?.getInt(DEPLOYMENT_ID)
+        val deploymentId = intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
         if (deploymentId != null) {
             handleDeploymentStep(deploymentId)
         } else {
@@ -402,7 +402,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
 
     companion object {
         const val loadingDialogTag = "LoadingDialog"
-        const val DEPLOYMENT_ID = "DEPLOYMENT_ID"
+        const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
 
         fun startActivity(context: Context) {
             val intent = Intent(context, DeploymentActivity::class.java)
@@ -411,7 +411,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
 
         fun startActivity(context: Context, deploymentId: Int) {
             val intent = Intent(context, DeploymentActivity::class.java)
-            intent.putExtra(DEPLOYMENT_ID, deploymentId)
+            intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
             context.startActivity(intent)
         }
     }

@@ -5,11 +5,7 @@ import io.realm.RealmList
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
-import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.DURATION_SELECTED_DEFAULT
-import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.GAIN_DEFAULT
-import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.RECORDING_DURATION_DEFAULT
-import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.SAMPLE_RATE_DEFAULT
-import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.SLEEP_DURATION_DEFAULT
+import org.rfcx.audiomoth.util.EdgeConfigure
 import java.util.*
 
 @RealmClass
@@ -46,8 +42,6 @@ open class Profile(
         this.durationSelected = durationSelected
     }
 
-    fun isNew() = (this.id == 0)
-
     fun asConfiguration(): Configuration {
         return Configuration(
             gain = gain,
@@ -65,12 +59,12 @@ open class Profile(
         const val FIELD_NAME = "name"
 
         fun default() = Profile(
-            gain = GAIN_DEFAULT,
+            gain = EdgeConfigure.GAIN_DEFAULT,
             name = "",
-            sampleRate = SAMPLE_RATE_DEFAULT,
-            recordingDuration = RECORDING_DURATION_DEFAULT,
-            sleepDuration = SLEEP_DURATION_DEFAULT,
-            durationSelected = DURATION_SELECTED_DEFAULT
+            sampleRate = EdgeConfigure.SAMPLE_RATE_DEFAULT,
+            recordingDuration = EdgeConfigure.RECORDING_DURATION_DEFAULT,
+            sleepDuration = EdgeConfigure.SLEEP_DURATION_DEFAULT,
+            durationSelected = EdgeConfigure.DURATION_SELECTED_DEFAULT
         )
     }
 }

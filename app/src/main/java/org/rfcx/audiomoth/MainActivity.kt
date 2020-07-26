@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
@@ -78,7 +79,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
             preferences.putBoolean(Preferences.IS_FIRST_TIME, false)
 
             SimpleTooltip.Builder(this)
-                .arrowColor(resources.getColor(R.color.white))
+                .arrowColor(ContextCompat.getColor(this, R.color.white))
                 .anchorView(createLocationButton)
                 .text(getString(R.string.setup_first_device, this.getUserNickname()))
                 .gravity(Gravity.TOP)
@@ -142,7 +143,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
 
     private fun showAboveAppbar(show: Boolean) {
         val contentContainerPaddingBottom =
-            if (show) resources.getDimensionPixelSize(R.dimen.button_battery_lv) else 0
+            if (show) resources.getDimensionPixelSize(R.dimen.size_battery_lv_button) else 0
         contentContainer.setPadding(0, 0, 0, contentContainerPaddingBottom)
     }
 

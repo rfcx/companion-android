@@ -51,7 +51,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_guardian_deployment)
-        val deploymentId = intent.extras?.getInt(DEPLOYMENT_ID)
+        val deploymentId = intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
         if (deploymentId != null) {
             val deployment = deploymentDb.getDeploymentById(deploymentId)
             if (deployment != null) {
@@ -157,9 +157,9 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         this._configuration = profile.asConfiguration()
         this._deployment?.configuration = _configuration
 
-//         update deployment
+        // update deployment
         _deployment?.let { deploymentDb.updateDeployment(it) }
-//         update profile
+        // update profile
         if (profile.name.isNotEmpty()) {
             profileDb.insertOrUpdateProfile(profile)
         }
@@ -249,11 +249,11 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun showLoading() {
         val loadingDialog: LoadingDialogFragment =
-            supportFragmentManager.findFragmentByTag(loadingDialogTag) as LoadingDialogFragment?
+            supportFragmentManager.findFragmentByTag(TAG_LOADING_DIALOG) as LoadingDialogFragment?
                 ?: run {
                     LoadingDialogFragment()
                 }
-        loadingDialog.show(supportFragmentManager, loadingDialogTag)
+        loadingDialog.show(supportFragmentManager, TAG_LOADING_DIALOG)
     }
 
     private fun showComplete() {
@@ -267,7 +267,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun hideLoading() {
         val loadingDialog: LoadingDialogFragment? =
-            supportFragmentManager.findFragmentByTag(loadingDialogTag) as LoadingDialogFragment?
+            supportFragmentManager.findFragmentByTag(TAG_LOADING_DIALOG) as LoadingDialogFragment?
         loadingDialog?.dismissDialog()
     }
 
@@ -280,8 +280,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     }
 
     companion object {
-        const val loadingDialogTag = "LoadingDialog"
-        const val DEPLOYMENT_ID = "DEPLOYMENT_ID"
+        private const val TAG_LOADING_DIALOG = "TAG_LOADING_DIALOG"
+        private const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
 
         fun startActivity(context: Context) {
             val intent = Intent(context, GuardianDeploymentActivity::class.java)
@@ -290,7 +290,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
         fun startActivity(context: Context, deploymentId: Int) {
             val intent = Intent(context, GuardianDeploymentActivity::class.java)
-            intent.putExtra(DEPLOYMENT_ID, deploymentId)
+            intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
             context.startActivity(intent)
         }
     }
