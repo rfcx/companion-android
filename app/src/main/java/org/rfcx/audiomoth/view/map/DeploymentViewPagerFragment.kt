@@ -49,7 +49,6 @@ class DeploymentViewPagerFragment : Fragment() {
 
         initAdapter()
         setViewPagerAdapter()
-
     }
 
     private fun setViewPagerAdapter() {
@@ -68,7 +67,7 @@ class DeploymentViewPagerFragment : Fragment() {
 
     private fun initIntent() {
         arguments?.let {
-            id = it.getInt(ARG_ID)
+            id = it.getInt(ARG_DEPLOYMENT_ID)
         }
     }
 
@@ -113,13 +112,13 @@ class DeploymentViewPagerFragment : Fragment() {
     }
 
     companion object {
-        private const val ARG_ID = "ARG_ID"
+        private const val ARG_DEPLOYMENT_ID = "ARG_DEPLOYMENT_ID"
 
         @JvmStatic
         fun newInstance(id: Int) =
             DeploymentViewPagerFragment().apply {
                 arguments = Bundle().apply {
-                    putInt(ARG_ID, id)
+                    putInt(ARG_DEPLOYMENT_ID, id)
                 }
             }
     }

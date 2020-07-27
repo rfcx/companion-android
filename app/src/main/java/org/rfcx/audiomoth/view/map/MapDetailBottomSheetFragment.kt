@@ -58,7 +58,7 @@ class MapDetailBottomSheetFragment : Fragment() {
 
     private fun initIntent() {
         arguments?.let {
-            id = it.getInt(ARG_ID)
+            id = it.getInt(ARG_DEPLOYMENT_ID)
             device = it.getString(ARG_DEVICE)
         }
     }
@@ -136,7 +136,7 @@ class MapDetailBottomSheetFragment : Fragment() {
     }
 
     companion object {
-        private const val ARG_ID = "ARG_ID"
+        private const val ARG_DEPLOYMENT_ID = "ARG_DEPLOYMENT_ID"
         private const val ARG_DEVICE = "ARG_DEVICE"
         private const val DAY = 24 * 60 * 60 * 1000
 
@@ -144,7 +144,7 @@ class MapDetailBottomSheetFragment : Fragment() {
         fun newInstance(id: Int, device: String) =
             MapDetailBottomSheetFragment().apply {
                 arguments = Bundle().apply {
-                    putInt(ARG_ID, id)
+                    putInt(ARG_DEPLOYMENT_ID, id)
                     putString(ARG_DEVICE, device)
                 }
             }

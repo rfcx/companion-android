@@ -3,7 +3,6 @@ package org.rfcx.audiomoth
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -229,8 +228,6 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     }
 
     override fun showBottomSheet(fragment: Fragment) {
-        Log.d("features", "$fragment")
-
         hidBottomAppBar()
         val layoutParams: CoordinatorLayout.LayoutParams = bottomSheetContainer.layoutParams
                 as CoordinatorLayout.LayoutParams
