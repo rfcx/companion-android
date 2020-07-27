@@ -26,10 +26,12 @@ open class Deployment(
 ) : RealmModel {
 
     companion object {
+        const val TABLE_NAME = "Deployment"
         const val FIELD_ID = "id"
         const val FIELD_STATE = "state"
         const val FIELD_SYNC_STATE = "syncState"
         const val FIELD_SERVER_ID = "serverId"
+        const val FIELD_DEPLOYMENT_ID = "deploymentId"
 
         const val PHOTOS = "photos"
     }
