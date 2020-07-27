@@ -5,26 +5,26 @@ import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioTrack
 import android.os.Build
+import android.util.Base64
 import android.util.Log
+import androidx.annotation.RequiresApi
+import kotlin.math.min
 
 class MicrophoneTestUtils {
     private val sampleRate = 24000
     private val channelConfiguration = AudioFormat.CHANNEL_OUT_MONO
     private val audioEncoding = AudioFormat.ENCODING_PCM_16BIT
-    private val minBufSize = AudioTrack.getMinBufferSize(
-        sampleRate,
-        channelConfiguration,
-        audioEncoding
-    )
     private var audioTrack: AudioTrack? = null
+    private var minBufSize: Int? = null
+    private val DEF_MINBUFSIZE = 5760
 
-    var buffer = ByteArray(minBufSize)
-    var readSize = 0
+    var buffer = ByteArray(0)
 
-    fun init() {
-        Log.d("MICROPHONE", "init")
+    fun init(minBufSize: Int) {
         stop()
         release()
+
+        this.minBufSize = minBufSize
 
         audioTrack = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             AudioTrack.Builder()
@@ -56,26 +56,31 @@ class MicrophoneTestUtils {
     }
 
     fun setTrack() {
-        Log.d("MICROPHONE", "set")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            audioTrack?.write(buffer, 0, buffer.size, AudioTrack.WRITE_BLOCKING)
-        }
+        audioTrack?.write(buffer, 0, minBufSize ?: DEF_MINBUFSIZE)
     }
 
     fun play() {
-        Log.d("MICROPHONE", "play")
         audioTrack?.play()
     }
 
     fun stop() {
-        Log.d("MICROPHONE", "stop")
         audioTrack?.stop()
         audioTrack?.flush()
     }
 
     fun release() {
-        Log.d("MICROPHONE", "release")
         audioTrack?.release()
         audioTrack = null
+    }
+
+    /*
+     * Utils functions for Audio Byte Array
+     */
+    fun decodeEncodedAudio(encodedAudio: String): ByteArray {
+        return Base64.decode(encodedAudio, Base64.NO_WRAP)
+    }
+
+    fun getEncodedAudioBufferSize(encodedAudio: String): Int {
+        return decodeEncodedAudio(encodedAudio).size
     }
 }

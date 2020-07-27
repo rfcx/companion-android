@@ -25,12 +25,6 @@ import java.util.*
 class GuardianMicrophoneFragment : Fragment(), OnReceiveResponse {
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
-
-    private val timer by lazy {
-        Timer()
-    }
-    private var timerPause: Boolean = false
-
     private val microphoneTestUtils by lazy {
         MicrophoneTestUtils()
     }
@@ -54,9 +48,6 @@ class GuardianMicrophoneFragment : Fragment(), OnReceiveResponse {
         deploymentProtocol?.hideCompleteButton()
         setUiByState(MicTestingState.READY)
 
-        microphoneTestUtils.init()
-        microphoneTestUtils.play()
-
         listenAudioButton.setOnClickListener {
             setUiByState(MicTestingState.LISTENING)
             retrieveLiveAudioBuffer()
@@ -66,14 +57,12 @@ class GuardianMicrophoneFragment : Fragment(), OnReceiveResponse {
             setUiByState(MicTestingState.FINISH)
             retrieveLiveAudioBuffer()
             microphoneTestUtils.stop()
-            timerPause = true
         }
 
         listenAgainAudioButton.setOnClickListener {
             setUiByState(MicTestingState.LISTENING)
             microphoneTestUtils.play()
-            //retrieveLiveAudioBuffer()
-            timerPause = false
+            retrieveLiveAudioBuffer()
         }
 
         finishButton.setOnClickListener {
@@ -112,16 +101,6 @@ class GuardianMicrophoneFragment : Fragment(), OnReceiveResponse {
             microphoneTestUtils,
             this@GuardianMicrophoneFragment
         )
-//        timer.schedule(object : TimerTask() {
-//            override fun run() {
-//                if (!timerPause) {
-//                    SocketManager.getLiveAudioBuffer(
-//                        microphoneTestUtils,
-//                        this@GuardianMicrophoneFragment
-//                    )
-//                }
-//            }
-//        }, DELAY, MILLI_PERIOD)
     }
 
     override fun onReceive(response: SocketResposne) { /* not used */ }
@@ -138,13 +117,11 @@ class GuardianMicrophoneFragment : Fragment(), OnReceiveResponse {
             it.stop()
             it.release()
         }
-        timer.cancel()
+        SocketManager.stopAudioQueueThread()
+        SocketManager.stopConnection()
     }
 
     companion object {
-        private const val DELAY = 0L
-        private const val MILLI_PERIOD = 1L
-
         enum class MicTestingState { READY, LISTENING, FINISH }
 
         fun newInstance(): GuardianMicrophoneFragment = GuardianMicrophoneFragment()
