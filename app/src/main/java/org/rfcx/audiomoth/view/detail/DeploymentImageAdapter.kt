@@ -25,7 +25,7 @@ class DeploymentImageAdapter : ListAdapter<DeploymentImageView,
         return ImageDetailViewHolder(view)
     }
 
-    class DeploymentImageViewDiff : DiffUtil.ItemCallback<DeploymentImageView>() {
+    private class DeploymentImageViewDiff : DiffUtil.ItemCallback<DeploymentImageView>() {
         override fun areItemsTheSame(
             oldItem: DeploymentImageView,
             newItem: DeploymentImageView
