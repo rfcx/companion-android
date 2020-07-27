@@ -32,7 +32,7 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
     private val timeAdapter by lazy { TimeAdapter(this, context) }
     private val gainList by lazy { resources.getStringArray(R.array.edge_gains) }
     private val sampleRateList = EdgeConfigure.configureSampleRate
-    var timeList = EdgeConfigure.configureTimes
+    private var timeList = EdgeConfigure.configureTimes
 
     private var gain = EdgeConfigure.GAIN_DEFAULT
     private var sampleRate = EdgeConfigure.SAMPLE_RATE_DEFAULT

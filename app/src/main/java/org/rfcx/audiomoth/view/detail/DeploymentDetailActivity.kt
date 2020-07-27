@@ -123,7 +123,7 @@ class DeploymentDetailActivity : AppCompatActivity() {
     }
 
     private fun setupTimeLineRecycler(selectTimeList: Array<String>) {
-        val timeList = ConfigureFragment().timeList
+        val timeList = EdgeConfigure.configureTimes
         val array = ArrayList<Boolean>()
 
         timeLineRecycler.apply {
