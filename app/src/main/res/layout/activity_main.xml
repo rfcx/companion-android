@@ -30,8 +30,8 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/createLocationButton"
-        android:layout_width="@dimen/button_battery_lv"
-        android:layout_height="@dimen/button_battery_lv"
+        android:layout_width="@dimen/size_battery_lv_button"
+        android:layout_height="@dimen/size_battery_lv_button"
         android:src="@drawable/ic_signs"
         app:backgroundTint="@color/colorPrimary"
         app:layout_anchor="@id/bottomBar"

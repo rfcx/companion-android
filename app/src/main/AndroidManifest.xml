@@ -42,7 +42,7 @@
         </provider>
 
         <activity
-            android:name=".view.detail.DetailDeploymentActivity"
+            android:name=".view.detail.DeploymentDetailActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".view.profile.coordinates.CoordinatesActivity"

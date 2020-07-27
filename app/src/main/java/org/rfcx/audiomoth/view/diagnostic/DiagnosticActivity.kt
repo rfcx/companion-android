@@ -218,16 +218,16 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
 
     private fun showLoading() {
         val loadingDialog: LoadingDialogFragment =
-            supportFragmentManager.findFragmentByTag(GuardianDeploymentActivity.loadingDialogTag) as LoadingDialogFragment?
+            supportFragmentManager.findFragmentByTag(TAG_LOADING_DIALOG) as LoadingDialogFragment?
                 ?: run {
                     LoadingDialogFragment()
                 }
-        loadingDialog.show(supportFragmentManager, GuardianDeploymentActivity.loadingDialogTag)
+        loadingDialog.show(supportFragmentManager, TAG_LOADING_DIALOG)
     }
 
     private fun hideLoading() {
         val loadingDialog: LoadingDialogFragment? =
-            supportFragmentManager.findFragmentByTag(GuardianDeploymentActivity.loadingDialogTag) as LoadingDialogFragment?
+            supportFragmentManager.findFragmentByTag(TAG_LOADING_DIALOG) as LoadingDialogFragment?
         loadingDialog?.dismissDialog()
     }
 
@@ -312,6 +312,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
 
 
     companion object {
+        private const val TAG_LOADING_DIALOG = "TAG_LOADING_DIALOG"
         const val IS_CONNECTED = "is_connected"
         const val DEPLOYMENT = "deployment"
 

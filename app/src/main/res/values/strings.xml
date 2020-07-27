@@ -43,7 +43,7 @@
     <string name="minimum_1_second">The minimum is 1 second</string>
     <string name="minimum_5_second">The minimum is 5 seconds</string>
 
-    <!--    SyncFragment-->
+    <!--  SyncFragment -->
     <string name="sync">Sync</string>
     <string name="switch_to_config">1. Switch your device to CONFIG</string>
     <string name="max_volume">2. Set the volume of your phone to high level</string>
@@ -54,7 +54,8 @@
     <string name="play_syncing">Syncing...</string>
     <string name="ready_send_configuration">Ready to send the configuration to the device</string>
 
-    <!--    DetailDeploymentActivity-->
+    <!-- DetailDeploymentActivity -->
+    <string name="title_deployment_detail">Location name</string>
     <string name="sleep_duration_title">Sleep duration</string>
     <string name="estimated_battery_duration">Estimated battery duration</string>
     <string name="photos">Photos</string>
@@ -254,5 +255,6 @@
     <string name="search_not_found_message">Try searching something else</string>
     <string name="search_error_title">An error has occurred</string>
     <string name="search_error_message">Please try again later</string>
+    <string name="desc_deployment_image">deployment image</string>
 
 </resources>

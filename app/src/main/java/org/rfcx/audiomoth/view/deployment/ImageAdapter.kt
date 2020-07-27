@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import kotlinx.android.synthetic.main.adapter_image.view.*
+import kotlinx.android.synthetic.main.item_image.view.*
 import kotlinx.android.synthetic.main.item_add_image.view.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.adapter.AddImageItem
@@ -132,7 +132,7 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
         return when (viewType) {
             VIEW_TYPE_IMAGE -> {
                 val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.adapter_image, parent, false)
+                    .inflate(R.layout.item_image, parent, false)
                 ImageAdapterViewHolder(view, onImageAdapterClickListener)
             }
             VIEW_TYPE_ADD_IMAGE -> {
@@ -167,7 +167,6 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
                 .placeholder(R.drawable.bg_grey_light)
                 .error(R.drawable.bg_grey_light)
                 .into(imageView)
-
 
             deleteButton.setOnClickListener {
                 onImageAdapterClickListener?.onDeleteImageClick(adapterPosition, imagePath)
