@@ -9,6 +9,7 @@ import java.util.*
  */
 data class DeploymentResponse(
     var serverId: String? = null,
+    var deploymentId: String? = null,
     var batteryDepletedAt: Date? = Date(),
     var batteryLevel: Int? = 0,
     var deployedAt: Date? = Date(),
@@ -40,6 +41,7 @@ data class ConfigurationResponse(
 
 fun DeploymentResponse.toDeployment(): Deployment {
     return Deployment(
+        deploymentId = this.deploymentId,
         serverId = this.serverId,
         batteryDepletedAt = this.batteryDepletedAt ?: Date(),
         deployedAt = this.deployedAt ?: Date(),
