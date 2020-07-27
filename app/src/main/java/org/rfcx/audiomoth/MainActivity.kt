@@ -6,28 +6,40 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
+import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.util.LocationPermissions
 import org.rfcx.audiomoth.util.Preferences
 import org.rfcx.audiomoth.util.getUserNickname
 import org.rfcx.audiomoth.util.logout
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity
+import org.rfcx.audiomoth.view.map.DeploymentBottomSheet
 import org.rfcx.audiomoth.view.map.MapFragment
 import org.rfcx.audiomoth.view.profile.ProfileFragment
 import org.rfcx.audiomoth.widget.BottomNavigationMenuItem
 
-class MainActivity : AppCompatActivity(), MainActivityListener {
+class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListener {
     // database manager
     private var currentFragment: Fragment? = null
     private val locationPermissions by lazy { LocationPermissions(this) }
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
 
     private var snackbar: Snackbar? = null
+    private var _showDeployments: List<DeploymentBottomSheet> = listOf()
+
+    override fun getShowDeployments(): List<DeploymentBottomSheet> = this._showDeployments
+
+    override fun setShowDeployments(deployments: List<DeploymentBottomSheet>) {
+        this._showDeployments = deployments
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -69,6 +81,25 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         if (savedInstanceState == null) {
             setupFragments()
         }
+
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetContainer)
+        bottomSheetBehavior.addBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                    showBottomAppBar()
+                    val bottomSheetFragment =
+                        supportFragmentManager.findFragmentByTag(BOTTOM_SHEET)
+                    if (bottomSheetFragment != null) {
+                        supportFragmentManager.beginTransaction()
+                            .remove(bottomSheetFragment)
+                            .commit()
+                    }
+                }
+            }
+        })
     }
 
     private fun setupSimpleTooltip() {
@@ -179,9 +210,51 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         finish()
     }
 
+    override fun moveMapIntoReportMarker(location: DeploymentLocation) {
+        val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
+        if (mapFragment is MapFragment) {
+            mapFragment.moveToDeploymentMarker(location)
+        }
+    }
+
+    override fun hidBottomAppBar() {
+        createLocationButton.visibility = View.INVISIBLE
+        bottomBar.visibility = View.INVISIBLE
+    }
+
+    override fun showBottomAppBar() {
+        bottomBar.visibility = View.VISIBLE
+        createLocationButton.visibility = View.VISIBLE
+    }
+
+    override fun showBottomSheet(fragment: Fragment) {
+        hidBottomAppBar()
+        val layoutParams: CoordinatorLayout.LayoutParams = bottomSheetContainer.layoutParams
+                as CoordinatorLayout.LayoutParams
+        layoutParams.anchorGravity = Gravity.BOTTOM
+        bottomSheetContainer.layoutParams = layoutParams
+        supportFragmentManager.beginTransaction()
+            .replace(bottomSheetContainer.id, fragment, BOTTOM_SHEET)
+            .commit()
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+    }
+
+    override fun hideBottomSheet() {
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
+
+    override fun onBackPressed() {
+        if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+            hideBottomSheet()
+        } else {
+            return super.onBackPressed()
+        }
+    }
+
     companion object {
         private const val IMAGES = "IMAGES"
         private const val DEPLOYMENT_ID = "DEPLOYMENT_ID"
+        private const val BOTTOM_SHEET = "BOTTOM_SHEET"
 
         fun startActivity(
             context: Context,
@@ -197,7 +270,12 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
 }
 
 interface MainActivityListener {
+    fun showBottomSheet(fragment: Fragment)
+    fun showBottomAppBar()
+    fun hidBottomAppBar()
+    fun hideBottomSheet()
     fun showSnackbar(msg: String, duration: Int)
     fun hideSnackbar()
     fun onLogout()
+    fun moveMapIntoReportMarker(location: DeploymentLocation)
 }

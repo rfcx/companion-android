@@ -3,7 +3,6 @@ package org.rfcx.audiomoth.view.map
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.PointF
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -21,7 +20,6 @@ import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.Mapbox
-import com.mapbox.mapboxsdk.annotations.BubbleLayout
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
@@ -32,18 +30,17 @@ import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.mapboxsdk.style.expressions.Expression
-import com.mapbox.mapboxsdk.style.layers.Property
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.BitmapUtils
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_map.*
-import kotlinx.android.synthetic.main.layout_map_window_info.view.*
+import org.rfcx.audiomoth.DeploymentListener
 import org.rfcx.audiomoth.MainActivityListener
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Deployment
+import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.DeploymentState.Edge
 import org.rfcx.audiomoth.entity.Device
 import org.rfcx.audiomoth.entity.Locate
@@ -55,17 +52,14 @@ import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
 import org.rfcx.audiomoth.util.*
-import org.rfcx.audiomoth.view.deployment.DeploymentActivity
-import org.rfcx.audiomoth.view.detail.DeploymentDetailActivity
-import org.rfcx.audiomoth.view.diagnostic.DiagnosticActivity
 
 class MapFragment : Fragment(), OnMapReadyCallback {
+
     // map
     private lateinit var mapView: MapView
     private var mapboxMap: MapboxMap? = null
     private var deploymentSource: GeoJsonSource? = null
     private var deploymentFeatures: FeatureCollection? = null
-    private val mapInfoViews = hashMapOf<String, View>()
 
     // database manager
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
@@ -87,6 +81,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private val locationPermissions by lazy { activity?.let { LocationPermissions(it) } }
     private var listener: MainActivityListener? = null
+    private var deploymentListener: DeploymentListener? = null
 
     // observer
     private val workInfoObserve = Observer<List<WorkInfo>> {
@@ -109,6 +104,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         this.listener = context as MainActivityListener
+        this.deploymentListener = context as DeploymentListener
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -157,28 +153,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             retrieveLocations(it)
             retrieveDiagnostics(it)
         }
+
         mapboxMap.setStyle(Style.OUTDOORS) {
             checkThenAccquireLocation(it)
             setupSources(it)
             setupImages(it)
             setupMarkerLayers(it)
-            setupWindowInfo(it)
 
             mapboxMap.addOnMapClickListener { latLng ->
-                val screenPoint = mapboxMap.projection.toScreenLocation(latLng)
-                val features = mapboxMap.queryRenderedFeatures(screenPoint, WINDOW_DEPLOYMENT_ID)
-                if (features.isNotEmpty()) {
-                    val feature = features[0]
-                    val device = feature.getStringProperty(PROPERTY_MARKER_DEVICE)
-                    if (device == Device.EDGE.value) {
-                        handlePressedDeployment(feature)
-                    } else {
-                        handlePressedGuardianDeployment(feature)
-                    }
-                    true
-                } else {
-                    handleClickIcon(mapboxMap.projection.toScreenLocation(latLng))
-                }
+                handleClickIcon(mapboxMap.projection.toScreenLocation(latLng))
             }
         }
     }
@@ -192,14 +175,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private fun setupImages(style: Style) {
         val drawablePinConnectedGuardian =
             ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map, null)
-        val mBitmapPinConnectedGuardian = BitmapUtils.getBitmapFromDrawable(drawablePinConnectedGuardian)
+        val mBitmapPinConnectedGuardian =
+            BitmapUtils.getBitmapFromDrawable(drawablePinConnectedGuardian)
         if (mBitmapPinConnectedGuardian != null) {
             style.addImage(GuardianPin.CONNECTED_GUARDIAN, mBitmapPinConnectedGuardian)
         }
 
         val drawablePinNotConnectedGuardian =
             ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map_grey, null)
-        val mBitmapPinNotConnectedGuardian = BitmapUtils.getBitmapFromDrawable(drawablePinNotConnectedGuardian)
+        val mBitmapPinNotConnectedGuardian =
+            BitmapUtils.getBitmapFromDrawable(drawablePinNotConnectedGuardian)
         if (mBitmapPinNotConnectedGuardian != null) {
             style.addImage(GuardianPin.NOT_CONNECTED_GUARDIAN, mBitmapPinNotConnectedGuardian)
         }
@@ -211,38 +196,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             style.addImage(Battery.BATTERY_PIN_GREEN, mBitmapPinMapGreen)
         }
 
-        val drawablePinMapOrange =
-            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map_orange, null)
-        val mBitmapPinMapOrange = BitmapUtils.getBitmapFromDrawable(drawablePinMapOrange)
-        if (mBitmapPinMapOrange != null) {
-            style.addImage(Battery.BATTERY_PIN_ORANGE, mBitmapPinMapOrange)
-        }
-
-        val drawablePinMapRed =
-            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map_red, null)
-        val mBitmapPinMapRed = BitmapUtils.getBitmapFromDrawable(drawablePinMapRed)
-        if (mBitmapPinMapRed != null) {
-            style.addImage(Battery.BATTERY_PIN_RED, mBitmapPinMapRed)
-        }
-
         val drawablePinMapGrey =
             ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map_grey, null)
         val mBitmapPinMapGrey = BitmapUtils.getBitmapFromDrawable(drawablePinMapGrey)
         if (mBitmapPinMapGrey != null) {
             style.addImage(Battery.BATTERY_PIN_GREY, mBitmapPinMapGrey)
         }
-    }
-
-    private fun setupWindowInfo(it: Style) {
-        it.addLayer(SymbolLayer(WINDOW_DEPLOYMENT_ID, SOURCE_DEPLOYMENT).apply {
-            withProperties(
-                PropertyFactory.iconImage("{${PROPERTY_MARKER_LOCATION_ID}}"),
-                PropertyFactory.iconAnchor(Property.ICON_ANCHOR_BOTTOM),
-                PropertyFactory.iconOffset(arrayOf(-2f, -20f)),
-                PropertyFactory.iconAllowOverlap(true)
-            )
-            withFilter(Expression.eq(Expression.get(PROPERTY_SELECTED), Expression.literal(true)))
-        })
     }
 
     private fun setupMarkerLayers(style: Style) {
@@ -257,39 +216,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         style.addLayer(markerLayer)
     }
 
-    private fun handlePressedGuardianDeployment(feature: Feature) {
-        val deployment =
-            guardianDeploymentDb.getDeploymentById(feature.getProperty(PROPERTY_MARKER_DEPLOYMENT_ID).asInt)
-        if (deployment != null) {
-            context?.let {
-                DiagnosticActivity.startActivity(
-                    it,
-                    deployment,
-                    WifiHotspotUtils.isConnectedWithGuardian(requireContext(), deployment.wifiName ?: "")
-                )
-            }
-        }
-    }
-
-    private fun handlePressedDeployment(feature: Feature) {
-        val deployment =
-            deploymentDb.getDeploymentById(feature.getProperty(PROPERTY_MARKER_DEPLOYMENT_ID).asInt)
-        if (deployment != null) {
-            if (deployment.state != 6) {
-                context?.let {
-                    DeploymentActivity.startActivity(
-                        it,
-                        feature.getProperty(PROPERTY_MARKER_DEPLOYMENT_ID).asInt
-                    )
-                }
-            } else {
-                context?.let {
-                    DeploymentDetailActivity.startActivity(it, deployment.id)
-                }
-            }
-        }
-    }
-
     private fun handleClickIcon(screenPoint: PointF): Boolean {
         val deploymentFeatures = mapboxMap?.queryRenderedFeatures(screenPoint, MARKER_DEPLOYMENT_ID)
         if (deploymentFeatures != null && deploymentFeatures.isNotEmpty()) {
@@ -301,12 +227,20 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     )
                 ) {
                     features[index]?.let { setFeatureSelectState(it, true) }
+                    val id =
+                        selectedFeature.getStringProperty(PROPERTY_MARKER_LOCATION_ID).split(".")[1]
+                    (activity as MainActivityListener).showBottomSheet(
+                        DeploymentViewPagerFragment.newInstance(
+                            id.toInt()
+                        )
+                    )
                 } else {
                     features[index]?.let { setFeatureSelectState(it, false) }
                 }
             }
             return true
         }
+        (activity as MainActivityListener).hideBottomSheet()
 
         clearFeatureSelected()
         return false
@@ -362,6 +296,25 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val guardianDeploymentMarkers = showGuardianDeployments.map { it.toMark() }
 
         handleMarkerDeployment(deploymentMarkers + guardianDeploymentMarkers)
+        handleShowDeployment(showDeployments, showGuardianDeployments)
+    }
+
+    private fun handleShowDeployment(
+        deployments: List<Deployment>,
+        guardianDeployments: List<GuardianDeployment>
+    ) {
+        val showDeployments = arrayListOf<DeploymentBottomSheet>()
+        val showGuardianDeployments = arrayListOf<DeploymentBottomSheet>()
+
+        deployments.forEach {
+            showDeployments.add(DeploymentBottomSheet(it.id, Device.EDGE.value))
+        }
+
+        guardianDeployments.forEach {
+            showGuardianDeployments.add(DeploymentBottomSheet(it.id, Device.GUARDIAN.value))
+        }
+
+        deploymentListener?.setShowDeployments(showDeployments + showGuardianDeployments)
     }
 
     private fun fetchData() {
@@ -423,7 +376,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
             // else also waiting network
             else -> {
-                listener?.showSnackbar(getString(R.string.format_deploy_waiting_network), Snackbar.LENGTH_LONG)
+                listener?.showSnackbar(
+                    getString(R.string.format_deploy_waiting_network),
+                    Snackbar.LENGTH_LONG
+                )
             }
         }
     }
@@ -444,32 +400,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             )
         }
 
-        // Create window info
-        val windowInfoImages = hashMapOf<String, Bitmap>()
-        val inflater = LayoutInflater.from(context)
-        pointFeatures.forEach {
-            val bubbleLayout =
-                inflater.inflate(R.layout.layout_map_window_info, null) as BubbleLayout
-
-            val id = it.getStringProperty(PROPERTY_MARKER_LOCATION_ID)
-
-            val title = it.getStringProperty(PROPERTY_MARKER_TITLE)
-            bubbleLayout.infoWindowTitle.text = title
-
-            val caption = it.getStringProperty(PROPERTY_MARKER_CAPTION)
-            bubbleLayout.infoWindowDescription.text = caption
-
-            val measureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-            bubbleLayout.measure(measureSpec, measureSpec)
-            val measuredWidth = bubbleLayout.measuredWidth
-            bubbleLayout.arrowPosition = (measuredWidth / 2 - 5).toFloat()
-
-            val bitmap = SymbolGenerator.generate(bubbleLayout)
-            mapInfoViews[id] = bubbleLayout
-            windowInfoImages[id] = bitmap
-        }
-
-        setWindowInfoImageGenResults(windowInfoImages)
         deploymentFeatures = FeatureCollection.fromFeatures(pointFeatures)
         refreshSource()
 
@@ -483,10 +413,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         if (deploymentSource != null && deploymentFeatures != null) {
             deploymentSource!!.setGeoJson(deploymentFeatures)
         }
-    }
-
-    private fun setWindowInfoImageGenResults(windowInfoImages: HashMap<String, Bitmap>) {
-        mapboxMap?.style?.addImages(windowInfoImages)
     }
 
     private fun moveCamera(latLng: LatLng) {
@@ -529,6 +455,19 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    fun moveToDeploymentMarker(location: DeploymentLocation) {
+        mapboxMap?.let {
+            it.moveCamera(
+                CameraUpdateFactory.newLatLngZoom(
+                    LatLng(
+                        location.latitude,
+                        location.longitude
+                    ), it.cameraPosition.zoom
+                )
+            )
+        }
+    }
+
     override fun onStart() {
         super.onStart()
         mapView.onStart()
@@ -565,7 +504,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun Deployment.toMark(): DeploymentMarker {
         val pinImage = if (state == Edge.ReadyToUpload.key)
-            Battery.getBatteryPinImage(batteryDepletedAt.time)
+            Battery.BATTERY_PIN_GREEN
         else
             Battery.BATTERY_PIN_GREY
 
@@ -601,7 +540,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         private const val SOURCE_DEPLOYMENT = "source.deployment"
         private const val MARKER_DEPLOYMENT_ID = "marker.deployment"
-        private const val WINDOW_DEPLOYMENT_ID = "info.deployment"
 
         private const val PROPERTY_SELECTED = "selected"
         private const val PROPERTY_MARKER_DEVICE = "device"
