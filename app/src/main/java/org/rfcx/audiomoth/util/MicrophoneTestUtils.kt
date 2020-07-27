@@ -6,9 +6,6 @@ import android.media.AudioManager
 import android.media.AudioTrack
 import android.os.Build
 import android.util.Base64
-import android.util.Log
-import androidx.annotation.RequiresApi
-import kotlin.math.min
 
 class MicrophoneTestUtils {
     private val sampleRate = 24000

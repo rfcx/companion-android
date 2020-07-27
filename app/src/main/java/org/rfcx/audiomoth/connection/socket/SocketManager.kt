@@ -1,7 +1,5 @@
 package org.rfcx.audiomoth.connection.socket
 
-import android.util.Base64
-import android.util.Log
 import com.google.gson.Gson
 import org.json.JSONObject
 import org.rfcx.audiomoth.entity.socket.*
@@ -10,7 +8,6 @@ import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.ConnectException
 import java.net.Socket
-import java.nio.ByteBuffer
 
 object SocketManager {
 
@@ -77,12 +74,12 @@ object SocketManager {
             try {
                 socket = Socket("192.168.43.1", 9999)
 
+                outputStream = DataOutputStream(socket.getOutputStream())
+
+                outputStream.writeUTF(data)
+                outputStream.flush()
+
                 while (true) {
-                    outputStream = DataOutputStream(socket.getOutputStream())
-
-                    outputStream.writeUTF(data)
-                    outputStream.flush()
-
                     val dataInput = DataInputStream(socket.getInputStream()).readUTF()
                     if (!dataInput.isNullOrBlank()) {
 
@@ -152,7 +149,9 @@ object SocketManager {
             }
         })
 
-        clientThread.start()
+        if (!clientThread.isAlive){
+            clientThread.start()
+        }
     }
 
     private fun setAudioFromQueue() {
@@ -180,7 +179,6 @@ object SocketManager {
     }
 
     fun stopConnection() {
-        outputStream.close()
         clientThread.interrupt()
     }
 

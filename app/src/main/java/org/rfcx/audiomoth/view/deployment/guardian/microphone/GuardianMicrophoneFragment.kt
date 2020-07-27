@@ -1,9 +1,6 @@
 package org.rfcx.audiomoth.view.deployment.guardian.microphone
 
 import android.content.Context
-import android.media.AudioFormat
-import android.media.AudioManager
-import android.media.AudioTrack
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,13 +11,9 @@ import kotlinx.android.synthetic.main.fragment_guardian_microphone.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.OnReceiveResponse
 import org.rfcx.audiomoth.connection.socket.SocketManager
-import org.rfcx.audiomoth.entity.socket.MicrophoneTestResponse
 import org.rfcx.audiomoth.entity.socket.SocketResposne
 import org.rfcx.audiomoth.util.MicrophoneTestUtils
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
-import org.rfcx.audiomoth.view.deployment.guardian.signal.GuardianSignalFragment
-import java.net.Socket
-import java.util.*
 
 class GuardianMicrophoneFragment : Fragment(), OnReceiveResponse {
 
