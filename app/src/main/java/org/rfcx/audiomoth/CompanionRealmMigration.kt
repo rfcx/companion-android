@@ -5,7 +5,6 @@ import io.realm.RealmMigration
 import org.rfcx.audiomoth.entity.Deployment
 
 class CompanionRealmMigration : RealmMigration {
-
     override fun migrate(realm: DynamicRealm, oldVersion: Long, newVersion: Long) {
         if (oldVersion < 2L && newVersion >= 2L) {
             migrateToV2(realm)
