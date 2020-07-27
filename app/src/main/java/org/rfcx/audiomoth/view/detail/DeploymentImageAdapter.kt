@@ -37,9 +37,9 @@ class DeploymentImageAdapter : ListAdapter<DeploymentImageView,
             oldItem: DeploymentImageView,
             newItem: DeploymentImageView
         ): Boolean {
-            return oldItem.localPath == newItem.localPath
-                    && oldItem.remotePath == newItem.remotePath
-                    && oldItem.syncState == newItem.syncState
+            return oldItem.localPath == newItem.localPath &&
+                    oldItem.remotePath == newItem.remotePath &&
+                    oldItem.syncState == newItem.syncState
         }
     }
 
@@ -69,7 +69,7 @@ class DeploymentImageAdapter : ListAdapter<DeploymentImageView,
                 val handler = Handler()
                 handler.postDelayed({
                     syncImageView.visibility = View.INVISIBLE
-                }, 2000) //2s
+                }, 2000) // 2s
             }
         }
     }

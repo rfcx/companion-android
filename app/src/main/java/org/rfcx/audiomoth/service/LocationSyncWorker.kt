@@ -48,7 +48,6 @@ class LocationSyncWorker(appContext: Context, params: WorkerParameters) :
         }
 
         return if (someFailed) Result.retry() else Result.success()
-
     }
 
     companion object {

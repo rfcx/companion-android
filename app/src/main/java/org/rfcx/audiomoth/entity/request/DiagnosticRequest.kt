@@ -1,7 +1,7 @@
 package org.rfcx.audiomoth.entity.request
 
-import org.rfcx.audiomoth.entity.guardian.DiagnosticInfo
 import java.util.*
+import org.rfcx.audiomoth.entity.guardian.DiagnosticInfo
 
 data class DiagnosticRequest(
     val deploymentServerId: String? = null,

@@ -1,10 +1,9 @@
 package org.rfcx.audiomoth.util
 
-
 import android.os.Environment
-import org.rfcx.audiomoth.BuildConfig
 import java.io.File
 import java.util.*
+import org.rfcx.audiomoth.BuildConfig
 
 object ImageUtils {
 

@@ -25,8 +25,8 @@ open class Locate(
 ) : RealmModel {
 
     fun isCompleted(): Boolean {
-        return lastDeploymentId != 0 || lastDeploymentServerId != null
-                || lastGuardianDeploymentId != 0 || lastGuardianDeploymentServerId != null
+        return lastDeploymentId != 0 || lastDeploymentServerId != null ||
+                lastGuardianDeploymentId != 0 || lastGuardianDeploymentServerId != null
     }
 
     fun getLastDeploymentId(): String {

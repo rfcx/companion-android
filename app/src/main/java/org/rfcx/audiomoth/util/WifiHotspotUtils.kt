@@ -6,7 +6,6 @@ import android.net.NetworkCapabilities
 import android.net.wifi.WifiManager
 import android.os.Build
 
-
 object WifiHotspotUtils {
 
     fun isConnectedWithGuardian(context: Context, name: String): Boolean {

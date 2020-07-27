@@ -61,14 +61,14 @@ class ProfileDb(private val realm: Realm) {
                 .equalTo(Profile.FIELD_SYNC_STATE, SyncState.Unsent.key).findAll()
                 .createSnapshot()
             unsentCopied = unsent.toList()
-            unsent.forEach {d->
+            unsent.forEach { d ->
                 d.syncState = SyncState.Sending.key
             }
         }
         return unsentCopied
     }
 
-    fun insertOrUpdateProfile(profile: Profile){
+    fun insertOrUpdateProfile(profile: Profile) {
         realm.executeTransaction {
             if (profile.id == 0) {
                 val id = (realm.where(Profile::class.java).max(Profile.FIELD_ID)

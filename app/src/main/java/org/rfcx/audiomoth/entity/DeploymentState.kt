@@ -1,6 +1,5 @@
 package org.rfcx.audiomoth.entity
 
-
 sealed class DeploymentState {
     enum class Edge(val key: Int) {
         Locate(1), Config(2), Sync(3), Verify(4), Deploy(5), ReadyToUpload(6);
@@ -11,7 +10,7 @@ sealed class DeploymentState {
         }
     }
 
-    enum class Guardian(val key: Int){
+    enum class Guardian(val key: Int) {
         Connect(1), Locate(2), Config(3), Sync(4), Deploy(5), ReadyToUpload(6);
 
         companion object {

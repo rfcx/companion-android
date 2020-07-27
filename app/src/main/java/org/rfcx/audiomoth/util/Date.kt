@@ -42,7 +42,7 @@ fun Calendar.toTimeString(): String {
     return outputTimeSdf.format(this.time)
 }
 
-fun getCalendar() : Calendar {
+fun getCalendar(): Calendar {
     return Calendar.getInstance()
 }
 

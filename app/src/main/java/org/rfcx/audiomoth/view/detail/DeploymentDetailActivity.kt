@@ -11,6 +11,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.realm.Realm
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlinx.android.synthetic.main.activity_deployment_detail.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
@@ -20,10 +22,7 @@ import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
-import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment.Companion.CONTINUOUS
-import java.util.*
-import kotlin.collections.ArrayList
 
 class DeploymentDetailActivity : AppCompatActivity() {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }

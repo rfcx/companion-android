@@ -92,5 +92,4 @@ class CredentialVerifier(val context: Context) {
     }
 
     private fun getString(resId: Int): String = context.getString(resId)
-
 }

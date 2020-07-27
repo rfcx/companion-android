@@ -1,8 +1,8 @@
 package org.rfcx.audiomoth.entity.request
 
+import java.util.*
 import org.rfcx.audiomoth.entity.Device
 import org.rfcx.audiomoth.entity.guardian.GuardianProfile
-import java.util.*
 
 data class GuardianProfileRequest(
     var device: String,

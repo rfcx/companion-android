@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_profile.view.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.entity.guardian.GuardianProfile
 import org.rfcx.audiomoth.entity.guardian.toReadableFormat
 

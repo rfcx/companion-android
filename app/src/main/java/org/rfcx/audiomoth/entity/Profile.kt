@@ -5,8 +5,8 @@ import io.realm.RealmList
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
-import org.rfcx.audiomoth.util.EdgeConfigure
 import java.util.*
+import org.rfcx.audiomoth.util.EdgeConfigure
 
 @RealmClass
 open class Profile(

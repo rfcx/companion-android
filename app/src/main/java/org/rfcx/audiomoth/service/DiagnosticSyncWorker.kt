@@ -10,7 +10,7 @@ import org.rfcx.audiomoth.localdb.guardian.DiagnosticDb
 import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.util.RealmHelper
 
-class DiagnosticSyncWorker (val context: Context, params: WorkerParameters) :
+class DiagnosticSyncWorker(val context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
@@ -71,5 +71,4 @@ class DiagnosticSyncWorker (val context: Context, params: WorkerParameters) :
                 .getWorkInfosForUniqueWorkLiveData(UNIQUE_WORK_KEY)
         }
     }
-
 }
