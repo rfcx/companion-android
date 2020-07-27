@@ -24,7 +24,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver() {
                     batteryDepletedAt
                 )
             )
-            .setSmallIcon(R.drawable.ic_audiomoth)
+            .setSmallIcon(R.drawable.ic_notification)
             .setDefaults(Notification.DEFAULT_ALL)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 

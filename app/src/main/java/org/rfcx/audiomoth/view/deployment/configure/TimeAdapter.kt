@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.time_item.view.*
+import kotlinx.android.synthetic.main.item_time.view.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.util.getIntColor
 
@@ -20,7 +20,7 @@ class TimeAdapter(private val listener: OnItemClickListener, private val context
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TimeAdapterViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val view = inflater.inflate(R.layout.time_item, parent, false)
+        val view = inflater.inflate(R.layout.item_time, parent, false)
         return TimeAdapterViewHolder(view)
     }
 

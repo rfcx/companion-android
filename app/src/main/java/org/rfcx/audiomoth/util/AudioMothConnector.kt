@@ -16,6 +16,6 @@ interface AudioMothConnector {
 
     fun getPacketLength(configuration: AudioMothConfiguration): Int
 
-    fun setConfiguration(calendar: Calendar, configuration: AudioMothConfiguration, id: Array<Int>?)
+    fun setConfiguration(calendar: Calendar, configuration: AudioMothConfiguration, id: DeploymentIdentifier?)
 
 }

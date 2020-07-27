@@ -8,6 +8,7 @@ import java.util.*
 
 data class DeploymentRequest(
     var device: String,
+    var deploymentId: String? = null,
     var batteryDepletedAt: Date = Date(),
     var batteryLevel: Int = 0,
     var deployedAt: Date = Date(),
@@ -24,6 +25,7 @@ fun Deployment.toRequestBody(): DeploymentRequest {
         deployedAt = this.deployedAt,
         configuration = this.configuration,
         location = this.location,
-        createdAt = this.createdAt
+        createdAt = this.createdAt,
+        deploymentId = this.deploymentId
     )
 }

@@ -8,6 +8,7 @@ import android.view.Gravity
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
@@ -15,7 +16,6 @@ import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
-import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.util.LocationPermissions
 import org.rfcx.audiomoth.util.Preferences
@@ -111,7 +111,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
             preferences.putBoolean(Preferences.IS_FIRST_TIME, false)
 
             SimpleTooltip.Builder(this)
-                .arrowColor(resources.getColor(R.color.white))
+                .arrowColor(ContextCompat.getColor(this, R.color.white))
                 .anchorView(createLocationButton)
                 .text(getString(R.string.setup_first_device, this.getUserNickname()))
                 .gravity(Gravity.TOP)
@@ -175,7 +175,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
 
     private fun showAboveAppbar(show: Boolean) {
         val contentContainerPaddingBottom =
-            if (show) resources.getDimensionPixelSize(R.dimen.button_battery_lv) else 0
+            if (show) resources.getDimensionPixelSize(R.dimen.size_battery_lv_button) else 0
         contentContainer.setPadding(0, 0, 0, contentContainerPaddingBottom)
     }
 

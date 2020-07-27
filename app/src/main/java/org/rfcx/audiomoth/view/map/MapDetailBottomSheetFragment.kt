@@ -18,7 +18,7 @@ import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.util.WifiHotspotUtils
 import org.rfcx.audiomoth.util.toDateString
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity
-import org.rfcx.audiomoth.view.detail.DetailDeploymentActivity
+import org.rfcx.audiomoth.view.detail.DeploymentDetailActivity
 import org.rfcx.audiomoth.view.diagnostic.DiagnosticActivity
 import java.util.*
 import kotlin.math.roundToInt
@@ -81,7 +81,7 @@ class MapDetailBottomSheetFragment : Fragment() {
             mapDetailBottomSheetView.setOnClickListener {
                 if (isStateReadyToUpload) {
                     context?.let { context ->
-                        DetailDeploymentActivity.startActivity(context, deployment.id)
+                        DeploymentDetailActivity.startActivity(context, deployment.id)
                     }
                 } else {
                     context?.let {

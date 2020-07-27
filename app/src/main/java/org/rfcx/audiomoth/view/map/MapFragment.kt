@@ -3,7 +3,6 @@ package org.rfcx.audiomoth.view.map
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.PointF
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -21,7 +20,6 @@ import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.Mapbox
-import com.mapbox.mapboxsdk.annotations.BubbleLayout
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
@@ -32,15 +30,12 @@ import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.mapboxsdk.style.expressions.Expression
-import com.mapbox.mapboxsdk.style.layers.Property
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.BitmapUtils
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_map.*
-import kotlinx.android.synthetic.main.layout_map_window_info.view.*
 import org.rfcx.audiomoth.DeploymentListener
 import org.rfcx.audiomoth.MainActivityListener
 import org.rfcx.audiomoth.R
@@ -57,9 +52,6 @@ import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
 import org.rfcx.audiomoth.util.*
-import org.rfcx.audiomoth.view.deployment.DeploymentActivity
-import org.rfcx.audiomoth.view.detail.DetailDeploymentActivity
-import org.rfcx.audiomoth.view.diagnostic.DiagnosticActivity
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
