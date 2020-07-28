@@ -57,5 +57,4 @@ class AudioMothConfiguration {
     var filter: Filter? = null
 
     var amplitudeThreshold: AmplitudeThreshold? = null
-
 }

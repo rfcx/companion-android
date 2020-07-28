@@ -28,7 +28,7 @@ class ProfileSyncWorker(val context: Context, params: WorkerParameters) :
             val result = firestore.sendProfile(it.toRequestBody())
 
             if (result != null) {
-                Log.d(TAG,"$result")
+                Log.d(TAG, "$result")
                 db.markSent(result.id, it.id)
             } else {
                 db.markUnsent(it.id)

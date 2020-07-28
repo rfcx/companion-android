@@ -1,6 +1,5 @@
 package org.rfcx.audiomoth.view.deployment.configure
 
-
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -20,65 +19,26 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_configure.*
-import kotlinx.android.synthetic.main.fragment_configure.radioGroup
-import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.DURATION_SELECTED_DEFAULT
-import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.GAIN_DEFAULT
-import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.RECORDING_DURATION_DEFAULT
-import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.SAMPLE_RATE_DEFAULT
-import org.rfcx.audiomoth.entity.EdgeConfigure.Companion.SLEEP_DURATION_DEFAULT
 import org.rfcx.audiomoth.entity.Profile
+import org.rfcx.audiomoth.util.EdgeConfigure
 import org.rfcx.audiomoth.util.convertToStopStartPeriods
 import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 
-class ConfigureFragment : Fragment(),
-    OnItemClickListener {
+class ConfigureFragment : Fragment(), OnItemClickListener {
 
     private var deploymentProtocol: DeploymentProtocol? = null
-    private val timeAdapter by lazy {
-        TimeAdapter(
-            this,
-            context
-        )
-    }
-
-    private val sampleRateList = arrayOf("8", "16", "32", "48", "96", "192", "256", "384")
-    private val gainList = arrayOf("Low", "Low - Medium", "Medium", "Medium - High", "High")
-    var timeList = arrayListOf(
-        "00:00",
-        "01:00",
-        "02:00",
-        "03:00",
-        "04:00",
-        "05:00",
-        "06:00",
-        "07:00",
-        "08:00",
-        "09:00",
-        "10:00",
-        "11:00",
-        "12:00",
-        "13:00",
-        "14:00",
-        "15:00",
-        "16:00",
-        "17:00",
-        "18:00",
-        "19:00",
-        "20:00",
-        "21:00",
-        "22:00",
-        "23:00"
-    )
-
-    private var gain = GAIN_DEFAULT
-    private var sampleRate = SAMPLE_RATE_DEFAULT
-    private var sleepDuration = RECORDING_DURATION_DEFAULT
-    private var recordingDuration = SLEEP_DURATION_DEFAULT
+    private val timeAdapter by lazy { TimeAdapter(this, context) }
+    private val gainList by lazy { resources.getStringArray(R.array.edge_gains) }
+    private val sampleRateList = EdgeConfigure.configureSampleRate
+    private val timeList = EdgeConfigure.configureTimes
+    private var gain = EdgeConfigure.GAIN_DEFAULT
+    private var sampleRate = EdgeConfigure.SAMPLE_RATE_DEFAULT
+    private var sleepDuration = EdgeConfigure.RECORDING_DURATION_DEFAULT
+    private var recordingDuration = EdgeConfigure.SLEEP_DURATION_DEFAULT
     private var recordingPeriod = ArrayList<String>()
     private var customRecordingPeriod = recordingPeriod.isNotEmpty()
-    private var durationSelected = DURATION_SELECTED_DEFAULT
+    private var durationSelected = EdgeConfigure.DURATION_SELECTED_DEFAULT
     private var profile: Profile? = null
     private var timeState = ArrayList<TimeItem>()
 

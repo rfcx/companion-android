@@ -1,0 +1,101 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/transparent"
+    android:clickable="true"
+    android:focusable="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_padding_normal"
+        android:background="@drawable/bg_color_white">
+
+        <TextView
+            android:id="@+id/locationNameTextView"
+            style="@style/AudioMothText.Body.Small"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_padding_normal"
+            android:layout_marginTop="@dimen/margin_padding_normal"
+            android:layout_marginEnd="@dimen/margin_padding_small"
+            android:ellipsize="end"
+            android:maxLines="1"
+            app:layout_constraintEnd_toStartOf="@id/estimatedBatteryDurationTextView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Location 1" />
+
+        <TextView
+            android:id="@+id/estimatedBatteryDurationTextView"
+            style="@style/AudioMothText.Body.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_padding_normal"
+            android:layout_marginEnd="@dimen/margin_padding_normal"
+            android:textSize="@dimen/text_xsmall"
+            app:layout_constraintEnd_toStartOf="@id/guardianTextView"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="6 days" />
+
+        <TextView
+            android:id="@+id/dateTextView"
+            style="@style/AudioMothText.Body.Secondary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_padding_normal"
+            android:layout_marginTop="@dimen/margin_padding_small"
+            android:layout_marginEnd="@dimen/margin_padding_normal"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/see_deployment_detail"
+            android:textSize="@dimen/text_xsmall"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/locationNameTextView"
+            tools:text="Deployed at 11/03/2020 11:30" />
+
+        <TextView
+            android:id="@+id/seeDetailTextView"
+            style="@style/AudioMothText.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/viewpager_padding"
+            android:paddingBottom="@dimen/margin_padding_normal"
+            android:text="@string/see_deployment_detail"
+            android:textColor="@color/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dateTextView" />
+
+        <View
+            android:id="@+id/mapDetailBottomSheetView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="@id/seeDetailTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/guardianTextView"
+            style="@style/AudioMothText.Body.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin_padding_normal"
+            android:background="@drawable/bg_color_grey_active"
+            android:padding="@dimen/margin_padding_xsmall"
+            android:text="@string/guardian"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_xxsmall"
+            app:layout_constraintBottom_toBottomOf="@id/locationNameTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/locationNameTextView"
+            tools:text="GUARDIAN" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

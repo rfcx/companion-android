@@ -10,13 +10,13 @@ import com.mapbox.api.geocoding.v5.MapboxGeocoding
 import com.mapbox.api.geocoding.v5.models.CarmenFeature
 import com.mapbox.api.geocoding.v5.models.GeocodingResponse
 import com.mapbox.mapboxsdk.geometry.LatLng
+import java.util.*
 import kotlinx.android.synthetic.main.layout_search_result.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.adapter.BaseListItem
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.util.*
 
 class SearchResultFragment : Fragment() {
 
@@ -125,7 +125,6 @@ class SearchResultFragment : Fragment() {
                     R.drawable.ic_baseline_error_outline_24
                 )
             )
-
         } else {
             val list: List<SearchResult> = result?.mapNotNull { carmenFeature ->
                 if (carmenFeature.center() != null && carmenFeature.placeName() != null) {

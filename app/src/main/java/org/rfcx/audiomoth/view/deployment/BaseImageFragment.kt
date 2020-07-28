@@ -11,10 +11,10 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.zhihu.matisse.Matisse
 import com.zhihu.matisse.MimeType
+import java.io.File
 import kotlinx.android.synthetic.main.buttom_sheet_attach_image_layout.view.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.util.*
-import java.io.File
 
 abstract class BaseImageFragment : Fragment() {
 
@@ -115,7 +115,6 @@ abstract class BaseImageFragment : Fragment() {
                 didAddImages(pathList)
             }
             dismissImagePickerOptionsDialog()
-
         } else {
             // remove file image
             imageFile?.let {

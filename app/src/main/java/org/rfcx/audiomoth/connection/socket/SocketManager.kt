@@ -8,6 +8,8 @@ import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.ConnectException
 import java.net.Socket
+import org.json.JSONObject
+import org.rfcx.audiomoth.entity.socket.*
 
 object SocketManager {
 
@@ -187,7 +189,6 @@ object SocketManager {
             audioThread.interrupt()
         }
     }
-
 }
 
 interface OnReceiveResponse {

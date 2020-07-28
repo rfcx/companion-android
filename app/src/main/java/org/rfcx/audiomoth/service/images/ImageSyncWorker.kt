@@ -9,7 +9,7 @@ import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.util.Storage
 
-class ImageSyncWorker (val context: Context, params: WorkerParameters) :
+class ImageSyncWorker(val context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
@@ -33,7 +33,6 @@ class ImageSyncWorker (val context: Context, params: WorkerParameters) :
                 someFailed = true
             }
         }
-
 
         ImageSyncToFireStoreWorker.enqueue(context)
 

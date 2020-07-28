@@ -26,7 +26,7 @@ class GuardianConfigureFragment : Fragment() {
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
 
-    //Predefined configuration values
+    // Predefined configuration values
     private var sampleRateEntries: Array<String>? = null
     private var sampleRateValues: Array<String>? = null
     private var bitrateEntries: Array<String>? = null
@@ -35,10 +35,10 @@ class GuardianConfigureFragment : Fragment() {
     private var durationEntries: Array<String>? = null
     private var durationValues: Array<String>? = null
 
-    private var sampleRate = 24000      // default guardian sampleRate is 24000
-    private var bitrate = 28672         // default guardian bitrate is 28672
-    private var fileFormat = "opus"     // default guardian file format is opus
-    private var duration = 90           // default guardian duration is 90
+    private var sampleRate = 24000 // default guardian sampleRate is 24000
+    private var bitrate = 28672 // default guardian bitrate is 28672
+    private var fileFormat = "opus" // default guardian file format is opus
+    private var duration = 90 // default guardian duration is 90
 
     private var profile: GuardianProfile? = null
 

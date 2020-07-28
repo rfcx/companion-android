@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--  Edge  -->
     <string-array name="audiomoth_steps">
         <item>Locate</item>
         <item>Config</item>
@@ -7,7 +8,16 @@
         <item>Verify</item>
         <item>Deploy</item>
     </string-array>
-
+    
+    <string-array name="edge_gains">
+        <item>Low</item>
+        <item>Low - Medium</item>
+        <item>Medium</item>
+        <item>Medium - High</item>
+        <item>High</item>
+    </string-array>
+    
+    <!--  Guardian  -->
     <string-array name="guardian_steps">
         <item>Connect</item>
         <item>Locate</item>

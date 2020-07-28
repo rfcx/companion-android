@@ -1,6 +1,5 @@
 package org.rfcx.audiomoth.entity
 
-
 sealed class DeploymentState {
     enum class Edge(val key: Int) {
         Locate(1), Config(2), Sync(3), Verify(4), Deploy(5), ReadyToUpload(6);

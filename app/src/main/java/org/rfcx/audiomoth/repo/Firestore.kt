@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import java.sql.Timestamp
 import kotlinx.coroutines.tasks.await
 import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_SERVER_ID
 import org.rfcx.audiomoth.entity.Device
@@ -20,7 +21,6 @@ import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.audiomoth.util.Preferences
 import org.rfcx.audiomoth.util.Storage
 import org.rfcx.audiomoth.util.getEmailUser
-import java.sql.Timestamp
 
 class Firestore(val context: Context) {
     val db = Firebase.firestore
@@ -195,7 +195,9 @@ class Firestore(val context: Context) {
     }
 
     fun saveFeedback(
-        text: String, uris: List<String>?, callback: (Boolean) -> Unit
+        text: String,
+        uris: List<String>?,
+        callback: (Boolean) -> Unit
     ) {
         val docData = hashMapOf(
             "userId" to guid,

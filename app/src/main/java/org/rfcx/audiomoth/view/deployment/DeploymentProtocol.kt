@@ -1,7 +1,7 @@
 package org.rfcx.audiomoth.view.deployment
 
-import org.rfcx.audiomoth.entity.*
 import java.sql.Timestamp
+import org.rfcx.audiomoth.entity.*
 
 interface DeploymentProtocol : BaseDeploymentProtocal {
     fun openWithEdgeDevice()

@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_guardian_hotspot.view.*
 import org.rfcx.audiomoth.R
 
-class GuardianHotspotAdapter(private val onHotspotClickListener: (ScanResult) -> Unit): RecyclerView.Adapter<GuardianHotspotAdapter.GuardianHotspotViewHolder>() {
+class GuardianHotspotAdapter(private val onHotspotClickListener: (ScanResult) -> Unit) : RecyclerView.Adapter<GuardianHotspotAdapter.GuardianHotspotViewHolder>() {
 
     var selectedPosition = -1
 
@@ -41,15 +41,14 @@ class GuardianHotspotAdapter(private val onHotspotClickListener: (ScanResult) ->
         }
     }
 
-    inner class GuardianHotspotViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+    inner class GuardianHotspotViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val hotspotName = itemView.hotspotNameTextView
         private val deployStatus = itemView.deployStatusTextView
 
         fun bind(hotspot: ScanResult) {
             hotspotName.text = hotspot.SSID
             deployStatus.text = "not deployed"
-            //TODO: if deploy then show deployed text
+            // TODO: if deploy then show deployed text
         }
     }
-
 }

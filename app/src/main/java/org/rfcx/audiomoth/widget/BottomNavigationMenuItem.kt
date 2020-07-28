@@ -1,6 +1,5 @@
 package org.rfcx.audiomoth.widget
 
-
 import android.content.Context
 import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
@@ -145,7 +144,6 @@ class BottomNavigationMenuItem @JvmOverloads constructor(
         }
 
         constructor(superState: Parcelable?) : super(superState)
-
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
             super.writeToParcel(parcel, flags)

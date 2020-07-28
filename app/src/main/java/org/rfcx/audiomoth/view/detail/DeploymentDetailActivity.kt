@@ -6,36 +6,63 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.realm.Realm
-import kotlinx.android.synthetic.main.activity_detail_deployment.*
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlinx.android.synthetic.main.activity_deployment_detail.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Deployment
+import org.rfcx.audiomoth.entity.DeploymentImage
 import org.rfcx.audiomoth.localdb.DeploymentDb
-import org.rfcx.audiomoth.repo.Firestore
+import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.util.*
-import org.rfcx.audiomoth.view.deployment.DeploymentActivity.Companion.DEPLOYMENT_ID
-import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
+import org.rfcx.audiomoth.view.deployment.DeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment.Companion.CONTINUOUS
-import java.util.*
-import kotlin.collections.ArrayList
 
-class DetailDeploymentActivity : AppCompatActivity() {
-    var deployment: Deployment? = null
+class DeploymentDetailActivity : AppCompatActivity() {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val deploymentDb by lazy { DeploymentDb(realm) }
-    private val gainList = arrayOf("Low", "Low - Medium", "Medium", "Medium - High", "High")
-    private val imageAdapter by lazy { ImageDetailAdapter() }
+    private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
+    private val gainList by lazy { resources.getStringArray(R.array.edge_gains) }
+    private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
     private val timeLineAdapter by lazy { TimeLineAdapter() }
+
+    // data
+    private var deployment: Deployment? = null
+    private lateinit var deployImageLiveData: LiveData<List<DeploymentImage>>
+    private var deploymentImages = listOf<DeploymentImage>()
+    private val deploymentImageObserve = Observer<List<DeploymentImage>> {
+        deploymentImages = it
+        updateDeploymentImages(deploymentImages)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_detail_deployment)
+        setContentView(R.layout.activity_deployment_detail)
 
-        val deploymentId = intent.extras?.getInt(DEPLOYMENT_ID)
-        if (deploymentId != null) {
-            deployment = deploymentDb.getDeploymentById(deploymentId)
+        deployment =
+            intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)?.let { deploymentDb.getDeploymentById(it) }
+
+        setupToolbar()
+        updateDeploymentDetailView()
+
+        // setup onclick
+        reconfigureButton.setOnClickListener {
+            Toast.makeText(this, R.string.reconfigure, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun updateDeploymentDetailView() {
+        deployment?.let {
+            // setup deployment images view
+            setupImageRecycler()
+            observeDeploymentImage(it.id)
+
             val location = deployment?.location
             val configuration = deployment?.configuration
 
@@ -44,7 +71,7 @@ class DetailDeploymentActivity : AppCompatActivity() {
 
             sampleRateValue.text =
                 getString(R.string.kilohertz, configuration?.sampleRate.toString())
-            gainValue.text = configuration?.gain?.let { gainList[it] }
+            gainValue.text = configuration?.gain?.let { gain -> gainList[gain] }
 
             val continuous = getString(R.string.continuous)
             val isContinuous = configuration?.durationSelected == CONTINUOUS
@@ -59,42 +86,43 @@ class DetailDeploymentActivity : AppCompatActivity() {
             sleepLabel.visibility = if (isContinuous) View.GONE else View.VISIBLE
 
             estimatedBatteryDurationValue.text =
-                deployment?.batteryDepletedAt?.time?.let { Date(it).toDateTimeString() }
-            configuration?.recordingPeriodList?.let {
-                customRecordingLabel.visibility = if (it.size != 0) View.VISIBLE else View.GONE
-                timeLineRecycler.visibility = if (it.size != 0) View.VISIBLE else View.GONE
-                setupTimeLineRecycler(it.toTypedArray())
-            }
-            deployment?.serverId?.let {
-                setupImageRecycler()
-                Firestore(this).getRemotePathByServerId(it) { remotePathList ->
-                    if (remotePathList != null) {
-                        photoLabel.visibility = if(remotePathList.size > 0) View.VISIBLE else View.GONE
-                        attachImageRecycler.visibility = if(remotePathList.size > 0) View.VISIBLE else View.GONE
-                        imageAdapter.items = remotePathList
-                    }
+                deployment?.batteryDepletedAt?.time?.let { depletedAt ->
+                    Date(depletedAt).toDateTimeString()
                 }
+            configuration?.recordingPeriodList?.let { period ->
+                customRecordingLabel.visibility = if (period.size != 0) View.VISIBLE else View.GONE
+                timeLineRecycler.visibility = if (period.size != 0) View.VISIBLE else View.GONE
+                setupTimeLineRecycler(period.toTypedArray())
             }
         }
+    }
 
-        reconfigureButton.setOnClickListener {
-            Toast.makeText(this, R.string.reconfigure, Toast.LENGTH_LONG).show()
-        }
+    private fun observeDeploymentImage(deploymentId: Int) {
+        deployImageLiveData =
+            Transformations.map(deploymentImageDb.getAllResultsAsync(deploymentId).asLiveData()) {
+                it
+            }
+        deployImageLiveData.observeForever(deploymentImageObserve)
+    }
 
-        setupToolbar()
-
+    private fun updateDeploymentImages(deploymentImages: List<DeploymentImage>) {
+        photoLabel.visibility = if (deploymentImages.isNotEmpty()) View.VISIBLE else View.GONE
+        deploymentImageRecycler.visibility =
+            if (deploymentImages.isNotEmpty()) View.VISIBLE else View.GONE
+        val items = deploymentImages.map { it.toDeploymentImageView() }
+        deploymentImageAdapter.submitList(items)
     }
 
     private fun setupImageRecycler() {
-        attachImageRecycler.apply {
-            adapter = imageAdapter
+        deploymentImageRecycler.apply {
+            adapter = deploymentImageAdapter
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             setHasFixedSize(true)
         }
     }
 
     private fun setupTimeLineRecycler(selectTimeList: Array<String>) {
-        val timeList = ConfigureFragment().timeList
+        val timeList = EdgeConfigure.configureTimes
         val array = ArrayList<Boolean>()
 
         timeLineRecycler.apply {
@@ -119,7 +147,7 @@ class DetailDeploymentActivity : AppCompatActivity() {
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
-            title = if (deployment != null) deployment?.location?.name else "Location name"
+            title = deployment?.location?.name ?: getString(R.string.title_deployment_detail)
         }
     }
 
@@ -128,10 +156,16 @@ class DetailDeploymentActivity : AppCompatActivity() {
         return true
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        // remove observer
+        deployImageLiveData.removeObserver(deploymentImageObserve)
+    }
+
     companion object {
         fun startActivity(context: Context, deploymentId: Int) {
-            val intent = Intent(context, DetailDeploymentActivity::class.java)
-            intent.putExtra(DEPLOYMENT_ID, deploymentId)
+            val intent = Intent(context, DeploymentDetailActivity::class.java)
+            intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
             context.startActivity(intent)
         }
     }

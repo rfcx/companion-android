@@ -8,35 +8,6 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:998168833060:android:02ce7932fb3f650a55fcb1",
-        "android_client_info": {
-          "package_name": "org.rfcx.audiomoth"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "998168833060-n2n5qic9mtdch79rjok2vut8tmc7m2tc.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDvrGtl425bvbbO1yY-JzDPzF1RDaCuZ8A"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "998168833060-n2n5qic9mtdch79rjok2vut8tmc7m2tc.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:998168833060:android:d0db213135c58afd55fcb1",
         "android_client_info": {
           "package_name": "org.rfcx.companion"

@@ -1,15 +1,16 @@
 package org.rfcx.audiomoth.util
 
 import io.realm.RealmConfiguration
+import org.rfcx.audiomoth.CompanionRealmMigration
 
 class RealmHelper {
     companion object {
-        private const val schemaVersion = 1L
+        private const val schemaVersion = 2L
 
         fun migrationConfig(): RealmConfiguration {
             return RealmConfiguration.Builder().apply {
                 schemaVersion(schemaVersion)
-                // create migration database here
+                migration(CompanionRealmMigration())
             }.build()
         }
 

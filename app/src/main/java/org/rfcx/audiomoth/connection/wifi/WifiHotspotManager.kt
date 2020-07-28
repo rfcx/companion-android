@@ -15,7 +15,6 @@ import android.net.wifi.WifiNetworkSpecifier
 import android.os.Build
 import android.util.Log
 
-
 class WifiHotspotManager(private val context: Context) {
 
     private var wifiManager: WifiManager? = null
@@ -82,7 +81,6 @@ class WifiHotspotManager(private val context: Context) {
             wifiManager!!.enableNetwork(netId, true)
             wifiManager!!.reconnect()
         }
-
     }
 
     fun unRegisterReceiver() {
@@ -123,7 +121,6 @@ class WifiHotspotManager(private val context: Context) {
                 }
             }
         }
-
     }
 }
 

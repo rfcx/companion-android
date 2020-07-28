@@ -29,6 +29,8 @@ import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
+import java.util.*
+import kotlin.concurrent.schedule
 import kotlinx.android.synthetic.main.fragment_map_picker.*
 import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.audiomoth.R
@@ -37,8 +39,6 @@ import org.rfcx.audiomoth.util.longitudeCoordinates
 import org.rfcx.audiomoth.view.deployment.BaseDeploymentProtocal
 import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment.Companion.DEFAULT_ZOOM
-import java.util.*
-import kotlin.concurrent.schedule
 
 class MapPickerFragment : Fragment(), OnMapReadyCallback,
     SearchResultFragment.OnSearchResultListener {
@@ -83,7 +83,8 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_map_picker, container, false)
@@ -177,7 +178,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
             locationComponent?.renderMode = RenderMode.COMPASS
 
             if (latitude != 0.0 && longitude != 0.0) {
-                Log.d("location","$latitude $longitude")
+                Log.d("location", "$latitude $longitude")
                 moveCamera(LatLng(latitude, longitude), DEFAULT_ZOOM)
                 setLatLogLabel(LatLng(latitude, longitude))
             } else {
@@ -288,7 +289,6 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
         mapView.onDestroy()
     }
 
-
     private fun setupSearch() {
         searchLayoutCardView.setOnClickListener {
             searchLayoutSearchEditText.clearFocus()
@@ -341,7 +341,6 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 // do nothing
             }
-
         })
 
         searchLayoutSearchEditText.setOnEditorActionListener { _, actionId, _ ->
@@ -357,7 +356,6 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
         searchViewActionLeftButton.setOnClickListener {
             clearSearchInputAndHideSoftInput()
         }
-
     }
 
     private fun showSearchFragment() {

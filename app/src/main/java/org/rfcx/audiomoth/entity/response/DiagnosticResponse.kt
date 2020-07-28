@@ -1,8 +1,8 @@
 package org.rfcx.audiomoth.entity.response
 
+import java.util.*
 import org.rfcx.audiomoth.entity.SyncState
 import org.rfcx.audiomoth.entity.guardian.DiagnosticInfo
-import java.util.*
 
 /**
  * Firestore response for getting a location

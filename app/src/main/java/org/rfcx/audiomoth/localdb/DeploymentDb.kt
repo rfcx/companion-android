@@ -49,6 +49,7 @@ class DeploymentDb(private val realm: Realm) {
                     .findFirst()
 
             if (deployment != null) {
+                deployment.deploymentId = deploymentResponse.deploymentId
                 deployment.serverId = deploymentResponse.serverId
                 deployment.batteryDepletedAt =
                     deploymentResponse.batteryDepletedAt ?: deployment.batteryDepletedAt

@@ -11,7 +11,6 @@ import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioTrack
 import android.os.Build
-
 import kotlin.math.*
 
 /* Global constants */
@@ -270,7 +269,6 @@ class AudioMothChime {
         if (xor > 0) out = out xor CRC_POLY
 
         return out
-
     }
 
     private fun createCRC16(bytes: Array<Int>): CRC16 {
@@ -288,7 +286,6 @@ class AudioMothChime {
         }
 
         return CRC16(crc and 0xFF, (crc shr 8) and 0xFF)
-
     }
 
     /* Function to encode bytes */
@@ -308,7 +305,6 @@ class AudioMothChime {
                     bitSequence.add(HAMMING_CODE[low][x])
                     bitSequence.add(HAMMING_CODE[high][x])
                 }
-
             } else {
 
                 for (x in 0 until 8) {
@@ -316,15 +312,11 @@ class AudioMothChime {
                     val mask = (0x01 shl x)
 
                     bitSequence.add(if ((it and mask) == mask) 1 else 0)
-
                 }
-
             }
-
         }
 
         return bitSequence
-
     }
 
     /* Functions to parses notes */
@@ -342,15 +334,12 @@ class AudioMothChime {
                 val duration = it.split(":")[1].toInt()
 
                 frequency?.let { notes.add(Note(frequency, duration)) }
-
             }
-
         }
 
         if (notes.size == 0) notes.add(Note())
 
         return notes
-
     }
 
     /* Functions to generate waveforms */
@@ -403,9 +392,7 @@ class AudioMothChime {
             state.x = x
 
             state.y = y
-
         }
-
     }
 
     private fun createWaveform(
@@ -459,7 +446,6 @@ class AudioMothChime {
             )
 
             phase *= -1.0f
-
         }
 
         /* Data bits */
@@ -480,7 +466,6 @@ class AudioMothChime {
             )
 
             phase *= -1.0f
-
         }
 
         /* Stop bits */
@@ -499,7 +484,6 @@ class AudioMothChime {
             )
 
             phase *= -1.0f
-
         }
 
         /* Reset counter */
@@ -532,7 +516,6 @@ class AudioMothChime {
                     noteDuration * note.duration,
                     noteFallDuration
                 )
-
         }
 
         /* Sum the waveforms */
@@ -542,7 +525,6 @@ class AudioMothChime {
         for (i in 0 until length) waveform.add(waveform1[i] / 4.0f + waveform2[i] / 2.0f)
 
         return waveform
-
     }
 
     /* Public chime function */
@@ -597,7 +579,5 @@ class AudioMothChime {
         player.play()
 
         player.write(buffer, 0, waveform.size)
-
     }
-
 }
