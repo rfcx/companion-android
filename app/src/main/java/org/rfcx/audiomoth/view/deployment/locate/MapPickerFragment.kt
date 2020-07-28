@@ -49,6 +49,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
     private var selectedLocation: Location? = null
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
+    private var nameLocation: String? = null
 
     private val mapboxLocationChangeCallback =
         object : LocationEngineCallback<LocationEngineResult> {
@@ -62,12 +63,6 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
                     }
 
                     showLoading(currentUserLocation == null)
-
-//                    if (selectedLocation == null) {
-//                        val latLng = LatLng(location.latitude, location.longitude)
-//                        moveCamera(latLng, DEFAULT_ZOOM)
-//                        setLatLogLabel(latLng)
-//                    }
                 }
             }
 
@@ -108,7 +103,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
         selectButton.setOnClickListener {
             val currentCameraPosition = mapboxMap?.cameraPosition?.target
             currentCameraPosition?.let {
-                deploymentProtocol?.startLocation(it.latitude, it.longitude)
+                deploymentProtocol?.startLocation(it.latitude, it.longitude, nameLocation ?: "")
             }
         }
 
@@ -127,6 +122,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
         arguments?.let {
             latitude = it.getDouble(ARG_LATITUDE)
             longitude = it.getDouble(ARG_LONGITUDE)
+            nameLocation = it.getString(ARG_LOCATION_NAME)
         }
     }
 
@@ -177,7 +173,6 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
             locationComponent?.renderMode = RenderMode.COMPASS
 
             if (latitude != 0.0 && longitude != 0.0) {
-                Log.d("location", "$latitude $longitude")
                 moveCamera(LatLng(latitude, longitude), DEFAULT_ZOOM)
                 setLatLogLabel(LatLng(latitude, longitude))
             } else {
@@ -403,13 +398,15 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
     companion object {
         private const val ARG_LATITUDE = "ARG_LATITUDE"
         private const val ARG_LONGITUDE = "ARG_LONGITUDE"
+        private const val ARG_LOCATION_NAME = "ARG_LOCATION_NAME"
 
         @JvmStatic
-        fun newInstance(lat: Double, lng: Double) = MapPickerFragment()
+        fun newInstance(lat: Double, lng: Double, name: String) = MapPickerFragment()
             .apply {
                 arguments = Bundle().apply {
                     putDouble(ARG_LATITUDE, lat)
                     putDouble(ARG_LONGITUDE, lng)
+                    putString(ARG_LOCATION_NAME, name)
                 }
             }
     }

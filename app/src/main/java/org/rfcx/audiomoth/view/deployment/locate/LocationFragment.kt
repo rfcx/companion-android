@@ -61,6 +61,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var locationEngine: LocationEngine? = null
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
+    private var nameLocation: String? = null
 
     private var deploymentProtocol: BaseDeploymentProtocol? = null
     private val locationPermissions by lazy { activity?.let { LocationPermissions(it) } }
@@ -119,8 +120,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private fun initIntent() {
         arguments?.let {
-            latitude = it.getDouble(LATITUDE_VALUE)
-            longitude = it.getDouble(LONGITUDE_VALUE)
+            latitude = it.getDouble(ARG_LATITUDE)
+            longitude = it.getDouble(ARG_LONGITUDE)
+            nameLocation = it.getString(ARG_LOCATION_NAME)
         }
     }
 
@@ -136,6 +138,10 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
         setHideKeyboard()
 
+        if (nameLocation != "" && nameLocation != null) {
+            locationNameEditText.setText(nameLocation)
+        }
+
         finishButton.setOnClickListener {
             if (existingRadioButton.isChecked) {
                 handleExistLocate()
@@ -145,12 +151,14 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
 
         changeTextView.setOnClickListener {
-            deploymentProtocol?.startMapPicker(latitude, longitude)
+            val name = locationNameEditText.text.toString()
+            deploymentProtocol?.startMapPicker(latitude, longitude, name)
         }
 
         viewOfMapBox.setOnClickListener {
             if (newLocationRadioButton.isChecked) {
-                deploymentProtocol?.startMapPicker(latitude, longitude)
+                val name = locationNameEditText.text.toString()
+                deploymentProtocol?.startMapPicker(latitude, longitude, name)
             }
         }
     }
@@ -489,8 +497,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         const val TAG = "LocationFragment"
         const val REQUEST_PERMISSIONS_REQUEST_CODE = 34
         const val DEFAULT_ZOOM = 15.0
-        const val LATITUDE_VALUE = "LATITUDE_VALUE"
-        const val LONGITUDE_VALUE = "LONGITUDE_VALUE"
+        const val ARG_LATITUDE = "ARG_LATITUDE"
+        const val ARG_LONGITUDE = "ARG_LONGITUDE"
+        const val ARG_LOCATION_NAME = "ARG_LOCATION_NAME"
 
         const val DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L
         const val DEFAULT_MAX_WAIT_TIME = DEFAULT_INTERVAL_IN_MILLISECONDS * 5
@@ -499,11 +508,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             return LocationFragment()
         }
 
-        fun newInstance(latitude: Double, longitude: Double) = LocationFragment()
+        fun newInstance(latitude: Double, longitude: Double, name: String) = LocationFragment()
             .apply {
                 arguments = Bundle().apply {
-                    putDouble(LATITUDE_VALUE, latitude)
-                    putDouble(LONGITUDE_VALUE, longitude)
+                    putDouble(ARG_LATITUDE, latitude)
+                    putDouble(ARG_LONGITUDE, longitude)
+                    putString(ARG_LOCATION_NAME, name)
                 }
             }
     }

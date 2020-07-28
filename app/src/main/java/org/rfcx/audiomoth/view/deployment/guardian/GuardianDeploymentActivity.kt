@@ -52,6 +52,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     private var latitude = 0.0
     private var longitude = 0.0
+    private var nameLocation: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -280,19 +281,19 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         loadingDialog?.dismissDialog()
     }
 
-    override fun startMapPicker(latitude: Double, longitude: Double) {
+    override fun startMapPicker(latitude: Double, longitude: Double, name: String) {
         hideStepView()
-        setLatLng(latitude, longitude)
-        startFragment(MapPickerFragment.newInstance(latitude, longitude))
+        setLatLng(latitude, longitude, name)
+        startFragment(MapPickerFragment.newInstance(latitude, longitude, name))
     }
 
-    private fun setLatLng(latitude: Double, longitude: Double) {
+    private fun setLatLng(latitude: Double, longitude: Double, name: String) {
         this.latitude = latitude
         this.longitude = longitude
     }
 
-    override fun startLocation(latitude: Double, longitude: Double) {
-        startFragment(LocationFragment.newInstance(latitude, longitude))
+    override fun startLocation(latitude: Double, longitude: Double, name: String) {
+        startFragment(LocationFragment.newInstance(latitude, longitude, name))
     }
 
     override fun onBackPressed() {

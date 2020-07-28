@@ -58,6 +58,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
 
     private var latitude = 0.0
     private var longitude = 0.0
+    private var nameLocation: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -172,9 +173,10 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         this._profile = profile
     }
 
-    private fun setLatLng(latitude: Double, longitude: Double) {
+    private fun setLatLng(latitude: Double, longitude: Double, name: String) {
         this.latitude = latitude
         this.longitude = longitude
+        this.nameLocation = name
     }
 
     override fun setPerformBattery(batteryDepletedAt: Timestamp, batteryLevel: Int) {
@@ -215,8 +217,8 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         startFragment(SyncFragment.newInstance(status))
     }
 
-    override fun startLocation(latitude: Double, longitude: Double) {
-        startFragment(LocationFragment.newInstance(latitude, longitude))
+    override fun startLocation(latitude: Double, longitude: Double, name: String) {
+        startFragment(LocationFragment.newInstance(latitude, longitude, name))
     }
 
     override fun playSyncSound() {
@@ -252,10 +254,10 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         startFragment(PerformBatteryFragment.newInstance(status, level))
     }
 
-    override fun startMapPicker(latitude: Double, longitude: Double) {
+    override fun startMapPicker(latitude: Double, longitude: Double, name: String) {
         hideStepView()
-        setLatLng(latitude, longitude)
-        startFragment(MapPickerFragment.newInstance(latitude, longitude))
+        setLatLng(latitude, longitude, name)
+        startFragment(MapPickerFragment.newInstance(latitude, longitude, name))
     }
 
     private fun setupView() {
@@ -373,7 +375,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
                 if (supportFragmentManager.fragments.firstOrNull() is LocationFragment) {
                     finish()
                 } else {
-                    startLocation(this.latitude, this.longitude)
+                    startLocation(this.latitude, this.longitude, this.nameLocation)
                 }
             } else if (!isFragmentPopped) {
                 super.onBackPressed()
