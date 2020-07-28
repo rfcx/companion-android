@@ -42,8 +42,7 @@ import org.rfcx.audiomoth.util.LocationPermissions
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.util.latitudeCoordinates
 import org.rfcx.audiomoth.util.longitudeCoordinates
-import org.rfcx.audiomoth.view.deployment.BaseDeploymentProtocal
-import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
+import org.rfcx.audiomoth.view.deployment.BaseDeploymentProtocol
 
 class LocationFragment : Fragment(), OnMapReadyCallback {
     private val locateDb by lazy {
@@ -63,7 +62,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
 
-    private var deploymentProtocol: BaseDeploymentProtocal? = null
+    private var deploymentProtocol: BaseDeploymentProtocol? = null
     private val locationPermissions by lazy { activity?.let { LocationPermissions(it) } }
     private val mapboxLocationChangeCallback =
         object : LocationEngineCallback<LocationEngineResult> {
@@ -101,7 +100,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        deploymentProtocol = context as BaseDeploymentProtocal
+        deploymentProtocol = context as BaseDeploymentProtocol
     }
 
     override fun onCreateView(
