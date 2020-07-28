@@ -1,5 +1,7 @@
 package org.rfcx.audiomoth.util
 
+import android.content.Context
+import org.rfcx.audiomoth.R
 import kotlin.math.roundToInt
 
 object Battery {
@@ -17,5 +19,18 @@ object Battery {
             "<1 day"
         }
         return "$daysLeft remaining"
+    }
+
+    fun getEstimatedBatteryDuration(context: Context, timestamp: Long): String {
+        val currentMillis = System.currentTimeMillis()
+        return if (timestamp > currentMillis) {
+            val numberOfDate = ((timestamp - currentMillis) / DAY.toDouble()).roundToInt()
+            if (numberOfDate > 1) context.getString(
+                R.string.days_remaining,
+                numberOfDate
+            ) else context.getString(R.string.day_remaining, numberOfDate)
+        } else {
+            context.getString(R.string.battery_depleted)
+        }
     }
 }

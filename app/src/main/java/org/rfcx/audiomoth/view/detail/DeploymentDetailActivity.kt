@@ -11,7 +11,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.realm.Realm
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlinx.android.synthetic.main.activity_deployment_detail.*
 import kotlinx.android.synthetic.main.toolbar_default.*
@@ -21,6 +20,7 @@ import org.rfcx.audiomoth.entity.DeploymentImage
 import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.util.*
+import org.rfcx.audiomoth.util.Battery.getEstimatedBatteryDuration
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment.Companion.CONTINUOUS
 
@@ -87,7 +87,7 @@ class DeploymentDetailActivity : AppCompatActivity() {
 
             estimatedBatteryDurationValue.text =
                 deployment?.batteryDepletedAt?.time?.let { depletedAt ->
-                    Date(depletedAt).toDateTimeString()
+                    getEstimatedBatteryDuration(this, depletedAt)
                 }
             configuration?.recordingPeriodList?.let { period ->
                 customRecordingLabel.visibility = if (period.size != 0) View.VISIBLE else View.GONE

@@ -16,6 +16,7 @@ import org.rfcx.audiomoth.entity.Device
 import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
 import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
+import org.rfcx.audiomoth.util.Battery.getEstimatedBatteryDuration
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.util.WifiHotspotUtils
 import org.rfcx.audiomoth.util.toDateString
@@ -72,7 +73,7 @@ class MapDetailBottomSheetFragment : Fragment() {
             dateTextView.text = if (isStateReadyToUpload) getString(
                 R.string.deploy_at,
                 Date(deployment.deployedAt.time).toDateString()
-            ) else getString(R.string.create_at, Date(deployment.createdAt.time).toDateString())
+            ) else getString(R.string.no_deployment)
 
             seeDetailTextView.text =
                 if (isStateReadyToUpload) getString(R.string.see_deployment_detail) else getString(
@@ -94,7 +95,7 @@ class MapDetailBottomSheetFragment : Fragment() {
             estimatedBatteryDurationTextView.visibility =
                 if (isStateReadyToUpload) View.VISIBLE else View.GONE
             estimatedBatteryDurationTextView.text =
-                getEstimatedBatteryDuration(deployment.batteryDepletedAt.time)
+                context?.let { getEstimatedBatteryDuration(it, deployment.batteryDepletedAt.time) }
             guardianTextView.visibility = View.GONE
         }
     }
@@ -126,23 +127,9 @@ class MapDetailBottomSheetFragment : Fragment() {
         }
     }
 
-    private fun getEstimatedBatteryDuration(timestamp: Long): String {
-        val currentMillis = System.currentTimeMillis()
-        return if (timestamp > currentMillis) {
-            val numberOfDate = ((timestamp - currentMillis) / (DAY).toDouble()).roundToInt()
-            if (numberOfDate > 1) getString(
-                R.string.days_remaining,
-                numberOfDate
-            ) else getString(R.string.day_remaining, numberOfDate)
-        } else {
-            getString(R.string.battery_depleted)
-        }
-    }
-
     companion object {
         private const val ARG_DEPLOYMENT_ID = "ARG_DEPLOYMENT_ID"
         private const val ARG_DEVICE = "ARG_DEVICE"
-        private const val DAY = 24 * 60 * 60 * 1000
 
         @JvmStatic
         fun newInstance(id: Int, device: String) =
