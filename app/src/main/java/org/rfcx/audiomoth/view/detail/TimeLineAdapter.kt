@@ -7,7 +7,6 @@ import kotlinx.android.synthetic.main.item_timeline.view.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.util.getIntColor
 
-
 class TimeLineAdapter : RecyclerView.Adapter<TimeLineAdapter.TimeLineViewHolder>() {
     var items: ArrayList<String> = arrayListOf()
         set(value) {
@@ -19,7 +18,7 @@ class TimeLineAdapter : RecyclerView.Adapter<TimeLineAdapter.TimeLineViewHolder>
         parent: ViewGroup,
         viewType: Int
     ): TimeLineViewHolder {
-        val view = View.inflate(parent.context, R.layout.item_timeline, null);
+        val view = View.inflate(parent.context, R.layout.item_timeline, null)
         return TimeLineViewHolder(view, viewType)
     }
 

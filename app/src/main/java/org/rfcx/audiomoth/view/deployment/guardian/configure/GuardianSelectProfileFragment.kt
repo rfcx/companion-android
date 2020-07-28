@@ -1,6 +1,5 @@
 package org.rfcx.audiomoth.view.deployment.guardian.configure
 
-
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -28,7 +27,8 @@ class GuardianSelectProfileFragment : Fragment(), (GuardianProfile) -> Unit {
     private var currentProfile: List<GuardianProfile>? = null
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_guardian_select_profile, container, false)

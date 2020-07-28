@@ -9,17 +9,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import kotlinx.android.synthetic.main.confirm_perform_battery.*
-import kotlinx.android.synthetic.main.fragment_battery_level.*
+import java.sql.Timestamp
+import java.util.*
 import kotlinx.android.synthetic.main.fragment_perform_battery.*
+import kotlinx.android.synthetic.main.fragment_perform_battery_level.*
+import kotlinx.android.synthetic.main.fragment_select_battery_level.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.BatteryDetail
 import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.util.NotificationBroadcastReceiver
 import org.rfcx.audiomoth.util.toDateTimeString
 import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
-import java.sql.Timestamp
-import java.util.*
 
 class PerformBatteryFragment : Fragment() {
     private var status: String? = null
@@ -43,9 +43,9 @@ class PerformBatteryFragment : Fragment() {
 
         when (status) {
             TIME_LED_FLASH -> view =
-                inflater.inflate(R.layout.fragment_battery_level, container, false)
+                inflater.inflate(R.layout.fragment_select_battery_level, container, false)
             BATTERY_LEVEL -> view =
-                inflater.inflate(R.layout.confirm_perform_battery, container, false)
+                inflater.inflate(R.layout.fragment_perform_battery_level, container, false)
         }
         return view
     }

@@ -1,7 +1,7 @@
 package org.rfcx.audiomoth.entity.request
 
-import org.rfcx.audiomoth.entity.Locate
 import java.util.*
+import org.rfcx.audiomoth.entity.Locate
 
 data class LocateRequest(
     var name: String = "",

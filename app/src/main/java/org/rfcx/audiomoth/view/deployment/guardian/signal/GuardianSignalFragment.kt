@@ -53,7 +53,7 @@ class GuardianSignalFragment : Fragment(), OnReceiveResponse {
     }
 
     private fun retrieveGuardianSignal() {
-        timer.schedule(object : TimerTask(){
+        timer.schedule(object : TimerTask() {
             override fun run() {
                 SocketManager.getSignalStrength(this@GuardianSignalFragment)
             }
@@ -62,7 +62,7 @@ class GuardianSignalFragment : Fragment(), OnReceiveResponse {
 
     private fun showSignalStrength(state: SignalState) {
         listOfSignal.forEachIndexed { index, view ->
-            if (index < state.value){
+            if (index < state.value) {
                 (view.background as GradientDrawable).setBackground(requireContext(), R.color.signal_filled)
             } else {
                 (view.background as GradientDrawable).setBackground(requireContext(), R.color.white)

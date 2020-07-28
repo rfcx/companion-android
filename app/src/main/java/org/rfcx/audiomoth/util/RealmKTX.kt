@@ -27,7 +27,6 @@ class LiveDataRealmObject<T : RealmObject>(private val result: T) : LiveData<T>(
     private val listener = RealmChangeListener<T> { t ->
         if (t.isValid)
             value = t
-
     }
 
     override fun onActive() {

@@ -28,7 +28,7 @@ class GuardianProfileDb(private val realm: Realm) {
                 .equalTo(GuardianProfile.FIELD_SYNC_STATE, SyncState.Unsent.key).findAll()
                 .createSnapshot()
             unsentCopied = unsent.toList()
-            unsent.forEach {d->
+            unsent.forEach { d ->
                 d.syncState = SyncState.Sending.key
             }
         }
@@ -61,7 +61,7 @@ class GuardianProfileDb(private val realm: Realm) {
         }
     }
 
-    fun insertOrUpdateProfile(profile: GuardianProfile){
+    fun insertOrUpdateProfile(profile: GuardianProfile) {
         realm.executeTransaction {
             if (profile.id == 0) {
                 val id = (realm.where(GuardianProfile::class.java).max(GuardianProfile.FIELD_ID)

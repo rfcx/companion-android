@@ -43,7 +43,7 @@
     <string name="minimum_1_second">The minimum is 1 second</string>
     <string name="minimum_5_second">The minimum is 5 seconds</string>
 
-    <!--    SyncFragment-->
+    <!--  SyncFragment -->
     <string name="sync">Sync</string>
     <string name="switch_to_config">1. Switch your device to CONFIG</string>
     <string name="max_volume">2. Set the volume of your phone to high level</string>
@@ -54,7 +54,8 @@
     <string name="play_syncing">Syncing...</string>
     <string name="ready_send_configuration">Ready to send the configuration to the device</string>
 
-    <!--    DetailDeploymentActivity-->
+    <!-- DetailDeploymentActivity -->
+    <string name="title_deployment_detail">Location name</string>
     <string name="sleep_duration_title">Sleep duration</string>
     <string name="estimated_battery_duration">Estimated battery duration</string>
     <string name="photos">Photos</string>
@@ -142,6 +143,13 @@
     <string name="these_photos_already_exists">These photos already exist</string>
     <string name="this_photo_already_exists">This photo already exists</string>
     <string name="can_not_create_image">Unable to create image file.</string>
+
+    <!--  MapDetailBottomSheetFragment  -->
+    <string name="see_deployment_detail">See Detail</string>
+    <string name="create_deployment">Create deployment</string>
+    <string name="create_at">Create at %s</string>
+    <string name="deploy_at">Deployed at %s</string>
+    <string name="guardian">Guardian</string>
 
     <!--  ChooseDeviceFragment  -->
     <string name="choose_your_device">Choose your device</string>
@@ -254,6 +262,7 @@
     <string name="search_not_found_message">Try searching something else</string>
     <string name="search_error_title">An error has occurred</string>
     <string name="search_error_message">Please try again later</string>
+    <string name="desc_deployment_image">deployment image</string>
 
     <!-- GuardianMicrophoneTestingFragment -->
     <string name="positioning_the_microphone">Positioning the microphone</string>

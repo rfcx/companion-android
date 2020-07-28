@@ -4,7 +4,6 @@ import com.google.gson.annotations.Expose
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
-import org.rfcx.audiomoth.entity.response.DeploymentResponse
 import java.util.*
 
 @RealmClass
@@ -14,6 +13,7 @@ open class Deployment(
     var serverId: String? = null,
     var batteryDepletedAt: Date = Date(),
     var deployedAt: Date = Date(),
+    var deploymentId: String? = null, // random when edge
     var batteryLevel: Int = 0,
     @Expose(serialize = false)
     var state: Int = 0, // 1 = Locate, 2 = Config, 3 = Sync, 4 = Verify, 5 = Deploy, 6 = Ready To Upload

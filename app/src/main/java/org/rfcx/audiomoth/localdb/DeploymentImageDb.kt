@@ -5,6 +5,7 @@ import io.realm.RealmResults
 import io.realm.Sort
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.DeploymentImage
+import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_ID
 import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_SERVER_ID
 import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_ID
 import org.rfcx.audiomoth.entity.SyncState
@@ -62,9 +63,16 @@ class DeploymentImageDb(private val realm: Realm) {
         }
     }
 
-    fun getAllResultsAsync(sort: Sort = Sort.DESCENDING): RealmResults<DeploymentImage> {
+    /**
+     * Return of RealmResults DeploymentImage By Deployment ID for Observer
+     * */
+    fun getAllResultsAsync(
+        deploymentId: Int,
+        sort: Sort = Sort.DESCENDING
+    ): RealmResults<DeploymentImage> {
         return realm.where(DeploymentImage::class.java)
-            .sort(DeploymentImage.FIELD_ID, sort)
+            .sort(FIELD_ID, sort)
+            .equalTo(FIELD_DEPLOYMENT_ID, deploymentId)
             .findAllAsync()
     }
 
@@ -73,9 +81,8 @@ class DeploymentImageDb(private val realm: Realm) {
         realm.executeTransaction {
             // save attached image to be Deployment Image
             attachImages.forEach { attachImage ->
-                val imageId = (it.where(DeploymentImage::class.java).max(
-                    DeploymentImage.FIELD_ID
-                )?.toInt() ?: 0) + 1
+                val imageId =
+                    (it.where(DeploymentImage::class.java).max(FIELD_ID)?.toInt() ?: 0) + 1
                 val deploymentImage = DeploymentImage(
                     id = imageId,
                     deploymentId = deployment.id,
@@ -90,7 +97,6 @@ class DeploymentImageDb(private val realm: Realm) {
     /**
      * Return of DeploymentImage that need to upload into firebase firestore
      */
-
     fun lockUnsentForFireStore(): List<DeploymentImage> {
         var unsentCopied: List<DeploymentImage> = listOf()
         realm.executeTransaction {
@@ -102,7 +108,7 @@ class DeploymentImageDb(private val realm: Realm) {
                 .findAll()
             unsentCopied = unsent.createSnapshot()
             unsent.forEach { d ->
-                d.syncState = SyncState.Sending.key
+                d.syncToFireStoreState = SyncState.Sending.key
             }
         }
         return unsentCopied
@@ -128,7 +134,6 @@ class DeploymentImageDb(private val realm: Realm) {
             val report = it.where(DeploymentImage::class.java).equalTo(FIELD_ID, id).findFirst()
             if (report != null) {
                 report.syncToFireStoreState = SyncState.Sent.key
-
             }
         }
     }

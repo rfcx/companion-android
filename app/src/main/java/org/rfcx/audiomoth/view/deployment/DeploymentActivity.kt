@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import io.realm.Realm
+import java.sql.Timestamp
+import java.util.*
 import kotlinx.android.synthetic.main.activity_deployment.*
 import org.rfcx.audiomoth.BuildConfig
 import org.rfcx.audiomoth.R
@@ -30,8 +32,6 @@ import org.rfcx.audiomoth.view.deployment.verify.PerformBatteryFragment.Companio
 import org.rfcx.audiomoth.view.dialog.CompleteFragment
 import org.rfcx.audiomoth.view.dialog.CompleteListener
 import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
-import java.sql.Timestamp
-import java.util.*
 
 class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteListener {
     // manager database
@@ -62,7 +62,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_deployment)
-        val deploymentId = intent.extras?.getInt(DEPLOYMENT_ID)
+        val deploymentId = intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
         if (deploymentId != null) {
             handleDeploymentStep(deploymentId)
         } else {
@@ -156,6 +156,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
     override fun setDeployLocation(locate: Locate) {
         val deployment = _deployment ?: Deployment()
         deployment.state = DeploymentState.Edge.Locate.key // state
+        deployment.deploymentId = randomDeploymentId()
 
         this._deployLocation = locate.asDeploymentLocation()
         val deploymentId = deploymentDb.insertOrUpdate(deployment, _deployLocation!!)
@@ -219,12 +220,13 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
     }
 
     override fun playSyncSound() {
+        val deploymentId = getDeployment()?.deploymentId
         convertProfileToAudioMothConfiguration()
         Thread {
             audioMothConnector.setConfiguration(
                 calendar,
                 configuration,
-                arrayOf(0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08)
+                deploymentId?.let { DeploymentIdentifier(it) }
             )
             this@DeploymentActivity.runOnUiThread {
                 startSyncing(SyncFragment.AFTER_SYNC)
@@ -402,7 +404,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
 
     companion object {
         const val loadingDialogTag = "LoadingDialog"
-        const val DEPLOYMENT_ID = "DEPLOYMENT_ID"
+        const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
 
         fun startActivity(context: Context) {
             val intent = Intent(context, DeploymentActivity::class.java)
@@ -411,7 +413,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
 
         fun startActivity(context: Context, deploymentId: Int) {
             val intent = Intent(context, DeploymentActivity::class.java)
-            intent.putExtra(DEPLOYMENT_ID, deploymentId)
+            intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
             context.startActivity(intent)
         }
     }

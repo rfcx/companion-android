@@ -4,9 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="org.rfcx.audiomoth.view.detail.DetailDeploymentActivity">
+    tools:context="org.rfcx.audiomoth.view.detail.DeploymentDetailActivity">
 
-    <include android:id="@+id/toolbarLayout" layout="@layout/toolbar_default" />
+    <include
+        android:id="@+id/toolbarLayout"
+        layout="@layout/toolbar_default" />
 
     <ScrollView
         android:id="@+id/scrollView"
@@ -278,8 +280,8 @@
                 app:layout_constraintTop_toBottomOf="@id/estimatedBatteryDurationValue" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/attachImageRecycler"
-                android:layout_width="0dp"
+                android:id="@+id/deploymentImageRecycler"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_large"
                 android:layout_marginTop="@dimen/margin_padding_normal"
@@ -290,6 +292,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/photoLabel"
                 tools:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_image"
                 tools:orientation="horizontal" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,9 +7,8 @@
 package org.rfcx.audiomoth.util
 
 import java.util.Calendar
-
-import kotlin.random.Random
 import kotlin.math.*
+import kotlin.random.Random
 
 class AudioMothChimeConnector : AudioMothConnector {
 
@@ -64,11 +63,9 @@ class AudioMothChimeConnector : AudioMothConnector {
         if (value) {
 
             state.bytes[byte] = state.bytes[byte] or (1 shl bit)
-
         }
 
         state.index += 1
-
     }
 
     private fun setBits(state: State, value: Int, length: Int) {
@@ -78,12 +75,10 @@ class AudioMothChimeConnector : AudioMothConnector {
             val mask = (1 shl i)
 
             setBit(state, (value and mask) == mask)
-
         }
-
     }
 
-    private fun normaliseMinutes(minutes: Int) : Int {
+    private fun normaliseMinutes(minutes: Int): Int {
 
         var mins = minutes
 
@@ -92,7 +87,6 @@ class AudioMothChimeConnector : AudioMothConnector {
         while (mins > MINUTES_IN_DAY) mins -= MINUTES_IN_DAY
 
         return mins
-
     }
 
     /* Public interface functions */
@@ -108,7 +102,6 @@ class AudioMothChimeConnector : AudioMothConnector {
                 "e4:4"
             )
         )
-
     }
 
     override fun getPacketLength(configuration: AudioMothConfiguration): Int {
@@ -124,7 +117,6 @@ class AudioMothChimeConnector : AudioMothConnector {
             val numberOfStartStopPeriod = min(MAX_START_STOP_PERIODS, startStopPeriods.size)
 
             packetLength += 2 * numberOfStartStopPeriod * BITS_IN_INT16 / BITS_PER_BYTE
-
         }
 
         packetLength += if (configuration.firstRecordingDate == null) 0 else BITS_IN_INT32 / BITS_PER_BYTE
@@ -136,10 +128,9 @@ class AudioMothChimeConnector : AudioMothConnector {
         packetLength += if (configuration.amplitudeThreshold == null) 0 else BITS_IN_INT16 / BITS_PER_BYTE
 
         return packetLength
-
     }
 
-    override fun setConfiguration(calendar: Calendar, configuration: AudioMothConfiguration, id: Array<Int>?) {
+    override fun setConfiguration(calendar: Calendar, configuration: AudioMothConfiguration, id: DeploymentIdentifier?) {
 
         /* Calculate timestamp and offset */
 
@@ -191,7 +182,6 @@ class AudioMothChimeConnector : AudioMothConnector {
             if (periods.size == 1 && periods[0].startMinutes == 0 && periods[0].stopMinutes == MINUTES_IN_DAY) {
 
                 startStopPeriods.add(AudioMothConfiguration.StartStopPeriod(0, MINUTES_IN_DAY))
-
             } else {
 
                 periods.forEach {
@@ -214,7 +204,6 @@ class AudioMothChimeConnector : AudioMothConnector {
                                 stopMinutes
                             )
                         )
-
                     } else {
 
                         startStopPeriods.add(
@@ -223,15 +212,11 @@ class AudioMothChimeConnector : AudioMothConnector {
                                 stopMinutes
                             )
                         )
-
                     }
-
                 }
-
             }
 
             startStopPeriods.sortWith(compareBy({ it.startMinutes }))
-
         }
 
         val activeStartStopPeriods = min(MAX_START_STOP_PERIODS, startStopPeriods.size)
@@ -263,7 +248,6 @@ class AudioMothChimeConnector : AudioMothConnector {
             setBits(state, sleepDuration, BITS_IN_INT16)
 
             setBits(state, recordDuration, BITS_IN_INT16)
-
         }
 
         /* Start stop periods */
@@ -273,7 +257,6 @@ class AudioMothChimeConnector : AudioMothConnector {
             setBits(state, startStopPeriods[i].startMinutes, BITS_IN_INT16)
 
             setBits(state, startStopPeriods[i].stopMinutes, BITS_IN_INT16)
-
         }
 
         /* Earliest recording time */
@@ -296,7 +279,6 @@ class AudioMothChimeConnector : AudioMothConnector {
             val earliestRecordingTime = (earliestRecordingCalendar.timeInMillis / MILLISECONDS_IN_SECOND).toInt()
 
             setBits(state, earliestRecordingTime, BITS_IN_INT32)
-
         }
 
         /* Latest recording time */
@@ -319,7 +301,6 @@ class AudioMothChimeConnector : AudioMothConnector {
             val latestRecordingTime = (latestRecordingCalendar.timeInMillis / MILLISECONDS_IN_SECOND).toInt() + SECONDS_IN_DAY
 
             setBits(state, latestRecordingTime, BITS_IN_INT32)
-
         }
 
         /* Filter */
@@ -331,7 +312,6 @@ class AudioMothChimeConnector : AudioMothConnector {
 
             setBits(state, lowerFilterFrequency, BITS_IN_INT16)
             setBits(state, higherFilterFrequency, BITS_IN_INT16)
-
         } else if (configuration.filter is AudioMothConfiguration.HighPassFilter) {
 
             val lowerFilterFrequency = max(0, min(MAXIMUM_FILTER_FREQUENCY, (configuration.filter as AudioMothConfiguration.HighPassFilter).frequency)) / FILTER_FREQUENCY_FACTOR
@@ -339,7 +319,6 @@ class AudioMothChimeConnector : AudioMothConnector {
 
             setBits(state, lowerFilterFrequency, BITS_IN_INT16)
             setBits(state, higherFilterFrequency, BITS_IN_INT16)
-
         } else if (configuration.filter is AudioMothConfiguration.BandPassFilter) {
 
             val lowerFilterFrequency = max(0, min(MAXIMUM_FILTER_FREQUENCY, (configuration.filter as AudioMothConfiguration.BandPassFilter).lowerFrequency)) / FILTER_FREQUENCY_FACTOR
@@ -347,7 +326,6 @@ class AudioMothChimeConnector : AudioMothConnector {
 
             setBits(state, lowerFilterFrequency, BITS_IN_INT16)
             setBits(state, higherFilterFrequency, BITS_IN_INT16)
-
         }
 
         /* Amplitude threshold */
@@ -357,21 +335,17 @@ class AudioMothChimeConnector : AudioMothConnector {
             val amplitudeThreshold = max(0, min(MAXIMUM_FILTER_THRESHOLD, (configuration.amplitudeThreshold as AudioMothConfiguration.AmplitudeThreshold).threshold))
 
             setBits(state, amplitudeThreshold, BITS_IN_INT16)
-
         }
 
         /* Deployment ID */
 
         val length = state.index / BITS_PER_BYTE + DEPLOYMENT_ID_LENGTH
 
-        if (id != null) {
-
-            for (i in 0 until min(DEPLOYMENT_ID_LENGTH, id.size)) {
-
-                data[length - 1 - i] = id[i] and 0xFF
-
+        if (id != null && id.isValid) {
+            val idArray = id.toByteArray
+            for (i in 0 until min(DEPLOYMENT_ID_LENGTH, idArray.size)) {
+                data[length - 1 - i] = idArray[i].toInt()
             }
-
         }
 
         /* Play the data */
@@ -390,7 +364,5 @@ class AudioMothChimeConnector : AudioMothConnector {
                 "e4:4"
             )
         )
-
     }
-
 }

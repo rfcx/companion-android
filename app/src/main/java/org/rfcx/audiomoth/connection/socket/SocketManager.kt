@@ -1,12 +1,12 @@
 package org.rfcx.audiomoth.connection.socket
 
 import com.google.gson.Gson
-import org.json.JSONObject
-import org.rfcx.audiomoth.entity.socket.*
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.ConnectException
 import java.net.Socket
+import org.json.JSONObject
+import org.rfcx.audiomoth.entity.socket.*
 
 object SocketManager {
 
@@ -60,7 +60,7 @@ object SocketManager {
                     outputStream.writeUTF(data)
                     outputStream.flush()
 
-                    //receiving data
+                    // receiving data
                     val dataInput = DataInputStream(socket.getInputStream()).readUTF()
                     if (!dataInput.isNullOrBlank()) {
 
@@ -119,7 +119,6 @@ object SocketManager {
         outputStream.close()
         clientThread.interrupt()
     }
-
 }
 
 interface OnReceiveResponse {

@@ -9,4 +9,3 @@ data class DiagnosticResponse(
     val configure: GuardianConfiguration,
     val prefs: JsonArray
 ) : SocketResposne
-

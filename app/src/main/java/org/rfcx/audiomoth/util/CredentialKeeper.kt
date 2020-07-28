@@ -1,6 +1,5 @@
 package org.rfcx.audiomoth.util
 
-
 import android.content.Context
 import org.rfcx.audiomoth.entity.UserAuthResponse
 

@@ -56,5 +56,4 @@ class ImageSyncToFireStoreWorker(val context: Context, params: WorkerParameters)
                 .getWorkInfosForUniqueWorkLiveData(UNIQUE_WORK_KEY)
         }
     }
-
 }

@@ -27,7 +27,6 @@ import org.rfcx.audiomoth.util.CredentialKeeper
 import org.rfcx.audiomoth.util.CredentialVerifier
 import org.rfcx.audiomoth.util.Preferences
 import org.rfcx.audiomoth.util.Preferences.Companion.USER_FIREBASE_UID
-import org.rfcx.audiomoth.view.profile.coordinates.CoordinatesActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

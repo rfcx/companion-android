@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import androidx.preference.PreferenceFragmentCompat
-import com.google.gson.JsonArray
 import org.rfcx.audiomoth.R
 
 class GuardianPrefsFragment() : PreferenceFragmentCompat(),
@@ -66,5 +65,4 @@ class GuardianPrefsFragment() : PreferenceFragmentCompat(),
         super.onPause()
         preferenceScreen.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
     }
-
 }
