@@ -26,7 +26,8 @@ import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianConfigureFr
 import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianSelectProfileFragment
 import org.rfcx.audiomoth.view.deployment.guardian.connect.ConnectGuardianFragment
 import org.rfcx.audiomoth.view.deployment.guardian.deploy.GuardianDeployFragment
-import org.rfcx.audiomoth.view.deployment.guardian.verify.GuardianVerifyFragment
+import org.rfcx.audiomoth.view.deployment.guardian.microphone.GuardianMicrophoneFragment
+import org.rfcx.audiomoth.view.deployment.guardian.signal.GuardianSignalFragment
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
 import org.rfcx.audiomoth.view.deployment.locate.MapPickerFragment
 import org.rfcx.audiomoth.view.dialog.CompleteFragment
@@ -230,10 +231,14 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                 startFragment(GuardianSelectProfileFragment.newInstance())
             }
             3 -> {
-                updateDeploymentState(DeploymentState.Guardian.Sync)
-                startFragment(GuardianVerifyFragment.newInstance())
+                updateDeploymentState(DeploymentState.Guardian.Signal)
+                startFragment(GuardianSignalFragment.newInstance())
             }
             4 -> {
+                updateDeploymentState(DeploymentState.Guardian.Microphone)
+                startFragment(GuardianMicrophoneFragment.newInstance())
+            }
+            5 -> {
                 updateDeploymentState(DeploymentState.Guardian.Deploy)
                 startFragment(GuardianDeployFragment.newInstance())
             }

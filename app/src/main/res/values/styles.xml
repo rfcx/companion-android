@@ -56,6 +56,12 @@
         <item name="android:textSize">@dimen/text_medium</item>
     </style>
 
+    <style name="GuardianButton.RedButton" parent="AudioMothButton">
+        <item name="android:background">@drawable/bg_color_red_button</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">@dimen/text_medium</item>
+    </style>
+
     <!-- TextView -->
     <style name="AudioMothText" parent="Widget.AppCompat.TextView"/>
 
