@@ -150,6 +150,9 @@
     <string name="create_at">Create at %s</string>
     <string name="deploy_at">Deployed at %s</string>
     <string name="guardian">Guardian</string>
+    <string name="days_remaining">%d days remaining</string>
+    <string name="day_remaining">%d day remaining</string>
+    <string name="battery_depleted">Battery depleted</string>
 
     <!--  ChooseDeviceFragment  -->
     <string name="choose_your_device">Choose your device</string>

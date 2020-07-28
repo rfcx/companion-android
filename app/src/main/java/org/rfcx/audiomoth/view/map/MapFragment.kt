@@ -503,10 +503,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun Deployment.toMark(): DeploymentMarker {
-        val pinImage = if (state == Edge.ReadyToUpload.key)
-            Battery.BATTERY_PIN_GREEN
-        else
-            Battery.BATTERY_PIN_GREY
+        val pinImage =
+            if (state == Edge.ReadyToUpload.key && isBatteryRemaining(batteryDepletedAt.time))
+                Battery.BATTERY_PIN_GREEN
+            else
+                Battery.BATTERY_PIN_GREY
 
         val description = if (state >= Edge.ReadyToUpload.key)
             Battery.getPredictionBattery(batteryDepletedAt.time)
@@ -533,6 +534,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             Device.GUARDIAN.value,
             createdAt
         )
+    }
+
+    private fun isBatteryRemaining(timestamp: Long): Boolean {
+        val currentMillis = System.currentTimeMillis()
+        return timestamp > currentMillis
     }
 
     companion object {

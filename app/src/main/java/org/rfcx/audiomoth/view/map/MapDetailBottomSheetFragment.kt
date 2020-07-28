@@ -130,9 +130,12 @@ class MapDetailBottomSheetFragment : Fragment() {
         val currentMillis = System.currentTimeMillis()
         return if (timestamp > currentMillis) {
             val cal = ((timestamp - currentMillis) / (DAY).toDouble()).roundToInt()
-            if (cal > 1) "$cal days" else "$cal day"
+            if (cal > 1) getString(
+                R.string.days_remaining,
+                cal
+            ) else getString(R.string.day_remaining, cal)
         } else {
-            "<1 day"
+            getString(R.string.battery_depleted)
         }
     }
 
