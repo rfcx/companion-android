@@ -3,6 +3,7 @@ package org.rfcx.audiomoth.entity.response
 import io.realm.RealmList
 import java.util.*
 import org.rfcx.audiomoth.entity.*
+import org.rfcx.audiomoth.util.EdgeConfigure
 
 /**
  * Firestore response for getting a deployment
@@ -29,12 +30,12 @@ data class ConfigurationResponse(
     fun toConfiguration(): Configuration {
         val realmList = recordingPeriodList?.mapTo(RealmList(), { it })
         return Configuration(
-            gain ?: 3,
-            sampleRate ?: 8,
-            recordingDuration ?: 5,
-            sleepDuration ?: 10,
-            realmList ?: RealmList<String>(),
-            durationSelected ?: "RECOMMENDED"
+            gain ?: EdgeConfigure.GAIN_DEFAULT,
+            sampleRate ?: EdgeConfigure.SAMPLE_RATE_DEFAULT,
+            recordingDuration ?: EdgeConfigure.RECORDING_DURATION_DEFAULT,
+            sleepDuration ?: EdgeConfigure.SLEEP_DURATION_DEFAULT,
+            realmList ?: RealmList(),
+            durationSelected ?: EdgeConfigure.DURATION_SELECTED_DEFAULT
         )
     }
 }
