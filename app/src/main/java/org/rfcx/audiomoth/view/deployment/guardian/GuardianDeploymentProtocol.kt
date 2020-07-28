@@ -3,9 +3,9 @@ package org.rfcx.audiomoth.view.deployment.guardian
 import org.rfcx.audiomoth.entity.guardian.GuardianConfiguration
 import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
 import org.rfcx.audiomoth.entity.guardian.GuardianProfile
-import org.rfcx.audiomoth.view.deployment.BaseDeploymentProtocal
+import org.rfcx.audiomoth.view.deployment.BaseDeploymentProtocol
 
-interface GuardianDeploymentProtocol : BaseDeploymentProtocal {
+interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun startSetupConfigure(profile: GuardianProfile)
 
     fun backToConfigure()

@@ -5,8 +5,8 @@ import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
 object EdgeConfigure {
     const val GAIN_DEFAULT = 2
     const val SAMPLE_RATE_DEFAULT = 48
-    const val RECORDING_DURATION_DEFAULT = 1
-    const val SLEEP_DURATION_DEFAULT = 5
+    const val RECORDING_DURATION_DEFAULT = 300
+    const val SLEEP_DURATION_DEFAULT = 600
     const val DURATION_SELECTED_DEFAULT = ConfigureFragment.RECOMMENDED
 
     val configureSampleRate = arrayOf("8", "16", "32", "48", "96", "192", "256", "384")

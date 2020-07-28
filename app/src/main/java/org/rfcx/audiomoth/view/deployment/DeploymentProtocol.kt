@@ -3,7 +3,7 @@ package org.rfcx.audiomoth.view.deployment
 import java.sql.Timestamp
 import org.rfcx.audiomoth.entity.*
 
-interface DeploymentProtocol : BaseDeploymentProtocal {
+interface DeploymentProtocol : BaseDeploymentProtocol {
     fun openWithEdgeDevice()
     fun openWithGuardianDevice()
 

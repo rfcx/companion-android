@@ -2,9 +2,9 @@ package org.rfcx.audiomoth.view.deployment
 
 import org.rfcx.audiomoth.entity.*
 
-interface BaseDeploymentProtocal {
-    fun startMapPicker(latitude: Double, longitude: Double)
-    fun startLocation(latitude: Double, longitude: Double)
+interface BaseDeploymentProtocol {
+    fun startMapPicker(latitude: Double, longitude: Double, name: String)
+    fun startLocation(latitude: Double, longitude: Double, name: String)
 
     fun hideCompleteButton()
     fun showCompleteButton()

@@ -280,10 +280,10 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         loadingDialog?.dismissDialog()
     }
 
-    override fun startMapPicker(latitude: Double, longitude: Double) {
+    override fun startMapPicker(latitude: Double, longitude: Double, name: String) {
         hideStepView()
         setLatLng(latitude, longitude)
-        startFragment(MapPickerFragment.newInstance(latitude, longitude))
+        startFragment(MapPickerFragment.newInstance(latitude, longitude, name))
     }
 
     private fun setLatLng(latitude: Double, longitude: Double) {
@@ -291,8 +291,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         this.longitude = longitude
     }
 
-    override fun startLocation(latitude: Double, longitude: Double) {
-        startFragment(LocationFragment.newInstance(latitude, longitude))
+    override fun startLocation(latitude: Double, longitude: Double, name: String) {
+        startFragment(LocationFragment.newInstance(latitude, longitude, name))
     }
 
     override fun onBackPressed() {
