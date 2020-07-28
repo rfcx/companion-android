@@ -28,6 +28,7 @@ import org.rfcx.audiomoth.view.deployment.guardian.connect.ConnectGuardianFragme
 import org.rfcx.audiomoth.view.deployment.guardian.deploy.GuardianDeployFragment
 import org.rfcx.audiomoth.view.deployment.guardian.verify.GuardianVerifyFragment
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
+import org.rfcx.audiomoth.view.deployment.locate.MapPickerFragment
 import org.rfcx.audiomoth.view.dialog.CompleteFragment
 import org.rfcx.audiomoth.view.dialog.CompleteListener
 import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
@@ -47,6 +48,9 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private var _deployment: GuardianDeployment? = null
     private var _deployLocation: DeploymentLocation? = null
     private var _configuration: GuardianConfiguration? = null
+
+    private var latitude = 0.0
+    private var longitude = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -269,6 +273,21 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         val loadingDialog: LoadingDialogFragment? =
             supportFragmentManager.findFragmentByTag(TAG_LOADING_DIALOG) as LoadingDialogFragment?
         loadingDialog?.dismissDialog()
+    }
+
+    override fun startMapPicker(latitude: Double, longitude: Double) {
+        hideStepView()
+        setLatLng(latitude, longitude)
+        startFragment(MapPickerFragment.newInstance(latitude, longitude))
+    }
+
+    private fun setLatLng(latitude: Double, longitude: Double) {
+        this.latitude = latitude
+        this.longitude = longitude
+    }
+
+    override fun startLocation(latitude: Double, longitude: Double) {
+        startFragment(LocationFragment.newInstance(latitude, longitude))
     }
 
     override fun onBackPressed() {

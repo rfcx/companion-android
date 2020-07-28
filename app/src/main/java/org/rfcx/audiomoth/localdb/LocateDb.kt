@@ -87,7 +87,7 @@ class LocateDb(private val realm: Realm) {
             } else {
                 locate.lastGuardianDeploymentId = deploymentId
                 locate.lastDeploymentId = 0
-                locate.lastGuardianDeploymentServerId = null
+                locate.lastDeploymentServerId = null
             }
             it.insertOrUpdate(locate)
         }
