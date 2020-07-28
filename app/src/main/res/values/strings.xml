@@ -57,7 +57,7 @@
     <!-- DetailDeploymentActivity -->
     <string name="title_deployment_detail">Location name</string>
     <string name="sleep_duration_title">Sleep duration</string>
-    <string name="estimated_battery_duration">Estimated battery duration</string>
+    <string name="estimated_battery_duration">Estimate battery remaining</string>
     <string name="photos">Photos</string>
     <string name="detail_sec">%d second</string>
     <string name="reconfigure">Reconfigure</string>
