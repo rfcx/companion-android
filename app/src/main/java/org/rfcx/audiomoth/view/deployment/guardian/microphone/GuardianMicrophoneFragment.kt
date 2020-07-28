@@ -5,14 +5,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_guardian_microphone.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.connection.socket.OnReceiveResponse
+import org.rfcx.audiomoth.connection.socket.SocketManager
+import org.rfcx.audiomoth.entity.socket.SocketResposne
+import org.rfcx.audiomoth.util.MicrophoneTestUtils
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 
-class GuardianMicrophoneFragment : Fragment() {
+class GuardianMicrophoneFragment : Fragment(), OnReceiveResponse {
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
+    private val microphoneTestUtils by lazy {
+        MicrophoneTestUtils()
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -35,14 +43,19 @@ class GuardianMicrophoneFragment : Fragment() {
 
         listenAudioButton.setOnClickListener {
             setUiByState(MicTestingState.LISTENING)
+            retrieveLiveAudioBuffer()
         }
 
         cancelAudioButton.setOnClickListener {
             setUiByState(MicTestingState.FINISH)
+            retrieveLiveAudioBuffer()
+            microphoneTestUtils.stop()
         }
 
         listenAgainAudioButton.setOnClickListener {
             setUiByState(MicTestingState.LISTENING)
+            microphoneTestUtils.play()
+            retrieveLiveAudioBuffer()
         }
 
         finishButton.setOnClickListener {
@@ -76,9 +89,35 @@ class GuardianMicrophoneFragment : Fragment() {
         }
     }
 
+    private fun retrieveLiveAudioBuffer() {
+        SocketManager.getLiveAudioBuffer(
+            microphoneTestUtils,
+            this@GuardianMicrophoneFragment
+        )
+    }
+
+    override fun onReceive(response: SocketResposne) { /* not used */ }
+
+    override fun onFailed(message: String) {
+        requireActivity().runOnUiThread {
+            Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        microphoneTestUtils.let {
+            it.stop()
+            it.release()
+        }
+        SocketManager.stopAudioQueueThread()
+        SocketManager.stopConnection()
+    }
+
     companion object {
         enum class MicTestingState { READY, LISTENING, FINISH }
 
         fun newInstance(): GuardianMicrophoneFragment = GuardianMicrophoneFragment()
     }
+
 }
