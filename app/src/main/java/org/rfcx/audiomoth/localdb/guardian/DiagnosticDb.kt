@@ -1,10 +1,10 @@
 package org.rfcx.audiomoth.localdb.guardian
 
 import io.realm.Realm
+import java.util.*
 import org.rfcx.audiomoth.entity.SyncState
 import org.rfcx.audiomoth.entity.guardian.DiagnosticInfo
 import org.rfcx.audiomoth.entity.response.DiagnosticResponse
-import java.util.*
 
 class DiagnosticDb(private val realm: Realm) {
 
@@ -39,7 +39,6 @@ class DiagnosticDb(private val realm: Realm) {
                 diagnosticInfo.id = id
                 diagnosticInfo.syncState = SyncState.Unsent.key
                 it.insertOrUpdate(diagnosticInfo)
-
             } else {
                 val diagnosticInfo =
                     it.where(DiagnosticInfo::class.java)
@@ -55,7 +54,6 @@ class DiagnosticDb(private val realm: Realm) {
                     )
                     it.insertOrUpdate(newDiagnosticInfo)
                 }
-
             }
         }
     }
@@ -115,5 +113,4 @@ class DiagnosticDb(private val realm: Realm) {
             }
         }
     }
-
 }

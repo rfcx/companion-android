@@ -4,7 +4,6 @@ import com.google.gson.annotations.Expose
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
-import org.rfcx.audiomoth.entity.response.DeploymentResponse
 import java.util.*
 
 @RealmClass

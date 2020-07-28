@@ -6,8 +6,6 @@
 
 package org.rfcx.audiomoth.util
 
-import org.rfcx.audiomoth.util.AudioMothConfiguration
-
 import java.util.Calendar
 
 interface AudioMothConnector {
@@ -17,5 +15,4 @@ interface AudioMothConnector {
     fun getPacketLength(configuration: AudioMothConfiguration): Int
 
     fun setConfiguration(calendar: Calendar, configuration: AudioMothConfiguration, id: DeploymentIdentifier?)
-
 }

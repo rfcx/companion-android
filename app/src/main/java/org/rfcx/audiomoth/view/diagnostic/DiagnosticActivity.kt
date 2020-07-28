@@ -23,12 +23,9 @@ import org.rfcx.audiomoth.entity.socket.SocketResposne
 import org.rfcx.audiomoth.localdb.guardian.DiagnosticDb
 import org.rfcx.audiomoth.service.DiagnosticSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
-import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
 import org.rfcx.audiomoth.view.prefs.GuardianPrefsFragment
 import org.rfcx.audiomoth.view.prefs.SyncPreferenceListener
-import java.security.Guard
-
 
 class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
 
@@ -137,7 +134,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
                     val prefsData = diagnosticInfo.prefs
 
                     runOnUiThread {
-                        //set Diagnostic detail
+                        // set Diagnostic detail
                         detailRecordValue.text =
                             getString(R.string.detail_file, diagnosticData.totalLocal)
                         detailCheckInValue.text =
@@ -148,7 +145,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
                         detailBatteryValue.text =
                             getString(R.string.detail_percentage, diagnosticData.batteryPercentage)
 
-                        //set Configuration
+                        // set Configuration
                         configFileFormatValue.text = configurationData.fileFormat
                         configSampleRateValue.text =
                             getString(R.string.detail_khz, configurationData.sampleRate)
@@ -177,7 +174,6 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
                             .show()
                     }
                 }
-
             })
         } else {
             setupLastKnownDiagnostic()
@@ -185,7 +181,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
     }
 
     private fun setupLastKnownDiagnostic() {
-        //configuration data from marker
+        // configuration data from marker
         val configurationInfo = configuration?.toReadableFormat()
         configFileFormatValue.text = configurationInfo?.fileFormat
         configSampleRateValue.text =
@@ -309,7 +305,6 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
         super.onDestroy()
         this.prefsEditor?.clear()?.apply()
     }
-
 
     companion object {
         private const val TAG_LOADING_DIALOG = "TAG_LOADING_DIALOG"

@@ -1,6 +1,5 @@
 package org.rfcx.audiomoth.view.deployment.configure
 
-
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -19,7 +18,8 @@ class SelectProfileFragment : Fragment(), (Profile) -> Unit {
     private var profiles = listOf<Profile>()
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_select_profile, container, false)

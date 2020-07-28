@@ -1,6 +1,5 @@
 package org.rfcx.audiomoth.view.map
 
-
 import android.content.Context
 import android.content.Intent
 import android.graphics.PointF
@@ -122,7 +121,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_map, container, false)
@@ -207,7 +207,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private fun setupMarkerLayers(style: Style) {
         val markerLayer = SymbolLayer(MARKER_DEPLOYMENT_ID, SOURCE_DEPLOYMENT).apply {
             withProperties(
-                PropertyFactory.iconImage("{${PROPERTY_MARKER_IMAGE}}"),
+                PropertyFactory.iconImage("{$PROPERTY_MARKER_IMAGE}"),
                 PropertyFactory.iconAllowOverlap(true),
                 PropertyFactory.iconIgnorePlacement(true),
                 PropertyFactory.iconSize(1f)

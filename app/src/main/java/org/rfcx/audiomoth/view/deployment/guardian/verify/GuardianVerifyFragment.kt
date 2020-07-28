@@ -3,13 +3,13 @@ package org.rfcx.audiomoth.view.deployment.guardian.verify
 import android.content.Context
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import java.util.*
 import kotlinx.android.synthetic.main.fragment_guardian_verify.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.OnReceiveResponse
@@ -17,7 +17,6 @@ import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.entity.socket.SignalResponse
 import org.rfcx.audiomoth.entity.socket.SocketResposne
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
-import java.util.*
 
 class GuardianVerifyFragment : Fragment(), OnReceiveResponse {
     private val listOfSignal by lazy {
@@ -54,7 +53,7 @@ class GuardianVerifyFragment : Fragment(), OnReceiveResponse {
     }
 
     private fun retrieveGuardianSignal() {
-        timer.schedule(object : TimerTask(){
+        timer.schedule(object : TimerTask() {
             override fun run() {
                 SocketManager.getSignalStrength(this@GuardianVerifyFragment)
             }
@@ -63,7 +62,7 @@ class GuardianVerifyFragment : Fragment(), OnReceiveResponse {
 
     private fun showSignalStrength(state: SignalState) {
         listOfSignal.forEachIndexed { index, view ->
-            if (index < state.value){
+            if (index < state.value) {
                 (view.background as GradientDrawable).setBackground(requireContext(), R.color.signal_filled)
             } else {
                 (view.background as GradientDrawable).setBackground(requireContext(), R.color.white)

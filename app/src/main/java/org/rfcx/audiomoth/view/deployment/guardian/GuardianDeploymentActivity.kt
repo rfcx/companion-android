@@ -7,6 +7,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import io.realm.Realm
+import java.util.*
 import kotlinx.android.synthetic.main.activity_deployment.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.DeploymentLocation
@@ -30,7 +31,6 @@ import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
 import org.rfcx.audiomoth.view.dialog.CompleteFragment
 import org.rfcx.audiomoth.view.dialog.CompleteListener
 import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
-import java.util.*
 
 class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtocol,
     CompleteListener {

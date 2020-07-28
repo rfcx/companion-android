@@ -65,5 +65,4 @@ class Preferences(context: Context) {
     fun clear() {
         sharedPreferences.edit().clear().apply()
     }
-
 }

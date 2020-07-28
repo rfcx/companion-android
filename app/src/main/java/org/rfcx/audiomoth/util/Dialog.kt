@@ -10,8 +10,11 @@ fun Activity.showCommonDialog(message: String) {
     showCommonDialog(null, message)
 }
 
-fun Activity.showCommonDialog(title: String? = null, message: String,
-                              onClick: DialogInterface.OnClickListener? = null) {
+fun Activity.showCommonDialog(
+    title: String? = null,
+    message: String,
+    onClick: DialogInterface.OnClickListener? = null
+) {
     if (isDestroyed || isFinishing) return
 
     AlertDialog.Builder(this)
@@ -25,7 +28,10 @@ fun Activity.showCommonDialog(@StringRes message: Int) {
     showCommonDialog(null, getString(message))
 }
 
-fun Activity.showCommonDialog(@StringRes title: Int, @StringRes message: Int,
-                              onClick: DialogInterface.OnClickListener? = null) {
+fun Activity.showCommonDialog(
+    @StringRes title: Int,
+    @StringRes message: Int,
+    onClick: DialogInterface.OnClickListener? = null
+) {
     showCommonDialog(getString(title), getString(message), onClick)
 }

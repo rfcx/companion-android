@@ -4,10 +4,10 @@ import com.google.gson.annotations.Expose
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
-import org.rfcx.audiomoth.entity.DeploymentLocation
-import org.rfcx.audiomoth.entity.Device
 import java.io.Serializable
 import java.util.*
+import org.rfcx.audiomoth.entity.DeploymentLocation
+import org.rfcx.audiomoth.entity.Device
 
 @RealmClass
 open class GuardianDeployment(

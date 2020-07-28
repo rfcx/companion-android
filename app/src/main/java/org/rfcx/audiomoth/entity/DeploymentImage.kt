@@ -21,7 +21,7 @@ open class DeploymentImage(
     var syncState: Int = 0,
     @Expose(serialize = false)
     var syncToFireStoreState: Int = 0
-    ) : RealmModel {
+) : RealmModel {
     companion object {
         const val FIELD_ID = "id"
         const val FIELD_DEPLOYMENT_ID = "deploymentId"

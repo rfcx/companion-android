@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import io.realm.Realm
+import java.sql.Timestamp
+import java.util.*
 import kotlinx.android.synthetic.main.activity_deployment.*
 import org.rfcx.audiomoth.BuildConfig
 import org.rfcx.audiomoth.R
@@ -30,8 +32,6 @@ import org.rfcx.audiomoth.view.deployment.verify.PerformBatteryFragment.Companio
 import org.rfcx.audiomoth.view.dialog.CompleteFragment
 import org.rfcx.audiomoth.view.dialog.CompleteListener
 import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
-import java.sql.Timestamp
-import java.util.*
 
 class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteListener {
     // manager database

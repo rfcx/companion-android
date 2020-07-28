@@ -1,11 +1,11 @@
 package org.rfcx.audiomoth.entity.response
 
+import java.util.*
 import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.DeploymentState
 import org.rfcx.audiomoth.entity.SyncState
 import org.rfcx.audiomoth.entity.guardian.GuardianConfiguration
 import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
-import java.util.*
 
 data class GuardianDeploymentResponse(
     var device: String? = null,

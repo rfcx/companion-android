@@ -1,8 +1,8 @@
 package org.rfcx.audiomoth.entity.response
 
 import io.realm.RealmList
-import org.rfcx.audiomoth.entity.*
 import java.util.*
+import org.rfcx.audiomoth.entity.*
 
 /**
  * Firestore response for getting a deployment

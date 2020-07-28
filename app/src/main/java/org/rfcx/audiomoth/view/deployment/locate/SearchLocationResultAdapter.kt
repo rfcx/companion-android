@@ -53,7 +53,6 @@ class SearchLocationResultAdapter :
     fun showError(error: SearchResultError) {
         submitList(listOf(error))
     }
-
 }
 
 class SearchLocationResultDiffCallback : DiffUtil.ItemCallback<BaseListItem>() {
@@ -82,9 +81,7 @@ class SearchLocationResultDiffCallback : DiffUtil.ItemCallback<BaseListItem>() {
             else -> false
         }
     }
-
 }
-
 
 class SearchLocationViewHolder(
     itemView: View,
@@ -143,7 +140,6 @@ class SearchLocationErrorViewHolder(itemView: View) : RecyclerView.ViewHolder(it
         itemView.searchErrorTitleTextView.text = error.title
         itemView.searchErrorMessageTextView.text = error.message
     }
-
 }
 
 data class SearchResult(

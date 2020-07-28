@@ -6,8 +6,8 @@ import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.Task
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
-import kotlinx.coroutines.tasks.await
 import java.io.File
+import kotlinx.coroutines.tasks.await
 
 class Storage(val context: Context) {
     private val storage = FirebaseStorage.getInstance()

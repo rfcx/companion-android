@@ -57,10 +57,10 @@ class ProfilesAdapter(private val itemClickListener: (Profile) -> Unit) :
                 "${profile.recordingDuration} sec/ ${profile.sleepDuration} sec"
             }
 
-            var detail = "${profile.sampleRate} kHz, ${gainLabel}, $duration"
+            var detail = "${profile.sampleRate} kHz, $gainLabel, $duration"
 
             if (profile.recordingPeriodList.isNotEmpty()) {
-                detail = "${profile.sampleRate} kHz, ${gainLabel}, $duration, $time"
+                detail = "${profile.sampleRate} kHz, $gainLabel, $duration, $time"
             }
 
             detailProfile.text = detail

@@ -1,6 +1,5 @@
 package org.rfcx.audiomoth.view.deployment.locate
 
-
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
@@ -105,7 +104,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_location, container, false)

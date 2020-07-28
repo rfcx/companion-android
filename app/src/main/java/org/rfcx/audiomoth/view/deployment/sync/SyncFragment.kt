@@ -2,7 +2,6 @@ package org.rfcx.audiomoth.view.deployment.sync
 
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,7 +22,8 @@ class SyncFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         var view = inflater.inflate(R.layout.fragment_before_sync, container, false)
@@ -79,4 +79,3 @@ class SyncFragment : Fragment() {
         }
     }
 }
-

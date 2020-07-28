@@ -1,7 +1,7 @@
 package org.rfcx.audiomoth.entity.request
 
-import org.rfcx.audiomoth.entity.Profile
 import java.util.*
+import org.rfcx.audiomoth.entity.Profile
 
 data class ProfileRequest(
     var name: String = "",

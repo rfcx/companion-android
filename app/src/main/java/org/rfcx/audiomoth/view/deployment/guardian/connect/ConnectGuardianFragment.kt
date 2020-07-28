@@ -86,7 +86,7 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
     }
 
     override fun onWifiConnected() {
-        SocketManager.connect(object: OnReceiveResponse{
+        SocketManager.connect(object : OnReceiveResponse {
             override fun onReceive(response: SocketResposne) {
                 activity?.runOnUiThread {
                     val connection = response as ConnectionResponse
@@ -140,7 +140,7 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
     }
 
     private fun retryCountdown(state: String) {
-        countDownTimer = object: CountDownTimer(10000, 1000) {
+        countDownTimer = object : CountDownTimer(10000, 1000) {
             override fun onFinish() {
                 if (state == SCAN) {
                     showNotFound()
