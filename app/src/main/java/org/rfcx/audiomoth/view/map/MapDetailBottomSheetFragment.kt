@@ -129,11 +129,11 @@ class MapDetailBottomSheetFragment : Fragment() {
     private fun getEstimatedBatteryDuration(timestamp: Long): String {
         val currentMillis = System.currentTimeMillis()
         return if (timestamp > currentMillis) {
-            val cal = ((timestamp - currentMillis) / (DAY).toDouble()).roundToInt()
-            if (cal > 1) getString(
+            val numberOfDate = ((timestamp - currentMillis) / (DAY).toDouble()).roundToInt()
+            if (numberOfDate > 1) getString(
                 R.string.days_remaining,
-                cal
-            ) else getString(R.string.day_remaining, cal)
+                numberOfDate
+            ) else getString(R.string.day_remaining, numberOfDate)
         } else {
             getString(R.string.battery_depleted)
         }
