@@ -50,7 +50,7 @@ object SocketManager {
         signal.value = SignalResponse()
     }
 
-    fun connect() {
+    fun getConnection() {
         val data = gson.toJson(SocketRequest(CONNECTION))
         sendMessage(data)
     }
@@ -86,6 +86,7 @@ object SocketManager {
             try {
                 socket = Socket("192.168.43.1", 9999)
                 outputStream = DataOutputStream(socket?.getOutputStream())
+                startInComingMessageThread()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -195,10 +196,18 @@ object SocketManager {
     }
 
     fun stopConnection() {
+        inComingMessageThread?.interrupt()
+        inComingMessageThread = null
+
         clientThread?.interrupt()
+        clientThread = null
+
+        outputStream?.close()
+        socket?.close()
     }
 
     fun stopAudioQueueThread() {
         audioThread?.interrupt()
+        audioThread = null
     }
 }
