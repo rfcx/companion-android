@@ -4,21 +4,18 @@ import android.content.Context
 import android.net.wifi.ScanResult
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_connect_guardian.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.connection.socket.OnReceiveResponse
 import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.connection.wifi.OnWifiListener
 import org.rfcx.audiomoth.connection.wifi.WifiHotspotManager
-import org.rfcx.audiomoth.entity.socket.ConnectionResponse
-import org.rfcx.audiomoth.entity.socket.SocketResposne
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 
 class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit {
@@ -37,12 +34,19 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
         deploymentProtocol = (context as GuardianDeploymentProtocol)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_connect_guardian, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // connect to SocketServer
+        SocketManager.connectSocket()
 
         deploymentProtocol?.hideCompleteButton()
         showLoading()
@@ -86,25 +90,16 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
     }
 
     override fun onWifiConnected() {
-        SocketManager.connect(object : OnReceiveResponse {
-            override fun onReceive(response: SocketResposne) {
-                activity?.runOnUiThread {
-                    val connection = response as ConnectionResponse
-                    Log.d("ConenctionGuardian", connection.connection.status)
-                    if (connection.connection.status == CONNECTION_SUCCESS) {
-                        if (connectionCount == 0) {
-                            deploymentProtocol?.setDeploymentWifiName(guardianHotspot!!.SSID)
-                            deploymentProtocol?.nextStep()
-                        }
-                        connectionCount += 1
-                    } else {
-                        hideLoading()
+        SocketManager.getConnection()
+        SocketManager.connection.observe(this, Observer { response ->
+            activity?.runOnUiThread {
+                if (response.connection.status == CONNECTION_SUCCESS) {
+                    if (connectionCount == 0) {
+                        deploymentProtocol?.setDeploymentWifiName(guardianHotspot!!.SSID)
+                        deploymentProtocol?.nextStep()
                     }
-                }
-            }
-
-            override fun onFailed(message: String) {
-                activity?.runOnUiThread {
+                    connectionCount += 1
+                } else {
                     hideLoading()
                 }
             }
