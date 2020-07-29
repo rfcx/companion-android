@@ -59,9 +59,7 @@ class DeploymentViewPagerFragment : Fragment() {
                 viewPagerAdapter.deployments = showDeployments
                 val deploymentIndex =
                     showDeployments.indexOf(showDeployments.find { it.id == this.id })
-                deploymentViewPager.post {
-                    deploymentViewPager.setCurrentItem(deploymentIndex, false)
-                }
+                deploymentViewPager.setCurrentItem(deploymentIndex, false)
             }
         }
     }

@@ -226,7 +226,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         PROPERTY_MARKER_LOCATION_ID
                     )
                 ) {
-                    features[index]?.let { setFeatureSelectState(it, true) }
                     val id =
                         selectedFeature.getStringProperty(PROPERTY_MARKER_LOCATION_ID).split(".")[1]
                     (activity as MainActivityListener).showBottomSheet(
@@ -234,30 +233,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                             id.toInt()
                         )
                     )
-                } else {
-                    features[index]?.let { setFeatureSelectState(it, false) }
                 }
             }
             return true
         }
         (activity as MainActivityListener).hideBottomSheet()
 
-        clearFeatureSelected()
         return false
-    }
-
-    private fun clearFeatureSelected() {
-        if (this.deploymentFeatures?.features() != null) {
-            val features = this.deploymentFeatures!!.features()
-            features?.forEach { setFeatureSelectState(it, false) }
-        }
-    }
-
-    private fun setFeatureSelectState(feature: Feature, selectedState: Boolean) {
-        feature.properties()?.let {
-            it.addProperty(PROPERTY_SELECTED, selectedState)
-            refreshSource()
-        }
     }
 
     private val guardianDeploymentObserve = Observer<List<GuardianDeployment>> {
