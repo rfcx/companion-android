@@ -25,10 +25,13 @@ object Battery {
         val currentMillis = System.currentTimeMillis()
         return if (timestamp > currentMillis) {
             val numberOfDate = ((timestamp - currentMillis) / DAY.toDouble()).roundToInt()
-            if (numberOfDate > 1) context.getString(
-                R.string.days_remaining,
-                numberOfDate
-            ) else context.getString(R.string.day_remaining, numberOfDate)
+            when {
+                numberOfDate > 1 -> context.getString(R.string.days_remaining, numberOfDate)
+                numberOfDate == 1 -> context.getString(
+                    R.string.day_remaining, numberOfDate.toString()
+                )
+                else -> context.getString(R.string.day_remaining, "<1")
+            }
         } else {
             context.getString(R.string.battery_depleted)
         }
