@@ -1,5 +1,6 @@
 package org.rfcx.audiomoth.connection.socket
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import org.json.JSONObject
@@ -13,11 +14,11 @@ object SocketManager {
 
     private var socket: Socket? = null
     private var outputStream: DataOutputStream? = null
-    private var clientThread: Thread? = null // Thread for socket communication
-    private var audioThread: Thread? =
-        null // Separated thread for queuing audio and set audio track
+    private var inputStream: DataInputStream? = null
+    private var clientThread: Thread? = null// Thread for socket communication
+    private var audioThread: Thread? = null// Separated thread for queuing audio and set audio track
 
-    private var inComingMessageThread: Thread? = null
+    private lateinit var inComingMessageThread: Thread
 
     private val gson = Gson()
 
@@ -83,12 +84,16 @@ object SocketManager {
         sendMessage(data)
     }
 
-    fun connectSocket() {
+    private fun sendMessage(message: String) {
         clientThread = Thread(Runnable {
             try {
+                Log.d("Socket", "Connecting thread")
                 socket = Socket("192.168.43.1", 9999)
-                outputStream = DataOutputStream(socket?.getOutputStream())
                 startInComingMessageThread()
+                Log.d("Socket", "Sending message $message")
+                outputStream = DataOutputStream(socket?.getOutputStream())
+                outputStream?.writeUTF(message)
+                outputStream?.flush()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -96,18 +101,15 @@ object SocketManager {
         clientThread?.start()
     }
 
-    private fun sendMessage(message: String) {
-        outputStream?.writeUTF(message)
-        outputStream?.flush()
-    }
-
     private fun startInComingMessageThread() {
         inComingMessageThread = Thread(Runnable {
             try {
                 while (true) {
-                    val dataInput = DataInputStream(socket!!.getInputStream()).readUTF()
+                    inputStream = DataInputStream(socket!!.getInputStream())
+                    val dataInput = inputStream?.readUTF()
                     if (!dataInput.isNullOrBlank()) {
 
+                        Log.d("Socket", "getting new command")
                         val receiveJson = JSONObject(dataInput)
                         val jsonIterator = receiveJson.keys()
 
@@ -116,17 +118,17 @@ object SocketManager {
                             CONFIGURE -> {
                                 val response =
                                     gson.fromJson(dataInput, ConfigurationResponse::class.java)
-                                this.currentConfiguration.value = response
+                                this.currentConfiguration.postValue(response)
                             }
                             DIAGNOSTIC -> {
                                 val response =
                                     gson.fromJson(dataInput, DiagnosticResponse::class.java)
-                                this.diagnostic.value = response
+                                this.diagnostic.postValue(response)
                             }
                             CONNECTION -> {
                                 val response =
                                     gson.fromJson(dataInput, ConnectionResponse::class.java)
-                                this.connection.value = response
+                                this.connection.postValue(response)
                             }
                             SYNC -> {
                                 val response =
@@ -135,20 +137,20 @@ object SocketManager {
                                         SyncConfigurationResponse::class.java
                                     )
                                 if (response.sync.status == Status.SUCCESS.value) {
-                                    this.syncConfiguration.value = response
+                                    this.syncConfiguration.postValue(response)
                                 } else {
-                                    this.syncConfiguration.value = response
+                                    this.syncConfiguration.postValue(response)
                                 }
                             }
                             PREFS -> {
                                 val response =
                                     gson.fromJson(dataInput, PrefsResponse::class.java)
-                                this.prefs.value = response
+                                this.prefs.postValue(response)
                             }
                             SIGNAL_INFO -> {
                                 val response =
                                     gson.fromJson(dataInput, SignalResponse::class.java)
-                                this.signal.value = response
+                                this.signal.postValue(response)
                             }
                             MICROPHONE_TEST -> {
                                 val response =
@@ -161,7 +163,7 @@ object SocketManager {
                                     setAudioFromQueue()
                                     isTestingFirstTime = false
                                 }
-                                this.liveAudio.value = response
+                                this.liveAudio.postValue(response)
                                 audioQueue.add(response.audioBuffer.buffer)
                             }
                         }
@@ -171,7 +173,7 @@ object SocketManager {
                 e.printStackTrace()
             }
         })
-        inComingMessageThread?.start()
+        inComingMessageThread.start()
     }
 
     private fun setAudioFromQueue() {
@@ -199,11 +201,15 @@ object SocketManager {
     }
 
     fun stopConnection() {
-        inComingMessageThread?.interrupt()
-        inComingMessageThread = null
+        //stop incoming message thread
+        inComingMessageThread.interrupt()
 
+        //stop server thread
         clientThread?.interrupt()
-        clientThread = null
+
+        outputStream?.close()
+
+        inputStream?.close()
 
         outputStream?.close()
         socket?.close()
@@ -211,6 +217,5 @@ object SocketManager {
 
     fun stopAudioQueueThread() {
         audioThread?.interrupt()
-        audioThread = null
     }
 }

@@ -130,7 +130,6 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
     private fun retrieveDiagnosticInfo() {
         if (isConnected == true) {
             showLoading()
-            SocketManager.connectSocket()
             SocketManager.getDiagnosticData()
             SocketManager.diagnostic.observe(this, Observer { diagnosticInfo ->
                 val diagnosticData = diagnosticInfo.diagnostic

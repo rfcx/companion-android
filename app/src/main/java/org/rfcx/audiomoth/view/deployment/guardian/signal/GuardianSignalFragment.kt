@@ -19,6 +19,8 @@ class GuardianSignalFragment : Fragment() {
         listOf(signalStrength1, signalStrength2, signalStrength3, signalStrength4)
     }
 
+    private var isSignalTesting = false
+
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
 
     override fun onAttach(context: Context) {
@@ -45,8 +47,10 @@ class GuardianSignalFragment : Fragment() {
     }
 
     private fun retrieveGuardianSignal() {
+        isSignalTesting = true
         SocketManager.getSignalStrength()
         SocketManager.signal.observe(viewLifecycleOwner, Observer { signal ->
+            deploymentProtocol?.hideLoading()
             val strength = signal.signalInfo.signal
             val simCard = signal.signalInfo.simCard
             requireActivity().runOnUiThread {
@@ -115,6 +119,13 @@ class GuardianSignalFragment : Fragment() {
 
     private fun hideSimError() {
         signalErrorText.visibility = View.GONE
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        if(isSignalTesting) {
+            SocketManager.getSignalStrength() // call to disable getting signal
+        }
     }
 
     companion object {

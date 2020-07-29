@@ -114,8 +114,8 @@ class WifiHotspotManager(private val context: Context) {
                 context!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             val netInfo = conManager.activeNetworkInfo
             if (netInfo != null && netInfo.isConnected && netInfo.type == ConnectivityManager.TYPE_WIFI) {
-                Log.d("WifiHotspot", "Connected to hotspot")
                 if (!isConnected) {
+                    Log.d("WifiHotspot", "Connected to hotspot")
                     onWifiListener.onWifiConnected()
                     isConnected = true
                 }

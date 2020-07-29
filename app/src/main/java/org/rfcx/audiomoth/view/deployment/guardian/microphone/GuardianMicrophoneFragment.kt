@@ -20,6 +20,8 @@ class GuardianMicrophoneFragment : Fragment() {
         MicrophoneTestUtils()
     }
 
+    private var isMicTesting = false
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         deploymentProtocol = (context as GuardianDeploymentProtocol)
@@ -40,17 +42,20 @@ class GuardianMicrophoneFragment : Fragment() {
         setUiByState(MicTestingState.READY)
 
         listenAudioButton.setOnClickListener {
+            isMicTesting = true
             setUiByState(MicTestingState.LISTENING)
             retrieveLiveAudioBuffer()
         }
 
         cancelAudioButton.setOnClickListener {
+            isMicTesting = false
             setUiByState(MicTestingState.FINISH)
             retrieveLiveAudioBuffer()
             microphoneTestUtils.stop()
         }
 
         listenAgainAudioButton.setOnClickListener {
+            isMicTesting = true
             setUiByState(MicTestingState.LISTENING)
             microphoneTestUtils.play()
             retrieveLiveAudioBuffer()
@@ -101,6 +106,9 @@ class GuardianMicrophoneFragment : Fragment() {
             it.release()
         }
         SocketManager.stopAudioQueueThread()
+        if (isMicTesting) {
+            SocketManager.getLiveAudioBuffer(microphoneTestUtils) // call to disable getting audio
+        }
     }
 
     companion object {

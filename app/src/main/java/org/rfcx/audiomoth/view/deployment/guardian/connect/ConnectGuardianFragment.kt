@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.wifi.ScanResult
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -44,9 +45,6 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // connect to SocketServer
-        SocketManager.connectSocket()
 
         deploymentProtocol?.hideCompleteButton()
         showLoading()
@@ -90,9 +88,11 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
     }
 
     override fun onWifiConnected() {
+        // connect to SocketServer
         SocketManager.getConnection()
         SocketManager.connection.observe(viewLifecycleOwner, Observer { response ->
             requireActivity().runOnUiThread {
+                Log.d("Socket", "data changed")
                 if (response.connection.status == CONNECTION_SUCCESS) {
                     if (connectionCount == 0) {
                         deploymentProtocol?.setDeploymentWifiName(guardianHotspot!!.SSID)
