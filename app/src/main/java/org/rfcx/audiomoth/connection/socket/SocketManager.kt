@@ -7,7 +7,6 @@ import org.rfcx.audiomoth.entity.socket.*
 import org.rfcx.audiomoth.util.MicrophoneTestUtils
 import java.io.DataInputStream
 import java.io.DataOutputStream
-import java.net.ConnectException
 import java.net.Socket
 
 object SocketManager {
@@ -15,7 +14,8 @@ object SocketManager {
     private var socket: Socket? = null
     private var outputStream: DataOutputStream? = null
     private var clientThread: Thread? = null // Thread for socket communication
-    private var audioThread: Thread? = null // Separated thread for queuing audio and set audio track
+    private var audioThread: Thread? =
+        null // Separated thread for queuing audio and set audio track
 
     private var inComingMessageThread: Thread? = null
 
@@ -40,6 +40,7 @@ object SocketManager {
     val syncConfiguration = MutableLiveData<SyncConfigurationResponse>()
     val prefs = MutableLiveData<PrefsResponse>()
     val signal = MutableLiveData<SignalResponse>()
+    val liveAudio = MutableLiveData<MicrophoneTestResponse>()
 
     init {
         connection.value = ConnectionResponse()
@@ -48,6 +49,7 @@ object SocketManager {
         syncConfiguration.value = SyncConfigurationResponse()
         prefs.value = PrefsResponse()
         signal.value = SignalResponse()
+        liveAudio.value = MicrophoneTestResponse()
     }
 
     fun getConnection() {
@@ -99,7 +101,7 @@ object SocketManager {
         outputStream?.flush()
     }
 
-    fun startInComingMessageThread() {
+    private fun startInComingMessageThread() {
         inComingMessageThread = Thread(Runnable {
             try {
                 while (true) {
@@ -159,6 +161,7 @@ object SocketManager {
                                     setAudioFromQueue()
                                     isTestingFirstTime = false
                                 }
+                                this.liveAudio.value = response
                                 audioQueue.add(response.audioBuffer.buffer)
                             }
                         }

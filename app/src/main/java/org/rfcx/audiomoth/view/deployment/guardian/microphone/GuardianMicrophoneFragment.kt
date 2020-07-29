@@ -5,17 +5,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_guardian_microphone.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.connection.socket.OnReceiveResponse
 import org.rfcx.audiomoth.connection.socket.SocketManager
-import org.rfcx.audiomoth.entity.socket.SocketResposne
 import org.rfcx.audiomoth.util.MicrophoneTestUtils
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 
-class GuardianMicrophoneFragment : Fragment(), OnReceiveResponse {
+class GuardianMicrophoneFragment : Fragment() {
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
     private val microphoneTestUtils by lazy {
@@ -90,18 +88,10 @@ class GuardianMicrophoneFragment : Fragment(), OnReceiveResponse {
     }
 
     private fun retrieveLiveAudioBuffer() {
-        SocketManager.getLiveAudioBuffer(
-            microphoneTestUtils,
-            this@GuardianMicrophoneFragment
-        )
-    }
-
-    override fun onReceive(response: SocketResposne) { /* not used */ }
-
-    override fun onFailed(message: String) {
-        requireActivity().runOnUiThread {
-            Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
-        }
+        SocketManager.getLiveAudioBuffer(microphoneTestUtils)
+        SocketManager.liveAudio.observe(viewLifecycleOwner, Observer {
+            //TODO: for wave form
+        })
     }
 
     override fun onDetach() {
@@ -111,7 +101,6 @@ class GuardianMicrophoneFragment : Fragment(), OnReceiveResponse {
             it.release()
         }
         SocketManager.stopAudioQueueThread()
-        SocketManager.stopConnection()
     }
 
     companion object {

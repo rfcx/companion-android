@@ -91,8 +91,8 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
 
     override fun onWifiConnected() {
         SocketManager.getConnection()
-        SocketManager.connection.observe(this, Observer { response ->
-            activity?.runOnUiThread {
+        SocketManager.connection.observe(viewLifecycleOwner, Observer { response ->
+            requireActivity().runOnUiThread {
                 if (response.connection.status == CONNECTION_SUCCESS) {
                     if (connectionCount == 0) {
                         deploymentProtocol?.setDeploymentWifiName(guardianHotspot!!.SSID)
@@ -135,7 +135,7 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
     }
 
     private fun retryCountdown(state: String) {
-        countDownTimer = object : CountDownTimer(10000, 1000) {
+        countDownTimer = object : CountDownTimer(15000, 1000) {
             override fun onFinish() {
                 if (state == SCAN) {
                     showNotFound()
