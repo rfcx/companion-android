@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonArray
@@ -15,11 +16,9 @@ import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_guardian_diagnostic.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.connection.socket.OnReceiveResponse
 import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.entity.guardian.*
-import org.rfcx.audiomoth.entity.socket.DiagnosticResponse
-import org.rfcx.audiomoth.entity.socket.SocketResposne
+import org.rfcx.audiomoth.entity.socket.Status
 import org.rfcx.audiomoth.localdb.guardian.DiagnosticDb
 import org.rfcx.audiomoth.service.DiagnosticSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
@@ -31,7 +30,11 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
 
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val diagnosticDb: DiagnosticDb by lazy { DiagnosticDb(realm) }
-    private val diagnosticInfo: DiagnosticInfo by lazy { diagnosticDb.getDiagnosticInfo(deploymentServerId) }
+    private val diagnosticInfo: DiagnosticInfo by lazy {
+        diagnosticDb.getDiagnosticInfo(
+            deploymentServerId
+        )
+    }
 
     private var collapseAdvanced = false
     private var prefsChanges: Map<String, String>? = null
@@ -114,7 +117,8 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
             setDisplayShowTitleEnabled(true)
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
-            title = if (isConnected != false) locationName else "$locationName (${diagnosticInfo.getRelativeTimeSpan()})"
+            title =
+                if (isConnected != false) locationName else "$locationName (${diagnosticInfo.getRelativeTimeSpan()})"
         }
     }
 
@@ -126,55 +130,54 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
     private fun retrieveDiagnosticInfo() {
         if (isConnected == true) {
             showLoading()
-            SocketManager.getDiagnosticData(object : OnReceiveResponse {
-                override fun onReceive(response: SocketResposne) {
-                    val diagnosticInfo = response as DiagnosticResponse
-                    val diagnosticData = diagnosticInfo.diagnostic
-                    val configurationData = diagnosticInfo.configure.toReadableFormat()
-                    val prefsData = diagnosticInfo.prefs
+            SocketManager.connectSocket()
+            SocketManager.getDiagnosticData()
+            SocketManager.diagnostic.observe(this, Observer { diagnosticInfo ->
+                val diagnosticData = diagnosticInfo.diagnostic
+                val configurationData = diagnosticInfo.configure.toReadableFormat()
+                val prefsData = diagnosticInfo.prefs
 
-                    runOnUiThread {
-                        // set Diagnostic detail
-                        detailRecordValue.text =
-                            getString(R.string.detail_file, diagnosticData.totalLocal)
-                        detailCheckInValue.text =
-                            getString(R.string.detail_file, diagnosticData.totalCheckIn)
-                        detailTotalSizeValue.text =
-                            getString(R.string.detail_size, diagnosticData.totalFileSize / 1000)
-                        detailTotalTimeValue.text = diagnosticData.getRecordTime()
-                        detailBatteryValue.text =
-                            getString(R.string.detail_percentage, diagnosticData.batteryPercentage)
+                runOnUiThread {
+                    // set Diagnostic detail
+                    detailRecordValue.text =
+                        getString(R.string.detail_file, diagnosticData.totalLocal)
+                    detailCheckInValue.text =
+                        getString(R.string.detail_file, diagnosticData.totalCheckIn)
+                    detailTotalSizeValue.text =
+                        getString(R.string.detail_size, diagnosticData.totalFileSize / 1000)
+                    detailTotalTimeValue.text = diagnosticData.getRecordTime()
+                    detailBatteryValue.text =
+                        getString(R.string.detail_percentage, diagnosticData.batteryPercentage)
 
-                        // set Configuration
-                        configFileFormatValue.text = configurationData.fileFormat
-                        configSampleRateValue.text =
-                            getString(R.string.detail_khz, configurationData.sampleRate)
-                        configBitrateValue.text =
-                            getString(R.string.detail_kbs, configurationData.bitrate)
-                        configDurationValue.text =
-                            getString(R.string.detail_secs, configurationData.duration)
+                    // set Configuration
+                    configFileFormatValue.text = configurationData.fileFormat
+                    configSampleRateValue.text =
+                        getString(R.string.detail_khz, configurationData.sampleRate)
+                    configBitrateValue.text =
+                        getString(R.string.detail_kbs, configurationData.bitrate)
+                    configDurationValue.text =
+                        getString(R.string.detail_secs, configurationData.duration)
 
-                        setupAdvancedSetting()
-                        setupCurrentPrefs(prefsData)
-                        hideLoading()
-                    }
-
-                    saveNewDiagnostic()
+                    setupAdvancedSetting()
+                    setupCurrentPrefs(prefsData)
+                    hideLoading()
                 }
 
-                override fun onFailed(message: String) {
-                    runOnUiThread {
-                        hideLoading()
-                        Snackbar.make(
-                            diagRootView,
-                            "Getting diagnostic data failed",
-                            Snackbar.LENGTH_LONG
-                        )
-                            .setAction(R.string.retry) { retrieveDiagnosticInfo() }
-                            .show()
-                    }
-                }
+                saveNewDiagnostic()
             })
+
+//                override fun onFailed(message: String) {
+//                    runOnUiThread {
+//                        hideLoading()
+//                        Snackbar.make(
+//                            diagRootView,
+//                            "Getting diagnostic data failed",
+//                            Snackbar.LENGTH_LONG
+//                        )
+//                            .setAction(R.string.retry) { retrieveDiagnosticInfo() }
+//                            .show()
+//                    }
+//                }
         } else {
             setupLastKnownDiagnostic()
         }
@@ -267,12 +270,11 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
                 listForGuardian.add("${it.key}|${it.value}")
             }
 
-            SocketManager.syncConfiguration(listForGuardian, object : OnReceiveResponse {
-                override fun onReceive(response: SocketResposne) {
+            SocketManager.syncConfiguration(listForGuardian)
+            SocketManager.syncConfiguration.observe(this, Observer { syncConfiguration ->
+                if (syncConfiguration.sync.status == Status.SUCCESS.value) {
                     showSuccessResponse()
-                }
-
-                override fun onFailed(message: String) {
+                } else {
                     showFailedResponse()
                 }
             })
