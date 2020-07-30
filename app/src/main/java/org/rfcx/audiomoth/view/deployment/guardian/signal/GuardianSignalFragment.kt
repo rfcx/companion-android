@@ -13,11 +13,14 @@ import kotlinx.android.synthetic.main.fragment_guardian_signal.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
+import java.util.*
 
 class GuardianSignalFragment : Fragment() {
     private val listOfSignal by lazy {
         listOf(signalStrength1, signalStrength2, signalStrength3, signalStrength4)
     }
+
+    private var timer: Timer? = null
 
     private var isSignalTesting = false
 
@@ -48,7 +51,14 @@ class GuardianSignalFragment : Fragment() {
 
     private fun retrieveGuardianSignal() {
         isSignalTesting = true
-        SocketManager.getSignalStrength()
+
+        timer = Timer()
+        timer?.schedule( object : TimerTask(){
+            override fun run() {
+                SocketManager.getSignalStrength()
+            }
+        }, DELAY, MILLI_PERIOD)
+
         SocketManager.signal.observe(viewLifecycleOwner, Observer { signal ->
             deploymentProtocol?.hideLoading()
             val strength = signal.signalInfo.signal
@@ -124,11 +134,15 @@ class GuardianSignalFragment : Fragment() {
     override fun onDetach() {
         super.onDetach()
         if(isSignalTesting) {
-            SocketManager.getSignalStrength() // call to disable getting signal
+            timer?.cancel()
+            timer = null
         }
     }
 
     companion object {
+
+        private const val DELAY = 0L
+        private const val MILLI_PERIOD = 1000L
 
         private enum class SignalState(val value: Int) {
             NONE(0), LOW(1), NORMAL(2), HIGH(3), MAX(4)
