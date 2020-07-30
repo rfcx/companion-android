@@ -3,7 +3,6 @@ package org.rfcx.audiomoth.view.detail
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -12,7 +11,7 @@ import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.view.deployment.locate.MapPickerFragment
 
-class EditLocationActivity : AppCompatActivity(), MapPickerProtocol {
+class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocationProtocol {
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     private var nameLocation: String? = null
@@ -37,7 +36,16 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol {
     }
 
     override fun startLocationPage(latitude: Double, longitude: Double, name: String) {
-        Log.d("onSelectLocation", "$latitude, $longitude, $name")
+        toolbarLayout.visibility = View.VISIBLE
+        startFragment(EditLocationFragment.newInstance(latitude, longitude, nameLocation ?: ""))
+    }
+
+    override fun startMapPickerPage(latitude: Double, longitude: Double, name: String) {
+        startFragment(MapPickerFragment.newInstance(latitude, longitude, nameLocation ?: ""))
+    }
+
+    override fun startDetailDeploymentPage() {
+        finish()
     }
 
     private fun startFragment(fragment: Fragment) {

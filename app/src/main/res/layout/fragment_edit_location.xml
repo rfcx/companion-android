@@ -1,0 +1,114 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
+    tools:context="org.rfcx.audiomoth.view.detail.EditLocationFragment">
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/locationNameTextInput"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:layout_marginEnd="@dimen/margin_padding_large"
+        android:hint="@string/name_location"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/locationNameEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionDone"
+            android:inputType="text"
+            android:lines="1"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_small" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.mapbox.mapboxsdk.maps.MapView
+        android:id="@+id/mapBoxView"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:layout_marginEnd="@dimen/margin_padding_large"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/locationNameTextInput" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/pinDeploymentImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_pin_map"
+        app:layout_constraintBottom_toBottomOf="@id/mapBoxView"
+        app:layout_constraintEnd_toEndOf="@id/mapBoxView"
+        app:layout_constraintStart_toStartOf="@id/mapBoxView"
+        app:layout_constraintTop_toTopOf="@id/mapBoxView" />
+
+    <View
+        android:id="@+id/viewOfMapBox"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@id/mapBoxView"
+        app:layout_constraintEnd_toEndOf="@id/mapBoxView"
+        app:layout_constraintStart_toStartOf="@id/mapBoxView"
+        app:layout_constraintTop_toTopOf="@id/mapBoxView" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/locationTitleTextView"
+        style="@style/AudioMothText.Body.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:text="@string/location"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/mapBoxView" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/locationValueTextView"
+        style="@style/AudioMothText.Body.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginTop="@dimen/margin_padding_small"
+        android:textSize="@dimen/text_xsmall"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/locationTitleTextView" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/changeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/transparent"
+        android:layout_marginEnd="@dimen/margin_padding_small"
+        android:text="@string/change"
+        android:textAllCaps="true"
+        android:textColor="@color/colorPrimary"
+        android:textSize="@dimen/text_small"
+        app:layout_constraintBottom_toBottomOf="@id/locationValueTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/locationTitleTextView" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/saveButton"
+        style="@style/AudioMothButton.GreenButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginEnd="@dimen/margin_padding_large"
+        android:layout_marginBottom="@dimen/margin_padding_normal"
+        android:text="@string/save"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
