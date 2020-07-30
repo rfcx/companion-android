@@ -16,7 +16,6 @@ object SocketManager {
     private var outputStream: DataOutputStream? = null
     private var inputStream: DataInputStream? = null
     private var clientThread: Thread? = null// Thread for socket communication
-    private var audioThread: Thread? = null// Separated thread for queuing audio and set audio track
 
     private lateinit var inComingMessageThread: Thread
 
@@ -82,6 +81,10 @@ object SocketManager {
         this.microphoneTestUtils = micTestUtils
         val data = gson.toJson(SocketRequest(MICROPHONE_TEST))
         sendMessage(data)
+    }
+
+    fun resetDefaultValue() {
+        isTestingFirstTime = true
     }
 
     private fun sendMessage(message: String) {
@@ -160,11 +163,13 @@ object SocketManager {
                                         util.init(util.getEncodedAudioBufferSize(response.audioBuffer.buffer))
                                         util.play()
                                     }
-                                    setAudioFromQueue()
                                     isTestingFirstTime = false
                                 }
                                 this.liveAudio.postValue(response)
-                                audioQueue.add(response.audioBuffer.buffer)
+                                microphoneTestUtils?.let {
+                                    it.buffer = it.decodeEncodedAudio(response.audioBuffer.buffer)
+                                    it.setTrack()
+                                }
                             }
                         }
                     }
@@ -174,30 +179,6 @@ object SocketManager {
             }
         })
         inComingMessageThread.start()
-    }
-
-    private fun setAudioFromQueue() {
-        audioThread = Thread(Runnable {
-            while (!audioThread!!.isInterrupted) {
-                try {
-                    if (audioQueue.isNotEmpty()) {
-                        val audio = audioQueue[0]
-                        microphoneTestUtils?.apply {
-                            buffer = decodeEncodedAudio(audio)
-                        }.also { util ->
-                            util?.setTrack()
-                        }
-                        audioQueue.remove(audio)
-                    }
-                } catch (e: InterruptedException) {
-                    audioThread?.interrupt()
-                } catch (e: IllegalStateException) {
-                    e.printStackTrace()
-                }
-            }
-        })
-
-        audioThread?.start()
     }
 
     fun stopConnection() {
@@ -213,9 +194,5 @@ object SocketManager {
 
         outputStream?.close()
         socket?.close()
-    }
-
-    fun stopAudioQueueThread() {
-        audioThread?.interrupt()
     }
 }

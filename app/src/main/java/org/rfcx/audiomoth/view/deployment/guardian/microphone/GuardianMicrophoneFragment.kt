@@ -105,7 +105,7 @@ class GuardianMicrophoneFragment : Fragment() {
             it.stop()
             it.release()
         }
-        SocketManager.stopAudioQueueThread()
+        SocketManager.resetDefaultValue()
         if (isMicTesting) {
             SocketManager.getLiveAudioBuffer(microphoneTestUtils) // call to disable getting audio
         }
