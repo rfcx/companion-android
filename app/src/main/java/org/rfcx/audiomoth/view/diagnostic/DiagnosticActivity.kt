@@ -164,19 +164,6 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
 
                 saveNewDiagnostic()
             })
-
-//                override fun onFailed(message: String) {
-//                    runOnUiThread {
-//                        hideLoading()
-//                        Snackbar.make(
-//                            diagRootView,
-//                            "Getting diagnostic data failed",
-//                            Snackbar.LENGTH_LONG
-//                        )
-//                            .setAction(R.string.retry) { retrieveDiagnosticInfo() }
-//                            .show()
-//                    }
-//                }
         } else {
             setupLastKnownDiagnostic()
         }
