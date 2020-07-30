@@ -155,6 +155,9 @@
     <string name="day_remaining">%s day remaining</string>
     <string name="battery_depleted">battery depleted</string>
 
+    <!--  EditLocationActivity  -->
+    <string name="edit_location">Edit location</string>
+
     <!--  ChooseDeviceFragment  -->
     <string name="choose_your_device">Choose your device</string>
     <string name="rfcx_edge">RFCx Edge</string>
