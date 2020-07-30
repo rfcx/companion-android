@@ -67,7 +67,7 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         }
 
         saveButton.setOnClickListener {
-            editLocationProtocol?.startDetailDeploymentPage()
+            editLocationProtocol?.startDetailDeploymentPage(locationNameEditText.text.toString())
         }
     }
 

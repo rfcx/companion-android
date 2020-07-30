@@ -48,7 +48,7 @@ class DeploymentDetailActivity : AppCompatActivity() {
             intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)?.let { deploymentDb.getDeploymentById(it) }
 
         setupToolbar()
-        updateDeploymentDetailView()
+        deployment?.let { updateDeploymentDetailView(it) }
 
         // setup onclick
         reconfigureButton.setOnClickListener {
@@ -59,52 +59,74 @@ class DeploymentDetailActivity : AppCompatActivity() {
             deployment?.let {
                 val location = deployment?.location
                 location?.let { locate ->
-                    EditLocationActivity.startActivity(
-                        this, locate.latitude, locate.longitude, locate.name
-                    )
+                    intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)?.let { deploymentId ->
+                        EditLocationActivity.startActivity(
+                            this,
+                            locate.latitude,
+                            locate.longitude,
+                            locate.name,
+                            deploymentId,
+                            DEPLOYMENT_REQUEST_CODE
+                        )
+                    }
                 }
             }
         }
     }
 
-    private fun updateDeploymentDetailView() {
-        deployment?.let {
-            // setup deployment images view
-            setupImageRecycler()
-            observeDeploymentImage(it.id)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == DEPLOYMENT_REQUEST_CODE) {
+            forceUpdateDeployment()
+        }
+    }
 
-            val location = deployment?.location
-            val configuration = deployment?.configuration
-            locationValueTextView.text =
-                location?.let { locate ->
-                    convertLatLngLabel(this, locate.latitude, locate.longitude)
-                }
-
-            sampleRateValue.text =
-                getString(R.string.kilohertz, configuration?.sampleRate.toString())
-            gainValue.text = configuration?.gain?.let { gain -> gainList[gain] }
-
-            val continuous = getString(R.string.continuous)
-            val isContinuous = configuration?.durationSelected == CONTINUOUS
-
-            val recordingDurationLabel = getString(
-                if (configuration?.recordingDuration == 1) R.string.detail_sec else R.string.detail_secs,
-                configuration?.recordingDuration
-            )
-            recordingValue.text = if (isContinuous) continuous else recordingDurationLabel
-            sleepValue.text = getString(R.string.detail_secs, configuration?.sleepDuration)
-            sleepValue.visibility = if (isContinuous) View.GONE else View.VISIBLE
-            sleepLabel.visibility = if (isContinuous) View.GONE else View.VISIBLE
-
-            estimatedBatteryDurationValue.text =
-                deployment?.batteryDepletedAt?.time?.let { depletedAt ->
-                    getEstimatedBatteryDuration(this, depletedAt)
-                }
-            configuration?.recordingPeriodList?.let { period ->
-                customRecordingLabel.visibility = if (period.size != 0) View.VISIBLE else View.GONE
-                timeLineRecycler.visibility = if (period.size != 0) View.VISIBLE else View.GONE
-                setupTimeLineRecycler(period.toTypedArray())
+    private fun forceUpdateDeployment() {
+        if (this.deployment != null) {
+            this.deployment = deploymentDb.getDeploymentById(this.deployment!!.id)
+            this.deployment?.let { it1 -> updateDeploymentDetailView(it1) }
+            supportActionBar?.apply {
+                title = deployment?.location?.name ?: getString(R.string.title_deployment_detail)
             }
+        }
+    }
+
+    private fun updateDeploymentDetailView(deployment: Deployment) {
+        // setup deployment images view
+        setupImageRecycler()
+        observeDeploymentImage(deployment.id)
+
+        val location = deployment.location
+        val configuration = deployment.configuration
+        locationValueTextView.text =
+            location?.let { locate ->
+                convertLatLngLabel(this, locate.latitude, locate.longitude)
+            }
+
+        sampleRateValue.text =
+            getString(R.string.kilohertz, configuration?.sampleRate.toString())
+        gainValue.text = configuration?.gain?.let { gain -> gainList[gain] }
+
+        val continuous = getString(R.string.continuous)
+        val isContinuous = configuration?.durationSelected == CONTINUOUS
+
+        val recordingDurationLabel = getString(
+            if (configuration?.recordingDuration == 1) R.string.detail_sec else R.string.detail_secs,
+            configuration?.recordingDuration
+        )
+        recordingValue.text = if (isContinuous) continuous else recordingDurationLabel
+        sleepValue.text = getString(R.string.detail_secs, configuration?.sleepDuration)
+        sleepValue.visibility = if (isContinuous) View.GONE else View.VISIBLE
+        sleepLabel.visibility = if (isContinuous) View.GONE else View.VISIBLE
+
+        estimatedBatteryDurationValue.text =
+            getEstimatedBatteryDuration(this, deployment.batteryDepletedAt.time)
+
+        configuration?.recordingPeriodList?.let { period ->
+            customRecordingLabel.visibility = if (period.size != 0) View.VISIBLE else View.GONE
+            timeLineRecycler.visibility = if (period.size != 0) View.VISIBLE else View.GONE
+            setupTimeLineRecycler(period.toTypedArray())
+
         }
     }
 
@@ -174,6 +196,8 @@ class DeploymentDetailActivity : AppCompatActivity() {
     }
 
     companion object {
+        const val DEPLOYMENT_REQUEST_CODE = 1001
+
         fun startActivity(context: Context, deploymentId: Int) {
             val intent = Intent(context, DeploymentDetailActivity::class.java)
             intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
