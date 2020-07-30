@@ -17,6 +17,7 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.connection.wifi.OnWifiListener
 import org.rfcx.audiomoth.connection.wifi.WifiHotspotManager
+import org.rfcx.audiomoth.entity.socket.Status
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 
 class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit {
@@ -93,7 +94,7 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
         SocketManager.connection.observe(viewLifecycleOwner, Observer { response ->
             requireActivity().runOnUiThread {
                 Log.d("Socket", "data changed")
-                if (response.connection.status == CONNECTION_SUCCESS) {
+                if (response.connection.status == Status.SUCCESS.value) {
                     if (connectionCount == 0) {
                         deploymentProtocol?.setDeploymentWifiName(guardianHotspot!!.SSID)
                         deploymentProtocol?.nextStep()
@@ -163,7 +164,6 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
     }
 
     companion object {
-        private val CONNECTION_SUCCESS = "success"
         private val SCAN = "scan"
         private val CONNECT = "connect"
 
