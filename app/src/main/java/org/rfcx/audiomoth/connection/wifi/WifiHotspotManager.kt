@@ -13,7 +13,6 @@ import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
 import android.net.wifi.WifiNetworkSpecifier
 import android.os.Build
-import android.util.Log
 
 class WifiHotspotManager(private val context: Context) {
 
@@ -75,7 +74,6 @@ class WifiHotspotManager(private val context: Context) {
             wifiConfig.allowedProtocols.set(WifiConfiguration.Protocol.RSN)
             wifiConfig.allowedProtocols.set(WifiConfiguration.Protocol.WPA)
 
-            Log.d("wifihotspot", "Connecting to ${wifiConfig.SSID}")
             val netId = wifiManager!!.addNetwork(wifiConfig)
             wifiManager!!.disconnect()
             wifiManager!!.enableNetwork(netId, true)
@@ -115,7 +113,6 @@ class WifiHotspotManager(private val context: Context) {
             val netInfo = conManager.activeNetworkInfo
             if (netInfo != null && netInfo.isConnected && netInfo.type == ConnectivityManager.TYPE_WIFI) {
                 if (!isConnected) {
-                    Log.d("WifiHotspot", "Connected to hotspot")
                     onWifiListener.onWifiConnected()
                     isConnected = true
                 }

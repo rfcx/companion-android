@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.wifi.ScanResult
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -93,7 +92,6 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
         SocketManager.getConnection()
         SocketManager.connection.observe(viewLifecycleOwner, Observer { response ->
             requireActivity().runOnUiThread {
-                Log.d("Socket", "data changed")
                 if (response.connection.status == Status.SUCCESS.value) {
                     if (connectionCount == 0) {
                         deploymentProtocol?.setDeploymentWifiName(guardianHotspot!!.SSID)

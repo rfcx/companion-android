@@ -1,6 +1,5 @@
 package org.rfcx.audiomoth.connection.socket
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import org.json.JSONObject
@@ -92,10 +91,8 @@ object SocketManager {
     private fun sendMessage(message: String) {
         clientThread = Thread(Runnable {
             try {
-                Log.d("Socket", "Connecting thread")
                 socket = Socket("192.168.43.1", 9999)
                 startInComingMessageThread()
-                Log.d("Socket", "Sending message $message")
                 outputStream = DataOutputStream(socket?.getOutputStream())
                 outputStream?.writeUTF(message)
                 outputStream?.flush()
@@ -114,7 +111,6 @@ object SocketManager {
                     val dataInput = inputStream?.readUTF()
                     if (!dataInput.isNullOrBlank()) {
 
-                        Log.d("Socket", "getting new command")
                         val receiveJson = JSONObject(dataInput)
                         val jsonIterator = receiveJson.keys()
 
