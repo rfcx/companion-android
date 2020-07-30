@@ -45,6 +45,7 @@ class GuardianMicrophoneFragment : Fragment() {
 
         deploymentProtocol?.hideCompleteButton()
         setUiByState(MicTestingState.READY)
+        SocketManager.resetDefaultValue()
 
         listenAudioButton.setOnClickListener {
             isMicTesting = true
@@ -120,7 +121,6 @@ class GuardianMicrophoneFragment : Fragment() {
             it.stop()
             it.release()
         }
-        SocketManager.resetDefaultValue()
         if (isMicTesting) {
             timer?.cancel()
             timer = null
