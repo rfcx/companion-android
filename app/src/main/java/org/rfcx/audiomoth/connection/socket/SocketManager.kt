@@ -34,6 +34,8 @@ object SocketManager {
     private var microphoneTestUtils: MicrophoneTestUtils? = null
     private var isTestingFirstTime = true
 
+    private var tempAudio = ""
+
     val connection = MutableLiveData<ConnectionResponse>()
     val diagnostic = MutableLiveData<DiagnosticResponse>()
     val currentConfiguration = MutableLiveData<ConfigurationResponse>()
@@ -165,11 +167,14 @@ object SocketManager {
                                     }
                                     isTestingFirstTime = false
                                 }
-                                this.liveAudio.postValue(response)
-                                microphoneTestUtils?.let {
-                                    it.buffer = it.decodeEncodedAudio(response.audioBuffer.buffer)
-                                    it.setTrack()
+                                if (tempAudio != response.audioBuffer.buffer) {
+                                    tempAudio = response.audioBuffer.buffer
+                                    microphoneTestUtils?.let {
+                                        it.buffer = it.decodeEncodedAudio(response.audioBuffer.buffer)
+                                        it.setTrack()
+                                    }
                                 }
+                                this.liveAudio.postValue(response)
                             }
                         }
                     }

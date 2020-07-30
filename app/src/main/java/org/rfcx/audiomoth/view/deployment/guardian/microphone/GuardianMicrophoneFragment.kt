@@ -12,8 +12,13 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.util.MicrophoneTestUtils
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
+import org.rfcx.audiomoth.view.deployment.guardian.signal.GuardianSignalFragment
+import java.util.*
 
 class GuardianMicrophoneFragment : Fragment() {
+
+    private var timer: Timer? = null
+    private var isTimerPause = false
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
     private val microphoneTestUtils by lazy {
@@ -49,16 +54,16 @@ class GuardianMicrophoneFragment : Fragment() {
 
         cancelAudioButton.setOnClickListener {
             isMicTesting = false
+            isTimerPause = true
             setUiByState(MicTestingState.FINISH)
-            retrieveLiveAudioBuffer()
             microphoneTestUtils.stop()
         }
 
         listenAgainAudioButton.setOnClickListener {
             isMicTesting = true
+            isTimerPause = false
             setUiByState(MicTestingState.LISTENING)
             microphoneTestUtils.play()
-            retrieveLiveAudioBuffer()
         }
 
         finishButton.setOnClickListener {
@@ -93,9 +98,19 @@ class GuardianMicrophoneFragment : Fragment() {
     }
 
     private fun retrieveLiveAudioBuffer() {
-        SocketManager.getLiveAudioBuffer(microphoneTestUtils)
+        timer = Timer()
+
+        timer?.schedule( object : TimerTask(){
+            override fun run() {
+                if (!isTimerPause) {
+                    SocketManager.getLiveAudioBuffer(microphoneTestUtils)
+                    isTimerPause = true
+                }
+            }
+        }, DELAY, MILLI_PERIOD)
+
         SocketManager.liveAudio.observe(viewLifecycleOwner, Observer {
-            //TODO: for wave form
+            isTimerPause = false
         })
     }
 
@@ -107,11 +122,15 @@ class GuardianMicrophoneFragment : Fragment() {
         }
         SocketManager.resetDefaultValue()
         if (isMicTesting) {
-            SocketManager.getLiveAudioBuffer(microphoneTestUtils) // call to disable getting audio
+            timer?.cancel()
+            timer = null
         }
     }
 
     companion object {
+        private const val DELAY = 0L
+        private const val MILLI_PERIOD = 100L
+
         enum class MicTestingState { READY, LISTENING, FINISH }
 
         fun newInstance(): GuardianMicrophoneFragment = GuardianMicrophoneFragment()

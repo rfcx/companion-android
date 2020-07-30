@@ -6,6 +6,7 @@ import android.media.AudioManager
 import android.media.AudioTrack
 import android.os.Build
 import android.util.Base64
+import android.util.Log
 
 class MicrophoneTestUtils {
     private val sampleRate = 24000
@@ -53,7 +54,7 @@ class MicrophoneTestUtils {
     }
 
     fun setTrack() {
-        audioTrack?.write(buffer, 0, minBufSize ?: DEF_MINBUFSIZE)
+        audioTrack?.write(buffer, 0, buffer.size)
     }
 
     fun play() {
@@ -74,7 +75,7 @@ class MicrophoneTestUtils {
      * Utils functions for Audio Byte Array
      */
     fun decodeEncodedAudio(encodedAudio: String): ByteArray {
-        return Base64.decode(encodedAudio, Base64.NO_WRAP)
+        return Base64.decode(encodedAudio, Base64.DEFAULT)
     }
 
     fun getEncodedAudioBufferSize(encodedAudio: String): Int {

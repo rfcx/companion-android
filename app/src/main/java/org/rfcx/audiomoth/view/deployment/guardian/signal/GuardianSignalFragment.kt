@@ -140,7 +140,6 @@ class GuardianSignalFragment : Fragment() {
     }
 
     companion object {
-
         private const val DELAY = 0L
         private const val MILLI_PERIOD = 1000L
 
