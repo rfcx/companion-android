@@ -61,6 +61,7 @@
     <string name="photos">Photos</string>
     <string name="detail_sec">%d second</string>
     <string name="reconfigure">Reconfigure</string>
+    <string name="edit">edit</string>
 
     <!--  Perform Battery  -->
     <string name="test">test</string>

@@ -11,7 +11,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.realm.Realm
-import kotlin.collections.ArrayList
 import kotlinx.android.synthetic.main.activity_deployment_detail.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
@@ -55,6 +54,17 @@ class DeploymentDetailActivity : AppCompatActivity() {
         reconfigureButton.setOnClickListener {
             Toast.makeText(this, R.string.reconfigure, Toast.LENGTH_LONG).show()
         }
+
+        editButton.setOnClickListener {
+            deployment?.let {
+                val location = deployment?.location
+                location?.let { locate ->
+                    EditLocationActivity.startActivity(
+                        this, locate.latitude, locate.longitude, locate.name
+                    )
+                }
+            }
+        }
     }
 
     private fun updateDeploymentDetailView() {
@@ -65,9 +75,10 @@ class DeploymentDetailActivity : AppCompatActivity() {
 
             val location = deployment?.location
             val configuration = deployment?.configuration
-
-            locationLongitudeValue.text = location?.longitude.longitudeCoordinates(this)
-            locationLatitudeValue.text = location?.latitude.latitudeCoordinates(this)
+            locationValueTextView.text =
+                location?.let { locate ->
+                    convertLatLngLabel(this, locate.latitude, locate.longitude)
+                }
 
             sampleRateValue.text =
                 getString(R.string.kilohertz, configuration?.sampleRate.toString())
