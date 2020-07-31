@@ -134,7 +134,7 @@ class Firestore(val context: Context) {
 
                     // if SyncState not equal SEND don't update
                     val isSend = deploymentDb.getDeploymentsSend().contains(dr.serverId)
-                    if (isSend){
+                    if (isSend) {
                         deploymentDb.insertOrUpdate(dr)
                     }
                 }
@@ -174,7 +174,19 @@ class Firestore(val context: Context) {
 
                 // verify response and store deployment
                 locationResponses.forEach { lr ->
-                    locateDb.insertOrUpdate(lr)
+
+                    // if SyncState not equal SEND don't update
+                    val isSend = locateDb.getLocatesSend().contains(lr.serverId)
+                    if (isSend) {
+                        locateDb.insertOrUpdate(lr)
+                    } else {
+                        lr.lastDeploymentServerId?.let { serverId ->
+                            val locate = locateDb.getLocateByServerId(serverId)
+                            if (locate != null) {
+                                locateDb.updateLocate(locate)
+                            }
+                        }
+                    }
                 }
                 callback?.onSuccessCallback(locationResponses)
             }
