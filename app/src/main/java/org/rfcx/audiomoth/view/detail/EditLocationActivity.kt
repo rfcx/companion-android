@@ -3,7 +3,6 @@ package org.rfcx.audiomoth.view.detail
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.SyncStats
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -12,20 +11,20 @@ import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_edit_location.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.SyncState
 import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
+import org.rfcx.audiomoth.service.DeploymentSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.view.deployment.locate.MapPickerFragment
-import org.rfcx.audiomoth.view.profile.ProfileFragment
 
 class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocationProtocol {
 
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val deploymentDb by lazy { DeploymentDb(realm) }
+    private val locateDb by lazy { LocateDb(realm) }
 
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
@@ -80,6 +79,18 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
                 deploymentDb.insertOrUpdate(deployment, deploymentLocation)
                 deployment.syncState = SyncState.Unsent.key
                 deploymentDb.updateDeployment(deployment)
+                deployment.serverId?.let { serverId ->
+
+                    val location = locateDb.getLocateByServerId(serverId)
+                    if (location != null) {
+                        location.latitude = latitude
+                        location.longitude = longitude
+                        location.name = name
+                        location.syncState = SyncState.Unsent.key
+                        locateDb.updateLocate(location)
+                    }
+                }
+                DeploymentSyncWorker.enqueue(this)
                 finish()
             }
         }

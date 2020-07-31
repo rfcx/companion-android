@@ -59,5 +59,6 @@ open class Locate(
     companion object {
         const val FIELD_ID = "id"
         const val FIELD_SERVER_ID = "serverId"
+        const val FIELD_LAST_DEPLOYMENT_SERVER_ID = "lastDeploymentServerId"
     }
 }

@@ -26,6 +26,15 @@ class LocateDb(private val realm: Realm) {
             .findFirst()
     }
 
+    fun getLocateByServerId(serverId: String): Locate? {
+        val locate =
+            realm.where(Locate::class.java).equalTo(Locate.FIELD_LAST_DEPLOYMENT_SERVER_ID, serverId).findFirst()
+        if (locate != null) {
+            return realm.copyFromRealm(locate)
+        }
+        return null
+    }
+
     fun unlockSent(): List<Locate> {
         var unsentCopied: List<Locate> = listOf()
         realm.executeTransaction {
@@ -69,6 +78,12 @@ class LocateDb(private val realm: Realm) {
                 locate.serverId = serverId
                 locate.syncState = syncState
             }
+        }
+    }
+
+    fun updateLocate(locate: Locate) {
+        realm.executeTransaction {
+            it.insertOrUpdate(locate)
         }
     }
 

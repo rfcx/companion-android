@@ -2,12 +2,14 @@ package org.rfcx.audiomoth.repo
 
 import android.content.Context
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import java.sql.Timestamp
 import kotlinx.coroutines.tasks.await
 import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_SERVER_ID
+import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.Device
+import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.User
 import org.rfcx.audiomoth.entity.request.*
 import org.rfcx.audiomoth.entity.response.DeploymentResponse
@@ -21,6 +23,7 @@ import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.audiomoth.util.Preferences
 import org.rfcx.audiomoth.util.Storage
 import org.rfcx.audiomoth.util.getEmailUser
+import java.sql.Timestamp
 
 class Firestore(val context: Context) {
     val db = Firebase.firestore
@@ -77,6 +80,23 @@ class Firestore(val context: Context) {
             .set(locateRequest).await()
     }
 
+    suspend fun updateLocate(locateServerId: String, locate: DeploymentLocation) {
+        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        val updates = hashMapOf<String, Any>(
+            "latitude" to locate.latitude,
+            "longitude" to locate.longitude,
+            "name" to locate.name
+        )
+        userDocument.collection(COLLECTION_LOCATIONS).document(locateServerId)
+            .update(updates).await()
+    }
+
+    suspend fun updateDeploymentLocation(serverId: String, deploymentLocation: DeploymentLocation) {
+        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        userDocument.collection(COLLECTION_DEPLOYMENTS).document(serverId)
+            .update("location", deploymentLocation).await()
+    }
+
     suspend fun sendDiagnostic(diagnosticRequest: DiagnosticRequest): DocumentReference? {
         val userDocument = db.collection(COLLECTION_USERS).document(guid)
         return userDocument.collection(COLLECTION_DIAGNOSTIC).add(diagnosticRequest).await()
@@ -127,6 +147,13 @@ class Firestore(val context: Context) {
             .addOnFailureListener {
                 callback?.onFailureCallback(it.localizedMessage)
             }
+    }
+
+    suspend fun getLocateServerId(lastDeploymentServerId: String): QuerySnapshot? {
+        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        return userDocument.collection(COLLECTION_LOCATIONS)
+            .whereEqualTo(Locate.FIELD_LAST_DEPLOYMENT_SERVER_ID, lastDeploymentServerId).limit(1)
+            .get().await()
     }
 
     fun retrieveLocations(
