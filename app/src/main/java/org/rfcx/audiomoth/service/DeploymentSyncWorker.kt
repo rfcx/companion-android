@@ -45,13 +45,8 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
             } else {
                 val deploymentLocation = it.location
                 deploymentLocation?.let { it1 ->
-                    try {
-                        firestore.updateDeploymentLocation(it.serverId!!, it1)
-                        db.markSent(it.serverId!!, it.id)
-                    } catch (e: Exception) {
-                        db.markUnsent(it.id)
-                        someFailed = true
-                    }
+                    firestore.updateDeploymentLocation(it.serverId!!, it1)
+                    db.markSent(it.serverId!!, it.id)
                 }
             }
         }
