@@ -3,6 +3,7 @@ package org.rfcx.audiomoth.view.detail
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.SyncStats
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -13,6 +14,7 @@ import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.DeploymentLocation
+import org.rfcx.audiomoth.entity.SyncState
 import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.util.RealmHelper
@@ -75,7 +77,9 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
         deploymentId?.let {
             val deployment = deploymentDb.getDeploymentById(it)
             if (deployment != null) {
-                val deploymentId = deploymentDb.insertOrUpdate(deployment, deploymentLocation)
+                deploymentDb.insertOrUpdate(deployment, deploymentLocation)
+                deployment.syncState = SyncState.Unsent.key
+                deploymentDb.updateDeployment(deployment)
                 finish()
             }
         }
