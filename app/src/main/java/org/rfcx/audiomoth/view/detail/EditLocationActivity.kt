@@ -79,8 +79,8 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
                 deploymentDb.insertOrUpdate(deployment, deploymentLocation)
                 deployment.syncState = SyncState.Unsent.key
                 deploymentDb.updateDeployment(deployment)
-                deployment.serverId?.let { serverId ->
 
+                deployment.serverId?.let { serverId ->
                     val location = locateDb.getLocateByServerId(serverId)
                     if (location != null) {
                         location.latitude = latitude
@@ -90,6 +90,7 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
                         locateDb.updateLocate(location)
                     }
                 }
+
                 DeploymentSyncWorker.enqueue(this)
                 finish()
             }

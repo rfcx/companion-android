@@ -131,7 +131,12 @@ class Firestore(val context: Context) {
 
                 // verify response and store deployment
                 deploymentResponses.forEach { dr ->
-                    deploymentDb.insertOrUpdate(dr)
+
+                    // if SyncState not equal SEND don't update
+                    val isSend = deploymentDb.getDeploymentsSend().contains(dr.serverId)
+                    if (isSend){
+                        deploymentDb.insertOrUpdate(dr)
+                    }
                 }
 
                 // verify response and store guardian deployment
