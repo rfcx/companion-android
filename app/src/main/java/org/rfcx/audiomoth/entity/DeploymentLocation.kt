@@ -11,6 +11,10 @@ open class DeploymentLocation(
     var longitude: Double = 0.0
 ) : RealmModel, Serializable {
     companion object {
+        const val FIELD_NAME = "name"
+        const val FIELD_LATITUDE = "latitude"
+        const val FIELD_LONGITUDE = "longitude"
+
         fun default() = DeploymentLocation(
             name = "",
             latitude = 0.0,

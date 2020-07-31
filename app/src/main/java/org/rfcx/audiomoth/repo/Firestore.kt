@@ -6,11 +6,8 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
+import org.rfcx.audiomoth.entity.*
 import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_SERVER_ID
-import org.rfcx.audiomoth.entity.DeploymentLocation
-import org.rfcx.audiomoth.entity.Device
-import org.rfcx.audiomoth.entity.Locate
-import org.rfcx.audiomoth.entity.User
 import org.rfcx.audiomoth.entity.request.*
 import org.rfcx.audiomoth.entity.response.DeploymentResponse
 import org.rfcx.audiomoth.entity.response.DiagnosticResponse
@@ -83,9 +80,9 @@ class Firestore(val context: Context) {
     suspend fun updateLocate(locateServerId: String, locate: DeploymentLocation) {
         val userDocument = db.collection(COLLECTION_USERS).document(guid)
         val updates = hashMapOf<String, Any>(
-            "latitude" to locate.latitude,
-            "longitude" to locate.longitude,
-            "name" to locate.name
+            DeploymentLocation.FIELD_LATITUDE to locate.latitude,
+            DeploymentLocation.FIELD_LONGITUDE to locate.longitude,
+            DeploymentLocation.FIELD_NAME to locate.name
         )
         userDocument.collection(COLLECTION_LOCATIONS).document(locateServerId)
             .update(updates).await()
@@ -94,7 +91,7 @@ class Firestore(val context: Context) {
     suspend fun updateDeploymentLocation(serverId: String, deploymentLocation: DeploymentLocation) {
         val userDocument = db.collection(COLLECTION_USERS).document(guid)
         userDocument.collection(COLLECTION_DEPLOYMENTS).document(serverId)
-            .update("location", deploymentLocation).await()
+            .update(Deployment.FIELD_LOCATION, deploymentLocation).await()
     }
 
     suspend fun sendDiagnostic(diagnosticRequest: DiagnosticRequest): DocumentReference? {
