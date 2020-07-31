@@ -26,7 +26,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver() {
             )
             .setSmallIcon(R.drawable.ic_notification)
             .setDefaults(Notification.DEFAULT_ALL)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
 
         val notificationManager = NotificationManagerCompat.from(context)
         notificationManager.notify(1, builder.build())
