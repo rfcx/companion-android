@@ -16,9 +16,6 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import kotlinx.android.synthetic.main.fragment_edit_location.*
-import kotlinx.android.synthetic.main.fragment_edit_location.locationNameEditText
-import kotlinx.android.synthetic.main.fragment_edit_location.locationValueTextView
-import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.util.convertLatLngLabel
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
@@ -63,12 +60,24 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         locationValueTextView.text = context?.let { convertLatLngLabel(it, latitude, longitude) }
 
         changeButton.setOnClickListener {
-            editLocationProtocol?.startMapPickerPage(latitude, longitude, nameLocation ?: "")
+            openMapPickerPage()
+        }
+
+        viewMapBox.setOnClickListener {
+            openMapPickerPage()
         }
 
         saveButton.setOnClickListener {
             editLocationProtocol?.startDetailDeploymentPage(locationNameEditText.text.toString())
         }
+    }
+
+    private fun openMapPickerPage() {
+        editLocationProtocol?.startMapPickerPage(
+            latitude,
+            longitude,
+            locationNameEditText.text.toString()
+        )
     }
 
     private fun setHideKeyboard() {

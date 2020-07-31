@@ -51,20 +51,13 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
         }
     }
 
-    private fun setLatLng(latitude: Double, longitude: Double, name: String) {
-        this.latitude = latitude
-        this.longitude = longitude
-        this.nameLocation = name
-    }
-
     override fun startLocationPage(latitude: Double, longitude: Double, name: String) {
         toolbarLayout.visibility = View.VISIBLE
-        setLatLng(latitude, longitude, name)
-        startFragment(EditLocationFragment.newInstance(latitude, longitude, nameLocation ?: ""))
+        startFragment(EditLocationFragment.newInstance(latitude, longitude, name))
     }
 
     override fun startMapPickerPage(latitude: Double, longitude: Double, name: String) {
-        startFragment(MapPickerFragment.newInstance(latitude, longitude, nameLocation ?: ""))
+        startFragment(MapPickerFragment.newInstance(latitude, longitude, name))
     }
 
     override fun startDetailDeploymentPage(name: String) {

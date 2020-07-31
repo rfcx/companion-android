@@ -54,7 +54,7 @@
         app:layout_constraintTop_toTopOf="@id/mapBoxView" />
 
     <View
-        android:id="@+id/viewOfMapBox"
+        android:id="@+id/viewMapBox"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="@id/mapBoxView"
