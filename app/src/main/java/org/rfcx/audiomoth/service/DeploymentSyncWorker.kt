@@ -11,6 +11,7 @@ import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.service.images.ImageSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
+import java.util.*
 
 /**
  * For syncing data to server. Ref from Ranger Android App
@@ -45,7 +46,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
             } else {
                 val deploymentLocation = it.location
                 deploymentLocation?.let { it1 ->
-                    firestore.updateDeploymentLocation(it.serverId!!, it1)
+                    firestore.updateDeploymentLocation(it.serverId!!, it1, it.updatedAt ?: Date())
                     db.markSent(it.serverId!!, it.id)
                 }
             }

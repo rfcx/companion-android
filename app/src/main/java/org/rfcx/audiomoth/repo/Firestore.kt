@@ -21,6 +21,8 @@ import org.rfcx.audiomoth.util.Preferences
 import org.rfcx.audiomoth.util.Storage
 import org.rfcx.audiomoth.util.getEmailUser
 import java.sql.Timestamp
+import java.util.*
+import kotlin.collections.ArrayList
 
 class Firestore(val context: Context) {
     val db = Firebase.firestore
@@ -88,10 +90,14 @@ class Firestore(val context: Context) {
             .update(updates).await()
     }
 
-    suspend fun updateDeploymentLocation(serverId: String, deploymentLocation: DeploymentLocation) {
+    suspend fun updateDeploymentLocation(serverId: String, deploymentLocation: DeploymentLocation, updatedAt: Date) {
         val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        val updates = hashMapOf<String, Any>(
+            Deployment.FIELD_LOCATION to deploymentLocation,
+            Deployment.FIELD_UPDATED_AT to updatedAt
+        )
         userDocument.collection(COLLECTION_DEPLOYMENTS).document(serverId)
-            .update(Deployment.FIELD_LOCATION, deploymentLocation).await()
+            .update(updates).await()
     }
 
     suspend fun sendDiagnostic(diagnosticRequest: DiagnosticRequest): DocumentReference? {
