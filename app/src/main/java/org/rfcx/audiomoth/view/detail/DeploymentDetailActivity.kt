@@ -17,12 +17,15 @@ import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.DeploymentImage
+import org.rfcx.audiomoth.entity.SyncState
 import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.util.Battery.getEstimatedBatteryDuration
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment.Companion.CONTINUOUS
+import java.util.*
+import kotlin.collections.ArrayList
 
 class DeploymentDetailActivity : AppCompatActivity() {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
@@ -53,20 +56,7 @@ class DeploymentDetailActivity : AppCompatActivity() {
 
         // setup onclick
         deleteButton.setOnClickListener {
-            val builder = AlertDialog.Builder(this)
-            builder.setTitle(getString(R.string.delete_location))
-            builder.setMessage(getString(R.string.are_you_sure_delete_location))
-
-            builder.setPositiveButton(getString(R.string.yes)) { _, _ ->
-                finish()
-            }
-
-            builder.setNeutralButton(getString(R.string.cancel)) { _, _ -> }
-
-            val dialog: AlertDialog = builder.create()
-            dialog.show()
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0f);
-            dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0f);
+            confirmationDialog()
         }
 
         editButton.setOnClickListener {
@@ -84,6 +74,36 @@ class DeploymentDetailActivity : AppCompatActivity() {
                         )
                     }
                 }
+            }
+        }
+    }
+
+    private fun confirmationDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle(getString(R.string.delete_location))
+        builder.setMessage(getString(R.string.are_you_sure_delete_location))
+
+        builder.setPositiveButton(getString(R.string.yes)) { _, _ ->
+            onDeleteLocation()
+        }
+
+        builder.setNeutralButton(getString(R.string.cancel)) { _, _ -> }
+
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            .setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0f)
+        dialog.getButton(AlertDialog.BUTTON_NEUTRAL)
+            .setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0f)
+    }
+
+    private fun onDeleteLocation() {
+        if (deployment != null) {
+            deployment?.let {
+                it.deletedAt = Date()
+                it.syncState = SyncState.Unsent.key
+                deploymentDb.updateDeployment(it)
+                finish()
             }
         }
     }
