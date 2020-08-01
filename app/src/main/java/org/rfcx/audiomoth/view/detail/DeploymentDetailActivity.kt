@@ -3,8 +3,9 @@ package org.rfcx.audiomoth.view.detail
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.View
-import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -51,8 +52,21 @@ class DeploymentDetailActivity : AppCompatActivity() {
         deployment?.let { updateDeploymentDetailView(it) }
 
         // setup onclick
-        reconfigureButton.setOnClickListener {
-            Toast.makeText(this, R.string.reconfigure, Toast.LENGTH_LONG).show()
+        deleteButton.setOnClickListener {
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle(getString(R.string.delete_location))
+            builder.setMessage(getString(R.string.are_you_sure_delete_location))
+
+            builder.setPositiveButton(getString(R.string.yes)) { _, _ ->
+                finish()
+            }
+
+            builder.setNeutralButton(getString(R.string.cancel)) { _, _ -> }
+
+            val dialog: AlertDialog = builder.create()
+            dialog.show()
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0f);
+            dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0f);
         }
 
         editButton.setOnClickListener {

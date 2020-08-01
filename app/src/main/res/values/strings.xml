@@ -60,8 +60,10 @@
     <string name="estimated_battery_duration">Estimated battery remaining</string>
     <string name="photos">Photos</string>
     <string name="detail_sec">%d second</string>
-    <string name="reconfigure">Reconfigure</string>
+    <string name="delete">Delete</string>
     <string name="edit">edit</string>
+    <string name="delete_location">Delete location</string>
+    <string name="are_you_sure_delete_location">Are you sure you\'d like to delete this location?</string>
 
     <!--  Perform Battery  -->
     <string name="test">test</string>
