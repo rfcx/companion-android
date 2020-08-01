@@ -337,7 +337,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private fun retrieveDeployLocations() {
         locateItems.clear()
         val locations = locateDb.getLocations()
-        locateItems.addAll(locations)
+        val showLocations = locations.filter { it.isCompleted() }
+        locateItems.addAll(showLocations)
     }
 
     /**

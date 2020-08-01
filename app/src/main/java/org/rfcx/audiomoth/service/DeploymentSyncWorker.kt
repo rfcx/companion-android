@@ -11,6 +11,7 @@ import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.service.images.ImageSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
+import java.util.*
 
 /**
  * For syncing data to server. Ref from Ranger Android App
@@ -31,16 +32,32 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
 
         deployments.forEach {
             Log.d(TAG, "doWork: sending id ${it.id}")
-            val result = firestore.sendDeployment(it.toRequestBody())
 
-            if (result != null) {
-                Log.d(TAG, "doWork: success ${it.id}")
-                db.markSent(result.id, it.id)
-                locateDb.updateDeploymentServerId(it.id, result.id)
+            if (it.serverId == null) {
+                val result = firestore.sendDeployment(it.toRequestBody())
+
+                if (result != null) {
+                    db.markSent(result.id, it.id)
+                    locateDb.updateDeploymentServerId(it.id, result.id)
+                } else {
+                    db.markUnsent(it.id)
+                    someFailed = true
+                }
             } else {
-                Log.d(TAG, "doWork: failed ${it.id}")
-                db.markUnsent(it.id)
-                someFailed = true
+                val deploymentLocation = it.location
+                deploymentLocation?.let { it1 ->
+                    if(it.deletedAt != null){
+                        firestore.updateDeleteDeployment(it.serverId!!, it.deletedAt!!)
+                        db.markSent(it.serverId!!, it.id)
+                    } else {
+                        firestore.updateDeploymentLocation(
+                            it.serverId!!,
+                            it1,
+                            it.updatedAt ?: Date()
+                        )
+                        db.markSent(it.serverId!!, it.id)
+                    }
+                }
             }
         }
 

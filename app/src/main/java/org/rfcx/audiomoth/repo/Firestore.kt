@@ -2,13 +2,12 @@ package org.rfcx.audiomoth.repo
 
 import android.content.Context
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import java.sql.Timestamp
 import kotlinx.coroutines.tasks.await
+import org.rfcx.audiomoth.entity.*
 import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_SERVER_ID
-import org.rfcx.audiomoth.entity.Device
-import org.rfcx.audiomoth.entity.User
 import org.rfcx.audiomoth.entity.request.*
 import org.rfcx.audiomoth.entity.response.DeploymentResponse
 import org.rfcx.audiomoth.entity.response.DiagnosticResponse
@@ -21,6 +20,8 @@ import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.audiomoth.util.Preferences
 import org.rfcx.audiomoth.util.Storage
 import org.rfcx.audiomoth.util.getEmailUser
+import java.sql.Timestamp
+import java.util.*
 
 class Firestore(val context: Context) {
     val db = Firebase.firestore
@@ -77,6 +78,26 @@ class Firestore(val context: Context) {
             .set(locateRequest).await()
     }
 
+    suspend fun updateDeploymentLocation(
+        serverId: String,
+        deploymentLocation: DeploymentLocation,
+        updatedAt: Date
+    ) {
+        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        val updates = hashMapOf<String, Any>(
+            Deployment.FIELD_LOCATION to deploymentLocation,
+            Deployment.FIELD_UPDATED_AT to updatedAt
+        )
+        userDocument.collection(COLLECTION_DEPLOYMENTS).document(serverId)
+            .update(updates).await()
+    }
+
+    suspend fun updateDeleteDeployment(serverId: String, deletedAt: Date) {
+        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        userDocument.collection(COLLECTION_DEPLOYMENTS).document(serverId)
+            .update(Deployment.FIELD_DELETED_AT, deletedAt).await()
+    }
+
     suspend fun sendDiagnostic(diagnosticRequest: DiagnosticRequest): DocumentReference? {
         val userDocument = db.collection(COLLECTION_USERS).document(guid)
         return userDocument.collection(COLLECTION_DIAGNOSTIC).add(diagnosticRequest).await()
@@ -114,7 +135,12 @@ class Firestore(val context: Context) {
 
                 // verify response and store deployment
                 deploymentResponses.forEach { dr ->
-                    deploymentDb.insertOrUpdate(dr)
+
+                    // if SyncState not equal SEND don't update
+                    val isSend = deploymentDb.getDeploymentsSend().contains(dr.serverId)
+                    if (isSend) {
+                        deploymentDb.insertOrUpdate(dr)
+                    }
                 }
 
                 // verify response and store guardian deployment
@@ -127,6 +153,13 @@ class Firestore(val context: Context) {
             .addOnFailureListener {
                 callback?.onFailureCallback(it.localizedMessage)
             }
+    }
+
+    suspend fun getLocateServerId(lastDeploymentServerId: String): QuerySnapshot? {
+        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        return userDocument.collection(COLLECTION_LOCATIONS)
+            .whereEqualTo(Locate.FIELD_LAST_DEPLOYMENT_SERVER_ID, lastDeploymentServerId).limit(1)
+            .get().await()
     }
 
     fun retrieveLocations(
@@ -145,7 +178,19 @@ class Firestore(val context: Context) {
 
                 // verify response and store deployment
                 locationResponses.forEach { lr ->
-                    locateDb.insertOrUpdate(lr)
+
+                    // if SyncState not equal SEND don't update
+                    val isSend = locateDb.getLocatesSend().contains(lr.serverId)
+                    if (isSend) {
+                        locateDb.insertOrUpdate(lr)
+                    } else {
+                        lr.lastDeploymentServerId?.let { serverId ->
+                            val locate = locateDb.getLocateByServerId(serverId)
+                            if (locate != null) {
+                                locateDb.updateLocate(locate)
+                            }
+                        }
+                    }
                 }
                 callback?.onSuccessCallback(locationResponses)
             }

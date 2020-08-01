@@ -29,11 +29,13 @@ import org.rfcx.audiomoth.view.deployment.sync.SyncFragment
 import org.rfcx.audiomoth.view.deployment.sync.SyncFragment.Companion.BEFORE_SYNC
 import org.rfcx.audiomoth.view.deployment.verify.PerformBatteryFragment
 import org.rfcx.audiomoth.view.deployment.verify.PerformBatteryFragment.Companion.TEST_BATTERY
+import org.rfcx.audiomoth.view.detail.MapPickerProtocol
 import org.rfcx.audiomoth.view.dialog.CompleteFragment
 import org.rfcx.audiomoth.view.dialog.CompleteListener
 import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
 
-class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteListener {
+class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteListener,
+    MapPickerProtocol {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val deploymentDb by lazy {
@@ -217,7 +219,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         startFragment(SyncFragment.newInstance(status))
     }
 
-    override fun startLocation(latitude: Double, longitude: Double, name: String) {
+    override fun startLocationPage(latitude: Double, longitude: Double, name: String) {
         startFragment(LocationFragment.newInstance(latitude, longitude, name))
     }
 
@@ -375,7 +377,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
                 if (supportFragmentManager.fragments.firstOrNull() is LocationFragment) {
                     finish()
                 } else {
-                    startLocation(this.latitude, this.longitude, this.nameLocation)
+                    startLocationPage(this.latitude, this.longitude, this.nameLocation)
                 }
             } else if (!isFragmentPopped) {
                 super.onBackPressed()

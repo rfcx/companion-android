@@ -14,7 +14,9 @@ data class DeploymentRequest(
     var deployedAt: Date = Date(),
     var configuration: Configuration? = null,
     var location: DeploymentLocation? = null,
-    var createdAt: Date = Date()
+    var createdAt: Date = Date(),
+    var updatedAt: Date? = null,
+    var deletedAt: Date? = null
 )
 
 fun Deployment.toRequestBody(): DeploymentRequest {
@@ -26,6 +28,8 @@ fun Deployment.toRequestBody(): DeploymentRequest {
         configuration = this.configuration,
         location = this.location,
         createdAt = this.createdAt,
-        deploymentId = this.deploymentId
+        deploymentId = this.deploymentId,
+        updatedAt = this.updatedAt,
+        deletedAt = this.deletedAt
     )
 }

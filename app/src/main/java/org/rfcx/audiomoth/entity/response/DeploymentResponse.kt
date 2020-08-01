@@ -16,7 +16,9 @@ data class DeploymentResponse(
     var deployedAt: Date? = Date(),
     var configuration: ConfigurationResponse? = null,
     var location: DeploymentLocation? = null,
-    var createdAt: Date? = Date()
+    var createdAt: Date? = Date(),
+    var updatedAt: Date? = null,
+    var deletedAt: Date? = null
 )
 
 data class ConfigurationResponse(
@@ -51,6 +53,8 @@ fun DeploymentResponse.toDeployment(): Deployment {
         configuration = this.configuration?.toConfiguration(),
         location = this.location,
         createdAt = this.createdAt ?: Date(),
-        syncState = SyncState.Sent.key
+        syncState = SyncState.Sent.key,
+        updatedAt = this.updatedAt,
+        deletedAt = this.deletedAt
     )
 }

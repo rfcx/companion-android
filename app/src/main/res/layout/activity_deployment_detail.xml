@@ -39,63 +39,29 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <LinearLayout
-                android:id="@+id/longitudeLayout"
-                android:layout_width="0dp"
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/locationValueTextView"
+                style="@style/AudioMothText.Body.Secondary"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:clickable="true"
-                android:focusable="true"
-                android:orientation="vertical"
-                app:layout_constraintEnd_toEndOf="@id/guidelineVertical"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_small"
+                android:textSize="@dimen/text_xsmall"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/deploymentLocationTitle">
+                app:layout_constraintTop_toBottomOf="@id/deploymentLocationTitle" />
 
-                <TextView
-                    android:id="@+id/locationLongitudeLabel"
-                    style="@style/AudioMothText.Body.Small.Label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/longitude" />
-
-                <TextView
-                    android:id="@+id/locationLongitudeValue"
-                    style="@style/GuardianText.Label.Value"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/margin_padding_large"
-                    android:textSize="@dimen/text_xsmall"
-                    tools:text="100.000" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/latitudeLayout"
-                android:layout_width="0dp"
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/editButton"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:clickable="true"
-                android:focusable="true"
-                android:orientation="vertical"
+                android:background="@color/transparent"
+                android:text="@string/edit"
+                android:textAllCaps="true"
+                android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/text_small"
+                app:layout_constraintBottom_toBottomOf="@id/locationValueTextView"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@id/guidelineVertical"
-                app:layout_constraintTop_toBottomOf="@+id/deploymentLocationTitle">
-
-                <TextView
-                    android:id="@+id/locationLatitudeLabel"
-                    style="@style/AudioMothText.Body.Small.Label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="0dp"
-                    android:text="@string/latitude" />
-
-                <TextView
-                    android:id="@+id/locationLatitudeValue"
-                    style="@style/GuardianText.Label.Value"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/text_xsmall"
-                    tools:text="100.000" />
-            </LinearLayout>
+                app:layout_constraintTop_toTopOf="@id/deploymentLocationTitle" />
 
             <View
                 android:id="@+id/separateLine2"
@@ -103,7 +69,7 @@
                 android:layout_height="2dp"
                 android:layout_marginTop="@dimen/margin_padding_normal"
                 android:background="@color/grey_light"
-                app:layout_constraintTop_toBottomOf="@id/latitudeLayout" />
+                app:layout_constraintTop_toBottomOf="@id/locationValueTextView" />
 
             <TextView
                 android:id="@+id/deploymentConfigurationTitle"
@@ -299,16 +265,15 @@
     </ScrollView>
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/reconfigureButton"
-        style="@style/AudioMothButton.GreenButton"
+        android:id="@+id/deleteButton"
+        style="@style/GuardianButton.GreenButton.Line"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginTop="@dimen/margin_padding_normal"
         android:layout_marginEnd="@dimen/margin_padding_large"
         android:layout_marginBottom="@dimen/margin_padding_normal"
-        android:text="@string/reconfigure"
-        android:visibility="gone"
+        android:text="@string/delete"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

@@ -30,12 +30,13 @@ import org.rfcx.audiomoth.view.deployment.guardian.microphone.GuardianMicrophone
 import org.rfcx.audiomoth.view.deployment.guardian.signal.GuardianSignalFragment
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
 import org.rfcx.audiomoth.view.deployment.locate.MapPickerFragment
+import org.rfcx.audiomoth.view.detail.MapPickerProtocol
 import org.rfcx.audiomoth.view.dialog.CompleteFragment
 import org.rfcx.audiomoth.view.dialog.CompleteListener
 import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
 
 class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtocol,
-    CompleteListener {
+    CompleteListener, MapPickerProtocol {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val locateDb by lazy { LocateDb(realm) }
@@ -291,7 +292,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         this.longitude = longitude
     }
 
-    override fun startLocation(latitude: Double, longitude: Double, name: String) {
+    override fun startLocationPage(latitude: Double, longitude: Double, name: String) {
         startFragment(LocationFragment.newInstance(latitude, longitude, name))
     }
 
