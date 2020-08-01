@@ -20,6 +20,8 @@ import org.rfcx.audiomoth.entity.DeploymentImage
 import org.rfcx.audiomoth.entity.SyncState
 import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
+import org.rfcx.audiomoth.localdb.LocateDb
+import org.rfcx.audiomoth.service.DeploymentSyncWorker
 import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.util.Battery.getEstimatedBatteryDuration
 import org.rfcx.audiomoth.view.deployment.DeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
@@ -30,6 +32,7 @@ import kotlin.collections.ArrayList
 class DeploymentDetailActivity : AppCompatActivity() {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val deploymentDb by lazy { DeploymentDb(realm) }
+    private val locateDb by lazy { LocateDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val gainList by lazy { resources.getStringArray(R.array.edge_gains) }
     private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
@@ -103,6 +106,16 @@ class DeploymentDetailActivity : AppCompatActivity() {
                 it.deletedAt = Date()
                 it.syncState = SyncState.Unsent.key
                 deploymentDb.updateDeployment(it)
+
+                it.serverId?.let { serverId ->
+                    val location = locateDb.getLocateByServerId(serverId)
+                    if (location != null) {
+                        location.deletedAt = Date()
+                        location.syncState = SyncState.Unsent.key
+                        locateDb.updateLocate(location)
+                    }
+                }
+                DeploymentSyncWorker.enqueue(this)
                 finish()
             }
         }

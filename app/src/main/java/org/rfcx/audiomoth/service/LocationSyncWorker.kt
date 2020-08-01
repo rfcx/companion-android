@@ -29,13 +29,23 @@ class LocationSyncWorker(appContext: Context, params: WorkerParameters) :
                 val result = firestore.getLocateServerId(it.lastDeploymentServerId!!)
                 val locateServerId = result?.first()?.id
                 if (locateServerId != null) {
-                    try {
-                        val locate = DeploymentLocation(it.name, it.latitude, it.longitude)
-                        firestore.updateLocate(locateServerId, locate)
-                        db.markSent(it.serverId!!, it.id)
-                    } catch (e: Exception) {
-                        db.markUnsent(it.id)
-                        someFailed = true
+                    if(it.deletedAt != null){
+                        try {
+                            firestore.updateDeleteLocate(locateServerId, it.deletedAt!!)
+                            db.markSent(it.serverId!!, it.id)
+                        } catch (e: Exception) {
+                            db.markUnsent(it.id)
+                            someFailed = true
+                        }
+                    } else {
+                        try {
+                            val locate = DeploymentLocation(it.name, it.latitude, it.longitude)
+                            firestore.updateLocate(locateServerId, locate)
+                            db.markSent(it.serverId!!, it.id)
+                        } catch (e: Exception) {
+                            db.markUnsent(it.id)
+                            someFailed = true
+                        }
                     }
                 }
             } else if (it.serverId == null) {

@@ -22,7 +22,6 @@ import org.rfcx.audiomoth.util.Storage
 import org.rfcx.audiomoth.util.getEmailUser
 import java.sql.Timestamp
 import java.util.*
-import kotlin.collections.ArrayList
 
 class Firestore(val context: Context) {
     val db = Firebase.firestore
@@ -90,7 +89,17 @@ class Firestore(val context: Context) {
             .update(updates).await()
     }
 
-    suspend fun updateDeploymentLocation(serverId: String, deploymentLocation: DeploymentLocation, updatedAt: Date) {
+    suspend fun updateDeleteLocate(locateServerId: String, deletedAt: Date) {
+        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        userDocument.collection(COLLECTION_LOCATIONS).document(locateServerId)
+            .update(Locate.FIELD_DELETED_AT, deletedAt).await()
+    }
+
+    suspend fun updateDeploymentLocation(
+        serverId: String,
+        deploymentLocation: DeploymentLocation,
+        updatedAt: Date
+    ) {
         val userDocument = db.collection(COLLECTION_USERS).document(guid)
         val updates = hashMapOf<String, Any>(
             Deployment.FIELD_LOCATION to deploymentLocation,
@@ -98,6 +107,12 @@ class Firestore(val context: Context) {
         )
         userDocument.collection(COLLECTION_DEPLOYMENTS).document(serverId)
             .update(updates).await()
+    }
+
+    suspend fun updateDeleteDeployment(serverId: String, deletedAt: Date) {
+        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        userDocument.collection(COLLECTION_DEPLOYMENTS).document(serverId)
+            .update(Deployment.FIELD_DELETED_AT, deletedAt).await()
     }
 
     suspend fun sendDiagnostic(diagnosticRequest: DiagnosticRequest): DocumentReference? {

@@ -46,8 +46,17 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
             } else {
                 val deploymentLocation = it.location
                 deploymentLocation?.let { it1 ->
-                    firestore.updateDeploymentLocation(it.serverId!!, it1, it.updatedAt ?: Date())
-                    db.markSent(it.serverId!!, it.id)
+                    if(it.deletedAt != null){
+                        firestore.updateDeleteDeployment(it.serverId!!, it.deletedAt!!)
+                        db.markSent(it.serverId!!, it.id)
+                    } else {
+                        firestore.updateDeploymentLocation(
+                            it.serverId!!,
+                            it1,
+                            it.updatedAt ?: Date()
+                        )
+                        db.markSent(it.serverId!!, it.id)
+                    }
                 }
             }
         }
