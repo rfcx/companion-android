@@ -78,23 +78,6 @@ class Firestore(val context: Context) {
             .set(locateRequest).await()
     }
 
-    suspend fun updateLocate(locateServerId: String, locate: DeploymentLocation) {
-        val userDocument = db.collection(COLLECTION_USERS).document(guid)
-        val updates = hashMapOf<String, Any>(
-            DeploymentLocation.FIELD_LATITUDE to locate.latitude,
-            DeploymentLocation.FIELD_LONGITUDE to locate.longitude,
-            DeploymentLocation.FIELD_NAME to locate.name
-        )
-        userDocument.collection(COLLECTION_LOCATIONS).document(locateServerId)
-            .update(updates).await()
-    }
-
-    suspend fun updateDeleteLocate(locateServerId: String, deletedAt: Date) {
-        val userDocument = db.collection(COLLECTION_USERS).document(guid)
-        userDocument.collection(COLLECTION_LOCATIONS).document(locateServerId)
-            .update(Locate.FIELD_DELETED_AT, deletedAt).await()
-    }
-
     suspend fun updateDeploymentLocation(
         serverId: String,
         deploymentLocation: DeploymentLocation,

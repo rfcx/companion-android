@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import io.realm.Realm
-import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.request.toRequestBody
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.repo.Firestore
@@ -23,32 +22,7 @@ class LocationSyncWorker(appContext: Context, params: WorkerParameters) :
         var someFailed = false
         Log.d(TAG, "doWork: found ${locatesNeedToSync.size} unsent")
         locatesNeedToSync.forEach {
-            Log.d(TAG, "doWork: sending id ${it.id}")
-
-            if (it.lastDeploymentServerId != null) {
-                val result = firestore.getLocateServerId(it.lastDeploymentServerId!!)
-                val locateServerId = result?.first()?.id
-                if (locateServerId != null) {
-                    if(it.deletedAt != null){
-                        try {
-                            firestore.updateDeleteLocate(locateServerId, it.deletedAt!!)
-                            db.markSent(it.serverId!!, it.id)
-                        } catch (e: Exception) {
-                            db.markUnsent(it.id)
-                            someFailed = true
-                        }
-                    } else {
-                        try {
-                            val locate = DeploymentLocation(it.name, it.latitude, it.longitude)
-                            firestore.updateLocate(locateServerId, locate)
-                            db.markSent(it.serverId!!, it.id)
-                        } catch (e: Exception) {
-                            db.markUnsent(it.id)
-                            someFailed = true
-                        }
-                    }
-                }
-            } else if (it.serverId == null) {
+            if (it.serverId == null) {
                 val docRef = firestore.sendLocation(it.toRequestBody())
                 if (docRef != null) {
                     Log.d(TAG, "doWork:Create success ${it.id}")
