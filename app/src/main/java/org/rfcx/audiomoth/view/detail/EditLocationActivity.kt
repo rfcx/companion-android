@@ -18,6 +18,7 @@ import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.view.deployment.locate.MapPickerFragment
+import java.util.*
 
 class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocationProtocol {
 
@@ -77,6 +78,7 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
             val deployment = deploymentDb.getDeploymentById(it)
             if (deployment != null) {
                 deploymentDb.insertOrUpdate(deployment, deploymentLocation)
+                deployment.updatedAt = Date()
                 deployment.syncState = SyncState.Unsent.key
                 deploymentDb.updateDeployment(deployment)
 

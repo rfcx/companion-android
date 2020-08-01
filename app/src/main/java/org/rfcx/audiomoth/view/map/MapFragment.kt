@@ -385,7 +385,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         deploymentFeatures = FeatureCollection.fromFeatures(pointFeatures)
         refreshSource()
 
-        val lastDeployment = deploymentMarkers.maxBy { it.createdAt }
+        val lastDeployment = deploymentMarkers.maxBy { it.updatedAt ?: it.createdAt }
         if (lastDeployment != null) {
             moveCamera(LatLng(lastDeployment.latitude, lastDeployment.longitude))
         }
@@ -500,7 +500,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             id, location?.name ?: "",
             location?.longitude ?: 0.0,
             location?.latitude ?: 0.0,
-            pinImage, description, Device.EDGE.value, createdAt
+            pinImage, description, Device.EDGE.value, createdAt, updatedAt
         )
     }
 
@@ -514,7 +514,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             pinImage,
             "-",
             Device.GUARDIAN.value,
-            createdAt
+            createdAt,
+            null
         )
     }
 

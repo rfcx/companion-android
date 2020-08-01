@@ -21,7 +21,8 @@ open class Deployment(
     var location: DeploymentLocation? = null,
     var createdAt: Date = Date(),
     @Expose(serialize = false)
-    var syncState: Int = 0
+    var syncState: Int = 0,
+    var updatedAt: Date? = null
 ) : RealmModel {
 
     companion object {
@@ -32,6 +33,7 @@ open class Deployment(
         const val FIELD_SERVER_ID = "serverId"
         const val FIELD_DEPLOYMENT_ID = "deploymentId"
         const val FIELD_LOCATION = "location"
+        const val FIELD_UPDATED_AT = "updatedAt"
 
         const val PHOTOS = "photos"
     }

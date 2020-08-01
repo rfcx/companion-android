@@ -10,5 +10,6 @@ data class DeploymentMarker(
     val pin: String,
     val description: String,
     val device: String,
-    val createdAt: Date
+    val createdAt: Date,
+    val updatedAt: Date?
 )
