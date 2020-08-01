@@ -26,6 +26,16 @@ class LocateDb(private val realm: Realm) {
             .findFirst()
     }
 
+    fun getLocateByServerId(serverId: String): Locate? {
+        val locate =
+            realm.where(Locate::class.java)
+                .equalTo(Locate.FIELD_LAST_DEPLOYMENT_SERVER_ID, serverId).findFirst()
+        if (locate != null) {
+            return realm.copyFromRealm(locate)
+        }
+        return null
+    }
+
     fun unlockSent(): List<Locate> {
         var unsentCopied: List<Locate> = listOf()
         realm.executeTransaction {
@@ -49,6 +59,29 @@ class LocateDb(private val realm: Realm) {
         return unsentCopied
     }
 
+    fun getLocatesSend(): ArrayList<String> {
+        val sentCopied = arrayListOf<String>()
+        realm.executeTransaction {
+            val unsent = it.where(Locate::class.java)
+                .equalTo("syncState", SyncState.Sent.key)
+                .and()
+                .isNotNull("lastDeploymentServerId")
+                .and()
+                .isNotEmpty("lastDeploymentServerId")
+                .or()
+                .isNotNull("lastGuardianDeploymentServerId")
+                .and()
+                .isNotEmpty("lastGuardianDeploymentServerId")
+                .findAll()
+                .createSnapshot()
+
+            unsent.forEach { locate ->
+                locate.serverId?.let { serverId -> sentCopied.add(serverId) }
+            }
+        }
+        return sentCopied
+    }
+
     fun markUnsent(id: Int) {
         mark(id = id, syncState = SyncState.Unsent.key)
     }
@@ -69,6 +102,12 @@ class LocateDb(private val realm: Realm) {
                 locate.serverId = serverId
                 locate.syncState = syncState
             }
+        }
+    }
+
+    fun updateLocate(locate: Locate) {
+        realm.executeTransaction {
+            it.insertOrUpdate(locate)
         }
     }
 

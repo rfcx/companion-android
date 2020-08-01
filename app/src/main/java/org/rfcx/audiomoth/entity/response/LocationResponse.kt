@@ -13,6 +13,7 @@ data class LocationResponse(
     var latitude: Double? = null,
     var longitude: Double? = null,
     var createdAt: Date? = null,
+    var deletedAt: Date? = null,
     var lastDeploymentServerId: String? = null,
     var lastGuardianDeploymentServerId: String? = null
 )
@@ -24,6 +25,7 @@ fun LocationResponse.toLocate(): Locate {
         latitude = this.latitude ?: 0.0,
         longitude = this.longitude ?: 0.0,
         createdAt = this.createdAt ?: Date(),
+        deletedAt = this.deletedAt,
         lastDeploymentServerId = this.lastDeploymentServerId,
         lastGuardianDeploymentServerId = this.lastGuardianDeploymentServerId,
         syncState = SyncState.Sent.key

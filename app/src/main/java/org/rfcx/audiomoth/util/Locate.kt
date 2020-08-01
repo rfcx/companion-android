@@ -2,10 +2,10 @@ package org.rfcx.audiomoth.util
 
 import android.content.Context
 import android.location.Location
-import kotlin.math.absoluteValue
 import org.rfcx.audiomoth.view.profile.coordinates.CoordinatesActivity.Companion.DDM_FORMAT
 import org.rfcx.audiomoth.view.profile.coordinates.CoordinatesActivity.Companion.DD_FORMAT
 import org.rfcx.audiomoth.view.profile.coordinates.CoordinatesActivity.Companion.DMS_FORMAT
+import kotlin.math.absoluteValue
 
 fun Double?.latitudeCoordinates(context: Context): String {
     val lat = this
@@ -91,4 +91,8 @@ private fun replaceDelimitersDDM(str: String): String {
     }
     strDDMFormat += "\'"
     return strDDMFormat
+}
+
+fun convertLatLngLabel(context: Context, lat: Double, lng: Double): String {
+    return "${lat.latitudeCoordinates(context)}, ${lng.longitudeCoordinates(context)}"
 }

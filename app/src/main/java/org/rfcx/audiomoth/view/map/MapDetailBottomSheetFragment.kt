@@ -9,6 +9,7 @@ import io.realm.Realm
 import java.util.*
 import kotlin.math.roundToInt
 import kotlinx.android.synthetic.main.fragment_map_detail_bottom_sheet.*
+import org.rfcx.audiomoth.MainActivityListener
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.DeploymentState
@@ -85,6 +86,7 @@ class MapDetailBottomSheetFragment : Fragment() {
                     context?.let { context ->
                         DeploymentDetailActivity.startActivity(context, deployment.id)
                     }
+                    (activity as MainActivityListener).hideBottomSheet()
                 } else {
                     context?.let {
                         DeploymentActivity.startActivity(it, deployment.id)
