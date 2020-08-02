@@ -6,7 +6,7 @@ import io.realm.annotations.RealmClass
 import org.rfcx.audiomoth.util.EdgeConfigure
 
 @RealmClass
-open class Configuration(
+open class EdgeConfiguration(
     var gain: Int = EdgeConfigure.GAIN_DEFAULT,
     var sampleRate: Int = EdgeConfigure.SAMPLE_RATE_DEFAULT,
     var recordingDuration: Int = EdgeConfigure.RECORDING_DURATION_DEFAULT,

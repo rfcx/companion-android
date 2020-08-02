@@ -3,7 +3,7 @@ package org.rfcx.audiomoth.view.deployment
 import java.sql.Timestamp
 import org.rfcx.audiomoth.entity.*
 
-interface DeploymentProtocol : BaseDeploymentProtocol {
+interface EdgeDeploymentProtocol : BaseDeploymentProtocol {
     fun openWithEdgeDevice()
     fun openWithGuardianDevice()
 
@@ -14,7 +14,7 @@ interface DeploymentProtocol : BaseDeploymentProtocol {
     fun getProfiles(): List<Profile>
     fun getProfile(): Profile?
     fun getDeployment(): EdgeDeployment?
-    fun geConfiguration(): Configuration?
+    fun geConfiguration(): EdgeConfiguration?
 
     fun setDeployment(deployment: EdgeDeployment)
     fun setProfile(profile: Profile)

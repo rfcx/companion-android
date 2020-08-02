@@ -8,17 +8,16 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_after_sync.*
 import kotlinx.android.synthetic.main.fragment_before_sync.*
-import kotlinx.android.synthetic.main.fragment_sync.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
+import org.rfcx.audiomoth.view.deployment.EdgeDeploymentProtocol
 
 class SyncFragment : Fragment() {
-    private var deploymentProtocol: DeploymentProtocol? = null
+    private var edgeDeploymentProtocol: EdgeDeploymentProtocol? = null
     private var status: String? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        deploymentProtocol = (context as DeploymentProtocol)
+        edgeDeploymentProtocol = (context as EdgeDeploymentProtocol)
     }
 
     override fun onCreateView(
@@ -45,22 +44,22 @@ class SyncFragment : Fragment() {
     }
 
     private fun beforeSync() {
-        deploymentProtocol?.hideCompleteButton()
+        edgeDeploymentProtocol?.hideCompleteButton()
         nextButton.isSoundEffectsEnabled = false
 
         nextButton.setOnClickListener {
-            deploymentProtocol?.playSyncSound()
-            deploymentProtocol?.startSyncing(SYNCING)
+            edgeDeploymentProtocol?.playSyncSound()
+            edgeDeploymentProtocol?.startSyncing(SYNCING)
         }
     }
 
     private fun afterSync() {
         yesButton.setOnClickListener {
-            deploymentProtocol?.nextStep()
+            edgeDeploymentProtocol?.nextStep()
         }
 
         noButton.setOnClickListener {
-            deploymentProtocol?.startSyncing(BEFORE_SYNC)
+            edgeDeploymentProtocol?.startSyncing(BEFORE_SYNC)
         }
     }
 

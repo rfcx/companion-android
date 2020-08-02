@@ -19,7 +19,7 @@ import org.rfcx.audiomoth.util.Battery.getEstimatedBatteryDuration
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.util.WifiHotspotUtils
 import org.rfcx.audiomoth.util.toDateString
-import org.rfcx.audiomoth.view.deployment.DeploymentActivity
+import org.rfcx.audiomoth.view.deployment.EdgeDeploymentActivity
 import org.rfcx.audiomoth.view.detail.DeploymentDetailActivity
 import org.rfcx.audiomoth.view.diagnostic.DiagnosticActivity
 import java.util.*
@@ -89,7 +89,7 @@ class MapDetailBottomSheetFragment : Fragment() {
                     (activity as MainActivityListener).hideBottomSheet()
                 } else {
                     context?.let {
-                        DeploymentActivity.startActivity(it, deployment.id)
+                        EdgeDeploymentActivity.startActivity(it, deployment.id)
                     }
                 }
             }

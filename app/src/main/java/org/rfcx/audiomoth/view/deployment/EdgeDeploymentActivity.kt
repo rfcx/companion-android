@@ -34,7 +34,7 @@ import org.rfcx.audiomoth.view.dialog.CompleteFragment
 import org.rfcx.audiomoth.view.dialog.CompleteListener
 import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
 
-class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteListener,
+class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, CompleteListener,
     MapPickerProtocol {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
@@ -52,7 +52,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
     private var _profile: Profile? = null
     private var _deployment: EdgeDeployment? = null
     private var _deployLocation: DeploymentLocation? = null
-    private var _configuration: Configuration? = null
+    private var _edgeConfiguration: EdgeConfiguration? = null
 
     private val audioMothConnector: AudioMothConnector = AudioMothChimeConnector()
     private val configuration = AudioMothConfiguration()
@@ -137,8 +137,8 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
 
     override fun setDeploymentConfigure(profile: Profile) {
         setProfile(profile)
-        this._configuration = profile.asConfiguration()
-        this._deployment?.configuration = _configuration
+        this._edgeConfiguration = profile.asConfiguration()
+        this._deployment?.configuration = _edgeConfiguration
 
         // update deployment
         _deployment?.let { deploymentDb.updateDeployment(it) }
@@ -152,7 +152,8 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         nextStep()
     }
 
-    override fun geConfiguration(): Configuration? = _configuration
+    override fun geConfiguration(): EdgeConfiguration? =
+        _edgeConfiguration
 
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
@@ -202,7 +203,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
             deploymentImageDb.insertImage(it, images)
             deploymentDb.updateDeployment(it)
 
-            DeploymentSyncWorker.enqueue(this@DeploymentActivity)
+            DeploymentSyncWorker.enqueue(this@EdgeDeploymentActivity)
             hideLoading()
             showComplete()
         }
@@ -232,7 +233,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
                 configuration,
                 deploymentId?.let { DeploymentIdentifier(it) }
             )
-            this@DeploymentActivity.runOnUiThread {
+            this@EdgeDeploymentActivity.runOnUiThread {
                 startSyncing(SyncFragment.AFTER_SYNC)
             }
         }.start()
@@ -279,7 +280,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
             }
 
             if (deployment.configuration != null) {
-                _configuration = deployment.configuration
+                _edgeConfiguration = deployment.configuration
             }
             currentStep = deployment.state - 1
             stepView.go(currentStep, true)
@@ -411,12 +412,12 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
 
         fun startActivity(context: Context) {
-            val intent = Intent(context, DeploymentActivity::class.java)
+            val intent = Intent(context, EdgeDeploymentActivity::class.java)
             context.startActivity(intent)
         }
 
         fun startActivity(context: Context, deploymentId: Int) {
-            val intent = Intent(context, DeploymentActivity::class.java)
+            val intent = Intent(context, EdgeDeploymentActivity::class.java)
             intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
             context.startActivity(intent)
         }

@@ -11,11 +11,11 @@ import org.rfcx.audiomoth.R
 
 class DeployFragment : BaseImageFragment() {
 
-    private var deploymentProtocol: DeploymentProtocol? = null
+    private var edgeDeploymentProtocol: EdgeDeploymentProtocol? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        deploymentProtocol = (context as DeploymentProtocol)
+        edgeDeploymentProtocol = (context as EdgeDeploymentProtocol)
     }
 
     override fun onCreateView(
@@ -28,11 +28,11 @@ class DeployFragment : BaseImageFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        deploymentProtocol?.hideCompleteButton()
+        edgeDeploymentProtocol?.hideCompleteButton()
         setupImageRecycler()
         finishButton.setOnClickListener {
             val images = imageAdapter.getNewAttachImage()
-            deploymentProtocol?.setReadyToDeploy(images)
+            edgeDeploymentProtocol?.setReadyToDeploy(images)
         }
     }
 

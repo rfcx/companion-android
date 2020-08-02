@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".view.deployment.DeploymentActivity">
+    tools:context=".view.deployment.EdgeDeploymentActivity">
 
     <com.shuhart.stepview.StepView
         android:id="@+id/stepView"

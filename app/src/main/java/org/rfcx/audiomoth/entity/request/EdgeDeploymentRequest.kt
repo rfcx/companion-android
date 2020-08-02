@@ -1,7 +1,7 @@
 package org.rfcx.audiomoth.entity.request
 
 import java.util.*
-import org.rfcx.audiomoth.entity.Configuration
+import org.rfcx.audiomoth.entity.EdgeConfiguration
 import org.rfcx.audiomoth.entity.EdgeDeployment
 import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.Device
@@ -12,7 +12,7 @@ data class DeploymentRequest(
     var batteryDepletedAt: Date = Date(),
     var batteryLevel: Int = 0,
     var deployedAt: Date = Date(),
-    var configuration: Configuration? = null,
+    var configuration: EdgeConfiguration? = null,
     var location: DeploymentLocation? = null,
     var createdAt: Date = Date(),
     var updatedAt: Date? = null,

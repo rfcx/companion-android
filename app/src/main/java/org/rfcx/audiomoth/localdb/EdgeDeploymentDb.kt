@@ -6,7 +6,7 @@ import io.realm.RealmResults
 import io.realm.Sort
 import org.rfcx.audiomoth.entity.*
 import org.rfcx.audiomoth.entity.response.EdgeDeploymentResponse
-import org.rfcx.audiomoth.entity.response.toDeployment
+import org.rfcx.audiomoth.entity.response.toEdgeDeployment
 
 /**
  * For Manage the saving and sending of deployment from the local database
@@ -68,7 +68,7 @@ class EdgeDeploymentDb(private val realm: Realm) {
                 deployment.deployedAt = deploymentResponse.deployedAt ?: deployment.deployedAt
                 deployment.batteryLevel = deploymentResponse.batteryLevel ?: deployment.batteryLevel
 
-                val newConfig = deploymentResponse.configuration?.toConfiguration()
+                val newConfig = deploymentResponse.configuration?.toEdgeConfiguration()
                 if (newConfig != null) {
                     deployment.configuration = it.copyToRealm(newConfig)
                 }
@@ -80,7 +80,7 @@ class EdgeDeploymentDb(private val realm: Realm) {
 
                 deployment.createdAt = deploymentResponse.createdAt ?: deployment.createdAt
             } else {
-                val deploymentObj = deploymentResponse.toDeployment()
+                val deploymentObj = deploymentResponse.toEdgeDeployment()
                 val id = (it.where(EdgeDeployment::class.java).max(EdgeDeployment.FIELD_ID)
                     ?.toInt() ?: 0) + 1
                 deploymentObj.id = id

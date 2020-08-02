@@ -17,7 +17,7 @@ open class EdgeDeployment(
     var batteryLevel: Int = 0,
     @Expose(serialize = false)
     var state: Int = 0, // 1 = Locate, 2 = Config, 3 = Sync, 4 = Verify, 5 = Deploy, 6 = Ready To Upload
-    var configuration: Configuration? = null,
+    var configuration: EdgeConfiguration? = null,
     var location: DeploymentLocation? = null,
     var createdAt: Date = Date(),
     @Expose(serialize = false)
