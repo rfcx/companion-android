@@ -10,16 +10,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_guardian_configure.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.connection.socket.OnReceiveResponse
 import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.entity.guardian.GuardianConfiguration
 import org.rfcx.audiomoth.entity.guardian.GuardianProfile
 import org.rfcx.audiomoth.entity.guardian.toListForGuardian
-import org.rfcx.audiomoth.entity.socket.SocketResposne
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianConfigureFragment : Fragment() {
@@ -96,17 +94,10 @@ class GuardianConfigureFragment : Fragment() {
     }
 
     private fun syncConfig() {
-        SocketManager.syncConfiguration(getConfiguration().toListForGuardian(), object : OnReceiveResponse {
-            override fun onReceive(response: SocketResposne) {
-                activity!!.runOnUiThread {
-                    deploymentProtocol?.nextStep()
-                }
-            }
-
-            override fun onFailed(message: String) {
-                activity!!.runOnUiThread {
-                    Toast.makeText(activity, message, Toast.LENGTH_LONG).show()
-                }
+        SocketManager.syncConfiguration(getConfiguration().toListForGuardian())
+        SocketManager.syncConfiguration.observe(viewLifecycleOwner, Observer {
+            requireActivity().runOnUiThread {
+                deploymentProtocol?.nextStep()
             }
         })
     }

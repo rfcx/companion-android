@@ -6,18 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.fragment_guardian_select_profile.*
-import kotlinx.android.synthetic.main.fragment_select_profile.createNewButton
-import kotlinx.android.synthetic.main.fragment_select_profile.profileProgressBar
-import kotlinx.android.synthetic.main.fragment_select_profile.profileRecyclerView
-import kotlinx.android.synthetic.main.fragment_select_profile.tryAgainTextView
+import kotlinx.android.synthetic.main.fragment_select_profile.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.connection.socket.OnReceiveResponse
 import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.entity.guardian.GuardianProfile
-import org.rfcx.audiomoth.entity.socket.ConfigurationResponse
-import org.rfcx.audiomoth.entity.socket.SocketResposne
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianSelectProfileFragment : Fragment(), (GuardianProfile) -> Unit {
@@ -69,25 +63,21 @@ class GuardianSelectProfileFragment : Fragment(), (GuardianProfile) -> Unit {
 
     private fun getCurrentConfiguration() {
         checkState(SHOW_LOADING)
-        SocketManager.getCurrentConfiguration(object : OnReceiveResponse {
-            override fun onReceive(response: SocketResposne) {
-                val config = response as ConfigurationResponse
 
-                currentProfile = listOf(GuardianProfile(
+        SocketManager.getCurrentConfiguration()
+        SocketManager.currentConfiguration.observe(viewLifecycleOwner, Observer { configuration ->
+            currentProfile = listOf(
+                GuardianProfile(
                     name = "Current configuration",
-                    sampleRate = config.configure.sampleRate,
-                    bitrate = config.configure.bitrate,
-                    fileFormat = config.configure.fileFormat,
-                    duration = config.configure.duration
-                ))
+                    sampleRate = configuration.configure.sampleRate,
+                    bitrate = configuration.configure.bitrate,
+                    fileFormat = configuration.configure.fileFormat,
+                    duration = configuration.configure.duration
+                )
+            )
 
-                activity!!.runOnUiThread {
-                    retrieveProfiles()
-                }
-            }
-
-            override fun onFailed(message: String) {
-                checkState(SHOW_TRY_AGAIN)
+            requireActivity().runOnUiThread {
+                retrieveProfiles()
             }
         })
     }

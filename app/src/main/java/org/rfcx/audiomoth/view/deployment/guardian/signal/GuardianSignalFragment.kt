@@ -6,26 +6,23 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_guardian_signal.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.connection.socket.OnReceiveResponse
 import org.rfcx.audiomoth.connection.socket.SocketManager
-import org.rfcx.audiomoth.entity.socket.SignalResponse
-import org.rfcx.audiomoth.entity.socket.SocketResposne
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 import java.util.*
 
-class GuardianSignalFragment : Fragment(), OnReceiveResponse {
+class GuardianSignalFragment : Fragment() {
     private val listOfSignal by lazy {
         listOf(signalStrength1, signalStrength2, signalStrength3, signalStrength4)
     }
 
-    private val timer by lazy {
-        Timer()
-    }
+    private var timer: Timer? = null
+
+    private var isSignalTesting = false
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
 
@@ -53,17 +50,63 @@ class GuardianSignalFragment : Fragment(), OnReceiveResponse {
     }
 
     private fun retrieveGuardianSignal() {
-        timer.schedule(object : TimerTask() {
+        isSignalTesting = true
+
+        timer = Timer()
+        timer?.schedule( object : TimerTask(){
             override fun run() {
-                SocketManager.getSignalStrength(this@GuardianSignalFragment)
+                SocketManager.getSignalStrength()
             }
         }, DELAY, MILLI_PERIOD)
+
+        SocketManager.signal.observe(viewLifecycleOwner, Observer { signal ->
+            deploymentProtocol?.hideLoading()
+            val strength = signal.signalInfo.signal
+            val simCard = signal.signalInfo.simCard
+            requireActivity().runOnUiThread {
+                if (simCard) {
+                    hideSimError()
+                    showSignalInfo()
+                    when {
+                        strength > -70 -> {
+                            showSignalStrength(SignalState.MAX)
+                            signalDescText.text = getString(R.string.signal_text_4)
+                        }
+                        strength > -90 -> {
+                            showSignalStrength(SignalState.HIGH)
+                            signalDescText.text = getString(R.string.signal_text_3)
+                        }
+                        strength > -110 -> {
+                            showSignalStrength(SignalState.NORMAL)
+                            signalDescText.text = getString(R.string.signal_text_2)
+                        }
+                        strength > -130 -> {
+                            showSignalStrength(SignalState.LOW)
+                            signalDescText.text = getString(R.string.signal_text_1)
+                        }
+                        else -> {
+                            showSignalStrength(SignalState.NONE)
+                            signalDescText.text = getString(R.string.signal_text_0)
+                        }
+                    }
+                    signalValue.text = getString(R.string.signal_value, strength)
+                } else {
+                    hideSignalInfo()
+                    showSimError()
+                    showSignalStrength(SignalState.NONE)
+                    signalErrorText.text = getText(R.string.signal_sim_card)
+                }
+            }
+        })
     }
 
     private fun showSignalStrength(state: SignalState) {
         listOfSignal.forEachIndexed { index, view ->
             if (index < state.value) {
-                (view.background as GradientDrawable).setBackground(requireContext(), R.color.signal_filled)
+                (view.background as GradientDrawable).setBackground(
+                    requireContext(),
+                    R.color.signal_filled
+                )
             } else {
                 (view.background as GradientDrawable).setBackground(requireContext(), R.color.white)
             }
@@ -88,56 +131,12 @@ class GuardianSignalFragment : Fragment(), OnReceiveResponse {
         signalErrorText.visibility = View.GONE
     }
 
-    override fun onReceive(response: SocketResposne) {
-        deploymentProtocol?.hideLoading()
-        val signalResponse = response as SignalResponse
-        val strength = signalResponse.signalInfo.signal
-        val simCard = signalResponse.signalInfo.simCard
-        requireActivity().runOnUiThread {
-            if (simCard) {
-                hideSimError()
-                showSignalInfo()
-                when {
-                    strength > -70 -> {
-                        showSignalStrength(SignalState.MAX)
-                        signalDescText.text = getString(R.string.signal_text_4)
-                    }
-                    strength > -90 -> {
-                        showSignalStrength(SignalState.HIGH)
-                        signalDescText.text = getString(R.string.signal_text_3)
-                    }
-                    strength > -110 -> {
-                        showSignalStrength(SignalState.NORMAL)
-                        signalDescText.text = getString(R.string.signal_text_2)
-                    }
-                    strength > -130 -> {
-                        showSignalStrength(SignalState.LOW)
-                        signalDescText.text = getString(R.string.signal_text_1)
-                    }
-                    else -> {
-                        showSignalStrength(SignalState.NONE)
-                        signalDescText.text = getString(R.string.signal_text_0)
-                    }
-                }
-                signalValue.text = getString(R.string.signal_value, strength)
-            } else {
-                hideSignalInfo()
-                showSimError()
-                showSignalStrength(SignalState.NONE)
-                signalErrorText.text = getText(R.string.signal_sim_card)
-            }
-        }
-    }
-
-    override fun onFailed(message: String) {
-        requireActivity().runOnUiThread {
-            Toast.makeText(requireContext(), "Getting signal failed", Toast.LENGTH_LONG).show()
-        }
-    }
-
     override fun onDetach() {
         super.onDetach()
-        timer.cancel()
+        if(isSignalTesting) {
+            timer?.cancel()
+            timer = null
+        }
     }
 
     companion object {

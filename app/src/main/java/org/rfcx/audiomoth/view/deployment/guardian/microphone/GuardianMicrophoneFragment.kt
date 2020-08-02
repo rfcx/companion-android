@@ -5,22 +5,27 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_guardian_microphone.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.connection.socket.OnReceiveResponse
 import org.rfcx.audiomoth.connection.socket.SocketManager
-import org.rfcx.audiomoth.entity.socket.SocketResposne
 import org.rfcx.audiomoth.util.MicrophoneTestUtils
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
+import org.rfcx.audiomoth.view.deployment.guardian.signal.GuardianSignalFragment
+import java.util.*
 
-class GuardianMicrophoneFragment : Fragment(), OnReceiveResponse {
+class GuardianMicrophoneFragment : Fragment() {
+
+    private var timer: Timer? = null
+    private var isTimerPause = false
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
     private val microphoneTestUtils by lazy {
         MicrophoneTestUtils()
     }
+
+    private var isMicTesting = false
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -40,22 +45,26 @@ class GuardianMicrophoneFragment : Fragment(), OnReceiveResponse {
 
         deploymentProtocol?.hideCompleteButton()
         setUiByState(MicTestingState.READY)
+        SocketManager.resetDefaultValue()
 
         listenAudioButton.setOnClickListener {
+            isMicTesting = true
             setUiByState(MicTestingState.LISTENING)
             retrieveLiveAudioBuffer()
         }
 
         cancelAudioButton.setOnClickListener {
+            isMicTesting = false
+            isTimerPause = true
             setUiByState(MicTestingState.FINISH)
-            retrieveLiveAudioBuffer()
             microphoneTestUtils.stop()
         }
 
         listenAgainAudioButton.setOnClickListener {
+            isMicTesting = true
+            isTimerPause = false
             setUiByState(MicTestingState.LISTENING)
             microphoneTestUtils.play()
-            retrieveLiveAudioBuffer()
         }
 
         finishButton.setOnClickListener {
@@ -90,18 +99,20 @@ class GuardianMicrophoneFragment : Fragment(), OnReceiveResponse {
     }
 
     private fun retrieveLiveAudioBuffer() {
-        SocketManager.getLiveAudioBuffer(
-            microphoneTestUtils,
-            this@GuardianMicrophoneFragment
-        )
-    }
+        timer = Timer()
 
-    override fun onReceive(response: SocketResposne) { /* not used */ }
+        timer?.schedule( object : TimerTask(){
+            override fun run() {
+                if (!isTimerPause) {
+                    SocketManager.getLiveAudioBuffer(microphoneTestUtils)
+                    isTimerPause = true
+                }
+            }
+        }, DELAY, MILLI_PERIOD)
 
-    override fun onFailed(message: String) {
-        requireActivity().runOnUiThread {
-            Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
-        }
+        SocketManager.liveAudio.observe(viewLifecycleOwner, Observer {
+            isTimerPause = false
+        })
     }
 
     override fun onDetach() {
@@ -110,11 +121,16 @@ class GuardianMicrophoneFragment : Fragment(), OnReceiveResponse {
             it.stop()
             it.release()
         }
-        SocketManager.stopAudioQueueThread()
-        SocketManager.stopConnection()
+        if (isMicTesting) {
+            timer?.cancel()
+            timer = null
+        }
     }
 
     companion object {
+        private const val DELAY = 0L
+        private const val MILLI_PERIOD = 100L
+
         enum class MicTestingState { READY, LISTENING, FINISH }
 
         fun newInstance(): GuardianMicrophoneFragment = GuardianMicrophoneFragment()
