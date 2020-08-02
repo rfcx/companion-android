@@ -1,20 +1,22 @@
 package org.rfcx.audiomoth.connection.socket
 
+import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import org.json.JSONObject
 import org.rfcx.audiomoth.entity.socket.*
 import org.rfcx.audiomoth.util.MicrophoneTestUtils
 import java.io.DataInputStream
 import java.io.DataOutputStream
-import java.net.ConnectException
 import java.net.Socket
 
 object SocketManager {
 
-    private lateinit var socket: Socket
-    private lateinit var outputStream: DataOutputStream
-    private lateinit var clientThread: Thread // Thread for socket communication
-    private lateinit var audioThread: Thread // Separated thread for queuing audio and set audio track
+    private var socket: Socket? = null
+    private var outputStream: DataOutputStream? = null
+    private var inputStream: DataInputStream? = null
+    private var clientThread: Thread? = null// Thread for socket communication
+
+    private lateinit var inComingMessageThread: Thread
 
     private val gson = Gson()
 
@@ -31,56 +33,82 @@ object SocketManager {
     private var microphoneTestUtils: MicrophoneTestUtils? = null
     private var isTestingFirstTime = true
 
-    fun connect(onReceiveResponse: OnReceiveResponse) {
+    private var tempAudio = ""
+
+    val connection = MutableLiveData<ConnectionResponse>()
+    val diagnostic = MutableLiveData<DiagnosticResponse>()
+    val currentConfiguration = MutableLiveData<ConfigurationResponse>()
+    val syncConfiguration = MutableLiveData<SyncConfigurationResponse>()
+    val prefs = MutableLiveData<PrefsResponse>()
+    val signal = MutableLiveData<SignalResponse>()
+    val liveAudio = MutableLiveData<MicrophoneTestResponse>()
+
+    init {
+        connection.value = ConnectionResponse()
+        diagnostic.value = DiagnosticResponse()
+        currentConfiguration.value = ConfigurationResponse()
+        syncConfiguration.value = SyncConfigurationResponse()
+        prefs.value = PrefsResponse()
+        signal.value = SignalResponse()
+        liveAudio.value = MicrophoneTestResponse()
+    }
+
+    fun getConnection() {
         val data = gson.toJson(SocketRequest(CONNECTION))
-        sendData(data, onReceiveResponse)
+        sendMessage(data)
     }
 
-    fun getDiagnosticData(onReceiveResponse: OnReceiveResponse) {
+    fun getDiagnosticData() {
         val data = gson.toJson(SocketRequest(DIAGNOSTIC))
-        sendData(data, onReceiveResponse)
+        sendMessage(data)
     }
 
-    fun getCurrentConfiguration(onReceiveResponse: OnReceiveResponse) {
+    fun getCurrentConfiguration() {
         val data = gson.toJson(SocketRequest(CONFIGURE))
-        sendData(data, onReceiveResponse)
+        sendMessage(data)
     }
 
-    fun syncConfiguration(config: List<String>, onReceiveResponse: OnReceiveResponse) {
+    fun syncConfiguration(config: List<String>) {
         val jsonString = gson.toJson(SyncConfigurationRequest(SyncConfiguration(config)))
-        sendData(jsonString, onReceiveResponse)
+        sendMessage(jsonString)
     }
 
-    fun getSignalStrength(onReceiveResponse: OnReceiveResponse) {
+    fun getSignalStrength() {
         val data = gson.toJson(SocketRequest(SIGNAL))
-        sendData(data, onReceiveResponse)
+        sendMessage(data)
     }
 
-    fun getLiveAudioBuffer(
-        micTestUtils: MicrophoneTestUtils,
-        onReceiveResponse: OnReceiveResponse
-    ) {
+    fun getLiveAudioBuffer(micTestUtils: MicrophoneTestUtils) {
+        this.microphoneTestUtils = micTestUtils
         val data = gson.toJson(SocketRequest(MICROPHONE_TEST))
-        sendData(data, onReceiveResponse, micTestUtils)
+        sendMessage(data)
     }
 
-    private fun sendData(
-        data: String,
-        onReceiveResponse: OnReceiveResponse,
-        micTestUtils: MicrophoneTestUtils? = null
-    ) {
-        microphoneTestUtils = micTestUtils
+    fun resetDefaultValue() {
+        isTestingFirstTime = true
+    }
+
+    private fun sendMessage(message: String) {
         clientThread = Thread(Runnable {
             try {
                 socket = Socket("192.168.43.1", 9999)
+                startInComingMessageThread()
+                outputStream = DataOutputStream(socket?.getOutputStream())
+                outputStream?.writeUTF(message)
+                outputStream?.flush()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        })
+        clientThread?.start()
+    }
 
-                outputStream = DataOutputStream(socket.getOutputStream())
-
-                outputStream.writeUTF(data)
-                outputStream.flush()
-
+    private fun startInComingMessageThread() {
+        inComingMessageThread = Thread(Runnable {
+            try {
                 while (true) {
-                    val dataInput = DataInputStream(socket.getInputStream()).readUTF()
+                    inputStream = DataInputStream(socket!!.getInputStream())
+                    val dataInput = inputStream?.readUTF()
                     if (!dataInput.isNullOrBlank()) {
 
                         val receiveJson = JSONObject(dataInput)
@@ -91,17 +119,17 @@ object SocketManager {
                             CONFIGURE -> {
                                 val response =
                                     gson.fromJson(dataInput, ConfigurationResponse::class.java)
-                                onReceiveResponse.onReceive(response)
+                                this.currentConfiguration.postValue(response)
                             }
                             DIAGNOSTIC -> {
                                 val response =
                                     gson.fromJson(dataInput, DiagnosticResponse::class.java)
-                                onReceiveResponse.onReceive(response)
+                                this.diagnostic.postValue(response)
                             }
                             CONNECTION -> {
                                 val response =
                                     gson.fromJson(dataInput, ConnectionResponse::class.java)
-                                onReceiveResponse.onReceive(response)
+                                this.connection.postValue(response)
                             }
                             SYNC -> {
                                 val response =
@@ -109,21 +137,21 @@ object SocketManager {
                                         dataInput,
                                         SyncConfigurationResponse::class.java
                                     )
-                                if (response.sync.status == "success") {
-                                    onReceiveResponse.onReceive(response)
+                                if (response.sync.status == Status.SUCCESS.value) {
+                                    this.syncConfiguration.postValue(response)
                                 } else {
-                                    onReceiveResponse.onFailed("Sync failed, there is something wrong on the server")
+                                    this.syncConfiguration.postValue(response)
                                 }
                             }
                             PREFS -> {
                                 val response =
                                     gson.fromJson(dataInput, PrefsResponse::class.java)
-                                onReceiveResponse.onReceive(response)
+                                this.prefs.postValue(response)
                             }
                             SIGNAL_INFO -> {
                                 val response =
                                     gson.fromJson(dataInput, SignalResponse::class.java)
-                                onReceiveResponse.onReceive(response)
+                                this.signal.postValue(response)
                             }
                             MICROPHONE_TEST -> {
                                 val response =
@@ -133,63 +161,39 @@ object SocketManager {
                                         util.init(util.getEncodedAudioBufferSize(response.audioBuffer.buffer))
                                         util.play()
                                     }
-                                    setAudioFromQueue()
                                     isTestingFirstTime = false
                                 }
-                                audioQueue.add(response.audioBuffer.buffer)
+                                if (tempAudio != response.audioBuffer.buffer) {
+                                    tempAudio = response.audioBuffer.buffer
+                                    microphoneTestUtils?.let {
+                                        it.buffer = it.decodeEncodedAudio(response.audioBuffer.buffer)
+                                        it.setTrack()
+                                    }
+                                }
+                                this.liveAudio.postValue(response)
                             }
                         }
                     }
                 }
-
             } catch (e: Exception) {
-                if (e is ConnectException) {
-                    onReceiveResponse.onFailed("failed to connect to the server")
-                }
+                e.printStackTrace()
             }
         })
-
-        if (!clientThread.isAlive){
-            clientThread.start()
-        }
-    }
-
-    private fun setAudioFromQueue() {
-        audioThread = Thread(Runnable {
-            while (!audioThread.isInterrupted) {
-                try {
-                    if (audioQueue.isNotEmpty()) {
-                        val audio = audioQueue[0]
-                        microphoneTestUtils?.apply {
-                            buffer = decodeEncodedAudio(audio)
-                        }.also { util ->
-                            util?.setTrack()
-                        }
-                        audioQueue.remove(audio)
-                    }
-                } catch (e: InterruptedException) {
-                    audioThread.interrupt()
-                } catch (e: IllegalStateException) {
-                    e.printStackTrace()
-                }
-            }
-        })
-
-        audioThread.start()
+        inComingMessageThread.start()
     }
 
     fun stopConnection() {
-        clientThread.interrupt()
-    }
+        //stop incoming message thread
+        inComingMessageThread.interrupt()
 
-    fun stopAudioQueueThread() {
-        if (::audioThread.isInitialized){
-            audioThread.interrupt()
-        }
-    }
-}
+        //stop server thread
+        clientThread?.interrupt()
 
-interface OnReceiveResponse {
-    fun onReceive(response: SocketResposne)
-    fun onFailed(message: String)
+        outputStream?.close()
+
+        inputStream?.close()
+
+        outputStream?.close()
+        socket?.close()
+    }
 }

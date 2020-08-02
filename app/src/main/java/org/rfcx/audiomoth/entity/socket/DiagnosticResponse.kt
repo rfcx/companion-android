@@ -5,7 +5,7 @@ import org.rfcx.audiomoth.entity.guardian.Diagnostic
 import org.rfcx.audiomoth.entity.guardian.GuardianConfiguration
 
 data class DiagnosticResponse(
-    val diagnostic: Diagnostic,
-    val configure: GuardianConfiguration,
-    val prefs: JsonArray
+    val diagnostic: Diagnostic = Diagnostic(),
+    val configure: GuardianConfiguration = GuardianConfiguration(),
+    val prefs: JsonArray = JsonArray()
 ) : SocketResposne

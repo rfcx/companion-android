@@ -3,6 +3,7 @@ package org.rfcx.audiomoth
 import android.app.Application
 import io.realm.Realm
 import io.realm.exceptions.RealmMigrationNeededException
+import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.service.DeploymentCleanupWorker
 import org.rfcx.audiomoth.util.RealmHelper
 
@@ -33,5 +34,10 @@ class CompanionApplication : Application() {
             } catch (e: RealmMigrationNeededException) {
             }
         }
+    }
+
+    override fun onTerminate() {
+        super.onTerminate()
+        SocketManager.stopConnection()
     }
 }
