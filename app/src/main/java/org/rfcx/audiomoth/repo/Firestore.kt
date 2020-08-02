@@ -135,17 +135,7 @@ class Firestore(val context: Context) {
 
                 // verify response and store deployment
                 deploymentResponses.forEach { dr ->
-
-                    val deploymentsCount = deploymentDb.getAllResultsAsync().count()
-                    if (deploymentsCount == 0) {
-                        deploymentDb.insertOrUpdate(dr)
-                    } else {
-                        // if SyncState not equal SEND don't update
-                        val isSend = deploymentDb.getDeploymentsSend().contains(dr.serverId)
-                        if (isSend) {
-                            deploymentDb.insertOrUpdate(dr)
-                        }
-                    }
+                    deploymentDb.insertOrUpdate(dr)
                 }
 
                 // verify response and store guardian deployment
@@ -183,25 +173,9 @@ class Firestore(val context: Context) {
 
                 // verify response and store deployment
                 locationResponses.forEach { lr ->
-
-                    val locatesCount = locateDb.getAllResultsAsync().count()
-                    if (locatesCount == 0) {
-                        locateDb.insertOrUpdate(lr)
-                    } else {
-                        // if SyncState not equal SEND don't update
-                        val isSend = locateDb.getLocatesSend().contains(lr.serverId)
-                        if (isSend) {
-                            locateDb.insertOrUpdate(lr)
-                        } else {
-                            lr.lastDeploymentServerId?.let { serverId ->
-                                val locate = locateDb.getLocateByServerId(serverId)
-                                if (locate != null) {
-                                    locateDb.updateLocate(locate)
-                                }
-                            }
-                        }
-                    }
+                    locateDb.insertOrUpdate(lr)
                 }
+                
                 callback?.onSuccessCallback(locationResponses)
             }
             .addOnFailureListener {

@@ -161,20 +161,21 @@ class LocateDb(private val realm: Realm) {
                     .equalTo(Locate.FIELD_SERVER_ID, locationResponse.serverId)
                     .findFirst()
 
-            if (location != null) {
+            if (location == null) {
+                val locate = locationResponse.toLocate()
+                val id = (it.where(Locate::class.java).max(Deployment.FIELD_ID)
+                    ?.toInt() ?: 0) + 1
+                locate.id = id
+                it.insert(locate)
+            } else if (location.syncState == SyncState.Sent.key) {
                 location.serverId = locationResponse.serverId
                 location.name = locationResponse.name ?: location.name
                 location.latitude = locationResponse.latitude ?: location.latitude
                 location.longitude = locationResponse.longitude ?: location.longitude
                 location.createdAt = locationResponse.createdAt ?: location.createdAt
                 location.lastDeploymentServerId = locationResponse.lastDeploymentServerId
-                location.lastGuardianDeploymentServerId = locationResponse.lastGuardianDeploymentServerId
-            } else {
-                val locate = locationResponse.toLocate()
-                val id = (it.where(Locate::class.java).max(Deployment.FIELD_ID)
-                    ?.toInt() ?: 0) + 1
-                locate.id = id
-                it.insert(locate)
+                location.lastGuardianDeploymentServerId =
+                    locationResponse.lastGuardianDeploymentServerId
             }
         }
     }

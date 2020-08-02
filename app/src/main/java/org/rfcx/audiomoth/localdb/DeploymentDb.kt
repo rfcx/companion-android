@@ -60,7 +60,13 @@ class DeploymentDb(private val realm: Realm) {
                     .equalTo(Deployment.FIELD_SERVER_ID, deploymentResponse.serverId)
                     .findFirst()
 
-            if (deployment != null) {
+            if (deployment == null) {
+                val deploymentObj = deploymentResponse.toDeployment()
+                val id = (it.where(Deployment::class.java).max(Deployment.FIELD_ID)
+                    ?.toInt() ?: 0) + 1
+                deploymentObj.id = id
+                it.insert(deploymentObj)
+            } else if (deployment.syncState == SyncState.Sent.key) {
                 deployment.deploymentId = deploymentResponse.deploymentId
                 deployment.serverId = deploymentResponse.serverId
                 deployment.batteryDepletedAt =
@@ -79,12 +85,6 @@ class DeploymentDb(private val realm: Realm) {
                 }
 
                 deployment.createdAt = deploymentResponse.createdAt ?: deployment.createdAt
-            } else {
-                val deploymentObj = deploymentResponse.toDeployment()
-                val id = (it.where(Deployment::class.java).max(Deployment.FIELD_ID)
-                    ?.toInt() ?: 0) + 1
-                deploymentObj.id = id
-                it.insert(deploymentObj)
             }
         }
     }
