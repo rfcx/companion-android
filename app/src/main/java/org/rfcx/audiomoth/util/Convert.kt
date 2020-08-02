@@ -1,8 +1,8 @@
 package org.rfcx.audiomoth.util
 
-import org.rfcx.audiomoth.entity.Deployment
+import org.rfcx.audiomoth.entity.EdgeDeployment
 
-fun Deployment.getSampleRate(): AudioMothConfiguration.SampleRate {
+fun EdgeDeployment.getSampleRate(): AudioMothConfiguration.SampleRate {
     return when (this.configuration?.sampleRate) {
         384 -> AudioMothConfiguration.SampleRate.SAMPLE_RATE_384KHZ
         256 -> AudioMothConfiguration.SampleRate.SAMPLE_RATE_256KHZ
@@ -15,7 +15,7 @@ fun Deployment.getSampleRate(): AudioMothConfiguration.SampleRate {
     }
 }
 
-fun Deployment.getGain(): AudioMothConfiguration.Gain {
+fun EdgeDeployment.getGain(): AudioMothConfiguration.Gain {
     return when (this.configuration?.gain) {
         5 -> AudioMothConfiguration.Gain.HIGH_GAIN
         4 -> AudioMothConfiguration.Gain.MEDIUM_HIGH_GAIN
@@ -25,7 +25,7 @@ fun Deployment.getGain(): AudioMothConfiguration.Gain {
     }
 }
 
-fun Deployment.getSleepRecordCycle(): AudioMothConfiguration.SleepRecordCycle? {
+fun EdgeDeployment.getSleepRecordCycle(): AudioMothConfiguration.SleepRecordCycle? {
     val sleepDuration = this.configuration?.sleepDuration
     val recordingDuration = this.configuration?.recordingDuration
     if (sleepDuration != null && recordingDuration != null) {
@@ -34,7 +34,7 @@ fun Deployment.getSleepRecordCycle(): AudioMothConfiguration.SleepRecordCycle? {
     return null
 }
 
-fun Deployment.getStartStopPeriods(): Array<AudioMothConfiguration.StartStopPeriod>? {
+fun EdgeDeployment.getStartStopPeriods(): Array<AudioMothConfiguration.StartStopPeriod>? {
     val recordingPeriodList = this.configuration?.recordingPeriodList
     if (recordingPeriodList?.size == 0) return arrayOf(
         AudioMothConfiguration.StartStopPeriod(

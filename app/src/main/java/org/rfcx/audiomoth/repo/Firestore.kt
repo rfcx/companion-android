@@ -9,11 +9,11 @@ import kotlinx.coroutines.tasks.await
 import org.rfcx.audiomoth.entity.*
 import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_SERVER_ID
 import org.rfcx.audiomoth.entity.request.*
-import org.rfcx.audiomoth.entity.response.DeploymentResponse
 import org.rfcx.audiomoth.entity.response.DiagnosticResponse
+import org.rfcx.audiomoth.entity.response.EdgeDeploymentResponse
 import org.rfcx.audiomoth.entity.response.GuardianDeploymentResponse
 import org.rfcx.audiomoth.entity.response.LocationResponse
-import org.rfcx.audiomoth.localdb.DeploymentDb
+import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.guardian.DiagnosticDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
@@ -85,8 +85,8 @@ class Firestore(val context: Context) {
     ) {
         val userDocument = db.collection(COLLECTION_USERS).document(guid)
         val updates = hashMapOf<String, Any>(
-            Deployment.FIELD_LOCATION to deploymentLocation,
-            Deployment.FIELD_UPDATED_AT to updatedAt
+            EdgeDeployment.FIELD_LOCATION to deploymentLocation,
+            EdgeDeployment.FIELD_UPDATED_AT to updatedAt
         )
         userDocument.collection(COLLECTION_DEPLOYMENTS).document(serverId)
             .update(updates).await()
@@ -95,7 +95,7 @@ class Firestore(val context: Context) {
     suspend fun updateDeleteDeployment(serverId: String, deletedAt: Date) {
         val userDocument = db.collection(COLLECTION_USERS).document(guid)
         userDocument.collection(COLLECTION_DEPLOYMENTS).document(serverId)
-            .update(Deployment.FIELD_DELETED_AT, deletedAt).await()
+            .update(EdgeDeployment.FIELD_DELETED_AT, deletedAt).await()
     }
 
     suspend fun sendDiagnostic(diagnosticRequest: DiagnosticRequest): DocumentReference? {
@@ -110,40 +110,39 @@ class Firestore(val context: Context) {
     }
 
     fun retrieveDeployments(
-        deploymentDb: DeploymentDb,
+        edgeDeploymentDb: EdgeDeploymentDb,
         guardianDeploymentDb: GuardianDeploymentDb,
         callback: ResponseCallback<Boolean>? = null
     ) {
         val userDocument = db.collection(COLLECTION_USERS).document(guid)
         userDocument.collection(COLLECTION_DEPLOYMENTS).get()
             .addOnSuccessListener {
-                val deploymentResponses = arrayListOf<DeploymentResponse>()
+                val edResponses = arrayListOf<EdgeDeploymentResponse>()
                 val gdResponses = arrayListOf<GuardianDeploymentResponse>()
+                //verify response
                 it.documents.forEach { doc ->
                     if (doc == null) return@forEach
-
                     if (doc.getString("device") == Device.GUARDIAN.value) {
                         val response = doc.toObject(GuardianDeploymentResponse::class.java)
                         response?.serverId = doc.id
                         response?.let { it1 -> gdResponses.add(it1) }
                     } else {
-                        val response = doc.toObject(DeploymentResponse::class.java)
+                        val response = doc.toObject(EdgeDeploymentResponse::class.java)
                         response?.serverId = doc.id
-                        response?.let { it1 -> deploymentResponses.add(it1) }
+                        response?.let { it1 -> edResponses.add(it1) }
                     }
                 }
 
-                // verify response and store deployment
-                deploymentResponses.forEach { dr ->
-
-                    // if SyncState not equal SEND don't update
-                    val isSend = deploymentDb.getDeploymentsSend().contains(dr.serverId)
-                    if (isSend) {
-                        deploymentDb.insertOrUpdate(dr)
+                // store edge deployment
+                edResponses.forEach { dr ->
+                    // if SyncState not equal SENT don't update
+                    val isSent = edgeDeploymentDb.getDeploymentsSent().contains(dr.serverId)
+                    if (isSent) {
+                        edgeDeploymentDb.insertOrUpdate(dr)
                     }
                 }
 
-                // verify response and store guardian deployment
+                // store guardian deployment
                 gdResponses.forEach { dr ->
                     guardianDeploymentDb.insertOrUpdate(dr)
                 }

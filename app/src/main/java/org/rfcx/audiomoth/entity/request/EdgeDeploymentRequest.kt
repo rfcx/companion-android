@@ -2,7 +2,7 @@ package org.rfcx.audiomoth.entity.request
 
 import java.util.*
 import org.rfcx.audiomoth.entity.Configuration
-import org.rfcx.audiomoth.entity.Deployment
+import org.rfcx.audiomoth.entity.EdgeDeployment
 import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.Device
 
@@ -19,7 +19,7 @@ data class DeploymentRequest(
     var deletedAt: Date? = null
 )
 
-fun Deployment.toRequestBody(): DeploymentRequest {
+fun EdgeDeployment.toRequestBody(): DeploymentRequest {
     return DeploymentRequest(
         device = Device.EDGE.value,
         batteryDepletedAt = this.batteryDepletedAt,

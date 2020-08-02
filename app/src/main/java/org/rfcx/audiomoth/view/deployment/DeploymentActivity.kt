@@ -14,7 +14,7 @@ import kotlinx.android.synthetic.main.activity_deployment.*
 import org.rfcx.audiomoth.BuildConfig
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.*
-import org.rfcx.audiomoth.localdb.DeploymentDb
+import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.ProfileDb
@@ -39,7 +39,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val deploymentDb by lazy {
-        DeploymentDb(
+        EdgeDeploymentDb(
             realm
         )
     }
@@ -50,7 +50,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
     private var currentStep = 0
     private var _profiles: List<Profile> = listOf()
     private var _profile: Profile? = null
-    private var _deployment: Deployment? = null
+    private var _deployment: EdgeDeployment? = null
     private var _deployLocation: DeploymentLocation? = null
     private var _configuration: Configuration? = null
 
@@ -129,9 +129,9 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         }
     }
 
-    override fun getDeployment(): Deployment? = this._deployment
+    override fun getDeployment(): EdgeDeployment? = this._deployment
 
-    override fun setDeployment(deployment: Deployment) {
+    override fun setDeployment(deployment: EdgeDeployment) {
         this._deployment = deployment
     }
 
@@ -157,7 +157,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
     override fun setDeployLocation(locate: Locate) {
-        val deployment = _deployment ?: Deployment()
+        val deployment = _deployment ?: EdgeDeployment()
         deployment.state = DeploymentState.Edge.Locate.key // state
         deployment.deploymentId = randomDeploymentId()
 

@@ -13,10 +13,10 @@ interface DeploymentProtocol : BaseDeploymentProtocol {
 
     fun getProfiles(): List<Profile>
     fun getProfile(): Profile?
-    fun getDeployment(): Deployment?
+    fun getDeployment(): EdgeDeployment?
     fun geConfiguration(): Configuration?
 
-    fun setDeployment(deployment: Deployment)
+    fun setDeployment(deployment: EdgeDeployment)
     fun setProfile(profile: Profile)
     fun setDeploymentConfigure(profile: Profile)
     fun setPerformBattery(batteryDepletedAt: Timestamp, batteryLevel: Int)

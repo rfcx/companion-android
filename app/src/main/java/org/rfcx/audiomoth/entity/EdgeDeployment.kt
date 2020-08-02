@@ -7,7 +7,7 @@ import io.realm.annotations.RealmClass
 import java.util.*
 
 @RealmClass
-open class Deployment(
+open class EdgeDeployment(
     @PrimaryKey
     var id: Int = 0,
     var serverId: String? = null,
@@ -29,7 +29,6 @@ open class Deployment(
     fun isSent(): Boolean = (syncState == SyncState.Sent.key)
 
     companion object {
-        const val TABLE_NAME = "Deployment"
         const val FIELD_ID = "id"
         const val FIELD_STATE = "state"
         const val FIELD_SYNC_STATE = "syncState"

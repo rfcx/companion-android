@@ -3,7 +3,7 @@ package org.rfcx.audiomoth.localdb
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
-import org.rfcx.audiomoth.entity.Deployment
+import org.rfcx.audiomoth.entity.EdgeDeployment
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.SyncState
 import org.rfcx.audiomoth.entity.response.LocationResponse
@@ -171,7 +171,7 @@ class LocateDb(private val realm: Realm) {
                 location.lastGuardianDeploymentServerId = locationResponse.lastGuardianDeploymentServerId
             } else {
                 val locate = locationResponse.toLocate()
-                val id = (it.where(Locate::class.java).max(Deployment.FIELD_ID)
+                val id = (it.where(Locate::class.java).max(EdgeDeployment.FIELD_ID)
                     ?.toInt() ?: 0) + 1
                 locate.id = id
                 it.insert(locate)

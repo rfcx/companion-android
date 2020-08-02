@@ -15,10 +15,10 @@ import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_deployment_detail.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.Deployment
+import org.rfcx.audiomoth.entity.EdgeDeployment
 import org.rfcx.audiomoth.entity.DeploymentImage
 import org.rfcx.audiomoth.entity.SyncState
-import org.rfcx.audiomoth.localdb.DeploymentDb
+import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
@@ -31,7 +31,7 @@ import kotlin.collections.ArrayList
 
 class DeploymentDetailActivity : AppCompatActivity() {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val deploymentDb by lazy { DeploymentDb(realm) }
+    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val gainList by lazy { resources.getStringArray(R.array.edge_gains) }
@@ -39,7 +39,7 @@ class DeploymentDetailActivity : AppCompatActivity() {
     private val timeLineAdapter by lazy { TimeLineAdapter() }
 
     // data
-    private var deployment: Deployment? = null
+    private var deployment: EdgeDeployment? = null
     private lateinit var deployImageLiveData: LiveData<List<DeploymentImage>>
     private var deploymentImages = listOf<DeploymentImage>()
     private val deploymentImageObserve = Observer<List<DeploymentImage>> {
@@ -52,7 +52,7 @@ class DeploymentDetailActivity : AppCompatActivity() {
         setContentView(R.layout.activity_deployment_detail)
 
         deployment =
-            intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)?.let { deploymentDb.getDeploymentById(it) }
+            intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)?.let { edgeDeploymentDb.getDeploymentById(it) }
 
         setupToolbar()
         deployment?.let { updateDeploymentDetailView(it) }
@@ -105,7 +105,7 @@ class DeploymentDetailActivity : AppCompatActivity() {
             deployment?.let {
                 it.deletedAt = Date()
                 it.syncState = SyncState.Unsent.key
-                deploymentDb.updateDeployment(it)
+                edgeDeploymentDb.updateDeployment(it)
 
                 it.serverId?.let { serverId ->
                     val location = locateDb.getLocateByServerId(serverId)
@@ -130,7 +130,7 @@ class DeploymentDetailActivity : AppCompatActivity() {
 
     private fun forceUpdateDeployment() {
         if (this.deployment != null) {
-            this.deployment = deploymentDb.getDeploymentById(this.deployment!!.id)
+            this.deployment = edgeDeploymentDb.getDeploymentById(this.deployment!!.id)
             this.deployment?.let { it1 -> updateDeploymentDetailView(it1) }
             supportActionBar?.apply {
                 title = deployment?.location?.name ?: getString(R.string.title_deployment_detail)
@@ -138,7 +138,7 @@ class DeploymentDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateDeploymentDetailView(deployment: Deployment) {
+    private fun updateDeploymentDetailView(deployment: EdgeDeployment) {
         // setup deployment images view
         setupImageRecycler()
         observeDeploymentImage(deployment.id)

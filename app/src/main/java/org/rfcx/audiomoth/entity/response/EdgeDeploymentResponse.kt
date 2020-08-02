@@ -8,7 +8,7 @@ import org.rfcx.audiomoth.util.EdgeConfigure
 /**
  * Firestore response for getting a deployment
  */
-data class DeploymentResponse(
+data class EdgeDeploymentResponse(
     var serverId: String? = null,
     var deploymentId: String? = null,
     var batteryDepletedAt: Date? = Date(),
@@ -42,8 +42,8 @@ data class ConfigurationResponse(
     }
 }
 
-fun DeploymentResponse.toDeployment(): Deployment {
-    return Deployment(
+fun EdgeDeploymentResponse.toDeployment(): EdgeDeployment {
+    return EdgeDeployment(
         deploymentId = this.deploymentId,
         serverId = this.serverId,
         batteryDepletedAt = this.batteryDepletedAt ?: Date(),
