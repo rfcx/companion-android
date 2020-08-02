@@ -267,11 +267,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         })
 
         val showDeployments = this.deployments.filter {
-            showDeployIds.contains(it.serverId) || showDeployIds.contains(it.id.toString())
+            if (it.isSent()) showDeployIds.contains(it.serverId) else showDeployIds.contains(it.id.toString())
         }
 
         val showGuardianDeployments = this.guardianDeployments.filter {
-            showDeployIds.contains(it.serverId) || showDeployIds.contains(it.id.toString())
+            if (it.isSent()) showDeployIds.contains(it.serverId) else showDeployIds.contains(it.id.toString())
         }
 
         val deploymentMarkers = showDeployments.map { it.toMark() }
@@ -331,7 +331,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun fetchJobSyncing() {
         context ?: return
-        deploymentWorkInfoLiveData = DeploymentSyncWorker.workInfos(context!!)
+        deploymentWorkInfoLiveData = DeploymentSyncWorker.workInfos(requireContext())
         deploymentWorkInfoLiveData.observeForever(workInfoObserve)
     }
 

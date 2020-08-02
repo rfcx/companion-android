@@ -29,21 +29,40 @@ open class Locate(
         return (lastDeploymentId != 0 || lastDeploymentServerId != null || lastGuardianDeploymentId != 0 || lastGuardianDeploymentServerId != null) && deletedAt == null
     }
 
-    fun getLastDeploymentId(): String {
-        return when {
-            lastDeploymentServerId != null -> {
+    fun getLastEdgeDeploymentId(): String {
+        // is sent?
+        return if (syncState == SyncState.Sent.key) {
+            // is last deployment from edge?
+            if (lastDeploymentServerId != null) {
                 lastDeploymentServerId
-            }
-            lastDeploymentId != 0 -> {
-                lastDeploymentId
-            }
-            lastGuardianDeploymentServerId != null -> {
+            } else {
                 lastGuardianDeploymentServerId
-            }
-            else -> {
+            }.toString()
+        } else {
+            if (lastDeploymentId != 0) {
+                lastDeploymentId
+            } else {
                 lastGuardianDeploymentId
+            }.toString()
+        }
+    }
+
+    fun getLastDeploymentId(): String {
+        // is sent?
+        return if (syncState == SyncState.Sent.key) {
+            // is last deployment from edge?
+            if (lastDeploymentServerId != null) {
+                lastDeploymentServerId!!
+            } else {
+                lastGuardianDeploymentServerId!!
             }
-        }.toString()
+        } else {
+            if (lastDeploymentId != 0) {
+                lastDeploymentId
+            } else {
+                lastGuardianDeploymentId
+            }.toString()
+        }
     }
 
     fun getLatLng(): LatLng = LatLng(latitude, longitude)
