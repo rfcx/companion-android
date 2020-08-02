@@ -135,10 +135,14 @@ class Firestore(val context: Context) {
 
                 // verify response and store deployment
                 deploymentResponses.forEach { dr ->
-
                     // if SyncState not equal SEND don't update
-                    val isSend = deploymentDb.getDeploymentsSend().contains(dr.serverId)
-                    if (isSend) {
+                    val localEdgeDeployment = deploymentDb.getDeploymentByServerId(dr.serverId)
+                    if (localEdgeDeployment != null) {
+                        val result = dr.createdAt?.compareTo(localEdgeDeployment.createdAt) ?: 0
+                        if (result > 0) { // edge deployment response is after local edge deployment
+                            deploymentDb.insertOrUpdate(dr)
+                        }
+                    } else {
                         deploymentDb.insertOrUpdate(dr)
                     }
                 }

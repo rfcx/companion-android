@@ -9,7 +9,7 @@ import org.rfcx.audiomoth.util.EdgeConfigure
  * Firestore response for getting a deployment
  */
 data class DeploymentResponse(
-    var serverId: String? = null,
+    var serverId: String,
     var deploymentId: String? = null,
     var batteryDepletedAt: Date? = Date(),
     var batteryLevel: Int? = 0,
