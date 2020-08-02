@@ -42,7 +42,6 @@ class CompanionRealmMigration : RealmMigration {
             removeField("configuration")
             renameField("configuration_tmp", "configuration")
 
-
             addField(EdgeDeployment.FIELD_UPDATED_AT, Date::class.java)
             addField(EdgeDeployment.FIELD_DELETED_AT, Date::class.java)
         }
