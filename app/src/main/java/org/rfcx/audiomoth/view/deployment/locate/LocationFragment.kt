@@ -80,7 +80,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     mapboxMap?.let {
                         this@LocationFragment.currentUserLocation = location
                         it.locationComponent.forceLocationUpdate(location)
-                        if (isFirstTime && lastLocation == null) {
+                        if (isFirstTime && lastLocation == null &&
+                            latitude == 0.0 && longitude == 0.0
+                        ) {
                             // force update input view
                             isFirstTime = false
                             this@LocationFragment.lastLocation =
@@ -277,6 +279,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         val deploymentLocation = deploymentProtocol?.getDeploymentLocation()
         if (deploymentLocation != null && locateAdapter != null) {
             val spinnerPosition = locateAdapter!!.getPosition(deploymentLocation.name)
+            // enable exiting radio button
+            enableExistingLocationButton()
             locationNameSpinner.setSelection(spinnerPosition)
         } else {
             val nearLocations = findNearLocations(lastLocation, locateItems)
@@ -286,10 +290,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 latitude == 0.0 && longitude == 0.0
             ) {
                 // enable exiting radio button
-                existingRadioButton.isChecked = true
-                existingRadioButton.isEnabled = true
-                newLocationRadioButton.isChecked = false
-
+                enableExistingLocationButton()
                 // set selected locate Item
                 val nearItem = nearLocations.minBy { it.second }
                 val position = locateItems.indexOf(nearItem?.first)
@@ -298,11 +299,21 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
                 onPressedExisting()
             } else {
-                newLocationRadioButton.isChecked = true
-                existingRadioButton.isChecked = false
+                enableNewLocationButton()
                 onPressedNewLocation()
             }
         }
+    }
+
+    private fun enableExistingLocationButton() {
+        existingRadioButton.isChecked = true
+        existingRadioButton.isEnabled = true
+        newLocationRadioButton.isChecked = false
+    }
+
+    private fun enableNewLocationButton() {
+        newLocationRadioButton.isChecked = true
+        existingRadioButton.isChecked = false
     }
 
     private fun setupLocationSpinner() {
