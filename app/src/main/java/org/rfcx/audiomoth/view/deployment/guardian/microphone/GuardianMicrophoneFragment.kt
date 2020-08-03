@@ -1,6 +1,7 @@
 package org.rfcx.audiomoth.view.deployment.guardian.microphone
 
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_guardian_microphone.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
+import org.rfcx.audiomoth.util.AudioSpectrogramUtils
 import org.rfcx.audiomoth.util.MicrophoneTestUtils
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 import org.rfcx.audiomoth.view.deployment.guardian.signal.GuardianSignalFragment
@@ -44,6 +46,7 @@ class GuardianMicrophoneFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         deploymentProtocol?.hideCompleteButton()
+        setupSpectrogram()
         setUiByState(MicTestingState.READY)
         SocketManager.resetDefaultValue()
 
@@ -70,6 +73,11 @@ class GuardianMicrophoneFragment : Fragment() {
         finishButton.setOnClickListener {
             deploymentProtocol?.nextStep()
         }
+    }
+
+    private fun setupSpectrogram() {
+        spectrogramView.setSamplingRate(24000)
+        spectrogramView.setBackgroundColor(Color.BLACK)
     }
 
     private fun setUiByState(state: MicTestingState) {
@@ -112,6 +120,17 @@ class GuardianMicrophoneFragment : Fragment() {
 
         SocketManager.liveAudio.observe(viewLifecycleOwner, Observer {
             isTimerPause = false
+        })
+
+        SocketManager.spectrogram.observe(viewLifecycleOwner, Observer {
+            if (it.isNotEmpty()) {
+                val mag = AudioSpectrogramUtils.extractMagnitude(it)
+                spectrogramView.setMagnitudes(mag)
+
+                requireActivity().runOnUiThread {
+                    spectrogramView.invalidate()
+                }
+            }
         })
     }
 

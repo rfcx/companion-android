@@ -20,11 +20,18 @@
         android:id="@+id/microphoneView"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:background="@drawable/ic_microphone_green"
         android:layout_marginTop="@dimen/margin_padding_xlarge"
+        android:background="@drawable/ic_microphone_green"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/microphoneTitle" />
+
+    <org.rfcx.audiomoth.view.deployment.guardian.microphone.FrequencyView
+        android:id="@+id/spectrogramView"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginTop="@dimen/margin_padding_xlarge"
+        app:layout_constraintTop_toBottomOf="@id/microphoneView"/>
 
     <TextView
         android:id="@+id/microphoneWarnTextView"
