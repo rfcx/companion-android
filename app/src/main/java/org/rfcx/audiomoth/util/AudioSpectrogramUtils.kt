@@ -7,7 +7,7 @@ object AudioSpectrogramUtils {
     private var window: DoubleArray? = null
 
     fun extractMagnitude(doubleArray: DoubleArray): DoubleArray {
-        val array = doubleArray
+        val array = DoubleArray(doubleArray.size)
         val dfft = DoubleFFT_1D(array.size.toLong())
 
         System.arraycopy(applyWindow(doubleArray), 0, array, 0, doubleArray.size)
