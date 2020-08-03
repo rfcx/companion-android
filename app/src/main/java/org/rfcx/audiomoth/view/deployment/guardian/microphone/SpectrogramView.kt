@@ -45,7 +45,7 @@ class FrequencyView : View {
     private val colorRainbow =
         intArrayOf(-0x1, -0xff01, -0x10000, -0x100, -0xff0100, -0xff0001, -0xffff01, -0x1000000)
     private val colorFire = intArrayOf(-0x1, -0x100, -0x10000, -0x1000000)
-    private val colorIce = intArrayOf(-0x1, -0xff0001, -0xffff01, -0xfffff1, -0x1000000)
+    private val colorIce = intArrayOf(-0x1, -0xf00001, -0xff0001, -0xfff001, -0xffff01, -0xfffff1, -0x1000000)
     private val colorGrey = intArrayOf(-0x1, -0x1000000)
 
     constructor(context: Context?) : super(context) {
@@ -119,7 +119,7 @@ class FrequencyView : View {
             if (_magnitudes != null) {
                 val mag = _magnitudes!![(j * _magnitudes!!.size / 2).toInt()]
                 val db =
-                    Math.max(0.0, -20 * Math.log10(mag.toDouble())).toFloat()
+                    Math.max(0.0, -20 * Math.log10(mag)).toFloat()
                 val c = getInterpolatedColor(colors, db * 0.009f)
                 paint.color = c
                 val x = pos % rWidth
