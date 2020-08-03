@@ -196,6 +196,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         showLoading()
         _deployment?.let {
             it.deployedAt = Date()
+            it.updatedAt = Date()
             it.state = DeploymentState.Edge.ReadyToUpload.key
             setDeployment(it)
 
