@@ -29,6 +29,7 @@ open class EdgeDeployment(
     fun isSent(): Boolean = (syncState == SyncState.Sent.key)
 
     companion object {
+        const val TABLE_NAME ="EdgeDeployment"
         const val FIELD_ID = "id"
         const val FIELD_STATE = "state"
         const val FIELD_SYNC_STATE = "syncState"
@@ -37,7 +38,6 @@ open class EdgeDeployment(
         const val FIELD_LOCATION = "location"
         const val FIELD_UPDATED_AT = "updatedAt"
         const val FIELD_DELETED_AT = "deletedAt"
-
-        const val PHOTOS = "photos"
+        const val FIELD_CONFIGURATION = "configuration"
     }
 }

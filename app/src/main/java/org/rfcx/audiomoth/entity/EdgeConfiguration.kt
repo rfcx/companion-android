@@ -13,4 +13,8 @@ open class EdgeConfiguration(
     var sleepDuration: Int = EdgeConfigure.SLEEP_DURATION_DEFAULT,
     var recordingPeriodList: RealmList<String> = RealmList(),
     var durationSelected: String = EdgeConfigure.DURATION_SELECTED_DEFAULT
-) : RealmModel
+) : RealmModel {
+    companion object {
+        const val TABLE_NAME = "EdgeConfiguration"
+    }
+}

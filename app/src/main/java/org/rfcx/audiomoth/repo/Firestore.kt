@@ -118,29 +118,29 @@ class Firestore(val context: Context) {
         val userDocument = db.collection(COLLECTION_USERS).document(guid)
         userDocument.collection(COLLECTION_DEPLOYMENTS).get()
             .addOnSuccessListener {
-                val edResponses = arrayListOf<EdgeDeploymentResponse>()
-                val gdResponses = arrayListOf<GuardianDeploymentResponse>()
+                val edgeResponses = arrayListOf<EdgeDeploymentResponse>()
+                val guardianResponses = arrayListOf<GuardianDeploymentResponse>()
                 //verify response
                 it.documents.forEach { doc ->
                     if (doc == null) return@forEach
                     if (doc.getString("device") == Device.GUARDIAN.value) {
                         val response = doc.toObject(GuardianDeploymentResponse::class.java)
                         response?.serverId = doc.id
-                        response?.let { it1 -> gdResponses.add(it1) }
+                        response?.let { it1 -> guardianResponses.add(it1) }
                     } else {
                         val response = doc.toObject(EdgeDeploymentResponse::class.java)
                         response?.serverId = doc.id
-                        response?.let { it1 -> edResponses.add(it1) }
+                        response?.let { it1 -> edgeResponses.add(it1) }
                     }
                 }
 
                 // verify response and store deployment
-                edResponses.forEach { dr ->
+                edgeResponses.forEach { dr ->
                     edgeDeploymentDb.insertOrUpdate(dr)
                 }
 
                 // store guardian deployment
-                gdResponses.forEach { dr ->
+                guardianResponses.forEach { dr ->
                     guardianDeploymentDb.insertOrUpdate(dr)
                 }
 
