@@ -21,18 +21,6 @@ class DeploymentDb(private val realm: Realm) {
             .count()
     }
 
-    fun getDeploymentsSend(): ArrayList<String> {
-        val deployments = realm.where(Deployment::class.java)
-            .equalTo(Deployment.FIELD_STATE, DeploymentState.Edge.ReadyToUpload.key)
-            .and()
-            .equalTo(Deployment.FIELD_SYNC_STATE, SyncState.Sent.key).findAllAsync()
-        val arrayOfId = arrayListOf<String>()
-        deployments.forEach {
-            it.serverId?.let { it1 -> arrayOfId.add(it1) }
-        }
-        return arrayOfId
-    }
-
     fun getAllResultsAsync(sort: Sort = Sort.DESCENDING): RealmResults<Deployment> {
         return realm.where(Deployment::class.java)
             .sort(Deployment.FIELD_ID, sort)
@@ -60,7 +48,13 @@ class DeploymentDb(private val realm: Realm) {
                     .equalTo(Deployment.FIELD_SERVER_ID, deploymentResponse.serverId)
                     .findFirst()
 
-            if (deployment != null) {
+            if (deployment == null) {
+                val deploymentObj = deploymentResponse.toDeployment()
+                val id = (it.where(Deployment::class.java).max(Deployment.FIELD_ID)
+                    ?.toInt() ?: 0) + 1
+                deploymentObj.id = id
+                it.insert(deploymentObj)
+            } else if (deployment.syncState == SyncState.Sent.key) {
                 deployment.deploymentId = deploymentResponse.deploymentId
                 deployment.serverId = deploymentResponse.serverId
                 deployment.batteryDepletedAt =
@@ -79,12 +73,6 @@ class DeploymentDb(private val realm: Realm) {
                 }
 
                 deployment.createdAt = deploymentResponse.createdAt ?: deployment.createdAt
-            } else {
-                val deploymentObj = deploymentResponse.toDeployment()
-                val id = (it.where(Deployment::class.java).max(Deployment.FIELD_ID)
-                    ?.toInt() ?: 0) + 1
-                deploymentObj.id = id
-                it.insert(deploymentObj)
             }
         }
     }
