@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import io.realm.Realm
 import java.util.*
-import kotlin.math.roundToInt
 import kotlinx.android.synthetic.main.fragment_map_detail_bottom_sheet.*
 import org.rfcx.audiomoth.MainActivityListener
 import org.rfcx.audiomoth.R
@@ -82,11 +81,12 @@ class MapDetailBottomSheetFragment : Fragment() {
                 )
 
             mapDetailBottomSheetView.setOnClickListener {
+                (activity as MainActivityListener).hideBottomSheet()
+
                 if (isStateReadyToUpload) {
                     context?.let { context ->
                         DeploymentDetailActivity.startActivity(context, deployment.id)
                     }
-                    (activity as MainActivityListener).hideBottomSheet()
                 } else {
                     context?.let {
                         DeploymentActivity.startActivity(it, deployment.id)
