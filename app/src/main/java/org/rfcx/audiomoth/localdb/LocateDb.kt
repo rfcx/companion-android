@@ -59,29 +59,6 @@ class LocateDb(private val realm: Realm) {
         return unsentCopied
     }
 
-    fun getLocatesSend(): ArrayList<String> {
-        val sentCopied = arrayListOf<String>()
-        realm.executeTransaction {
-            val unsent = it.where(Locate::class.java)
-                .equalTo("syncState", SyncState.Sent.key)
-                .and()
-                .isNotNull("lastDeploymentServerId")
-                .and()
-                .isNotEmpty("lastDeploymentServerId")
-                .or()
-                .isNotNull("lastGuardianDeploymentServerId")
-                .and()
-                .isNotEmpty("lastGuardianDeploymentServerId")
-                .findAll()
-                .createSnapshot()
-
-            unsent.forEach { locate ->
-                locate.serverId?.let { serverId -> sentCopied.add(serverId) }
-            }
-        }
-        return sentCopied
-    }
-
     fun markUnsent(id: Int) {
         mark(id = id, syncState = SyncState.Unsent.key)
     }
@@ -161,20 +138,21 @@ class LocateDb(private val realm: Realm) {
                     .equalTo(Locate.FIELD_SERVER_ID, locationResponse.serverId)
                     .findFirst()
 
-            if (location != null) {
+            if (location == null) {
+                val locate = locationResponse.toLocate()
+                val id = (it.where(Locate::class.java).max(Locate.FIELD_ID)
+                    ?.toInt() ?: 0) + 1
+                locate.id = id
+                it.insert(locate)
+            } else if (location.syncState == SyncState.Sent.key) {
                 location.serverId = locationResponse.serverId
                 location.name = locationResponse.name ?: location.name
                 location.latitude = locationResponse.latitude ?: location.latitude
                 location.longitude = locationResponse.longitude ?: location.longitude
                 location.createdAt = locationResponse.createdAt ?: location.createdAt
                 location.lastDeploymentServerId = locationResponse.lastDeploymentServerId
-                location.lastGuardianDeploymentServerId = locationResponse.lastGuardianDeploymentServerId
-            } else {
-                val locate = locationResponse.toLocate()
-                val id = (it.where(Locate::class.java).max(EdgeDeployment.FIELD_ID)
-                    ?.toInt() ?: 0) + 1
-                locate.id = id
-                it.insert(locate)
+                location.lastGuardianDeploymentServerId =
+                    locationResponse.lastGuardianDeploymentServerId
             }
         }
     }

@@ -2,12 +2,13 @@ package org.rfcx.audiomoth.repo
 
 import android.content.Context
 import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
-import org.rfcx.audiomoth.entity.*
-import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_SERVER_ID
+import org.rfcx.audiomoth.entity.DeploymentLocation
+import org.rfcx.audiomoth.entity.Device
+import org.rfcx.audiomoth.entity.EdgeDeployment
+import org.rfcx.audiomoth.entity.User
 import org.rfcx.audiomoth.entity.request.*
 import org.rfcx.audiomoth.entity.response.DiagnosticResponse
 import org.rfcx.audiomoth.entity.response.EdgeDeploymentResponse
@@ -133,13 +134,9 @@ class Firestore(val context: Context) {
                     }
                 }
 
-                // store edge deployment
+                // verify response and store deployment
                 edResponses.forEach { dr ->
-                    // if SyncState not equal SENT don't update
-                    val isSent = edgeDeploymentDb.getDeploymentsSent().contains(dr.serverId)
-                    if (isSent) {
-                        edgeDeploymentDb.insertOrUpdate(dr)
-                    }
+                    edgeDeploymentDb.insertOrUpdate(dr)
                 }
 
                 // store guardian deployment
@@ -152,13 +149,6 @@ class Firestore(val context: Context) {
             .addOnFailureListener {
                 callback?.onFailureCallback(it.localizedMessage)
             }
-    }
-
-    suspend fun getLocateServerId(lastDeploymentServerId: String): QuerySnapshot? {
-        val userDocument = db.collection(COLLECTION_USERS).document(guid)
-        return userDocument.collection(COLLECTION_LOCATIONS)
-            .whereEqualTo(Locate.FIELD_LAST_DEPLOYMENT_SERVER_ID, lastDeploymentServerId).limit(1)
-            .get().await()
     }
 
     fun retrieveLocations(
@@ -177,40 +167,13 @@ class Firestore(val context: Context) {
 
                 // verify response and store deployment
                 locationResponses.forEach { lr ->
-
-                    // if SyncState not equal SEND don't update
-                    val isSend = locateDb.getLocatesSend().contains(lr.serverId)
-                    if (isSend) {
-                        locateDb.insertOrUpdate(lr)
-                    } else {
-                        lr.lastDeploymentServerId?.let { serverId ->
-                            val locate = locateDb.getLocateByServerId(serverId)
-                            if (locate != null) {
-                                locateDb.updateLocate(locate)
-                            }
-                        }
-                    }
+                    locateDb.insertOrUpdate(lr)
                 }
+
                 callback?.onSuccessCallback(locationResponses)
             }
             .addOnFailureListener {
                 callback?.onFailureCallback(it.localizedMessage)
-            }
-    }
-
-    fun getRemotePathByServerId(serverId: String, callback: (ArrayList<String>?) -> Unit) {
-        val userDocument = db.collection(COLLECTION_USERS).document(guid)
-        userDocument.collection(COLLECTION_IMAGES)
-            .whereEqualTo(FIELD_DEPLOYMENT_SERVER_ID, serverId).get()
-            .addOnSuccessListener {
-                val array = arrayListOf<String>()
-                it.documents.forEach { doc ->
-                    val remotePath = doc["remotePath"] as String
-                    array.add(remotePath)
-                }
-                callback(array)
-            }.addOnFailureListener {
-                callback(null)
             }
     }
 

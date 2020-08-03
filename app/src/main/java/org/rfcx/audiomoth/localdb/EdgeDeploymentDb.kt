@@ -60,7 +60,13 @@ class EdgeDeploymentDb(private val realm: Realm) {
                     .equalTo(EdgeDeployment.FIELD_SERVER_ID, deploymentResponse.serverId)
                     .findFirst()
 
-            if (deployment != null) {
+            if (deployment == null) {
+                val deploymentObj = deploymentResponse.toEdgeDeployment()
+                val id = (it.where(EdgeDeployment::class.java).max(EdgeDeployment.FIELD_ID)
+                    ?.toInt() ?: 0) + 1
+                deploymentObj.id = id
+                it.insert(deploymentObj)
+            } else if (deployment.syncState == SyncState.Sent.key) {
                 deployment.deploymentId = deploymentResponse.deploymentId
                 deployment.serverId = deploymentResponse.serverId
                 deployment.batteryDepletedAt =
@@ -79,12 +85,6 @@ class EdgeDeploymentDb(private val realm: Realm) {
                 }
 
                 deployment.createdAt = deploymentResponse.createdAt ?: deployment.createdAt
-            } else {
-                val deploymentObj = deploymentResponse.toEdgeDeployment()
-                val id = (it.where(EdgeDeployment::class.java).max(EdgeDeployment.FIELD_ID)
-                    ?.toInt() ?: 0) + 1
-                deploymentObj.id = id
-                it.insert(deploymentObj)
             }
         }
     }
@@ -101,7 +101,8 @@ class EdgeDeploymentDb(private val realm: Realm) {
     private fun mark(id: Int, serverId: String? = null, syncState: Int) {
         realm.executeTransaction {
             val deployment =
-                it.where(EdgeDeployment::class.java).equalTo(EdgeDeployment.FIELD_ID, id).findFirst()
+                it.where(EdgeDeployment::class.java).equalTo(EdgeDeployment.FIELD_ID, id)
+                    .findFirst()
             if (deployment != null) {
                 deployment.serverId = serverId
                 deployment.syncState = syncState
