@@ -117,6 +117,9 @@ dependencies {
         exclude group: 'org.json', module: 'json' //provided by Android natively
     }
 
+    /* FFT */
+    implementation 'com.github.wendykierp:JTransforms:3.1'
+
     /* ktlint */
     ktlint "com.pinterest:ktlint:0.36.0"
 
