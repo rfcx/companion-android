@@ -2,18 +2,19 @@ package org.rfcx.audiomoth.repo
 
 import android.content.Context
 import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
-import org.rfcx.audiomoth.entity.*
-import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_SERVER_ID
+import org.rfcx.audiomoth.entity.DeploymentLocation
+import org.rfcx.audiomoth.entity.Device
+import org.rfcx.audiomoth.entity.EdgeDeployment
+import org.rfcx.audiomoth.entity.User
 import org.rfcx.audiomoth.entity.request.*
-import org.rfcx.audiomoth.entity.response.DeploymentResponse
 import org.rfcx.audiomoth.entity.response.DiagnosticResponse
+import org.rfcx.audiomoth.entity.response.EdgeDeploymentResponse
 import org.rfcx.audiomoth.entity.response.GuardianDeploymentResponse
 import org.rfcx.audiomoth.entity.response.LocationResponse
-import org.rfcx.audiomoth.localdb.DeploymentDb
+import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.guardian.DiagnosticDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
@@ -85,8 +86,8 @@ class Firestore(val context: Context) {
     ) {
         val userDocument = db.collection(COLLECTION_USERS).document(guid)
         val updates = hashMapOf<String, Any>(
-            Deployment.FIELD_LOCATION to deploymentLocation,
-            Deployment.FIELD_UPDATED_AT to updatedAt
+            EdgeDeployment.FIELD_LOCATION to deploymentLocation,
+            EdgeDeployment.FIELD_UPDATED_AT to updatedAt
         )
         userDocument.collection(COLLECTION_DEPLOYMENTS).document(serverId)
             .update(updates).await()
@@ -95,7 +96,7 @@ class Firestore(val context: Context) {
     suspend fun updateDeleteDeployment(serverId: String, deletedAt: Date) {
         val userDocument = db.collection(COLLECTION_USERS).document(guid)
         userDocument.collection(COLLECTION_DEPLOYMENTS).document(serverId)
-            .update(Deployment.FIELD_DELETED_AT, deletedAt).await()
+            .update(EdgeDeployment.FIELD_DELETED_AT, deletedAt).await()
     }
 
     suspend fun sendDiagnostic(diagnosticRequest: DiagnosticRequest): DocumentReference? {
@@ -110,36 +111,36 @@ class Firestore(val context: Context) {
     }
 
     fun retrieveDeployments(
-        deploymentDb: DeploymentDb,
+        edgeDeploymentDb: EdgeDeploymentDb,
         guardianDeploymentDb: GuardianDeploymentDb,
         callback: ResponseCallback<Boolean>? = null
     ) {
         val userDocument = db.collection(COLLECTION_USERS).document(guid)
         userDocument.collection(COLLECTION_DEPLOYMENTS).get()
             .addOnSuccessListener {
-                val deploymentResponses = arrayListOf<DeploymentResponse>()
-                val gdResponses = arrayListOf<GuardianDeploymentResponse>()
+                val edgeResponses = arrayListOf<EdgeDeploymentResponse>()
+                val guardianResponses = arrayListOf<GuardianDeploymentResponse>()
+                //verify response
                 it.documents.forEach { doc ->
                     if (doc == null) return@forEach
-
                     if (doc.getString("device") == Device.GUARDIAN.value) {
                         val response = doc.toObject(GuardianDeploymentResponse::class.java)
                         response?.serverId = doc.id
-                        response?.let { it1 -> gdResponses.add(it1) }
+                        response?.let { it1 -> guardianResponses.add(it1) }
                     } else {
-                        val response = doc.toObject(DeploymentResponse::class.java)
+                        val response = doc.toObject(EdgeDeploymentResponse::class.java)
                         response?.serverId = doc.id
-                        response?.let { it1 -> deploymentResponses.add(it1) }
+                        response?.let { it1 -> edgeResponses.add(it1) }
                     }
                 }
 
                 // verify response and store deployment
-                deploymentResponses.forEach { dr ->
-                    deploymentDb.insertOrUpdate(dr)
+                edgeResponses.forEach { dr ->
+                    edgeDeploymentDb.insertOrUpdate(dr)
                 }
 
-                // verify response and store guardian deployment
-                gdResponses.forEach { dr ->
+                // store guardian deployment
+                guardianResponses.forEach { dr ->
                     guardianDeploymentDb.insertOrUpdate(dr)
                 }
 
@@ -148,13 +149,6 @@ class Firestore(val context: Context) {
             .addOnFailureListener {
                 callback?.onFailureCallback(it.localizedMessage)
             }
-    }
-
-    suspend fun getLocateServerId(lastDeploymentServerId: String): QuerySnapshot? {
-        val userDocument = db.collection(COLLECTION_USERS).document(guid)
-        return userDocument.collection(COLLECTION_LOCATIONS)
-            .whereEqualTo(Locate.FIELD_LAST_DEPLOYMENT_SERVER_ID, lastDeploymentServerId).limit(1)
-            .get().await()
     }
 
     fun retrieveLocations(
@@ -175,27 +169,11 @@ class Firestore(val context: Context) {
                 locationResponses.forEach { lr ->
                     locateDb.insertOrUpdate(lr)
                 }
-                
+
                 callback?.onSuccessCallback(locationResponses)
             }
             .addOnFailureListener {
                 callback?.onFailureCallback(it.localizedMessage)
-            }
-    }
-
-    fun getRemotePathByServerId(serverId: String, callback: (ArrayList<String>?) -> Unit) {
-        val userDocument = db.collection(COLLECTION_USERS).document(guid)
-        userDocument.collection(COLLECTION_IMAGES)
-            .whereEqualTo(FIELD_DEPLOYMENT_SERVER_ID, serverId).get()
-            .addOnSuccessListener {
-                val array = arrayListOf<String>()
-                it.documents.forEach { doc ->
-                    val remotePath = doc["remotePath"] as String
-                    array.add(remotePath)
-                }
-                callback(array)
-            }.addOnFailureListener {
-                callback(null)
             }
     }
 

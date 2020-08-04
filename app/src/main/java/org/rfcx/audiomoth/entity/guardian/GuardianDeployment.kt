@@ -8,6 +8,7 @@ import java.io.Serializable
 import java.util.*
 import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.Device
+import org.rfcx.audiomoth.entity.SyncState
 
 @RealmClass
 open class GuardianDeployment(
@@ -25,6 +26,8 @@ open class GuardianDeployment(
     @Expose(serialize = false)
     var syncState: Int = 0
 ) : RealmModel, Serializable {
+
+    fun isSent(): Boolean = (syncState == SyncState.Sent.key)
 
     companion object {
         const val FIELD_ID = "id"

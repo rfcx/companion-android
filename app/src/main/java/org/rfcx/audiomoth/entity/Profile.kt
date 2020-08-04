@@ -42,8 +42,8 @@ open class Profile(
         this.durationSelected = durationSelected
     }
 
-    fun asConfiguration(): Configuration {
-        return Configuration(
+    fun asConfiguration(): EdgeConfiguration {
+        return EdgeConfiguration(
             gain = gain,
             sampleRate = sampleRate,
             recordingDuration = recordingDuration,
