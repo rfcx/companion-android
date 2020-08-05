@@ -13,7 +13,7 @@ import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.SyncState
-import org.rfcx.audiomoth.localdb.DeploymentDb
+import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
@@ -24,7 +24,7 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
 
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val deploymentDb by lazy { DeploymentDb(realm) }
+    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
 
     private var latitude: Double = 0.0
@@ -75,14 +75,14 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
             longitude = longitude
         )
         deploymentId?.let {
-            val deployment = deploymentDb.getDeploymentById(it)
-            if (deployment != null) {
-                deploymentDb.insertOrUpdate(deployment, deploymentLocation)
-                deployment.updatedAt = Date()
-                deployment.syncState = SyncState.Unsent.key
-                deploymentDb.updateDeployment(deployment)
+            val edgeDeployment = edgeDeploymentDb.getDeploymentById(it)
+            if (edgeDeployment != null) {
+                edgeDeploymentDb.insertOrUpdate(edgeDeployment, deploymentLocation)
+                edgeDeployment.updatedAt = Date()
+                edgeDeployment.syncState = SyncState.Unsent.key
+                edgeDeploymentDb.updateDeployment(edgeDeployment)
 
-                deployment.serverId?.let { serverId ->
+                edgeDeployment.serverId?.let { serverId ->
                     val location = locateDb.getLocateByServerId(serverId)
                     if (location != null) {
                         location.latitude = latitude

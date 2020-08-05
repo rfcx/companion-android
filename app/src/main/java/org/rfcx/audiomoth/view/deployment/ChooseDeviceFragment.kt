@@ -10,33 +10,33 @@ import kotlinx.android.synthetic.main.fragment_choose_device.*
 import org.rfcx.audiomoth.R
 
 class ChooseDeviceFragment : Fragment() {
-    private var deploymentProtocol: DeploymentProtocol? = null
+    private var edgeDeploymentProtocol: EdgeDeploymentProtocol? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        deploymentProtocol = (context as DeploymentProtocol)
+        edgeDeploymentProtocol = (context as EdgeDeploymentProtocol)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        deploymentProtocol?.hideCompleteButton()
-        deploymentProtocol?.hideStepView()
+        edgeDeploymentProtocol?.hideCompleteButton()
+        edgeDeploymentProtocol?.hideStepView()
 
         edgeImageView.setOnClickListener {
-            deploymentProtocol?.openWithEdgeDevice()
+            edgeDeploymentProtocol?.openWithEdgeDevice()
         }
 
         edgeTextView.setOnClickListener {
-            deploymentProtocol?.openWithEdgeDevice()
+            edgeDeploymentProtocol?.openWithEdgeDevice()
         }
 
         guardianImageView.setOnClickListener {
-            deploymentProtocol?.openWithGuardianDevice()
+            edgeDeploymentProtocol?.openWithGuardianDevice()
         }
 
         guardianTextview.setOnClickListener {
-            deploymentProtocol?.openWithGuardianDevice()
+            edgeDeploymentProtocol?.openWithGuardianDevice()
         }
     }
 

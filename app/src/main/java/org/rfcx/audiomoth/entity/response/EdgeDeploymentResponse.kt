@@ -8,20 +8,20 @@ import org.rfcx.audiomoth.util.EdgeConfigure
 /**
  * Firestore response for getting a deployment
  */
-data class DeploymentResponse(
+data class EdgeDeploymentResponse(
     var serverId: String? = null,
     var deploymentId: String? = null,
     var batteryDepletedAt: Date? = Date(),
     var batteryLevel: Int? = 0,
     var deployedAt: Date? = Date(),
-    var configuration: ConfigurationResponse? = null,
+    var configuration: EdgeConfigurationResponse? = null,
     var location: DeploymentLocation? = null,
     var createdAt: Date? = Date(),
     var updatedAt: Date? = null,
     var deletedAt: Date? = null
 )
 
-data class ConfigurationResponse(
+data class EdgeConfigurationResponse(
     var gain: Int? = null,
     var sampleRate: Int? = null,
     var recordingDuration: Int? = null,
@@ -29,9 +29,9 @@ data class ConfigurationResponse(
     var recordingPeriodList: ArrayList<String>? = arrayListOf(),
     var durationSelected: String? = null
 ) {
-    fun toConfiguration(): Configuration {
+    fun toEdgeConfiguration(): EdgeConfiguration {
         val realmList = recordingPeriodList?.mapTo(RealmList(), { it })
-        return Configuration(
+        return EdgeConfiguration(
             gain ?: EdgeConfigure.GAIN_DEFAULT,
             sampleRate ?: EdgeConfigure.SAMPLE_RATE_DEFAULT,
             recordingDuration ?: EdgeConfigure.RECORDING_DURATION_DEFAULT,
@@ -42,15 +42,15 @@ data class ConfigurationResponse(
     }
 }
 
-fun DeploymentResponse.toDeployment(): Deployment {
-    return Deployment(
+fun EdgeDeploymentResponse.toEdgeDeployment(): EdgeDeployment {
+    return EdgeDeployment(
         deploymentId = this.deploymentId,
         serverId = this.serverId,
         batteryDepletedAt = this.batteryDepletedAt ?: Date(),
         deployedAt = this.deployedAt ?: Date(),
         batteryLevel = this.batteryLevel ?: 0,
         state = DeploymentState.Edge.ReadyToUpload.key,
-        configuration = this.configuration?.toConfiguration(),
+        configuration = this.configuration?.toEdgeConfiguration(),
         location = this.location,
         createdAt = this.createdAt ?: Date(),
         syncState = SyncState.Sent.key,

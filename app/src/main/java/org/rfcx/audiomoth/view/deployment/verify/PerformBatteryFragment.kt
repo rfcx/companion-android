@@ -15,22 +15,22 @@ import kotlinx.android.synthetic.main.fragment_perform_battery.*
 import kotlinx.android.synthetic.main.fragment_perform_battery_level.*
 import kotlinx.android.synthetic.main.fragment_select_battery_level.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.BatteryDetail
+import org.rfcx.audiomoth.entity.EdgeBatteryInfo
 import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.util.NotificationBroadcastReceiver
 import org.rfcx.audiomoth.util.toDateTimeString
-import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
+import org.rfcx.audiomoth.view.deployment.EdgeDeploymentProtocol
 
 class PerformBatteryFragment : Fragment() {
     private var status: String? = null
-    private var deploymentProtocol: DeploymentProtocol? = null
+    private var edgeDeploymentProtocol: EdgeDeploymentProtocol? = null
     private var location: DeploymentLocation? = null
     private val day = 24 * 60 * 60 * 1000
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        this.deploymentProtocol = (context as DeploymentProtocol)
-        this.location = deploymentProtocol?.getDeploymentLocation()
+        this.edgeDeploymentProtocol = (context as EdgeDeploymentProtocol)
+        this.location = edgeDeploymentProtocol?.getDeploymentLocation()
     }
 
     override fun onCreateView(
@@ -52,7 +52,7 @@ class PerformBatteryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        deploymentProtocol?.hideCompleteButton()
+        edgeDeploymentProtocol?.hideCompleteButton()
         when (status) {
             TEST_BATTERY -> checkBattery()
             TIME_LED_FLASH -> timeFlash()
@@ -62,50 +62,50 @@ class PerformBatteryFragment : Fragment() {
 
     private fun checkBattery() {
         testButton.setOnClickListener {
-            deploymentProtocol?.playCheckBatterySound()
-            deploymentProtocol?.startCheckBattery(TIME_LED_FLASH, null)
+            edgeDeploymentProtocol?.playCheckBatterySound()
+            edgeDeploymentProtocol?.startCheckBattery(TIME_LED_FLASH, null)
         }
 
         skipButton.setOnClickListener {
             val batteryDepletedAt = Timestamp(System.currentTimeMillis() + (day * 8))
             if (location != null) {
                 notification(batteryDepletedAt, location!!.name)
-                deploymentProtocol?.setPerformBattery(batteryDepletedAt, 100)
-                deploymentProtocol?.nextStep()
+                edgeDeploymentProtocol?.setPerformBattery(batteryDepletedAt, 100)
+                edgeDeploymentProtocol?.nextStep()
             }
         }
     }
 
     private fun timeFlash() {
         tryAgainButton.setOnClickListener {
-            deploymentProtocol?.playCheckBatterySound()
+            edgeDeploymentProtocol?.playCheckBatterySound()
         }
         batteryLv1Button.setOnClickListener {
-            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 8)
+            edgeDeploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 8)
         }
         batteryLv2Button.setOnClickListener {
-            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 7)
+            edgeDeploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 7)
         }
         batteryLv3Button.setOnClickListener {
-            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 6)
+            edgeDeploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 6)
         }
         batteryLv4Button.setOnClickListener {
-            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 5)
+            edgeDeploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 5)
         }
         batteryLv5Button.setOnClickListener {
-            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 4)
+            edgeDeploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 4)
         }
         batteryLv6Button.setOnClickListener {
-            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 3)
+            edgeDeploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 3)
         }
         batteryLv7Button.setOnClickListener {
-            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 2)
+            edgeDeploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 2)
         }
         batteryLv8Button.setOnClickListener {
-            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 1)
+            edgeDeploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 1)
         }
         batteryLv9Button.setOnClickListener {
-            deploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 0)
+            edgeDeploymentProtocol?.startCheckBattery(BATTERY_LEVEL, 0)
         }
     }
 
@@ -125,14 +125,14 @@ class PerformBatteryFragment : Fragment() {
             if (location != null) {
 
                 notification(batteryDepletedAt, location!!.name)
-                deploymentProtocol?.setPerformBattery(batteryDepletedAt, batteryDetail.batteryLevel)
-                deploymentProtocol?.nextStep()
+                edgeDeploymentProtocol?.setPerformBattery(batteryDepletedAt, batteryDetail.batteryLevel)
+                edgeDeploymentProtocol?.nextStep()
             }
         }
     }
 
-    private fun setData(level: Int): BatteryDetail {
-        return BatteryDetail(
+    private fun setData(level: Int): EdgeBatteryInfo {
+        return EdgeBatteryInfo(
             days = getString(
                 if (level == 1) R.string.day else R.string.days,
                 if (level == 0) ">1" else level.toString()

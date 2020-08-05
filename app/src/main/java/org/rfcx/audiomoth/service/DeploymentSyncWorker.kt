@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.work.*
 import io.realm.Realm
 import org.rfcx.audiomoth.entity.request.toRequestBody
-import org.rfcx.audiomoth.localdb.DeploymentDb
+import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.service.images.ImageSyncWorker
@@ -22,7 +22,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
     override suspend fun doWork(): Result {
         Log.d(TAG, "doWork")
 
-        val db = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
+        val db = EdgeDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val locateDb = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val firestore = Firestore(context)
         val deployments = db.lockUnsent()
