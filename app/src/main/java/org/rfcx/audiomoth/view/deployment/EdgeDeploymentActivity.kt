@@ -8,14 +8,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import io.realm.Realm
-import java.sql.Timestamp
-import java.util.*
 import kotlinx.android.synthetic.main.activity_deployment.*
 import org.rfcx.audiomoth.BuildConfig
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.*
-import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
+import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.ProfileDb
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
@@ -33,6 +31,8 @@ import org.rfcx.audiomoth.view.detail.MapPickerProtocol
 import org.rfcx.audiomoth.view.dialog.CompleteFragment
 import org.rfcx.audiomoth.view.dialog.CompleteListener
 import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
+import java.sql.Timestamp
+import java.util.*
 
 class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, CompleteListener,
     MapPickerProtocol {
@@ -197,6 +197,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         showLoading()
         _deployment?.let {
             it.deployedAt = Date()
+            it.updatedAt = Date()
             it.state = DeploymentState.Edge.ReadyToUpload.key
             setDeployment(it)
 
@@ -282,7 +283,11 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             if (deployment.configuration != null) {
                 _edgeConfiguration = deployment.configuration
             }
-            currentStep = deployment.state - 1
+            currentStep = if (deployment.state == 1) {
+                deployment.state
+            } else {
+                deployment.state - 1
+            }
             stepView.go(currentStep, true)
             handleFragment(currentStep)
         }

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import io.realm.Realm
+import java.util.*
 import kotlinx.android.synthetic.main.fragment_map_detail_bottom_sheet.*
 import org.rfcx.audiomoth.MainActivityListener
 import org.rfcx.audiomoth.R
@@ -22,7 +23,6 @@ import org.rfcx.audiomoth.util.toDateString
 import org.rfcx.audiomoth.view.deployment.EdgeDeploymentActivity
 import org.rfcx.audiomoth.view.detail.DeploymentDetailActivity
 import org.rfcx.audiomoth.view.diagnostic.DiagnosticActivity
-import java.util.*
 
 class MapDetailBottomSheetFragment : Fragment() {
     private val edgeDeploymentDb =
@@ -82,11 +82,12 @@ class MapDetailBottomSheetFragment : Fragment() {
                 )
 
             mapDetailBottomSheetView.setOnClickListener {
+                (activity as MainActivityListener).hideBottomSheet()
+
                 if (isStateReadyToUpload) {
                     context?.let { context ->
                         DeploymentDetailActivity.startActivity(context, deployment.id)
                     }
-                    (activity as MainActivityListener).hideBottomSheet()
                 } else {
                     context?.let {
                         EdgeDeploymentActivity.startActivity(it, deployment.id)
