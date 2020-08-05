@@ -82,8 +82,6 @@ class MapDetailBottomSheetFragment : Fragment() {
                 )
 
             mapDetailBottomSheetView.setOnClickListener {
-                (activity as MainActivityListener).hideBottomSheet()
-
                 if (isStateReadyToUpload) {
                     context?.let { context ->
                         DeploymentDetailActivity.startActivity(context, deployment.id)

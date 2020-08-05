@@ -227,6 +227,10 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         createLocationButton.visibility = View.VISIBLE
     }
 
+    override fun getBottomSheetState(): Int {
+        return bottomSheetBehavior.state
+    }
+
     override fun showBottomSheet(fragment: Fragment) {
         hidBottomAppBar()
         val layoutParams: CoordinatorLayout.LayoutParams = bottomSheetContainer.layoutParams
@@ -270,6 +274,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
 }
 
 interface MainActivityListener {
+    fun getBottomSheetState(): Int
     fun showBottomSheet(fragment: Fragment)
     fun showBottomAppBar()
     fun hidBottomAppBar()

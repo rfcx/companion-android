@@ -14,6 +14,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.work.WorkInfo
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
@@ -341,7 +342,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         if (this.lastSyncingInfo == SyncInfo.Uploaded && status == SyncInfo.Uploaded) return
 
         this.lastSyncingInfo = status
+        val state = listener?.getBottomSheetState() ?: 0
+        if (state != BottomSheetBehavior.STATE_EXPANDED){
+            setSnackbar(status)
+        }
+    }
 
+    private fun setSnackbar(status: SyncInfo) {
         val deploymentUnsentCount = edgeDeploymentDb.unsentCount().toInt()
         when (status) {
             SyncInfo.Starting, SyncInfo.Uploading -> {
