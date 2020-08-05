@@ -150,6 +150,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             if (existingRadioButton.isChecked) {
                 handleExistLocate()
             } else if (newLocationRadioButton.isChecked) {
+                getLastLocation()
                 verifyInput()
             }
         }
@@ -247,7 +248,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         locationNameSpinner.visibility = View.VISIBLE
     }
 
-    private fun onPressedNewLocation() {
+    private fun getLastLocation() {
         if (latitude != 0.0 && longitude != 0.0) {
             val loc = Location(LocationManager.GPS_PROVIDER)
             loc.latitude = latitude
@@ -258,6 +259,10 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             this.latitude = lastLocation?.latitude ?: 0.0
             this.longitude = lastLocation?.longitude ?: 0.0
         }
+    }
+
+    private fun onPressedNewLocation() {
+        getLastLocation()
 
         if (lastLocation != null) {
             lastLocation?.let {
