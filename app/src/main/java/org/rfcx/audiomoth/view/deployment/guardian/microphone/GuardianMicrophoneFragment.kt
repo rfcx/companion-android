@@ -153,7 +153,7 @@ class GuardianMicrophoneFragment : Fragment() {
 
     companion object {
         private const val DELAY = 0L
-        private const val MILLI_PERIOD = 100L
+        private const val MILLI_PERIOD = 10L
 
         enum class MicTestingState { READY, LISTENING, FINISH }
 

@@ -27,10 +27,12 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import org.rfcx.audiomoth.util.spectrogram.AudioSpectrogramUtils
-import kotlin.math.abs
+import kotlin.math.log10
+import kotlin.math.max
+import kotlin.math.pow
+import kotlin.math.roundToInt
 
 class FrequencyView : View {
     // Attributes
@@ -124,8 +126,7 @@ class FrequencyView : View {
             if (_magnitudes != null) {
                 val mag = _magnitudes!![(j * _magnitudes!!.size / 2).toInt()]
                 val db =
-                    Math.max(0.0, -20 * Math.log10(mag.toDouble())).toFloat()
-                Log.d("audi", "" + mag)
+                    max(0.0, -20 * log10(mag.toDouble())).toFloat()
                 val c = getInterpolatedColor(colors, db * 0.009f)
                 paint.color = c
                 val x = pos % rWidth
@@ -151,7 +152,52 @@ class FrequencyView : View {
             paint.color = c
             canvas.drawLine(0f, i.toFloat(), wColor - 5.toFloat(), i.toFloat(), paint)
         }
+
+        // Draw frequency scale
+        val ratio = 0.7f * resources.displayMetrics.density
+        paint.textSize = 12f * ratio
+        paint.color = Color.BLACK
+        canvas.drawRect(rWidth + wColor.toFloat(), 0f, width.toFloat(), height.toFloat(), paint)
+        paint.color = Color.WHITE
+        canvas.drawText("kHz", rWidth + wColor.toFloat(), 12 * ratio, paint)
+        if (logFrequency) {
+            for (i in 1..4) {
+                val y: Float = getRelativePosition(
+                    Math.pow(10.0, i.toDouble()).toFloat(),
+                    1f,
+                    samplingRate / 2.toFloat(),
+                    logFrequency
+                )
+                canvas.drawText("1e$i", rWidth + wColor.toFloat(), (1f - y) * height, paint)
+            }
+        } else {
+            var i = 0
+            while (i < (samplingRate - 500) / 2) {
+                canvas.drawText(
+                    " " + i / 1000,
+                    rWidth + wColor.toFloat(),
+                    height * (1f - i.toFloat() / (samplingRate / 2)),
+                    paint
+                )
+                i += 1000
+            }
+        }
         pos++
+    }
+
+    /**
+     * Converts relative position of a value within given boundaries
+     * Log=true for logarithmic scale
+     */
+    private fun getRelativePosition(
+        value: Float,
+        minValue: Float,
+        maxValue: Float,
+        log: Boolean
+    ): Float {
+        return if (log) log10(1 + value - minValue.toDouble()).toFloat() / Math.log10(
+            1 + maxValue - minValue.toDouble()
+        ).toFloat() else (value - minValue) / (maxValue - minValue)
     }
 
     /**
@@ -164,17 +210,14 @@ class FrequencyView : View {
         maxValue: Float,
         log: Boolean
     ): Float {
-        return if (log) (Math.pow(
-            10.0,
-            position * Math.log10(1 + maxValue - minValue.toDouble())
-        ) + minValue - 1).toFloat() else minValue + position * (maxValue - minValue)
+        return if (log) (10.0.pow(position * log10(1 + maxValue - minValue.toDouble())) + minValue - 1).toFloat() else minValue + position * (maxValue - minValue)
     }
 
     /**
      * Calculate rainbow colors
      */
     private fun ave(s: Int, d: Int, p: Float): Int {
-        return s + Math.round(p * (d - s))
+        return s + (p * (d - s)).roundToInt()
     }
 
     private fun getInterpolatedColor(colors: IntArray?, unit: Float): Int {
