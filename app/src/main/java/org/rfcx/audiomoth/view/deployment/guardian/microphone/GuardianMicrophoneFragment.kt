@@ -76,8 +76,9 @@ class GuardianMicrophoneFragment : Fragment() {
     }
 
     private fun setupSpectrogram() {
+        spectrogramView.setFFTResolution(AudioSpectrogramUtils.fftResolution)
         spectrogramView.setSamplingRate(44100)
-        spectrogramView.setBackgroundColor(Color.WHITE)
+        spectrogramView.setBackgroundColor(Color.BLACK)
     }
 
     private fun setUiByState(state: MicTestingState) {

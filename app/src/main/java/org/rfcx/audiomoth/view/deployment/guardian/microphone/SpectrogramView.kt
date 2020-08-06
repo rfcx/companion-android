@@ -74,12 +74,15 @@ class FrequencyView : View {
         canvas = Canvas(bitmap!!)
     }
 
+    fun setFFTResolution(res: Int) {
+        _magnitudes = FloatArray(res)
+    }
+
     fun setSamplingRate(sampling: Int) {
         samplingRate = sampling
     }
 
     fun setMagnitudes(m: FloatArray) {
-        _magnitudes = FloatArray(AudioSpectrogramUtils.fftResolution)
         System.arraycopy(m, 0, _magnitudes!!, 0, m.size)
     }
 

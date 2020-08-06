@@ -28,8 +28,9 @@ object AudioSpectrogramUtils {
             bufferStack = arrayListOf()
             val size = (bufferLength / (res / 2)) / 4
             for (i in 0 until size + 1) {
-                bufferStack!!.add(ShortArray(res / 2))
+                bufferStack!!.add(ShortArray((res / 2)))
             }
+            isSetup = true
         }
     }
 
