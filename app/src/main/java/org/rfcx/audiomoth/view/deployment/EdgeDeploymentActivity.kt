@@ -1,5 +1,7 @@
 package org.rfcx.audiomoth.view.deployment
 
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -205,6 +207,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             deploymentDb.updateDeployment(it)
 
             DeploymentSyncWorker.enqueue(this@EdgeDeploymentActivity)
+            notification()
             hideLoading()
             showComplete()
         }
@@ -390,6 +393,34 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             }
         } else {
             backStep()
+        }
+    }
+
+    private fun notification() {
+        val edgeDeploymentId = _deployment?.deploymentId
+        val day = 24 * 60 * 60 * 1000
+        val intent = Intent(this, NotificationBroadcastReceiver::class.java)
+        //TODO delete 2000
+        val dateAlarm = (_deployment?.batteryDepletedAt?.time)?.minus(day)?.let { Date(it + 2000) }
+
+        intent.putExtra(PerformBatteryFragment.BATTERY_DEPLETED_AT, _deployment?.batteryDepletedAt?.toDateTimeString())
+        intent.putExtra(PerformBatteryFragment.LOCATION_NAME, _deployment?.location?.name)
+        intent.putExtra(PerformBatteryFragment.EXTRA_EDGE_DEPLOYMENT_ID, edgeDeploymentId)
+
+        val pendingIntent =
+            PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        val cal = Calendar.getInstance()
+        if (dateAlarm != null) {
+            cal.time = dateAlarm
+            if (dateAlarm.time > System.currentTimeMillis()) {
+                val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                alarmManager.setExact(
+                    AlarmManager.RTC_WAKEUP,
+                    cal.timeInMillis,
+                    pendingIntent
+                )
+            }
         }
     }
 

@@ -70,7 +70,6 @@ class PerformBatteryFragment : Fragment() {
         skipButton.setOnClickListener {
             val batteryDepletedAt = Timestamp(System.currentTimeMillis() + (day * 8))
             if (location != null) {
-                notification(batteryDepletedAt, location!!.name)
                 edgeDeploymentProtocol?.setPerformBattery(batteryDepletedAt, 100)
                 edgeDeploymentProtocol?.nextStep()
             }
@@ -122,10 +121,8 @@ class PerformBatteryFragment : Fragment() {
             if (level == 0) getString(R.string.too_low_battery) else getString(R.string.notification)
         nextButton.setOnClickListener {
             val batteryDepletedAt =
-                Timestamp(System.currentTimeMillis() + (day * batteryDetail.numberOfDays) + 20)
+                Timestamp(System.currentTimeMillis() + (day * batteryDetail.numberOfDays))
             if (location != null) {
-
-                notification(batteryDepletedAt, location!!.name)
                 edgeDeploymentProtocol?.setPerformBattery(batteryDepletedAt, batteryDetail.batteryLevel)
                 edgeDeploymentProtocol?.nextStep()
             }
@@ -208,31 +205,6 @@ class PerformBatteryFragment : Fragment() {
         batteryLevel6View.visibility = if (view6) View.VISIBLE else View.INVISIBLE
         batteryLevel7View.visibility = if (view7) View.VISIBLE else View.INVISIBLE
         batteryLevel8View.visibility = if (view8) View.VISIBLE else View.INVISIBLE
-    }
-
-    private fun notification(batteryDepletedAt: Timestamp, locationName: String) {
-        val edgeDeploymentId = edgeDeploymentProtocol?.getDeployment()?.deploymentId
-        val intent = Intent(context, NotificationBroadcastReceiver::class.java)
-        val date = Date(batteryDepletedAt.time)
-        val dateAlarm = Date((batteryDepletedAt.time) - day)
-        Log.d("notification","$edgeDeploymentId")
-        intent.putExtra(BATTERY_DEPLETED_AT, date.toDateTimeString())
-        intent.putExtra(LOCATION_NAME, locationName)
-        intent.putExtra(EXTRA_EDGE_DEPLOYMENT_ID, edgeDeploymentId)
-
-        val pendingIntent =
-            PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-
-        val cal = Calendar.getInstance()
-        cal.time = dateAlarm
-        if (dateAlarm.time > System.currentTimeMillis()) {
-            val alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            alarmManager.setExact(
-                AlarmManager.RTC_WAKEUP,
-                cal.timeInMillis,
-                pendingIntent
-            )
-        }
     }
 
     companion object {

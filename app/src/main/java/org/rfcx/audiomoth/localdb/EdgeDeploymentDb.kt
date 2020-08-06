@@ -125,6 +125,15 @@ class EdgeDeploymentDb(private val realm: Realm) {
         return null
     }
 
+    fun getDeploymentByDeploymentId(deploymentId: String): EdgeDeployment? {
+        val deployment =
+            realm.where(EdgeDeployment::class.java).equalTo(EdgeDeployment.FIELD_DEPLOYMENT_ID, deploymentId).findFirst()
+        if (deployment != null) {
+            return realm.copyFromRealm(deployment)
+        }
+        return null
+    }
+
     fun lockUnsent(): List<EdgeDeployment> {
         var unsentCopied: List<EdgeDeployment> = listOf()
         realm.executeTransaction {
