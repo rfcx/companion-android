@@ -5,7 +5,6 @@ import com.google.gson.Gson
 import org.json.JSONObject
 import org.rfcx.audiomoth.entity.socket.*
 import org.rfcx.audiomoth.util.MicrophoneTestUtils
-import org.rfcx.audiomoth.util.toDoubleArray
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.Socket
@@ -43,7 +42,7 @@ object SocketManager {
     val prefs = MutableLiveData<PrefsResponse>()
     val signal = MutableLiveData<SignalResponse>()
     val liveAudio = MutableLiveData<MicrophoneTestResponse>()
-    val spectrogram = MutableLiveData<DoubleArray>()
+    val spectrogram = MutableLiveData<ByteArray>()
 
     init {
         connection.value = ConnectionResponse()
@@ -53,7 +52,7 @@ object SocketManager {
         prefs.value = PrefsResponse()
         signal.value = SignalResponse()
         liveAudio.value = MicrophoneTestResponse()
-        spectrogram.value = DoubleArray(2)
+        spectrogram.value = ByteArray(2)
     }
 
     fun getConnection() {
@@ -171,7 +170,7 @@ object SocketManager {
                                     microphoneTestUtils?.let {
                                         it.buffer = it.decodeEncodedAudio(response.audioBuffer.buffer)
                                         it.setTrack()
-                                        this.spectrogram.postValue(it.buffer.toDoubleArray())
+                                        this.spectrogram.postValue(it.buffer)
                                     }
                                 }
                                 this.liveAudio.postValue(response)

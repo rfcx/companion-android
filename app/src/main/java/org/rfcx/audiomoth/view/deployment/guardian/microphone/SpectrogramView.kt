@@ -20,7 +20,6 @@
 
 package org.rfcx.audiomoth.view.deployment.guardian.microphone
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
@@ -28,8 +27,10 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
-import android.view.MotionEvent
+import android.util.Log
 import android.view.View
+import org.rfcx.audiomoth.util.spectrogram.AudioSpectrogramUtils
+import kotlin.math.abs
 
 class FrequencyView : View {
     // Attributes
@@ -40,13 +41,17 @@ class FrequencyView : View {
     private var pos = 0
     private var samplingRate = 0
     private var _width = 0
-    private var _height = 100
-    private var _magnitudes: DoubleArray? = null
+    private var _height = 0
+    private var _magnitudes: FloatArray? = null
     private val colorRainbow =
-        intArrayOf(-0x1, -0xff01, -0x10000, -0x100, -0xff0100, -0xff0001, -0xffff01, -0x1000000)
-    private val colorFire = intArrayOf(-0x1, -0x100, -0x10000, -0x1000000)
-    private val colorIce = intArrayOf(-0x1, -0xf00001, -0xff0001, -0xfff001, -0xffff01, -0xfffff1, -0x1000000)
-    private val colorGrey = intArrayOf(-0x1, -0x1000000)
+        intArrayOf(
+            -0x1, -0xff01, -0x10000, -0x100, -0xff0100, -0xff0001, -0xffff01, -0x1000000
+        )
+    private val colorFire =
+        intArrayOf(-0x1, -0x100, -0x10000, -0x1000000)
+    private val colorIce =
+        intArrayOf(-0x1, -0xff0001, -0xffff01, -0x1000000)
+    private val colorGrey = intArrayOf(-0x1, 0xFF00000)
 
     constructor(context: Context?) : super(context) {
         activity = context as Activity
@@ -63,7 +68,7 @@ class FrequencyView : View {
         _width = w
         _height = h
         if (bitmap != null) bitmap!!.recycle()
-        bitmap = Bitmap.createBitmap(_width, _height*4, Bitmap.Config.ARGB_8888)
+        bitmap = Bitmap.createBitmap(_width, _height, Bitmap.Config.ARGB_8888)
         canvas = Canvas(bitmap!!)
     }
 
@@ -71,9 +76,9 @@ class FrequencyView : View {
         samplingRate = sampling
     }
 
-    fun setMagnitudes(m: DoubleArray) {
-        _magnitudes = DoubleArray(m.size)
-        System.arraycopy(m, 0, _magnitudes, 0, m.size)
+    fun setMagnitudes(m: FloatArray) {
+        _magnitudes = FloatArray(AudioSpectrogramUtils.fftResolution)
+        System.arraycopy(m, 0, _magnitudes!!, 0, m.size)
     }
 
     /**
@@ -83,7 +88,7 @@ class FrequencyView : View {
      */
     public override fun onDraw(canvas: Canvas) {
         var colors: IntArray? = null
-        val colorScale = "Ice"
+        val colorScale = "Rainbow"
 
         when (colorScale) {
             "Grey" -> colors = colorGrey
@@ -92,7 +97,7 @@ class FrequencyView : View {
             "Rainbow" -> colors = colorRainbow
         }
         val wColor = 10
-        val wFrequency = 40
+        val wFrequency = 30
         val rWidth = _width - wColor - wFrequency
         paint.strokeWidth = 1f
 
@@ -112,18 +117,21 @@ class FrequencyView : View {
             var j = getValueFromRelativePosition(
                 (_height - i).toFloat() / _height,
                 1f,
-                samplingRate.toFloat(),
+                samplingRate.toFloat()/2,
                 logFrequency
             )
-            j /= samplingRate.toFloat()
+            j /= samplingRate.toFloat()/2
             if (_magnitudes != null) {
                 val mag = _magnitudes!![(j * _magnitudes!!.size / 2).toInt()]
                 val db =
-                    Math.max(0.0, -20 * Math.log10(mag)).toFloat()
+                    Math.max(0.0, -20 * Math.log10(mag.toDouble())).toFloat()
+                Log.d("audi", "" + mag)
                 val c = getInterpolatedColor(colors, db * 0.009f)
                 paint.color = c
                 val x = pos % rWidth
-                this.canvas!!.drawPoint(x.toFloat(), i.toFloat(), paint)
+                val y = i
+                this.canvas!!.drawPoint(x.toFloat(), y.toFloat(), paint)
+                this.canvas!!.drawPoint(x.toFloat(), y.toFloat(), paint)
             }
         }
 
@@ -133,6 +141,15 @@ class FrequencyView : View {
         } else {
             canvas.drawBitmap(bitmap!!, wColor.toFloat() - pos % rWidth, 0f, paint)
             canvas.drawBitmap(bitmap!!, wColor.toFloat() + (rWidth - pos % rWidth), 0f, paint)
+        }
+
+        // Draw color scale
+        paint.color = Color.BLACK
+        canvas.drawRect(0f, 0f, wColor.toFloat(), height.toFloat(), paint)
+        for (i in 0 until height) {
+            val c = getInterpolatedColor(colors, i.toFloat() / height)
+            paint.color = c
+            canvas.drawLine(0f, i.toFloat(), wColor - 5.toFloat(), i.toFloat(), paint)
         }
         pos++
     }
@@ -165,8 +182,7 @@ class FrequencyView : View {
         if (unit >= 1) return colors!![colors.size - 1]
         var p = unit * (colors!!.size - 1)
         val i = p.toInt()
-        p -= i.toFloat()
-
+        p -= i
         // now p is just the fractional part [0...1) and i is the index
         val c0 = colors[i]
         val c1 = colors[i + 1]

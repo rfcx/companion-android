@@ -11,10 +11,10 @@ import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_guardian_microphone.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
-import org.rfcx.audiomoth.util.AudioSpectrogramUtils
 import org.rfcx.audiomoth.util.MicrophoneTestUtils
+import org.rfcx.audiomoth.util.spectrogram.AudioSpectrogramUtils
+import org.rfcx.audiomoth.util.spectrogram.toShortArray
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
-import org.rfcx.audiomoth.view.deployment.guardian.signal.GuardianSignalFragment
 import java.util.*
 
 class GuardianMicrophoneFragment : Fragment() {
@@ -76,7 +76,7 @@ class GuardianMicrophoneFragment : Fragment() {
     }
 
     private fun setupSpectrogram() {
-        spectrogramView.setSamplingRate(24000)
+        spectrogramView.setSamplingRate(44100)
         spectrogramView.setBackgroundColor(Color.WHITE)
     }
 
@@ -123,10 +123,15 @@ class GuardianMicrophoneFragment : Fragment() {
         })
 
         SocketManager.spectrogram.observe(viewLifecycleOwner, Observer {
-            if (it.isNotEmpty()) {
-                val mag = AudioSpectrogramUtils.extractMagnitude(it)
-                spectrogramView.setMagnitudes(mag)
+            if (it.size > 2) {
+                AudioSpectrogramUtils.setupSpectrogram(it.size)
+                AudioSpectrogramUtils.getTrunks(it.toShortArray())
+            }
+        })
 
+        AudioSpectrogramUtils.spectrogramLive.observe(viewLifecycleOwner, Observer {
+            if (it.size > 2) {
+                spectrogramView.setMagnitudes(it)
                 requireActivity().runOnUiThread {
                     spectrogramView.invalidate()
                 }
