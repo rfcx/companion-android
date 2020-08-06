@@ -3,6 +3,7 @@ package org.rfcx.audiomoth
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -21,6 +22,7 @@ import org.rfcx.audiomoth.util.Preferences
 import org.rfcx.audiomoth.util.getUserNickname
 import org.rfcx.audiomoth.util.logout
 import org.rfcx.audiomoth.view.deployment.EdgeDeploymentActivity
+import org.rfcx.audiomoth.view.deployment.verify.PerformBatteryFragment
 import org.rfcx.audiomoth.view.map.DeploymentBottomSheet
 import org.rfcx.audiomoth.view.map.MapFragment
 import org.rfcx.audiomoth.view.profile.ProfileFragment
@@ -251,19 +253,27 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         }
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        Log.d("notification", "onNewIntent")
+
+        if (intent?.hasExtra(EXTRA_EDGE_DEPLOYMENT_ID) == true) {
+            val edgeDeploymentId: String? =
+                intent.getStringExtra(EXTRA_EDGE_DEPLOYMENT_ID)
+            Log.d("notification", "$edgeDeploymentId")
+        }
+    }
+
     companion object {
-        private const val IMAGES = "IMAGES"
-        private const val DEPLOYMENT_ID = "DEPLOYMENT_ID"
+        const val EXTRA_EDGE_DEPLOYMENT_ID = "EXTRA_EDGE_DEPLOYMENT_ID"
         private const val BOTTOM_SHEET = "BOTTOM_SHEET"
 
-        fun startActivity(
-            context: Context,
-            images: ArrayList<String>? = null,
-            deploymentId: String? = null
-        ) {
+        fun startActivity(context: Context, deploymentId: String? = null) {
+            Log.d("notification", "startActivity")
+            Log.d("notification", "startActivity $deploymentId")
             val intent = Intent(context, MainActivity::class.java)
-            intent.putStringArrayListExtra(IMAGES, images)
-            intent.putExtra(DEPLOYMENT_ID, deploymentId)
+            if (deploymentId != null)
+                intent.putExtra(EXTRA_EDGE_DEPLOYMENT_ID, deploymentId)
             context.startActivity(intent)
         }
     }

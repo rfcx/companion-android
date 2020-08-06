@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -121,7 +122,7 @@ class PerformBatteryFragment : Fragment() {
             if (level == 0) getString(R.string.too_low_battery) else getString(R.string.notification)
         nextButton.setOnClickListener {
             val batteryDepletedAt =
-                Timestamp(System.currentTimeMillis() + (day * batteryDetail.numberOfDays))
+                Timestamp(System.currentTimeMillis() + (day * batteryDetail.numberOfDays) + 20)
             if (location != null) {
 
                 notification(batteryDepletedAt, location!!.name)
@@ -210,11 +211,14 @@ class PerformBatteryFragment : Fragment() {
     }
 
     private fun notification(batteryDepletedAt: Timestamp, locationName: String) {
+        val edgeDeploymentId = edgeDeploymentProtocol?.getDeployment()?.deploymentId
         val intent = Intent(context, NotificationBroadcastReceiver::class.java)
         val date = Date(batteryDepletedAt.time)
         val dateAlarm = Date((batteryDepletedAt.time) - day)
+        Log.d("notification","$edgeDeploymentId")
         intent.putExtra(BATTERY_DEPLETED_AT, date.toDateTimeString())
         intent.putExtra(LOCATION_NAME, locationName)
+        intent.putExtra(EXTRA_EDGE_DEPLOYMENT_ID, edgeDeploymentId)
 
         val pendingIntent =
             PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
@@ -240,6 +244,7 @@ class PerformBatteryFragment : Fragment() {
         const val BATTERY_LEVEL = "BATTERY_LEVEL"
         const val BATTERY_DEPLETED_AT = "BATTERY_DEPLETED_AT"
         const val LOCATION_NAME = "LOCATION_NAME"
+        const val EXTRA_EDGE_DEPLOYMENT_ID = "EXTRA_EDGE_DEPLOYMENT_ID"
 
         @JvmStatic
         fun newInstance(page: String, level: Int?) = PerformBatteryFragment()

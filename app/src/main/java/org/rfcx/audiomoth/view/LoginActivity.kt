@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
@@ -57,7 +58,7 @@ class LoginActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
 
         if (CredentialKeeper(this).hasValidCredentials()) {
-            MainActivity.startActivity(this@LoginActivity)
+            MainActivity.startActivity(this@LoginActivity, getDeploymentFromIntentIfHave(intent))
             finish()
         }
 
@@ -278,6 +279,22 @@ class LoginActivity : AppCompatActivity() {
         loading(false)
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        getDeploymentFromIntentIfHave(intent)
+        Log.d("notification", "LoginActivity onNewIntent")
+
+    }
+
+    private fun getDeploymentFromIntentIfHave(intent: Intent?) :String? {
+        Log.d("notification", "LoginActivity getDeploymentFromIntentIfHave")
+
+        if (intent?.hasExtra(MainActivity.EXTRA_EDGE_DEPLOYMENT_ID) == true) {
+            return intent.getStringExtra(MainActivity.EXTRA_EDGE_DEPLOYMENT_ID)
+        }
+        return null
+    }
+
     private fun View.hideKeyboard() = this.let {
         val inputManager =
             context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -286,7 +303,11 @@ class LoginActivity : AppCompatActivity() {
 
     companion object {
         fun startActivity(context: Context) {
+            Log.d("notification", "startActivity LoginActivity")
+
             val intent = Intent(context, LoginActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
             context.startActivity(intent)
         }
     }
