@@ -76,17 +76,6 @@
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/microphoneWarnTextView"
-        style="@style/AudioMothText.Subhead.Small"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/margin_padding_normal"
-        android:text="@string/don_t_forget_to_turn_speaker_on"
-        app:layout_constraintBottom_toTopOf="@id/audioButtonLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
     <LinearLayout
         android:id="@+id/audioButtonLayout"
         android:layout_width="match_parent"
