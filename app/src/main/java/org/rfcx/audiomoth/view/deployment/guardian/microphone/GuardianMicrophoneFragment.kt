@@ -49,6 +49,7 @@ class GuardianMicrophoneFragment : Fragment() {
 
         deploymentProtocol?.hideCompleteButton()
         setupSpectrogram()
+        setupSpectrogramFreqMenu()
         setupSpectrogramColorMenu()
         setUiByState(MicTestingState.READY)
         SocketManager.resetDefaultValue()
@@ -83,10 +84,25 @@ class GuardianMicrophoneFragment : Fragment() {
         spectrogramView.setBackgroundColor(Color.WHITE)
     }
 
+    private fun setupSpectrogramFreqMenu() {
+        val adapter: ArrayAdapter<String> = ArrayAdapter<String>(
+            requireContext(),
+            R.layout.dropdown_menu_popup_spectrogram,
+            freq
+        )
+        freqScaleSpecDropdown.setAdapter(adapter)
+        freqScaleSpecDropdown.setOnItemClickListener { _, _, position, _ ->
+            spectrogramView.freqScale = freq[position]
+            spectrogramView.invalidate()
+        }
+        freqScaleSpecDropdown.inputType = 0
+        freqScaleSpecDropdown.setText(freq[0], false)
+    }
+
     private fun setupSpectrogramColorMenu() {
         val adapter: ArrayAdapter<String> = ArrayAdapter<String>(
             requireContext(),
-            R.layout.dropdown_menu_popup_spectrogram_color,
+            R.layout.dropdown_menu_popup_spectrogram,
             color
         )
         colorSpecDropdown.setAdapter(adapter)
@@ -172,6 +188,7 @@ class GuardianMicrophoneFragment : Fragment() {
     companion object {
 
         private val color = arrayOf("Rainbow", "Fire", "Ice", "Grey")
+        private val freq = arrayOf("Linear", "Logarithmic")
 
         private const val DELAY = 0L
         private const val MILLI_PERIOD = 10L
