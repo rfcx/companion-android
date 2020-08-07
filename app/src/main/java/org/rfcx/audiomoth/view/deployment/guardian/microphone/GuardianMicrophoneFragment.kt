@@ -73,6 +73,16 @@ class GuardianMicrophoneFragment : Fragment() {
         finishButton.setOnClickListener {
             deploymentProtocol?.nextStep()
         }
+
+        colorSpecGroup.setOnCheckedChangeListener { _, id ->
+            when (id) {
+                R.id.colorRainbowChip -> spectrogramView.colorScale = ColorScale.RAINBOW.value
+                R.id.colorFireChip -> spectrogramView.colorScale = ColorScale.FIRE.value
+                R.id.colorIceChip -> spectrogramView.colorScale = ColorScale.ICE.value
+                R.id.colorGreyChip -> spectrogramView.colorScale = ColorScale.GREY.value
+            }
+            spectrogramView.invalidate()
+        }
     }
 
     private fun setupSpectrogram() {
@@ -152,6 +162,9 @@ class GuardianMicrophoneFragment : Fragment() {
     }
 
     companion object {
+
+        private enum class ColorScale(val value:String) { RAINBOW("Rainbow"), FIRE("Fire"), ICE("Ice"), GREY("Grey")}
+
         private const val DELAY = 0L
         private const val MILLI_PERIOD = 10L
 

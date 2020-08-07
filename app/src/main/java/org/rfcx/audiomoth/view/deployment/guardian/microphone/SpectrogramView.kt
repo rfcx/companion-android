@@ -53,7 +53,9 @@ class FrequencyView : View {
         intArrayOf(-0x1, -0x100, -0x10000, -0x1000000)
     private val colorIce =
         intArrayOf(-0x1, -0xff0001, -0xffff01, -0x1000000)
-    private val colorGrey = intArrayOf(-0x1, 0xFF00000)
+    private val colorGrey = intArrayOf(-0x1, -0x1000000)
+
+    var colorScale = "Rainbow"
 
     constructor(context: Context?) : super(context) {
         activity = context as Activity
@@ -90,7 +92,6 @@ class FrequencyView : View {
      */
     public override fun onDraw(canvas: Canvas) {
         var colors: IntArray? = null
-        val colorScale = "Rainbow"
 
         when (colorScale) {
             "Grey" -> colors = colorGrey

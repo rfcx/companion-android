@@ -21,8 +21,8 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginTop="@dimen/margin_padding_xlarge"
-        android:visibility="gone"
         android:background="@drawable/ic_microphone_green"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/microphoneTitle" />
@@ -30,9 +30,49 @@
     <org.rfcx.audiomoth.view.deployment.guardian.microphone.FrequencyView
         android:id="@+id/spectrogramView"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="200dp"
         android:layout_marginTop="@dimen/margin_padding_xlarge"
-        app:layout_constraintTop_toBottomOf="@id/microphoneView"/>
+        app:layout_constraintTop_toBottomOf="@id/microphoneView" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/colorSpecGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/margin_padding_small"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/spectrogramView"
+        app:singleSelection="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/colorRainbowChip"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="@string/rainbow" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/colorFireChip"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/fire" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/colorIceChip"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ice" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/colorGreyChip"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/grey" />
+
+    </com.google.android.material.chip.ChipGroup>
 
     <TextView
         android:id="@+id/microphoneWarnTextView"
