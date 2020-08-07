@@ -76,7 +76,7 @@ class GuardianMicrophoneFragment : Fragment() {
     }
 
     private fun setupSpectrogram() {
-        spectrogramView.setSamplingRate(44100)
+        spectrogramView.setSamplingRate(deploymentProtocol?.getSampleRate() ?: 24000)
         spectrogramView.setBackgroundColor(Color.WHITE)
     }
 
