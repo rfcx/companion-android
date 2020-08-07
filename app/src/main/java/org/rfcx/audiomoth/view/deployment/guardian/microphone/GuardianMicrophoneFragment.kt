@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_guardian_microphone.*
@@ -16,6 +17,7 @@ import org.rfcx.audiomoth.util.spectrogram.AudioSpectrogramUtils
 import org.rfcx.audiomoth.util.spectrogram.toShortArray
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 import java.util.*
+
 
 class GuardianMicrophoneFragment : Fragment() {
 
@@ -47,6 +49,7 @@ class GuardianMicrophoneFragment : Fragment() {
 
         deploymentProtocol?.hideCompleteButton()
         setupSpectrogram()
+        setupSpectrogramColorMenu()
         setUiByState(MicTestingState.READY)
         SocketManager.resetDefaultValue()
 
@@ -73,21 +76,26 @@ class GuardianMicrophoneFragment : Fragment() {
         finishButton.setOnClickListener {
             deploymentProtocol?.nextStep()
         }
-
-        colorSpecGroup.setOnCheckedChangeListener { _, id ->
-            when (id) {
-                R.id.colorRainbowChip -> spectrogramView.colorScale = ColorScale.RAINBOW.value
-                R.id.colorFireChip -> spectrogramView.colorScale = ColorScale.FIRE.value
-                R.id.colorIceChip -> spectrogramView.colorScale = ColorScale.ICE.value
-                R.id.colorGreyChip -> spectrogramView.colorScale = ColorScale.GREY.value
-            }
-            spectrogramView.invalidate()
-        }
     }
 
     private fun setupSpectrogram() {
         spectrogramView.setSamplingRate(44100)
         spectrogramView.setBackgroundColor(Color.WHITE)
+    }
+
+    private fun setupSpectrogramColorMenu() {
+        val adapter: ArrayAdapter<String> = ArrayAdapter<String>(
+            requireContext(),
+            R.layout.dropdown_menu_popup_spectrogram_color,
+            color
+        )
+        colorSpecDropdown.setAdapter(adapter)
+        colorSpecDropdown.setOnItemClickListener { _, _, position, _ ->
+            spectrogramView.colorScale = color[position]
+            spectrogramView.invalidate()
+        }
+        colorSpecDropdown.inputType = 0
+        colorSpecDropdown.setText(color[0], false)
     }
 
     private fun setUiByState(state: MicTestingState) {
@@ -163,7 +171,7 @@ class GuardianMicrophoneFragment : Fragment() {
 
     companion object {
 
-        private enum class ColorScale(val value:String) { RAINBOW("Rainbow"), FIRE("Fire"), ICE("Ice"), GREY("Grey")}
+        private val color = arrayOf("Rainbow", "Fire", "Ice", "Grey")
 
         private const val DELAY = 0L
         private const val MILLI_PERIOD = 10L

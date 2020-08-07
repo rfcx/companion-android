@@ -277,5 +277,6 @@
     <string name="fire">Fire</string>
     <string name="ice">Ice</string>
     <string name="grey">Grey</string>
+    <string name="color">Color</string>
 
 </resources>
