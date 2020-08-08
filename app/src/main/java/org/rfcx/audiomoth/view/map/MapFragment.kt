@@ -39,7 +39,6 @@ import kotlinx.android.synthetic.main.fragment_map.*
 import org.rfcx.audiomoth.DeploymentListener
 import org.rfcx.audiomoth.MainActivityListener
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.DeploymentState.Edge
 import org.rfcx.audiomoth.entity.Device
 import org.rfcx.audiomoth.entity.EdgeDeployment
@@ -222,17 +221,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         if (deploymentFeatures != null && deploymentFeatures.isNotEmpty()) {
             val selectedFeature = deploymentFeatures[0]
             val features = this.deploymentFeatures!!.features()!!
-            features.forEachIndexed { index, feature ->
+            features.forEachIndexed { _, feature ->
                 if (selectedFeature.getProperty(PROPERTY_MARKER_LOCATION_ID) == feature.getProperty(
                         PROPERTY_MARKER_LOCATION_ID
                     )
                 ) {
-                    val id =
-                        selectedFeature.getStringProperty(PROPERTY_MARKER_LOCATION_ID).split(".")[1]
+                    val deploymentId =
+                        selectedFeature.getStringProperty(PROPERTY_MARKER_DEPLOYMENT_ID).toInt()
                     (activity as MainActivityListener).showBottomSheet(
-                        DeploymentViewPagerFragment.newInstance(
-                            id.toInt()
-                        )
+                        DeploymentViewPagerFragment.newInstance(deploymentId)
                     )
                 }
             }
@@ -267,7 +264,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             it.getLastDeploymentId()
         })
 
-        val showDeployments = this.edgeDeployments.filter {
+        val showEdgeDeployments = this.edgeDeployments.filter {
             if (it.isSent()) showDeployIds.contains(it.serverId) else showDeployIds.contains(it.id.toString())
         }
 
@@ -275,29 +272,25 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             if (it.isSent()) showDeployIds.contains(it.serverId) else showDeployIds.contains(it.id.toString())
         }
 
-        val deploymentMarkers = showDeployments.map { it.toMark() }
+        val deploymentMarkers = showEdgeDeployments.map { it.toMark() }
         val guardianDeploymentMarkers = showGuardianDeployments.map { it.toMark() }
 
+        handleShowDeployment(showEdgeDeployments, showGuardianDeployments)
         handleMarkerDeployment(deploymentMarkers + guardianDeploymentMarkers)
-        handleShowDeployment(showDeployments, showGuardianDeployments)
     }
 
     private fun handleShowDeployment(
-        deployments: List<EdgeDeployment>,
+        edgeDeployments: List<EdgeDeployment>,
         guardianDeployments: List<GuardianDeployment>
     ) {
-        val showDeployments = arrayListOf<DeploymentBottomSheet>()
-        val showGuardianDeployments = arrayListOf<DeploymentBottomSheet>()
-
-        deployments.forEach {
-            showDeployments.add(DeploymentBottomSheet(it.id, Device.EDGE.value))
-        }
-
-        guardianDeployments.forEach {
-            showGuardianDeployments.add(DeploymentBottomSheet(it.id, Device.GUARDIAN.value))
-        }
-
-        deploymentListener?.setShowDeployments(showDeployments + showGuardianDeployments)
+        val deploymentDetails = arrayListOf<DeploymentDetailView>()
+        deploymentDetails.addAll(edgeDeployments.map {
+            it.toEdgeDeploymentView()
+        })
+        deploymentDetails.addAll(guardianDeployments.map {
+            it.toGuardianDeploymentView()
+        })
+        deploymentListener?.setShowDeployments(deploymentDetails)
     }
 
     private fun fetchData() {
@@ -343,7 +336,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         this.lastSyncingInfo = status
         val state = listener?.getBottomSheetState() ?: 0
-        if (state != BottomSheetBehavior.STATE_EXPANDED){
+        if (state != BottomSheetBehavior.STATE_EXPANDED) {
             setSnackbar(status)
         }
     }
@@ -444,15 +437,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    fun moveToDeploymentMarker(location: DeploymentLocation) {
+    fun moveToDeploymentMarker(lat: Double, lng: Double) {
         mapboxMap?.let {
             it.moveCamera(
-                CameraUpdateFactory.newLatLngZoom(
-                    LatLng(
-                        location.latitude,
-                        location.longitude
-                    ), it.cameraPosition.zoom
-                )
+                CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), it.cameraPosition.zoom)
             )
         }
     }
@@ -537,14 +525,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         private const val SOURCE_DEPLOYMENT = "source.deployment"
         private const val MARKER_DEPLOYMENT_ID = "marker.deployment"
 
-        private const val PROPERTY_SELECTED = "selected"
         private const val PROPERTY_MARKER_DEVICE = "device"
         private const val PROPERTY_MARKER_LOCATION_ID = "location"
         private const val PROPERTY_MARKER_TITLE = "title"
         private const val PROPERTY_MARKER_DEPLOYMENT_ID = "deployment"
         private const val PROPERTY_MARKER_CAPTION = "caption"
         private const val PROPERTY_MARKER_IMAGE = "marker.image"
-        private const val MARKER_GUARDIAN_PIN = "guardian_pin"
 
         fun newInstance(): MapFragment {
             return MapFragment()

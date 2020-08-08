@@ -89,7 +89,6 @@ class DeploymentDetailActivity : AppCompatActivity() {
         builder.setPositiveButton(getString(R.string.yes)) { _, _ ->
             onDeleteLocation()
         }
-
         builder.setNeutralButton(getString(R.string.cancel)) { _, _ -> }
 
         val dialog: AlertDialog = builder.create()
