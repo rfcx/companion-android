@@ -235,8 +235,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
             return true
         }
-        (activity as MainActivityListener).hideBottomSheet()
-
         return false
     }
 

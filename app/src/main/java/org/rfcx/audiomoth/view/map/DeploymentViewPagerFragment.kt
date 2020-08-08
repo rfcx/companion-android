@@ -29,6 +29,7 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
     private var deploymentListener: DeploymentListener? = null
     private lateinit var viewPagerAdapter: DeploymentViewPagerAdapter
     private var selectedId: Int? = null // selected deployment id
+    private var currentPosition: Int = 0
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -56,9 +57,6 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
 
     // Region {DeploymentViewPagerAdapter.DeploymentDetailClickListener}
     override fun onClickedEdgeDeploymentDetail(edgeDeploymentView: DeploymentDetailView.EdgeDeploymentView) {
-        Log.d(
-            "deploymentIndex", "currentItem ${deploymentViewPager.currentItem}"
-        )
         context?.let {
             val isReadyToUpload = edgeDeploymentView.state == DeploymentState.Edge.ReadyToUpload.key
             if (isReadyToUpload) {
@@ -102,8 +100,7 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
                     }
                 }
             })
-            Log.d("deploymentIndex", "selectedId $selectedId")
-            Log.d("deploymentIndex", deploymentIndex.toString())
+            this.currentPosition = deploymentIndex
             deploymentViewPager.setCurrentItem(deploymentIndex, false)
         }
     }
@@ -112,7 +109,7 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
         val showDeployments = deploymentListener?.getShowDeployments()
         showDeployments?.let {
             viewPagerAdapter.submitList(showDeployments)
-//            setSelectedPosition(it)
+            deploymentViewPager.setCurrentItem(currentPosition, false)
         }
     }
 
@@ -142,6 +139,7 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
             if (activity is MainActivity && position < viewPagerAdapter.itemCount) {
                 val detailView = viewPagerAdapter.getItemByPosition(position)
                 detailView?.let {
+                    this@DeploymentViewPagerFragment.currentPosition = position
                     (activity as MainActivity).moveMapIntoDeploymentMarker(
                         it.latitude,
                         it.longitude

@@ -5,13 +5,15 @@ import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
 import java.util.*
 
 sealed class DeploymentDetailView {
-    abstract val viewType: Int
+    abstract val id: Int // edge deployment local id
     abstract val locationName: String
     abstract val latitude: Double
     abstract val longitude: Double
+    abstract val viewType: Int
+
 
     data class EdgeDeploymentView(
-        val id: Int, // edge deployment local id
+        override val id: Int, // edge deployment local id
         var serverId: String?,
         val deploymentId: String,
         val batteryDepletedAt: Date,
@@ -29,7 +31,7 @@ sealed class DeploymentDetailView {
     ) : DeploymentDetailView()
 
     data class GuardianDeploymentView(
-        val id: Int,
+        override val id: Int,
         var serverId: String? = null,
         val deployedAt: Date,
         val state: Int,
