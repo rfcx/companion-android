@@ -3,7 +3,6 @@ package org.rfcx.audiomoth.localdb
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
-import org.rfcx.audiomoth.entity.EdgeDeployment
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.SyncState
 import org.rfcx.audiomoth.entity.response.LocationResponse
@@ -22,14 +21,17 @@ class LocateDb(private val realm: Realm) {
     }
 
     fun getLocateById(id: Int): Locate? {
-        return realm.where(Locate::class.java).equalTo(Locate.FIELD_ID, id)
-            .findFirst()
+        return realm.where(Locate::class.java).equalTo(Locate.FIELD_ID, id).findFirst()
+    }
+
+    fun getLocateByEdgeDeploymentId(deploymentId: Int): Locate? {
+        return realm.where(Locate::class.java).equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_ID, deploymentId).findFirst()
     }
 
     fun getLocateByServerId(serverId: String): Locate? {
         val locate =
             realm.where(Locate::class.java)
-                .equalTo(Locate.FIELD_LAST_DEPLOYMENT_SERVER_ID, serverId).findFirst()
+                .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_SERVER_ID, serverId).findFirst()
         if (locate != null) {
             return realm.copyFromRealm(locate)
         }

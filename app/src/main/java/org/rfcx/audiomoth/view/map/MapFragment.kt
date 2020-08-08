@@ -74,7 +74,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var lastSyncingInfo: SyncInfo? = null
 
     private lateinit var guardianDeployLiveData: LiveData<List<GuardianDeployment>>
-    private lateinit var deployLiveData: LiveData<List<EdgeDeployment>>
+    private lateinit var edgeDeployLiveData: LiveData<List<EdgeDeployment>>
     private lateinit var locateLiveData: LiveData<List<Locate>>
     private lateinit var deploymentWorkInfoLiveData: LiveData<List<WorkInfo>>
 
@@ -234,6 +234,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 }
             }
             return true
+        } else {
+            (activity as MainActivityListener).hideBottomSheet()
         }
         return false
     }
@@ -263,11 +265,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         })
 
         val showEdgeDeployments = this.edgeDeployments.filter {
-            if (it.isSent()) showDeployIds.contains(it.serverId) else showDeployIds.contains(it.id.toString())
+            showDeployIds.contains(it.serverId) || showDeployIds.contains(it.id.toString())
         }
 
         val showGuardianDeployments = this.guardianDeployments.filter {
-            if (it.isSent()) showDeployIds.contains(it.serverId) else showDeployIds.contains(it.id.toString())
+            showDeployIds.contains(it.serverId) || showDeployIds.contains(it.id.toString())
         }
 
         val deploymentMarkers = showEdgeDeployments.map { it.toMark() }
@@ -298,10 +300,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
         guardianDeployLiveData.observeForever(guardianDeploymentObserve)
 
-        deployLiveData = Transformations.map(edgeDeploymentDb.getAllResultsAsync().asLiveData()) {
-            it
-        }
-        deployLiveData.observeForever(edgeDeploymentObserve)
+        edgeDeployLiveData =
+            Transformations.map(edgeDeploymentDb.getAllResultsAsync().asLiveData()) {
+                it
+            }
+        edgeDeployLiveData.observeForever(edgeDeploymentObserve)
 
         locateLiveData = Transformations.map(locateDb.getAllResultsAsync().asLiveData()) {
             it
@@ -472,7 +475,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         super.onDestroy()
         deploymentWorkInfoLiveData.removeObserver(workInfoObserve)
         guardianDeployLiveData.removeObserver(guardianDeploymentObserve)
-        deployLiveData.removeObserver(edgeDeploymentObserve)
+        edgeDeployLiveData.removeObserver(edgeDeploymentObserve)
         locateLiveData.removeObserver(locateObserve)
         mapView.onDestroy()
     }

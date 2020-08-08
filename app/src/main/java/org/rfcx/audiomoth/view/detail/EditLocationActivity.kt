@@ -77,20 +77,24 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
         deploymentId?.let {
             val edgeDeployment = edgeDeploymentDb.getDeploymentById(it)
             if (edgeDeployment != null) {
-                edgeDeploymentDb.insertOrUpdate(edgeDeployment, deploymentLocation)
                 edgeDeployment.updatedAt = Date()
                 edgeDeployment.syncState = SyncState.Unsent.key
+                edgeDeployment.location = deploymentLocation
                 edgeDeploymentDb.updateDeployment(edgeDeployment)
 
-                edgeDeployment.serverId?.let { serverId ->
-                    val location = locateDb.getLocateByServerId(serverId)
-                    if (location != null) {
-                        location.latitude = latitude
-                        location.longitude = longitude
-                        location.name = name
-                        location.syncState = SyncState.Unsent.key
-                        locateDb.updateLocate(location)
-                    }
+                val edgeServerId = edgeDeployment.serverId
+                val location = if (edgeServerId != null) {
+                    locateDb.getLocateByServerId(edgeServerId)
+                } else {
+                    locateDb.getLocateByEdgeDeploymentId(edgeDeployment.id)
+                }
+
+                if (location != null) {
+                    location.latitude = deploymentLocation.latitude
+                    location.longitude = deploymentLocation.longitude
+                    location.name = deploymentLocation.name
+                    location.syncState = SyncState.Unsent.key
+                    locateDb.updateLocate(location)
                 }
 
                 DeploymentSyncWorker.enqueue(this)
