@@ -1,4 +1,8 @@
 /**
+ * Most of the logic code were from Spectrogram Android application
+ */
+
+/**
  * Spectrogram Android application
  * Copyright (c) 2013 Guillaume Adam  http://www.galmiza.net/
  * This software is provided 'as-is', without any express or implied warranty.
