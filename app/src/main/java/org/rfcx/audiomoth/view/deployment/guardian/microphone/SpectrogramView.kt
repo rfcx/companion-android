@@ -24,7 +24,6 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import org.rfcx.audiomoth.util.spectrogram.AudioSpectrogramUtils
 import kotlin.math.log10
@@ -98,7 +97,6 @@ class FrequencyView : View {
      * Frequency scale can be linear or logarithmic
      */
     public override fun onDraw(canvas: Canvas) {
-        Log.d("audi", "On drawn ${++o}")
         var colors: IntArray? = null
 
         when (colorScale) {

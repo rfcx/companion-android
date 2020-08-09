@@ -3,7 +3,6 @@ package org.rfcx.audiomoth.view.deployment.guardian.microphone
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,7 +19,6 @@ import org.rfcx.audiomoth.util.spectrogram.toShortArray
 import org.rfcx.audiomoth.util.spectrogram.toSmallChunk
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
@@ -204,7 +202,6 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     }
 
     override fun onProcessed(mag: FloatArray) {
-        Log.d("audi", "add ${++x}")
         spectrogramStack.add(mag)
     }
 
