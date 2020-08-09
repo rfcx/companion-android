@@ -24,6 +24,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import org.rfcx.audiomoth.util.spectrogram.AudioSpectrogramUtils
 import kotlin.math.log10
@@ -58,6 +59,8 @@ class FrequencyView : View {
     private var _height = 0
     private var _magnitudes: FloatArray? = null
 
+    var o = 0
+
     var colorScale = RAINBOW
     var freqScale = LINEAR
 
@@ -80,15 +83,12 @@ class FrequencyView : View {
         canvas = Canvas(bitmap!!)
     }
 
-    fun setFFTResolution(res: Int) {
-        _magnitudes = FloatArray(res)
-    }
-
     fun setSamplingRate(sampling: Int) {
         samplingRate = sampling
     }
 
     fun setMagnitudes(m: FloatArray) {
+        _magnitudes = FloatArray(AudioSpectrogramUtils.fftResolution)
         System.arraycopy(m, 0, _magnitudes!!, 0, m.size)
     }
 
@@ -98,6 +98,7 @@ class FrequencyView : View {
      * Frequency scale can be linear or logarithmic
      */
     public override fun onDraw(canvas: Canvas) {
+        Log.d("audi", "On drawn ${++o}")
         var colors: IntArray? = null
 
         when (colorScale) {
@@ -243,4 +244,5 @@ class FrequencyView : View {
         val b = ave(Color.blue(c0), Color.blue(c1), p)
         return Color.argb(a, r, g, b)
     }
+
 }

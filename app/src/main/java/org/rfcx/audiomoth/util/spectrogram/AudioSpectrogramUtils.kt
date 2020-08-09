@@ -1,5 +1,6 @@
 package org.rfcx.audiomoth.util.spectrogram
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import org.jtransforms.fft.FloatFFT_1D
 import java.nio.ByteBuffer
@@ -11,16 +12,14 @@ import kotlin.math.sqrt
 
 object AudioSpectrogramUtils {
 
-    var fftResolution = 1024
+    var fftResolution = 2048
 
     private var bufferStack: ArrayList<ShortArray>? = null
     private var fftBuffer: ShortArray? = null
     private var isSetup = false
 
-    val spectrogramLive = MutableLiveData<FloatArray>()
-
-    init {
-        spectrogramLive.value = FloatArray(1)
+    fun setFFTResolution(res: Int) {
+        fftResolution = res
     }
 
     fun setupSpectrogram(bufferLength: Int) {
@@ -36,7 +35,7 @@ object AudioSpectrogramUtils {
         }
     }
 
-    fun getTrunks(recordBuffer: ShortArray) {
+    fun getTrunks(recordBuffer: ShortArray, spectrogramListener: SpectrogramListener) {
         val n = fftResolution
         if (bufferStack != null) {
             // Trunks are consecutive n/2 length samples
@@ -55,18 +54,12 @@ object AudioSpectrogramUtils {
             for (i in 0 until bufferStack!!.size - 1) {
                 System.arraycopy(bufferStack!![i], 0, fftBuffer!!, 0, n / 2)
                 System.arraycopy(bufferStack!![i + 1], 0, fftBuffer!!, n / 2, n / 2)
-                process()
+                process(spectrogramListener)
             }
-
-            // Last item has not yet fully be used (only its first half)
-            // Move it to first position in arraylist so that its last half is used
-            val first: ShortArray = bufferStack!![0]
-            val last: ShortArray = bufferStack!![bufferStack!!.size - 1]
-            System.arraycopy(last, 0, first, 0, n / 2)
         }
     }
 
-    private fun process() {
+    private fun process(spectrogramListener: SpectrogramListener) {
 
         val floatFFT = FloatArray(fftBuffer!!.size)
         fftBuffer!!.forEachIndexed { index, sh ->
@@ -81,8 +74,13 @@ object AudioSpectrogramUtils {
             val imagine = floatFFT[2 * i + 1]
             mag[i] = sqrt(real * real + imagine * imagine) / 83886070
         }
-        spectrogramLive.value = mag
+
+        spectrogramListener.onProcessed(mag)
     }
+}
+
+interface SpectrogramListener {
+    fun onProcessed(mag: FloatArray)
 }
 
 fun ShortArray.toSmallChunk(number: Int): List<ShortArray> {
