@@ -79,7 +79,7 @@ class GuardianMicrophoneFragment : Fragment() {
     }
 
     private fun setupSpectrogram() {
-        spectrogramView.setSamplingRate(deploymentProtocol?.getSampleRate() ?: 24000)
+        spectrogramView.setSamplingRate(deploymentProtocol?.getSampleRate() ?: DEF_SAMPLERATE)
         spectrogramView.setBackgroundColor(Color.WHITE)
     }
 
@@ -175,6 +175,8 @@ class GuardianMicrophoneFragment : Fragment() {
 
         private const val DELAY = 0L
         private const val MILLI_PERIOD = 10L
+        
+        private const val DEF_SAMPLERATE = 24000
 
         enum class MicTestingState { READY, LISTENING, FINISH }
 
