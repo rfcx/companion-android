@@ -102,6 +102,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         speedSpecDropdown.setOnItemClickListener { _, _, position, _ ->
             AudioSpectrogramUtils.setSpeed(speed[position])
             AudioSpectrogramUtils.resetSetupState()
+            spectrogramStack.clear()
             spectrogramView.invalidate()
         }
         speedSpecDropdown.inputType = 0
@@ -170,7 +171,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
 
         timer?.schedule( object : TimerTask(){
             override fun run() {
-                if (!isTimerPause && !isMicTesting) {
+                if (!isTimerPause && isMicTesting) {
                     SocketManager.getLiveAudioBuffer(microphoneTestUtils)
                     isTimerPause = true
                 }
