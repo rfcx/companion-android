@@ -5,33 +5,45 @@ import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
 import org.rfcx.audiomoth.entity.*
-import org.rfcx.audiomoth.entity.response.DeploymentResponse
-import org.rfcx.audiomoth.entity.response.toDeployment
+import org.rfcx.audiomoth.entity.response.EdgeDeploymentResponse
+import org.rfcx.audiomoth.entity.response.toEdgeDeployment
 
 /**
  * For Manage the saving and sending of deployment from the local database
  */
-class DeploymentDb(private val realm: Realm) {
+class EdgeDeploymentDb(private val realm: Realm) {
 
     fun unsentCount(): Long {
-        return realm.where(Deployment::class.java)
-            .equalTo(Deployment.FIELD_STATE, DeploymentState.Edge.ReadyToUpload.key)
+        return realm.where(EdgeDeployment::class.java)
+            .equalTo(EdgeDeployment.FIELD_STATE, DeploymentState.Edge.ReadyToUpload.key)
             .and()
-            .notEqualTo(Deployment.FIELD_SYNC_STATE, SyncState.Sent.key)
+            .notEqualTo(EdgeDeployment.FIELD_SYNC_STATE, SyncState.Sent.key)
             .count()
     }
 
-    fun getAllResultsAsync(sort: Sort = Sort.DESCENDING): RealmResults<Deployment> {
-        return realm.where(Deployment::class.java)
-            .sort(Deployment.FIELD_ID, sort)
+    fun getDeploymentsSent(): ArrayList<String> {
+        val deployments = realm.where(EdgeDeployment::class.java)
+            .equalTo(EdgeDeployment.FIELD_STATE, DeploymentState.Edge.ReadyToUpload.key)
+            .and()
+            .equalTo(EdgeDeployment.FIELD_SYNC_STATE, SyncState.Sent.key).findAllAsync()
+        val arrayOfId = arrayListOf<String>()
+        deployments.forEach {
+            it.serverId?.let { it1 -> arrayOfId.add(it1) }
+        }
+        return arrayOfId
+    }
+
+    fun getAllResultsAsync(sort: Sort = Sort.DESCENDING): RealmResults<EdgeDeployment> {
+        return realm.where(EdgeDeployment::class.java)
+            .sort(EdgeDeployment.FIELD_ID, sort)
             .findAllAsync()
     }
 
-    fun insertOrUpdate(deployment: Deployment, location: DeploymentLocation): Int {
+    fun insertOrUpdate(deployment: EdgeDeployment, location: DeploymentLocation): Int {
         var id = deployment.id
         realm.executeTransaction {
             if (deployment.id == 0) {
-                id = (it.where(Deployment::class.java).max(Deployment.FIELD_ID)
+                id = (it.where(EdgeDeployment::class.java).max(EdgeDeployment.FIELD_ID)
                     ?.toInt() ?: 0) + 1
                 deployment.id = id
             }
@@ -41,14 +53,20 @@ class DeploymentDb(private val realm: Realm) {
         return id
     }
 
-    fun insertOrUpdate(deploymentResponse: DeploymentResponse) {
+    fun insertOrUpdate(deploymentResponse: EdgeDeploymentResponse) {
         realm.executeTransaction {
             val deployment =
-                it.where(Deployment::class.java)
-                    .equalTo(Deployment.FIELD_SERVER_ID, deploymentResponse.serverId)
+                it.where(EdgeDeployment::class.java)
+                    .equalTo(EdgeDeployment.FIELD_SERVER_ID, deploymentResponse.serverId)
                     .findFirst()
 
-            if (deployment != null) {
+            if (deployment == null) {
+                val deploymentObj = deploymentResponse.toEdgeDeployment()
+                val id = (it.where(EdgeDeployment::class.java).max(EdgeDeployment.FIELD_ID)
+                    ?.toInt() ?: 0) + 1
+                deploymentObj.id = id
+                it.insert(deploymentObj)
+            } else if (deployment.syncState == SyncState.Sent.key) {
                 deployment.deploymentId = deploymentResponse.deploymentId
                 deployment.serverId = deploymentResponse.serverId
                 deployment.batteryDepletedAt =
@@ -56,7 +74,7 @@ class DeploymentDb(private val realm: Realm) {
                 deployment.deployedAt = deploymentResponse.deployedAt ?: deployment.deployedAt
                 deployment.batteryLevel = deploymentResponse.batteryLevel ?: deployment.batteryLevel
 
-                val newConfig = deploymentResponse.configuration?.toConfiguration()
+                val newConfig = deploymentResponse.configuration?.toEdgeConfiguration()
                 if (newConfig != null) {
                     deployment.configuration = it.copyToRealm(newConfig)
                 }
@@ -67,12 +85,6 @@ class DeploymentDb(private val realm: Realm) {
                 }
 
                 deployment.createdAt = deploymentResponse.createdAt ?: deployment.createdAt
-            } else {
-                val deploymentObj = deploymentResponse.toDeployment()
-                val id = (it.where(Deployment::class.java).max(Deployment.FIELD_ID)
-                    ?.toInt() ?: 0) + 1
-                deploymentObj.id = id
-                it.insert(deploymentObj)
             }
         }
     }
@@ -89,7 +101,8 @@ class DeploymentDb(private val realm: Realm) {
     private fun mark(id: Int, serverId: String? = null, syncState: Int) {
         realm.executeTransaction {
             val deployment =
-                it.where(Deployment::class.java).equalTo(Deployment.FIELD_ID, id).findFirst()
+                it.where(EdgeDeployment::class.java).equalTo(EdgeDeployment.FIELD_ID, id)
+                    .findFirst()
             if (deployment != null) {
                 deployment.serverId = serverId
                 deployment.syncState = syncState
@@ -97,28 +110,28 @@ class DeploymentDb(private val realm: Realm) {
         }
     }
 
-    fun updateDeployment(deployment: Deployment) {
+    fun updateDeployment(deployment: EdgeDeployment) {
         realm.executeTransaction {
             it.insertOrUpdate(deployment)
         }
     }
 
-    fun getDeploymentById(id: Int): Deployment? {
+    fun getDeploymentById(id: Int): EdgeDeployment? {
         val deployment =
-            realm.where(Deployment::class.java).equalTo(Deployment.FIELD_ID, id).findFirst()
+            realm.where(EdgeDeployment::class.java).equalTo(EdgeDeployment.FIELD_ID, id).findFirst()
         if (deployment != null) {
             return realm.copyFromRealm(deployment)
         }
         return null
     }
 
-    fun lockUnsent(): List<Deployment> {
-        var unsentCopied: List<Deployment> = listOf()
+    fun lockUnsent(): List<EdgeDeployment> {
+        var unsentCopied: List<EdgeDeployment> = listOf()
         realm.executeTransaction {
-            val unsent = it.where(Deployment::class.java)
-                .equalTo(Deployment.FIELD_STATE, DeploymentState.Edge.ReadyToUpload.key)
+            val unsent = it.where(EdgeDeployment::class.java)
+                .equalTo(EdgeDeployment.FIELD_STATE, DeploymentState.Edge.ReadyToUpload.key)
                 .and()
-                .equalTo(Deployment.FIELD_SYNC_STATE, SyncState.Unsent.key).findAll()
+                .equalTo(EdgeDeployment.FIELD_SYNC_STATE, SyncState.Unsent.key).findAll()
                 .createSnapshot()
             unsentCopied = unsent.toList()
             unsent.forEach { d ->
@@ -130,8 +143,8 @@ class DeploymentDb(private val realm: Realm) {
 
     fun unlockSending() {
         realm.executeTransaction {
-            val snapshot = it.where(Deployment::class.java)
-                .equalTo(Deployment.FIELD_SYNC_STATE, SyncState.Sending.key).findAll()
+            val snapshot = it.where(EdgeDeployment::class.java)
+                .equalTo(EdgeDeployment.FIELD_SYNC_STATE, SyncState.Sending.key).findAll()
                 .createSnapshot()
             snapshot.forEach {
                 it.syncState = SyncState.Unsent.key

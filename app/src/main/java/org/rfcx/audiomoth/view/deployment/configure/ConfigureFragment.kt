@@ -23,11 +23,11 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Profile
 import org.rfcx.audiomoth.util.EdgeConfigure
 import org.rfcx.audiomoth.util.convertToStopStartPeriods
-import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
+import org.rfcx.audiomoth.view.deployment.EdgeDeploymentProtocol
 
 class ConfigureFragment : Fragment(), OnItemClickListener {
 
-    private var deploymentProtocol: DeploymentProtocol? = null
+    private var edgeDeploymentProtocol: EdgeDeploymentProtocol? = null
     private val timeAdapter by lazy { TimeAdapter(this, context) }
     private val gainList by lazy { resources.getStringArray(R.array.edge_gains) }
     private val sampleRateList = EdgeConfigure.configureSampleRate
@@ -44,7 +44,7 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        deploymentProtocol = context as DeploymentProtocol
+        edgeDeploymentProtocol = context as EdgeDeploymentProtocol
     }
 
     override fun onCreateView(
@@ -60,8 +60,8 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
 
         view.viewTreeObserver.addOnGlobalLayoutListener { setOnFocusEditText() }
 
-        profile = deploymentProtocol?.getProfile()
-        deploymentProtocol?.hideCompleteButton()
+        profile = edgeDeploymentProtocol?.getProfile()
+        edgeDeploymentProtocol?.hideCompleteButton()
 
         if (profile?.name != null) {
             profileEditText.setText(profile?.name)
@@ -344,7 +344,7 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
             profileTemp
         }
 
-        deploymentProtocol?.setDeploymentConfigure(newProfile)
+        edgeDeploymentProtocol?.setDeploymentConfigure(newProfile)
     }
 
     private fun createNotificationChannel() {

@@ -16,6 +16,7 @@ open class Locate(
     var latitude: Double = 0.0,
     var longitude: Double = 0.0,
     var createdAt: Date = Date(),
+    var deletedAt: Date? = null,
     var lastDeploymentId: Int = 0,
     var lastDeploymentServerId: String? = null,
     var lastGuardianDeploymentId: Int = 0,
@@ -25,25 +26,43 @@ open class Locate(
 ) : RealmModel {
 
     fun isCompleted(): Boolean {
-        return lastDeploymentId != 0 || lastDeploymentServerId != null ||
-                lastGuardianDeploymentId != 0 || lastGuardianDeploymentServerId != null
+        return (lastDeploymentId != 0 || lastDeploymentServerId != null || lastGuardianDeploymentId != 0 || lastGuardianDeploymentServerId != null) && deletedAt == null
+    }
+
+    fun getLastEdgeDeploymentId(): String {
+        // is sent?
+        return if (syncState == SyncState.Sent.key) {
+            // is last deployment from edge?
+            if (lastDeploymentServerId != null) {
+                lastDeploymentServerId
+            } else {
+                lastGuardianDeploymentServerId
+            }.toString()
+        } else {
+            if (lastDeploymentId != 0) {
+                lastDeploymentId
+            } else {
+                lastGuardianDeploymentId
+            }.toString()
+        }
     }
 
     fun getLastDeploymentId(): String {
-        return when {
-            lastDeploymentServerId != null -> {
-                lastDeploymentServerId
+        // is sent?
+        return if (syncState == SyncState.Sent.key) {
+            // is last deployment from edge?
+            if (lastDeploymentServerId != null) {
+                lastDeploymentServerId!!
+            } else {
+                lastGuardianDeploymentServerId!!
             }
-            lastDeploymentId != 0 -> {
+        } else {
+            if (lastDeploymentId != 0) {
                 lastDeploymentId
-            }
-            lastGuardianDeploymentServerId != null -> {
-                lastGuardianDeploymentServerId
-            }
-            else -> {
+            } else {
                 lastGuardianDeploymentId
-            }
-        }.toString()
+            }.toString()
+        }
     }
 
     fun getLatLng(): LatLng = LatLng(latitude, longitude)
@@ -57,7 +76,10 @@ open class Locate(
     }
 
     companion object {
+        const val TABLE_NAME = "Locate"
         const val FIELD_ID = "id"
         const val FIELD_SERVER_ID = "serverId"
+        const val FIELD_DELETED_AT = "deletedAt"
+        const val FIELD_LAST_DEPLOYMENT_SERVER_ID = "lastDeploymentServerId"
     }
 }

@@ -8,14 +8,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import io.realm.Realm
-import java.sql.Timestamp
-import java.util.*
 import kotlinx.android.synthetic.main.activity_deployment.*
 import org.rfcx.audiomoth.BuildConfig
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.*
-import org.rfcx.audiomoth.localdb.DeploymentDb
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
+import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.ProfileDb
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
@@ -29,15 +27,19 @@ import org.rfcx.audiomoth.view.deployment.sync.SyncFragment
 import org.rfcx.audiomoth.view.deployment.sync.SyncFragment.Companion.BEFORE_SYNC
 import org.rfcx.audiomoth.view.deployment.verify.PerformBatteryFragment
 import org.rfcx.audiomoth.view.deployment.verify.PerformBatteryFragment.Companion.TEST_BATTERY
+import org.rfcx.audiomoth.view.detail.MapPickerProtocol
 import org.rfcx.audiomoth.view.dialog.CompleteFragment
 import org.rfcx.audiomoth.view.dialog.CompleteListener
 import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
+import java.sql.Timestamp
+import java.util.*
 
-class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteListener {
+class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, CompleteListener,
+    MapPickerProtocol {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val deploymentDb by lazy {
-        DeploymentDb(
+        EdgeDeploymentDb(
             realm
         )
     }
@@ -48,9 +50,9 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
     private var currentStep = 0
     private var _profiles: List<Profile> = listOf()
     private var _profile: Profile? = null
-    private var _deployment: Deployment? = null
+    private var _deployment: EdgeDeployment? = null
     private var _deployLocation: DeploymentLocation? = null
-    private var _configuration: Configuration? = null
+    private var _edgeConfiguration: EdgeConfiguration? = null
 
     private val audioMothConnector: AudioMothConnector = AudioMothChimeConnector()
     private val configuration = AudioMothConfiguration()
@@ -127,16 +129,16 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         }
     }
 
-    override fun getDeployment(): Deployment? = this._deployment
+    override fun getDeployment(): EdgeDeployment? = this._deployment
 
-    override fun setDeployment(deployment: Deployment) {
+    override fun setDeployment(deployment: EdgeDeployment) {
         this._deployment = deployment
     }
 
     override fun setDeploymentConfigure(profile: Profile) {
         setProfile(profile)
-        this._configuration = profile.asConfiguration()
-        this._deployment?.configuration = _configuration
+        this._edgeConfiguration = profile.asConfiguration()
+        this._deployment?.configuration = _edgeConfiguration
 
         // update deployment
         _deployment?.let { deploymentDb.updateDeployment(it) }
@@ -150,12 +152,13 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         nextStep()
     }
 
-    override fun geConfiguration(): Configuration? = _configuration
+    override fun geConfiguration(): EdgeConfiguration? =
+        _edgeConfiguration
 
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
     override fun setDeployLocation(locate: Locate) {
-        val deployment = _deployment ?: Deployment()
+        val deployment = _deployment ?: EdgeDeployment()
         deployment.state = DeploymentState.Edge.Locate.key // state
         deployment.deploymentId = randomDeploymentId()
 
@@ -194,13 +197,14 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         showLoading()
         _deployment?.let {
             it.deployedAt = Date()
+            it.updatedAt = Date()
             it.state = DeploymentState.Edge.ReadyToUpload.key
             setDeployment(it)
 
             deploymentImageDb.insertImage(it, images)
             deploymentDb.updateDeployment(it)
 
-            DeploymentSyncWorker.enqueue(this@DeploymentActivity)
+            DeploymentSyncWorker.enqueue(this@EdgeDeploymentActivity)
             hideLoading()
             showComplete()
         }
@@ -217,7 +221,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         startFragment(SyncFragment.newInstance(status))
     }
 
-    override fun startLocation(latitude: Double, longitude: Double, name: String) {
+    override fun startLocationPage(latitude: Double, longitude: Double, name: String) {
         startFragment(LocationFragment.newInstance(latitude, longitude, name))
     }
 
@@ -230,7 +234,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
                 configuration,
                 deploymentId?.let { DeploymentIdentifier(it) }
             )
-            this@DeploymentActivity.runOnUiThread {
+            this@EdgeDeploymentActivity.runOnUiThread {
                 startSyncing(SyncFragment.AFTER_SYNC)
             }
         }.start()
@@ -277,9 +281,13 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
             }
 
             if (deployment.configuration != null) {
-                _configuration = deployment.configuration
+                _edgeConfiguration = deployment.configuration
             }
-            currentStep = deployment.state - 1
+            currentStep = if (deployment.state == 1) {
+                deployment.state
+            } else {
+                deployment.state - 1
+            }
             stepView.go(currentStep, true)
             handleFragment(currentStep)
         }
@@ -375,7 +383,7 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
                 if (supportFragmentManager.fragments.firstOrNull() is LocationFragment) {
                     finish()
                 } else {
-                    startLocation(this.latitude, this.longitude, this.nameLocation)
+                    startLocationPage(this.latitude, this.longitude, this.nameLocation)
                 }
             } else if (!isFragmentPopped) {
                 super.onBackPressed()
@@ -409,12 +417,12 @@ class DeploymentActivity : AppCompatActivity(), DeploymentProtocol, CompleteList
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
 
         fun startActivity(context: Context) {
-            val intent = Intent(context, DeploymentActivity::class.java)
+            val intent = Intent(context, EdgeDeploymentActivity::class.java)
             context.startActivity(intent)
         }
 
         fun startActivity(context: Context, deploymentId: Int) {
-            val intent = Intent(context, DeploymentActivity::class.java)
+            val intent = Intent(context, EdgeDeploymentActivity::class.java)
             intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
             context.startActivity(intent)
         }

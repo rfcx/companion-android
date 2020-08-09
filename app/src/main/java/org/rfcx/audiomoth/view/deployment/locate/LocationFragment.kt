@@ -28,7 +28,6 @@ import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
-import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
@@ -51,7 +50,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private var mapboxMap: MapboxMap? = null
     private lateinit var mapView: MapView
-    private var isSelectedNewLocation = false
+    private var isFirstTime = true
     private var lastLocation: Location? = null
     private var locateItems = ArrayList<Locate>()
     private var locateNames = ArrayList<String>()
@@ -81,9 +80,14 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     mapboxMap?.let {
                         this@LocationFragment.currentUserLocation = location
                         it.locationComponent.forceLocationUpdate(location)
-                        if (isSelectedNewLocation && lastLocation == null) {
+                        if (isFirstTime && lastLocation == null &&
+                            latitude == 0.0 && longitude == 0.0
+                        ) {
                             // force update input view
-                            onPressedNewLocation()
+                            isFirstTime = false
+                            this@LocationFragment.lastLocation =
+                                this@LocationFragment.currentUserLocation
+                            updateLocationAdapter()
                         }
                     }
                 }
@@ -146,6 +150,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             if (existingRadioButton.isChecked) {
                 handleExistLocate()
             } else if (newLocationRadioButton.isChecked) {
+                getLastLocation()
                 verifyInput()
             }
         }
@@ -163,16 +168,24 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun setHideKeyboard() {
-        val editorActionListener =
-            TextView.OnEditorActionListener { v, actionId, _ ->
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    v.clearFocus()
-                    v.hideKeyboard()
-                }
-                false
+    override fun onMapReady(mapboxMap: MapboxMap) {
+        this.mapboxMap = mapboxMap
+        mapboxMap.uiSettings.setAllGesturesEnabled(false)
+        mapboxMap.uiSettings.isAttributionEnabled = false
+        mapboxMap.uiSettings.isLogoEnabled = false
+
+        mapboxMap.setStyle(Style.OUTDOORS) {
+            lastLocation?.let { lastLocation ->
+                val latLng = LatLng(lastLocation.latitude, lastLocation.longitude)
+                moveCamera(latLng, DEFAULT_ZOOM)
+                setLatLogLabel(latLng)
             }
-        locationNameEditText.setOnEditorActionListener(editorActionListener)
+            retrieveDeployLocations()
+            setupLocationSpinner()
+            setupLocationOptions()
+            updateLocationAdapter()
+            enableLocationComponent()
+        }
     }
 
     private fun verifyInput() {
@@ -235,9 +248,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         locationNameSpinner.visibility = View.VISIBLE
     }
 
-    private fun onPressedNewLocation() {
-        isSelectedNewLocation = true
-
+    private fun getLastLocation() {
         if (latitude != 0.0 && longitude != 0.0) {
             val loc = Location(LocationManager.GPS_PROVIDER)
             loc.latitude = latitude
@@ -248,6 +259,10 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             this.latitude = lastLocation?.latitude ?: 0.0
             this.longitude = lastLocation?.longitude ?: 0.0
         }
+    }
+
+    private fun onPressedNewLocation() {
+        getLastLocation()
 
         if (lastLocation != null) {
             lastLocation?.let {
@@ -264,37 +279,57 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         locationNameSpinner.visibility = View.GONE
     }
 
-    private fun setLocationAdapter() {
-        isSelectedNewLocation = false
+    private fun updateLocationAdapter() {
+        // already have deployment location?
+        val deploymentLocation = deploymentProtocol?.getDeploymentLocation()
+        if (deploymentLocation != null && locateAdapter != null) {
+            val spinnerPosition = locateAdapter!!.getPosition(deploymentLocation.name)
+            // enable exiting radio button
+            enableExistingLocationButton()
+            locationNameSpinner.setSelection(spinnerPosition)
+        } else {
+            val nearLocations = findNearLocations(lastLocation, locateItems)
+
+            // lat & lng from selecting new location
+            if (locateItems.isNotEmpty() && nearLocations != null &&
+                latitude == 0.0 && longitude == 0.0
+            ) {
+                // enable exiting radio button
+                enableExistingLocationButton()
+                // set selected locate Item
+                val nearItem = nearLocations.minBy { it.second }
+                val position = locateItems.indexOf(nearItem?.first)
+                locationNameSpinner.setSelection(position)
+                locateItem = locateItems[position]
+
+                onPressedExisting()
+            } else {
+                enableNewLocationButton()
+                onPressedNewLocation()
+            }
+        }
+    }
+
+    private fun enableExistingLocationButton() {
+        existingRadioButton.isChecked = true
+        existingRadioButton.isEnabled = true
+        newLocationRadioButton.isChecked = false
+    }
+
+    private fun enableNewLocationButton() {
+        newLocationRadioButton.isChecked = true
+        existingRadioButton.isChecked = false
+    }
+
+    private fun setupLocationSpinner() {
         locateItems.mapTo(locateNames, { it.name })
-        locateAdapter = context?.let {
+        this.locateAdapter = context?.let {
             ArrayAdapter(
                 it,
                 R.layout.support_simple_spinner_dropdown_item,
                 locateNames
             )
         }
-        locationNameSpinner.adapter = locateAdapter
-        setLocationSpinner()
-        setRecommendLocation()
-
-        if (latitude != 0.0 && longitude != 0.0) {
-            newLocationRadioButton.isChecked = true
-            existingRadioButton.isChecked = false
-        } else {
-            newLocationRadioButton.isChecked = locateItems.isEmpty()
-            existingRadioButton.isEnabled = locateItems.isNotEmpty()
-            existingRadioButton.isChecked = locateItems.isNotEmpty()
-        }
-
-        val deploymentLocation = deploymentProtocol?.getDeploymentLocation()
-        if (deploymentLocation != null && locateAdapter != null) {
-            val spinnerPosition = locateAdapter!!.getPosition(deploymentLocation.name)
-            locationNameSpinner.setSelection(spinnerPosition)
-        }
-    }
-
-    private fun setLocationSpinner() {
         locationNameSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
@@ -312,17 +347,24 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
+        locationNameSpinner.adapter = locateAdapter
     }
 
     private fun retrieveDeployLocations() {
         locateItems.clear()
         val locations = locateDb.getLocations()
-        locateItems.addAll(locations)
-        setLocationAdapter()
+        val showLocations = locations.filter { it.isCompleted() }
+        locateItems.addAll(showLocations)
     }
 
-    private fun setRecommendLocation() {
-        lastLocation ?: return
+    /**
+     * Return [List<Locate, Distance( < 50m )>]]
+     * */
+    private fun findNearLocations(
+        lastLocation: Location?,
+        locateItems: ArrayList<Locate>
+    ): List<Pair<Locate, Float>>? {
+        lastLocation ?: return null
 
         if (locateItems.isNotEmpty()) {
             val itemsWithDistance = arrayListOf<Pair<Locate, Float>>()
@@ -331,32 +373,13 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 val loc = Location(LocationManager.GPS_PROVIDER)
                 loc.latitude = it.latitude
                 loc.longitude = it.longitude
-                val distance = loc.distanceTo(lastLocation)
+                val distance = loc.distanceTo(this.lastLocation) // return in meters
                 Pair(it, distance)
             })
-            val nearItem = itemsWithDistance.minBy { it.second }
-            val position = locateItems.indexOf(nearItem?.first)
-            locationNameSpinner.setSelection(position)
-            locateItem = locateItems[position]
+            val nearItems = itemsWithDistance.filter { it.second < 50 }
+            return if (nearItems.isEmpty()) null else nearItems
         }
-    }
-
-    override fun onMapReady(mapboxMap: MapboxMap) {
-        this.mapboxMap = mapboxMap
-        mapboxMap.uiSettings.setAllGesturesEnabled(false)
-        mapboxMap.uiSettings.isAttributionEnabled = false
-        mapboxMap.uiSettings.isLogoEnabled = false
-
-        mapboxMap.setStyle(Style.OUTDOORS) {
-            lastLocation?.let { lastLocation ->
-                val latLng = LatLng(lastLocation.latitude, lastLocation.longitude)
-                moveCamera(latLng, DEFAULT_ZOOM)
-                setLatLogLabel(latLng)
-            }
-            setupLocationOptions()
-            enableLocationComponent()
-            retrieveDeployLocations()
-        }
+        return null
     }
 
     private fun moveCamera(latLng: LatLng, zoom: Double) {
@@ -423,10 +446,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                         .build()
                 )
             }
-            // Enable to make component visible
-            locationComponent?.isLocationComponentEnabled = false
-            // Set the component's render mode
-            locationComponent?.renderMode = RenderMode.COMPASS
 
             this.currentUserLocation = locationComponent?.lastKnownLocation
             this.lastLocation = this.currentUserLocation
@@ -485,6 +504,18 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         super.onDestroy()
         locationEngine?.removeLocationUpdates(mapboxLocationChangeCallback)
         mapView.onDestroy()
+    }
+
+    private fun setHideKeyboard() {
+        val editorActionListener =
+            TextView.OnEditorActionListener { v, actionId, _ ->
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    v.clearFocus()
+                    v.hideKeyboard()
+                }
+                false
+            }
+        locationNameEditText.setOnEditorActionListener(editorActionListener)
     }
 
     private fun View.hideKeyboard() = this.let {

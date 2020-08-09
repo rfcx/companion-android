@@ -38,13 +38,13 @@ import kotlinx.android.synthetic.main.fragment_map.*
 import org.rfcx.audiomoth.DeploymentListener
 import org.rfcx.audiomoth.MainActivityListener
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.DeploymentState.Edge
 import org.rfcx.audiomoth.entity.Device
+import org.rfcx.audiomoth.entity.EdgeDeployment
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
-import org.rfcx.audiomoth.localdb.DeploymentDb
+import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.guardian.DiagnosticDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
@@ -62,19 +62,19 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     // database manager
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val deploymentDb by lazy { DeploymentDb(realm) }
+    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
     private val diagnosticDb by lazy { DiagnosticDb(realm) }
 
     // data
     private var guardianDeployments = listOf<GuardianDeployment>()
-    private var deployments = listOf<Deployment>()
+    private var edgeDeployments = listOf<EdgeDeployment>()
     private var locations = listOf<Locate>()
     private var lastSyncingInfo: SyncInfo? = null
 
     private lateinit var guardianDeployLiveData: LiveData<List<GuardianDeployment>>
-    private lateinit var deployLiveData: LiveData<List<Deployment>>
+    private lateinit var deployLiveData: LiveData<List<EdgeDeployment>>
     private lateinit var locateLiveData: LiveData<List<Locate>>
     private lateinit var deploymentWorkInfoLiveData: LiveData<List<WorkInfo>>
 
@@ -226,7 +226,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         PROPERTY_MARKER_LOCATION_ID
                     )
                 ) {
-                    features[index]?.let { setFeatureSelectState(it, true) }
                     val id =
                         selectedFeature.getStringProperty(PROPERTY_MARKER_LOCATION_ID).split(".")[1]
                     (activity as MainActivityListener).showBottomSheet(
@@ -234,30 +233,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                             id.toInt()
                         )
                     )
-                } else {
-                    features[index]?.let { setFeatureSelectState(it, false) }
                 }
             }
             return true
         }
         (activity as MainActivityListener).hideBottomSheet()
 
-        clearFeatureSelected()
         return false
-    }
-
-    private fun clearFeatureSelected() {
-        if (this.deploymentFeatures?.features() != null) {
-            val features = this.deploymentFeatures!!.features()
-            features?.forEach { setFeatureSelectState(it, false) }
-        }
-    }
-
-    private fun setFeatureSelectState(feature: Feature, selectedState: Boolean) {
-        feature.properties()?.let {
-            it.addProperty(PROPERTY_SELECTED, selectedState)
-            refreshSource()
-        }
     }
 
     private val guardianDeploymentObserve = Observer<List<GuardianDeployment>> {
@@ -265,8 +247,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         combinedData()
     }
 
-    private val deploymentObserve = Observer<List<Deployment>> {
-        this.deployments = it
+    private val edgeDeploymentObserve = Observer<List<EdgeDeployment>> {
+        this.edgeDeployments = it
         combinedData()
     }
 
@@ -284,12 +266,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             it.getLastDeploymentId()
         })
 
-        val showDeployments = this.deployments.filter {
-            showDeployIds.contains(it.serverId) || showDeployIds.contains(it.id.toString())
+        val showDeployments = this.edgeDeployments.filter {
+            if (it.isSent()) showDeployIds.contains(it.serverId) else showDeployIds.contains(it.id.toString())
         }
 
         val showGuardianDeployments = this.guardianDeployments.filter {
-            showDeployIds.contains(it.serverId) || showDeployIds.contains(it.id.toString())
+            if (it.isSent()) showDeployIds.contains(it.serverId) else showDeployIds.contains(it.id.toString())
         }
 
         val deploymentMarkers = showDeployments.map { it.toMark() }
@@ -300,7 +282,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun handleShowDeployment(
-        deployments: List<Deployment>,
+        deployments: List<EdgeDeployment>,
         guardianDeployments: List<GuardianDeployment>
     ) {
         val showDeployments = arrayListOf<DeploymentBottomSheet>()
@@ -324,10 +306,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
         guardianDeployLiveData.observeForever(guardianDeploymentObserve)
 
-        deployLiveData = Transformations.map(deploymentDb.getAllResultsAsync().asLiveData()) {
+        deployLiveData = Transformations.map(edgeDeploymentDb.getAllResultsAsync().asLiveData()) {
             it
         }
-        deployLiveData.observeForever(deploymentObserve)
+        deployLiveData.observeForever(edgeDeploymentObserve)
 
         locateLiveData = Transformations.map(locateDb.getAllResultsAsync().asLiveData()) {
             it
@@ -336,7 +318,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun retrieveDeployments(context: Context) {
-        Firestore(context).retrieveDeployments(deploymentDb, guardianDeploymentDb)
+        Firestore(context).retrieveDeployments(edgeDeploymentDb, guardianDeploymentDb)
     }
 
     private fun retrieveLocations(context: Context) {
@@ -349,7 +331,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun fetchJobSyncing() {
         context ?: return
-        deploymentWorkInfoLiveData = DeploymentSyncWorker.workInfos(context!!)
+        deploymentWorkInfoLiveData = DeploymentSyncWorker.workInfos(requireContext())
         deploymentWorkInfoLiveData.observeForever(workInfoObserve)
     }
 
@@ -360,7 +342,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         this.lastSyncingInfo = status
 
-        val deploymentUnsentCount = deploymentDb.unsentCount().toInt()
+        val deploymentUnsentCount = edgeDeploymentDb.unsentCount().toInt()
         when (status) {
             SyncInfo.Starting, SyncInfo.Uploading -> {
                 val msg = if (deploymentUnsentCount > 1) {
@@ -403,7 +385,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         deploymentFeatures = FeatureCollection.fromFeatures(pointFeatures)
         refreshSource()
 
-        val lastDeployment = deploymentMarkers.maxBy { it.createdAt }
+        val lastDeployment = deploymentMarkers.maxBy { it.updatedAt ?: it.createdAt }
         if (lastDeployment != null) {
             moveCamera(LatLng(lastDeployment.latitude, lastDeployment.longitude))
         }
@@ -497,12 +479,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         super.onDestroy()
         deploymentWorkInfoLiveData.removeObserver(workInfoObserve)
         guardianDeployLiveData.removeObserver(guardianDeploymentObserve)
-        deployLiveData.removeObserver(deploymentObserve)
+        deployLiveData.removeObserver(edgeDeploymentObserve)
         locateLiveData.removeObserver(locateObserve)
         mapView.onDestroy()
     }
 
-    private fun Deployment.toMark(): DeploymentMarker {
+    private fun EdgeDeployment.toMark(): DeploymentMarker {
         val pinImage =
             if (state == Edge.ReadyToUpload.key && isBatteryRemaining(batteryDepletedAt.time))
                 Battery.BATTERY_PIN_GREEN
@@ -518,7 +500,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             id, location?.name ?: "",
             location?.longitude ?: 0.0,
             location?.latitude ?: 0.0,
-            pinImage, description, Device.EDGE.value, createdAt
+            pinImage, description, Device.EDGE.value, createdAt, updatedAt
         )
     }
 
@@ -532,7 +514,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             pinImage,
             "-",
             Device.GUARDIAN.value,
-            createdAt
+            createdAt,
+            null
         )
     }
 

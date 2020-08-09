@@ -7,25 +7,26 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import io.realm.Realm
 import java.util.*
-import kotlin.math.roundToInt
 import kotlinx.android.synthetic.main.fragment_map_detail_bottom_sheet.*
+import org.rfcx.audiomoth.MainActivityListener
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.Deployment
 import org.rfcx.audiomoth.entity.DeploymentState
 import org.rfcx.audiomoth.entity.Device
+import org.rfcx.audiomoth.entity.EdgeDeployment
 import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
-import org.rfcx.audiomoth.localdb.DeploymentDb
+import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.audiomoth.util.Battery.getEstimatedBatteryDuration
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.util.WifiHotspotUtils
 import org.rfcx.audiomoth.util.toDateString
-import org.rfcx.audiomoth.view.deployment.DeploymentActivity
+import org.rfcx.audiomoth.view.deployment.EdgeDeploymentActivity
 import org.rfcx.audiomoth.view.detail.DeploymentDetailActivity
 import org.rfcx.audiomoth.view.diagnostic.DiagnosticActivity
 
 class MapDetailBottomSheetFragment : Fragment() {
-    private val deploymentDb = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
+    private val edgeDeploymentDb =
+        EdgeDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
     private val guardianDeploymentDb =
         GuardianDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
     private var id: Int? = null
@@ -50,7 +51,7 @@ class MapDetailBottomSheetFragment : Fragment() {
         val id: Int = this.id ?: -1
 
         if (device == Device.EDGE.value) {
-            val deployment = deploymentDb.getDeploymentById(id)
+            val deployment = edgeDeploymentDb.getDeploymentById(id)
             bindEdgeDeploymentView(deployment)
         } else {
             val guardianDeployment = guardianDeploymentDb.getDeploymentById(id)
@@ -65,7 +66,7 @@ class MapDetailBottomSheetFragment : Fragment() {
         }
     }
 
-    private fun bindEdgeDeploymentView(deployment: Deployment?) {
+    private fun bindEdgeDeploymentView(deployment: EdgeDeployment?) {
         if (deployment != null) {
             val isStateReadyToUpload = deployment.state == DeploymentState.Edge.ReadyToUpload.key
             locationNameTextView.text = deployment.location?.name
@@ -81,13 +82,15 @@ class MapDetailBottomSheetFragment : Fragment() {
                 )
 
             mapDetailBottomSheetView.setOnClickListener {
+                (activity as MainActivityListener).hideBottomSheet()
+
                 if (isStateReadyToUpload) {
                     context?.let { context ->
                         DeploymentDetailActivity.startActivity(context, deployment.id)
                     }
                 } else {
                     context?.let {
-                        DeploymentActivity.startActivity(it, deployment.id)
+                        EdgeDeploymentActivity.startActivity(it, deployment.id)
                     }
                 }
             }

@@ -14,7 +14,7 @@ import org.rfcx.audiomoth.DeploymentListener
 import org.rfcx.audiomoth.MainActivity
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Device
-import org.rfcx.audiomoth.localdb.DeploymentDb
+import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.audiomoth.util.RealmHelper
 
@@ -23,7 +23,8 @@ class DeploymentViewPagerFragment : Fragment() {
     private var deploymentListener: DeploymentListener? = null
     private var id: Int? = null
     private lateinit var viewPagerAdapter: DeploymentViewPagerAdapter
-    private val deploymentDb = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
+    private val edgeDeploymentDb =
+        EdgeDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
     private val guardianDeploymentDb =
         GuardianDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
 
@@ -59,9 +60,7 @@ class DeploymentViewPagerFragment : Fragment() {
                 viewPagerAdapter.deployments = showDeployments
                 val deploymentIndex =
                     showDeployments.indexOf(showDeployments.find { it.id == this.id })
-                deploymentViewPager.post {
-                    deploymentViewPager.setCurrentItem(deploymentIndex, false)
-                }
+                deploymentViewPager.setCurrentItem(deploymentIndex, false)
             }
         }
     }
@@ -92,7 +91,7 @@ class DeploymentViewPagerFragment : Fragment() {
                 if (activity is MainActivity && position < viewPagerAdapter.itemCount) {
                     val deployment = viewPagerAdapter.deployments[position]
                     if (deployment.device == Device.EDGE.value) {
-                        val edgeDeployment = deploymentDb.getDeploymentById(deployment.id)
+                        val edgeDeployment = edgeDeploymentDb.getDeploymentById(deployment.id)
                         edgeDeployment?.location?.let {
                             (activity as MainActivity).moveMapIntoReportMarker(
                                 it

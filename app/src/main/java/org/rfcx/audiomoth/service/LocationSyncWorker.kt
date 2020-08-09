@@ -22,8 +22,6 @@ class LocationSyncWorker(appContext: Context, params: WorkerParameters) :
         var someFailed = false
         Log.d(TAG, "doWork: found ${locatesNeedToSync.size} unsent")
         locatesNeedToSync.forEach {
-            Log.d(TAG, "doWork: sending id ${it.id}")
-
             if (it.serverId == null) {
                 val docRef = firestore.sendLocation(it.toRequestBody())
                 if (docRef != null) {

@@ -10,11 +10,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_select_profile.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Profile
-import org.rfcx.audiomoth.view.deployment.DeploymentProtocol
+import org.rfcx.audiomoth.view.deployment.EdgeDeploymentProtocol
 
 class SelectProfileFragment : Fragment(), (Profile) -> Unit {
     private val profilesAdapter by lazy { ProfilesAdapter(this) }
-    private var deploymentProtocol: DeploymentProtocol? = null
+    private var edgeDeploymentProtocol: EdgeDeploymentProtocol? = null
     private var profiles = listOf<Profile>()
 
     override fun onCreateView(
@@ -27,7 +27,7 @@ class SelectProfileFragment : Fragment(), (Profile) -> Unit {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        deploymentProtocol = context as DeploymentProtocol
+        edgeDeploymentProtocol = context as EdgeDeploymentProtocol
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -38,14 +38,14 @@ class SelectProfileFragment : Fragment(), (Profile) -> Unit {
 
     // @{ProfilesAdapter.itemClickListener}
     override fun invoke(profile: Profile) {
-        deploymentProtocol?.startSetupConfigure(profile)
+        edgeDeploymentProtocol?.startSetupConfigure(profile)
     }
 
     private fun setupView() {
-        deploymentProtocol?.hideCompleteButton()
+        edgeDeploymentProtocol?.hideCompleteButton()
 
         createNewButton.setOnClickListener {
-            deploymentProtocol?.startSetupConfigure(Profile.default()) // new profile
+            edgeDeploymentProtocol?.startSetupConfigure(Profile.default()) // new profile
         }
 
         profileRecyclerView.apply {
@@ -60,7 +60,7 @@ class SelectProfileFragment : Fragment(), (Profile) -> Unit {
 
     private fun retrieveProfiles() {
         checkState(SHOW_LOADING)
-        this.profiles = deploymentProtocol?.getProfiles() ?: arrayListOf()
+        this.profiles = edgeDeploymentProtocol?.getProfiles() ?: arrayListOf()
         if (profiles.isNotEmpty()) {
             profilesAdapter.items = profiles
             checkState(SHOW_LIST_PROFILE)

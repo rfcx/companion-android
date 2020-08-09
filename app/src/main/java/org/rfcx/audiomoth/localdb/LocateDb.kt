@@ -3,7 +3,7 @@ package org.rfcx.audiomoth.localdb
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
-import org.rfcx.audiomoth.entity.Deployment
+import org.rfcx.audiomoth.entity.EdgeDeployment
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.SyncState
 import org.rfcx.audiomoth.entity.response.LocationResponse
@@ -24,6 +24,16 @@ class LocateDb(private val realm: Realm) {
     fun getLocateById(id: Int): Locate? {
         return realm.where(Locate::class.java).equalTo(Locate.FIELD_ID, id)
             .findFirst()
+    }
+
+    fun getLocateByServerId(serverId: String): Locate? {
+        val locate =
+            realm.where(Locate::class.java)
+                .equalTo(Locate.FIELD_LAST_DEPLOYMENT_SERVER_ID, serverId).findFirst()
+        if (locate != null) {
+            return realm.copyFromRealm(locate)
+        }
+        return null
     }
 
     fun unlockSent(): List<Locate> {
@@ -69,6 +79,12 @@ class LocateDb(private val realm: Realm) {
                 locate.serverId = serverId
                 locate.syncState = syncState
             }
+        }
+    }
+
+    fun updateLocate(locate: Locate) {
+        realm.executeTransaction {
+            it.insertOrUpdate(locate)
         }
     }
 
@@ -122,20 +138,21 @@ class LocateDb(private val realm: Realm) {
                     .equalTo(Locate.FIELD_SERVER_ID, locationResponse.serverId)
                     .findFirst()
 
-            if (location != null) {
+            if (location == null) {
+                val locate = locationResponse.toLocate()
+                val id = (it.where(Locate::class.java).max(Locate.FIELD_ID)
+                    ?.toInt() ?: 0) + 1
+                locate.id = id
+                it.insert(locate)
+            } else if (location.syncState == SyncState.Sent.key) {
                 location.serverId = locationResponse.serverId
                 location.name = locationResponse.name ?: location.name
                 location.latitude = locationResponse.latitude ?: location.latitude
                 location.longitude = locationResponse.longitude ?: location.longitude
                 location.createdAt = locationResponse.createdAt ?: location.createdAt
                 location.lastDeploymentServerId = locationResponse.lastDeploymentServerId
-                location.lastGuardianDeploymentServerId = locationResponse.lastGuardianDeploymentServerId
-            } else {
-                val locate = locationResponse.toLocate()
-                val id = (it.where(Locate::class.java).max(Deployment.FIELD_ID)
-                    ?.toInt() ?: 0) + 1
-                locate.id = id
-                it.insert(locate)
+                location.lastGuardianDeploymentServerId =
+                    locationResponse.lastGuardianDeploymentServerId
             }
         }
     }

@@ -57,10 +57,13 @@
     <!-- DetailDeploymentActivity -->
     <string name="title_deployment_detail">Location name</string>
     <string name="sleep_duration_title">Sleep duration</string>
-    <string name="estimated_battery_duration">Estimate battery remaining</string>
+    <string name="estimated_battery_duration">Estimated battery remaining</string>
     <string name="photos">Photos</string>
     <string name="detail_sec">%d second</string>
-    <string name="reconfigure">Reconfigure</string>
+    <string name="delete">Delete</string>
+    <string name="edit">edit</string>
+    <string name="delete_location">Delete location</string>
+    <string name="are_you_sure_delete_location">Are you sure you\'d like to delete this location?</string>
 
     <!--  Perform Battery  -->
     <string name="test">test</string>
@@ -151,8 +154,12 @@
     <string name="deploy_at">Deployed at %s</string>
     <string name="guardian">Guardian</string>
     <string name="days_remaining">%d days remaining</string>
-    <string name="day_remaining">%d day remaining</string>
+    <string name="day_remaining">%s day remaining</string>
     <string name="battery_depleted">battery depleted</string>
+
+    <!--  EditLocationActivity  -->
+    <string name="edit_location">Edit location</string>
+    <string name="save">save</string>
 
     <!--  ChooseDeviceFragment  -->
     <string name="choose_your_device">Choose your device</string>

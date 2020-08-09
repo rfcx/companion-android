@@ -3,7 +3,7 @@ package org.rfcx.audiomoth.localdb
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
-import org.rfcx.audiomoth.entity.Deployment
+import org.rfcx.audiomoth.entity.EdgeDeployment
 import org.rfcx.audiomoth.entity.DeploymentImage
 import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_ID
 import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_SERVER_ID
@@ -11,14 +11,6 @@ import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_ID
 import org.rfcx.audiomoth.entity.SyncState
 
 class DeploymentImageDb(private val realm: Realm) {
-
-    fun unsentCount(): Long {
-        return realm.where(DeploymentImage::class.java).notEqualTo(
-            DeploymentImage.FIELD_SYNC_STATE,
-            SyncState.Sent.key
-        ).count()
-    }
-
     /**
      * return DeploymentImage that not be sync to Firebase Storage
      */
@@ -76,7 +68,7 @@ class DeploymentImageDb(private val realm: Realm) {
             .findAllAsync()
     }
 
-    fun insertImage(deployment: Deployment, attachImages: List<String>) {
+    fun insertImage(deployment: EdgeDeployment, attachImages: List<String>) {
         val imageCreateAt = deployment.deployedAt
         realm.executeTransaction {
             // save attached image to be Deployment Image
