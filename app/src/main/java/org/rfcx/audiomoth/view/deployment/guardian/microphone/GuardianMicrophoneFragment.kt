@@ -56,6 +56,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
 
         deploymentProtocol?.hideCompleteButton()
         setupSpectrogram()
+        setupSpectrogramSpeed()
         setupSpectrogramFreqMenu()
         setupSpectrogramColorMenu()
         setUiByState(MicTestingState.READY)
@@ -89,6 +90,22 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     private fun setupSpectrogram() {
         spectrogramView.setSamplingRate(deploymentProtocol?.getSampleRate() ?: DEF_SAMPLERATE)
         spectrogramView.setBackgroundColor(Color.WHITE)
+    }
+
+    private fun setupSpectrogramSpeed() {
+        val adapter: ArrayAdapter<String> = ArrayAdapter<String>(
+            requireContext(),
+            R.layout.dropdown_menu_popup_spectrogram,
+            speed
+        )
+        speedSpecDropdown.setAdapter(adapter)
+        speedSpecDropdown.setOnItemClickListener { _, _, position, _ ->
+            AudioSpectrogramUtils.setSpeed(speed[position])
+            AudioSpectrogramUtils.resetSetupState()
+            spectrogramView.invalidate()
+        }
+        speedSpecDropdown.inputType = 0
+        speedSpecDropdown.setText(speed[0], false)
     }
 
     private fun setupSpectrogramFreqMenu() {
@@ -153,7 +170,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
 
         timer?.schedule( object : TimerTask(){
             override fun run() {
-                if (!isTimerPause) {
+                if (!isTimerPause && !isMicTesting) {
                     SocketManager.getLiveAudioBuffer(microphoneTestUtils)
                     isTimerPause = true
                 }
@@ -208,6 +225,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
 
         private val color = arrayOf("Rainbow", "Fire", "Ice", "Grey")
         private val freq = arrayOf("Linear", "Logarithmic")
+        private val speed = arrayOf("Fast", "Normal", "Slow")
 
         private const val DELAY = 0L
         private const val MILLI_PERIOD = 10L

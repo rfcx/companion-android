@@ -88,7 +88,7 @@ class FrequencyView : View {
     }
 
     fun setMagnitudes(m: FloatArray) {
-        _magnitudes = FloatArray(AudioSpectrogramUtils.fftResolution)
+        _magnitudes = FloatArray(AudioSpectrogramUtils.getFFTResolution())
         System.arraycopy(m, 0, _magnitudes!!, 0, m.size)
     }
 

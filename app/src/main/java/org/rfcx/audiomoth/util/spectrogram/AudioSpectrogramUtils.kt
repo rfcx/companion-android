@@ -1,7 +1,5 @@
 package org.rfcx.audiomoth.util.spectrogram
 
-import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import org.jtransforms.fft.FloatFFT_1D
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -12,14 +10,26 @@ import kotlin.math.sqrt
 
 object AudioSpectrogramUtils {
 
-    var fftResolution = 2048
+    private enum class ScrollSpeed(val value: Int) { FAST(1024), NORMAL(2048), SLOW(4096)}
+
+    var fftResolution = 1024
 
     private var bufferStack: ArrayList<ShortArray>? = null
     private var fftBuffer: ShortArray? = null
     private var isSetup = false
 
-    fun setFFTResolution(res: Int) {
-        fftResolution = res
+    fun getFFTResolution(): Int = fftResolution
+
+    fun resetSetupState() {
+        isSetup = false
+    }
+
+    fun setSpeed(speed: String) {
+        when (speed.toUpperCase(Locale.getDefault())) {
+            ScrollSpeed.FAST.name -> fftResolution = ScrollSpeed.FAST.value
+            ScrollSpeed.NORMAL.name -> fftResolution = ScrollSpeed.NORMAL.value
+            ScrollSpeed.SLOW.name -> fftResolution = ScrollSpeed.SLOW.value
+        }
     }
 
     fun setupSpectrogram(bufferLength: Int) {
