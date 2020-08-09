@@ -4,6 +4,8 @@ import androidx.lifecycle.MutableLiveData
 import org.jtransforms.fft.FloatFFT_1D
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.util.*
+import kotlin.math.min
 import kotlin.math.sqrt
 
 
@@ -36,7 +38,7 @@ object AudioSpectrogramUtils {
 
     fun getTrunks(recordBuffer: ShortArray) {
         val n = fftResolution
-        if(bufferStack != null) {
+        if (bufferStack != null) {
             // Trunks are consecutive n/2 length samples
             for (i in 0 until bufferStack!!.size - 1) {
                 System.arraycopy(
@@ -72,15 +74,26 @@ object AudioSpectrogramUtils {
         }
 
         val fft = FloatFFT_1D(fftResolution.toLong())
-        val mag = FloatArray(floatFFT.size/2)
+        val mag = FloatArray(floatFFT.size / 2)
         fft.realForward(floatFFT)
-        for (i in 0 until floatFFT.size/2) {
+        for (i in 0 until floatFFT.size / 2) {
             val real = floatFFT[2 * i]
             val imagine = floatFFT[2 * i + 1]
             mag[i] = sqrt(real * real + imagine * imagine) / 83886070
         }
         spectrogramLive.value = mag
     }
+}
+
+fun ShortArray.toSmallChunk(number: Int): List<ShortArray> {
+    val numberOfChunk = this.size / number
+    val resultChunk = arrayListOf<ShortArray>()
+    var i = 0
+    while (i < this.size) {
+        resultChunk.add(this.copyOfRange(i, min(this.size, i + numberOfChunk)))
+        i += numberOfChunk
+    }
+    return resultChunk
 }
 
 fun ByteArray.toShortArray(): ShortArray {

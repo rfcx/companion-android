@@ -15,6 +15,7 @@ import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.util.MicrophoneTestUtils
 import org.rfcx.audiomoth.util.spectrogram.AudioSpectrogramUtils
 import org.rfcx.audiomoth.util.spectrogram.toShortArray
+import org.rfcx.audiomoth.util.spectrogram.toSmallChunk
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 import java.util.*
 
@@ -158,8 +159,10 @@ class GuardianMicrophoneFragment : Fragment() {
 
         SocketManager.spectrogram.observe(viewLifecycleOwner, Observer {
             if (it.size > 2) {
-                AudioSpectrogramUtils.setupSpectrogram(it.size)
-                AudioSpectrogramUtils.getTrunks(it.toShortArray())
+                AudioSpectrogramUtils.setupSpectrogram(it.size / 6)
+                for (chunk in it.toShortArray().toSmallChunk(6)) {
+                    AudioSpectrogramUtils.getTrunks(chunk)
+                }
             }
         })
 
