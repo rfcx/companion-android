@@ -42,6 +42,7 @@ object SocketManager {
     val prefs = MutableLiveData<PrefsResponse>()
     val signal = MutableLiveData<SignalResponse>()
     val liveAudio = MutableLiveData<MicrophoneTestResponse>()
+    val spectrogram = MutableLiveData<ByteArray>()
 
     init {
         connection.value = ConnectionResponse()
@@ -51,6 +52,7 @@ object SocketManager {
         prefs.value = PrefsResponse()
         signal.value = SignalResponse()
         liveAudio.value = MicrophoneTestResponse()
+        spectrogram.value = ByteArray(2)
     }
 
     fun getConnection() {
@@ -168,6 +170,7 @@ object SocketManager {
                                     microphoneTestUtils?.let {
                                         it.buffer = it.decodeEncodedAudio(response.audioBuffer.buffer)
                                         it.setTrack()
+                                        this.spectrogram.postValue(it.buffer)
                                     }
                                 }
                                 this.liveAudio.postValue(response)

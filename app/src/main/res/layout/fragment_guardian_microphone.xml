@@ -20,22 +20,61 @@
         android:id="@+id/microphoneView"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:background="@drawable/ic_microphone_green"
         android:layout_marginTop="@dimen/margin_padding_xlarge"
+        android:background="@drawable/ic_microphone_green"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/microphoneTitle" />
 
-    <TextView
-        android:id="@+id/microphoneWarnTextView"
-        style="@style/AudioMothText.Subhead.Small"
-        android:layout_width="wrap_content"
+    <org.rfcx.audiomoth.view.deployment.guardian.microphone.FrequencyView
+        android:id="@+id/spectrogramView"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginTop="@dimen/margin_padding_xlarge"
+        app:layout_constraintTop_toBottomOf="@id/microphoneView" />
+
+    <LinearLayout
+        android:id="@+id/adjustSpecLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/margin_padding_normal"
-        android:text="@string/don_t_forget_to_turn_speaker_on"
-        app:layout_constraintBottom_toTopOf="@id/audioButtonLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/spectrogramView">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/freqScaleSpecMenu"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="@dimen/margin_padding_xsmall"
+            android:hint="@string/frequency_scale">
+
+            <AutoCompleteTextView
+                android:id="@+id/freqScaleSpecDropdown"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:inputType="none"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/colorSpecMenu"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="@dimen/margin_padding_xsmall"
+            android:hint="@string/color">
+
+            <AutoCompleteTextView
+                android:id="@+id/colorSpecDropdown"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:inputType="none"/>
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/audioButtonLayout"
