@@ -14,11 +14,13 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getProfile(): GuardianProfile?
     fun getDeployment(): GuardianDeployment?
     fun getConfiguration(): GuardianConfiguration?
+    fun getSampleRate(): Int
 
     fun setProfile(profile: GuardianProfile)
     fun setDeploymentConfigure(profile: GuardianProfile)
     fun setDeployment(deployment: GuardianDeployment)
     fun setDeploymentWifiName(name: String)
+    fun setSampleRate(sampleRate: Int)
 
     fun showLoading()
     fun hideLoading()
