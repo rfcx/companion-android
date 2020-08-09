@@ -36,8 +36,9 @@ object AudioSpectrogramUtils {
 
     fun getTrunks(recordBuffer: ShortArray) {
         val n = fftResolution
-        // Trunks are consecutive n/2 length samples
-        for (i in 0 until bufferStack!!.size - 1) {
+        if(bufferStack != null) {
+            // Trunks are consecutive n/2 length samples
+            for (i in 0 until bufferStack!!.size - 1) {
                 System.arraycopy(
                     recordBuffer,
                     n / 2 * i,
@@ -45,21 +46,22 @@ object AudioSpectrogramUtils {
                     0,
                     n / 2
                 )
-        }
+            }
 
-        // Build n length buffers for processing
-        // Are build from consecutive trunks
-        for (i in 0 until bufferStack!!.size - 1) {
-            System.arraycopy(bufferStack!![i], 0, fftBuffer!!, 0, n / 2)
-            System.arraycopy(bufferStack!![i + 1], 0, fftBuffer!!, n / 2, n / 2)
-            process()
-        }
+            // Build n length buffers for processing
+            // Are build from consecutive trunks
+            for (i in 0 until bufferStack!!.size - 1) {
+                System.arraycopy(bufferStack!![i], 0, fftBuffer!!, 0, n / 2)
+                System.arraycopy(bufferStack!![i + 1], 0, fftBuffer!!, n / 2, n / 2)
+                process()
+            }
 
-        // Last item has not yet fully be used (only its first half)
-        // Move it to first position in arraylist so that its last half is used
-        val first: ShortArray = bufferStack!![0]
-        val last: ShortArray = bufferStack!![bufferStack!!.size - 1]
-        System.arraycopy(last, 0, first, 0, n / 2)
+            // Last item has not yet fully be used (only its first half)
+            // Move it to first position in arraylist so that its last half is used
+            val first: ShortArray = bufferStack!![0]
+            val last: ShortArray = bufferStack!![bufferStack!!.size - 1]
+            System.arraycopy(last, 0, first, 0, n / 2)
+        }
     }
 
     private fun process() {

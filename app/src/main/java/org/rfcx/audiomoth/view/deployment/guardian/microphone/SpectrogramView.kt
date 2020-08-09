@@ -1,4 +1,8 @@
 /**
+ * Most of the logic code were from Spectrogram Android application
+ */
+
+/**
  * Spectrogram Android application
  * Copyright (c) 2013 Guillaume Adam  http://www.galmiza.net/
  * This software is provided 'as-is', without any express or implied warranty.
@@ -9,13 +13,6 @@
  * 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
  * 2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
  * 3. This notice may not be removed or altered from any source distribution.
- */
-
-
-/**
- * Class associated with the spectrogram view
- * Handles events:
- * onSizeChanged, onTouchEvent, onDraw
  */
 
 package org.rfcx.audiomoth.view.deployment.guardian.microphone
@@ -35,6 +32,21 @@ import kotlin.math.pow
 import kotlin.math.roundToInt
 
 class FrequencyView : View {
+
+    companion object {
+        private val colorRainbow =
+            intArrayOf(
+                -0x1, -0xff01, -0x10000, -0x100, -0xff0100, -0xff0001, -0xffff01, -0x1000000
+            )
+        private val colorFire =
+            intArrayOf(-0x1, -0x100, -0x10000, -0x1000000)
+        private val colorIce =
+            intArrayOf(-0x1, -0xff0001, -0xffff01, -0x1000000)
+        private val colorGrey = intArrayOf(-0x1, -0x1000000)
+
+        private const val RAINBOW = "Rainbow"
+        private const val LINEAR = "Linear"
+    }
     // Attributes
     private var activity: Activity
     private val paint = Paint()
@@ -45,15 +57,9 @@ class FrequencyView : View {
     private var _width = 0
     private var _height = 0
     private var _magnitudes: FloatArray? = null
-    private val colorRainbow =
-        intArrayOf(
-            -0x1, -0xff01, -0x10000, -0x100, -0xff0100, -0xff0001, -0xffff01, -0x1000000
-        )
-    private val colorFire =
-        intArrayOf(-0x1, -0x100, -0x10000, -0x1000000)
-    private val colorIce =
-        intArrayOf(-0x1, -0xff0001, -0xffff01, -0x1000000)
-    private val colorGrey = intArrayOf(-0x1, 0xFF00000)
+
+    var colorScale = RAINBOW
+    var freqScale = LINEAR
 
     constructor(context: Context?) : super(context) {
         activity = context as Activity
@@ -93,7 +99,6 @@ class FrequencyView : View {
      */
     public override fun onDraw(canvas: Canvas) {
         var colors: IntArray? = null
-        val colorScale = "Rainbow"
 
         when (colorScale) {
             "Grey" -> colors = colorGrey
@@ -107,7 +112,7 @@ class FrequencyView : View {
         paint.strokeWidth = 1f
 
         // Get scale preferences
-        val logFrequency = false
+        val logFrequency = freqScale != LINEAR
 
         // Update buffer bitmap
         paint.color = Color.BLACK

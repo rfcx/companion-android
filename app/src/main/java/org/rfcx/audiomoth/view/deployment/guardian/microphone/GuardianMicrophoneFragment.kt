@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_guardian_microphone.*
@@ -16,6 +17,7 @@ import org.rfcx.audiomoth.util.spectrogram.AudioSpectrogramUtils
 import org.rfcx.audiomoth.util.spectrogram.toShortArray
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 import java.util.*
+
 
 class GuardianMicrophoneFragment : Fragment() {
 
@@ -47,6 +49,8 @@ class GuardianMicrophoneFragment : Fragment() {
 
         deploymentProtocol?.hideCompleteButton()
         setupSpectrogram()
+        setupSpectrogramFreqMenu()
+        setupSpectrogramColorMenu()
         setUiByState(MicTestingState.READY)
         SocketManager.resetDefaultValue()
 
@@ -76,9 +80,38 @@ class GuardianMicrophoneFragment : Fragment() {
     }
 
     private fun setupSpectrogram() {
-        spectrogramView.setFFTResolution(AudioSpectrogramUtils.fftResolution)
-        spectrogramView.setSamplingRate(44100)
-        spectrogramView.setBackgroundColor(Color.BLACK)
+        spectrogramView.setSamplingRate(deploymentProtocol?.getSampleRate() ?: DEF_SAMPLERATE)
+        spectrogramView.setBackgroundColor(Color.WHITE)
+    }
+
+    private fun setupSpectrogramFreqMenu() {
+        val adapter: ArrayAdapter<String> = ArrayAdapter<String>(
+            requireContext(),
+            R.layout.dropdown_menu_popup_spectrogram,
+            freq
+        )
+        freqScaleSpecDropdown.setAdapter(adapter)
+        freqScaleSpecDropdown.setOnItemClickListener { _, _, position, _ ->
+            spectrogramView.freqScale = freq[position]
+            spectrogramView.invalidate()
+        }
+        freqScaleSpecDropdown.inputType = 0
+        freqScaleSpecDropdown.setText(freq[0], false)
+    }
+
+    private fun setupSpectrogramColorMenu() {
+        val adapter: ArrayAdapter<String> = ArrayAdapter<String>(
+            requireContext(),
+            R.layout.dropdown_menu_popup_spectrogram,
+            color
+        )
+        colorSpecDropdown.setAdapter(adapter)
+        colorSpecDropdown.setOnItemClickListener { _, _, position, _ ->
+            spectrogramView.colorScale = color[position]
+            spectrogramView.invalidate()
+        }
+        colorSpecDropdown.inputType = 0
+        colorSpecDropdown.setText(color[0], false)
     }
 
     private fun setUiByState(state: MicTestingState) {
@@ -153,8 +186,14 @@ class GuardianMicrophoneFragment : Fragment() {
     }
 
     companion object {
+
+        private val color = arrayOf("Rainbow", "Fire", "Ice", "Grey")
+        private val freq = arrayOf("Linear", "Logarithmic")
+
         private const val DELAY = 0L
         private const val MILLI_PERIOD = 10L
+        
+        private const val DEF_SAMPLERATE = 24000
 
         enum class MicTestingState { READY, LISTENING, FINISH }
 
