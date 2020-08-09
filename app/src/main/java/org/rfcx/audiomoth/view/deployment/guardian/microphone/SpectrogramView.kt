@@ -32,6 +32,21 @@ import kotlin.math.pow
 import kotlin.math.roundToInt
 
 class FrequencyView : View {
+
+    companion object {
+        private val colorRainbow =
+            intArrayOf(
+                -0x1, -0xff01, -0x10000, -0x100, -0xff0100, -0xff0001, -0xffff01, -0x1000000
+            )
+        private val colorFire =
+            intArrayOf(-0x1, -0x100, -0x10000, -0x1000000)
+        private val colorIce =
+            intArrayOf(-0x1, -0xff0001, -0xffff01, -0x1000000)
+        private val colorGrey = intArrayOf(-0x1, -0x1000000)
+
+        private const val RAINBOW = "Rainbow"
+        private const val LINEAR = "Linear"
+    }
     // Attributes
     private var activity: Activity
     private val paint = Paint()
@@ -42,17 +57,9 @@ class FrequencyView : View {
     private var _width = 0
     private var _height = 0
     private var _magnitudes: FloatArray? = null
-    private val colorRainbow =
-        intArrayOf(
-            -0x1, -0xff01, -0x10000, -0x100, -0xff0100, -0xff0001, -0xffff01, -0x1000000
-        )
-    private val colorFire =
-        intArrayOf(-0x1, -0x100, -0x10000, -0x1000000)
-    private val colorIce =
-        intArrayOf(-0x1, -0xff0001, -0xffff01, -0x1000000)
-    private val colorGrey = intArrayOf(-0x1, -0x1000000)
 
-    var colorScale = "Rainbow"
+    var colorScale = RAINBOW
+    var freqScale = LINEAR
 
     constructor(context: Context?) : super(context) {
         activity = context as Activity
@@ -102,7 +109,7 @@ class FrequencyView : View {
         paint.strokeWidth = 1f
 
         // Get scale preferences
-        val logFrequency = false
+        val logFrequency = freqScale != LINEAR
 
         // Update buffer bitmap
         paint.color = Color.BLACK
