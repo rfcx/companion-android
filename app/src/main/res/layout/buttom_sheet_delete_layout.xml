@@ -8,22 +8,13 @@
     app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
 
     <TextView
-        android:id="@+id/menuTakePhoto"
+        android:id="@+id/menuDelete"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_gravity="center"
         android:foreground="?attr/selectableItemBackground"
         android:gravity="center_vertical"
         android:padding="@dimen/margin_padding_normal"
-        android:text="@string/menu_camera" />
+        android:text="@string/delete" />
 
-    <TextView
-        android:id="@+id/menuGallery"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_gravity="center"
-        android:foreground="?attr/selectableItemBackground"
-        android:gravity="center_vertical"
-        android:padding="@dimen/margin_padding_normal"
-        android:text="@string/menu_gallery" />
 </LinearLayout>

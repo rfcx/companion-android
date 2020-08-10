@@ -27,13 +27,10 @@ open class GuardianDeployment(
     var syncState: Int = 0
 ) : RealmModel, Serializable {
 
-    fun isSent(): Boolean = (syncState == SyncState.Sent.key)
-
     companion object {
         const val FIELD_ID = "id"
         const val FIELD_SERVER_ID = "serverId"
         const val FIELD_STATE = "state"
         const val FIELD_SYNC_STATE = "syncState"
-        const val PHOTOS = "photos"
     }
 }

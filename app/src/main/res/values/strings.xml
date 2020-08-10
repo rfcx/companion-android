@@ -280,5 +280,11 @@
     <string name="cancel">cancel</string>
     <string name="listen_again">listen again</string>
     <string name="don_t_forget_to_turn_speaker_on">*Don\'t forget to turn speaker on</string>
+    <string name="rainbow">Rainbow</string>
+    <string name="fire">Fire</string>
+    <string name="ice">Ice</string>
+    <string name="grey">Grey</string>
+    <string name="color">Color</string>
+    <string name="frequency_scale">Frequency Scale</string>
 
 </resources>

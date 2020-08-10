@@ -16,11 +16,14 @@ import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
-import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.util.*
+import org.rfcx.audiomoth.util.LocationPermissions
+import org.rfcx.audiomoth.util.Preferences
+import org.rfcx.audiomoth.util.getUserNickname
+import org.rfcx.audiomoth.util.logout
 import org.rfcx.audiomoth.view.deployment.EdgeDeploymentActivity
-import org.rfcx.audiomoth.view.map.DeploymentBottomSheet
+import org.rfcx.audiomoth.view.map.DeploymentDetailView
 import org.rfcx.audiomoth.view.map.DeploymentViewPagerFragment
 import org.rfcx.audiomoth.view.map.MapFragment
 import org.rfcx.audiomoth.view.profile.ProfileFragment
@@ -30,18 +33,25 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
 
-    // database manager
     private var currentFragment: Fragment? = null
     private val locationPermissions by lazy { LocationPermissions(this) }
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
-
     private var snackbar: Snackbar? = null
-    private var _showDeployments: List<DeploymentBottomSheet> = listOf()
+    private var _showDeployments: List<DeploymentDetailView> = listOf()
 
-    override fun getShowDeployments(): List<DeploymentBottomSheet> = this._showDeployments
+    override fun getShowDeployments(): List<DeploymentDetailView> = this._showDeployments
 
-    override fun setShowDeployments(deployments: List<DeploymentBottomSheet>) {
+    override fun setShowDeployments(deployments: List<DeploymentDetailView>, deploymentId : Int) {
         this._showDeployments = deployments
+        updateDeploymentDetailPagerView(deploymentId)
+    }
+
+    private fun updateDeploymentDetailPagerView(deploymentId : Int) {
+        val bottomSheetFragment =
+            supportFragmentManager.findFragmentByTag(BOTTOM_SHEET)
+        if (bottomSheetFragment != null && bottomSheetFragment is DeploymentViewPagerFragment) {
+            bottomSheetFragment.updateItems(deploymentId)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -213,10 +223,10 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         finish()
     }
 
-    override fun moveMapIntoReportMarker(location: DeploymentLocation) {
+    override fun moveMapIntoDeploymentMarker(lat: Double, lng: Double) {
         val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
         if (mapFragment is MapFragment) {
-            mapFragment.moveToDeploymentMarker(location)
+            mapFragment.moveToDeploymentMarker(lat, lng)
         }
     }
 
@@ -228,6 +238,10 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     override fun showBottomAppBar() {
         bottomBar.visibility = View.VISIBLE
         createLocationButton.visibility = View.VISIBLE
+    }
+
+    override fun getBottomSheetState(): Int {
+        return bottomSheetBehavior.state
     }
 
     override fun showBottomSheet(fragment: Fragment) {
@@ -280,6 +294,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
 }
 
 interface MainActivityListener {
+    fun getBottomSheetState(): Int
     fun showBottomSheet(fragment: Fragment)
     fun showBottomAppBar()
     fun hidBottomAppBar()
@@ -287,5 +302,5 @@ interface MainActivityListener {
     fun showSnackbar(msg: String, duration: Int)
     fun hideSnackbar()
     fun onLogout()
-    fun moveMapIntoReportMarker(location: DeploymentLocation)
+    fun moveMapIntoDeploymentMarker(lat: Double, lng: Double)
 }

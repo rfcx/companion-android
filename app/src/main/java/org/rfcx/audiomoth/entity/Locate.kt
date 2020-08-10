@@ -29,24 +29,6 @@ open class Locate(
         return (lastDeploymentId != 0 || lastDeploymentServerId != null || lastGuardianDeploymentId != 0 || lastGuardianDeploymentServerId != null) && deletedAt == null
     }
 
-    fun getLastEdgeDeploymentId(): String {
-        // is sent?
-        return if (syncState == SyncState.Sent.key) {
-            // is last deployment from edge?
-            if (lastDeploymentServerId != null) {
-                lastDeploymentServerId
-            } else {
-                lastGuardianDeploymentServerId
-            }.toString()
-        } else {
-            if (lastDeploymentId != 0) {
-                lastDeploymentId
-            } else {
-                lastGuardianDeploymentId
-            }.toString()
-        }
-    }
-
     fun getLastDeploymentId(): String {
         // is sent?
         return if (syncState == SyncState.Sent.key) {
@@ -80,6 +62,7 @@ open class Locate(
         const val FIELD_ID = "id"
         const val FIELD_SERVER_ID = "serverId"
         const val FIELD_DELETED_AT = "deletedAt"
-        const val FIELD_LAST_DEPLOYMENT_SERVER_ID = "lastDeploymentServerId"
+        const val FIELD_LAST_EDGE_DEPLOYMENT_SERVER_ID = "lastDeploymentServerId"
+        const val FIELD_LAST_EDGE_DEPLOYMENT_ID = "lastDeploymentId"
     }
 }

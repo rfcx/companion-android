@@ -51,6 +51,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private var _deployLocation: DeploymentLocation? = null
     private var _configuration: GuardianConfiguration? = null
 
+    private var _sampleRate = 24000
+
     private var latitude = 0.0
     private var longitude = 0.0
 
@@ -158,6 +160,10 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         setDeployment(deployment)
     }
 
+    override fun setSampleRate(sampleRate: Int) {
+        this._sampleRate = sampleRate
+    }
+
     override fun setDeploymentConfigure(profile: GuardianProfile) {
         setProfile(profile)
         this._configuration = profile.asConfiguration()
@@ -172,6 +178,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     }
 
     override fun getConfiguration(): GuardianConfiguration? = _configuration
+
+    override fun getSampleRate(): Int = _sampleRate
 
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 

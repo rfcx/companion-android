@@ -26,8 +26,6 @@ open class EdgeDeployment(
     var deletedAt: Date? = null
 ) : RealmModel {
 
-    fun isSent(): Boolean = (syncState == SyncState.Sent.key)
-
     companion object {
         const val TABLE_NAME ="EdgeDeployment"
         const val FIELD_ID = "id"

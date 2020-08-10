@@ -90,6 +90,7 @@ class GuardianConfigureFragment : Fragment() {
             setNextButton(false)
             syncConfig()
             updateProfile()
+            deploymentProtocol?.setSampleRate(sampleRate)
         }
     }
 

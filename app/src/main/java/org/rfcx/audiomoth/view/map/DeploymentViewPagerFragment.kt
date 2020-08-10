@@ -5,28 +5,44 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.realm.Realm
+import kotlinx.android.synthetic.main.buttom_sheet_delete_layout.view.*
 import kotlinx.android.synthetic.main.fragment_deployment_view_pager.*
 import org.rfcx.audiomoth.DeploymentListener
 import org.rfcx.audiomoth.MainActivity
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.Device
+import org.rfcx.audiomoth.entity.DeploymentState
 import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
+import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.audiomoth.util.RealmHelper
+import org.rfcx.audiomoth.util.WifiHotspotUtils
+import org.rfcx.audiomoth.view.deployment.EdgeDeploymentActivity
+import org.rfcx.audiomoth.view.detail.DeploymentDetailActivity
+import org.rfcx.audiomoth.view.diagnostic.DiagnosticActivity
 
-class DeploymentViewPagerFragment : Fragment() {
-
-    private var deploymentListener: DeploymentListener? = null
-    private var id: Int? = null
-    private lateinit var viewPagerAdapter: DeploymentViewPagerAdapter
-    private val edgeDeploymentDb =
-        EdgeDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
-    private val guardianDeploymentDb =
+class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
+    private val guardianDeploymentDb by lazy {
         GuardianDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
+    }
+    private val edgeDeploymentDb by lazy {
+        EdgeDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
+    }
+    private val locateDb by lazy {
+        LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
+    }
+    private var deploymentListener: DeploymentListener? = null
+    private lateinit var viewPagerAdapter: DeploymentViewPagerAdapter
+    private var selectedId: Int? = null // selected deployment id
+    private var currentPosition: Int = 0
+    private var edgeDeploymentViewId: Int? = null
+    private var locateId: Int? = null
+    private lateinit var deleteDialog: BottomSheetDialog
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -36,6 +52,7 @@ class DeploymentViewPagerFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initIntent()
+        setupDeleteDialog()
     }
 
     override fun onCreateView(
@@ -48,27 +65,101 @@ class DeploymentViewPagerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         initAdapter()
         setViewPagerAdapter()
+    }
+
+    // Region {DeploymentViewPagerAdapter.DeploymentDetailClickListener}
+    override fun onClickedMoreIcon(edgeDeploymentView: DeploymentDetailView.EdgeDeploymentView) {
+        locateId = locateDb.getDeleteLocateId(
+            edgeDeploymentView.locationName,
+            edgeDeploymentView.latitude,
+            edgeDeploymentView.longitude
+        )
+        edgeDeploymentViewId = edgeDeploymentView.id
+        deleteDialog.show()
+    }
+
+    override fun onClickedEdgeDeploymentDetail(edgeDeploymentView: DeploymentDetailView.EdgeDeploymentView) {
+        context?.let {
+            val isReadyToUpload = edgeDeploymentView.state == DeploymentState.Edge.ReadyToUpload.key
+            if (isReadyToUpload) {
+                DeploymentDetailActivity.startActivity(it, edgeDeploymentView.id)
+            } else {
+                EdgeDeploymentActivity.startActivity(it, edgeDeploymentView.id)
+            }
+        }
+    }
+
+    override fun onClickedGuardianDeploymentDetail(guardianDeploymentView: DeploymentDetailView.GuardianDeploymentView) {
+        val guardianDeployment = guardianDeploymentDb.getDeploymentById(guardianDeploymentView.id)
+        if (context != null && guardianDeployment != null) {
+            DiagnosticActivity.startActivity(
+                requireContext(), guardianDeployment,
+                WifiHotspotUtils.isConnectedWithGuardian(
+                    requireContext(), guardianDeploymentView.wifiName ?: ""
+                )
+            )
+        }
+    }
+    // Endregion
+
+    private fun setupDeleteDialog() {
+        val bottomSheetView =
+            layoutInflater.inflate(R.layout.buttom_sheet_delete_layout, null)
+
+        bottomSheetView.menuDelete.setOnClickListener { onDeleteLocationOfNoDeployment() }
+
+        context?.let { deleteDialog = BottomSheetDialog(it) }
+        deleteDialog.setContentView(bottomSheetView)
+    }
+
+    private fun onDeleteLocationOfNoDeployment() {
+        if (edgeDeploymentViewId != null && locateId != null) {
+            locateDb.deleteLocate(locateId!!)
+            edgeDeploymentDb.deleteDeployment(edgeDeploymentViewId!!)
+            deleteDialog.dismiss()
+        } else {
+            Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT).show()
+            deleteDialog.dismiss()
+        }
     }
 
     private fun setViewPagerAdapter() {
         val showDeployments = deploymentListener?.getShowDeployments()
         if (showDeployments != null) {
-            id?.let {
-                viewPagerAdapter.deployments = showDeployments
-                val deploymentIndex =
-                    showDeployments.indexOf(showDeployments.find { it.id == this.id })
-                deploymentViewPager.setCurrentItem(deploymentIndex, false)
+            viewPagerAdapter.submitList(showDeployments) // adapter update items
+            selectedId?.let { selectedId ->
+                setSelectedPosition(showDeployments, selectedId)
             }
         }
     }
 
-    private fun initIntent() {
-        arguments?.let {
-            id = it.getInt(ARG_DEPLOYMENT_ID)
+    private fun setSelectedPosition(showDeployments: List<DeploymentDetailView>, selectedId: Int) {
+        val deploymentIndex = showDeployments.indexOf(showDeployments.find {
+            when (it) {
+                is DeploymentDetailView.EdgeDeploymentView -> {
+                    it.id == selectedId
+                }
+                is DeploymentDetailView.GuardianDeploymentView -> {
+                    it.id == selectedId
+                }
+            }
+        })
+        this.currentPosition = deploymentIndex
+        deploymentViewPager.setCurrentItem(deploymentIndex, false)
+    }
+
+    fun updateItems(deploymentId: Int) {
+        val showDeployments = deploymentListener?.getShowDeployments()
+        showDeployments?.let {
+            viewPagerAdapter.submitList(showDeployments)
+            setSelectedPosition(showDeployments, deploymentId)
         }
+    }
+
+    private fun initIntent() {
+        arguments?.let { selectedId = it.getInt(ARG_DEPLOYMENT_ID) }
     }
 
     private fun initAdapter() {
@@ -83,43 +174,35 @@ class DeploymentViewPagerFragment : Fragment() {
             MarginPageTransformer(resources.getDimensionPixelSize(R.dimen.margin_padding_normal))
         deploymentViewPager.setPageTransformer(marginTransformer)
         deploymentViewPager.offscreenPageLimit = 2
-        viewPagerAdapter = DeploymentViewPagerAdapter(childFragmentManager, lifecycle)
+        viewPagerAdapter = DeploymentViewPagerAdapter(this)
         deploymentViewPager.adapter = viewPagerAdapter
-        deploymentViewPager.registerOnPageChangeCallback(object :
-            ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                if (activity is MainActivity && position < viewPagerAdapter.itemCount) {
-                    val deployment = viewPagerAdapter.deployments[position]
-                    if (deployment.device == Device.EDGE.value) {
-                        val edgeDeployment = edgeDeploymentDb.getDeploymentById(deployment.id)
-                        edgeDeployment?.location?.let {
-                            (activity as MainActivity).moveMapIntoReportMarker(
-                                it
-                            )
-                        }
-                    } else {
-                        val guardianDeployment =
-                            guardianDeploymentDb.getDeploymentById(deployment.id)
-                        guardianDeployment?.location?.let {
-                            (activity as MainActivity).moveMapIntoReportMarker(
-                                it
-                            )
-                        }
-                    }
+        deploymentViewPager.registerOnPageChangeCallback(providedPagerChangeCallback)
+    }
+
+    private val providedPagerChangeCallback = object : ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) {
+            if (activity is MainActivity && position < viewPagerAdapter.itemCount) {
+                val detailView = viewPagerAdapter.getItemByPosition(position)
+                detailView?.let {
+                    this@DeploymentViewPagerFragment.currentPosition = position
+                    (activity as MainActivity).moveMapIntoDeploymentMarker(
+                        it.latitude,
+                        it.longitude
+                    )
                 }
             }
-        })
+        }
     }
 
     companion object {
+        const val TAG = "DeploymentViewPagerFragment"
         private const val ARG_DEPLOYMENT_ID = "ARG_DEPLOYMENT_ID"
 
         @JvmStatic
-        fun newInstance(id: Int) =
-            DeploymentViewPagerFragment().apply {
-                arguments = Bundle().apply {
-                    putInt(ARG_DEPLOYMENT_ID, id)
-                }
+        fun newInstance(id: Int) = DeploymentViewPagerFragment().apply {
+            arguments = Bundle().apply {
+                putInt(ARG_DEPLOYMENT_ID, id)
             }
+        }
     }
 }

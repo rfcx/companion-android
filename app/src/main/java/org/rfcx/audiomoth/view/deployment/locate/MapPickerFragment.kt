@@ -35,6 +35,7 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.util.latitudeCoordinates
 import org.rfcx.audiomoth.util.longitudeCoordinates
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment.Companion.DEFAULT_ZOOM
+import org.rfcx.audiomoth.view.detail.EditLocationActivityListener
 import org.rfcx.audiomoth.view.detail.MapPickerProtocol
 import java.util.*
 import kotlin.concurrent.schedule
@@ -44,6 +45,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
     private var mapboxMap: MapboxMap? = null
     private lateinit var mapView: MapView
     private var mapPickerProtocol: MapPickerProtocol? = null
+    private var editLocationActivityListener: EditLocationActivityListener? = null
     private var locationEngine: LocationEngine? = null
     private var currentUserLocation: Location? = null
     private var selectedLocation: Location? = null
@@ -74,6 +76,12 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mapPickerProtocol = context as MapPickerProtocol
+
+        try {
+            editLocationActivityListener = context as EditLocationActivityListener
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun onCreateView(
@@ -292,11 +300,13 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
             if (hasFocus) {
                 searchLayout.setBackgroundResource(R.color.white)
                 searchViewActionLeftButton.visibility = View.VISIBLE
+                editLocationActivityListener?.hideAppbar()
                 showSearchFragment()
             } else {
                 searchLayout.setBackgroundResource(R.color.transparent)
                 searchViewActionLeftButton.visibility = View.GONE
                 searchViewActionRightButton.visibility = View.GONE
+                editLocationActivityListener?.showAppbar()
                 hideSearchFragment()
             }
         }
@@ -353,7 +363,6 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun showSearchFragment() {
-
         childFragmentManager.beginTransaction().apply {
             setCustomAnimations(R.anim.fragment_slide_in_up, 0, 0, R.anim.fragment_slide_out_up)
         }.addToBackStack(SearchResultFragment.tag)
