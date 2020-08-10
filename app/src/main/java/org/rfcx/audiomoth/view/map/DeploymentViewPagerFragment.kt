@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
@@ -16,6 +17,8 @@ import org.rfcx.audiomoth.DeploymentListener
 import org.rfcx.audiomoth.MainActivity
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.DeploymentState
+import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
+import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.util.WifiHotspotUtils
@@ -27,10 +30,18 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
     private val guardianDeploymentDb by lazy {
         GuardianDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
     }
+    private val edgeDeploymentDb by lazy {
+        EdgeDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
+    }
+    private val locateDb by lazy {
+        LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
+    }
     private var deploymentListener: DeploymentListener? = null
     private lateinit var viewPagerAdapter: DeploymentViewPagerAdapter
     private var selectedId: Int? = null // selected deployment id
     private var currentPosition: Int = 0
+    private var edgeDeploymentViewId: Int? = null
+    private var locateId: Int? = null
     private lateinit var deleteDialog: BottomSheetDialog
 
     override fun onAttach(context: Context) {
@@ -60,6 +71,12 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
 
     // Region {DeploymentViewPagerAdapter.DeploymentDetailClickListener}
     override fun onClickedMoreIcon(edgeDeploymentView: DeploymentDetailView.EdgeDeploymentView) {
+        locateId = locateDb.getDeleteLocateId(
+            edgeDeploymentView.locationName,
+            edgeDeploymentView.latitude,
+            edgeDeploymentView.longitude
+        )
+        edgeDeploymentViewId = edgeDeploymentView.id
         deleteDialog.show()
     }
 
@@ -91,14 +108,21 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
         val bottomSheetView =
             layoutInflater.inflate(R.layout.buttom_sheet_delete_layout, null)
 
-        bottomSheetView.menuDelete.setOnClickListener { onDeleteLocationNoDeployment() }
+        bottomSheetView.menuDelete.setOnClickListener { onDeleteLocationOfNoDeployment() }
 
         context?.let { deleteDialog = BottomSheetDialog(it) }
         deleteDialog.setContentView(bottomSheetView)
     }
 
-    private fun onDeleteLocationNoDeployment() {
-        // TODO: onDeleteLocationNoDeployment
+    private fun onDeleteLocationOfNoDeployment() {
+        if (edgeDeploymentViewId != null && locateId != null) {
+            locateDb.deleteLocate(locateId!!)
+            edgeDeploymentDb.deleteDeployment(edgeDeploymentViewId!!)
+            deleteDialog.dismiss()
+        } else {
+            Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT).show()
+            deleteDialog.dismiss()
+        }
     }
 
     private fun setViewPagerAdapter() {

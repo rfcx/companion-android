@@ -4,6 +4,7 @@ import android.util.Log
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
+import io.realm.kotlin.deleteFromRealm
 import org.rfcx.audiomoth.entity.*
 import org.rfcx.audiomoth.entity.response.EdgeDeploymentResponse
 import org.rfcx.audiomoth.entity.response.toEdgeDeployment
@@ -113,6 +114,17 @@ class EdgeDeploymentDb(private val realm: Realm) {
     fun updateDeployment(deployment: EdgeDeployment) {
         realm.executeTransaction {
             it.insertOrUpdate(deployment)
+        }
+    }
+
+    fun deleteDeployment(id: Int) {
+        realm.executeTransaction {
+            val deployment =
+                it.where(EdgeDeployment::class.java).equalTo(EdgeDeployment.FIELD_ID, id)
+                    .findFirst()
+            Log.d("onDelete","deleteDeployment ${deployment != null}")
+
+            deployment?.deleteFromRealm()
         }
     }
 
