@@ -76,7 +76,12 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mapPickerProtocol = context as MapPickerProtocol
-        editLocationActivityListener = context as EditLocationActivityListener
+
+        try {
+            editLocationActivityListener = context as EditLocationActivityListener
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun onCreateView(
