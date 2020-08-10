@@ -2,7 +2,6 @@ package org.rfcx.audiomoth.view.map
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -84,32 +83,32 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
         val showDeployments = deploymentListener?.getShowDeployments()
         if (showDeployments != null) {
             viewPagerAdapter.submitList(showDeployments) // adapter update items
-            setSelectedPosition(showDeployments)
+            selectedId?.let { selectedId ->
+                setSelectedPosition(showDeployments, selectedId)
+            }
         }
     }
 
-    private fun setSelectedPosition(showDeployments: List<DeploymentDetailView>) {
-        selectedId?.let { selectedId ->
-            val deploymentIndex = showDeployments.indexOf(showDeployments.find {
-                when (it) {
-                    is DeploymentDetailView.EdgeDeploymentView -> {
-                        it.id == selectedId
-                    }
-                    is DeploymentDetailView.GuardianDeploymentView -> {
-                        it.id == selectedId
-                    }
+    private fun setSelectedPosition(showDeployments: List<DeploymentDetailView>, selectedId: Int) {
+        val deploymentIndex = showDeployments.indexOf(showDeployments.find {
+            when (it) {
+                is DeploymentDetailView.EdgeDeploymentView -> {
+                    it.id == selectedId
                 }
-            })
-            this.currentPosition = deploymentIndex
-            deploymentViewPager.setCurrentItem(deploymentIndex, false)
-        }
+                is DeploymentDetailView.GuardianDeploymentView -> {
+                    it.id == selectedId
+                }
+            }
+        })
+        this.currentPosition = deploymentIndex
+        deploymentViewPager.setCurrentItem(deploymentIndex, false)
     }
 
-    fun updateItems() {
+    fun updateItems(deploymentId: Int) {
         val showDeployments = deploymentListener?.getShowDeployments()
         showDeployments?.let {
             viewPagerAdapter.submitList(showDeployments)
-            deploymentViewPager.setCurrentItem(currentPosition, false)
+            setSelectedPosition(showDeployments, deploymentId)
         }
     }
 

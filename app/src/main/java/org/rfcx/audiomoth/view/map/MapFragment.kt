@@ -272,16 +272,17 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             showDeployIds.contains(it.serverId) || showDeployIds.contains(it.id.toString())
         }
 
-        val deploymentMarkers = showEdgeDeployments.map { it.toMark() }
+        val edgeDeploymentMarkers = showEdgeDeployments.map { it.toMark() }
         val guardianDeploymentMarkers = showGuardianDeployments.map { it.toMark() }
-
-        handleShowDeployment(showEdgeDeployments, showGuardianDeployments)
-        handleMarkerDeployment(deploymentMarkers + guardianDeploymentMarkers)
+        val deploymentMarkers = edgeDeploymentMarkers + guardianDeploymentMarkers
+        handleShowDeployment(showEdgeDeployments, showGuardianDeployments, deploymentMarkers)
+        handleMarkerDeployment(deploymentMarkers)
     }
 
     private fun handleShowDeployment(
         edgeDeployments: List<EdgeDeployment>,
-        guardianDeployments: List<GuardianDeployment>
+        guardianDeployments: List<GuardianDeployment>,
+        deploymentMarkers: List<DeploymentMarker>
     ) {
         val deploymentDetails = arrayListOf<DeploymentDetailView>()
         deploymentDetails.addAll(edgeDeployments.map {
@@ -290,7 +291,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         deploymentDetails.addAll(guardianDeployments.map {
             it.toGuardianDeploymentView()
         })
-        deploymentListener?.setShowDeployments(deploymentDetails)
+
+        val lastDeployment = deploymentMarkers.maxBy { it.updatedAt ?: it.createdAt }
+        if (lastDeployment != null) {
+            deploymentListener?.setShowDeployments(deploymentDetails, lastDeployment.id)
+        }
     }
 
     private fun fetchData() {

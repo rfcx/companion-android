@@ -35,16 +35,16 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
 
     override fun getShowDeployments(): List<DeploymentDetailView> = this._showDeployments
 
-    override fun setShowDeployments(deployments: List<DeploymentDetailView>) {
+    override fun setShowDeployments(deployments: List<DeploymentDetailView>, deploymentId : Int) {
         this._showDeployments = deployments
-        updateDeploymentDetailPagerView()
+        updateDeploymentDetailPagerView(deploymentId)
     }
 
-    private fun updateDeploymentDetailPagerView() {
+    private fun updateDeploymentDetailPagerView(deploymentId : Int) {
         val bottomSheetFragment =
             supportFragmentManager.findFragmentByTag(BOTTOM_SHEET)
         if (bottomSheetFragment != null && bottomSheetFragment is DeploymentViewPagerFragment) {
-            bottomSheetFragment.updateItems()
+            bottomSheetFragment.updateItems(deploymentId)
         }
     }
 
