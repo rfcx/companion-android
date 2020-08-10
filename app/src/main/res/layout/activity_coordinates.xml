@@ -1,171 +1,178 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".view.profile.coordinates.CoordinatesActivity">
 
-    <include android:id="@+id/toolbarLayout" layout="@layout/toolbar_default" />
+    <include
+        android:id="@+id/toolbarLayout"
+        layout="@layout/toolbar_default" />
 
-    <LinearLayout
-        android:id="@+id/ddLayout"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground"
-        android:orientation="horizontal"
-        android:paddingTop="@dimen/margin_padding_normal"
-        android:paddingBottom="@dimen/margin_padding_small"
-        app:layout_constraintTop_toBottomOf="@id/toolbarLayout">
+        android:layout_height="match_parent"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:id="@+id/ddLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:background="?attr/selectableItemBackground"
+            android:orientation="horizontal"
+            android:paddingTop="@dimen/margin_padding_normal"
+            android:paddingBottom="@dimen/margin_padding_small"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:id="@+id/ddTextView"
-                style="@style/AudioMothText.Subhead.Bold"
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/ddTextView"
+                    style="@style/AudioMothText.Subhead.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_padding_normal"
+                    android:layout_marginEnd="@dimen/margin_padding_small"
+                    android:text="@string/dd_coordinates" />
+
+                <TextView
+                    style="@style/AudioMothText.Body.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_padding_normal"
+                    android:layout_marginEnd="@dimen/margin_padding_small"
+                    android:text="@string/dd_coordinates_format"
+                    tools:text="0.00000°N 0.00000°E" />
+            </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/checkDDImageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_normal"
-                android:layout_marginEnd="@dimen/margin_padding_small"
-                android:text="@string/dd_coordinates" />
-
-            <TextView
-                style="@style/AudioMothText.Body.Secondary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_normal"
-                android:layout_marginEnd="@dimen/margin_padding_small"
-                android:text="@string/dd_coordinates_format"
-                tools:text="0.00000°N 0.00000°E" />
-        </LinearLayout>
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/checkDDImageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginEnd="@dimen/margin_padding_normal"
-            android:src="@drawable/ic_check_24dp"
-            android:visibility="invisible" />
-
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/grey"
-        app:layout_constraintTop_toBottomOf="@+id/ddLayout" />
-
-    <LinearLayout
-        android:id="@+id/ddmLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground"
-        android:orientation="horizontal"
-        android:paddingTop="@dimen/margin_padding_normal"
-        android:paddingBottom="@dimen/margin_padding_small"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ddLayout">
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/ddmTextView"
-                style="@style/AudioMothText.Subhead.Bold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_normal"
-                android:layout_marginEnd="@dimen/margin_padding_small"
-                android:text="@string/ddm_coordinates" />
-
-            <TextView
-                style="@style/AudioMothText.Body.Secondary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_normal"
-                android:layout_marginEnd="@dimen/margin_padding_small"
-                android:text="@string/ddm_coordinates_format"
-                tools:text="0°0.0000'N 0°0.0000'E" />
+                android:layout_gravity="center"
+                android:layout_marginEnd="@dimen/margin_padding_normal"
+                android:src="@drawable/ic_check_24dp"
+                android:visibility="invisible" />
 
         </LinearLayout>
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/checkDDMImageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginEnd="@dimen/margin_padding_normal"
-            android:src="@drawable/ic_check_24dp"
-            android:visibility="invisible" />
-
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/grey"
-        app:layout_constraintTop_toBottomOf="@+id/ddmLayout" />
-
-    <LinearLayout
-        android:id="@+id/dmsLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:background="?attr/selectableItemBackground"
-        android:orientation="horizontal"
-        android:paddingTop="@dimen/margin_padding_normal"
-        android:paddingBottom="@dimen/margin_padding_small"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ddmLayout">
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/grey"
+            app:layout_constraintTop_toBottomOf="@+id/ddLayout" />
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:id="@+id/ddmLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:background="?attr/selectableItemBackground"
+            android:orientation="horizontal"
+            android:paddingTop="@dimen/margin_padding_normal"
+            android:paddingBottom="@dimen/margin_padding_small"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ddLayout">
 
-            <TextView
-                android:id="@+id/dmsTextView"
-                style="@style/AudioMothText.Subhead.Bold"
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/ddmTextView"
+                    style="@style/AudioMothText.Subhead.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_padding_normal"
+                    android:layout_marginEnd="@dimen/margin_padding_small"
+                    android:text="@string/ddm_coordinates" />
+
+                <TextView
+                    style="@style/AudioMothText.Body.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_padding_normal"
+                    android:layout_marginEnd="@dimen/margin_padding_small"
+                    android:text="@string/ddm_coordinates_format"
+                    tools:text="0°0.0000'N 0°0.0000'E" />
+
+            </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/checkDDMImageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_normal"
-                android:layout_marginEnd="@dimen/margin_padding_small"
-                android:text="@string/dms_coordinates" />
-
-            <TextView
-                style="@style/AudioMothText.Body.Secondary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_normal"
-                android:layout_marginEnd="@dimen/margin_padding_small"
-                android:text="@string/dms_coordinates_format" />
+                android:layout_gravity="center"
+                android:layout_marginEnd="@dimen/margin_padding_normal"
+                android:src="@drawable/ic_check_24dp"
+                android:visibility="invisible" />
 
         </LinearLayout>
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/checkDMSImageView"
-            android:layout_width="wrap_content"
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/grey"
+            app:layout_constraintTop_toBottomOf="@+id/ddmLayout" />
+
+        <LinearLayout
+            android:id="@+id/dmsLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginEnd="@dimen/margin_padding_normal"
-            android:src="@drawable/ic_check_24dp"
-            android:visibility="invisible" />
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
+            android:orientation="horizontal"
+            android:paddingTop="@dimen/margin_padding_normal"
+            android:paddingBottom="@dimen/margin_padding_small"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ddmLayout">
 
-    </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/grey"
-        app:layout_constraintTop_toBottomOf="@+id/dmsLayout" />
+                <TextView
+                    android:id="@+id/dmsTextView"
+                    style="@style/AudioMothText.Subhead.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_padding_normal"
+                    android:layout_marginEnd="@dimen/margin_padding_small"
+                    android:text="@string/dms_coordinates" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+                <TextView
+                    style="@style/AudioMothText.Body.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_padding_normal"
+                    android:layout_marginEnd="@dimen/margin_padding_small"
+                    android:text="@string/dms_coordinates_format" />
+
+            </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/checkDMSImageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginEnd="@dimen/margin_padding_normal"
+                android:src="@drawable/ic_check_24dp"
+                android:visibility="invisible" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/grey"
+            app:layout_constraintTop_toBottomOf="@+id/dmsLayout" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

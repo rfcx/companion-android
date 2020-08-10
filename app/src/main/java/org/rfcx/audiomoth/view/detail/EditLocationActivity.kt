@@ -20,7 +20,7 @@ import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.view.deployment.locate.MapPickerFragment
 import java.util.*
 
-class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocationProtocol {
+class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocationActivityListener {
 
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
@@ -38,8 +38,7 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
 
         initIntent()
         setupToolbar()
-        toolbarLayout.visibility = View.GONE
-
+        toolbarLayout.visibility = View.VISIBLE
         startFragment(MapPickerFragment.newInstance(latitude, longitude, nameLocation ?: ""))
     }
 
@@ -57,6 +56,14 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
         this.longitude = longitude
     }
 
+    override fun showAppbar() {
+        toolbarLayout.visibility = View.VISIBLE
+    }
+
+    override fun hideAppbar() {
+        toolbarLayout.visibility = View.GONE
+    }
+
     override fun startLocationPage(latitude: Double, longitude: Double, name: String) {
         toolbarLayout.visibility = View.VISIBLE
         setLatLng(latitude, longitude)
@@ -64,6 +71,7 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
     }
 
     override fun startMapPickerPage(latitude: Double, longitude: Double, name: String) {
+        toolbarLayout.visibility = View.VISIBLE
         setLatLng(latitude, longitude)
         startFragment(MapPickerFragment.newInstance(latitude, longitude, name))
     }

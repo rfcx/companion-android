@@ -28,11 +28,11 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
     private var longitude: Double = 0.0
     private var nameLocation: String? = null
 
-    private var editLocationProtocol: EditLocationProtocol? = null
+    private var editLocationActivityListener: EditLocationActivityListener? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        editLocationProtocol = context as EditLocationProtocol
+        editLocationActivityListener = context as EditLocationActivityListener
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,12 +68,12 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         }
 
         saveButton.setOnClickListener {
-            editLocationProtocol?.startDetailDeploymentPage(locationNameEditText.text.toString())
+            editLocationActivityListener?.startDetailDeploymentPage(locationNameEditText.text.toString())
         }
     }
 
     private fun openMapPickerPage() {
-        editLocationProtocol?.startMapPickerPage(
+        editLocationActivityListener?.startMapPickerPage(
             latitude,
             longitude,
             locationNameEditText.text.toString()
