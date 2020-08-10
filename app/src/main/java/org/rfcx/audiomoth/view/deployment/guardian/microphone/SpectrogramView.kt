@@ -58,8 +58,6 @@ class FrequencyView : View {
     private var _height = 0
     private var _magnitudes: FloatArray? = null
 
-    var o = 0
-
     var colorScale = RAINBOW
     var freqScale = LINEAR
 
