@@ -1,26 +1,19 @@
 package org.rfcx.audiomoth.view.deployment.verify
 
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import java.sql.Timestamp
-import java.util.*
 import kotlinx.android.synthetic.main.fragment_perform_battery.*
 import kotlinx.android.synthetic.main.fragment_perform_battery_level.*
 import kotlinx.android.synthetic.main.fragment_select_battery_level.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.EdgeBatteryInfo
 import org.rfcx.audiomoth.entity.DeploymentLocation
-import org.rfcx.audiomoth.util.NotificationBroadcastReceiver
-import org.rfcx.audiomoth.util.toDateTimeString
+import org.rfcx.audiomoth.entity.EdgeBatteryInfo
 import org.rfcx.audiomoth.view.deployment.EdgeDeploymentProtocol
+import java.sql.Timestamp
 
 class PerformBatteryFragment : Fragment() {
     private var status: String? = null
