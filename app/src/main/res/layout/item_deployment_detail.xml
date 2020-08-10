@@ -42,7 +42,7 @@
                 android:layout_marginTop="@dimen/margin_padding_normal"
                 android:layout_marginEnd="@dimen/margin_padding_normal"
                 android:textSize="@dimen/text_xsmall"
-                app:layout_constraintEnd_toStartOf="@id/guardianBadgeTextView"
+                app:layout_constraintEnd_toStartOf="@id/moreIconImageView"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="6 days" />
 
@@ -93,6 +93,35 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/locationNameTextView"
                 tools:text="GUARDIAN" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/moreIconImageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/margin_padding_small"
+                android:layout_marginEnd="@dimen/margin_padding_small"
+                android:src="@drawable/ic_more_horiz"
+                app:layout_constraintBottom_toBottomOf="@id/locationNameTextView"
+                app:layout_constraintEnd_toStartOf="@id/guardianBadgeTextView"
+                app:layout_constraintTop_toTopOf="@id/locationNameTextView" />
+
+            <View
+                android:id="@+id/deploymentDetailView"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="@id/deploymentDetailLayout"
+                app:layout_constraintEnd_toEndOf="@id/deploymentDetailLayout"
+                app:layout_constraintStart_toStartOf="@id/deploymentDetailLayout"
+                app:layout_constraintTop_toTopOf="@id/deploymentDetailLayout" />
+
+            <View
+                android:id="@+id/moreIconView"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="@id/moreIconImageView"
+                app:layout_constraintEnd_toEndOf="@id/moreIconImageView"
+                app:layout_constraintStart_toStartOf="@id/moreIconImageView"
+                app:layout_constraintTop_toTopOf="@id/moreIconImageView" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

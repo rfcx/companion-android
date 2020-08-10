@@ -78,7 +78,9 @@ class EdgeDeploymentDetailViewHolder(
     private val tvSeeDetail = itemView.seeDetailTextView
     private val tvGuardianBadge = itemView.guardianBadgeTextView
     private val tvEstimatedBatteryDuration = itemView.estimatedBatteryDurationTextView
-    private val itemLayout = itemView.deploymentDetailLayout
+    private val ivMoreIcon = itemView.moreIconImageView
+    private val vDeploymentDetail = itemView.deploymentDetailView
+    private val vMoreIconView = itemView.moreIconView
 
     fun bind(deployment: DeploymentDetailView.EdgeDeploymentView) {
         val isReadyToUpload = deployment.state == DeploymentState.Edge.ReadyToUpload.key
@@ -94,11 +96,15 @@ class EdgeDeploymentDetailViewHolder(
             if (isReadyToUpload) R.string.see_deployment_detail else R.string.create_deployment
         )
 
+        ivMoreIcon.visibility = if (isReadyToUpload) View.GONE else View.VISIBLE
         tvEstimatedBatteryDuration.visibility = if (isReadyToUpload) View.VISIBLE else View.GONE
         tvEstimatedBatteryDuration.text =
             Battery.getEstimatedBatteryDuration(context, deployment.batteryDepletedAt.time)
-        itemLayout.setOnClickListener {
+        vDeploymentDetail.setOnClickListener {
             itemClickListener.onClickedEdgeDeploymentDetail(deployment)
+        }
+        vMoreIconView.setOnClickListener {
+            // Todo : setOnClickListener
         }
     }
 }
@@ -113,11 +119,17 @@ class GuardianDeploymentDetailViewHolder(
     private val tvSeeDetail = itemView.seeDetailTextView
     private val tvGuardianBadge = itemView.guardianBadgeTextView
     private val tvEstimatedBatteryDuration = itemView.estimatedBatteryDurationTextView
+    private val ivMoreIcon = itemView.moreIconImageView
+    private val vDeploymentDetail = itemView.deploymentDetailView
+    private val vMoreIconView = itemView.moreIconView
     private val itemLayout = itemView.deploymentDetailLayout
 
     fun bind(deployment: DeploymentDetailView.GuardianDeploymentView) {
         tvGuardianBadge.visibility = View.VISIBLE
         tvEstimatedBatteryDuration.visibility = View.GONE
+        ivMoreIcon.visibility = View.GONE
+        vDeploymentDetail.visibility = View.GONE
+        vMoreIconView.visibility = View.GONE
         tvLocation.text = deployment.locationName
         tvSeeDetail.text = context.getString(R.string.see_deployment_detail)
         tvDate.text =
