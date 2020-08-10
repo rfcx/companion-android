@@ -14,6 +14,7 @@ import org.rfcx.audiomoth.util.toDateString
 import java.util.*
 
 interface DeploymentDetailClickListener {
+    fun onClickedMoreIcon(edgeDeploymentView: DeploymentDetailView.EdgeDeploymentView)
     fun onClickedEdgeDeploymentDetail(edgeDeploymentView: DeploymentDetailView.EdgeDeploymentView)
     fun onClickedGuardianDeploymentDetail(guardianDeploymentView: DeploymentDetailView.GuardianDeploymentView)
 }
@@ -104,7 +105,7 @@ class EdgeDeploymentDetailViewHolder(
             itemClickListener.onClickedEdgeDeploymentDetail(deployment)
         }
         vMoreIconView.setOnClickListener {
-            // Todo : setOnClickListener
+            itemClickListener.onClickedMoreIcon(deployment)
         }
     }
 }

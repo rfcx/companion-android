@@ -8,7 +8,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.realm.Realm
+import kotlinx.android.synthetic.main.buttom_sheet_delete_layout.view.*
 import kotlinx.android.synthetic.main.fragment_deployment_view_pager.*
 import org.rfcx.audiomoth.DeploymentListener
 import org.rfcx.audiomoth.MainActivity
@@ -29,6 +31,7 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
     private lateinit var viewPagerAdapter: DeploymentViewPagerAdapter
     private var selectedId: Int? = null // selected deployment id
     private var currentPosition: Int = 0
+    private lateinit var deleteDialog: BottomSheetDialog
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -38,6 +41,7 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initIntent()
+        setupDeleteDialog()
     }
 
     override fun onCreateView(
@@ -55,6 +59,10 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
     }
 
     // Region {DeploymentViewPagerAdapter.DeploymentDetailClickListener}
+    override fun onClickedMoreIcon(edgeDeploymentView: DeploymentDetailView.EdgeDeploymentView) {
+        deleteDialog.show()
+    }
+
     override fun onClickedEdgeDeploymentDetail(edgeDeploymentView: DeploymentDetailView.EdgeDeploymentView) {
         context?.let {
             val isReadyToUpload = edgeDeploymentView.state == DeploymentState.Edge.ReadyToUpload.key
@@ -78,6 +86,20 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
         }
     }
     // Endregion
+
+    private fun setupDeleteDialog() {
+        val bottomSheetView =
+            layoutInflater.inflate(R.layout.buttom_sheet_delete_layout, null)
+
+        bottomSheetView.menuDelete.setOnClickListener { onDeleteLocationNoDeployment() }
+
+        context?.let { deleteDialog = BottomSheetDialog(it) }
+        deleteDialog.setContentView(bottomSheetView)
+    }
+
+    private fun onDeleteLocationNoDeployment() {
+        // TODO: onDeleteLocationNoDeployment
+    }
 
     private fun setViewPagerAdapter() {
         val showDeployments = deploymentListener?.getShowDeployments()
