@@ -86,7 +86,8 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
             if (isReadyToUpload) {
                 DeploymentDetailActivity.startActivity(it, edgeDeploymentView.id)
             } else {
-                EdgeDeploymentActivity.startActivity(it, edgeDeploymentView.id)
+                deploymentListener?.setCurrentDeploymentId(edgeDeploymentView.id)
+                EdgeDeploymentActivity.startActivity(it, edgeDeploymentView.id, MainActivity.CREATE_DEPLOYMENT_REQUEST_CODE)
             }
         }
     }

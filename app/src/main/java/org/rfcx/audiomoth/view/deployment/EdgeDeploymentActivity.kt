@@ -2,6 +2,7 @@ package org.rfcx.audiomoth.view.deployment
 
 import android.app.AlarmManager
 import android.app.PendingIntent
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -455,6 +456,12 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             val intent = Intent(context, EdgeDeploymentActivity::class.java)
             intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
             context.startActivity(intent)
+        }
+
+        fun startActivity(context: Context, deploymentId: Int, requestCode: Int) {
+            val intent = Intent(context, EdgeDeploymentActivity::class.java)
+            intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
+            (context as Activity).startActivityForResult(intent, requestCode)
         }
     }
 }

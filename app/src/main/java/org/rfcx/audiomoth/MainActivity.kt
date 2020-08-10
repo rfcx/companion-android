@@ -37,16 +37,21 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     private val locationPermissions by lazy { LocationPermissions(this) }
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
     private var snackbar: Snackbar? = null
+    private var _currentDeploymentId: Int? = null
     private var _showDeployments: List<DeploymentDetailView> = listOf()
 
     override fun getShowDeployments(): List<DeploymentDetailView> = this._showDeployments
 
-    override fun setShowDeployments(deployments: List<DeploymentDetailView>, deploymentId : Int) {
+    override fun setShowDeployments(deployments: List<DeploymentDetailView>, deploymentId: Int) {
         this._showDeployments = deployments
         updateDeploymentDetailPagerView(deploymentId)
     }
 
-    private fun updateDeploymentDetailPagerView(deploymentId : Int) {
+    override fun setCurrentDeploymentId(deploymentId: Int) {
+        this._currentDeploymentId = deploymentId
+    }
+
+    private fun updateDeploymentDetailPagerView(deploymentId: Int) {
         val bottomSheetFragment =
             supportFragmentManager.findFragmentByTag(BOTTOM_SHEET)
         if (bottomSheetFragment != null && bottomSheetFragment is DeploymentViewPagerFragment) {
@@ -56,6 +61,13 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == CREATE_DEPLOYMENT_REQUEST_CODE) {
+            val currentDeploymentId = _currentDeploymentId
+            if (currentDeploymentId != null) {
+                showBottomSheet(DeploymentViewPagerFragment.newInstance(currentDeploymentId))
+            }
+        }
+
         locationPermissions.handleActivityResult(requestCode, resultCode)
 
         currentFragment?.let {
@@ -283,6 +295,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     companion object {
         const val EXTRA_EDGE_DEPLOYMENT_ID = "EXTRA_EDGE_DEPLOYMENT_ID"
         private const val BOTTOM_SHEET = "BOTTOM_SHEET"
+        const val CREATE_DEPLOYMENT_REQUEST_CODE = 1002
 
         fun startActivity(context: Context, deploymentId: String? = null) {
             val intent = Intent(context, MainActivity::class.java)
