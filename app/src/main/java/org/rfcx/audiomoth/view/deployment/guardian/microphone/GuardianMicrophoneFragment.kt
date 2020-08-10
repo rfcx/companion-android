@@ -28,7 +28,6 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     private val spectrogramStack = arrayListOf<FloatArray>()
     private var isTimerPause = false
 
-    var x = 0
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
     private val microphoneTestUtils by lazy {
         MicrophoneTestUtils()
@@ -86,6 +85,8 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     }
 
     private fun setupSpectrogram() {
+        AudioSpectrogramUtils.resetToDefaultValue()
+        spectrogramView.resetToDefaultValue()
         spectrogramView.setSamplingRate(deploymentProtocol?.getSampleRate() ?: DEF_SAMPLERATE)
         spectrogramView.setBackgroundColor(Color.BLACK)
     }

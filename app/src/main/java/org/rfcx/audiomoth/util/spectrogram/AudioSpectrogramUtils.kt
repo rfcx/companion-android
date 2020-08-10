@@ -12,13 +12,17 @@ object AudioSpectrogramUtils {
 
     private enum class ScrollSpeed(val value: Int) { FAST(1024), NORMAL(2048), SLOW(4096)}
 
-    var fftResolution = 1024
+    private var fftResolution = 1024
 
     private var bufferStack: ArrayList<ShortArray>? = null
     private var fftBuffer: ShortArray? = null
     private var isSetup = false
 
     fun getFFTResolution(): Int = fftResolution
+
+    fun resetToDefaultValue() {
+        fftResolution = 1024
+    }
 
     fun resetSetupState() {
         isSetup = false

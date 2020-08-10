@@ -82,6 +82,11 @@ class FrequencyView : View {
         canvas = Canvas(bitmap!!)
     }
 
+    fun resetToDefaultValue() {
+        colorScale = RAINBOW
+        freqScale = LINEAR
+    }
+
     fun setSamplingRate(sampling: Int) {
         samplingRate = sampling
     }
