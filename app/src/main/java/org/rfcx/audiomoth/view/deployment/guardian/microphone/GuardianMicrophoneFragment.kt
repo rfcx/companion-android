@@ -14,14 +14,18 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.util.MicrophoneTestUtils
 import org.rfcx.audiomoth.util.spectrogram.AudioSpectrogramUtils
+import org.rfcx.audiomoth.util.spectrogram.SpectrogramListener
 import org.rfcx.audiomoth.util.spectrogram.toShortArray
+import org.rfcx.audiomoth.util.spectrogram.toSmallChunk
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 import java.util.*
 
 
-class GuardianMicrophoneFragment : Fragment() {
+class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
 
     private var timer: Timer? = null
+    private var spectrogramTimer: Timer? = null
+    private val spectrogramStack = arrayListOf<FloatArray>()
     private var isTimerPause = false
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
@@ -49,6 +53,7 @@ class GuardianMicrophoneFragment : Fragment() {
 
         deploymentProtocol?.hideCompleteButton()
         setupSpectrogram()
+        setupSpectrogramSpeed()
         setupSpectrogramFreqMenu()
         setupSpectrogramColorMenu()
         setUiByState(MicTestingState.READY)
@@ -80,8 +85,27 @@ class GuardianMicrophoneFragment : Fragment() {
     }
 
     private fun setupSpectrogram() {
+        AudioSpectrogramUtils.resetToDefaultValue()
+        spectrogramView.resetToDefaultValue()
         spectrogramView.setSamplingRate(deploymentProtocol?.getSampleRate() ?: DEF_SAMPLERATE)
-        spectrogramView.setBackgroundColor(Color.WHITE)
+        spectrogramView.setBackgroundColor(Color.BLACK)
+    }
+
+    private fun setupSpectrogramSpeed() {
+        val adapter: ArrayAdapter<String> = ArrayAdapter<String>(
+            requireContext(),
+            R.layout.dropdown_menu_popup_spectrogram,
+            speed
+        )
+        speedSpecDropdown.setAdapter(adapter)
+        speedSpecDropdown.setOnItemClickListener { _, _, position, _ ->
+            AudioSpectrogramUtils.setSpeed(speed[position])
+            AudioSpectrogramUtils.resetSetupState()
+            spectrogramStack.clear()
+            spectrogramView.invalidate()
+        }
+        speedSpecDropdown.inputType = 0
+        speedSpecDropdown.setText(speed[0], false)
     }
 
     private fun setupSpectrogramFreqMenu() {
@@ -142,15 +166,26 @@ class GuardianMicrophoneFragment : Fragment() {
 
     private fun retrieveLiveAudioBuffer() {
         timer = Timer()
+        spectrogramTimer = Timer()
 
         timer?.schedule( object : TimerTask(){
             override fun run() {
-                if (!isTimerPause) {
+                if (!isTimerPause && isMicTesting) {
                     SocketManager.getLiveAudioBuffer(microphoneTestUtils)
                     isTimerPause = true
                 }
             }
         }, DELAY, MILLI_PERIOD)
+
+        spectrogramTimer?.schedule( object : TimerTask() {
+            override fun run() {
+                if (spectrogramStack.isNotEmpty()) {
+                    spectrogramView.setMagnitudes(spectrogramStack[0])
+                    spectrogramView.invalidate()
+                    spectrogramStack.removeAt(0)
+                }
+            }
+        }, DELAY, STACK_PERIOD)
 
         SocketManager.liveAudio.observe(viewLifecycleOwner, Observer {
             isTimerPause = false
@@ -159,18 +194,16 @@ class GuardianMicrophoneFragment : Fragment() {
         SocketManager.spectrogram.observe(viewLifecycleOwner, Observer {
             if (it.size > 2) {
                 AudioSpectrogramUtils.setupSpectrogram(it.size)
-                AudioSpectrogramUtils.getTrunks(it.toShortArray())
-            }
-        })
-
-        AudioSpectrogramUtils.spectrogramLive.observe(viewLifecycleOwner, Observer {
-            if (it.size > 2) {
-                spectrogramView.setMagnitudes(it)
-                requireActivity().runOnUiThread {
-                    spectrogramView.invalidate()
+                val audioChunks = it.toShortArray().toSmallChunk(1)
+                for (chunk in audioChunks) {
+                    AudioSpectrogramUtils.getTrunks(chunk, this)
                 }
             }
         })
+    }
+
+    override fun onProcessed(mag: FloatArray) {
+        spectrogramStack.add(mag)
     }
 
     override fun onDetach() {
@@ -183,15 +216,20 @@ class GuardianMicrophoneFragment : Fragment() {
             timer?.cancel()
             timer = null
         }
+        spectrogramTimer?.cancel()
+        spectrogramTimer= null
     }
 
     companion object {
 
         private val color = arrayOf("Rainbow", "Fire", "Ice", "Grey")
         private val freq = arrayOf("Linear", "Logarithmic")
+        private val speed = arrayOf("Fast", "Normal", "Slow")
 
         private const val DELAY = 0L
         private const val MILLI_PERIOD = 10L
+
+        private const val STACK_PERIOD = 40L
         
         private const val DEF_SAMPLERATE = 24000
 
