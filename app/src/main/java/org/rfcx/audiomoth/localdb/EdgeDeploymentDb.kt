@@ -1,6 +1,5 @@
 package org.rfcx.audiomoth.localdb
 
-import android.util.Log
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
@@ -122,8 +121,6 @@ class EdgeDeploymentDb(private val realm: Realm) {
             val deployment =
                 it.where(EdgeDeployment::class.java).equalTo(EdgeDeployment.FIELD_ID, id)
                     .findFirst()
-            Log.d("onDelete","deleteDeployment ${deployment != null}")
-
             deployment?.deleteFromRealm()
         }
     }
@@ -178,9 +175,6 @@ class EdgeDeploymentDb(private val realm: Realm) {
             realm.where(DeploymentImage::class.java)
                 .equalTo(DeploymentImage.FIELD_DEPLOYMENT_ID, deploymentId)
                 .findAll()
-        images?.forEach {
-            Log.i("saveDeploymentIdToImage", it.localPath)
-        }
         realm.executeTransaction { transition ->
             images?.forEach {
                 val image = it.apply {
