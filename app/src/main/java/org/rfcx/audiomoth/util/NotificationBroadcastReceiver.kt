@@ -11,22 +11,20 @@ import androidx.core.app.NotificationManagerCompat
 import org.rfcx.audiomoth.MainActivity
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment.Companion.CHANNEL_ID
-import org.rfcx.audiomoth.view.deployment.verify.PerformBatteryFragment
-import org.rfcx.audiomoth.view.deployment.verify.PerformBatteryFragment.Companion.BATTERY_DEPLETED_AT
-import org.rfcx.audiomoth.view.deployment.verify.PerformBatteryFragment.Companion.LOCATION_NAME
 
 class NotificationBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        val batteryDepletedAt = intent.extras?.getString(BATTERY_DEPLETED_AT)
-        val locationName = intent.extras?.getString(LOCATION_NAME)
-        val edgeDeploymentId = intent.extras?.getString(PerformBatteryFragment.EXTRA_EDGE_DEPLOYMENT_ID)
+        val batteryDepletedAt = intent.extras?.getString(EXTRA_BATTERY_DEPLETED_AT)
+        val locationName = intent.extras?.getString(EXTRA_LOCATION_NAME)
+        val edgeDeploymentId = intent.extras?.getString(EXTRA_DEPLOYMENT_ID)
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
 
         val intentData = Intent(context, MainActivity::class.java)
         intentData.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        intentData.putExtra(PerformBatteryFragment.EXTRA_EDGE_DEPLOYMENT_ID, edgeDeploymentId)
+        intentData.putExtra(EXTRA_DEPLOYMENT_ID, edgeDeploymentId)
 
-        val pendingIntent = PendingIntent.getActivity(context, 0, intentData, PendingIntent.FLAG_ONE_SHOT)
+        val pendingIntent =
+            PendingIntent.getActivity(context, 0, intentData, PendingIntent.FLAG_ONE_SHOT)
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setAutoCancel(true)
             .setContentTitle(context.getString(R.string.edge_device_battery))
@@ -45,5 +43,11 @@ class NotificationBroadcastReceiver : BroadcastReceiver() {
 
         val notificationManager = NotificationManagerCompat.from(context)
         notificationManager.notify(1, builder.build())
+    }
+
+    companion object {
+        const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
+        const val EXTRA_BATTERY_DEPLETED_AT = "EXTRA_BATTERY_DEPLETED_AT"
+        const val EXTRA_LOCATION_NAME = "EXTRA_LOCATION_NAME"
     }
 }

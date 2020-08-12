@@ -207,9 +207,6 @@ class PerformBatteryFragment : Fragment() {
         const val TEST_BATTERY = "TEST_BATTERY"
         const val TIME_LED_FLASH = "TIME_LED_FLASH"
         const val BATTERY_LEVEL = "BATTERY_LEVEL"
-        const val BATTERY_DEPLETED_AT = "BATTERY_DEPLETED_AT"
-        const val LOCATION_NAME = "LOCATION_NAME"
-        const val EXTRA_EDGE_DEPLOYMENT_ID = "EXTRA_EDGE_DEPLOYMENT_ID"
 
         @JvmStatic
         fun newInstance(page: String, level: Int?) = PerformBatteryFragment()

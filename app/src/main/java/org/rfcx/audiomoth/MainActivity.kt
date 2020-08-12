@@ -282,7 +282,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        val edgeDeploymentId: String? = intent?.getStringExtra(EXTRA_EDGE_DEPLOYMENT_ID)
+        val edgeDeploymentId: String? = intent?.getStringExtra(EXTRA_DEPLOYMENT_ID)
 
         if (edgeDeploymentId != null) {
             val deployment = edgeDeploymentDb.getDeploymentByDeploymentId(edgeDeploymentId)
@@ -293,14 +293,14 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     }
 
     companion object {
-        const val EXTRA_EDGE_DEPLOYMENT_ID = "EXTRA_EDGE_DEPLOYMENT_ID"
+        const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
         private const val BOTTOM_SHEET = "BOTTOM_SHEET"
         const val CREATE_DEPLOYMENT_REQUEST_CODE = 1002
 
         fun startActivity(context: Context, deploymentId: String? = null) {
             val intent = Intent(context, MainActivity::class.java)
             if (deploymentId != null)
-                intent.putExtra(EXTRA_EDGE_DEPLOYMENT_ID, deploymentId)
+                intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
             context.startActivity(intent)
         }
     }
