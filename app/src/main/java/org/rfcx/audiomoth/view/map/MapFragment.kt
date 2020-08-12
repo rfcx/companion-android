@@ -388,7 +388,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         refreshSource()
 
         val lastDeployment = deploymentMarkers.maxBy { it.updatedAt ?: it.createdAt }
-        if (lastDeployment != null) {
+        val state = listener?.getBottomSheetState() ?: 0
+        if (lastDeployment != null && state != BottomSheetBehavior.STATE_EXPANDED) {
             moveCamera(LatLng(lastDeployment.latitude, lastDeployment.longitude))
         }
     }
