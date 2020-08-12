@@ -275,14 +275,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val edgeDeploymentMarkers = showEdgeDeployments.map { it.toMark() }
         val guardianDeploymentMarkers = showGuardianDeployments.map { it.toMark() }
         val deploymentMarkers = edgeDeploymentMarkers + guardianDeploymentMarkers
-        handleShowDeployment(showEdgeDeployments, showGuardianDeployments, deploymentMarkers)
+        handleShowDeployment(showEdgeDeployments, showGuardianDeployments)
         handleMarkerDeployment(deploymentMarkers)
     }
 
     private fun handleShowDeployment(
         edgeDeployments: List<EdgeDeployment>,
-        guardianDeployments: List<GuardianDeployment>,
-        deploymentMarkers: List<DeploymentMarker>
+        guardianDeployments: List<GuardianDeployment>
     ) {
         val deploymentDetails = arrayListOf<DeploymentDetailView>()
         deploymentDetails.addAll(edgeDeployments.map {
@@ -291,30 +290,27 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         deploymentDetails.addAll(guardianDeployments.map {
             it.toGuardianDeploymentView()
         })
-
-        val lastDeployment = deploymentMarkers.maxBy { it.updatedAt ?: it.createdAt }
-        if (lastDeployment != null) {
-            deploymentListener?.setShowDeployments(deploymentDetails, lastDeployment.id)
-        }
+        deploymentListener?.setShowDeployments(deploymentDetails)
     }
 
     private fun fetchData() {
-        guardianDeployLiveData =
-            Transformations.map(guardianDeploymentDb.getAllResultsAsync().asLiveData()) {
-                it
-            }
-        guardianDeployLiveData.observeForever(guardianDeploymentObserve)
+        locateLiveData = Transformations.map(locateDb.getAllResultsAsync().asLiveData()) {
+            it
+        }
 
         edgeDeployLiveData =
             Transformations.map(edgeDeploymentDb.getAllResultsAsync().asLiveData()) {
                 it
             }
-        edgeDeployLiveData.observeForever(edgeDeploymentObserve)
 
-        locateLiveData = Transformations.map(locateDb.getAllResultsAsync().asLiveData()) {
-            it
-        }
+        guardianDeployLiveData =
+            Transformations.map(guardianDeploymentDb.getAllResultsAsync().asLiveData()) {
+                it
+            }
+
         locateLiveData.observeForever(locateObserve)
+        edgeDeployLiveData.observeForever(edgeDeploymentObserve)
+        guardianDeployLiveData.observeForever(guardianDeploymentObserve)
     }
 
     private fun retrieveDeployments(context: Context) {

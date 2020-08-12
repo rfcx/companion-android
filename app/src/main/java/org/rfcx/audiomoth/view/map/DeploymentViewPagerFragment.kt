@@ -82,12 +82,16 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
 
     override fun onClickedEdgeDeploymentDetail(edgeDeploymentView: DeploymentDetailView.EdgeDeploymentView) {
         context?.let {
+            this@DeploymentViewPagerFragment.selectedId = edgeDeploymentView.id
             val isReadyToUpload = edgeDeploymentView.state == DeploymentState.Edge.ReadyToUpload.key
             if (isReadyToUpload) {
                 DeploymentDetailActivity.startActivity(it, edgeDeploymentView.id)
             } else {
-                deploymentListener?.setCurrentDeploymentId(edgeDeploymentView.id)
-                EdgeDeploymentActivity.startActivity(it, edgeDeploymentView.id, MainActivity.CREATE_DEPLOYMENT_REQUEST_CODE)
+                EdgeDeploymentActivity.startActivity(
+                    it,
+                    edgeDeploymentView.id,
+                    MainActivity.CREATE_DEPLOYMENT_REQUEST_CODE
+                )
             }
         }
     }
@@ -130,13 +134,11 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
         val showDeployments = deploymentListener?.getShowDeployments()
         if (showDeployments != null) {
             viewPagerAdapter.submitList(showDeployments) // adapter update items
-            selectedId?.let { selectedId ->
-                setSelectedPosition(showDeployments, selectedId)
-            }
+            setSelectedPosition(showDeployments)
         }
     }
 
-    private fun setSelectedPosition(showDeployments: List<DeploymentDetailView>, selectedId: Int) {
+    private fun setSelectedPosition(showDeployments: List<DeploymentDetailView>) {
         val deploymentIndex = showDeployments.indexOf(showDeployments.find {
             when (it) {
                 is DeploymentDetailView.EdgeDeploymentView -> {
@@ -147,15 +149,24 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
                 }
             }
         })
-        this.currentPosition = deploymentIndex
+        // if position = -1 meant have no item in list
+        this.currentPosition = findCorrectItemIndex(deploymentIndex)
         deploymentViewPager.setCurrentItem(deploymentIndex, false)
     }
 
-    fun updateItems(deploymentId: Int) {
+    private fun findCorrectItemIndex(deploymentIndex: Int): Int {
+        return if (deploymentIndex != -1) {
+            deploymentIndex
+        } else {
+            if (this.currentPosition > 0) this.currentPosition - 1 else 0
+        }
+    }
+
+    fun updateItems() {
         val showDeployments = deploymentListener?.getShowDeployments()
         showDeployments?.let {
-            viewPagerAdapter.submitList(showDeployments)
-            setSelectedPosition(showDeployments, deploymentId)
+            viewPagerAdapter.submitList(it)
+            setSelectedPosition(it)
         }
     }
 

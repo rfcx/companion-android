@@ -18,10 +18,6 @@ import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
 import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.util.*
-import org.rfcx.audiomoth.util.LocationPermissions
-import org.rfcx.audiomoth.util.Preferences
-import org.rfcx.audiomoth.util.getUserNickname
-import org.rfcx.audiomoth.util.logout
 import org.rfcx.audiomoth.view.deployment.EdgeDeploymentActivity
 import org.rfcx.audiomoth.view.map.DeploymentDetailView
 import org.rfcx.audiomoth.view.map.DeploymentViewPagerFragment
@@ -37,36 +33,30 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     private val locationPermissions by lazy { LocationPermissions(this) }
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
     private var snackbar: Snackbar? = null
-    private var _currentDeploymentId: Int? = null
     private var _showDeployments: List<DeploymentDetailView> = listOf()
 
     override fun getShowDeployments(): List<DeploymentDetailView> = this._showDeployments
 
-    override fun setShowDeployments(deployments: List<DeploymentDetailView>, deploymentId: Int) {
+    override fun setShowDeployments(deployments: List<DeploymentDetailView>) {
         this._showDeployments = deployments
-        updateDeploymentDetailPagerView(deploymentId)
+        // delete?
+        updateDeploymentDetailPagerView()
     }
 
-    override fun setCurrentDeploymentId(deploymentId: Int) {
-        this._currentDeploymentId = deploymentId
-    }
-
-    private fun updateDeploymentDetailPagerView(deploymentId: Int) {
+    private fun updateDeploymentDetailPagerView() {
         val bottomSheetFragment =
             supportFragmentManager.findFragmentByTag(BOTTOM_SHEET)
         if (bottomSheetFragment != null && bottomSheetFragment is DeploymentViewPagerFragment) {
-            bottomSheetFragment.updateItems(deploymentId)
+            bottomSheetFragment.updateItems()
+            if (_showDeployments.isEmpty()) {
+                hideBottomSheet()
+                showBottomAppBar()
+            }
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CREATE_DEPLOYMENT_REQUEST_CODE) {
-            val currentDeploymentId = _currentDeploymentId
-            if (currentDeploymentId != null) {
-                showBottomSheet(DeploymentViewPagerFragment.newInstance(currentDeploymentId))
-            }
-        }
 
         locationPermissions.handleActivityResult(requestCode, resultCode)
 

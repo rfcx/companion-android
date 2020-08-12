@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.util.TypedValue
 import android.view.View
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
@@ -15,24 +14,21 @@ import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_deployment_detail.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.EdgeDeployment
 import org.rfcx.audiomoth.entity.DeploymentImage
-import org.rfcx.audiomoth.entity.SyncState
-import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
+import org.rfcx.audiomoth.entity.EdgeDeployment
+import org.rfcx.audiomoth.localdb.DatabaseCallback
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
-import org.rfcx.audiomoth.localdb.LocateDb
+import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
 import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.util.Battery.getEstimatedBatteryDuration
+import org.rfcx.audiomoth.view.BaseActivity
 import org.rfcx.audiomoth.view.deployment.EdgeDeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment.Companion.CONTINUOUS
-import java.util.*
-import kotlin.collections.ArrayList
 
-class DeploymentDetailActivity : AppCompatActivity() {
+class DeploymentDetailActivity : BaseActivity() {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
-    private val locateDb by lazy { LocateDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val gainList by lazy { resources.getStringArray(R.array.edge_gains) }
     private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
@@ -52,9 +48,11 @@ class DeploymentDetailActivity : AppCompatActivity() {
         setContentView(R.layout.activity_deployment_detail)
 
         deployment =
-            intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)?.let { edgeDeploymentDb.getDeploymentById(it) }
+            intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
+                ?.let { edgeDeploymentDb.getDeploymentById(it) }
 
         setupToolbar()
+        setupImageRecycler()
         deployment?.let { updateDeploymentDetailView(it) }
 
         // setup onclick
@@ -100,23 +98,20 @@ class DeploymentDetailActivity : AppCompatActivity() {
     }
 
     private fun onDeleteLocation() {
-        if (deployment != null) {
-            deployment?.let {
-                it.deletedAt = Date()
-                it.syncState = SyncState.Unsent.key
-                edgeDeploymentDb.updateDeployment(it)
-
-                it.serverId?.let { serverId ->
-                    val location = locateDb.getLocateByServerId(serverId)
-                    if (location != null) {
-                        location.deletedAt = Date()
-                        location.syncState = SyncState.Unsent.key
-                        locateDb.updateLocate(location)
-                    }
+        showLoading()
+        deployment?.let {
+            edgeDeploymentDb.deleteDeploymentLocation(it.id, object : DatabaseCallback {
+                override fun onSuccess() {
+                    DeploymentSyncWorker.enqueue(this@DeploymentDetailActivity)
+                    hideLoading()
+                    finish()
                 }
-                DeploymentSyncWorker.enqueue(this)
-                finish()
-            }
+
+                override fun onFailure(errorMessage: String) {
+                    hideLoading()
+                    showCommonDialog(errorMessage)
+                }
+            })
         }
     }
 
@@ -139,7 +134,6 @@ class DeploymentDetailActivity : AppCompatActivity() {
 
     private fun updateDeploymentDetailView(deployment: EdgeDeployment) {
         // setup deployment images view
-        setupImageRecycler()
         observeDeploymentImage(deployment.id)
 
         val location = deployment.location

@@ -110,12 +110,6 @@ class LocateDb(private val realm: Realm) {
         }
     }
 
-    fun updateLocate(locate: Locate) {
-        realm.executeTransaction {
-            it.insertOrUpdate(locate)
-        }
-    }
-
     fun insertOrUpdateLocate(deploymentId: Int, locate: Locate, isGuardian: Boolean = false) {
         realm.executeTransaction {
             if (locate.id == 0) {

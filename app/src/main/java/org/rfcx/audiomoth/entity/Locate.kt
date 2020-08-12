@@ -31,7 +31,7 @@ open class Locate(
 
     fun getLastDeploymentId(): String {
         // is sent?
-        return if (syncState == SyncState.Sent.key) {
+        return if (lastDeploymentServerId != null || lastGuardianDeploymentServerId != null) {
             // is last deployment from edge?
             if (lastDeploymentServerId != null) {
                 lastDeploymentServerId!!
