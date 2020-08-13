@@ -23,19 +23,16 @@ class NotificationBroadcastReceiver : BroadcastReceiver() {
         intentData.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         intentData.putExtra(EXTRA_DEPLOYMENT_ID, edgeDeploymentId)
 
+        val contentText =
+            context.getString(R.string.will_run_out_on, locationName, batteryDepletedAt)
         val pendingIntent =
             PendingIntent.getActivity(context, 0, intentData, PendingIntent.FLAG_ONE_SHOT)
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setAutoCancel(true)
             .setContentTitle(context.getString(R.string.edge_device_battery))
             .setContentIntent(pendingIntent)
-            .setContentText(
-                context.getString(
-                    R.string.will_run_out_on,
-                    locationName,
-                    batteryDepletedAt
-                )
-            )
+            .setContentText(contentText)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
             .setSmallIcon(R.drawable.ic_notification)
             .setSound(defaultSoundUri)
             .setDefaults(Notification.DEFAULT_ALL)
