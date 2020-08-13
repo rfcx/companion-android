@@ -111,12 +111,21 @@ class PerformBatteryFragment : Fragment() {
         setBatteryView(level)
         daysTextView.text = if (level == 0) getString(R.string.recharging) else batteryDetail.days
         chargedTextView.text =
-            if (level == 0) getString(R.string.too_low_battery) else getString(R.string.notification)
+            when (level) {
+                0 -> getString(R.string.too_low_battery)
+                1 -> getString(R.string.recharge_or_replace)
+                else -> getString(
+                    R.string.notification
+                )
+            }
         nextButton.setOnClickListener {
             val batteryDepletedAt =
                 Timestamp(System.currentTimeMillis() + (day * batteryDetail.numberOfDays))
             if (location != null) {
-                edgeDeploymentProtocol?.setPerformBattery(batteryDepletedAt, batteryDetail.batteryLevel)
+                edgeDeploymentProtocol?.setPerformBattery(
+                    batteryDepletedAt,
+                    batteryDetail.batteryLevel
+                )
                 edgeDeploymentProtocol?.nextStep()
             }
         }
