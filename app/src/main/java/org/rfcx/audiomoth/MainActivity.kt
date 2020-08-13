@@ -225,10 +225,10 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         finish()
     }
 
-    override fun moveMapIntoDeploymentMarker(lat: Double, lng: Double) {
+    override fun moveMapIntoDeploymentMarker(lat: Double, lng: Double, markerLocationId: String) {
         val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
         if (mapFragment is MapFragment) {
-            mapFragment.moveToDeploymentMarker(lat, lng)
+            mapFragment.moveToDeploymentMarker(lat, lng, markerLocationId)
         }
     }
 
@@ -265,6 +265,10 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     override fun onBackPressed() {
         if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
             hideBottomSheet()
+            val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
+            if (mapFragment is MapFragment) {
+                mapFragment.clearFeatureSelected()
+            }
         } else {
             return super.onBackPressed()
         }
@@ -305,5 +309,5 @@ interface MainActivityListener {
     fun showSnackbar(msg: String, duration: Int)
     fun hideSnackbar()
     fun onLogout()
-    fun moveMapIntoDeploymentMarker(lat: Double, lng: Double)
+    fun moveMapIntoDeploymentMarker(lat: Double, lng: Double, markerLocationId: String)
 }

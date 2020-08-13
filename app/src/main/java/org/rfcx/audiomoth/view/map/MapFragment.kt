@@ -173,7 +173,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         style.addSource(deploymentSource!!)
     }
 
-    private fun clearFeatureSelected() {
+    fun clearFeatureSelected() {
         if (this.deploymentFeatures?.features() != null) {
             val features = this.deploymentFeatures!!.features()
             features?.forEach { setFeatureSelectState(it, false) }
@@ -467,11 +467,20 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    fun moveToDeploymentMarker(lat: Double, lng: Double) {
+    fun moveToDeploymentMarker(lat: Double, lng: Double, markerLocationId: String) {
         mapboxMap?.let {
             it.moveCamera(
                 CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), it.cameraPosition.zoom)
             )
+        }
+
+        val features = this.deploymentFeatures!!.features()!!
+        features.forEachIndexed { index, feature ->
+            if (markerLocationId == feature.getProperty(PROPERTY_MARKER_LOCATION_ID).toString()) {
+                features[index]?.let { setFeatureSelectState(it, true) }
+            } else {
+                features[index]?.let { setFeatureSelectState(it, false) }
+            }
         }
     }
 

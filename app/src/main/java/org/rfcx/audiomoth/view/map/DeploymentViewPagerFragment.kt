@@ -201,7 +201,8 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
                     this@DeploymentViewPagerFragment.currentPosition = position
                     (activity as MainActivity).moveMapIntoDeploymentMarker(
                         it.latitude,
-                        it.longitude
+                        it.longitude,
+                        "\"${it.locationName}.${it.id}\""
                     )
                 }
             }
