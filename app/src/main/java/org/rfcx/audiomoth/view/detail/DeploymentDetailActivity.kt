@@ -84,16 +84,16 @@ class DeploymentDetailActivity : BaseActivity() {
         builder.setTitle(getString(R.string.delete_location))
         builder.setMessage(getString(R.string.are_you_sure_delete_location))
 
-        builder.setPositiveButton(getString(R.string.yes)) { _, _ ->
+        builder.setPositiveButton(getString(R.string.delete)) { _, _ ->
             onDeleteLocation()
         }
-        builder.setNeutralButton(getString(R.string.cancel)) { _, _ -> }
+        builder.setNegativeButton(getString(R.string.cancel)) { _, _ -> }
 
         val dialog: AlertDialog = builder.create()
         dialog.show()
         dialog.getButton(AlertDialog.BUTTON_POSITIVE)
             .setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0f)
-        dialog.getButton(AlertDialog.BUTTON_NEUTRAL)
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
             .setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0f)
     }
 

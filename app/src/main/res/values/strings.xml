@@ -62,8 +62,8 @@
     <string name="detail_sec">%d second</string>
     <string name="delete">Delete</string>
     <string name="edit">edit</string>
-    <string name="delete_location">Delete location</string>
-    <string name="are_you_sure_delete_location">Are you sure you\'d like to delete this location?</string>
+    <string name="delete_location">Delete location?</string>
+    <string name="are_you_sure_delete_location">The device and its location will be removed</string>
 
     <!--  Perform Battery  -->
     <string name="test">test</string>
