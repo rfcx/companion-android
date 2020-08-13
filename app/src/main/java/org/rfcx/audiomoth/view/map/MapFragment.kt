@@ -30,6 +30,7 @@ import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.mapboxsdk.style.expressions.Expression
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
@@ -172,6 +173,20 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         style.addSource(deploymentSource!!)
     }
 
+    private fun clearFeatureSelected() {
+        if (this.deploymentFeatures?.features() != null) {
+            val features = this.deploymentFeatures!!.features()
+            features?.forEach { setFeatureSelectState(it, false) }
+        }
+    }
+
+    private fun setFeatureSelectState(feature: Feature, selectedState: Boolean) {
+        feature.properties()?.let {
+            it.addProperty(PROPERTY_SELECTED, selectedState)
+            refreshSource()
+        }
+    }
+
     private fun setupImages(style: Style) {
         val drawablePinConnectedGuardian =
             ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map, null)
@@ -210,7 +225,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 PropertyFactory.iconImage("{$PROPERTY_MARKER_IMAGE}"),
                 PropertyFactory.iconAllowOverlap(true),
                 PropertyFactory.iconIgnorePlacement(true),
-                PropertyFactory.iconSize(1f)
+                PropertyFactory.iconSize(
+                    Expression.match(
+                        Expression.toString(
+                            Expression.get(
+                                PROPERTY_SELECTED
+                            )
+                        ), Expression.literal(0.8f), Expression.stop("true", 1.0f)
+                    )
+                )
             )
         }
         style.addLayer(markerLayer)
@@ -221,22 +244,26 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         if (deploymentFeatures != null && deploymentFeatures.isNotEmpty()) {
             val selectedFeature = deploymentFeatures[0]
             val features = this.deploymentFeatures!!.features()!!
-            features.forEachIndexed { _, feature ->
+            features.forEachIndexed { index, feature ->
                 if (selectedFeature.getProperty(PROPERTY_MARKER_LOCATION_ID) == feature.getProperty(
                         PROPERTY_MARKER_LOCATION_ID
                     )
                 ) {
+                    features[index]?.let { setFeatureSelectState(it, true) }
                     val deploymentId =
                         selectedFeature.getStringProperty(PROPERTY_MARKER_DEPLOYMENT_ID).toInt()
                     (activity as MainActivityListener).showBottomSheet(
                         DeploymentViewPagerFragment.newInstance(deploymentId)
                     )
+                } else {
+                    features[index]?.let { setFeatureSelectState(it, false) }
                 }
             }
             return true
         } else {
             (activity as MainActivityListener).hideBottomSheet()
         }
+        clearFeatureSelected()
         return false
     }
 
@@ -528,6 +555,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         private const val SOURCE_DEPLOYMENT = "source.deployment"
         private const val MARKER_DEPLOYMENT_ID = "marker.deployment"
 
+        private const val PROPERTY_SELECTED = "selected"
         private const val PROPERTY_MARKER_DEVICE = "device"
         private const val PROPERTY_MARKER_LOCATION_ID = "location"
         private const val PROPERTY_MARKER_TITLE = "title"
