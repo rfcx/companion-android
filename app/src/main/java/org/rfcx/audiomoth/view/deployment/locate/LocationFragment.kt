@@ -306,6 +306,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             } else {
                 enableNewLocationButton()
                 onPressedNewLocation()
+                if (locateItems.isNullOrEmpty()) {
+                    existingRadioButton.isEnabled = false
+                }
             }
         }
     }
