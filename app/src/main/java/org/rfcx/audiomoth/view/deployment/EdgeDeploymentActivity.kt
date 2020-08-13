@@ -401,7 +401,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         val edgeDeploymentId = _deployment?.deploymentId
         val day = 24 * 60 * 60 * 1000
         val intent = Intent(this, NotificationBroadcastReceiver::class.java)
-        val dateAlarm = (_deployment?.batteryDepletedAt?.time)?.minus(day)?.let { Date(it + 60000) }
+        val dateAlarm = (_deployment?.batteryDepletedAt?.time)?.minus(day)?.let { Date(it) }
 
         intent.putExtra(EXTRA_BATTERY_DEPLETED_AT, _deployment?.batteryDepletedAt?.toDateTimeString())
         intent.putExtra(EXTRA_LOCATION_NAME, _deployment?.location?.name)
