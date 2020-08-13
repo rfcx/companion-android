@@ -62,8 +62,8 @@
     <string name="detail_sec">%d second</string>
     <string name="delete">Delete</string>
     <string name="edit">edit</string>
-    <string name="delete_location">Delete location</string>
-    <string name="are_you_sure_delete_location">Are you sure you\'d like to delete this location?</string>
+    <string name="delete_location">Delete location?</string>
+    <string name="are_you_sure_delete_location">The device and its location will be removed</string>
 
     <!--  Perform Battery  -->
     <string name="test">test</string>
@@ -76,6 +76,7 @@
     <string name="day">Estimated battery duration: %s day</string>
     <string name="notification">A notification will be sent a day \nbefore the battery is due to run out</string>
     <string name="too_low_battery">The battery level is too low \nto estimate the recording duration</string>
+    <string name="recharge_or_replace">Recharge or replace the batteries \nfor a longer recording duration</string>
     <string name="recharging">Batteries need recharging!</string>
 
     <!--  LocationFragment  -->

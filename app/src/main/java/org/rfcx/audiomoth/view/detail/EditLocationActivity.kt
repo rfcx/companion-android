@@ -5,22 +5,21 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_edit_location.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.DeploymentLocation
-import org.rfcx.audiomoth.entity.SyncState
+import org.rfcx.audiomoth.localdb.DatabaseCallback
 import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
+import org.rfcx.audiomoth.util.showCommonDialog
+import org.rfcx.audiomoth.view.BaseActivity
 import org.rfcx.audiomoth.view.deployment.locate.MapPickerFragment
-import java.util.*
 
-class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocationActivityListener {
+class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActivityListener {
 
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
@@ -76,34 +75,26 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
         startFragment(MapPickerFragment.newInstance(latitude, longitude, name))
     }
 
-    override fun startDetailDeploymentPage(name: String) {
-        val deploymentLocation = DeploymentLocation(
-            name = name,
-            latitude = latitude,
-            longitude = longitude
-        )
+    override fun updateDeploymentDetail(name: String) {
+        showLoading()
         deploymentId?.let {
-            val edgeDeployment = edgeDeploymentDb.getDeploymentById(it)
-            if (edgeDeployment != null) {
-                edgeDeploymentDb.insertOrUpdate(edgeDeployment, deploymentLocation)
-                edgeDeployment.updatedAt = Date()
-                edgeDeployment.syncState = SyncState.Unsent.key
-                edgeDeploymentDb.updateDeployment(edgeDeployment)
-
-                edgeDeployment.serverId?.let { serverId ->
-                    val location = locateDb.getLocateByServerId(serverId)
-                    if (location != null) {
-                        location.latitude = latitude
-                        location.longitude = longitude
-                        location.name = name
-                        location.syncState = SyncState.Unsent.key
-                        locateDb.updateLocate(location)
+            edgeDeploymentDb.editLocation(
+                id = it,
+                locationName = name,
+                latitude = latitude,
+                longitude = longitude,
+                callback = object : DatabaseCallback {
+                    override fun onSuccess() {
+                        DeploymentSyncWorker.enqueue(this@EditLocationActivity)
+                        hideLoading()
+                        finish()
                     }
-                }
 
-                DeploymentSyncWorker.enqueue(this)
-                finish()
-            }
+                    override fun onFailure(errorMessage: String) {
+                        hideLoading()
+                        showCommonDialog(errorMessage)
+                    }
+                })
         }
     }
 

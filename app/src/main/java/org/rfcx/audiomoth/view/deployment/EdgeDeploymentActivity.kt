@@ -1,5 +1,8 @@
 package org.rfcx.audiomoth.view.deployment
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -205,6 +208,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             deploymentDb.updateDeployment(it)
 
             DeploymentSyncWorker.enqueue(this@EdgeDeploymentActivity)
+            notification()
             hideLoading()
             showComplete()
         }
@@ -393,6 +397,33 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         }
     }
 
+    private fun notification() {
+        val edgeDeploymentId = _deployment?.deploymentId
+        val day = 24 * 60 * 60 * 1000
+        val intent = Intent(this, NotificationBroadcastReceiver::class.java)
+        val dateAlarm = (_deployment?.batteryDepletedAt?.time)?.minus(day)?.let { Date(it) }
+
+        intent.putExtra(EXTRA_BATTERY_DEPLETED_AT, _deployment?.batteryDepletedAt?.toDateTimeString())
+        intent.putExtra(EXTRA_LOCATION_NAME, _deployment?.location?.name)
+        intent.putExtra(EXTRA_DEPLOYMENT_ID, edgeDeploymentId)
+
+        val pendingIntent =
+            PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        val cal = Calendar.getInstance()
+        if (dateAlarm != null) {
+            cal.time = dateAlarm
+            if (dateAlarm.time > System.currentTimeMillis()) {
+                val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                alarmManager.setExact(
+                    AlarmManager.RTC_WAKEUP,
+                    cal.timeInMillis,
+                    pendingIntent
+                )
+            }
+        }
+    }
+
     private fun handleNestedFragmentBackStack(fragmentManager: FragmentManager): Boolean {
         val childFragmentList = fragmentManager.fragments
         if (childFragmentList.size > 0) {
@@ -415,6 +446,8 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     companion object {
         const val loadingDialogTag = "LoadingDialog"
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
+        const val EXTRA_BATTERY_DEPLETED_AT = "EXTRA_BATTERY_DEPLETED_AT"
+        const val EXTRA_LOCATION_NAME = "EXTRA_LOCATION_NAME"
 
         fun startActivity(context: Context) {
             val intent = Intent(context, EdgeDeploymentActivity::class.java)
@@ -425,6 +458,12 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             val intent = Intent(context, EdgeDeploymentActivity::class.java)
             intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
             context.startActivity(intent)
+        }
+
+        fun startActivity(context: Context, deploymentId: Int, requestCode: Int) {
+            val intent = Intent(context, EdgeDeploymentActivity::class.java)
+            intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
+            (context as Activity).startActivityForResult(intent, requestCode)
         }
     }
 }

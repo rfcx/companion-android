@@ -1,25 +1,19 @@
 package org.rfcx.audiomoth.view.deployment.verify
 
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import java.sql.Timestamp
-import java.util.*
 import kotlinx.android.synthetic.main.fragment_perform_battery.*
 import kotlinx.android.synthetic.main.fragment_perform_battery_level.*
 import kotlinx.android.synthetic.main.fragment_select_battery_level.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.EdgeBatteryInfo
 import org.rfcx.audiomoth.entity.DeploymentLocation
-import org.rfcx.audiomoth.util.NotificationBroadcastReceiver
-import org.rfcx.audiomoth.util.toDateTimeString
+import org.rfcx.audiomoth.entity.EdgeBatteryInfo
 import org.rfcx.audiomoth.view.deployment.EdgeDeploymentProtocol
+import java.sql.Timestamp
 
 class PerformBatteryFragment : Fragment() {
     private var status: String? = null
@@ -69,7 +63,6 @@ class PerformBatteryFragment : Fragment() {
         skipButton.setOnClickListener {
             val batteryDepletedAt = Timestamp(System.currentTimeMillis() + (day * 8))
             if (location != null) {
-                notification(batteryDepletedAt, location!!.name)
                 edgeDeploymentProtocol?.setPerformBattery(batteryDepletedAt, 100)
                 edgeDeploymentProtocol?.nextStep()
             }
@@ -118,14 +111,21 @@ class PerformBatteryFragment : Fragment() {
         setBatteryView(level)
         daysTextView.text = if (level == 0) getString(R.string.recharging) else batteryDetail.days
         chargedTextView.text =
-            if (level == 0) getString(R.string.too_low_battery) else getString(R.string.notification)
+            when (level) {
+                0 -> getString(R.string.too_low_battery)
+                1 -> getString(R.string.recharge_or_replace)
+                else -> getString(
+                    R.string.notification
+                )
+            }
         nextButton.setOnClickListener {
             val batteryDepletedAt =
                 Timestamp(System.currentTimeMillis() + (day * batteryDetail.numberOfDays))
             if (location != null) {
-
-                notification(batteryDepletedAt, location!!.name)
-                edgeDeploymentProtocol?.setPerformBattery(batteryDepletedAt, batteryDetail.batteryLevel)
+                edgeDeploymentProtocol?.setPerformBattery(
+                    batteryDepletedAt,
+                    batteryDetail.batteryLevel
+                )
                 edgeDeploymentProtocol?.nextStep()
             }
         }
@@ -209,28 +209,6 @@ class PerformBatteryFragment : Fragment() {
         batteryLevel8View.visibility = if (view8) View.VISIBLE else View.INVISIBLE
     }
 
-    private fun notification(batteryDepletedAt: Timestamp, locationName: String) {
-        val intent = Intent(context, NotificationBroadcastReceiver::class.java)
-        val date = Date(batteryDepletedAt.time)
-        val dateAlarm = Date((batteryDepletedAt.time) - day)
-        intent.putExtra(BATTERY_DEPLETED_AT, date.toDateTimeString())
-        intent.putExtra(LOCATION_NAME, locationName)
-
-        val pendingIntent =
-            PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-
-        val cal = Calendar.getInstance()
-        cal.time = dateAlarm
-        if (dateAlarm.time > System.currentTimeMillis()) {
-            val alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            alarmManager.setExact(
-                AlarmManager.RTC_WAKEUP,
-                cal.timeInMillis,
-                pendingIntent
-            )
-        }
-    }
-
     companion object {
         const val TAG = "PerformBatteryFragment"
         const val STATUS = "STATUS"
@@ -238,8 +216,6 @@ class PerformBatteryFragment : Fragment() {
         const val TEST_BATTERY = "TEST_BATTERY"
         const val TIME_LED_FLASH = "TIME_LED_FLASH"
         const val BATTERY_LEVEL = "BATTERY_LEVEL"
-        const val BATTERY_DEPLETED_AT = "BATTERY_DEPLETED_AT"
-        const val LOCATION_NAME = "LOCATION_NAME"
 
         @JvmStatic
         fun newInstance(page: String, level: Int?) = PerformBatteryFragment()

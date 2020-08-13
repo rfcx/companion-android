@@ -3,7 +3,7 @@ package org.rfcx.audiomoth.localdb
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
-import org.rfcx.audiomoth.entity.EdgeDeployment
+import io.realm.kotlin.deleteFromRealm
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.SyncState
 import org.rfcx.audiomoth.entity.response.LocationResponse
@@ -22,18 +22,46 @@ class LocateDb(private val realm: Realm) {
     }
 
     fun getLocateById(id: Int): Locate? {
-        return realm.where(Locate::class.java).equalTo(Locate.FIELD_ID, id)
-            .findFirst()
+        return realm.where(Locate::class.java).equalTo(Locate.FIELD_ID, id).findFirst()
+    }
+
+    fun getLocateByEdgeDeploymentId(deploymentId: Int): Locate? {
+        return realm.where(Locate::class.java)
+            .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_ID, deploymentId).findFirst()
     }
 
     fun getLocateByServerId(serverId: String): Locate? {
         val locate =
             realm.where(Locate::class.java)
-                .equalTo(Locate.FIELD_LAST_DEPLOYMENT_SERVER_ID, serverId).findFirst()
+                .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_SERVER_ID, serverId).findFirst()
         if (locate != null) {
             return realm.copyFromRealm(locate)
         }
         return null
+    }
+
+    fun getDeleteLocateId(name: String, latitude: Double, longitude: Double): Int? {
+        var locateId: Int? = null
+        realm.executeTransaction {
+            val locate = it.where(Locate::class.java)
+                .equalTo("name", name)
+                .and()
+                .equalTo("latitude", latitude)
+                .and()
+                .equalTo("longitude", longitude)
+                .findFirst()
+            locateId = locate?.id
+        }
+        return locateId
+    }
+
+    fun deleteLocate(id: Int) {
+        realm.executeTransaction {
+            val locate =
+                it.where(Locate::class.java).equalTo(Locate.FIELD_ID, id)
+                    .findFirst()
+            locate?.deleteFromRealm()
+        }
     }
 
     fun unlockSent(): List<Locate> {
@@ -79,12 +107,6 @@ class LocateDb(private val realm: Realm) {
                 locate.serverId = serverId
                 locate.syncState = syncState
             }
-        }
-    }
-
-    fun updateLocate(locate: Locate) {
-        realm.executeTransaction {
-            it.insertOrUpdate(locate)
         }
     }
 

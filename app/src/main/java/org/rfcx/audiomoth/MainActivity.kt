@@ -12,37 +12,52 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
+import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
-import org.rfcx.audiomoth.entity.DeploymentLocation
-import org.rfcx.audiomoth.util.LocationPermissions
-import org.rfcx.audiomoth.util.Preferences
-import org.rfcx.audiomoth.util.getUserNickname
-import org.rfcx.audiomoth.util.logout
+import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
+import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.deployment.EdgeDeploymentActivity
-import org.rfcx.audiomoth.view.map.DeploymentBottomSheet
+import org.rfcx.audiomoth.view.map.DeploymentDetailView
+import org.rfcx.audiomoth.view.map.DeploymentViewPagerFragment
 import org.rfcx.audiomoth.view.map.MapFragment
 import org.rfcx.audiomoth.view.profile.ProfileFragment
 import org.rfcx.audiomoth.widget.BottomNavigationMenuItem
 
 class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListener {
-    // database manager
+    private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
+    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
+
     private var currentFragment: Fragment? = null
     private val locationPermissions by lazy { LocationPermissions(this) }
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
-
     private var snackbar: Snackbar? = null
-    private var _showDeployments: List<DeploymentBottomSheet> = listOf()
+    private var _showDeployments: List<DeploymentDetailView> = listOf()
 
-    override fun getShowDeployments(): List<DeploymentBottomSheet> = this._showDeployments
+    override fun getShowDeployments(): List<DeploymentDetailView> = this._showDeployments
 
-    override fun setShowDeployments(deployments: List<DeploymentBottomSheet>) {
+    override fun setShowDeployments(deployments: List<DeploymentDetailView>) {
         this._showDeployments = deployments
+        // delete?
+        updateDeploymentDetailPagerView()
+    }
+
+    private fun updateDeploymentDetailPagerView() {
+        val bottomSheetFragment =
+            supportFragmentManager.findFragmentByTag(BOTTOM_SHEET)
+        if (bottomSheetFragment != null && bottomSheetFragment is DeploymentViewPagerFragment) {
+            bottomSheetFragment.updateItems()
+            if (_showDeployments.isEmpty()) {
+                hideBottomSheet()
+                showBottomAppBar()
+            }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+
         locationPermissions.handleActivityResult(requestCode, resultCode)
 
         currentFragment?.let {
@@ -210,10 +225,10 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         finish()
     }
 
-    override fun moveMapIntoReportMarker(location: DeploymentLocation) {
+    override fun moveMapIntoDeploymentMarker(lat: Double, lng: Double) {
         val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
         if (mapFragment is MapFragment) {
-            mapFragment.moveToDeploymentMarker(location)
+            mapFragment.moveToDeploymentMarker(lat, lng)
         }
     }
 
@@ -225,6 +240,10 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     override fun showBottomAppBar() {
         bottomBar.visibility = View.VISIBLE
         createLocationButton.visibility = View.VISIBLE
+    }
+
+    override fun getBottomSheetState(): Int {
+        return bottomSheetBehavior.state
     }
 
     override fun showBottomSheet(fragment: Fragment) {
@@ -251,25 +270,34 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         }
     }
 
-    companion object {
-        private const val IMAGES = "IMAGES"
-        private const val DEPLOYMENT_ID = "DEPLOYMENT_ID"
-        private const val BOTTOM_SHEET = "BOTTOM_SHEET"
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        val edgeDeploymentId: String? = intent?.getStringExtra(EXTRA_DEPLOYMENT_ID)
 
-        fun startActivity(
-            context: Context,
-            images: ArrayList<String>? = null,
-            deploymentId: String? = null
-        ) {
+        if (edgeDeploymentId != null) {
+            val deployment = edgeDeploymentDb.getDeploymentByDeploymentId(edgeDeploymentId)
+            deployment?.let {
+                showBottomSheet(DeploymentViewPagerFragment.newInstance(it.id))
+            }
+        }
+    }
+
+    companion object {
+        const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
+        private const val BOTTOM_SHEET = "BOTTOM_SHEET"
+        const val CREATE_DEPLOYMENT_REQUEST_CODE = 1002
+
+        fun startActivity(context: Context, deploymentId: String? = null) {
             val intent = Intent(context, MainActivity::class.java)
-            intent.putStringArrayListExtra(IMAGES, images)
-            intent.putExtra(DEPLOYMENT_ID, deploymentId)
+            if (deploymentId != null)
+                intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
             context.startActivity(intent)
         }
     }
 }
 
 interface MainActivityListener {
+    fun getBottomSheetState(): Int
     fun showBottomSheet(fragment: Fragment)
     fun showBottomAppBar()
     fun hidBottomAppBar()
@@ -277,5 +305,5 @@ interface MainActivityListener {
     fun showSnackbar(msg: String, duration: Int)
     fun hideSnackbar()
     fun onLogout()
-    fun moveMapIntoReportMarker(location: DeploymentLocation)
+    fun moveMapIntoDeploymentMarker(lat: Double, lng: Double)
 }

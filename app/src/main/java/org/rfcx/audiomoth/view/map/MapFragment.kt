@@ -14,6 +14,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.work.WorkInfo
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
@@ -38,7 +39,6 @@ import kotlinx.android.synthetic.main.fragment_map.*
 import org.rfcx.audiomoth.DeploymentListener
 import org.rfcx.audiomoth.MainActivityListener
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.DeploymentState.Edge
 import org.rfcx.audiomoth.entity.Device
 import org.rfcx.audiomoth.entity.EdgeDeployment
@@ -74,7 +74,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var lastSyncingInfo: SyncInfo? = null
 
     private lateinit var guardianDeployLiveData: LiveData<List<GuardianDeployment>>
-    private lateinit var deployLiveData: LiveData<List<EdgeDeployment>>
+    private lateinit var edgeDeployLiveData: LiveData<List<EdgeDeployment>>
     private lateinit var locateLiveData: LiveData<List<Locate>>
     private lateinit var deploymentWorkInfoLiveData: LiveData<List<WorkInfo>>
 
@@ -221,24 +221,22 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         if (deploymentFeatures != null && deploymentFeatures.isNotEmpty()) {
             val selectedFeature = deploymentFeatures[0]
             val features = this.deploymentFeatures!!.features()!!
-            features.forEachIndexed { index, feature ->
+            features.forEachIndexed { _, feature ->
                 if (selectedFeature.getProperty(PROPERTY_MARKER_LOCATION_ID) == feature.getProperty(
                         PROPERTY_MARKER_LOCATION_ID
                     )
                 ) {
-                    val id =
-                        selectedFeature.getStringProperty(PROPERTY_MARKER_LOCATION_ID).split(".")[1]
+                    val deploymentId =
+                        selectedFeature.getStringProperty(PROPERTY_MARKER_DEPLOYMENT_ID).toInt()
                     (activity as MainActivityListener).showBottomSheet(
-                        DeploymentViewPagerFragment.newInstance(
-                            id.toInt()
-                        )
+                        DeploymentViewPagerFragment.newInstance(deploymentId)
                     )
                 }
             }
             return true
+        } else {
+            (activity as MainActivityListener).hideBottomSheet()
         }
-        (activity as MainActivityListener).hideBottomSheet()
-
         return false
     }
 
@@ -266,55 +264,53 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             it.getLastDeploymentId()
         })
 
-        val showDeployments = this.edgeDeployments.filter {
-            if (it.isSent()) showDeployIds.contains(it.serverId) else showDeployIds.contains(it.id.toString())
+        val showEdgeDeployments = this.edgeDeployments.filter {
+            showDeployIds.contains(it.serverId) || showDeployIds.contains(it.id.toString())
         }
 
         val showGuardianDeployments = this.guardianDeployments.filter {
-            if (it.isSent()) showDeployIds.contains(it.serverId) else showDeployIds.contains(it.id.toString())
+            showDeployIds.contains(it.serverId) || showDeployIds.contains(it.id.toString())
         }
 
-        val deploymentMarkers = showDeployments.map { it.toMark() }
+        val edgeDeploymentMarkers = showEdgeDeployments.map { it.toMark() }
         val guardianDeploymentMarkers = showGuardianDeployments.map { it.toMark() }
-
-        handleMarkerDeployment(deploymentMarkers + guardianDeploymentMarkers)
-        handleShowDeployment(showDeployments, showGuardianDeployments)
+        val deploymentMarkers = edgeDeploymentMarkers + guardianDeploymentMarkers
+        handleShowDeployment(showEdgeDeployments, showGuardianDeployments)
+        handleMarkerDeployment(deploymentMarkers)
     }
 
     private fun handleShowDeployment(
-        deployments: List<EdgeDeployment>,
+        edgeDeployments: List<EdgeDeployment>,
         guardianDeployments: List<GuardianDeployment>
     ) {
-        val showDeployments = arrayListOf<DeploymentBottomSheet>()
-        val showGuardianDeployments = arrayListOf<DeploymentBottomSheet>()
-
-        deployments.forEach {
-            showDeployments.add(DeploymentBottomSheet(it.id, Device.EDGE.value))
-        }
-
-        guardianDeployments.forEach {
-            showGuardianDeployments.add(DeploymentBottomSheet(it.id, Device.GUARDIAN.value))
-        }
-
-        deploymentListener?.setShowDeployments(showDeployments + showGuardianDeployments)
+        val deploymentDetails = arrayListOf<DeploymentDetailView>()
+        deploymentDetails.addAll(edgeDeployments.map {
+            it.toEdgeDeploymentView()
+        })
+        deploymentDetails.addAll(guardianDeployments.map {
+            it.toGuardianDeploymentView()
+        })
+        deploymentListener?.setShowDeployments(deploymentDetails)
     }
 
     private fun fetchData() {
+        locateLiveData = Transformations.map(locateDb.getAllResultsAsync().asLiveData()) {
+            it
+        }
+
+        edgeDeployLiveData =
+            Transformations.map(edgeDeploymentDb.getAllResultsAsync().asLiveData()) {
+                it
+            }
+
         guardianDeployLiveData =
             Transformations.map(guardianDeploymentDb.getAllResultsAsync().asLiveData()) {
                 it
             }
-        guardianDeployLiveData.observeForever(guardianDeploymentObserve)
 
-        deployLiveData = Transformations.map(edgeDeploymentDb.getAllResultsAsync().asLiveData()) {
-            it
-        }
-        deployLiveData.observeForever(edgeDeploymentObserve)
-
-        locateLiveData = Transformations.map(locateDb.getAllResultsAsync().asLiveData()) {
-            it
-        }
         locateLiveData.observeForever(locateObserve)
+        edgeDeployLiveData.observeForever(edgeDeploymentObserve)
+        guardianDeployLiveData.observeForever(guardianDeploymentObserve)
     }
 
     private fun retrieveDeployments(context: Context) {
@@ -341,7 +337,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         if (this.lastSyncingInfo == SyncInfo.Uploaded && status == SyncInfo.Uploaded) return
 
         this.lastSyncingInfo = status
+        val state = listener?.getBottomSheetState() ?: 0
+        if (state != BottomSheetBehavior.STATE_EXPANDED) {
+            setSnackbar(status)
+        }
+    }
 
+    private fun setSnackbar(status: SyncInfo) {
         val deploymentUnsentCount = edgeDeploymentDb.unsentCount().toInt()
         when (status) {
             SyncInfo.Starting, SyncInfo.Uploading -> {
@@ -386,7 +388,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         refreshSource()
 
         val lastDeployment = deploymentMarkers.maxBy { it.updatedAt ?: it.createdAt }
-        if (lastDeployment != null) {
+        val state = listener?.getBottomSheetState() ?: 0
+        if (lastDeployment != null && state != BottomSheetBehavior.STATE_EXPANDED) {
             moveCamera(LatLng(lastDeployment.latitude, lastDeployment.longitude))
         }
     }
@@ -437,15 +440,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    fun moveToDeploymentMarker(location: DeploymentLocation) {
+    fun moveToDeploymentMarker(lat: Double, lng: Double) {
         mapboxMap?.let {
             it.moveCamera(
-                CameraUpdateFactory.newLatLngZoom(
-                    LatLng(
-                        location.latitude,
-                        location.longitude
-                    ), it.cameraPosition.zoom
-                )
+                CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), it.cameraPosition.zoom)
             )
         }
     }
@@ -479,7 +477,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         super.onDestroy()
         deploymentWorkInfoLiveData.removeObserver(workInfoObserve)
         guardianDeployLiveData.removeObserver(guardianDeploymentObserve)
-        deployLiveData.removeObserver(edgeDeploymentObserve)
+        edgeDeployLiveData.removeObserver(edgeDeploymentObserve)
         locateLiveData.removeObserver(locateObserve)
         mapView.onDestroy()
     }
@@ -530,14 +528,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         private const val SOURCE_DEPLOYMENT = "source.deployment"
         private const val MARKER_DEPLOYMENT_ID = "marker.deployment"
 
-        private const val PROPERTY_SELECTED = "selected"
         private const val PROPERTY_MARKER_DEVICE = "device"
         private const val PROPERTY_MARKER_LOCATION_ID = "location"
         private const val PROPERTY_MARKER_TITLE = "title"
         private const val PROPERTY_MARKER_DEPLOYMENT_ID = "deployment"
         private const val PROPERTY_MARKER_CAPTION = "caption"
         private const val PROPERTY_MARKER_IMAGE = "marker.image"
-        private const val MARKER_GUARDIAN_PIN = "guardian_pin"
 
         fun newInstance(): MapFragment {
             return MapFragment()

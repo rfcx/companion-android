@@ -1,12 +1,13 @@
 package org.rfcx.audiomoth.localdb
 
-import android.util.Log
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
+import io.realm.kotlin.deleteFromRealm
 import org.rfcx.audiomoth.entity.*
 import org.rfcx.audiomoth.entity.response.EdgeDeploymentResponse
 import org.rfcx.audiomoth.entity.response.toEdgeDeployment
+import java.util.*
 
 /**
  * For Manage the saving and sending of deployment from the local database
@@ -116,9 +117,118 @@ class EdgeDeploymentDb(private val realm: Realm) {
         }
     }
 
+    /**
+     * Delete Locate
+     * */
+    fun deleteDeploymentLocation(id: Int, callback: DatabaseCallback) {
+        realm.executeTransactionAsync({ bgRealm ->
+            // do update and set delete deployment
+            val edgeDeployment =
+                bgRealm.where(EdgeDeployment::class.java).equalTo(EdgeDeployment.FIELD_ID, id)
+                    .findFirst()
+            if (edgeDeployment?.location != null) {
+                edgeDeployment.deletedAt = Date()
+                edgeDeployment.updatedAt = Date()
+                edgeDeployment.syncState = SyncState.Unsent.key
+            }
+
+            // do set delete location
+            val location = if (edgeDeployment?.serverId != null) {
+                bgRealm.where(Locate::class.java)
+                    .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_SERVER_ID, edgeDeployment.serverId)
+                    .findFirst()
+            } else {
+                bgRealm.where(Locate::class.java)
+                    .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_ID, id).findFirst()
+            }
+
+            if (location != null) {
+                location.deletedAt = Date()
+                location.syncState = SyncState.Unsent.key
+            }
+        }, {
+            // success
+            realm.close()
+            callback.onSuccess()
+        }, {
+            // failure
+            realm.close()
+            callback.onFailure(it.localizedMessage ?: "")
+        })
+    }
+
+    /**
+     * Update Deployment Location and Locate
+     * */
+    fun editLocation(
+        id: Int,
+        locationName: String,
+        latitude: Double,
+        longitude: Double,
+        callback: DatabaseCallback
+    ) {
+        realm.executeTransactionAsync({ bgRealm ->
+            // do update deployment location
+            val edgeDeployment =
+                bgRealm.where(EdgeDeployment::class.java).equalTo(EdgeDeployment.FIELD_ID, id)
+                    .findFirst()
+            if (edgeDeployment?.location != null) {
+                edgeDeployment.location?.name = locationName
+                edgeDeployment.location?.latitude = latitude
+                edgeDeployment.location?.longitude = longitude
+                edgeDeployment.updatedAt = Date()
+                edgeDeployment.syncState = SyncState.Unsent.key
+            }
+
+            // do update location
+            val location = if (edgeDeployment?.serverId != null) {
+                bgRealm.where(Locate::class.java)
+                    .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_SERVER_ID, edgeDeployment.serverId)
+                    .findFirst()
+            } else {
+                bgRealm.where(Locate::class.java)
+                    .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_ID, id).findFirst()
+            }
+
+            if (location != null) {
+                location.latitude = latitude
+                location.longitude = longitude
+                location.name = locationName
+                location.syncState = SyncState.Unsent.key
+            }
+        }, {
+            // success
+            realm.close()
+            callback.onSuccess()
+        }, {
+            // failure
+            realm.close()
+            callback.onFailure(it.localizedMessage ?: "")
+        })
+    }
+
+    fun deleteDeployment(id: Int) {
+        realm.executeTransaction {
+            val deployment =
+                it.where(EdgeDeployment::class.java).equalTo(EdgeDeployment.FIELD_ID, id)
+                    .findFirst()
+            deployment?.deleteFromRealm()
+        }
+    }
+
     fun getDeploymentById(id: Int): EdgeDeployment? {
         val deployment =
             realm.where(EdgeDeployment::class.java).equalTo(EdgeDeployment.FIELD_ID, id).findFirst()
+        if (deployment != null) {
+            return realm.copyFromRealm(deployment)
+        }
+        return null
+    }
+
+    fun getDeploymentByDeploymentId(deploymentId: String): EdgeDeployment? {
+        val deployment =
+            realm.where(EdgeDeployment::class.java)
+                .equalTo(EdgeDeployment.FIELD_DEPLOYMENT_ID, deploymentId).findFirst()
         if (deployment != null) {
             return realm.copyFromRealm(deployment)
         }
@@ -157,9 +267,6 @@ class EdgeDeploymentDb(private val realm: Realm) {
             realm.where(DeploymentImage::class.java)
                 .equalTo(DeploymentImage.FIELD_DEPLOYMENT_ID, deploymentId)
                 .findAll()
-        images?.forEach {
-            Log.i("saveDeploymentIdToImage", it.localPath)
-        }
         realm.executeTransaction { transition ->
             images?.forEach {
                 val image = it.apply {
