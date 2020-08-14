@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation" translatable="false">
-    <string name="app_name">RFCx Companion</string>
+    <string name="app_name">Companion</string>
 
     <string name="auth0_client_id">Y9zqxaStNad486EnJJduIcFtrmrkHpvV</string>
     <string name="auth0_domain">auth.rfcx.org</string>
