@@ -80,12 +80,17 @@ class FrequencyView : View {
         canvas = Canvas(bitmap!!)
     }
 
+    fun resetToDefaultValue() {
+        colorScale = RAINBOW
+        freqScale = LINEAR
+    }
+
     fun setSamplingRate(sampling: Int) {
         samplingRate = sampling
     }
 
     fun setMagnitudes(m: FloatArray) {
-        _magnitudes = FloatArray(AudioSpectrogramUtils.fftResolution)
+        _magnitudes = FloatArray(AudioSpectrogramUtils.getFFTResolution())
         System.arraycopy(m, 0, _magnitudes!!, 0, m.size)
     }
 
@@ -240,4 +245,5 @@ class FrequencyView : View {
         val b = ave(Color.blue(c0), Color.blue(c1), p)
         return Color.argb(a, r, g, b)
     }
+
 }

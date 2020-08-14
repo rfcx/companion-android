@@ -1,24 +1,39 @@
 package org.rfcx.audiomoth.util.spectrogram
 
-import androidx.lifecycle.MutableLiveData
 import org.jtransforms.fft.FloatFFT_1D
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.util.*
+import kotlin.math.min
 import kotlin.math.sqrt
 
 
 object AudioSpectrogramUtils {
 
-    var fftResolution = 1024
+    private enum class ScrollSpeed(val value: Int) { FAST(1024), NORMAL(2048), SLOW(4096)}
+
+    private var fftResolution = 1024
 
     private var bufferStack: ArrayList<ShortArray>? = null
     private var fftBuffer: ShortArray? = null
     private var isSetup = false
 
-    val spectrogramLive = MutableLiveData<FloatArray>()
+    fun getFFTResolution(): Int = fftResolution
 
-    init {
-        spectrogramLive.value = FloatArray(1)
+    fun resetToDefaultValue() {
+        fftResolution = 1024
+    }
+
+    fun resetSetupState() {
+        isSetup = false
+    }
+
+    fun setSpeed(speed: String) {
+        when (speed.toUpperCase(Locale.getDefault())) {
+            ScrollSpeed.FAST.name -> fftResolution = ScrollSpeed.FAST.value
+            ScrollSpeed.NORMAL.name -> fftResolution = ScrollSpeed.NORMAL.value
+            ScrollSpeed.SLOW.name -> fftResolution = ScrollSpeed.SLOW.value
+        }
     }
 
     fun setupSpectrogram(bufferLength: Int) {
@@ -28,14 +43,15 @@ object AudioSpectrogramUtils {
             bufferStack = arrayListOf()
             val size = (bufferLength / (res / 2)) / 4
             for (i in 0 until size + 1) {
-                bufferStack!!.add(ShortArray(res / 2))
+                bufferStack!!.add(ShortArray((res / 2)))
             }
+            isSetup = true
         }
     }
 
-    fun getTrunks(recordBuffer: ShortArray) {
+    fun getTrunks(recordBuffer: ShortArray, spectrogramListener: SpectrogramListener) {
         val n = fftResolution
-        if(bufferStack != null) {
+        if (bufferStack != null) {
             // Trunks are consecutive n/2 length samples
             for (i in 0 until bufferStack!!.size - 1) {
                 System.arraycopy(
@@ -52,18 +68,12 @@ object AudioSpectrogramUtils {
             for (i in 0 until bufferStack!!.size - 1) {
                 System.arraycopy(bufferStack!![i], 0, fftBuffer!!, 0, n / 2)
                 System.arraycopy(bufferStack!![i + 1], 0, fftBuffer!!, n / 2, n / 2)
-                process()
+                process(spectrogramListener)
             }
-
-            // Last item has not yet fully be used (only its first half)
-            // Move it to first position in arraylist so that its last half is used
-            val first: ShortArray = bufferStack!![0]
-            val last: ShortArray = bufferStack!![bufferStack!!.size - 1]
-            System.arraycopy(last, 0, first, 0, n / 2)
         }
     }
 
-    private fun process() {
+    private fun process(spectrogramListener: SpectrogramListener) {
 
         val floatFFT = FloatArray(fftBuffer!!.size)
         fftBuffer!!.forEachIndexed { index, sh ->
@@ -71,15 +81,31 @@ object AudioSpectrogramUtils {
         }
 
         val fft = FloatFFT_1D(fftResolution.toLong())
-        val mag = FloatArray(floatFFT.size/2)
+        val mag = FloatArray(floatFFT.size / 2)
         fft.realForward(floatFFT)
-        for (i in 0 until floatFFT.size/2) {
+        for (i in 0 until floatFFT.size / 2) {
             val real = floatFFT[2 * i]
             val imagine = floatFFT[2 * i + 1]
             mag[i] = sqrt(real * real + imagine * imagine) / 83886070
         }
-        spectrogramLive.value = mag
+
+        spectrogramListener.onProcessed(mag)
     }
+}
+
+interface SpectrogramListener {
+    fun onProcessed(mag: FloatArray)
+}
+
+fun ShortArray.toSmallChunk(number: Int): List<ShortArray> {
+    val numberOfChunk = this.size / number
+    val resultChunk = arrayListOf<ShortArray>()
+    var i = 0
+    while (i < this.size) {
+        resultChunk.add(this.copyOfRange(i, min(this.size, i + numberOfChunk)))
+        i += numberOfChunk
+    }
+    return resultChunk
 }
 
 fun ByteArray.toShortArray(): ShortArray {

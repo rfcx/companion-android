@@ -287,5 +287,6 @@
     <string name="grey">Grey</string>
     <string name="color">Color</string>
     <string name="frequency_scale">Frequency Scale</string>
+    <string name="speed">Speed</string>
 
 </resources>
