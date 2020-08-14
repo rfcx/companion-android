@@ -1,6 +1,8 @@
 package org.rfcx.audiomoth.view.map
 
+import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.EdgeDeployment
+import org.rfcx.audiomoth.entity.SyncState
 import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
 import java.util.*
 
@@ -28,7 +30,13 @@ sealed class DeploymentDetailView {
         override val latitude: Double,
         override val longitude: Double,
         override val viewType: Int = DeploymentViewPagerAdapter.DEPLOYMENT_EDGE_VIEW
-    ) : DeploymentDetailView()
+    ) : DeploymentDetailView() {
+        val syncImage = when (syncState) {
+            SyncState.Unsent.key -> R.drawable.ic_cloud_queue_16dp
+            SyncState.Sending.key -> R.drawable.ic_cloud_upload_16dp
+            else -> R.drawable.ic_cloud_done_16dp
+        }
+    }
 
     data class GuardianDeploymentView(
         override val id: Int,
@@ -42,7 +50,13 @@ sealed class DeploymentDetailView {
         override val latitude: Double,
         override val longitude: Double,
         override val viewType: Int = DeploymentViewPagerAdapter.DEPLOYMENT_GUARDIAN_VIEW
-    ) : DeploymentDetailView()
+    ) : DeploymentDetailView() {
+        val syncImage = when (syncState) {
+            SyncState.Unsent.key -> R.drawable.ic_cloud_queue_16dp
+            SyncState.Sending.key -> R.drawable.ic_cloud_upload_16dp
+            else -> R.drawable.ic_cloud_done_16dp
+        }
+    }
 }
 
 fun EdgeDeployment.toEdgeDeploymentView(): DeploymentDetailView.EdgeDeploymentView {

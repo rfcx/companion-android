@@ -3,6 +3,7 @@ package org.rfcx.audiomoth.view.map
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -81,10 +82,18 @@ class EdgeDeploymentDetailViewHolder(
     private val tvEstimatedBatteryDuration = itemView.estimatedBatteryDurationTextView
     private val ivMoreIcon = itemView.moreIconImageView
     private val vDeploymentDetail = itemView.deploymentDetailView
+    private val ivSync = itemView.syncImageView
     private val vMoreIconView = itemView.moreIconView
 
     fun bind(deployment: DeploymentDetailView.EdgeDeploymentView) {
         val isReadyToUpload = deployment.state == DeploymentState.Edge.ReadyToUpload.key
+
+        ivSync.setImageDrawable(
+            ContextCompat.getDrawable(
+                itemView.context,
+                deployment.syncImage
+            )
+        )
 
         tvGuardianBadge.visibility = View.GONE
         tvLocation.text = deployment.locationName
@@ -123,6 +132,7 @@ class GuardianDeploymentDetailViewHolder(
     private val ivMoreIcon = itemView.moreIconImageView
     private val vDeploymentDetail = itemView.deploymentDetailView
     private val vMoreIconView = itemView.moreIconView
+    private val ivSync = itemView.syncImageView
     private val itemLayout = itemView.deploymentDetailLayout
 
     fun bind(deployment: DeploymentDetailView.GuardianDeploymentView) {
@@ -139,6 +149,12 @@ class GuardianDeploymentDetailViewHolder(
         itemLayout.setOnClickListener {
             itemClickListener.onClickedGuardianDeploymentDetail(deployment)
         }
+        ivSync.setImageDrawable(
+            ContextCompat.getDrawable(
+                itemView.context,
+                deployment.syncImage
+            )
+        )
     }
 }
 
