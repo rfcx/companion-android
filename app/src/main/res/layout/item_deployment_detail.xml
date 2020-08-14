@@ -29,10 +29,46 @@
                 android:layout_marginEnd="@dimen/margin_padding_small"
                 android:ellipsize="end"
                 android:maxLines="1"
-                app:layout_constraintEnd_toStartOf="@id/estimatedBatteryDurationTextView"
+                app:layout_constraintEnd_toStartOf="@id/batteryView"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Location 1" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/batteryGroupView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                app:constraint_referenced_ids="positiveBatteryView,batteryView,batteryLevelView" />
+
+            <View
+                android:id="@+id/positiveBatteryView"
+                android:layout_width="2dp"
+                android:layout_height="4dp"
+                android:background="@color/gray_30"
+                app:layout_constraintBottom_toBottomOf="@id/batteryView"
+                app:layout_constraintStart_toEndOf="@id/batteryView"
+                app:layout_constraintTop_toTopOf="@id/batteryView" />
+
+            <View
+                android:id="@+id/batteryView"
+                android:layout_width="16dp"
+                android:layout_height="10dp"
+                android:layout_marginEnd="@dimen/margin_padding_small"
+                android:background="@color/gray_30"
+                app:layout_constraintBottom_toBottomOf="@id/locationNameTextView"
+                app:layout_constraintEnd_toStartOf="@id/estimatedBatteryDurationTextView"
+                app:layout_constraintTop_toTopOf="@id/locationNameTextView" />
+
+            <View
+                android:id="@+id/batteryLevelView"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginEnd="@dimen/margin_padding_small"
+                android:background="@color/colorPrimary"
+                app:layout_constraintBottom_toBottomOf="@id/locationNameTextView"
+                app:layout_constraintStart_toStartOf="@id/batteryView"
+                app:layout_constraintTop_toTopOf="@id/locationNameTextView" />
 
             <TextView
                 android:id="@+id/estimatedBatteryDurationTextView"
