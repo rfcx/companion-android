@@ -96,7 +96,8 @@ class LoginActivity : AppCompatActivity() {
                             runOnUiThread { loading(false) }
                         }
                         is Ok -> {
-                            saveUserToFirestore(result.value)
+                            userTouch(result.value)
+                            CredentialKeeper(this@LoginActivity).save(result.value)
                         }
                     }
                 }
@@ -124,8 +125,8 @@ class LoginActivity : AppCompatActivity() {
         Firestore(this@LoginActivity)
             .saveUser(user, result.guid) { string, isSuccess ->
                 if (isSuccess) {
-                    userTouch(result.idToken)
-                    CredentialKeeper(this@LoginActivity).save(result)
+                    MainActivity.startActivity(this@LoginActivity)
+                    finish()
                 } else {
                     Toast.makeText(this@LoginActivity, string, Toast.LENGTH_SHORT).show()
                     loading(false)
@@ -155,7 +156,8 @@ class LoginActivity : AppCompatActivity() {
                             loading(false)
                         }
                         is Ok -> {
-                            saveUserToFirestore(result.value)
+                            userTouch(result.value)
+                            CredentialKeeper(this@LoginActivity).save(result.value)
                         }
                     }
                 }
@@ -185,17 +187,18 @@ class LoginActivity : AppCompatActivity() {
                             loading(false)
                         }
                         is Ok -> {
-                            saveUserToFirestore(result.value)
+                            userTouch(result.value)
+                            CredentialKeeper(this@LoginActivity).save(result.value)
                         }
                     }
                 }
             })
     }
 
-    private fun userTouch(idToken: String) {
+    private fun userTouch(result: UserAuthResponse) {
         runOnUiThread { loading() }
 
-        val authUser = "Bearer $idToken"
+        val authUser = "Bearer ${result.idToken}"
         ApiManager.getInstance().apiRest.userTouch(authUser)
             .enqueue(object : Callback<UserTouchResponse> {
                 override fun onFailure(call: Call<UserTouchResponse>, t: Throwable) {
@@ -209,7 +212,7 @@ class LoginActivity : AppCompatActivity() {
                 ) {
                     response.body()?.let {
                         if (it.success) {
-                            getFirebaseAuth(authUser)
+                            getFirebaseAuth(authUser, result)
                         } else {
                             loading(false)
                         }
@@ -218,7 +221,7 @@ class LoginActivity : AppCompatActivity() {
             })
     }
 
-    private fun getFirebaseAuth(authUser: String) {
+    private fun getFirebaseAuth(authUser: String, result: UserAuthResponse) {
         ApiManager.getInstance().apiFirebaseAuth.firebaseAuth(authUser)
             .enqueue(object : Callback<FirebaseAuthResponse> {
                 override fun onFailure(call: Call<FirebaseAuthResponse>, t: Throwable) {
@@ -232,13 +235,13 @@ class LoginActivity : AppCompatActivity() {
                     response: Response<FirebaseAuthResponse>
                 ) {
                     response.body()?.let {
-                        signInWithFirebaseToken(it.firebaseToken)
+                        signInWithFirebaseToken(it.firebaseToken, result)
                     }
                 }
             })
     }
 
-    private fun signInWithFirebaseToken(firebaseToken: String) {
+    private fun signInWithFirebaseToken(firebaseToken: String, result: UserAuthResponse) {
         val preferences = Preferences.getInstance(this)
 
         auth.signInWithCustomToken(firebaseToken)
@@ -247,8 +250,7 @@ class LoginActivity : AppCompatActivity() {
                     val user = auth.currentUser
                     user?.uid?.let { preferences.putString(USER_FIREBASE_UID, it) }
 
-                    MainActivity.startActivity(this@LoginActivity)
-                    finish()
+                    saveUserToFirestore(result)
                 } else {
                     loading(false)
                     Toast.makeText(baseContext, R.string.an_error_occurred, Toast.LENGTH_SHORT)
