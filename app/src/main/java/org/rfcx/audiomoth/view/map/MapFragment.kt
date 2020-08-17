@@ -154,7 +154,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             retrieveDeployments(it)
             retrieveLocations(it)
             retrieveDiagnostics(it)
-            retrieveImages(it)
         }
 
         mapboxMap.setStyle(Style.OUTDOORS) {
@@ -250,6 +249,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private val edgeDeploymentObserve = Observer<List<EdgeDeployment>> {
         this.edgeDeployments = it
+        context?.let { context ->
+            retrieveImages(context)
+        }
         combinedData()
     }
 
