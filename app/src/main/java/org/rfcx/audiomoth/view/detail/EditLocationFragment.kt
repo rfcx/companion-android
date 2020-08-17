@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -68,7 +69,15 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         }
 
         saveButton.setOnClickListener {
-            editLocationActivityListener?.updateDeploymentDetail(locationNameEditText.text.toString())
+            if (locationNameEditText.text.isNullOrBlank()) {
+                Toast.makeText(
+                    context,
+                    getString(R.string.please_fill_information),
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                editLocationActivityListener?.updateDeploymentDetail(locationNameEditText.text.toString())
+            }
         }
     }
 
