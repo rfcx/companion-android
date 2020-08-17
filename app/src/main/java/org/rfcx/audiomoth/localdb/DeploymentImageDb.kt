@@ -8,7 +8,11 @@ import org.rfcx.audiomoth.entity.DeploymentImage
 import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_ID
 import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_SERVER_ID
 import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_ID
+import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.SyncState
+import org.rfcx.audiomoth.entity.response.DeploymentImageResponse
+import org.rfcx.audiomoth.entity.response.LocationResponse
+import org.rfcx.audiomoth.entity.response.toLocate
 
 class DeploymentImageDb(private val realm: Realm) {
     /**
@@ -126,6 +130,26 @@ class DeploymentImageDb(private val realm: Realm) {
             val report = it.where(DeploymentImage::class.java).equalTo(FIELD_ID, id).findFirst()
             if (report != null) {
                 report.syncToFireStoreState = SyncState.Sent.key
+            }
+        }
+    }
+
+
+    fun insertOrUpdate(deploymentImageResponse: DeploymentImageResponse, deploymentId: Int?) {
+        realm.executeTransaction {
+            val image =
+                it.where(DeploymentImage::class.java)
+                    .equalTo(DeploymentImage.FIELD_REMOTE_PATH, deploymentImageResponse.remotePath)
+                    .findFirst()
+
+            if (image == null && deploymentId != null) {
+                val deploymentImage = deploymentImageResponse.toDeploymentImage()
+                val id = (it.where(DeploymentImage::class.java).max(FIELD_ID)?.toInt() ?: 0) + 1
+                deploymentImage.id = id
+                deploymentImage.deploymentId = deploymentId
+                deploymentImage.syncState = SyncState.Sent.key
+                deploymentImage.syncToFireStoreState = SyncState.Sent.key
+                it.insert(deploymentImage)
             }
         }
     }

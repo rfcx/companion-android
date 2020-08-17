@@ -44,6 +44,7 @@ import org.rfcx.audiomoth.entity.Device
 import org.rfcx.audiomoth.entity.EdgeDeployment
 import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
+import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.guardian.DiagnosticDb
@@ -63,6 +64,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     // database manager
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
+    private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
     private val diagnosticDb by lazy { DiagnosticDb(realm) }
@@ -247,6 +249,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private val edgeDeploymentObserve = Observer<List<EdgeDeployment>> {
         this.edgeDeployments = it
+        context?.let { context ->
+            retrieveImages(context)
+        }
         combinedData()
     }
 
@@ -323,6 +328,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun retrieveDiagnostics(context: Context) {
         Firestore(context).retrieveDiagnostics(diagnosticDb)
+    }
+
+    private fun retrieveImages(context: Context) {
+        Firestore(context).retrieveImages(edgeDeploymentDb, deploymentImageDb)
     }
 
     private fun fetchJobSyncing() {

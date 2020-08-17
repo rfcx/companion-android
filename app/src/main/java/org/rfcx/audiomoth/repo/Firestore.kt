@@ -10,10 +10,8 @@ import org.rfcx.audiomoth.entity.Device
 import org.rfcx.audiomoth.entity.EdgeDeployment
 import org.rfcx.audiomoth.entity.User
 import org.rfcx.audiomoth.entity.request.*
-import org.rfcx.audiomoth.entity.response.DiagnosticResponse
-import org.rfcx.audiomoth.entity.response.EdgeDeploymentResponse
-import org.rfcx.audiomoth.entity.response.GuardianDeploymentResponse
-import org.rfcx.audiomoth.entity.response.LocationResponse
+import org.rfcx.audiomoth.entity.response.*
+import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.guardian.DiagnosticDb
@@ -175,6 +173,36 @@ class Firestore(val context: Context) {
             .addOnFailureListener {
                 callback?.onFailureCallback(it.localizedMessage)
             }
+    }
+
+    fun retrieveImages(
+        edgeDeploymentDb: EdgeDeploymentDb,
+        deploymentImageDb: DeploymentImageDb,
+        callback: ResponseCallback<List<DeploymentImageResponse>>? = null
+    ) {
+        if (guid != "") {
+            val userDocument = db.collection(COLLECTION_USERS).document(guid)
+            userDocument.collection(COLLECTION_IMAGES).get()
+                .addOnSuccessListener {
+                    val deploymentImageResponses = arrayListOf<DeploymentImageResponse>()
+                    it.documents.forEach { doc ->
+                        val deploymentImageResponse =
+                            doc.toObject(DeploymentImageResponse::class.java)
+                        deploymentImageResponse?.let { it1 -> deploymentImageResponses.add(it1) }
+                    }
+
+                    deploymentImageResponses.forEach { lr ->
+                        val edgeDeploymentId =
+                            edgeDeploymentDb.getDeploymentByServerId(lr.deploymentServerId)
+                        deploymentImageDb.insertOrUpdate(lr, edgeDeploymentId?.id)
+                    }
+
+                    callback?.onSuccessCallback(deploymentImageResponses)
+                }
+                .addOnFailureListener {
+                    callback?.onFailureCallback(it.localizedMessage)
+                }
+        }
     }
 
     fun retrieveDiagnostics(
