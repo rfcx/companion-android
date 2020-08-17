@@ -29,7 +29,7 @@ object SocketManager {
     private const val SIGNAL_INFO = "signal_info"
     private const val MICROPHONE_TEST = "microphone_test"
 
-    private val audioChunks = arrayListOf<String>()
+    private var audioChunks = arrayListOf<String>()
     private var microphoneTestUtils: MicrophoneTestUtils? = null
     private var isTestingFirstTime = true
 
@@ -161,10 +161,10 @@ object SocketManager {
                                 audioChunks.add(response.audioBuffer.buffer)
                                 if (response.audioBuffer.amount == response.audioBuffer.number) {
                                     var fullAudio = ByteArray(0)
+
                                     audioChunks
                                         .map { microphoneTestUtils?.decodeEncodedAudio(it) }
                                         .forEach { fullAudio += it!! }
-
 
                                     if (isTestingFirstTime) {
                                         microphoneTestUtils?.let { util ->
@@ -181,6 +181,7 @@ object SocketManager {
                                             this.spectrogram.postValue(it.buffer)
                                         }
                                     }
+                                    audioChunks.clear()
                                     this.liveAudio.postValue(response)
                                 }
                             }

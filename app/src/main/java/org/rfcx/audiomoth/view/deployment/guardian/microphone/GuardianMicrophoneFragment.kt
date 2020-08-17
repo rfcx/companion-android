@@ -52,6 +52,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         super.onViewCreated(view, savedInstanceState)
 
         deploymentProtocol?.hideCompleteButton()
+        setupAudioTrack()
         setupSpectrogram()
         setupSpectrogramSpeed()
         setupSpectrogramFreqMenu()
@@ -69,6 +70,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
             isMicTesting = false
             isTimerPause = true
             setUiByState(MicTestingState.FINISH)
+            spectrogramStack.clear()
             microphoneTestUtils.stop()
         }
 
@@ -82,6 +84,10 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         finishButton.setOnClickListener {
             deploymentProtocol?.nextStep()
         }
+    }
+
+    private fun setupAudioTrack() {
+        microphoneTestUtils.setSampleRate(deploymentProtocol?.getSampleRate() ?: DEF_SAMPLERATE)
     }
 
     private fun setupSpectrogram() {
@@ -180,9 +186,11 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         spectrogramTimer?.schedule( object : TimerTask() {
             override fun run() {
                 if (spectrogramStack.isNotEmpty()) {
-                    spectrogramView.setMagnitudes(spectrogramStack[0])
-                    spectrogramView.invalidate()
-                    spectrogramStack.removeAt(0)
+                    if (spectrogramStack[0] != null) {
+                        spectrogramView.setMagnitudes(spectrogramStack[0])
+                        spectrogramView.invalidate()
+                        spectrogramStack.removeAt(0)
+                    }
                 }
             }
         }, DELAY, STACK_PERIOD)
@@ -212,12 +220,14 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
             it.stop()
             it.release()
         }
+        spectrogramTimer?.cancel()
+        spectrogramTimer= null
+
         if (isMicTesting) {
             timer?.cancel()
             timer = null
+            isMicTesting = false
         }
-        spectrogramTimer?.cancel()
-        spectrogramTimer= null
     }
 
     companion object {
@@ -229,7 +239,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         private const val DELAY = 0L
         private const val MILLI_PERIOD = 10L
 
-        private const val STACK_PERIOD = 40L
+        private const val STACK_PERIOD = 20L
         
         private const val DEF_SAMPLERATE = 24000
 
