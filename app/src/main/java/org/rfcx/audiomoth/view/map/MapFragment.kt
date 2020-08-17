@@ -396,15 +396,30 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun handleMarkerDeployment(deploymentMarkers: List<DeploymentMarker>) {
+        val features = this.deploymentFeatures?.features()
+        val deploymentSelecting = features?.firstOrNull { feature ->
+            feature.getBooleanProperty(PROPERTY_SELECTED) ?: false
+        }
+
         // Create point
         val pointFeatures = deploymentMarkers.map {
+            // check is this deployment is selecting (to set bigger pin)
+            val isSelecting =
+                if (deploymentSelecting == null) {
+                    false
+                } else {
+                    it.id.toString() == deploymentSelecting.getProperty(
+                        PROPERTY_MARKER_DEPLOYMENT_ID
+                    ).asString
+                }
             val properties = mapOf(
                 Pair(PROPERTY_MARKER_LOCATION_ID, "${it.locationName}.${it.id}"),
                 Pair(PROPERTY_MARKER_IMAGE, it.pin),
                 Pair(PROPERTY_MARKER_TITLE, it.locationName),
                 Pair(PROPERTY_MARKER_DEPLOYMENT_ID, it.id.toString()),
                 Pair(PROPERTY_MARKER_CAPTION, it.description),
-                Pair(PROPERTY_MARKER_DEVICE, it.device)
+                Pair(PROPERTY_MARKER_DEVICE, it.device),
+                Pair(PROPERTY_SELECTED, isSelecting.toString())
             )
             Feature.fromGeometry(
                 Point.fromLngLat(it.longitude, it.latitude), properties.toJsonObject()
