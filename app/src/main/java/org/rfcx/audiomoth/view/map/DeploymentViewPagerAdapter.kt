@@ -85,9 +85,7 @@ class EdgeDeploymentDetailViewHolder(
     private val ivMoreIcon = itemView.moreIconImageView
     private val vDeploymentDetail = itemView.deploymentDetailView
     private val ivSync = itemView.syncImageView
-    private val vBatteryLevel = itemView.batteryLevelView
-    private val vPositiveBattery = itemView.positiveBatteryView
-    private val gvBattery = itemView.batteryGroupView
+    private val batteryComponent = itemView.batteryComponent
     private val vMoreIconView = itemView.moreIconView
 
     fun bind(deployment: DeploymentDetailView.EdgeDeploymentView) {
@@ -99,28 +97,9 @@ class EdgeDeploymentDetailViewHolder(
                 deployment.syncImage
             )
         )
-
-        vBatteryLevel.requestLayout()
         val estimatedBatteryDays =
             Battery.getEstimatedBatteryDays(deployment.batteryDepletedAt.time)
-        when (estimatedBatteryDays) {
-            8 -> {
-                vBatteryLevel.layoutParams.width = (2 * estimatedBatteryDays).toPixels(itemView.context)
-                vPositiveBattery.setBackgroundColor(context.getIntColor(R.color.colorPrimary))
-                vBatteryLevel.setBackgroundColor(context.getIntColor(R.color.colorPrimary))
-            }
-            in 1..7 -> {
-                vBatteryLevel.setBackgroundColor(context.getIntColor(R.color.colorPrimary))
-                vPositiveBattery.setBackgroundColor(context.getIntColor(R.color.gray_30))
-                vBatteryLevel.layoutParams.width = (2 * estimatedBatteryDays).toPixels(itemView.context)
-            }
-            else -> {
-                vBatteryLevel.layoutParams.width = 2.toPixels(itemView.context)
-                vPositiveBattery.setBackgroundColor(context.getIntColor(R.color.gray_30))
-                vBatteryLevel.setBackgroundColor(context.getIntColor(R.color.text_error))
-            }
-        }
-        vBatteryLevel.layoutParams.height = 10.toPixels(itemView.context)
+        batteryComponent.levelBattery = if(estimatedBatteryDays >= 0) estimatedBatteryDays else -1
 
         tvGuardianBadge.visibility = View.GONE
         tvLocation.text = deployment.locationName
@@ -132,7 +111,7 @@ class EdgeDeploymentDetailViewHolder(
         tvSeeDetail.text = context.getString(
             if (isReadyToUpload) R.string.see_deployment_detail else R.string.create_deployment
         )
-        gvBattery.visibility = if (isReadyToUpload) View.VISIBLE else View.GONE
+        batteryComponent.visibility = if (isReadyToUpload) View.VISIBLE else View.GONE
         ivMoreIcon.visibility = if (isReadyToUpload) View.GONE else View.VISIBLE
         tvEstimatedBatteryDuration.visibility = if (isReadyToUpload) View.VISIBLE else View.GONE
         tvEstimatedBatteryDuration.text =
@@ -144,10 +123,6 @@ class EdgeDeploymentDetailViewHolder(
             itemClickListener.onClickedMoreIcon(deployment)
         }
     }
-
-    private fun Int.toPixels(context: Context): Int =
-        (this * context.resources.displayMetrics.density).toInt()
-
 }
 
 class GuardianDeploymentDetailViewHolder(
@@ -164,7 +139,7 @@ class GuardianDeploymentDetailViewHolder(
     private val vDeploymentDetail = itemView.deploymentDetailView
     private val vMoreIconView = itemView.moreIconView
     private val ivSync = itemView.syncImageView
-    private val gvBattery = itemView.batteryGroupView
+    private val batteryComponent = itemView.batteryComponent
     private val itemLayout = itemView.deploymentDetailLayout
 
     fun bind(deployment: DeploymentDetailView.GuardianDeploymentView) {
@@ -173,7 +148,7 @@ class GuardianDeploymentDetailViewHolder(
         ivMoreIcon.visibility = View.GONE
         vDeploymentDetail.visibility = View.GONE
         vMoreIconView.visibility = View.GONE
-        gvBattery.visibility = View.GONE
+        batteryComponent.visibility = View.GONE
         tvLocation.text = deployment.locationName
         tvSeeDetail.text = context.getString(R.string.see_deployment_detail)
         tvDate.text =
