@@ -29,29 +29,50 @@
                 android:layout_marginEnd="@dimen/margin_padding_small"
                 android:ellipsize="end"
                 android:maxLines="1"
-                app:layout_constraintEnd_toStartOf="@id/estimatedBatteryDurationTextView"
+                app:layout_constraintEnd_toStartOf="@id/batteryComponent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Location 1" />
+
+            <org.rfcx.audiomoth.widget.BatteryComponent
+                android:id="@+id/batteryComponent"
+                android:layout_width="@dimen/battery_width"
+                android:layout_height="@dimen/battery_height"
+                android:layout_marginEnd="@dimen/margin_padding_xsmall"
+                app:layout_constraintBottom_toBottomOf="@id/locationNameTextView"
+                app:layout_constraintEnd_toStartOf="@id/estimatedBatteryDurationTextView"
+                app:layout_constraintTop_toTopOf="@id/locationNameTextView" />
 
             <TextView
                 android:id="@+id/estimatedBatteryDurationTextView"
                 style="@style/AudioMothText.Body.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_padding_normal"
                 android:layout_marginEnd="@dimen/margin_padding_normal"
                 android:textSize="@dimen/text_xsmall"
                 app:layout_constraintEnd_toStartOf="@id/moreIconImageView"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toTopOf="@id/locationNameTextView"
+                app:layout_constraintBottom_toBottomOf="@id/locationNameTextView"
                 tools:text="6 days" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/syncImageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_normal"
+                android:layout_marginTop="@dimen/margin_padding_small"
+                android:contentDescription="@string/sync"
+                android:tint="@color/grey_active"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/locationNameTextView"
+                tools:src="@drawable/ic_cloud_done_16dp" />
 
             <TextView
                 android:id="@+id/dateTextView"
                 style="@style/AudioMothText.Body.Secondary"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_normal"
+                android:layout_marginStart="@dimen/margin_padding_small"
                 android:layout_marginTop="@dimen/margin_padding_small"
                 android:layout_marginEnd="@dimen/margin_padding_normal"
                 android:ellipsize="end"
@@ -59,7 +80,7 @@
                 android:text="@string/see_deployment_detail"
                 android:textSize="@dimen/text_xsmall"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toEndOf="@id/syncImageView"
                 app:layout_constraintTop_toBottomOf="@id/locationNameTextView"
                 tools:text="Deployed at 11/03/2020 11:30" />
 
@@ -98,8 +119,8 @@
                 android:id="@+id/moreIconImageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/margin_padding_small"
                 android:layout_marginEnd="@dimen/margin_padding_small"
+                android:padding="@dimen/margin_padding_small"
                 android:src="@drawable/ic_more_horiz"
                 app:layout_constraintBottom_toBottomOf="@id/locationNameTextView"
                 app:layout_constraintEnd_toStartOf="@id/guardianBadgeTextView"

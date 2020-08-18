@@ -1,8 +1,10 @@
 package org.rfcx.audiomoth.view.map
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -10,6 +12,7 @@ import kotlinx.android.synthetic.main.item_deployment_detail.view.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.DeploymentState
 import org.rfcx.audiomoth.util.Battery
+import org.rfcx.audiomoth.util.getIntColor
 import org.rfcx.audiomoth.util.toDateString
 import java.util.*
 
@@ -81,10 +84,22 @@ class EdgeDeploymentDetailViewHolder(
     private val tvEstimatedBatteryDuration = itemView.estimatedBatteryDurationTextView
     private val ivMoreIcon = itemView.moreIconImageView
     private val vDeploymentDetail = itemView.deploymentDetailView
+    private val ivSync = itemView.syncImageView
+    private val batteryComponent = itemView.batteryComponent
     private val vMoreIconView = itemView.moreIconView
 
     fun bind(deployment: DeploymentDetailView.EdgeDeploymentView) {
         val isReadyToUpload = deployment.state == DeploymentState.Edge.ReadyToUpload.key
+
+        ivSync.setImageDrawable(
+            ContextCompat.getDrawable(
+                itemView.context,
+                deployment.syncImage
+            )
+        )
+        val estimatedBatteryDays =
+            Battery.getEstimatedBatteryDays(deployment.batteryDepletedAt.time)
+        batteryComponent.levelBattery = if(estimatedBatteryDays >= 0) estimatedBatteryDays else -1
 
         tvGuardianBadge.visibility = View.GONE
         tvLocation.text = deployment.locationName
@@ -96,7 +111,7 @@ class EdgeDeploymentDetailViewHolder(
         tvSeeDetail.text = context.getString(
             if (isReadyToUpload) R.string.see_deployment_detail else R.string.create_deployment
         )
-
+        batteryComponent.visibility = if (isReadyToUpload) View.VISIBLE else View.GONE
         ivMoreIcon.visibility = if (isReadyToUpload) View.GONE else View.VISIBLE
         tvEstimatedBatteryDuration.visibility = if (isReadyToUpload) View.VISIBLE else View.GONE
         tvEstimatedBatteryDuration.text =
@@ -123,6 +138,8 @@ class GuardianDeploymentDetailViewHolder(
     private val ivMoreIcon = itemView.moreIconImageView
     private val vDeploymentDetail = itemView.deploymentDetailView
     private val vMoreIconView = itemView.moreIconView
+    private val ivSync = itemView.syncImageView
+    private val batteryComponent = itemView.batteryComponent
     private val itemLayout = itemView.deploymentDetailLayout
 
     fun bind(deployment: DeploymentDetailView.GuardianDeploymentView) {
@@ -131,6 +148,7 @@ class GuardianDeploymentDetailViewHolder(
         ivMoreIcon.visibility = View.GONE
         vDeploymentDetail.visibility = View.GONE
         vMoreIconView.visibility = View.GONE
+        batteryComponent.visibility = View.GONE
         tvLocation.text = deployment.locationName
         tvSeeDetail.text = context.getString(R.string.see_deployment_detail)
         tvDate.text =
@@ -139,6 +157,12 @@ class GuardianDeploymentDetailViewHolder(
         itemLayout.setOnClickListener {
             itemClickListener.onClickedGuardianDeploymentDetail(deployment)
         }
+        ivSync.setImageDrawable(
+            ContextCompat.getDrawable(
+                itemView.context,
+                deployment.syncImage
+            )
+        )
     }
 }
 

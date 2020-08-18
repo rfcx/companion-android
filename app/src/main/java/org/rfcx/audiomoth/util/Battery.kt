@@ -36,4 +36,13 @@ object Battery {
             context.getString(R.string.battery_depleted)
         }
     }
+
+    fun getEstimatedBatteryDays(timestamp: Long): Int {
+        val currentMillis = System.currentTimeMillis()
+        return if (timestamp > currentMillis) {
+            ((timestamp - currentMillis) / DAY.toDouble()).roundToInt()
+        } else {
+            0
+        }
+    }
 }

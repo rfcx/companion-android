@@ -29,6 +29,10 @@
     <dimen name="search_input_padding">12dp</dimen>
     ​<dimen name="viewpager_padding">32dp</dimen>
 
+    <!--  Battery level  -->
+    ​<dimen name="battery_width">20dp</dimen>
+    ​<dimen name="battery_height">10dp</dimen>
+
     <!--  Deployment Image  -->
     <dimen name="size_deployment_image">72dp</dimen>
 
