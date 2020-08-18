@@ -36,8 +36,8 @@
 
             <org.rfcx.audiomoth.widget.BatteryComponent
                 android:id="@+id/batteryComponent"
-                android:layout_width="20dp"
-                android:layout_height="10dp"
+                android:layout_width="@dimen/battery_width"
+                android:layout_height="@dimen/battery_height"
                 android:layout_marginEnd="@dimen/margin_padding_xsmall"
                 app:layout_constraintBottom_toBottomOf="@id/locationNameTextView"
                 app:layout_constraintEnd_toStartOf="@id/estimatedBatteryDurationTextView"
