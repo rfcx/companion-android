@@ -295,5 +295,6 @@
     <string name="checkin_url">Checkin url</string>
     <string name="status">Status</string>
     <string name="delivery_time">Delivery time</string>
+    <string name="dash">-</string>
 
 </resources>
