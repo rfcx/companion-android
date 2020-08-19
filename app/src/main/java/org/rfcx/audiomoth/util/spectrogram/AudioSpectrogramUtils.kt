@@ -10,9 +10,9 @@ import kotlin.math.sqrt
 
 object AudioSpectrogramUtils {
 
-    private enum class ScrollSpeed(val value: Int) { FAST(1024), NORMAL(2048), SLOW(4096)}
+    private enum class ScrollSpeed(val value: Int) { FAST(256), NORMAL(1024), SLOW(4096)}
 
-    private var fftResolution = 1024
+    private var fftResolution = 256
 
     private var bufferStack: ArrayList<ShortArray>? = null
     private var fftBuffer: ShortArray? = null
@@ -21,7 +21,7 @@ object AudioSpectrogramUtils {
     fun getFFTResolution(): Int = fftResolution
 
     fun resetToDefaultValue() {
-        fftResolution = 1024
+        fftResolution = 256
     }
 
     fun resetSetupState() {
