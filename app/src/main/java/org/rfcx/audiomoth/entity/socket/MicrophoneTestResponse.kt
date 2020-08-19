@@ -8,6 +8,8 @@ data class MicrophoneTestResponse(
 ): SocketResposne
 
 data class AudioBuffer(
+    val amount: Int = 0,
+    val number: Int = 0,
     val buffer: String = "",
     @SerializedName("read_size")
     val readSize: Int = 0
