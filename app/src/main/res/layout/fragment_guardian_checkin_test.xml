@@ -33,10 +33,12 @@
 
         <TextView
             android:id="@+id/fileFormatTextView"
-            style="@style/AudioMothText.Subhead.Bold"
+            style="@style/AudioMothText.Subhead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/checkin_url" />
+            android:text="@string/checkin_url"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_small" />
 
         <TextView
             android:id="@+id/fileFormatValueTextView"
@@ -48,10 +50,12 @@
 
         <TextView
             android:id="@+id/sampleRateTextView"
-            style="@style/AudioMothText.Subhead.Bold"
+            style="@style/AudioMothText.Subhead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/status" />
+            android:text="@string/status"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_small" />
 
         <TextView
             android:id="@+id/sampleRateValueTextView"
@@ -63,10 +67,12 @@
 
         <TextView
             android:id="@+id/bitrateTextView"
-            style="@style/AudioMothText.Subhead.Bold"
+            style="@style/AudioMothText.Subhead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/delivery_time" />
+            android:text="@string/delivery_time"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_small" />
 
         <TextView
             android:id="@+id/bitrateValueTextView"
@@ -84,10 +90,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/margin_padding_small"
+        android:text="*Wait until the checkin get published"
         app:layout_constraintBottom_toTopOf="@id/checkInFinishButton"
         app:layout_constraintEnd_toEndOf="@id/checkInFinishButton"
-        app:layout_constraintStart_toStartOf="@id/checkInFinishButton"
-        android:text="*Wait until the checkin get published"/>
+        app:layout_constraintStart_toStartOf="@id/checkInFinishButton" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/checkInFinishButton"
