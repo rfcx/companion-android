@@ -9,7 +9,7 @@ import android.util.Base64
 import android.util.Log
 
 class MicrophoneTestUtils {
-    private val sampleRate = 24000
+    private var sampleRate = 24000
     private val channelConfiguration = AudioFormat.CHANNEL_OUT_MONO
     private val audioEncoding = AudioFormat.ENCODING_PCM_16BIT
     private var audioTrack: AudioTrack? = null
@@ -17,6 +17,10 @@ class MicrophoneTestUtils {
     private val DEF_MINBUFSIZE = 5760
 
     var buffer = ByteArray(0)
+
+    fun setSampleRate(rate: Int) {
+        sampleRate = rate
+    }
 
     fun init(minBufSize: Int) {
         stop()

@@ -31,11 +31,11 @@ object SocketManager {
     private const val MICROPHONE_TEST = "microphone_test"
     private const val CHECKIN = "checkin"
 
-    private val audioQueue = arrayListOf<String>()
+    private var audioChunks = arrayListOf<String>()
     private var microphoneTestUtils: MicrophoneTestUtils? = null
     private var isTestingFirstTime = true
 
-    private var tempAudio = ""
+    private var tempAudio = ByteArray(0)
 
     val connection = MutableLiveData<ConnectionResponse>()
     val diagnostic = MutableLiveData<DiagnosticResponse>()
@@ -167,22 +167,32 @@ object SocketManager {
                             MICROPHONE_TEST -> {
                                 val response =
                                     gson.fromJson(dataInput, MicrophoneTestResponse::class.java)
-                                if (isTestingFirstTime) {
-                                    microphoneTestUtils?.let { util ->
-                                        util.init(util.getEncodedAudioBufferSize(response.audioBuffer.buffer))
-                                        util.play()
+                                audioChunks.add(response.audioBuffer.buffer)
+                                if (response.audioBuffer.amount == response.audioBuffer.number) {
+                                    var fullAudio = ByteArray(0)
+
+                                    audioChunks
+                                        .map { microphoneTestUtils?.decodeEncodedAudio(it) }
+                                        .forEach { fullAudio += it!! }
+
+                                    if (isTestingFirstTime) {
+                                        microphoneTestUtils?.let { util ->
+                                            util.init(fullAudio.size)
+                                            util.play()
+                                        }
+                                        isTestingFirstTime = false
                                     }
-                                    isTestingFirstTime = false
-                                }
-                                if (tempAudio != response.audioBuffer.buffer) {
-                                    tempAudio = response.audioBuffer.buffer
-                                    microphoneTestUtils?.let {
-                                        it.buffer = it.decodeEncodedAudio(response.audioBuffer.buffer)
-                                        it.setTrack()
-                                        this.spectrogram.postValue(it.buffer)
+                                    if (!tempAudio.contentEquals(fullAudio)) {
+                                        tempAudio = fullAudio
+                                        microphoneTestUtils?.let {
+                                            it.buffer = fullAudio
+                                            it.setTrack()
+                                            this.spectrogram.postValue(it.buffer)
+                                        }
                                     }
+                                    audioChunks.clear()
+                                    this.liveAudio.postValue(response)
                                 }
-                                this.liveAudio.postValue(response)
                             }
                             CHECKIN -> {
                                 val response =
