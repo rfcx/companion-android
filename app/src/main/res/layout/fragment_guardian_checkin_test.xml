@@ -18,7 +18,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
-        android:id="@+id/configureLayout"
+        android:id="@+id/checkInInfoLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"
@@ -32,7 +32,7 @@
         app:layout_constraintTop_toBottomOf="@id/checkInTestTitle">
 
         <TextView
-            android:id="@+id/fileFormatTextView"
+            android:id="@+id/checkInUrlTextView"
             style="@style/AudioMothText.Subhead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -41,7 +41,7 @@
             android:textSize="@dimen/text_small" />
 
         <TextView
-            android:id="@+id/fileFormatValueTextView"
+            android:id="@+id/checkInUrlValueTextView"
             style="@style/AudioMothText.Body.Secondary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -50,7 +50,7 @@
             tools:text="ssl://checkin.rfcx.org" />
 
         <TextView
-            android:id="@+id/sampleRateTextView"
+            android:id="@+id/checkInStatusTextView"
             style="@style/AudioMothText.Subhead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -59,7 +59,7 @@
             android:textSize="@dimen/text_small" />
 
         <TextView
-            android:id="@+id/sampleRateValueTextView"
+            android:id="@+id/checkInStatusValueTextView"
             style="@style/AudioMothText.Body.Secondary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -68,7 +68,7 @@
             tools:text="publish" />
 
         <TextView
-            android:id="@+id/bitrateTextView"
+            android:id="@+id/checkInDeliveryTimeTextView"
             style="@style/AudioMothText.Subhead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -77,7 +77,7 @@
             android:textSize="@dimen/text_small" />
 
         <TextView
-            android:id="@+id/bitrateValueTextView"
+            android:id="@+id/checkInDeliveryTimeValueTextView"
             style="@style/AudioMothText.Body.Secondary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
