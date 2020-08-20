@@ -40,15 +40,19 @@ class GuardianCheckInTestFragment : Fragment() {
     }
 
     private fun setCheckInTestView() {
+        SocketManager.getCheckInTest()
         SocketManager.checkInTest.observe(viewLifecycleOwner, Observer { res ->
             checkInUrlValueTextView.text = res.checkin.apiUrl
             checkInStatusValueTextView.text = res.checkin.state
             checkInDeliveryTimeValueTextView.text = res.checkin.deliveryTime
 
-            if (res.checkin.state == CHECKIN_SUCCESS) {
-                checkInFinishButton.isEnabled = true
-            }
+            checkInFinishButton.isEnabled = res.checkin.state == CHECKIN_SUCCESS
         })
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        SocketManager.getCheckInTest() // to stop listening checkin test
     }
 
     companion object {
