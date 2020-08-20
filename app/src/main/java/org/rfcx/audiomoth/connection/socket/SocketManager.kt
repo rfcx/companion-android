@@ -20,6 +20,7 @@ object SocketManager {
 
     private val gson = Gson()
 
+    // List of socket commands
     private const val CONNECTION = "connection"
     private const val DIAGNOSTIC = "diagnostic"
     private const val CONFIGURE = "configure"
@@ -28,6 +29,7 @@ object SocketManager {
     private const val SIGNAL = "signal"
     private const val SIGNAL_INFO = "signal_info"
     private const val MICROPHONE_TEST = "microphone_test"
+    private const val CHECKIN = "checkin"
 
     private val audioQueue = arrayListOf<String>()
     private var microphoneTestUtils: MicrophoneTestUtils? = null
@@ -43,6 +45,7 @@ object SocketManager {
     val signal = MutableLiveData<SignalResponse>()
     val liveAudio = MutableLiveData<MicrophoneTestResponse>()
     val spectrogram = MutableLiveData<ByteArray>()
+    val checkInTest = MutableLiveData<CheckInTestResponse>()
 
     init {
         connection.value = ConnectionResponse()
@@ -53,6 +56,7 @@ object SocketManager {
         signal.value = SignalResponse()
         liveAudio.value = MicrophoneTestResponse()
         spectrogram.value = ByteArray(2)
+        checkInTest.value = CheckInTestResponse()
     }
 
     fun getConnection() {
@@ -83,6 +87,11 @@ object SocketManager {
     fun getLiveAudioBuffer(micTestUtils: MicrophoneTestUtils) {
         this.microphoneTestUtils = micTestUtils
         val data = gson.toJson(SocketRequest(MICROPHONE_TEST))
+        sendMessage(data)
+    }
+
+    fun getCheckInTest() {
+        val data = gson.toJson(SocketRequest(CHECKIN))
         sendMessage(data)
     }
 
@@ -174,6 +183,11 @@ object SocketManager {
                                     }
                                 }
                                 this.liveAudio.postValue(response)
+                            }
+                            CHECKIN -> {
+                                val response =
+                                    gson.fromJson(dataInput, CheckInTestResponse::class.java)
+                                this.checkInTest.postValue(response)
                             }
                         }
                     }
