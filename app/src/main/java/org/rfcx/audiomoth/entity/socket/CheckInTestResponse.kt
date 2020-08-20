@@ -8,8 +8,8 @@ data class CheckInTestResponse(
 
 data class CheckIn(
     @SerializedName("api_url")
-    val apiUrl: String = "",
-    val state: String = "",
+    val apiUrl: String = "-",
+    val state: String = "-",
     @SerializedName("delivery_time")
-    val deliveryTime: String = ""
+    val deliveryTime: String = "-"
 )
