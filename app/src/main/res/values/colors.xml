@@ -25,4 +25,6 @@
 
     <color name="signal_stroke">#5A6978</color>
     <color name="signal_filled">#2AA841</color>
+
+    <color name="step_enabled_true">#2AA841</color>
 </resources>
