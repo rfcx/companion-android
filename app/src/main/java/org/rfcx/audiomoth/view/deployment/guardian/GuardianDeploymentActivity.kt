@@ -6,9 +6,10 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import io.realm.Realm
 import java.util.*
-import kotlinx.android.synthetic.main.activity_deployment.*
+import kotlinx.android.synthetic.main.activity_guardian_deployment.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.DeploymentState
@@ -22,6 +23,7 @@ import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentImageDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianProfileDb
 import org.rfcx.audiomoth.service.GuardianDeploymentSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
+import org.rfcx.audiomoth.view.deployment.StepViewAdapter
 import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianConfigureFragment
 import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianSelectProfileFragment
 import org.rfcx.audiomoth.view.deployment.guardian.connect.ConnectGuardianFragment
@@ -44,6 +46,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private val deploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val deploymentImageDb by lazy { GuardianDeploymentImageDb(realm) }
 
+    private val guardianStepView by lazy { StepViewAdapter() }
+
     private var currentStep = 0
     private var _profiles: List<GuardianProfile> = listOf()
     private var _profile: GuardianProfile? = null
@@ -59,6 +63,13 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_guardian_deployment)
+
+        guardianStepRecyclerView.apply {
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            adapter = guardianStepView
+        }
+        guardianStepView.setSteps(this.resources.getStringArray(R.array.guardian_steps).toList())
+
         val deploymentId = intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
         if (deploymentId != null) {
             val deployment = deploymentDb.getDeploymentById(deploymentId)
@@ -73,7 +84,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                     _configuration = deployment.configuration
                 }
                 currentStep = deployment.state - 1
-                stepView.go(currentStep, true)
                 handleFragment(currentStep)
             }
         } else {
@@ -102,14 +112,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun nextStep() {
         currentStep += 1
-
-        if (stepView.stepCount == currentStep) {
-            stepView.done(true)
-            hideCompleteButton()
-        } else {
-            stepView.go(currentStep, true)
-        }
-
         handleFragment(currentStep)
     }
 
@@ -121,14 +123,12 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                 if (container is GuardianConfigureFragment) {
                     startFragment(GuardianSelectProfileFragment.newInstance())
                 } else {
-                    currentStep = stepView.currentStep - 1
-                    stepView.go(currentStep, true)
+                    currentStep = guardianStepView.getCurrentStep() - 1
                     handleFragment(currentStep)
                 }
             }
             else -> {
-                currentStep = stepView.currentStep - 1
-                stepView.go(currentStep, true)
+                currentStep = guardianStepView.getCurrentStep() - 1
                 handleFragment(currentStep)
             }
         }
@@ -195,7 +195,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     }
 
     override fun setReadyToDeploy(images: List<String>) {
-        stepView.done(true)
         showLoading()
         _deployment?.let {
             it.deployedAt = Date()
@@ -213,18 +212,17 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     override fun startSetupConfigure(profile: GuardianProfile) {
         setProfile(profile)
         currentStep = 2
-        stepView.go(currentStep, true)
         startFragment(GuardianConfigureFragment.newInstance())
     }
 
     override fun backToConfigure() {
         currentStep = 2
-        stepView.go(currentStep, true)
         startFragment(GuardianConfigureFragment.newInstance())
     }
 
     private fun handleFragment(currentStep: Int) {
         // setup fragment for current step
+        guardianStepView.setStepPasses(currentStep)
         when (currentStep) {
             0 -> {
                 updateDeploymentState(DeploymentState.Guardian.Connect)

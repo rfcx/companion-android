@@ -29,12 +29,18 @@ class StepViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     fun setStepPasses(position: Int) {
         (listOfSteps[position * 2] as StepViewItem.StepItem).isPassed = true
-        (listOfSteps[position * 2 + 1] as StepViewItem.DividerItem).isPassed = true
+        if (position != 0) {
+            (listOfSteps[position * 2 - 1] as StepViewItem.DividerItem).isPassed = true
+        }
+    }
+
+    fun getCurrentStep(): Int {
+        return listOfSteps.count { (it as StepViewItem.StepItem).isPassed }
     }
 
     override fun getItemViewType(position: Int): Int {
         return when (listOfSteps[position]) {
-            is StepViewItem.DividerItem -> STEP_ITEM
+            is StepViewItem.StepItem -> STEP_ITEM
             else -> DIVIDER_ITEM
         }
     }

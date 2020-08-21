@@ -5,37 +5,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".view.deployment.EdgeDeploymentActivity">
+    tools:context=".view.deployment.guardian.GuardianDeploymentActivity">
 
-    <com.shuhart.stepview.StepView
-        android:id="@+id/stepView"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/guardianStepRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="@dimen/margin_padding_large"
         android:paddingTop="@dimen/margin_padding_normal"
         android:paddingEnd="@dimen/margin_padding_large"
         android:paddingBottom="@dimen/margin_padding_normal"
-        app:layout_constraintTop_toTopOf="parent"
-        app:sv_animationType="All"
-        app:sv_doneCircleColor="@color/colorAccent"
-        app:sv_doneStepLineColor="@color/colorAccent"
-        app:sv_doneStepMarkColor="@color/white"
-        app:sv_doneTextColor="@color/grey"
-        app:sv_nextStepCircleEnabled="true"
-        app:sv_nextStepLineColor="@color/grey"
-        app:sv_nextTextColor="@color/grey"
-        app:sv_selectedCircleColor="@color/colorAccent"
-        app:sv_selectedStepNumberColor="@color/white"
-        app:sv_selectedTextColor="@color/colorAccent"
-        app:sv_stepLineWidth="1dp"
-        app:sv_steps="@array/guardian_steps" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <FrameLayout
         android:id="@+id/contentContainer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/stepView"
+        app:layout_constraintTop_toBottomOf="@id/guardianStepRecyclerView"
         app:layout_constraintVertical_bias="0.0"
         tools:layout_editor_absoluteX="0dp" />
 
