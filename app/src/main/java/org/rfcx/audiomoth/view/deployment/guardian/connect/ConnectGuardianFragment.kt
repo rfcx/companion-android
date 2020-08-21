@@ -65,11 +65,12 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
         }
 
         retryGuardianButton.setOnClickListener {
-            showLoading()
-            hideRetry()
-            hideNotFound()
-            retryCountdown(SCAN)
-            wifiHotspotManager.nearbyHotspot(this)
+//            showLoading()
+//            hideRetry()
+//            hideNotFound()
+//            retryCountdown(SCAN)
+//            wifiHotspotManager.nearbyHotspot(this)
+            deploymentProtocol?.nextStep()
         }
     }
 

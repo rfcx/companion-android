@@ -9,6 +9,7 @@
         android:id="@+id/stepDivider"
         android:layout_width="@dimen/width_divider"
         android:layout_height="@dimen/height_divider"
-        android:background="@color/colorPrimary"/>
+        android:layout_marginTop="@dimen/margin_divider"
+        android:background="@color/text_secondary"/>
 
 </LinearLayout>

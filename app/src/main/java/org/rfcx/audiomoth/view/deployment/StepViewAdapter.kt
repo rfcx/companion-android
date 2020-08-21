@@ -32,10 +32,12 @@ class StepViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         if (position != 0) {
             (listOfSteps[position * 2 - 1] as StepViewItem.DividerItem).isPassed = true
         }
+        notifyDataSetChanged()
     }
 
     fun getCurrentStep(): Int {
-        return listOfSteps.count { (it as StepViewItem.StepItem).isPassed }
+        val tempListOfSteps = listOfSteps
+        return tempListOfSteps.filterIsInstance<StepViewItem.StepItem>().count { it.isPassed }
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -67,9 +69,9 @@ class StepViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         private val stepCircle = itemView.findViewById<View>(R.id.stepCircle)
         fun bind(step: StepViewItem.StepItem) {
             stepNumber.text = step.number.toString()
-            stepNumber.text = step.name
+            stepName.text = step.name
             if (step.isPassed) {
-                stepNumber.setTextColor(ContextCompat.getColor(itemView.context, R.color.colorPrimary))
+                stepNumber.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
                 stepName.setTextColor(ContextCompat.getColor(itemView.context, R.color.colorPrimary))
                 stepCircle.background = ContextCompat.getDrawable(itemView.context, R.drawable.circle_step_passed)
             }

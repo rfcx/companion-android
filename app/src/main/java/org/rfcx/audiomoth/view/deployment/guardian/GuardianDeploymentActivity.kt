@@ -3,12 +3,12 @@ package org.rfcx.audiomoth.view.deployment.guardian
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.realm.Realm
-import java.util.*
 import kotlinx.android.synthetic.main.activity_guardian_deployment.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.DeploymentLocation
@@ -36,6 +36,7 @@ import org.rfcx.audiomoth.view.detail.MapPickerProtocol
 import org.rfcx.audiomoth.view.dialog.CompleteFragment
 import org.rfcx.audiomoth.view.dialog.CompleteListener
 import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
+import java.util.*
 
 class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtocol,
     CompleteListener, MapPickerProtocol {
@@ -123,12 +124,12 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                 if (container is GuardianConfigureFragment) {
                     startFragment(GuardianSelectProfileFragment.newInstance())
                 } else {
-                    currentStep = guardianStepView.getCurrentStep() - 1
+                    currentStep -= 1
                     handleFragment(currentStep)
                 }
             }
             else -> {
-                currentStep = guardianStepView.getCurrentStep() - 1
+                currentStep -= 1
                 handleFragment(currentStep)
             }
         }
@@ -223,6 +224,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private fun handleFragment(currentStep: Int) {
         // setup fragment for current step
         guardianStepView.setStepPasses(currentStep)
+        guardianStepRecyclerView.smoothScrollToPosition(currentStep)
         when (currentStep) {
             0 -> {
                 updateDeploymentState(DeploymentState.Guardian.Connect)

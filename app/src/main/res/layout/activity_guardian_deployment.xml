@@ -14,7 +14,6 @@
         android:paddingStart="@dimen/margin_padding_large"
         android:paddingTop="@dimen/margin_padding_normal"
         android:paddingEnd="@dimen/margin_padding_large"
-        android:paddingBottom="@dimen/margin_padding_normal"
         app:layout_constraintTop_toTopOf="parent"/>
 
     <FrameLayout
