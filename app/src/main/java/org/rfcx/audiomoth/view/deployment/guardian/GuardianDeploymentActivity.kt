@@ -112,7 +112,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     }
 
     override fun invoke(number: Int) {
-        handleFragment(number - 1)
+        currentStep = number - 1
+        handleFragment(currentStep)
     }
 
     override fun nextStep() {
