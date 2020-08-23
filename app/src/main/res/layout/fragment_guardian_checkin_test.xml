@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/checkInTestTitle"
+        style="@style/AudioMothText.Subhead.Bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:layout_marginEnd="@dimen/margin_padding_large"
+        android:text="@string/testing_guardian_checkin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/checkInInfoLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginEnd="@dimen/margin_padding_large"
+        android:layout_weight="1"
+        android:clickable="true"
+        android:focusable="true"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/margin_padding_normal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/checkInTestTitle">
+
+        <TextView
+            android:id="@+id/checkInUrlTextView"
+            style="@style/AudioMothText.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/checkin_url"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_small" />
+
+        <TextView
+            android:id="@+id/checkInUrlValueTextView"
+            style="@style/AudioMothText.Body.Secondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/margin_padding_small"
+            android:text="@string/dash"
+            tools:text="ssl://checkin.rfcx.org" />
+
+        <TextView
+            android:id="@+id/checkInStatusTextView"
+            style="@style/AudioMothText.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/status"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_small" />
+
+        <TextView
+            android:id="@+id/checkInStatusValueTextView"
+            style="@style/AudioMothText.Body.Secondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/margin_padding_small"
+            android:text="@string/dash"
+            tools:text="publish" />
+
+        <TextView
+            android:id="@+id/checkInDeliveryTimeTextView"
+            style="@style/AudioMothText.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/delivery_time"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_small" />
+
+        <TextView
+            android:id="@+id/checkInDeliveryTimeValueTextView"
+            style="@style/AudioMothText.Body.Secondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/margin_padding_small"
+            android:text="@string/dash"
+            tools:text="12 seconds" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/checkInWarnTextView"
+        style="@style/AudioMothText.Body.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/margin_padding_small"
+        android:text="*Wait until the checkin get published"
+        app:layout_constraintBottom_toTopOf="@id/checkInFinishButton"
+        app:layout_constraintEnd_toEndOf="@id/checkInFinishButton"
+        app:layout_constraintStart_toStartOf="@id/checkInFinishButton" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/checkInFinishButton"
+        style="@style/AudioMothButton.GreenButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:enabled="false"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginEnd="@dimen/margin_padding_large"
+        android:layout_marginBottom="@dimen/margin_padding_normal"
+        android:text="@string/next"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

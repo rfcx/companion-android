@@ -290,4 +290,11 @@
     <string name="frequency_scale">Frequency Scale</string>
     <string name="speed">Speed</string>
 
+    <!-- GuardianCheckinTestFragment -->
+    <string name="testing_guardian_checkin">Testing guardian checkin</string>
+    <string name="checkin_url">Checkin url</string>
+    <string name="status">Status</string>
+    <string name="delivery_time">Delivery time</string>
+    <string name="dash">-</string>
+
 </resources>
