@@ -1,6 +1,5 @@
 package org.rfcx.audiomoth.view.deployment
 
-import android.net.wifi.ScanResult
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,11 +33,6 @@ class StepViewAdapter(private val onStepClickListener: (Int) -> Unit) : Recycler
             (listOfSteps[position * 2 - 1] as StepViewItem.DividerItem).isPassed = true
         }
         notifyDataSetChanged()
-    }
-
-    fun getCurrentStep(): Int {
-        val tempListOfSteps = listOfSteps
-        return tempListOfSteps.filterIsInstance<StepViewItem.StepItem>().count { it.isPassed }
     }
 
     override fun getItemViewType(position: Int): Int {
