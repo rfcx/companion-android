@@ -117,13 +117,13 @@ class LoginActivity : AppCompatActivity() {
             })
     }
 
-    private fun saveUserToFirestore(result: UserAuthResponse) {
+    private fun saveUserToFirestore(result: UserAuthResponse, uid: String) {
         val name = result.nickname ?: "Companion"
         val email = result.email ?: "Email"
         val user = User(name, email)
 
         Firestore(this@LoginActivity)
-            .saveUser(user, result.guid) { string, isSuccess ->
+            .saveUser(user, uid) { string, isSuccess ->
                 if (isSuccess) {
                     MainActivity.startActivity(this@LoginActivity)
                     finish()
@@ -248,9 +248,10 @@ class LoginActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     val user = auth.currentUser
-                    user?.uid?.let { preferences.putString(USER_FIREBASE_UID, it) }
-
-                    saveUserToFirestore(result)
+                    user?.uid?.let {
+                        preferences.putString(USER_FIREBASE_UID, it)
+                        saveUserToFirestore(result, it)
+                    }
                 } else {
                     loading(false)
                     Toast.makeText(baseContext, R.string.an_error_occurred, Toast.LENGTH_SHORT)
