@@ -76,6 +76,9 @@ class StepViewAdapter(private val onStepClickListener: (Int) -> Unit) : Recycler
                 stepCircle.background = ContextCompat.getDrawable(itemView.context, R.drawable.circle_step_passed)
                 itemView.isEnabled = true
             } else {
+                stepNumber.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_secondary))
+                stepName.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_secondary))
+                stepCircle.background = ContextCompat.getDrawable(itemView.context, R.drawable.circle_step_not_passed)
                 itemView.isEnabled = false
             }
         }

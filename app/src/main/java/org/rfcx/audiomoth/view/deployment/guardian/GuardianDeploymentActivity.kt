@@ -66,11 +66,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_guardian_deployment)
 
-        guardianStepRecyclerView.apply {
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-            adapter = guardianStepView
-        }
-        guardianStepView.setSteps(this.resources.getStringArray(R.array.guardian_steps).toList())
+        setupStepView()
 
         val deploymentId = intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
         if (deploymentId != null) {
@@ -91,6 +87,14 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         } else {
             setupView()
         }
+    }
+
+    private fun setupStepView() {
+        guardianStepRecyclerView.apply {
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            adapter = guardianStepView
+        }
+        guardianStepView.setSteps(this.resources.getStringArray(R.array.guardian_steps).toList())
     }
 
     private fun setupView() {
