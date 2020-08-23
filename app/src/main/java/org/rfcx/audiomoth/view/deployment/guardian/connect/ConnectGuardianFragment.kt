@@ -94,12 +94,11 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
             requireActivity().runOnUiThread {
                 if (response.connection.status == Status.SUCCESS.value) {
                     if (connectionCount == 0) {
+                        hideLoading()
                         deploymentProtocol?.setDeploymentWifiName(guardianHotspot!!.SSID)
                         deploymentProtocol?.nextStep()
                     }
                     connectionCount += 1
-                } else {
-                    hideLoading()
                 }
             }
         })
