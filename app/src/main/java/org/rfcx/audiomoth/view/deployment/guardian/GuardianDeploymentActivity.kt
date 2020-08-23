@@ -260,7 +260,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     private fun handleStepView(currentStep: Int) {
         guardianStepView.setStepPasses(currentStep)
-        Handler().postDelayed({ (guardianStepRecyclerView.layoutManager as LinearLayoutManager).scrollToPosition(currentStep) }, 200)
+        guardianStepRecyclerView.smoothScrollToPosition(currentStep * 2)
     }
 
     private fun startFragment(fragment: Fragment) {
