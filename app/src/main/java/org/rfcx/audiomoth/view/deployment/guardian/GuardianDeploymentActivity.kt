@@ -39,7 +39,7 @@ import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
 import java.util.*
 
 class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtocol,
-    CompleteListener, MapPickerProtocol {
+    CompleteListener, MapPickerProtocol, (Int) -> Unit {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val locateDb by lazy { LocateDb(realm) }
@@ -47,7 +47,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private val deploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val deploymentImageDb by lazy { GuardianDeploymentImageDb(realm) }
 
-    private val guardianStepView by lazy { StepViewAdapter() }
+    private val guardianStepView by lazy { StepViewAdapter(this) }
 
     private var currentStep = 0
     private var _profiles: List<GuardianProfile> = listOf()
@@ -109,6 +109,10 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun setCompleteTextButton(text: String) {
         completeStepButton.text = text
+    }
+
+    override fun invoke(number: Int) {
+        handleFragment(number - 1)
     }
 
     override fun nextStep() {
@@ -223,8 +227,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     private fun handleFragment(currentStep: Int) {
         // setup fragment for current step
-        guardianStepView.setStepPasses(currentStep)
-        guardianStepRecyclerView.smoothScrollToPosition(currentStep)
+        handleStepView(currentStep)
         when (currentStep) {
             0 -> {
                 updateDeploymentState(DeploymentState.Guardian.Connect)
@@ -252,6 +255,11 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                 startFragment(GuardianDeployFragment.newInstance())
             }
         }
+    }
+
+    private fun handleStepView(currentStep: Int) {
+        guardianStepView.setStepPasses(currentStep)
+        Handler().postDelayed({ (guardianStepRecyclerView.layoutManager as LinearLayoutManager).scrollToPosition(currentStep) }, 200)
     }
 
     private fun startFragment(fragment: Fragment) {

@@ -1,5 +1,6 @@
 package org.rfcx.audiomoth.view.deployment
 
+import android.net.wifi.ScanResult
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.adapter.StepViewItem
 
-class StepViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class StepViewAdapter(private val onStepClickListener: (Int) -> Unit) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
         const val STEP_ITEM = 1
@@ -70,10 +71,18 @@ class StepViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         fun bind(step: StepViewItem.StepItem) {
             stepNumber.text = step.number.toString()
             stepName.text = step.name
+
+            itemView.setOnClickListener {
+                onStepClickListener(step.number)
+            }
+
             if (step.isPassed) {
                 stepNumber.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
                 stepName.setTextColor(ContextCompat.getColor(itemView.context, R.color.colorPrimary))
                 stepCircle.background = ContextCompat.getDrawable(itemView.context, R.drawable.circle_step_passed)
+                itemView.isEnabled = true
+            } else {
+                itemView.isEnabled = false
             }
         }
     }
