@@ -24,6 +24,7 @@ import org.rfcx.audiomoth.localdb.guardian.GuardianProfileDb
 import org.rfcx.audiomoth.service.GuardianDeploymentSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.view.deployment.StepViewAdapter
+import org.rfcx.audiomoth.view.deployment.guardian.checkin.GuardianCheckInTestFragment
 import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianConfigureFragment
 import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianSelectProfileFragment
 import org.rfcx.audiomoth.view.deployment.guardian.connect.ConnectGuardianFragment
@@ -252,6 +253,10 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                 startFragment(GuardianMicrophoneFragment.newInstance())
             }
             5 -> {
+                updateDeploymentState(DeploymentState.Guardian.Checkin)
+                startFragment(GuardianCheckInTestFragment.newInstance())
+            }
+            6 -> {
                 updateDeploymentState(DeploymentState.Guardian.Deploy)
                 startFragment(GuardianDeployFragment.newInstance())
             }

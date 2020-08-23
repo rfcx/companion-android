@@ -24,6 +24,7 @@
         <item>Config</item>
         <item>Signal</item>
         <item>Mic</item>
+        <item>Checkin</item>
         <item>Deploy</item>
     </string-array>
 

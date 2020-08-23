@@ -17,6 +17,7 @@ import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.connection.wifi.OnWifiListener
 import org.rfcx.audiomoth.connection.wifi.WifiHotspotManager
 import org.rfcx.audiomoth.entity.socket.Status
+import org.rfcx.audiomoth.util.WifiHotspotUtils
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 
 class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit {
@@ -61,7 +62,14 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
         connectGuardianButton.setOnClickListener {
             showLoading()
             retryCountdown(CONNECT)
-            wifiHotspotManager.connectTo(guardianHotspot!!, this)
+            guardianHotspot?.let {
+                if (WifiHotspotUtils.isConnectedWithGuardian(requireContext(), it.SSID)) {
+                    deploymentProtocol?.setDeploymentWifiName(it.SSID)
+                    deploymentProtocol?.nextStep()
+                } else {
+                    wifiHotspotManager.connectTo(it, this)
+                }
+            }
         }
 
         retryGuardianButton.setOnClickListener {
@@ -94,12 +102,11 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
             requireActivity().runOnUiThread {
                 if (response.connection.status == Status.SUCCESS.value) {
                     if (connectionCount == 0) {
+                        hideLoading()
                         deploymentProtocol?.setDeploymentWifiName(guardianHotspot!!.SSID)
                         deploymentProtocol?.nextStep()
                     }
                     connectionCount += 1
-                } else {
-                    hideLoading()
                 }
             }
         })
