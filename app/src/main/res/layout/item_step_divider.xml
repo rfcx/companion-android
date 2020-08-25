@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_margin="@dimen/margin_padding_small"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <View
+        android:id="@+id/stepDivider"
+        android:layout_width="@dimen/width_divider"
+        android:layout_height="@dimen/height_divider"
+        android:layout_marginTop="@dimen/margin_divider"
+        android:background="@color/text_secondary"/>
+
+</LinearLayout>

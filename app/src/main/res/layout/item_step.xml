@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/margin_padding_small"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    
+    <View
+        android:id="@+id/stepCircle"
+        android:layout_width="@dimen/size_step"
+        android:layout_height="@dimen/size_step"
+        android:background="@drawable/circle_step_not_passed"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/stepNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintTop_toTopOf="@id/stepCircle"
+        app:layout_constraintStart_toStartOf="@id/stepCircle"
+        app:layout_constraintEnd_toEndOf="@id/stepCircle"
+        app:layout_constraintBottom_toBottomOf="@id/stepCircle"
+        tools:text="1"/>
+
+    <TextView
+        android:id="@+id/stepName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintTop_toBottomOf="@id/stepCircle"
+        app:layout_constraintStart_toStartOf="@id/stepCircle"
+        app:layout_constraintEnd_toEndOf="@id/stepCircle"
+        tools:text="connect"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
