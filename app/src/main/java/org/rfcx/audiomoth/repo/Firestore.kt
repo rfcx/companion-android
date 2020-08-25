@@ -28,11 +28,11 @@ class Firestore(val context: Context) {
     /* TODO: update get user */
     private val preferences =
         Preferences.getInstance(context)
-    private val guid = preferences.getString(Preferences.USER_GUID, "")
+    private val uid = preferences.getString(Preferences.USER_FIREBASE_UID, "")
     private val feedbackDocument = db.collection(COLLECTION_FEEDBACK)
 
-    fun saveUser(user: User, guid: String, callback: (String?, Boolean) -> Unit) {
-        db.collection(COLLECTION_USERS).document(guid).set(user)
+    fun saveUser(user: User, uid: String, callback: (String?, Boolean) -> Unit) {
+        db.collection(COLLECTION_USERS).document(uid).set(user)
             .addOnSuccessListener {
                 callback(null, true)
             }
@@ -42,37 +42,37 @@ class Firestore(val context: Context) {
     }
 
     suspend fun sendDeployment(deployment: DeploymentRequest): DocumentReference? {
-        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        val userDocument = db.collection(COLLECTION_USERS).document(uid)
         return userDocument.collection(COLLECTION_DEPLOYMENTS).add(deployment).await()
     }
 
     suspend fun sendDeployment(deployment: GuardianDeploymentRequest): DocumentReference? {
-        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        val userDocument = db.collection(COLLECTION_USERS).document(uid)
         return userDocument.collection(COLLECTION_DEPLOYMENTS).add(deployment).await()
     }
 
     suspend fun sendProfile(profile: ProfileRequest): DocumentReference? {
-        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        val userDocument = db.collection(COLLECTION_USERS).document(uid)
         return userDocument.collection(COLLECTION_PROFILES).add(profile).await()
     }
 
     suspend fun sendProfile(profile: GuardianProfileRequest): DocumentReference? {
-        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        val userDocument = db.collection(COLLECTION_USERS).document(uid)
         return userDocument.collection(COLLECTION_PROFILES).add(profile).await()
     }
 
     suspend fun sendImage(imageRequest: ImageRequest): DocumentReference? {
-        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        val userDocument = db.collection(COLLECTION_USERS).document(uid)
         return userDocument.collection(COLLECTION_IMAGES).add(imageRequest).await()
     }
 
     suspend fun sendLocation(locateRequest: LocateRequest): DocumentReference? {
-        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        val userDocument = db.collection(COLLECTION_USERS).document(uid)
         return userDocument.collection(COLLECTION_LOCATIONS).add(locateRequest).await()
     }
 
     suspend fun updateLocation(locateServerId: String, locateRequest: LocateRequest) {
-        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        val userDocument = db.collection(COLLECTION_USERS).document(uid)
         userDocument.collection(COLLECTION_LOCATIONS).document(locateServerId)
             .set(locateRequest).await()
     }
@@ -82,7 +82,7 @@ class Firestore(val context: Context) {
         deploymentLocation: DeploymentLocation,
         updatedAt: Date
     ) {
-        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        val userDocument = db.collection(COLLECTION_USERS).document(uid)
         val updates = hashMapOf<String, Any>(
             EdgeDeployment.FIELD_LOCATION to deploymentLocation,
             EdgeDeployment.FIELD_UPDATED_AT to updatedAt
@@ -92,18 +92,18 @@ class Firestore(val context: Context) {
     }
 
     suspend fun updateDeleteDeployment(serverId: String, deletedAt: Date) {
-        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        val userDocument = db.collection(COLLECTION_USERS).document(uid)
         userDocument.collection(COLLECTION_DEPLOYMENTS).document(serverId)
             .update(EdgeDeployment.FIELD_DELETED_AT, deletedAt).await()
     }
 
     suspend fun sendDiagnostic(diagnosticRequest: DiagnosticRequest): DocumentReference? {
-        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        val userDocument = db.collection(COLLECTION_USERS).document(uid)
         return userDocument.collection(COLLECTION_DIAGNOSTIC).add(diagnosticRequest).await()
     }
 
     suspend fun updateDiagnostic(diagnosticServerId: String, diagnosticRequest: DiagnosticRequest) {
-        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        val userDocument = db.collection(COLLECTION_USERS).document(uid)
         userDocument.collection(COLLECTION_DIAGNOSTIC).document(diagnosticServerId)
             .set(diagnosticRequest).await()
     }
@@ -113,7 +113,7 @@ class Firestore(val context: Context) {
         guardianDeploymentDb: GuardianDeploymentDb,
         callback: ResponseCallback<Boolean>? = null
     ) {
-        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        val userDocument = db.collection(COLLECTION_USERS).document(uid)
         userDocument.collection(COLLECTION_DEPLOYMENTS).get()
             .addOnSuccessListener {
                 val edgeResponses = arrayListOf<EdgeDeploymentResponse>()
@@ -153,7 +153,7 @@ class Firestore(val context: Context) {
         locateDb: LocateDb,
         callback: ResponseCallback<List<LocationResponse>>? = null
     ) {
-        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        val userDocument = db.collection(COLLECTION_USERS).document(uid)
         userDocument.collection(COLLECTION_LOCATIONS).get()
             .addOnSuccessListener {
                 val locationResponses = arrayListOf<LocationResponse>()
@@ -180,8 +180,8 @@ class Firestore(val context: Context) {
         deploymentImageDb: DeploymentImageDb,
         callback: ResponseCallback<List<DeploymentImageResponse>>? = null
     ) {
-        if (guid != "") {
-            val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        if (uid != "") {
+            val userDocument = db.collection(COLLECTION_USERS).document(uid)
             userDocument.collection(COLLECTION_IMAGES).get()
                 .addOnSuccessListener {
                     val deploymentImageResponses = arrayListOf<DeploymentImageResponse>()
@@ -209,7 +209,7 @@ class Firestore(val context: Context) {
         diagnosticDb: DiagnosticDb,
         callback: ResponseCallback<List<DiagnosticResponse>>? = null
     ) {
-        val userDocument = db.collection(COLLECTION_USERS).document(guid)
+        val userDocument = db.collection(COLLECTION_USERS).document(uid)
         userDocument.collection(COLLECTION_DIAGNOSTIC).get()
             .addOnSuccessListener {
                 val diagnosticResponses = arrayListOf<DiagnosticResponse>()
@@ -235,7 +235,7 @@ class Firestore(val context: Context) {
         callback: (Boolean) -> Unit
     ) {
         val docData = hashMapOf(
-            "userId" to guid,
+            "userId" to uid,
             "from" to context.getEmailUser(),
             "inputFeedback" to text,
             "pathImages" to arrayListOf<String>(),
