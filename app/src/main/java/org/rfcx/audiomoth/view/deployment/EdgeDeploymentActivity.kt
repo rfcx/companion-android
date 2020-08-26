@@ -10,6 +10,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_deployment.*
 import org.rfcx.audiomoth.BuildConfig
@@ -38,7 +39,7 @@ import java.sql.Timestamp
 import java.util.*
 
 class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, CompleteListener,
-    MapPickerProtocol {
+    MapPickerProtocol, (Int) -> Unit {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val deploymentDb by lazy {
@@ -49,6 +50,8 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     private val locateDb by lazy { LocateDb(realm) }
     private val profileDb by lazy { ProfileDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
+
+    private val edgeStepView by lazy { StepViewAdapter(this) }
 
     private var currentStep = 0
     private var _profiles: List<Profile> = listOf()
@@ -68,6 +71,9 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_deployment)
+
+        setupStepView()
+
         val deploymentId = intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
         if (deploymentId != null) {
             handleDeploymentStep(deploymentId)
@@ -78,6 +84,14 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 openWithEdgeDevice()
             }
         }
+    }
+
+    private fun setupStepView() {
+        edgeStepRecyclerView.apply {
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            adapter = edgeStepView
+        }
+        edgeStepView.setSteps(this.resources.getStringArray(R.array.audiomoth_steps).toList())
     }
 
     override fun openWithEdgeDevice() {
@@ -94,11 +108,11 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     }
 
     override fun showStepView() {
-        stepView.visibility = View.VISIBLE
+        edgeStepRecyclerView.visibility = View.VISIBLE
     }
 
     override fun hideStepView() {
-        stepView.visibility = View.GONE
+        edgeStepRecyclerView.visibility = View.GONE
     }
 
     override fun showCompleteButton() {
@@ -109,16 +123,13 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         completeStepButton.text = text
     }
 
+    override fun invoke(number: Int) {
+        currentStep = number - 1
+        handleFragment(currentStep)
+    }
+
     override fun nextStep() {
         currentStep += 1
-
-        if (stepView.stepCount == currentStep) {
-            stepView.done(true)
-            hideCompleteButton()
-        } else {
-            stepView.go(currentStep, true)
-        }
-
         handleFragment(currentStep)
     }
 
@@ -126,8 +137,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         if (currentStep == 0) {
             finish()
         } else {
-            currentStep = stepView.currentStep - 1
-            stepView.go(currentStep, true)
+            currentStep -= 1
             handleFragment(currentStep)
         }
     }
@@ -196,7 +206,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     }
 
     override fun setReadyToDeploy(images: List<String>) {
-        stepView.done(true)
         showLoading()
         _deployment?.let {
             it.deployedAt = Date()
@@ -217,7 +226,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     override fun startSetupConfigure(profile: Profile) {
         setProfile(profile)
         currentStep = 1
-        stepView.go(currentStep, true)
         startFragment(ConfigureFragment.newInstance())
     }
 
@@ -292,13 +300,13 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             } else {
                 deployment.state - 1
             }
-            stepView.go(currentStep, true)
             handleFragment(currentStep)
         }
     }
 
     private fun handleFragment(currentStep: Int) {
         // setup fragment for current step
+        handleStepView(currentStep)
         when (currentStep) {
             0 -> {
                 updateDeploymentState(DeploymentState.Edge.Locate)
@@ -321,6 +329,11 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 startFragment(DeployFragment.newInstance())
             }
         }
+    }
+
+    private fun handleStepView(currentStep: Int) {
+        edgeStepView.setStepPasses(currentStep)
+        edgeStepRecyclerView.smoothScrollToPosition(currentStep * 2)
     }
 
     private fun handleSelectingConfig() {
