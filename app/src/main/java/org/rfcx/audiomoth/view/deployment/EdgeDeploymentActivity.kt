@@ -68,6 +68,8 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     private var longitude = 0.0
     private var nameLocation: String = ""
 
+    private var beforeStep = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_deployment)
@@ -124,16 +126,19 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     }
 
     override fun invoke(number: Int) {
+        beforeStep = currentStep
         currentStep = number - 1
         handleFragment(currentStep)
     }
 
     override fun nextStep() {
+        beforeStep = currentStep
         currentStep += 1
         handleFragment(currentStep)
     }
 
     override fun backStep() {
+        beforeStep = currentStep
         if (currentStep == 0) {
             finish()
         } else {
@@ -332,6 +337,8 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     }
 
     private fun handleStepView(currentStep: Int) {
+        edgeStepView.setStepUnSelected(beforeStep)
+        edgeStepView.setStepSelected(currentStep)
         edgeStepView.setStepPasses(currentStep)
         edgeStepRecyclerView.smoothScrollToPosition(currentStep * 2)
     }

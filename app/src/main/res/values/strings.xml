@@ -296,5 +296,6 @@
     <string name="status">Status</string>
     <string name="delivery_time">Delivery time</string>
     <string name="dash">-</string>
+    <string name="correct_mark">\u2713</string>
 
 </resources>
