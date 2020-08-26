@@ -40,7 +40,7 @@
     <dimen name="size_step">30dp</dimen>
     <dimen name="width_divider">30dp</dimen>
     <dimen name="height_divider">2dp</dimen>
-    <dimen name="margin_divider">10dp</dimen>
+    <dimen name="margin_divider">15dp</dimen>
     <dimen name="margin_step">12dp</dimen>
 
 </resources>
