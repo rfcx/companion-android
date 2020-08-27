@@ -114,6 +114,8 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
                             dialog.dismiss()
                         }
                     }
+                val dialog = builder.create()
+                dialog.show()
             }
         }
     }
@@ -133,6 +135,8 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
                             dialog.dismiss()
                         }
                     }
+                val dialog = builder.create()
+                dialog.show()
             }
         }
     }
@@ -152,6 +156,8 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
                             dialog.dismiss()
                         }
                     }
+                val dialog = builder.create()
+                dialog.show()
             }
         }
     }
