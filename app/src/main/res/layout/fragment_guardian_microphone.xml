@@ -44,73 +44,85 @@
         android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginTop="@dimen/margin_padding_normal"
         android:layout_marginEnd="@dimen/margin_padding_large"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         app:layout_constraintTop_toBottomOf="@id/spectrogramView">
 
-        <TextView
-            android:id="@+id/speedTextView"
-            style="@style/AudioMothText.Subhead.Bold"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/speed" />
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/speedValueTextView"
-            style="@style/AudioMothText.Body.Secondary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/margin_padding_small"
-            tools:text="Fast" />
+            <TextView
+                android:id="@+id/speedTextView"
+                style="@style/AudioMothText.Body.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/speed" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginBottom="@dimen/margin_padding_small"
-            android:background="@color/gray_30" />
+            <TextView
+                android:id="@+id/speedValueTextView"
+                style="@style/AudioMothText.Body.Secondary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/margin_padding_small"
+                tools:text="Fast" />
+        </LinearLayout>
 
-        <TextView
-            android:id="@+id/freqScaleTextView"
-            style="@style/AudioMothText.Subhead.Bold"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/frequency_scale" />
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/freqScaleValueTextView"
-            style="@style/AudioMothText.Body.Secondary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/margin_padding_small"
-            tools:text="Linear" />
+            <TextView
+                android:id="@+id/freqScaleTextView"
+                style="@style/AudioMothText.Body.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/frequency_scale" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginBottom="@dimen/margin_padding_small"
-            android:background="@color/gray_30" />
+            <TextView
+                android:id="@+id/freqScaleValueTextView"
+                style="@style/AudioMothText.Body.Secondary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/margin_padding_small"
+                tools:text="Linear" />
+        </LinearLayout>
 
-        <TextView
-            android:id="@+id/colorSpecTextView"
-            style="@style/AudioMothText.Subhead.Bold"
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/color" />
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/colorSpecValueTextView"
-            style="@style/AudioMothText.Body.Secondary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/margin_padding_small"
-            tools:text="Rainbow" />
+            <TextView
+                android:id="@+id/colorSpecTextView"
+                style="@style/AudioMothText.Body.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/color" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginBottom="@dimen/margin_padding_small"
-            android:background="@color/gray_30" />
-
+            <TextView
+                android:id="@+id/colorSpecValueTextView"
+                style="@style/AudioMothText.Body.Secondary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/margin_padding_small"
+                tools:text="Rainbow" />
+        </LinearLayout>
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginEnd="@dimen/margin_padding_large"
+        android:layout_marginBottom="@dimen/margin_padding_small"
+        android:background="@color/gray_30"
+        app:layout_constraintTop_toBottomOf="@id/adjustSpecLayout" />
 
     <LinearLayout
         android:id="@+id/audioButtonLayout"
