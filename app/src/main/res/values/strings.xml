@@ -289,6 +289,9 @@
     <string name="color">Color</string>
     <string name="frequency_scale">Frequency Scale</string>
     <string name="speed">Speed</string>
+    <string name="choose_speed">Choose spectrogram speed</string>
+    <string name="choose_freq">Choose spectrogram frequency scale</string>
+    <string name="choose_color">Choose spectrogram color</string>
 
     <!-- GuardianCheckinTestFragment -->
     <string name="testing_guardian_checkin">Testing guardian checkin</string>
