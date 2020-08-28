@@ -37,9 +37,10 @@
     <dimen name="size_deployment_image">72dp</dimen>
 
     <!-- StepView -->
-    <dimen name="size_step">40dp</dimen>
-    <dimen name="width_divider">10dp</dimen>
-    <dimen name="height_divider">1dp</dimen>
-    <dimen name="margin_divider">20dp</dimen>
+    <dimen name="size_step">30dp</dimen>
+    <dimen name="width_divider">30dp</dimen>
+    <dimen name="height_divider">2dp</dimen>
+    <dimen name="margin_divider">15dp</dimen>
+    <dimen name="margin_step">12dp</dimen>
 
 </resources>

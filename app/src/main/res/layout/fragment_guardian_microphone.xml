@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -31,67 +32,97 @@
         android:id="@+id/spectrogramView"
         android:layout_width="match_parent"
         android:layout_height="200dp"
+        android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginTop="@dimen/margin_padding_xlarge"
+        android:layout_marginEnd="@dimen/margin_padding_large"
         app:layout_constraintTop_toBottomOf="@id/microphoneView" />
 
     <LinearLayout
         android:id="@+id/adjustSpecLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:layout_marginEnd="@dimen/margin_padding_large"
         android:orientation="horizontal"
         app:layout_constraintTop_toBottomOf="@id/spectrogramView">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/speedSpecMenu"
-            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:padding="@dimen/margin_padding_xsmall"
-            android:hint="@string/speed">
+            android:orientation="vertical">
 
-            <AutoCompleteTextView
-                android:id="@+id/speedSpecDropdown"
+            <TextView
+                android:id="@+id/speedTextView"
+                style="@style/AudioMothText.Body.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/speed" />
+
+            <TextView
+                android:id="@+id/speedValueTextView"
+                style="@style/AudioMothText.Body.Secondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/white"
-                android:inputType="none"/>
-        </com.google.android.material.textfield.TextInputLayout>
+                android:paddingBottom="@dimen/margin_padding_small"
+                tools:text="Fast" />
+        </LinearLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/freqScaleSpecMenu"
-            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:padding="@dimen/margin_padding_xsmall"
-            android:hint="@string/frequency_scale">
+            android:orientation="vertical">
 
-            <AutoCompleteTextView
-                android:id="@+id/freqScaleSpecDropdown"
+            <TextView
+                android:id="@+id/freqScaleTextView"
+                style="@style/AudioMothText.Body.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/frequency_scale" />
+
+            <TextView
+                android:id="@+id/freqScaleValueTextView"
+                style="@style/AudioMothText.Body.Secondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/white"
-                android:inputType="none"/>
-        </com.google.android.material.textfield.TextInputLayout>
+                android:paddingBottom="@dimen/margin_padding_small"
+                tools:text="Linear" />
+        </LinearLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/colorSpecMenu"
-            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
-            android:layout_width="0dp"
+
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:padding="@dimen/margin_padding_xsmall"
-            android:hint="@string/color">
+            android:orientation="vertical">
 
-            <AutoCompleteTextView
-                android:id="@+id/colorSpecDropdown"
+            <TextView
+                android:id="@+id/colorSpecTextView"
+                style="@style/AudioMothText.Body.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/color" />
+
+            <TextView
+                android:id="@+id/colorSpecValueTextView"
+                style="@style/AudioMothText.Body.Secondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/white"
-                android:inputType="none"/>
-        </com.google.android.material.textfield.TextInputLayout>
+                android:paddingBottom="@dimen/margin_padding_small"
+                tools:text="Rainbow" />
+        </LinearLayout>
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginEnd="@dimen/margin_padding_large"
+        android:layout_marginBottom="@dimen/margin_padding_small"
+        android:background="@color/gray_30"
+        app:layout_constraintTop_toBottomOf="@id/adjustSpecLayout" />
 
     <LinearLayout
         android:id="@+id/audioButtonLayout"

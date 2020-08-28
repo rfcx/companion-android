@@ -35,6 +35,16 @@ class StepViewAdapter(private val onStepClickListener: (Int) -> Unit) : Recycler
         notifyDataSetChanged()
     }
 
+    fun setStepSelected(position: Int) {
+        (listOfSteps[position * 2] as StepViewItem.StepItem).isSelected = true
+        notifyDataSetChanged()
+    }
+
+    fun setStepUnSelected(position: Int) {
+        (listOfSteps[position * 2] as StepViewItem.StepItem).isSelected = false
+        notifyDataSetChanged()
+    }
+
     override fun getItemViewType(position: Int): Int {
         return when (listOfSteps[position]) {
             is StepViewItem.StepItem -> STEP_ITEM
@@ -63,20 +73,27 @@ class StepViewAdapter(private val onStepClickListener: (Int) -> Unit) : Recycler
         private val stepName = itemView.findViewById<TextView>(R.id.stepName)
         private val stepCircle = itemView.findViewById<View>(R.id.stepCircle)
         fun bind(step: StepViewItem.StepItem) {
-            stepNumber.text = step.number.toString()
             stepName.text = step.name
 
             itemView.setOnClickListener {
                 onStepClickListener(step.number)
             }
 
-            if (step.isPassed) {
+            if (step.isSelected && step.isPassed) {
                 stepNumber.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
+                stepNumber.text = step.number.toString()
                 stepName.setTextColor(ContextCompat.getColor(itemView.context, R.color.colorPrimary))
+                stepCircle.background = ContextCompat.getDrawable(itemView.context, R.drawable.circle_step_passed)
+                itemView.isEnabled = true
+            } else if (step.isPassed) {
+                stepNumber.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
+                stepNumber.text = itemView.context.getString(R.string.correct_mark)
+                stepName.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_secondary))
                 stepCircle.background = ContextCompat.getDrawable(itemView.context, R.drawable.circle_step_passed)
                 itemView.isEnabled = true
             } else {
                 stepNumber.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_secondary))
+                stepNumber.text = step.number.toString()
                 stepName.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_secondary))
                 stepCircle.background = ContextCompat.getDrawable(itemView.context, R.drawable.circle_step_not_passed)
                 itemView.isEnabled = false

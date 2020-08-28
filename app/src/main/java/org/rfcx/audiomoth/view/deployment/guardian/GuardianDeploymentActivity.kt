@@ -62,6 +62,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private var latitude = 0.0
     private var longitude = 0.0
 
+    private var beforeStep = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_guardian_deployment)
@@ -117,16 +119,19 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     }
 
     override fun invoke(number: Int) {
+        beforeStep = currentStep
         currentStep = number - 1
         handleFragment(currentStep)
     }
 
     override fun nextStep() {
+        beforeStep = currentStep
         currentStep += 1
         handleFragment(currentStep)
     }
 
     override fun backStep() {
+        beforeStep = currentStep
         when (currentStep) {
             0 -> finish()
             2 -> {
@@ -268,6 +273,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     }
 
     private fun handleStepView(currentStep: Int) {
+        guardianStepView.setStepUnSelected(beforeStep)
+        guardianStepView.setStepSelected(currentStep)
         guardianStepView.setStepPasses(currentStep)
         guardianStepRecyclerView.smoothScrollToPosition(currentStep * 2)
     }

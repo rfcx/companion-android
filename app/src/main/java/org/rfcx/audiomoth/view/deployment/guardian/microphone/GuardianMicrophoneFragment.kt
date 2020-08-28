@@ -1,12 +1,12 @@
 package org.rfcx.audiomoth.view.deployment.guardian.microphone
 
+import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_guardian_microphone.*
@@ -98,50 +98,68 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     }
 
     private fun setupSpectrogramSpeed() {
-        val adapter: ArrayAdapter<String> = ArrayAdapter<String>(
-            requireContext(),
-            R.layout.dropdown_menu_popup_spectrogram,
-            speed
-        )
-        speedSpecDropdown.setAdapter(adapter)
-        speedSpecDropdown.setOnItemClickListener { _, _, position, _ ->
-            AudioSpectrogramUtils.setSpeed(speed[position])
-            AudioSpectrogramUtils.resetSetupState()
-            spectrogramStack.clear()
-            spectrogramView.invalidate()
+        speedValueTextView.text = speed[0]
+        speedValueTextView.setOnClickListener {
+            val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
+            if (builder != null) {
+                builder.setTitle(R.string.choose_speed)
+                    ?.setItems(speed) { dialog, i ->
+                        try {
+                            speedValueTextView.text = speed[i]
+                            AudioSpectrogramUtils.setSpeed(speed[i])
+                            AudioSpectrogramUtils.resetSetupState()
+                            spectrogramStack.clear()
+                            spectrogramView.invalidate()
+                        } catch (e: IllegalArgumentException) {
+                            dialog.dismiss()
+                        }
+                    }
+                val dialog = builder.create()
+                dialog.show()
+            }
         }
-        speedSpecDropdown.inputType = 0
-        speedSpecDropdown.setText(speed[0], false)
     }
 
     private fun setupSpectrogramFreqMenu() {
-        val adapter: ArrayAdapter<String> = ArrayAdapter<String>(
-            requireContext(),
-            R.layout.dropdown_menu_popup_spectrogram,
-            freq
-        )
-        freqScaleSpecDropdown.setAdapter(adapter)
-        freqScaleSpecDropdown.setOnItemClickListener { _, _, position, _ ->
-            spectrogramView.freqScale = freq[position]
-            spectrogramView.invalidate()
+        freqScaleValueTextView.text = freq[0]
+        freqScaleValueTextView.setOnClickListener {
+            val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
+            if (builder != null) {
+                builder.setTitle(R.string.choose_freq)
+                    ?.setItems(freq) { dialog, i ->
+                        try {
+                            freqScaleValueTextView.text = freq[i]
+                            spectrogramView.freqScale = freq[i]
+                            spectrogramView.invalidate()
+                        } catch (e: IllegalArgumentException) {
+                            dialog.dismiss()
+                        }
+                    }
+                val dialog = builder.create()
+                dialog.show()
+            }
         }
-        freqScaleSpecDropdown.inputType = 0
-        freqScaleSpecDropdown.setText(freq[0], false)
     }
 
     private fun setupSpectrogramColorMenu() {
-        val adapter: ArrayAdapter<String> = ArrayAdapter<String>(
-            requireContext(),
-            R.layout.dropdown_menu_popup_spectrogram,
-            color
-        )
-        colorSpecDropdown.setAdapter(adapter)
-        colorSpecDropdown.setOnItemClickListener { _, _, position, _ ->
-            spectrogramView.colorScale = color[position]
-            spectrogramView.invalidate()
+        colorSpecValueTextView.text = color[0]
+        colorSpecValueTextView.setOnClickListener {
+            val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
+            if (builder != null) {
+                builder.setTitle(R.string.choose_color)
+                    ?.setItems(color) { dialog, i ->
+                        try {
+                            colorSpecValueTextView.text = color[i]
+                            spectrogramView.colorScale = color[i]
+                            spectrogramView.invalidate()
+                        } catch (e: IllegalArgumentException) {
+                            dialog.dismiss()
+                        }
+                    }
+                val dialog = builder.create()
+                dialog.show()
+            }
         }
-        colorSpecDropdown.inputType = 0
-        colorSpecDropdown.setText(color[0], false)
     }
 
     private fun setUiByState(state: MicTestingState) {
@@ -174,7 +192,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         timer = Timer()
         spectrogramTimer = Timer()
 
-        timer?.schedule( object : TimerTask(){
+        timer?.schedule(object : TimerTask() {
             override fun run() {
                 if (!isTimerPause && isMicTesting) {
                     SocketManager.getLiveAudioBuffer(microphoneTestUtils)
@@ -183,7 +201,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
             }
         }, DELAY, MILLI_PERIOD)
 
-        spectrogramTimer?.schedule( object : TimerTask() {
+        spectrogramTimer?.schedule(object : TimerTask() {
             override fun run() {
                 if (spectrogramStack.isNotEmpty()) {
                     if (spectrogramStack[0] != null) {
@@ -221,7 +239,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
             it.release()
         }
         spectrogramTimer?.cancel()
-        spectrogramTimer= null
+        spectrogramTimer = null
 
         if (isMicTesting) {
             timer?.cancel()
@@ -240,7 +258,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         private const val MILLI_PERIOD = 10L
 
         private const val STACK_PERIOD = 10L
-        
+
         private const val DEF_SAMPLERATE = 24000
 
         enum class MicTestingState { READY, LISTENING, FINISH }
