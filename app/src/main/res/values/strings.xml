@@ -301,4 +301,10 @@
     <string name="dash">-</string>
     <string name="correct_mark">\u2713</string>
 
+    <!-- GuardianSolarPanelFragment -->
+    <string name="solar_panel_feedback">Solar panel feedback</string>
+    <string name="voltage_v">Voltage(V)</string>
+    <string name="current_a">Current(A)</string>
+    <string name="power_w">Power(W)</string>
+
 </resources>
