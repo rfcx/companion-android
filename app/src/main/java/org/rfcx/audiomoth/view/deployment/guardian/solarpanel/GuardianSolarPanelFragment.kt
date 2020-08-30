@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
@@ -16,12 +17,19 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import kotlinx.android.synthetic.main.fragment_guardian_solar_panel.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 
 
 class GuardianSolarPanelFragment : Fragment() {
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
+
+    private lateinit var voltageLineDataSet: LineDataSet
+    private lateinit var powerLineDataSet: LineDataSet
+
+    private var voltageValues = arrayListOf<Int>()
+    private var powerValues = arrayListOf<Int>()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -41,37 +49,65 @@ class GuardianSolarPanelFragment : Fragment() {
 
         deploymentProtocol?.hideCompleteButton()
 
-        setVoltageValue()
-        setCurrentValue()
-        setPowerValue()
-
         setFeedbackChart()
+        setChartDataSetting()
+        getSentinelValue()
     }
 
-    private fun setVoltageValue() {
-        voltageValueTextView.text = "000"
+    private fun getSentinelValue() {
+        SocketManager.getSentinelBoardValue()
+        SocketManager.sentinel.observe(viewLifecycleOwner, Observer { sentinelResponse ->
+            if (sentinelResponse.sentinel.isSolarAttached) {
+                val voltage = sentinelResponse.sentinel.voltage
+                val current = sentinelResponse.sentinel.voltage
+                val power = sentinelResponse.sentinel.power
+
+                //set 3 top value
+                setVoltageValue(voltage)
+                setCurrentValue(current)
+                setPowerValue(power)
+
+                voltageValues.add(voltage)
+                powerValues.add(power)
+
+                //update power and voltage to chart
+                updateData()
+            }
+        })
     }
 
-    private fun setCurrentValue() {
-        currentValueTextView.text = "000"
+    private fun setVoltageValue(value: Int) {
+        voltageValueTextView.text = value.toString()
     }
 
-    private fun setPowerValue() {
-        powerValueTextView.text = "000"
+    private fun setCurrentValue(value: Int) {
+        currentValueTextView.text = value.toString()
+    }
+
+    private fun setPowerValue(value: Int) {
+        powerValueTextView.text = value.toString()
+    }
+
+    private fun convertArrayIntToEntry(array: ArrayList<Int>): ArrayList<Entry> {
+        val values = arrayListOf<Entry>()
+        array.forEachIndexed { index, value ->
+            values.add(Entry(index.toFloat(), value.toFloat()))
+        }
+        return values
     }
 
     private fun setFeedbackChart() {
         //setup simple line chart
         feedbackChart.apply {
             setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
-            description.isEnabled = false
+            description.isEnabled = false /* description inside chart */
             setTouchEnabled(false)
             isDragEnabled = true
             setScaleEnabled(true)
         }
 
         //set x axis
-        val xAxis = feedbackChart.xAxis.apply {
+        feedbackChart.xAxis.apply {
             axisMaximum = 20f
             axisMinimum = 0f
             axisLineWidth = 2f
@@ -79,22 +115,23 @@ class GuardianSolarPanelFragment : Fragment() {
         }
 
         //set y axis
-        val yAxisLeft = feedbackChart.axisLeft.apply {
+        feedbackChart.axisLeft.apply {
             axisMaximum = 200f
             axisMinimum = 0f
             axisLineColor = Color.RED
             axisLineWidth = 2f
         }
-        val yAxisRight = feedbackChart.axisRight.apply {
+        feedbackChart.axisRight.apply {
             axisMaximum = 100f
             axisMinimum = 0f
             axisLineWidth = 2f
             axisLineColor = Color.BLUE
         }
+    }
 
-        //set data
-        var values = random()
-        var set1 = LineDataSet(values, "Data1").apply {
+    private fun setChartDataSetting() {
+        //set line data set
+        voltageLineDataSet = LineDataSet(convertArrayIntToEntry(voltageValues), "Voltage").apply {
             setDrawIcons(false)
             color = Color.RED
             lineWidth = 1f
@@ -107,8 +144,7 @@ class GuardianSolarPanelFragment : Fragment() {
             valueTextColor = Color.RED
             enableDashedHighlightLine(10f, 5f, 0f)
         }
-        values = random()
-        var set2 = LineDataSet(values, "Data2").apply {
+        powerLineDataSet = LineDataSet(convertArrayIntToEntry(powerValues), "Power").apply {
             setDrawIcons(false)
             color = Color.BLUE
             lineWidth = 1f
@@ -123,32 +159,23 @@ class GuardianSolarPanelFragment : Fragment() {
         }
 
         val dataSets = arrayListOf<ILineDataSet>()
-        dataSets.add(set1)
-        dataSets.add(set2)
+        dataSets.add(voltageLineDataSet)
+        dataSets.add(powerLineDataSet)
 
         val lineData = LineData(dataSets)
         feedbackChart.data = lineData
-
-        solarFinishButton.setOnClickListener {
-            set1 = feedbackChart.data.getDataSetByIndex(0) as LineDataSet
-            set1.values = random()
-            set1.notifyDataSetChanged()
-            set2 = feedbackChart.data.getDataSetByIndex(1) as LineDataSet
-            set2.values = random()
-            set2.notifyDataSetChanged()
-            feedbackChart.data.notifyDataChanged()
-            feedbackChart.notifyDataSetChanged()
-            feedbackChart.invalidate()
-        }
     }
 
-    private fun random(): ArrayList<Entry> {
-        val values = arrayListOf<Entry>()
-        for (i in 0 until 20) {
-            val value = ((Math.random() * 100)).toFloat()
-            values.add(Entry(i.toFloat(), value))
-        }
-        return values
+    private fun updateData() {
+        voltageLineDataSet = feedbackChart.data.getDataSetByIndex(0) as LineDataSet
+        voltageLineDataSet.values = convertArrayIntToEntry(voltageValues)
+        voltageLineDataSet.notifyDataSetChanged()
+        powerLineDataSet = feedbackChart.data.getDataSetByIndex(1) as LineDataSet
+        powerLineDataSet.values = convertArrayIntToEntry(powerValues)
+        powerLineDataSet.notifyDataSetChanged()
+        feedbackChart.data.notifyDataChanged()
+        feedbackChart.notifyDataSetChanged()
+        feedbackChart.invalidate()
     }
 
     companion object {
