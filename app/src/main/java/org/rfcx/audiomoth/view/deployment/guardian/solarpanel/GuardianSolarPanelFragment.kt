@@ -74,6 +74,7 @@ class GuardianSolarPanelFragment : Fragment() {
         val xAxis = feedbackChart.xAxis.apply {
             axisMaximum = 20f
             axisMinimum = 0f
+            axisLineWidth = 2f
             position = XAxis.XAxisPosition.BOTTOM
         }
 
@@ -81,10 +82,14 @@ class GuardianSolarPanelFragment : Fragment() {
         val yAxisLeft = feedbackChart.axisLeft.apply {
             axisMaximum = 200f
             axisMinimum = 0f
+            axisLineColor = Color.RED
+            axisLineWidth = 2f
         }
         val yAxisRight = feedbackChart.axisRight.apply {
-            axisMaximum = 200f
+            axisMaximum = 100f
             axisMinimum = 0f
+            axisLineWidth = 2f
+            axisLineColor = Color.BLUE
         }
 
         //set data
@@ -92,30 +97,28 @@ class GuardianSolarPanelFragment : Fragment() {
         var set1 = LineDataSet(values, "Data1").apply {
             setDrawIcons(false)
             color = Color.RED
-            setCircleColor(Color.RED)
             lineWidth = 1f
-            circleRadius = 3f
+            setDrawCircles(false)
             setDrawCircleHole(false)
             formLineWidth = 1f
             formLineDashEffect = DashPathEffect(floatArrayOf(10f, 5f), 0f)
             formSize = 15f
-            valueTextSize = 9f
+            valueTextSize = 0f
             valueTextColor = Color.RED
             enableDashedHighlightLine(10f, 5f, 0f)
         }
         values = random()
         var set2 = LineDataSet(values, "Data2").apply {
             setDrawIcons(false)
-            color = Color.YELLOW
-            setCircleColor(Color.YELLOW)
+            color = Color.BLUE
             lineWidth = 1f
-            circleRadius = 3f
+            setDrawCircles(false)
             setDrawCircleHole(false)
             formLineWidth = 1f
             formLineDashEffect = DashPathEffect(floatArrayOf(10f, 5f), 0f)
             formSize = 15f
-            valueTextSize = 9f
-            valueTextColor = Color.YELLOW
+            valueTextSize = 0f
+            valueTextColor = Color.BLUE
             enableDashedHighlightLine(10f, 5f, 0f)
         }
 
