@@ -19,11 +19,18 @@ import kotlinx.android.synthetic.main.fragment_guardian_solar_panel.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
+import org.rfcx.audiomoth.view.deployment.guardian.signal.GuardianSignalFragment
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class GuardianSolarPanelFragment : Fragment() {
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
+
+    private var timer: Timer? = null
+
+    private var isGettingSentinel = false
 
     private lateinit var voltageLineDataSet: LineDataSet
     private lateinit var powerLineDataSet: LineDataSet
@@ -55,9 +62,20 @@ class GuardianSolarPanelFragment : Fragment() {
     }
 
     private fun getSentinelValue() {
-        SocketManager.getSentinelBoardValue()
+        isGettingSentinel = true
+
+        // getting sentinel values every second
+        timer = Timer()
+        timer?.schedule( object : TimerTask(){
+            override fun run() {
+                SocketManager.getSentinelBoardValue()
+            }
+        }, DELAY, MILLI_PERIOD)
+
         SocketManager.sentinel.observe(viewLifecycleOwner, Observer { sentinelResponse ->
             if (sentinelResponse.sentinel.isSolarAttached) {
+                hideAssembleWarn()
+
                 val voltage = sentinelResponse.sentinel.voltage
                 val current = sentinelResponse.sentinel.voltage
                 val power = sentinelResponse.sentinel.power
@@ -72,6 +90,8 @@ class GuardianSolarPanelFragment : Fragment() {
 
                 //update power and voltage to chart
                 updateData()
+            } else {
+                showAssembleWarn()
             }
         })
     }
@@ -178,7 +198,26 @@ class GuardianSolarPanelFragment : Fragment() {
         feedbackChart.invalidate()
     }
 
+    private fun showAssembleWarn() {
+        solarWarnTextView.visibility = View.VISIBLE
+    }
+
+    private fun hideAssembleWarn() {
+        solarWarnTextView.visibility = View.INVISIBLE
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        if(isGettingSentinel) {
+            timer?.cancel()
+            timer = null
+        }
+    }
+
     companion object {
+        private const val DELAY = 0L
+        private const val MILLI_PERIOD = 1000L
+
         fun newInstance(): GuardianSolarPanelFragment = GuardianSolarPanelFragment()
     }
 }
