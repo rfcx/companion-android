@@ -19,7 +19,6 @@ import kotlinx.android.synthetic.main.fragment_guardian_solar_panel.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
-import org.rfcx.audiomoth.view.deployment.guardian.signal.GuardianSignalFragment
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -187,12 +186,17 @@ class GuardianSolarPanelFragment : Fragment() {
     }
 
     private fun updateData() {
+        //get voltage data set
         voltageLineDataSet = feedbackChart.data.getDataSetByIndex(0) as LineDataSet
         voltageLineDataSet.values = convertArrayIntToEntry(voltageValues)
         voltageLineDataSet.notifyDataSetChanged()
+
+        //get power data set
         powerLineDataSet = feedbackChart.data.getDataSetByIndex(1) as LineDataSet
         powerLineDataSet.values = convertArrayIntToEntry(powerValues)
         powerLineDataSet.notifyDataSetChanged()
+
+        //notify and re-view
         feedbackChart.data.notifyDataChanged()
         feedbackChart.notifyDataSetChanged()
         feedbackChart.invalidate()
