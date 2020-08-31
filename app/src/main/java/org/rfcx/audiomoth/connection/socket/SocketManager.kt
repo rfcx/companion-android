@@ -99,7 +99,7 @@ object SocketManager {
     }
 
     fun getSentinelBoardValue() {
-        val data = gson.toJson(SocketRequest(CHECKIN))
+        val data = gson.toJson(SocketRequest(SENTINEL))
         sendMessage(data)
     }
 
