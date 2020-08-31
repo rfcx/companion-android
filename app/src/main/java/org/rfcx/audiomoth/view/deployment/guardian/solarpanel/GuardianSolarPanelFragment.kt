@@ -75,8 +75,8 @@ class GuardianSolarPanelFragment : Fragment() {
             if (sentinelResponse.sentinel.isSolarAttached) {
                 hideAssembleWarn()
 
-                val voltage = sentinelResponse.sentinel.voltage
-                val current = sentinelResponse.sentinel.voltage
+                val voltage = sentinelResponse.sentinel.voltage + 30
+                val current = sentinelResponse.sentinel.current
                 val power = sentinelResponse.sentinel.power
 
                 //set 3 top value
@@ -89,6 +89,9 @@ class GuardianSolarPanelFragment : Fragment() {
 
                 //update power and voltage to chart
                 updateData()
+
+                //expand xAxis line
+                expandXAxisLine()
             } else {
                 showAssembleWarn()
             }
@@ -115,6 +118,10 @@ class GuardianSolarPanelFragment : Fragment() {
         return values
     }
 
+    private fun convertVoltageAndPowerToEntry(voltage: Int, power: Int): Pair<Entry, Entry> {
+        return Pair(Entry(voltageValues.size.toFloat() - 1, voltage.toFloat()), Entry(powerValues.size.toFloat() - 1, power.toFloat()))
+    }
+
     private fun setFeedbackChart() {
         //setup simple line chart
         feedbackChart.apply {
@@ -127,23 +134,23 @@ class GuardianSolarPanelFragment : Fragment() {
 
         //set x axis
         feedbackChart.xAxis.apply {
-            axisMaximum = 20f
-            axisMinimum = 0f
-            axisLineWidth = 2f
+            axisMaximum = X_AXIS_MAXIMUM
+            axisMinimum = AXIS_MINIMUM
+            axisLineWidth = AXIS_LINE_WIDTH
             position = XAxis.XAxisPosition.BOTTOM
         }
 
         //set y axis
         feedbackChart.axisLeft.apply {
-            axisMaximum = 200f
-            axisMinimum = 0f
+            axisMaximum = LEFT_AXIS_MAXIMUM
+            axisMinimum = AXIS_MINIMUM
             axisLineColor = Color.RED
-            axisLineWidth = 2f
+            axisLineWidth = AXIS_LINE_WIDTH
         }
         feedbackChart.axisRight.apply {
-            axisMaximum = 100f
-            axisMinimum = 0f
-            axisLineWidth = 2f
+            axisMaximum = RIGHT_AXIS_MAXIMUM
+            axisMinimum = AXIS_MINIMUM
+            axisLineWidth = AXIS_LINE_WIDTH
             axisLineColor = Color.BLUE
         }
     }
@@ -153,27 +160,25 @@ class GuardianSolarPanelFragment : Fragment() {
         voltageLineDataSet = LineDataSet(convertArrayIntToEntry(voltageValues), "Voltage").apply {
             setDrawIcons(false)
             color = Color.RED
-            lineWidth = 1f
+            lineWidth = CHART_LINE_WIDTH
             setDrawCircles(false)
             setDrawCircleHole(false)
-            formLineWidth = 1f
+            formLineWidth = CHART_LINE_WIDTH
             formLineDashEffect = DashPathEffect(floatArrayOf(10f, 5f), 0f)
-            formSize = 15f
-            valueTextSize = 0f
-            valueTextColor = Color.RED
+            formSize = FORM_SIZE
+            valueTextSize = CHART_TEXT_SIZE
             enableDashedHighlightLine(10f, 5f, 0f)
         }
         powerLineDataSet = LineDataSet(convertArrayIntToEntry(powerValues), "Power").apply {
             setDrawIcons(false)
             color = Color.BLUE
-            lineWidth = 1f
+            lineWidth = CHART_LINE_WIDTH
             setDrawCircles(false)
             setDrawCircleHole(false)
-            formLineWidth = 1f
+            formLineWidth = CHART_LINE_WIDTH
             formLineDashEffect = DashPathEffect(floatArrayOf(10f, 5f), 0f)
-            formSize = 15f
-            valueTextSize = 0f
-            valueTextColor = Color.BLUE
+            formSize = FORM_SIZE
+            valueTextSize = CHART_TEXT_SIZE
             enableDashedHighlightLine(10f, 5f, 0f)
         }
 
@@ -202,6 +207,13 @@ class GuardianSolarPanelFragment : Fragment() {
         feedbackChart.invalidate()
     }
 
+    private fun expandXAxisLine() {
+        if (voltageValues.size > X_AXIS_MAXIMUM) {
+            feedbackChart.xAxis.axisMaximum = voltageValues.size.toFloat()
+            feedbackChart.invalidate()
+        }
+    }
+
     private fun showAssembleWarn() {
         solarWarnTextView.visibility = View.VISIBLE
     }
@@ -221,6 +233,16 @@ class GuardianSolarPanelFragment : Fragment() {
     companion object {
         private const val DELAY = 0L
         private const val MILLI_PERIOD = 1000L
+
+        private const val X_AXIS_MAXIMUM = 100f
+        private const val LEFT_AXIS_MAXIMUM = 200f
+        private const val RIGHT_AXIS_MAXIMUM = 150f
+        private const val AXIS_MINIMUM = 0f
+        private const val AXIS_LINE_WIDTH = 2f
+
+        private const val CHART_LINE_WIDTH = 1f
+        private const val FORM_SIZE = 15f
+        private const val CHART_TEXT_SIZE = 0f
 
         fun newInstance(): GuardianSolarPanelFragment = GuardianSolarPanelFragment()
     }
