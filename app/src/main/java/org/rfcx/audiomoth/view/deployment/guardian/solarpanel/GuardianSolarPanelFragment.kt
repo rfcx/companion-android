@@ -20,7 +20,6 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class GuardianSolarPanelFragment : Fragment() {
@@ -33,9 +32,6 @@ class GuardianSolarPanelFragment : Fragment() {
 
     private lateinit var voltageLineDataSet: LineDataSet
     private lateinit var powerLineDataSet: LineDataSet
-
-    private var voltageValues = arrayListOf<Int>()
-    private var powerValues = arrayListOf<Int>()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -65,7 +61,7 @@ class GuardianSolarPanelFragment : Fragment() {
 
         // getting sentinel values every second
         timer = Timer()
-        timer?.schedule( object : TimerTask(){
+        timer?.schedule(object : TimerTask() {
             override fun run() {
                 SocketManager.getSentinelBoardValue()
             }
@@ -84,11 +80,8 @@ class GuardianSolarPanelFragment : Fragment() {
                 setCurrentValue(current)
                 setPowerValue(power)
 
-                voltageValues.add(voltage)
-                powerValues.add(power)
-
                 //update power and voltage to chart
-                updateData()
+                updateData(voltage, power)
 
                 //expand xAxis line
                 expandXAxisLine()
@@ -110,16 +103,13 @@ class GuardianSolarPanelFragment : Fragment() {
         powerValueTextView.text = value.toString()
     }
 
-    private fun convertArrayIntToEntry(array: ArrayList<Int>): ArrayList<Entry> {
-        val values = arrayListOf<Entry>()
-        array.forEachIndexed { index, value ->
-            values.add(Entry(index.toFloat(), value.toFloat()))
-        }
-        return values
-    }
-
     private fun convertVoltageAndPowerToEntry(voltage: Int, power: Int): Pair<Entry, Entry> {
-        return Pair(Entry(voltageValues.size.toFloat() - 1, voltage.toFloat()), Entry(powerValues.size.toFloat() - 1, power.toFloat()))
+        val voltageDataSet = feedbackChart.data.getDataSetByIndex(0) as LineDataSet
+        val powerDataSet = feedbackChart.data.getDataSetByIndex(1) as LineDataSet
+        return Pair(
+            Entry((voltageDataSet.entryCount - 1).toFloat(), voltage.toFloat()),
+            Entry((powerDataSet.entryCount - 1).toFloat(), power.toFloat())
+        )
     }
 
     private fun setFeedbackChart() {
@@ -157,7 +147,7 @@ class GuardianSolarPanelFragment : Fragment() {
 
     private fun setChartDataSetting() {
         //set line data set
-        voltageLineDataSet = LineDataSet(convertArrayIntToEntry(voltageValues), "Voltage").apply {
+        voltageLineDataSet = LineDataSet(arrayListOf<Entry>(), "Voltage").apply {
             setDrawIcons(false)
             color = Color.RED
             lineWidth = CHART_LINE_WIDTH
@@ -169,7 +159,7 @@ class GuardianSolarPanelFragment : Fragment() {
             valueTextSize = CHART_TEXT_SIZE
             enableDashedHighlightLine(10f, 5f, 0f)
         }
-        powerLineDataSet = LineDataSet(convertArrayIntToEntry(powerValues), "Power").apply {
+        powerLineDataSet = LineDataSet(arrayListOf<Entry>(), "Power").apply {
             setDrawIcons(false)
             color = Color.BLUE
             lineWidth = CHART_LINE_WIDTH
@@ -190,15 +180,16 @@ class GuardianSolarPanelFragment : Fragment() {
         feedbackChart.data = lineData
     }
 
-    private fun updateData() {
+    private fun updateData(voltage: Int, power: Int) {
+        val pair = convertVoltageAndPowerToEntry(voltage, power)
         //get voltage data set
         voltageLineDataSet = feedbackChart.data.getDataSetByIndex(0) as LineDataSet
-        voltageLineDataSet.values = convertArrayIntToEntry(voltageValues)
+        voltageLineDataSet.addEntry(pair.first)
         voltageLineDataSet.notifyDataSetChanged()
 
         //get power data set
         powerLineDataSet = feedbackChart.data.getDataSetByIndex(1) as LineDataSet
-        powerLineDataSet.values = convertArrayIntToEntry(powerValues)
+        powerLineDataSet.addEntry(pair.second)
         powerLineDataSet.notifyDataSetChanged()
 
         //notify and re-view
@@ -208,8 +199,10 @@ class GuardianSolarPanelFragment : Fragment() {
     }
 
     private fun expandXAxisLine() {
-        if (voltageValues.size > X_AXIS_MAXIMUM) {
-            feedbackChart.xAxis.axisMaximum = voltageValues.size.toFloat()
+        //both voltage and power will have the same size
+        val voltageDataSet = feedbackChart.data.getDataSetByIndex(0) as LineDataSet
+        if (voltageDataSet.entryCount > X_AXIS_MAXIMUM) {
+            feedbackChart.xAxis.axisMaximum = voltageDataSet.entryCount.toFloat()
             feedbackChart.invalidate()
         }
     }
@@ -224,7 +217,7 @@ class GuardianSolarPanelFragment : Fragment() {
 
     override fun onDetach() {
         super.onDetach()
-        if(isGettingSentinel) {
+        if (isGettingSentinel) {
             timer?.cancel()
             timer = null
         }
