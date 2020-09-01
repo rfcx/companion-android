@@ -9,7 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.adapter.StepViewItem
 
-class StepViewAdapter(private val onStepClickListener: (Int) -> Unit) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class StepViewAdapter(private val onStepClickListener: (Int) -> Unit) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
         const val STEP_ITEM = 1
@@ -28,20 +29,46 @@ class StepViewAdapter(private val onStepClickListener: (Int) -> Unit) : Recycler
     }
 
     fun setStepPasses(position: Int) {
-        (listOfSteps[position * 2] as StepViewItem.StepItem).isPassed = true
-        if (position != 0) {
-            (listOfSteps[position * 2 - 1] as StepViewItem.DividerItem).isPassed = true
-        }
+        getStepItemFromIndex(position * 2).isPassed = true
+        setDividerPasses()
         notifyDataSetChanged()
     }
 
+    private fun setDividerPasses() {
+        for (i in 0..listOfSteps.size / 4 + 1) {
+            if (getStepItemFromIndex(i * 2).isPassed && getStepItemFromIndex(i * 2 + 2).isPassed) {
+                getDividerFromIndex(i * 2 + 1).isPassed = true
+            }
+        }
+    }
+
+    private fun getStepItemFromIndex(index: Int): StepViewItem.StepItem {
+        return listOfSteps[index] as StepViewItem.StepItem
+    }
+
+    private fun getDividerFromIndex(index: Int): StepViewItem.DividerItem {
+        return listOfSteps[index] as StepViewItem.DividerItem
+    }
+
+    fun isEveryStepsPassed(): Boolean {
+        return listOfSteps.filterIsInstance<StepViewItem.StepItem>().filter { !it.canSkip }.all { it.isPassed }
+    }
+
+    fun setStepsCanSkip(steps: List<String>) {
+        steps.forEach { step ->
+            val skipStep = listOfSteps.filterIsInstance<StepViewItem.StepItem>()
+                .find { it.name == step }
+            skipStep?.let { it.canSkip = true }
+        }
+    }
+
     fun setStepSelected(position: Int) {
-        (listOfSteps[position * 2] as StepViewItem.StepItem).isSelected = true
+        getStepItemFromIndex(position * 2).isSelected = true
         notifyDataSetChanged()
     }
 
     fun setStepUnSelected(position: Int) {
-        (listOfSteps[position * 2] as StepViewItem.StepItem).isSelected = false
+        getStepItemFromIndex(position * 2).isSelected = false
         notifyDataSetChanged()
     }
 
@@ -54,8 +81,13 @@ class StepViewAdapter(private val onStepClickListener: (Int) -> Unit) : Recycler
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            STEP_ITEM -> StepItemViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_step, parent, false))
-            else -> DividerItemViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_step_divider, parent, false))
+            STEP_ITEM -> StepItemViewHolder(
+                LayoutInflater.from(parent.context).inflate(R.layout.item_step, parent, false)
+            )
+            else -> DividerItemViewHolder(
+                LayoutInflater.from(parent.context)
+                    .inflate(R.layout.item_step_divider, parent, false)
+            )
         }
     }
 
@@ -63,8 +95,8 @@ class StepViewAdapter(private val onStepClickListener: (Int) -> Unit) : Recycler
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder.itemViewType) {
-            STEP_ITEM -> (holder as StepItemViewHolder).bind(listOfSteps[position] as StepViewItem.StepItem)
-            else -> (holder as DividerItemViewHolder).bind(listOfSteps[position] as StepViewItem.DividerItem)
+            STEP_ITEM -> (holder as StepItemViewHolder).bind(getStepItemFromIndex(position))
+            else -> (holder as DividerItemViewHolder).bind(getDividerFromIndex(position))
         }
     }
 
@@ -82,21 +114,57 @@ class StepViewAdapter(private val onStepClickListener: (Int) -> Unit) : Recycler
             if (step.isSelected && step.isPassed) {
                 stepNumber.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
                 stepNumber.text = step.number.toString()
-                stepName.setTextColor(ContextCompat.getColor(itemView.context, R.color.colorPrimary))
-                stepCircle.background = ContextCompat.getDrawable(itemView.context, R.drawable.circle_step_passed)
+                stepName.setTextColor(
+                    ContextCompat.getColor(
+                        itemView.context,
+                        R.color.colorPrimary
+                    )
+                )
+                stepCircle.background =
+                    ContextCompat.getDrawable(itemView.context, R.drawable.circle_step_passed)
+                itemView.isEnabled = true
+
+            } else if (step.isSelected) {
+                stepNumber.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
+                stepNumber.text = step.number.toString()
+                stepName.setTextColor(
+                    ContextCompat.getColor(
+                        itemView.context,
+                        R.color.colorPrimary
+                    )
+                )
+                stepCircle.background =
+                    ContextCompat.getDrawable(itemView.context, R.drawable.circle_step_passed)
                 itemView.isEnabled = true
             } else if (step.isPassed) {
                 stepNumber.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
                 stepNumber.text = itemView.context.getString(R.string.correct_mark)
-                stepName.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_secondary))
-                stepCircle.background = ContextCompat.getDrawable(itemView.context, R.drawable.circle_step_passed)
+                stepName.setTextColor(
+                    ContextCompat.getColor(
+                        itemView.context,
+                        R.color.text_secondary
+                    )
+                )
+                stepCircle.background =
+                    ContextCompat.getDrawable(itemView.context, R.drawable.circle_step_passed)
                 itemView.isEnabled = true
             } else {
-                stepNumber.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_secondary))
+                stepNumber.setTextColor(
+                    ContextCompat.getColor(
+                        itemView.context,
+                        R.color.text_secondary
+                    )
+                )
                 stepNumber.text = step.number.toString()
-                stepName.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_secondary))
-                stepCircle.background = ContextCompat.getDrawable(itemView.context, R.drawable.circle_step_not_passed)
-                itemView.isEnabled = false
+                stepName.setTextColor(
+                    ContextCompat.getColor(
+                        itemView.context,
+                        R.color.text_secondary
+                    )
+                )
+                stepCircle.background =
+                    ContextCompat.getDrawable(itemView.context, R.drawable.circle_step_not_passed)
+                itemView.isEnabled = true
             }
         }
     }
@@ -105,7 +173,19 @@ class StepViewAdapter(private val onStepClickListener: (Int) -> Unit) : Recycler
         private val dividerLine = itemView.findViewById<View>(R.id.stepDivider)
         fun bind(divider: StepViewItem.DividerItem) {
             if (divider.isPassed) {
-                dividerLine.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.colorPrimary))
+                dividerLine.setBackgroundColor(
+                    ContextCompat.getColor(
+                        itemView.context,
+                        R.color.colorPrimary
+                    )
+                )
+            } else {
+                dividerLine.setBackgroundColor(
+                    ContextCompat.getColor(
+                        itemView.context,
+                        R.color.text_secondary
+                    )
+                )
             }
         }
     }

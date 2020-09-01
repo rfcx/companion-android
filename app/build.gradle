@@ -53,6 +53,10 @@ configurations {
     ktlint
 }
 
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -117,6 +121,9 @@ dependencies {
 
     /* FFT */
     implementation 'com.github.wendykierp:JTransforms:3.1'
+
+    /* Chart */
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 
     /* ktlint */
     ktlint "com.pinterest:ktlint:0.36.0"

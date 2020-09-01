@@ -31,6 +31,7 @@ import org.rfcx.audiomoth.view.deployment.guardian.connect.ConnectGuardianFragme
 import org.rfcx.audiomoth.view.deployment.guardian.deploy.GuardianDeployFragment
 import org.rfcx.audiomoth.view.deployment.guardian.microphone.GuardianMicrophoneFragment
 import org.rfcx.audiomoth.view.deployment.guardian.signal.GuardianSignalFragment
+import org.rfcx.audiomoth.view.deployment.guardian.solarpanel.GuardianSolarPanelFragment
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
 import org.rfcx.audiomoth.view.deployment.locate.MapPickerFragment
 import org.rfcx.audiomoth.view.detail.MapPickerProtocol
@@ -97,6 +98,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             adapter = guardianStepView
         }
         guardianStepView.setSteps(this.resources.getStringArray(R.array.guardian_steps).toList())
+        guardianStepView.setStepsCanSkip(this.resources.getStringArray(R.array.guardian_can_skip_steps).toList())
     }
 
     private fun setupView() {
@@ -126,6 +128,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun nextStep() {
         beforeStep = currentStep
+        guardianStepView.setStepPasses(currentStep)
         currentStep += 1
         handleFragment(currentStep)
     }
@@ -178,6 +181,10 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun setSampleRate(sampleRate: Int) {
         this._sampleRate = sampleRate
+    }
+
+    override fun canDeploy(): Boolean {
+        return guardianStepView.isEveryStepsPassed()
     }
 
     override fun setDeploymentConfigure(profile: GuardianProfile) {
@@ -246,7 +253,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             }
             1 -> {
                 updateDeploymentState(DeploymentState.Guardian.Locate)
-                startFragment(LocationFragment.newInstance())
+                startFragment(GuardianSignalFragment.newInstance())
             }
             2 -> {
                 this._profiles = profileDb.getProfiles()
@@ -254,18 +261,22 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                 startFragment(GuardianSelectProfileFragment.newInstance())
             }
             3 -> {
-                updateDeploymentState(DeploymentState.Guardian.Signal)
-                startFragment(GuardianSignalFragment.newInstance())
-            }
-            4 -> {
-                updateDeploymentState(DeploymentState.Guardian.Microphone)
+                updateDeploymentState(DeploymentState.Guardian.SolarPanel)
                 startFragment(GuardianMicrophoneFragment.newInstance())
             }
+            4 -> {
+                updateDeploymentState(DeploymentState.Guardian.Signal)
+                startFragment(GuardianSolarPanelFragment.newInstance())
+            }
             5 -> {
+                updateDeploymentState(DeploymentState.Guardian.Microphone)
+                startFragment(LocationFragment.newInstance())
+            }
+            6 -> {
                 updateDeploymentState(DeploymentState.Guardian.Checkin)
                 startFragment(GuardianCheckInTestFragment.newInstance())
             }
-            6 -> {
+            7 -> {
                 updateDeploymentState(DeploymentState.Guardian.Deploy)
                 startFragment(GuardianDeployFragment.newInstance())
             }
@@ -275,7 +286,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private fun handleStepView(currentStep: Int) {
         guardianStepView.setStepUnSelected(beforeStep)
         guardianStepView.setStepSelected(currentStep)
-        guardianStepView.setStepPasses(currentStep)
         guardianStepRecyclerView.smoothScrollToPosition(currentStep * 2)
     }
 
