@@ -98,6 +98,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             adapter = guardianStepView
         }
         guardianStepView.setSteps(this.resources.getStringArray(R.array.guardian_steps).toList())
+        guardianStepView.setStepsCanSkip(this.resources.getStringArray(R.array.guardian_steps).toList())
     }
 
     private fun setupView() {
@@ -127,6 +128,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun nextStep() {
         beforeStep = currentStep
+        guardianStepView.setStepPasses(currentStep)
         currentStep += 1
         handleFragment(currentStep)
     }
@@ -254,23 +256,23 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                 updateDeploymentState(DeploymentState.Guardian.Config)
                 startFragment(GuardianSelectProfileFragment.newInstance())
             }
-            4 -> {
+            3 -> {
                 updateDeploymentState(DeploymentState.Guardian.SolarPanel)
                 startFragment(GuardianSolarPanelFragment.newInstance())
             }
-            5 -> {
+            4 -> {
                 updateDeploymentState(DeploymentState.Guardian.Signal)
                 startFragment(GuardianSignalFragment.newInstance())
             }
-            6 -> {
+            5 -> {
                 updateDeploymentState(DeploymentState.Guardian.Microphone)
                 startFragment(GuardianMicrophoneFragment.newInstance())
             }
-            7 -> {
+            6 -> {
                 updateDeploymentState(DeploymentState.Guardian.Checkin)
                 startFragment(GuardianCheckInTestFragment.newInstance())
             }
-            8 -> {
+            7 -> {
                 updateDeploymentState(DeploymentState.Guardian.Deploy)
                 startFragment(GuardianDeployFragment.newInstance())
             }
@@ -280,7 +282,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private fun handleStepView(currentStep: Int) {
         guardianStepView.setStepUnSelected(beforeStep)
         guardianStepView.setStepSelected(currentStep)
-        guardianStepView.setStepPasses(currentStep)
         guardianStepRecyclerView.smoothScrollToPosition(currentStep * 2)
     }
 

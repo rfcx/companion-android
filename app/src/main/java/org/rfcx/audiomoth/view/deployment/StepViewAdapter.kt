@@ -35,6 +35,14 @@ class StepViewAdapter(private val onStepClickListener: (Int) -> Unit) : Recycler
         notifyDataSetChanged()
     }
 
+    fun setStepsCanSkip(steps: List<String>) {
+        steps.forEach { step ->
+            val skipStep = listOfSteps.filterIsInstance<StepViewItem.StepItem>()
+                .find { it.name == step }
+            skipStep?.let { it.canSkip = true }
+        }
+    }
+
     fun setStepSelected(position: Int) {
         (listOfSteps[position * 2] as StepViewItem.StepItem).isSelected = true
         notifyDataSetChanged()
@@ -85,11 +93,25 @@ class StepViewAdapter(private val onStepClickListener: (Int) -> Unit) : Recycler
                 stepName.setTextColor(ContextCompat.getColor(itemView.context, R.color.colorPrimary))
                 stepCircle.background = ContextCompat.getDrawable(itemView.context, R.drawable.circle_step_passed)
                 itemView.isEnabled = true
-            } else if (step.isPassed) {
+
+            } else if (step.isSelected) {
+                stepNumber.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
+                stepNumber.text = step.number.toString()
+                stepName.setTextColor(ContextCompat.getColor(itemView.context, R.color.colorPrimary))
+                stepCircle.background = ContextCompat.getDrawable(itemView.context, R.drawable.circle_step_passed)
+                itemView.isEnabled = true
+            }
+            else if (step.isPassed) {
                 stepNumber.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
                 stepNumber.text = itemView.context.getString(R.string.correct_mark)
                 stepName.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_secondary))
                 stepCircle.background = ContextCompat.getDrawable(itemView.context, R.drawable.circle_step_passed)
+                itemView.isEnabled = true
+            } else if (step.canSkip) {
+                stepNumber.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_secondary))
+                stepNumber.text = step.number.toString()
+                stepName.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_secondary))
+                stepCircle.background = ContextCompat.getDrawable(itemView.context, R.drawable.circle_step_not_passed)
                 itemView.isEnabled = true
             } else {
                 stepNumber.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_secondary))
@@ -106,6 +128,8 @@ class StepViewAdapter(private val onStepClickListener: (Int) -> Unit) : Recycler
         fun bind(divider: StepViewItem.DividerItem) {
             if (divider.isPassed) {
                 dividerLine.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.colorPrimary))
+            } else {
+                dividerLine.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.text_secondary))
             }
         }
     }
