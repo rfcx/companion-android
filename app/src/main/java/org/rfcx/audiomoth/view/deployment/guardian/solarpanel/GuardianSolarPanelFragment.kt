@@ -87,6 +87,8 @@ class GuardianSolarPanelFragment : Fragment() {
 
                 //expand xAxis line
                 expandXAxisLine()
+
+                solarFinishButton.isEnabled = true
             } else {
                 showAssembleWarn()
             }
