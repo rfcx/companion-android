@@ -29,6 +29,13 @@ class GuardianDeployFragment : BaseImageFragment() {
         super.onViewCreated(view, savedInstanceState)
         deploymentProtocol?.hideCompleteButton()
         setupImageRecycler()
+
+        deploymentProtocol?.canDeploy()?.let { canDeploy ->
+            if (canDeploy) {
+                finishButton.isEnabled = false
+            }
+        }
+
         finishButton.setOnClickListener {
             val images = imageAdapter.getNewAttachImage()
             deploymentProtocol?.setReadyToDeploy(images)

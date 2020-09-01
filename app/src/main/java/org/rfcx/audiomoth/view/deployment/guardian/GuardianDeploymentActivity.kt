@@ -183,6 +183,10 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         this._sampleRate = sampleRate
     }
 
+    override fun canDeploy(): Boolean {
+        return guardianStepView.isEveryStepsPassed()
+    }
+
     override fun setDeploymentConfigure(profile: GuardianProfile) {
         setProfile(profile)
         this._configuration = profile.asConfiguration()

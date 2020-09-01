@@ -50,6 +50,10 @@ class StepViewAdapter(private val onStepClickListener: (Int) -> Unit) :
         return listOfSteps[index] as StepViewItem.DividerItem
     }
 
+    fun isEveryStepsPassed(): Boolean {
+        return listOfSteps.filterIsInstance<StepViewItem.StepItem>().all { it.isPassed }
+    }
+
     fun setStepsCanSkip(steps: List<String>) {
         steps.forEach { step ->
             val skipStep = listOfSteps.filterIsInstance<StepViewItem.StepItem>()
