@@ -306,5 +306,6 @@
     <string name="voltage_v">Voltage(V)</string>
     <string name="current_a">Current(A)</string>
     <string name="power_w">Power(W)</string>
+    <string name="please_assemble_solar_panel_to_get_feedback">Please assemble solar panel to get feedback</string>
 
 </resources>

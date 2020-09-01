@@ -30,6 +30,7 @@ object SocketManager {
     private const val SIGNAL_INFO = "signal_info"
     private const val MICROPHONE_TEST = "microphone_test"
     private const val CHECKIN = "checkin"
+    private const val SENTINEL = "sentinel"
 
     private var audioChunks = arrayListOf<String>()
     private var microphoneTestUtils: MicrophoneTestUtils? = null
@@ -46,6 +47,7 @@ object SocketManager {
     val liveAudio = MutableLiveData<MicrophoneTestResponse>()
     val spectrogram = MutableLiveData<ByteArray>()
     val checkInTest = MutableLiveData<CheckInTestResponse>()
+    val sentinel = MutableLiveData<SentinelResponse>()
 
     init {
         connection.value = ConnectionResponse()
@@ -57,6 +59,7 @@ object SocketManager {
         liveAudio.value = MicrophoneTestResponse()
         spectrogram.value = ByteArray(2)
         checkInTest.value = CheckInTestResponse()
+        sentinel.value = SentinelResponse()
     }
 
     fun getConnection() {
@@ -92,6 +95,11 @@ object SocketManager {
 
     fun getCheckInTest() {
         val data = gson.toJson(SocketRequest(CHECKIN))
+        sendMessage(data)
+    }
+
+    fun getSentinelBoardValue() {
+        val data = gson.toJson(SocketRequest(SENTINEL))
         sendMessage(data)
     }
 
@@ -199,6 +207,11 @@ object SocketManager {
                                     gson.fromJson(dataInput, CheckInTestResponse::class.java)
                                 this.checkInTest.postValue(response)
                             }
+                            SENTINEL -> {
+                                val response =
+                                    gson.fromJson(dataInput, SentinelResponse::class.java)
+                                this.sentinel.postValue(response)
+                            }
                         }
                     }
                 }
@@ -211,7 +224,9 @@ object SocketManager {
 
     fun stopConnection() {
         //stop incoming message thread
-        inComingMessageThread.interrupt()
+        if (::inComingMessageThread.isInitialized) {
+            inComingMessageThread.interrupt()
+        }
 
         //stop server thread
         clientThread?.interrupt()

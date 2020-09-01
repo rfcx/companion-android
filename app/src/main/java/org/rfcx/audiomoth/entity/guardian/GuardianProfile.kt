@@ -12,10 +12,10 @@ open class GuardianProfile(
     var id: Int = 0,
     var serverId: String? = null,
     var name: String = "",
-    var sampleRate: Int = 0,
-    var bitrate: Int = 0,
-    var fileFormat: String = "",
-    var duration: Int = 0,
+    var sampleRate: Int = 24000,
+    var bitrate: Int = 28672,
+    var fileFormat: String = "opus",
+    var duration: Int = 90,
     var createdAt: Date = Date(),
     @Expose(serialize = false)
     var syncState: Int = 0

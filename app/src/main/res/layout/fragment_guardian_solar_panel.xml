@@ -99,7 +99,19 @@
         android:id="@+id/feedbackChart"
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        app:layout_constraintTop_toBottomOf="@id/feedbackLayout"/>
+        app:layout_constraintTop_toBottomOf="@id/feedbackLayout" />
+
+    <TextView
+        android:id="@+id/solarWarnTextView"
+        style="@style/AudioMothText.Body.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/please_assemble_solar_panel_to_get_feedback"
+        android:textColor="@color/text_error"
+        android:layout_marginBottom="@dimen/margin_padding_small"
+        app:layout_constraintBottom_toTopOf="@id/solarFinishButton"
+        app:layout_constraintEnd_toEndOf="@id/solarFinishButton"
+        app:layout_constraintStart_toStartOf="@id/solarFinishButton" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/solarFinishButton"
@@ -110,6 +122,7 @@
         android:layout_marginEnd="@dimen/margin_padding_large"
         android:layout_marginBottom="@dimen/margin_padding_large"
         android:text="@string/next"
+        android:enabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
