@@ -253,7 +253,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             }
             1 -> {
                 updateDeploymentState(DeploymentState.Guardian.Locate)
-                startFragment(LocationFragment.newInstance())
+                startFragment(GuardianSignalFragment.newInstance())
             }
             2 -> {
                 this._profiles = profileDb.getProfiles()
@@ -262,15 +262,15 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             }
             3 -> {
                 updateDeploymentState(DeploymentState.Guardian.SolarPanel)
-                startFragment(GuardianSolarPanelFragment.newInstance())
+                startFragment(GuardianMicrophoneFragment.newInstance())
             }
             4 -> {
                 updateDeploymentState(DeploymentState.Guardian.Signal)
-                startFragment(GuardianSignalFragment.newInstance())
+                startFragment(GuardianSolarPanelFragment.newInstance())
             }
             5 -> {
                 updateDeploymentState(DeploymentState.Guardian.Microphone)
-                startFragment(GuardianMicrophoneFragment.newInstance())
+                startFragment(LocationFragment.newInstance())
             }
             6 -> {
                 updateDeploymentState(DeploymentState.Guardian.Checkin)

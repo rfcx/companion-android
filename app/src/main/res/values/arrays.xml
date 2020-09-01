@@ -20,11 +20,11 @@
     <!--  Guardian  -->
     <string-array name="guardian_steps">
         <item>Connect</item>
-        <item>Locate</item>
-        <item>Config</item>
-        <item>Solar Panel</item>
         <item>Signal</item>
+        <item>Config</item>
         <item>Microphone</item>
+        <item>Solar Panel</item>
+        <item>Locate</item>
         <item>Checkin</item>
         <item>Deploy</item>
     </string-array>
