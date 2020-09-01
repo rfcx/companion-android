@@ -26,7 +26,7 @@ class GuardianSolarPanelFragment : Fragment() {
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
 
-    private var timer: Timer? = null
+    private var timer: Timer = Timer()
 
     private var isGettingSentinel = false
 
@@ -61,7 +61,7 @@ class GuardianSolarPanelFragment : Fragment() {
 
         // getting sentinel values every second
         timer = Timer()
-        timer?.schedule(object : TimerTask() {
+        timer.schedule(object : TimerTask() {
             override fun run() {
                 SocketManager.getSentinelBoardValue()
             }
@@ -218,8 +218,7 @@ class GuardianSolarPanelFragment : Fragment() {
     override fun onDetach() {
         super.onDetach()
         if (isGettingSentinel) {
-            timer?.cancel()
-            timer = null
+            timer.cancel()
         }
     }
 
