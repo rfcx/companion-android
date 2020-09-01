@@ -8,8 +8,8 @@ import java.io.Serializable
 @RealmClass
 open class GuardianConfiguration(
     @SerializedName("sample_rate")
-    var sampleRate: Int = 14,
-    var bitrate: Int = 14,
+    var sampleRate: Int = 24000,
+    var bitrate: Int = 28672,
     @SerializedName("file_format")
     var fileFormat: String = "opus",
     var duration: Int = 90
