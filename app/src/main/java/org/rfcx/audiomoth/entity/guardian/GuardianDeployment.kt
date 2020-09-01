@@ -19,7 +19,7 @@ open class GuardianDeployment(
     @Expose(serialize = false)
     var state: Int = 0, // 1 = Locate, 2 = Config, 3 = Sync, 4 = Verify, 5 = Deploy, 6 = Ready To Upload
     var device: String? = Device.GUARDIAN.value,
-    var wifiName: String? = null,
+    var wifiName: String? = "",
     var configuration: GuardianConfiguration? = null,
     var location: DeploymentLocation? = null,
     var createdAt: Date = Date(),
