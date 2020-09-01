@@ -18,6 +18,7 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import kotlinx.android.synthetic.main.fragment_guardian_solar_panel.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
+import org.rfcx.audiomoth.entity.socket.SentinelInput
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 import java.util.*
 
@@ -26,7 +27,7 @@ class GuardianSolarPanelFragment : Fragment() {
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
 
-    private var timer: Timer? = null
+    private var timer: Timer = Timer()
 
     private var isGettingSentinel = false
 
@@ -61,19 +62,20 @@ class GuardianSolarPanelFragment : Fragment() {
 
         // getting sentinel values every second
         timer = Timer()
-        timer?.schedule(object : TimerTask() {
+        timer.schedule(object : TimerTask() {
             override fun run() {
                 SocketManager.getSentinelBoardValue()
             }
         }, DELAY, MILLI_PERIOD)
 
         SocketManager.sentinel.observe(viewLifecycleOwner, Observer { sentinelResponse ->
-            if (sentinelResponse.sentinel.isSolarAttached) {
+            val input = sentinelResponse.sentinel.input
+            if (isSentinelConnected(input)) {
                 hideAssembleWarn()
 
-                val voltage = sentinelResponse.sentinel.voltage + 30
-                val current = sentinelResponse.sentinel.current
-                val power = sentinelResponse.sentinel.power
+                val voltage = input.voltage
+                val current = input.current
+                val power = input.power
 
                 //set 3 top value
                 setVoltageValue(voltage)
@@ -89,6 +91,10 @@ class GuardianSolarPanelFragment : Fragment() {
                 showAssembleWarn()
             }
         })
+    }
+
+    private fun isSentinelConnected(input: SentinelInput): Boolean {
+        return input.voltage != 0 && input.current != 0 && input.power != 0
     }
 
     private fun setVoltageValue(value: Int) {
@@ -218,8 +224,7 @@ class GuardianSolarPanelFragment : Fragment() {
     override fun onDetach() {
         super.onDetach()
         if (isGettingSentinel) {
-            timer?.cancel()
-            timer = null
+            timer.cancel()
         }
     }
 
