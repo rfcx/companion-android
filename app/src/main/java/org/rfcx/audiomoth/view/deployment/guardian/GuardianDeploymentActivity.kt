@@ -98,7 +98,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             adapter = guardianStepView
         }
         guardianStepView.setSteps(this.resources.getStringArray(R.array.guardian_steps).toList())
-        guardianStepView.setStepsCanSkip(this.resources.getStringArray(R.array.guardian_steps).toList())
+        guardianStepView.setStepsCanSkip(this.resources.getStringArray(R.array.guardian_can_skip_steps).toList())
     }
 
     private fun setupView() {
