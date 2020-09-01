@@ -148,23 +148,6 @@ class StepViewAdapter(private val onStepClickListener: (Int) -> Unit) :
                 stepCircle.background =
                     ContextCompat.getDrawable(itemView.context, R.drawable.circle_step_passed)
                 itemView.isEnabled = true
-            } else if (step.canSkip) {
-                stepNumber.setTextColor(
-                    ContextCompat.getColor(
-                        itemView.context,
-                        R.color.text_secondary
-                    )
-                )
-                stepNumber.text = step.number.toString()
-                stepName.setTextColor(
-                    ContextCompat.getColor(
-                        itemView.context,
-                        R.color.text_secondary
-                    )
-                )
-                stepCircle.background =
-                    ContextCompat.getDrawable(itemView.context, R.drawable.circle_step_not_passed)
-                itemView.isEnabled = true
             } else {
                 stepNumber.setTextColor(
                     ContextCompat.getColor(
@@ -181,7 +164,7 @@ class StepViewAdapter(private val onStepClickListener: (Int) -> Unit) :
                 )
                 stepCircle.background =
                     ContextCompat.getDrawable(itemView.context, R.drawable.circle_step_not_passed)
-                itemView.isEnabled = false
+                itemView.isEnabled = true
             }
         }
     }
