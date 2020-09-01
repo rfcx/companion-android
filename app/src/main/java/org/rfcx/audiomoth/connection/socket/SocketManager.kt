@@ -224,7 +224,9 @@ object SocketManager {
 
     fun stopConnection() {
         //stop incoming message thread
-        inComingMessageThread.interrupt()
+        if (::inComingMessageThread.isInitialized) {
+            inComingMessageThread.interrupt()
+        }
 
         //stop server thread
         clientThread?.interrupt()
