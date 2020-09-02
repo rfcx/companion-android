@@ -3,7 +3,6 @@ package org.rfcx.audiomoth.view.prefs
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import androidx.preference.PreferenceFragmentCompat
 import org.rfcx.audiomoth.R
 
@@ -42,7 +41,6 @@ class GuardianPrefsFragment() : PreferenceFragmentCompat(),
         }
 
         prefsChanges[key!!] = value
-        Log.d(LOGTAG, "Prefs changed: $key | $value")
 
         syncPreferenceListener?.showSyncButton()
         syncPreferenceListener?.setPrefsChanges(prefsChanges)
