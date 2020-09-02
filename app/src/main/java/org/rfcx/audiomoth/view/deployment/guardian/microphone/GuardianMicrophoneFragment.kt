@@ -57,6 +57,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         setupSpectrogramSpeed()
         setupSpectrogramFreqMenu()
         setupSpectrogramColorMenu()
+        setupAudioPlaybackMenu()
         setUiByState(MicTestingState.READY)
         SocketManager.resetDefaultValue()
 
@@ -162,6 +163,30 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         }
     }
 
+    private fun setupAudioPlaybackMenu() {
+        playbackValueTextView.text = playback[0]
+        playbackValueTextView.setOnClickListener {
+            val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
+            if (builder != null) {
+                builder.setTitle(R.string.choose_play_back)
+                    ?.setItems(playback) { dialog, i ->
+                        try {
+                            playbackValueTextView.text = playback[i]
+                            if (i == 0) {
+                                microphoneTestUtils.play()
+                            } else {
+                                microphoneTestUtils.stop()
+                            }
+                        } catch (e: IllegalArgumentException) {
+                            dialog.dismiss()
+                        }
+                    }
+                val dialog = builder.create()
+                dialog.show()
+            }
+        }
+    }
+
     private fun setUiByState(state: MicTestingState) {
         when (state) {
             MicTestingState.READY -> {
@@ -253,6 +278,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         private val color = arrayOf("Rainbow", "Fire", "Ice", "Grey")
         private val freq = arrayOf("Linear", "Logarithmic")
         private val speed = arrayOf("Fast", "Normal", "Slow")
+        private val playback = arrayOf("On", "Off")
 
         private const val DELAY = 0L
         private const val MILLI_PERIOD = 10L
