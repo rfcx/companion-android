@@ -65,6 +65,8 @@
                 style="@style/AudioMothText.Body.Secondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:paddingBottom="@dimen/margin_padding_small"
                 tools:text="Fast" />
         </LinearLayout>
@@ -87,6 +89,8 @@
                 style="@style/AudioMothText.Body.Secondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:paddingBottom="@dimen/margin_padding_small"
                 tools:text="Linear" />
         </LinearLayout>
@@ -95,7 +99,7 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:orientation="vertical">
 
             <TextView
@@ -110,6 +114,8 @@
                 style="@style/AudioMothText.Body.Secondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:paddingBottom="@dimen/margin_padding_small"
                 tools:text="Rainbow" />
         </LinearLayout>
@@ -132,6 +138,8 @@
                 style="@style/AudioMothText.Body.Secondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:paddingBottom="@dimen/margin_padding_small"
                 tools:text="On" />
         </LinearLayout>
