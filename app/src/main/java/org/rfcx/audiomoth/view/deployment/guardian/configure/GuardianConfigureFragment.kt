@@ -73,7 +73,6 @@ class GuardianConfigureFragment : Fragment() {
         profile = deploymentProtocol?.getProfile()
 
         setupAdvancedSetting()
-        setupSyncButton()
         retrieveAllPrefs()
 
         setNextButton(true)
@@ -124,12 +123,6 @@ class GuardianConfigureFragment : Fragment() {
             } else {
                 prefsEditor.putString(key, value).apply()
             }
-        }
-    }
-
-    private fun setupSyncButton() {
-        configSyncButton.setOnClickListener {
-            syncPreferenceListener?.syncPrefs()
         }
     }
 
