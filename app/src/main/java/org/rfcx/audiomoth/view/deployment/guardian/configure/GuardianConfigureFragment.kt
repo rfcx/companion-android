@@ -29,9 +29,10 @@ import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 import org.rfcx.audiomoth.view.prefs.GuardianPrefsFragment
 import org.rfcx.audiomoth.view.prefs.SyncPreferenceListener
 
-class GuardianConfigureFragment : Fragment(), SyncPreferenceListener {
+class GuardianConfigureFragment : Fragment() {
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
+    private var syncPreferenceListener: SyncPreferenceListener? = null
 
     // Predefined configuration values
     private var sampleRateEntries: Array<String>? = null
@@ -51,12 +52,11 @@ class GuardianConfigureFragment : Fragment(), SyncPreferenceListener {
     private var profile: GuardianProfile? = null
 
     private var collapseAdvanced = false
-    private var prefsChanges: Map<String, String>? = null
-    private var prefsEditor: SharedPreferences.Editor? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         deploymentProtocol = context as GuardianDeploymentProtocol
+        syncPreferenceListener = context as SyncPreferenceListener
         setPredefinedConfiguration(context)
     }
 
@@ -97,20 +97,20 @@ class GuardianConfigureFragment : Fragment(), SyncPreferenceListener {
 
     private fun setupAdvancedSetting() {
         val fragment = GuardianPrefsFragment()
-        diagnosticAdvanceLayout.setOnClickListener {
+        configAdvanceLayout.setOnClickListener {
             if (!collapseAdvanced) {
                 childFragmentManager.beginTransaction()
                     .replace(configAdvancedContainer.id, fragment)
                     .commit()
                 collapseAdvanced = true
-                advanceCollapseIcon.background =
+                configAdvanceCollapseIcon.background =
                     ContextCompat.getDrawable(requireContext(), R.drawable.ic_up)
             } else {
                 childFragmentManager.beginTransaction()
                     .remove(fragment)
                     .commit()
                 collapseAdvanced = false
-                advanceCollapseIcon.background =
+                configAdvanceCollapseIcon.background =
                     ContextCompat.getDrawable(requireContext(), R.drawable.ic_drop_down)
             }
         }
@@ -132,7 +132,7 @@ class GuardianConfigureFragment : Fragment(), SyncPreferenceListener {
 
     private fun setupSyncButton() {
         configSyncButton.setOnClickListener {
-            syncPrefs(prefsChanges!!)
+            syncPreferenceListener?.syncPrefs()
         }
     }
 
@@ -311,58 +311,6 @@ class GuardianConfigureFragment : Fragment(), SyncPreferenceListener {
                 dialog.show()
             }
         }
-    }
-
-    override fun setPrefsChanges(prefs: Map<String, String>) {
-        this.prefsChanges = prefs
-    }
-
-    override fun showSyncButton() {
-        configSyncButton.visibility = View.VISIBLE
-    }
-
-    override fun hideSyncButton() {
-        configSyncButton.visibility = View.INVISIBLE
-    }
-
-    override fun syncPrefs(prefs: Map<String, String>) {
-        if (prefs.isNotEmpty()) {
-            val listForGuardian = mutableListOf<String>()
-            prefs.forEach {
-                listForGuardian.add("${it.key}|${it.value}")
-            }
-
-            SocketManager.syncConfiguration(listForGuardian)
-            SocketManager.syncConfiguration.observe(viewLifecycleOwner, Observer { syncConfiguration ->
-                if (syncConfiguration.sync.status == Status.SUCCESS.value) {
-                    showSuccessResponse()
-                } else {
-                    showFailedResponse()
-                }
-            })
-
-            hideSyncButton()
-        }
-    }
-
-    override fun showSuccessResponse() {
-        Snackbar.make(configRootView, "Sync preferences success", Snackbar.LENGTH_LONG)
-            .show()
-    }
-
-    override fun showFailedResponse() {
-        Snackbar.make(configRootView, "Sync preferences failed", Snackbar.LENGTH_LONG)
-            .setAction(R.string.retry) { syncPrefs(prefsChanges ?: mapOf()) }
-            .show()
-    }
-
-    override fun setEditor(editor: SharedPreferences.Editor) {
-        this.prefsEditor = editor
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        this.prefsEditor?.clear()?.apply()
     }
 
     companion object {

@@ -183,7 +183,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
 
     private fun setupSyncButton() {
         syncButton.setOnClickListener {
-            syncPrefs(prefsChanges!!)
+            syncPrefs()
         }
     }
 
@@ -235,10 +235,10 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
         syncButton.visibility = View.INVISIBLE
     }
 
-    override fun syncPrefs(prefs: Map<String, String>) {
-        if (prefs.isNotEmpty()) {
+    override fun syncPrefs() {
+        if (this.prefsChanges!!.isNotEmpty()) {
             val listForGuardian = mutableListOf<String>()
-            prefs.forEach {
+            this.prefsChanges?.forEach {
                 listForGuardian.add("${it.key}|${it.value}")
             }
 
@@ -262,7 +262,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
 
     override fun showFailedResponse() {
         Snackbar.make(diagRootView, "Sync preferences failed", Snackbar.LENGTH_LONG)
-            .setAction(R.string.retry) { syncPrefs(prefsChanges ?: mapOf()) }
+            .setAction(R.string.retry) { syncPrefs() }
             .show()
     }
 
