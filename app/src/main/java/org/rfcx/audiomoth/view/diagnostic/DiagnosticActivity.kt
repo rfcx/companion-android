@@ -40,21 +40,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
     private var prefsChanges: Map<String, String>? = null
     private var prefsEditor: SharedPreferences.Editor? = null
 
-    private var switchPrefs = listOf(
-        "show_ui",
-        "enable_audio_capture",
-        "enable_checkin_publish",
-        "enable_cutoffs_battery",
-        "enable_cutoffs_schedule_off_hours",
-        "admin_enable_log_capture",
-        "admin_enable_screenshot_capture",
-        "admin_enable_bluetooth",
-        "admin_enable_wifi",
-        "admin_enable_tcp_adb",
-        "admin_enable_sentinel_capture",
-        "admin_enable_ssh_server",
-        "admin_enable_wifi_socket"
-    )
+    private var switchPrefs = this.resources.getStringArray(R.array.switch_prefs).toList()
 
     private var lat: Double? = null
     private var long: Double? = null

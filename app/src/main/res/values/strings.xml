@@ -190,6 +190,7 @@
     <string name="choose_bitrate">Choose bitrate (kbs)</string>
     <string name="choose_file_format">Choose file format</string>
     <string name="choose_duration_cycle">Choose record duration cycle (secs)</string>
+    <string name="advanced_config">Advanced configuration</string>
 
     <!-- GuardianPreferences -->
     <bool name="prefs_value_default_show_ui">true</bool>

@@ -4,23 +4,32 @@ import android.app.AlertDialog
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.preference.PreferenceManager
+import com.google.android.material.snackbar.Snackbar
+import com.google.gson.JsonArray
+import kotlinx.android.synthetic.main.activity_guardian_diagnostic.*
 import kotlinx.android.synthetic.main.fragment_guardian_configure.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.entity.guardian.GuardianConfiguration
 import org.rfcx.audiomoth.entity.guardian.GuardianProfile
 import org.rfcx.audiomoth.entity.guardian.toListForGuardian
+import org.rfcx.audiomoth.entity.socket.Status
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
+import org.rfcx.audiomoth.view.prefs.GuardianPrefsFragment
+import org.rfcx.audiomoth.view.prefs.SyncPreferenceListener
 
-class GuardianConfigureFragment : Fragment() {
+class GuardianConfigureFragment : Fragment(), SyncPreferenceListener {
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
 
@@ -32,6 +41,7 @@ class GuardianConfigureFragment : Fragment() {
     private var fileFormatList: Array<String>? = null
     private var durationEntries: Array<String>? = null
     private var durationValues: Array<String>? = null
+    private var switchPrefs: List<String>? = null
 
     private var sampleRate = 24000 // default guardian sampleRate is 24000
     private var bitrate = 28672 // default guardian bitrate is 28672
@@ -39,6 +49,10 @@ class GuardianConfigureFragment : Fragment() {
     private var duration = 90 // default guardian duration is 90
 
     private var profile: GuardianProfile? = null
+
+    private var collapseAdvanced = false
+    private var prefsChanges: Map<String, String>? = null
+    private var prefsEditor: SharedPreferences.Editor? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -61,6 +75,10 @@ class GuardianConfigureFragment : Fragment() {
 
         profile = deploymentProtocol?.getProfile()
 
+        setupAdvancedSetting()
+        setupSyncButton()
+        retrieveAllPrefs()
+
         setNextButton(true)
         setFileFormatLayout()
         setSampleRateLayout()
@@ -68,6 +86,54 @@ class GuardianConfigureFragment : Fragment() {
         setDuration()
         createNotificationChannel()
         setNextOnClick()
+    }
+
+    private fun retrieveAllPrefs() {
+        SocketManager.getAllPrefs()
+        SocketManager.prefs.observe(viewLifecycleOwner, Observer {
+            setupCurrentPrefs(it.prefs)
+        })
+    }
+
+    private fun setupAdvancedSetting() {
+        val fragment = GuardianPrefsFragment()
+        diagnosticAdvanceLayout.setOnClickListener {
+            if (!collapseAdvanced) {
+                childFragmentManager.beginTransaction()
+                    .replace(configAdvancedContainer.id, fragment)
+                    .commit()
+                collapseAdvanced = true
+                advanceCollapseIcon.background =
+                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_up)
+            } else {
+                childFragmentManager.beginTransaction()
+                    .remove(fragment)
+                    .commit()
+                collapseAdvanced = false
+                advanceCollapseIcon.background =
+                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_drop_down)
+            }
+        }
+    }
+
+    private fun setupCurrentPrefs(prefs: JsonArray) {
+        val prefsEditor = PreferenceManager.getDefaultSharedPreferences(requireContext()).edit()
+        prefs.forEach {
+            val pref = it.asJsonObject
+            val key = ArrayList<String>(pref.keySet())[0]
+            val value = pref.get(key).asString.replace("\"", "")
+            if (switchPrefs!!.contains(key)) {
+                prefsEditor.putBoolean(key, value.toBoolean()).apply()
+            } else {
+                prefsEditor.putString(key, value).apply()
+            }
+        }
+    }
+
+    private fun setupSyncButton() {
+        configSyncButton.setOnClickListener {
+            syncPrefs(prefsChanges!!)
+        }
     }
 
     private fun setPredefinedConfiguration(context: Context) {
@@ -78,6 +144,7 @@ class GuardianConfigureFragment : Fragment() {
         fileFormatList = context.resources.getStringArray(R.array.audio_codec)
         durationEntries = context.resources.getStringArray(R.array.duration_cycle_entries)
         durationValues = context.resources.getStringArray(R.array.duration_cycle_values)
+        switchPrefs = this.resources.getStringArray(R.array.switch_prefs).toList()
     }
 
     private fun setNextButton(show: Boolean) {
@@ -244,6 +311,58 @@ class GuardianConfigureFragment : Fragment() {
                 dialog.show()
             }
         }
+    }
+
+    override fun setPrefsChanges(prefs: Map<String, String>) {
+        this.prefsChanges = prefs
+    }
+
+    override fun showSyncButton() {
+        configSyncButton.visibility = View.VISIBLE
+    }
+
+    override fun hideSyncButton() {
+        configSyncButton.visibility = View.INVISIBLE
+    }
+
+    override fun syncPrefs(prefs: Map<String, String>) {
+        if (prefs.isNotEmpty()) {
+            val listForGuardian = mutableListOf<String>()
+            prefs.forEach {
+                listForGuardian.add("${it.key}|${it.value}")
+            }
+
+            SocketManager.syncConfiguration(listForGuardian)
+            SocketManager.syncConfiguration.observe(viewLifecycleOwner, Observer { syncConfiguration ->
+                if (syncConfiguration.sync.status == Status.SUCCESS.value) {
+                    showSuccessResponse()
+                } else {
+                    showFailedResponse()
+                }
+            })
+
+            hideSyncButton()
+        }
+    }
+
+    override fun showSuccessResponse() {
+        Snackbar.make(configRootView, "Sync preferences success", Snackbar.LENGTH_LONG)
+            .show()
+    }
+
+    override fun showFailedResponse() {
+        Snackbar.make(configRootView, "Sync preferences failed", Snackbar.LENGTH_LONG)
+            .setAction(R.string.retry) { syncPrefs(prefsChanges ?: mapOf()) }
+            .show()
+    }
+
+    override fun setEditor(editor: SharedPreferences.Editor) {
+        this.prefsEditor = editor
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        this.prefsEditor?.clear()?.apply()
     }
 
     companion object {
