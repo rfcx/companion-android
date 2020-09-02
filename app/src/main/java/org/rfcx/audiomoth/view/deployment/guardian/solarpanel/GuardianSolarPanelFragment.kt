@@ -52,6 +52,10 @@ class GuardianSolarPanelFragment : Fragment() {
 
         deploymentProtocol?.hideCompleteButton()
 
+        solarFinishButton.setOnClickListener {
+            deploymentProtocol?.nextStep()
+        }
+
         setFeedbackChart()
         setChartDataSetting()
         getSentinelValue()
