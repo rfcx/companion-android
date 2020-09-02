@@ -227,6 +227,8 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
         this.prefsChanges = prefs
     }
 
+    override fun getPrefsChanges(): List<String> {/* not used */ return listOf()}
+
     override fun showSyncButton() {
         syncButton.visibility = View.VISIBLE
     }

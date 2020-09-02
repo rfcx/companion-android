@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -15,9 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
-import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonArray
-import kotlinx.android.synthetic.main.activity_guardian_diagnostic.*
 import kotlinx.android.synthetic.main.fragment_guardian_configure.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
@@ -99,14 +96,14 @@ class GuardianConfigureFragment : Fragment() {
         val fragment = GuardianPrefsFragment()
         configAdvanceLayout.setOnClickListener {
             if (!collapseAdvanced) {
-                childFragmentManager.beginTransaction()
+                parentFragmentManager.beginTransaction()
                     .replace(configAdvancedContainer.id, fragment)
                     .commit()
                 collapseAdvanced = true
                 configAdvanceCollapseIcon.background =
                     ContextCompat.getDrawable(requireContext(), R.drawable.ic_up)
             } else {
-                childFragmentManager.beginTransaction()
+                parentFragmentManager.beginTransaction()
                     .remove(fragment)
                     .commit()
                 collapseAdvanced = false
@@ -162,10 +159,13 @@ class GuardianConfigureFragment : Fragment() {
     }
 
     private fun syncConfig() {
-        SocketManager.syncConfiguration(getConfiguration().toListForGuardian())
+        val prefs = syncPreferenceListener?.getPrefsChanges() ?: listOf()
+        SocketManager.syncConfiguration(getConfiguration().toListForGuardian() + prefs)
         SocketManager.syncConfiguration.observe(viewLifecycleOwner, Observer {
             requireActivity().runOnUiThread {
-                deploymentProtocol?.nextStep()
+                if (it.sync.status == Status.SUCCESS.value) {
+                    deploymentProtocol?.nextStep()
+                }
             }
         })
     }
