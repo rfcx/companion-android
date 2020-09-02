@@ -40,7 +40,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
     private var prefsChanges: Map<String, String>? = null
     private var prefsEditor: SharedPreferences.Editor? = null
 
-    private var switchPrefs = this.resources.getStringArray(R.array.switch_prefs).toList()
+    private var switchPrefs = listOf<String>()
 
     private var lat: Double? = null
     private var long: Double? = null
@@ -168,6 +168,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
     }
 
     private fun setupCurrentPrefs(prefs: JsonArray) {
+        switchPrefs = this.resources.getStringArray(R.array.switch_prefs).toList()
         val prefsEditor = PreferenceManager.getDefaultSharedPreferences(this).edit()
         prefs.forEach {
             val pref = it.asJsonObject
