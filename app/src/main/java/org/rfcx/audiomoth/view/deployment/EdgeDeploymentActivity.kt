@@ -133,6 +133,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     override fun nextStep() {
         beforeStep = currentStep
+        edgeStepView.setStepPasses(currentStep)
         currentStep += 1
         handleFragment(currentStep)
     }
@@ -339,7 +340,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     private fun handleStepView(currentStep: Int) {
         edgeStepView.setStepUnSelected(beforeStep)
         edgeStepView.setStepSelected(currentStep)
-        edgeStepView.setStepPasses(currentStep)
         edgeStepRecyclerView.smoothScrollToPosition(currentStep * 2)
     }
 
