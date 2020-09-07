@@ -151,7 +151,7 @@ object SocketManager {
         val jsonString = gson.toJson(
             RegisterRequest(
                 Register(
-                    preferences.getString(Preferences.ID_TOKEN, "")
+                    RegisterInfo(preferences.getString(Preferences.ID_TOKEN, ""))
                 )
             )
         )

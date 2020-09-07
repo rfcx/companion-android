@@ -7,6 +7,10 @@ data class RegisterRequest(
 )
 
 data class Register(
+    val register: RegisterInfo
+)
+
+data class RegisterInfo(
     @SerializedName("token_id")
     val tokenId: String
 )
