@@ -1,10 +1,14 @@
 package org.rfcx.audiomoth.connection.socket
 
+import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import org.json.JSONObject
-import org.rfcx.audiomoth.entity.socket.*
+import org.rfcx.audiomoth.entity.socket.request.*
+import org.rfcx.audiomoth.entity.socket.response.*
 import org.rfcx.audiomoth.util.MicrophoneTestUtils
+import org.rfcx.audiomoth.util.Preferences
+import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentActivity
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.Socket
@@ -50,57 +54,108 @@ object SocketManager {
     val sentinel = MutableLiveData<SentinelResponse>()
 
     init {
-        connection.value = ConnectionResponse()
-        diagnostic.value = DiagnosticResponse()
-        currentConfiguration.value = ConfigurationResponse()
-        syncConfiguration.value = SyncConfigurationResponse()
+        connection.value =
+            ConnectionResponse()
+        diagnostic.value =
+            DiagnosticResponse()
+        currentConfiguration.value =
+            ConfigurationResponse()
+        syncConfiguration.value =
+            SyncConfigurationResponse()
         prefs.value = PrefsResponse()
         signal.value = SignalResponse()
-        liveAudio.value = MicrophoneTestResponse()
+        liveAudio.value =
+            MicrophoneTestResponse()
         spectrogram.value = ByteArray(2)
-        checkInTest.value = CheckInTestResponse()
-        sentinel.value = SentinelResponse()
+        checkInTest.value =
+            CheckInTestResponse()
+        sentinel.value =
+            SentinelResponse()
     }
 
     fun getConnection() {
-        val data = gson.toJson(SocketRequest(CONNECTION))
+        val data = gson.toJson(
+            SocketRequest(
+                CONNECTION
+            )
+        )
         sendMessage(data)
     }
 
     fun getDiagnosticData() {
-        val data = gson.toJson(SocketRequest(DIAGNOSTIC))
+        val data = gson.toJson(
+            SocketRequest(
+                DIAGNOSTIC
+            )
+        )
         sendMessage(data)
     }
 
     fun getCurrentConfiguration() {
-        val data = gson.toJson(SocketRequest(CONFIGURE))
+        val data = gson.toJson(
+            SocketRequest(
+                CONFIGURE
+            )
+        )
         sendMessage(data)
     }
 
     fun syncConfiguration(config: List<String>) {
-        val jsonString = gson.toJson(SyncConfigurationRequest(SyncConfiguration(config)))
+        val jsonString = gson.toJson(
+            SyncConfigurationRequest(
+                SyncConfiguration(config)
+            )
+        )
         sendMessage(jsonString)
     }
 
     fun getSignalStrength() {
-        val data = gson.toJson(SocketRequest(SIGNAL))
+        val data = gson.toJson(
+            SocketRequest(
+                SIGNAL
+            )
+        )
         sendMessage(data)
     }
 
     fun getLiveAudioBuffer(micTestUtils: MicrophoneTestUtils) {
         this.microphoneTestUtils = micTestUtils
-        val data = gson.toJson(SocketRequest(MICROPHONE_TEST))
+        val data = gson.toJson(
+            SocketRequest(
+                MICROPHONE_TEST
+            )
+        )
         sendMessage(data)
     }
 
     fun getCheckInTest() {
-        val data = gson.toJson(SocketRequest(CHECKIN))
+        val data = gson.toJson(
+            SocketRequest(
+                CHECKIN
+            )
+        )
         sendMessage(data)
     }
 
     fun getSentinelBoardValue() {
-        val data = gson.toJson(SocketRequest(SENTINEL))
+        val data = gson.toJson(
+            SocketRequest(
+                SENTINEL
+            )
+        )
         sendMessage(data)
+    }
+
+    fun sendGuardianRegistration(context: Context) {
+        val preferences = Preferences.getInstance(context)
+        val jsonString = gson.toJson(
+            RegisterRequest(
+                Register(
+                    preferences.getString(Preferences.ID_TOKEN, "")
+                )
+            )
+        )
+        sendMessage(jsonString)
     }
 
     fun resetDefaultValue() {
