@@ -12,5 +12,6 @@ data class Register(
 
 data class RegisterInfo(
     @SerializedName("token_id")
-    val tokenId: String
+    val tokenId: String,
+    val isProduction: Boolean
 )

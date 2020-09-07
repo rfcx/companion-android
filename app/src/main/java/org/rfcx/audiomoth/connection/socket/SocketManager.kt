@@ -35,6 +35,7 @@ object SocketManager {
     private const val MICROPHONE_TEST = "microphone_test"
     private const val CHECKIN = "checkin"
     private const val SENTINEL = "sentinel"
+    private const val REGISTER = "register"
 
     private var audioChunks = arrayListOf<String>()
     private var microphoneTestUtils: MicrophoneTestUtils? = null
@@ -52,6 +53,7 @@ object SocketManager {
     val spectrogram = MutableLiveData<ByteArray>()
     val checkInTest = MutableLiveData<CheckInTestResponse>()
     val sentinel = MutableLiveData<SentinelResponse>()
+    val register = MutableLiveData<RegisterResponse>()
 
     init {
         connection.value =
@@ -71,6 +73,7 @@ object SocketManager {
             CheckInTestResponse()
         sentinel.value =
             SentinelResponse()
+        register.value = RegisterResponse()
     }
 
     fun getConnection() {
@@ -146,12 +149,12 @@ object SocketManager {
         sendMessage(data)
     }
 
-    fun sendGuardianRegistration(context: Context) {
+    fun sendGuardianRegistration(context: Context, isProduction: Boolean) {
         val preferences = Preferences.getInstance(context)
         val jsonString = gson.toJson(
             RegisterRequest(
                 Register(
-                    RegisterInfo(preferences.getString(Preferences.ID_TOKEN, ""))
+                    RegisterInfo(preferences.getString(Preferences.ID_TOKEN, ""), isProduction)
                 )
             )
         )
@@ -266,6 +269,11 @@ object SocketManager {
                                 val response =
                                     gson.fromJson(dataInput, SentinelResponse::class.java)
                                 this.sentinel.postValue(response)
+                            }
+                            REGISTER -> {
+                                val response =
+                                    gson.fromJson(dataInput, RegisterResponse::class.java)
+                                this.register.postValue(response)
                             }
                         }
                     }
