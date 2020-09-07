@@ -18,7 +18,7 @@ import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.entity.guardian.*
-import org.rfcx.audiomoth.entity.socket.Status
+import org.rfcx.audiomoth.entity.socket.response.Status
 import org.rfcx.audiomoth.localdb.guardian.DiagnosticDb
 import org.rfcx.audiomoth.service.DiagnosticSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper

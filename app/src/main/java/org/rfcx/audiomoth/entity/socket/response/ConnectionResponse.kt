@@ -1,4 +1,4 @@
-package org.rfcx.audiomoth.entity.socket
+package org.rfcx.audiomoth.entity.socket.response
 
 data class ConnectionResponse(
     val connection: Connection = Connection()

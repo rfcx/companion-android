@@ -16,7 +16,7 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.connection.wifi.OnWifiListener
 import org.rfcx.audiomoth.connection.wifi.WifiHotspotManager
-import org.rfcx.audiomoth.entity.socket.Status
+import org.rfcx.audiomoth.entity.socket.response.Status
 import org.rfcx.audiomoth.util.WifiHotspotUtils
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 
