@@ -2,8 +2,8 @@ package org.rfcx.audiomoth.view.deployment.guardian
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
-import android.os.Handler
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_guardian_deployment.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.DeploymentState
 import org.rfcx.audiomoth.entity.Locate
@@ -38,10 +39,11 @@ import org.rfcx.audiomoth.view.detail.MapPickerProtocol
 import org.rfcx.audiomoth.view.dialog.CompleteFragment
 import org.rfcx.audiomoth.view.dialog.CompleteListener
 import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
+import org.rfcx.audiomoth.view.prefs.SyncPreferenceListener
 import java.util.*
 
 class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtocol,
-    CompleteListener, MapPickerProtocol, (Int) -> Unit {
+    CompleteListener, MapPickerProtocol, SyncPreferenceListener, (Int) -> Unit {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val locateDb by lazy { LocateDb(realm) }
@@ -64,6 +66,9 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private var longitude = 0.0
 
     private var beforeStep = 0
+
+    private var prefsChanges: Map<String, String>? = null
+    private var prefsEditor: SharedPreferences.Editor? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -347,6 +352,11 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         finish()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        this.prefsEditor?.clear()?.apply()
+    }
+
     companion object {
         private const val TAG_LOADING_DIALOG = "TAG_LOADING_DIALOG"
         private const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
@@ -361,5 +371,33 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
             context.startActivity(intent)
         }
+    }
+
+    override fun setPrefsChanges(prefs: Map<String, String>) {
+        this.prefsChanges = prefs
+    }
+
+    override fun getPrefsChanges(): List<String> {
+        val listForGuardian = mutableListOf<String>()
+        if (this.prefsChanges!!.isNotEmpty()) {
+            this.prefsChanges?.forEach {
+                listForGuardian.add("${it.key}|${it.value}")
+            }
+        }
+        return listForGuardian
+    }
+
+    override fun showSyncButton() { /* not used */ }
+
+    override fun hideSyncButton() { /* not used */ }
+
+    override fun syncPrefs() {/* not used */}
+
+    override fun showSuccessResponse() { /* not used */ }
+
+    override fun showFailedResponse() { /* not used */ }
+
+    override fun setEditor(editor: SharedPreferences.Editor) {
+        this.prefsEditor = editor
     }
 }

@@ -103,6 +103,11 @@ object SocketManager {
         sendMessage(data)
     }
 
+    fun getAllPrefs() {
+        val data = gson.toJson(SocketRequest(PREFS))
+        sendMessage(data)
+    }
+
     fun resetDefaultValue() {
         isTestingFirstTime = true
     }

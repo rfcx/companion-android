@@ -10,19 +10,26 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.preference.PreferenceManager
+import com.google.gson.JsonArray
 import kotlinx.android.synthetic.main.fragment_guardian_configure.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.entity.guardian.GuardianConfiguration
 import org.rfcx.audiomoth.entity.guardian.GuardianProfile
 import org.rfcx.audiomoth.entity.guardian.toListForGuardian
+import org.rfcx.audiomoth.entity.socket.Status
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
+import org.rfcx.audiomoth.view.prefs.GuardianPrefsFragment
+import org.rfcx.audiomoth.view.prefs.SyncPreferenceListener
 
 class GuardianConfigureFragment : Fragment() {
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
+    private var syncPreferenceListener: SyncPreferenceListener? = null
 
     // Predefined configuration values
     private var sampleRateEntries: Array<String>? = null
@@ -32,6 +39,7 @@ class GuardianConfigureFragment : Fragment() {
     private var fileFormatList: Array<String>? = null
     private var durationEntries: Array<String>? = null
     private var durationValues: Array<String>? = null
+    private var switchPrefs: List<String>? = null
 
     private var sampleRate = 24000 // default guardian sampleRate is 24000
     private var bitrate = 28672 // default guardian bitrate is 28672
@@ -40,9 +48,12 @@ class GuardianConfigureFragment : Fragment() {
 
     private var profile: GuardianProfile? = null
 
+    private var collapseAdvanced = false
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         deploymentProtocol = context as GuardianDeploymentProtocol
+        syncPreferenceListener = context as SyncPreferenceListener
         setPredefinedConfiguration(context)
     }
 
@@ -61,6 +72,9 @@ class GuardianConfigureFragment : Fragment() {
 
         profile = deploymentProtocol?.getProfile()
 
+        setupAdvancedSetting()
+        retrieveAllPrefs()
+
         setNextButton(true)
         setFileFormatLayout()
         setSampleRateLayout()
@@ -68,6 +82,48 @@ class GuardianConfigureFragment : Fragment() {
         setDuration()
         createNotificationChannel()
         setNextOnClick()
+    }
+
+    private fun retrieveAllPrefs() {
+        SocketManager.getAllPrefs()
+        SocketManager.prefs.observe(viewLifecycleOwner, Observer {
+            setupCurrentPrefs(it.prefs)
+        })
+    }
+
+    private fun setupAdvancedSetting() {
+        val fragment = GuardianPrefsFragment()
+        configAdvanceLayout.setOnClickListener {
+            if (!collapseAdvanced) {
+                parentFragmentManager.beginTransaction()
+                    .replace(configAdvancedContainer.id, fragment)
+                    .commit()
+                collapseAdvanced = true
+                configAdvanceCollapseIcon.background =
+                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_up)
+            } else {
+                parentFragmentManager.beginTransaction()
+                    .remove(fragment)
+                    .commit()
+                collapseAdvanced = false
+                configAdvanceCollapseIcon.background =
+                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_drop_down)
+            }
+        }
+    }
+
+    private fun setupCurrentPrefs(prefs: JsonArray) {
+        val prefsEditor = PreferenceManager.getDefaultSharedPreferences(requireContext()).edit()
+        prefs.forEach {
+            val pref = it.asJsonObject
+            val key = ArrayList<String>(pref.keySet())[0]
+            val value = pref.get(key).asString.replace("\"", "")
+            if (switchPrefs!!.contains(key)) {
+                prefsEditor.putBoolean(key, value.toBoolean()).apply()
+            } else {
+                prefsEditor.putString(key, value).apply()
+            }
+        }
     }
 
     private fun setPredefinedConfiguration(context: Context) {
@@ -78,6 +134,7 @@ class GuardianConfigureFragment : Fragment() {
         fileFormatList = context.resources.getStringArray(R.array.audio_codec)
         durationEntries = context.resources.getStringArray(R.array.duration_cycle_entries)
         durationValues = context.resources.getStringArray(R.array.duration_cycle_values)
+        switchPrefs = this.resources.getStringArray(R.array.switch_prefs).toList()
     }
 
     private fun setNextButton(show: Boolean) {
@@ -95,10 +152,13 @@ class GuardianConfigureFragment : Fragment() {
     }
 
     private fun syncConfig() {
-        SocketManager.syncConfiguration(getConfiguration().toListForGuardian())
+        val prefs = syncPreferenceListener?.getPrefsChanges() ?: listOf()
+        SocketManager.syncConfiguration(getConfiguration().toListForGuardian() + prefs)
         SocketManager.syncConfiguration.observe(viewLifecycleOwner, Observer {
             requireActivity().runOnUiThread {
-                deploymentProtocol?.nextStep()
+                if (it.sync.status == Status.SUCCESS.value) {
+                    deploymentProtocol?.nextStep()
+                }
             }
         })
     }

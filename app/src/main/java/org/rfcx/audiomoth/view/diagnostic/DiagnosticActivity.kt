@@ -40,21 +40,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
     private var prefsChanges: Map<String, String>? = null
     private var prefsEditor: SharedPreferences.Editor? = null
 
-    private var switchPrefs = listOf(
-        "show_ui",
-        "enable_audio_capture",
-        "enable_checkin_publish",
-        "enable_cutoffs_battery",
-        "enable_cutoffs_schedule_off_hours",
-        "admin_enable_log_capture",
-        "admin_enable_screenshot_capture",
-        "admin_enable_bluetooth",
-        "admin_enable_wifi",
-        "admin_enable_tcp_adb",
-        "admin_enable_sentinel_capture",
-        "admin_enable_ssh_server",
-        "admin_enable_wifi_socket"
-    )
+    private var switchPrefs = listOf<String>()
 
     private var lat: Double? = null
     private var long: Double? = null
@@ -182,6 +168,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
     }
 
     private fun setupCurrentPrefs(prefs: JsonArray) {
+        switchPrefs = this.resources.getStringArray(R.array.switch_prefs).toList()
         val prefsEditor = PreferenceManager.getDefaultSharedPreferences(this).edit()
         prefs.forEach {
             val pref = it.asJsonObject
@@ -197,7 +184,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
 
     private fun setupSyncButton() {
         syncButton.setOnClickListener {
-            syncPrefs(prefsChanges!!)
+            syncPrefs()
         }
     }
 
@@ -241,6 +228,8 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
         this.prefsChanges = prefs
     }
 
+    override fun getPrefsChanges(): List<String> {/* not used */ return listOf()}
+
     override fun showSyncButton() {
         syncButton.visibility = View.VISIBLE
     }
@@ -249,10 +238,10 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
         syncButton.visibility = View.INVISIBLE
     }
 
-    override fun syncPrefs(prefs: Map<String, String>) {
-        if (prefs.isNotEmpty()) {
+    override fun syncPrefs() {
+        if (this.prefsChanges!!.isNotEmpty()) {
             val listForGuardian = mutableListOf<String>()
-            prefs.forEach {
+            this.prefsChanges?.forEach {
                 listForGuardian.add("${it.key}|${it.value}")
             }
 
@@ -276,7 +265,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
 
     override fun showFailedResponse() {
         Snackbar.make(diagRootView, "Sync preferences failed", Snackbar.LENGTH_LONG)
-            .setAction(R.string.retry) { syncPrefs(prefsChanges ?: mapOf()) }
+            .setAction(R.string.retry) { syncPrefs() }
             .show()
     }
 
