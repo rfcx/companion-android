@@ -67,7 +67,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     private var beforeStep = 0
 
-    private var prefsChanges: Map<String, String>? = null
+    private var prefsChanges = mapOf<String, String>()
     private var prefsEditor: SharedPreferences.Editor? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -379,8 +379,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun getPrefsChanges(): List<String> {
         val listForGuardian = mutableListOf<String>()
-        if (this.prefsChanges!!.isNotEmpty()) {
-            this.prefsChanges?.forEach {
+        if (this.prefsChanges.isNotEmpty()) {
+            this.prefsChanges.forEach {
                 listForGuardian.add("${it.key}|${it.value}")
             }
         }
