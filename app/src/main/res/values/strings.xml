@@ -317,5 +317,7 @@
     <string name="register_failed">Your registration is failed, please try again</string>
     <string name="register_success">Your registration is success</string>
     <string name="registering">Sent registration, waiting for response</string>
+    <string name="check_registered">Checking if guardian registered or not</string>
+    <string name="not_registered">Your guardian is not registered</string>
 
 </resources>

@@ -23,7 +23,11 @@ class GuardianRegisterFragment : Fragment() {
         deploymentProtocol = (context as GuardianDeploymentProtocol)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_guardian_register, container, false)
     }
 
@@ -49,9 +53,10 @@ class GuardianRegisterFragment : Fragment() {
     }
 
     private fun registerGuardian() {
-        SocketManager.sendGuardianRegistration(requireContext(),  getRadioValueForRegistration())
+        SocketManager.sendGuardianRegistration(requireContext(), getRadioValueForRegistration())
         SocketManager.register.observe(viewLifecycleOwner, Observer {
             if (it.register.status == Status.SUCCESS.value) {
+                registerFinishButton.visibility = View.VISIBLE
                 registerGuardianButton.visibility = View.GONE
                 registerResultTextView.text = requireContext().getString(R.string.register_success)
             } else {
@@ -62,11 +67,19 @@ class GuardianRegisterFragment : Fragment() {
     }
 
     private fun isGuardianRegistered() {
+        registerResultTextView.text = requireContext().getString(R.string.check_registered)
+        registerGuardianButton.isEnabled = false
+
         SocketManager.isGuardianRegistered()
         SocketManager.isRegistered.observe(viewLifecycleOwner, Observer {
             if (it.isRegistered) {
                 registerGuardianButton.visibility = View.GONE
-                registerResultTextView.text = requireContext().getString(R.string.already_registered)
+                registerResultTextView.text =
+                    requireContext().getString(R.string.already_registered)
+                registerFinishButton.visibility = View.VISIBLE
+            } else {
+                registerResultTextView.text = requireContext().getString(R.string.not_registered)
+                registerGuardianButton.isEnabled = true
             }
         })
     }
