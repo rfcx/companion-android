@@ -308,4 +308,10 @@
     <string name="power_w">Power(W)</string>
     <string name="please_assemble_solar_panel_to_get_feedback">Please assemble solar panel to get feedback</string>
 
+    <!-- GuardianRegisterFragment -->
+    <string name="let_s_register_your_guardian">Let\'s register your guardian</string>
+    <string name="production">Production</string>
+    <string name="staging">Staging</string>
+    <string name="register">Register</string>
+
 </resources>
