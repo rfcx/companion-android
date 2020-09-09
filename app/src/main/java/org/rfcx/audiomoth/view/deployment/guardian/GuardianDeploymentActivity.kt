@@ -138,7 +138,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         beforeStep = currentStep
         when (currentStep) {
             0 -> finish()
-            2 -> {
+            3 -> {
                 val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
                 if (container is GuardianConfigureFragment) {
                     startFragment(GuardianSelectProfileFragment.newInstance())
@@ -235,12 +235,12 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun startSetupConfigure(profile: GuardianProfile) {
         setProfile(profile)
-        currentStep = 2
+        currentStep = 3
         startFragment(GuardianConfigureFragment.newInstance())
     }
 
     override fun backToConfigure() {
-        currentStep = 2
+        currentStep = 3
         startFragment(GuardianConfigureFragment.newInstance())
     }
 
