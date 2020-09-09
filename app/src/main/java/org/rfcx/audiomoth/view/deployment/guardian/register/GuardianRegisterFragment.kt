@@ -38,7 +38,6 @@ class GuardianRegisterFragment : Fragment() {
         isGuardianRegistered()
 
         registerGuardianButton.setOnClickListener {
-            setUIWaitingRegisterResponse()
             registerGuardian()
         }
 
@@ -64,15 +63,15 @@ class GuardianRegisterFragment : Fragment() {
                 registerResultTextView.text = requireContext().getString(R.string.register_failed)
             }
         })
+        setUIWaitingRegisterResponse()
     }
 
     private fun isGuardianRegistered() {
-        registerResultTextView.text = requireContext().getString(R.string.check_registered)
-        registerGuardianButton.isEnabled = false
-
         SocketManager.isGuardianRegistered()
         SocketManager.isRegistered.observe(viewLifecycleOwner, Observer {
             if (it.isRegistered) {
+                productionRadioButton.isEnabled = false
+                stagingRadioButton.isEnabled = false
                 registerGuardianButton.visibility = View.GONE
                 registerResultTextView.text =
                     requireContext().getString(R.string.already_registered)
@@ -82,6 +81,8 @@ class GuardianRegisterFragment : Fragment() {
                 registerGuardianButton.isEnabled = true
             }
         })
+        registerResultTextView.text = requireContext().getString(R.string.check_registered)
+        registerGuardianButton.isEnabled = false
     }
 
     private fun getRadioValueForRegistration(): Boolean {
