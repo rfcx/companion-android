@@ -6,8 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import kotlinx.android.synthetic.main.fragment_guardian_register.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.connection.socket.SocketManager
+import org.rfcx.audiomoth.entity.socket.response.Status
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianRegisterFragment : Fragment() {
@@ -27,9 +31,48 @@ class GuardianRegisterFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         deploymentProtocol?.hideCompleteButton()
 
+        isGuardianRegistered()
+
+        registerGuardianButton.setOnClickListener {
+            setUIWaitingRegisterResponse()
+            registerGuardian()
+        }
+
         registerFinishButton.setOnClickListener {
             deploymentProtocol?.nextStep()
         }
+    }
+
+    private fun setUIWaitingRegisterResponse() {
+        registerGuardianButton.isEnabled = false
+        registerResultTextView.text = requireContext().getString(R.string.registering)
+    }
+
+    private fun registerGuardian() {
+        SocketManager.sendGuardianRegistration(requireContext(),  getRadioValueForRegistration())
+        SocketManager.register.observe(viewLifecycleOwner, Observer {
+            if (it.register.status == Status.SUCCESS.value) {
+                registerGuardianButton.visibility = View.GONE
+                registerResultTextView.text = requireContext().getString(R.string.register_success)
+            } else {
+                registerGuardianButton.isEnabled = true
+                registerResultTextView.text = requireContext().getString(R.string.register_failed)
+            }
+        })
+    }
+
+    private fun isGuardianRegistered() {
+        SocketManager.isGuardianRegistered()
+        SocketManager.isRegistered.observe(viewLifecycleOwner, Observer {
+            if (it.isRegistered) {
+                registerGuardianButton.visibility = View.GONE
+                registerResultTextView.text = requireContext().getString(R.string.already_registered)
+            }
+        })
+    }
+
+    private fun getRadioValueForRegistration(): Boolean {
+        return productionRadioButton.isChecked
     }
 
     companion object {

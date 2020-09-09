@@ -313,5 +313,9 @@
     <string name="production">Production</string>
     <string name="staging">Staging</string>
     <string name="register">Register</string>
+    <string name="already_registered">Your guardian is already registered</string>
+    <string name="register_failed">Your registration is failed, please try again</string>
+    <string name="register_success">Your registration is success</string>
+    <string name="registering">Sent registration, waiting for response</string>
 
 </resources>
