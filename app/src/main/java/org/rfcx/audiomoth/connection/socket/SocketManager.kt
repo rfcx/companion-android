@@ -36,6 +36,7 @@ object SocketManager {
     private const val CHECKIN = "checkin"
     private const val SENTINEL = "sentinel"
     private const val REGISTER = "register"
+    private const val IS_REGISTERED = "is_registered"
 
     private var audioChunks = arrayListOf<String>()
     private var microphoneTestUtils: MicrophoneTestUtils? = null
@@ -54,6 +55,7 @@ object SocketManager {
     val checkInTest = MutableLiveData<CheckInTestResponse>()
     val sentinel = MutableLiveData<SentinelResponse>()
     val register = MutableLiveData<RegisterResponse>()
+    val isRegistered = MutableLiveData<CheckGuardianRegistered>()
 
     init {
         connection.value =
@@ -74,6 +76,7 @@ object SocketManager {
         sentinel.value =
             SentinelResponse()
         register.value = RegisterResponse()
+        isRegistered.value = CheckGuardianRegistered()
     }
 
     fun getConnection() {
@@ -159,6 +162,15 @@ object SocketManager {
             )
         )
         sendMessage(jsonString)
+    }
+
+    fun isGuardianRegistered() {
+        val data = gson.toJson(
+            SocketRequest(
+                IS_REGISTERED
+            )
+        )
+        sendMessage(data)
     }
 
     fun resetDefaultValue() {
@@ -274,6 +286,11 @@ object SocketManager {
                                 val response =
                                     gson.fromJson(dataInput, RegisterResponse::class.java)
                                 this.register.postValue(response)
+                            }
+                            IS_REGISTERED -> {
+                                val response =
+                                    gson.fromJson(dataInput, CheckGuardianRegistered::class.java)
+                                this.isRegistered.postValue(response)
                             }
                         }
                     }
