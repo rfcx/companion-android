@@ -1,4 +1,4 @@
-package org.rfcx.audiomoth.entity.socket
+package org.rfcx.audiomoth.entity.socket.request
 
 data class SyncConfigurationRequest(
     val command: SyncConfiguration
