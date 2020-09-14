@@ -11,7 +11,7 @@ sealed class DeploymentState {
     }
 
     enum class Guardian(val key: Int){
-        Connect(1), Locate(2), Config(3), SolarPanel(4), Signal(5), Microphone(6), Checkin(7), Deploy(8), ReadyToUpload(9);
+        Connect(1), Register(2), Locate(3), Config(4), SolarPanel(5), Signal(6), Microphone(7), Checkin(8), Deploy(9), ReadyToUpload(10);
 
         companion object {
             private val map = values().associateBy(DeploymentState.Guardian::key)

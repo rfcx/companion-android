@@ -20,6 +20,7 @@
     <!--  Guardian  -->
     <string-array name="guardian_steps">
         <item>Connect</item>
+        <item>Register</item>
         <item>Signal</item>
         <item>Config</item>
         <item>Microphone</item>

@@ -30,6 +30,7 @@ import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianSelectProfi
 import org.rfcx.audiomoth.view.deployment.guardian.connect.ConnectGuardianFragment
 import org.rfcx.audiomoth.view.deployment.guardian.deploy.GuardianDeployFragment
 import org.rfcx.audiomoth.view.deployment.guardian.microphone.GuardianMicrophoneFragment
+import org.rfcx.audiomoth.view.deployment.guardian.register.GuardianRegisterFragment
 import org.rfcx.audiomoth.view.deployment.guardian.signal.GuardianSignalFragment
 import org.rfcx.audiomoth.view.deployment.guardian.solarpanel.GuardianSolarPanelFragment
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
@@ -137,7 +138,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         beforeStep = currentStep
         when (currentStep) {
             0 -> finish()
-            2 -> {
+            3 -> {
                 val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
                 if (container is GuardianConfigureFragment) {
                     startFragment(GuardianSelectProfileFragment.newInstance())
@@ -234,12 +235,12 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun startSetupConfigure(profile: GuardianProfile) {
         setProfile(profile)
-        currentStep = 2
+        currentStep = 3
         startFragment(GuardianConfigureFragment.newInstance())
     }
 
     override fun backToConfigure() {
-        currentStep = 2
+        currentStep = 3
         startFragment(GuardianConfigureFragment.newInstance())
     }
 
@@ -252,31 +253,35 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                 startFragment(ConnectGuardianFragment.newInstance())
             }
             1 -> {
+                updateDeploymentState(DeploymentState.Guardian.Register)
+                startFragment(GuardianRegisterFragment.newInstance())
+            }
+            2 -> {
                 updateDeploymentState(DeploymentState.Guardian.Locate)
                 startFragment(GuardianSignalFragment.newInstance())
             }
-            2 -> {
+            3 -> {
                 this._profiles = profileDb.getProfiles()
                 updateDeploymentState(DeploymentState.Guardian.Config)
                 startFragment(GuardianSelectProfileFragment.newInstance())
             }
-            3 -> {
+            4 -> {
                 updateDeploymentState(DeploymentState.Guardian.SolarPanel)
                 startFragment(GuardianMicrophoneFragment.newInstance())
             }
-            4 -> {
+            5 -> {
                 updateDeploymentState(DeploymentState.Guardian.Signal)
                 startFragment(GuardianSolarPanelFragment.newInstance())
             }
-            5 -> {
+            6 -> {
                 updateDeploymentState(DeploymentState.Guardian.Microphone)
                 startFragment(LocationFragment.newInstance())
             }
-            6 -> {
+            7 -> {
                 updateDeploymentState(DeploymentState.Guardian.Checkin)
                 startFragment(GuardianCheckInTestFragment.newInstance())
             }
-            7 -> {
+            8 -> {
                 updateDeploymentState(DeploymentState.Guardian.Deploy)
                 startFragment(GuardianDeployFragment.newInstance())
             }
