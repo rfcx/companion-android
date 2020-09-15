@@ -21,7 +21,7 @@ import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.entity.guardian.GuardianConfiguration
 import org.rfcx.audiomoth.entity.guardian.GuardianProfile
 import org.rfcx.audiomoth.entity.guardian.toListForGuardian
-import org.rfcx.audiomoth.entity.socket.Status
+import org.rfcx.audiomoth.entity.socket.response.Status
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 import org.rfcx.audiomoth.view.prefs.GuardianPrefsFragment
 import org.rfcx.audiomoth.view.prefs.SyncPreferenceListener
