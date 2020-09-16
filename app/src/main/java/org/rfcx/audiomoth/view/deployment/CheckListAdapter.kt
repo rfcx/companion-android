@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.adapter.CheckListItem
@@ -54,8 +55,17 @@ class CheckListAdapter (private val onCheckClickListener: (Int) -> Unit) :
         private val checkName = itemView.findViewById<TextView>(R.id.checkName)
         fun bind(check: CheckListItem.CheckItem) {
             checkName.text = check.name
+
             itemView.setOnClickListener {
                 onCheckClickListener(check.number)
+            }
+
+            if (check.isPassed) {
+                checkName.setTextColor(ContextCompat.getColor(itemView.context, R.color.colorPrimary))
+                checkName.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
+            } else {
+                checkName.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_secondary))
+                checkName.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist, 0, 0, 0)
             }
         }
     }
