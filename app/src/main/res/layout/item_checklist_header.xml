@@ -12,7 +12,6 @@
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/padding_top_header"
         android:paddingBottom="@dimen/margin_padding_small"
-        android:textAllCaps="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="ASSEMBLY" />

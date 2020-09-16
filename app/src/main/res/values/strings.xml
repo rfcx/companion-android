@@ -324,7 +324,7 @@
     <string name="not_registered">Your guardian is not registered</string>
 
     <!-- GuardianCheckListFragment -->
-    <string name="setting_up_checklist">SETTING UP CHECKLIST</string>
+    <string name="setting_up_checklist">Setting up checklist</string>
     <string name="deploy">Deploy</string>
 
 </resources>
