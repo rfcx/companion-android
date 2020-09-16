@@ -14,8 +14,8 @@
         android:clickable="true"
         android:drawableStart="@drawable/ic_checklist"
         android:drawablePadding="@dimen/margin_padding_small"
-        android:paddingTop="@dimen/margin_padding_small"
-        android:paddingBottom="@dimen/margin_padding_small"
+        android:paddingTop="@dimen/margin_padding_normal"
+        android:paddingBottom="@dimen/margin_padding_normal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Install bracket" />
