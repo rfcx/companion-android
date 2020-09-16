@@ -29,6 +29,10 @@ class CheckListAdapter(private val onCheckClickListener: (Int) -> Unit) :
         notifyDataSetChanged()
     }
 
+    fun isEveryCheckListPassed(): Boolean {
+        return listOfChecks.filterIsInstance<CheckListItem.CheckItem>().filter { !it.isRequired }.all { it.isPassed }
+    }
+
     override fun getItemViewType(position: Int): Int {
         return when (listOfChecks[position]) {
             is CheckListItem.CheckItem -> CHECK_ITEM
