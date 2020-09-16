@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.adapter.CheckListItem
 
-class CheckListAdapter (private val onCheckClickListener: (Int) -> Unit) :
+class CheckListAdapter(private val onCheckClickListener: (Int) -> Unit) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var listOfChecks = listOf<CheckListItem>()
@@ -23,6 +23,12 @@ class CheckListAdapter (private val onCheckClickListener: (Int) -> Unit) :
         listOfChecks = checks
     }
 
+    fun setCheckPassed(number: Int) {
+        listOfChecks.filterIsInstance<CheckListItem.CheckItem>()
+            .find { it.number == number }?.isPassed = true
+        notifyDataSetChanged()
+    }
+
     override fun getItemViewType(position: Int): Int {
         return when (listOfChecks[position]) {
             is CheckListItem.CheckItem -> CHECK_ITEM
@@ -33,7 +39,8 @@ class CheckListAdapter (private val onCheckClickListener: (Int) -> Unit) :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             CHECK_ITEM -> CheckItemViewHolder(
-                LayoutInflater.from(parent.context).inflate(R.layout.item_checklist_step, parent, false)
+                LayoutInflater.from(parent.context)
+                    .inflate(R.layout.item_checklist_step, parent, false)
             )
             else -> HeaderItemViewHolder(
                 LayoutInflater.from(parent.context)
@@ -61,10 +68,25 @@ class CheckListAdapter (private val onCheckClickListener: (Int) -> Unit) :
             }
 
             if (check.isPassed) {
-                checkName.setTextColor(ContextCompat.getColor(itemView.context, R.color.colorPrimary))
-                checkName.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
+                checkName.setTextColor(
+                    ContextCompat.getColor(
+                        itemView.context,
+                        R.color.colorPrimary
+                    )
+                )
+                checkName.setCompoundDrawablesWithIntrinsicBounds(
+                    R.drawable.ic_checklist_passed,
+                    0,
+                    0,
+                    0
+                )
             } else {
-                checkName.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_secondary))
+                checkName.setTextColor(
+                    ContextCompat.getColor(
+                        itemView.context,
+                        R.color.text_secondary
+                    )
+                )
                 checkName.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist, 0, 0, 0)
             }
         }
