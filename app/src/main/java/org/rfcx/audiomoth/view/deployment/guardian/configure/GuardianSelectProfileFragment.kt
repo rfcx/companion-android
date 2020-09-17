@@ -45,8 +45,6 @@ class GuardianSelectProfileFragment : Fragment(), (GuardianProfile) -> Unit {
     }
 
     private fun setupView() {
-        deploymentProtocol?.hideCompleteButton()
-
         createNewButton.setOnClickListener {
             deploymentProtocol?.startSetupConfigure(GuardianProfile.default()) // new profile
         }

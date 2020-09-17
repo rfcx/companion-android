@@ -51,7 +51,6 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        deploymentProtocol?.hideCompleteButton()
         setupAudioTrack()
         setupSpectrogram()
         setupSpectrogramSpeed()

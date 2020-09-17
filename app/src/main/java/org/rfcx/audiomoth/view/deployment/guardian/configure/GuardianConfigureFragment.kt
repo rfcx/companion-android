@@ -68,8 +68,6 @@ class GuardianConfigureFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        deploymentProtocol?.hideCompleteButton()
-
         profile = deploymentProtocol?.getProfile()
 
         setupAdvancedSetting()

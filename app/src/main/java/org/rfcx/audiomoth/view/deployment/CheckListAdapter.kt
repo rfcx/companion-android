@@ -30,7 +30,7 @@ class CheckListAdapter(private val onCheckClickListener: (Int) -> Unit) :
     }
 
     fun isEveryCheckListPassed(): Boolean {
-        return listOfChecks.filterIsInstance<CheckListItem.CheckItem>().filter { !it.isRequired }.all { it.isPassed }
+        return listOfChecks.filterIsInstance<CheckListItem.CheckItem>().filter { it.isRequired }.all { it.isPassed }
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -67,7 +67,7 @@ class CheckListAdapter(private val onCheckClickListener: (Int) -> Unit) :
         fun bind(check: CheckListItem.CheckItem) {
             checkName.text = check.name
 
-            itemView.setOnClickListener {
+            checkName.setOnClickListener {
                 onCheckClickListener(check.number)
             }
 

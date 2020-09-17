@@ -2,6 +2,7 @@ package org.rfcx.audiomoth.view.deployment.guardian
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_guardian_checklist.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.adapter.CheckListItem
+import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.view.deployment.CheckListAdapter
 
 class GuardianCheckListFragment : Fragment(), (Int) -> Unit {
@@ -34,16 +36,34 @@ class GuardianCheckListFragment : Fragment(), (Int) -> Unit {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setGuardianName()
+
         guardianCheckListRecyclerView.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             adapter = checkListRecyclerView
         }
 
         checkListRecyclerView.setCheckList(getAllChecks())
+        //set passed checks
+        deploymentProtocol?.getPassedChecks()?.forEach { number ->
+            checkListRecyclerView.setCheckPassed(number)
+        }
+
+        checklistDeployButton.isEnabled = checkListRecyclerView.isEveryCheckListPassed()
+        Log.d("checklist", checkListRecyclerView.isEveryCheckListPassed().toString())
+        checklistDeployButton.setOnClickListener {
+            deploymentProtocol?.setReadyToDeploy()
+            SocketManager.stopConnection()
+        }
     }
 
-    override fun invoke(p1: Int) {
-        TODO("Not yet implemented")
+    private fun setGuardianName() {
+        val wifi = deploymentProtocol?.getWifiName()
+        guardianIdTextView.text = wifi
+    }
+
+    override fun invoke(number: Int) {
+        deploymentProtocol?.handleCheckClicked(number)
     }
 
     private fun getAllChecks(): List<CheckListItem> {
@@ -53,14 +73,14 @@ class GuardianCheckListFragment : Fragment(), (Int) -> Unit {
         checkList.add(CheckListItem.Header("Assembly"))
         val assemblyChecks = requireContext().resources.getStringArray(R.array.guardian_assembly_checks).toList()
         assemblyChecks.forEach { name ->
-            checkList.add(CheckListItem.CheckItem(number, name))
+            checkList.add(CheckListItem.CheckItem(number, name, isRequired = false))
             number++
         }
 
         checkList.add(CheckListItem.Header("Setup"))
         val setupChecks = requireContext().resources.getStringArray(R.array.guardian_setup_checks).toList()
         setupChecks.forEach { name ->
-            checkList.add(CheckListItem.CheckItem(number, name))
+            checkList.add(CheckListItem.CheckItem(number, name, isRequired = true))
             number++
         }
 

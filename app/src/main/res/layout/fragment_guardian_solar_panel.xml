@@ -120,7 +120,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginEnd="@dimen/margin_padding_large"
-        android:layout_marginBottom="@dimen/margin_padding_large"
+        android:layout_marginBottom="@dimen/margin_padding_normal"
         android:text="@string/next"
         android:enabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
