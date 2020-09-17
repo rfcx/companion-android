@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -18,7 +17,6 @@ import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.guardian.GuardianConfiguration
 import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
 import org.rfcx.audiomoth.entity.guardian.GuardianProfile
-import org.rfcx.audiomoth.entity.guardian.getRelativeTimeSpan
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentImageDb
@@ -127,6 +125,11 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         }
     }
 
+    override fun onSupportNavigateUp(): Boolean {
+        backStep()
+        return true
+    }
+
     override fun startCheckList() {
         startFragment(GuardianCheckListFragment.newInstance())
     }
@@ -167,7 +170,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         setProfile(profile)
         this._configuration = profile.asConfiguration()
         this._deployment?.configuration = _configuration
-        Log.d("checklist", this._deployment!!.configuration!!.duration.toString())
 
         // update deployment
         this._deployment?.let { deploymentDb.updateDeployment(it) }
