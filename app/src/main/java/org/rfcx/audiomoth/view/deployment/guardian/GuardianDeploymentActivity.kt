@@ -123,6 +123,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             is GuardianCheckListFragment -> {
                 SocketManager.resetCheckInValue()
                 SocketManager.getCheckInTest() // to stop getting checkin test
+                passedChecks.clear() // remove all passed 
                 startFragment(ConnectGuardianFragment.newInstance())
             }
             is ConnectGuardianFragment -> finish()
