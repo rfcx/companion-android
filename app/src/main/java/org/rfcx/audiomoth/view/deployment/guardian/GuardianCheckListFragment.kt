@@ -2,7 +2,6 @@ package org.rfcx.audiomoth.view.deployment.guardian
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -52,7 +51,6 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
         }
 
         checklistDeployButton.isEnabled = checkListRecyclerView.isEveryCheckListPassed()
-        Log.d("checklist", checkListRecyclerView.isEveryCheckListPassed().toString())
         checklistDeployButton.setOnClickListener {
             deploymentProtocol?.setReadyToDeploy()
             SocketManager.stopConnection()
