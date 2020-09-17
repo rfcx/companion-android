@@ -63,7 +63,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         setupSpectrogramColorMenu()
         setupAudioPlaybackMenu()
         setUiByState(MicTestingState.READY)
-        SocketManager.resetDefaultValue()
+        SocketManager.resetMicrophoneDefaultValue()
 
         listenAudioButton.setOnClickListener {
             isMicTesting = true

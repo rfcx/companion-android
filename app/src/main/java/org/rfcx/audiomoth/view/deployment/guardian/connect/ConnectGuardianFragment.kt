@@ -65,6 +65,7 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
                 if (WifiHotspotUtils.isConnectedWithGuardian(requireContext(), it.SSID)) {
                     deploymentProtocol?.setDeploymentWifiName(it.SSID)
                     deploymentProtocol?.startCheckList()
+                    SocketManager.getCheckInTest()
                 } else {
                     wifiHotspotManager.connectTo(it, this)
                 }
@@ -103,7 +104,8 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
                     if (connectionCount == 0) {
                         hideLoading()
                         deploymentProtocol?.setDeploymentWifiName(guardianHotspot!!.SSID)
-                        deploymentProtocol?.nextStep()
+                        deploymentProtocol?.startCheckList()
+                        SocketManager.getCheckInTest()
                     }
                     connectionCount += 1
                 }

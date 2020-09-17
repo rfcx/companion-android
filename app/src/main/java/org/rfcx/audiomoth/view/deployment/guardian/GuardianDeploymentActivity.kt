@@ -11,6 +11,7 @@ import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_guardian_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.DeploymentState
 import org.rfcx.audiomoth.entity.Locate
@@ -119,7 +120,11 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         when (container) {
             is MapPickerFragment -> startFragment(LocationFragment.newInstance())
             is GuardianConfigureFragment -> startFragment(GuardianSelectProfileFragment.newInstance())
-            is GuardianCheckListFragment -> startFragment(ConnectGuardianFragment.newInstance())
+            is GuardianCheckListFragment -> {
+                SocketManager.resetCheckInValue()
+                SocketManager.getCheckInTest() // to stop getting checkin test
+                startFragment(ConnectGuardianFragment.newInstance())
+            }
             is ConnectGuardianFragment -> finish()
             else -> startCheckList()
         }
