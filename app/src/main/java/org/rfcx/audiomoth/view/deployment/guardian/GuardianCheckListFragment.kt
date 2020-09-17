@@ -14,7 +14,7 @@ import org.rfcx.audiomoth.adapter.CheckListItem
 import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.view.deployment.CheckListAdapter
 
-class GuardianCheckListFragment : Fragment(), (Int) -> Unit {
+class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
 
@@ -35,6 +35,8 @@ class GuardianCheckListFragment : Fragment(), (Int) -> Unit {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        deploymentProtocol?.hideToolbar()
 
         setGuardianName()
 
@@ -62,8 +64,9 @@ class GuardianCheckListFragment : Fragment(), (Int) -> Unit {
         guardianIdTextView.text = wifi
     }
 
-    override fun invoke(number: Int) {
+    override fun invoke(number: Int, name: String) {
         deploymentProtocol?.handleCheckClicked(number)
+        deploymentProtocol?.setCurrentPage(name)
     }
 
     private fun getAllChecks(): List<CheckListItem> {

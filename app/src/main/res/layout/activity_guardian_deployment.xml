@@ -8,11 +8,15 @@
     android:background="@color/white"
     tools:context=".view.deployment.guardian.GuardianDeploymentActivity">
 
+    <include
+        android:id="@+id/toolbarLayout"
+        layout="@layout/toolbar_default" />
+
     <FrameLayout
         android:id="@+id/contentContainer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/toolbarLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

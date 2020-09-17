@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.adapter.CheckListItem
 
-class CheckListAdapter(private val onCheckClickListener: (Int) -> Unit) :
+class CheckListAdapter(private val onCheckClickListener: (Int, String) -> Unit) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var listOfChecks = listOf<CheckListItem>()
@@ -68,7 +68,7 @@ class CheckListAdapter(private val onCheckClickListener: (Int) -> Unit) :
             checkName.text = check.name
 
             checkName.setOnClickListener {
-                onCheckClickListener(check.number)
+                onCheckClickListener(check.number, check.name)
             }
 
             if (check.isPassed) {

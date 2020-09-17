@@ -32,6 +32,11 @@ class GuardianCheckInTestFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        deploymentProtocol?.let {
+            it.showToolbar()
+            it.setToolbarTitle()
+        }
+
         setCheckInTestView()
 
         checkInFinishButton.setOnClickListener {

@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_guardian_deployment.*
+import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.DeploymentState
@@ -17,6 +18,7 @@ import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.entity.guardian.GuardianConfiguration
 import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
 import org.rfcx.audiomoth.entity.guardian.GuardianProfile
+import org.rfcx.audiomoth.entity.guardian.getRelativeTimeSpan
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentImageDb
@@ -66,11 +68,14 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private var prefsEditor: SharedPreferences.Editor? = null
 
     private var currentCheck = 0
+    private var currentCheckName = ""
     private var passedChecks = arrayListOf<Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_guardian_deployment)
+
+        setupToolbar()
 
         val deploymentId = intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
         if (deploymentId != null) {
@@ -91,6 +96,15 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         }
     }
 
+    private fun setupToolbar() {
+        setSupportActionBar(toolbar)
+        supportActionBar?.apply {
+            setDisplayShowTitleEnabled(true)
+            setDisplayHomeAsUpEnabled(true)
+            setDisplayShowHomeEnabled(true)
+        }
+    }
+
     private fun setupView() {
         startFragment(ConnectGuardianFragment.newInstance())
     }
@@ -104,18 +118,12 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun backStep() {
         val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
-        if (currentCheck == 5) {
-            if (container is GuardianConfigureFragment) {
-                startFragment(GuardianSelectProfileFragment.newInstance())
-            } else {
-                startCheckList()
-            }
-        } else {
-            when (container) {
-                is GuardianCheckListFragment -> startFragment(ConnectGuardianFragment.newInstance())
-                is ConnectGuardianFragment -> finish()
-                else -> startCheckList()
-            }
+        when (container) {
+            is MapPickerFragment -> startFragment(LocationFragment.newInstance())
+            is GuardianConfigureFragment -> startFragment(GuardianSelectProfileFragment.newInstance())
+            is GuardianCheckListFragment -> startFragment(ConnectGuardianFragment.newInstance())
+            is ConnectGuardianFragment -> finish()
+            else -> startCheckList()
         }
     }
 
@@ -149,6 +157,10 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun setImages(images: List<String>) {
         this._images = images
+    }
+
+    override fun setCurrentPage(name: String) {
+        currentCheckName = name
     }
 
     override fun setDeploymentConfigure(profile: GuardianProfile) {
@@ -283,6 +295,20 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         val loadingDialog: LoadingDialogFragment? =
             supportFragmentManager.findFragmentByTag(TAG_LOADING_DIALOG) as LoadingDialogFragment?
         loadingDialog?.dismissDialog()
+    }
+
+    override fun showToolbar() {
+        toolbar.visibility = View.VISIBLE
+    }
+
+    override fun hideToolbar() {
+        toolbar.visibility = View.GONE
+    }
+
+    override fun setToolbarTitle() {
+        supportActionBar?.apply {
+            title = currentCheckName
+        }
     }
 
     override fun startMapPicker(latitude: Double, longitude: Double, name: String) {

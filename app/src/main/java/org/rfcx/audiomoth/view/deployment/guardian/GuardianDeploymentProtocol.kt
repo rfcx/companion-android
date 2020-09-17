@@ -27,9 +27,15 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun setSampleRate(sampleRate: Int)
     fun setImages(images: List<String>)
 
+    fun setCurrentPage(name: String)
+
     fun handleCheckClicked(number: Int)
     fun getPassedChecks(): List<Int>
 
     fun showLoading()
     fun hideLoading()
+
+    fun showToolbar()
+    fun hideToolbar()
+    fun setToolbarTitle()
 }
