@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="BottomNavigationMenuItem">
+        <attr name="title" format="string|reference" />
+        <attr name="icon" format="reference" />
+        <attr name="iconTintColor" format="reference" />
+        <attr name="menuSelected" format="boolean" />
+        <attr name="titleColor" format="reference" />
+        <attr name="titleColorSelected" format="reference" />
+        <attr name="showBadge" format="boolean" />
+    </declare-styleable>
+
+    <!-- Bottom navigation widget -->
+    <dimen name="bottom_navigation_widget_icon_size">24dp</dimen>
+    <dimen name="bottom_navigation_widget_title_size">10sp</dimen>
+    <!-- End Bottom navigation widget -->
+
+</resources>
