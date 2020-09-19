@@ -12,6 +12,8 @@ import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_guardian_signal.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
+import org.rfcx.audiomoth.entity.Screen
+import org.rfcx.audiomoth.util.Analytics
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 import java.util.*
 
@@ -25,6 +27,8 @@ class GuardianSignalFragment : Fragment() {
     private var isSignalTesting = false
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
+
+    private val analytics by lazy { context?.let { Analytics(it) } }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -137,6 +141,11 @@ class GuardianSignalFragment : Fragment() {
             timer?.cancel()
             timer = null
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        analytics?.trackScreen(Screen.GUARDIAN_SIGNAL)
     }
 
     companion object {

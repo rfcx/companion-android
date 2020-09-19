@@ -11,12 +11,16 @@ import androidx.lifecycle.observe
 import kotlinx.android.synthetic.main.fragment_guardian_register.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
+import org.rfcx.audiomoth.entity.Screen
 import org.rfcx.audiomoth.entity.socket.response.Status
+import org.rfcx.audiomoth.util.Analytics
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianRegisterFragment : Fragment() {
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
+
+    private val analytics by lazy { context?.let { Analytics(it) } }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -87,6 +91,11 @@ class GuardianRegisterFragment : Fragment() {
 
     private fun getRadioValueForRegistration(): Boolean {
         return productionRadioButton.isChecked
+    }
+
+    override fun onResume() {
+        super.onResume()
+        analytics?.trackScreen(Screen.GUARDIAN_REGISTER)
     }
 
     companion object {

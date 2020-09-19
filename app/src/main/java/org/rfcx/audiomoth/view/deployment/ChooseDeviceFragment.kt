@@ -8,9 +8,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_choose_device.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.Screen
+import org.rfcx.audiomoth.util.Analytics
 
 class ChooseDeviceFragment : Fragment() {
     private var edgeDeploymentProtocol: EdgeDeploymentProtocol? = null
+    private val analytics by lazy { context?.let { Analytics(it) } }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -38,6 +41,11 @@ class ChooseDeviceFragment : Fragment() {
         guardianTextview.setOnClickListener {
             edgeDeploymentProtocol?.openWithGuardianDevice()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        analytics?.trackScreen(Screen.CHOOSE_DEVICE)
     }
 
     override fun onCreateView(

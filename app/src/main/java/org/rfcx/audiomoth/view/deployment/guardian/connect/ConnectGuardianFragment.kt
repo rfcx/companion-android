@@ -16,7 +16,9 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.connection.wifi.OnWifiListener
 import org.rfcx.audiomoth.connection.wifi.WifiHotspotManager
+import org.rfcx.audiomoth.entity.Screen
 import org.rfcx.audiomoth.entity.socket.response.Status
+import org.rfcx.audiomoth.util.Analytics
 import org.rfcx.audiomoth.util.WifiHotspotUtils
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 
@@ -30,6 +32,8 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
     private lateinit var countDownTimer: CountDownTimer
 
     private var connectionCount = 0
+
+    private val analytics by lazy { context?.let { Analytics(it) } }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -166,6 +170,11 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
         super.onDetach()
         wifiHotspotManager.unRegisterReceiver()
         countDownTimer.cancel()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        analytics?.trackScreen(Screen.CONNECT_GUARDIAN)
     }
 
     companion object {
