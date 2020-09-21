@@ -17,7 +17,7 @@ enum class Screen(val id: String) {
     GUARDIAN_CONFIGURE("Guardian Configure"),
     GUARDIAN_MICROPHONE("Guardian Microphone"),
     GUARDIAN_SOLAR_PANEL("Guardian Solar Panel"),
-    GUARDIAN_CHECK_IN_TEST("Guardian Check In Test"),
+    GUARDIAN_CHECKIN_TEST("Guardian CheckIn Test"),
     GUARDIAN_DEPLOY("Guardian Deploy"),
     GUARDIAN_DIAGNOSTIC("Guardian Diagnostic")
 }

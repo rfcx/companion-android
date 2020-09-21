@@ -60,7 +60,7 @@ class GuardianCheckInTestFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        analytics?.trackScreen(Screen.GUARDIAN_CHECK_IN_TEST)
+        analytics?.trackScreen(Screen.GUARDIAN_CHECKIN_TEST)
     }
 
     companion object {
