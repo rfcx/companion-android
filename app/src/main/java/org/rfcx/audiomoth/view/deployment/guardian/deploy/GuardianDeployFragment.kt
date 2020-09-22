@@ -9,12 +9,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_deploy.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
+import org.rfcx.audiomoth.entity.Screen
+import org.rfcx.audiomoth.util.Analytics
 import org.rfcx.audiomoth.view.deployment.BaseImageFragment
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianDeployFragment : BaseImageFragment() {
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
+    private val analytics by lazy { context?.let { Analytics(it) } }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -54,6 +57,11 @@ class GuardianDeployFragment : BaseImageFragment() {
     override fun didAddImages(imagePaths: List<String>) {}
 
     override fun didRemoveImage(imagePath: String) {}
+
+    override fun onResume() {
+        super.onResume()
+        analytics?.trackScreen(Screen.GUARDIAN_DEPLOY)
+    }
 
     companion object {
         fun newInstance(): GuardianDeployFragment {

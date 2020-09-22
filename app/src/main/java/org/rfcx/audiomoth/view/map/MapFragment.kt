@@ -44,6 +44,7 @@ import org.rfcx.audiomoth.entity.DeploymentState.Edge
 import org.rfcx.audiomoth.entity.Device
 import org.rfcx.audiomoth.entity.EdgeDeployment
 import org.rfcx.audiomoth.entity.Locate
+import org.rfcx.audiomoth.entity.Screen
 import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
@@ -84,6 +85,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val locationPermissions by lazy { activity?.let { LocationPermissions(it) } }
     private var listener: MainActivityListener? = null
     private var deploymentListener: DeploymentListener? = null
+
+    private val analytics by lazy { context?.let { Analytics(it) } }
 
     // observer
     private val workInfoObserve = Observer<List<WorkInfo>> {
@@ -516,6 +519,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     override fun onResume() {
         super.onResume()
         mapView.onResume()
+        analytics?.trackScreen(Screen.MAP)
     }
 
     override fun onPause() {

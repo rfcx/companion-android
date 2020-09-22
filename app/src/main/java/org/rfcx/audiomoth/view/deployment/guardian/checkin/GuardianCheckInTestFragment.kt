@@ -10,11 +10,14 @@ import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_guardian_checkin_test.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
+import org.rfcx.audiomoth.entity.Screen
+import org.rfcx.audiomoth.util.Analytics
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianCheckInTestFragment : Fragment() {
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
+    private val analytics by lazy { context?.let { Analytics(it) } }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -52,6 +55,16 @@ class GuardianCheckInTestFragment : Fragment() {
 
             checkInFinishButton.isEnabled = res.checkin.state == CHECKIN_SUCCESS
         })
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        SocketManager.getCheckInTest() // to stop listening checkin test
+    }
+
+    override fun onResume() {
+        super.onResume()
+        analytics?.trackScreen(Screen.GUARDIAN_CHECKIN_TEST)
     }
 
     companion object {

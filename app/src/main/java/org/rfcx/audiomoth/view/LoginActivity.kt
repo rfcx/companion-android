@@ -23,6 +23,7 @@ import org.rfcx.audiomoth.entity.*
 import org.rfcx.audiomoth.entity.response.FirebaseAuthResponse
 import org.rfcx.audiomoth.repo.ApiManager
 import org.rfcx.audiomoth.repo.Firestore
+import org.rfcx.audiomoth.util.Analytics
 import org.rfcx.audiomoth.util.CredentialKeeper
 import org.rfcx.audiomoth.util.CredentialVerifier
 import org.rfcx.audiomoth.util.Preferences
@@ -34,6 +35,7 @@ import retrofit2.Response
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
+    private val analytics by lazy { Analytics(this) }
 
     private val auth0 by lazy {
         val auth0 =
@@ -279,6 +281,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         loading(false)
+        analytics.trackScreen(Screen.LOGIN)
     }
 
     private fun View.hideKeyboard() = this.let {

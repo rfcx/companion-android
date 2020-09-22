@@ -8,10 +8,14 @@ import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_coordinates.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.Screen
+import org.rfcx.audiomoth.util.Analytics
 import org.rfcx.audiomoth.util.Preferences
 import org.rfcx.audiomoth.util.getCoordinatesFormat
 
 class CoordinatesActivity : AppCompatActivity() {
+    private val analytics by lazy { Analytics(this) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_coordinates)
@@ -71,6 +75,11 @@ class CoordinatesActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true
+    }
+
+    override fun onResume() {
+        super.onResume()
+        analytics.trackScreen(Screen.COORDINATES)
     }
 
     companion object {

@@ -11,7 +11,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_select_profile.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
+import org.rfcx.audiomoth.entity.Screen
 import org.rfcx.audiomoth.entity.guardian.GuardianProfile
+import org.rfcx.audiomoth.util.Analytics
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianSelectProfileFragment : Fragment(), (GuardianProfile) -> Unit {
@@ -19,6 +21,7 @@ class GuardianSelectProfileFragment : Fragment(), (GuardianProfile) -> Unit {
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
     private var profiles = listOf<GuardianProfile>()
     private var currentProfile: List<GuardianProfile>? = null
+    private val analytics by lazy { context?.let { Analytics(it) } }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -120,6 +123,11 @@ class GuardianSelectProfileFragment : Fragment(), (GuardianProfile) -> Unit {
                 profileProgressBar.visibility = View.GONE
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        analytics?.trackScreen(Screen.GUARDIAN_SELECT_PROFILE)
     }
 
     companion object {

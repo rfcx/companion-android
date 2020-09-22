@@ -18,7 +18,9 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import kotlinx.android.synthetic.main.fragment_guardian_solar_panel.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
+import org.rfcx.audiomoth.entity.Screen
 import org.rfcx.audiomoth.entity.socket.response.SentinelInput
+import org.rfcx.audiomoth.util.Analytics
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 import java.util.*
 
@@ -33,6 +35,8 @@ class GuardianSolarPanelFragment : Fragment() {
 
     private lateinit var voltageLineDataSet: LineDataSet
     private lateinit var powerLineDataSet: LineDataSet
+
+    private val analytics by lazy { context?.let { Analytics(it) } }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -235,6 +239,11 @@ class GuardianSolarPanelFragment : Fragment() {
         if (isGettingSentinel) {
             timer.cancel()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        analytics?.trackScreen(Screen.GUARDIAN_SOLAR_PANEL)
     }
 
     companion object {

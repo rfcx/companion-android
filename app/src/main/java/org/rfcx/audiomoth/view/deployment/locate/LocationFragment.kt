@@ -36,11 +36,9 @@ import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Locate
+import org.rfcx.audiomoth.entity.Screen
 import org.rfcx.audiomoth.localdb.LocateDb
-import org.rfcx.audiomoth.util.LocationPermissions
-import org.rfcx.audiomoth.util.RealmHelper
-import org.rfcx.audiomoth.util.latitudeCoordinates
-import org.rfcx.audiomoth.util.longitudeCoordinates
+import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.deployment.BaseDeploymentProtocol
 
 class LocationFragment : Fragment(), OnMapReadyCallback {
@@ -61,6 +59,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     private var nameLocation: String? = null
+
+    private val analytics by lazy { context?.let { Analytics(it) } }
 
     private var deploymentProtocol: BaseDeploymentProtocol? = null
     private val locationPermissions by lazy { activity?.let { LocationPermissions(it) } }
@@ -483,6 +483,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     override fun onResume() {
         super.onResume()
         mapView.onResume()
+        analytics?.trackScreen(Screen.LOCATION)
     }
 
     override fun onPause() {
