@@ -12,6 +12,8 @@ import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_guardian_microphone.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
+import org.rfcx.audiomoth.entity.Screen
+import org.rfcx.audiomoth.util.Analytics
 import org.rfcx.audiomoth.util.MicrophoneTestUtils
 import org.rfcx.audiomoth.util.spectrogram.AudioSpectrogramUtils
 import org.rfcx.audiomoth.util.spectrogram.SpectrogramListener
@@ -23,6 +25,7 @@ import java.util.*
 
 class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
 
+    private val analytics by lazy { context?.let { Analytics(it) } }
     private var timer: Timer? = null
     private var spectrogramTimer: Timer? = null
     private val spectrogramStack = arrayListOf<FloatArray>()
@@ -271,6 +274,11 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
             timer = null
             isMicTesting = false
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        analytics?.trackScreen(Screen.GUARDIAN_MICROPHONE)
     }
 
     companion object {

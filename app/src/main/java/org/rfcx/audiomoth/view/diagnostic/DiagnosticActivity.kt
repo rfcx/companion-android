@@ -17,14 +17,19 @@ import kotlinx.android.synthetic.main.activity_guardian_diagnostic.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
+import org.rfcx.audiomoth.entity.Device
+import org.rfcx.audiomoth.entity.Screen
 import org.rfcx.audiomoth.entity.guardian.*
 import org.rfcx.audiomoth.entity.socket.response.Status
 import org.rfcx.audiomoth.localdb.guardian.DiagnosticDb
 import org.rfcx.audiomoth.service.DiagnosticSyncWorker
+import org.rfcx.audiomoth.util.Analytics
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
 import org.rfcx.audiomoth.view.prefs.GuardianPrefsFragment
 import org.rfcx.audiomoth.view.prefs.SyncPreferenceListener
+import java.util.*
+import kotlin.collections.ArrayList
 
 class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
 
@@ -49,6 +54,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
     private var deployment: GuardianDeployment? = null
     private var deploymentServerId: String? = null
     private var configuration: GuardianConfiguration? = null
+    private val analytics by lazy { Analytics(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -281,6 +287,11 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
     override fun onDestroy() {
         super.onDestroy()
         this.prefsEditor?.clear()?.apply()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        analytics.trackScreen(Screen.GUARDIAN_DIAGNOSTIC)
     }
 
     companion object {
