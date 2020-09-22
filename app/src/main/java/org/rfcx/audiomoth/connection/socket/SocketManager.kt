@@ -178,8 +178,12 @@ object SocketManager {
         sendMessage(data)
     }
 
-    fun resetDefaultValue() {
+    fun resetMicrophoneDefaultValue() {
         isTestingFirstTime = true
+    }
+
+    fun resetCheckInValue() {
+        this.checkInTest.value = CheckInTestResponse()
     }
 
     private fun sendMessage(message: String) {
@@ -280,7 +284,9 @@ object SocketManager {
                             CHECKIN -> {
                                 val response =
                                     gson.fromJson(dataInput, CheckInTestResponse::class.java)
-                                this.checkInTest.postValue(response)
+                                if (this.checkInTest.value!!.checkin.state != "published") {
+                                    this.checkInTest.postValue(response)
+                                }
                             }
                             SENTINEL -> {
                                 val response =

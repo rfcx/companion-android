@@ -38,6 +38,12 @@ class GuardianSelectProfileFragment : Fragment(), (GuardianProfile) -> Unit {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        deploymentProtocol?.let {
+            it.showToolbar()
+            it.setToolbarTitle()
+        }
+
         setupView()
         getCurrentConfiguration()
     }
@@ -48,8 +54,6 @@ class GuardianSelectProfileFragment : Fragment(), (GuardianProfile) -> Unit {
     }
 
     private fun setupView() {
-        deploymentProtocol?.hideCompleteButton()
-
         createNewButton.setOnClickListener {
             deploymentProtocol?.startSetupConfigure(GuardianProfile.default()) // new profile
         }

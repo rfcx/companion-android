@@ -35,6 +35,11 @@ class GuardianCheckInTestFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        deploymentProtocol?.let {
+            it.showToolbar()
+            it.setToolbarTitle()
+        }
+
         setCheckInTestView()
 
         checkInFinishButton.setOnClickListener {
@@ -43,7 +48,6 @@ class GuardianCheckInTestFragment : Fragment() {
     }
 
     private fun setCheckInTestView() {
-        SocketManager.getCheckInTest()
         SocketManager.checkInTest.observe(viewLifecycleOwner, Observer { res ->
             checkInUrlValueTextView.text = res.checkin.apiUrl
             checkInStatusValueTextView.text = res.checkin.state

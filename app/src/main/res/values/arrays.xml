@@ -30,6 +30,25 @@
         <item>Deploy</item>
     </string-array>
 
+    <string-array name="guardian_assembly_checks">
+        <item>Install brackets</item>
+        <item>Attach solar panel</item>
+    </string-array>
+
+    <string-array name="guardian_setup_checks">
+        <item>Register guardian</item>
+        <item>Test cellphone signal</item>
+        <item>Test microphone</item>
+        <item>Config audio parameters</item>
+        <item>Locate guardian\'s location</item>
+        <item>Verify checkin</item>
+    </string-array>
+
+    <string-array name="guardian_optional_checks">
+        <item>Add photo attachments</item>
+        <item>Advanced</item>
+    </string-array>
+
     <string-array name="guardian_can_skip_steps">
         <item>Connect</item>
         <item>Config</item>

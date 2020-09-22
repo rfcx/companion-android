@@ -30,15 +30,18 @@ class GuardianDeployFragment : BaseImageFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        deploymentProtocol?.hideCompleteButton()
-        setupImageRecycler()
 
-        finishButton.isEnabled = deploymentProtocol?.canDeploy() ?: false
+        deploymentProtocol?.let {
+            it.showToolbar()
+            it.setToolbarTitle()
+        }
+
+        setupImageRecycler()
 
         finishButton.setOnClickListener {
             val images = imageAdapter.getNewAttachImage()
-            deploymentProtocol?.setReadyToDeploy(images)
-            SocketManager.stopConnection()
+            deploymentProtocol?.setImages(images)
+            deploymentProtocol?.nextStep()
         }
     }
 

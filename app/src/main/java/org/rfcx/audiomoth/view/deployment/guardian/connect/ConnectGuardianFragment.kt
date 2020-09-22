@@ -51,7 +51,6 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        deploymentProtocol?.hideCompleteButton()
         showLoading()
         retryCountdown(SCAN)
 
@@ -69,7 +68,8 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
             guardianHotspot?.let {
                 if (WifiHotspotUtils.isConnectedWithGuardian(requireContext(), it.SSID)) {
                     deploymentProtocol?.setDeploymentWifiName(it.SSID)
-                    deploymentProtocol?.nextStep()
+                    deploymentProtocol?.startCheckList()
+                    SocketManager.getCheckInTest()
                 } else {
                     wifiHotspotManager.connectTo(it, this)
                 }
@@ -108,7 +108,8 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
                     if (connectionCount == 0) {
                         hideLoading()
                         deploymentProtocol?.setDeploymentWifiName(guardianHotspot!!.SSID)
-                        deploymentProtocol?.nextStep()
+                        deploymentProtocol?.startCheckList()
+                        SocketManager.getCheckInTest()
                     }
                     connectionCount += 1
                 }

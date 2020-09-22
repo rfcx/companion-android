@@ -137,9 +137,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         mapView.getMapAsync(this)
         view.viewTreeObserver.addOnGlobalLayoutListener { setOnFocusEditText() }
 
-        deploymentProtocol?.showStepView()
-        deploymentProtocol?.hideCompleteButton()
-
         setHideKeyboard()
 
         if (nameLocation != "" && nameLocation != null) {

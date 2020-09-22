@@ -54,7 +54,11 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        deploymentProtocol?.hideCompleteButton()
+        deploymentProtocol?.let {
+            it.showToolbar()
+            it.setToolbarTitle()
+        }
+
         setupAudioTrack()
         setupSpectrogram()
         setupSpectrogramSpeed()
@@ -62,7 +66,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         setupSpectrogramColorMenu()
         setupAudioPlaybackMenu()
         setUiByState(MicTestingState.READY)
-        SocketManager.resetDefaultValue()
+        SocketManager.resetMicrophoneDefaultValue()
 
         listenAudioButton.setOnClickListener {
             isMicTesting = true
