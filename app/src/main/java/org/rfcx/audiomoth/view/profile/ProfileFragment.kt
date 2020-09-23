@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_profile.*
@@ -62,6 +63,14 @@ class ProfileFragment : Fragment() {
 
         coordinatesLinearLayout.setOnClickListener {
             context?.let { it1 -> CoordinatesActivity.startActivity(it1) }
+        }
+
+        darkThemeSwitch.setOnClickListener {
+            if (darkThemeSwitch.isChecked) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            }
         }
     }
 

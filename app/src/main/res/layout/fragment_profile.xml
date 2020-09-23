@@ -154,7 +154,7 @@
             style="@style/SwitchCompatStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:checked="false" />
+            android:checked="true" />
 
     </LinearLayout>
 
