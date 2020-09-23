@@ -90,7 +90,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun setupDisplayTheme() {
         val preferences = Preferences.getInstance(this)
-        val themeOption = this.resources.getStringArray(R.array.theme)
+        val themeOption = this.resources.getStringArray(R.array.theme_more_than_9)
         val theme = when (preferences.getString(DISPLAY_THEME, themeOption[1])) {
             themeOption[0] -> {
                 AppCompatDelegate.MODE_NIGHT_NO

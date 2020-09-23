@@ -1,8 +1,10 @@
 package org.rfcx.audiomoth.view.profile
 
+import android.Manifest
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -44,7 +46,11 @@ class ProfileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val preferences = context?.let { it1 -> Preferences.getInstance(it1) }
-        val themeOption = this.resources.getStringArray(R.array.theme)
+        val themeOption = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            this.resources.getStringArray(R.array.theme_more_than_9)
+        } else {
+            this.resources.getStringArray(R.array.theme_less_than_10)
+        }
 
         userNameTextView.text = context.getUserNickname()
         userLocationTextView.text = context?.getDefaultSiteName()
