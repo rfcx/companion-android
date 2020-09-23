@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <!-- Margin/Padding size -->
+    <dimen name="margin_padding_xsmall">4dp</dimen>
+    <dimen name="margin_padding_small">8dp</dimen>
+    <dimen name="margin_padding_normal">16dp</dimen>
+    <dimen name="margin_padding_large">24dp</dimen>
+    <dimen name="margin_padding_xlarge">32dp</dimen>
+
+    <!-- Text size -->
+    <dimen name="text_large">18sp</dimen>
+    <dimen name="text_medium">16sp</dimen>
+    <dimen name="text_small">14sp</dimen>
+    <dimen name="text_xsmall">12sp</dimen>
+    <dimen name="text_xxsmall">10sp</dimen>
+
+    <dimen name="ic_audiomoth_size">110dp</dimen>
+    <dimen name="size_battery_lv_button">56dp</dimen>
+    <dimen name="button_battery">46dp</dimen>
+    <dimen name="progress_bar">40dp</dimen>
+    <dimen name="button_height">44dp</dimen>
+    <dimen name="size_complete">150dp</dimen>
+    <dimen name="size_view_complete">170dp</dimen>
+    <dimen name="mark_size">15dp</dimen>
+    <dimen name="timeline_padding">12dp</dimen>
+    <dimen name="padding_bottom">78dp</dimen>
+    <dimen name="edge_width">150dp</dimen>
+    <dimen name="search_input_padding">12dp</dimen>
+    ​<dimen name="viewpager_padding">32dp</dimen>
+
+    <!--  Battery level  -->
+    ​<dimen name="battery_width">20dp</dimen>
+    ​<dimen name="battery_height">10dp</dimen>
+
+    <!--  Deployment Image  -->
+    <dimen name="size_deployment_image">72dp</dimen>
+
+    <!-- StepView -->
+    <dimen name="size_step">30dp</dimen>
+    <dimen name="width_divider">30dp</dimen>
+    <dimen name="height_divider">2dp</dimen>
+    <dimen name="margin_divider">15dp</dimen>
+    <dimen name="margin_step">12dp</dimen>
+
+</resources>
