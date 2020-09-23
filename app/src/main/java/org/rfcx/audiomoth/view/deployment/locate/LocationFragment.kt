@@ -160,14 +160,21 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
         changeTextView.setOnClickListener {
             val name = locationNameEditText.text.toString()
-            deploymentProtocol?.startMapPicker(latitude, longitude, name)
+            startMapPicker(name)
         }
 
         viewOfMapBox.setOnClickListener {
             if (newLocationRadioButton.isChecked) {
                 val name = locationNameEditText.text.toString()
-                deploymentProtocol?.startMapPicker(latitude, longitude, name)
+                startMapPicker(name)
             }
+        }
+    }
+
+    private fun startMapPicker(name: String) {
+        deploymentProtocol?.let {
+            it.startMapPicker(latitude, longitude, name)
+            it.hideToolbar()
         }
     }
 

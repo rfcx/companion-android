@@ -176,4 +176,10 @@
         <item name="android:textSize">@dimen/text_small</item>
     </style>
 
+    <!-- Toolbar -->
+    <style name="Toolbar.TitleText" parent="Widget.MaterialComponents.Toolbar.Primary">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
 </resources>
