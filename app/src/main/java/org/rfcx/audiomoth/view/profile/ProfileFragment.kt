@@ -15,10 +15,8 @@ import org.rfcx.audiomoth.BuildConfig
 import org.rfcx.audiomoth.MainActivityListener
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Screen
-import org.rfcx.audiomoth.util.Analytics
-import org.rfcx.audiomoth.util.getCoordinatesFormat
-import org.rfcx.audiomoth.util.getDefaultSiteName
-import org.rfcx.audiomoth.util.getUserNickname
+import org.rfcx.audiomoth.util.*
+import org.rfcx.audiomoth.util.Preferences.Companion.DISPLAY_THEME
 import org.rfcx.audiomoth.view.profile.coordinates.CoordinatesActivity
 
 class ProfileFragment : Fragment() {
@@ -68,6 +66,7 @@ class ProfileFragment : Fragment() {
 
 
         darkThemeLinearLayout.setOnClickListener {
+            val preferences = context?.let { it1 -> Preferences.getInstance(it1) }
             val builder = context?.let { it1 -> android.app.AlertDialog.Builder(it1) }
             val selectedRadioItem = -1
             val themeOption = this.resources.getStringArray(R.array.theme)
@@ -77,14 +76,17 @@ class ProfileFragment : Fragment() {
 
                 builder.setSingleChoiceItems(themeOption, selectedRadioItem,
                     DialogInterface.OnClickListener { dialog, which ->
-                        when(themeOption[which]) {
+                        when (themeOption[which]) {
                             themeOption[0] -> {
+                                preferences?.putString(DISPLAY_THEME, themeOption[0])
                                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                             }
                             themeOption[1] -> {
+                                preferences?.putString(DISPLAY_THEME, themeOption[1])
                                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                             }
                             themeOption[2] -> {
+                                preferences?.putString(DISPLAY_THEME, themeOption[2])
                                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
                             }
                         }
