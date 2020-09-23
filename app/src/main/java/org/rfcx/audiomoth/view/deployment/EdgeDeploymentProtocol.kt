@@ -23,8 +23,6 @@ interface EdgeDeploymentProtocol : BaseDeploymentProtocol {
     fun hideStepView()
     fun showStepView()
 
-    fun setReadyToDeploy(images: List<String>)
-
     fun setDeployment(deployment: EdgeDeployment)
     fun setProfile(profile: Profile)
     fun setDeploymentConfigure(profile: Profile)

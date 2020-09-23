@@ -32,7 +32,8 @@ class DeployFragment : BaseImageFragment() {
         setupImageRecycler()
         finishButton.setOnClickListener {
             val images = imageAdapter.getNewAttachImage()
-            edgeDeploymentProtocol?.setReadyToDeploy(images)
+            edgeDeploymentProtocol?.setImages(images)
+            edgeDeploymentProtocol?.setReadyToDeploy()
         }
     }
 
