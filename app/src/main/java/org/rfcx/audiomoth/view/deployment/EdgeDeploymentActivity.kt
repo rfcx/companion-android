@@ -74,6 +74,8 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_deployment)
 
+        setupToolbar()
+
         val deploymentId = intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
         if (deploymentId != null) {
             handleDeploymentStep(deploymentId)
@@ -86,6 +88,15 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         }
     }
 
+    private fun setupToolbar() {
+        setSupportActionBar(toolbar)
+        supportActionBar?.apply {
+            setDisplayShowTitleEnabled(true)
+            setDisplayHomeAsUpEnabled(true)
+            setDisplayShowHomeEnabled(true)
+        }
+    }
+
     override fun openWithEdgeDevice() {
         startCheckList()
     }
@@ -93,6 +104,11 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     override fun openWithGuardianDevice() {
         GuardianDeploymentActivity.startActivity(this)
         finish()
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        backStep()
+        return true
     }
 
     override fun nextStep() {
@@ -106,10 +122,30 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
         when (container) {
             is MapPickerFragment -> startFragment(LocationFragment.newInstance())
-            is ConfigureFragment -> startFragment(SelectProfileFragment.newInstance())
+            is ConfigureFragment -> {
+                this._profiles = profileDb.getProfiles()
+                if (_profiles.isNotEmpty()) {
+                    startFragment(SelectProfileFragment.newInstance())
+                } else {
+                    startCheckList()
+                }
+            }
             is EdgeCheckListFragment -> {
                 passedChecks.clear() // remove all passed
                 finish()
+            }
+            is LocationFragment -> {
+                val isFragmentPopped = handleNestedFragmentBackStack(supportFragmentManager)
+                if (!isFragmentPopped && supportFragmentManager.backStackEntryCount <= 1) {
+                    // if top's fragment is  LocationFragment then finish else show LocationFragment fragment
+                    if (supportFragmentManager.fragments.firstOrNull() is LocationFragment) {
+                        startCheckList()
+                    } else {
+                        startLocationPage(this.latitude, this.longitude, this.nameLocation)
+                    }
+                } else if (!isFragmentPopped) {
+                    super.onBackPressed()
+                }
             }
             else -> startCheckList()
         }
@@ -380,21 +416,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     }
 
     override fun onBackPressed() {
-        if (currentCheck == 0) {
-            val isFragmentPopped = handleNestedFragmentBackStack(supportFragmentManager)
-            if (!isFragmentPopped && supportFragmentManager.backStackEntryCount <= 1) {
-                // if top's fragment is  LocationFragment then finish else show LocationFragment fragment
-                if (supportFragmentManager.fragments.firstOrNull() is LocationFragment) {
-                    startCheckList()
-                } else {
-                    startLocationPage(this.latitude, this.longitude, this.nameLocation)
-                }
-            } else if (!isFragmentPopped) {
-                super.onBackPressed()
-            }
-        } else {
-            backStep()
-        }
+        backStep()
     }
 
     private fun notification() {

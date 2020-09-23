@@ -132,6 +132,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        deploymentProtocol?.let {
+            it.showToolbar()
+            it.setToolbarTitle()
+        }
+
         mapView = view.findViewById(R.id.mapBoxView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
