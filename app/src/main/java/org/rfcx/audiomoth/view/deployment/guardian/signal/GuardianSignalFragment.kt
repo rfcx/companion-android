@@ -9,13 +9,13 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import java.util.*
 import kotlinx.android.synthetic.main.fragment_guardian_signal.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.entity.Screen
 import org.rfcx.audiomoth.util.Analytics
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
-import java.util.*
 
 class GuardianSignalFragment : Fragment() {
     private val listOfSignal by lazy {
@@ -63,7 +63,7 @@ class GuardianSignalFragment : Fragment() {
         isSignalTesting = true
 
         timer = Timer()
-        timer?.schedule( object : TimerTask(){
+        timer?.schedule(object : TimerTask() {
             override fun run() {
                 SocketManager.getSignalStrength()
             }
@@ -143,7 +143,7 @@ class GuardianSignalFragment : Fragment() {
 
     override fun onDetach() {
         super.onDetach()
-        if(isSignalTesting) {
+        if (isSignalTesting) {
             timer?.cancel()
             timer = null
         }

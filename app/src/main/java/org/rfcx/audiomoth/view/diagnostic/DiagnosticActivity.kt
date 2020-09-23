@@ -13,11 +13,12 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonArray
 import io.realm.Realm
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlinx.android.synthetic.main.activity_guardian_diagnostic.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
-import org.rfcx.audiomoth.entity.Device
 import org.rfcx.audiomoth.entity.Screen
 import org.rfcx.audiomoth.entity.guardian.*
 import org.rfcx.audiomoth.entity.socket.response.Status
@@ -28,8 +29,6 @@ import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
 import org.rfcx.audiomoth.view.prefs.GuardianPrefsFragment
 import org.rfcx.audiomoth.view.prefs.SyncPreferenceListener
-import java.util.*
-import kotlin.collections.ArrayList
 
 class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
 
@@ -234,7 +233,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
         this.prefsChanges = prefs
     }
 
-    override fun getPrefsChanges(): List<String> {/* not used */ return listOf()}
+    override fun getPrefsChanges(): List<String> { /* not used */ return listOf() }
 
     override fun showSyncButton() {
         syncButton.visibility = View.VISIBLE

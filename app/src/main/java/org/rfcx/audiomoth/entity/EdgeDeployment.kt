@@ -27,7 +27,7 @@ open class EdgeDeployment(
 ) : RealmModel {
 
     companion object {
-        const val TABLE_NAME ="EdgeDeployment"
+        const val TABLE_NAME = "EdgeDeployment"
         const val FIELD_ID = "id"
         const val FIELD_STATE = "state"
         const val FIELD_SYNC_STATE = "syncState"

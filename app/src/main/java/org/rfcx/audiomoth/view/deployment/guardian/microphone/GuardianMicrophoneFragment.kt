@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import java.util.*
 import kotlinx.android.synthetic.main.fragment_guardian_microphone.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
@@ -20,8 +21,6 @@ import org.rfcx.audiomoth.util.spectrogram.SpectrogramListener
 import org.rfcx.audiomoth.util.spectrogram.toShortArray
 import org.rfcx.audiomoth.util.spectrogram.toSmallChunk
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
-import java.util.*
-
 
 class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
 
@@ -303,5 +302,4 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
 
         fun newInstance(): GuardianMicrophoneFragment = GuardianMicrophoneFragment()
     }
-
 }

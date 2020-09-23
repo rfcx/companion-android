@@ -45,7 +45,7 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
         }
 
         checkListRecyclerView.setCheckList(getAllChecks())
-        //set passed checks
+        // set passed checks
         deploymentProtocol?.getPassedChecks()?.forEach { number ->
             checkListRecyclerView.setCheckPassed(number)
         }
@@ -100,5 +100,4 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
             return GuardianCheckListFragment()
         }
     }
-
 }

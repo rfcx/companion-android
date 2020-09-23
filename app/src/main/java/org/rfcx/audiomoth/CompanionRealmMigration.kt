@@ -2,10 +2,10 @@ package org.rfcx.audiomoth
 
 import io.realm.DynamicRealm
 import io.realm.RealmMigration
+import java.util.*
 import org.rfcx.audiomoth.entity.EdgeConfiguration
 import org.rfcx.audiomoth.entity.EdgeDeployment
 import org.rfcx.audiomoth.entity.Locate
-import java.util.*
 
 class CompanionRealmMigration : RealmMigration {
     override fun migrate(realm: DynamicRealm, oldVersion: Long, newVersion: Long) {

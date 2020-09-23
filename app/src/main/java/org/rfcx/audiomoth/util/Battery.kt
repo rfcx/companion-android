@@ -1,8 +1,8 @@
 package org.rfcx.audiomoth.util
 
 import android.content.Context
-import org.rfcx.audiomoth.R
 import kotlin.math.roundToInt
+import org.rfcx.audiomoth.R
 
 object Battery {
     const val BATTERY_PIN_GREEN = "BATTERY_PIN_GREEN"

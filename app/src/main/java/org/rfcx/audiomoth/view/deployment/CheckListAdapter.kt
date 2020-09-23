@@ -102,5 +102,4 @@ class CheckListAdapter(private val onCheckClickListener: (Int, String) -> Unit) 
             headerName.text = header.name
         }
     }
-
 }
