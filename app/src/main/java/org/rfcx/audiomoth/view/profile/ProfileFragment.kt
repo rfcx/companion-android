@@ -42,6 +42,10 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val preferences = context?.let { it1 -> Preferences.getInstance(it1) }
+        val themeOption = this.resources.getStringArray(R.array.theme)
+
         userNameTextView.text = context.getUserNickname()
         userLocationTextView.text = context?.getDefaultSiteName()
         versionTextView.text = getString(
@@ -50,6 +54,7 @@ class ProfileFragment : Fragment() {
             BuildConfig.VERSION_CODE.toString()
         )
         formatCoordinatesTextView.text = context?.getCoordinatesFormat()
+        themeSelectTextView.text = preferences?.getString(DISPLAY_THEME, themeOption[1])
 
         feedbackTextView.setOnClickListener {
             val intent = Intent(activity, FeedbackActivity::class.java)
@@ -64,12 +69,9 @@ class ProfileFragment : Fragment() {
             context?.let { it1 -> CoordinatesActivity.startActivity(it1) }
         }
 
-
         darkThemeLinearLayout.setOnClickListener {
-            val preferences = context?.let { it1 -> Preferences.getInstance(it1) }
             val builder = context?.let { it1 -> android.app.AlertDialog.Builder(it1) }
-            val selectedRadioItem = -1
-            val themeOption = this.resources.getStringArray(R.array.theme)
+            val selectedRadioItem = themeOption.indexOf(preferences?.getString(DISPLAY_THEME, themeOption[1]))
 
             if (builder != null) {
                 builder.setTitle(getString(R.string.theme))
@@ -90,14 +92,13 @@ class ProfileFragment : Fragment() {
                                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
                             }
                         }
+                        themeSelectTextView.text = themeOption[which]
                         dialog.dismiss()
                     }
                 )
-
                 builder.setPositiveButton(getString(R.string.cancel)) { dialog, which ->
                     dialog.dismiss()
                 }
-
                 builder.show()
             }
         }
