@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/backgroundColor">
 
     <LinearLayout
         android:id="@+id/userProfileLayout"
@@ -62,9 +62,9 @@
     <View
         android:id="@+id/view"
         android:layout_width="match_parent"
-        android:layout_height="10dp"
+        android:layout_height="3dp"
         android:layout_marginTop="@dimen/margin_padding_normal"
-        android:background="@color/grey_light"
+        android:background="@color/lineColor"
         app:layout_constraintTop_toBottomOf="@id/userProfileLayout" />
 
     <TextView
@@ -112,8 +112,8 @@
     <View
         android:id="@+id/view1"
         android:layout_width="match_parent"
-        android:layout_height="10dp"
-        android:background="@color/grey_light"
+        android:layout_height="3dp"
+        android:background="@color/lineColor"
         app:layout_constraintTop_toBottomOf="@id/coordinatesLinearLayout" />
 
     <TextView
@@ -167,9 +167,9 @@
     <View
         android:id="@+id/view2"
         android:layout_width="match_parent"
-        android:layout_height="10dp"
+        android:layout_height="3dp"
         android:layout_marginTop="@dimen/margin_padding_small"
-        android:background="@color/grey_light"
+        android:background="@color/lineColor"
         app:layout_constraintTop_toBottomOf="@id/versionTextView" />
 
     <TextView
@@ -195,13 +195,5 @@
         android:text="@string/profile_sign_out_label"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/accountTextView" />
-
-    <View
-        android:id="@+id/view3"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="@color/grey_light"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/logoutTextView" />
-
+    
 </androidx.constraintlayout.widget.ConstraintLayout>
