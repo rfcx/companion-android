@@ -147,6 +147,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                     super.onBackPressed()
                 }
             }
+            is ChooseDeviceFragment -> finish()
             else -> startCheckList()
         }
     }
