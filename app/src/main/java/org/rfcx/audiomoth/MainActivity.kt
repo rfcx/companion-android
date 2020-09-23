@@ -146,8 +146,6 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         menuProfile.setOnClickListener {
             onBottomMenuClick(it)
         }
-
-        menuMap.performClick()
     }
 
     private fun onBottomMenuClick(menu: View) {
