@@ -46,7 +46,12 @@ class PerformBatteryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        edgeDeploymentProtocol?.hideCompleteButton()
+        
+        edgeDeploymentProtocol?.let {
+            it.showToolbar()
+            it.setToolbarTitle()
+        }
+
         when (status) {
             TEST_BATTERY -> checkBattery()
             TIME_LED_FLASH -> timeFlash()

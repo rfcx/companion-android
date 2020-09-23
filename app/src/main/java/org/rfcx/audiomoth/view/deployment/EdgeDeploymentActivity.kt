@@ -95,26 +95,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         finish()
     }
 
-    override fun hideCompleteButton() {
-        completeStepButton.visibility = View.INVISIBLE
-    }
-
-    override fun showStepView() {
-        edgeStepRecyclerView.visibility = View.VISIBLE
-    }
-
-    override fun hideStepView() {
-        edgeStepRecyclerView.visibility = View.GONE
-    }
-
-    override fun showCompleteButton() {
-        completeStepButton.visibility = View.VISIBLE
-    }
-
-    override fun setCompleteTextButton(text: String) {
-        completeStepButton.text = text
-    }
-
     override fun nextStep() {
         if (currentCheck !in passedChecks) {
             passedChecks.add(currentCheck)
@@ -318,7 +298,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     }
 
     override fun startMapPicker(latitude: Double, longitude: Double, name: String) {
-        hideStepView()
         setLatLng(latitude, longitude, name)
         startFragment(MapPickerFragment.newInstance(latitude, longitude, name))
     }
