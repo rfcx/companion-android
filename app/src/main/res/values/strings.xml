@@ -117,6 +117,8 @@
     <string name="profile_feedback_label">Feedback</string>
     <string name="coordinates">Coordinates</string>
     <string name="location">Location</string>
+    <string name="display">Display</string>
+    <string name="dark_theme">Dark theme</string>
 
     <string name="dd_coordinates">DD</string>
     <string name="ddm_coordinates">DDM</string>
