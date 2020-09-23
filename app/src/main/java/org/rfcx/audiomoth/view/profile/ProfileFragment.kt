@@ -1,6 +1,7 @@
 package org.rfcx.audiomoth.view.profile
 
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -65,11 +66,37 @@ class ProfileFragment : Fragment() {
             context?.let { it1 -> CoordinatesActivity.startActivity(it1) }
         }
 
-        darkThemeSwitch.setOnClickListener {
-            if (darkThemeSwitch.isChecked) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
+        darkThemeLinearLayout.setOnClickListener {
+            val builder = context?.let { it1 -> android.app.AlertDialog.Builder(it1) }
+            val selectedRadioItem = -1
+            val themeOption = this.resources.getStringArray(R.array.theme)
+
+            if (builder != null) {
+                builder.setTitle(getString(R.string.theme))
+
+                builder.setSingleChoiceItems(themeOption, selectedRadioItem,
+                    DialogInterface.OnClickListener { dialog, which ->
+                        when(themeOption[which]) {
+                            themeOption[0] -> {
+                                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                            }
+                            themeOption[1] -> {
+                                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                            }
+                            themeOption[2] -> {
+                                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                            }
+                        }
+                        dialog.dismiss()
+                    }
+                )
+
+                builder.setPositiveButton(getString(R.string.cancel)) { dialog, which ->
+                    dialog.dismiss()
+                }
+
+                builder.show()
             }
         }
     }

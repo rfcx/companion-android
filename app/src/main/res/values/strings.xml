@@ -118,7 +118,10 @@
     <string name="coordinates">Coordinates</string>
     <string name="location">Location</string>
     <string name="display">Display</string>
-    <string name="dark_theme">Dark theme</string>
+    <string name="theme">Theme</string>
+    <string name="dark_theme">Dark</string>
+    <string name="light_theme">Light</string>
+    <string name="system_default">System default</string>
 
     <string name="dd_coordinates">DD</string>
     <string name="ddm_coordinates">DDM</string>

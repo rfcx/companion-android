@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!--  Common  -->
+    <string-array name="theme">
+        <item>Light</item>
+        <item>Dark</item>
+        <item>System default</item>
+    </string-array>
+
     <!--  Edge  -->
     <string-array name="audiomoth_steps">
         <item>Locate</item>
