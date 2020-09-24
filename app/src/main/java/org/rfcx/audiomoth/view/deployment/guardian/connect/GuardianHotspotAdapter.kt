@@ -5,6 +5,7 @@ import android.net.wifi.ScanResult
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_guardian_hotspot.view.*
 import org.rfcx.audiomoth.R
@@ -28,9 +29,25 @@ class GuardianHotspotAdapter(private val onHotspotClickListener: (ScanResult) ->
 
     override fun onBindViewHolder(holder: GuardianHotspotViewHolder, position: Int) {
         if (selectedPosition == position) {
-            holder.itemView.setBackgroundColor(Color.parseColor("#B57BBD89"))
+            holder.itemView.hotspotNameTextView.apply {
+                setTextColor(ContextCompat.getColor(this.context, R.color.colorPrimary))
+                setCompoundDrawablesWithIntrinsicBounds(
+                    0,
+                    0,
+                    R.drawable.ic_hotspot_selected,
+                    0
+                )
+            }
         } else {
-            holder.itemView.setBackgroundColor(Color.parseColor("#FFFFFF"))
+            holder.itemView.hotspotNameTextView.apply {
+                setTextColor(ContextCompat.getColor(this.context, R.color.text_secondary))
+                setCompoundDrawablesWithIntrinsicBounds(
+                    0,
+                    0,
+                    0,
+                    0
+                )
+            }
         }
         val hotspot = items[position]
         holder.bind(hotspot)
@@ -43,12 +60,9 @@ class GuardianHotspotAdapter(private val onHotspotClickListener: (ScanResult) ->
 
     inner class GuardianHotspotViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val hotspotName = itemView.hotspotNameTextView
-        private val deployStatus = itemView.deployStatusTextView
 
         fun bind(hotspot: ScanResult) {
             hotspotName.text = hotspot.SSID
-            deployStatus.text = "not deployed"
-            // TODO: if deploy then show deployed text
         }
     }
 }

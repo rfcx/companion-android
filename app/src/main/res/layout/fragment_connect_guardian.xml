@@ -6,14 +6,27 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/nearbyGuardianTextView"
-        style="@style/AudioMothText.Subhead.Bold"
+        style="@style/AudioMothText.Headline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginTop="@dimen/margin_padding_normal"
-        android:text="@string/nearby_guardians"
+        android:textAlignment="center"
+        android:text="@string/connecting_up"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/guardianImageView"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:padding="@dimen/margin_padding_small"
+        android:background="?attr/selectableItemBackground"
+        android:src="@drawable/guardian"
+        app:layout_constraintTop_toBottomOf="@+id/nearbyGuardianTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/guardianHotspotRecyclerView"
@@ -23,8 +36,19 @@
         android:layout_marginTop="@dimen/margin_padding_normal"
         android:layout_marginEnd="@dimen/margin_padding_large"
         android:layout_marginBottom="@dimen/margin_padding_normal"
+        app:layout_constraintBottom_toTopOf="@id/connectInstructionText"
+        app:layout_constraintTop_toBottomOf="@id/guardianImageView" />
+
+    <TextView
+        android:id="@+id/connectInstructionText"
+        style="@style/AudioMothText.Body.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/instruction"
+        android:layout_marginBottom="@dimen/margin_padding_small"
         app:layout_constraintBottom_toTopOf="@id/connectGuardianButton"
-        app:layout_constraintTop_toBottomOf="@id/nearbyGuardianTextView" />
+        app:layout_constraintStart_toStartOf="@id/connectGuardianButton"
+        app:layout_constraintEnd_toEndOf="@id/connectGuardianButton"/>
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/connectGuardianButton"
@@ -59,7 +83,7 @@
         android:layout_marginEnd="@dimen/margin_padding_large"
         android:layout_marginBottom="@dimen/margin_padding_normal"
         android:text="@string/retry"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent" />
 
     <ProgressBar
