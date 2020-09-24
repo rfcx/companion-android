@@ -32,6 +32,8 @@ import com.mapbox.mapboxsdk.maps.Style
 import kotlinx.android.synthetic.main.fragment_map_picker.*
 import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.Screen
+import org.rfcx.audiomoth.util.Analytics
 import org.rfcx.audiomoth.util.latitudeCoordinates
 import org.rfcx.audiomoth.util.longitudeCoordinates
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment.Companion.DEFAULT_ZOOM
@@ -52,6 +54,8 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     private var nameLocation: String? = null
+
+    private val analytics by lazy { context?.let { Analytics(it) } }
 
     private val mapboxLocationChangeCallback =
         object : LocationEngineCallback<LocationEngineResult> {
@@ -264,6 +268,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
     override fun onResume() {
         super.onResume()
         mapView.onResume()
+        analytics?.trackScreen(Screen.MAP_PICKER)
     }
 
     override fun onPause() {

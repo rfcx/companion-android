@@ -7,9 +7,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_guardian_deployment.*
+import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.entity.DeploymentLocation
@@ -24,7 +24,6 @@ import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentImageDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianProfileDb
 import org.rfcx.audiomoth.service.GuardianDeploymentSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
-import org.rfcx.audiomoth.view.deployment.StepViewAdapter
 import org.rfcx.audiomoth.view.deployment.guardian.checkin.GuardianCheckInTestFragment
 import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianConfigureFragment
 import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianSelectProfileFragment
@@ -44,7 +43,7 @@ import org.rfcx.audiomoth.view.prefs.SyncPreferenceListener
 import java.util.*
 
 class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtocol,
-    CompleteListener, MapPickerProtocol, SyncPreferenceListener, (Int) -> Unit {
+    CompleteListener, MapPickerProtocol, SyncPreferenceListener {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val locateDb by lazy { LocateDb(realm) }
@@ -52,30 +51,30 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private val deploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val deploymentImageDb by lazy { GuardianDeploymentImageDb(realm) }
 
-    private val guardianStepView by lazy { StepViewAdapter(this) }
-
-    private var currentStep = 0
     private var _profiles: List<GuardianProfile> = listOf()
     private var _profile: GuardianProfile? = null
     private var _deployment: GuardianDeployment? = null
     private var _deployLocation: DeploymentLocation? = null
     private var _configuration: GuardianConfiguration? = null
+    private var _images: List<String> = listOf()
 
     private var _sampleRate = 24000
 
     private var latitude = 0.0
     private var longitude = 0.0
 
-    private var beforeStep = 0
-
     private var prefsChanges = mapOf<String, String>()
     private var prefsEditor: SharedPreferences.Editor? = null
+
+    private var currentCheck = 0
+    private var currentCheckName = ""
+    private var passedChecks = arrayListOf<Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_guardian_deployment)
 
-        setupStepView()
+        setupToolbar()
 
         val deploymentId = intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
         if (deploymentId != null) {
@@ -90,79 +89,55 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                 if (deployment.configuration != null) {
                     _configuration = deployment.configuration
                 }
-                currentStep = deployment.state - 1
-                handleFragment(currentStep)
             }
         } else {
             setupView()
         }
     }
 
-    private fun setupStepView() {
-        guardianStepRecyclerView.apply {
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-            adapter = guardianStepView
+    private fun setupToolbar() {
+        setSupportActionBar(toolbar)
+        supportActionBar?.apply {
+            setDisplayShowTitleEnabled(true)
+            setDisplayHomeAsUpEnabled(true)
+            setDisplayShowHomeEnabled(true)
         }
-        guardianStepView.setSteps(this.resources.getStringArray(R.array.guardian_steps).toList())
-        guardianStepView.setStepsCanSkip(this.resources.getStringArray(R.array.guardian_can_skip_steps).toList())
     }
 
     private fun setupView() {
-        handleFragment(currentStep) // start page
-        completeStepButton.setOnClickListener {
-            nextStep()
-        }
-    }
-
-    override fun hideCompleteButton() {
-        completeStepButton.visibility = View.INVISIBLE
-    }
-
-    override fun showCompleteButton() {
-        completeStepButton.visibility = View.VISIBLE
-    }
-
-    override fun setCompleteTextButton(text: String) {
-        completeStepButton.text = text
-    }
-
-    override fun invoke(number: Int) {
-        beforeStep = currentStep
-        currentStep = number - 1
-        handleFragment(currentStep)
+        startFragment(ConnectGuardianFragment.newInstance())
     }
 
     override fun nextStep() {
-        beforeStep = currentStep
-        guardianStepView.setStepPasses(currentStep)
-        currentStep += 1
-        handleFragment(currentStep)
+        if (currentCheck !in passedChecks) {
+            passedChecks.add(currentCheck)
+        }
+        startCheckList()
     }
 
     override fun backStep() {
-        beforeStep = currentStep
-        when (currentStep) {
-            0 -> finish()
-            3 -> {
-                val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
-                if (container is GuardianConfigureFragment) {
-                    startFragment(GuardianSelectProfileFragment.newInstance())
-                } else {
-                    currentStep -= 1
-                    handleFragment(currentStep)
-                }
+        val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
+        when (container) {
+            is MapPickerFragment -> startFragment(LocationFragment.newInstance())
+            is GuardianConfigureFragment -> startFragment(GuardianSelectProfileFragment.newInstance())
+            is GuardianCheckListFragment -> {
+                SocketManager.resetCheckInValue()
+                SocketManager.getCheckInTest() // to stop getting checkin test
+                passedChecks.clear() // remove all passed 
+                startFragment(ConnectGuardianFragment.newInstance())
             }
-            else -> {
-                currentStep -= 1
-                handleFragment(currentStep)
-            }
+            is ConnectGuardianFragment -> finish()
+            else -> startCheckList()
         }
     }
 
-    override fun hideStepView() {
+    override fun onSupportNavigateUp(): Boolean {
+        backStep()
+        return true
     }
 
-    override fun showStepView() {
+    override fun startCheckList() {
+        startFragment(GuardianCheckListFragment.newInstance())
     }
 
     override fun getProfiles(): List<GuardianProfile> = _profiles
@@ -189,8 +164,12 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         this._sampleRate = sampleRate
     }
 
-    override fun canDeploy(): Boolean {
-        return guardianStepView.isEveryStepsPassed()
+    override fun setImages(images: List<String>) {
+        this._images = images
+    }
+
+    override fun setCurrentPage(name: String) {
+        currentCheckName = name
     }
 
     override fun setDeploymentConfigure(profile: GuardianProfile) {
@@ -199,7 +178,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         this._deployment?.configuration = _configuration
 
         // update deployment
-        _deployment?.let { deploymentDb.updateDeployment(it) }
+        this._deployment?.let { deploymentDb.updateDeployment(it) }
         // update profile
         if (profile.name.isNotEmpty()) {
             profileDb.insertOrUpdateProfile(profile)
@@ -209,6 +188,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     override fun getConfiguration(): GuardianConfiguration? = _configuration
 
     override fun getSampleRate(): Int = _sampleRate
+
+    override fun getWifiName(): String = _deployment?.wifiName ?: ""
 
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
@@ -223,14 +204,14 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         setDeployment(deployment)
     }
 
-    override fun setReadyToDeploy(images: List<String>) {
+    override fun setReadyToDeploy() {
         showLoading()
-        _deployment?.let {
+        this._deployment?.let {
             it.deployedAt = Date()
             it.state = DeploymentState.Guardian.ReadyToUpload.key
             setDeployment(it)
 
-            deploymentImageDb.insertImage(it, images)
+            deploymentImageDb.insertImage(it, _images)
             deploymentDb.updateDeployment(it)
 
             GuardianDeploymentSyncWorker.enqueue(this@GuardianDeploymentActivity)
@@ -240,46 +221,40 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun startSetupConfigure(profile: GuardianProfile) {
         setProfile(profile)
-        currentStep = 3
         startFragment(GuardianConfigureFragment.newInstance())
     }
 
     override fun backToConfigure() {
-        currentStep = 3
         startFragment(GuardianConfigureFragment.newInstance())
     }
 
-    private fun handleFragment(currentStep: Int) {
+    override fun handleCheckClicked(number: Int) {
         // setup fragment for current step
-        handleStepView(currentStep)
-        when (currentStep) {
-            0 -> {
-                updateDeploymentState(DeploymentState.Guardian.Connect)
-                startFragment(ConnectGuardianFragment.newInstance())
-            }
+        currentCheck = number
+        when (number) {
             1 -> {
+                updateDeploymentState(DeploymentState.Guardian.SolarPanel)
+                startFragment(GuardianSolarPanelFragment.newInstance())
+            }
+            2 -> {
                 updateDeploymentState(DeploymentState.Guardian.Register)
                 startFragment(GuardianRegisterFragment.newInstance())
             }
-            2 -> {
-                updateDeploymentState(DeploymentState.Guardian.Locate)
+            3 -> {
+                updateDeploymentState(DeploymentState.Guardian.Signal)
                 startFragment(GuardianSignalFragment.newInstance())
             }
-            3 -> {
+            4 -> {
+                updateDeploymentState(DeploymentState.Guardian.Microphone)
+                startFragment(GuardianMicrophoneFragment.newInstance())
+            }
+            5 -> {
                 this._profiles = profileDb.getProfiles()
                 updateDeploymentState(DeploymentState.Guardian.Config)
                 startFragment(GuardianSelectProfileFragment.newInstance())
             }
-            4 -> {
-                updateDeploymentState(DeploymentState.Guardian.SolarPanel)
-                startFragment(GuardianMicrophoneFragment.newInstance())
-            }
-            5 -> {
-                updateDeploymentState(DeploymentState.Guardian.Signal)
-                startFragment(GuardianSolarPanelFragment.newInstance())
-            }
             6 -> {
-                updateDeploymentState(DeploymentState.Guardian.Microphone)
+                updateDeploymentState(DeploymentState.Guardian.Locate)
                 startFragment(LocationFragment.newInstance())
             }
             7 -> {
@@ -293,11 +268,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         }
     }
 
-    private fun handleStepView(currentStep: Int) {
-        guardianStepView.setStepUnSelected(beforeStep)
-        guardianStepView.setStepSelected(currentStep)
-        guardianStepRecyclerView.smoothScrollToPosition(currentStep * 2)
-    }
+    override fun getPassedChecks(): List<Int> = passedChecks
 
     private fun startFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
@@ -334,8 +305,21 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         loadingDialog?.dismissDialog()
     }
 
+    override fun showToolbar() {
+        toolbar.visibility = View.VISIBLE
+    }
+
+    override fun hideToolbar() {
+        toolbar.visibility = View.GONE
+    }
+
+    override fun setToolbarTitle() {
+        supportActionBar?.apply {
+            title = currentCheckName
+        }
+    }
+
     override fun startMapPicker(latitude: Double, longitude: Double, name: String) {
-        hideStepView()
         setLatLng(latitude, longitude)
         startFragment(MapPickerFragment.newInstance(latitude, longitude, name))
     }
@@ -392,15 +376,20 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         return listForGuardian
     }
 
-    override fun showSyncButton() { /* not used */ }
+    override fun showSyncButton() { /* not used */
+    }
 
-    override fun hideSyncButton() { /* not used */ }
+    override fun hideSyncButton() { /* not used */
+    }
 
-    override fun syncPrefs() {/* not used */}
+    override fun syncPrefs() {/* not used */
+    }
 
-    override fun showSuccessResponse() { /* not used */ }
+    override fun showSuccessResponse() { /* not used */
+    }
 
-    override fun showFailedResponse() { /* not used */ }
+    override fun showFailedResponse() { /* not used */
+    }
 
     override fun setEditor(editor: SharedPreferences.Editor) {
         this.prefsEditor = editor

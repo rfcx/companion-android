@@ -18,16 +18,18 @@ import com.google.gson.JsonArray
 import kotlinx.android.synthetic.main.fragment_guardian_configure.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
+import org.rfcx.audiomoth.entity.Screen
 import org.rfcx.audiomoth.entity.guardian.GuardianConfiguration
 import org.rfcx.audiomoth.entity.guardian.GuardianProfile
 import org.rfcx.audiomoth.entity.guardian.toListForGuardian
 import org.rfcx.audiomoth.entity.socket.response.Status
+import org.rfcx.audiomoth.util.Analytics
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
 import org.rfcx.audiomoth.view.prefs.GuardianPrefsFragment
 import org.rfcx.audiomoth.view.prefs.SyncPreferenceListener
 
 class GuardianConfigureFragment : Fragment() {
-
+    private val analytics by lazy { context?.let { Analytics(it) } }
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
     private var syncPreferenceListener: SyncPreferenceListener? = null
 
@@ -68,7 +70,10 @@ class GuardianConfigureFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        deploymentProtocol?.hideCompleteButton()
+        deploymentProtocol?.let {
+            it.showToolbar()
+            it.setToolbarTitle()
+        }
 
         profile = deploymentProtocol?.getProfile()
 
@@ -304,6 +309,11 @@ class GuardianConfigureFragment : Fragment() {
                 dialog.show()
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        analytics?.trackScreen(Screen.GUARDIAN_CONFIGURE)
     }
 
     companion object {

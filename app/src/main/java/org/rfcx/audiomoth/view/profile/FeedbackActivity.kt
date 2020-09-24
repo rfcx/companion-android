@@ -27,6 +27,7 @@ import kotlinx.android.synthetic.main.activity_feedback.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.adapter.BaseListItem
+import org.rfcx.audiomoth.entity.Screen
 import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.util.*
 
@@ -37,6 +38,7 @@ class FeedbackActivity : AppCompatActivity() {
     private val feedbackImageAdapter by lazy { FeedbackImageAdapter() }
     private var pathListArray: List<String>? = null
     private var menuAll: Menu? = null
+    private val analytics by lazy { Analytics(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -261,6 +263,11 @@ class FeedbackActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true
+    }
+
+    override fun onResume() {
+        super.onResume()
+        analytics.trackScreen(Screen.FEEDBACK)
     }
 }
 

@@ -12,6 +12,8 @@ import kotlinx.android.synthetic.main.fragment_profile.*
 import org.rfcx.audiomoth.BuildConfig
 import org.rfcx.audiomoth.MainActivityListener
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.Screen
+import org.rfcx.audiomoth.util.Analytics
 import org.rfcx.audiomoth.util.getCoordinatesFormat
 import org.rfcx.audiomoth.util.getDefaultSiteName
 import org.rfcx.audiomoth.util.getUserNickname
@@ -19,6 +21,7 @@ import org.rfcx.audiomoth.view.profile.coordinates.CoordinatesActivity
 
 class ProfileFragment : Fragment() {
     lateinit var listener: MainActivityListener
+    private val analytics by lazy { context?.let { Analytics(it) } }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -75,6 +78,7 @@ class ProfileFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         formatCoordinatesTextView.text = context?.getCoordinatesFormat()
+        analytics?.trackScreen(Screen.PROFILE)
     }
 
     companion object {

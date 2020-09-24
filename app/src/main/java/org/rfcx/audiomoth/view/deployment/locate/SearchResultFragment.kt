@@ -14,12 +14,14 @@ import java.util.*
 import kotlinx.android.synthetic.main.layout_search_result.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.adapter.BaseListItem
+import org.rfcx.audiomoth.entity.Screen
+import org.rfcx.audiomoth.util.Analytics
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class SearchResultFragment : Fragment() {
-
+    private val analytics by lazy { context?.let { Analytics(it) } }
     private var mapBoxGeoCoding: MapboxGeocoding? = null
 
     private val searchLocationResultAdapter =
@@ -183,6 +185,11 @@ class SearchResultFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         mapBoxGeoCoding?.cancelCall()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        analytics?.trackScreen(Screen.MAP_SEARCH_RESULT)
     }
 
     interface OnSearchResultListener {

@@ -7,6 +7,7 @@ import org.rfcx.audiomoth.view.deployment.BaseDeploymentProtocol
 
 interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun startSetupConfigure(profile: GuardianProfile)
+    fun startCheckList()
 
     fun backToConfigure()
 
@@ -15,15 +16,26 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getDeployment(): GuardianDeployment?
     fun getConfiguration(): GuardianConfiguration?
     fun getSampleRate(): Int
+    fun getWifiName(): String
+
+    fun setReadyToDeploy()
 
     fun setProfile(profile: GuardianProfile)
     fun setDeploymentConfigure(profile: GuardianProfile)
     fun setDeployment(deployment: GuardianDeployment)
     fun setDeploymentWifiName(name: String)
     fun setSampleRate(sampleRate: Int)
+    fun setImages(images: List<String>)
 
-    fun canDeploy(): Boolean
+    fun setCurrentPage(name: String)
+
+    fun handleCheckClicked(number: Int)
+    fun getPassedChecks(): List<Int>
 
     fun showLoading()
     fun hideLoading()
+
+    fun showToolbar()
+    fun hideToolbar()
+    fun setToolbarTitle()
 }

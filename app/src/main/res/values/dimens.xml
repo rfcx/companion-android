@@ -43,4 +43,7 @@
     <dimen name="margin_divider">15dp</dimen>
     <dimen name="margin_step">12dp</dimen>
 
+    <!-- CheckList -->
+    <dimen name="padding_top_header">12dp</dimen>
+
 </resources>
