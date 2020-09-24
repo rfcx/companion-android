@@ -9,6 +9,7 @@
         <item name="android:textSize">@dimen/text_medium</item>
         <item name="titleTextColor">@android:color/white</item>
         <item name="android:windowLightStatusBar">true</item>
+        <item name="fontFamily">@font/lato_regular</item>
     </style>
 
     <style name="AppTheme.Toolbar" parent="Theme.MaterialComponents.Light.DarkActionBar">
