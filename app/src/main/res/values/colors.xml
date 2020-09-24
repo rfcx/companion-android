@@ -3,6 +3,7 @@
     <color name="backgroundColor">#ffffff</color>
     <color name="backgroundImageCard">@color/grey_light</color>
     <color name="lineColor">#F0F0F0</color>
+    <color name="searchColor">@color/white</color>
 
     <color name="colorPrimary">#2AA841</color>
     <color name="colorPrimaryDark">#ff2c9a46</color>

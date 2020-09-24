@@ -3,6 +3,7 @@
     <color name="backgroundColor">#141525</color>
     <color name="backgroundImageCard">#232436</color>
     <color name="lineColor">#232436</color>
+    <color name="searchColor">#3b3e53</color>
 
     <color name="colorPrimary">#2AA841</color>
     <color name="colorPrimaryDark">#ff2c9a46</color>
