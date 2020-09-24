@@ -32,6 +32,12 @@ class SelectProfileFragment : Fragment(), (Profile) -> Unit {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        edgeDeploymentProtocol?.let {
+            it.showToolbar()
+            it.setToolbarTitle()
+        }
+
         setupView()
         retrieveProfiles()
     }
@@ -42,8 +48,6 @@ class SelectProfileFragment : Fragment(), (Profile) -> Unit {
     }
 
     private fun setupView() {
-        edgeDeploymentProtocol?.hideCompleteButton()
-
         createNewButton.setOnClickListener {
             edgeDeploymentProtocol?.startSetupConfigure(Profile.default()) // new profile
         }

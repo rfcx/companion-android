@@ -23,8 +23,7 @@ class ChooseDeviceFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        edgeDeploymentProtocol?.hideCompleteButton()
-        edgeDeploymentProtocol?.hideStepView()
+        edgeDeploymentProtocol?.hideToolbar()
 
         edgeImageView.setOnClickListener {
             edgeDeploymentProtocol?.openWithEdgeDevice()
