@@ -85,6 +85,10 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
             retryCountdown(SCAN)
             wifiHotspotManager.nearbyHotspot(this)
         }
+
+        connectInstructionText.setOnClickListener {
+            deploymentProtocol?.showConnectInstruction()
+        }
     }
 
     override fun invoke(hotspot: ScanResult) {
@@ -96,7 +100,6 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
         hideLoading()
         hideNotFound()
         hideRetry()
-        wifiHotspotManager.unRegisterReceiver()
         countDownTimer.cancel()
         guardianHotspotAdapter.items = result
     }

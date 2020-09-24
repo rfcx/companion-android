@@ -38,6 +38,7 @@ import org.rfcx.audiomoth.view.deployment.locate.MapPickerFragment
 import org.rfcx.audiomoth.view.detail.MapPickerProtocol
 import org.rfcx.audiomoth.view.dialog.CompleteFragment
 import org.rfcx.audiomoth.view.dialog.CompleteListener
+import org.rfcx.audiomoth.view.dialog.ConnectInstructionDialogFragment
 import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
 import org.rfcx.audiomoth.view.prefs.SyncPreferenceListener
 import java.util.*
@@ -281,6 +282,15 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         this._deployment?.let { deploymentDb.updateDeployment(it) }
     }
 
+    override fun showConnectInstruction() {
+        val instructionDialog: ConnectInstructionDialogFragment =
+            supportFragmentManager.findFragmentByTag(TAG_INSTRUCTION_DIALOG) as ConnectInstructionDialogFragment?
+                ?: run {
+                    ConnectInstructionDialogFragment()
+                }
+        instructionDialog.show(supportFragmentManager, TAG_INSTRUCTION_DIALOG)
+    }
+
     override fun showLoading() {
         val loadingDialog: LoadingDialogFragment =
             supportFragmentManager.findFragmentByTag(TAG_LOADING_DIALOG) as LoadingDialogFragment?
@@ -347,6 +357,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     }
 
     companion object {
+        private const val TAG_INSTRUCTION_DIALOG = "TAG_INSTRUCTION_DIALOG"
         private const val TAG_LOADING_DIALOG = "TAG_LOADING_DIALOG"
         private const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
 

@@ -45,6 +45,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/instruction"
+        android:drawableEnd="@drawable/ic_help"
+        android:drawablePadding="@dimen/margin_padding_xsmall"
         android:layout_marginBottom="@dimen/margin_padding_small"
         app:layout_constraintBottom_toTopOf="@id/connectGuardianButton"
         app:layout_constraintStart_toStartOf="@id/connectGuardianButton"
