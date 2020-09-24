@@ -125,10 +125,13 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
     private fun showLoading() {
         connectGuardianLoading?.visibility = View.VISIBLE
         connectGuardianButton.isEnabled = false
+        connectGuardianButton.visibility = View.VISIBLE
+        guardianHotspotRecyclerView.visibility = View.INVISIBLE
     }
 
     private fun hideLoading() {
         connectGuardianLoading.visibility = View.INVISIBLE
+        guardianHotspotRecyclerView.visibility = View.VISIBLE
     }
 
     private fun showRetry() {
