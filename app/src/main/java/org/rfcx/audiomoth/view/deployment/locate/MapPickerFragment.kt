@@ -29,6 +29,8 @@ import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
+import java.util.*
+import kotlin.concurrent.schedule
 import kotlinx.android.synthetic.main.fragment_map_picker.*
 import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.audiomoth.R
@@ -39,8 +41,6 @@ import org.rfcx.audiomoth.util.longitudeCoordinates
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment.Companion.DEFAULT_ZOOM
 import org.rfcx.audiomoth.view.detail.EditLocationActivityListener
 import org.rfcx.audiomoth.view.detail.MapPickerProtocol
-import java.util.*
-import kotlin.concurrent.schedule
 
 class MapPickerFragment : Fragment(), OnMapReadyCallback,
     SearchResultFragment.OnSearchResultListener {

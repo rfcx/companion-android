@@ -4,10 +4,10 @@ import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
 import io.realm.kotlin.deleteFromRealm
+import java.util.*
 import org.rfcx.audiomoth.entity.*
 import org.rfcx.audiomoth.entity.response.EdgeDeploymentResponse
 import org.rfcx.audiomoth.entity.response.toEdgeDeployment
-import java.util.*
 
 /**
  * For Manage the saving and sending of deployment from the local database

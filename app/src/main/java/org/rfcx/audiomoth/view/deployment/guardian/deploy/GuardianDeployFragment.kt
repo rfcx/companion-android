@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_deploy.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.entity.Screen
 import org.rfcx.audiomoth.util.Analytics
 import org.rfcx.audiomoth.view.deployment.BaseImageFragment

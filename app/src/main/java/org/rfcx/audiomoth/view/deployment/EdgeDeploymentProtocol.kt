@@ -7,10 +7,6 @@ interface EdgeDeploymentProtocol : BaseDeploymentProtocol {
     fun openWithEdgeDevice()
     fun openWithGuardianDevice()
 
-    fun hideCompleteButton()
-    fun showCompleteButton()
-    fun setCompleteTextButton(text: String)
-
     fun startSetupConfigure(profile: Profile)
     fun startSyncing(status: String)
     fun startCheckBattery(status: String, level: Int?)
@@ -19,11 +15,6 @@ interface EdgeDeploymentProtocol : BaseDeploymentProtocol {
     fun getProfile(): Profile?
     fun getDeployment(): EdgeDeployment?
     fun geConfiguration(): EdgeConfiguration?
-
-    fun hideStepView()
-    fun showStepView()
-
-    fun setReadyToDeploy(images: List<String>)
 
     fun setDeployment(deployment: EdgeDeployment)
     fun setProfile(profile: Profile)

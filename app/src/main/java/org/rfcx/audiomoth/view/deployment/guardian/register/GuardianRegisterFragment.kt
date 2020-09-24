@@ -107,5 +107,4 @@ class GuardianRegisterFragment : Fragment() {
             return GuardianRegisterFragment()
         }
     }
-
 }

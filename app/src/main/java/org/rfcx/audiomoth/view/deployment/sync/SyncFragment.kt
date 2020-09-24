@@ -37,6 +37,12 @@ class SyncFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        edgeDeploymentProtocol?.let {
+            it.showToolbar()
+            it.setToolbarTitle()
+        }
+
         when (status) {
             BEFORE_SYNC -> beforeSync()
             AFTER_SYNC -> afterSync()
@@ -44,7 +50,6 @@ class SyncFragment : Fragment() {
     }
 
     private fun beforeSync() {
-        edgeDeploymentProtocol?.hideCompleteButton()
         nextButton.isSoundEffectsEnabled = false
 
         nextButton.setOnClickListener {

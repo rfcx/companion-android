@@ -25,11 +25,11 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
-import org.rfcx.audiomoth.util.spectrogram.AudioSpectrogramUtils
 import kotlin.math.log10
 import kotlin.math.max
 import kotlin.math.pow
 import kotlin.math.roundToInt
+import org.rfcx.audiomoth.util.spectrogram.AudioSpectrogramUtils
 
 class FrequencyView : View {
 
@@ -129,10 +129,10 @@ class FrequencyView : View {
             var j = getValueFromRelativePosition(
                 (_height - i).toFloat() / _height,
                 1f,
-                samplingRate.toFloat()/2,
+                samplingRate.toFloat() / 2,
                 logFrequency
             )
-            j /= samplingRate.toFloat()/2
+            j /= samplingRate.toFloat() / 2
             if (_magnitudes != null) {
                 val mag = _magnitudes!![(j * _magnitudes!!.size / 2).toInt()]
                 val db =
@@ -245,5 +245,4 @@ class FrequencyView : View {
         val b = ave(Color.blue(c0), Color.blue(c1), p)
         return Color.argb(a, r, g, b)
     }
-
 }

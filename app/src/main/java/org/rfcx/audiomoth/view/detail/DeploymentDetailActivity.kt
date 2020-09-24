@@ -166,7 +166,6 @@ class DeploymentDetailActivity : BaseActivity() {
             customRecordingLabel.visibility = if (period.size != 0) View.VISIBLE else View.GONE
             timeLineRecycler.visibility = if (period.size != 0) View.VISIBLE else View.GONE
             setupTimeLineRecycler(period.toTypedArray())
-
         }
     }
 

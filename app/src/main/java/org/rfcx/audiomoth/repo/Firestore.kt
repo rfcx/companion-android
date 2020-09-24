@@ -4,6 +4,8 @@ import android.content.Context
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import java.sql.Timestamp
+import java.util.*
 import kotlinx.coroutines.tasks.await
 import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.Device
@@ -19,8 +21,6 @@ import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.audiomoth.util.Preferences
 import org.rfcx.audiomoth.util.Storage
 import org.rfcx.audiomoth.util.getEmailUser
-import java.sql.Timestamp
-import java.util.*
 
 class Firestore(val context: Context) {
     val db = Firebase.firestore
@@ -118,7 +118,7 @@ class Firestore(val context: Context) {
             .addOnSuccessListener {
                 val edgeResponses = arrayListOf<EdgeDeploymentResponse>()
                 val guardianResponses = arrayListOf<GuardianDeploymentResponse>()
-                //verify response
+                // verify response
                 it.documents.forEach { doc ->
                     if (doc == null) return@forEach
                     if (doc.getString("device") == Device.GUARDIAN.value) {

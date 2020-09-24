@@ -28,11 +28,17 @@ class DeployFragment : BaseImageFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        edgeDeploymentProtocol?.hideCompleteButton()
+
+        edgeDeploymentProtocol?.let {
+            it.showToolbar()
+            it.setToolbarTitle()
+        }
+
         setupImageRecycler()
         finishButton.setOnClickListener {
             val images = imageAdapter.getNewAttachImage()
-            edgeDeploymentProtocol?.setReadyToDeploy(images)
+            edgeDeploymentProtocol?.setImages(images)
+            edgeDeploymentProtocol?.nextStep()
         }
     }
 

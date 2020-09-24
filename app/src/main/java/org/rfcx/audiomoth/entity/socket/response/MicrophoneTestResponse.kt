@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 data class MicrophoneTestResponse(
     @SerializedName("microphone_test")
     val audioBuffer: AudioBuffer = AudioBuffer()
-): SocketResposne
+) : SocketResposne
 
 data class AudioBuffer(
     val amount: Int = 0,

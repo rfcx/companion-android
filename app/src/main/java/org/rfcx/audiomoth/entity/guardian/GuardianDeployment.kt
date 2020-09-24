@@ -8,7 +8,6 @@ import java.io.Serializable
 import java.util.*
 import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.Device
-import org.rfcx.audiomoth.entity.SyncState
 
 @RealmClass
 open class GuardianDeployment(
