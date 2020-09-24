@@ -5,13 +5,13 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import io.realm.Realm
+import java.util.*
 import org.rfcx.audiomoth.entity.request.toRequestBody
 import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.repo.Firestore
 import org.rfcx.audiomoth.service.images.ImageSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
-import java.util.*
 
 /**
  * For syncing data to server. Ref from Ranger Android App
@@ -46,7 +46,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
             } else {
                 val deploymentLocation = it.location
                 deploymentLocation?.let { it1 ->
-                    if(it.deletedAt != null){
+                    if (it.deletedAt != null) {
                         firestore.updateDeleteDeployment(it.serverId!!, it.deletedAt!!)
                         db.markSent(it.serverId!!, it.id)
                     } else {

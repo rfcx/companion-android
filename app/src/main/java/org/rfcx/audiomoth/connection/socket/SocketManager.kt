@@ -3,22 +3,21 @@ package org.rfcx.audiomoth.connection.socket
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
+import java.io.DataInputStream
+import java.io.DataOutputStream
+import java.net.Socket
 import org.json.JSONObject
 import org.rfcx.audiomoth.entity.socket.request.*
 import org.rfcx.audiomoth.entity.socket.response.*
 import org.rfcx.audiomoth.util.MicrophoneTestUtils
 import org.rfcx.audiomoth.util.Preferences
-import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentActivity
-import java.io.DataInputStream
-import java.io.DataOutputStream
-import java.net.Socket
 
 object SocketManager {
 
     private var socket: Socket? = null
     private var outputStream: DataOutputStream? = null
     private var inputStream: DataInputStream? = null
-    private var clientThread: Thread? = null// Thread for socket communication
+    private var clientThread: Thread? = null // Thread for socket communication
 
     private lateinit var inComingMessageThread: Thread
 
@@ -314,12 +313,12 @@ object SocketManager {
     }
 
     fun stopConnection() {
-        //stop incoming message thread
+        // stop incoming message thread
         if (::inComingMessageThread.isInitialized) {
             inComingMessageThread.interrupt()
         }
 
-        //stop server thread
+        // stop server thread
         clientThread?.interrupt()
 
         outputStream?.close()

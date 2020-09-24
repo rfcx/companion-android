@@ -1,10 +1,10 @@
 package org.rfcx.audiomoth.view.map
 
+import java.util.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.EdgeDeployment
 import org.rfcx.audiomoth.entity.SyncState
 import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
-import java.util.*
 
 sealed class DeploymentDetailView {
     abstract val id: Int // edge deployment local id
@@ -12,7 +12,6 @@ sealed class DeploymentDetailView {
     abstract val latitude: Double
     abstract val longitude: Double
     abstract val viewType: Int
-
 
     data class EdgeDeploymentView(
         override val id: Int, // edge deployment local id
