@@ -23,7 +23,7 @@
             android:id="@+id/lineView"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:background="@color/grey_light"
+            android:background="@color/backgroundImageCard"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -47,8 +47,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin_padding_normal"
-            android:backgroundTint="@color/grey_light"
             android:scaleType="centerInside"
+            android:background="@color/transparent"
+            android:tint="@color/text_black"
             android:src="@drawable/ic_close_grey_600_24dp"
             app:layout_constraintBottom_toBottomOf="@id/lineView"
             app:layout_constraintEnd_toEndOf="@id/lineView"
