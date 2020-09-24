@@ -10,7 +10,7 @@ sealed class DeploymentState {
         }
     }
 
-    enum class Guardian(val key: Int){
+    enum class Guardian(val key: Int) {
         Connect(1), Register(2), Locate(3), Config(4), SolarPanel(5), Signal(6), Microphone(7), Checkin(8), Deploy(9), ReadyToUpload(10);
 
         companion object {

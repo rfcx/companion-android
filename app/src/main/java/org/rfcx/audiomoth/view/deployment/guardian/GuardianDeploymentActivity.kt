@@ -8,6 +8,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import io.realm.Realm
+import java.util.*
 import kotlinx.android.synthetic.main.activity_guardian_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
@@ -40,7 +41,6 @@ import org.rfcx.audiomoth.view.dialog.CompleteFragment
 import org.rfcx.audiomoth.view.dialog.CompleteListener
 import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
 import org.rfcx.audiomoth.view.prefs.SyncPreferenceListener
-import java.util.*
 
 class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtocol,
     CompleteListener, MapPickerProtocol, SyncPreferenceListener {
@@ -382,7 +382,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     override fun hideSyncButton() { /* not used */
     }
 
-    override fun syncPrefs() {/* not used */
+    override fun syncPrefs() { /* not used */
     }
 
     override fun showSuccessResponse() { /* not used */

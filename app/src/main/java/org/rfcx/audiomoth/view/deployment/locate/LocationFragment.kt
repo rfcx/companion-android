@@ -132,6 +132,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        deploymentProtocol?.let {
+            it.showToolbar()
+            it.setToolbarTitle()
+        }
+
         mapView = view.findViewById(R.id.mapBoxView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
@@ -154,14 +160,21 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
         changeTextView.setOnClickListener {
             val name = locationNameEditText.text.toString()
-            deploymentProtocol?.startMapPicker(latitude, longitude, name)
+            startMapPicker(name)
         }
 
         viewOfMapBox.setOnClickListener {
             if (newLocationRadioButton.isChecked) {
                 val name = locationNameEditText.text.toString()
-                deploymentProtocol?.startMapPicker(latitude, longitude, name)
+                startMapPicker(name)
             }
+        }
+    }
+
+    private fun startMapPicker(name: String) {
+        deploymentProtocol?.let {
+            it.startMapPicker(latitude, longitude, name)
+            it.hideToolbar()
         }
     }
 

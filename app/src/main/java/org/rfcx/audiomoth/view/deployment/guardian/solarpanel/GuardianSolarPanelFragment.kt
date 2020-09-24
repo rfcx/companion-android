@@ -15,6 +15,7 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import java.util.*
 import kotlinx.android.synthetic.main.fragment_guardian_solar_panel.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
@@ -22,8 +23,6 @@ import org.rfcx.audiomoth.entity.Screen
 import org.rfcx.audiomoth.entity.socket.response.SentinelInput
 import org.rfcx.audiomoth.util.Analytics
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentProtocol
-import java.util.*
-
 
 class GuardianSolarPanelFragment : Fragment() {
 
@@ -88,15 +87,15 @@ class GuardianSolarPanelFragment : Fragment() {
                 val current = input.current
                 val power = input.power
 
-                //set 3 top value
+                // set 3 top value
                 setVoltageValue(voltage)
                 setCurrentValue(current)
                 setPowerValue(power)
 
-                //update power and voltage to chart
+                // update power and voltage to chart
                 updateData(voltage, power)
 
-                //expand xAxis line
+                // expand xAxis line
                 expandXAxisLine()
 
                 solarFinishButton.isEnabled = true
@@ -132,7 +131,7 @@ class GuardianSolarPanelFragment : Fragment() {
     }
 
     private fun setFeedbackChart() {
-        //setup simple line chart
+        // setup simple line chart
         feedbackChart.apply {
             setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
             description.isEnabled = false /* description inside chart */
@@ -141,7 +140,7 @@ class GuardianSolarPanelFragment : Fragment() {
             setScaleEnabled(true)
         }
 
-        //set x axis
+        // set x axis
         feedbackChart.xAxis.apply {
             axisMaximum = X_AXIS_MAXIMUM
             axisMinimum = AXIS_MINIMUM
@@ -149,7 +148,7 @@ class GuardianSolarPanelFragment : Fragment() {
             position = XAxis.XAxisPosition.BOTTOM
         }
 
-        //set y axis
+        // set y axis
         feedbackChart.axisLeft.apply {
             axisMaximum = LEFT_AXIS_MAXIMUM
             axisMinimum = AXIS_MINIMUM
@@ -165,7 +164,7 @@ class GuardianSolarPanelFragment : Fragment() {
     }
 
     private fun setChartDataSetting() {
-        //set line data set
+        // set line data set
         voltageLineDataSet = LineDataSet(arrayListOf<Entry>(), "Voltage").apply {
             setDrawIcons(false)
             color = Color.RED
@@ -201,24 +200,24 @@ class GuardianSolarPanelFragment : Fragment() {
 
     private fun updateData(voltage: Int, power: Int) {
         val pair = convertVoltageAndPowerToEntry(voltage, power)
-        //get voltage data set
+        // get voltage data set
         voltageLineDataSet = feedbackChart.data.getDataSetByIndex(0) as LineDataSet
         voltageLineDataSet.addEntry(pair.first)
         voltageLineDataSet.notifyDataSetChanged()
 
-        //get power data set
+        // get power data set
         powerLineDataSet = feedbackChart.data.getDataSetByIndex(1) as LineDataSet
         powerLineDataSet.addEntry(pair.second)
         powerLineDataSet.notifyDataSetChanged()
 
-        //notify and re-view
+        // notify and re-view
         feedbackChart.data.notifyDataChanged()
         feedbackChart.notifyDataSetChanged()
         feedbackChart.invalidate()
     }
 
     private fun expandXAxisLine() {
-        //both voltage and power will have the same size
+        // both voltage and power will have the same size
         val voltageDataSet = feedbackChart.data.getDataSetByIndex(0) as LineDataSet
         if (voltageDataSet.entryCount > X_AXIS_MAXIMUM) {
             feedbackChart.xAxis.axisMaximum = voltageDataSet.entryCount.toFloat()

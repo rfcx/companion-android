@@ -1,16 +1,15 @@
 package org.rfcx.audiomoth.util.spectrogram
 
-import org.jtransforms.fft.FloatFFT_1D
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
 import kotlin.math.min
 import kotlin.math.sqrt
-
+import org.jtransforms.fft.FloatFFT_1D
 
 object AudioSpectrogramUtils {
 
-    private enum class ScrollSpeed(val value: Int) { FAST(256), NORMAL(1024), SLOW(4096)}
+    private enum class ScrollSpeed(val value: Int) { FAST(256), NORMAL(1024), SLOW(4096) }
 
     private var fftResolution = 256
 

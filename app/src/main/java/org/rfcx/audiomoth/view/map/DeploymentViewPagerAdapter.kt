@@ -1,6 +1,5 @@
 package org.rfcx.audiomoth.view.map
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,13 +7,12 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import java.util.*
 import kotlinx.android.synthetic.main.item_deployment_detail.view.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.DeploymentState
 import org.rfcx.audiomoth.util.Battery
-import org.rfcx.audiomoth.util.getIntColor
 import org.rfcx.audiomoth.util.toDateString
-import java.util.*
 
 interface DeploymentDetailClickListener {
     fun onClickedMoreIcon(edgeDeploymentView: DeploymentDetailView.EdgeDeploymentView)
@@ -99,7 +97,7 @@ class EdgeDeploymentDetailViewHolder(
         )
         val estimatedBatteryDays =
             Battery.getEstimatedBatteryDays(deployment.batteryDepletedAt.time)
-        batteryComponent.levelBattery = if(estimatedBatteryDays >= 0) estimatedBatteryDays else -1
+        batteryComponent.levelBattery = if (estimatedBatteryDays >= 0) estimatedBatteryDays else -1
 
         tvGuardianBadge.visibility = View.GONE
         tvLocation.text = deployment.locationName
@@ -191,28 +189,28 @@ class DeploymentDetailViewDiffCallback : DiffUtil.ItemCallback<DeploymentDetailV
         return when {
             oldItem is DeploymentDetailView.EdgeDeploymentView
                     && newItem is DeploymentDetailView.EdgeDeploymentView -> {
-                oldItem.batteryDepletedAt == newItem.batteryDepletedAt
-                        && oldItem.batteryLevel == newItem.batteryLevel
-                        && oldItem.createdAt == newItem.createdAt
-                        && oldItem.deletedAt == newItem.deletedAt
-                        && oldItem.deployedAt == newItem.deployedAt
-                        && oldItem.state == newItem.state
-                        && oldItem.syncState == newItem.syncState
-                        && oldItem.deploymentId == newItem.deploymentId
-                        && oldItem.locationName == newItem.locationName
-                        && oldItem.longitude == newItem.longitude
-                        && oldItem.latitude == newItem.latitude
+                oldItem.batteryDepletedAt == newItem.batteryDepletedAt &&
+                        oldItem.batteryLevel == newItem.batteryLevel &&
+                        oldItem.createdAt == newItem.createdAt &&
+                        oldItem.deletedAt == newItem.deletedAt &&
+                        oldItem.deployedAt == newItem.deployedAt &&
+                        oldItem.state == newItem.state &&
+                        oldItem.syncState == newItem.syncState &&
+                        oldItem.deploymentId == newItem.deploymentId &&
+                        oldItem.locationName == newItem.locationName &&
+                        oldItem.longitude == newItem.longitude &&
+                        oldItem.latitude == newItem.latitude
             }
             oldItem is DeploymentDetailView.GuardianDeploymentView
                     && newItem is DeploymentDetailView.GuardianDeploymentView -> {
-                oldItem.createdAt == newItem.createdAt
-                        && oldItem.deployedAt == newItem.deployedAt
-                        && oldItem.state == newItem.state
-                        && oldItem.syncState == newItem.syncState
-                        && oldItem.wifiName == newItem.wifiName
-                        && oldItem.locationName == newItem.locationName
-                        && oldItem.longitude == newItem.longitude
-                        && oldItem.latitude == newItem.latitude
+                oldItem.createdAt == newItem.createdAt &&
+                        oldItem.deployedAt == newItem.deployedAt &&
+                        oldItem.state == newItem.state &&
+                        oldItem.syncState == newItem.syncState &&
+                        oldItem.wifiName == newItem.wifiName &&
+                        oldItem.locationName == newItem.locationName &&
+                        oldItem.longitude == newItem.longitude &&
+                        oldItem.latitude == newItem.latitude
             }
             else -> false
         }

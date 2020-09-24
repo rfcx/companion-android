@@ -29,6 +29,14 @@
         <item>Medium - High</item>
         <item>High</item>
     </string-array>
+
+    <string-array name="edge_setup_checks">
+        <item>Locate</item>
+        <item>Config</item>
+        <item>Sync</item>
+        <item>Verify</item>
+        <item>Deploy</item>
+    </string-array>
     
     <!--  Guardian  -->
     <string-array name="guardian_steps">

@@ -6,7 +6,6 @@ import android.media.AudioManager
 import android.media.AudioTrack
 import android.os.Build
 import android.util.Base64
-import android.util.Log
 
 class MicrophoneTestUtils {
     private var sampleRate = 24000

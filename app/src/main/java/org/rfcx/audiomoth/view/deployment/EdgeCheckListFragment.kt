@@ -1,4 +1,4 @@
-package org.rfcx.audiomoth.view.deployment.guardian
+package org.rfcx.audiomoth.view.deployment
 
 import android.content.Context
 import android.os.Bundle
@@ -7,21 +7,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.fragment_guardian_checklist.*
+import kotlinx.android.synthetic.main.fragment_edge_checklist.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.adapter.CheckListItem
-import org.rfcx.audiomoth.connection.socket.SocketManager
-import org.rfcx.audiomoth.view.deployment.CheckListAdapter
 
-class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
+class EdgeCheckListFragment : Fragment(), (Int, String) -> Unit {
 
-    private var deploymentProtocol: GuardianDeploymentProtocol? = null
+    private var deploymentProtocol: EdgeDeploymentProtocol? = null
 
     private val checkListRecyclerView by lazy { CheckListAdapter(this) }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        deploymentProtocol = (context as GuardianDeploymentProtocol)
+        deploymentProtocol = (context as EdgeDeploymentProtocol)
     }
 
     override fun onCreateView(
@@ -29,7 +27,7 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_guardian_checklist, container, false)
+        return inflater.inflate(R.layout.fragment_edge_checklist, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -37,9 +35,7 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
 
         deploymentProtocol?.hideToolbar()
 
-        setGuardianName()
-
-        guardianCheckListRecyclerView.apply {
+        edgeCheckListRecyclerView.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             adapter = checkListRecyclerView
         }
@@ -50,16 +46,10 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
             checkListRecyclerView.setCheckPassed(number)
         }
 
-        checklistDeployButton.isEnabled = checkListRecyclerView.isEveryCheckListPassed()
-        checklistDeployButton.setOnClickListener {
+        edgeChecklistDeployButton.isEnabled = checkListRecyclerView.isEveryCheckListPassed()
+        edgeChecklistDeployButton.setOnClickListener {
             deploymentProtocol?.setReadyToDeploy()
-            SocketManager.stopConnection()
         }
-    }
-
-    private fun setGuardianName() {
-        val wifi = deploymentProtocol?.getWifiName()
-        guardianIdTextView.text = wifi
     }
 
     override fun invoke(number: Int, name: String) {
@@ -71,24 +61,10 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
         val checkList = arrayListOf<CheckListItem>()
         var number = 0
 
-        checkList.add(CheckListItem.Header("Assembly"))
-        val assemblyChecks = requireContext().resources.getStringArray(R.array.guardian_assembly_checks).toList()
-        assemblyChecks.forEach { name ->
-            checkList.add(CheckListItem.CheckItem(number, name, isRequired = false))
-            number++
-        }
-
         checkList.add(CheckListItem.Header("Setup"))
-        val setupChecks = requireContext().resources.getStringArray(R.array.guardian_setup_checks).toList()
+        val setupChecks = requireContext().resources.getStringArray(R.array.edge_setup_checks).toList()
         setupChecks.forEach { name ->
             checkList.add(CheckListItem.CheckItem(number, name, isRequired = true))
-            number++
-        }
-
-        checkList.add(CheckListItem.Header("Optional"))
-        val optionalChecks = requireContext().resources.getStringArray(R.array.guardian_optional_checks).toList()
-        optionalChecks.forEach { name ->
-            checkList.add(CheckListItem.CheckItem(number, name, isRequired = false))
             number++
         }
 
@@ -96,8 +72,8 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
     }
 
     companion object {
-        fun newInstance(): GuardianCheckListFragment {
-            return GuardianCheckListFragment()
+        fun newInstance(): EdgeCheckListFragment {
+            return EdgeCheckListFragment()
         }
     }
 }

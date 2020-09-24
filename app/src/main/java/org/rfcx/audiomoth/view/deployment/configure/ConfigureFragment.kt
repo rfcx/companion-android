@@ -58,10 +58,14 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        edgeDeploymentProtocol?.let {
+            it.showToolbar()
+            it.setToolbarTitle()
+        }
+
         view.viewTreeObserver.addOnGlobalLayoutListener { setOnFocusEditText() }
 
         profile = edgeDeploymentProtocol?.getProfile()
-        edgeDeploymentProtocol?.hideCompleteButton()
 
         if (profile?.name != null) {
             profileEditText.setText(profile?.name)

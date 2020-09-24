@@ -123,7 +123,6 @@ class StepViewAdapter(private val onStepClickListener: (Int) -> Unit) :
                 stepCircle.background =
                     ContextCompat.getDrawable(itemView.context, R.drawable.circle_step_passed)
                 itemView.isEnabled = true
-
             } else if (step.isSelected) {
                 stepNumber.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
                 stepNumber.text = step.number.toString()

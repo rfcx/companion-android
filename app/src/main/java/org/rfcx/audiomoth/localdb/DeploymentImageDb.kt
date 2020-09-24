@@ -3,16 +3,13 @@ package org.rfcx.audiomoth.localdb
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
-import org.rfcx.audiomoth.entity.EdgeDeployment
 import org.rfcx.audiomoth.entity.DeploymentImage
 import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_ID
 import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_SERVER_ID
 import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_ID
-import org.rfcx.audiomoth.entity.Locate
+import org.rfcx.audiomoth.entity.EdgeDeployment
 import org.rfcx.audiomoth.entity.SyncState
 import org.rfcx.audiomoth.entity.response.DeploymentImageResponse
-import org.rfcx.audiomoth.entity.response.LocationResponse
-import org.rfcx.audiomoth.entity.response.toLocate
 
 class DeploymentImageDb(private val realm: Realm) {
     /**
@@ -133,7 +130,6 @@ class DeploymentImageDb(private val realm: Realm) {
             }
         }
     }
-
 
     fun insertOrUpdate(deploymentImageResponse: DeploymentImageResponse, deploymentId: Int?) {
         realm.executeTransaction {
