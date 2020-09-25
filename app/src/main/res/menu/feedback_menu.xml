@@ -6,7 +6,7 @@
     <item
         android:id="@+id/attachView"
         android:icon="@drawable/ic_attach_file"
-        app:iconTint="@color/text_black"
+        app:iconTint="@color/iconColor"
         app:showAsAction="always"
         tools:ignore="MenuTitle">
         <menu>
