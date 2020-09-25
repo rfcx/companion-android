@@ -180,12 +180,6 @@
         <item name="android:textSize">@dimen/text_small</item>
     </style>
 
-    <!-- SwitchCompat -->
-    <style name="SwitchCompatStyle">
-        <item name="thumbTint">@color/switch_color</item>
-        <item name="showText">false</item>
-    </style>
-
     <!-- Toolbar -->
     <style name="Toolbar.TitleText" parent="Widget.MaterialComponents.Toolbar.Primary">
         <item name="android:textSize">18sp</item>
