@@ -177,7 +177,7 @@
 
     <!-- ConnectGuardianFragment -->
     <string name="nearby_guardians">Nearby Guardian(s)</string>
-    <string name="connecting_up">Connecting up\nSearching for nearby\n Guardians</string>
+    <string name="connecting_up">Searching for nearby\n Guardians</string>
     <string name="instruction">Why can\'t I see a guardian</string>
     <string name="connect">Connect</string>
     <string name="retry">Retry</string>
