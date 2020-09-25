@@ -2,7 +2,7 @@
 <resources>
     <color name="backgroundColor">#141525</color>
     <color name="backgroundImageCard">#232436</color>
-    <color name="lineColor">#232436</color>
+    <color name="separateLine">#45485D</color>
     <color name="searchColor">#3b3e53</color>
 
     <color name="colorPrimary">#2AA841</color>
