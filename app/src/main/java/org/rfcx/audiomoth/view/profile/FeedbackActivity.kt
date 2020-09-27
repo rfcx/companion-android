@@ -124,7 +124,7 @@ class FeedbackActivity : AppCompatActivity() {
                 ContextCompat.getColor(this, R.color.colorPrimary)
             ) else DrawableCompat.setTint(
                 wrapDrawable,
-                ContextCompat.getColor(this, android.R.color.darker_gray)
+                ContextCompat.getColor(this, R.color.disableColor)
             )
         }
     }

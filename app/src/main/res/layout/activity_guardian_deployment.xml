@@ -6,6 +6,7 @@
     android:id="@+id/guardianRootView"
     android:layout_height="match_parent"
     android:background="@color/backgroundColor"
+    android:fitsSystemWindows="true"
     tools:context=".view.deployment.guardian.GuardianDeploymentActivity">
 
     <include

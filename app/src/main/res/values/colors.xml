@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="backgroundColor">#ffffff</color>
+    <color name="backgroundColor">@color/white</color>
+    <color name="backgroundImageCard">@color/grey_light</color>
+    <color name="separateLine">@color/grey_light</color>
+    <color name="searchColor">@color/white</color>
+    <color name="iconColor">#000000</color>
+    <color name="bottomBar">@color/white</color>
+    <color name="disableColor">#aaa</color>
 
     <color name="colorPrimary">#2AA841</color>
     <color name="colorPrimaryDark">#ff2c9a46</color>

@@ -125,7 +125,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
             preferences.putBoolean(Preferences.IS_FIRST_TIME, false)
 
             SimpleTooltip.Builder(this)
-                .arrowColor(ContextCompat.getColor(this, R.color.white))
+                .arrowColor(ContextCompat.getColor(this, R.color.backgroundColor))
                 .anchorView(createLocationButton)
                 .text(getString(R.string.setup_first_device, this.getUserNickname()))
                 .gravity(Gravity.TOP)
@@ -146,8 +146,6 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         menuProfile.setOnClickListener {
             onBottomMenuClick(it)
         }
-
-        menuMap.performClick()
     }
 
     private fun onBottomMenuClick(menu: View) {
