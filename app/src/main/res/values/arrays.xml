@@ -67,6 +67,14 @@
         <item>Deploy</item>
     </string-array>
 
+    <string-array name="guardian_connect_instructions">
+        <item>Power guardian up</item>
+        <item>Enter guardian application</item>
+        <item>Enter preferences menu on top right</item>
+        <item>Make sure "admin_enable_wifi" is true</item>
+        <item>Let\'s waiting guardian to be scanned</item>
+    </string-array>
+
     <string-array name="bitrate_entries">
         <item>4 kbps</item>
         <item>8 kbps</item>
