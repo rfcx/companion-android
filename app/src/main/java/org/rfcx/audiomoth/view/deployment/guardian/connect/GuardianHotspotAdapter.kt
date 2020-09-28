@@ -5,6 +5,7 @@ import android.net.wifi.ScanResult
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_guardian_hotspot.view.*
 import org.rfcx.audiomoth.R
@@ -30,7 +31,7 @@ class GuardianHotspotAdapter(private val onHotspotClickListener: (ScanResult) ->
         if (selectedPosition == position) {
             holder.itemView.setBackgroundColor(Color.parseColor("#B57BBD89"))
         } else {
-            holder.itemView.setBackgroundColor(Color.parseColor("#FFFFFF"))
+            holder.itemView.setBackgroundColor(ContextCompat.getColor(holder.itemView.context, R.color.backgroundColor))
         }
         val hotspot = items[position]
         holder.bind(hotspot)
