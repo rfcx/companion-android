@@ -303,7 +303,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
 
         searchLayoutSearchEditText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
-                searchLayout.setBackgroundResource(R.color.white)
+                searchLayout.setBackgroundResource(R.color.backgroundColor)
                 searchViewActionLeftButton.visibility = View.VISIBLE
                 editLocationActivityListener?.hideAppbar()
                 showSearchFragment()

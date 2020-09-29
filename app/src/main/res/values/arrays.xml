@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!--  Common  -->
+    <string-array name="theme_more_than_9">
+        <item>Light</item>
+        <item>Dark</item>
+        <item>System default</item>
+    </string-array>
+
+    <string-array name="theme_less_than_10">
+        <item>Light</item>
+        <item>Dark</item>
+    </string-array>
+
     <!--  Edge  -->
     <string-array name="audiomoth_steps">
         <item>Locate</item>

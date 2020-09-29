@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/margin_padding_normal"
-        android:background="@color/white"
+        android:background="@color/backgroundColor"
         app:cardCornerRadius="8dp"
         app:cardUseCompatPadding="true">
 

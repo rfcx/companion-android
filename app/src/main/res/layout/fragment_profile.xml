@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/backgroundColor">
 
     <LinearLayout
         android:id="@+id/userProfileLayout"
@@ -64,7 +64,7 @@
         android:layout_width="match_parent"
         android:layout_height="10dp"
         android:layout_marginTop="@dimen/margin_padding_normal"
-        android:background="@color/grey_light"
+        android:background="@color/separateLine"
         app:layout_constraintTop_toBottomOf="@id/userProfileLayout" />
 
     <TextView
@@ -110,11 +110,59 @@
     </LinearLayout>
 
     <View
+        android:id="@+id/viewTopOnDarkModeTitle"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:background="@color/separateLine"
+        app:layout_constraintTop_toBottomOf="@id/coordinatesLinearLayout" />
+
+    <TextView
+        android:id="@+id/displayTextView"
+        style="@style/AudioMothText.Title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_small"
+        android:padding="@dimen/margin_padding_small"
+        android:text="@string/display"
+        android:textAllCaps="true"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/viewTopOnDarkModeTitle" />
+
+    <LinearLayout
+        android:id="@+id/darkThemeLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:orientation="vertical"
+        android:paddingStart="@dimen/margin_padding_normal"
+        android:paddingTop="@dimen/margin_padding_small"
+        android:paddingEnd="@dimen/margin_padding_normal"
+        android:paddingBottom="@dimen/margin_padding_small"
+        app:layout_constraintTop_toBottomOf="@id/displayTextView">
+
+        <TextView
+            android:id="@+id/darkThemeTextView"
+            style="@style/AudioMothText.SubTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@string/theme" />
+
+        <TextView
+            android:id="@+id/themeSelectTextView"
+            style="@style/AudioMothText.Body.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dark_theme" />
+
+    </LinearLayout>
+
+    <View
         android:id="@+id/view1"
         android:layout_width="match_parent"
         android:layout_height="10dp"
-        android:background="@color/grey_light"
-        app:layout_constraintTop_toBottomOf="@id/coordinatesLinearLayout" />
+        android:background="@color/separateLine"
+        app:layout_constraintTop_toBottomOf="@id/darkThemeLinearLayout" />
 
     <TextView
 
@@ -169,7 +217,7 @@
         android:layout_width="match_parent"
         android:layout_height="10dp"
         android:layout_marginTop="@dimen/margin_padding_small"
-        android:background="@color/grey_light"
+        android:background="@color/separateLine"
         app:layout_constraintTop_toBottomOf="@id/versionTextView" />
 
     <TextView
@@ -195,13 +243,5 @@
         android:text="@string/profile_sign_out_label"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/accountTextView" />
-
-    <View
-        android:id="@+id/view3"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="@color/grey_light"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/logoutTextView" />
-
+    
 </androidx.constraintlayout.widget.ConstraintLayout>
