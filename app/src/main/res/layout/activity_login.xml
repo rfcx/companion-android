@@ -20,7 +20,7 @@
         android:layout_height="@dimen/ic_audiomoth_size"
         android:layout_marginTop="@dimen/margin_padding_small"
         android:layout_marginBottom="@dimen/margin_padding_small"
-        android:src="@drawable/ic_audiomoth"
+        android:src="@drawable/ic_ic_logo_gray"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

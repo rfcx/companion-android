@@ -23,6 +23,8 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun setDeploymentWifiName(name: String)
     fun setSampleRate(sampleRate: Int)
 
+    fun showConnectInstruction()
+
     fun showLoading()
     fun hideLoading()
 }
