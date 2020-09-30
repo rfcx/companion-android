@@ -14,6 +14,9 @@ class CompanionRealmMigration : RealmMigration {
         if (oldVersion < 3L && newVersion >= 3L) {
             migrateToV3(realm)
         }
+        if (oldVersion < 4L && newVersion >= 4L) {
+            migrateToV4(realm)
+        }
     }
 
     private fun migrateToV2(realm: DynamicRealm) {
@@ -52,6 +55,20 @@ class CompanionRealmMigration : RealmMigration {
         val locate = realm.schema.get(Locate.TABLE_NAME)
         locate?.apply {
             addField(Locate.FIELD_DELETED_AT, Date::class.java)
+        }
+    }
+
+    private fun migrateToV4(realm: DynamicRealm) {
+        // Remove tables that were not used in AudioMoth version
+        realm.schema.remove("Profile")
+        realm.schema.remove("EdgeConfiguration")
+
+        // Remove fields that were not used in AudioMoth version
+        val edgeDeployment = realm.schema.get(EdgeDeployment.TABLE_NAME)
+        edgeDeployment?.apply {
+            removeField("configuration")
+            removeField("batteryLevel")
+            removeField("batteryDepletedAt")
         }
     }
 
