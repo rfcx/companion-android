@@ -1,8 +1,6 @@
 package org.rfcx.audiomoth.view.deployment
 
 import android.app.Activity
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -11,18 +9,20 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import io.realm.Realm
-import java.sql.Timestamp
-import java.util.*
 import kotlinx.android.synthetic.main.activity_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.BuildConfig
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.*
+import org.rfcx.audiomoth.entity.DeploymentLocation
+import org.rfcx.audiomoth.entity.DeploymentState
+import org.rfcx.audiomoth.entity.EdgeDeployment
+import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
-import org.rfcx.audiomoth.util.*
+import org.rfcx.audiomoth.util.AudioMothChimeConnector
+import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
 import org.rfcx.audiomoth.view.deployment.locate.MapPickerFragment
@@ -32,6 +32,7 @@ import org.rfcx.audiomoth.view.detail.MapPickerProtocol
 import org.rfcx.audiomoth.view.dialog.CompleteFragment
 import org.rfcx.audiomoth.view.dialog.CompleteListener
 import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
+import java.util.*
 
 class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, CompleteListener,
     MapPickerProtocol {
@@ -48,6 +49,9 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     private var _deployment: EdgeDeployment? = null
     private var _deployLocation: DeploymentLocation? = null
     private var _images: List<String> = listOf()
+
+    private var audioMothConnector = AudioMothChimeConnector()
+    private var calendar = Calendar.getInstance()
 
     private var latitude = 0.0
     private var longitude = 0.0
@@ -135,7 +139,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         startFragment(EdgeCheckListFragment.newInstance())
     }
 
-    override fun getDeployment(): EdgeDeployment? = this._deployment
+    override fun getDeployment(): EdgeDeployment? = this._deployment ?: EdgeDeployment()
 
     override fun setDeployment(deployment: EdgeDeployment) {
         this._deployment = deployment
@@ -146,7 +150,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     override fun setDeployLocation(locate: Locate) {
         val deployment = _deployment ?: EdgeDeployment()
         deployment.state = DeploymentState.Edge.Locate.key // state
-        deployment.deploymentId = randomDeploymentId()
 
         this._deployLocation = locate.asDeploymentLocation()
         val deploymentId = deploymentDb.insertOrUpdate(deployment, _deployLocation!!)
@@ -230,12 +233,12 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     override fun playSyncSound() {
         val deploymentId = getDeployment()?.deploymentId
+        val deploymentIdArrayInt = deploymentId?.map { it.toInt() }?.toTypedArray() ?: arrayOf()
         Thread {
-//            audioMothConnector.setConfiguration(
-//                calendar,
-//                configuration,
-//                deploymentId?.let { DeploymentIdentifier(it) }
-//            )
+            audioMothConnector.playTimeAndDeploymentID(
+                calendar,
+                deploymentIdArrayInt
+            )
             this@EdgeDeploymentActivity.runOnUiThread {
                 startSyncing(SyncFragment.AFTER_SYNC)
             }
