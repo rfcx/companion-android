@@ -548,13 +548,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun EdgeDeployment.toMark(): DeploymentMarker {
         val pinImage =
-            if (state == Edge.ReadyToUpload.key && isBatteryRemaining(batteryDepletedAt.time))
+            if (state == Edge.ReadyToUpload.key)
                 Battery.BATTERY_PIN_GREEN
             else
                 Battery.BATTERY_PIN_GREY
 
         val description = if (state >= Edge.ReadyToUpload.key)
-            Battery.getPredictionBattery(batteryDepletedAt.time)
+            getString(R.string.format_deployed)
         else
             getString(R.string.format_in_progress_step)
 

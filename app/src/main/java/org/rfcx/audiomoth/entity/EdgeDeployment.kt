@@ -11,13 +11,10 @@ open class EdgeDeployment(
     @PrimaryKey
     var id: Int = 0,
     var serverId: String? = null,
-    var batteryDepletedAt: Date = Date(),
     var deployedAt: Date = Date(),
     var deploymentId: String? = null, // random when edge
-    var batteryLevel: Int = 0,
     @Expose(serialize = false)
     var state: Int = 0, // 1 = Locate, 2 = Config, 3 = Sync, 4 = Verify, 5 = Deploy, 6 = Ready To Upload
-    var configuration: EdgeConfiguration? = null,
     var location: DeploymentLocation? = null,
     var createdAt: Date = Date(),
     @Expose(serialize = false)
@@ -36,6 +33,5 @@ open class EdgeDeployment(
         const val FIELD_LOCATION = "location"
         const val FIELD_UPDATED_AT = "updatedAt"
         const val FIELD_DELETED_AT = "deletedAt"
-        const val FIELD_CONFIGURATION = "configuration"
     }
 }

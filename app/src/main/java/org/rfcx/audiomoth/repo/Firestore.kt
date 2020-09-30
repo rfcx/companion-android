@@ -51,11 +51,6 @@ class Firestore(val context: Context) {
         return userDocument.collection(COLLECTION_DEPLOYMENTS).add(deployment).await()
     }
 
-    suspend fun sendProfile(profile: ProfileRequest): DocumentReference? {
-        val userDocument = db.collection(COLLECTION_USERS).document(uid)
-        return userDocument.collection(COLLECTION_PROFILES).add(profile).await()
-    }
-
     suspend fun sendProfile(profile: GuardianProfileRequest): DocumentReference? {
         val userDocument = db.collection(COLLECTION_USERS).document(uid)
         return userDocument.collection(COLLECTION_PROFILES).add(profile).await()

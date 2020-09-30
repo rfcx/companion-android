@@ -95,9 +95,6 @@ class EdgeDeploymentDetailViewHolder(
                 deployment.syncImage
             )
         )
-        val estimatedBatteryDays =
-            Battery.getEstimatedBatteryDays(deployment.batteryDepletedAt.time)
-        batteryComponent.levelBattery = if (estimatedBatteryDays >= 0) estimatedBatteryDays else -1
 
         tvGuardianBadge.visibility = View.GONE
         tvLocation.text = deployment.locationName
@@ -111,9 +108,6 @@ class EdgeDeploymentDetailViewHolder(
         )
         batteryComponent.visibility = if (isReadyToUpload) View.VISIBLE else View.GONE
         ivMoreIcon.visibility = if (isReadyToUpload) View.GONE else View.VISIBLE
-        tvEstimatedBatteryDuration.visibility = if (isReadyToUpload) View.VISIBLE else View.GONE
-        tvEstimatedBatteryDuration.text =
-            Battery.getEstimatedBatteryDuration(context, deployment.batteryDepletedAt.time)
         vDeploymentDetail.setOnClickListener {
             itemClickListener.onClickedEdgeDeploymentDetail(deployment)
         }
@@ -189,8 +183,6 @@ class DeploymentDetailViewDiffCallback : DiffUtil.ItemCallback<DeploymentDetailV
         return when {
             oldItem is DeploymentDetailView.EdgeDeploymentView
                     && newItem is DeploymentDetailView.EdgeDeploymentView -> {
-                oldItem.batteryDepletedAt == newItem.batteryDepletedAt &&
-                        oldItem.batteryLevel == newItem.batteryLevel &&
                         oldItem.createdAt == newItem.createdAt &&
                         oldItem.deletedAt == newItem.deletedAt &&
                         oldItem.deployedAt == newItem.deployedAt &&

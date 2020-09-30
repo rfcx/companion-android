@@ -3,7 +3,6 @@ package org.rfcx.audiomoth
 import io.realm.DynamicRealm
 import io.realm.RealmMigration
 import java.util.*
-import org.rfcx.audiomoth.entity.EdgeConfiguration
 import org.rfcx.audiomoth.entity.EdgeDeployment
 import org.rfcx.audiomoth.entity.Locate
 
@@ -27,7 +26,7 @@ class CompanionRealmMigration : RealmMigration {
 
     private fun migrateToV3(realm: DynamicRealm) {
         // Rename table Configuration to EdgeConfiguration
-        val edgeConfiguration = realm.schema.rename("Configuration", EdgeConfiguration.TABLE_NAME)
+        val edgeConfiguration = realm.schema.rename("Configuration", "EdgeConfiguration")
 
         // Rename table Deployment to EdgeDeployment
         val edgeDeployment = realm.schema.rename("Deployment", EdgeDeployment.TABLE_NAME)
@@ -35,15 +34,15 @@ class CompanionRealmMigration : RealmMigration {
         // Add field updatedAt and deletedAt to EdgeDeployment
         edgeDeployment?.apply {
             // Change Configuration class to EdgeConfiguration class
-            addRealmObjectField("${EdgeDeployment.FIELD_CONFIGURATION}_tmp", edgeConfiguration)
+            addRealmObjectField("configuration_tmp", edgeConfiguration)
             transform { obj ->
-                val configObj = obj.getObject(EdgeDeployment.FIELD_CONFIGURATION)
-                obj.setObject("${EdgeDeployment.FIELD_CONFIGURATION}_tmp", configObj)
+                val configObj = obj.getObject("configuration_tmp")
+                obj.setObject("configuration_tmp", configObj)
             }
-            removeField(EdgeDeployment.FIELD_CONFIGURATION)
+            removeField("configuration_tmp")
             renameField(
-                "${EdgeDeployment.FIELD_CONFIGURATION}_tmp",
-                EdgeDeployment.FIELD_CONFIGURATION
+                "configuration_tmp",
+                "configuration_tmp"
             )
 
             addField(EdgeDeployment.FIELD_UPDATED_AT, Date::class.java)

@@ -21,7 +21,6 @@ import org.rfcx.audiomoth.entity.*
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
-import org.rfcx.audiomoth.localdb.ProfileDb
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
 import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentActivity
@@ -44,14 +43,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         )
     }
     private val locateDb by lazy { LocateDb(realm) }
-    private val profileDb by lazy { ProfileDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
 
-    private var _profiles: List<Profile> = listOf()
-    private var _profile: Profile? = null
     private var _deployment: EdgeDeployment? = null
     private var _deployLocation: DeploymentLocation? = null
-    private var _edgeConfiguration: EdgeConfiguration? = null
     private var _images: List<String> = listOf()
 
     private var latitude = 0.0
@@ -146,26 +141,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         this._deployment = deployment
     }
 
-    override fun setDeploymentConfigure(profile: Profile) {
-        setProfile(profile)
-        this._edgeConfiguration = profile.asConfiguration()
-        this._deployment?.configuration = _edgeConfiguration
-
-        // update deployment
-        _deployment?.let { deploymentDb.updateDeployment(it) }
-        // update profile
-        if (profile.name.isNotEmpty()) {
-            if (!profileDb.isExistingProfile(profile.name)) {
-                profileDb.insertOrUpdateProfile(profile)
-            }
-        }
-
-        nextStep()
-    }
-
-    override fun geConfiguration(): EdgeConfiguration? =
-        _edgeConfiguration
-
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
     override fun setDeployLocation(locate: Locate) {
@@ -183,28 +158,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         this._images = images
     }
 
-    override fun getProfiles(): List<Profile> = this._profiles
-
-    override fun getProfile(): Profile? = this._profile
-
-    override fun setProfile(profile: Profile) {
-        this._profile = profile
-    }
-
     private fun setLatLng(latitude: Double, longitude: Double, name: String) {
         this.latitude = latitude
         this.longitude = longitude
         this.nameLocation = name
-    }
-
-    override fun setPerformBattery(batteryDepletedAt: Timestamp, batteryLevel: Int) {
-        this._deployment?.let {
-            it.batteryDepletedAt = batteryDepletedAt
-            it.batteryLevel = batteryLevel
-
-            // update about battery
-            this.deploymentDb.updateDeployment(it)
-        }
     }
 
     override fun setReadyToDeploy() {
@@ -299,9 +256,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 _deployLocation = deployment.location
             }
 
-            if (deployment.configuration != null) {
-                _edgeConfiguration = deployment.configuration
-            }
             currentCheck = if (deployment.state == 1) {
                 deployment.state
             } else {
