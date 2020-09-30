@@ -59,10 +59,6 @@ class CompanionRealmMigration : RealmMigration {
     }
 
     private fun migrateToV4(realm: DynamicRealm) {
-        // Remove tables that were not used in AudioMoth version
-        realm.schema.remove("Profile")
-        realm.schema.remove("EdgeConfiguration")
-
         // Remove fields that were not used in AudioMoth version
         val edgeDeployment = realm.schema.get(EdgeDeployment.TABLE_NAME)
         edgeDeployment?.apply {
