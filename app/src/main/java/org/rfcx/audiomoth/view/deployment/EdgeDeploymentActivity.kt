@@ -24,15 +24,11 @@ import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.localdb.ProfileDb
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
 import org.rfcx.audiomoth.util.*
-import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
-import org.rfcx.audiomoth.view.deployment.configure.SelectProfileFragment
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
 import org.rfcx.audiomoth.view.deployment.locate.MapPickerFragment
 import org.rfcx.audiomoth.view.deployment.sync.SyncFragment
 import org.rfcx.audiomoth.view.deployment.sync.SyncFragment.Companion.BEFORE_SYNC
-import org.rfcx.audiomoth.view.deployment.verify.PerformBatteryFragment
-import org.rfcx.audiomoth.view.deployment.verify.PerformBatteryFragment.Companion.TEST_BATTERY
 import org.rfcx.audiomoth.view.detail.MapPickerProtocol
 import org.rfcx.audiomoth.view.dialog.CompleteFragment
 import org.rfcx.audiomoth.view.dialog.CompleteListener
@@ -57,10 +53,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     private var _deployLocation: DeploymentLocation? = null
     private var _edgeConfiguration: EdgeConfiguration? = null
     private var _images: List<String> = listOf()
-
-    private val audioMothConnector: AudioMothConnector = AudioMothChimeConnector()
-    private val configuration = AudioMothConfiguration()
-    private val calendar = Calendar.getInstance()
 
     private var latitude = 0.0
     private var longitude = 0.0
@@ -122,14 +114,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
         when (container) {
             is MapPickerFragment -> startFragment(LocationFragment.newInstance())
-            is ConfigureFragment -> {
-                this._profiles = profileDb.getProfiles()
-                if (_profiles.isNotEmpty()) {
-                    startFragment(SelectProfileFragment.newInstance())
-                } else {
-                    startCheckList()
-                }
-            }
             is EdgeCheckListFragment -> {
                 passedChecks.clear() // remove all passed
                 finish()
@@ -235,7 +219,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             deploymentDb.updateDeployment(it)
 
             DeploymentSyncWorker.enqueue(this@EdgeDeploymentActivity)
-            notification()
             hideLoading()
             showComplete()
         }
@@ -250,18 +233,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 startFragment(LocationFragment.newInstance())
             }
             1 -> {
-                updateDeploymentState(DeploymentState.Edge.Config)
-                handleSelectingConfig()
-            }
-            2 -> {
                 updateDeploymentState(DeploymentState.Edge.Sync)
                 startFragment(SyncFragment.newInstance(BEFORE_SYNC))
             }
-            3 -> {
-                updateDeploymentState(DeploymentState.Edge.Verify)
-                startFragment(PerformBatteryFragment.newInstance(TEST_BATTERY, null))
-            }
-            4 -> {
+            2 -> {
                 updateDeploymentState(DeploymentState.Edge.Deploy)
                 startFragment(DeployFragment.newInstance())
             }
@@ -288,11 +263,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         }
     }
 
-    override fun startSetupConfigure(profile: Profile) {
-        setProfile(profile)
-        startFragment(ConfigureFragment.newInstance())
-    }
-
     override fun startSyncing(status: String) {
         startFragment(SyncFragment.newInstance(status))
     }
@@ -303,35 +273,16 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     override fun playSyncSound() {
         val deploymentId = getDeployment()?.deploymentId
-        convertProfileToAudioMothConfiguration()
         Thread {
-            audioMothConnector.setConfiguration(
-                calendar,
-                configuration,
-                deploymentId?.let { DeploymentIdentifier(it) }
-            )
+//            audioMothConnector.setConfiguration(
+//                calendar,
+//                configuration,
+//                deploymentId?.let { DeploymentIdentifier(it) }
+//            )
             this@EdgeDeploymentActivity.runOnUiThread {
                 startSyncing(SyncFragment.AFTER_SYNC)
             }
         }.start()
-    }
-
-    private fun convertProfileToAudioMothConfiguration() {
-        val deployment = _deployment
-        if (deployment != null) {
-            configuration.sampleRate = deployment.getSampleRate()
-            configuration.gain = deployment.getGain()
-            configuration.sleepRecordCycle = deployment.getSleepRecordCycle()
-            configuration.startStopPeriods = deployment.getStartStopPeriods()
-        }
-    }
-
-    override fun playCheckBatterySound() {
-        Thread { audioMothConnector.getBatteryState() }.start()
-    }
-
-    override fun startCheckBattery(status: String, level: Int?) {
-        startFragment(PerformBatteryFragment.newInstance(status, level))
     }
 
     override fun startMapPicker(latitude: Double, longitude: Double, name: String) {
@@ -357,22 +308,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 deployment.state - 1
             }
             handleCheckClicked(currentCheck)
-        }
-    }
-
-    private fun handleSelectingConfig() {
-        if (_profile != null) {
-            val profile = _profile
-            if (profile != null) {
-                startSetupConfigure(profile)
-            }
-        } else {
-            this._profiles = profileDb.getProfiles()
-            if (_profiles.isNotEmpty()) {
-                startFragment(SelectProfileFragment.newInstance())
-            } else {
-                startSetupConfigure(Profile.default())
-            }
         }
     }
 
@@ -420,36 +355,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         backStep()
     }
 
-    private fun notification() {
-        val edgeDeploymentId = _deployment?.deploymentId
-        val day = 24 * 60 * 60 * 1000
-        val intent = Intent(this, NotificationBroadcastReceiver::class.java)
-        val dateAlarm = (_deployment?.batteryDepletedAt?.time)?.minus(day)?.let { Date(it) }
-
-        intent.putExtra(
-            EXTRA_BATTERY_DEPLETED_AT,
-            _deployment?.batteryDepletedAt?.toDateTimeString()
-        )
-        intent.putExtra(EXTRA_LOCATION_NAME, _deployment?.location?.name)
-        intent.putExtra(EXTRA_DEPLOYMENT_ID, edgeDeploymentId)
-
-        val pendingIntent =
-            PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-
-        val cal = Calendar.getInstance()
-        if (dateAlarm != null) {
-            cal.time = dateAlarm
-            if (dateAlarm.time > System.currentTimeMillis()) {
-                val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-                alarmManager.setExact(
-                    AlarmManager.RTC_WAKEUP,
-                    cal.timeInMillis,
-                    pendingIntent
-                )
-            }
-        }
-    }
-
     private fun handleNestedFragmentBackStack(fragmentManager: FragmentManager): Boolean {
         val childFragmentList = fragmentManager.fragments
         if (childFragmentList.size > 0) {
@@ -472,8 +377,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     companion object {
         const val loadingDialogTag = "LoadingDialog"
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
-        const val EXTRA_BATTERY_DEPLETED_AT = "EXTRA_BATTERY_DEPLETED_AT"
-        const val EXTRA_LOCATION_NAME = "EXTRA_LOCATION_NAME"
 
         fun startActivity(context: Context) {
             val intent = Intent(context, EdgeDeploymentActivity::class.java)

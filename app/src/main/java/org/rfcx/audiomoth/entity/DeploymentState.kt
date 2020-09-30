@@ -2,7 +2,7 @@ package org.rfcx.audiomoth.entity
 
 sealed class DeploymentState {
     enum class Edge(val key: Int) {
-        Locate(1), Config(2), Sync(3), Verify(4), Deploy(5), ReadyToUpload(6);
+        Locate(1), Sync(2), Deploy(3), ReadyToUpload(4);
 
         companion object {
             private val map = values().associateBy(DeploymentState.Edge::key)

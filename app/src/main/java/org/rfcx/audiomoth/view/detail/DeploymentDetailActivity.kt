@@ -21,18 +21,14 @@ import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
 import org.rfcx.audiomoth.util.*
-import org.rfcx.audiomoth.util.Battery.getEstimatedBatteryDuration
 import org.rfcx.audiomoth.view.BaseActivity
 import org.rfcx.audiomoth.view.deployment.EdgeDeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
-import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment.Companion.CONTINUOUS
 
 class DeploymentDetailActivity : BaseActivity() {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
-    private val gainList by lazy { resources.getStringArray(R.array.edge_gains) }
     private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
-    private val timeLineAdapter by lazy { TimeLineAdapter() }
 
     // data
     private var deployment: EdgeDeployment? = null
@@ -137,36 +133,10 @@ class DeploymentDetailActivity : BaseActivity() {
         observeDeploymentImage(deployment.id)
 
         val location = deployment.location
-        val configuration = deployment.configuration
         locationValueTextView.text =
             location?.let { locate ->
                 convertLatLngLabel(this, locate.latitude, locate.longitude)
             }
-
-        sampleRateValue.text =
-            getString(R.string.kilohertz, configuration?.sampleRate.toString())
-        gainValue.text = configuration?.gain?.let { gain -> gainList[gain] }
-
-        val continuous = getString(R.string.continuous)
-        val isContinuous = configuration?.durationSelected == CONTINUOUS
-
-        val recordingDurationLabel = getString(
-            if (configuration?.recordingDuration == 1) R.string.detail_sec else R.string.detail_secs,
-            configuration?.recordingDuration
-        )
-        recordingValue.text = if (isContinuous) continuous else recordingDurationLabel
-        sleepValue.text = getString(R.string.detail_secs, configuration?.sleepDuration)
-        sleepValue.visibility = if (isContinuous) View.GONE else View.VISIBLE
-        sleepLabel.visibility = if (isContinuous) View.GONE else View.VISIBLE
-
-        estimatedBatteryDurationValue.text =
-            getEstimatedBatteryDuration(this, deployment.batteryDepletedAt.time)
-
-        configuration?.recordingPeriodList?.let { period ->
-            customRecordingLabel.visibility = if (period.size != 0) View.VISIBLE else View.GONE
-            timeLineRecycler.visibility = if (period.size != 0) View.VISIBLE else View.GONE
-            setupTimeLineRecycler(period.toTypedArray())
-        }
     }
 
     private fun observeDeploymentImage(deploymentId: Int) {
@@ -191,27 +161,6 @@ class DeploymentDetailActivity : BaseActivity() {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             setHasFixedSize(true)
         }
-    }
-
-    private fun setupTimeLineRecycler(selectTimeList: Array<String>) {
-        val timeList = EdgeConfigure.configureTimes
-        val array = ArrayList<Boolean>()
-
-        timeLineRecycler.apply {
-            adapter = timeLineAdapter
-            layoutManager = LinearLayoutManager(context)
-        }
-
-        timeList.forEach {
-            array.add(selectTimeList.contains(it))
-        }
-
-        val recordingPeriod = convertToStopStartPeriods(array.toTypedArray())
-        val arrayRecordingPeriod = arrayListOf<String>()
-        recordingPeriod?.forEach {
-            arrayRecordingPeriod.add("${timeList[it.startMinutes / 60]} - ${if (it.stopMinutes / 60 == 24) timeList[0] else timeList[it.stopMinutes / 60]}")
-        }
-        timeLineAdapter.items = arrayRecordingPeriod
     }
 
     private fun setupToolbar() {

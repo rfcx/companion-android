@@ -7,9 +7,7 @@ interface EdgeDeploymentProtocol : BaseDeploymentProtocol {
     fun openWithEdgeDevice()
     fun openWithGuardianDevice()
 
-    fun startSetupConfigure(profile: Profile)
     fun startSyncing(status: String)
-    fun startCheckBattery(status: String, level: Int?)
 
     fun getProfiles(): List<Profile>
     fun getProfile(): Profile?
@@ -22,5 +20,4 @@ interface EdgeDeploymentProtocol : BaseDeploymentProtocol {
     fun setPerformBattery(batteryDepletedAt: Timestamp, batteryLevel: Int)
 
     fun playSyncSound()
-    fun playCheckBatterySound()
 }
