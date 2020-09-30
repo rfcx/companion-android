@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/backgroundColor"
     android:fitsSystemWindows="true"
     tools:context=".view.profile.coordinates.CoordinatesActivity">
 
@@ -65,7 +66,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/grey"
+            android:background="@color/separateLine"
             app:layout_constraintTop_toBottomOf="@+id/ddLayout" />
 
         <LinearLayout
@@ -119,7 +120,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/grey"
+            android:background="@color/separateLine"
             app:layout_constraintTop_toBottomOf="@+id/ddmLayout" />
 
         <LinearLayout
@@ -173,7 +174,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/grey"
+            android:background="@color/separateLine"
             app:layout_constraintTop_toBottomOf="@+id/dmsLayout" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
