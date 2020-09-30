@@ -11,17 +11,16 @@ import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioTrack
 import android.os.Build
-import kotlin.math.*
 
-/* Global constants */
+import kotlin.math.*
 
 class AudioMothChime {
 
     /* General constants */
 
-    private val SPEED_FACTOR: Float = 2.0f
+    private val SPEED_FACTOR: Float = 1.0f
 
-    private val USE_HAMMING_CODE: Boolean = false
+    private val USE_HAMMING_CODE: Boolean = true
 
     private val CARRIER_FREQUENCY: Int = 18000
 
@@ -45,8 +44,7 @@ class AudioMothChime {
     /* Note parsing constants */
 
     private val REGEX = Regex(
-        "^(C|C#|Db|D|D#|Eb|E|F|F#|Gb|G|G#|Ab|A|A#|Bb|B)([0-9]):([1-9])$",
-        RegexOption.IGNORE_CASE
+        "^(C|C#|Db|D|D#|Eb|E|F|F#|Gb|G|G#|Ab|A|A#|Bb|B)([0-9]):([1-9])$"
     )
 
     private val FREQUENCY_LOOKUP = mapOf(
@@ -269,6 +267,7 @@ class AudioMothChime {
         if (xor > 0) out = out xor CRC_POLY
 
         return out
+
     }
 
     private fun createCRC16(bytes: Array<Int>): CRC16 {
@@ -285,7 +284,11 @@ class AudioMothChime {
             crc = updateCRC16(crc, 0)
         }
 
-        return CRC16(crc and 0xFF, (crc shr 8) and 0xFF)
+        return CRC16(
+            crc and 0xFF,
+            (crc shr 8) and 0xFF
+        )
+
     }
 
     /* Function to encode bytes */
@@ -305,6 +308,7 @@ class AudioMothChime {
                     bitSequence.add(HAMMING_CODE[low][x])
                     bitSequence.add(HAMMING_CODE[high][x])
                 }
+
             } else {
 
                 for (x in 0 until 8) {
@@ -312,11 +316,15 @@ class AudioMothChime {
                     val mask = (0x01 shl x)
 
                     bitSequence.add(if ((it and mask) == mask) 1 else 0)
+
                 }
+
             }
+
         }
 
         return bitSequence
+
     }
 
     /* Functions to parses notes */
@@ -329,17 +337,27 @@ class AudioMothChime {
 
             if (REGEX.matches(it)) {
 
-                val frequency: Int? = FREQUENCY_LOOKUP.get(it.split(":")[0].toUpperCase())
+                val frequency: Int? = FREQUENCY_LOOKUP.get(it.split(":")[0])
 
                 val duration = it.split(":")[1].toInt()
 
-                frequency?.let { notes.add(Note(frequency, duration)) }
+                frequency?.let {
+                    notes.add(
+                        Note(
+                            frequency,
+                            duration
+                        )
+                    )
+                }
+
             }
+
         }
 
         if (notes.size == 0) notes.add(Note())
 
         return notes
+
     }
 
     /* Functions to generate waveforms */
@@ -392,7 +410,9 @@ class AudioMothChime {
             state.x = x
 
             state.y = y
+
         }
+
     }
 
     private fun createWaveform(
@@ -420,13 +440,20 @@ class AudioMothChime {
 
         val bitSequence: ArrayList<Int> = encode(bytes)
 
+        /* Display output */
+
+        println("AUDIOMOTHCHIME: " + bytes.size + " bytes")
+
+        println("AUDIOMOTHCHIME: " + bitSequence.size + " bits")
+
         /* Generate note sequence */
 
         val notes: ArrayList<Note> = parseNotes(noteArray)
 
         /* Counters used during sound waveform creation */
 
-        var state: State = State()
+        var state: State =
+            State()
 
         var phase: Float = 1.0f
 
@@ -446,6 +473,7 @@ class AudioMothChime {
             )
 
             phase *= -1.0f
+
         }
 
         /* Data bits */
@@ -466,6 +494,7 @@ class AudioMothChime {
             )
 
             phase *= -1.0f
+
         }
 
         /* Stop bits */
@@ -484,6 +513,7 @@ class AudioMothChime {
             )
 
             phase *= -1.0f
+
         }
 
         /* Reset counter */
@@ -503,19 +533,20 @@ class AudioMothChime {
 
         notes.forEachIndexed { index, note ->
 
-                val noteFallDuration =
-                    if (index == notes.size - 1) NOTE_LONG_FALL_DURATION else NOTE_FALL_DURATION
+            val noteFallDuration =
+                if (index == notes.size - 1) NOTE_LONG_FALL_DURATION else NOTE_FALL_DURATION
 
-                createWaveformComponent(
-                    waveform2,
-                    state,
-                    sampleRate,
-                    note.frequency,
-                    1.0f,
-                    NOTE_RISE_DURATION,
-                    noteDuration * note.duration,
-                    noteFallDuration
-                )
+            createWaveformComponent(
+                waveform2,
+                state,
+                sampleRate,
+                note.frequency,
+                1.0f,
+                NOTE_RISE_DURATION,
+                noteDuration * note.duration,
+                noteFallDuration
+            )
+
         }
 
         /* Sum the waveforms */
@@ -525,6 +556,7 @@ class AudioMothChime {
         for (i in 0 until length) waveform.add(waveform1[i] / 4.0f + waveform2[i] / 2.0f)
 
         return waveform
+
     }
 
     /* Public chime function */
@@ -535,7 +567,11 @@ class AudioMothChime {
 
         val sampleRate: Int = AudioTrack.getNativeOutputSampleRate(AudioManager.STREAM_MUSIC)
 
-        val minBufferSize = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT)
+        val minBufferSize = AudioTrack.getMinBufferSize(
+            sampleRate,
+            AudioFormat.CHANNEL_OUT_MONO,
+            AudioFormat.ENCODING_PCM_16BIT
+        )
 
         val player = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             AudioTrack.Builder()
@@ -560,7 +596,7 @@ class AudioMothChime {
                 AudioFormat.CHANNEL_OUT_MONO,
                 AudioFormat.ENCODING_PCM_16BIT,
                 minBufferSize,
-                AudioTrack.MODE_STREAM
+                AudioTrack.MODE_STATIC
             )
         }
 
@@ -576,8 +612,14 @@ class AudioMothChime {
             buffer[index] = (fl * Short.MAX_VALUE).toShort()
         }
 
+        println("AUDIOMOTHCHIME: Start")
+
         player.play()
 
         player.write(buffer, 0, waveform.size)
+
+        println("AUDIOMOTHCHIME: Done")
+
     }
+
 }
