@@ -9,7 +9,6 @@
         <item name="android:textSize">@dimen/text_medium</item>
         <item name="titleTextColor">@color/white</item>
         <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:windowTranslucentNavigation">true</item>
         <item name="fontFamily">@font/lato_regular</item>
         <item name="android:itemTextAppearance">@style/menu_item_color</item>
     </style>
