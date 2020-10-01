@@ -109,12 +109,32 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/locationGroupLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/margin_padding_normal"
+        android:paddingBottom="@dimen/margin_padding_normal"
+        app:layout_constraintTop_toBottomOf="@id/coordinatesLinearLayout">
+
+        <TextView
+            android:id="@+id/locationGroupTextView"
+            style="@style/AudioMothText.SubTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_padding_normal"
+            android:layout_marginEnd="@dimen/margin_padding_small"
+            android:text="@string/location_group" />
+    </LinearLayout>
+
     <View
         android:id="@+id/view1"
         android:layout_width="match_parent"
         android:layout_height="10dp"
         android:background="@color/grey_light"
-        app:layout_constraintTop_toBottomOf="@id/coordinatesLinearLayout" />
+        app:layout_constraintTop_toBottomOf="@id/locationGroupLinearLayout" />
 
     <TextView
 

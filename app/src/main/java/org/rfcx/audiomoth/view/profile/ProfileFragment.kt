@@ -63,6 +63,10 @@ class ProfileFragment : Fragment() {
         coordinatesLinearLayout.setOnClickListener {
             context?.let { it1 -> CoordinatesActivity.startActivity(it1) }
         }
+
+        locationGroupLinearLayout.setOnClickListener {
+            // TODO: setOnClick
+        }
     }
 
     private fun handleShowSnackbarResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
