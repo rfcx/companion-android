@@ -46,4 +46,7 @@
     <!-- CheckList -->
     <dimen name="padding_top_header">12dp</dimen>
 
+    <!-- Prefs -->
+    <dimen name="size_prefs">32dp</dimen>
+
 </resources>
