@@ -42,6 +42,10 @@
         </provider>
 
         <activity
+            android:name=".view.profile.locationgroup.LocationGroupActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
             android:name=".view.detail.EditLocationActivity"
             android:screenOrientation="portrait" />
         <activity

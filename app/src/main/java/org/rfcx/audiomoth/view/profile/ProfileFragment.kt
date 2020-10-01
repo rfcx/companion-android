@@ -18,6 +18,7 @@ import org.rfcx.audiomoth.util.getCoordinatesFormat
 import org.rfcx.audiomoth.util.getDefaultSiteName
 import org.rfcx.audiomoth.util.getUserNickname
 import org.rfcx.audiomoth.view.profile.coordinates.CoordinatesActivity
+import org.rfcx.audiomoth.view.profile.locationgroup.LocationGroupActivity
 
 class ProfileFragment : Fragment() {
     lateinit var listener: MainActivityListener
@@ -65,7 +66,7 @@ class ProfileFragment : Fragment() {
         }
 
         locationGroupLinearLayout.setOnClickListener {
-            // TODO: setOnClick
+            context?.let { it1 -> LocationGroupActivity.startActivity(it1) }
         }
     }
 
