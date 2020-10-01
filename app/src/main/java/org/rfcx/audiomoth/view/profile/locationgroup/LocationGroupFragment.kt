@@ -1,5 +1,6 @@
 package org.rfcx.audiomoth.view.profile.locationgroup
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,12 @@ import org.rfcx.audiomoth.R
 
 class LocationGroupFragment : Fragment() {
     private val locationGroupAdapter by lazy { LocationGroupAdapter() }
+    private var locationGroupProtocol: LocationGroupProtocol? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        locationGroupProtocol = (context as LocationGroupProtocol)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,6 +33,10 @@ class LocationGroupFragment : Fragment() {
         locationGroupRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = locationGroupAdapter
+        }
+
+        locationGroupLinearLayout.setOnClickListener {
+            locationGroupProtocol?.onCreateNewGroup()
         }
 
         locationGroupAdapter.items = listOf("Location Group 01", "Location Group 02", "Location Group 03")
