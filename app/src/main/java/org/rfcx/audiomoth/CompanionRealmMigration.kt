@@ -59,16 +59,7 @@ class CompanionRealmMigration : RealmMigration {
     }
 
     private fun migrateToV4(realm: DynamicRealm) {
-        // Remove tables that were not used in AudioMoth version
-        val edgeProfile = realm.schema.get("Profile")
-        val edgeConfig = realm.schema.get("EdgeConfiguration")
-        edgeProfile?.let {
-            realm.schema.remove("Profile")
-        }
-        edgeConfig?.let {
-            realm.schema.remove("EdgeConfiguration")
-        }
-
+        // Delete field first to avoid ref error
         // Remove fields that were not used in AudioMoth version
         val edgeDeployment = realm.schema.get(EdgeDeployment.TABLE_NAME)
         edgeDeployment?.apply {
@@ -84,6 +75,16 @@ class CompanionRealmMigration : RealmMigration {
             if (hasBatteryDepletedField) {
                 removeField("batteryDepletedAt")
             }
+        }
+
+        // Remove tables that were not used in AudioMoth version
+        val edgeProfile = realm.schema.get("Profile")
+        val edgeConfig = realm.schema.get("EdgeConfiguration")
+        edgeProfile?.let {
+            realm.schema.remove("Profile")
+        }
+        edgeConfig?.let {
+            realm.schema.remove("EdgeConfiguration")
         }
     }
 
