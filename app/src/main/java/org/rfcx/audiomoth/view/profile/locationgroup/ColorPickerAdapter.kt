@@ -9,7 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_color_picker.view.*
 import org.rfcx.audiomoth.R
 
-class ColorPickerAdapter : RecyclerView.Adapter<ColorPickerAdapter.ColorPickerViewHolder>() {
+class ColorPickerAdapter(private val onColorClickListener: (String) -> Unit) :
+    RecyclerView.Adapter<ColorPickerAdapter.ColorPickerViewHolder>() {
     var items: ArrayList<String> = arrayListOf()
         set(value) {
             field = value
@@ -28,6 +29,9 @@ class ColorPickerAdapter : RecyclerView.Adapter<ColorPickerAdapter.ColorPickerVi
 
     override fun onBindViewHolder(holder: ColorPickerViewHolder, position: Int) {
         holder.bind(items[position])
+        holder.itemView.setOnClickListener {
+            onColorClickListener(items[position])
+        }
     }
 
     class ColorPickerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

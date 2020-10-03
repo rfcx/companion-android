@@ -3,14 +3,15 @@ package org.rfcx.audiomoth.view.profile.locationgroup
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import kotlinx.android.synthetic.main.activity_create_new_group.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
 
-class CreateNewGroupActivity : AppCompatActivity() {
-    private val colorPickerAdapter by lazy { ColorPickerAdapter() }
+class CreateNewGroupActivity : AppCompatActivity(), (String) -> Unit {
+    private val colorPickerAdapter by lazy { ColorPickerAdapter(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +45,10 @@ class CreateNewGroupActivity : AppCompatActivity() {
             "#7a5547",
             "#5e7c8b"
         )
+    }
+
+    override fun invoke(color: String) {
+        Log.d("color","color: $color")
     }
 
     private fun setupToolbar() {
