@@ -9,9 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_color_picker.view.*
 import org.rfcx.audiomoth.R
 
-class ColorPickerAdapter(private val onColorClickListener: (String) -> Unit) :
+class ColorPickerAdapter(private val onColorClickListener: (ColorPickerItem, Int) -> Unit) :
     RecyclerView.Adapter<ColorPickerAdapter.ColorPickerViewHolder>() {
-    var items: ArrayList<String> = arrayListOf()
+    var items: ArrayList<ColorPickerItem> = arrayListOf()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -30,18 +30,21 @@ class ColorPickerAdapter(private val onColorClickListener: (String) -> Unit) :
     override fun onBindViewHolder(holder: ColorPickerViewHolder, position: Int) {
         holder.bind(items[position])
         holder.itemView.setOnClickListener {
-            onColorClickListener(items[position])
+            onColorClickListener(items[position], position)
         }
     }
 
     class ColorPickerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val colorImageView = itemView.colorImageView
+        private val checkImageView = itemView.checkImageView
 
-        fun bind(color: String) {
+        fun bind(colorItem: ColorPickerItem) {
             val porterDuffColorFilter =
-                PorterDuffColorFilter(Color.parseColor(color), PorterDuff.Mode.SRC_ATOP)
+                PorterDuffColorFilter(Color.parseColor(colorItem.color), PorterDuff.Mode.SRC_ATOP)
             colorImageView.drawable.colorFilter = porterDuffColorFilter
             colorImageView.setBackgroundColor(Color.TRANSPARENT)
+
+            checkImageView.visibility = if (colorItem.selected) View.VISIBLE else View.GONE
         }
     }
 }
