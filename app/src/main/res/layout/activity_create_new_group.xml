@@ -34,4 +34,26 @@
             android:textSize="@dimen/text_small" />
 
     </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/selectColorTextView"
+        style="@style/AudioMothText.Subhead.Bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:layout_marginEnd="@dimen/margin_padding_large"
+        android:text="@string/select_a_color"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/locationGroupTextInput" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/colorPickerRecyclerView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_padding_small"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/selectColorTextView" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
