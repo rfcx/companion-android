@@ -3,6 +3,8 @@ package org.rfcx.audiomoth.view.profile.locationgroup
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import kotlinx.android.synthetic.main.activity_create_new_group.*
@@ -45,13 +47,20 @@ class CreateNewGroupActivity : AppCompatActivity(), (ColorPickerItem, Int) -> Un
             adapter = colorPickerAdapter
         }
 
-
-
         colorPickerList.forEach {
             colorPickerState.add(ColorPickerItem(it, colorPickerList.first() == it))
         }
         colorPickerAdapter.items = colorPickerState
 
+        saveButton.setOnClickListener {
+            val color = colorPickerState.firstOrNull { it.selected }
+            if (locationGroupEditText.text.isNullOrBlank() || color == null) {
+                Toast.makeText(this, R.string.missing_name_group, Toast.LENGTH_LONG).show()
+            } else {
+                Log.d("saveButton", "${locationGroupEditText.text}")
+                Log.d("saveButton", "${color?.color}")
+            }
+        }
     }
 
     override fun invoke(colorPickerItem: ColorPickerItem, position: Int) {
