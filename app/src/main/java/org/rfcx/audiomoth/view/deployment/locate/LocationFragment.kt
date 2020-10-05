@@ -40,6 +40,7 @@ import org.rfcx.audiomoth.entity.Screen
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.deployment.BaseDeploymentProtocol
+import org.rfcx.audiomoth.view.profile.locationgroup.LocationGroupActivity
 
 class LocationFragment : Fragment(), OnMapReadyCallback {
     private val locateDb by lazy {
@@ -161,6 +162,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         changeTextView.setOnClickListener {
             val name = locationNameEditText.text.toString()
             startMapPicker(name)
+        }
+
+        changeGroupTextView.setOnClickListener {
+            val group = locationGroupValueTextView.text.toString()
+            val setLocationGroup = if (group == getString(R.string.none)) null else group
+            context?.let { it1 -> LocationGroupActivity.startActivity(it1, setLocationGroup, Screen.LOCATION.id) }
         }
 
         viewOfMapBox.setOnClickListener {

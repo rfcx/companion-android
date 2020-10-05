@@ -3,11 +3,13 @@ package org.rfcx.audiomoth.view.profile.locationgroup
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_location_group.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.Screen
 
 class LocationGroupActivity : AppCompatActivity(), LocationGroupProtocol {
 
@@ -18,6 +20,10 @@ class LocationGroupActivity : AppCompatActivity(), LocationGroupProtocol {
         setupToolbar()
         startFragment(LocationGroupFragment.newInstance())
 
+        val group: String? = intent?.getStringExtra(EXTRA_GROUP)
+        val screen: String? = intent?.getStringExtra(EXTRA_SCREEN)
+        Log.d("LocationGroupActivity","$screen")
+        // TODO: set group when seleced
     }
 
     override fun onCreateNewGroup() {
@@ -45,8 +51,14 @@ class LocationGroupActivity : AppCompatActivity(), LocationGroupProtocol {
     }
 
     companion object {
-        fun startActivity(context: Context) {
+        const val EXTRA_GROUP = "EXTRA_GROUP"
+        const val EXTRA_SCREEN = "EXTRA_SCREEN"
+
+        fun startActivity(context: Context, group: String? = null, screen: String = Screen.PROFILE.id) {
             val intent = Intent(context, LocationGroupActivity::class.java)
+            if (group != null)
+                intent.putExtra(EXTRA_GROUP, group)
+                intent.putExtra(EXTRA_SCREEN, screen)
             context.startActivity(intent)
         }
     }
