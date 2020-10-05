@@ -61,6 +61,11 @@ class Firestore(val context: Context) {
         return userDocument.collection(COLLECTION_PROFILES).add(profile).await()
     }
 
+    suspend fun sendProfile(group: EdgeGroupRequest): DocumentReference? {
+        val userDocument = db.collection(COLLECTION_USERS).document(uid)
+        return userDocument.collection(COLLECTION_GROUPS).add(group).await()
+    }
+
     suspend fun sendImage(imageRequest: ImageRequest): DocumentReference? {
         val userDocument = db.collection(COLLECTION_USERS).document(uid)
         return userDocument.collection(COLLECTION_IMAGES).add(imageRequest).await()
@@ -268,5 +273,6 @@ class Firestore(val context: Context) {
         const val COLLECTION_PROFILES = "profiles"
         const val COLLECTION_IMAGES = "images"
         const val COLLECTION_DIAGNOSTIC = "diagnostics"
+        const val COLLECTION_GROUPS = "groups"
     }
 }

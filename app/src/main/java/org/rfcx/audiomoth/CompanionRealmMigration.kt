@@ -1,11 +1,13 @@
 package org.rfcx.audiomoth
 
 import io.realm.DynamicRealm
+import io.realm.FieldAttribute
 import io.realm.RealmMigration
-import java.util.*
 import org.rfcx.audiomoth.entity.EdgeConfiguration
 import org.rfcx.audiomoth.entity.EdgeDeployment
 import org.rfcx.audiomoth.entity.Locate
+import org.rfcx.audiomoth.entity.LocationGroups
+import java.util.*
 
 class CompanionRealmMigration : RealmMigration {
     override fun migrate(realm: DynamicRealm, oldVersion: Long, newVersion: Long) {
@@ -14,6 +16,9 @@ class CompanionRealmMigration : RealmMigration {
         }
         if (oldVersion < 3L && newVersion >= 3L) {
             migrateToV3(realm)
+        }
+        if (oldVersion < 4L && newVersion >= 4L) {
+            migrateToV4(realm)
         }
     }
 
@@ -53,6 +58,24 @@ class CompanionRealmMigration : RealmMigration {
         val locate = realm.schema.get(Locate.TABLE_NAME)
         locate?.apply {
             addField(Locate.FIELD_DELETED_AT, Date::class.java)
+        }
+    }
+
+    private fun migrateToV4(realm: DynamicRealm) {
+        // Add LocationGroups class
+        val locationGroups = realm.schema.create(LocationGroups.TABLE_NAME)
+        locationGroups.apply {
+            addField(LocationGroups.LOCATION_GROUPS_ID, Int::class.java, FieldAttribute.PRIMARY_KEY)
+            addField(
+                LocationGroups.LOCATION_GROUPS_NAME,
+                String::class.java
+            ).setNullable(LocationGroups.LOCATION_GROUPS_NAME, false)
+
+            addField(LocationGroups.LOCATION_GROUPS_COLOR, String::class.java)
+                .setNullable(LocationGroups.LOCATION_GROUPS_COLOR, false)
+
+            addField(LocationGroups.LOCATION_GROUPS_SYNC_STATE, Int::class.java)
+                .setNullable(LocationGroups.LOCATION_GROUPS_SYNC_STATE, false)
         }
     }
 

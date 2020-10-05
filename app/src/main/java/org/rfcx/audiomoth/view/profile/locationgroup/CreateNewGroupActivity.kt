@@ -3,15 +3,21 @@ package org.rfcx.audiomoth.view.profile.locationgroup
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
+import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_create_new_group.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.LocationGroups
+import org.rfcx.audiomoth.localdb.LocationGroupDb
+import org.rfcx.audiomoth.util.RealmHelper
 
 class CreateNewGroupActivity : AppCompatActivity(), (ColorPickerItem, Int) -> Unit {
+    private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
+
+    private val locationGroupDb by lazy { LocationGroupDb(realm) }
     private val colorPickerAdapter by lazy { ColorPickerAdapter(this) }
     private var colorPickerState = ArrayList<ColorPickerItem>()
     private val colorPickerList = arrayListOf(
@@ -57,8 +63,11 @@ class CreateNewGroupActivity : AppCompatActivity(), (ColorPickerItem, Int) -> Un
             if (locationGroupEditText.text.isNullOrBlank() || color == null) {
                 Toast.makeText(this, R.string.missing_name_group, Toast.LENGTH_LONG).show()
             } else {
-                Log.d("saveButton", "${locationGroupEditText.text}")
-                Log.d("saveButton", "${color?.color}")
+                val group = LocationGroups(
+                    name = locationGroupEditText.text.toString(),
+                    color = color.color
+                )
+                locationGroupDb.insertOrUpdateLocationGroup(group)
             }
         }
     }
