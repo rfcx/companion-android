@@ -11,8 +11,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import io.realm.Realm
-import java.sql.Timestamp
-import java.util.*
 import kotlinx.android.synthetic.main.activity_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.BuildConfig
@@ -37,6 +35,8 @@ import org.rfcx.audiomoth.view.detail.MapPickerProtocol
 import org.rfcx.audiomoth.view.dialog.CompleteFragment
 import org.rfcx.audiomoth.view.dialog.CompleteListener
 import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
+import java.sql.Timestamp
+import java.util.*
 
 class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, CompleteListener,
     MapPickerProtocol {
@@ -418,6 +418,14 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     override fun onBackPressed() {
         backStep()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        val fragment =
+            supportFragmentManager.findFragmentByTag(LocationFragment.TAG) as LocationFragment?
+                ?: LocationFragment.newInstance()
+        fragment.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun notification() {

@@ -1,9 +1,9 @@
 package org.rfcx.audiomoth.view.profile.locationgroup
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_location_group.*
@@ -22,12 +22,15 @@ class LocationGroupActivity : AppCompatActivity(), LocationGroupProtocol {
 
         val group: String? = intent?.getStringExtra(EXTRA_GROUP)
         val screen: String? = intent?.getStringExtra(EXTRA_SCREEN)
-        Log.d("LocationGroupActivity","$screen")
         // TODO: set group when seleced
     }
 
     override fun onCreateNewGroup() {
         CreateNewGroupActivity.startActivity(this)
+    }
+
+    override fun onFinish() {
+        finish()
     }
 
     private fun startFragment(fragment: Fragment) {
@@ -54,12 +57,29 @@ class LocationGroupActivity : AppCompatActivity(), LocationGroupProtocol {
         const val EXTRA_GROUP = "EXTRA_GROUP"
         const val EXTRA_SCREEN = "EXTRA_SCREEN"
 
-        fun startActivity(context: Context, group: String? = null, screen: String = Screen.PROFILE.id) {
+        fun startActivity(
+            context: Context,
+            group: String? = null,
+            screen: String = Screen.PROFILE.id
+        ) {
             val intent = Intent(context, LocationGroupActivity::class.java)
             if (group != null)
                 intent.putExtra(EXTRA_GROUP, group)
-                intent.putExtra(EXTRA_SCREEN, screen)
+            intent.putExtra(EXTRA_SCREEN, screen)
             context.startActivity(intent)
+        }
+
+        fun startActivity(
+            context: Context,
+            group: String? = null,
+            screen: String = Screen.PROFILE.id,
+            requestCode: Int
+        ) {
+            val intent = Intent(context, LocationGroupActivity::class.java)
+            if (group != null)
+                intent.putExtra(EXTRA_GROUP, group)
+            intent.putExtra(EXTRA_SCREEN, screen)
+            (context as Activity).startActivityForResult(intent, requestCode)
         }
     }
 }

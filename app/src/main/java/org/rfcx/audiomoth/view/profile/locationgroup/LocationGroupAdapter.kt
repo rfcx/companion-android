@@ -8,7 +8,7 @@ import kotlinx.android.synthetic.main.item_location_group.view.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.LocationGroups
 
-class LocationGroupAdapter :
+class LocationGroupAdapter(private val onGroupClickListener: (LocationGroups) -> Unit) :
     RecyclerView.Adapter<LocationGroupAdapter.LocationGroupAdapterViewHolder>() {
 
     var items: List<LocationGroups> = arrayListOf()
@@ -31,7 +31,7 @@ class LocationGroupAdapter :
     override fun onBindViewHolder(holder: LocationGroupAdapterViewHolder, position: Int) {
         holder.bind(items[position].name)
         holder.itemView.setOnClickListener {
-            // TODO: setOnClick
+            onGroupClickListener(items[position])
         }
     }
 

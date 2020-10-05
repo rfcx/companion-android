@@ -167,7 +167,14 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         changeGroupTextView.setOnClickListener {
             val group = locationGroupValueTextView.text.toString()
             val setLocationGroup = if (group == getString(R.string.none)) null else group
-            context?.let { it1 -> LocationGroupActivity.startActivity(it1, setLocationGroup, Screen.LOCATION.id) }
+            context?.let { it1 ->
+                LocationGroupActivity.startActivity(
+                    it1,
+                    setLocationGroup,
+                    Screen.LOCATION.id,
+                    LOCATION_REQUEST_CODE
+                )
+            }
         }
 
         viewOfMapBox.setOnClickListener {
@@ -548,6 +555,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     companion object {
         const val TAG = "LocationFragment"
         const val REQUEST_PERMISSIONS_REQUEST_CODE = 34
+        const val LOCATION_REQUEST_CODE = 1003
         const val DEFAULT_ZOOM = 15.0
         const val ARG_LATITUDE = "ARG_LATITUDE"
         const val ARG_LONGITUDE = "ARG_LONGITUDE"
