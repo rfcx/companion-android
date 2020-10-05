@@ -47,6 +47,11 @@ class LocationGroupFragment : Fragment() {
         locationGroupAdapter.items = locationGroupDb.getLocationGroups()
     }
 
+    override fun onResume() {
+        super.onResume()
+        locationGroupAdapter.items = locationGroupDb.getLocationGroups()
+    }
+
     companion object {
         @JvmStatic
         fun newInstance() = LocationGroupFragment()

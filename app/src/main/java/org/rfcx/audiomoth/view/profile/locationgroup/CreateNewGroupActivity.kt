@@ -2,18 +2,20 @@ package org.rfcx.audiomoth.view.profile.locationgroup
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Rect
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_create_new_group.*
+import kotlinx.android.synthetic.main.fragment_profile.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.LocationGroups
 import org.rfcx.audiomoth.localdb.LocationGroupDb
 import org.rfcx.audiomoth.service.LocationGroupSyncWorker
-import org.rfcx.audiomoth.service.LocationSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
 
 class CreateNewGroupActivity : AppCompatActivity(), (ColorPickerItem, Int) -> Unit {
@@ -49,6 +51,7 @@ class CreateNewGroupActivity : AppCompatActivity(), (ColorPickerItem, Int) -> Un
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_new_group)
         setupToolbar()
+        window.decorView.rootView.viewTreeObserver.addOnGlobalLayoutListener { setOnFocusEditText() }
 
         colorPickerRecyclerView.apply {
             layoutManager = GridLayoutManager(context, 5)
@@ -75,12 +78,25 @@ class CreateNewGroupActivity : AppCompatActivity(), (ColorPickerItem, Int) -> Un
             }
         }
     }
-
     override fun invoke(colorPickerItem: ColorPickerItem, position: Int) {
         colorPickerList.forEachIndexed { index, _ ->
             colorPickerState[index] = ColorPickerItem(colorPickerList[index], position == index)
         }
         colorPickerAdapter.items = colorPickerState
+    }
+
+    private fun setOnFocusEditText() {
+        val screenHeight: Int = window.decorView.rootView?.height ?: 0
+        val r = Rect()
+        window.decorView.rootView?.getWindowVisibleDisplayFrame(r)
+        val keypadHeight: Int = screenHeight - r.bottom
+        if (keypadHeight > screenHeight * 0.15) {
+            saveButton.visibility = View.GONE
+        } else {
+            if (saveButton != null) {
+                saveButton.visibility = View.VISIBLE
+            }
+        }
     }
 
     private fun setupToolbar() {
