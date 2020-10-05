@@ -11,6 +11,7 @@ open class LocationGroups(
     var id: Int = 0,
     var name: String = "",
     var color: String = "",
+    var serverId: String? = null,
     @Expose(serialize = false)
     var syncState: Int = 0
 
@@ -20,6 +21,7 @@ open class LocationGroups(
         const val LOCATION_GROUPS_ID = "id"
         const val LOCATION_GROUPS_NAME = "name"
         const val LOCATION_GROUPS_COLOR = "color"
+        const val LOCATION_GROUPS_SERVER_ID = "serverId"
         const val LOCATION_GROUPS_SYNC_STATE = "syncState"
     }
 }

@@ -53,19 +53,20 @@ class LocationGroupDb(private val realm: Realm) {
     }
 
     fun markSent(serverId: String, id: Int) {
-        mark(id, SyncState.Sent.key)
+        mark(id, serverId, SyncState.Sent.key)
     }
 
     fun getLocationGroups(): List<LocationGroups> {
         return realm.where(LocationGroups::class.java).findAll() ?: arrayListOf()
     }
 
-    private fun mark(id: Int, syncState: Int) {
+    private fun mark(id: Int, serverId: String? = null, syncState: Int) {
         realm.executeTransaction {
             val locationGroup =
                 it.where(LocationGroups::class.java).equalTo(LocationGroups.LOCATION_GROUPS_ID, id)
                     .findFirst()
             if (locationGroup != null) {
+                locationGroup.serverId = serverId
                 locationGroup.syncState = syncState
             }
         }
