@@ -75,7 +75,6 @@ class CompanionRealmMigration : RealmMigration {
                 .setNullable(LocationGroups.LOCATION_GROUPS_COLOR, false)
 
             addField(LocationGroups.LOCATION_GROUPS_SYNC_STATE, Int::class.java)
-                .setNullable(LocationGroups.LOCATION_GROUPS_SYNC_STATE, false)
         }
     }
 
