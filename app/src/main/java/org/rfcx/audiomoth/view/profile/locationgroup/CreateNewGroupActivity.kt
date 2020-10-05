@@ -12,6 +12,8 @@ import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.LocationGroups
 import org.rfcx.audiomoth.localdb.LocationGroupDb
+import org.rfcx.audiomoth.service.LocationGroupSyncWorker
+import org.rfcx.audiomoth.service.LocationSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
 
 class CreateNewGroupActivity : AppCompatActivity(), (ColorPickerItem, Int) -> Unit {
@@ -68,6 +70,7 @@ class CreateNewGroupActivity : AppCompatActivity(), (ColorPickerItem, Int) -> Un
                     color = color.color
                 )
                 locationGroupDb.insertOrUpdateLocationGroup(group)
+                LocationGroupSyncWorker.enqueue(this)
             }
         }
     }

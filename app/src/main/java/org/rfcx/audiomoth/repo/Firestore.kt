@@ -61,7 +61,7 @@ class Firestore(val context: Context) {
         return userDocument.collection(COLLECTION_PROFILES).add(profile).await()
     }
 
-    suspend fun sendProfile(group: EdgeGroupRequest): DocumentReference? {
+    suspend fun sendGroup(group: EdgeGroupRequest): DocumentReference? {
         val userDocument = db.collection(COLLECTION_USERS).document(uid)
         return userDocument.collection(COLLECTION_GROUPS).add(group).await()
     }
