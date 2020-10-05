@@ -6,11 +6,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_location_group.view.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.LocationGroups
 
 class LocationGroupAdapter :
     RecyclerView.Adapter<LocationGroupAdapter.LocationGroupAdapterViewHolder>() {
 
-    var items: List<String> = arrayListOf()
+    var items: List<LocationGroups> = arrayListOf()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -28,7 +29,7 @@ class LocationGroupAdapter :
     override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: LocationGroupAdapterViewHolder, position: Int) {
-        holder.bind(items[position])
+        holder.bind(items[position].name)
         holder.itemView.setOnClickListener {
             // TODO: setOnClick
         }

@@ -7,10 +7,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_location_group.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.localdb.LocationGroupDb
+import org.rfcx.audiomoth.util.RealmHelper
 
 class LocationGroupFragment : Fragment() {
+    val realm: Realm = Realm.getInstance(RealmHelper.migrationConfig())
+    private val locationGroupDb = LocationGroupDb(realm)
+
     private val locationGroupAdapter by lazy { LocationGroupAdapter() }
     private var locationGroupProtocol: LocationGroupProtocol? = null
 
@@ -38,8 +44,7 @@ class LocationGroupFragment : Fragment() {
         locationGroupLinearLayout.setOnClickListener {
             locationGroupProtocol?.onCreateNewGroup()
         }
-
-        locationGroupAdapter.items = listOf("Location Group 01", "Location Group 02", "Location Group 03")
+        locationGroupAdapter.items = locationGroupDb.getLocationGroups()
     }
 
     companion object {

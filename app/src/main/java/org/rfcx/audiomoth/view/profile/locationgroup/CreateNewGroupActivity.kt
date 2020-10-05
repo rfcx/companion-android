@@ -71,6 +71,7 @@ class CreateNewGroupActivity : AppCompatActivity(), (ColorPickerItem, Int) -> Un
                 )
                 locationGroupDb.insertOrUpdateLocationGroup(group)
                 LocationGroupSyncWorker.enqueue(this)
+                finish()
             }
         }
     }
