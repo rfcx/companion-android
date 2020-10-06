@@ -90,12 +90,12 @@ class CompanionRealmMigration : RealmMigration {
 
         val locate = realm.schema.get(Locate.TABLE_NAME)
         locate?.apply {
-            addField(Locate.FIELD_LOCATION_GROUP, LocationGroup::class.java)
+            addRealmObjectField(Locate.FIELD_LOCATION_GROUP, locationGroup)
         }
 
         val deploymentLocation = realm.schema.get(DeploymentLocation.TABLE_NAME)
         deploymentLocation?.apply {
-            addField(DeploymentLocation.FIELD_LOCATION_GROUP, LocationGroup::class.java)
+            addRealmObjectField(DeploymentLocation.FIELD_LOCATION_GROUP, locationGroup)
         }
     }
 
