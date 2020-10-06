@@ -25,6 +25,7 @@ import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentImageDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianProfileDb
 import org.rfcx.audiomoth.service.GuardianDeploymentSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
+import org.rfcx.audiomoth.view.deployment.guardian.advanced.GuardianAdvancedFragment
 import org.rfcx.audiomoth.view.deployment.guardian.checkin.GuardianCheckInTestFragment
 import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianConfigureFragment
 import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianSelectProfileFragment
@@ -41,6 +42,7 @@ import org.rfcx.audiomoth.view.dialog.CompleteFragment
 import org.rfcx.audiomoth.view.dialog.CompleteListener
 import org.rfcx.audiomoth.view.dialog.ConnectInstructionDialogFragment
 import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
+import org.rfcx.audiomoth.view.prefs.GuardianPrefsFragment
 import org.rfcx.audiomoth.view.prefs.SyncPreferenceListener
 
 class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtocol,
@@ -265,6 +267,10 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             8 -> {
                 updateDeploymentState(DeploymentState.Guardian.Deploy)
                 startFragment(GuardianDeployFragment.newInstance())
+            }
+            9 -> {
+                updateDeploymentState(DeploymentState.Guardian.Advanced)
+                startFragment(GuardianAdvancedFragment.newInstance())
             }
         }
     }

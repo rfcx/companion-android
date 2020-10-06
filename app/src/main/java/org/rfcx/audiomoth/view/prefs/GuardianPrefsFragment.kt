@@ -9,8 +9,6 @@ import org.rfcx.audiomoth.R
 class GuardianPrefsFragment() : PreferenceFragmentCompat(),
     SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private val LOGTAG = "GuardianPrefsFragment"
-
     private val prefsChanges = mutableMapOf<String, String>()
 
     private var syncPreferenceListener: SyncPreferenceListener? = null
