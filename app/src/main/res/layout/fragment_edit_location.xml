@@ -34,7 +34,7 @@
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/mapBoxView"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="@dimen/map_box_height"
         android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginTop="@dimen/margin_padding_normal"
         android:layout_marginEnd="@dimen/margin_padding_large"
