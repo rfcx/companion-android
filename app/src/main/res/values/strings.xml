@@ -182,6 +182,8 @@
 
     <!-- ConnectGuardianFragment -->
     <string name="nearby_guardians">Nearby Guardian(s)</string>
+    <string name="connecting_up">Searching for nearby\n Guardians</string>
+    <string name="instruction">Why can\'t I see a guardian</string>
     <string name="connect">Connect</string>
     <string name="retry">Retry</string>
     <string name="not_found">No Guardians were detected nearby.</string>
@@ -285,7 +287,8 @@
     <!-- GuardianMicrophoneTestingFragment -->
     <string name="positioning_the_microphone">Positioning the microphone</string>
     <string name="listen">Listen</string>
-    <string name="cancel">cancel</string>
+    <string name="cancel">stop</string>
+    <string name="stop_listen">Stop listen</string>
     <string name="listen_again">listen again</string>
     <string name="don_t_forget_to_turn_speaker_on">*Don\'t forget to turn speaker on</string>
     <string name="rainbow">Rainbow</string>
@@ -331,5 +334,8 @@
     <!-- GuardianCheckListFragment -->
     <string name="setting_up_checklist">Setting up checklist</string>
     <string name="deploy">Deploy</string>
+
+    <!-- ConnectInstructionDiaglogFragment -->
+    <string name="got_it">Got it</string>
 
 </resources>

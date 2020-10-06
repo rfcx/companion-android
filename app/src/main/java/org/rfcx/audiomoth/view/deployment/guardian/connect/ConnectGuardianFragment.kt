@@ -51,6 +51,8 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        deploymentProtocol?.hideToolbar()
+
         showLoading()
         retryCountdown(SCAN)
 
@@ -83,6 +85,10 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
             retryCountdown(SCAN)
             wifiHotspotManager.nearbyHotspot(this)
         }
+
+        connectInstructionText.setOnClickListener {
+            deploymentProtocol?.showConnectInstruction()
+        }
     }
 
     override fun invoke(hotspot: ScanResult) {
@@ -94,7 +100,6 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
         hideLoading()
         hideNotFound()
         hideRetry()
-        wifiHotspotManager.unRegisterReceiver()
         countDownTimer.cancel()
         guardianHotspotAdapter.items = result
     }
@@ -119,22 +124,24 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
 
     private fun showLoading() {
         connectGuardianLoading?.visibility = View.VISIBLE
-        connectGuardianButton.visibility = View.GONE
+        connectGuardianButton.isEnabled = false
+        connectGuardianButton.visibility = View.VISIBLE
+        guardianHotspotRecyclerView.visibility = View.INVISIBLE
     }
 
     private fun hideLoading() {
-        connectGuardianLoading.visibility = View.GONE
-        connectGuardianButton.visibility = View.VISIBLE
+        connectGuardianLoading.visibility = View.INVISIBLE
+        guardianHotspotRecyclerView.visibility = View.VISIBLE
     }
 
     private fun showRetry() {
         retryGuardianButton.visibility = View.VISIBLE
         connectGuardianLoading.visibility = View.GONE
-        connectGuardianButton.visibility = View.GONE
+        connectGuardianButton.visibility = View.INVISIBLE
     }
 
     private fun hideRetry() {
-        retryGuardianButton.visibility = View.GONE
+        retryGuardianButton.visibility = View.INVISIBLE
     }
 
     private fun showNotFound() {
@@ -154,6 +161,7 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
                     wifiHotspotManager.unRegisterReceiver()
                 } else {
                     hideLoading()
+                    enableConnectButton()
                     Toast.makeText(activity!!, "Connection failed", Toast.LENGTH_LONG).show()
                 }
             }

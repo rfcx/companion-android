@@ -13,6 +13,7 @@ import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
 import android.net.wifi.WifiNetworkSpecifier
 import android.os.Build
+import org.rfcx.audiomoth.util.WifiHotspotUtils
 
 class WifiHotspotManager(private val context: Context) {
 
@@ -20,6 +21,8 @@ class WifiHotspotManager(private val context: Context) {
     private lateinit var wifiScanReceiver: WifiScanReceiver
     private lateinit var wifiConnectionReceiver: WifiConnectionReceiver
     private var isConnected = false
+
+    private var wifiName = ""
 
     fun nearbyHotspot(onWifiListener: OnWifiListener) {
         wifiManager =
@@ -35,6 +38,7 @@ class WifiHotspotManager(private val context: Context) {
     }
 
     fun connectTo(guardian: ScanResult, onWifiListener: OnWifiListener) {
+        wifiName = guardian.SSID
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val wifiNetworkSpecifier = WifiNetworkSpecifier.Builder().also {
                 it.setSsid(guardian.SSID)
@@ -113,8 +117,10 @@ class WifiHotspotManager(private val context: Context) {
             val netInfo = conManager.activeNetworkInfo
             if (netInfo != null && netInfo.isConnected && netInfo.type == ConnectivityManager.TYPE_WIFI) {
                 if (!isConnected) {
-                    onWifiListener.onWifiConnected()
-                    isConnected = true
+                    if (WifiHotspotUtils.isConnectedWithGuardian(context, wifiName)) {
+                        onWifiListener.onWifiConnected()
+                        isConnected = true
+                    }
                 }
             }
         }
