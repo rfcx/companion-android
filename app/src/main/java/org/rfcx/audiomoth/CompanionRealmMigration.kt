@@ -83,6 +83,7 @@ class CompanionRealmMigration : RealmMigration {
             addField(Locate.FIELD_GROUP, String::class.java)
             addField(Locate.FIELD_COLOR, String::class.java)
             addField(Locate.FIELD_GROUP_ID, Int::class.java)
+                .setNullable(Locate.FIELD_GROUP_ID, true)
             addField(Locate.FIELD_GROUP_SERVER_ID, String::class.java)
         }
     }
