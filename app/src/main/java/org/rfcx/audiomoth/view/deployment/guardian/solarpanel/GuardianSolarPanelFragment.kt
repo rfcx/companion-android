@@ -133,7 +133,7 @@ class GuardianSolarPanelFragment : Fragment() {
     private fun setFeedbackChart() {
         // setup simple line chart
         feedbackChart.apply {
-            setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+            setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.backgroundColor))
             description.isEnabled = false /* description inside chart */
             setTouchEnabled(false)
             isDragEnabled = true
@@ -146,6 +146,7 @@ class GuardianSolarPanelFragment : Fragment() {
             axisMinimum = AXIS_MINIMUM
             axisLineWidth = AXIS_LINE_WIDTH
             position = XAxis.XAxisPosition.BOTTOM
+            textColor = ContextCompat.getColor(requireContext(), R.color.text_primary)
         }
 
         // set y axis
@@ -154,12 +155,14 @@ class GuardianSolarPanelFragment : Fragment() {
             axisMinimum = AXIS_MINIMUM
             axisLineColor = Color.RED
             axisLineWidth = AXIS_LINE_WIDTH
+            textColor = ContextCompat.getColor(requireContext(), R.color.text_primary)
         }
         feedbackChart.axisRight.apply {
             axisMaximum = RIGHT_AXIS_MAXIMUM
             axisMinimum = AXIS_MINIMUM
             axisLineWidth = AXIS_LINE_WIDTH
             axisLineColor = Color.BLUE
+            textColor = ContextCompat.getColor(requireContext(), R.color.text_primary)
         }
     }
 
