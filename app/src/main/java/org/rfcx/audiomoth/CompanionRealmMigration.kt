@@ -79,13 +79,8 @@ class CompanionRealmMigration : RealmMigration {
         val locationGroup = realm.schema.create(LocationGroup.TABLE_NAME)
         locationGroup.apply {
             addField(LocationGroup.FIELD_GROUP, String::class.java)
-                .setNullable(LocationGroup.FIELD_GROUP, true)
-
             addField(LocationGroup.FIELD_COLOR, String::class.java)
-                .setNullable(LocationGroup.FIELD_COLOR, true)
-
             addField(LocationGroup.FIELD_SERVER_ID, String::class.java)
-                .setNullable(LocationGroup.FIELD_SERVER_ID, true)
         }
 
         val locate = realm.schema.get(Locate.TABLE_NAME)
