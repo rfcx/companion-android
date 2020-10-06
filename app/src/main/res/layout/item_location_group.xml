@@ -18,6 +18,17 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Location Group 01" />
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/checkImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_check_24dp"
+        android:paddingEnd="@dimen/margin_padding_normal"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"

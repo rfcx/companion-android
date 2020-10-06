@@ -516,7 +516,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         val preferences = context?.let { Preferences.getInstance(it) }
         locationGroupValueTextView.text =
             preferences?.getString(Preferences.GROUP, getString(R.string.none))
-        preferences?.putString(Preferences.GROUP, getString(R.string.none))
     }
 
     override fun onPause() {
@@ -538,6 +537,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         super.onDestroy()
         locationEngine?.removeLocationUpdates(mapboxLocationChangeCallback)
         mapView.onDestroy()
+
+        val preferences = context?.let { Preferences.getInstance(it) }
+        preferences?.putString(Preferences.GROUP, getString(R.string.none))
     }
 
     private fun setHideKeyboard() {

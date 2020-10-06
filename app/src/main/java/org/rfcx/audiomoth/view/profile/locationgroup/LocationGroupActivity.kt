@@ -12,7 +12,6 @@ import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.LocationGroups
 import org.rfcx.audiomoth.entity.Screen
 import org.rfcx.audiomoth.util.Preferences
-import org.rfcx.audiomoth.view.deployment.locate.LocationFragment.Companion.LOCATION_RESULT_CODE
 
 class LocationGroupActivity : AppCompatActivity(), LocationGroupProtocol {
 
@@ -21,11 +20,9 @@ class LocationGroupActivity : AppCompatActivity(), LocationGroupProtocol {
         setContentView(R.layout.activity_location_group)
 
         setupToolbar()
-        startFragment(LocationGroupFragment.newInstance())
 
         val group: String? = intent?.getStringExtra(EXTRA_GROUP)
-        val screen: String? = intent?.getStringExtra(EXTRA_SCREEN)
-        // TODO: set group when seleced
+        startFragment(LocationGroupFragment.newInstance(group))
     }
 
     override fun onCreateNewGroup() {
@@ -33,10 +30,14 @@ class LocationGroupActivity : AppCompatActivity(), LocationGroupProtocol {
     }
 
     override fun onLocationGroupClick(group: LocationGroups) {
-        val preferences = Preferences.getInstance(this)
-        preferences.putString(Preferences.GROUP, group.name)
+        val screen: String? = intent?.getStringExtra(EXTRA_SCREEN)
 
-        finish()
+        if (screen == Screen.LOCATION.id) {
+            val preferences = Preferences.getInstance(this)
+            preferences.putString(Preferences.GROUP, group.name)
+
+            finish()
+        }
     }
 
     private fun startFragment(fragment: Fragment) {

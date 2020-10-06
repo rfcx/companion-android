@@ -10,7 +10,7 @@ import org.rfcx.audiomoth.entity.LocationGroups
 
 class LocationGroupAdapter(private val onGroupClickListener: (LocationGroups) -> Unit) :
     RecyclerView.Adapter<LocationGroupAdapter.LocationGroupAdapterViewHolder>() {
-
+    var selectedGroup: String? = null
     var items: List<LocationGroups> = arrayListOf()
         set(value) {
             field = value
@@ -37,8 +37,11 @@ class LocationGroupAdapter(private val onGroupClickListener: (LocationGroups) ->
 
     inner class LocationGroupAdapterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val locationGroupTextView = itemView.locationGroupTextView
+        private val checkImageView = itemView.checkImageView
 
         fun bind(locationGroup: String) {
+            checkImageView.visibility =
+                if (locationGroup == selectedGroup) View.VISIBLE else View.GONE
             locationGroupTextView.text = locationGroup
         }
     }

@@ -20,10 +20,16 @@ class LocationGroupFragment : Fragment(), (LocationGroups) -> Unit {
 
     private val locationGroupAdapter by lazy { LocationGroupAdapter(this) }
     private var locationGroupProtocol: LocationGroupProtocol? = null
+    private var selectedGroup: String? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         locationGroupProtocol = (context as LocationGroupProtocol)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        initIntent()
     }
 
     override fun onCreateView(
@@ -46,6 +52,11 @@ class LocationGroupFragment : Fragment(), (LocationGroups) -> Unit {
             locationGroupProtocol?.onCreateNewGroup()
         }
         locationGroupAdapter.items = locationGroupDb.getLocationGroups()
+        locationGroupAdapter.selectedGroup = selectedGroup
+    }
+
+    private fun initIntent() {
+        arguments?.let { selectedGroup = it.getString(ARG_GROUP) }
     }
 
     override fun invoke(group: LocationGroups) {
@@ -58,7 +69,13 @@ class LocationGroupFragment : Fragment(), (LocationGroups) -> Unit {
     }
 
     companion object {
+        private const val ARG_GROUP = "ARG_GROUP"
+
         @JvmStatic
-        fun newInstance() = LocationGroupFragment()
+        fun newInstance(group: String?) = LocationGroupFragment().apply {
+            arguments = Bundle().apply {
+                putString(ARG_GROUP, group)
+            }
+        }
     }
 }
