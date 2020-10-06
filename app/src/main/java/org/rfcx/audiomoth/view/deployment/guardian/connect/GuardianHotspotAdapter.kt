@@ -28,6 +28,8 @@ class GuardianHotspotAdapter(private val onHotspotClickListener: (ScanResult) ->
     override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: GuardianHotspotViewHolder, position: Int) {
+        holder.itemView.setBackgroundColor(ContextCompat.getColor(holder.itemView.context, R.color.backgroundColor))
+
         if (selectedPosition == position) {
             holder.itemView.hotspotNameTextView.apply {
                 setTextColor(ContextCompat.getColor(this.context, R.color.colorPrimary))

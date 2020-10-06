@@ -5,7 +5,7 @@
     android:layout_height="72dp"
     android:layout_marginStart="@dimen/margin_padding_xsmall"
     android:layout_marginEnd="@dimen/margin_padding_xsmall"
-    android:background="@color/grey_light"
+    android:background="@color/addImageBackground"
     android:foreground="?attr/selectableItemBackgroundBorderless"
     android:gravity="center"
     android:orientation="vertical">
