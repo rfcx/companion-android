@@ -9,7 +9,10 @@ import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_location_group.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.LocationGroups
 import org.rfcx.audiomoth.entity.Screen
+import org.rfcx.audiomoth.util.Preferences
+import org.rfcx.audiomoth.view.deployment.locate.LocationFragment.Companion.LOCATION_RESULT_CODE
 
 class LocationGroupActivity : AppCompatActivity(), LocationGroupProtocol {
 
@@ -29,7 +32,10 @@ class LocationGroupActivity : AppCompatActivity(), LocationGroupProtocol {
         CreateNewGroupActivity.startActivity(this)
     }
 
-    override fun onFinish() {
+    override fun onLocationGroupClick(group: LocationGroups) {
+        val preferences = Preferences.getInstance(this)
+        preferences.putString(Preferences.GROUP, group.name)
+
         finish()
     }
 

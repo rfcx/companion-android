@@ -49,7 +49,7 @@ class LocationGroupFragment : Fragment(), (LocationGroups) -> Unit {
     }
 
     override fun invoke(group: LocationGroups) {
-        locationGroupProtocol?.onFinish()
+        locationGroupProtocol?.onLocationGroupClick(group)
     }
 
     override fun onResume() {

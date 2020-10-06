@@ -60,6 +60,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     private var nameLocation: String? = null
+    private var group: String? = null
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
@@ -511,6 +512,11 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         super.onResume()
         mapView.onResume()
         analytics?.trackScreen(Screen.LOCATION)
+
+        val preferences = context?.let { Preferences.getInstance(it) }
+        locationGroupValueTextView.text =
+            preferences?.getString(Preferences.GROUP, getString(R.string.none))
+        preferences?.putString(Preferences.GROUP, getString(R.string.none))
     }
 
     override fun onPause() {
