@@ -77,6 +77,14 @@ class CompanionRealmMigration : RealmMigration {
             addField(LocationGroups.LOCATION_GROUPS_SYNC_STATE, Int::class.java)
             addField(LocationGroups.LOCATION_GROUPS_SERVER_ID, String::class.java)
         }
+
+        val locate = realm.schema.get(Locate.TABLE_NAME)
+        locate?.apply {
+            addField(Locate.FIELD_GROUP, String::class.java)
+            addField(Locate.FIELD_COLOR, String::class.java)
+            addField(Locate.FIELD_GROUP_ID, Int::class.java)
+            addField(Locate.FIELD_GROUP_SERVER_ID, String::class.java)
+        }
     }
 
     override fun hashCode(): Int {

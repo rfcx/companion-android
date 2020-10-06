@@ -12,6 +12,10 @@ open class Locate(
     @PrimaryKey
     var id: Int = 0,
     var serverId: String? = null,
+    var group: String? = null,
+    var color: String? = null,
+    var groupId: Int? = null,
+    var groupServerId: String? = null,
     var name: String = "",
     var latitude: Double = 0.0,
     var longitude: Double = 0.0,
@@ -61,6 +65,10 @@ open class Locate(
         const val TABLE_NAME = "Locate"
         const val FIELD_ID = "id"
         const val FIELD_SERVER_ID = "serverId"
+        const val FIELD_GROUP = "group"
+        const val FIELD_COLOR = "color"
+        const val FIELD_GROUP_ID = "groupId"
+        const val FIELD_GROUP_SERVER_ID = "groupServerId"
         const val FIELD_DELETED_AT = "deletedAt"
         const val FIELD_LAST_EDGE_DEPLOYMENT_SERVER_ID = "lastDeploymentServerId"
         const val FIELD_LAST_EDGE_DEPLOYMENT_ID = "lastDeploymentId"
