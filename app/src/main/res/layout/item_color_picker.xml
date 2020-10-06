@@ -6,8 +6,8 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/colorImageView"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="@dimen/color_image_size"
+        android:layout_height="@dimen/color_image_size"
         android:layout_margin="@dimen/margin_padding_small"
         android:scaleType="centerCrop"
         android:src="@drawable/bg_color_picker"
