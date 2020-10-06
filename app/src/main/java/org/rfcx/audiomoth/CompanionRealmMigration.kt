@@ -3,10 +3,7 @@ package org.rfcx.audiomoth
 import io.realm.DynamicRealm
 import io.realm.FieldAttribute
 import io.realm.RealmMigration
-import org.rfcx.audiomoth.entity.EdgeConfiguration
-import org.rfcx.audiomoth.entity.EdgeDeployment
-import org.rfcx.audiomoth.entity.Locate
-import org.rfcx.audiomoth.entity.LocationGroups
+import org.rfcx.audiomoth.entity.*
 import java.util.*
 
 class CompanionRealmMigration : RealmMigration {
@@ -78,13 +75,27 @@ class CompanionRealmMigration : RealmMigration {
             addField(LocationGroups.LOCATION_GROUPS_SERVER_ID, String::class.java)
         }
 
+        // Add LocationGroup class
+        val locationGroup = realm.schema.create(LocationGroup.TABLE_NAME)
+        locationGroup.apply {
+            addField(LocationGroup.FIELD_GROUP, String::class.java)
+                .setNullable(LocationGroup.FIELD_GROUP, false)
+
+            addField(LocationGroup.FIELD_COLOR, String::class.java)
+                .setNullable(LocationGroup.FIELD_COLOR, false)
+
+            addField(LocationGroup.FIELD_SERVER_ID, String::class.java)
+                .setNullable(LocationGroup.FIELD_SERVER_ID, false)
+        }
+
         val locate = realm.schema.get(Locate.TABLE_NAME)
         locate?.apply {
-            addField(Locate.FIELD_GROUP, String::class.java)
-            addField(Locate.FIELD_COLOR, String::class.java)
-            addField(Locate.FIELD_GROUP_ID, Int::class.java)
-                .setNullable(Locate.FIELD_GROUP_ID, true)
-            addField(Locate.FIELD_GROUP_SERVER_ID, String::class.java)
+            addField(Locate.FIELD_LOCATION_GROUP, LocationGroup::class.java)
+        }
+
+        val deploymentLocation = realm.schema.get(DeploymentLocation.TABLE_NAME)
+        deploymentLocation?.apply {
+            addField(DeploymentLocation.FIELD_LOCATION_GROUP, LocationGroup::class.java)
         }
     }
 
