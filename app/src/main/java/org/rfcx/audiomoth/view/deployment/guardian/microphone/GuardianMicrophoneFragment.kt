@@ -107,7 +107,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     private fun setupSpectrogramSpeed() {
         speedValueTextView.text = speed[0]
         speedValueTextView.setOnClickListener {
-            val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
+            val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
             if (builder != null) {
                 builder.setTitle(R.string.choose_speed)
                     ?.setItems(speed) { dialog, i ->
@@ -130,7 +130,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     private fun setupSpectrogramFreqMenu() {
         freqScaleValueTextView.text = freq[0]
         freqScaleValueTextView.setOnClickListener {
-            val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
+            val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
             if (builder != null) {
                 builder.setTitle(R.string.choose_freq)
                     ?.setItems(freq) { dialog, i ->
@@ -151,7 +151,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     private fun setupSpectrogramColorMenu() {
         colorSpecValueTextView.text = color[0]
         colorSpecValueTextView.setOnClickListener {
-            val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
+            val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
             if (builder != null) {
                 builder.setTitle(R.string.choose_color)
                     ?.setItems(color) { dialog, i ->
@@ -172,7 +172,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     private fun setupAudioPlaybackMenu() {
         playbackValueTextView.text = playback[0]
         playbackValueTextView.setOnClickListener {
-            val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
+            val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
             if (builder != null) {
                 builder.setTitle(R.string.choose_play_back)
                     ?.setItems(playback) { dialog, i ->
