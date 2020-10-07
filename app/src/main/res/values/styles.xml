@@ -31,8 +31,10 @@
 
     <style name="AudioMothButton.GreenButton" parent="AudioMothButton">
         <item name="android:background">@drawable/bg_color_primary_button</item>
-        <item name="android:textColor">@android:color/white</item>
-        <item name="android:textSize">@dimen/text_medium</item>
+        <item name="android:textColor">@color/color_button_text</item>
+        <item name="android:textSize">@dimen/text_button</item>
+        <item name="fontFamily">@font/lato_bold</item>
+        <item name="android:lineSpacingExtra">0.5sp</item>
     </style>
 
     <style name="AudioMothButton.FacebookButton" parent="Widget.AppCompat.Button">

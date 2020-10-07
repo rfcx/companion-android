@@ -10,7 +10,7 @@
     <color name="addImageBackground">#45485D</color>
 
     <color name="colorPrimary">#2AA841</color>
-    <color name="colorPrimaryDark">#ff2c9a46</color>
+    <color name="colorPrimaryDark">#2C9A46</color>
     <color name="colorAccent">#ff2c9a46</color>
 
     <!-- Text color -->
@@ -19,8 +19,11 @@
     <color name="text_error">#e41a1a</color>
     <color name="text_white">#000000</color>
     <color name="text_black">#ffffff</color>
+    <color name="text_button_enable">#ffffff</color>
+    <color name="text_button_disable">#3dbf63</color>
 
     <color name="divider">#D6D6D6</color>
+    <color name="background_button_disable">@color/colorPrimary</color>
 
     <color name="white">#FFF</color>
     <color name="grey">#D3D9E0</color>
