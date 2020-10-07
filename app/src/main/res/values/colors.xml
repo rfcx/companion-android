@@ -8,6 +8,9 @@
     <color name="bottomBar">@color/white</color>
     <color name="disableColor">#aaa</color>
     <color name="addImageBackground">@color/grey_light</color>
+    <color name="snackbarBgColor">#1F2D3D</color>
+    <color name="snackbarBtColor">@color/colorPrimary</color>
+    <color name="snackbarTxtColor">#FFFFFF</color>
 
     <color name="colorPrimary">#2AA841</color>
     <color name="colorPrimaryDark">#ff2c9a46</color>
