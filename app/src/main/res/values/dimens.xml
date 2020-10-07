@@ -46,4 +46,7 @@
     <!-- CheckList -->
     <dimen name="padding_top_header">12dp</dimen>
 
+    <!-- ProfileFragment -->
+    <dimen name="separate_line_size">2dp</dimen>
+
 </resources>

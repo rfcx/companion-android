@@ -110,11 +110,13 @@
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">@dimen/text_small</item>
         <item name="android:textAllCaps">true</item>
+        <item name="android:fontFamily">@font/lato_regular</item>
     </style>
 
     <style name="AudioMothText.Body.Small" parent="TextAppearance.AppCompat.Body2">
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">@dimen/text_small</item>
+        <item name="android:fontFamily">@font/lato_regular</item>
     </style>
 
     <style name="AudioMothText.Body.Small.Label" parent="AudioMothText.Body.Small">
