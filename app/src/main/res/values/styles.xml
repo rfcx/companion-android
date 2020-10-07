@@ -61,7 +61,7 @@
 
     <style name="GuardianButton.GreenButton.Line" parent="AudioMothButton">
         <item name="android:background">@drawable/bg_button_green_outline</item>
-        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textColor">@color/color_button_outline_text</item>
         <item name="android:textSize">@dimen/text_button</item>
         <item name="fontFamily">@font/lato_bold</item>
         <item name="android:lineSpacingExtra">0.5sp</item>
