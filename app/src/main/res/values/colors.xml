@@ -8,7 +8,7 @@
     <color name="bottomBar">@color/white</color>
     <color name="disableColor">#aaa</color>
     <color name="addImageBackground">@color/grey_light</color>
-    <color name="dialogColor">#D6D6D6</color>
+    <color name="dialogColor">#ffffff</color>
 
     <color name="colorPrimary">#2AA841</color>
     <color name="colorPrimaryDark">#ff2c9a46</color>
