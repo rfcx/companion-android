@@ -5,6 +5,7 @@
     <color name="separateLine">#45485D</color>
     <color name="searchColor">#3b3e53</color>
     <color name="iconColor">#999999</color>
+    <color name="topBar">#232436</color>
     <color name="bottomBar">#232436</color>
     <color name="disableColor">#5A6978</color>
     <color name="addImageBackground">#45485D</color>

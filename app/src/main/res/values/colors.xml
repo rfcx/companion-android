@@ -5,6 +5,7 @@
     <color name="separateLine">@color/grey_light</color>
     <color name="searchColor">@color/white</color>
     <color name="iconColor">#000000</color>
+    <color name="topBar">@color/white</color>
     <color name="bottomBar">@color/white</color>
     <color name="disableColor">#aaa</color>
     <color name="addImageBackground">@color/grey_light</color>
