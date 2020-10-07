@@ -21,10 +21,14 @@
     <color name="text_black">#000000</color>
     <color name="text_button_enable">#ffffff</color>
     <color name="text_button_disable">#ffffff</color>
+    <color name="text_button_outline_enable">@color/colorPrimary</color>
+    <color name="text_button_outline_disable">#969FAA</color>
 
     <color name="divider">#D6D6D6</color>
     <color name="background_button_enable">@color/colorPrimary</color>
     <color name="background_button_disable">#969FAA</color>
+    <color name="background_outline_button_enable">@color/colorPrimary</color>
+    <color name="background_outline_button_disable">#969FAA</color>
 
     <color name="white">#FFF</color>
     <color name="grey">#D3D9E0</color>

@@ -60,10 +60,11 @@
     </style>
 
     <style name="GuardianButton.GreenButton.Line" parent="AudioMothButton">
-        <item name="android:background">@drawable/bg_button_green</item>
-        <item name="android:textStyle">normal</item>
+        <item name="android:background">@drawable/bg_button_green_outline</item>
         <item name="android:textColor">@color/colorPrimary</item>
-        <item name="android:textSize">@dimen/text_medium</item>
+        <item name="android:textSize">@dimen/text_button</item>
+        <item name="fontFamily">@font/lato_bold</item>
+        <item name="android:lineSpacingExtra">0.5sp</item>
     </style>
 
     <style name="GuardianButton.RedButton" parent="AudioMothButton">
