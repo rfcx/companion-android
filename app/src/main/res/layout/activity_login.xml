@@ -140,7 +140,7 @@
         android:background="@drawable/bg_sms_login_button"
         android:text="@string/connect_with_sms"
         android:textSize="@dimen/text_button"
-        android:fontFamily="@font/lato_bold"
+        android:fontFamily="@font/lato_regular"
         android:textStyle="bold"
         android:lineSpacingExtra="0.5sp"
         app:layout_constraintEnd_toEndOf="parent"

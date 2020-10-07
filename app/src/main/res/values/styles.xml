@@ -21,6 +21,10 @@
     <!-- Button -->
     <style name="AudioMothButton" parent="Widget.AppCompat.Button">
         <item name="android:minWidth">120dp</item>
+        <item name="android:textSize">@dimen/text_button</item>
+        <item name="android:textStyle">bold</item>
+        <item name="fontFamily">@font/lato_regular</item>
+        <item name="android:lineSpacingExtra">0.5sp</item>
     </style>
 
     <style name="AudioMothButton.Primary" parent="AudioMothButton">
@@ -32,16 +36,10 @@
     <style name="AudioMothButton.GreenButton" parent="AudioMothButton">
         <item name="android:background">@drawable/bg_color_primary_button</item>
         <item name="android:textColor">@color/color_button_text</item>
-        <item name="android:textSize">@dimen/text_button</item>
-        <item name="fontFamily">@font/lato_bold</item>
-        <item name="android:lineSpacingExtra">0.5sp</item>
     </style>
 
-    <style name="AudioMothButton.FacebookButton" parent="Widget.AppCompat.Button">
+    <style name="AudioMothButton.FacebookButton" parent="AudioMothButton">
         <item name="android:background">@drawable/bg_facebook_login_button</item>
-        <item name="android:textSize">@dimen/text_button</item>
-        <item name="fontFamily">@font/lato_bold</item>
-        <item name="android:lineSpacingExtra">0.5sp</item>
     </style>
 
     <style name="AudioMothButton.GrayButton" parent="Widget.AppCompat.Button">
@@ -63,9 +61,6 @@
     <style name="GuardianButton.GreenButton.Line" parent="AudioMothButton">
         <item name="android:background">@drawable/bg_button_green_outline</item>
         <item name="android:textColor">@color/color_button_outline_text</item>
-        <item name="android:textSize">@dimen/text_button</item>
-        <item name="fontFamily">@font/lato_bold</item>
-        <item name="android:lineSpacingExtra">0.5sp</item>
     </style>
 
     <style name="GuardianButton.RedButton" parent="AudioMothButton">
