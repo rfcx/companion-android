@@ -36,4 +36,6 @@
     <color name="signal_filled">#2AA841</color>
 
     <color name="step_enabled_true">#2AA841</color>
+
+    <color name="bottom_bar_icon_default_tint">#969FAA</color>
 </resources>
