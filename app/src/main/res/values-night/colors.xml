@@ -23,7 +23,8 @@
     <color name="text_button_disable">#3dbf63</color>
 
     <color name="divider">#D6D6D6</color>
-    <color name="background_button_disable">@color/colorPrimary</color>
+    <color name="background_button_enable">@color/colorPrimaryDark</color>
+    <color name="background_button_disable">@color/colorPrimaryDark</color>
 
     <color name="white">#FFF</color>
     <color name="grey">#D3D9E0</color>
