@@ -139,8 +139,10 @@
         android:layout_marginEnd="@dimen/margin_padding_normal"
         android:background="@drawable/bg_sms_login_button"
         android:text="@string/connect_with_sms"
-        android:textColor="@color/white"
+        android:textSize="@dimen/text_button"
+        android:fontFamily="@font/lato_bold"
         android:textStyle="bold"
+        android:lineSpacingExtra="0.5sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/facebookLoginButton" />

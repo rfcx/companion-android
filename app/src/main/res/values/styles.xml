@@ -39,8 +39,9 @@
 
     <style name="AudioMothButton.FacebookButton" parent="Widget.AppCompat.Button">
         <item name="android:background">@drawable/bg_facebook_login_button</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">@dimen/text_button</item>
+        <item name="fontFamily">@font/lato_bold</item>
+        <item name="android:lineSpacingExtra">0.5sp</item>
     </style>
 
     <style name="AudioMothButton.GrayButton" parent="Widget.AppCompat.Button">
