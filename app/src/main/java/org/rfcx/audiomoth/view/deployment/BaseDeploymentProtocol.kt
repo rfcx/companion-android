@@ -10,6 +10,7 @@ interface BaseDeploymentProtocol {
     fun backStep()
 
     fun getDeploymentLocation(): DeploymentLocation?
+    fun getLocationGroup(name: String): LocationGroups?
 
     fun setDeployLocation(locate: Locate)
     fun setImages(images: List<String>)

@@ -60,6 +60,11 @@ class LocationGroupDb(private val realm: Realm) {
         return realm.where(LocationGroups::class.java).findAll() ?: arrayListOf()
     }
 
+    fun getLocationGroups(name: String): LocationGroups {
+        return realm.where(LocationGroups::class.java)
+            .equalTo(LocationGroups.LOCATION_GROUPS_NAME, name).findFirst() ?: LocationGroups()
+    }
+
     private fun mark(id: Int, serverId: String? = null, syncState: Int) {
         realm.executeTransaction {
             val locationGroup =

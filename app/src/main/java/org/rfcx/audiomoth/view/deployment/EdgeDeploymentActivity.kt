@@ -16,10 +16,7 @@ import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.BuildConfig
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.*
-import org.rfcx.audiomoth.localdb.DeploymentImageDb
-import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
-import org.rfcx.audiomoth.localdb.LocateDb
-import org.rfcx.audiomoth.localdb.ProfileDb
+import org.rfcx.audiomoth.localdb.*
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
 import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
@@ -48,6 +45,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         )
     }
     private val locateDb by lazy { LocateDb(realm) }
+    private val locationGroupDb by lazy { LocationGroupDb(realm) }
     private val profileDb by lazy { ProfileDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
 
@@ -57,6 +55,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     private var _deployLocation: DeploymentLocation? = null
     private var _edgeConfiguration: EdgeConfiguration? = null
     private var _images: List<String> = listOf()
+    private var _deployLocationGroup: LocationGroup? = null
 
     private val audioMothConnector: AudioMothConnector = AudioMothChimeConnector()
     private val configuration = AudioMothConfiguration()
@@ -157,6 +156,9 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     }
 
     override fun getDeployment(): EdgeDeployment? = this._deployment
+    override fun getLocationGroup(name: String): LocationGroups? {
+        return locationGroupDb.getLocationGroups(name)
+    }
 
     override fun setDeployment(deployment: EdgeDeployment) {
         this._deployment = deployment

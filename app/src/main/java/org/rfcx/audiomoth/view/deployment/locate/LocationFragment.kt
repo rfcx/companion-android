@@ -36,6 +36,8 @@ import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Locate
+import org.rfcx.audiomoth.entity.LocationGroup
+import org.rfcx.audiomoth.entity.LocationGroups
 import org.rfcx.audiomoth.entity.Screen
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.util.*
@@ -218,7 +220,13 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         val locationValue = locationValueTextView.text.toString()
         if (name.isNotEmpty() && locationValue.isNotEmpty() && lastLocation != null) {
             lastLocation?.let {
-                val locate = Locate(name = name, latitude = it.latitude, longitude = it.longitude)
+
+                val locate = Locate(
+                    name = name,
+                    latitude = it.latitude,
+                    longitude = it.longitude,
+                    locationGroup = getLocationGroup()
+                )
                 deploymentProtocol?.setDeployLocation(locate)
                 deploymentProtocol?.nextStep()
             }
@@ -232,10 +240,32 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun handleExistLocate() {
+        val group = getLocationGroup()
         locateItem?.let {
-            deploymentProtocol?.setDeployLocation(it)
+            val locate = Locate(
+                it.id,
+                it.serverId,
+                getLocationGroup(),
+                it.name,
+                it.latitude,
+                it.longitude,
+                it.createdAt,
+                it.deletedAt,
+                it.lastDeploymentId,
+                it.lastDeploymentServerId,
+                it.lastGuardianDeploymentId,
+                it.lastGuardianDeploymentServerId,
+                it.syncState
+            )
+            deploymentProtocol?.setDeployLocation(locate)
             deploymentProtocol?.nextStep()
         }
+    }
+
+    private fun getLocationGroup(): LocationGroup {
+        val group = this.group ?: getString(R.string.none)
+        val locationGroup = deploymentProtocol?.getLocationGroup(group) ?: LocationGroups()
+        return LocationGroup(locationGroup.name, locationGroup.color, locationGroup.serverId)
     }
 
     private fun setupLocationOptions() {
@@ -514,8 +544,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         analytics?.trackScreen(Screen.LOCATION)
 
         val preferences = context?.let { Preferences.getInstance(it) }
-        locationGroupValueTextView.text =
-            preferences?.getString(Preferences.GROUP, getString(R.string.none))
+        group = preferences?.getString(Preferences.GROUP, getString(R.string.none))
+        locationGroupValueTextView.text = group
     }
 
     override fun onPause() {

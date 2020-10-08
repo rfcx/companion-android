@@ -35,7 +35,6 @@ class LocationGroupActivity : AppCompatActivity(), LocationGroupProtocol {
         if (screen == Screen.LOCATION.id) {
             val preferences = Preferences.getInstance(this)
             preferences.putString(Preferences.GROUP, group.name)
-
             finish()
         }
     }

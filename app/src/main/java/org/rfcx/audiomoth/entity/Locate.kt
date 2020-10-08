@@ -54,7 +54,8 @@ open class Locate(
         return DeploymentLocation(
             name = name,
             latitude = latitude,
-            longitude = longitude
+            longitude = longitude,
+            locationGroup = locationGroup
         )
     }
 
