@@ -157,7 +157,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     override fun getDeployment(): EdgeDeployment? = this._deployment
     override fun getLocationGroup(name: String): LocationGroups? {
-        return locationGroupDb.getLocationGroups(name)
+        return locationGroupDb.getLocationGroup(name)
     }
 
     override fun setDeployment(deployment: EdgeDeployment) {

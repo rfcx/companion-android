@@ -114,6 +114,12 @@ class Firestore(val context: Context) {
             .set(diagnosticRequest).await()
     }
 
+    suspend fun updateGroup(groupServerId: String, group: EdgeGroupRequest) {
+        val userDocument = db.collection(COLLECTION_USERS).document(uid)
+        userDocument.collection(COLLECTION_GROUPS).document(groupServerId)
+            .set(group).await()
+    }
+
     fun retrieveDeployments(
         edgeDeploymentDb: EdgeDeploymentDb,
         guardianDeploymentDb: GuardianDeploymentDb,

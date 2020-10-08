@@ -8,7 +8,7 @@ import kotlinx.android.synthetic.main.item_location_group.view.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.LocationGroups
 
-class LocationGroupAdapter(private val onGroupClickListener: (LocationGroups) -> Unit) :
+class LocationGroupAdapter(private val locationGroupListener: LocationGroupListener) :
     RecyclerView.Adapter<LocationGroupAdapter.LocationGroupAdapterViewHolder>() {
     var selectedGroup: String? = null
     var items: List<LocationGroups> = arrayListOf()
@@ -16,6 +16,10 @@ class LocationGroupAdapter(private val onGroupClickListener: (LocationGroups) ->
             field = value
             notifyDataSetChanged()
         }
+
+    fun removeGroup(id: Int) {
+        items = items.filter { it.id != id }
+    }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -31,7 +35,12 @@ class LocationGroupAdapter(private val onGroupClickListener: (LocationGroups) ->
     override fun onBindViewHolder(holder: LocationGroupAdapterViewHolder, position: Int) {
         holder.bind(items[position].name)
         holder.itemView.setOnClickListener {
-            onGroupClickListener(items[position])
+            locationGroupListener.onClicked(items[position])
+        }
+
+        holder.itemView.setOnLongClickListener {
+            locationGroupListener.onLongClicked(items[position])
+            true
         }
     }
 
@@ -45,4 +54,9 @@ class LocationGroupAdapter(private val onGroupClickListener: (LocationGroups) ->
             locationGroupTextView.text = locationGroup
         }
     }
+}
+
+interface LocationGroupListener {
+    fun onClicked(group: LocationGroups)
+    fun onLongClicked(group: LocationGroups)
 }

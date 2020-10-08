@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
+import java.util.*
 
 @RealmClass
 open class LocationGroups(
@@ -13,8 +14,8 @@ open class LocationGroups(
     var color: String = "",
     var serverId: String? = null,
     @Expose(serialize = false)
-    var syncState: Int = 0
-
+    var syncState: Int = 0,
+    var deletedAt: Date? = null
 ) : RealmModel {
     companion object {
         const val TABLE_NAME = "LocationGroups"
@@ -23,5 +24,6 @@ open class LocationGroups(
         const val LOCATION_GROUPS_COLOR = "color"
         const val LOCATION_GROUPS_SERVER_ID = "serverId"
         const val LOCATION_GROUPS_SYNC_STATE = "syncState"
+        const val LOCATION_GROUPS_DELETE_AT = "deletedAt"
     }
 }
