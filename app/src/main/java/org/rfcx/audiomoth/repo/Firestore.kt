@@ -16,6 +16,7 @@ import org.rfcx.audiomoth.entity.response.*
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
+import org.rfcx.audiomoth.localdb.LocationGroupDb
 import org.rfcx.audiomoth.localdb.guardian.DiagnosticDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.audiomoth.util.Preferences
@@ -174,6 +175,32 @@ class Firestore(val context: Context) {
                 }
 
                 callback?.onSuccessCallback(locationResponses)
+            }
+            .addOnFailureListener {
+                callback?.onFailureCallback(it.localizedMessage)
+            }
+    }
+
+    fun retrieveLocationGroups(
+        locationGroupDb: LocationGroupDb,
+        callback: ResponseCallback<List<LocationGroupsResponse>>? = null
+    ) {
+        val userDocument = db.collection(COLLECTION_USERS).document(uid)
+        userDocument.collection(COLLECTION_GROUPS).get()
+            .addOnSuccessListener {
+                val groupResponses = arrayListOf<LocationGroupsResponse>()
+                it.documents.forEach { doc ->
+                    val groupResponse = doc.toObject(LocationGroupsResponse::class.java)
+                    groupResponse?.serverId = doc.id
+                    groupResponse?.let { it1 -> groupResponses.add(it1) }
+                }
+
+                // verify response and store deployment
+                groupResponses.forEach { lr ->
+                    locationGroupDb.insertOrUpdate(lr)
+                }
+
+                callback?.onSuccessCallback(groupResponses)
             }
             .addOnFailureListener {
                 callback?.onFailureCallback(it.localizedMessage)

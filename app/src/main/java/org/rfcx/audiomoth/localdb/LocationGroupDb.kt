@@ -1,8 +1,14 @@
 package org.rfcx.audiomoth.localdb
 
 import io.realm.Realm
+import org.rfcx.audiomoth.entity.Locate
+import org.rfcx.audiomoth.entity.LocationGroup
 import org.rfcx.audiomoth.entity.LocationGroups
 import org.rfcx.audiomoth.entity.SyncState
+import org.rfcx.audiomoth.entity.response.LocationGroupsResponse
+import org.rfcx.audiomoth.entity.response.LocationResponse
+import org.rfcx.audiomoth.entity.response.toLocate
+import org.rfcx.audiomoth.entity.response.toLocationGroups
 
 class LocationGroupDb(private val realm: Realm) {
     fun insertOrUpdateLocationGroup(group: LocationGroups) {
@@ -63,6 +69,27 @@ class LocationGroupDb(private val realm: Realm) {
     fun getLocationGroups(name: String): LocationGroups {
         return realm.where(LocationGroups::class.java)
             .equalTo(LocationGroups.LOCATION_GROUPS_NAME, name).findFirst() ?: LocationGroups()
+    }
+
+    fun insertOrUpdate(groupsResponse: LocationGroupsResponse) {
+        realm.executeTransaction {
+            val group =
+                it.where(LocationGroups::class.java)
+                    .equalTo(LocationGroups.LOCATION_GROUPS_SERVER_ID, groupsResponse.serverId)
+                    .findFirst()
+
+            if (group == null) {
+                val locationGroup = groupsResponse.toLocationGroups()
+                val id = (it.where(LocationGroups::class.java).max(LocationGroups.LOCATION_GROUPS_ID)
+                    ?.toInt() ?: 0) + 1
+                locationGroup.id = id
+                it.insert(locationGroup)
+            } else if (group.syncState == SyncState.Sent.key) {
+                group.serverId = groupsResponse.serverId
+                group.name = groupsResponse.name
+                group.color = groupsResponse.color
+            }
+        }
     }
 
     private fun mark(id: Int, serverId: String? = null, syncState: Int) {

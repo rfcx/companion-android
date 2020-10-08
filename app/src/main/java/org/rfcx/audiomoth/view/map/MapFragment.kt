@@ -40,15 +40,13 @@ import kotlinx.android.synthetic.main.fragment_map.*
 import org.rfcx.audiomoth.DeploymentListener
 import org.rfcx.audiomoth.MainActivityListener
 import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.*
 import org.rfcx.audiomoth.entity.DeploymentState.Edge
-import org.rfcx.audiomoth.entity.Device
-import org.rfcx.audiomoth.entity.EdgeDeployment
-import org.rfcx.audiomoth.entity.Locate
-import org.rfcx.audiomoth.entity.Screen
 import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
+import org.rfcx.audiomoth.localdb.LocationGroupDb
 import org.rfcx.audiomoth.localdb.guardian.DiagnosticDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.audiomoth.repo.Firestore
@@ -69,6 +67,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
+    private val locationGroupDb by lazy { LocationGroupDb(realm) }
     private val diagnosticDb by lazy { DiagnosticDb(realm) }
 
     // data
@@ -157,6 +156,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         context?.let {
             retrieveDeployments(it)
             retrieveLocations(it)
+            retrieveLocationGroups(it)
             retrieveDiagnostics(it)
         }
 
@@ -354,6 +354,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun retrieveLocations(context: Context) {
         Firestore(context).retrieveLocations(locateDb)
+    }
+
+    private fun retrieveLocationGroups(context: Context) {
+        Firestore(context).retrieveLocationGroups(locationGroupDb)
     }
 
     private fun retrieveDiagnostics(context: Context) {

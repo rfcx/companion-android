@@ -9,7 +9,7 @@ open class LocationGroup(
     var group: String? = null,
     var color: String? = null,
     var serverId: String? = null
-) : RealmModel, Serializable {
+) : RealmModel {
     companion object {
         const val TABLE_NAME = "LocationGroup"
         const val FIELD_SERVER_ID = "serverId"
