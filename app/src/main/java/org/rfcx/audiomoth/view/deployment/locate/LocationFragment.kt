@@ -594,9 +594,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         super.onDestroy()
         locationEngine?.removeLocationUpdates(mapboxLocationChangeCallback)
         mapView.onDestroy()
-
-        val preferences = context?.let { Preferences.getInstance(it) }
-        preferences?.putString(Preferences.GROUP, getString(R.string.none))
     }
 
     private fun setHideKeyboard() {
