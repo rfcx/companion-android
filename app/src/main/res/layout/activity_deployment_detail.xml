@@ -64,13 +64,47 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/deploymentLocationTitle" />
 
+            <TextView
+                android:id="@+id/deploymentLocationGroupTitle"
+                style="@style/AudioMothText.Body.Small.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/location_group"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/locationValueTextView" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/locationGroupValueTextView"
+                style="@style/AudioMothText.Body.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_small"
+                android:textSize="@dimen/text_xsmall"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/deploymentLocationGroupTitle" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/editGroupButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/transparent"
+                android:text="@string/edit"
+                android:textAllCaps="true"
+                android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/text_small"
+                app:layout_constraintBottom_toBottomOf="@id/locationGroupValueTextView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/deploymentLocationGroupTitle" />
+
             <View
                 android:id="@+id/separateLine2"
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
                 android:layout_marginTop="@dimen/margin_padding_normal"
                 android:background="@color/grey_light"
-                app:layout_constraintTop_toBottomOf="@id/locationValueTextView" />
+                app:layout_constraintTop_toBottomOf="@id/locationGroupValueTextView" />
 
             <TextView
                 android:id="@+id/deploymentConfigurationTitle"

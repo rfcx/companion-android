@@ -12,10 +12,14 @@ import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_deployment_detail.*
+import kotlinx.android.synthetic.main.activity_deployment_detail.locationGroupValueTextView
+import kotlinx.android.synthetic.main.activity_deployment_detail.locationValueTextView
+import kotlinx.android.synthetic.main.fragment_location.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.DeploymentImage
 import org.rfcx.audiomoth.entity.EdgeDeployment
+import org.rfcx.audiomoth.entity.Screen
 import org.rfcx.audiomoth.localdb.DatabaseCallback
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
@@ -25,6 +29,8 @@ import org.rfcx.audiomoth.util.Battery.getEstimatedBatteryDuration
 import org.rfcx.audiomoth.view.BaseActivity
 import org.rfcx.audiomoth.view.deployment.EdgeDeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment.Companion.CONTINUOUS
+import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
+import org.rfcx.audiomoth.view.profile.locationgroup.LocationGroupActivity
 
 class DeploymentDetailActivity : BaseActivity() {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
@@ -75,6 +81,20 @@ class DeploymentDetailActivity : BaseActivity() {
                         )
                     }
                 }
+            }
+        }
+
+        editGroupButton.setOnClickListener {
+            val group = locationGroupValueTextView.text.toString()
+            val setLocationGroup = if (group == getString(R.string.none)) null else group
+            intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)?.let { deploymentId ->
+                LocationGroupActivity.startActivity(
+                    this,
+                    setLocationGroup,
+                    deploymentId,
+                    Screen.EDGE_DETAIL.id,
+                    DEPLOYMENT_REQUEST_CODE
+                )
             }
         }
     }
@@ -141,6 +161,15 @@ class DeploymentDetailActivity : BaseActivity() {
         locationValueTextView.text =
             location?.let { locate ->
                 convertLatLngLabel(this, locate.latitude, locate.longitude)
+            }
+
+        locationGroupValueTextView.text =
+            location?.locationGroup?.let { locationGroup ->
+                if (locationGroup.group.isNullOrBlank()) {
+                    getString(R.string.none)
+                } else {
+                    locationGroup.group
+                }
             }
 
         sampleRateValue.text =
