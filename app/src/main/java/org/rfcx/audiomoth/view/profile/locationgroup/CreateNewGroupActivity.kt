@@ -24,28 +24,7 @@ class CreateNewGroupActivity : AppCompatActivity(), (ColorPickerItem, Int) -> Un
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
     private val colorPickerAdapter by lazy { ColorPickerAdapter(this) }
     private var colorPickerState = ArrayList<ColorPickerItem>()
-    private val colorPickerList = arrayListOf(
-        "#ff7575",
-        "#ffcd00",
-        "#ba4d4d",
-        "#31984f",
-        "#9d9d9d",
-        "#f6402c",
-        "#eb1460",
-        "#9c1ab1",
-        "#6633b9",
-        "#3d4db7",
-        "#46af4a",
-        "#129788",
-        "#8cfffb",
-        "#00bbd5",
-        "#00a6f6",
-        "#88c440",
-        "#ccdd1e",
-        "#ff9800",
-        "#7a5547",
-        "#5e7c8b"
-    )
+    private var colorPickerList = listOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +36,8 @@ class CreateNewGroupActivity : AppCompatActivity(), (ColorPickerItem, Int) -> Un
             layoutManager = GridLayoutManager(context, 5)
             adapter = colorPickerAdapter
         }
+
+        colorPickerList = this.resources.getStringArray(R.array.group_color_picker).toList()
 
         colorPickerList.forEach {
             colorPickerState.add(ColorPickerItem(it, colorPickerList.first() == it))

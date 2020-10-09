@@ -3,12 +3,14 @@ package org.rfcx.audiomoth.view.map
 import android.content.Context
 import android.content.Intent
 import android.graphics.PointF
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.toColorInt
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -40,8 +42,11 @@ import kotlinx.android.synthetic.main.fragment_map.*
 import org.rfcx.audiomoth.DeploymentListener
 import org.rfcx.audiomoth.MainActivityListener
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.*
 import org.rfcx.audiomoth.entity.DeploymentState.Edge
+import org.rfcx.audiomoth.entity.Device
+import org.rfcx.audiomoth.entity.EdgeDeployment
+import org.rfcx.audiomoth.entity.Locate
+import org.rfcx.audiomoth.entity.Screen
 import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
@@ -84,6 +89,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val locationPermissions by lazy { activity?.let { LocationPermissions(it) } }
     private var listener: MainActivityListener? = null
     private var deploymentListener: DeploymentListener? = null
+
+    private var groupColors = listOf<String>()
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
@@ -148,10 +155,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         progressBar.visibility = View.VISIBLE
     }
 
+    private fun getGroupsColor() {
+        groupColors = requireContext().resources.getStringArray(R.array.group_color_picker).toList()
+    }
+
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
         mapboxMap.uiSettings.isAttributionEnabled = false
         mapboxMap.uiSettings.isLogoEnabled = false
+
+        getGroupsColor()
 
         context?.let {
             retrieveDeployments(it)
@@ -221,6 +234,21 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val mBitmapPinMapGrey = BitmapUtils.getBitmapFromDrawable(drawablePinMapGrey)
         if (mBitmapPinMapGrey != null) {
             style.addImage(Battery.BATTERY_PIN_GREY, mBitmapPinMapGrey)
+        }
+
+        //Pin color for each groups
+        groupColors.forEach {
+            val drawablePinMap =
+                ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map, null)
+            if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M) {
+                drawablePinMap?.setColorFilter(it.toColorInt(), PorterDuff.Mode.SRC_ATOP)
+            } else {
+                drawablePinMap?.setTint(it.toColorInt())
+            }
+            val mBitmapPinMap = BitmapUtils.getBitmapFromDrawable(drawablePinMap)
+            if (mBitmapPinMap != null) {
+                style.addImage(it, mBitmapPinMap)
+            }
         }
     }
 
@@ -552,10 +580,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun EdgeDeployment.toMark(): DeploymentMarker {
         val pinImage =
-            if (state == Edge.ReadyToUpload.key && isBatteryRemaining(batteryDepletedAt.time))
-                Battery.BATTERY_PIN_GREEN
-            else
+            if (state == Edge.ReadyToUpload.key && isBatteryRemaining(batteryDepletedAt.time)) {
+                location?.locationGroup?.color
+            } else {
                 Battery.BATTERY_PIN_GREY
+            } ?: Battery.BATTERY_PIN_GREEN
 
         val description = if (state >= Edge.ReadyToUpload.key)
             Battery.getPredictionBattery(batteryDepletedAt.time)
