@@ -579,9 +579,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun EdgeDeployment.toMark(): DeploymentMarker {
+        val color = location?.locationGroup?.color
         val pinImage =
             if (state == Edge.ReadyToUpload.key && isBatteryRemaining(batteryDepletedAt.time)) {
-                location?.locationGroup?.color
+                if (color != null && color.isNotEmpty()) {
+                    location?.locationGroup?.color
+                } else {
+                    Battery.BATTERY_PIN_GREEN
+                }
             } else {
                 Battery.BATTERY_PIN_GREY
             } ?: Battery.BATTERY_PIN_GREEN

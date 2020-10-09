@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.PorterDuff
 import android.graphics.Rect
 import android.location.Location
 import android.location.LocationManager
@@ -22,6 +23,8 @@ import android.widget.ArrayAdapter
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.toColorInt
 import androidx.fragment.app.Fragment
 import com.mapbox.android.core.location.*
 import com.mapbox.mapboxsdk.Mapbox
@@ -240,7 +243,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun handleExistLocate() {
-        val group = getLocationGroup()
         locateItem?.let {
             val locate = Locate(
                 it.id,
@@ -444,6 +446,30 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         mapboxMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom))
     }
 
+    private fun changePinColorByGroup(group: String) {
+        val locationGroup = deploymentProtocol?.getLocationGroup(group)
+        val color = locationGroup?.color
+        val pinDrawable = pinDeploymentImageView.drawable
+        if (color != null && color.isNotEmpty() && group != getString(R.string.none)) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                pinDrawable.setColorFilter(color.toColorInt(), PorterDuff.Mode.SRC_ATOP)
+            } else {
+                pinDrawable.setTint(color.toColorInt())
+            }
+        } else {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                pinDrawable.setColorFilter(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.colorPrimary
+                    ), PorterDuff.Mode.SRC_ATOP
+                )
+            } else {
+                pinDrawable.setTint(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
+            }
+        }
+    }
+
     private fun setOnFocusEditText() {
         val screenHeight: Int = view?.rootView?.height ?: 0
         val r = Rect()
@@ -546,6 +572,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         val preferences = context?.let { Preferences.getInstance(it) }
         group = preferences?.getString(Preferences.GROUP, getString(R.string.none))
         locationGroupValueTextView.text = group
+        changePinColorByGroup(group ?: "")
     }
 
     override fun onPause() {
