@@ -299,7 +299,9 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
         mapView.onResume()
         analytics?.trackScreen(Screen.MAP_PICKER)
 
-        changePinColorByGroup(editLocationActivityListener?.getLocationGroupName() ?: requireContext().getString(R.string.none))
+        editLocationActivityListener?.let {
+            changePinColorByGroup(it.getLocationGroupName())
+        }
     }
 
     override fun onPause() {
