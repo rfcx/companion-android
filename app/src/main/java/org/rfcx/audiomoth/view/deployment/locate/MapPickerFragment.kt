@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.PorterDuff
 import android.location.Location
 import android.location.LocationManager
 import android.os.Build
@@ -18,6 +19,8 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.toColorInt
 import androidx.fragment.app.Fragment
 import com.mapbox.android.core.location.*
 import com.mapbox.mapboxsdk.Mapbox
@@ -29,9 +32,11 @@ import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
+import kotlinx.android.synthetic.main.fragment_edit_location.*
 import java.util.*
 import kotlin.concurrent.schedule
 import kotlinx.android.synthetic.main.fragment_map_picker.*
+import kotlinx.android.synthetic.main.fragment_map_picker.pinDeploymentImageView
 import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Screen
@@ -169,6 +174,30 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
         mapboxMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom))
     }
 
+    private fun changePinColorByGroup(group: String) {
+        val locationGroup = editLocationActivityListener?.getLocationGroup(group)
+        val color = locationGroup?.color
+        val pinDrawable = pinDeploymentImageView.drawable
+        if (color != null && color.isNotEmpty() && group != getString(R.string.none)) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                pinDrawable.setColorFilter(color.toColorInt(), PorterDuff.Mode.SRC_ATOP)
+            } else {
+                pinDrawable.setTint(color.toColorInt())
+            }
+        } else {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                pinDrawable.setColorFilter(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.colorPrimary
+                    ), PorterDuff.Mode.SRC_ATOP
+                )
+            } else {
+                pinDrawable.setTint(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
+            }
+        }
+    }
+
     @SuppressLint("MissingPermission")
     private fun enableLocationComponent() {
         if (hasPermissions()) {
@@ -269,6 +298,8 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
         super.onResume()
         mapView.onResume()
         analytics?.trackScreen(Screen.MAP_PICKER)
+
+        changePinColorByGroup(editLocationActivityListener?.getLocationGroupName() ?: requireContext().getString(R.string.none))
     }
 
     override fun onPause() {

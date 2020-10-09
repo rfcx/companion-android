@@ -77,6 +77,7 @@ class DeploymentDetailActivity : BaseActivity() {
                             locate.longitude,
                             locate.name,
                             deploymentId,
+                            locationGroupValueTextView.text.toString(),
                             DEPLOYMENT_REQUEST_CODE
                         )
                     }
