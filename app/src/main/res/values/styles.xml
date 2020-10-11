@@ -11,6 +11,9 @@
         <item name="android:windowTranslucentStatus">true</item>
         <item name="fontFamily">@font/lato_regular</item>
         <item name="android:itemTextAppearance">@style/menu_item_color</item>
+        <item name="snackbarStyle">@style/SnackBarBackground</item>
+        <item name="snackbarButtonStyle">@style/SnackBarButton</item>
+        <item name="snackbarTextViewStyle">@style/SnackBarText</item>
     </style>
 
     <style name="AppTheme.Toolbar" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
@@ -196,6 +199,19 @@
         <item name="android:textColor">@color/text_black</item>
     </style>
 
+    <!-- SnackBar -->
+    <style name="SnackBarBackground" parent="Widget.MaterialComponents.Snackbar">
+        <item name="android:background">@drawable/snackbar_default</item>
+    </style>
+
+    <style name="SnackBarText" parent="Widget.MaterialComponents.Snackbar.TextView">
+        <item name="android:textColor">@color/snackbarTxtColor</item>
+    </style>
+
+    <style name="SnackBarButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/snackbarBtColor</item>
+    </style>
+  
     <!-- Dialog -->
     <style name="DialogCustom" parent="ThemeOverlay.AppCompat.Dialog.Alert">
         <item name="colorAccent">@color/colorPrimary</item>

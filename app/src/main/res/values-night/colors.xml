@@ -9,6 +9,9 @@
     <color name="bottomBar">#232436</color>
     <color name="disableColor">#5A6978</color>
     <color name="addImageBackground">#45485D</color>
+    <color name="snackbarBgColor">#ffffff</color>
+    <color name="snackbarBtColor">#31984F</color>
+    <color name="snackbarTxtColor">#141525</color>
     <color name="dialogColor">#232436</color>
 
     <color name="colorPrimary">#2AA841</color>
