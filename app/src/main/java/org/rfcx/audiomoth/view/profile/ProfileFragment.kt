@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
@@ -76,7 +77,7 @@ class ProfileFragment : Fragment() {
         }
 
         darkThemeLinearLayout.setOnClickListener {
-            val builder = context?.let { it1 -> android.app.AlertDialog.Builder(it1) }
+            val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
             val selectedRadioItem = themeOption.indexOf(preferences?.getString(DISPLAY_THEME, themeOption[1]))
 
             if (builder != null) {

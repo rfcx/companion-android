@@ -377,7 +377,7 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
         }
 
         sampleRateLayout.setOnClickListener {
-            val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
+            val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
             if (builder != null) {
                 builder.setTitle(R.string.choose_sample_rate)
                     ?.setItems(sampleRateList) { dialog, i ->
@@ -406,7 +406,7 @@ class ConfigureFragment : Fragment(), OnItemClickListener {
         }
 
         gainLayout.setOnClickListener {
-            val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
+            val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
             if (builder != null) {
                 builder.setTitle(R.string.choose_gain)?.setItems(gainList) { dialog, i ->
                     try {
