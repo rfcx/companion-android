@@ -14,14 +14,6 @@
     </string-array>
 
     <!--  Edge  -->
-    <string-array name="audiomoth_steps">
-        <item>Locate</item>
-        <item>Config</item>
-        <item>Sync</item>
-        <item>Verify</item>
-        <item>Deploy</item>
-    </string-array>
-    
     <string-array name="edge_gains">
         <item>Low</item>
         <item>Low - Medium</item>
@@ -31,11 +23,11 @@
     </string-array>
 
     <string-array name="edge_setup_checks">
-        <item>Locate</item>
+        <item>Locate device\'s location</item>
         <item>Config</item>
-        <item>Sync</item>
+        <item>Sync the parameter to your device</item>
         <item>Verify</item>
-        <item>Deploy</item>
+        <item>Add photo attachments</item>
     </string-array>
     
     <!--  Guardian  -->
