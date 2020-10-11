@@ -5,7 +5,7 @@ import org.rfcx.audiomoth.CompanionRealmMigration
 
 class RealmHelper {
     companion object {
-        private const val schemaVersion = 3L
+        private const val schemaVersion = 4L
 
         fun migrationConfig(): RealmConfiguration {
             return RealmConfiguration.Builder().apply {

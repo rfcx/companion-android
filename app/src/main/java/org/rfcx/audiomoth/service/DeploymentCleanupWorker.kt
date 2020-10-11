@@ -6,11 +6,9 @@ import androidx.work.*
 import io.realm.Realm
 import java.util.concurrent.TimeUnit
 import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
-import org.rfcx.audiomoth.localdb.ProfileDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianProfileDb
 import org.rfcx.audiomoth.service.profile.GuardianProfileSyncWorker
-import org.rfcx.audiomoth.service.profile.ProfileSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
 
 class DeploymentCleanupWorker(val context: Context, params: WorkerParameters) :
@@ -34,13 +32,6 @@ class DeploymentCleanupWorker(val context: Context, params: WorkerParameters) :
         edgeDeploymentDb.unlockSending()
         if (unsent > 0) {
             DeploymentSyncWorker.enqueue(context)
-        }
-
-        val profileDb = ProfileDb(realm)
-        val profileUnsent = profileDb.unsentCount()
-        profileDb.unlockSending()
-        if (profileUnsent > 0) {
-            ProfileSyncWorker.enqueue(context)
         }
 
         val guardianDeploymentDb = GuardianDeploymentDb(realm)

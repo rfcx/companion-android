@@ -70,15 +70,7 @@ class EdgeDeploymentDb(private val realm: Realm) {
             } else if (deployment.syncState == SyncState.Sent.key) {
                 deployment.deploymentId = deploymentResponse.deploymentId
                 deployment.serverId = deploymentResponse.serverId
-                deployment.batteryDepletedAt =
-                    deploymentResponse.batteryDepletedAt ?: deployment.batteryDepletedAt
                 deployment.deployedAt = deploymentResponse.deployedAt ?: deployment.deployedAt
-                deployment.batteryLevel = deploymentResponse.batteryLevel ?: deployment.batteryLevel
-
-                val newConfig = deploymentResponse.configuration?.toEdgeConfiguration()
-                if (newConfig != null) {
-                    deployment.configuration = it.copyToRealm(newConfig)
-                }
 
                 val newLocation = deploymentResponse.location
                 if (newLocation != null) {

@@ -29,31 +29,9 @@
                 android:layout_marginEnd="@dimen/margin_padding_small"
                 android:ellipsize="end"
                 android:maxLines="1"
-                app:layout_constraintEnd_toStartOf="@id/batteryComponent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Location 1" />
-
-            <org.rfcx.audiomoth.widget.BatteryComponent
-                android:id="@+id/batteryComponent"
-                android:layout_width="@dimen/battery_width"
-                android:layout_height="@dimen/battery_height"
-                android:layout_marginEnd="@dimen/margin_padding_xsmall"
-                app:layout_constraintBottom_toBottomOf="@id/locationNameTextView"
-                app:layout_constraintEnd_toStartOf="@id/estimatedBatteryDurationTextView"
-                app:layout_constraintTop_toTopOf="@id/locationNameTextView" />
-
-            <TextView
-                android:id="@+id/estimatedBatteryDurationTextView"
-                style="@style/AudioMothText.Body.Secondary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/margin_padding_normal"
-                android:textSize="@dimen/text_xsmall"
-                app:layout_constraintEnd_toStartOf="@id/moreIconImageView"
-                app:layout_constraintTop_toTopOf="@id/locationNameTextView"
-                app:layout_constraintBottom_toBottomOf="@id/locationNameTextView"
-                tools:text="6 days" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/syncImageView"

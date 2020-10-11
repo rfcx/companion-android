@@ -179,6 +179,7 @@
     <string name="an_error_occurred">Service unavailable</string>
     <string name="error_has_occurred">An error occurred. Please try again.</string>
     <string name="format_in_progress_step">Not yet deployed</string>
+    <string name="format_deployed">deployed</string>
 
     <!-- ConnectGuardianFragment -->
     <string name="nearby_guardians">Nearby Guardian(s)</string>

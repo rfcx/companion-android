@@ -79,11 +79,9 @@ class EdgeDeploymentDetailViewHolder(
     private val tvDate = itemView.dateTextView
     private val tvSeeDetail = itemView.seeDetailTextView
     private val tvGuardianBadge = itemView.guardianBadgeTextView
-    private val tvEstimatedBatteryDuration = itemView.estimatedBatteryDurationTextView
     private val ivMoreIcon = itemView.moreIconImageView
     private val vDeploymentDetail = itemView.deploymentDetailView
     private val ivSync = itemView.syncImageView
-    private val batteryComponent = itemView.batteryComponent
     private val vMoreIconView = itemView.moreIconView
 
     fun bind(deployment: DeploymentDetailView.EdgeDeploymentView) {
@@ -95,9 +93,6 @@ class EdgeDeploymentDetailViewHolder(
                 deployment.syncImage
             )
         )
-        val estimatedBatteryDays =
-            Battery.getEstimatedBatteryDays(deployment.batteryDepletedAt.time)
-        batteryComponent.levelBattery = if (estimatedBatteryDays >= 0) estimatedBatteryDays else -1
 
         tvGuardianBadge.visibility = View.GONE
         tvLocation.text = deployment.locationName
@@ -109,11 +104,7 @@ class EdgeDeploymentDetailViewHolder(
         tvSeeDetail.text = context.getString(
             if (isReadyToUpload) R.string.see_deployment_detail else R.string.create_deployment
         )
-        batteryComponent.visibility = if (isReadyToUpload) View.VISIBLE else View.GONE
         ivMoreIcon.visibility = if (isReadyToUpload) View.GONE else View.VISIBLE
-        tvEstimatedBatteryDuration.visibility = if (isReadyToUpload) View.VISIBLE else View.GONE
-        tvEstimatedBatteryDuration.text =
-            Battery.getEstimatedBatteryDuration(context, deployment.batteryDepletedAt.time)
         vDeploymentDetail.setOnClickListener {
             itemClickListener.onClickedEdgeDeploymentDetail(deployment)
         }
@@ -132,21 +123,17 @@ class GuardianDeploymentDetailViewHolder(
     private val tvDate = itemView.dateTextView
     private val tvSeeDetail = itemView.seeDetailTextView
     private val tvGuardianBadge = itemView.guardianBadgeTextView
-    private val tvEstimatedBatteryDuration = itemView.estimatedBatteryDurationTextView
     private val ivMoreIcon = itemView.moreIconImageView
     private val vDeploymentDetail = itemView.deploymentDetailView
     private val vMoreIconView = itemView.moreIconView
     private val ivSync = itemView.syncImageView
-    private val batteryComponent = itemView.batteryComponent
     private val itemLayout = itemView.deploymentDetailLayout
 
     fun bind(deployment: DeploymentDetailView.GuardianDeploymentView) {
         tvGuardianBadge.visibility = View.VISIBLE
-        tvEstimatedBatteryDuration.visibility = View.GONE
         ivMoreIcon.visibility = View.GONE
         vDeploymentDetail.visibility = View.GONE
         vMoreIconView.visibility = View.GONE
-        batteryComponent.visibility = View.GONE
         tvLocation.text = deployment.locationName
         tvSeeDetail.text = context.getString(R.string.see_deployment_detail)
         tvDate.text =
@@ -189,8 +176,6 @@ class DeploymentDetailViewDiffCallback : DiffUtil.ItemCallback<DeploymentDetailV
         return when {
             oldItem is DeploymentDetailView.EdgeDeploymentView
                     && newItem is DeploymentDetailView.EdgeDeploymentView -> {
-                oldItem.batteryDepletedAt == newItem.batteryDepletedAt &&
-                        oldItem.batteryLevel == newItem.batteryLevel &&
                         oldItem.createdAt == newItem.createdAt &&
                         oldItem.deletedAt == newItem.deletedAt &&
                         oldItem.deployedAt == newItem.deployedAt &&

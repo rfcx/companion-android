@@ -17,9 +17,7 @@ sealed class DeploymentDetailView {
         override val id: Int, // edge deployment local id
         var serverId: String?,
         val deploymentId: String,
-        val batteryDepletedAt: Date,
         val deployedAt: Date = Date(),
-        val batteryLevel: Int,
         val state: Int,
         val createdAt: Date,
         val syncState: Int,
@@ -64,8 +62,6 @@ fun EdgeDeployment.toEdgeDeploymentView(): DeploymentDetailView.EdgeDeploymentVi
         serverId = this.serverId,
         deploymentId = this.deploymentId ?: "",
         deployedAt = this.deployedAt,
-        batteryDepletedAt = this.batteryDepletedAt,
-        batteryLevel = this.batteryLevel,
         state = this.state,
         createdAt = this.createdAt,
         syncState = this.syncState,
