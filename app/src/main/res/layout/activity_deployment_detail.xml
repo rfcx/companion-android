@@ -71,7 +71,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
                 android:layout_marginTop="@dimen/margin_padding_normal"
-                android:background="@color/grey_light"
+                android:background="@color/separateLine"
                 app:layout_constraintTop_toBottomOf="@id/locationValueTextView" />
 
             <TextView

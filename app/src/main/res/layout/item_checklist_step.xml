@@ -24,7 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginBottom="@dimen/margin_padding_small"
-        android:background="@color/gray_30"
+        android:background="@color/separateLine"
         app:layout_constraintTop_toBottomOf="@id/checkName" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
