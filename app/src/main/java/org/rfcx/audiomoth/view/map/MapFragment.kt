@@ -3,12 +3,14 @@ package org.rfcx.audiomoth.view.map
 import android.content.Context
 import android.content.Intent
 import android.graphics.PointF
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.toColorInt
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -49,6 +51,7 @@ import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
+import org.rfcx.audiomoth.localdb.LocationGroupDb
 import org.rfcx.audiomoth.localdb.guardian.DiagnosticDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.audiomoth.repo.Firestore
@@ -69,6 +72,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
+    private val locationGroupDb by lazy { LocationGroupDb(realm) }
     private val diagnosticDb by lazy { DiagnosticDb(realm) }
 
     // data
@@ -85,6 +89,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val locationPermissions by lazy { activity?.let { LocationPermissions(it) } }
     private var listener: MainActivityListener? = null
     private var deploymentListener: DeploymentListener? = null
+
+    private var groupColors = listOf<String>()
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
@@ -149,14 +155,21 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         progressBar.visibility = View.VISIBLE
     }
 
+    private fun getGroupsColor() {
+        groupColors = requireContext().resources.getStringArray(R.array.group_color_picker).toList()
+    }
+
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
         mapboxMap.uiSettings.isAttributionEnabled = false
         mapboxMap.uiSettings.isLogoEnabled = false
 
+        getGroupsColor()
+
         context?.let {
             retrieveDeployments(it)
             retrieveLocations(it)
+            retrieveLocationGroups(it)
             retrieveDiagnostics(it)
         }
 
@@ -221,6 +234,21 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val mBitmapPinMapGrey = BitmapUtils.getBitmapFromDrawable(drawablePinMapGrey)
         if (mBitmapPinMapGrey != null) {
             style.addImage(Battery.BATTERY_PIN_GREY, mBitmapPinMapGrey)
+        }
+
+        //Pin color for each groups
+        groupColors.forEach {
+            val drawablePinMap =
+                ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map, null)
+            if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M) {
+                drawablePinMap?.setColorFilter(it.toColorInt(), PorterDuff.Mode.SRC_ATOP)
+            } else {
+                drawablePinMap?.setTint(it.toColorInt())
+            }
+            val mBitmapPinMap = BitmapUtils.getBitmapFromDrawable(drawablePinMap)
+            if (mBitmapPinMap != null) {
+                style.addImage(it, mBitmapPinMap)
+            }
         }
     }
 
@@ -354,6 +382,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun retrieveLocations(context: Context) {
         Firestore(context).retrieveLocations(locateDb)
+    }
+
+    private fun retrieveLocationGroups(context: Context) {
+        Firestore(context).retrieveLocationGroups(locationGroupDb)
     }
 
     private fun retrieveDiagnostics(context: Context) {
@@ -547,11 +579,17 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun EdgeDeployment.toMark(): DeploymentMarker {
+        val color = location?.locationGroup?.color
         val pinImage =
-            if (state == Edge.ReadyToUpload.key)
-                Battery.BATTERY_PIN_GREEN
-            else
+            if (state == Edge.ReadyToUpload.key) {
+                if (color != null && color.isNotEmpty()) {
+                    location?.locationGroup?.color
+                } else {
+                    Battery.BATTERY_PIN_GREEN
+                }
+            } else {
                 Battery.BATTERY_PIN_GREY
+            } ?: Battery.BATTERY_PIN_GREEN
 
         val description = if (state >= Edge.ReadyToUpload.key)
             getString(R.string.format_deployed)

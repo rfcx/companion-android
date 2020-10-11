@@ -21,6 +21,7 @@ import org.rfcx.audiomoth.entity.Screen
 import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.util.Preferences.Companion.DISPLAY_THEME
 import org.rfcx.audiomoth.view.profile.coordinates.CoordinatesActivity
+import org.rfcx.audiomoth.view.profile.locationgroup.LocationGroupActivity
 
 class ProfileFragment : Fragment() {
     lateinit var listener: MainActivityListener
@@ -78,7 +79,8 @@ class ProfileFragment : Fragment() {
 
         darkThemeLinearLayout.setOnClickListener {
             val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
-            val selectedRadioItem = themeOption.indexOf(preferences?.getString(DISPLAY_THEME, themeOption[1]))
+            val selectedRadioItem =
+                themeOption.indexOf(preferences?.getString(DISPLAY_THEME, themeOption[1]))
 
             if (builder != null) {
                 builder.setTitle(getString(R.string.theme))
@@ -107,6 +109,9 @@ class ProfileFragment : Fragment() {
                     dialog.dismiss()
                 }
                 builder.show()
+            }
+            locationGroupLinearLayout.setOnClickListener {
+                context?.let { it1 -> LocationGroupActivity.startActivity(it1) }
             }
         }
     }

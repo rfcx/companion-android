@@ -32,6 +32,7 @@ class Preferences(context: Context) {
         const val COORDINATES_FORMAT = "${PREFIX}COORDINATES_FORMAT"
         const val USER_FIREBASE_UID = "${PREFIX}USER_FIREBASE_UID"
         const val DISPLAY_THEME = "${PREFIX}DISPLAY_THEME"
+        const val GROUP = "${PREFIX}GROUP"
     }
 
     init {

@@ -16,10 +16,12 @@ import org.rfcx.audiomoth.connection.socket.SocketManager
 import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.DeploymentState
 import org.rfcx.audiomoth.entity.Locate
+import org.rfcx.audiomoth.entity.LocationGroups
 import org.rfcx.audiomoth.entity.guardian.GuardianConfiguration
 import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
 import org.rfcx.audiomoth.entity.guardian.GuardianProfile
 import org.rfcx.audiomoth.localdb.LocateDb
+import org.rfcx.audiomoth.localdb.LocationGroupDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentImageDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianProfileDb
@@ -48,6 +50,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val locateDb by lazy { LocateDb(realm) }
+    private val locationGroupDb by lazy { LocationGroupDb(realm) }
     private val profileDb by lazy { GuardianProfileDb(realm) }
     private val deploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val deploymentImageDb by lazy { GuardianDeploymentImageDb(realm) }
@@ -193,6 +196,10 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     override fun getWifiName(): String = _deployment?.wifiName ?: ""
 
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
+
+    override fun getLocationGroup(name: String): LocationGroups? {
+        return locationGroupDb.getLocationGroup(name)
+    }
 
     override fun setDeployLocation(locate: Locate) {
         val deployment = _deployment ?: GuardianDeployment()

@@ -122,6 +122,11 @@
     <string name="dark_theme">Dark</string>
     <string name="light_theme">Light</string>
     <string name="system_default">System default</string>
+    <string name="location_group">Location group</string>
+    <string name="create_new_group">Create new group</string>
+    <string name="select_a_color">Select a color</string>
+    <string name="missing_name_group">Missing name group</string>
+    <string name="none">None</string>
 
     <string name="dd_coordinates">DD</string>
     <string name="ddm_coordinates">DDM</string>
@@ -129,6 +134,8 @@
     <string name="dd_coordinates_format">0.00000°N 0.00000°E</string>
     <string name="ddm_coordinates_format">0°0.0000\'N 0°0.0000\'E</string>
     <string name="dms_coordinates_format">0°0\'0.0\"N 0°0\'0.0\"E</string>
+
+    <string name="delete_location_group_title">Do you want to delete %s ?</string>
 
     <!--  FeedbackActivity  -->
     <string name="app_feedback_share_ideas">Leave app feedback or share your ideas</string>

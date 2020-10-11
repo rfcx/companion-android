@@ -20,6 +20,8 @@ import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
+import org.rfcx.audiomoth.entity.*
+import org.rfcx.audiomoth.localdb.*
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
 import org.rfcx.audiomoth.util.AudioMothChimeConnector
 import org.rfcx.audiomoth.util.RealmHelper
@@ -44,11 +46,13 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         )
     }
     private val locateDb by lazy { LocateDb(realm) }
+    private val locationGroupDb by lazy { LocationGroupDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
 
     private var _deployment: EdgeDeployment? = null
     private var _deployLocation: DeploymentLocation? = null
     private var _images: List<String> = listOf()
+    private var _deployLocationGroup: LocationGroup? = null
 
     private var audioMothConnector = AudioMothChimeConnector()
     private var calendar = Calendar.getInstance()
@@ -140,6 +144,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     }
 
     override fun getDeployment(): EdgeDeployment? = this._deployment ?: EdgeDeployment()
+
+    override fun getLocationGroup(name: String): LocationGroups? {
+        return locationGroupDb.getLocationGroup(name)
+    }
 
     override fun setDeployment(deployment: EdgeDeployment) {
         this._deployment = deployment
@@ -310,6 +318,14 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     override fun onBackPressed() {
         backStep()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        val fragment =
+            supportFragmentManager.findFragmentByTag(LocationFragment.TAG) as LocationFragment?
+                ?: LocationFragment.newInstance()
+        fragment.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun handleNestedFragmentBackStack(fragmentManager: FragmentManager): Boolean {

@@ -1,7 +1,9 @@
 package org.rfcx.audiomoth
 
 import io.realm.DynamicRealm
+import io.realm.FieldAttribute
 import io.realm.RealmMigration
+import org.rfcx.audiomoth.entity.*
 import java.util.*
 import org.rfcx.audiomoth.entity.EdgeDeployment
 import org.rfcx.audiomoth.entity.Locate
@@ -59,6 +61,45 @@ class CompanionRealmMigration : RealmMigration {
     }
 
     private fun migrateToV4(realm: DynamicRealm) {
+        // Add LocationGroup class
+        val locationGroup = realm.schema.create(LocationGroup.TABLE_NAME)
+        locationGroup.apply {
+            addField(LocationGroup.FIELD_GROUP, String::class.java)
+            addField(LocationGroup.FIELD_COLOR, String::class.java)
+            addField(LocationGroup.FIELD_SERVER_ID, String::class.java)
+        }
+
+        // Add LocationGroups class
+        val locationGroups = realm.schema.create(LocationGroups.TABLE_NAME)
+        locationGroups.apply {
+            addField(
+                LocationGroups.LOCATION_GROUPS_ID,
+                Int::class.java,
+                FieldAttribute.PRIMARY_KEY
+            )
+            addField(
+                LocationGroups.LOCATION_GROUPS_NAME,
+                String::class.java
+            ).setNullable(LocationGroups.LOCATION_GROUPS_NAME, false)
+
+            addField(LocationGroups.LOCATION_GROUPS_COLOR, String::class.java)
+                .setNullable(LocationGroups.LOCATION_GROUPS_COLOR, false)
+
+            addField(LocationGroups.LOCATION_GROUPS_SYNC_STATE, Int::class.java)
+            addField(LocationGroups.LOCATION_GROUPS_SERVER_ID, String::class.java)
+            addField(LocationGroups.LOCATION_GROUPS_DELETE_AT, Date::class.java)
+        }
+
+        val locate = realm.schema.get(Locate.TABLE_NAME)
+        locate?.apply {
+            addRealmObjectField(Locate.FIELD_LOCATION_GROUP, locationGroup)
+        }
+
+        val deploymentLocation = realm.schema.get(DeploymentLocation.TABLE_NAME)
+        deploymentLocation?.apply {
+            addRealmObjectField(DeploymentLocation.FIELD_LOCATION_GROUP, locationGroup)
+        }
+
         // Delete field first to avoid ref error
         // Remove fields that were not used in AudioMoth version
         val edgeDeployment = realm.schema.get(EdgeDeployment.TABLE_NAME)

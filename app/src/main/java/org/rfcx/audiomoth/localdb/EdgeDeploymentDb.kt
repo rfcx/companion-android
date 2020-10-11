@@ -199,6 +199,33 @@ class EdgeDeploymentDb(private val realm: Realm) {
         })
     }
 
+    fun editLocationGroup(id: Int, locationGroup: LocationGroup, callback: DatabaseCallback) {
+        realm.executeTransactionAsync({ bgRealm ->
+            // do update deployment location
+            val edgeDeployment =
+                bgRealm.where(EdgeDeployment::class.java).equalTo(EdgeDeployment.FIELD_ID, id)
+                    .findFirst()
+            if (edgeDeployment?.location != null) {
+                edgeDeployment.updatedAt = Date()
+                edgeDeployment.syncState = SyncState.Unsent.key
+            }
+            //update location group
+            edgeDeployment?.location?.locationGroup?.let {
+                it.group = locationGroup.group
+                it.color = locationGroup.color
+                it.serverId = locationGroup.serverId
+            }
+        }, {
+            // success
+            realm.close()
+            callback.onSuccess()
+        }, {
+            // failure
+            realm.close()
+            callback.onFailure(it.localizedMessage ?: "")
+        })
+    }
+
     fun deleteDeployment(id: Int) {
         realm.executeTransaction {
             val deployment =

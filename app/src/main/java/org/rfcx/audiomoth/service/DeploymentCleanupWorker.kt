@@ -4,12 +4,13 @@ import android.content.Context
 import android.util.Log
 import androidx.work.*
 import io.realm.Realm
-import java.util.concurrent.TimeUnit
 import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
+import org.rfcx.audiomoth.localdb.LocationGroupDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianProfileDb
 import org.rfcx.audiomoth.service.profile.GuardianProfileSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
+import java.util.concurrent.TimeUnit
 
 class DeploymentCleanupWorker(val context: Context, params: WorkerParameters) :
     Worker(context, params) {

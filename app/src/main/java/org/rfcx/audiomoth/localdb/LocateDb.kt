@@ -5,6 +5,7 @@ import io.realm.RealmResults
 import io.realm.Sort
 import io.realm.kotlin.deleteFromRealm
 import org.rfcx.audiomoth.entity.Locate
+import org.rfcx.audiomoth.entity.LocationGroup
 import org.rfcx.audiomoth.entity.SyncState
 import org.rfcx.audiomoth.entity.response.LocationResponse
 import org.rfcx.audiomoth.entity.response.toLocate
@@ -172,6 +173,18 @@ class LocateDb(private val realm: Realm) {
                 location.latitude = locationResponse.latitude ?: location.latitude
                 location.longitude = locationResponse.longitude ?: location.longitude
                 location.createdAt = locationResponse.createdAt ?: location.createdAt
+
+                val locationGroupObj = it.createObject(LocationGroup::class.java)
+                locationGroupObj?.let { obj ->
+                    val locationGroup = locationResponse.locationGroup
+                    if (locationGroup != null) {
+                        obj.group = locationGroup.group
+                        obj.color = locationGroup.color
+                        obj.serverId = locationGroup.serverId
+                    }
+                }
+                location.locationGroup = locationGroupObj
+
                 location.lastDeploymentServerId = locationResponse.lastDeploymentServerId
                 location.lastGuardianDeploymentServerId =
                     locationResponse.lastGuardianDeploymentServerId

@@ -2,6 +2,7 @@ package org.rfcx.audiomoth.entity.response
 
 import java.util.*
 import org.rfcx.audiomoth.entity.Locate
+import org.rfcx.audiomoth.entity.LocationGroup
 import org.rfcx.audiomoth.entity.SyncState
 
 /**
@@ -14,6 +15,7 @@ data class LocationResponse(
     var longitude: Double? = null,
     var createdAt: Date? = null,
     var deletedAt: Date? = null,
+    var locationGroup: LocationGroup? = null,
     var lastDeploymentServerId: String? = null,
     var lastGuardianDeploymentServerId: String? = null
 )
@@ -26,6 +28,7 @@ fun LocationResponse.toLocate(): Locate {
         longitude = this.longitude ?: 0.0,
         createdAt = this.createdAt ?: Date(),
         deletedAt = this.deletedAt,
+        locationGroup = this.locationGroup,
         lastDeploymentServerId = this.lastDeploymentServerId,
         lastGuardianDeploymentServerId = this.lastGuardianDeploymentServerId,
         syncState = SyncState.Sent.key

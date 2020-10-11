@@ -16,13 +16,18 @@ import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.DeploymentImage
 import org.rfcx.audiomoth.entity.EdgeDeployment
+import org.rfcx.audiomoth.entity.Screen
 import org.rfcx.audiomoth.localdb.DatabaseCallback
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
-import org.rfcx.audiomoth.util.*
+import org.rfcx.audiomoth.util.RealmHelper
+import org.rfcx.audiomoth.util.asLiveData
+import org.rfcx.audiomoth.util.convertLatLngLabel
+import org.rfcx.audiomoth.util.showCommonDialog
 import org.rfcx.audiomoth.view.BaseActivity
 import org.rfcx.audiomoth.view.deployment.EdgeDeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
+import org.rfcx.audiomoth.view.profile.locationgroup.LocationGroupActivity
 
 class DeploymentDetailActivity : BaseActivity() {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
@@ -67,10 +72,25 @@ class DeploymentDetailActivity : BaseActivity() {
                             locate.longitude,
                             locate.name,
                             deploymentId,
+                            locationGroupValueTextView.text.toString(),
                             DEPLOYMENT_REQUEST_CODE
                         )
                     }
                 }
+            }
+        }
+
+        editGroupButton.setOnClickListener {
+            val group = locationGroupValueTextView.text.toString()
+            val setLocationGroup = if (group == getString(R.string.none)) null else group
+            intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)?.let { deploymentId ->
+                LocationGroupActivity.startActivity(
+                    this,
+                    setLocationGroup,
+                    deploymentId,
+                    Screen.EDGE_DETAIL.id,
+                    DEPLOYMENT_REQUEST_CODE
+                )
             }
         }
     }

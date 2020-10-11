@@ -16,6 +16,7 @@ import org.rfcx.audiomoth.entity.response.*
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
+import org.rfcx.audiomoth.localdb.LocationGroupDb
 import org.rfcx.audiomoth.localdb.guardian.DiagnosticDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.audiomoth.util.Preferences
@@ -54,6 +55,11 @@ class Firestore(val context: Context) {
     suspend fun sendProfile(profile: GuardianProfileRequest): DocumentReference? {
         val userDocument = db.collection(COLLECTION_USERS).document(uid)
         return userDocument.collection(COLLECTION_PROFILES).add(profile).await()
+    }
+
+    suspend fun sendGroup(group: EdgeGroupRequest): DocumentReference? {
+        val userDocument = db.collection(COLLECTION_USERS).document(uid)
+        return userDocument.collection(COLLECTION_GROUPS).add(group).await()
     }
 
     suspend fun sendImage(imageRequest: ImageRequest): DocumentReference? {
@@ -101,6 +107,12 @@ class Firestore(val context: Context) {
         val userDocument = db.collection(COLLECTION_USERS).document(uid)
         userDocument.collection(COLLECTION_DIAGNOSTIC).document(diagnosticServerId)
             .set(diagnosticRequest).await()
+    }
+
+    suspend fun updateGroup(groupServerId: String, group: EdgeGroupRequest) {
+        val userDocument = db.collection(COLLECTION_USERS).document(uid)
+        userDocument.collection(COLLECTION_GROUPS).document(groupServerId)
+            .set(group).await()
     }
 
     fun retrieveDeployments(
@@ -164,6 +176,32 @@ class Firestore(val context: Context) {
                 }
 
                 callback?.onSuccessCallback(locationResponses)
+            }
+            .addOnFailureListener {
+                callback?.onFailureCallback(it.localizedMessage)
+            }
+    }
+
+    fun retrieveLocationGroups(
+        locationGroupDb: LocationGroupDb,
+        callback: ResponseCallback<List<LocationGroupsResponse>>? = null
+    ) {
+        val userDocument = db.collection(COLLECTION_USERS).document(uid)
+        userDocument.collection(COLLECTION_GROUPS).get()
+            .addOnSuccessListener {
+                val groupResponses = arrayListOf<LocationGroupsResponse>()
+                it.documents.forEach { doc ->
+                    val groupResponse = doc.toObject(LocationGroupsResponse::class.java)
+                    groupResponse?.serverId = doc.id
+                    groupResponse?.let { it1 -> groupResponses.add(it1) }
+                }
+
+                // verify response and store deployment
+                groupResponses.forEach { lr ->
+                    locationGroupDb.insertOrUpdate(lr)
+                }
+
+                callback?.onSuccessCallback(groupResponses)
             }
             .addOnFailureListener {
                 callback?.onFailureCallback(it.localizedMessage)
@@ -263,5 +301,6 @@ class Firestore(val context: Context) {
         const val COLLECTION_PROFILES = "profiles"
         const val COLLECTION_IMAGES = "images"
         const val COLLECTION_DIAGNOSTIC = "diagnostics"
+        const val COLLECTION_GROUPS = "groups"
     }
 }
