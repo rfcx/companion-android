@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    android:background="@color/backgroundColor">
+    android:background="@color/backgroundColor"
+    android:fitsSystemWindows="true">
 
     <LinearLayout
         android:id="@+id/userProfileLayout"
@@ -60,25 +60,21 @@
         </LinearLayout>
     </LinearLayout>
 
-    <View
-        android:id="@+id/view"
-        android:layout_width="match_parent"
-        android:layout_height="10dp"
-        android:layout_marginTop="@dimen/margin_padding_normal"
-        android:background="@color/separateLine"
-        app:layout_constraintTop_toBottomOf="@id/userProfileLayout" />
-
     <TextView
         android:id="@+id/locationTextView"
         style="@style/AudioMothText.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_small"
-        android:padding="@dimen/margin_padding_small"
+        android:paddingStart="@dimen/margin_padding_normal"
+        android:paddingTop="@dimen/margin_padding_large"
+        android:paddingEnd="@dimen/margin_padding_normal"
+        android:paddingBottom="@dimen/margin_padding_small"
         android:text="@string/location"
-        android:textAllCaps="true"
+        android:textAllCaps="false"
+        android:textColor="@color/text_secondary"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/view" />
+        app:layout_constraintTop_toBottomOf="@id/userProfileLayout" />
 
     <LinearLayout
         android:id="@+id/coordinatesLinearLayout"
@@ -86,7 +82,7 @@
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"
         android:orientation="vertical"
-        android:paddingTop="@dimen/margin_padding_normal"
+        android:paddingTop="@dimen/margin_padding_small"
         android:paddingBottom="@dimen/margin_padding_small"
         app:layout_constraintTop_toBottomOf="@id/locationTextView">
 
@@ -97,7 +93,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_padding_normal"
             android:layout_marginEnd="@dimen/margin_padding_small"
-            android:text="@string/coordinates" />
+            android:text="@string/coordinates"
+            android:textColor="@color/text_primary"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/formatCoordinatesTextView"
@@ -110,24 +108,21 @@
 
     </LinearLayout>
 
-    <View
-        android:id="@+id/viewTopOnDarkModeTitle"
-        android:layout_width="match_parent"
-        android:layout_height="10dp"
-        android:background="@color/separateLine"
-        app:layout_constraintTop_toBottomOf="@id/coordinatesLinearLayout" />
-
     <TextView
         android:id="@+id/displayTextView"
         style="@style/AudioMothText.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_small"
-        android:padding="@dimen/margin_padding_small"
+        android:paddingStart="@dimen/margin_padding_normal"
+        android:paddingTop="@dimen/margin_padding_small"
+        android:paddingEnd="@dimen/margin_padding_normal"
+        android:paddingBottom="@dimen/margin_padding_small"
         android:text="@string/display"
-        android:textAllCaps="true"
+        android:textAllCaps="false"
+        android:textColor="@color/text_secondary"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/viewTopOnDarkModeTitle" />
+        app:layout_constraintTop_toBottomOf="@id/coordinatesLinearLayout" />
 
     <LinearLayout
         android:id="@+id/darkThemeLinearLayout"
@@ -138,7 +133,7 @@
         android:paddingStart="@dimen/margin_padding_normal"
         android:paddingTop="@dimen/margin_padding_small"
         android:paddingEnd="@dimen/margin_padding_normal"
-        android:paddingBottom="@dimen/margin_padding_small"
+        android:paddingBottom="@dimen/margin_padding_normal"
         app:layout_constraintTop_toBottomOf="@id/displayTextView">
 
         <TextView
@@ -147,7 +142,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:text="@string/theme" />
+            android:text="@string/theme"
+            android:textColor="@color/text_primary"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/themeSelectTextView"
@@ -161,7 +158,7 @@
     <View
         android:id="@+id/view1"
         android:layout_width="match_parent"
-        android:layout_height="10dp"
+        android:layout_height="@dimen/separate_line_size"
         android:background="@color/separateLine"
         app:layout_constraintTop_toBottomOf="@id/darkThemeLinearLayout" />
 
@@ -171,11 +168,13 @@
         style="@style/AudioMothText.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_padding_small"
-        android:layout_marginStart="@dimen/margin_padding_small"
-        android:padding="@dimen/margin_padding_small"
+        android:paddingStart="@dimen/margin_padding_normal"
+        android:paddingTop="@dimen/margin_padding_normal"
+        android:paddingEnd="@dimen/margin_padding_normal"
         android:text="@string/profile_aditional_label"
-        android:textAllCaps="true"
+        android:textAllCaps="false"
+        android:textColor="@color/text_secondary"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/view1" />
 
@@ -187,8 +186,10 @@
         android:background="?attr/selectableItemBackground"
         android:padding="@dimen/margin_padding_normal"
         android:text="@string/profile_feedback_label"
+        android:textColor="@color/text_primary"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/additionalTextView" />
+        app:layout_constraintTop_toBottomOf="@id/versionTextView" />
 
     <TextView
         android:id="@+id/appVersionTextView"
@@ -196,11 +197,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_normal"
-        android:layout_marginTop="@dimen/margin_padding_small"
+        android:layout_marginTop="@dimen/margin_padding_normal"
         android:text="@string/profile_app_version_label"
         android:textColor="@color/text_secondary"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/feedbackTextView" />
+        app:layout_constraintTop_toBottomOf="@id/additionalTextView" />
 
     <TextView
         android:id="@+id/versionTextView"
@@ -216,21 +217,22 @@
     <View
         android:id="@+id/view2"
         android:layout_width="match_parent"
-        android:layout_height="10dp"
-        android:layout_marginTop="@dimen/margin_padding_small"
+        android:layout_height="@dimen/separate_line_size"
         android:background="@color/separateLine"
-        app:layout_constraintTop_toBottomOf="@id/versionTextView" />
+        app:layout_constraintTop_toBottomOf="@id/feedbackTextView" />
 
     <TextView
         android:id="@+id/accountTextView"
         style="@style/AudioMothText.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_padding_small"
-        android:layout_marginStart="@dimen/margin_padding_small"
-        android:padding="@dimen/margin_padding_small"
+        android:paddingStart="@dimen/margin_padding_normal"
+        android:paddingTop="@dimen/margin_padding_normal"
+        android:paddingEnd="@dimen/margin_padding_normal"
         android:text="@string/account"
-        android:textAllCaps="true"
+        android:textAllCaps="false"
+        android:textColor="@color/text_secondary"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/view2" />
 
@@ -242,7 +244,9 @@
         android:background="?attr/selectableItemBackground"
         android:padding="@dimen/margin_padding_normal"
         android:text="@string/profile_sign_out_label"
+        android:textColor="@color/text_primary"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/accountTextView" />
-    
+
 </androidx.constraintlayout.widget.ConstraintLayout>

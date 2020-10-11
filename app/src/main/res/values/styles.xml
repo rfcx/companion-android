@@ -24,6 +24,10 @@
     <!-- Button -->
     <style name="AudioMothButton" parent="Widget.AppCompat.Button">
         <item name="android:minWidth">120dp</item>
+        <item name="android:textSize">@dimen/text_button</item>
+        <item name="android:textStyle">bold</item>
+        <item name="fontFamily">@font/lato_regular</item>
+        <item name="android:lineSpacingExtra">0.5sp</item>
     </style>
 
     <style name="AudioMothButton.Primary" parent="AudioMothButton">
@@ -34,14 +38,11 @@
 
     <style name="AudioMothButton.GreenButton" parent="AudioMothButton">
         <item name="android:background">@drawable/bg_color_primary_button</item>
-        <item name="android:textColor">@android:color/white</item>
-        <item name="android:textSize">@dimen/text_medium</item>
+        <item name="android:textColor">@color/color_button_text</item>
     </style>
 
-    <style name="AudioMothButton.FacebookButton" parent="Widget.AppCompat.Button">
+    <style name="AudioMothButton.FacebookButton" parent="AudioMothButton">
         <item name="android:background">@drawable/bg_facebook_login_button</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@android:color/white</item>
     </style>
 
     <style name="AudioMothButton.GrayButton" parent="Widget.AppCompat.Button">
@@ -61,10 +62,8 @@
     </style>
 
     <style name="GuardianButton.GreenButton.Line" parent="AudioMothButton">
-        <item name="android:background">@drawable/bg_button_green</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:textColor">@color/colorPrimary</item>
-        <item name="android:textSize">@dimen/text_medium</item>
+        <item name="android:background">@drawable/bg_button_green_outline</item>
+        <item name="android:textColor">@color/color_button_outline_text</item>
     </style>
 
     <style name="GuardianButton.RedButton" parent="AudioMothButton">
@@ -113,11 +112,13 @@
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">@dimen/text_small</item>
         <item name="android:textAllCaps">true</item>
+        <item name="android:fontFamily">@font/lato_regular</item>
     </style>
 
     <style name="AudioMothText.Body.Small" parent="TextAppearance.AppCompat.Body2">
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">@dimen/text_small</item>
+        <item name="android:fontFamily">@font/lato_regular</item>
     </style>
 
     <style name="AudioMothText.Body.Small.Label" parent="AudioMothText.Body.Small">
@@ -188,6 +189,11 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <!-- BottomAppBar -->
+    <style name="BottomAppBar" parent="Widget.MaterialComponents.BottomAppBar.Colored">
+        <item name="backgroundTint">@color/bottomBar</item>
+    </style>
+
     <!-- Menu -->
     <style name="menu_item_color">
         <item name="android:textColor">@color/text_black</item>
@@ -204,6 +210,26 @@
 
     <style name="SnackBarButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textColor">@color/snackbarBtColor</item>
+    </style>
+  
+    <!-- Dialog -->
+    <style name="DialogCustom" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="android:background">@color/dialogColor</item>
+        <item name="android:textColorAlertDialogListItem">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_primary</item>
+        <item name="positiveButtonText">@style/NegativeButton</item>
+        <item name="buttonBarPositiveButtonStyle">@style/PositiveButton</item>
+    </style>
+
+    <style name="PositiveButton" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/colorPrimary</item>
+    </style>
+
+    <style name="NegativeButton" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/colorPrimary</item>
     </style>
 
 </resources>

@@ -5,15 +5,17 @@
     <color name="separateLine">#45485D</color>
     <color name="searchColor">#3b3e53</color>
     <color name="iconColor">#999999</color>
+    <color name="topBar">#232436</color>
     <color name="bottomBar">#232436</color>
     <color name="disableColor">#5A6978</color>
     <color name="addImageBackground">#45485D</color>
     <color name="snackbarBgColor">#ffffff</color>
     <color name="snackbarBtColor">#31984F</color>
     <color name="snackbarTxtColor">#141525</color>
+    <color name="dialogColor">#232436</color>
 
     <color name="colorPrimary">#2AA841</color>
-    <color name="colorPrimaryDark">#ff2c9a46</color>
+    <color name="colorPrimaryDark">#2C9A46</color>
     <color name="colorAccent">#ff2c9a46</color>
 
     <!-- Text color -->
@@ -22,8 +24,16 @@
     <color name="text_error">#e41a1a</color>
     <color name="text_white">#000000</color>
     <color name="text_black">#ffffff</color>
+    <color name="text_button_enable">#ffffff</color>
+    <color name="text_button_disable">#3dbf63</color>
+    <color name="text_button_outline_enable">#ffffff</color>
+    <color name="text_button_outline_disable">#505050</color>
 
     <color name="divider">#D6D6D6</color>
+    <color name="background_button_enable">@color/colorPrimaryDark</color>
+    <color name="background_button_disable">@color/colorPrimaryDark</color>
+    <color name="background_outline_button_enable">#45485d</color>
+    <color name="background_outline_button_disable">#000000</color>
 
     <color name="white">#FFF</color>
     <color name="grey">#D3D9E0</color>
@@ -39,4 +49,6 @@
     <color name="signal_filled">#2AA841</color>
 
     <color name="step_enabled_true">#2AA841</color>
+
+    <color name="bottom_bar_icon_default_tint">#999999</color>
 </resources>
