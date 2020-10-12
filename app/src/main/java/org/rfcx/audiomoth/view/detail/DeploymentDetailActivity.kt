@@ -20,10 +20,14 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_deployment_detail.*
+import kotlinx.android.synthetic.main.activity_deployment_detail.locationGroupValueTextView
+import kotlinx.android.synthetic.main.activity_deployment_detail.locationValueTextView
+import kotlinx.android.synthetic.main.fragment_location.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.DeploymentImage
 import org.rfcx.audiomoth.entity.EdgeDeployment
+import org.rfcx.audiomoth.entity.Screen
 import org.rfcx.audiomoth.localdb.DatabaseCallback
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
@@ -34,7 +38,9 @@ import org.rfcx.audiomoth.util.convertLatLngLabel
 import org.rfcx.audiomoth.util.showCommonDialog
 import org.rfcx.audiomoth.view.BaseActivity
 import org.rfcx.audiomoth.view.deployment.EdgeDeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
+import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment.Companion.CONTINUOUS
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
+import org.rfcx.audiomoth.view.profile.locationgroup.LocationGroupActivity
 
 class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
@@ -88,10 +94,25 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
                             locate.longitude,
                             locate.name,
                             deploymentId,
+                            locationGroupValueTextView.text.toString(),
                             DEPLOYMENT_REQUEST_CODE
                         )
                     }
                 }
+            }
+        }
+
+        editGroupButton.setOnClickListener {
+            val group = locationGroupValueTextView.text.toString()
+            val setLocationGroup = if (group == getString(R.string.none)) null else group
+            intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)?.let { deploymentId ->
+                LocationGroupActivity.startActivity(
+                    this,
+                    setLocationGroup,
+                    deploymentId,
+                    Screen.EDGE_DETAIL.id,
+                    DEPLOYMENT_REQUEST_CODE
+                )
             }
         }
     }
@@ -162,6 +183,40 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
             location?.let { locate ->
                 convertLatLngLabel(this, locate.latitude, locate.longitude)
             }
+
+        locationGroupValueTextView.text =
+            location?.locationGroup?.let { locationGroup ->
+                if (locationGroup.group.isNullOrBlank()) {
+                    getString(R.string.none)
+                } else {
+                    locationGroup.group
+                }
+            }
+
+        sampleRateValue.text =
+            getString(R.string.kilohertz, configuration?.sampleRate.toString())
+        gainValue.text = configuration?.gain?.let { gain -> gainList[gain] }
+
+        val continuous = getString(R.string.continuous)
+        val isContinuous = configuration?.durationSelected == CONTINUOUS
+
+        val recordingDurationLabel = getString(
+            if (configuration?.recordingDuration == 1) R.string.detail_sec else R.string.detail_secs,
+            configuration?.recordingDuration
+        )
+        recordingValue.text = if (isContinuous) continuous else recordingDurationLabel
+        sleepValue.text = getString(R.string.detail_secs, configuration?.sleepDuration)
+        sleepValue.visibility = if (isContinuous) View.GONE else View.VISIBLE
+        sleepLabel.visibility = if (isContinuous) View.GONE else View.VISIBLE
+
+        estimatedBatteryDurationValue.text =
+            getEstimatedBatteryDuration(this, deployment.batteryDepletedAt.time)
+
+        configuration?.recordingPeriodList?.let { period ->
+            customRecordingLabel.visibility = if (period.size != 0) View.VISIBLE else View.GONE
+            timeLineRecycler.visibility = if (period.size != 0) View.VISIBLE else View.GONE
+            setupTimeLineRecycler(period.toTypedArray())
+        }
     }
 
     private fun observeDeploymentImage(deploymentId: Int) {

@@ -1,6 +1,7 @@
 package org.rfcx.audiomoth.service
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import io.realm.Realm
@@ -20,12 +21,25 @@ class LocationGroupSyncWorker(appContext: Context, params: WorkerParameters) :
         var someFailed = false
 
         locatesNeedToSync.forEach {
-            val docRef = firestore.sendGroup(it.toRequestBody())
-            if (docRef != null) {
-                db.markSent(docRef.id, it.id)
+            if (it.serverId == null) {
+                val docRef = firestore.sendGroup(it.toRequestBody())
+                if (docRef != null) {
+                    db.markSent(docRef.id, it.id)
+                } else {
+                    db.markUnsent(it.id)
+                    someFailed = true
+                }
             } else {
-                db.markUnsent(it.id)
-                someFailed = true
+                try {
+                    firestore.updateGroup(it.serverId!!, it.toRequestBody())
+                    if (it.deletedAt != null) {
+                        db.deleteLocationGroupFromLocal(it.id)
+                    }
+                    db.markSent(it.serverId!!, it.id)
+                } catch (e: Exception) {
+                    db.markUnsent(it.id)
+                    someFailed = true
+                }
             }
         }
 

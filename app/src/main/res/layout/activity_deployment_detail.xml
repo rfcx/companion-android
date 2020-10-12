@@ -64,26 +64,185 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/deploymentLocationTitle" />
 
-            <com.mapbox.mapboxsdk.maps.MapView
-                android:id="@+id/mapBoxView"
+            <TextView
+                android:id="@+id/deploymentLocationGroupTitle"
+                style="@style/AudioMothText.Body.Small.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/location_group"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/locationValueTextView" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/locationGroupValueTextView"
+                style="@style/AudioMothText.Body.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_small"
+                android:textSize="@dimen/text_xsmall"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/deploymentLocationGroupTitle" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/editGroupButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/transparent"
+                android:text="@string/edit"
+                android:textAllCaps="true"
+                android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/text_small"
+                app:layout_constraintBottom_toBottomOf="@id/locationGroupValueTextView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/deploymentLocationGroupTitle" />
+
+            <View
+                android:id="@+id/separateLine2"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/map_box_height"
+                android:layout_height="2dp"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:background="@color/grey_light"
+                app:layout_constraintTop_toBottomOf="@id/locationGroupValueTextView" />
+
+            <TextView
+                android:id="@+id/deploymentConfigurationTitle"
+                style="@style/AudioMothText.Body.Small.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="@dimen/margin_padding_small"
+                android:text="@string/configuration"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/separateLine2" />
+
+            <LinearLayout
+                android:id="@+id/sampleRateLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="@id/guidelineVertical"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/deploymentConfigurationTitle">
+
+                <TextView
+                    android:id="@+id/sampleRateLabel"
+                    style="@style/AudioMothText.Body.Small.Label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sample_rate" />
+
+                <TextView
+                    android:id="@+id/sampleRateValue"
+                    style="@style/GuardianText.Label.Value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_padding_large"
+                    android:textSize="@dimen/text_xsmall"
+                    tools:text="48 kHz" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/gainLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/guidelineVertical"
+                app:layout_constraintTop_toBottomOf="@+id/deploymentConfigurationTitle">
+
+                <TextView
+                    android:id="@+id/gainLabel"
+                    style="@style/AudioMothText.Body.Small.Label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="0dp"
+                    android:text="@string/gain" />
+
+                <TextView
+                    android:id="@+id/gainValue"
+                    style="@style/GuardianText.Label.Value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_xsmall"
+                    tools:text="Medium - High" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/recordingLabel"
+                style="@style/AudioMothText.Body.Small.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/recording_duration_title"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/sampleRateLayout" />
+
+            <TextView
+                android:id="@+id/recordingValue"
+                style="@style/GuardianText.Label.Value"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/margin_padding_large"
+                android:gravity="end"
+                android:textSize="@dimen/text_xsmall"
+                app:layout_constraintBottom_toBottomOf="@id/recordingLabel"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/recordingLabel"
+                app:layout_constraintTop_toTopOf="@id/recordingLabel"
+                tools:text="60 seconds" />
+
+            <TextView
+                android:id="@+id/sleepLabel"
+                style="@style/AudioMothText.Body.Small.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sleep_duration_title"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/recordingLabel" />
+
+            <TextView
+                android:id="@+id/sleepValue"
+                style="@style/GuardianText.Label.Value"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/margin_padding_large"
+                android:gravity="end"
+                android:textSize="@dimen/text_xsmall"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/sleepLabel"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/sleepLabel"
+                app:layout_constraintTop_toTopOf="@id/sleepLabel"
+                tools:text="60 seconds" />
+
+            <TextView
+                android:id="@+id/customRecordingLabel"
+                style="@style/AudioMothText.Body.Small.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/custom_recording_period"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/sleepLabel" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/timeLineRecycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_large"
                 android:layout_marginTop="@dimen/margin_padding_normal"
                 android:layout_marginEnd="@dimen/margin_padding_large"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/locationValueTextView" />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/pinDeploymentImageView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_pin_map"
-                app:layout_constraintBottom_toBottomOf="@id/mapBoxView"
-                app:layout_constraintEnd_toEndOf="@id/mapBoxView"
-                app:layout_constraintStart_toStartOf="@id/mapBoxView"
-                app:layout_constraintTop_toTopOf="@id/mapBoxView" />
 
             <TextView
                 android:id="@+id/photoLabel"

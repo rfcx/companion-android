@@ -200,7 +200,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
     override fun getLocationGroup(name: String): LocationGroups? {
-        return locationGroupDb.getLocationGroups(name)
+        return locationGroupDb.getLocationGroup(name)
     }
 
     override fun setDeployLocation(locate: Locate) {

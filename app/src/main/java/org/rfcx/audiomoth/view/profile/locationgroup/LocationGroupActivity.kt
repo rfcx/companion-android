@@ -4,16 +4,27 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_location_group.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.LocationGroups
 import org.rfcx.audiomoth.entity.Screen
+import org.rfcx.audiomoth.entity.toLocationGroup
+import org.rfcx.audiomoth.localdb.DatabaseCallback
+import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
+import org.rfcx.audiomoth.service.DeploymentSyncWorker
 import org.rfcx.audiomoth.util.Preferences
+import org.rfcx.audiomoth.util.RealmHelper
+import org.rfcx.audiomoth.util.showCommonDialog
+import org.rfcx.audiomoth.view.BaseActivity
 
-class LocationGroupActivity : AppCompatActivity(), LocationGroupProtocol {
+class LocationGroupActivity : BaseActivity(), LocationGroupProtocol {
+
+    // For detail page to edit location group
+    private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
+    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,11 +42,31 @@ class LocationGroupActivity : AppCompatActivity(), LocationGroupProtocol {
 
     override fun onLocationGroupClick(group: LocationGroups) {
         val screen: String? = intent?.getStringExtra(EXTRA_SCREEN)
+        when(screen) {
+            Screen.LOCATION.id -> {
+                val preferences = Preferences.getInstance(this)
+                preferences.putString(Preferences.GROUP, group.name)
+                finish()
+            }
+            Screen.EDGE_DETAIL.id -> {
+                val deploymentId: Int? = intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
+                deploymentId?.let { id ->
+                    showLoading()
+                    edgeDeploymentDb.editLocationGroup(id, group.toLocationGroup(), object :
+                        DatabaseCallback {
+                        override fun onSuccess() {
+                            hideLoading()
+                            DeploymentSyncWorker.enqueue(this@LocationGroupActivity)
+                            finish()
+                        }
 
-        if (screen == Screen.LOCATION.id) {
-            val preferences = Preferences.getInstance(this)
-            preferences.putString(Preferences.GROUP, group.name)
-            finish()
+                        override fun onFailure(errorMessage: String) {
+                            hideLoading()
+                            showCommonDialog(errorMessage)
+                        }
+                    })
+                }
+            }
         }
     }
 
@@ -62,6 +93,7 @@ class LocationGroupActivity : AppCompatActivity(), LocationGroupProtocol {
     companion object {
         const val EXTRA_GROUP = "EXTRA_GROUP"
         const val EXTRA_SCREEN = "EXTRA_SCREEN"
+        const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
 
         fun startActivity(
             context: Context,
@@ -84,6 +116,22 @@ class LocationGroupActivity : AppCompatActivity(), LocationGroupProtocol {
             val intent = Intent(context, LocationGroupActivity::class.java)
             if (group != null)
                 intent.putExtra(EXTRA_GROUP, group)
+            intent.putExtra(EXTRA_SCREEN, screen)
+            (context as Activity).startActivityForResult(intent, requestCode)
+        }
+
+        fun startActivity(
+            context: Context,
+            group: String? = null,
+            deploymentId: Int? = null,
+            screen: String = Screen.EDGE_DETAIL.id,
+            requestCode: Int
+        ) {
+            val intent = Intent(context, LocationGroupActivity::class.java)
+            if (group != null)
+                intent.putExtra(EXTRA_GROUP, group)
+            if (deploymentId != null)
+                intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
             intent.putExtra(EXTRA_SCREEN, screen)
             (context as Activity).startActivityForResult(intent, requestCode)
         }
