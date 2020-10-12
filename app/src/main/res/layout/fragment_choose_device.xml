@@ -45,7 +45,7 @@
         android:layout_marginTop="@dimen/margin_padding_normal"
         android:textColor="@color/text_black"
         android:textStyle="bold"
-        android:text="@string/rfcx_edge"
+        android:text="@string/rfcx_edge_audiomoth"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/edgeImageView" />
