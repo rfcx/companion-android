@@ -3,6 +3,7 @@ package org.rfcx.audiomoth.view.detail
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.util.TypedValue
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -10,6 +11,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
+import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.maps.MapView
+import com.mapbox.mapboxsdk.maps.MapboxMap
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
+import com.mapbox.mapboxsdk.maps.Style
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_deployment_detail.*
 import kotlinx.android.synthetic.main.activity_deployment_detail.locationGroupValueTextView
@@ -24,21 +32,24 @@ import org.rfcx.audiomoth.localdb.DatabaseCallback
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
-import org.rfcx.audiomoth.util.*
-import org.rfcx.audiomoth.util.Battery.getEstimatedBatteryDuration
+import org.rfcx.audiomoth.util.RealmHelper
+import org.rfcx.audiomoth.util.asLiveData
+import org.rfcx.audiomoth.util.convertLatLngLabel
+import org.rfcx.audiomoth.util.showCommonDialog
 import org.rfcx.audiomoth.view.BaseActivity
 import org.rfcx.audiomoth.view.deployment.EdgeDeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
 import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment.Companion.CONTINUOUS
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
 import org.rfcx.audiomoth.view.profile.locationgroup.LocationGroupActivity
 
-class DeploymentDetailActivity : BaseActivity() {
+class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
-    private val gainList by lazy { resources.getStringArray(R.array.edge_gains) }
     private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
-    private val timeLineAdapter by lazy { TimeLineAdapter() }
+
+    private lateinit var mapView: MapView
+    private lateinit var mapBoxMap: MapboxMap
 
     // data
     private var deployment: EdgeDeployment? = null
@@ -51,7 +62,13 @@ class DeploymentDetailActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Mapbox.getInstance(this, getString(R.string.mapbox_token))
         setContentView(R.layout.activity_deployment_detail)
+
+        // Setup Mapbox
+        mapView = findViewById(R.id.mapBoxView)
+        mapView.onCreate(savedInstanceState)
+        mapView.getMapAsync(this)
 
         deployment =
             intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
@@ -146,7 +163,11 @@ class DeploymentDetailActivity : BaseActivity() {
     private fun forceUpdateDeployment() {
         if (this.deployment != null) {
             this.deployment = edgeDeploymentDb.getDeploymentById(this.deployment!!.id)
-            this.deployment?.let { it1 -> updateDeploymentDetailView(it1) }
+            this.deployment?.let { it1 ->
+                updateDeploymentDetailView(it1)
+                setLocationOnMap(it1)
+            }
+
             supportActionBar?.apply {
                 title = deployment?.location?.name ?: getString(R.string.title_deployment_detail)
             }
@@ -158,7 +179,6 @@ class DeploymentDetailActivity : BaseActivity() {
         observeDeploymentImage(deployment.id)
 
         val location = deployment.location
-        val configuration = deployment.configuration
         locationValueTextView.text =
             location?.let { locate ->
                 convertLatLngLabel(this, locate.latitude, locate.longitude)
@@ -223,25 +243,29 @@ class DeploymentDetailActivity : BaseActivity() {
         }
     }
 
-    private fun setupTimeLineRecycler(selectTimeList: Array<String>) {
-        val timeList = EdgeConfigure.configureTimes
-        val array = ArrayList<Boolean>()
-
-        timeLineRecycler.apply {
-            adapter = timeLineAdapter
-            layoutManager = LinearLayoutManager(context)
+    override fun onMapReady(mapboxMap: MapboxMap) {
+        mapBoxMap = mapboxMap
+        mapboxMap.uiSettings.apply {
+            setAllGesturesEnabled(false)
+            isAttributionEnabled = false
+            isLogoEnabled = false
         }
 
-        timeList.forEach {
-            array.add(selectTimeList.contains(it))
+        mapboxMap.setStyle(Style.OUTDOORS) {
+            deployment?.let { it1 -> setLocationOnMap(it1) }
         }
+    }
 
-        val recordingPeriod = convertToStopStartPeriods(array.toTypedArray())
-        val arrayRecordingPeriod = arrayListOf<String>()
-        recordingPeriod?.forEach {
-            arrayRecordingPeriod.add("${timeList[it.startMinutes / 60]} - ${if (it.stopMinutes / 60 == 24) timeList[0] else timeList[it.stopMinutes / 60]}")
+    private fun setLocationOnMap(deployment: EdgeDeployment) {
+        val location = deployment.location
+        location?.let { locate ->
+            val latLng = LatLng(locate.latitude, locate.longitude)
+            moveCamera(latLng, LocationFragment.DEFAULT_ZOOM)
         }
-        timeLineAdapter.items = arrayRecordingPeriod
+    }
+
+    private fun moveCamera(latLng: LatLng, zoom: Double) {
+        mapBoxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom))
     }
 
     private fun setupToolbar() {
@@ -262,6 +286,36 @@ class DeploymentDetailActivity : BaseActivity() {
         super.onDestroy()
         // remove observer
         deployImageLiveData.removeObserver(deploymentImageObserve)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        mapView.onStart()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mapView.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mapView.onPause()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mapView.onStop()
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        mapView.onLowMemory()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
+        super.onSaveInstanceState(outState, outPersistentState)
+        mapView.onSaveInstanceState(outState)
     }
 
     companion object {

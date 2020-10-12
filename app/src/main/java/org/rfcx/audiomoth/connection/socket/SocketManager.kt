@@ -185,6 +185,10 @@ object SocketManager {
         this.checkInTest.value = CheckInTestResponse()
     }
 
+    fun resetPrefsValue() {
+        this.prefs.value = PrefsResponse()
+    }
+
     private fun sendMessage(message: String) {
         clientThread = Thread(Runnable {
             try {
