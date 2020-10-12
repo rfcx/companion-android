@@ -114,6 +114,10 @@ class ProfileFragment : Fragment() {
                 context?.let { it1 -> LocationGroupActivity.startActivity(it1) }
             }
         }
+
+        locationGroupLinearLayout.setOnClickListener {
+            context?.let { it1 -> LocationGroupActivity.startActivity(it1) }
+        }
     }
 
     private fun handleShowSnackbarResult(requestCode: Int, resultCode: Int, intentData: Intent?) {

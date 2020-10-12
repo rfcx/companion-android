@@ -73,7 +73,7 @@ class LocationGroupFragment : Fragment(), LocationGroupListener {
     }
 
     private fun showDeleteDialog(group: LocationGroups) {
-        val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
+        val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
         builder?.apply {
             setTitle(getString(R.string.delete_location_group_title, group.name))
             setPositiveButton(getString(R.string.delete)) { dialog, which ->
