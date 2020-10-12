@@ -108,6 +108,27 @@
                 android:background="@color/separateLine"
                 app:layout_constraintTop_toBottomOf="@id/locationGroupValueTextView" />
 
+            <com.mapbox.mapboxsdk.maps.MapView
+                android:id="@+id/mapBoxView"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/map_box_height"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:layout_marginEnd="@dimen/margin_padding_large"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/separateLine2" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/pinDeploymentImageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_pin_map"
+                app:layout_constraintBottom_toBottomOf="@id/mapBoxView"
+                app:layout_constraintEnd_toEndOf="@id/mapBoxView"
+                app:layout_constraintStart_toStartOf="@id/mapBoxView"
+                app:layout_constraintTop_toTopOf="@id/mapBoxView" />
+
             <TextView
                 android:id="@+id/photoLabel"
                 style="@style/AudioMothText.Body.Small.Label"
@@ -116,7 +137,7 @@
                 android:text="@string/photos"
                 android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/separateLine2" />
+                app:layout_constraintTop_toBottomOf="@id/mapBoxView" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/deploymentImageRecycler"
