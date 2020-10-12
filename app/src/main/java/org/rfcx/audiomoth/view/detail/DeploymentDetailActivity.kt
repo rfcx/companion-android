@@ -157,6 +157,15 @@ class DeploymentDetailActivity : BaseActivity() {
             location?.let { locate ->
                 convertLatLngLabel(this, locate.latitude, locate.longitude)
             }
+
+        locationGroupValueTextView.text =
+            location?.locationGroup?.let { locationGroup ->
+                if (locationGroup.group.isNullOrBlank()) {
+                    getString(R.string.none)
+                } else {
+                    locationGroup.group
+                }
+            }
     }
 
     private fun observeDeploymentImage(deploymentId: Int) {

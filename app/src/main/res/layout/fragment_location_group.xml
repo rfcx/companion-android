@@ -7,13 +7,14 @@
         android:id="@+id/locationGroupRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/backgroundColor"
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/locationGroupLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground"
+        android:background="@color/backgroundColor"
         android:orientation="horizontal"
         android:padding="@dimen/margin_padding_normal"
         app:layout_constraintTop_toBottomOf="@id/locationGroupRecyclerView">
@@ -40,7 +41,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/grey_light"
+        android:background="@color/separateLine"
         app:layout_constraintTop_toBottomOf="@id/locationGroupLinearLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
