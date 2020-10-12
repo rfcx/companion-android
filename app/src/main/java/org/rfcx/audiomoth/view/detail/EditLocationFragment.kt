@@ -1,6 +1,8 @@
 package org.rfcx.audiomoth.view.detail
 
 import android.content.Context
+import android.graphics.PorterDuff
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +11,8 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.toColorInt
 import androidx.fragment.app.Fragment
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -17,6 +21,10 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import kotlinx.android.synthetic.main.fragment_edit_location.*
+import kotlinx.android.synthetic.main.fragment_edit_location.locationNameEditText
+import kotlinx.android.synthetic.main.fragment_edit_location.locationValueTextView
+import kotlinx.android.synthetic.main.fragment_edit_location.pinDeploymentImageView
+import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.util.convertLatLngLabel
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
@@ -127,6 +135,30 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         mapboxMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom))
     }
 
+    private fun changePinColorByGroup(group: String) {
+        val locationGroup = editLocationActivityListener?.getLocationGroup(group)
+        val color = locationGroup?.color
+        val pinDrawable = pinDeploymentImageView.drawable
+        if (color != null && color.isNotEmpty() && group != getString(R.string.none)) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                pinDrawable.setColorFilter(color.toColorInt(), PorterDuff.Mode.SRC_ATOP)
+            } else {
+                pinDrawable.setTint(color.toColorInt())
+            }
+        } else {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                pinDrawable.setColorFilter(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.colorPrimary
+                    ), PorterDuff.Mode.SRC_ATOP
+                )
+            } else {
+                pinDrawable.setTint(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
+            }
+        }
+    }
+
     private fun View.hideKeyboard() = this.let {
         val inputManager =
             context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -141,6 +173,11 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
     override fun onResume() {
         super.onResume()
         mapView.onResume()
+
+        changePinColorByGroup(
+            editLocationActivityListener?.getLocationGroupName()
+                ?: requireContext().getString(R.string.none)
+        )
     }
 
     override fun onPause() {
