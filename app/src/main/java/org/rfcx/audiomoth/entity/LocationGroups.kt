@@ -27,3 +27,7 @@ open class LocationGroups(
         const val LOCATION_GROUPS_DELETE_AT = "deletedAt"
     }
 }
+
+fun LocationGroups.toLocationGroup(): LocationGroup {
+    return LocationGroup(this.name, this.color, this.serverId)
+}
