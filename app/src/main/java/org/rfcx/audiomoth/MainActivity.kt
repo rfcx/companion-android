@@ -2,6 +2,7 @@ package org.rfcx.audiomoth
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -91,28 +92,32 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         setContentView(R.layout.activity_main)
 
         createLocationButton.setOnClickListener {
-            val tooltip = SimpleTooltip.Builder(this)
-                .arrowColor(ContextCompat.getColor(this, R.color.tooltipColor))
-                .anchorView(createLocationButton)
-                .gravity(Gravity.TOP)
-                .modal(true)
-                .dismissOnInsideTouch(false)
-                .animationPadding(10F)
-                .contentView(R.layout.tooltip_add_device)
-                .animated(false)
-                .transparentOverlay(true)
-                .build()
+            if (BuildConfig.ENABLE_GUARDIAN) {
+                val tooltip = SimpleTooltip.Builder(this)
+                    .arrowColor(ContextCompat.getColor(this, R.color.tooltipColor))
+                    .anchorView(createLocationButton)
+                    .gravity(Gravity.TOP)
+                    .modal(true)
+                    .dismissOnInsideTouch(false)
+                    .animationPadding(10F)
+                    .contentView(R.layout.tooltip_add_device)
+                    .animated(false)
+                    .transparentOverlay(true)
+                    .build()
 
-            val addEdgeOrAudioMoth = tooltip.findViewById<ConstraintLayout>(R.id.audioMothLayout)
-            val addGuardian = tooltip.findViewById<ConstraintLayout>(R.id.guardianLayout)
-            addEdgeOrAudioMoth.setOnClickListener {
+                val addEdgeOrAudioMoth = tooltip.findViewById<ConstraintLayout>(R.id.audioMothLayout)
+                val addGuardian = tooltip.findViewById<ConstraintLayout>(R.id.guardianLayout)
+                addEdgeOrAudioMoth.setOnClickListener {
+                    EdgeDeploymentActivity.startActivity(this)
+                }
+                addGuardian.setOnClickListener {
+                    GuardianDeploymentActivity.startActivity(this)
+                }
+
+                tooltip.show()
+            } else {
                 EdgeDeploymentActivity.startActivity(this)
             }
-            addGuardian.setOnClickListener {
-                GuardianDeploymentActivity.startActivity(this)
-            }
-
-            tooltip.show()
         }
 
         setupSimpleTooltip()
