@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
@@ -16,9 +17,11 @@ import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
+import kotlinx.android.synthetic.main.tooltip_add_device.*
 import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.deployment.EdgeDeploymentActivity
+import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.audiomoth.view.map.DeploymentDetailView
 import org.rfcx.audiomoth.view.map.DeploymentViewPagerFragment
 import org.rfcx.audiomoth.view.map.MapFragment
@@ -87,7 +90,28 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         setContentView(R.layout.activity_main)
 
         createLocationButton.setOnClickListener {
-            EdgeDeploymentActivity.startActivity(this)
+            val tooltip = SimpleTooltip.Builder(this)
+                .arrowColor(ContextCompat.getColor(this, R.color.backgroundColor))
+                .anchorView(createLocationButton)
+                .gravity(Gravity.TOP)
+                .modal(true)
+                .dismissOnInsideTouch(false)
+                .animationPadding(10F)
+                .contentView(R.layout.tooltip_add_device)
+                .animated(false)
+                .transparentOverlay(true)
+                .build()
+
+            val addEdgeOrAudioMoth = tooltip.findViewById<TextView>(R.id.addEdgeOrAudioMoth)
+            val addGuardian = tooltip.findViewById<TextView>(R.id.addGuardian)
+            addEdgeOrAudioMoth.setOnClickListener {
+                EdgeDeploymentActivity.startActivity(this)
+            }
+            addGuardian.setOnClickListener {
+                GuardianDeploymentActivity.startActivity(this)
+            }
+
+            tooltip.show()
         }
 
         setupSimpleTooltip()
