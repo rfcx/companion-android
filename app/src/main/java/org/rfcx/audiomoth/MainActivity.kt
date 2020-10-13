@@ -7,6 +7,7 @@ import android.view.Gravity
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -102,8 +103,8 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
                 .transparentOverlay(true)
                 .build()
 
-            val addEdgeOrAudioMoth = tooltip.findViewById<TextView>(R.id.addEdgeOrAudioMoth)
-            val addGuardian = tooltip.findViewById<TextView>(R.id.addGuardian)
+            val addEdgeOrAudioMoth = tooltip.findViewById<ConstraintLayout>(R.id.audioMothLayout)
+            val addGuardian = tooltip.findViewById<ConstraintLayout>(R.id.guardianLayout)
             addEdgeOrAudioMoth.setOnClickListener {
                 EdgeDeploymentActivity.startActivity(this)
             }
