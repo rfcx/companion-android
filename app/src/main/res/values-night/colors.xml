@@ -13,6 +13,7 @@
     <color name="snackbarBtColor">#31984F</color>
     <color name="snackbarTxtColor">#141525</color>
     <color name="dialogColor">#232436</color>
+    <color name="tooltipColor">#232436</color>
 
     <color name="colorPrimary">#2AA841</color>
     <color name="colorPrimaryDark">#2C9A46</color>

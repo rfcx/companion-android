@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
 
         createLocationButton.setOnClickListener {
             val tooltip = SimpleTooltip.Builder(this)
-                .arrowColor(ContextCompat.getColor(this, R.color.backgroundColor))
+                .arrowColor(ContextCompat.getColor(this, R.color.tooltipColor))
                 .anchorView(createLocationButton)
                 .gravity(Gravity.TOP)
                 .modal(true)
