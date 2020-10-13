@@ -28,12 +28,11 @@
 
         <TextView
             android:id="@+id/addEdgeOrAudioMoth"
+            style="@style/AudioMothText.Body"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="@dimen/margin_padding_small"
             android:text="@string/rfcx_edge_audiomoth"
-            android:textAppearance="@android:style/TextAppearance.Large"
-            android:textColor="@color/text_black"
             app:layout_constraintBottom_toBottomOf="@id/tooltipAudioMothIcon"
             app:layout_constraintStart_toEndOf="@id/tooltipAudioMothIcon"
             app:layout_constraintTop_toTopOf="@id/tooltipAudioMothIcon"
@@ -63,12 +62,11 @@
 
         <TextView
             android:id="@+id/addGuardian"
+            style="@style/AudioMothText.Body"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:padding="@dimen/margin_padding_small"
             android:text="@string/rfcx_guardian"
-            android:textAppearance="@android:style/TextAppearance.Large"
-            android:textColor="@color/text_black"
             app:layout_constraintBottom_toBottomOf="@id/tooltipGuardianIcon"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/tooltipGuardianIcon"
