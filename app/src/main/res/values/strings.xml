@@ -148,7 +148,7 @@
     <string name="snackbar_retry">RETRY</string>
 
     <!--  DeployFragment  -->
-    <string name="deployment_will_uploaded">The deployment will be uploaded to your account</string>
+    <string name="deployment_will_uploaded">Images will be uploaded to your account</string>
     <string name="almost_there">Almost there!</string>
     <string name="switch_to_deploy">Switch your device to DEPLOY</string>
     <string name="take_photos">Take some photos of the deploy \nlocation (optional)</string>

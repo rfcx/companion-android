@@ -23,8 +23,8 @@
     </string-array>
 
     <string-array name="edge_setup_checks">
-        <item>Locate device\'s location</item>
-        <item>Sync the parameter to your device</item>
+        <item>Set device\'s location</item>
+        <item>Sync time</item>
         <item>Add photo attachments</item>
     </string-array>
     

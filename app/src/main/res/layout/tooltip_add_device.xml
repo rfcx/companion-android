@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tooltipAddDevice"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_tooltip"
+    android:orientation="vertical">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/audioMothLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:padding="@dimen/margin_padding_small"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <View
+            android:id="@+id/tooltipAudioMothIcon"
+            android:layout_width="@dimen/tooltip_icon_size"
+            android:layout_height="@dimen/tooltip_icon_size"
+            android:background="@drawable/tooltip_audiomoth"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/addEdgeOrAudioMoth"
+            style="@style/AudioMothText.Body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/margin_padding_small"
+            android:text="@string/rfcx_edge_audiomoth"
+            app:layout_constraintBottom_toBottomOf="@id/tooltipAudioMothIcon"
+            app:layout_constraintStart_toEndOf="@id/tooltipAudioMothIcon"
+            app:layout_constraintTop_toTopOf="@id/tooltipAudioMothIcon"
+            tools:ignore="RtlHardcoded" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/guardianLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:padding="@dimen/margin_padding_small"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/audioMothLayout">
+
+        <View
+            android:id="@+id/tooltipGuardianIcon"
+            android:layout_width="@dimen/tooltip_icon_size"
+            android:layout_height="@dimen/tooltip_icon_size"
+            android:layout_marginTop="@dimen/margin_padding_small"
+            android:background="@drawable/tooltip_guardian"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/addGuardian"
+            style="@style/AudioMothText.Body"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/margin_padding_small"
+            android:text="@string/rfcx_guardian"
+            app:layout_constraintBottom_toBottomOf="@id/tooltipGuardianIcon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tooltipGuardianIcon"
+            app:layout_constraintTop_toTopOf="@id/tooltipGuardianIcon"
+            tools:ignore="RtlHardcoded" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

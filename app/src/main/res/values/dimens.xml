@@ -55,4 +55,7 @@
     <!-- Prefs -->
     <dimen name="size_prefs">32dp</dimen>
 
+    <!-- Tooltip -->
+    <dimen name="tooltip_icon_size">24dp</dimen>
+
 </resources>
