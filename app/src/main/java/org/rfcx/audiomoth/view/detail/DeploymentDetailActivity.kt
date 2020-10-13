@@ -197,7 +197,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
                 } else {
                     locationGroup.group
                 }
-            }
+            } ?: getString(R.string.none)
 
         changePinColorByGroup(location?.locationGroup?.group ?: getString(R.string.none))
     }

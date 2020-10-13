@@ -4,10 +4,10 @@ import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
 import io.realm.kotlin.deleteFromRealm
-import java.util.*
 import org.rfcx.audiomoth.entity.*
 import org.rfcx.audiomoth.entity.response.EdgeDeploymentResponse
 import org.rfcx.audiomoth.entity.response.toEdgeDeployment
+import java.util.*
 
 /**
  * For Manage the saving and sending of deployment from the local database
@@ -208,12 +208,21 @@ class EdgeDeploymentDb(private val realm: Realm) {
             if (edgeDeployment?.location != null) {
                 edgeDeployment.updatedAt = Date()
                 edgeDeployment.syncState = SyncState.Unsent.key
-            }
-            //update location group
-            edgeDeployment?.location?.locationGroup?.let {
-                it.group = locationGroup.group
-                it.color = locationGroup.color
-                it.serverId = locationGroup.serverId
+
+                //update location group
+                if (edgeDeployment.location?.locationGroup != null) {
+                    edgeDeployment.location?.locationGroup?.let {
+                        it.group = locationGroup.group
+                        it.color = locationGroup.color
+                        it.serverId = locationGroup.serverId
+                    }
+                } else {
+                    edgeDeployment.location?.locationGroup = LocationGroup(
+                        locationGroup.group,
+                        locationGroup.color,
+                        locationGroup.serverId
+                    )
+                }
             }
         }, {
             // success
