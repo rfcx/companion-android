@@ -139,6 +139,18 @@
         app:layout_constraintTop_toBottomOf="@id/guidelineHorizontal5" />
 
     <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/playToneButton"
+        style="@style/AudioMothButton.GreenButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginEnd="@dimen/margin_padding_large"
+        android:layout_marginBottom="@dimen/margin_padding_normal"
+        android:text="@string/play_tone"
+        app:layout_constraintBottom_toTopOf="@id/nextButton" />
+
+
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/nextButton"
         style="@style/AudioMothButton.GreenButton"
         android:layout_width="match_parent"
