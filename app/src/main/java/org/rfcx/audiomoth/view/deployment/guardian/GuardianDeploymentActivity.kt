@@ -239,40 +239,40 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         // setup fragment for current step
         currentCheck = number
         when (number) {
-            1 -> {
+            0 -> {
                 updateDeploymentState(DeploymentState.Guardian.SolarPanel)
                 startFragment(GuardianSolarPanelFragment.newInstance())
             }
-            2 -> {
+            1 -> {
                 updateDeploymentState(DeploymentState.Guardian.Register)
                 startFragment(GuardianRegisterFragment.newInstance())
             }
-            3 -> {
+            2 -> {
                 updateDeploymentState(DeploymentState.Guardian.Signal)
                 startFragment(GuardianSignalFragment.newInstance())
             }
-            4 -> {
+            3 -> {
                 updateDeploymentState(DeploymentState.Guardian.Microphone)
                 startFragment(GuardianMicrophoneFragment.newInstance())
             }
-            5 -> {
+            4 -> {
                 this._profiles = profileDb.getProfiles()
                 updateDeploymentState(DeploymentState.Guardian.Config)
                 startFragment(GuardianSelectProfileFragment.newInstance())
             }
-            6 -> {
+            5 -> {
                 updateDeploymentState(DeploymentState.Guardian.Locate)
                 startFragment(LocationFragment.newInstance())
             }
-            7 -> {
+            6 -> {
                 updateDeploymentState(DeploymentState.Guardian.Checkin)
                 startFragment(GuardianCheckInTestFragment.newInstance())
             }
-            8 -> {
+            7 -> {
                 updateDeploymentState(DeploymentState.Guardian.Deploy)
                 startFragment(GuardianDeployFragment.newInstance())
             }
-            9 -> {
+            8 -> {
                 updateDeploymentState(DeploymentState.Guardian.Advanced)
                 startFragment(GuardianAdvancedFragment.newInstance())
             }
