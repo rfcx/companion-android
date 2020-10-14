@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import io.realm.Realm
@@ -13,6 +14,8 @@ import kotlinx.android.synthetic.main.activity_guardian_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.connection.socket.SocketManager
+import org.rfcx.audiomoth.connection.wifi.WifiHotspotManager
+import org.rfcx.audiomoth.connection.wifi.WifiLostListener
 import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.DeploymentState
 import org.rfcx.audiomoth.entity.Locate
@@ -25,6 +28,7 @@ import org.rfcx.audiomoth.localdb.guardian.GuardianDeploymentImageDb
 import org.rfcx.audiomoth.localdb.guardian.GuardianProfileDb
 import org.rfcx.audiomoth.service.GuardianDeploymentSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
+import org.rfcx.audiomoth.util.WifiHotspotUtils
 import org.rfcx.audiomoth.view.deployment.guardian.advanced.GuardianAdvancedFragment
 import org.rfcx.audiomoth.view.deployment.guardian.checkin.GuardianCheckInTestFragment
 import org.rfcx.audiomoth.view.deployment.guardian.configure.GuardianConfigureFragment
@@ -38,10 +42,7 @@ import org.rfcx.audiomoth.view.deployment.guardian.solarpanel.GuardianSolarPanel
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
 import org.rfcx.audiomoth.view.deployment.locate.MapPickerFragment
 import org.rfcx.audiomoth.view.detail.MapPickerProtocol
-import org.rfcx.audiomoth.view.dialog.CompleteFragment
-import org.rfcx.audiomoth.view.dialog.CompleteListener
-import org.rfcx.audiomoth.view.dialog.ConnectInstructionDialogFragment
-import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
+import org.rfcx.audiomoth.view.dialog.*
 import org.rfcx.audiomoth.view.prefs.GuardianPrefsFragment
 import org.rfcx.audiomoth.view.prefs.SyncPreferenceListener
 
@@ -72,6 +73,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private var currentCheck = 0
     private var currentCheckName = ""
     private var passedChecks = arrayListOf<Int>()
+
+    private lateinit var wifiHotspotManager: WifiHotspotManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -321,6 +324,27 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         loadingDialog?.dismissDialog()
     }
 
+    override fun setWifiManager(wifiManager: WifiHotspotManager) {
+        wifiHotspotManager = wifiManager
+    }
+
+    override fun registerWifiConnectionLostListener() {
+        wifiHotspotManager.registerWifiConnectionLost(object : WifiLostListener{
+            override fun onLost() {
+                val wifiLostDialog: WifiLostDialogFragment =
+                    supportFragmentManager.findFragmentByTag(TAG_WIFI_LOST_DIALOG) as WifiLostDialogFragment?
+                        ?: run {
+                            WifiLostDialogFragment()
+                        }
+                wifiLostDialog.show(supportFragmentManager, TAG_WIFI_LOST_DIALOG)
+            }
+        })
+    }
+
+    override fun unregisterWifiConnectionLostListener() {
+        wifiHotspotManager.unregisterWifiConnectionLost()
+    }
+
     override fun showToolbar() {
         toolbar.visibility = View.VISIBLE
     }
@@ -360,9 +384,11 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     override fun onDestroy() {
         super.onDestroy()
         this.prefsEditor?.clear()?.apply()
+        unregisterWifiConnectionLostListener()
     }
 
     companion object {
+        private const val TAG_WIFI_LOST_DIALOG = "TAG_WIFI_LOST_DIALOG"
         private const val TAG_INSTRUCTION_DIALOG = "TAG_INSTRUCTION_DIALOG"
         private const val TAG_LOADING_DIALOG = "TAG_LOADING_DIALOG"
         private const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"

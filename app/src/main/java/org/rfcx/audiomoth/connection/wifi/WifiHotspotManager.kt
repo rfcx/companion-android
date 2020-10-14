@@ -13,11 +13,14 @@ import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
 import android.net.wifi.WifiNetworkSpecifier
 import android.os.Build
+import androidx.annotation.RequiresApi
 import org.rfcx.audiomoth.util.WifiHotspotUtils
 
 class WifiHotspotManager(private val context: Context) {
 
     private var wifiManager: WifiManager? = null
+    private lateinit var connectivityManager: ConnectivityManager
+    private lateinit var networkCallback: ConnectivityManager.NetworkCallback
     private lateinit var wifiScanReceiver: WifiScanReceiver
     private lateinit var wifiConnectionReceiver: WifiConnectionReceiver
     private var isConnected = false
@@ -125,9 +128,39 @@ class WifiHotspotManager(private val context: Context) {
             }
         }
     }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private inner class WifiLostCallback(private val wifiLostListener: WifiLostListener) : ConnectivityManager.NetworkCallback() {
+        override fun onLost(network: Network) {
+            super.onLost(network)
+            wifiLostListener.onLost()
+        }
+    }
+
+    fun registerWifiConnectionLost(wifiLostListener: WifiLostListener) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            connectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val networkRequest = NetworkRequest.Builder().also {
+                it.addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+            }.build()
+            networkCallback = WifiLostCallback(wifiLostListener)
+            connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
+        }
+    }
+
+    fun unregisterWifiConnectionLost() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (::connectivityManager.isInitialized)
+                connectivityManager.unregisterNetworkCallback(networkCallback)
+        }
+    }
 }
 
 interface OnWifiListener {
     fun onScanReceive(result: List<ScanResult>)
     fun onWifiConnected()
+}
+
+interface WifiLostListener {
+    fun onLost()
 }
