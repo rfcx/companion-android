@@ -129,7 +129,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             is GuardianCheckListFragment -> {
                 SocketManager.resetCheckInValue()
                 SocketManager.getCheckInTest() // to stop getting checkin test
-                passedChecks.clear() // remove all passed 
+                passedChecks.clear() // remove all passed
+                unregisterWifiConnectionLostListener()
                 startFragment(ConnectGuardianFragment.newInstance())
             }
             is ConnectGuardianFragment -> finish()
