@@ -2,11 +2,15 @@ package org.rfcx.audiomoth.view.detail
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.PorterDuff
+import android.os.Build
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.util.TypedValue
 import android.view.View
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.toColorInt
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
@@ -20,13 +24,19 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_deployment_detail.*
+import kotlinx.android.synthetic.main.activity_deployment_detail.locationValueTextView
+import kotlinx.android.synthetic.main.activity_deployment_detail.pinDeploymentImageView
+import kotlinx.android.synthetic.main.fragment_edit_location.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.DeploymentImage
 import org.rfcx.audiomoth.entity.EdgeDeployment
+import org.rfcx.audiomoth.entity.Screen
+import org.rfcx.audiomoth.entity.toLocationGroup
 import org.rfcx.audiomoth.localdb.DatabaseCallback
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
+import org.rfcx.audiomoth.localdb.LocationGroupDb
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
 import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.util.asLiveData
@@ -34,6 +44,7 @@ import org.rfcx.audiomoth.util.convertLatLngLabel
 import org.rfcx.audiomoth.util.showCommonDialog
 import org.rfcx.audiomoth.view.BaseActivity
 import org.rfcx.audiomoth.view.deployment.EdgeDeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
+import org.rfcx.audiomoth.view.profile.locationgroup.LocationGroupActivity
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
 
 class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
@@ -41,6 +52,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
+    private val locationGroupDb by lazy { LocationGroupDb(realm) }
 
     private lateinit var mapView: MapView
     private lateinit var mapBoxMap: MapboxMap
@@ -88,10 +100,25 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
                             locate.longitude,
                             locate.name,
                             deploymentId,
+                            locationGroupValueTextView.text.toString(),
                             DEPLOYMENT_REQUEST_CODE
                         )
                     }
                 }
+            }
+        }
+
+        editGroupButton.setOnClickListener {
+            val group = locationGroupValueTextView.text.toString()
+            val setLocationGroup = if (group == getString(R.string.none)) null else group
+            intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)?.let { deploymentId ->
+                LocationGroupActivity.startActivity(
+                    this,
+                    setLocationGroup,
+                    deploymentId,
+                    Screen.EDGE_DETAIL.id,
+                    DEPLOYMENT_REQUEST_CODE
+                )
             }
         }
     }
@@ -162,6 +189,17 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
             location?.let { locate ->
                 convertLatLngLabel(this, locate.latitude, locate.longitude)
             }
+
+        locationGroupValueTextView.text =
+            location?.locationGroup?.let { locationGroup ->
+                if (locationGroup.group.isNullOrBlank()) {
+                    getString(R.string.none)
+                } else {
+                    locationGroup.group
+                }
+            } ?: getString(R.string.none)
+
+        changePinColorByGroup(location?.locationGroup?.group ?: getString(R.string.none))
     }
 
     private fun observeDeploymentImage(deploymentId: Int) {
@@ -185,6 +223,30 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
             adapter = deploymentImageAdapter
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             setHasFixedSize(true)
+        }
+    }
+
+    private fun changePinColorByGroup(group: String) {
+        val locationGroup = locationGroupDb.getLocationGroup(group).toLocationGroup()
+        val color = locationGroup.color
+        val pinDrawable = pinDeploymentImageView.drawable
+        if (color != null && color.isNotEmpty() && group != getString(R.string.none)) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                pinDrawable.setColorFilter(color.toColorInt(), PorterDuff.Mode.SRC_ATOP)
+            } else {
+                pinDrawable.setTint(color.toColorInt())
+            }
+        } else {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                pinDrawable.setColorFilter(
+                    ContextCompat.getColor(
+                        this,
+                        R.color.colorPrimary
+                    ), PorterDuff.Mode.SRC_ATOP
+                )
+            } else {
+                pinDrawable.setTint(ContextCompat.getColor(this, R.color.colorPrimary))
+            }
         }
     }
 

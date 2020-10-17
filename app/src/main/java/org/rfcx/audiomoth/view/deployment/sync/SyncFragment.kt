@@ -40,6 +40,7 @@ class SyncFragment : Fragment() {
 
         edgeDeploymentProtocol?.let {
             it.showToolbar()
+            it.setCurrentPage(requireContext().resources.getStringArray(R.array.edge_setup_checks)[1])
             it.setToolbarTitle()
         }
 

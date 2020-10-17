@@ -173,6 +173,42 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/locationTitleTextView" />
 
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/locationGroupTitleTextView"
+                style="@style/AudioMothText.Body.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:text="@string/location_group"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/locationValueTextView" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/locationGroupValueTextView"
+                style="@style/AudioMothText.Body.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_small"
+                android:textSize="@dimen/text_xsmall"
+                android:text="@string/none"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/locationGroupTitleTextView" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/changeGroupTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/margin_padding_large"
+                android:text="@string/change"
+                android:textSize="@dimen/text_small"
+                android:textAllCaps="true"
+                android:textColor="@color/colorPrimary"
+                app:layout_constraintBottom_toBottomOf="@id/locationGroupValueTextView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/locationGroupTitleTextView" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 

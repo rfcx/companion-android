@@ -4,10 +4,10 @@ import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
 import io.realm.kotlin.deleteFromRealm
-import java.util.*
 import org.rfcx.audiomoth.entity.*
 import org.rfcx.audiomoth.entity.response.EdgeDeploymentResponse
 import org.rfcx.audiomoth.entity.response.toEdgeDeployment
+import java.util.*
 
 /**
  * For Manage the saving and sending of deployment from the local database
@@ -70,15 +70,7 @@ class EdgeDeploymentDb(private val realm: Realm) {
             } else if (deployment.syncState == SyncState.Sent.key) {
                 deployment.deploymentId = deploymentResponse.deploymentId
                 deployment.serverId = deploymentResponse.serverId
-                deployment.batteryDepletedAt =
-                    deploymentResponse.batteryDepletedAt ?: deployment.batteryDepletedAt
                 deployment.deployedAt = deploymentResponse.deployedAt ?: deployment.deployedAt
-                deployment.batteryLevel = deploymentResponse.batteryLevel ?: deployment.batteryLevel
-
-                val newConfig = deploymentResponse.configuration?.toEdgeConfiguration()
-                if (newConfig != null) {
-                    deployment.configuration = it.copyToRealm(newConfig)
-                }
 
                 val newLocation = deploymentResponse.location
                 if (newLocation != null) {
@@ -195,6 +187,42 @@ class EdgeDeploymentDb(private val realm: Realm) {
                 location.longitude = longitude
                 location.name = locationName
                 location.syncState = SyncState.Unsent.key
+            }
+        }, {
+            // success
+            realm.close()
+            callback.onSuccess()
+        }, {
+            // failure
+            realm.close()
+            callback.onFailure(it.localizedMessage ?: "")
+        })
+    }
+
+    fun editLocationGroup(id: Int, locationGroup: LocationGroup, callback: DatabaseCallback) {
+        realm.executeTransactionAsync({ bgRealm ->
+            // do update deployment location
+            val edgeDeployment =
+                bgRealm.where(EdgeDeployment::class.java).equalTo(EdgeDeployment.FIELD_ID, id)
+                    .findFirst()
+            if (edgeDeployment?.location != null) {
+                edgeDeployment.updatedAt = Date()
+                edgeDeployment.syncState = SyncState.Unsent.key
+
+                //update location group
+                if (edgeDeployment.location?.locationGroup != null) {
+                    edgeDeployment.location?.locationGroup?.let {
+                        it.group = locationGroup.group
+                        it.color = locationGroup.color
+                        it.serverId = locationGroup.serverId
+                    }
+                } else {
+                    edgeDeployment.location?.locationGroup = LocationGroup(
+                        locationGroup.group,
+                        locationGroup.color,
+                        locationGroup.serverId
+                    )
+                }
             }
         }, {
             // success

@@ -1,8 +1,6 @@
 package org.rfcx.audiomoth.view.deployment
 
 import android.app.Activity
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -11,32 +9,32 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import io.realm.Realm
-import java.sql.Timestamp
-import java.util.*
 import kotlinx.android.synthetic.main.activity_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.BuildConfig
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.*
+import org.rfcx.audiomoth.entity.DeploymentLocation
+import org.rfcx.audiomoth.entity.DeploymentState
+import org.rfcx.audiomoth.entity.EdgeDeployment
+import org.rfcx.audiomoth.entity.Locate
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
-import org.rfcx.audiomoth.localdb.ProfileDb
+import org.rfcx.audiomoth.entity.*
+import org.rfcx.audiomoth.localdb.*
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
-import org.rfcx.audiomoth.util.*
-import org.rfcx.audiomoth.view.deployment.configure.ConfigureFragment
-import org.rfcx.audiomoth.view.deployment.configure.SelectProfileFragment
+import org.rfcx.audiomoth.util.AudioMothChimeConnector
+import org.rfcx.audiomoth.util.RealmHelper
 import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
 import org.rfcx.audiomoth.view.deployment.locate.MapPickerFragment
 import org.rfcx.audiomoth.view.deployment.sync.SyncFragment
 import org.rfcx.audiomoth.view.deployment.sync.SyncFragment.Companion.BEFORE_SYNC
-import org.rfcx.audiomoth.view.deployment.verify.PerformBatteryFragment
-import org.rfcx.audiomoth.view.deployment.verify.PerformBatteryFragment.Companion.TEST_BATTERY
 import org.rfcx.audiomoth.view.detail.MapPickerProtocol
 import org.rfcx.audiomoth.view.dialog.CompleteFragment
 import org.rfcx.audiomoth.view.dialog.CompleteListener
 import org.rfcx.audiomoth.view.dialog.LoadingDialogFragment
+import java.util.*
 
 class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, CompleteListener,
     MapPickerProtocol {
@@ -48,19 +46,16 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         )
     }
     private val locateDb by lazy { LocateDb(realm) }
-    private val profileDb by lazy { ProfileDb(realm) }
+    private val locationGroupDb by lazy { LocationGroupDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
 
-    private var _profiles: List<Profile> = listOf()
-    private var _profile: Profile? = null
     private var _deployment: EdgeDeployment? = null
     private var _deployLocation: DeploymentLocation? = null
-    private var _edgeConfiguration: EdgeConfiguration? = null
     private var _images: List<String> = listOf()
+    private var _deployLocationGroup: LocationGroup? = null
 
-    private val audioMothConnector: AudioMothConnector = AudioMothChimeConnector()
-    private val configuration = AudioMothConfiguration()
-    private val calendar = Calendar.getInstance()
+    private var audioMothConnector = AudioMothChimeConnector()
+    private var calendar = Calendar.getInstance()
 
     private var latitude = 0.0
     private var longitude = 0.0
@@ -122,14 +117,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
         when (container) {
             is MapPickerFragment -> startFragment(LocationFragment.newInstance())
-            is ConfigureFragment -> {
-                this._profiles = profileDb.getProfiles()
-                if (_profiles.isNotEmpty()) {
-                    startFragment(SelectProfileFragment.newInstance())
-                } else {
-                    startCheckList()
-                }
-            }
             is EdgeCheckListFragment -> {
                 passedChecks.clear() // remove all passed
                 finish()
@@ -156,38 +143,21 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         startFragment(EdgeCheckListFragment.newInstance())
     }
 
-    override fun getDeployment(): EdgeDeployment? = this._deployment
+    override fun getDeployment(): EdgeDeployment? = this._deployment ?: EdgeDeployment()
+
+    override fun getLocationGroup(name: String): LocationGroups? {
+        return locationGroupDb.getLocationGroup(name)
+    }
 
     override fun setDeployment(deployment: EdgeDeployment) {
         this._deployment = deployment
     }
-
-    override fun setDeploymentConfigure(profile: Profile) {
-        setProfile(profile)
-        this._edgeConfiguration = profile.asConfiguration()
-        this._deployment?.configuration = _edgeConfiguration
-
-        // update deployment
-        _deployment?.let { deploymentDb.updateDeployment(it) }
-        // update profile
-        if (profile.name.isNotEmpty()) {
-            if (!profileDb.isExistingProfile(profile.name)) {
-                profileDb.insertOrUpdateProfile(profile)
-            }
-        }
-
-        nextStep()
-    }
-
-    override fun geConfiguration(): EdgeConfiguration? =
-        _edgeConfiguration
 
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
     override fun setDeployLocation(locate: Locate) {
         val deployment = _deployment ?: EdgeDeployment()
         deployment.state = DeploymentState.Edge.Locate.key // state
-        deployment.deploymentId = randomDeploymentId()
 
         this._deployLocation = locate.asDeploymentLocation()
         val deploymentId = deploymentDb.insertOrUpdate(deployment, _deployLocation!!)
@@ -199,28 +169,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         this._images = images
     }
 
-    override fun getProfiles(): List<Profile> = this._profiles
-
-    override fun getProfile(): Profile? = this._profile
-
-    override fun setProfile(profile: Profile) {
-        this._profile = profile
-    }
-
     private fun setLatLng(latitude: Double, longitude: Double, name: String) {
         this.latitude = latitude
         this.longitude = longitude
         this.nameLocation = name
-    }
-
-    override fun setPerformBattery(batteryDepletedAt: Timestamp, batteryLevel: Int) {
-        this._deployment?.let {
-            it.batteryDepletedAt = batteryDepletedAt
-            it.batteryLevel = batteryLevel
-
-            // update about battery
-            this.deploymentDb.updateDeployment(it)
-        }
     }
 
     override fun setReadyToDeploy() {
@@ -235,7 +187,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             deploymentDb.updateDeployment(it)
 
             DeploymentSyncWorker.enqueue(this@EdgeDeploymentActivity)
-            notification()
             hideLoading()
             showComplete()
         }
@@ -250,18 +201,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 startFragment(LocationFragment.newInstance())
             }
             1 -> {
-                updateDeploymentState(DeploymentState.Edge.Config)
-                handleSelectingConfig()
-            }
-            2 -> {
                 updateDeploymentState(DeploymentState.Edge.Sync)
                 startFragment(SyncFragment.newInstance(BEFORE_SYNC))
             }
-            3 -> {
-                updateDeploymentState(DeploymentState.Edge.Verify)
-                startFragment(PerformBatteryFragment.newInstance(TEST_BATTERY, null))
-            }
-            4 -> {
+            2 -> {
                 updateDeploymentState(DeploymentState.Edge.Deploy)
                 startFragment(DeployFragment.newInstance())
             }
@@ -288,11 +231,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         }
     }
 
-    override fun startSetupConfigure(profile: Profile) {
-        setProfile(profile)
-        startFragment(ConfigureFragment.newInstance())
-    }
-
     override fun startSyncing(status: String) {
         startFragment(SyncFragment.newInstance(status))
     }
@@ -303,35 +241,16 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     override fun playSyncSound() {
         val deploymentId = getDeployment()?.deploymentId
-        convertProfileToAudioMothConfiguration()
+        val deploymentIdArrayInt = deploymentId?.map { it.toInt() }?.toTypedArray() ?: arrayOf()
         Thread {
-            audioMothConnector.setConfiguration(
+            audioMothConnector.playTimeAndDeploymentID(
                 calendar,
-                configuration,
-                deploymentId?.let { DeploymentIdentifier(it) }
+                deploymentIdArrayInt
             )
             this@EdgeDeploymentActivity.runOnUiThread {
                 startSyncing(SyncFragment.AFTER_SYNC)
             }
         }.start()
-    }
-
-    private fun convertProfileToAudioMothConfiguration() {
-        val deployment = _deployment
-        if (deployment != null) {
-            configuration.sampleRate = deployment.getSampleRate()
-            configuration.gain = deployment.getGain()
-            configuration.sleepRecordCycle = deployment.getSleepRecordCycle()
-            configuration.startStopPeriods = deployment.getStartStopPeriods()
-        }
-    }
-
-    override fun playCheckBatterySound() {
-        Thread { audioMothConnector.getBatteryState() }.start()
-    }
-
-    override fun startCheckBattery(status: String, level: Int?) {
-        startFragment(PerformBatteryFragment.newInstance(status, level))
     }
 
     override fun startMapPicker(latitude: Double, longitude: Double, name: String) {
@@ -348,31 +267,12 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 _deployLocation = deployment.location
             }
 
-            if (deployment.configuration != null) {
-                _edgeConfiguration = deployment.configuration
-            }
             currentCheck = if (deployment.state == 1) {
                 deployment.state
             } else {
                 deployment.state - 1
             }
             handleCheckClicked(currentCheck)
-        }
-    }
-
-    private fun handleSelectingConfig() {
-        if (_profile != null) {
-            val profile = _profile
-            if (profile != null) {
-                startSetupConfigure(profile)
-            }
-        } else {
-            this._profiles = profileDb.getProfiles()
-            if (_profiles.isNotEmpty()) {
-                startFragment(SelectProfileFragment.newInstance())
-            } else {
-                startSetupConfigure(Profile.default())
-            }
         }
     }
 
@@ -420,34 +320,12 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         backStep()
     }
 
-    private fun notification() {
-        val edgeDeploymentId = _deployment?.deploymentId
-        val day = 24 * 60 * 60 * 1000
-        val intent = Intent(this, NotificationBroadcastReceiver::class.java)
-        val dateAlarm = (_deployment?.batteryDepletedAt?.time)?.minus(day)?.let { Date(it) }
-
-        intent.putExtra(
-            EXTRA_BATTERY_DEPLETED_AT,
-            _deployment?.batteryDepletedAt?.toDateTimeString()
-        )
-        intent.putExtra(EXTRA_LOCATION_NAME, _deployment?.location?.name)
-        intent.putExtra(EXTRA_DEPLOYMENT_ID, edgeDeploymentId)
-
-        val pendingIntent =
-            PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-
-        val cal = Calendar.getInstance()
-        if (dateAlarm != null) {
-            cal.time = dateAlarm
-            if (dateAlarm.time > System.currentTimeMillis()) {
-                val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-                alarmManager.setExact(
-                    AlarmManager.RTC_WAKEUP,
-                    cal.timeInMillis,
-                    pendingIntent
-                )
-            }
-        }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        val fragment =
+            supportFragmentManager.findFragmentByTag(LocationFragment.TAG) as LocationFragment?
+                ?: LocationFragment.newInstance()
+        fragment.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun handleNestedFragmentBackStack(fragmentManager: FragmentManager): Boolean {
@@ -472,8 +350,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     companion object {
         const val loadingDialogTag = "LoadingDialog"
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
-        const val EXTRA_BATTERY_DEPLETED_AT = "EXTRA_BATTERY_DEPLETED_AT"
-        const val EXTRA_LOCATION_NAME = "EXTRA_LOCATION_NAME"
 
         fun startActivity(context: Context) {
             val intent = Intent(context, EdgeDeploymentActivity::class.java)

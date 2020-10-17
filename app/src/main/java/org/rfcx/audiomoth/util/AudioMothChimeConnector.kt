@@ -7,10 +7,8 @@
 package org.rfcx.audiomoth.util
 
 import java.util.Calendar
-import kotlin.math.*
-import kotlin.random.Random
 
-class AudioMothChimeConnector : AudioMothConnector {
+class AudioMothChimeConnector {
 
     /* Useful constants */
 
@@ -18,36 +16,16 @@ class AudioMothChimeConnector : AudioMothConnector {
     private val BITS_IN_INT16: Int = 16
     private val BITS_IN_INT32: Int = 32
 
-    private val UINT16_MAX: Int = 0xFFFF
+    private val LENGTH_OF_CHIME_PACKET: Int = 6
+    private val LENGTH_OF_DEPLOYMENT_ID: Int = 8
 
-    private val HOURS_IN_DAY: Int = 24
-    private val MINUTES_IN_HOUR: Int = 60
-    private val MINUTES_IN_DAY: Int = 1440
-    private val SECONDS_IN_MINUTE: Int = 60
-
-    private val MILLISECONDS_IN_SECOND: Int = 1000
-
-    private val SECONDS_IN_DAY: Int = SECONDS_IN_MINUTE * MINUTES_IN_HOUR * HOURS_IN_DAY
-
-    private val GET_BATTERY_MESSAGE_LENGTH: Int = 6
-    private val COMPRESSED_CONFIGURATION_LENGTH: Int = 8
-    private val MAXIMUM_SET_CONFIGURATION_MESSAGE_LENGTH: Int = 54
-
-    private val DEPLOYMENT_ID_LENGTH: Int = 8
-    private val MAX_START_STOP_PERIODS: Int = 5
-
-    private val MINIMUM_SLEEP_DURATION: Int = 5
-    private val MINIMUM_RECORD_DURATION: Int = 1
-
-    private val MAXIMUM_DURATION: Int = 43200
-    private val MAXIMUM_FILTER_THRESHOLD: Int = 32768
-    private val MAXIMUM_FILTER_FREQUENCY: Int = 192000
-
-    private val FILTER_FREQUENCY_FACTOR: Int = 100
+    private val MILLISECONDS_IN_SECOND = 1000
+    private val SECONDS_IN_MINUTE = 60
 
     /* AudioMothChime object */
 
-    private val audioMothChime = AudioMothChime()
+    private val audioMothChime =
+        AudioMothChime()
 
     /* Data class to keep track of packet contents */
 
@@ -63,9 +41,11 @@ class AudioMothChimeConnector : AudioMothConnector {
         if (value) {
 
             state.bytes[byte] = state.bytes[byte] or (1 shl bit)
+
         }
 
         state.index += 1
+
     }
 
     private fun setBits(state: State, value: Int, length: Int) {
@@ -75,74 +55,19 @@ class AudioMothChimeConnector : AudioMothConnector {
             val mask = (1 shl i)
 
             setBit(state, (value and mask) == mask)
-        }
-    }
 
-    private fun normaliseMinutes(minutes: Int): Int {
-
-        var mins = minutes
-
-        while (mins < 0) mins += MINUTES_IN_DAY
-
-        while (mins > MINUTES_IN_DAY) mins -= MINUTES_IN_DAY
-
-        return mins
-    }
-
-    /* Public interface functions */
-
-    override fun getBatteryState() {
-
-        val data = Array<Int>(GET_BATTERY_MESSAGE_LENGTH) { Random.nextInt(256) }
-
-        audioMothChime.chime(
-            data,
-            arrayOf(
-                "c4:4",
-                "e4:4"
-            )
-        )
-    }
-
-    override fun getPacketLength(configuration: AudioMothConfiguration): Int {
-
-        var packetLength: Int = COMPRESSED_CONFIGURATION_LENGTH + DEPLOYMENT_ID_LENGTH
-
-        packetLength += if (configuration.sleepRecordCycle == null) 0 else 2 * BITS_IN_INT16 / BITS_PER_BYTE
-
-        if (configuration.startStopPeriods != null) {
-
-            val startStopPeriods = configuration.startStopPeriods as Array<AudioMothConfiguration.StartStopPeriod>
-
-            val numberOfStartStopPeriod = min(MAX_START_STOP_PERIODS, startStopPeriods.size)
-
-            packetLength += 2 * numberOfStartStopPeriod * BITS_IN_INT16 / BITS_PER_BYTE
         }
 
-        packetLength += if (configuration.firstRecordingDate == null) 0 else BITS_IN_INT32 / BITS_PER_BYTE
-
-        packetLength += if (configuration.lastRecordingDate == null) 0 else BITS_IN_INT32 / BITS_PER_BYTE
-
-        packetLength += if (configuration.filter == null) 0 else 2 * BITS_IN_INT16 / BITS_PER_BYTE
-
-        packetLength += if (configuration.amplitudeThreshold == null) 0 else BITS_IN_INT16 / BITS_PER_BYTE
-
-        return packetLength
     }
 
-    override fun setConfiguration(calendar: Calendar, configuration: AudioMothConfiguration, id: DeploymentIdentifier?) {
+    private fun setTimeData(calendar: Calendar, data: Array<Int>, state: State) {
 
         /* Calculate timestamp and offset */
 
         val timestamp: Int = (calendar.timeInMillis / MILLISECONDS_IN_SECOND).toInt()
 
-        val timezoneMinutes: Int = (calendar.timeZone.rawOffset + calendar.timeZone.dstSavings) / SECONDS_IN_MINUTE / MILLISECONDS_IN_SECOND
-
-        /* Set up array */
-
-        var data = Array<Int>(MAXIMUM_SET_CONFIGURATION_MESSAGE_LENGTH) { 0 }
-
-        var state = State(data, 0)
+        val timezoneMinutes: Int =
+            (calendar.timeZone.rawOffset + calendar.timeZone.dstSavings) / SECONDS_IN_MINUTE / MILLISECONDS_IN_SECOND
 
         /* Time and timezone */
 
@@ -150,219 +75,92 @@ class AudioMothChimeConnector : AudioMothConnector {
 
         setBits(state, timezoneMinutes, BITS_IN_INT16)
 
-        /* Gain */
+    }
 
-        setBits(state, configuration.gain.ordinal, 3)
+    /* Public interface function */
 
-        /* Sample rate */
+    fun playTime(calendar: Calendar) {
 
-        setBits(state, configuration.sampleRate.ordinal, 3)
+        /* Set up array */
 
-        /* Low voltage cut-off enable */
+        var data = Array<Int>(LENGTH_OF_CHIME_PACKET) { 0 }
 
-        setBit(state, configuration.enableLowVoltageCutoff)
-
-        /* Sleep record disable */
-
-        setBit(state, configuration.sleepRecordCycle == null)
-
-        /* Enable LED */
-
-        setBit(state, configuration.enableLED)
-
-        /* Active start stop periods */
-
-        val startStopPeriods = arrayListOf<AudioMothConfiguration.StartStopPeriod>()
-
-        if (configuration.startStopPeriods != null) {
-
-            val periods =
-                configuration.startStopPeriods as Array<AudioMothConfiguration.StartStopPeriod>
-
-            if (periods.size == 1 && periods[0].startMinutes == 0 && periods[0].stopMinutes == MINUTES_IN_DAY) {
-
-                startStopPeriods.add(AudioMothConfiguration.StartStopPeriod(0, MINUTES_IN_DAY))
-            } else {
-
-                periods.forEach {
-
-                    val startMinutes: Int = normaliseMinutes(it.startMinutes - timezoneMinutes)
-
-                    val stopMinutes: Int = normaliseMinutes(it.stopMinutes - timezoneMinutes)
-
-                    if (startMinutes > stopMinutes) {
-
-                        if (startMinutes < MINUTES_IN_DAY) startStopPeriods.add(
-                            AudioMothConfiguration.StartStopPeriod(
-                                startMinutes,
-                                MINUTES_IN_DAY
-                            )
-                        )
-                        if (stopMinutes > 0) startStopPeriods.add(
-                            AudioMothConfiguration.StartStopPeriod(
-                                0,
-                                stopMinutes
-                            )
-                        )
-                    } else {
-
-                        startStopPeriods.add(
-                            AudioMothConfiguration.StartStopPeriod(
-                                startMinutes,
-                                stopMinutes
-                            )
-                        )
-                    }
-                }
-            }
-
-            startStopPeriods.sortWith(compareBy({ it.startMinutes }))
-        }
-
-        val activeStartStopPeriods = min(MAX_START_STOP_PERIODS, startStopPeriods.size)
-
-        setBits(state, activeStartStopPeriods, 3)
-
-        /* Earliest and latest recording times */
-
-        setBit(state, configuration.firstRecordingDate != null)
-
-        setBit(state, configuration.lastRecordingDate != null)
-
-        /* Filter */
-
-        setBit(state, configuration.filter != null)
-
-        /* Amplitude threshold */
-
-        setBit(state, configuration.amplitudeThreshold != null)
-
-        /* Sleep and record duration */
-
-        if (configuration.sleepRecordCycle != null) {
-
-            val sleepDuration = max(MINIMUM_SLEEP_DURATION, min(MAXIMUM_DURATION, (configuration.sleepRecordCycle as AudioMothConfiguration.SleepRecordCycle).sleepDuration))
-
-            val recordDuration = max(MINIMUM_RECORD_DURATION, min(MAXIMUM_DURATION, (configuration.sleepRecordCycle as AudioMothConfiguration.SleepRecordCycle).recordDuration))
-
-            setBits(state, sleepDuration, BITS_IN_INT16)
-
-            setBits(state, recordDuration, BITS_IN_INT16)
-        }
-
-        /* Start stop periods */
-
-        for (i in 0 until activeStartStopPeriods) {
-
-            setBits(state, startStopPeriods[i].startMinutes, BITS_IN_INT16)
-
-            setBits(state, startStopPeriods[i].stopMinutes, BITS_IN_INT16)
-        }
-
-        /* Earliest recording time */
-
-        if (configuration.firstRecordingDate != null) {
-
-            val firstRecordingDate = configuration.firstRecordingDate as AudioMothConfiguration.RecordingDate
-
-            val earliestRecordingCalendar: Calendar = calendar.clone() as Calendar
-
-            earliestRecordingCalendar.set(
-                firstRecordingDate.year,
-                firstRecordingDate.month - 1,
-                firstRecordingDate.day,
-                0,
-                0,
+        var state =
+            State(
+                data,
                 0
             )
 
-            val earliestRecordingTime = (earliestRecordingCalendar.timeInMillis / MILLISECONDS_IN_SECOND).toInt()
+        /* Set the time date */
 
-            setBits(state, earliestRecordingTime, BITS_IN_INT32)
-        }
-
-        /* Latest recording time */
-
-        if (configuration.lastRecordingDate != null) {
-
-            val lastRecordingDate = configuration.firstRecordingDate as AudioMothConfiguration.RecordingDate
-
-            val latestRecordingCalendar = calendar.clone() as Calendar
-
-            latestRecordingCalendar.set(
-                lastRecordingDate.year,
-                lastRecordingDate.month - 1,
-                lastRecordingDate.day,
-                0,
-                0,
-                0
-            )
-
-            val latestRecordingTime = (latestRecordingCalendar.timeInMillis / MILLISECONDS_IN_SECOND).toInt() + SECONDS_IN_DAY
-
-            setBits(state, latestRecordingTime, BITS_IN_INT32)
-        }
-
-        /* Filter */
-
-        if (configuration.filter is AudioMothConfiguration.LowPassFilter) {
-
-            val lowerFilterFrequency = UINT16_MAX
-            val higherFilterFrequency = max(0, min(MAXIMUM_FILTER_FREQUENCY, (configuration.filter as AudioMothConfiguration.LowPassFilter).frequency)) / FILTER_FREQUENCY_FACTOR
-
-            setBits(state, lowerFilterFrequency, BITS_IN_INT16)
-            setBits(state, higherFilterFrequency, BITS_IN_INT16)
-        } else if (configuration.filter is AudioMothConfiguration.HighPassFilter) {
-
-            val lowerFilterFrequency = max(0, min(MAXIMUM_FILTER_FREQUENCY, (configuration.filter as AudioMothConfiguration.HighPassFilter).frequency)) / FILTER_FREQUENCY_FACTOR
-            val higherFilterFrequency = UINT16_MAX
-
-            setBits(state, lowerFilterFrequency, BITS_IN_INT16)
-            setBits(state, higherFilterFrequency, BITS_IN_INT16)
-        } else if (configuration.filter is AudioMothConfiguration.BandPassFilter) {
-
-            val lowerFilterFrequency = max(0, min(MAXIMUM_FILTER_FREQUENCY, (configuration.filter as AudioMothConfiguration.BandPassFilter).lowerFrequency)) / FILTER_FREQUENCY_FACTOR
-            val higherFilterFrequency = max(0, min(MAXIMUM_FILTER_FREQUENCY, (configuration.filter as AudioMothConfiguration.BandPassFilter).higherFrequency)) / FILTER_FREQUENCY_FACTOR
-
-            setBits(state, lowerFilterFrequency, BITS_IN_INT16)
-            setBits(state, higherFilterFrequency, BITS_IN_INT16)
-        }
-
-        /* Amplitude threshold */
-
-        if (configuration.amplitudeThreshold != null) {
-
-            val amplitudeThreshold = max(0, min(MAXIMUM_FILTER_THRESHOLD, (configuration.amplitudeThreshold as AudioMothConfiguration.AmplitudeThreshold).threshold))
-
-            setBits(state, amplitudeThreshold, BITS_IN_INT16)
-        }
-
-        /* Deployment ID */
-
-        val length = state.index / BITS_PER_BYTE + DEPLOYMENT_ID_LENGTH
-
-        if (id != null && id.isValid) {
-            val idArray = id.toByteArray
-            for (i in 0 until min(DEPLOYMENT_ID_LENGTH, idArray.size)) {
-                data[length - 1 - i] = idArray[i].toInt()
-            }
-        }
+        setTimeData(calendar, data, state)
 
         /* Play the data */
-
-        data = data.slice(0 until length).toTypedArray()
 
         audioMothChime.chime(
             data,
             arrayOf(
-                "c4:4",
-                "d4:4",
-                "e4:4",
-                "c4:4",
-                "c4:4",
-                "d4:4",
-                "e4:4"
+                "C5:1",
+                "D5:1",
+                "E5:1",
+                "C5:3"
             )
         )
+
     }
+
+    fun playTimeAndDeploymentID(calendar: Calendar, deploymentID: Array<Int>) {
+
+        /* Check deployment ID length */
+
+        if (deploymentID.size != LENGTH_OF_DEPLOYMENT_ID) {
+
+            println("AUDIOMOTHCHIME_CONNECTOR: Deployment ID is incorrect length")
+
+            return
+
+        }
+
+        /* Set up array */
+
+        val size = LENGTH_OF_CHIME_PACKET + LENGTH_OF_DEPLOYMENT_ID
+
+        var data = Array<Int>(size) { 0 }
+
+        var state =
+            State(
+                data,
+                0
+            )
+
+        /* Set the time date */
+
+        setTimeData(calendar, data, state)
+
+        /* Set the deployment ID */
+
+        for (i in 0 until LENGTH_OF_DEPLOYMENT_ID) {
+
+            data[size - 1 - i] = deploymentID[i] and 0xFF
+
+        }
+
+        /* Play the data */
+
+        audioMothChime.chime(
+            data,
+            arrayOf(
+                "Eb5:1",
+                "G5:1",
+                "D5:1",
+                "F#5:1",
+                "Db5:1",
+                "F5:1",
+                "C5:1",
+                "E5:5"
+            )
+        )
+
+    }
+
 }

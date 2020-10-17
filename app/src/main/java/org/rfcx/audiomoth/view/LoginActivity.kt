@@ -8,6 +8,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import com.auth0.android.Auth0
 import com.auth0.android.authentication.AuthenticationAPIClient
 import com.auth0.android.authentication.AuthenticationException
@@ -27,6 +28,7 @@ import org.rfcx.audiomoth.util.Analytics
 import org.rfcx.audiomoth.util.CredentialKeeper
 import org.rfcx.audiomoth.util.CredentialVerifier
 import org.rfcx.audiomoth.util.Preferences
+import org.rfcx.audiomoth.util.Preferences.Companion.DISPLAY_THEME
 import org.rfcx.audiomoth.util.Preferences.Companion.USER_FIREBASE_UID
 import retrofit2.Call
 import retrofit2.Callback
@@ -57,6 +59,7 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         auth = FirebaseAuth.getInstance()
+        setupDisplayTheme()
 
         if (CredentialKeeper(this).hasValidCredentials()) {
             MainActivity.startActivity(this@LoginActivity)
@@ -83,6 +86,23 @@ class LoginActivity : AppCompatActivity() {
             loading()
             loginMagicLink()
         }
+    }
+
+    private fun setupDisplayTheme() {
+        val preferences = Preferences.getInstance(this)
+        val themeOption = this.resources.getStringArray(R.array.theme_more_than_9)
+        val theme = when (preferences.getString(DISPLAY_THEME, themeOption[1])) {
+            themeOption[0] -> {
+                AppCompatDelegate.MODE_NIGHT_NO
+            }
+            themeOption[1] -> {
+                AppCompatDelegate.MODE_NIGHT_YES
+            }
+            else -> {
+                AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            }
+        }
+        AppCompatDelegate.setDefaultNightMode(theme)
     }
 
     private fun login(email: String, password: String) {

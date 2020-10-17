@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.PorterDuff
 import android.graphics.Rect
 import android.location.Location
 import android.location.LocationManager
@@ -22,6 +23,8 @@ import android.widget.ArrayAdapter
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.toColorInt
 import androidx.fragment.app.Fragment
 import com.mapbox.android.core.location.*
 import com.mapbox.mapboxsdk.Mapbox
@@ -36,10 +39,13 @@ import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Locate
+import org.rfcx.audiomoth.entity.LocationGroup
+import org.rfcx.audiomoth.entity.LocationGroups
 import org.rfcx.audiomoth.entity.Screen
 import org.rfcx.audiomoth.localdb.LocateDb
 import org.rfcx.audiomoth.util.*
 import org.rfcx.audiomoth.view.deployment.BaseDeploymentProtocol
+import org.rfcx.audiomoth.view.profile.locationgroup.LocationGroupActivity
 
 class LocationFragment : Fragment(), OnMapReadyCallback {
     private val locateDb by lazy {
@@ -59,6 +65,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     private var nameLocation: String? = null
+    private var group: String? = null
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
@@ -163,6 +170,19 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             startMapPicker(name)
         }
 
+        changeGroupTextView.setOnClickListener {
+            val group = locationGroupValueTextView.text.toString()
+            val setLocationGroup = if (group == getString(R.string.none)) null else group
+            context?.let { it1 ->
+                LocationGroupActivity.startActivity(
+                    it1,
+                    setLocationGroup,
+                    Screen.LOCATION.id,
+                    LOCATION_REQUEST_CODE
+                )
+            }
+        }
+
         viewOfMapBox.setOnClickListener {
             if (newLocationRadioButton.isChecked) {
                 val name = locationNameEditText.text.toString()
@@ -203,7 +223,13 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         val locationValue = locationValueTextView.text.toString()
         if (name.isNotEmpty() && locationValue.isNotEmpty() && lastLocation != null) {
             lastLocation?.let {
-                val locate = Locate(name = name, latitude = it.latitude, longitude = it.longitude)
+
+                val locate = Locate(
+                    name = name,
+                    latitude = it.latitude,
+                    longitude = it.longitude,
+                    locationGroup = getLocationGroup()
+                )
                 deploymentProtocol?.setDeployLocation(locate)
                 deploymentProtocol?.nextStep()
             }
@@ -218,9 +244,30 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private fun handleExistLocate() {
         locateItem?.let {
-            deploymentProtocol?.setDeployLocation(it)
+            val locate = Locate(
+                it.id,
+                it.serverId,
+                getLocationGroup(),
+                it.name,
+                it.latitude,
+                it.longitude,
+                it.createdAt,
+                it.deletedAt,
+                it.lastDeploymentId,
+                it.lastDeploymentServerId,
+                it.lastGuardianDeploymentId,
+                it.lastGuardianDeploymentServerId,
+                it.syncState
+            )
+            deploymentProtocol?.setDeployLocation(locate)
             deploymentProtocol?.nextStep()
         }
+    }
+
+    private fun getLocationGroup(): LocationGroup {
+        val group = this.group ?: getString(R.string.none)
+        val locationGroup = deploymentProtocol?.getLocationGroup(group) ?: LocationGroups()
+        return LocationGroup(locationGroup.name, locationGroup.color, locationGroup.serverId)
     }
 
     private fun setupLocationOptions() {
@@ -399,6 +446,30 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         mapboxMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom))
     }
 
+    private fun changePinColorByGroup(group: String) {
+        val locationGroup = deploymentProtocol?.getLocationGroup(group)
+        val color = locationGroup?.color
+        val pinDrawable = pinDeploymentImageView.drawable
+        if (color != null && color.isNotEmpty() && group != getString(R.string.none)) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                pinDrawable.setColorFilter(color.toColorInt(), PorterDuff.Mode.SRC_ATOP)
+            } else {
+                pinDrawable.setTint(color.toColorInt())
+            }
+        } else {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                pinDrawable.setColorFilter(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.colorPrimary
+                    ), PorterDuff.Mode.SRC_ATOP
+                )
+            } else {
+                pinDrawable.setTint(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
+            }
+        }
+    }
+
     private fun setOnFocusEditText() {
         val screenHeight: Int = view?.rootView?.height ?: 0
         val r = Rect()
@@ -497,6 +568,11 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         super.onResume()
         mapView.onResume()
         analytics?.trackScreen(Screen.LOCATION)
+
+        val preferences = context?.let { Preferences.getInstance(it) }
+        group = preferences?.getString(Preferences.GROUP, getString(R.string.none))
+        locationGroupValueTextView.text = group
+        changePinColorByGroup(group ?: "")
     }
 
     override fun onPause() {
@@ -541,6 +617,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     companion object {
         const val TAG = "LocationFragment"
         const val REQUEST_PERMISSIONS_REQUEST_CODE = 34
+        const val LOCATION_REQUEST_CODE = 1003
         const val DEFAULT_ZOOM = 15.0
         const val ARG_LATITUDE = "ARG_LATITUDE"
         const val ARG_LONGITUDE = "ARG_LONGITUDE"

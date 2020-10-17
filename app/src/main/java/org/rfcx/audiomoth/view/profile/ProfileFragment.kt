@@ -1,11 +1,16 @@
 package org.rfcx.audiomoth.view.profile
 
+import android.Manifest
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_profile.*
@@ -13,11 +18,10 @@ import org.rfcx.audiomoth.BuildConfig
 import org.rfcx.audiomoth.MainActivityListener
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.Screen
-import org.rfcx.audiomoth.util.Analytics
-import org.rfcx.audiomoth.util.getCoordinatesFormat
-import org.rfcx.audiomoth.util.getDefaultSiteName
-import org.rfcx.audiomoth.util.getUserNickname
+import org.rfcx.audiomoth.util.*
+import org.rfcx.audiomoth.util.Preferences.Companion.DISPLAY_THEME
 import org.rfcx.audiomoth.view.profile.coordinates.CoordinatesActivity
+import org.rfcx.audiomoth.view.profile.locationgroup.LocationGroupActivity
 
 class ProfileFragment : Fragment() {
     lateinit var listener: MainActivityListener
@@ -42,6 +46,14 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val preferences = context?.let { it1 -> Preferences.getInstance(it1) }
+        val themeOption = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            this.resources.getStringArray(R.array.theme_more_than_9)
+        } else {
+            this.resources.getStringArray(R.array.theme_less_than_10)
+        }
+
         userNameTextView.text = context.getUserNickname()
         userLocationTextView.text = context?.getDefaultSiteName()
         versionTextView.text = getString(
@@ -50,6 +62,7 @@ class ProfileFragment : Fragment() {
             BuildConfig.VERSION_CODE.toString()
         )
         formatCoordinatesTextView.text = context?.getCoordinatesFormat()
+        themeSelectTextView.text = preferences?.getString(DISPLAY_THEME, themeOption[1])
 
         feedbackTextView.setOnClickListener {
             val intent = Intent(activity, FeedbackActivity::class.java)
@@ -62,6 +75,48 @@ class ProfileFragment : Fragment() {
 
         coordinatesLinearLayout.setOnClickListener {
             context?.let { it1 -> CoordinatesActivity.startActivity(it1) }
+        }
+
+        darkThemeLinearLayout.setOnClickListener {
+            val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
+            val selectedRadioItem =
+                themeOption.indexOf(preferences?.getString(DISPLAY_THEME, themeOption[1]))
+
+            if (builder != null) {
+                builder.setTitle(getString(R.string.theme))
+
+                builder.setSingleChoiceItems(themeOption, selectedRadioItem,
+                    DialogInterface.OnClickListener { dialog, which ->
+                        when (themeOption[which]) {
+                            themeOption[0] -> {
+                                preferences?.putString(DISPLAY_THEME, themeOption[0])
+                                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                            }
+                            themeOption[1] -> {
+                                preferences?.putString(DISPLAY_THEME, themeOption[1])
+                                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                            }
+                            themeOption[2] -> {
+                                preferences?.putString(DISPLAY_THEME, themeOption[2])
+                                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                            }
+                        }
+                        themeSelectTextView.text = themeOption[which]
+                        dialog.dismiss()
+                    }
+                )
+                builder.setPositiveButton(getString(R.string.cancel)) { dialog, which ->
+                    dialog.dismiss()
+                }
+                builder.show()
+            }
+            locationGroupLinearLayout.setOnClickListener {
+                context?.let { it1 -> LocationGroupActivity.startActivity(it1) }
+            }
+        }
+
+        locationGroupLinearLayout.setOnClickListener {
+            context?.let { it1 -> LocationGroupActivity.startActivity(it1) }
         }
     }
 

@@ -117,6 +117,16 @@
     <string name="profile_feedback_label">Feedback</string>
     <string name="coordinates">Coordinates</string>
     <string name="location">Location</string>
+    <string name="display">Display</string>
+    <string name="theme">Theme</string>
+    <string name="dark_theme">Dark</string>
+    <string name="light_theme">Light</string>
+    <string name="system_default">System default</string>
+    <string name="location_group">Location group</string>
+    <string name="create_new_group">Create new group</string>
+    <string name="select_a_color">Select a color</string>
+    <string name="missing_name_group">Missing name group</string>
+    <string name="none">None</string>
 
     <string name="dd_coordinates">DD</string>
     <string name="ddm_coordinates">DDM</string>
@@ -124,6 +134,8 @@
     <string name="dd_coordinates_format">0.00000°N 0.00000°E</string>
     <string name="ddm_coordinates_format">0°0.0000\'N 0°0.0000\'E</string>
     <string name="dms_coordinates_format">0°0\'0.0\"N 0°0\'0.0\"E</string>
+
+    <string name="delete_location_group_title">Do you want to delete %s ?</string>
 
     <!--  FeedbackActivity  -->
     <string name="app_feedback_share_ideas">Leave app feedback or share your ideas</string>
@@ -135,7 +147,7 @@
     <string name="snackbar_retry">RETRY</string>
 
     <!--  DeployFragment  -->
-    <string name="deployment_will_uploaded">The deployment will be uploaded to your account</string>
+    <string name="deployment_will_uploaded">Images will be uploaded to your account</string>
     <string name="almost_there">Almost there!</string>
     <string name="switch_to_deploy">Switch your device to DEPLOY</string>
     <string name="take_photos">Take some photos of the deploy \nlocation (optional)</string>
@@ -165,7 +177,7 @@
 
     <!--  ChooseDeviceFragment  -->
     <string name="choose_your_device">Choose your device</string>
-    <string name="rfcx_edge">RFCx Edge</string>
+    <string name="rfcx_edge_audiomoth">RFCx Edge or AudioMoth</string>
     <string name="rfcx_guardian">RFCx Guardian</string>
 
     <string name="location_permission_msg">Companion App would like to use your location</string>
@@ -174,6 +186,7 @@
     <string name="an_error_occurred">Service unavailable</string>
     <string name="error_has_occurred">An error occurred. Please try again.</string>
     <string name="format_in_progress_step">Not yet deployed</string>
+    <string name="format_deployed">deployed</string>
 
     <!-- ConnectGuardianFragment -->
     <string name="nearby_guardians">Nearby Guardian(s)</string>
@@ -282,7 +295,7 @@
     <!-- GuardianMicrophoneTestingFragment -->
     <string name="positioning_the_microphone">Positioning the microphone</string>
     <string name="listen">Listen</string>
-    <string name="cancel">stop</string>
+    <string name="cancel">cancel</string>
     <string name="stop_listen">Stop listen</string>
     <string name="listen_again">listen again</string>
     <string name="don_t_forget_to_turn_speaker_on">*Don\'t forget to turn speaker on</string>

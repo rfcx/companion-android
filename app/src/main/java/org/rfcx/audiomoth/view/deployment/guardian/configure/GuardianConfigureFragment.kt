@@ -166,7 +166,7 @@ class GuardianConfigureFragment : Fragment() {
         bitrateValueTextView.text = bitrateEntries!![indexOfValue]
 
         bitrateValueTextView.setOnClickListener {
-            val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
+            val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
             if (builder != null) {
                 builder.setTitle(R.string.choose_bitrate)
                     ?.setItems(bitrateEntries) { dialog, i ->
@@ -191,7 +191,7 @@ class GuardianConfigureFragment : Fragment() {
         fileFormatValueTextView.text = fileFormat
 
         fileFormatValueTextView.setOnClickListener {
-            val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
+            val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
             if (builder != null) {
                 builder.setTitle(R.string.choose_file_format)
                     ?.setItems(fileFormatList) { dialog, i ->
@@ -217,7 +217,7 @@ class GuardianConfigureFragment : Fragment() {
         sampleRateValueTextView.text = sampleRateEntries!![indexOfValue]
 
         sampleRateValueTextView.setOnClickListener {
-            val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
+            val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
             if (builder != null) {
                 builder.setTitle(R.string.choose_sample_rate)
                     ?.setItems(sampleRateEntries) { dialog, i ->
@@ -242,7 +242,7 @@ class GuardianConfigureFragment : Fragment() {
         durationValueTextView.text = durationEntries!![indexOfValue]
 
         durationValueTextView.setOnClickListener {
-            val builder = context?.let { it1 -> AlertDialog.Builder(it1) }
+            val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
             if (builder != null) {
                 builder.setTitle(R.string.choose_duration_cycle)
                     ?.setItems(durationEntries) { dialog, i ->
