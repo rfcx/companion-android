@@ -1,5 +1,6 @@
 package org.rfcx.audiomoth.view.deployment.guardian
 
+import org.rfcx.audiomoth.connection.wifi.WifiHotspotManager
 import org.rfcx.audiomoth.entity.guardian.GuardianConfiguration
 import org.rfcx.audiomoth.entity.guardian.GuardianDeployment
 import org.rfcx.audiomoth.entity.guardian.GuardianProfile
@@ -27,4 +28,8 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
 
     fun showLoading()
     fun hideLoading()
+
+    fun setWifiManager(wifiManager: WifiHotspotManager)
+    fun registerWifiConnectionLostListener()
+    fun unregisterWifiConnectionLostListener()
 }

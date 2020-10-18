@@ -346,4 +346,7 @@
     <!-- ConnectInstructionDiaglogFragment -->
     <string name="got_it">Got it</string>
 
+    <!-- WifiLostDialog -->
+    <string name="wifi_lost_dialog">Guardian Hotspot connection got lost \n Please reconnect to continue the deploy</string>
+
 </resources>
