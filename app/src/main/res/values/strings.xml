@@ -53,6 +53,7 @@
     <string name="did_green_flash">Did you see the solid green light on completion?</string>
     <string name="yes">Yes</string>
     <string name="play_syncing">Syncing...</string>
+    <string name="play_tone">Play tone</string>
     <string name="ready_send_configuration">Ready to send the configuration to the device</string>
 
     <!-- DetailDeploymentActivity -->

@@ -57,6 +57,10 @@ class SyncFragment : Fragment() {
             edgeDeploymentProtocol?.playSyncSound()
             edgeDeploymentProtocol?.startSyncing(SYNCING)
         }
+
+        playToneButton.setOnClickListener {
+            edgeDeploymentProtocol?.playTone()
+        }
     }
 
     private fun afterSync() {
