@@ -9,9 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import io.realm.Realm
+import io.realm.RealmList
 import kotlinx.android.synthetic.main.activity_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
-import org.rfcx.audiomoth.BuildConfig
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.entity.DeploymentLocation
 import org.rfcx.audiomoth.entity.DeploymentState
@@ -63,7 +63,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     private var currentCheck = 0
     private var currentCheckName = ""
-    private var passedChecks = arrayListOf<Int>()
+    private var passedChecks = RealmList<Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,6 +114,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         when (container) {
             is MapPickerFragment -> startFragment(LocationFragment.newInstance())
             is EdgeCheckListFragment -> {
+                _deployment?.let {
+                    it.passedChecks = passedChecks
+                    deploymentDb.updateDeployment(it)
+                }
                 passedChecks.clear() // remove all passed
                 finish()
             }
@@ -271,12 +275,17 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 _deployLocation = deployment.location
             }
 
+            if (deployment.passedChecks != null) {
+                val passedChecks = deployment.passedChecks
+                this.passedChecks = passedChecks ?: RealmList<Int>()
+            }
+
             currentCheck = if (deployment.state == 1) {
                 deployment.state
             } else {
                 deployment.state - 1
             }
-            handleCheckClicked(currentCheck)
+            openWithEdgeDevice()
         }
     }
 

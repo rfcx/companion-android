@@ -16,7 +16,7 @@ open class EdgeDeployment(
     var deployedAt: Date = Date(),
     var deploymentId: String? = randomDeploymentIdOnlyNumber(), // random when edge
     @Expose(serialize = false)
-    var state: Int = 0, // 1 = Locate, 2 = Config, 3 = Sync, 4 = Verify, 5 = Deploy, 6 = Ready To Upload
+    var state: Int = 0, // 1 = Locate, 2 = Config, 3 = Deploy, 4 = Ready To Upload
     var location: DeploymentLocation? = null,
     var createdAt: Date = Date(),
     @Expose(serialize = false)
