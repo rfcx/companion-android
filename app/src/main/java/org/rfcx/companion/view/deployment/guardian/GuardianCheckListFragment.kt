@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_guardian_checklist.*
 import org.rfcx.companion.R
@@ -55,11 +56,23 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
             deploymentProtocol?.setReadyToDeploy()
             SocketManager.stopConnection()
         }
+
+        // check if guardian is registered so the step can be highlighted
+        checkIfRegistered()
     }
 
     private fun setGuardianName() {
         val wifi = deploymentProtocol?.getWifiName()
         guardianIdTextView.text = wifi
+    }
+
+    private fun checkIfRegistered() {
+        SocketManager.isGuardianRegistered()
+        SocketManager.isRegistered.observe(viewLifecycleOwner, Observer {
+            if (it.isRegistered) {
+                checkListRecyclerView.setCheckPassed(1)
+            }
+        })
     }
 
     override fun invoke(number: Int, name: String) {
