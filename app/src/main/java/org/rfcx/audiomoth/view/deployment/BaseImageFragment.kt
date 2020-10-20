@@ -13,6 +13,7 @@ import com.zhihu.matisse.Matisse
 import com.zhihu.matisse.MimeType
 import java.io.File
 import kotlinx.android.synthetic.main.buttom_sheet_attach_image_layout.view.*
+import kotlinx.android.synthetic.main.fragment_deploy.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.util.*
 
@@ -54,6 +55,7 @@ abstract class BaseImageFragment : Fragment() {
                     imageAdapter.removeAt(position)
                     dismissImagePickerOptionsDialog()
                     didRemoveImage(imagePath)
+                    finishButton.isEnabled = imageAdapter.getImageCount() > 0
                 }
             }
 
@@ -115,6 +117,7 @@ abstract class BaseImageFragment : Fragment() {
                 didAddImages(pathList)
             }
             dismissImagePickerOptionsDialog()
+            finishButton.isEnabled = imageAdapter.getImageCount() > 0
         } else {
             // remove file image
             imageFile?.let {
@@ -160,5 +163,6 @@ abstract class BaseImageFragment : Fragment() {
         imageAdapter.addImages(pathList)
         didAddImages(pathList)
         dismissImagePickerOptionsDialog()
+        finishButton.isEnabled = imageAdapter.getImageCount() > 0
     }
 }
