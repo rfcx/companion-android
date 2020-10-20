@@ -15,6 +15,7 @@
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"
         android:padding="@dimen/margin_padding_small"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -43,7 +44,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/guardianLayout"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"
         android:padding="@dimen/margin_padding_small"
@@ -63,7 +64,7 @@
         <TextView
             android:id="@+id/addGuardian"
             style="@style/AudioMothText.Body"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="@dimen/margin_padding_small"
             android:text="@string/rfcx_guardian"

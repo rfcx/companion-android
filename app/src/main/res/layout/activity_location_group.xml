@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/backgroundColor"
     android:fitsSystemWindows="true"
-    tools:context="org.rfcx.audiomoth.view.profile.locationgroup.LocationGroupActivity">
+    tools:context="org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity">
 
     <include
         android:id="@+id/toolbarLayout"

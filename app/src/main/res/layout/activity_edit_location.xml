@@ -7,7 +7,7 @@
     android:focusableInTouchMode="true"
     android:background="@color/backgroundColor"
     android:fitsSystemWindows="true"
-    tools:context="org.rfcx.audiomoth.view.detail.EditLocationActivity">
+    tools:context="org.rfcx.companion.view.detail.EditLocationActivity">
 
     <include
         android:id="@+id/toolbarLayout"

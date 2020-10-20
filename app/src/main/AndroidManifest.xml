@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="org.rfcx.audiomoth">
+    package="org.rfcx.companion">
 
     <uses-sdk tools:overrideLibrary="com.google.zxing.client.android" />
 
@@ -16,7 +16,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-        android:name=".CompanionApplication"
+        android:name="org.rfcx.companion.CompanionApplication"
         android:allowBackup="true"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
@@ -42,25 +42,25 @@
         </provider>
 
         <activity
-            android:name=".view.profile.locationgroup.CreateNewGroupActivity"
+            android:name="org.rfcx.companion.view.profile.locationgroup.CreateNewGroupActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".view.profile.locationgroup.LocationGroupActivity"
+            android:name="org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".view.detail.EditLocationActivity"
+            android:name="org.rfcx.companion.view.detail.EditLocationActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".view.detail.DeploymentDetailActivity"
+            android:name="org.rfcx.companion.view.detail.DeploymentDetailActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".view.profile.coordinates.CoordinatesActivity"
+            android:name="org.rfcx.companion.view.profile.coordinates.CoordinatesActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".view.profile.FeedbackActivity"
+            android:name="org.rfcx.companion.view.profile.FeedbackActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".view.LoginActivity"
+            android:name="org.rfcx.companion.view.LoginActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -69,22 +69,18 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name="org.rfcx.companion.MainActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".view.deployment.EdgeDeploymentActivity"
+            android:name="org.rfcx.companion.view.deployment.EdgeDeploymentActivity"
             android:screenOrientation="portrait" />
 
-        <activity android:name=".view.deployment.guardian.GuardianDeploymentActivity"
+        <activity android:name="org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity"
             android:screenOrientation="portrait"/>
 
-        <activity android:name=".view.diagnostic.DiagnosticActivity" />
+        <activity android:name="org.rfcx.companion.view.diagnostic.DiagnosticActivity" />
 
-        <receiver
-            android:name=".util.NotificationBroadcastReceiver"
-            android:enabled="true"
-            android:exported="true" />
     </application>
 
 </manifest>
