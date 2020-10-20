@@ -171,6 +171,12 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         this._sampleRate = sampleRate
     }
 
+    override fun addRegisteredToPassedCheck() {
+        if (1 !in passedChecks) {
+            passedChecks.add(1)
+        }
+    }
+
     override fun setImages(images: List<String>) {
         this._images = images
     }

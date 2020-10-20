@@ -71,6 +71,7 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
         SocketManager.isRegistered.observe(viewLifecycleOwner, Observer {
             if (it.isRegistered) {
                 checkListRecyclerView.setCheckPassed(1)
+                deploymentProtocol?.addRegisteredToPassedCheck()
             }
         })
     }

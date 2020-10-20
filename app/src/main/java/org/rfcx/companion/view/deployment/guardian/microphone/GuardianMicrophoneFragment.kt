@@ -249,11 +249,13 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         })
 
         SocketManager.spectrogram.observe(viewLifecycleOwner, Observer {
-            if (it.size > 2) {
-                AudioSpectrogramUtils.setupSpectrogram(it.size)
-                val audioChunks = it.toShortArray().toSmallChunk(1)
-                for (chunk in audioChunks) {
-                    AudioSpectrogramUtils.getTrunks(chunk, this)
+            if (isMicTesting) {
+                if (it.size > 2) {
+                    AudioSpectrogramUtils.setupSpectrogram(it.size)
+                    val audioChunks = it.toShortArray().toSmallChunk(1)
+                    for (chunk in audioChunks) {
+                        AudioSpectrogramUtils.getTrunks(chunk, this)
+                    }
                 }
             }
         })
