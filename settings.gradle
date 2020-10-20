@@ -1,2 +1,2 @@
 include ':app'
-rootProject.name='rfcx-audiomoth-android'
+rootProject.name='rfcx-companion-android'
