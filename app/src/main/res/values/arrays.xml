@@ -5,7 +5,7 @@
     <string-array name="theme_more_than_9">
         <item>Light</item>
         <item>Dark</item>
-        <item>System default</item>
+        <item>System Default</item>
     </string-array>
 
     <string-array name="theme_less_than_10">
@@ -28,7 +28,7 @@
     </string-array>
 
     <string-array name="edge_optional_checks">
-        <item>Add photo attachments</item>
+        <item>Add Deployment Photo(s)</item>
     </string-array>
     
     <!--  Guardian  -->
@@ -40,26 +40,26 @@
         <item>Microphone</item>
         <item>Solar Panel</item>
         <item>Locate</item>
-        <item>Checkin</item>
+        <item>CheckIn</item>
         <item>Deploy</item>
     </string-array>
 
     <string-array name="guardian_assembly_checks">
-        <item>Attach solar panel</item>
+        <item>Solar Panel Exposure Test</item>
     </string-array>
 
     <string-array name="guardian_setup_checks">
-        <item>Register guardian</item>
-        <item>Test cellphone signal</item>
-        <item>Test microphone</item>
-        <item>Config audio parameters</item>
-        <item>Locate guardian\'s location</item>
-        <item>Verify checkin</item>
+        <item>Register Guardian with RFCx</item>
+        <item>Network Signal Test</item>
+        <item>Microphone Capture Test</item>
+        <item>Audio Parameter Config</item>
+        <item>Guardian Installation Location</item>
+        <item>Confirm CheckIn Status</item>
     </string-array>
 
     <string-array name="guardian_optional_checks">
-        <item>Add photo attachments</item>
-        <item>Advanced</item>
+        <item>Add Deployment Photo(s)</item>
+        <item>Advanced Configuration</item>
     </string-array>
 
     <string-array name="guardian_can_skip_steps">
@@ -68,16 +68,16 @@
         <item>Solar Panel</item>
         <item>Signal</item>
         <item>Microphone</item>
-        <item>Checkin</item>
+        <item>CheckIn</item>
         <item>Deploy</item>
     </string-array>
 
     <string-array name="guardian_connect_instructions">
-        <item>Power guardian up</item>
-        <item>Enter guardian application</item>
-        <item>Enter preferences menu on top right</item>
-        <item>Make sure "admin_enable_wifi" is true</item>
-        <item>Let\'s waiting guardian to be scanned</item>
+        <item>Power Guardian On</item>
+        <item>Enter Guardian Application</item>
+        <item>Enter Preferences Menu on Top Right</item>
+        <item>Ensure that "admin_enable_wifi" is Enabled</item>
+        <item>Waiting for Guardian to Initialize</item>
     </string-array>
 
     <string-array name="bitrate_entries">

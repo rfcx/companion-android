@@ -4,12 +4,12 @@
     <string name="rfcx_companion">RFCx Companion</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
-    <string name="login_sign_in_button_label">Sign in</string>
+    <string name="login_sign_in_button_label">Sign In</string>
     <string name="powered_by">Powered by</string>
-    <string name="pls_fill_email">Missing email</string>
-    <string name="pls_fill_password">Missing password</string>
-    <string name="connect_with_facebook">Continue with Facebook</string>
-    <string name="connect_with_sms">Continue with phone number</string>
+    <string name="pls_fill_email">Missing Email</string>
+    <string name="pls_fill_password">Missing Password</string>
+    <string name="connect_with_facebook">Login with Facebook</string>
+    <string name="connect_with_sms">Login with Phone Number</string>
     <string name="or">OR</string>
 
     <!--  MainActivity  -->
@@ -24,18 +24,18 @@
 
     <!--    ConfigureFragment-->
     <string name="let_configure">Let’s configure the device</string>
-    <string name="sample_rate">Sample rate</string>
+    <string name="sample_rate">Sample Rate</string>
     <string name="gain">Gain</string>
     <string name="sleep_duration">Sleep (seconds)</string>
     <string name="recording_duration">Recording (seconds)</string>
-    <string name="profile_name">Profile name (optional)</string>
-    <string name="recording_duration_title">Recording duration</string>
-    <string name="choose_sample_rate">Sample rate (kHz)</string>
+    <string name="profile_name">Profile Name (optional)</string>
+    <string name="recording_duration_title">Recording Duration</string>
+    <string name="choose_sample_rate">Sample Rate (kHz)</string>
     <string name="choose_gain">Gain</string>
     <string name="kilohertz">%s kHz</string>
     <string name="continuous">Continuous</string>
-    <string name="custom_recording_period">Custom recording period</string>
-    <string name="always_recording">Always recording</string>
+    <string name="custom_recording_period">Custom Recording Period</string>
+    <string name="always_recording">Always Recording</string>
     <string name="recommended">Recommended</string>
     <string name="custom">Custom</string>
     <string name="recommended_text">Record for 5 minutes, sleep for 10 minutes</string>
@@ -63,8 +63,8 @@
     <string name="photos">Photos</string>
     <string name="detail_sec">%d second</string>
     <string name="delete">Delete</string>
-    <string name="edit">edit</string>
-    <string name="delete_location">Delete location?</string>
+    <string name="edit">Edit</string>
+    <string name="delete_location">Delete Location?</string>
     <string name="are_you_sure_delete_location">The device and its location will be removed</string>
 
     <!--  Perform Battery  -->
@@ -191,22 +191,22 @@
 
     <!-- ConnectGuardianFragment -->
     <string name="nearby_guardians">Nearby Guardian(s)</string>
-    <string name="connecting_up">Searching for nearby\n Guardians</string>
-    <string name="instruction">Why can\'t I see a guardian</string>
+    <string name="connecting_up">Searching for Nearby\n Guardians</string>
+    <string name="instruction">Why can\'t I see a Guardian</string>
     <string name="connect">Connect</string>
     <string name="retry">Retry</string>
-    <string name="not_found">No Guardians were detected nearby.</string>
+    <string name="not_found">No Guardians were Detected Nearby.</string>
 
     <!-- GuardianSelectProfileFragment -->
     <string name="configuration_details">%s, %d kHz, %d kbs, %d secs</string>
 
     <!-- GuardianConfigureFragment -->
     <string name="bitrate">Bitrate</string>
-    <string name="duration">Duration (per audio)</string>
-    <string name="choose_bitrate">Choose bitrate (kbs)</string>
-    <string name="choose_file_format">Choose file format</string>
-    <string name="choose_duration_cycle">Choose record duration cycle (secs)</string>
-    <string name="advanced_config">Advanced configuration</string>
+    <string name="duration">Duration (per file)</string>
+    <string name="choose_bitrate">Choose Bitrate (kbs)</string>
+    <string name="choose_file_format">Choose Audio Format</string>
+    <string name="choose_duration_cycle">Choose Recording Duration Cycle (secs)</string>
+    <string name="advanced_config">Advanced Configuration</string>
 
     <!-- GuardianPreferences -->
     <bool name="prefs_value_default_show_ui">true</bool>
@@ -219,7 +219,7 @@
     <string name="prefs_value_default_api_rest_host">api.rfcx.org</string>
     <string name="prefs_value_default_api_rest_protocol">https</string>
 
-    <string name="prefs_value_default_api_checkin_host">checkin.rfcx.org</string>
+    <string name="prefs_value_default_api_checkin_host">api-mqtt.rfcx.org</string>
     <string name="prefs_value_default_api_checkin_protocol">ssl</string>
     <string name="prefs_value_default_api_checkin_port">8883</string>
 
@@ -273,7 +273,7 @@
     <string name="detail_kbs">%d kbs</string>
 
     <!-- GuardianVerifyFragment -->
-    <string name="position_the_device">Position the device</string>
+    <string name="position_the_device">Adjust the Antenna to Attain the Best Signal</string>
 
     <string name="network_strength_signal">Network Signal Strength</string>
     <string name="signal_text_0">Signal Strength is Very Low or Imperceptible</string>
@@ -295,12 +295,12 @@
     <string name="desc_deployment_image">Deployment Photos</string>
 
     <!-- GuardianMicrophoneTestingFragment -->
-    <string name="positioning_the_microphone">Positioning the microphone</string>
-    <string name="listen">Listen</string>
+    <string name="positioning_the_microphone">Microphone Test</string>
+    <string name="listen">Begin Mic Test</string>
     <string name="cancel">cancel</string>
-    <string name="stop_listen">Stop listen</string>
-    <string name="listen_again">listen again</string>
-    <string name="don_t_forget_to_turn_speaker_on">*Don\'t forget to turn speaker on</string>
+    <string name="stop_listen">Halt Mic Test</string>
+    <string name="listen_again">Restart Mic Test</string>
+    <string name="don_t_forget_to_turn_speaker_on">*Please Turn the Speaker On</string>
     <string name="rainbow">Rainbow</string>
     <string name="fire">Fire</string>
     <string name="ice">Ice</string>
@@ -315,40 +315,40 @@
     <string name="play_back">Playback</string>
 
     <!-- GuardianCheckinTestFragment -->
-    <string name="testing_guardian_checkin">Testing guardian checkin</string>
-    <string name="checkin_url">Checkin url</string>
+    <string name="testing_guardian_checkin">Guardian CheckIn Test</string>
+    <string name="checkin_url">CheckIn URL</string>
     <string name="status">Status</string>
-    <string name="delivery_time">Delivery time</string>
+    <string name="delivery_time">Delivery Time</string>
     <string name="dash">-</string>
     <string name="correct_mark">\u2713</string>
 
     <!-- GuardianSolarPanelFragment -->
-    <string name="solar_panel_feedback">Solar panel feedback</string>
+    <string name="solar_panel_feedback">Solar Panel Info</string>
     <string name="voltage_v">Voltage(V)</string>
     <string name="current_a">Current(A)</string>
     <string name="power_w">Power(W)</string>
-    <string name="please_assemble_solar_panel_to_get_feedback">Please assemble solar panel to get feedback</string>
+    <string name="please_assemble_solar_panel_to_get_feedback">Please Begin Attaching the Solar Panels to Observe Feedback</string>
 
     <!-- GuardianRegisterFragment -->
-    <string name="let_s_register_your_guardian">Let\'s register your guardian</string>
+    <string name="let_s_register_your_guardian">Let\'s Register your Guardian</string>
     <string name="production">Production</string>
     <string name="staging">Staging</string>
     <string name="register">Register</string>
     <string name="already_registered">Your guardian is already registered</string>
-    <string name="register_failed">Your registration is failed, please try again</string>
-    <string name="register_success">Your registration is success</string>
-    <string name="registering">Sent registration, waiting for response</string>
-    <string name="check_registered">Checking if guardian registered or not</string>
-    <string name="not_registered">Your guardian is not registered</string>
+    <string name="register_failed">Registration Failed. Please Try Again.</string>
+    <string name="register_success">Your Registration is Complete!</string>
+    <string name="registering">Registration Request Sent. Awaiting Response.</string>
+    <string name="check_registered">Verifying Guardian Registration Status</string>
+    <string name="not_registered">Your Guardian is Not Registered</string>
 
     <!-- GuardianCheckListFragment -->
-    <string name="setting_up_checklist">Setting up checklist</string>
+    <string name="setting_up_checklist">Guardian Setup Checklist:</string>
     <string name="deploy">Deploy</string>
 
     <!-- ConnectInstructionDiaglogFragment -->
-    <string name="got_it">Got it</string>
+    <string name="got_it">Got It</string>
 
     <!-- WifiLostDialog -->
-    <string name="wifi_lost_dialog">Guardian Hotspot connection got lost \n Please reconnect to continue the deploy</string>
+    <string name="wifi_lost_dialog">Guardian Hotspot connection was lost. \n Please reconnect to continue the deployment.</string>
 
 </resources>
