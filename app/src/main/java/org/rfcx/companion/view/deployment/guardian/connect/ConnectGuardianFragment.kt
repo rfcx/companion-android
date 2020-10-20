@@ -69,11 +69,7 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
             retryCountdown(CONNECT)
             guardianHotspot?.let {
                 if (WifiHotspotUtils.isConnectedWithGuardian(requireContext(), it.SSID)) {
-                    deploymentProtocol?.setDeploymentWifiName(it.SSID)
-                    deploymentProtocol?.startCheckList()
-                    deploymentProtocol?.setWifiManager(wifiHotspotManager)
-                    deploymentProtocol?.registerWifiConnectionLostListener()
-                    SocketManager.getCheckInTest()
+                    checkConnection()
                 } else {
                     wifiHotspotManager.connectTo(it, this)
                 }
@@ -108,6 +104,10 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
 
     override fun onWifiConnected() {
         // connect to SocketServer
+        checkConnection()
+    }
+
+    private fun checkConnection() {
         SocketManager.getConnection()
         SocketManager.connection.observe(viewLifecycleOwner, Observer { response ->
             requireActivity().runOnUiThread {

@@ -24,6 +24,7 @@ class WifiHotspotManager(private val context: Context) {
     private lateinit var wifiScanReceiver: WifiScanReceiver
     private lateinit var wifiConnectionReceiver: WifiConnectionReceiver
     private var isConnected = false
+    private var isRegisterCallback = false
 
     private var wifiName = ""
 
@@ -144,14 +145,20 @@ class WifiHotspotManager(private val context: Context) {
                 it.addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
             }.build()
             networkCallback = WifiLostCallback(wifiLostListener)
-            connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
+            if (!isRegisterCallback) {
+                isRegisterCallback = true
+                connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
+            }
         }
     }
 
     fun unregisterWifiConnectionLost() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (::connectivityManager.isInitialized)
-                connectivityManager.unregisterNetworkCallback(networkCallback)
+                if (isRegisterCallback) {
+                    isRegisterCallback = false
+                    connectivityManager.unregisterNetworkCallback(networkCallback)
+                }
         }
     }
 }

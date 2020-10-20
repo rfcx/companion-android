@@ -287,9 +287,7 @@ object SocketManager {
                             CHECKIN -> {
                                 val response =
                                     gson.fromJson(dataInput, CheckInTestResponse::class.java)
-                                if (this.checkInTest.value!!.checkin.state != "published") {
                                     this.checkInTest.postValue(response)
-                                }
                             }
                             SENTINEL -> {
                                 val response =
