@@ -42,11 +42,9 @@ import kotlinx.android.synthetic.main.fragment_map.*
 import org.rfcx.companion.DeploymentListener
 import org.rfcx.companion.MainActivityListener
 import org.rfcx.companion.R
+import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.DeploymentState.Edge
-import org.rfcx.companion.entity.Device
-import org.rfcx.companion.entity.EdgeDeployment
-import org.rfcx.companion.entity.Locate
-import org.rfcx.companion.entity.Screen
+import org.rfcx.companion.entity.DeploymentState.Guardian
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.EdgeDeploymentDb
@@ -605,7 +603,21 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun GuardianDeployment.toMark(): DeploymentMarker {
-        val pinImage = GuardianPin.getGuardianPinImage(requireContext(), this.wifiName!!)
+        val color = location?.locationGroup?.color
+        val pinImage =
+            if (state == Guardian.ReadyToUpload.key) {
+                if (WifiHotspotUtils.isConnectedWithGuardian(requireContext(), this.wifiName!!)) {
+                    if (color != null && color.isNotEmpty()) {
+                        location?.locationGroup?.color
+                    } else {
+                        GuardianPin.CONNECTED_GUARDIAN
+                    }
+                } else {
+                    GuardianPin.NOT_CONNECTED_GUARDIAN
+                }
+            } else {
+                GuardianPin.NOT_CONNECTED_GUARDIAN
+            } ?: GuardianPin.CONNECTED_GUARDIAN
         return DeploymentMarker(
             id,
             location?.name ?: "",
