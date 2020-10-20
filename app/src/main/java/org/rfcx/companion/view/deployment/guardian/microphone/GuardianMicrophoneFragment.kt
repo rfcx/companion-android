@@ -236,7 +236,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
             override fun run() {
                 if (spectrogramStack.isNotEmpty()) {
                     if (spectrogramStack[0] != null) {
-                        spectrogramView.setMagnitudes(spectrogramStack[0])
+                        spectrogramView.setMagnitudes(spectrogramStack[0] ?: FloatArray(0))
                         spectrogramView.invalidate()
                         spectrogramStack.removeAt(0)
                     }
