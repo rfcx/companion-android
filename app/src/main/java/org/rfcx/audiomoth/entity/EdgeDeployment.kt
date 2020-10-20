@@ -1,6 +1,7 @@
 package org.rfcx.audiomoth.entity
 
 import com.google.gson.annotations.Expose
+import io.realm.RealmList
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
@@ -21,7 +22,8 @@ open class EdgeDeployment(
     @Expose(serialize = false)
     var syncState: Int = 0,
     var updatedAt: Date? = null,
-    var deletedAt: Date? = null
+    var deletedAt: Date? = null,
+    var passedChecks: RealmList<Int>? = null
 ) : RealmModel {
 
     companion object {
@@ -34,5 +36,6 @@ open class EdgeDeployment(
         const val FIELD_LOCATION = "location"
         const val FIELD_UPDATED_AT = "updatedAt"
         const val FIELD_DELETED_AT = "deletedAt"
+        const val FIELD_PASSED_CHECKS = "passedChecks"
     }
 }
