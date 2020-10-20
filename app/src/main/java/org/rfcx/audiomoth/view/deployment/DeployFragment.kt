@@ -31,7 +31,7 @@ class DeployFragment : BaseImageFragment() {
 
         edgeDeploymentProtocol?.let {
             it.showToolbar()
-            it.setCurrentPage(requireContext().resources.getStringArray(R.array.edge_setup_checks)[2])
+            it.setCurrentPage(requireContext().resources.getStringArray(R.array.edge_optional_checks)[0])
             it.setToolbarTitle()
         }
 
