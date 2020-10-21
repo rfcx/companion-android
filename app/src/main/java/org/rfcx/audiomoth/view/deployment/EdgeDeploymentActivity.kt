@@ -13,15 +13,11 @@ import io.realm.RealmList
 import kotlinx.android.synthetic.main.activity_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.DeploymentLocation
-import org.rfcx.audiomoth.entity.DeploymentState
-import org.rfcx.audiomoth.entity.EdgeDeployment
-import org.rfcx.audiomoth.entity.Locate
+import org.rfcx.audiomoth.entity.*
 import org.rfcx.audiomoth.localdb.DeploymentImageDb
 import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
 import org.rfcx.audiomoth.localdb.LocateDb
-import org.rfcx.audiomoth.entity.*
-import org.rfcx.audiomoth.localdb.*
+import org.rfcx.audiomoth.localdb.LocationGroupDb
 import org.rfcx.audiomoth.service.DeploymentSyncWorker
 import org.rfcx.audiomoth.util.AudioMothChimeConnector
 import org.rfcx.audiomoth.util.RealmHelper
@@ -88,6 +84,16 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         }
     }
 
+    private fun saveImages(deployment: EdgeDeployment){
+        val localPaths = arrayListOf<String>()
+        this._images.forEach { path ->
+            if (!deploymentImageDb.existImageByDeploymentId(deployment.id, path)) {
+                localPaths.add(path)
+            }
+        }
+        deploymentImageDb.insertImage(deployment, localPaths)
+    }
+
     override fun openWithEdgeDevice() {
         startCheckList()
     }
@@ -126,6 +132,8 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 _deployment?.let {
                     it.passedChecks = passedChecks
                     deploymentDb.updateDeployment(it)
+
+                    saveImages(it)
                 }
                 passedChecks.clear() // remove all passed
                 finish()
@@ -202,7 +210,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             it.state = DeploymentState.Edge.ReadyToUpload.key
             setDeployment(it)
 
-            deploymentImageDb.insertImage(it, this._images)
+            saveImages(it)
             deploymentDb.updateDeployment(it)
 
             DeploymentSyncWorker.enqueue(this@EdgeDeploymentActivity)
@@ -297,6 +305,15 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             if (deployment.passedChecks != null) {
                 val passedChecks = deployment.passedChecks
                 this.passedChecks = passedChecks ?: RealmList<Int>()
+            }
+
+            val images = deploymentImageDb.getImageByDeploymentId(deployment.id)
+            if (images.isNotEmpty()) {
+                val localPaths = arrayListOf<String>()
+                images.forEach {
+                    localPaths.add(it.localPath)
+                }
+                _images = localPaths
             }
 
             currentCheck = if (deployment.state == 1) {
