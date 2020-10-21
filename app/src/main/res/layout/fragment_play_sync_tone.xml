@@ -18,56 +18,38 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.9" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/readySendConfigureTextView"
-        style="@style/AudioMothText.Subhead.Bold"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="@dimen/margin_padding_normal"
-        android:text="@string/ready_send_configuration"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <View
-        android:id="@+id/view0"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:layout_marginStart="@dimen/margin_padding_large"
-        android:layout_marginEnd="@dimen/margin_padding_large"
-        android:background="@color/colorPrimary"
-        app:layout_constraintTop_toBottomOf="@id/readySendConfigureTextView" />
-
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/audioMothOffPhoneImageView"
+        android:id="@+id/audioMothSyncPhoneImageView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_padding_normal"
-        android:src="@drawable/audiomoth_off_phone"
+        android:layout_margin="@dimen/margin_padding_small"
+        android:src="@drawable/audiomoth_sync_phone"
         app:layout_constraintEnd_toEndOf="@id/guidelineVerticalRight"
         app:layout_constraintStart_toStartOf="@id/guidelineVerticalLeft"
-        app:layout_constraintTop_toBottomOf="@id/view0" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        style="@style/AudioMothText.Subhead.Small"
+        style="@style/AudioMothText.Body.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginTop="@dimen/margin_padding_normal"
-        android:text="@string/switch_to_off"
-        app:layout_constraintEnd_toEndOf="@id/guidelineVerticalRight"
-        app:layout_constraintStart_toStartOf="@id/guidelineVerticalLeft"
-        app:layout_constraintTop_toBottomOf="@id/audioMothOffPhoneImageView" />
+        android:layout_marginEnd="@dimen/margin_padding_large"
+        android:text="@string/ready_to_sync"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/audioMothSyncPhoneImageView" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/playToneButton"
+        android:id="@+id/playSyncToneButton"
         style="@style/AudioMothButton.GreenButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginEnd="@dimen/margin_padding_large"
         android:layout_marginBottom="@dimen/margin_padding_normal"
-        android:text="@string/play_initial_tone"
+        android:text="@string/play_sync_tone"
         app:layout_constraintBottom_toBottomOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

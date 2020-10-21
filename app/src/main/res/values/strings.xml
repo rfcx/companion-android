@@ -46,18 +46,16 @@
 
     <!--  SyncFragment -->
     <string name="sync">Sync</string>
-    <string name="switch_to_config">1. Switch your device to CONFIG</string>
-    <string name="max_volume">2. Set the volume of your phone to high level</string>
-    <string name="hold_device">3. Hold the device close to your phone speaker</string>
     <string name="no_retry">No, Retry</string>
-    <string name="did_green_flash">Did you see the solid green light on completion?</string>
     <string name="yes">Yes</string>
-    <string name="play_syncing">Syncing...</string>
-    <string name="play_tone">Play tone</string>
     <string name="ready_send_configuration">Ready to sync tone to the device</string>
-    <string name="switch_to_off">Switch device to "OFF" and place near your phone</string>
-    <string name="switch_to_custom">Move switch to "CUSTOM" while initial tone is playing</string>
+    <string name="switch_to_off">Switch device to \"OFF\" and place near your phone</string>
+    <string name="switch_to_custom">Move switch to \"CUSTOM\" while initial tone is playing</string>
+    <string name="solid_red_flashing_green">Do you see a solid red LED and flashing green LED?</string>
+    <string name="ready_to_sync">You are ready to sync your device</string>
+    <string name="flashing_red">Did you see the flashing red LED on completion?</string>
     <string name="play_initial_tone">play initial tone</string>
+    <string name="play_sync_tone">play sync tone</string>
 
     <!-- DetailDeploymentActivity -->
     <string name="title_deployment_detail">Location name</string>
