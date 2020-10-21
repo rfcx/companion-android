@@ -125,10 +125,16 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 val isFragmentPopped = handleNestedFragmentBackStack(supportFragmentManager)
                 if (!isFragmentPopped && supportFragmentManager.backStackEntryCount <= 1) {
                     // if top's fragment is  LocationFragment then finish else show LocationFragment fragment
-                    if (supportFragmentManager.fragments.firstOrNull() is LocationFragment) {
-                        startCheckList()
-                    } else {
-                        startLocationPage(this.latitude, this.longitude, this.nameLocation)
+                    when {
+                        supportFragmentManager.fragments.firstOrNull() is LocationFragment -> {
+                            startCheckList()
+                        }
+                        supportFragmentManager.fragments.lastOrNull() is LocationFragment -> {
+                            startCheckList()
+                        }
+                        else -> {
+                            startLocationPage(this.latitude, this.longitude, this.nameLocation)
+                        }
                     }
                 } else if (!isFragmentPopped) {
                     super.onBackPressed()
