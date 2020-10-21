@@ -4,7 +4,7 @@
     android:layout_height="@dimen/size_battery_lv_button"
     android:weightSum="5">
 
-    <org.rfcx.audiomoth.widget.BottomNavigationMenuItem
+    <org.rfcx.companion.widget.BottomNavigationMenuItem
         android:id="@+id/menuMap"
         android:layout_width="0dp"
         android:layout_height="match_parent"
@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1" />
 
-    <org.rfcx.audiomoth.widget.BottomNavigationMenuItem
+    <org.rfcx.companion.widget.BottomNavigationMenuItem
         android:id="@+id/menuProfile"
         android:layout_width="0dp"
         android:layout_height="match_parent"

@@ -4,8 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/diagRootView"
     android:layout_width="match_parent"
-    android:fitsSystemWindows="true"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/backgroundColor"
+    android:fitsSystemWindows="true">
 
     <include
         android:id="@+id/toolbarLayout"
@@ -42,6 +43,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/location"
+                    android:textColor="@color/text_secondary"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -87,9 +89,9 @@
             <View
                 android:id="@+id/separateLine2"
                 android:layout_width="match_parent"
-                android:layout_height="2dp"
+                android:layout_height="@dimen/separate_line_size"
                 android:layout_marginTop="@dimen/margin_padding_normal"
-                android:background="@color/grey"
+                android:background="@color/separateLine"
                 app:layout_constraintTop_toBottomOf="@id/diagnosticLocationLayout" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -111,6 +113,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/diagnostic"
+                    android:textColor="@color/text_secondary"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -213,9 +216,9 @@
             <View
                 android:id="@+id/separateLine3"
                 android:layout_width="match_parent"
-                android:layout_height="2dp"
+                android:layout_height="@dimen/separate_line_size"
                 android:layout_marginTop="@dimen/margin_padding_normal"
-                android:background="@color/grey"
+                android:background="@color/separateLine"
                 app:layout_constraintTop_toBottomOf="@id/diagnosticDetailLayout" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -232,6 +235,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/configuration"
+                    android:textColor="@color/text_secondary"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -315,9 +319,9 @@
             <View
                 android:id="@+id/separateLine4"
                 android:layout_width="match_parent"
-                android:layout_height="2dp"
+                android:layout_height="@dimen/separate_line_size"
                 android:layout_marginTop="@dimen/margin_padding_normal"
-                android:background="@color/grey"
+                android:background="@color/separateLine"
                 app:layout_constraintTop_toBottomOf="@id/diagnosticConfigurationLayout" />
 
             <androidx.constraintlayout.widget.ConstraintLayout

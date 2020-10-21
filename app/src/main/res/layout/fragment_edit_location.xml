@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:descendantFocusability="beforeDescendants"
     android:focusableInTouchMode="true"
-    tools:context="org.rfcx.audiomoth.view.detail.EditLocationFragment">
+    tools:context="org.rfcx.companion.view.detail.EditLocationFragment">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/locationNameTextInput"
