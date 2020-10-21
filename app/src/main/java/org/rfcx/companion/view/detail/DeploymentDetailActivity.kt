@@ -25,14 +25,10 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_deployment_detail.*
-<<<<<<< Updated upstream:app/src/main/java/org/rfcx/companion/view/detail/DeploymentDetailActivity.kt
-import kotlinx.android.synthetic.main.activity_deployment_detail.locationValueTextView
-import kotlinx.android.synthetic.main.activity_deployment_detail.pinDeploymentImageView
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.DeploymentImage
 import org.rfcx.companion.entity.EdgeDeployment
-import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.toLocationGroup
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.localdb.DeploymentImageDb
@@ -45,27 +41,7 @@ import org.rfcx.companion.util.convertLatLngLabel
 import org.rfcx.companion.util.showCommonDialog
 import org.rfcx.companion.view.BaseActivity
 import org.rfcx.companion.view.deployment.EdgeDeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
-import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import org.rfcx.companion.view.deployment.locate.LocationFragment
-=======
-import kotlinx.android.synthetic.main.toolbar_default.*
-import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.DeploymentImage
-import org.rfcx.audiomoth.entity.EdgeDeployment
-import org.rfcx.audiomoth.entity.toLocationGroup
-import org.rfcx.audiomoth.localdb.DatabaseCallback
-import org.rfcx.audiomoth.localdb.DeploymentImageDb
-import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
-import org.rfcx.audiomoth.localdb.LocationGroupDb
-import org.rfcx.audiomoth.service.DeploymentSyncWorker
-import org.rfcx.audiomoth.util.RealmHelper
-import org.rfcx.audiomoth.util.asLiveData
-import org.rfcx.audiomoth.util.convertLatLngLabel
-import org.rfcx.audiomoth.util.showCommonDialog
-import org.rfcx.audiomoth.view.BaseActivity
-import org.rfcx.audiomoth.view.deployment.EdgeDeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
-import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
->>>>>>> Stashed changes:app/src/main/java/org/rfcx/audiomoth/view/detail/DeploymentDetailActivity.kt
 
 class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
@@ -102,6 +78,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
 
         setupToolbar()
         setupImageRecycler()
+        Log.d("location", "onCreate")
         deployment?.let { updateDeploymentDetailView(it) }
 
         // setup onclick
@@ -176,6 +153,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
         if (this.deployment != null) {
             this.deployment = edgeDeploymentDb.getDeploymentById(this.deployment!!.id)
             this.deployment?.let { it1 ->
+                Log.d("location", "activityResult")
                 updateDeploymentDetailView(it1)
                 setLocationOnMap(it1)
             }
@@ -230,7 +208,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                 pinDrawable.setColorFilter(color.toColorInt(), PorterDuff.Mode.SRC_ATOP)
             } else {
-                Log.d("location", color)
+                Log.d("location", locationGroup.group!!)
                 pinDrawable.setTint(color.toColorInt())
             }
         } else {

@@ -4,15 +4,16 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_edit_location.*
 import kotlinx.android.synthetic.main.fragment_edit_location.*
 import kotlinx.android.synthetic.main.toolbar_default.*
-<<<<<<< Updated upstream:app/src/main/java/org/rfcx/companion/view/detail/EditLocationActivity.kt
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.LocationGroup
+import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.toLocationGroup
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.localdb.EdgeDeploymentDb
@@ -23,23 +24,8 @@ import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.showCommonDialog
 import org.rfcx.companion.view.BaseActivity
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
-=======
-import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.entity.LocationGroup
-import org.rfcx.audiomoth.entity.Screen
-import org.rfcx.audiomoth.entity.toLocationGroup
-import org.rfcx.audiomoth.localdb.DatabaseCallback
-import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
-import org.rfcx.audiomoth.localdb.LocateDb
-import org.rfcx.audiomoth.localdb.LocationGroupDb
-import org.rfcx.audiomoth.service.DeploymentSyncWorker
-import org.rfcx.audiomoth.util.RealmHelper
-import org.rfcx.audiomoth.util.showCommonDialog
-import org.rfcx.audiomoth.view.BaseActivity
-import org.rfcx.audiomoth.view.deployment.locate.MapPickerFragment
-import org.rfcx.audiomoth.view.detail.DeploymentDetailActivity.Companion.DEPLOYMENT_REQUEST_CODE
-import org.rfcx.audiomoth.view.profile.locationgroup.LocationGroupActivity
->>>>>>> Stashed changes:app/src/main/java/org/rfcx/audiomoth/view/detail/EditLocationActivity.kt
+import org.rfcx.companion.view.detail.DeploymentDetailActivity.Companion.DEPLOYMENT_REQUEST_CODE
+import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 
 class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActivityListener {
 
@@ -54,6 +40,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
     private var nameLocation: String? = null
     private var deploymentId: Int? = null
     private var groupName: String? = null
+    private var locationGroup: LocationGroup? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,8 +55,11 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == DEPLOYMENT_REQUEST_CODE) {
-            deploymentId?.let { id ->
-                groupName = edgeDeploymentDb.getDeploymentById(id)?.location?.locationGroup?.group ?: getString(R.string.none)
+            if (resultCode == LocationGroupActivity.RESULT_OK) {
+                locationGroup = data?.getSerializableExtra(EXTRA_LOCATION_GROUP) as LocationGroup
+                locationGroup?.let {
+                    groupName = it.group
+                }
             }
         }
     }
@@ -111,16 +101,16 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
 
     override fun updateDeploymentDetail(name: String) {
         showLoading()
-        deploymentId?.let {
+        Log.d("location", locationGroup?.group ?: "none")
+        deploymentId?.let { id ->
             edgeDeploymentDb.editLocation(
-                id = it,
+                id = id,
                 locationName = name,
                 latitude = latitude,
                 longitude = longitude,
                 callback = object : DatabaseCallback {
                     override fun onSuccess() {
                         DeploymentSyncWorker.enqueue(this@EditLocationActivity)
-                        hideLoading()
                         finish()
                     }
 
@@ -129,6 +119,22 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
                         showCommonDialog(errorMessage)
                     }
                 })
+
+            locationGroup?.let { group ->
+                edgeDeploymentDb.editLocationGroup(id, group, object :
+                    DatabaseCallback {
+                    override fun onSuccess() {
+                        hideLoading()
+                        DeploymentSyncWorker.enqueue(this@EditLocationActivity)
+                        finish()
+                    }
+
+                    override fun onFailure(errorMessage: String) {
+                        hideLoading()
+                        showCommonDialog(errorMessage)
+                    }
+                })
+            }
         }
     }
 
@@ -145,7 +151,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
                 this,
                 setLocationGroup,
                 deploymentId,
-                Screen.EDGE_DETAIL.id,
+                Screen.EDIT_LOCATION.id,
                 DEPLOYMENT_REQUEST_CODE
             )
         }
@@ -182,6 +188,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
         const val EXTRA_LOCATION_NAME = "EXTRA_LOCATION_NAME"
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
         const val EXTRA_LOCATION_GROUP_NAME = "EXTRA_LOCATION_GROUP_NAME"
+        const val EXTRA_LOCATION_GROUP = "EXTRA_LOCATION_GROUP"
 
         fun startActivity(
             context: Context,

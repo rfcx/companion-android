@@ -19,6 +19,7 @@ import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.showCommonDialog
 import org.rfcx.companion.view.BaseActivity
+import org.rfcx.companion.view.detail.EditLocationActivity
 
 class LocationGroupActivity : BaseActivity(), LocationGroupProtocol {
 
@@ -48,24 +49,11 @@ class LocationGroupActivity : BaseActivity(), LocationGroupProtocol {
                 preferences.putString(Preferences.GROUP, group.name)
                 finish()
             }
-            Screen.EDGE_DETAIL.id -> {
-                val deploymentId: Int? = intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
-                deploymentId?.let { id ->
-                    showLoading()
-                    edgeDeploymentDb.editLocationGroup(id, group.toLocationGroup(), object :
-                        DatabaseCallback {
-                        override fun onSuccess() {
-                            hideLoading()
-                            DeploymentSyncWorker.enqueue(this@LocationGroupActivity)
-                            finish()
-                        }
-
-                        override fun onFailure(errorMessage: String) {
-                            hideLoading()
-                            showCommonDialog(errorMessage)
-                        }
-                    })
-                }
+            Screen.EDIT_LOCATION.id -> {
+                val intent = Intent()
+                intent.putExtra(EditLocationActivity.EXTRA_LOCATION_GROUP, group.toLocationGroup())
+                setResult(RESULT_OK, intent)
+                finish()
             }
         }
     }
@@ -94,6 +82,7 @@ class LocationGroupActivity : BaseActivity(), LocationGroupProtocol {
         const val EXTRA_GROUP = "EXTRA_GROUP"
         const val EXTRA_SCREEN = "EXTRA_SCREEN"
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
+        const val RESULT_OK = 1
 
         fun startActivity(
             context: Context,

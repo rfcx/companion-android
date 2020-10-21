@@ -21,18 +21,12 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import kotlinx.android.synthetic.main.fragment_edit_location.*
-<<<<<<< Updated upstream:app/src/main/java/org/rfcx/companion/view/detail/EditLocationFragment.kt
 import kotlinx.android.synthetic.main.fragment_edit_location.locationNameEditText
 import kotlinx.android.synthetic.main.fragment_edit_location.locationValueTextView
 import kotlinx.android.synthetic.main.fragment_edit_location.pinDeploymentImageView
 import org.rfcx.companion.R
 import org.rfcx.companion.util.convertLatLngLabel
 import org.rfcx.companion.view.deployment.locate.LocationFragment
-=======
-import org.rfcx.audiomoth.R
-import org.rfcx.audiomoth.util.convertLatLngLabel
-import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
->>>>>>> Stashed changes:app/src/main/java/org/rfcx/audiomoth/view/detail/EditLocationFragment.kt
 
 class EditLocationFragment : Fragment(), OnMapReadyCallback {
     private var mapboxMap: MapboxMap? = null
