@@ -50,7 +50,6 @@ class DeployFragment : BaseImageFragment() {
             }
             imageAdapter.addImages(pathList)
             didAddImages(pathList)
-            finishButton.isEnabled = imageAdapter.getImageCount() > 0
         }
     }
 
