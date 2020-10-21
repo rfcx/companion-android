@@ -169,6 +169,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         this._images = images
     }
 
+    override fun getImages(): List<String> {
+        return this._images
+    }
+
     private fun setLatLng(latitude: Double, longitude: Double, name: String) {
         this.latitude = latitude
         this.longitude = longitude

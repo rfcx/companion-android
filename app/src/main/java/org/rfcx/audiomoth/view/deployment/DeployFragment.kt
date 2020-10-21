@@ -41,6 +41,17 @@ class DeployFragment : BaseImageFragment() {
             edgeDeploymentProtocol?.setImages(images)
             edgeDeploymentProtocol?.nextStep()
         }
+
+        val deployment = edgeDeploymentProtocol?.getImages()
+        if (deployment != null && deployment.isNotEmpty()) {
+            val pathList = mutableListOf<String>()
+            deployment.forEach {
+                pathList.add(it)
+            }
+            imageAdapter.addImages(pathList)
+            didAddImages(pathList)
+            finishButton.isEnabled = imageAdapter.getImageCount() > 0
+        }
     }
 
     private fun setupImageRecycler() {
