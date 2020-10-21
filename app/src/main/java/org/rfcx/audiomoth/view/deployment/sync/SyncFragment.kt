@@ -6,8 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.fragment_after_sync.*
-import kotlinx.android.synthetic.main.fragment_before_sync.*
+import kotlinx.android.synthetic.main.fragment_initial_tone_playing.*
+import kotlinx.android.synthetic.main.fragment_start_sync_process.*
 import org.rfcx.audiomoth.R
 import org.rfcx.audiomoth.view.deployment.EdgeDeploymentProtocol
 
@@ -20,17 +22,24 @@ class SyncFragment : Fragment() {
         edgeDeploymentProtocol = (context as EdgeDeploymentProtocol)
     }
 
+//    start_sync_process
+//    initial_tone_playing_process
+//    after_play_initial_tone_process
+//    play_sync_tone
+//    after_play_sync_tone
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        var view = inflater.inflate(R.layout.fragment_before_sync, container, false)
+        var view = inflater.inflate(R.layout.fragment_start_sync_process, container, false)
         arguments?.let { status = it.getString(STATUS) }
 
         when (status) {
-            SYNCING -> view = inflater.inflate(R.layout.fragment_sync, container, false)
-            AFTER_SYNC -> view = inflater.inflate(R.layout.fragment_after_sync, container, false)
+            INITIAL_TONE_PLAYING -> view =
+                inflater.inflate(R.layout.fragment_initial_tone_playing, container, false)
+            AFTER_PLAY_INITIAL_TONE -> view = inflater.inflate(R.layout.fragment_after_sync, container, false)
         }
         return view
     }
@@ -45,21 +54,29 @@ class SyncFragment : Fragment() {
         }
 
         when (status) {
-            BEFORE_SYNC -> beforeSync()
-            AFTER_SYNC -> afterSync()
+            START_SYNC -> startSyncProcess()
+            INITIAL_TONE_PLAYING -> initialTonePlaying()
+            AFTER_PLAY_INITIAL_TONE -> afterSync()
         }
     }
 
-    private fun beforeSync() {
-        nextButton.isSoundEffectsEnabled = false
-
-        nextButton.setOnClickListener {
-            edgeDeploymentProtocol?.playSyncSound()
-            edgeDeploymentProtocol?.startSyncing(SYNCING)
-        }
+    private fun startSyncProcess() {
+//        nextButton.isSoundEffectsEnabled = false
+//
+//        nextButton.setOnClickListener {
+//            edgeDeploymentProtocol?.playSyncSound()
+//            edgeDeploymentProtocol?.startSyncing(SYNCING)
+//        }
 
         playToneButton.setOnClickListener {
             edgeDeploymentProtocol?.playTone()
+        }
+    }
+
+    private fun initialTonePlaying() {
+        Glide.with(this).load(R.drawable.audiomoth_switch).into(audioMothSwitchImageView)
+        nextButton.setOnClickListener {
+            edgeDeploymentProtocol?.startSyncing(AFTER_PLAY_INITIAL_TONE)
         }
     }
 
@@ -69,22 +86,24 @@ class SyncFragment : Fragment() {
         }
 
         noButton.setOnClickListener {
-            edgeDeploymentProtocol?.startSyncing(BEFORE_SYNC)
+//            edgeDeploymentProtocol?.startSyncing(BEFORE_SYNC)
         }
     }
 
     companion object {
         const val STATUS = "STATUS"
-        const val SYNCING = "SYNCING"
-        const val AFTER_SYNC = "AFTER_SYNC"
-        const val BEFORE_SYNC = "BEFORE_SYNC"
+        const val START_SYNC = "START_SYNC"
+        const val INITIAL_TONE_PLAYING = "INITIAL_TONE_PLAYING"
+        const val AFTER_PLAY_INITIAL_TONE = "AFTER_PLAY_INITIAL_TONE"
+        const val PLAY_SYNC_TONE = "PLAY_SYNC_TONE"
+        const val AFTER_PLAY_SYNC_TONE = "AFTER_PLAY_SYNC_TONE"
 
         @JvmStatic
         fun newInstance(page: String) = SyncFragment()
             .apply {
-            arguments = Bundle().apply {
-                putString(STATUS, page)
+                arguments = Bundle().apply {
+                    putString(STATUS, page)
+                }
             }
-        }
     }
 }

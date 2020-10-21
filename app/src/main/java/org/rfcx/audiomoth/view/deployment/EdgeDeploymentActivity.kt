@@ -25,7 +25,7 @@ import org.rfcx.audiomoth.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
 import org.rfcx.audiomoth.view.deployment.locate.MapPickerFragment
 import org.rfcx.audiomoth.view.deployment.sync.SyncFragment
-import org.rfcx.audiomoth.view.deployment.sync.SyncFragment.Companion.BEFORE_SYNC
+import org.rfcx.audiomoth.view.deployment.sync.SyncFragment.Companion.START_SYNC
 import org.rfcx.audiomoth.view.detail.MapPickerProtocol
 import org.rfcx.audiomoth.view.dialog.CompleteFragment
 import org.rfcx.audiomoth.view.dialog.CompleteListener
@@ -224,7 +224,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             }
             1 -> {
                 updateDeploymentState(DeploymentState.Edge.Sync)
-                startFragment(SyncFragment.newInstance(BEFORE_SYNC))
+                startFragment(SyncFragment.newInstance(START_SYNC))
             }
             2 -> {
                 updateDeploymentState(DeploymentState.Edge.Deploy)
@@ -269,13 +269,14 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 calendar,
                 deploymentIdArrayInt
             )
-            this@EdgeDeploymentActivity.runOnUiThread {
-                startSyncing(SyncFragment.AFTER_SYNC)
-            }
+//            this@EdgeDeploymentActivity.runOnUiThread {
+//                startSyncing(SyncFragment.AFTER_PLAY_SYNC_TONE)
+//            }
         }.start()
     }
 
     override fun playTone() {
+        startSyncing(SyncFragment.INITIAL_TONE_PLAYING)
         Thread {
             audioMothConnector.playTone(
                 5000
