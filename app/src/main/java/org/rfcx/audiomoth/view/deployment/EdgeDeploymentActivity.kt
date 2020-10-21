@@ -103,8 +103,17 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     }
 
     override fun nextStep() {
+        if (passedChecks.contains(2) && _images.isNullOrEmpty()) {
+            passedChecks.remove(2)
+        }
+
         if (currentCheck !in passedChecks) {
-            passedChecks.add(currentCheck)
+            if (currentCheck == 2 && _images.isNullOrEmpty()) {
+                startCheckList()
+                return
+            } else {
+                passedChecks.add(currentCheck)
+            }
         }
         startCheckList()
     }
