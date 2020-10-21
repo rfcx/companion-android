@@ -85,13 +85,8 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     }
 
     private fun saveImages(deployment: EdgeDeployment){
-        val localPaths = arrayListOf<String>()
-        this._images.forEach { path ->
-            if (!deploymentImageDb.existImageByDeploymentId(deployment.id, path)) {
-                localPaths.add(path)
-            }
-        }
-        deploymentImageDb.insertImage(deployment, localPaths)
+        deploymentImageDb.deleteImages(deployment.id)
+        deploymentImageDb.insertImage(deployment, _images)
     }
 
     override fun openWithEdgeDevice() {

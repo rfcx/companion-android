@@ -7,7 +7,6 @@ import org.rfcx.audiomoth.entity.DeploymentImage
 import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_ID
 import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_SERVER_ID
 import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_ID
-import org.rfcx.audiomoth.entity.DeploymentImage.Companion.FIELD_LOCAL_PATH
 import org.rfcx.audiomoth.entity.EdgeDeployment
 import org.rfcx.audiomoth.entity.SyncState
 import org.rfcx.audiomoth.entity.response.DeploymentImageResponse
@@ -20,11 +19,11 @@ class DeploymentImageDb(private val realm: Realm) {
             .findAll()
     }
 
-    fun existImageByDeploymentId(id: Int, localPath: String): Boolean {
-        return realm.where(DeploymentImage::class.java)
-            .equalTo(FIELD_DEPLOYMENT_ID, id)
-            .equalTo(FIELD_LOCAL_PATH, localPath)
-            .findAll().count() != 0
+    fun deleteImages(id: Int) {
+        realm.executeTransaction {
+            realm.where(DeploymentImage::class.java).equalTo(FIELD_DEPLOYMENT_ID, id)?.findAll()
+                ?.deleteAllFromRealm()
+        }
     }
 
     /**
