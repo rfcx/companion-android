@@ -1,6 +1,7 @@
 package org.rfcx.companion.entity
 
 import com.google.gson.annotations.Expose
+import io.realm.RealmList
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
@@ -15,13 +16,14 @@ open class EdgeDeployment(
     var deployedAt: Date = Date(),
     var deploymentId: String? = randomDeploymentIdOnlyNumber(), // random when edge
     @Expose(serialize = false)
-    var state: Int = 0, // 1 = Locate, 2 = Config, 3 = Sync, 4 = Verify, 5 = Deploy, 6 = Ready To Upload
+    var state: Int = 0, // 1 = Locate, 2 = Config, 3 = Deploy, 4 = Ready To Upload
     var location: DeploymentLocation? = null,
     var createdAt: Date = Date(),
     @Expose(serialize = false)
     var syncState: Int = 0,
     var updatedAt: Date? = null,
-    var deletedAt: Date? = null
+    var deletedAt: Date? = null,
+    var passedChecks: RealmList<Int>? = null
 ) : RealmModel {
 
     companion object {
@@ -34,5 +36,6 @@ open class EdgeDeployment(
         const val FIELD_LOCATION = "location"
         const val FIELD_UPDATED_AT = "updatedAt"
         const val FIELD_DELETED_AT = "deletedAt"
+        const val FIELD_PASSED_CHECKS = "passedChecks"
     }
 }

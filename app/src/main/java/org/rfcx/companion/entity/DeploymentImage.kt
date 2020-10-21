@@ -27,6 +27,7 @@ open class DeploymentImage(
         const val FIELD_DEPLOYMENT_ID = "deploymentId"
         const val FIELD_SYNC_STATE = "syncState"
         const val FIELD_REMOTE_PATH = "remotePath"
+        const val FIELD_LOCAL_PATH = "localPath"
         const val FIELD_DEPLOYMENT_SERVER_ID = "deploymentServerId"
     }
 }

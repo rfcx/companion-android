@@ -19,6 +19,9 @@ class CompanionRealmMigration : RealmMigration {
         if (oldVersion < 4L && newVersion >= 4L) {
             migrateToV4(realm)
         }
+        if (oldVersion < 5L && newVersion >= 5L) {
+            migrateToV5(realm)
+        }
     }
 
     private fun migrateToV2(realm: DynamicRealm) {
@@ -126,6 +129,14 @@ class CompanionRealmMigration : RealmMigration {
         }
         edgeConfig?.let {
             realm.schema.remove("EdgeConfiguration")
+        }
+    }
+
+    private fun migrateToV5(realm: DynamicRealm) {
+        val edgeDeployment = realm.schema.get(EdgeDeployment.TABLE_NAME)
+        edgeDeployment?.apply {
+            addRealmListField(EdgeDeployment.FIELD_PASSED_CHECKS,  Int::class.java)
+                .setNullable(EdgeDeployment.FIELD_PASSED_CHECKS, true)
         }
     }
 

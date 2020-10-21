@@ -12,6 +12,20 @@ import org.rfcx.companion.entity.SyncState
 import org.rfcx.companion.entity.response.DeploymentImageResponse
 
 class DeploymentImageDb(private val realm: Realm) {
+
+    fun getImageByDeploymentId(id: Int): List<DeploymentImage> {
+        return realm.where(DeploymentImage::class.java)
+            .equalTo(FIELD_DEPLOYMENT_ID, id)
+            .findAll()
+    }
+
+    fun deleteImages(id: Int) {
+        realm.executeTransaction {
+            realm.where(DeploymentImage::class.java).equalTo(FIELD_DEPLOYMENT_ID, id)?.findAll()
+                ?.deleteAllFromRealm()
+        }
+    }
+
     /**
      * return DeploymentImage that not be sync to Firebase Storage
      */

@@ -6,8 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import kotlinx.android.synthetic.main.fragment_after_sync.*
-import kotlinx.android.synthetic.main.fragment_before_sync.*
+import com.bumptech.glide.Glide
+import kotlinx.android.synthetic.main.fragment_after_play_initial_tone.*
+import kotlinx.android.synthetic.main.fragment_after_play_initial_tone.noButton
+import kotlinx.android.synthetic.main.fragment_after_play_initial_tone.yesButton
+import kotlinx.android.synthetic.main.fragment_after_play_sync_tone.*
+import kotlinx.android.synthetic.main.fragment_initial_tone_playing.*
+import kotlinx.android.synthetic.main.fragment_play_sync_tone.*
+import kotlinx.android.synthetic.main.fragment_start_sync_process.*
 import org.rfcx.companion.R
 import org.rfcx.companion.view.deployment.EdgeDeploymentProtocol
 
@@ -25,12 +31,18 @@ class SyncFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        var view = inflater.inflate(R.layout.fragment_before_sync, container, false)
+        var view = inflater.inflate(R.layout.fragment_start_sync_process, container, false)
         arguments?.let { status = it.getString(STATUS) }
 
         when (status) {
-            SYNCING -> view = inflater.inflate(R.layout.fragment_sync, container, false)
-            AFTER_SYNC -> view = inflater.inflate(R.layout.fragment_after_sync, container, false)
+            INITIAL_TONE_PLAYING -> view =
+                inflater.inflate(R.layout.fragment_initial_tone_playing, container, false)
+            AFTER_PLAY_INITIAL_TONE -> view =
+                inflater.inflate(R.layout.fragment_after_play_initial_tone, container, false)
+            PLAY_SYNC_TONE -> view =
+                inflater.inflate(R.layout.fragment_play_sync_tone, container, false)
+            AFTER_PLAY_SYNC_TONE -> view =
+                inflater.inflate(R.layout.fragment_after_play_sync_tone, container, false)
         }
         return view
     }
@@ -45,46 +57,74 @@ class SyncFragment : Fragment() {
         }
 
         when (status) {
-            BEFORE_SYNC -> beforeSync()
-            AFTER_SYNC -> afterSync()
+            START_SYNC -> startSyncProcess()
+            INITIAL_TONE_PLAYING -> initialTonePlaying()
+            AFTER_PLAY_INITIAL_TONE -> afterPlayInitialTone()
+            PLAY_SYNC_TONE -> playSyncTone()
+            AFTER_PLAY_SYNC_TONE -> afterPlaySyncTone()
         }
     }
 
-    private fun beforeSync() {
-        nextButton.isSoundEffectsEnabled = false
-
-        nextButton.setOnClickListener {
-            edgeDeploymentProtocol?.playSyncSound()
-            edgeDeploymentProtocol?.startSyncing(SYNCING)
-        }
-
+    private fun startSyncProcess() {
         playToneButton.setOnClickListener {
             edgeDeploymentProtocol?.playTone()
         }
     }
 
-    private fun afterSync() {
+    private fun initialTonePlaying() {
+        Glide.with(this).load(R.drawable.audiomoth_switch).into(audioMothSwitchImageView)
+        nextButton.setOnClickListener {
+            edgeDeploymentProtocol?.startSyncing(AFTER_PLAY_INITIAL_TONE)
+        }
+    }
+
+    private fun afterPlayInitialTone() {
+        Glide.with(this).load(R.drawable.audiomoth_flashing_green)
+            .into(audioMothFlashingGreenImageView)
+
+        yesButton.setOnClickListener {
+            edgeDeploymentProtocol?.startSyncing(PLAY_SYNC_TONE)
+        }
+
+        noButton.setOnClickListener {
+            edgeDeploymentProtocol?.startSyncing(START_SYNC)
+        }
+    }
+
+    private fun playSyncTone() {
+        playSyncToneButton.isSoundEffectsEnabled = false
+        playSyncToneButton.setOnClickListener {
+            edgeDeploymentProtocol?.playSyncSound()
+            edgeDeploymentProtocol?.startSyncing(AFTER_PLAY_SYNC_TONE)
+        }
+    }
+
+    private fun afterPlaySyncTone() {
+        Glide.with(this).load(R.drawable.audiomoth_flashing_red)
+            .into(audioMothFlashingRedImageView)
         yesButton.setOnClickListener {
             edgeDeploymentProtocol?.nextStep()
         }
 
         noButton.setOnClickListener {
-            edgeDeploymentProtocol?.startSyncing(BEFORE_SYNC)
+            edgeDeploymentProtocol?.startSyncing(START_SYNC)
         }
     }
 
     companion object {
         const val STATUS = "STATUS"
-        const val SYNCING = "SYNCING"
-        const val AFTER_SYNC = "AFTER_SYNC"
-        const val BEFORE_SYNC = "BEFORE_SYNC"
+        const val START_SYNC = "START_SYNC"
+        const val INITIAL_TONE_PLAYING = "INITIAL_TONE_PLAYING"
+        const val AFTER_PLAY_INITIAL_TONE = "AFTER_PLAY_INITIAL_TONE"
+        const val PLAY_SYNC_TONE = "PLAY_SYNC_TONE"
+        const val AFTER_PLAY_SYNC_TONE = "AFTER_PLAY_SYNC_TONE"
 
         @JvmStatic
         fun newInstance(page: String) = SyncFragment()
             .apply {
-            arguments = Bundle().apply {
-                putString(STATUS, page)
+                arguments = Bundle().apply {
+                    putString(STATUS, page)
+                }
             }
-        }
     }
 }

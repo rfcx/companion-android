@@ -9,18 +9,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import io.realm.Realm
+import io.realm.RealmList
 import kotlinx.android.synthetic.main.activity_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
-import org.rfcx.companion.entity.DeploymentLocation
-import org.rfcx.companion.entity.DeploymentState
-import org.rfcx.companion.entity.EdgeDeployment
-import org.rfcx.companion.entity.Locate
+import org.rfcx.companion.entity.*
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
-import org.rfcx.companion.entity.*
-import org.rfcx.companion.localdb.*
+import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.util.AudioMothChimeConnector
 import org.rfcx.companion.util.RealmHelper
@@ -28,7 +25,6 @@ import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
 import org.rfcx.companion.view.deployment.sync.SyncFragment
-import org.rfcx.companion.view.deployment.sync.SyncFragment.Companion.BEFORE_SYNC
 import org.rfcx.companion.view.detail.MapPickerProtocol
 import org.rfcx.companion.view.dialog.CompleteFragment
 import org.rfcx.companion.view.dialog.CompleteListener
@@ -62,7 +58,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     private var currentCheck = 0
     private var currentCheckName = ""
-    private var passedChecks = arrayListOf<Int>()
+    private var passedChecks = RealmList<Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,6 +83,11 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         }
     }
 
+    private fun saveImages(deployment: EdgeDeployment) {
+        deploymentImageDb.deleteImages(deployment.id)
+        deploymentImageDb.insertImage(deployment, _images)
+    }
+
     override fun openWithEdgeDevice() {
         startCheckList()
     }
@@ -102,8 +103,17 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     }
 
     override fun nextStep() {
+        if (passedChecks.contains(2) && _images.isNullOrEmpty()) {
+            passedChecks.remove(2)
+        }
+
         if (currentCheck !in passedChecks) {
-            passedChecks.add(currentCheck)
+            if (currentCheck == 2 && _images.isNullOrEmpty()) {
+                startCheckList()
+                return
+            } else {
+                passedChecks.add(currentCheck)
+            }
         }
         startCheckList()
     }
@@ -113,6 +123,12 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         when (container) {
             is MapPickerFragment -> startFragment(LocationFragment.newInstance())
             is EdgeCheckListFragment -> {
+                _deployment?.let {
+                    it.passedChecks = passedChecks
+                    deploymentDb.updateDeployment(it)
+
+                    saveImages(it)
+                }
                 passedChecks.clear() // remove all passed
                 finish()
             }
@@ -120,10 +136,16 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 val isFragmentPopped = handleNestedFragmentBackStack(supportFragmentManager)
                 if (!isFragmentPopped && supportFragmentManager.backStackEntryCount <= 1) {
                     // if top's fragment is  LocationFragment then finish else show LocationFragment fragment
-                    if (supportFragmentManager.fragments.firstOrNull() is LocationFragment) {
-                        startCheckList()
-                    } else {
-                        startLocationPage(this.latitude, this.longitude, this.nameLocation)
+                    when {
+                        supportFragmentManager.fragments.firstOrNull() is LocationFragment -> {
+                            startCheckList()
+                        }
+                        supportFragmentManager.fragments.lastOrNull() is LocationFragment -> {
+                            startCheckList()
+                        }
+                        else -> {
+                            startLocationPage(this.latitude, this.longitude, this.nameLocation)
+                        }
                     }
                 } else if (!isFragmentPopped) {
                     super.onBackPressed()
@@ -164,6 +186,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         this._images = images
     }
 
+    override fun getImages(): List<String> {
+        return this._images
+    }
+
     private fun setLatLng(latitude: Double, longitude: Double, name: String) {
         this.latitude = latitude
         this.longitude = longitude
@@ -178,7 +204,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             it.state = DeploymentState.Edge.ReadyToUpload.key
             setDeployment(it)
 
-            deploymentImageDb.insertImage(it, this._images)
+            saveImages(it)
             deploymentDb.updateDeployment(it)
 
             DeploymentSyncWorker.enqueue(this@EdgeDeploymentActivity)
@@ -197,7 +223,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             }
             1 -> {
                 updateDeploymentState(DeploymentState.Edge.Sync)
-                startFragment(SyncFragment.newInstance(BEFORE_SYNC))
+                startFragment(SyncFragment.newInstance(SyncFragment.START_SYNC))
             }
             2 -> {
                 updateDeploymentState(DeploymentState.Edge.Deploy)
@@ -242,13 +268,11 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 calendar,
                 deploymentIdArrayInt
             )
-            this@EdgeDeploymentActivity.runOnUiThread {
-                startSyncing(SyncFragment.AFTER_SYNC)
-            }
         }.start()
     }
 
     override fun playTone() {
+        startSyncing(SyncFragment.INITIAL_TONE_PLAYING)
         Thread {
             audioMothConnector.playTone(
                 5000
@@ -270,12 +294,26 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 _deployLocation = deployment.location
             }
 
+            if (deployment.passedChecks != null) {
+                val passedChecks = deployment.passedChecks
+                this.passedChecks = passedChecks ?: RealmList<Int>()
+            }
+
+            val images = deploymentImageDb.getImageByDeploymentId(deployment.id)
+            if (images.isNotEmpty()) {
+                val localPaths = arrayListOf<String>()
+                images.forEach {
+                    localPaths.add(it.localPath)
+                }
+                _images = localPaths
+            }
+
             currentCheck = if (deployment.state == 1) {
                 deployment.state
             } else {
                 deployment.state - 1
             }
-            handleCheckClicked(currentCheck)
+            openWithEdgeDevice()
         }
     }
 
