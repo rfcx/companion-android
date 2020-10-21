@@ -269,9 +269,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 calendar,
                 deploymentIdArrayInt
             )
-//            this@EdgeDeploymentActivity.runOnUiThread {
-//                startSyncing(SyncFragment.AFTER_PLAY_SYNC_TONE)
-//            }
         }.start()
     }
 
