@@ -217,11 +217,13 @@ class EdgeDeploymentDb(private val realm: Realm) {
                         it.serverId = locationGroup.serverId
                     }
                 } else {
-                    edgeDeployment.location?.locationGroup = LocationGroup(
-                        locationGroup.group,
-                        locationGroup.color,
-                        locationGroup.serverId
-                    )
+                    val locationGroupObj = bgRealm.createObject(LocationGroup::class.java)
+                    locationGroupObj.let {
+                        it.color = locationGroup.color
+                        it.group = locationGroup.group
+                        it.serverId = locationGroup.serverId
+                    }
+                    edgeDeployment.location?.locationGroup = locationGroupObj
                 }
             }
         }, {

@@ -2,8 +2,6 @@ package org.rfcx.companion.view.detail
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.PorterDuff
-import android.os.Build
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.util.TypedValue
@@ -24,13 +22,10 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_deployment_detail.*
-import kotlinx.android.synthetic.main.activity_deployment_detail.locationValueTextView
-import kotlinx.android.synthetic.main.activity_deployment_detail.pinDeploymentImageView
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.DeploymentImage
 import org.rfcx.companion.entity.EdgeDeployment
-import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.toLocationGroup
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.localdb.DeploymentImageDb
@@ -43,7 +38,6 @@ import org.rfcx.companion.util.convertLatLngLabel
 import org.rfcx.companion.util.showCommonDialog
 import org.rfcx.companion.view.BaseActivity
 import org.rfcx.companion.view.deployment.EdgeDeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
-import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 
 class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
@@ -99,25 +93,11 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
                             locate.longitude,
                             locate.name,
                             deploymentId,
-                            locationGroupValueTextView.text.toString(),
+                            locate.locationGroup?.group ?: getString(R.string.none),
                             DEPLOYMENT_REQUEST_CODE
                         )
                     }
                 }
-            }
-        }
-
-        editGroupButton.setOnClickListener {
-            val group = locationGroupValueTextView.text.toString()
-            val setLocationGroup = if (group == getString(R.string.none)) null else group
-            intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)?.let { deploymentId ->
-                LocationGroupActivity.startActivity(
-                    this,
-                    setLocationGroup,
-                    deploymentId,
-                    Screen.EDGE_DETAIL.id,
-                    DEPLOYMENT_REQUEST_CODE
-                )
             }
         }
     }
@@ -188,16 +168,6 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
             location?.let { locate ->
                 convertLatLngLabel(this, locate.latitude, locate.longitude)
             }
-
-        locationGroupValueTextView.text =
-            location?.locationGroup?.let { locationGroup ->
-                if (locationGroup.group.isNullOrBlank()) {
-                    getString(R.string.none)
-                } else {
-                    locationGroup.group
-                }
-            } ?: getString(R.string.none)
-
         changePinColorByGroup(location?.locationGroup?.group ?: getString(R.string.none))
     }
 
@@ -228,24 +198,11 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
     private fun changePinColorByGroup(group: String) {
         val locationGroup = locationGroupDb.getLocationGroup(group).toLocationGroup()
         val color = locationGroup.color
-        val pinDrawable = pinDeploymentImageView.drawable
+        val pinDrawable = pinDetailDeploymentImageView
         if (color != null && color.isNotEmpty() && group != getString(R.string.none)) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                pinDrawable.setColorFilter(color.toColorInt(), PorterDuff.Mode.SRC_ATOP)
-            } else {
-                pinDrawable.setTint(color.toColorInt())
-            }
+            pinDrawable.setColorFilter(color.toColorInt())
         } else {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                pinDrawable.setColorFilter(
-                    ContextCompat.getColor(
-                        this,
-                        R.color.colorPrimary
-                    ), PorterDuff.Mode.SRC_ATOP
-                )
-            } else {
-                pinDrawable.setTint(ContextCompat.getColor(this, R.color.colorPrimary))
-            }
+            pinDrawable.setColorFilter(ContextCompat.getColor(this, R.color.colorPrimary))
         }
     }
 

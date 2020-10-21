@@ -10,6 +10,7 @@ enum class Screen(val id: String) {
     LOCATION("Location"),
     EDGE_DETAIL("Edge Detail"),
     MAP_PICKER("Map Picker"),
+    EDIT_LOCATION("Edit Location"),
     MAP_SEARCH_RESULT("Map Search Result"),
     CONNECT_GUARDIAN("Connect Guardian"),
     GUARDIAN_REGISTER("Guardian Register"),

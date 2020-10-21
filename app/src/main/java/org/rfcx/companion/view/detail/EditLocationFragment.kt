@@ -87,6 +87,10 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
                 editLocationActivityListener?.updateDeploymentDetail(locationNameEditText.text.toString())
             }
         }
+
+        editGroupButton.setOnClickListener {
+            editLocationActivityListener?.startLocationGroupPage()
+        }
     }
 
     private fun openMapPickerPage() {
@@ -137,24 +141,11 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
     private fun changePinColorByGroup(group: String) {
         val locationGroup = editLocationActivityListener?.getLocationGroup(group)
         val color = locationGroup?.color
-        val pinDrawable = pinDeploymentImageView.drawable
+        val pinDrawable = pinDeploymentImageView
         if (color != null && color.isNotEmpty() && group != getString(R.string.none)) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                pinDrawable.setColorFilter(color.toColorInt(), PorterDuff.Mode.SRC_ATOP)
-            } else {
-                pinDrawable.setTint(color.toColorInt())
-            }
+            pinDrawable.setColorFilter(color.toColorInt())
         } else {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                pinDrawable.setColorFilter(
-                    ContextCompat.getColor(
-                        requireContext(),
-                        R.color.colorPrimary
-                    ), PorterDuff.Mode.SRC_ATOP
-                )
-            } else {
-                pinDrawable.setTint(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
-            }
+            pinDrawable.setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
         }
     }
 
@@ -173,10 +164,12 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         super.onResume()
         mapView.onResume()
 
-        changePinColorByGroup(
-            editLocationActivityListener?.getLocationGroupName()
-                ?: requireContext().getString(R.string.none)
-        )
+        editLocationActivityListener?.let {
+            changePinColorByGroup(
+                it.getLocationGroupName()
+            )
+            locationGroupValueTextView.text = it.getLocationGroupName()
+        }
     }
 
     override fun onPause() {

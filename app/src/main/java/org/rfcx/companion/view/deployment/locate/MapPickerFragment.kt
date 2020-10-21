@@ -4,7 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.PorterDuff
 import android.location.Location
 import android.location.LocationManager
 import android.os.Build
@@ -35,7 +34,6 @@ import com.mapbox.mapboxsdk.maps.Style
 import java.util.*
 import kotlin.concurrent.schedule
 import kotlinx.android.synthetic.main.fragment_map_picker.*
-import kotlinx.android.synthetic.main.fragment_map_picker.pinDeploymentImageView
 import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Screen
@@ -176,24 +174,11 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
     private fun changePinColorByGroup(group: String) {
         val locationGroup = editLocationActivityListener?.getLocationGroup(group)
         val color = locationGroup?.color
-        val pinDrawable = pinDeploymentImageView.drawable
+        val pinDrawable = pinDeploymentImageView
         if (color != null && color.isNotEmpty() && group != getString(R.string.none)) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                pinDrawable.setColorFilter(color.toColorInt(), PorterDuff.Mode.SRC_ATOP)
-            } else {
-                pinDrawable.setTint(color.toColorInt())
-            }
+            pinDrawable.setColorFilter(color.toColorInt())
         } else {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                pinDrawable.setColorFilter(
-                    ContextCompat.getColor(
-                        requireContext(),
-                        R.color.colorPrimary
-                    ), PorterDuff.Mode.SRC_ATOP
-                )
-            } else {
-                pinDrawable.setTint(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
-            }
+            pinDrawable.setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
         }
     }
 
