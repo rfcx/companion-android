@@ -4,12 +4,10 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_edit_location.*
-import kotlinx.android.synthetic.main.fragment_edit_location.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.LocationGroup
@@ -101,7 +99,6 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
 
     override fun updateDeploymentDetail(name: String) {
         showLoading()
-        Log.d("location", locationGroup?.group ?: "none")
         deploymentId?.let { id ->
             edgeDeploymentDb.editLocation(
                 id = id,
@@ -110,6 +107,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
                 longitude = longitude,
                 callback = object : DatabaseCallback {
                     override fun onSuccess() {
+                        hideLoading()
                         DeploymentSyncWorker.enqueue(this@EditLocationActivity)
                         finish()
                     }

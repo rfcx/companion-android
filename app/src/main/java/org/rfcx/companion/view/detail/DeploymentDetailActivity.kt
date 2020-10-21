@@ -2,11 +2,8 @@ package org.rfcx.companion.view.detail
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.PorterDuff
-import android.os.Build
 import android.os.Bundle
 import android.os.PersistableBundle
-import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -78,7 +75,6 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
 
         setupToolbar()
         setupImageRecycler()
-        Log.d("location", "onCreate")
         deployment?.let { updateDeploymentDetailView(it) }
 
         // setup onclick
@@ -153,7 +149,6 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
         if (this.deployment != null) {
             this.deployment = edgeDeploymentDb.getDeploymentById(this.deployment!!.id)
             this.deployment?.let { it1 ->
-                Log.d("location", "activityResult")
                 updateDeploymentDetailView(it1)
                 setLocationOnMap(it1)
             }
@@ -203,25 +198,11 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
     private fun changePinColorByGroup(group: String) {
         val locationGroup = locationGroupDb.getLocationGroup(group).toLocationGroup()
         val color = locationGroup.color
-        val pinDrawable = pinDetailDeploymentImageView.drawable
+        val pinDrawable = pinDetailDeploymentImageView
         if (color != null && color.isNotEmpty() && group != getString(R.string.none)) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                pinDrawable.setColorFilter(color.toColorInt(), PorterDuff.Mode.SRC_ATOP)
-            } else {
-                Log.d("location", locationGroup.group!!)
-                pinDrawable.setTint(color.toColorInt())
-            }
+            pinDrawable.setColorFilter(color.toColorInt())
         } else {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                pinDrawable.setColorFilter(
-                    ContextCompat.getColor(
-                        this,
-                        R.color.colorPrimary
-                    ), PorterDuff.Mode.SRC_ATOP
-                )
-            } else {
-                pinDrawable.setTint(ContextCompat.getColor(this, R.color.colorPrimary))
-            }
+            pinDrawable.setColorFilter(ContextCompat.getColor(this, R.color.colorPrimary))
         }
     }
 

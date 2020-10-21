@@ -4,7 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.PorterDuff
 import android.location.Location
 import android.location.LocationManager
 import android.os.Build
@@ -175,24 +174,11 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
     private fun changePinColorByGroup(group: String) {
         val locationGroup = editLocationActivityListener?.getLocationGroup(group)
         val color = locationGroup?.color
-        val pinDrawable = pinDeploymentImageView.drawable
+        val pinDrawable = pinDeploymentImageView
         if (color != null && color.isNotEmpty() && group != getString(R.string.none)) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                pinDrawable.setColorFilter(color.toColorInt(), PorterDuff.Mode.SRC_ATOP)
-            } else {
-                pinDrawable.setTint(color.toColorInt())
-            }
+            pinDrawable.setColorFilter(color.toColorInt())
         } else {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                pinDrawable.setColorFilter(
-                    ContextCompat.getColor(
-                        requireContext(),
-                        R.color.colorPrimary
-                    ), PorterDuff.Mode.SRC_ATOP
-                )
-            } else {
-                pinDrawable.setTint(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
-            }
+            pinDrawable.setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
         }
     }
 
