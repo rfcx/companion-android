@@ -32,19 +32,19 @@ open class Locate(
 
     fun getLastDeploymentId(): String {
         // is sent?
-        return if (lastDeploymentServerId != null || lastGuardianDeploymentServerId != null) {
+        return if (lastDeploymentId != 0 || lastGuardianDeploymentId != 0) {
             // is last deployment from edge?
-            if (lastDeploymentServerId != null) {
-                lastDeploymentServerId!!
-            } else {
-                lastGuardianDeploymentServerId!!
-            }
-        } else {
             if (lastDeploymentId != 0) {
                 lastDeploymentId
             } else {
                 lastGuardianDeploymentId
             }.toString()
+        } else {
+            if (lastDeploymentServerId != null) {
+                lastDeploymentServerId!!
+            } else {
+                lastGuardianDeploymentServerId!!
+            }
         }
     }
 
