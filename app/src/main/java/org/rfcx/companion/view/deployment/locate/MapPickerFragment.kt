@@ -35,7 +35,6 @@ import com.mapbox.mapboxsdk.maps.Style
 import java.util.*
 import kotlin.concurrent.schedule
 import kotlinx.android.synthetic.main.fragment_map_picker.*
-import kotlinx.android.synthetic.main.fragment_map_picker.pinDeploymentImageView
 import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Screen

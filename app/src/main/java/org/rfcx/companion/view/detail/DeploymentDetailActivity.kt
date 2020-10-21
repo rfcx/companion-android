@@ -6,6 +6,7 @@ import android.graphics.PorterDuff
 import android.os.Build
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -24,6 +25,7 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_deployment_detail.*
+<<<<<<< Updated upstream:app/src/main/java/org/rfcx/companion/view/detail/DeploymentDetailActivity.kt
 import kotlinx.android.synthetic.main.activity_deployment_detail.locationValueTextView
 import kotlinx.android.synthetic.main.activity_deployment_detail.pinDeploymentImageView
 import kotlinx.android.synthetic.main.toolbar_default.*
@@ -45,6 +47,25 @@ import org.rfcx.companion.view.BaseActivity
 import org.rfcx.companion.view.deployment.EdgeDeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import org.rfcx.companion.view.deployment.locate.LocationFragment
+=======
+import kotlinx.android.synthetic.main.toolbar_default.*
+import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.DeploymentImage
+import org.rfcx.audiomoth.entity.EdgeDeployment
+import org.rfcx.audiomoth.entity.toLocationGroup
+import org.rfcx.audiomoth.localdb.DatabaseCallback
+import org.rfcx.audiomoth.localdb.DeploymentImageDb
+import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
+import org.rfcx.audiomoth.localdb.LocationGroupDb
+import org.rfcx.audiomoth.service.DeploymentSyncWorker
+import org.rfcx.audiomoth.util.RealmHelper
+import org.rfcx.audiomoth.util.asLiveData
+import org.rfcx.audiomoth.util.convertLatLngLabel
+import org.rfcx.audiomoth.util.showCommonDialog
+import org.rfcx.audiomoth.view.BaseActivity
+import org.rfcx.audiomoth.view.deployment.EdgeDeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
+import org.rfcx.audiomoth.view.deployment.locate.LocationFragment
+>>>>>>> Stashed changes:app/src/main/java/org/rfcx/audiomoth/view/detail/DeploymentDetailActivity.kt
 
 class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
@@ -99,25 +120,11 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
                             locate.longitude,
                             locate.name,
                             deploymentId,
-                            locationGroupValueTextView.text.toString(),
+                            locate.locationGroup?.group ?: getString(R.string.none),
                             DEPLOYMENT_REQUEST_CODE
                         )
                     }
                 }
-            }
-        }
-
-        editGroupButton.setOnClickListener {
-            val group = locationGroupValueTextView.text.toString()
-            val setLocationGroup = if (group == getString(R.string.none)) null else group
-            intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)?.let { deploymentId ->
-                LocationGroupActivity.startActivity(
-                    this,
-                    setLocationGroup,
-                    deploymentId,
-                    Screen.EDGE_DETAIL.id,
-                    DEPLOYMENT_REQUEST_CODE
-                )
             }
         }
     }
@@ -188,16 +195,6 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
             location?.let { locate ->
                 convertLatLngLabel(this, locate.latitude, locate.longitude)
             }
-
-        locationGroupValueTextView.text =
-            location?.locationGroup?.let { locationGroup ->
-                if (locationGroup.group.isNullOrBlank()) {
-                    getString(R.string.none)
-                } else {
-                    locationGroup.group
-                }
-            } ?: getString(R.string.none)
-
         changePinColorByGroup(location?.locationGroup?.group ?: getString(R.string.none))
     }
 
@@ -228,11 +225,12 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
     private fun changePinColorByGroup(group: String) {
         val locationGroup = locationGroupDb.getLocationGroup(group).toLocationGroup()
         val color = locationGroup.color
-        val pinDrawable = pinDeploymentImageView.drawable
+        val pinDrawable = pinDetailDeploymentImageView.drawable
         if (color != null && color.isNotEmpty() && group != getString(R.string.none)) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                 pinDrawable.setColorFilter(color.toColorInt(), PorterDuff.Mode.SRC_ATOP)
             } else {
+                Log.d("location", color)
                 pinDrawable.setTint(color.toColorInt())
             }
         } else {

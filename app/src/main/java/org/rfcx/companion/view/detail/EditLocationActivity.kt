@@ -8,7 +8,9 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_edit_location.*
+import kotlinx.android.synthetic.main.fragment_edit_location.*
 import kotlinx.android.synthetic.main.toolbar_default.*
+<<<<<<< Updated upstream:app/src/main/java/org/rfcx/companion/view/detail/EditLocationActivity.kt
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.toLocationGroup
@@ -21,6 +23,23 @@ import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.showCommonDialog
 import org.rfcx.companion.view.BaseActivity
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
+=======
+import org.rfcx.audiomoth.R
+import org.rfcx.audiomoth.entity.LocationGroup
+import org.rfcx.audiomoth.entity.Screen
+import org.rfcx.audiomoth.entity.toLocationGroup
+import org.rfcx.audiomoth.localdb.DatabaseCallback
+import org.rfcx.audiomoth.localdb.EdgeDeploymentDb
+import org.rfcx.audiomoth.localdb.LocateDb
+import org.rfcx.audiomoth.localdb.LocationGroupDb
+import org.rfcx.audiomoth.service.DeploymentSyncWorker
+import org.rfcx.audiomoth.util.RealmHelper
+import org.rfcx.audiomoth.util.showCommonDialog
+import org.rfcx.audiomoth.view.BaseActivity
+import org.rfcx.audiomoth.view.deployment.locate.MapPickerFragment
+import org.rfcx.audiomoth.view.detail.DeploymentDetailActivity.Companion.DEPLOYMENT_REQUEST_CODE
+import org.rfcx.audiomoth.view.profile.locationgroup.LocationGroupActivity
+>>>>>>> Stashed changes:app/src/main/java/org/rfcx/audiomoth/view/detail/EditLocationActivity.kt
 
 class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActivityListener {
 
@@ -44,6 +63,15 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
         setupToolbar()
         toolbarLayout.visibility = View.VISIBLE
         startFragment(MapPickerFragment.newInstance(latitude, longitude, nameLocation ?: ""))
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == DEPLOYMENT_REQUEST_CODE) {
+            deploymentId?.let { id ->
+                groupName = edgeDeploymentDb.getDeploymentById(id)?.location?.locationGroup?.group ?: getString(R.string.none)
+            }
+        }
     }
 
     private fun initIntent() {
@@ -110,6 +138,19 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
         return locationGroupDb.getLocationGroup(name).toLocationGroup()
     }
 
+    override fun startLocationGroupPage() {
+        val setLocationGroup = if (groupName == getString(R.string.none)) null else groupName
+        intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)?.let { deploymentId ->
+            LocationGroupActivity.startActivity(
+                this,
+                setLocationGroup,
+                deploymentId,
+                Screen.EDGE_DETAIL.id,
+                DEPLOYMENT_REQUEST_CODE
+            )
+        }
+    }
+
     private fun startFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
             .replace(editLocationContainer.id, fragment)
@@ -128,6 +169,11 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        finish()
     }
 
     companion object {
