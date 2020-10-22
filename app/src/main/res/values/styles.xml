@@ -221,16 +221,20 @@
         <item name="android:background">@color/dialogColor</item>
         <item name="android:textColorAlertDialogListItem">@color/text_primary</item>
         <item name="android:textColorSecondary">@color/text_primary</item>
-        <item name="positiveButtonText">@style/NegativeButton</item>
+        <item name="positiveButtonText">@style/PositiveButton</item>
+        <item name="negativeButtonText">@style/NegativeButton</item>
         <item name="buttonBarPositiveButtonStyle">@style/PositiveButton</item>
+        <item name="buttonBarNegativeButtonStyle">@style/NegativeButton</item>
     </style>
 
     <style name="PositiveButton" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
         <item name="android:textColor">@color/colorPrimary</item>
+        <item name="lineSpacing">0.5dp</item>
     </style>
 
     <style name="NegativeButton" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
         <item name="android:textColor">@color/colorPrimary</item>
+        <item name="lineSpacing">0.5dp</item>
     </style>
 
 </resources>
