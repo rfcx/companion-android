@@ -94,7 +94,8 @@ class BottomNavigationMenuItem @JvmOverloads constructor(
         } else {
             titleTextView.visibility = View.VISIBLE
             titleTextView.setTextColor(titleColor)
-            iconImageView.colorFilter = null
+            iconImageView.setColorFilter(titleColor,
+                PorterDuff.Mode.SRC_IN)
             updateBadge()
         }
     }

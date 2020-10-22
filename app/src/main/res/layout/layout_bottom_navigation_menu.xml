@@ -13,6 +13,7 @@
         app:icon="@drawable/ic_menu_map"
         app:iconTintColor="@color/color_bottom_icon_tint"
         app:title="@string/menu_map"
+        app:titleColor="@color/bottom_bar_icon_default_tint"
         app:titleColorSelected="@color/color_bottom_icon_tint" />
 
     <View
@@ -29,6 +30,7 @@
         app:icon="@drawable/ic_menu_profile"
         app:iconTintColor="@color/color_bottom_icon_tint"
         app:title="@string/menu_profile"
+        app:titleColor="@color/bottom_bar_icon_default_tint"
         app:titleColorSelected="@color/color_bottom_icon_tint" />
 
 </LinearLayout>
