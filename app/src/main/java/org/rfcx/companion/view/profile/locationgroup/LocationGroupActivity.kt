@@ -12,12 +12,9 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.LocationGroups
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.toLocationGroup
-import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.localdb.EdgeDeploymentDb
-import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.RealmHelper
-import org.rfcx.companion.util.showCommonDialog
 import org.rfcx.companion.view.BaseActivity
 import org.rfcx.companion.view.detail.EditLocationActivity
 
@@ -27,13 +24,15 @@ class LocationGroupActivity : BaseActivity(), LocationGroupProtocol {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
 
+    private var group: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_location_group)
 
         setupToolbar()
 
-        val group: String? = intent?.getStringExtra(EXTRA_GROUP)
+        group = intent?.getStringExtra(EXTRA_GROUP)
         startFragment(LocationGroupFragment.newInstance(group))
     }
 
@@ -78,11 +77,19 @@ class LocationGroupActivity : BaseActivity(), LocationGroupProtocol {
         return true
     }
 
+    override fun onBackPressed() {
+        val intent = Intent()
+        intent.putExtra(EXTRA_GROUP, group)
+        setResult(RESULT_DELETE, intent)
+        finish()
+    }
+
     companion object {
         const val EXTRA_GROUP = "EXTRA_GROUP"
         const val EXTRA_SCREEN = "EXTRA_SCREEN"
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
         const val RESULT_OK = 1
+        const val RESULT_DELETE = 2
 
         fun startActivity(
             context: Context,
