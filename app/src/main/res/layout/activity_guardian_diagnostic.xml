@@ -30,59 +30,39 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_padding_xsmall">
 
-                <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/guidelineVertical1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    app:layout_constraintGuide_percent="0.50" />
-
                 <TextView
-                    android:id="@+id/diagnosticLocationTitle"
-                    style="@style/GuardianText.Title.Bold"
+                    android:id="@+id/deploymentLocationTitle"
+                    style="@style/AudioMothText.Body.Small.Label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/location"
-                    android:textColor="@color/text_secondary"
+                    android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
-                    android:id="@+id/locationLongitudeLabel"
-                    style="@style/GuardianText.Label.Bold"
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/locationValueTextView"
+                    style="@style/AudioMothText.Body.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/longitude"
-                    app:layout_constraintStart_toStartOf="@id/diagnosticLocationTitle"
-                    app:layout_constraintTop_toBottomOf="@id/diagnosticLocationTitle" />
+                    android:layout_marginStart="@dimen/margin_padding_large"
+                    android:layout_marginTop="@dimen/margin_padding_small"
+                    android:textSize="@dimen/text_xsmall"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/deploymentLocationTitle" />
 
-                <TextView
-                    android:id="@+id/locationLongitudeValue"
-                    style="@style/GuardianText.Label.Value"
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/editButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="@id/locationLongitudeLabel"
-                    app:layout_constraintTop_toBottomOf="@id/locationLongitudeLabel"
-                    tools:text="100.000" />
-
-                <TextView
-                    android:id="@+id/locationLatitudeLabel"
-                    style="@style/GuardianText.Label.Bold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="0dp"
-                    android:text="@string/latitude"
-                    app:layout_constraintStart_toEndOf="@id/guidelineVertical1"
-                    app:layout_constraintTop_toBottomOf="@id/diagnosticLocationTitle" />
-
-                <TextView
-                    android:id="@+id/locationLatitudeValue"
-                    style="@style/GuardianText.Label.Value"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="@id/locationLatitudeLabel"
-                    app:layout_constraintTop_toBottomOf="@id/locationLatitudeLabel"
-                    tools:text="100.000" />
+                    android:background="@color/transparent"
+                    android:text="@string/edit"
+                    android:textAllCaps="true"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="@dimen/text_small"
+                    app:layout_constraintBottom_toBottomOf="@id/locationValueTextView"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/deploymentLocationTitle" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

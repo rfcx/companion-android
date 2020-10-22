@@ -25,6 +25,7 @@ import org.rfcx.companion.localdb.guardian.DiagnosticDb
 import org.rfcx.companion.service.DiagnosticSyncWorker
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.RealmHelper
+import org.rfcx.companion.util.convertLatLngLabel
 import org.rfcx.companion.view.dialog.LoadingDialogFragment
 import org.rfcx.companion.view.prefs.GuardianPrefsFragment
 import org.rfcx.companion.view.prefs.SyncPreferenceListener
@@ -113,8 +114,11 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
     }
 
     private fun setupLocationData() {
-        locationLongitudeValue.text = long.toString()
-        locationLatitudeValue.text = lat.toString()
+        val latitude = lat
+        val longitude = long
+        if(latitude != null && longitude != null) {
+            locationValueTextView.text = convertLatLngLabel(this, latitude, longitude)
+        }
     }
 
     private fun retrieveDiagnosticInfo() {
