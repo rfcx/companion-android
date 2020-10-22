@@ -280,6 +280,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         }.start()
     }
 
+    override fun stopPlaySound() {
+        audioMothConnector.stopPlay()
+    }
+
     override fun startMapPicker(latitude: Double, longitude: Double, name: String) {
         setLatLng(latitude, longitude, name)
         startFragment(MapPickerFragment.newInstance(latitude, longitude, name))

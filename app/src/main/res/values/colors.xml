@@ -13,7 +13,9 @@
     <color name="snackbarBtColor">@color/colorPrimary</color>
     <color name="snackbarTxtColor">#FFFFFF</color>
     <color name="dialogColor">#ffffff</color>
-    <color name="tooltipColor">#ffffff</color>
+    <color name="tooltipColor">#1F2D3D</color>
+    <color name="tooltipTextColor">#ffffff</color>
+    <color name="statusColor">#aaa</color>
 
     <color name="colorPrimary">#2AA841</color>
     <color name="colorPrimaryDark">#ff2c9a46</color>
@@ -51,5 +53,5 @@
 
     <color name="step_enabled_true">#2AA841</color>
 
-    <color name="bottom_bar_icon_default_tint">#969FAA</color>
+    <color name="bottom_bar_icon_default_tint">#5A6978</color>
 </resources>

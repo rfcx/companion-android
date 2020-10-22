@@ -81,6 +81,7 @@ class SyncFragment : Fragment() {
         switchAnimation.start()
 
         nextButton.setOnClickListener {
+            edgeDeploymentProtocol?.stopPlaySound()
             edgeDeploymentProtocol?.startSyncing(AFTER_PLAY_INITIAL_TONE)
         }
     }
@@ -93,10 +94,13 @@ class SyncFragment : Fragment() {
         flashingRedAnimation.start()
 
         yesButton.setOnClickListener {
+            edgeDeploymentProtocol?.stopPlaySound()
             edgeDeploymentProtocol?.startSyncing(PLAY_SYNC_TONE)
+
         }
 
         noButton.setOnClickListener {
+            edgeDeploymentProtocol?.stopPlaySound()
             edgeDeploymentProtocol?.startSyncing(START_SYNC)
         }
     }
@@ -117,10 +121,12 @@ class SyncFragment : Fragment() {
         flashingGreenAnimation.start()
 
         yesButton.setOnClickListener {
+            edgeDeploymentProtocol?.stopPlaySound()
             edgeDeploymentProtocol?.nextStep()
         }
 
         noButton.setOnClickListener {
+            edgeDeploymentProtocol?.stopPlaySound()
             edgeDeploymentProtocol?.startSyncing(START_SYNC)
         }
     }
