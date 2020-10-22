@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.PointF
 import android.graphics.PorterDuff
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -320,17 +321,17 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         // hide loading progress
         progressBar.visibility = View.INVISIBLE
 
-        val showLocations = locations.filter { it.isCompleted() }
-        val showDeployIds = showLocations.mapTo(arrayListOf(), {
-            it.getLastDeploymentId()
-        })
+//        val showLocations = locations.filter { it.isCompleted() }
+//        val showDeployIds = showLocations.mapTo(arrayListOf(), {
+//            it.getLastDeploymentId()
+//        })
 
-        val showEdgeDeployments = this.edgeDeployments.filter {
-            showDeployIds.contains(it.serverId) || showDeployIds.contains(it.id.toString())
+        val showEdgeDeployments = this.edgeDeployments.distinctBy {
+            it.location?.name to it.location?.longitude to it.location?.latitude
         }
 
-        val showGuardianDeployments = this.guardianDeployments.filter {
-            showDeployIds.contains(it.serverId) || showDeployIds.contains(it.id.toString())
+        val showGuardianDeployments = this.guardianDeployments.distinctBy {
+            it.location?.name to it.location?.longitude to it.location?.latitude
         }
 
         val edgeDeploymentMarkers = showEdgeDeployments.map { it.toMark() }
