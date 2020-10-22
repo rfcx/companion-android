@@ -279,6 +279,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     }
 
     override fun showBottomSheet(fragment: Fragment) {
+        hideSnackbar()
         hidBottomAppBar()
         val layoutParams: CoordinatorLayout.LayoutParams = bottomSheetContainer.layoutParams
                 as CoordinatorLayout.LayoutParams
