@@ -131,6 +131,11 @@ class SyncFragment : Fragment() {
         }
     }
 
+    override fun onDetach() {
+        super.onDetach()
+        edgeDeploymentProtocol?.stopPlaySound()
+    }
+
     companion object {
         const val STATUS = "STATUS"
         const val START_SYNC = "START_SYNC"
