@@ -82,6 +82,9 @@
     <string name="recharge_or_replace">Recharge or replace the batteries \nfor a longer recording duration</string>
     <string name="recharging">Batteries need recharging!</string>
 
+    <!-- EdgeCheckListFragment -->
+    <string name="setting_up_edge_checklist">AudioMoth Setup Checklist:</string>
+
     <!--  LocationFragment  -->
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
