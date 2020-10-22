@@ -16,4 +16,6 @@ interface EdgeDeploymentProtocol : BaseDeploymentProtocol {
     fun playSyncSound()
 
     fun playTone()
+
+    fun stopPlaySound()
 }

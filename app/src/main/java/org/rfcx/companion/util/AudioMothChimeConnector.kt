@@ -169,4 +169,8 @@ class AudioMothChimeConnector {
 
     }
 
+    fun stopPlay() {
+        audioMothChime.stop()
+    }
+
 }

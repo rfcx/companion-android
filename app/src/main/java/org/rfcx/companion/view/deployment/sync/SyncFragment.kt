@@ -74,6 +74,7 @@ class SyncFragment : Fragment() {
     private fun initialTonePlaying() {
         Glide.with(this).load(R.drawable.audiomoth_switch).into(audioMothSwitchImageView)
         nextButton.setOnClickListener {
+            edgeDeploymentProtocol?.stopPlaySound()
             edgeDeploymentProtocol?.startSyncing(AFTER_PLAY_INITIAL_TONE)
         }
     }
@@ -83,10 +84,13 @@ class SyncFragment : Fragment() {
             .into(audioMothFlashingGreenImageView)
 
         yesButton.setOnClickListener {
+            edgeDeploymentProtocol?.stopPlaySound()
             edgeDeploymentProtocol?.startSyncing(PLAY_SYNC_TONE)
+
         }
 
         noButton.setOnClickListener {
+            edgeDeploymentProtocol?.stopPlaySound()
             edgeDeploymentProtocol?.startSyncing(START_SYNC)
         }
     }
@@ -103,10 +107,12 @@ class SyncFragment : Fragment() {
         Glide.with(this).load(R.drawable.audiomoth_flashing_red)
             .into(audioMothFlashingRedImageView)
         yesButton.setOnClickListener {
+            edgeDeploymentProtocol?.stopPlaySound()
             edgeDeploymentProtocol?.nextStep()
         }
 
         noButton.setOnClickListener {
+            edgeDeploymentProtocol?.stopPlaySound()
             edgeDeploymentProtocol?.startSyncing(START_SYNC)
         }
     }
