@@ -7,7 +7,7 @@
         <item name="colorPrimaryDark">@color/backgroundColor</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:textSize">@dimen/text_medium</item>
-        <item name="titleTextColor">@color/colorPrimary</item>
+        <item name="titleTextColor">@color/white</item>
         <item name="android:windowTranslucentStatus">false</item>
         <item name="fontFamily">@font/lato_regular</item>
         <item name="android:itemTextAppearance">@style/menu_item_color</item>
