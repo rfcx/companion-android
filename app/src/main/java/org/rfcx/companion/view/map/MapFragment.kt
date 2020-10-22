@@ -421,7 +421,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 } else {
                     getString(R.string.format_deploy_uploading)
                 }
-                listener?.showSnackbar(msg, Snackbar.LENGTH_INDEFINITE)
+                listener?.showSnackbar(msg, Snackbar.LENGTH_SHORT)
             }
             SyncInfo.Uploaded -> {
                 val msg = getString(R.string.format_deploys_uploaded)
