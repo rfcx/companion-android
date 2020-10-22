@@ -15,6 +15,7 @@ import org.rfcx.companion.entity.LocationGroups
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.service.LocationGroupSyncWorker
+import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.showCommonDialog
 
@@ -55,8 +56,7 @@ class LocationGroupFragment : Fragment(), LocationGroupListener {
         locationGroupLinearLayout.setOnClickListener {
             locationGroupProtocol?.onCreateNewGroup()
         }
-        locationGroupAdapter.items = locationGroupDb.getLocationGroups()
-        locationGroupAdapter.selectedGroup = selectedGroup
+        locationGroupAdapter.selectedGroup = selectedGroup ?: getString(R.string.none)
     }
 
     private fun initIntent() {
@@ -72,12 +72,18 @@ class LocationGroupFragment : Fragment(), LocationGroupListener {
     }
 
     private fun showDeleteDialog(group: LocationGroups) {
+        val preferences = context?.let { Preferences.getInstance(it) }
+        val groupName = preferences?.getString(Preferences.GROUP, getString(R.string.none))
+
         val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
         builder?.apply {
             setTitle(getString(R.string.delete_location_group_title, group.name))
             setPositiveButton(getString(R.string.delete)) { dialog, which ->
                 locationGroupDb.deleteLocationGroup(group.id, object : DatabaseCallback {
                     override fun onSuccess() {
+                        if(group.name == groupName) {
+                            preferences.putString(Preferences.GROUP, getString(R.string.none))
+                        }
                         LocationGroupSyncWorker.enqueue(requireActivity())
                         locationGroupAdapter.removeGroup(group.id)
                         locationGroupAdapter.notifyDataSetChanged()
@@ -97,7 +103,12 @@ class LocationGroupFragment : Fragment(), LocationGroupListener {
 
     override fun onResume() {
         super.onResume()
-        locationGroupAdapter.items = locationGroupDb.getLocationGroups()
+        locationGroupAdapter.items = listOf(
+            LocationGroups(
+                id = -1,
+                name = getString(R.string.none)
+            )
+        ) + locationGroupDb.getLocationGroups()
     }
 
     companion object {
