@@ -10,7 +10,7 @@ import org.rfcx.companion.entity.LocationGroups
 
 class LocationGroupAdapter(private val locationGroupListener: LocationGroupListener) :
     RecyclerView.Adapter<LocationGroupAdapter.LocationGroupAdapterViewHolder>() {
-    var selectedGroup: String? = null
+    var selectedGroup: String = ""
     var items: List<LocationGroups> = arrayListOf()
         set(value) {
             field = value
@@ -37,10 +37,11 @@ class LocationGroupAdapter(private val locationGroupListener: LocationGroupListe
         holder.itemView.setOnClickListener {
             locationGroupListener.onClicked(items[position])
         }
-
-        holder.itemView.setOnLongClickListener {
-            locationGroupListener.onLongClicked(items[position])
-            true
+        if (items[position].id != -1) {
+            holder.itemView.setOnLongClickListener {
+                locationGroupListener.onLongClicked(items[position])
+                true
+            }
         }
     }
 

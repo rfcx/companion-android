@@ -56,8 +56,7 @@ class LocationGroupFragment : Fragment(), LocationGroupListener {
         locationGroupLinearLayout.setOnClickListener {
             locationGroupProtocol?.onCreateNewGroup()
         }
-        locationGroupAdapter.items = locationGroupDb.getLocationGroups()
-        locationGroupAdapter.selectedGroup = selectedGroup
+        locationGroupAdapter.selectedGroup = selectedGroup ?: getString(R.string.none)
     }
 
     private fun initIntent() {
@@ -104,7 +103,12 @@ class LocationGroupFragment : Fragment(), LocationGroupListener {
 
     override fun onResume() {
         super.onResume()
-        locationGroupAdapter.items = locationGroupDb.getLocationGroups()
+        locationGroupAdapter.items = listOf(
+            LocationGroups(
+                id = -1,
+                name = getString(R.string.none)
+            )
+        ) + locationGroupDb.getLocationGroups()
     }
 
     companion object {
