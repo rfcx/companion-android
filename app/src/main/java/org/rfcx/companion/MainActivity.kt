@@ -92,8 +92,6 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        setStatusBar()
-
         createLocationButton.setOnClickListener {
             if (BuildConfig.ENABLE_GUARDIAN) {
                 addTooltip = SimpleTooltip.Builder(this)
@@ -151,13 +149,6 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
                 }
             }
         })
-    }
-
-    private fun setStatusBar() {
-        val window = this.window
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            window.statusBarColor = ContextCompat.getColor(this, R.color.statusColor)
-        }
     }
 
     private fun setupSimpleTooltip() {
