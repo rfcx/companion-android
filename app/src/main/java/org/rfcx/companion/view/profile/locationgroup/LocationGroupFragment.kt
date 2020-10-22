@@ -77,7 +77,7 @@ class LocationGroupFragment : Fragment(), LocationGroupListener {
 
         val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
         builder?.apply {
-            setTitle(getString(R.string.delete_location_group_title, group.name))
+            setTitle(getString(R.string.delete_location_group_title))
             setPositiveButton(getString(R.string.delete)) { dialog, which ->
                 locationGroupDb.deleteLocationGroup(group.id, object : DatabaseCallback {
                     override fun onSuccess() {
