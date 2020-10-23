@@ -77,11 +77,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var guardianDeployments = listOf<GuardianDeployment>()
     private var edgeDeployments = listOf<EdgeDeployment>()
     private var locations = listOf<Locate>()
+    private var locationGroups = listOf<LocationGroups>()
     private var lastSyncingInfo: SyncInfo? = null
 
     private lateinit var guardianDeployLiveData: LiveData<List<GuardianDeployment>>
     private lateinit var edgeDeployLiveData: LiveData<List<EdgeDeployment>>
     private lateinit var locateLiveData: LiveData<List<Locate>>
+    private lateinit var locationGroupLiveData: LiveData<List<LocationGroups>>
     private lateinit var deploymentWorkInfoLiveData: LiveData<List<WorkInfo>>
 
     private val locationPermissions by lazy { activity?.let { LocationPermissions(it) } }
@@ -316,6 +318,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         combinedData()
     }
 
+    private val locationGroupObserve = Observer<List<LocationGroups>> {
+        this.locationGroups = it
+        combinedData()
+    }
+
     private fun combinedData() {
         // hide loading progress
         progressBar.visibility = View.INVISIBLE
@@ -369,9 +376,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 it
             }
 
+        locationGroupLiveData =
+            Transformations.map(locationGroupDb.getAllResultsAsync().asLiveData()) {
+                it
+            }
+
         locateLiveData.observeForever(locateObserve)
         edgeDeployLiveData.observeForever(edgeDeploymentObserve)
         guardianDeployLiveData.observeForever(guardianDeploymentObserve)
+        locationGroupLiveData.observeForever(locationGroupObserve)
     }
 
     private fun retrieveDeployments(context: Context) {
@@ -573,14 +586,17 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         guardianDeployLiveData.removeObserver(guardianDeploymentObserve)
         edgeDeployLiveData.removeObserver(edgeDeploymentObserve)
         locateLiveData.removeObserver(locateObserve)
+        locationGroupLiveData.removeObserver(locationGroupObserve)
         mapView.onDestroy()
     }
 
     private fun EdgeDeployment.toMark(): DeploymentMarker {
         val color = location?.locationGroup?.color
+        val group = location?.locationGroup?.group
+        val isGroupExisted = locationGroupDb.isExisted(group)
         val pinImage =
             if (state == Edge.ReadyToUpload.key) {
-                if (color != null && color.isNotEmpty()) {
+                if (color != null && color.isNotEmpty() && group != null && isGroupExisted ) {
                     location?.locationGroup?.color
                 } else {
                     Battery.BATTERY_PIN_GREEN

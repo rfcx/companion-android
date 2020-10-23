@@ -25,14 +25,16 @@ class LocationGroupActivity : BaseActivity(), LocationGroupProtocol {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
 
+    private var group: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_location_group)
 
         setupToolbar()
 
-        val group: String? = intent?.getStringExtra(EXTRA_GROUP)
         val screen: String? = intent?.getStringExtra(EXTRA_SCREEN)
+        group = intent?.getStringExtra(EXTRA_GROUP)
 
         startFragment(LocationGroupFragment.newInstance(group, screen))
     }
@@ -83,6 +85,13 @@ class LocationGroupActivity : BaseActivity(), LocationGroupProtocol {
         return true
     }
 
+    override fun onBackPressed() {
+        val intent = Intent()
+        intent.putExtra(EXTRA_GROUP, group)
+        setResult(RESULT_DELETE, intent)
+        finish()
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == LOCATION_GROUP_REQUEST_CODE) {
@@ -101,6 +110,7 @@ class LocationGroupActivity : BaseActivity(), LocationGroupProtocol {
         const val EXTRA_SCREEN = "EXTRA_SCREEN"
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
         const val RESULT_OK = 1
+        const val RESULT_DELETE = 2
         const val LOCATION_GROUP_REQUEST_CODE = 1004
 
         fun startActivity(
