@@ -43,14 +43,15 @@ import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.LocationGroups
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.localdb.LocateDb
+import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 
 class LocationFragment : Fragment(), OnMapReadyCallback {
-    private val locateDb by lazy {
-        LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
-    }
+    private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
+    private val locateDb by lazy { LocateDb(realm) }
+    private val locationGroupDb by lazy { LocationGroupDb(realm) }
 
     private var mapboxMap: MapboxMap? = null
     private lateinit var mapView: MapView
@@ -188,6 +189,14 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 val name = locationNameEditText.text.toString()
                 startMapPicker(name)
             }
+        }
+        val autoSelectGroup = locationGroupDb.getFirstLocationGroup().name
+        val preferences = context?.let { Preferences.getInstance(it) }
+        val deploymentLocation = deploymentProtocol?.getDeploymentLocation()
+        group = preferences?.getString(Preferences.GROUP, getString(R.string.none))
+
+        if(group == getString(R.string.none) && deploymentLocation == null) {
+            preferences?.putString(Preferences.GROUP, autoSelectGroup)
         }
     }
 

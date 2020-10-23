@@ -43,13 +43,15 @@ class LocationGroupActivity : BaseActivity(), LocationGroupProtocol {
 
     override fun onLocationGroupClick(group: LocationGroups) {
         val screen: String? = intent?.getStringExtra(EXTRA_SCREEN)
+        val preferences = Preferences.getInstance(this)
+
         when(screen) {
             Screen.LOCATION.id -> {
-                val preferences = Preferences.getInstance(this)
                 preferences.putString(Preferences.GROUP, group.name)
                 finish()
             }
             Screen.EDIT_LOCATION.id -> {
+                preferences.putString(Preferences.GROUP, group.name)
                 val intent = Intent()
                 intent.putExtra(EditLocationActivity.EXTRA_LOCATION_GROUP, group.toLocationGroup())
                 setResult(RESULT_OK, intent)

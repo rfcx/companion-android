@@ -68,6 +68,12 @@ class LocationGroupDb(private val realm: Realm) {
             .equalTo(LocationGroups.LOCATION_GROUPS_NAME, name).findFirst() ?: LocationGroups()
     }
 
+    fun getFirstLocationGroup(): LocationGroups {
+        return realm.where(LocationGroups::class.java)
+            .notEqualTo(LocationGroups.LOCATION_GROUPS_NAME, "None")
+            .findFirst() ?: LocationGroups()
+    }
+
     fun insertOrUpdate(groupsResponse: LocationGroupsResponse) {
         realm.executeTransaction {
             if (groupsResponse.deletedAt == null) {
