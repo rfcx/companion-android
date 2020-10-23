@@ -328,7 +328,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         val showEdgeDeployments = this.edgeDeployments.distinctBy {
             it.location?.name to it.location?.longitude to it.location?.latitude
-        }.filter { it.deletedAt == null }
+        }
 
         val showGuardianDeployments = this.guardianDeployments.distinctBy {
             it.location?.name to it.location?.longitude to it.location?.latitude
