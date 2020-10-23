@@ -1,5 +1,6 @@
 package org.rfcx.companion.view.profile.locationgroup
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
@@ -13,9 +14,12 @@ import kotlinx.android.synthetic.main.activity_create_new_group.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.LocationGroups
+import org.rfcx.companion.entity.Screen
+import org.rfcx.companion.entity.toLocationGroup
 import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.service.LocationGroupSyncWorker
 import org.rfcx.companion.util.RealmHelper
+import org.rfcx.companion.view.detail.EditLocationActivity.Companion.EXTRA_LOCATION_GROUP
 
 class CreateNewGroupActivity : AppCompatActivity(), (ColorPickerItem, Int) -> Unit {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
@@ -54,6 +58,10 @@ class CreateNewGroupActivity : AppCompatActivity(), (ColorPickerItem, Int) -> Un
                 )
                 locationGroupDb.insertOrUpdateLocationGroup(group)
                 LocationGroupSyncWorker.enqueue(this)
+
+                val intent = Intent()
+                intent.putExtra(EXTRA_LOCATION_GROUP, group.toLocationGroup())
+                setResult(LocationGroupActivity.RESULT_OK, intent)
                 finish()
             }
         }
@@ -94,9 +102,20 @@ class CreateNewGroupActivity : AppCompatActivity(), (ColorPickerItem, Int) -> Un
     }
 
     companion object {
-        fun startActivity(context: Context) {
+        fun startActivity(context: Context, screen: String = Screen.PROFILE.id) {
             val intent = Intent(context, CreateNewGroupActivity::class.java)
+            intent.putExtra(LocationGroupActivity.EXTRA_SCREEN, screen)
             context.startActivity(intent)
+        }
+
+        fun startActivity(
+            context: Context,
+            screen: String = Screen.PROFILE.id,
+            requestCode: Int
+        ) {
+            val intent = Intent(context, CreateNewGroupActivity::class.java)
+            intent.putExtra(LocationGroupActivity.EXTRA_SCREEN, screen)
+            (context as Activity).startActivityForResult(intent, requestCode)
         }
     }
 }
