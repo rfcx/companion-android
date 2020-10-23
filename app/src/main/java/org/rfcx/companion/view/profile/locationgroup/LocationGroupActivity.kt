@@ -32,7 +32,9 @@ class LocationGroupActivity : BaseActivity(), LocationGroupProtocol {
         setupToolbar()
 
         val group: String? = intent?.getStringExtra(EXTRA_GROUP)
-        startFragment(LocationGroupFragment.newInstance(group))
+        val screen: String? = intent?.getStringExtra(EXTRA_SCREEN)
+
+        startFragment(LocationGroupFragment.newInstance(group, screen))
     }
 
     override fun onCreateNewGroup() {
