@@ -2,9 +2,11 @@ package org.rfcx.companion
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -36,6 +38,8 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
     private var snackbar: Snackbar? = null
     private var _showDeployments: List<DeploymentDetailView> = listOf()
+
+    private var addTooltip: SimpleTooltip? = null
 
     override fun getShowDeployments(): List<DeploymentDetailView> = this._showDeployments
 
@@ -90,7 +94,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
 
         createLocationButton.setOnClickListener {
             if (BuildConfig.ENABLE_GUARDIAN) {
-                val tooltip = SimpleTooltip.Builder(this)
+                addTooltip = SimpleTooltip.Builder(this)
                     .arrowColor(ContextCompat.getColor(this, R.color.tooltipColor))
                     .anchorView(createLocationButton)
                     .gravity(Gravity.TOP)
@@ -102,16 +106,19 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
                     .transparentOverlay(true)
                     .build()
 
-                val addEdgeOrAudioMoth = tooltip.findViewById<ConstraintLayout>(R.id.audioMothLayout)
-                val addGuardian = tooltip.findViewById<ConstraintLayout>(R.id.guardianLayout)
-                addEdgeOrAudioMoth.setOnClickListener {
-                    EdgeDeploymentActivity.startActivity(this)
+                addTooltip?.let { tip ->
+                    val addEdgeOrAudioMoth = tip.findViewById<ConstraintLayout>(R.id.audioMothLayout)
+                    val addGuardian = tip.findViewById<ConstraintLayout>(R.id.guardianLayout)
+                    addEdgeOrAudioMoth?.setOnClickListener {
+                        EdgeDeploymentActivity.startActivity(this)
+                        tip.dismiss()
+                    }
+                    addGuardian?.setOnClickListener {
+                        GuardianDeploymentActivity.startActivity(this)
+                        tip.dismiss()
+                    }
+                    tip.show()
                 }
-                addGuardian.setOnClickListener {
-                    GuardianDeploymentActivity.startActivity(this)
-                }
-
-                tooltip.show()
             } else {
                 EdgeDeploymentActivity.startActivity(this)
             }
@@ -272,6 +279,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     }
 
     override fun showBottomSheet(fragment: Fragment) {
+        hideSnackbar()
         hidBottomAppBar()
         val layoutParams: CoordinatorLayout.LayoutParams = bottomSheetContainer.layoutParams
                 as CoordinatorLayout.LayoutParams
@@ -288,6 +296,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     }
 
     override fun onBackPressed() {
+        addTooltip?.dismiss()
         if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
             hideBottomSheet()
             val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)

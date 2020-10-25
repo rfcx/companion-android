@@ -82,6 +82,9 @@
     <string name="recharge_or_replace">Recharge or replace the batteries \nfor a longer recording duration</string>
     <string name="recharging">Batteries need recharging!</string>
 
+    <!-- EdgeCheckListFragment -->
+    <string name="setting_up_edge_checklist">AudioMoth Setup Checklist:</string>
+
     <!--  LocationFragment  -->
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
@@ -137,7 +140,7 @@
     <string name="ddm_coordinates_format">0°0.0000\'N 0°0.0000\'E</string>
     <string name="dms_coordinates_format">0°0\'0.0\"N 0°0\'0.0\"E</string>
 
-    <string name="delete_location_group_title">Do you want to delete %s ?</string>
+    <string name="delete_location_group_title">Do you want to delete this group?</string>
 
     <!--  FeedbackActivity  -->
     <string name="app_feedback_share_ideas">Leave app feedback or share your ideas</string>

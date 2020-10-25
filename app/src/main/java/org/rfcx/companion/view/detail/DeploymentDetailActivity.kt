@@ -86,6 +86,8 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
             deployment?.let {
                 val location = deployment?.location
                 location?.let { locate ->
+                    val group = locate.locationGroup?.group ?: getString(R.string.none)
+                    val isGroupExisted = locationGroupDb.isExisted(locate.locationGroup?.group)
                     intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)?.let { deploymentId ->
                         EditLocationActivity.startActivity(
                             this,
@@ -93,7 +95,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
                             locate.longitude,
                             locate.name,
                             deploymentId,
-                            locate.locationGroup?.group ?: getString(R.string.none),
+                            if (isGroupExisted) group else getString(R.string.none),
                             DEPLOYMENT_REQUEST_CODE
                         )
                     }

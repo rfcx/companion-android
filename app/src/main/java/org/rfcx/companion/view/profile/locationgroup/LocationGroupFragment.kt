@@ -12,9 +12,11 @@ import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_location_group.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.LocationGroups
+import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.service.LocationGroupSyncWorker
+import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.showCommonDialog
 
@@ -25,6 +27,7 @@ class LocationGroupFragment : Fragment(), LocationGroupListener {
     private val locationGroupAdapter by lazy { LocationGroupAdapter(this) }
     private var locationGroupProtocol: LocationGroupProtocol? = null
     private var selectedGroup: String? = null
+    private var screen: String? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -55,12 +58,15 @@ class LocationGroupFragment : Fragment(), LocationGroupListener {
         locationGroupLinearLayout.setOnClickListener {
             locationGroupProtocol?.onCreateNewGroup()
         }
-        locationGroupAdapter.items = locationGroupDb.getLocationGroups()
-        locationGroupAdapter.selectedGroup = selectedGroup
+        locationGroupAdapter.selectedGroup = selectedGroup ?: getString(R.string.none)
+        locationGroupAdapter.screen = screen ?: Screen.PROFILE.id
     }
 
     private fun initIntent() {
-        arguments?.let { selectedGroup = it.getString(ARG_GROUP) }
+        arguments?.let {
+            selectedGroup = it.getString(ARG_GROUP)
+            screen = it.getString(LocationGroupActivity.EXTRA_SCREEN)
+        }
     }
 
     override fun onClicked(group: LocationGroups) {
@@ -72,12 +78,18 @@ class LocationGroupFragment : Fragment(), LocationGroupListener {
     }
 
     private fun showDeleteDialog(group: LocationGroups) {
+        val preferences = context?.let { Preferences.getInstance(it) }
+        val groupName = preferences?.getString(Preferences.GROUP, getString(R.string.none))
+
         val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
         builder?.apply {
-            setTitle(getString(R.string.delete_location_group_title, group.name))
+            setTitle(getString(R.string.delete_location_group_title))
             setPositiveButton(getString(R.string.delete)) { dialog, which ->
                 locationGroupDb.deleteLocationGroup(group.id, object : DatabaseCallback {
                     override fun onSuccess() {
+                        if(group.name == groupName) {
+                            preferences.putString(Preferences.GROUP, getString(R.string.none))
+                        }
                         LocationGroupSyncWorker.enqueue(requireActivity())
                         locationGroupAdapter.removeGroup(group.id)
                         locationGroupAdapter.notifyDataSetChanged()
@@ -97,16 +109,22 @@ class LocationGroupFragment : Fragment(), LocationGroupListener {
 
     override fun onResume() {
         super.onResume()
-        locationGroupAdapter.items = locationGroupDb.getLocationGroups()
+        locationGroupAdapter.items = listOf(
+            LocationGroups(
+                id = -1,
+                name = getString(R.string.none)
+            )
+        ) + locationGroupDb.getLocationGroups()
     }
 
     companion object {
         private const val ARG_GROUP = "ARG_GROUP"
 
         @JvmStatic
-        fun newInstance(group: String?) = LocationGroupFragment().apply {
+        fun newInstance(group: String?, screen: String?) = LocationGroupFragment().apply {
             arguments = Bundle().apply {
                 putString(ARG_GROUP, group)
+                putString(LocationGroupActivity.EXTRA_SCREEN, screen)
             }
         }
     }

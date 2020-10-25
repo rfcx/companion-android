@@ -88,7 +88,7 @@ class CheckListAdapter(private val onCheckClickListener: (Int, String) -> Unit) 
                 checkName.setTextColor(
                     ContextCompat.getColor(
                         itemView.context,
-                        R.color.text_secondary
+                        R.color.text_primary
                     )
                 )
                 checkName.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist, 0, 0, 0)

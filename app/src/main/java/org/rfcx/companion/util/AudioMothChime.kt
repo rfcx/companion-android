@@ -44,6 +44,8 @@ class AudioMothChime {
     private val MIN_TONE_DURATION: Int = 500
     private val MAX_TONE_DURATION: Int = 60000
 
+    private var audioTrack: AudioTrack? = null
+
     /* Note parsing constants */
 
     private val REGEX = Regex(
@@ -587,7 +589,7 @@ class AudioMothChime {
             AudioFormat.ENCODING_PCM_16BIT
         )
 
-        val player = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        audioTrack = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             AudioTrack.Builder()
                 .setAudioAttributes(
                     AudioAttributes.Builder()
@@ -628,9 +630,9 @@ class AudioMothChime {
 
         println("AUDIOMOTHCHIME: Start")
 
-        player.play()
+        audioTrack?.play()
 
-        player.write(buffer, 0, waveform.size)
+        audioTrack?.write(buffer, 0, waveform.size)
 
         println("AUDIOMOTHCHIME: Done")
 
@@ -648,6 +650,12 @@ class AudioMothChime {
 
         play(null, byteArray, noteArray)
 
+    }
+
+    fun stop() {
+        audioTrack?.stop()
+        audioTrack?.release()
+        audioTrack = null
     }
 
 }

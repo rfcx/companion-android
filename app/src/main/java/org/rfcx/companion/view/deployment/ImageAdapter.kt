@@ -180,7 +180,7 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
         private val onImageAdapterClickListener: OnImageAdapterClickListener?
     ) : RecyclerView.ViewHolder(itemView) {
         init {
-            itemView.addItemImage.setOnClickListener {
+            itemView.setOnClickListener {
                 onImageAdapterClickListener?.onAddImageClick()
             }
         }

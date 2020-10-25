@@ -31,10 +31,12 @@ class LocationGroupSyncWorker(appContext: Context, params: WorkerParameters) :
             } else {
                 try {
                     firestore.updateGroup(it.serverId!!, it.toRequestBody())
-                    if (it.deletedAt != null) {
-                        db.deleteLocationGroupFromLocal(it.id)
-                    }
                     db.markSent(it.serverId!!, it.id)
+                    if (it.deletedAt != null) {
+                        val isExisted = db.isExisted(it.name)
+                        if (isExisted)
+                            db.deleteLocationGroupFromLocal(it.id)
+                    }
                 } catch (e: Exception) {
                     db.markUnsent(it.id)
                     someFailed = true

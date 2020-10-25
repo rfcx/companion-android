@@ -1,8 +1,11 @@
 package org.rfcx.companion.localdb
 
 import io.realm.Realm
+import io.realm.RealmResults
+import io.realm.Sort
 import io.realm.kotlin.deleteFromRealm
 import org.rfcx.companion.entity.*
+import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.response.LocationGroupsResponse
 import org.rfcx.companion.entity.response.toLocationGroups
 import java.util.*
@@ -63,6 +66,12 @@ class LocationGroupDb(private val realm: Realm) {
         return realm.where(LocationGroups::class.java).findAll() ?: arrayListOf()
     }
 
+    fun getAllResultsAsync(sort: Sort = Sort.DESCENDING): RealmResults<LocationGroups> {
+        return realm.where(LocationGroups::class.java)
+            .sort(LocationGroups.LOCATION_GROUPS_ID, sort)
+            .findAllAsync()
+    }
+
     fun getLocationGroup(name: String): LocationGroups {
         return realm.where(LocationGroups::class.java)
             .equalTo(LocationGroups.LOCATION_GROUPS_NAME, name).findFirst() ?: LocationGroups()
@@ -113,6 +122,16 @@ class LocationGroupDb(private val realm: Realm) {
                 it.where(LocationGroups::class.java).equalTo(LocationGroups.LOCATION_GROUPS_ID, id)
                     .findFirst()
             locationGroup?.deleteFromRealm()
+        }
+    }
+
+    fun isExisted(name: String?): Boolean {
+        return if (name != null) {
+            val locationGroup =  realm.where(LocationGroups::class.java)
+                .equalTo(LocationGroups.LOCATION_GROUPS_NAME, name).findFirst()
+            locationGroup != null
+        } else {
+            false
         }
     }
 

@@ -53,10 +53,26 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == DEPLOYMENT_REQUEST_CODE) {
-            if (resultCode == LocationGroupActivity.RESULT_OK) {
-                locationGroup = data?.getSerializableExtra(EXTRA_LOCATION_GROUP) as LocationGroup
-                locationGroup?.let {
-                    groupName = it.group
+            when(resultCode) {
+                LocationGroupActivity.RESULT_OK -> {
+                    locationGroup = data?.getSerializableExtra(EXTRA_LOCATION_GROUP) as LocationGroup
+                    locationGroup?.let {
+                        val isGroupExisted = locationGroupDb.isExisted(locationGroup?.group)
+                        groupName = if (isGroupExisted) {
+                            it.group
+                        } else {
+                            getString(R.string.none)
+                        }
+                    }
+                }
+                LocationGroupActivity.RESULT_DELETE -> {
+                    val group = data?.getStringExtra(LocationGroupActivity.EXTRA_GROUP)
+                    val isGroupExisted = locationGroupDb.isExisted(group)
+                    groupName = if (isGroupExisted) {
+                        group
+                    } else {
+                        getString(R.string.none)
+                    }
                 }
             }
         }

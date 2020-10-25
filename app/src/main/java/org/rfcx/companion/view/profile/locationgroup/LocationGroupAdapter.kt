@@ -7,10 +7,12 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_location_group.view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.LocationGroups
+import org.rfcx.companion.entity.Screen
 
 class LocationGroupAdapter(private val locationGroupListener: LocationGroupListener) :
     RecyclerView.Adapter<LocationGroupAdapter.LocationGroupAdapterViewHolder>() {
-    var selectedGroup: String? = null
+    var selectedGroup: String = ""
+    var screen: String = ""
     var items: List<LocationGroups> = arrayListOf()
         set(value) {
             field = value
@@ -37,10 +39,11 @@ class LocationGroupAdapter(private val locationGroupListener: LocationGroupListe
         holder.itemView.setOnClickListener {
             locationGroupListener.onClicked(items[position])
         }
-
-        holder.itemView.setOnLongClickListener {
-            locationGroupListener.onLongClicked(items[position])
-            true
+        if (items[position].id != -1) {
+            holder.itemView.setOnLongClickListener {
+                locationGroupListener.onLongClicked(items[position])
+                true
+            }
         }
     }
 
@@ -49,8 +52,10 @@ class LocationGroupAdapter(private val locationGroupListener: LocationGroupListe
         private val checkImageView = itemView.checkImageView
 
         fun bind(locationGroup: String) {
-            checkImageView.visibility =
-                if (locationGroup == selectedGroup) View.VISIBLE else View.GONE
+            if (screen != Screen.PROFILE.id) {
+                checkImageView.visibility =
+                    if (locationGroup == selectedGroup) View.VISIBLE else View.GONE
+            }
             locationGroupTextView.text = locationGroup
         }
     }

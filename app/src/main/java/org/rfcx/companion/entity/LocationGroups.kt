@@ -10,7 +10,7 @@ import java.util.*
 open class LocationGroups(
     @PrimaryKey
     var id: Int = 0,
-    var name: String = "",
+    var name: String = "None",
     var color: String = "",
     var serverId: String? = null,
     @Expose(serialize = false)

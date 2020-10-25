@@ -1,16 +1,15 @@
 package org.rfcx.companion.view.deployment.sync
 
 import android.content.Context
+import android.graphics.drawable.AnimationDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.fragment.app.Fragment
-import com.bumptech.glide.Glide
-import kotlinx.android.synthetic.main.fragment_after_play_initial_tone.*
 import kotlinx.android.synthetic.main.fragment_after_play_initial_tone.noButton
 import kotlinx.android.synthetic.main.fragment_after_play_initial_tone.yesButton
-import kotlinx.android.synthetic.main.fragment_after_play_sync_tone.*
 import kotlinx.android.synthetic.main.fragment_initial_tone_playing.*
 import kotlinx.android.synthetic.main.fragment_play_sync_tone.*
 import kotlinx.android.synthetic.main.fragment_start_sync_process.*
@@ -20,6 +19,9 @@ import org.rfcx.companion.view.deployment.EdgeDeploymentProtocol
 class SyncFragment : Fragment() {
     private var edgeDeploymentProtocol: EdgeDeploymentProtocol? = null
     private var status: String? = null
+    private lateinit var switchAnimation: AnimationDrawable
+    private lateinit var flashingGreenAnimation: AnimationDrawable
+    private lateinit var flashingRedAnimation: AnimationDrawable
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -58,10 +60,10 @@ class SyncFragment : Fragment() {
 
         when (status) {
             START_SYNC -> startSyncProcess()
-            INITIAL_TONE_PLAYING -> initialTonePlaying()
-            AFTER_PLAY_INITIAL_TONE -> afterPlayInitialTone()
+            INITIAL_TONE_PLAYING -> initialTonePlaying(view)
+            AFTER_PLAY_INITIAL_TONE -> afterPlayInitialTone(view)
             PLAY_SYNC_TONE -> playSyncTone()
-            AFTER_PLAY_SYNC_TONE -> afterPlaySyncTone()
+            AFTER_PLAY_SYNC_TONE -> afterPlaySyncTone(view)
         }
     }
 
@@ -71,22 +73,34 @@ class SyncFragment : Fragment() {
         }
     }
 
-    private fun initialTonePlaying() {
-        Glide.with(this).load(R.drawable.audiomoth_switch).into(audioMothSwitchImageView)
+    private fun initialTonePlaying(view: View) {
+        view.findViewById<ImageView>(R.id.audioMothSwitchImageView).apply {
+            setBackgroundResource(R.drawable.audiomoth_switch_to_custom)
+            switchAnimation = background as AnimationDrawable
+        }
+        switchAnimation.start()
+
         nextButton.setOnClickListener {
+            edgeDeploymentProtocol?.stopPlaySound()
             edgeDeploymentProtocol?.startSyncing(AFTER_PLAY_INITIAL_TONE)
         }
     }
 
-    private fun afterPlayInitialTone() {
-        Glide.with(this).load(R.drawable.audiomoth_flashing_green)
-            .into(audioMothFlashingGreenImageView)
+    private fun afterPlayInitialTone(view: View) {
+        view.findViewById<ImageView>(R.id.audioMothFlashingGreenImageView).apply {
+            setBackgroundResource(R.drawable.audiomoth_green_flashing)
+            flashingRedAnimation = background as AnimationDrawable
+        }
+        flashingRedAnimation.start()
 
         yesButton.setOnClickListener {
+            edgeDeploymentProtocol?.stopPlaySound()
             edgeDeploymentProtocol?.startSyncing(PLAY_SYNC_TONE)
+
         }
 
         noButton.setOnClickListener {
+            edgeDeploymentProtocol?.stopPlaySound()
             edgeDeploymentProtocol?.startSyncing(START_SYNC)
         }
     }
@@ -99,16 +113,27 @@ class SyncFragment : Fragment() {
         }
     }
 
-    private fun afterPlaySyncTone() {
-        Glide.with(this).load(R.drawable.audiomoth_flashing_red)
-            .into(audioMothFlashingRedImageView)
+    private fun afterPlaySyncTone(view: View) {
+        view.findViewById<ImageView>(R.id.audioMothFlashingRedImageView).apply {
+            setBackgroundResource(R.drawable.audiomoth_red_flashing)
+            flashingGreenAnimation = background as AnimationDrawable
+        }
+        flashingGreenAnimation.start()
+
         yesButton.setOnClickListener {
+            edgeDeploymentProtocol?.stopPlaySound()
             edgeDeploymentProtocol?.nextStep()
         }
 
         noButton.setOnClickListener {
+            edgeDeploymentProtocol?.stopPlaySound()
             edgeDeploymentProtocol?.startSyncing(START_SYNC)
         }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        edgeDeploymentProtocol?.stopPlaySound()
     }
 
     companion object {
