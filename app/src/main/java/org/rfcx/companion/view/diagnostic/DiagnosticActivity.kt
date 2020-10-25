@@ -12,20 +12,24 @@ import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonArray
+import com.mapbox.mapboxsdk.geometry.LatLng
 import io.realm.Realm
-import kotlin.collections.ArrayList
 import kotlinx.android.synthetic.main.activity_guardian_diagnostic.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.SocketManager
+import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.guardian.*
 import org.rfcx.companion.entity.socket.response.Status
+import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.localdb.guardian.DiagnosticDb
+import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.service.DiagnosticSyncWorker
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.convertLatLngLabel
+import org.rfcx.companion.view.detail.EditLocationActivity
 import org.rfcx.companion.view.dialog.LoadingDialogFragment
 import org.rfcx.companion.view.prefs.GuardianPrefsFragment
 import org.rfcx.companion.view.prefs.SyncPreferenceListener
@@ -34,6 +38,8 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
 
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val diagnosticDb: DiagnosticDb by lazy { DiagnosticDb(realm) }
+    private val locationGroupDb by lazy { LocationGroupDb(realm) }
+    private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val diagnosticInfo: DiagnosticInfo by lazy {
         diagnosticDb.getDiagnosticInfo(
             deploymentServerId
@@ -64,6 +70,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
         setupLocationData()
         retrieveDiagnosticInfo()
         setupSyncButton()
+        setupEditLocationButton()
     }
 
     private fun setupUiByConnection() {
@@ -190,10 +197,64 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
         }
     }
 
+    private fun setupEditLocationButton() {
+        editLocationButton.setOnClickListener {
+            editLocation()
+        }
+    }
+
+    private fun editLocation() {
+        deployment?.let {
+            val location = deployment?.location
+            location?.let { locate ->
+                val group = locate.locationGroup?.group ?: getString(R.string.none)
+                val isGroupExisted = locationGroupDb.isExisted(locate.locationGroup?.group)
+                EditLocationActivity.startActivity(
+                    this,
+                    locate.latitude,
+                    locate.longitude,
+                    locate.name,
+                    it.id,
+                    if (isGroupExisted) group else getString(R.string.none),
+                    Device.GUARDIAN.value,
+                    DIAGNOSTIC_REQUEST_CODE
+                )
+            }
+        }
+    }
+
     private fun setupSyncButton() {
         syncButton.setOnClickListener {
             syncPrefs()
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == DIAGNOSTIC_REQUEST_CODE) {
+            forceUpdateDeployment()
+        }
+    }
+
+    private fun forceUpdateDeployment() {
+        if (this.deployment != null) {
+            this.deployment = guardianDeploymentDb.getDeploymentById(this.deployment!!.id)
+            this.deployment?.let { it1 ->
+                updateDeploymentDetailView(it1)
+            }
+
+            supportActionBar?.apply {
+                title = deployment?.location?.name ?: getString(R.string.title_deployment_detail)
+            }
+        }
+    }
+
+    private fun updateDeploymentDetailView(deployment: GuardianDeployment) {
+        val location = deployment.location
+        locationValueTextView.text =
+            location?.let { locate ->
+                convertLatLngLabel(this, locate.latitude, locate.longitude)
+            }
     }
 
     private fun showLoading() {
@@ -298,6 +359,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
 
     companion object {
         private const val TAG_LOADING_DIALOG = "TAG_LOADING_DIALOG"
+        private const val DIAGNOSTIC_REQUEST_CODE = 1005
         const val IS_CONNECTED = "is_connected"
         const val DEPLOYMENT = "deployment"
 

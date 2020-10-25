@@ -25,6 +25,7 @@ import kotlinx.android.synthetic.main.activity_deployment_detail.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.DeploymentImage
+import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.EdgeDeployment
 import org.rfcx.companion.entity.toLocationGroup
 import org.rfcx.companion.localdb.DatabaseCallback
@@ -96,6 +97,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
                             locate.name,
                             deploymentId,
                             if (isGroupExisted) group else getString(R.string.none),
+                            Device.EDGE.value,
                             DEPLOYMENT_REQUEST_CODE
                         )
                     }

@@ -31,16 +31,22 @@ class GuardianDeploymentSyncWorker(val context: Context, params: WorkerParameter
 
         deployments.forEach {
             Log.d(TAG, "doWork: sending id ${it.id}")
-            val result = firestore.sendDeployment(it.toRequestBody())
+            if (it.serverId == null) {
+                val result = firestore.sendDeployment(it.toRequestBody())
 
-            if (result != null) {
-                Log.d(TAG, "doWork: success ${it.id}")
-                db.markSent(result.id, it.id)
-                locateDb.updateDeploymentServerId(it.id, result.id, true)
+                if (result != null) {
+                    db.markSent(result.id, it.id)
+                    locateDb.updateDeploymentServerId(it.id, result.id, true)
+                } else {
+                    db.markUnsent(it.id)
+                    someFailed = true
+                }
             } else {
-                Log.d(TAG, "doWork: failed ${it.id}")
-                db.markUnsent(it.id)
-                someFailed = true
+                val deploymentLocation = it.location
+                deploymentLocation?.let { it1 ->
+                    firestore.updateGuardianDeploymentLocation(it.serverId!!, it1)
+                    db.markSent(it.serverId!!, it.id)
+                }
             }
         }
 
