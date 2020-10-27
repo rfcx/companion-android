@@ -95,11 +95,13 @@ class Firestore(val context: Context) {
 
     suspend fun updateGuardianDeploymentLocation(
         serverId: String,
-        deploymentLocation: DeploymentLocation
+        deploymentLocation: DeploymentLocation,
+        updatedAt: Date
     ) {
         val userDocument = db.collection(COLLECTION_USERS).document(uid)
         val updates = hashMapOf<String, Any>(
-            GuardianDeployment.FIELD_LOCATION to deploymentLocation
+            GuardianDeployment.FIELD_LOCATION to deploymentLocation,
+            GuardianDeployment.FIELD_UPDATED_AT to updatedAt
         )
         userDocument.collection(COLLECTION_DEPLOYMENTS).document(serverId)
             .update(updates).await()

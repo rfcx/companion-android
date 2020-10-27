@@ -177,6 +177,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
                 guardianDeployment.location?.name = locationName
                 guardianDeployment.location?.latitude = latitude
                 guardianDeployment.location?.longitude = longitude
+                guardianDeployment.updatedAt = Date()
                 guardianDeployment.syncState = SyncState.Unsent.key
             }
 
@@ -210,15 +211,16 @@ class GuardianDeploymentDb(private val realm: Realm) {
     fun editLocationGroup(id: Int, locationGroup: LocationGroup, callback: DatabaseCallback) {
         realm.executeTransactionAsync({ bgRealm ->
             // do update deployment location
-            val edgeDeployment =
+            val guardianDeployment =
                 bgRealm.where(GuardianDeployment::class.java).equalTo(GuardianDeployment.FIELD_ID, id)
                     .findFirst()
-            if (edgeDeployment?.location != null) {
-                edgeDeployment.syncState = SyncState.Unsent.key
+            if (guardianDeployment?.location != null) {
+                guardianDeployment.updatedAt = Date()
+                guardianDeployment.syncState = SyncState.Unsent.key
 
                 //update location group
-                if (edgeDeployment.location?.locationGroup != null) {
-                    edgeDeployment.location?.locationGroup?.let {
+                if (guardianDeployment.location?.locationGroup != null) {
+                    guardianDeployment.location?.locationGroup?.let {
                         it.group = locationGroup.group
                         it.color = locationGroup.color
                         it.serverId = locationGroup.serverId
@@ -230,7 +232,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
                         it.group = locationGroup.group
                         it.serverId = locationGroup.serverId
                     }
-                    edgeDeployment.location?.locationGroup = locationGroupObj
+                    guardianDeployment.location?.locationGroup = locationGroupObj
                 }
             }
         }, {

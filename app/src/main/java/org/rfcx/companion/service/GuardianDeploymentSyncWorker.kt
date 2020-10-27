@@ -11,6 +11,7 @@ import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.Firestore
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.RealmHelper
+import java.util.*
 
 /**
  * For syncing data to server. Ref from Ranger Android App
@@ -44,7 +45,7 @@ class GuardianDeploymentSyncWorker(val context: Context, params: WorkerParameter
             } else {
                 val deploymentLocation = it.location
                 deploymentLocation?.let { it1 ->
-                    firestore.updateGuardianDeploymentLocation(it.serverId!!, it1)
+                    firestore.updateGuardianDeploymentLocation(it.serverId!!, it1, it.updatedAt ?: Date())
                     db.markSent(it.serverId!!, it.id)
                 }
             }
