@@ -123,6 +123,7 @@ class WifiHotspotManager(private val context: Context) {
                 if (!isConnected) {
                     if (WifiHotspotUtils.isConnectedWithGuardian(context, wifiName)) {
                         onWifiListener.onWifiConnected()
+                        wifiName = ""
                         isConnected = true
                     }
                 }

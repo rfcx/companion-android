@@ -112,15 +112,12 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
         SocketManager.connection.observe(viewLifecycleOwner, Observer { response ->
             requireActivity().runOnUiThread {
                 if (response.connection.status == Status.SUCCESS.value) {
-                    if (connectionCount == 0) {
-                        hideLoading()
-                        deploymentProtocol?.setDeploymentWifiName(guardianHotspot!!.SSID)
-                        deploymentProtocol?.startCheckList()
-                        deploymentProtocol?.setWifiManager(wifiHotspotManager)
-                        deploymentProtocol?.registerWifiConnectionLostListener()
-                        SocketManager.getCheckInTest()
-                    }
-                    connectionCount += 1
+                    hideLoading()
+                    deploymentProtocol?.setDeploymentWifiName(guardianHotspot!!.SSID)
+                    deploymentProtocol?.startCheckList()
+                    deploymentProtocol?.setWifiManager(wifiHotspotManager)
+                    deploymentProtocol?.registerWifiConnectionLostListener()
+                    SocketManager.getCheckInTest()
                 }
             }
         })
@@ -157,7 +154,7 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
     }
 
     private fun retryCountdown(state: String) {
-        countDownTimer = object : CountDownTimer(15000, 1000) {
+        countDownTimer = object : CountDownTimer(20000, 1000) {
             override fun onFinish() {
                 if (state == SCAN) {
                     showNotFound()
