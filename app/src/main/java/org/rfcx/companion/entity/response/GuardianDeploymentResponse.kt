@@ -14,6 +14,7 @@ data class GuardianDeploymentResponse(
     var wifi: String? = null,
     var configuration: GuardianConfiguration? = null,
     var location: DeploymentLocation? = null,
+    var updatedAt: Date? = null,
     var createdAt: Date? = Date()
 )
 
@@ -27,6 +28,7 @@ fun GuardianDeploymentResponse.toGuardianDeployment(): GuardianDeployment {
         configuration = this.configuration,
         location = this.location,
         createdAt = this.createdAt ?: Date(),
+        updatedAt = this.updatedAt,
         syncState = SyncState.Sent.key
     )
 }

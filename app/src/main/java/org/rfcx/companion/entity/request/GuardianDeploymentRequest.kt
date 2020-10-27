@@ -12,6 +12,7 @@ data class GuardianDeploymentRequest(
     var wifi: String,
     var configuration: GuardianConfiguration? = null,
     var location: DeploymentLocation? = null,
+    var updatedAt: Date? = null,
     var createdAt: Date = Date()
 )
 
@@ -22,6 +23,7 @@ fun GuardianDeployment.toRequestBody(): GuardianDeploymentRequest {
         wifi = this.wifiName!!,
         configuration = this.configuration,
         location = this.location,
+        updatedAt= this.updatedAt,
         createdAt = this.createdAt
     )
 }

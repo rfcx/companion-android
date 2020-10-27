@@ -7,6 +7,7 @@ import org.rfcx.companion.entity.*
 import java.util.*
 import org.rfcx.companion.entity.EdgeDeployment
 import org.rfcx.companion.entity.Locate
+import org.rfcx.companion.entity.guardian.GuardianDeployment
 
 class CompanionRealmMigration : RealmMigration {
     override fun migrate(realm: DynamicRealm, oldVersion: Long, newVersion: Long) {
@@ -21,6 +22,9 @@ class CompanionRealmMigration : RealmMigration {
         }
         if (oldVersion < 5L && newVersion >= 5L) {
             migrateToV5(realm)
+        }
+        if (oldVersion < 6L && newVersion >= 6L) {
+            migrateToV6(realm)
         }
     }
 
@@ -137,6 +141,13 @@ class CompanionRealmMigration : RealmMigration {
         edgeDeployment?.apply {
             addRealmListField(EdgeDeployment.FIELD_PASSED_CHECKS,  Int::class.java)
                 .setNullable(EdgeDeployment.FIELD_PASSED_CHECKS, true)
+        }
+    }
+
+    private fun migrateToV6(realm: DynamicRealm) {
+        val guardianDeployment = realm.schema.get(GuardianDeployment.TABLE_NAME)
+        guardianDeployment?.apply {
+            addField(GuardianDeployment.FIELD_UPDATED_AT, Date::class.java)
         }
     }
 
