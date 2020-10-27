@@ -189,6 +189,28 @@ object SocketManager {
         this.prefs.value = PrefsResponse()
     }
 
+    fun resetAllValuesToDefault() {
+        connection.value =
+            ConnectionResponse()
+        diagnostic.value =
+            DiagnosticResponse()
+        currentConfiguration.value =
+            ConfigurationResponse()
+        syncConfiguration.value =
+            SyncConfigurationResponse()
+        prefs.value = PrefsResponse()
+        signal.value = SignalResponse()
+        liveAudio.value =
+            MicrophoneTestResponse()
+        spectrogram.value = ByteArray(2)
+        checkInTest.value =
+            CheckInTestResponse()
+        sentinel.value =
+            SentinelResponse()
+        register.value = RegisterResponse()
+        isRegistered.value = CheckGuardianRegistered()
+    }
+
     private fun sendMessage(message: String) {
         clientThread = Thread(Runnable {
             try {
