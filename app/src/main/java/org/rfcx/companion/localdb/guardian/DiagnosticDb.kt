@@ -45,14 +45,8 @@ class DiagnosticDb(private val realm: Realm) {
                         .equalTo(DiagnosticInfo.FIELD_ID, id)
                         .findFirst()
                 if (diagnosticInfo != null) {
-                    val newDiagnosticInfo = DiagnosticInfo(
-                        diagnosticInfo.id,
-                        diagnosticInfo.serverId,
-                        diagnosticInfo.deploymentServerId,
-                        Date(),
-                        SyncState.Unsent.key
-                    )
-                    it.insertOrUpdate(newDiagnosticInfo)
+                    diagnosticInfo.lastConnection = Date()
+                    diagnosticInfo.syncState = SyncState.Unsent.key
                 }
             }
         }
