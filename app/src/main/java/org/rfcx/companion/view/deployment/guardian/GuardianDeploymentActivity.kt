@@ -61,6 +61,9 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private var _deployLocation: DeploymentLocation? = null
     private var _configuration: GuardianConfiguration? = null
     private var _images: List<String> = listOf()
+    private var _locate: Locate? = null
+
+    private var useExistedLocation: Boolean = false
 
     private var _sampleRate = 24000
 
@@ -210,13 +213,18 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         return locationGroupDb.getLocationGroup(name)
     }
 
-    override fun setDeployLocation(locate: Locate) {
+    override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
         val deployment = _deployment ?: GuardianDeployment()
         deployment.state = DeploymentState.Guardian.Locate.key // state
 
         this._deployLocation = locate.asDeploymentLocation()
         val deploymentId = deploymentDb.insertOrUpdateDeployment(deployment, _deployLocation!!)
-        locateDb.insertOrUpdateLocate(deploymentId, locate, true) // update locate - last deployment
+
+        useExistedLocation = isExisted
+        this._locate = locate
+        if (!useExistedLocation) {
+            locateDb.insertOrUpdateLocate(deploymentId, locate, true) // update locate - last deployment
+        }
 
         setDeployment(deployment)
     }
@@ -227,6 +235,12 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             it.deployedAt = Date()
             it.state = DeploymentState.Guardian.ReadyToUpload.key
             setDeployment(it)
+
+            if (useExistedLocation) {
+                this._locate?.let { locate ->
+                    locateDb.insertOrUpdateLocate(it.id, locate, true) // update locate - last deployment
+                }
+            }
 
             deploymentImageDb.insertImage(it, _images)
             deploymentDb.updateDeployment(it)
