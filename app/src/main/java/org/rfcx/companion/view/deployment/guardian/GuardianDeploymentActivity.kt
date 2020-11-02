@@ -180,6 +180,12 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         }
     }
 
+    override fun removeRegisteredOnPassedCheck() {
+        if (1 in passedChecks) {
+            passedChecks.remove(1)
+        }
+    }
+
     override fun setImages(images: List<String>) {
         this._images = images
     }

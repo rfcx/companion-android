@@ -72,6 +72,9 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
             if (it.isRegistered) {
                 checkListRecyclerView.setCheckPassed(1)
                 deploymentProtocol?.addRegisteredToPassedCheck()
+            } else {
+                checkListRecyclerView.setCheckUnPassed(1)
+                deploymentProtocol?.removeRegisteredOnPassedCheck()
             }
         })
     }
