@@ -11,6 +11,7 @@ import org.rfcx.companion.entity.DeploymentLocation
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.EdgeDeployment
 import org.rfcx.companion.entity.User
+import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.request.*
 import org.rfcx.companion.entity.response.*
 import org.rfcx.companion.localdb.DeploymentImageDb
@@ -87,6 +88,20 @@ class Firestore(val context: Context) {
         val updates = hashMapOf<String, Any>(
             EdgeDeployment.FIELD_LOCATION to deploymentLocation,
             EdgeDeployment.FIELD_UPDATED_AT to updatedAt
+        )
+        userDocument.collection(COLLECTION_DEPLOYMENTS).document(serverId)
+            .update(updates).await()
+    }
+
+    suspend fun updateGuardianDeploymentLocation(
+        serverId: String,
+        deploymentLocation: DeploymentLocation,
+        updatedAt: Date
+    ) {
+        val userDocument = db.collection(COLLECTION_USERS).document(uid)
+        val updates = hashMapOf<String, Any>(
+            GuardianDeployment.FIELD_LOCATION to deploymentLocation,
+            GuardianDeployment.FIELD_UPDATED_AT to updatedAt
         )
         userDocument.collection(COLLECTION_DEPLOYMENTS).document(serverId)
             .update(updates).await()

@@ -8,6 +8,8 @@ import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.response.GuardianDeploymentResponse
 import org.rfcx.companion.entity.response.toGuardianDeployment
+import org.rfcx.companion.localdb.DatabaseCallback
+import java.util.*
 
 class GuardianDeploymentDb(private val realm: Realm) {
 
@@ -154,5 +156,93 @@ class GuardianDeploymentDb(private val realm: Realm) {
                 transition.insertOrUpdate(image)
             }
         }
+    }
+
+    /**
+     * Update Deployment Location and Locate
+     * */
+    fun editGuardianLocation(
+        id: Int,
+        locationName: String,
+        latitude: Double,
+        longitude: Double,
+        callback: DatabaseCallback
+    ) {
+        realm.executeTransactionAsync({ bgRealm ->
+            // do update deployment location
+            val guardianDeployment =
+                bgRealm.where(GuardianDeployment::class.java).equalTo(GuardianDeployment.FIELD_ID, id)
+                    .findFirst()
+            if (guardianDeployment?.location != null) {
+                guardianDeployment.location?.name = locationName
+                guardianDeployment.location?.latitude = latitude
+                guardianDeployment.location?.longitude = longitude
+                guardianDeployment.updatedAt = Date()
+                guardianDeployment.syncState = SyncState.Unsent.key
+            }
+
+            // do update location
+            val location = if (guardianDeployment?.serverId != null) {
+                bgRealm.where(Locate::class.java)
+                    .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_SERVER_ID, guardianDeployment.serverId)
+                    .findFirst()
+            } else {
+                bgRealm.where(Locate::class.java)
+                    .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_ID, id).findFirst()
+            }
+
+            if (location != null) {
+                location.latitude = latitude
+                location.longitude = longitude
+                location.name = locationName
+                location.syncState = SyncState.Unsent.key
+            }
+        }, {
+            // success
+            realm.close()
+            callback.onSuccess()
+        }, {
+            // failure
+            realm.close()
+            callback.onFailure(it.localizedMessage ?: "")
+        })
+    }
+
+    fun editLocationGroup(id: Int, locationGroup: LocationGroup, callback: DatabaseCallback) {
+        realm.executeTransactionAsync({ bgRealm ->
+            // do update deployment location
+            val guardianDeployment =
+                bgRealm.where(GuardianDeployment::class.java).equalTo(GuardianDeployment.FIELD_ID, id)
+                    .findFirst()
+            if (guardianDeployment?.location != null) {
+                guardianDeployment.updatedAt = Date()
+                guardianDeployment.syncState = SyncState.Unsent.key
+
+                //update location group
+                if (guardianDeployment.location?.locationGroup != null) {
+                    guardianDeployment.location?.locationGroup?.let {
+                        it.group = locationGroup.group
+                        it.color = locationGroup.color
+                        it.serverId = locationGroup.serverId
+                    }
+                } else {
+                    val locationGroupObj = bgRealm.createObject(LocationGroup::class.java)
+                    locationGroupObj.let {
+                        it.color = locationGroup.color
+                        it.group = locationGroup.group
+                        it.serverId = locationGroup.serverId
+                    }
+                    guardianDeployment.location?.locationGroup = locationGroupObj
+                }
+            }
+        }, {
+            // success
+            realm.close()
+            callback.onSuccess()
+        }, {
+            // failure
+            realm.close()
+            callback.onFailure(it.localizedMessage ?: "")
+        })
     }
 }

@@ -10,14 +10,16 @@ import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_edit_location.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
+import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.toLocationGroup
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.localdb.EdgeDeploymentDb
-import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.LocationGroupDb
+import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.service.DeploymentSyncWorker
+import org.rfcx.companion.service.GuardianDeploymentSyncWorker
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.showCommonDialog
 import org.rfcx.companion.view.BaseActivity
@@ -30,14 +32,15 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
+    private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
-    private val locateDb by lazy { LocateDb(realm) }
 
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     private var nameLocation: String? = null
     private var deploymentId: Int? = null
     private var groupName: String? = null
+    private var device: String? = null
     private var locationGroup: LocationGroup? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,6 +88,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
             nameLocation = it.getString(EXTRA_LOCATION_NAME)
             deploymentId = it.getInt(EXTRA_DEPLOYMENT_ID)
             groupName = it.getString(EXTRA_LOCATION_GROUP_NAME)
+            device = it.getString(EXTRA_DEVICE)
         }
     }
 
@@ -116,38 +120,74 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
     override fun updateDeploymentDetail(name: String) {
         showLoading()
         deploymentId?.let { id ->
-            edgeDeploymentDb.editLocation(
-                id = id,
-                locationName = name,
-                latitude = latitude,
-                longitude = longitude,
-                callback = object : DatabaseCallback {
-                    override fun onSuccess() {
-                        hideLoading()
-                        DeploymentSyncWorker.enqueue(this@EditLocationActivity)
-                        finish()
-                    }
+            if (device == Device.EDGE.value) {
+                edgeDeploymentDb.editLocation(
+                    id = id,
+                    locationName = name,
+                    latitude = latitude,
+                    longitude = longitude,
+                    callback = object : DatabaseCallback {
+                        override fun onSuccess() {
+                            hideLoading()
+                            DeploymentSyncWorker.enqueue(this@EditLocationActivity)
+                            finish()
+                        }
 
-                    override fun onFailure(errorMessage: String) {
-                        hideLoading()
-                        showCommonDialog(errorMessage)
-                    }
-                })
+                        override fun onFailure(errorMessage: String) {
+                            hideLoading()
+                            showCommonDialog(errorMessage)
+                        }
+                    })
+            } else {
+                guardianDeploymentDb.editGuardianLocation(
+                    id = id,
+                    locationName = name,
+                    latitude = latitude,
+                    longitude = longitude,
+                    callback = object : DatabaseCallback {
+                        override fun onSuccess() {
+                            hideLoading()
+                            GuardianDeploymentSyncWorker.enqueue(this@EditLocationActivity)
+                            finish()
+                        }
+
+                        override fun onFailure(errorMessage: String) {
+                            hideLoading()
+                            showCommonDialog(errorMessage)
+                        }
+                    })
+            }
 
             locationGroup?.let { group ->
-                edgeDeploymentDb.editLocationGroup(id, group, object :
-                    DatabaseCallback {
-                    override fun onSuccess() {
-                        hideLoading()
-                        DeploymentSyncWorker.enqueue(this@EditLocationActivity)
-                        finish()
-                    }
+                if (device == Device.EDGE.value) {
+                    edgeDeploymentDb.editLocationGroup(id, group, object :
+                        DatabaseCallback {
+                        override fun onSuccess() {
+                            hideLoading()
+                            DeploymentSyncWorker.enqueue(this@EditLocationActivity)
+                            finish()
+                        }
 
-                    override fun onFailure(errorMessage: String) {
-                        hideLoading()
-                        showCommonDialog(errorMessage)
-                    }
-                })
+                        override fun onFailure(errorMessage: String) {
+                            hideLoading()
+                            showCommonDialog(errorMessage)
+                        }
+                    })
+                } else {
+                    guardianDeploymentDb.editLocationGroup(id, group, object :
+                        DatabaseCallback {
+                        override fun onSuccess() {
+                            hideLoading()
+                            GuardianDeploymentSyncWorker.enqueue(this@EditLocationActivity)
+                            finish()
+                        }
+
+                        override fun onFailure(errorMessage: String) {
+                            hideLoading()
+                            showCommonDialog(errorMessage)
+                        }
+                    })
+                }
             }
         }
     }
@@ -203,6 +243,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
         const val EXTRA_LOCATION_GROUP_NAME = "EXTRA_LOCATION_GROUP_NAME"
         const val EXTRA_LOCATION_GROUP = "EXTRA_LOCATION_GROUP"
+        const val EXTRA_DEVICE = "EXTRA_DEVICE"
 
         fun startActivity(
             context: Context,
@@ -211,6 +252,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
             name: String,
             deploymentId: Int,
             groupName: String,
+            device: String,
             requestCode: Int
         ) {
             val intent = Intent(context, EditLocationActivity::class.java)
@@ -219,6 +261,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
             intent.putExtra(EXTRA_LOCATION_NAME, name)
             intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
             intent.putExtra(EXTRA_LOCATION_GROUP_NAME, groupName)
+            intent.putExtra(EXTRA_DEVICE, device)
             (context as Activity).startActivityForResult(intent, requestCode)
         }
     }

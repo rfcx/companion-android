@@ -22,14 +22,18 @@ open class GuardianDeployment(
     var configuration: GuardianConfiguration? = null,
     var location: DeploymentLocation? = null,
     var createdAt: Date = Date(),
+    var updatedAt: Date? = null,
     @Expose(serialize = false)
     var syncState: Int = 0
 ) : RealmModel, Serializable {
 
     companion object {
+        const val TABLE_NAME = "GuardianDeployment"
         const val FIELD_ID = "id"
         const val FIELD_SERVER_ID = "serverId"
         const val FIELD_STATE = "state"
         const val FIELD_SYNC_STATE = "syncState"
+        const val FIELD_LOCATION = "location"
+        const val FIELD_UPDATED_AT = "updatedAt"
     }
 }

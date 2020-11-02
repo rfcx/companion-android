@@ -643,7 +643,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             "-",
             Device.GUARDIAN.value,
             createdAt,
-            null
+            updatedAt
         )
     }
 
