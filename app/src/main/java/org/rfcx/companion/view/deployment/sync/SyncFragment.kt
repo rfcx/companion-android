@@ -20,7 +20,6 @@ class SyncFragment : Fragment() {
     private var edgeDeploymentProtocol: EdgeDeploymentProtocol? = null
     private var status: String? = null
     private lateinit var switchAnimation: AnimationDrawable
-    private lateinit var flashingGreenAnimation: AnimationDrawable
     private lateinit var flashingRedAnimation: AnimationDrawable
 
     override fun onAttach(context: Context) {
@@ -114,8 +113,6 @@ class SyncFragment : Fragment() {
     }
 
     private fun afterPlaySyncTone(view: View) {
-        flashingGreenAnimation.start()
-
         yesButton.setOnClickListener {
             edgeDeploymentProtocol?.stopPlaySound()
             edgeDeploymentProtocol?.nextStep()
