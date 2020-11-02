@@ -114,10 +114,6 @@ class SyncFragment : Fragment() {
     }
 
     private fun afterPlaySyncTone(view: View) {
-        view.findViewById<ImageView>(R.id.audioMothFlashingRedImageView).apply {
-            setBackgroundResource(R.drawable.audiomoth_red_flashing)
-            flashingGreenAnimation = background as AnimationDrawable
-        }
         flashingGreenAnimation.start()
 
         yesButton.setOnClickListener {
