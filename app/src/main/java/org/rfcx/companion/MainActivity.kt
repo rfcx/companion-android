@@ -19,6 +19,7 @@ import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
+import org.rfcx.companion.entity.Device
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.EdgeDeploymentActivity
@@ -315,7 +316,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         if (edgeDeploymentId != null) {
             val deployment = edgeDeploymentDb.getDeploymentByDeploymentId(edgeDeploymentId)
             deployment?.let {
-                showBottomSheet(DeploymentViewPagerFragment.newInstance(it.id))
+                showBottomSheet(DeploymentViewPagerFragment.newInstance(it.id, Device.EDGE.value))
             }
         }
     }
