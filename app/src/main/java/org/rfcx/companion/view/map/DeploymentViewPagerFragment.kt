@@ -18,6 +18,7 @@ import org.rfcx.companion.DeploymentListener
 import org.rfcx.companion.MainActivity
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.DeploymentState
+import org.rfcx.companion.entity.Device
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
@@ -40,6 +41,7 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
     private var deploymentListener: DeploymentListener? = null
     private lateinit var viewPagerAdapter: DeploymentViewPagerAdapter
     private var selectedId: Int? = null // selected deployment id
+    private var selectedDevice: String? = null // selected deployment device
     private var currentPosition: Int = 0
     private var edgeDeploymentViewId: Int? = null
     private var locateId: Int? = null
@@ -143,10 +145,10 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
         val deploymentIndex = showDeployments.indexOf(showDeployments.find {
             when (it) {
                 is DeploymentDetailView.EdgeDeploymentView -> {
-                    it.id == selectedId
+                    Device.EDGE.value == selectedDevice && it.id == selectedId
                 }
                 is DeploymentDetailView.GuardianDeploymentView -> {
-                    it.id == selectedId
+                    Device.GUARDIAN.value == selectedDevice && it.id == selectedId
                 }
             }
         })
@@ -172,7 +174,10 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
     }
 
     private fun initIntent() {
-        arguments?.let { selectedId = it.getInt(ARG_DEPLOYMENT_ID) }
+        arguments?.let {
+            selectedId = it.getInt(ARG_DEPLOYMENT_ID)
+            selectedDevice = it.getString(ARG_DEPLOYMENT_DEVICE)
+        }
     }
 
     private fun initAdapter() {
@@ -212,11 +217,13 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
     companion object {
         const val TAG = "DeploymentViewPagerFragment"
         private const val ARG_DEPLOYMENT_ID = "ARG_DEPLOYMENT_ID"
+        private const val ARG_DEPLOYMENT_DEVICE = "ARG_DEPLOYMENT_DEVICE"
 
         @JvmStatic
-        fun newInstance(id: Int) = DeploymentViewPagerFragment().apply {
+        fun newInstance(id: Int, device: String) = DeploymentViewPagerFragment().apply {
             arguments = Bundle().apply {
                 putInt(ARG_DEPLOYMENT_ID, id)
+                putString(ARG_DEPLOYMENT_DEVICE, device)
             }
         }
     }

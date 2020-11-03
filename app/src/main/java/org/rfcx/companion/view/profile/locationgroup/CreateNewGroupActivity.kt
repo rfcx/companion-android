@@ -5,12 +5,15 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_create_new_group.*
+import kotlinx.android.synthetic.main.layout_search_view.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.LocationGroups
@@ -19,7 +22,11 @@ import org.rfcx.companion.entity.toLocationGroup
 import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.service.LocationGroupSyncWorker
 import org.rfcx.companion.util.RealmHelper
+import org.rfcx.companion.view.deployment.locate.SearchResultFragment
 import org.rfcx.companion.view.detail.EditLocationActivity.Companion.EXTRA_LOCATION_GROUP
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.concurrent.schedule
 
 class CreateNewGroupActivity : AppCompatActivity(), (ColorPickerItem, Int) -> Unit {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
@@ -65,6 +72,22 @@ class CreateNewGroupActivity : AppCompatActivity(), (ColorPickerItem, Int) -> Un
                 finish()
             }
         }
+
+        locationGroupEditText.addTextChangedListener(object : TextWatcher {
+                override fun afterTextChanged(s: Editable?) {
+                    val isGroupExisted = locationGroupDb.isExisted(s.toString())
+                    saveButton.isEnabled = !isGroupExisted
+
+                    if(isGroupExisted){
+                        locationGroupTextInput.error = getString(R.string.group_already_exists)
+                    } else {
+                        locationGroupTextInput.error = null
+                    }
+                }
+
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            })
     }
     override fun invoke(colorPickerItem: ColorPickerItem, position: Int) {
         colorPickerList.forEachIndexed { index, _ ->
