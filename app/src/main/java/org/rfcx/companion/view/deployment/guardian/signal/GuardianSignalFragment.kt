@@ -104,7 +104,11 @@ class GuardianSignalFragment : Fragment() {
                     hideSignalInfo()
                     showSimError()
                     showSignalStrength(SignalState.NONE)
-                    signalErrorText.text = getText(R.string.signal_sim_card)
+                    if (strength == -999) {
+                        signalErrorText.text = getText(R.string.signal_lost)
+                    } else {
+                        signalErrorText.text = getText(R.string.signal_sim_card)
+                    }
                 }
             }
         })
