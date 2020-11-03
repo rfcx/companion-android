@@ -61,6 +61,8 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
     private var configuration: GuardianConfiguration? = null
     private val analytics by lazy { Analytics(this) }
 
+    private var firstTimeEntered = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_guardian_diagnostic)
@@ -163,7 +165,10 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
                     hideLoading()
                 }
 
-                saveNewDiagnostic()
+                if (!firstTimeEntered) {
+                    saveNewDiagnostic()
+                }
+                firstTimeEntered = false
             })
         } else {
             setupLastKnownDiagnostic()
