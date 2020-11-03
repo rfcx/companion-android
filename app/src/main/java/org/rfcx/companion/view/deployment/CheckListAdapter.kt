@@ -29,6 +29,12 @@ class CheckListAdapter(private val onCheckClickListener: (Int, String) -> Unit) 
         notifyDataSetChanged()
     }
 
+    fun setCheckUnPassed(number: Int) {
+        listOfChecks.filterIsInstance<CheckListItem.CheckItem>()
+            .find { it.number == number }?.isPassed = false
+        notifyDataSetChanged()
+    }
+
     fun isEveryCheckListPassed(): Boolean {
         return listOfChecks.filterIsInstance<CheckListItem.CheckItem>().filter { it.isRequired }.all { it.isPassed }
     }

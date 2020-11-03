@@ -25,6 +25,7 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun setSampleRate(sampleRate: Int)
 
     fun addRegisteredToPassedCheck()
+    fun removeRegisteredOnPassedCheck()
 
     fun showConnectInstruction()
 

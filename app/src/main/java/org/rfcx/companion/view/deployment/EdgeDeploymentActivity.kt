@@ -48,6 +48,9 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     private var _deployLocation: DeploymentLocation? = null
     private var _images: List<String> = listOf()
     private var _deployLocationGroup: LocationGroup? = null
+    private var _locate: Locate? = null
+
+    private var useExistedLocation: Boolean = false
 
     private var audioMothConnector = AudioMothChimeConnector()
     private var calendar = Calendar.getInstance()
@@ -172,13 +175,19 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
-    override fun setDeployLocation(locate: Locate) {
+    override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
         val deployment = _deployment ?: EdgeDeployment()
         deployment.state = DeploymentState.Edge.Locate.key // state
 
         this._deployLocation = locate.asDeploymentLocation()
         val deploymentId = deploymentDb.insertOrUpdate(deployment, _deployLocation!!)
-        locateDb.insertOrUpdateLocate(deploymentId, locate) // update locate - last deployment
+
+        useExistedLocation = isExisted
+        this._locate = locate
+        if (!useExistedLocation) {
+            locateDb.insertOrUpdateLocate(deploymentId, locate) // update locate - last deployment
+        }
+
         setDeployment(deployment)
     }
 
@@ -203,6 +212,12 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             it.updatedAt = Date()
             it.state = DeploymentState.Edge.ReadyToUpload.key
             setDeployment(it)
+
+            if (useExistedLocation) {
+                this._locate?.let { locate ->
+                    locateDb.insertOrUpdateLocate(it.id, locate) // update locate - last deployment
+                }
+            }
 
             saveImages(it)
             deploymentDb.updateDeployment(it)

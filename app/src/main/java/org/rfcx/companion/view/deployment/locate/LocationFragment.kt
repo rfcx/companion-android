@@ -230,7 +230,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     longitude = it.longitude,
                     locationGroup = getLocationGroup()
                 )
-                deploymentProtocol?.setDeployLocation(locate)
+                deploymentProtocol?.setDeployLocation(locate, false)
                 deploymentProtocol?.nextStep()
             }
         } else {
@@ -259,7 +259,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 it.lastGuardianDeploymentServerId,
                 it.syncState
             )
-            deploymentProtocol?.setDeployLocation(locate)
+            deploymentProtocol?.setDeployLocation(locate, true)
             deploymentProtocol?.nextStep()
         }
     }

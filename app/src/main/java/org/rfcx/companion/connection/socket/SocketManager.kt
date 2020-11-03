@@ -189,6 +189,10 @@ object SocketManager {
         this.prefs.value = PrefsResponse()
     }
 
+    fun resetRegisterResult() {
+        this.register.value = RegisterResponse()
+    }
+
     fun resetAllValuesToDefault() {
         connection.value =
             ConnectionResponse()
