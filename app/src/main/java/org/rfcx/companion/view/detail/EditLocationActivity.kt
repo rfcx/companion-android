@@ -118,6 +118,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
     }
 
     override fun updateDeploymentDetail(name: String) {
+        val group = groupName ?: ""
         showLoading()
         deploymentId?.let { id ->
             if (device == Device.EDGE.value) {
@@ -158,36 +159,34 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
                     })
             }
 
-            locationGroup?.let { group ->
-                if (device == Device.EDGE.value) {
-                    edgeDeploymentDb.editLocationGroup(id, group, object :
-                        DatabaseCallback {
-                        override fun onSuccess() {
-                            hideLoading()
-                            DeploymentSyncWorker.enqueue(this@EditLocationActivity)
-                            finish()
-                        }
+            if (device == Device.EDGE.value) {
+                edgeDeploymentDb.editLocationGroup(id, getLocationGroup(group), object :
+                    DatabaseCallback {
+                    override fun onSuccess() {
+                        hideLoading()
+                        DeploymentSyncWorker.enqueue(this@EditLocationActivity)
+                        finish()
+                    }
 
-                        override fun onFailure(errorMessage: String) {
-                            hideLoading()
-                            showCommonDialog(errorMessage)
-                        }
-                    })
-                } else {
-                    guardianDeploymentDb.editLocationGroup(id, group, object :
-                        DatabaseCallback {
-                        override fun onSuccess() {
-                            hideLoading()
-                            GuardianDeploymentSyncWorker.enqueue(this@EditLocationActivity)
-                            finish()
-                        }
+                    override fun onFailure(errorMessage: String) {
+                        hideLoading()
+                        showCommonDialog(errorMessage)
+                    }
+                })
+            } else {
+                guardianDeploymentDb.editLocationGroup(id, getLocationGroup(group), object :
+                    DatabaseCallback {
+                    override fun onSuccess() {
+                        hideLoading()
+                        GuardianDeploymentSyncWorker.enqueue(this@EditLocationActivity)
+                        finish()
+                    }
 
-                        override fun onFailure(errorMessage: String) {
-                            hideLoading()
-                            showCommonDialog(errorMessage)
-                        }
-                    })
-                }
+                    override fun onFailure(errorMessage: String) {
+                        hideLoading()
+                        showCommonDialog(errorMessage)
+                    }
+                })
             }
         }
     }
