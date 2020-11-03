@@ -20,7 +20,6 @@ class SyncFragment : Fragment() {
     private var edgeDeploymentProtocol: EdgeDeploymentProtocol? = null
     private var status: String? = null
     private lateinit var switchAnimation: AnimationDrawable
-    private lateinit var flashingGreenAnimation: AnimationDrawable
     private lateinit var flashingRedAnimation: AnimationDrawable
 
     override fun onAttach(context: Context) {
@@ -114,12 +113,6 @@ class SyncFragment : Fragment() {
     }
 
     private fun afterPlaySyncTone(view: View) {
-        view.findViewById<ImageView>(R.id.audioMothFlashingRedImageView).apply {
-            setBackgroundResource(R.drawable.audiomoth_red_flashing)
-            flashingGreenAnimation = background as AnimationDrawable
-        }
-        flashingGreenAnimation.start()
-
         yesButton.setOnClickListener {
             edgeDeploymentProtocol?.stopPlaySound()
             edgeDeploymentProtocol?.nextStep()

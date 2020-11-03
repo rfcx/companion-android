@@ -53,7 +53,7 @@
     <string name="switch_to_custom">Move switch to \"CUSTOM\" while initial tone is playing</string>
     <string name="solid_red_flashing_green">Do you see a solid red LED and flashing green LED?</string>
     <string name="ready_to_sync">You are ready to sync your device</string>
-    <string name="flashing_red">Did you see the flashing red LED on completion?</string>
+    <string name="solid_green">Did you see the solid green LED on completion?</string>
     <string name="play_initial_tone">play initial tone</string>
     <string name="play_sync_tone">play sync tone</string>
 

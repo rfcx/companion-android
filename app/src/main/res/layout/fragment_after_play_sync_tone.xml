@@ -26,9 +26,10 @@
         app:layout_constraintGuide_percent="0.05" />
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/audioMothFlashingRedImageView"
+        android:id="@+id/audioMothSolidGreenImageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:src="@drawable/audiomoth_solid_green"
         android:layout_marginTop="@dimen/margin_padding_xlarge"
         app:layout_constraintEnd_toEndOf="@id/guidelineVerticalRight"
         app:layout_constraintStart_toStartOf="@id/guidelineVerticalLeft"
@@ -41,10 +42,10 @@
         android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginTop="@dimen/margin_padding_normal"
         android:layout_marginEnd="@dimen/margin_padding_large"
-        android:text="@string/flashing_red"
+        android:text="@string/solid_green"
         app:layout_constraintEnd_toEndOf="@id/guidelineVerticalRight"
         app:layout_constraintStart_toStartOf="@id/guidelineVerticalLeft"
-        app:layout_constraintTop_toBottomOf="@id/audioMothFlashingRedImageView" />
+        app:layout_constraintTop_toBottomOf="@id/audioMothSolidGreenImageView" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/yesButton"
