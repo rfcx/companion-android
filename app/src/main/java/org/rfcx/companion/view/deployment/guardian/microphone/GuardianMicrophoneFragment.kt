@@ -28,6 +28,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     private var timer: Timer? = null
     private var valueCheckTimer: Timer? = null
     private var spectrogramTimer: Timer? = null
+    private var recorderTimer: Timer? = null
     private val spectrogramStack = arrayListOf<FloatArray>()
     private var isTimerPause = false
 
@@ -67,6 +68,20 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         setupAudioPlaybackMenu()
         setUiByState(MicTestingState.READY)
         SocketManager.resetMicrophoneDefaultValue()
+
+        SocketManager.resetRecorderState()
+        retrieveRecorderState()
+        SocketManager.recorderState.observe(viewLifecycleOwner, Observer {
+            if (it.recorder.isRecording) {
+                listenAudioButton.isEnabled = true
+                listenAgainAudioButton.isEnabled = true
+                micWarningText.visibility = View.INVISIBLE
+            } else {
+                listenAudioButton.isEnabled = false
+                listenAgainAudioButton.isEnabled = false
+                micWarningText.visibility = View.VISIBLE
+            }
+        })
 
         listenAudioButton.setOnClickListener {
             isMicTesting = true
@@ -220,6 +235,15 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         }
     }
 
+    private fun retrieveRecorderState() {
+        recorderTimer = Timer()
+        recorderTimer?.schedule(object : TimerTask() {
+            override fun run() {
+                SocketManager.getRecorderState()
+            }
+        }, DELAY, RECORDER_CHECK_PERIOD)
+    }
+
     private fun retrieveLiveAudioBuffer() {
         timer = Timer()
         valueCheckTimer = Timer()
@@ -285,6 +309,8 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         spectrogramTimer = null
         valueCheckTimer?.cancel()
         valueCheckTimer = null
+        recorderTimer?.cancel()
+        recorderTimer = null
 
         if (isMicTesting) {
             timer?.cancel()
@@ -311,6 +337,8 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         private const val STACK_PERIOD = 10L
 
         private const val CHECK_VALUE_PERIOD = 1000L
+
+        private const val RECORDER_CHECK_PERIOD = 1000L
 
         private const val DEF_SAMPLERATE = 24000
 
