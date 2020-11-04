@@ -72,7 +72,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         SocketManager.resetRecorderState()
         retrieveRecorderState()
         SocketManager.recorderState.observe(viewLifecycleOwner, Observer {
-            if (it.recorder.isRecording) {
+            if (it.isRecording) {
                 listenAudioButton.isEnabled = true
                 listenAgainAudioButton.isEnabled = true
                 micWarningText.visibility = View.INVISIBLE

@@ -36,7 +36,7 @@ object SocketManager {
     private const val SENTINEL = "sentinel"
     private const val REGISTER = "register"
     private const val IS_REGISTERED = "is_registered"
-    private const val RECORDER_STATE = "recorder_state"
+    private const val IS_RECORDING = "is_recording"
 
     private var audioChunks = arrayListOf<String>()
     private var microphoneTestUtils: MicrophoneTestUtils? = null
@@ -181,7 +181,7 @@ object SocketManager {
     }
 
     fun getRecorderState() {
-        val data = gson.toJson(SocketRequest(RECORDER_STATE))
+        val data = gson.toJson(SocketRequest(IS_RECORDING))
         sendMessage(data)
     }
 
@@ -343,7 +343,7 @@ object SocketManager {
                                     gson.fromJson(dataInput, CheckGuardianRegistered::class.java)
                                 this.isRegistered.postValue(response)
                             }
-                            RECORDER_STATE -> {
+                            IS_RECORDING -> {
                                 val response =
                                     gson.fromJson(dataInput, RecorderStateResponse::class.java)
                                 this.recorderState.postValue(response)

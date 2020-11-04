@@ -1,9 +1,8 @@
 package org.rfcx.companion.entity.socket.response
 
-data class RecorderStateResponse(
-    val recorder: Recorder = Recorder()
-)
+import com.google.gson.annotations.SerializedName
 
-data class Recorder(
+data class RecorderStateResponse(
+    @SerializedName("is_recording")
     val isRecording: Boolean = false
 )
