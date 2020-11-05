@@ -117,11 +117,12 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
         builder?.apply {
             setTitle(getString(R.string.wifi_notification_title))
             setPositiveButton(getString(R.string.notification_yes)) { dialog, _ ->
+                deploymentProtocol?.setOnDeployClicked()
                 SocketManager.stopGuardianWiFi()
                 deploy()
                 dialog.dismiss()
             }
-            setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
+            setNegativeButton(getString(R.string.notification_no)) { dialog, _ ->
                 deploy()
                 dialog.dismiss()
             }
