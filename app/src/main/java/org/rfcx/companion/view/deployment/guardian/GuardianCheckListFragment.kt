@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -53,8 +54,7 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
 
         checklistDeployButton.isEnabled = checkListRecyclerView.isEveryCheckListPassed()
         checklistDeployButton.setOnClickListener {
-            deploymentProtocol?.setReadyToDeploy()
-            SocketManager.stopConnection()
+            showNotificationBeforeDeploy()
         }
 
         // check if guardian is registered so the step can be highlighted
@@ -110,6 +110,28 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
         }
 
         return checkList
+    }
+
+    private fun showNotificationBeforeDeploy() {
+        val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
+        builder?.apply {
+            setTitle(getString(R.string.wifi_notification_title))
+            setPositiveButton(getString(R.string.notification_yes)) { dialog, _ ->
+                SocketManager.stopGuardianWiFi()
+                deploy()
+                dialog.dismiss()
+            }
+            setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
+                deploy()
+                dialog.dismiss()
+            }
+        }
+        builder?.show()
+    }
+
+    private fun deploy() {
+        deploymentProtocol?.setReadyToDeploy()
+        SocketManager.stopConnection()
     }
 
     companion object {
