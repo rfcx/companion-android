@@ -28,6 +28,7 @@ import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.adapter.BaseListItem
 import org.rfcx.companion.entity.Screen
+import org.rfcx.companion.entity.Status
 import org.rfcx.companion.repo.Firestore
 import org.rfcx.companion.util.*
 
@@ -187,6 +188,7 @@ class FeedbackActivity : AppCompatActivity() {
         if (resultCode == Activity.RESULT_OK) {
             imageFile?.let {
                 val pathList = listOf(it.absolutePath)
+                analytics.trackAddFeedbackImagesEvent()
                 feedbackImageAdapter.addImages(pathList)
             }
         } else {
@@ -209,6 +211,7 @@ class FeedbackActivity : AppCompatActivity() {
                 pathList.add(path)
             }
         }
+        analytics.trackAddFeedbackImagesEvent()
         feedbackImageAdapter.addImages(pathList)
     }
 
@@ -228,10 +231,12 @@ class FeedbackActivity : AppCompatActivity() {
             if (success) {
                 val intent = Intent()
                 setResult(ProfileFragment.RESULT_CODE, intent)
+                analytics.trackSendFeedbackEvent(Status.SUCCESS.id)
                 finish()
             } else {
                 feedbackGroupView.visibility = View.VISIBLE
                 feedbackProgressBar.visibility = View.GONE
+                analytics.trackSendFeedbackEvent(Status.FAILURE.id)
 
                 Snackbar.make(
                     contextView,

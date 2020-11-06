@@ -113,11 +113,15 @@ class LoginActivity : AppCompatActivity() {
                 override fun onSuccess(credentials: Credentials) {
                     when (val result = CredentialVerifier(this@LoginActivity).verify(credentials)) {
                         is Err -> {
+                            analytics.trackLoginEvent(LoginType.EMAIL.id, Status.FAILURE.id)
+
                             Toast.makeText(this@LoginActivity, result.error, Toast.LENGTH_SHORT)
                                 .show()
                             runOnUiThread { loading(false) }
                         }
                         is Ok -> {
+                            analytics.trackLoginEvent(LoginType.EMAIL.id, Status.SUCCESS.id)
+
                             userTouch(result.value)
                             CredentialKeeper(this@LoginActivity).save(result.value)
                         }
@@ -125,6 +129,8 @@ class LoginActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(exception: AuthenticationException) {
+                    analytics.trackLoginEvent(LoginType.EMAIL.id, Status.FAILURE.id)
+
                     exception.printStackTrace()
                     runOnUiThread {
                         Toast.makeText(
@@ -166,6 +172,8 @@ class LoginActivity : AppCompatActivity() {
                 override fun onFailure(dialog: Dialog) {}
 
                 override fun onFailure(exception: AuthenticationException) {
+                    analytics.trackLoginEvent(LoginType.FACEBOOK.id, Status.FAILURE.id)
+
                     exception.printStackTrace()
                     loading(false)
                 }
@@ -173,11 +181,15 @@ class LoginActivity : AppCompatActivity() {
                 override fun onSuccess(credentials: Credentials) {
                     when (val result = CredentialVerifier(this@LoginActivity).verify(credentials)) {
                         is Err -> {
+                            analytics.trackLoginEvent(LoginType.FACEBOOK.id, Status.FAILURE.id)
+
                             Toast.makeText(this@LoginActivity, result.error, Toast.LENGTH_SHORT)
                                 .show()
                             loading(false)
                         }
                         is Ok -> {
+                            analytics.trackLoginEvent(LoginType.FACEBOOK.id, Status.SUCCESS.id)
+
                             userTouch(result.value)
                             CredentialKeeper(this@LoginActivity).save(result.value)
                         }
@@ -193,9 +205,13 @@ class LoginActivity : AppCompatActivity() {
             .withScheme(this.getString(R.string.auth0_scheme))
             .withAudience(this.getString(R.string.auth0_audience))
             .start(this, object : AuthCallback {
-                override fun onFailure(dialog: Dialog) {}
+                override fun onFailure(dialog: Dialog) {
+                    analytics.trackLoginEvent(LoginType.SMS.id, Status.FAILURE.id)
+                }
 
                 override fun onFailure(exception: AuthenticationException) {
+                    analytics.trackLoginEvent(LoginType.SMS.id, Status.FAILURE.id)
+
                     Toast.makeText(this@LoginActivity, exception.description, Toast.LENGTH_SHORT)
                         .show()
                     loading(false)
@@ -204,11 +220,15 @@ class LoginActivity : AppCompatActivity() {
                 override fun onSuccess(credentials: Credentials) {
                     when (val result = CredentialVerifier(this@LoginActivity).verify(credentials)) {
                         is Err -> {
+                            analytics.trackLoginEvent(LoginType.SMS.id, Status.FAILURE.id)
+
                             Toast.makeText(this@LoginActivity, result.error, Toast.LENGTH_SHORT)
                                 .show()
                             loading(false)
                         }
                         is Ok -> {
+                            analytics.trackLoginEvent(LoginType.SMS.id, Status.SUCCESS.id)
+
                             userTouch(result.value)
                             CredentialKeeper(this@LoginActivity).save(result.value)
                         }

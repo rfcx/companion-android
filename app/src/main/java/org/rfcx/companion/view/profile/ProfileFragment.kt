@@ -17,6 +17,7 @@ import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.MainActivityListener
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Screen
+import org.rfcx.companion.entity.Theme
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.Preferences.Companion.DISPLAY_THEME
 import org.rfcx.companion.view.profile.coordinates.CoordinatesActivity
@@ -88,14 +89,17 @@ class ProfileFragment : Fragment() {
                     DialogInterface.OnClickListener { dialog, which ->
                         when (themeOption[which]) {
                             themeOption[0] -> {
+                                analytics?.trackChangeThemeEvent(Theme.MODE_LIGHT.id)
                                 preferences?.putString(DISPLAY_THEME, themeOption[0])
                                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                             }
                             themeOption[1] -> {
+                                analytics?.trackChangeThemeEvent(Theme.MODE_NIGHT.id)
                                 preferences?.putString(DISPLAY_THEME, themeOption[1])
                                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                             }
                             themeOption[2] -> {
+                                analytics?.trackChangeThemeEvent(Theme.SYSTEM_DEFAULT.id)
                                 preferences?.putString(DISPLAY_THEME, themeOption[2])
                                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
                             }

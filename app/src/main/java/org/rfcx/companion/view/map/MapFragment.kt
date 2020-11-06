@@ -288,8 +288,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     (activity as MainActivityListener).showBottomSheet(
                         DeploymentViewPagerFragment.newInstance(deploymentId)
                     )
+                    analytics?.trackClickPinEvent(Status.SUCCESS.id)
                 } else {
                     features[index]?.let { setFeatureSelectState(it, false) }
+                    analytics?.trackClickPinEvent(Status.FAILURE.id)
                 }
             }
             return true

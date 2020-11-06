@@ -33,10 +33,7 @@ import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.service.DeploymentSyncWorker
-import org.rfcx.companion.util.RealmHelper
-import org.rfcx.companion.util.asLiveData
-import org.rfcx.companion.util.convertLatLngLabel
-import org.rfcx.companion.util.showCommonDialog
+import org.rfcx.companion.util.*
 import org.rfcx.companion.view.BaseActivity
 import org.rfcx.companion.view.deployment.EdgeDeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
 import org.rfcx.companion.view.deployment.locate.LocationFragment
@@ -50,6 +47,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
 
     private lateinit var mapView: MapView
     private lateinit var mapBoxMap: MapboxMap
+    private val analytics by lazy { Analytics(this) }
 
     // data
     private var deployment: EdgeDeployment? = null
@@ -90,6 +88,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
                     val group = locate.locationGroup?.group ?: getString(R.string.none)
                     val isGroupExisted = locationGroupDb.isExisted(locate.locationGroup?.group)
                     intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)?.let { deploymentId ->
+                        analytics.trackEditLocationEvent()
                         EditLocationActivity.startActivity(
                             this,
                             locate.latitude,
