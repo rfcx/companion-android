@@ -26,7 +26,6 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
 
     private val analytics by lazy { context?.let { Analytics(it) } }
     private var timer: Timer? = null
-    private var valueCheckTimer: Timer? = null
     private var spectrogramTimer: Timer? = null
     private val spectrogramStack = arrayListOf<FloatArray>()
     private var isTimerPause = false
@@ -37,6 +36,8 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     }
 
     private var isMicTesting = false
+
+    private var nullStackThreshold = 0
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -222,7 +223,6 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
 
     private fun retrieveLiveAudioBuffer() {
         timer = Timer()
-        valueCheckTimer = Timer()
         spectrogramTimer = Timer()
 
         timer?.schedule(object : TimerTask() {
@@ -234,21 +234,21 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
             }
         }, DELAY, MILLI_PERIOD)
 
-        valueCheckTimer?.schedule(object : TimerTask() {
-            override fun run() {
-                if (isTimerPause) {
-                    isTimerPause = false
-                }
-            }
-        }, DELAY, CHECK_VALUE_PERIOD)
-
         spectrogramTimer?.schedule(object : TimerTask() {
             override fun run() {
-                if (spectrogramStack.isNotEmpty()) {
-                    if (spectrogramStack[0] != null) {
+                if (!spectrogramStack.isNullOrEmpty()) {
+                    nullStackThreshold = 0
+                    try {
                         spectrogramView.setMagnitudes(spectrogramStack[0] ?: FloatArray(0))
                         spectrogramView.invalidate()
                         spectrogramStack.removeAt(0)
+                    } catch (e: Exception) { /* nothing now */ }
+                } else {
+                    nullStackThreshold++
+                    if (nullStackThreshold >= 50) {
+                        SocketManager.getLiveAudioBuffer(microphoneTestUtils)
+                        isTimerPause = true
+                        nullStackThreshold = 0
                     }
                 }
             }
@@ -283,8 +283,6 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         }
         spectrogramTimer?.cancel()
         spectrogramTimer = null
-        valueCheckTimer?.cancel()
-        valueCheckTimer = null
 
         if (isMicTesting) {
             timer?.cancel()
@@ -309,8 +307,6 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         private const val MILLI_PERIOD = 10L
 
         private const val STACK_PERIOD = 10L
-
-        private const val CHECK_VALUE_PERIOD = 1000L
 
         private const val DEF_SAMPLERATE = 24000
 
