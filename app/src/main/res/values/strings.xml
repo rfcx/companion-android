@@ -288,6 +288,7 @@
     <string name="signal_text_4">Signal Strength is Excellent</string>
     <string name="signal_value">%d dBm</string>
     <string name="signal_sim_card">The Guardian does not have a SIM card inserted.\nPlease insert a SIM card.</string>
+    <string name="signal_lost">WiFi hotspot connection lost.\nPlease try again.</string>
 
     <!-- Search Location -->
     <string name="search_box_hint">Search here</string>
@@ -318,6 +319,7 @@
     <string name="choose_color">Choose spectrogram color</string>
     <string name="choose_play_back">Choose audio playback</string>
     <string name="play_back">Playback</string>
+    <string name="mic_recorder_warn">Recorder service is not started yet.\nPlease try again later.</string>
 
     <!-- GuardianCheckinTestFragment -->
     <string name="testing_guardian_checkin">Guardian CheckIn Test</string>

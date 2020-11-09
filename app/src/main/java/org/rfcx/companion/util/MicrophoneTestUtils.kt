@@ -78,7 +78,7 @@ class MicrophoneTestUtils {
      * Utils functions for Audio Byte Array
      */
     fun decodeEncodedAudio(encodedAudio: String): ByteArray {
-        return Base64.decode(encodedAudio, Base64.DEFAULT)
+        return Base64.decode(encodedAudio, Base64.URL_SAFE)
     }
 
     fun getEncodedAudioBufferSize(encodedAudio: String): Int {

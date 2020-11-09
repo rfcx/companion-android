@@ -37,6 +37,7 @@ object SocketManager {
     private const val REGISTER = "register"
     private const val IS_REGISTERED = "is_registered"
     private const val STOP_WIFI = "stop_wifi"
+    private const val IS_RECORDING = "is_recording"
 
     private var audioChunks = arrayListOf<String>()
     private var microphoneTestUtils: MicrophoneTestUtils? = null
@@ -56,6 +57,7 @@ object SocketManager {
     val sentinel = MutableLiveData<SentinelResponse>()
     val register = MutableLiveData<RegisterResponse>()
     val isRegistered = MutableLiveData<CheckGuardianRegistered>()
+    val recorderState = MutableLiveData<RecorderStateResponse>()
 
     init {
         connection.value =
@@ -77,6 +79,7 @@ object SocketManager {
             SentinelResponse()
         register.value = RegisterResponse()
         isRegistered.value = CheckGuardianRegistered()
+        recorderState.value = RecorderStateResponse()
     }
 
     fun getConnection() {
@@ -187,6 +190,11 @@ object SocketManager {
         sendMessage(data)
     }
 
+    fun getRecorderState() {
+        val data = gson.toJson(SocketRequest(IS_RECORDING))
+        sendMessage(data)
+    }
+
     fun resetMicrophoneDefaultValue() {
         isTestingFirstTime = true
     }
@@ -201,6 +209,10 @@ object SocketManager {
 
     fun resetRegisterResult() {
         this.register.value = RegisterResponse()
+    }
+
+    fun resetRecorderState() {
+        this.recorderState.value = RecorderStateResponse()
     }
 
     fun resetAllValuesToDefault() {
@@ -223,6 +235,7 @@ object SocketManager {
             SentinelResponse()
         register.value = RegisterResponse()
         isRegistered.value = CheckGuardianRegistered()
+        recorderState.value = RecorderStateResponse()
     }
 
     private fun sendMessage(message: String) {
@@ -339,6 +352,11 @@ object SocketManager {
                                 val response =
                                     gson.fromJson(dataInput, CheckGuardianRegistered::class.java)
                                 this.isRegistered.postValue(response)
+                            }
+                            IS_RECORDING -> {
+                                val response =
+                                    gson.fromJson(dataInput, RecorderStateResponse::class.java)
+                                this.recorderState.postValue(response)
                             }
                         }
                     }
