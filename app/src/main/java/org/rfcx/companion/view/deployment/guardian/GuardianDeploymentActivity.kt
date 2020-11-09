@@ -22,6 +22,8 @@ import org.rfcx.companion.entity.LocationGroups
 import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.guardian.GuardianProfile
+import org.rfcx.companion.entity.socket.response.Signal
+import org.rfcx.companion.entity.socket.response.SignalResponse
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
@@ -368,6 +370,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                             WifiLostDialogFragment()
                         }
                 wifiLostDialog.show(supportFragmentManager, TAG_WIFI_LOST_DIALOG)
+                //Show no signal on signal testing
+                SocketManager.signal.postValue(SignalResponse(Signal(-999, false)))
             }
         })
     }
