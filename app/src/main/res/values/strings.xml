@@ -319,6 +319,7 @@
     <string name="choose_color">Choose spectrogram color</string>
     <string name="choose_play_back">Choose audio playback</string>
     <string name="play_back">Playback</string>
+    <string name="mic_recorder_warn">Recorder service is not started yet.\nPlease try again later.</string>
 
     <!-- GuardianCheckinTestFragment -->
     <string name="testing_guardian_checkin">Guardian CheckIn Test</string>

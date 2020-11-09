@@ -146,6 +146,8 @@
     </LinearLayout>
 
     <View
+        android:id="@+id/micMenuSeparator"
+        style="@style/AudioMothText.Body.Headline"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginStart="@dimen/margin_padding_large"
@@ -153,6 +155,18 @@
         android:layout_marginBottom="@dimen/margin_padding_small"
         android:background="@color/gray_30"
         app:layout_constraintTop_toBottomOf="@id/adjustSpecLayout" />
+
+    <TextView
+        android:id="@+id/micWarningText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:text="@string/mic_recorder_warn"
+        android:textAlignment="center"
+        android:textColor="@color/text_error"
+        android:textSize="14sp"
+        android:visibility="invisible"
+        app:layout_constraintTop_toBottomOf="@id/micMenuSeparator" />
 
     <LinearLayout
         android:id="@+id/audioButtonLayout"
