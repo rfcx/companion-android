@@ -79,6 +79,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private var currentCheckName = ""
     private var passedChecks = arrayListOf<Int>()
 
+    private var onDeployClicked = false
+
     private lateinit var wifiHotspotManager: WifiHotspotManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -174,6 +176,10 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun setSampleRate(sampleRate: Int) {
         this._sampleRate = sampleRate
+    }
+
+    override fun setOnDeployClicked() {
+        this.onDeployClicked = true
     }
 
     override fun addRegisteredToPassedCheck() {
@@ -364,14 +370,14 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     override fun registerWifiConnectionLostListener() {
         wifiHotspotManager.registerWifiConnectionLost(object : WifiLostListener {
             override fun onLost() {
-                val wifiLostDialog: WifiLostDialogFragment =
-                    supportFragmentManager.findFragmentByTag(TAG_WIFI_LOST_DIALOG) as WifiLostDialogFragment?
-                        ?: run {
-                            WifiLostDialogFragment()
-                        }
-                wifiLostDialog.show(supportFragmentManager, TAG_WIFI_LOST_DIALOG)
-                //Show no signal on signal testing
-                SocketManager.signal.postValue(SignalResponse(Signal(-999, false)))
+                if (!onDeployClicked) {
+                    val wifiLostDialog: WifiLostDialogFragment =
+                        supportFragmentManager.findFragmentByTag(TAG_WIFI_LOST_DIALOG) as WifiLostDialogFragment?
+                            ?: run {
+                                WifiLostDialogFragment()
+                            }
+                    wifiLostDialog.show(supportFragmentManager, TAG_WIFI_LOST_DIALOG)
+                }
             }
         })
     }

@@ -351,6 +351,9 @@
     <!-- GuardianCheckListFragment -->
     <string name="setting_up_checklist">Guardian Setup Checklist:</string>
     <string name="deploy">Deploy</string>
+    <string name="wifi_notification_title">Do you want to disable Guardian\'s WiFi after deployed?</string>
+    <string name="notification_yes">Yes</string>
+    <string name="notification_no">No</string>
 
     <!-- ConnectInstructionDiaglogFragment -->
     <string name="got_it">Got It</string>

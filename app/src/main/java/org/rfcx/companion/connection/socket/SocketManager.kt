@@ -36,6 +36,7 @@ object SocketManager {
     private const val SENTINEL = "sentinel"
     private const val REGISTER = "register"
     private const val IS_REGISTERED = "is_registered"
+    private const val STOP_WIFI = "stop_wifi"
     private const val IS_RECORDING = "is_recording"
 
     private var audioChunks = arrayListOf<String>()
@@ -170,6 +171,15 @@ object SocketManager {
         val data = gson.toJson(
             SocketRequest(
                 IS_REGISTERED
+            )
+        )
+        sendMessage(data)
+    }
+
+    fun stopGuardianWiFi() {
+        val data = gson.toJson(
+            SocketRequest(
+                STOP_WIFI
             )
         )
         sendMessage(data)
