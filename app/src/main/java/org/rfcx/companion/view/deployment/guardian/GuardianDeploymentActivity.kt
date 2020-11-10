@@ -154,6 +154,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         startFragment(GuardianCheckListFragment.newInstance())
     }
 
+    override fun isOpenedFromUnfinishedDeployment(): Boolean = false // guardian not have this feature so return false
+
     override fun getProfiles(): List<GuardianProfile> = _profiles
 
     override fun getProfile(): GuardianProfile? = _profile

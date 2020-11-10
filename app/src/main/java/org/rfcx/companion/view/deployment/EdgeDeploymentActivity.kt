@@ -100,6 +100,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         finish()
     }
 
+    override fun isOpenedFromUnfinishedDeployment(): Boolean {
+        return fromUnfinishedDeployment
+    }
+
     override fun onSupportNavigateUp(): Boolean {
         backStep()
         return true
@@ -407,9 +411,16 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         return false
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        fromUnfinishedDeployment = false
+    }
+
     companion object {
         const val loadingDialogTag = "LoadingDialog"
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
+
+        private var fromUnfinishedDeployment = false
 
         fun startActivity(context: Context) {
             val intent = Intent(context, EdgeDeploymentActivity::class.java)
@@ -425,6 +436,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         fun startActivity(context: Context, deploymentId: Int, requestCode: Int) {
             val intent = Intent(context, EdgeDeploymentActivity::class.java)
             intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
+            fromUnfinishedDeployment = true
             (context as Activity).startActivityForResult(intent, requestCode)
         }
     }
