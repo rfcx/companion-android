@@ -1,7 +1,7 @@
 package org.rfcx.companion.entity
 
 enum class Event(val id: String) {
-    LOGOUT ("logout"),
+    LOGOUT("logout"),
     CLICK_PIN("click_pin"),
     SEE_DETAIL("see_detail"),
     CONNECT_CREATE_DEPLOYMENT("connect_create_deployment"),
@@ -15,5 +15,24 @@ enum class Event(val id: String) {
     ADD_FEEDBACK_IMAGES("add_feedback_images"),
     SEARCH_LOCATION("search_location"),
     SELECT_LOCATION("select_location"),
-    EDIT_LOCATION("edit_location")
+    EDIT_LOCATION("edit_location"),
+    CHANGE_LOCATION("change_location "),
+    CHANGE_LOCATION_GROUP("change_location_group"),
+    SAVE_LOCATION("save_location"),
+    PLAY_TONE("play_tone"),
+    PLAY_TONE_COMPLETED("play_tone_completed"),
+    RETRY_PLAY_TONE("retry_play_tone"),
+    PLAY_SYNC_TONE("play_sync_tone"),
+    PLAY_SYNC_TONE_COMPLETED("play_sync_tone_completed"),
+    ADD_DEPLOYMENT_IMAGE("add_deployment_image"),
+    CREATE_AUDIOMOTH_DEPLOYMENT("create_audiomoth_deployment"),
+    SELECT_GUARDIAN_HOTSPOT ("select_guardian_hotspot"),
+    CONNECT_GUARDIAN_HOTSPOT("connect_guardian_hotspot"),
+    RETRY_GUARDIAN_HOTSPOT("retry_guardian_hotspot"),
+    CLICK_NEXT("click_next"),
+    REGISTER_GUARDIAN ("register_guardian"),
+    SELECT_GUARDIAN_PROFILE ("select_guardian_profile"),
+    CREATE_NEW_GUARDIAN_PROFILE("create_new_guardian_profile"),
+    SYNC_ADVANCED ("sync_advanced"),
+    CREATE_GUARDIAN_DEPLOYMENT ("create_guardian_deployment")
 }
