@@ -205,6 +205,13 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         existingRadioButton.isEnabled = !fromUnfinishedDeployment
         newLocationRadioButton.isEnabled = !fromUnfinishedDeployment
         locationNameSpinner.isEnabled = !fromUnfinishedDeployment
+        changeGroupTextView.isEnabled = !fromUnfinishedDeployment
+        if (fromUnfinishedDeployment) {
+            existingRadioButton.isClickable = false
+            existingRadioButton.alpha = 0.5f
+            newLocationRadioButton.alpha = 0.5f
+            changeGroupTextView.alpha = 0.5f
+        }
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
