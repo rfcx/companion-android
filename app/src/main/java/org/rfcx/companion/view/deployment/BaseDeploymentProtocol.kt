@@ -6,6 +6,8 @@ interface BaseDeploymentProtocol {
     fun startMapPicker(latitude: Double, longitude: Double, name: String)
     fun startCheckList()
 
+    fun isOpenedFromUnfinishedDeployment(): Boolean
+
     fun nextStep()
     fun backStep()
 

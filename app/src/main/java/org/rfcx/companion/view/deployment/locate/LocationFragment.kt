@@ -145,6 +145,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             it.setToolbarTitle()
         }
 
+        setViewFromDeploymentState()
+
         mapView = view.findViewById(R.id.mapBoxView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
@@ -196,6 +198,13 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             it.startMapPicker(latitude, longitude, name)
             it.hideToolbar()
         }
+    }
+
+    private fun setViewFromDeploymentState() {
+        val fromUnfinishedDeployment = deploymentProtocol?.isOpenedFromUnfinishedDeployment() ?: false
+        existingRadioButton.isEnabled = !fromUnfinishedDeployment
+        newLocationRadioButton.isEnabled = !fromUnfinishedDeployment
+        locationNameSpinner.isEnabled = !fromUnfinishedDeployment
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
