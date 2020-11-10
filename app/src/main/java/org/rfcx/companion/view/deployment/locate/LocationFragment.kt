@@ -402,6 +402,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     val latLng = it.getLatLng()
                     moveCamera(latLng, DEFAULT_ZOOM)
                     setLatLogLabel(latLng)
+                    group = it.locationGroup?.group
                     locationGroupValueTextView.text = it.locationGroup?.group
                     it.locationGroup?.color?.let { it1 -> setPinColorByGroup(it1) }
                 }
