@@ -225,6 +225,26 @@ class EdgeDeploymentDb(private val realm: Realm) {
                     }
                     edgeDeployment.location?.locationGroup = locationGroupObj
                 }
+
+                // do update location group
+                val location = if (edgeDeployment.serverId != null) {
+                    bgRealm.where(Locate::class.java)
+                        .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_SERVER_ID, edgeDeployment.serverId)
+                        .findFirst()
+                } else {
+                    bgRealm.where(Locate::class.java)
+                        .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_ID, id).findFirst()
+                }
+
+                if (location?.locationGroup != null) {
+                    val groupLocation = location.locationGroup
+                    if (groupLocation != null) {
+                        groupLocation.group =  locationGroup.group
+                        groupLocation.color = locationGroup.color
+                        groupLocation.serverId = locationGroup.serverId
+                        location.syncState = SyncState.Unsent.key
+                    }
+                }
             }
         }, {
             // success
