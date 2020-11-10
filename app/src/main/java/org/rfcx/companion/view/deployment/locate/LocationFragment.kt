@@ -43,14 +43,15 @@ import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.LocationGroups
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.localdb.LocateDb
+import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 
 class LocationFragment : Fragment(), OnMapReadyCallback {
-    private val locateDb by lazy {
-        LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
-    }
+    val realm: Realm = Realm.getInstance(RealmHelper.migrationConfig())
+    private val locationGroupDb = LocationGroupDb(realm)
+    private val locateDb by lazy { LocateDb(realm) }
 
     private var mapboxMap: MapboxMap? = null
     private lateinit var mapView: MapView
@@ -402,6 +403,16 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     val latLng = it.getLatLng()
                     moveCamera(latLng, DEFAULT_ZOOM)
                     setLatLogLabel(latLng)
+
+                    if (locationGroupDb.isExisted(it.locationGroup?.group)) {
+                        group = it.locationGroup?.group
+                        locationGroupValueTextView.text = it.locationGroup?.group
+                        it.locationGroup?.color?.let { it1 -> setPinColorByGroup(it1) }
+                    } else {
+                        group = getString(R.string.none)
+                        locationGroupValueTextView.text = getString(R.string.none)
+                        it.locationGroup?.color?.let { setPinColorByGroup("#2AA841") }
+                    }
                 }
             }
 
@@ -449,8 +460,14 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private fun changePinColorByGroup(group: String) {
         val locationGroup = deploymentProtocol?.getLocationGroup(group)
         val color = locationGroup?.color
+        if (color != null) {
+            setPinColorByGroup(color)
+        }
+    }
+
+    private fun setPinColorByGroup(color: String) {
         val pinDrawable = pinDeploymentImageView.drawable
-        if (color != null && color.isNotEmpty() && group != getString(R.string.none)) {
+        if (color.isNotEmpty() && group != getString(R.string.none)) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                 pinDrawable.setColorFilter(color.toColorInt(), PorterDuff.Mode.SRC_ATOP)
             } else {
