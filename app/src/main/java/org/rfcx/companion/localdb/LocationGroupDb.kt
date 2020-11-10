@@ -5,7 +5,7 @@ import io.realm.RealmResults
 import io.realm.Sort
 import io.realm.kotlin.deleteFromRealm
 import org.rfcx.companion.entity.*
-import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.LocationGroups.Companion.LOCATION_GROUPS_DELETE_AT
 import org.rfcx.companion.entity.response.LocationGroupsResponse
 import org.rfcx.companion.entity.response.toLocationGroups
 import java.util.*
@@ -63,7 +63,7 @@ class LocationGroupDb(private val realm: Realm) {
     }
 
     fun getLocationGroups(): List<LocationGroups> {
-        return realm.where(LocationGroups::class.java).findAll() ?: arrayListOf()
+        return realm.where(LocationGroups::class.java).isNull(LOCATION_GROUPS_DELETE_AT).findAll() ?: arrayListOf()
     }
 
     fun getAllResultsAsync(sort: Sort = Sort.DESCENDING): RealmResults<LocationGroups> {
