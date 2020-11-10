@@ -285,8 +285,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     features[index]?.let { setFeatureSelectState(it, true) }
                     val deploymentId =
                         selectedFeature.getStringProperty(PROPERTY_MARKER_DEPLOYMENT_ID).toInt()
+                    val deploymentDevice =
+                        selectedFeature.getStringProperty(PROPERTY_MARKER_DEVICE).toString()
                     (activity as MainActivityListener).showBottomSheet(
-                        DeploymentViewPagerFragment.newInstance(deploymentId)
+                        DeploymentViewPagerFragment.newInstance(deploymentId, deploymentDevice)
                     )
                     analytics?.trackClickPinEvent(Status.SUCCESS.id)
                 } else {

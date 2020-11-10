@@ -106,7 +106,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
     }
 
     private fun confirmationDialog() {
-        val builder = AlertDialog.Builder(this)
+        val builder = AlertDialog.Builder(this, R.style.DialogCustom)
         builder.setTitle(getString(R.string.delete_location))
         builder.setMessage(getString(R.string.are_you_sure_delete_location))
 

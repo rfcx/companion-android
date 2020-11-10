@@ -6,13 +6,15 @@ interface BaseDeploymentProtocol {
     fun startMapPicker(latitude: Double, longitude: Double, name: String)
     fun startCheckList()
 
+    fun isOpenedFromUnfinishedDeployment(): Boolean
+
     fun nextStep()
     fun backStep()
 
     fun getDeploymentLocation(): DeploymentLocation?
     fun getLocationGroup(name: String): LocationGroups?
 
-    fun setDeployLocation(locate: Locate)
+    fun setDeployLocation(locate: Locate, isExisted: Boolean)
     fun setImages(images: List<String>)
     fun setReadyToDeploy()
 

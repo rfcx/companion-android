@@ -22,6 +22,8 @@ import org.rfcx.companion.entity.LocationGroups
 import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.guardian.GuardianProfile
+import org.rfcx.companion.entity.socket.response.Signal
+import org.rfcx.companion.entity.socket.response.SignalResponse
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
@@ -61,6 +63,9 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private var _deployLocation: DeploymentLocation? = null
     private var _configuration: GuardianConfiguration? = null
     private var _images: List<String> = listOf()
+    private var _locate: Locate? = null
+
+    private var useExistedLocation: Boolean = false
 
     private var _sampleRate = 24000
 
@@ -73,6 +78,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private var currentCheck = 0
     private var currentCheckName = ""
     private var passedChecks = arrayListOf<Int>()
+
+    private var onDeployClicked = false
 
     private lateinit var wifiHotspotManager: WifiHotspotManager
 
@@ -147,6 +154,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         startFragment(GuardianCheckListFragment.newInstance())
     }
 
+    override fun isOpenedFromUnfinishedDeployment(): Boolean = false // guardian not have this feature so return false
+
     override fun getProfiles(): List<GuardianProfile> = _profiles
 
     override fun getProfile(): GuardianProfile? = _profile
@@ -171,9 +180,19 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         this._sampleRate = sampleRate
     }
 
+    override fun setOnDeployClicked() {
+        this.onDeployClicked = true
+    }
+
     override fun addRegisteredToPassedCheck() {
         if (1 !in passedChecks) {
             passedChecks.add(1)
+        }
+    }
+
+    override fun removeRegisteredOnPassedCheck() {
+        if (1 in passedChecks) {
+            passedChecks.remove(1)
         }
     }
 
@@ -210,13 +229,18 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         return locationGroupDb.getLocationGroup(name)
     }
 
-    override fun setDeployLocation(locate: Locate) {
+    override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
         val deployment = _deployment ?: GuardianDeployment()
         deployment.state = DeploymentState.Guardian.Locate.key // state
 
         this._deployLocation = locate.asDeploymentLocation()
         val deploymentId = deploymentDb.insertOrUpdateDeployment(deployment, _deployLocation!!)
-        locateDb.insertOrUpdateLocate(deploymentId, locate, true) // update locate - last deployment
+
+        useExistedLocation = isExisted
+        this._locate = locate
+        if (!useExistedLocation) {
+            locateDb.insertOrUpdateLocate(deploymentId, locate, true) // update locate - last deployment
+        }
 
         setDeployment(deployment)
     }
@@ -227,6 +251,12 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             it.deployedAt = Date()
             it.state = DeploymentState.Guardian.ReadyToUpload.key
             setDeployment(it)
+
+            if (useExistedLocation) {
+                this._locate?.let { locate ->
+                    locateDb.insertOrUpdateLocate(it.id, locate, true) // update locate - last deployment
+                }
+            }
 
             deploymentImageDb.insertImage(it, _images)
             deploymentDb.updateDeployment(it)
@@ -342,12 +372,14 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     override fun registerWifiConnectionLostListener() {
         wifiHotspotManager.registerWifiConnectionLost(object : WifiLostListener {
             override fun onLost() {
-                val wifiLostDialog: WifiLostDialogFragment =
-                    supportFragmentManager.findFragmentByTag(TAG_WIFI_LOST_DIALOG) as WifiLostDialogFragment?
-                        ?: run {
-                            WifiLostDialogFragment()
-                        }
-                wifiLostDialog.show(supportFragmentManager, TAG_WIFI_LOST_DIALOG)
+                if (!onDeployClicked) {
+                    val wifiLostDialog: WifiLostDialogFragment =
+                        supportFragmentManager.findFragmentByTag(TAG_WIFI_LOST_DIALOG) as WifiLostDialogFragment?
+                            ?: run {
+                                WifiLostDialogFragment()
+                            }
+                    wifiLostDialog.show(supportFragmentManager, TAG_WIFI_LOST_DIALOG)
+                }
             }
         })
     }

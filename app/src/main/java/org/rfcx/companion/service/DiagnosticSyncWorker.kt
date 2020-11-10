@@ -25,7 +25,6 @@ class DiagnosticSyncWorker(val context: Context, params: WorkerParameters) :
 
         diagnostic.forEach {
             Log.d(TAG, "doWork: sending id ${it.id}")
-
             if (it.serverId == null) {
                 val docRef = firestore.sendDiagnostic(it.toRequestBody())
                 if (docRef != null) {

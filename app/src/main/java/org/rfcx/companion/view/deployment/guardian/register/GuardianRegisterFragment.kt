@@ -14,6 +14,7 @@ import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.socket.response.Status
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
+import java.net.Socket
 
 class GuardianRegisterFragment : Fragment() {
 
@@ -42,6 +43,7 @@ class GuardianRegisterFragment : Fragment() {
             it.setToolbarTitle()
         }
 
+        SocketManager.resetRegisterResult()
         isGuardianRegistered()
 
         registerGuardianButton.setOnClickListener {

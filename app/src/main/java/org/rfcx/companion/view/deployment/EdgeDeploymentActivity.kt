@@ -48,6 +48,9 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     private var _deployLocation: DeploymentLocation? = null
     private var _images: List<String> = listOf()
     private var _deployLocationGroup: LocationGroup? = null
+    private var _locate: Locate? = null
+
+    private var useExistedLocation: Boolean = false
 
     private var audioMothConnector = AudioMothChimeConnector()
     private var calendar = Calendar.getInstance()
@@ -95,6 +98,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     override fun openWithGuardianDevice() {
         GuardianDeploymentActivity.startActivity(this)
         finish()
+    }
+
+    override fun isOpenedFromUnfinishedDeployment(): Boolean {
+        return fromUnfinishedDeployment
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -172,13 +179,19 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
-    override fun setDeployLocation(locate: Locate) {
+    override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
         val deployment = _deployment ?: EdgeDeployment()
         deployment.state = DeploymentState.Edge.Locate.key // state
 
         this._deployLocation = locate.asDeploymentLocation()
         val deploymentId = deploymentDb.insertOrUpdate(deployment, _deployLocation!!)
-        locateDb.insertOrUpdateLocate(deploymentId, locate) // update locate - last deployment
+
+        useExistedLocation = isExisted
+        this._locate = locate
+        if (!useExistedLocation) {
+            locateDb.insertOrUpdateLocate(deploymentId, locate) // update locate - last deployment
+        }
+
         setDeployment(deployment)
     }
 
@@ -203,6 +216,12 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             it.updatedAt = Date()
             it.state = DeploymentState.Edge.ReadyToUpload.key
             setDeployment(it)
+
+            if (useExistedLocation) {
+                this._locate?.let { locate ->
+                    locateDb.insertOrUpdateLocate(it.id, locate) // update locate - last deployment
+                }
+            }
 
             saveImages(it)
             deploymentDb.updateDeployment(it)
@@ -392,9 +411,16 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         return false
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        fromUnfinishedDeployment = false
+    }
+
     companion object {
         const val loadingDialogTag = "LoadingDialog"
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
+
+        private var fromUnfinishedDeployment = false
 
         fun startActivity(context: Context) {
             val intent = Intent(context, EdgeDeploymentActivity::class.java)
@@ -410,6 +436,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         fun startActivity(context: Context, deploymentId: Int, requestCode: Int) {
             val intent = Intent(context, EdgeDeploymentActivity::class.java)
             intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
+            fromUnfinishedDeployment = true
             (context as Activity).startActivityForResult(intent, requestCode)
         }
     }

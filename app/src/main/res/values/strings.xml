@@ -53,7 +53,7 @@
     <string name="switch_to_custom">Move switch to \"CUSTOM\" while initial tone is playing</string>
     <string name="solid_red_flashing_green">Do you see a solid red LED and flashing green LED?</string>
     <string name="ready_to_sync">You are ready to sync your device</string>
-    <string name="flashing_red">Did you see the flashing red LED on completion?</string>
+    <string name="solid_green">Did you see the solid green LED on completion?</string>
     <string name="play_initial_tone">play initial tone</string>
     <string name="play_sync_tone">play sync tone</string>
 
@@ -132,6 +132,7 @@
     <string name="select_a_color">Select a color</string>
     <string name="missing_name_group">Missing name group</string>
     <string name="none">None</string>
+    <string name="group_already_exists">The group already exists</string>
 
     <string name="dd_coordinates">DD</string>
     <string name="ddm_coordinates">DDM</string>
@@ -287,6 +288,7 @@
     <string name="signal_text_4">Signal Strength is Excellent</string>
     <string name="signal_value">%d dBm</string>
     <string name="signal_sim_card">The Guardian does not have a SIM card inserted.\nPlease insert a SIM card.</string>
+    <string name="signal_lost">WiFi hotspot connection lost.\nPlease try again.</string>
 
     <!-- Search Location -->
     <string name="search_box_hint">Search here</string>
@@ -317,6 +319,7 @@
     <string name="choose_color">Choose spectrogram color</string>
     <string name="choose_play_back">Choose audio playback</string>
     <string name="play_back">Playback</string>
+    <string name="mic_recorder_warn">Recorder service is not started yet.\nPlease try again later.</string>
 
     <!-- GuardianCheckinTestFragment -->
     <string name="testing_guardian_checkin">Guardian CheckIn Test</string>
@@ -348,6 +351,9 @@
     <!-- GuardianCheckListFragment -->
     <string name="setting_up_checklist">Guardian Setup Checklist:</string>
     <string name="deploy">Deploy</string>
+    <string name="wifi_notification_title">Do you want to disable Guardian\'s WiFi after deployed?</string>
+    <string name="notification_yes">Yes</string>
+    <string name="notification_no">No</string>
 
     <!-- ConnectInstructionDiaglogFragment -->
     <string name="got_it">Got It</string>

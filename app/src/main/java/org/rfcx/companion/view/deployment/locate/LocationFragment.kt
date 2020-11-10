@@ -43,14 +43,15 @@ import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.LocationGroups
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.localdb.LocateDb
+import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 
 class LocationFragment : Fragment(), OnMapReadyCallback {
-    private val locateDb by lazy {
-        LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
-    }
+    val realm: Realm = Realm.getInstance(RealmHelper.migrationConfig())
+    private val locationGroupDb = LocationGroupDb(realm)
+    private val locateDb by lazy { LocateDb(realm) }
 
     private var mapboxMap: MapboxMap? = null
     private lateinit var mapView: MapView
@@ -145,6 +146,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             it.setToolbarTitle()
         }
 
+        setViewFromDeploymentState()
+
         mapView = view.findViewById(R.id.mapBoxView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
@@ -198,6 +201,20 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    private fun setViewFromDeploymentState() {
+        val fromUnfinishedDeployment = deploymentProtocol?.isOpenedFromUnfinishedDeployment() ?: false
+        existingRadioButton.isEnabled = !fromUnfinishedDeployment
+        newLocationRadioButton.isEnabled = !fromUnfinishedDeployment
+        locationNameSpinner.isEnabled = !fromUnfinishedDeployment
+        changeGroupTextView.isEnabled = !fromUnfinishedDeployment
+        if (fromUnfinishedDeployment) {
+            existingRadioButton.isClickable = false
+            existingRadioButton.alpha = 0.5f
+            newLocationRadioButton.alpha = 0.5f
+            changeGroupTextView.alpha = 0.5f
+        }
+    }
+
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
         mapboxMap.uiSettings.setAllGesturesEnabled(false)
@@ -230,7 +247,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     longitude = it.longitude,
                     locationGroup = getLocationGroup()
                 )
-                deploymentProtocol?.setDeployLocation(locate)
+                deploymentProtocol?.setDeployLocation(locate, false)
                 deploymentProtocol?.nextStep()
             }
         } else {
@@ -259,7 +276,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 it.lastGuardianDeploymentServerId,
                 it.syncState
             )
-            deploymentProtocol?.setDeployLocation(locate)
+            deploymentProtocol?.setDeployLocation(locate, true)
             deploymentProtocol?.nextStep()
         }
     }
@@ -402,6 +419,16 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     val latLng = it.getLatLng()
                     moveCamera(latLng, DEFAULT_ZOOM)
                     setLatLogLabel(latLng)
+
+                    if (locationGroupDb.isExisted(it.locationGroup?.group)) {
+                        group = it.locationGroup?.group
+                        locationGroupValueTextView.text = it.locationGroup?.group
+                        it.locationGroup?.color?.let { it1 -> setPinColorByGroup(it1) }
+                    } else {
+                        group = getString(R.string.none)
+                        locationGroupValueTextView.text = getString(R.string.none)
+                        it.locationGroup?.color?.let { setPinColorByGroup("#2AA841") }
+                    }
                 }
             }
 
@@ -449,8 +476,14 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private fun changePinColorByGroup(group: String) {
         val locationGroup = deploymentProtocol?.getLocationGroup(group)
         val color = locationGroup?.color
+        if (color != null) {
+            setPinColorByGroup(color)
+        }
+    }
+
+    private fun setPinColorByGroup(color: String) {
         val pinDrawable = pinDeploymentImageView.drawable
-        if (color != null && color.isNotEmpty() && group != getString(R.string.none)) {
+        if (color.isNotEmpty() && group != getString(R.string.none)) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                 pinDrawable.setColorFilter(color.toColorInt(), PorterDuff.Mode.SRC_ATOP)
             } else {
