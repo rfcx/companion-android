@@ -46,14 +46,16 @@
 
     <!--  SyncFragment -->
     <string name="sync">Sync</string>
-    <string name="no_retry">No, Retry</string>
+    <string name="no_retry">TRY AGAIN</string>
     <string name="yes">Yes</string>
+    <string name="ok_complete">OK, COMPLETE</string>
     <string name="ready_send_configuration">Ready to sync tone to the device</string>
     <string name="switch_to_off">Switch device to \"OFF\" and place near your phone</string>
     <string name="switch_to_custom">Move switch to \"CUSTOM\" while initial tone is playing</string>
     <string name="solid_red_flashing_green">Do you see a solid red LED and flashing green LED?</string>
     <string name="ready_to_sync">You are ready to sync your device</string>
-    <string name="solid_green">Did you see the solid green LED on completion?</string>
+    <string name="the_end">At the end of the tone you should \nhave seen the solid green LED for 1 second</string>
+    <string name="should_see">Now you should see either flashing \nred (recording) or flashing green (sleeping)</string>
     <string name="play_initial_tone">play initial tone</string>
     <string name="play_sync_tone">play sync tone</string>
 
