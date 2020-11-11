@@ -67,6 +67,7 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
         connectGuardianButton.setOnClickListener {
             showLoading()
             retryCountdown(CONNECT)
+            analytics?.trackConnectGuardianHotspotEvent()
             guardianHotspot?.let {
                 if (WifiHotspotUtils.isConnectedWithGuardian(requireContext(), it.SSID)) {
                     checkConnection()
@@ -86,7 +87,6 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
         }
 
         connectInstructionText.setOnClickListener {
-            analytics?.trackConnectGuardianHotspotEvent()
             deploymentProtocol?.showConnectInstruction()
         }
     }
