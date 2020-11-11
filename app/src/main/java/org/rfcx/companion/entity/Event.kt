@@ -16,7 +16,7 @@ enum class Event(val id: String) {
     SEARCH_LOCATION("search_location"),
     SELECT_LOCATION("select_location"),
     EDIT_LOCATION("edit_location"),
-    CHANGE_LOCATION("change_location "),
+    CHANGE_LOCATION("change_location"),
     CHANGE_LOCATION_GROUP("change_location_group"),
     SAVE_LOCATION("save_location"),
     PLAY_TONE("play_tone"),

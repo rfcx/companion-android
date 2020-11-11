@@ -8,10 +8,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_deploy.*
 import org.rfcx.companion.R
+import org.rfcx.companion.util.Analytics
 
 class DeployFragment : BaseImageFragment() {
 
     private var edgeDeploymentProtocol: EdgeDeploymentProtocol? = null
+    private val analytics by lazy { context?.let { Analytics(it) } }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -38,6 +40,9 @@ class DeployFragment : BaseImageFragment() {
         setupImageRecycler()
         finishButton.setOnClickListener {
             val images = imageAdapter.getNewAttachImage()
+            if(images.isNotEmpty()) {
+                analytics?.trackAddDeploymentImageEvent()
+            }
             edgeDeploymentProtocol?.setImages(images)
             edgeDeploymentProtocol?.nextStep()
         }

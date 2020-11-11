@@ -232,6 +232,11 @@ class FeedbackActivity : AppCompatActivity() {
                 val intent = Intent()
                 setResult(ProfileFragment.RESULT_CODE, intent)
                 analytics.trackSendFeedbackEvent(Status.SUCCESS.id)
+
+                if(pathListArray != null){
+                    analytics.trackAddFeedbackImagesEvent()
+                }
+
                 finish()
             } else {
                 feedbackGroupView.visibility = View.VISIBLE

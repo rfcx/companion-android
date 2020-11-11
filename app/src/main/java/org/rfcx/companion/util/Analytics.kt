@@ -112,9 +112,108 @@ class Analytics(context: Context) {
         trackEvent(Event.EDIT_LOCATION.id, bundle)
     }
 
+    fun trackChangeLocationEvent(page: String) {
+        val bundle = Bundle()
+        bundle.putString(FROM_PAGE, page)
+        trackEvent(Event.CHANGE_LOCATION.id, bundle)
+    }
+
+    fun trackChangeLocationGroupEvent(page: String) {
+        val bundle = Bundle()
+        bundle.putString(FROM_PAGE, page)
+        trackEvent(Event.CHANGE_LOCATION_GROUP.id, bundle)
+    }
+
+    fun trackSaveLocationEvent(page: String) {
+        val bundle = Bundle()
+        bundle.putString(FROM_PAGE, page)
+        trackEvent(Event.SAVE_LOCATION.id, bundle)
+    }
+
+    fun trackPlayToneEvent() {
+        val bundle = Bundle()
+        trackEvent(Event.PLAY_TONE.id, bundle)
+    }
+
+    fun trackPlayToneCompletedEvent() {
+        val bundle = Bundle()
+        trackEvent(Event.PLAY_TONE_COMPLETED.id, bundle)
+    }
+
+    fun trackRetryPlayToneEvent() {
+        val bundle = Bundle()
+        trackEvent(Event.RETRY_PLAY_TONE.id, bundle)
+    }
+
+    fun trackPlaySyncToneEvent() {
+        val bundle = Bundle()
+        trackEvent(Event.PLAY_SYNC_TONE.id, bundle)
+    }
+
+    fun trackPlaySyncToneCompletedEvent() {
+        val bundle = Bundle()
+        trackEvent(Event.PLAY_SYNC_TONE_COMPLETED.id, bundle)
+    }
+
+    fun trackAddDeploymentImageEvent() {
+        val bundle = Bundle()
+        trackEvent(Event.ADD_DEPLOYMENT_IMAGE.id, bundle)
+    }
+
+    fun trackCreateAudiomothDeploymentEvent() {
+        val bundle = Bundle()
+        trackEvent(Event.CREATE_AUDIOMOTH_DEPLOYMENT.id, bundle)
+    }
+
+    fun trackSelectGuardianHotspotEvent() {
+        val bundle = Bundle()
+        trackEvent(Event.SELECT_GUARDIAN_HOTSPOT.id, bundle)
+    }
+
+    fun trackConnectGuardianHotspotEvent() {
+        val bundle = Bundle()
+        trackEvent(Event.CONNECT_GUARDIAN_HOTSPOT.id, bundle)
+    }
+
+    fun trackRetryGuardianHotspotEvent() {
+        val bundle = Bundle()
+        trackEvent(Event.RETRY_GUARDIAN_HOTSPOT.id, bundle)
+    }
+
+    fun trackClickNextEvent() {
+        val bundle = Bundle()
+        trackEvent(Event.CLICK_NEXT.id, bundle)
+    }
+
+    fun trackRegisterGuardianEvent() {
+        val bundle = Bundle()
+        trackEvent(Event.REGISTER_GUARDIAN.id, bundle)
+    }
+
+    fun trackSelectGuardianProfileEvent() {
+        val bundle = Bundle()
+        trackEvent(Event.SELECT_GUARDIAN_PROFILE.id, bundle)
+    }
+
+    fun trackCreateNewGuardianProfileEvent() {
+        val bundle = Bundle()
+        trackEvent(Event.CREATE_NEW_GUARDIAN_PROFILE.id, bundle)
+    }
+
+    fun trackSyncAdvancedEvent() {
+        val bundle = Bundle()
+        trackEvent(Event.SYNC_ADVANCED.id, bundle)
+    }
+
+    fun trackCreateGuardianDeploymentEvent() {
+        val bundle = Bundle()
+        trackEvent(Event.CREATE_GUARDIAN_DEPLOYMENT.id, bundle)
+    }
+
     companion object {
         const val USER_UID = "user_uid"
         const val LOGIN_TYPE = "login_type"
         const val STATUS = "status"
+        const val FROM_PAGE = "from_page"
     }
 }
