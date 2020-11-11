@@ -50,11 +50,13 @@ class GuardianSelectProfileFragment : Fragment(), (GuardianProfile) -> Unit {
 
     // @{ProfilesAdapter.itemClickListener}
     override fun invoke(profile: GuardianProfile) {
+        analytics?.trackSelectGuardianProfileEvent()
         deploymentProtocol?.startSetupConfigure(profile)
     }
 
     private fun setupView() {
         createNewButton.setOnClickListener {
+            analytics?.trackCreateNewGuardianProfileEvent()
             deploymentProtocol?.startSetupConfigure(GuardianProfile.default()) // new profile
         }
 

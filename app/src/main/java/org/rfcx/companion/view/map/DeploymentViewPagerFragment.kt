@@ -18,10 +18,12 @@ import org.rfcx.companion.DeploymentListener
 import org.rfcx.companion.MainActivity
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.DeploymentState
+import org.rfcx.companion.entity.Status
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
+import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.WifiHotspotUtils
 import org.rfcx.companion.view.deployment.EdgeDeploymentActivity
@@ -46,6 +48,7 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
     private var edgeDeploymentViewId: Int? = null
     private var locateId: Int? = null
     private lateinit var deleteDialog: BottomSheetDialog
+    private val analytics by lazy { context?.let { Analytics(it) } }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -89,12 +92,14 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
             val isReadyToUpload = edgeDeploymentView.state == DeploymentState.Edge.ReadyToUpload.key
             if (isReadyToUpload) {
                 DeploymentDetailActivity.startActivity(it, edgeDeploymentView.id)
+                analytics?.trackSeeDetailEvent()
             } else {
                 EdgeDeploymentActivity.startActivity(
                     it,
                     edgeDeploymentView.id,
                     MainActivity.CREATE_DEPLOYMENT_REQUEST_CODE
                 )
+                analytics?.trackConnectCreateDeploymentEvent()
             }
         }
     }
@@ -127,9 +132,11 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
             locateDb.deleteLocate(locateId!!)
             edgeDeploymentDb.deleteDeployment(edgeDeploymentViewId!!)
             deleteDialog.dismiss()
+            analytics?.trackDeleteDeploymentEvent(Status.SUCCESS.id)
         } else {
             Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT).show()
             deleteDialog.dismiss()
+            analytics?.trackDeleteDeploymentEvent(Status.FAILURE.id)
         }
     }
 

@@ -161,6 +161,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
 
         finishButton.setOnClickListener {
+            analytics?.trackSaveLocationEvent(Screen.LOCATION.id)
             if (existingRadioButton.isChecked) {
                 handleExistLocate()
             } else if (newLocationRadioButton.isChecked) {
@@ -172,6 +173,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         changeTextView.setOnClickListener {
             val name = locationNameEditText.text.toString()
             startMapPicker(name)
+            analytics?.trackChangeLocationEvent(Screen.LOCATION.id)
         }
 
         changeGroupTextView.setOnClickListener {
@@ -184,6 +186,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     Screen.LOCATION.id,
                     LOCATION_REQUEST_CODE
                 )
+                analytics?.trackChangeLocationGroupEvent(Screen.LOCATION.id)
             }
         }
 
@@ -191,6 +194,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             if (newLocationRadioButton.isChecked) {
                 val name = locationNameEditText.text.toString()
                 startMapPicker(name)
+                analytics?.trackChangeLocationEvent(Screen.LOCATION.id)
             }
         }
     }

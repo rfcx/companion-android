@@ -44,6 +44,7 @@ class CoordinatesActivity : AppCompatActivity() {
     }
 
     private fun showChecker(format: String) {
+        analytics.trackChangeCoordinatesEvent(format)
         when (format) {
             DD_FORMAT -> {
                 checkDDImageView.visibility = View.VISIBLE

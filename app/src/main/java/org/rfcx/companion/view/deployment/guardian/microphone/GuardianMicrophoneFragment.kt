@@ -106,6 +106,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         }
 
         finishButton.setOnClickListener {
+            analytics?.trackClickNextEvent(Screen.GUARDIAN_MICROPHONE.id)
             deploymentProtocol?.nextStep()
         }
     }

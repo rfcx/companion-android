@@ -30,6 +30,7 @@ import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentImageDb
 import org.rfcx.companion.localdb.guardian.GuardianProfileDb
 import org.rfcx.companion.service.GuardianDeploymentSyncWorker
+import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.view.deployment.guardian.advanced.GuardianAdvancedFragment
 import org.rfcx.companion.view.deployment.guardian.checkin.GuardianCheckInTestFragment
@@ -82,6 +83,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private var onDeployClicked = false
 
     private lateinit var wifiHotspotManager: WifiHotspotManager
+    private val analytics by lazy { Analytics(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -260,6 +262,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
             deploymentImageDb.insertImage(it, _images)
             deploymentDb.updateDeployment(it)
+            analytics.trackCreateGuardianDeploymentEvent()
 
             GuardianDeploymentSyncWorker.enqueue(this@GuardianDeploymentActivity)
             showComplete()

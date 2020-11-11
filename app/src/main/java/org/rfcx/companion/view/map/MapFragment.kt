@@ -290,6 +290,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     (activity as MainActivityListener).showBottomSheet(
                         DeploymentViewPagerFragment.newInstance(deploymentId, deploymentDevice)
                     )
+                    analytics?.trackClickPinEvent()
                 } else {
                     features[index]?.let { setFeatureSelectState(it, false) }
                 }

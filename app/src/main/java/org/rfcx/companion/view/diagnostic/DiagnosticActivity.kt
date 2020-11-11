@@ -214,6 +214,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
             location?.let { locate ->
                 val group = locate.locationGroup?.group ?: getString(R.string.none)
                 val isGroupExisted = locationGroupDb.isExisted(locate.locationGroup?.group)
+                analytics.trackEditLocationEvent()
                 EditLocationActivity.startActivity(
                     this,
                     locate.latitude,

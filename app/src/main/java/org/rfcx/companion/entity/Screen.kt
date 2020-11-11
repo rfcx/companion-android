@@ -8,6 +8,7 @@ enum class Screen(val id: String) {
     FEEDBACK("Feedback"),
     CHOOSE_DEVICE("Choose Device"),
     LOCATION("Location"),
+    SYNC("Sync"),
     EDGE_DETAIL("Edge Detail"),
     MAP_PICKER("Map Picker"),
     EDIT_LOCATION("Edit Location"),
@@ -21,5 +22,6 @@ enum class Screen(val id: String) {
     GUARDIAN_SOLAR_PANEL("Guardian Solar Panel"),
     GUARDIAN_CHECKIN_TEST("Guardian CheckIn Test"),
     GUARDIAN_DEPLOY("Guardian Deploy"),
+    GUARDIAN_ADVANCED("Guardian Advanced"),
     GUARDIAN_DIAGNOSTIC("Guardian Diagnostic")
 }

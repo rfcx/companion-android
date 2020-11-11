@@ -93,6 +93,7 @@ class GuardianConfigureFragment : Fragment() {
 
     private fun setNextOnClick() {
         nextButton.setOnClickListener {
+            analytics?.trackClickNextEvent(Screen.GUARDIAN_CONFIGURE.id)
             setNextButton(false)
             syncConfig()
             updateProfile()
