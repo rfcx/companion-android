@@ -24,10 +24,7 @@ import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_deployment_detail.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
-import org.rfcx.companion.entity.DeploymentImage
-import org.rfcx.companion.entity.Device
-import org.rfcx.companion.entity.EdgeDeployment
-import org.rfcx.companion.entity.toLocationGroup
+import org.rfcx.companion.entity.*
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.EdgeDeploymentDb
@@ -112,6 +109,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
 
         builder.setPositiveButton(getString(R.string.delete)) { _, _ ->
             onDeleteLocation()
+            analytics.trackDeleteDeploymentEvent(Status.SUCCESS.id)
         }
         builder.setNegativeButton(getString(R.string.cancel)) { _, _ -> }
 

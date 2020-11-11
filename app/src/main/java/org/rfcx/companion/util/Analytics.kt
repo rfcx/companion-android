@@ -36,9 +36,8 @@ class Analytics(context: Context) {
         trackEvent(Event.LOGOUT.id, bundle)
     }
 
-    fun trackClickPinEvent(status: String) {
+    fun trackClickPinEvent() {
         val bundle = Bundle()
-        bundle.putString(STATUS, status)
         trackEvent(Event.CLICK_PIN.id, bundle)
     }
 
