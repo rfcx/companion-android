@@ -5,6 +5,7 @@ import io.realm.RealmList
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
+import org.rfcx.companion.util.randomDeploymentId
 import org.rfcx.companion.util.randomDeploymentIdOnlyNumber
 import java.util.*
 
@@ -14,7 +15,7 @@ open class EdgeDeployment(
     var id: Int = 0,
     var serverId: String? = null,
     var deployedAt: Date = Date(),
-    var deploymentId: String? = randomDeploymentIdOnlyNumber(), // random when edge
+    var deploymentId: String? = randomDeploymentId(), // random when edge
     @Expose(serialize = false)
     var state: Int = 0, // 1 = Locate, 2 = Config, 3 = Deploy, 4 = Ready To Upload
     var location: DeploymentLocation? = null,
