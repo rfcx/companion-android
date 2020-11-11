@@ -204,6 +204,7 @@
                 android:text="@string/change"
                 android:textSize="@dimen/text_small"
                 android:textAllCaps="true"
+                android:visibility="invisible"
                 android:textColor="@color/colorPrimary"
                 app:layout_constraintBottom_toBottomOf="@id/locationGroupValueTextView"
                 app:layout_constraintEnd_toEndOf="parent"

@@ -297,11 +297,13 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             when (checkedId) {
                 R.id.newLocationRadioButton -> {
                     changeTextView.visibility = View.VISIBLE
+                    changeGroupTextView.visibility = View.VISIBLE
                     onPressedNewLocation()
                 }
 
                 R.id.existingRadioButton -> {
                     changeTextView.visibility = View.GONE
+                    changeGroupTextView.visibility = View.GONE
                     onPressedExisting()
                 }
             }
