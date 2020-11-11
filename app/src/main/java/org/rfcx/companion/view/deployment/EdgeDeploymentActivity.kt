@@ -281,7 +281,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     override fun playSyncSound() {
         val deploymentId = getDeployment()?.deploymentId
-        val deploymentIdArrayInt = deploymentId?.map { it.toInt() }?.toTypedArray() ?: arrayOf()
+        val deploymentIdArrayInt = deploymentId?.chunked(2)?.map { it.toInt(radix = 16) }?.toTypedArray() ?: arrayOf()
         Thread {
             audioMothConnector.playTimeAndDeploymentID(
                 calendar,
