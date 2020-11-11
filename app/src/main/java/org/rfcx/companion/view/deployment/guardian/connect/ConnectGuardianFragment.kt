@@ -77,6 +77,7 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
         }
 
         retryGuardianButton.setOnClickListener {
+            analytics?.trackRetryGuardianHotspotEvent()
             showLoading()
             hideRetry()
             hideNotFound()
@@ -85,11 +86,13 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
         }
 
         connectInstructionText.setOnClickListener {
+            analytics?.trackConnectGuardianHotspotEvent()
             deploymentProtocol?.showConnectInstruction()
         }
     }
 
     override fun invoke(hotspot: ScanResult) {
+        analytics?.trackSelectGuardianHotspotEvent()
         guardianHotspot = hotspot
         enableConnectButton()
     }

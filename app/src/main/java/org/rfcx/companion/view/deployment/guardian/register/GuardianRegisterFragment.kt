@@ -47,10 +47,12 @@ class GuardianRegisterFragment : Fragment() {
         isGuardianRegistered()
 
         registerGuardianButton.setOnClickListener {
+            analytics?.trackRegisterGuardianEvent()
             registerGuardian()
         }
 
         registerFinishButton.setOnClickListener {
+            analytics?.trackClickNextEvent(Screen.GUARDIAN_REGISTER.id)
             deploymentProtocol?.nextStep()
         }
     }

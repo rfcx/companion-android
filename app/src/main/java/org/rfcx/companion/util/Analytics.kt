@@ -155,8 +155,9 @@ class Analytics(context: Context) {
         trackEvent(Event.PLAY_SYNC_TONE_COMPLETED.id, bundle)
     }
 
-    fun trackAddDeploymentImageEvent() {
+    fun trackAddDeploymentImageEvent(device: String) {
         val bundle = Bundle()
+        bundle.putString(DEVICE, device)
         trackEvent(Event.ADD_DEPLOYMENT_IMAGE.id, bundle)
     }
 
@@ -180,8 +181,9 @@ class Analytics(context: Context) {
         trackEvent(Event.RETRY_GUARDIAN_HOTSPOT.id, bundle)
     }
 
-    fun trackClickNextEvent() {
+    fun trackClickNextEvent(page: String) {
         val bundle = Bundle()
+        bundle.putString(FROM_PAGE, page)
         trackEvent(Event.CLICK_NEXT.id, bundle)
     }
 
@@ -200,11 +202,6 @@ class Analytics(context: Context) {
         trackEvent(Event.CREATE_NEW_GUARDIAN_PROFILE.id, bundle)
     }
 
-    fun trackSyncAdvancedEvent() {
-        val bundle = Bundle()
-        trackEvent(Event.SYNC_ADVANCED.id, bundle)
-    }
-
     fun trackCreateGuardianDeploymentEvent() {
         val bundle = Bundle()
         trackEvent(Event.CREATE_GUARDIAN_DEPLOYMENT.id, bundle)
@@ -215,5 +212,6 @@ class Analytics(context: Context) {
         const val LOGIN_TYPE = "login_type"
         const val STATUS = "status"
         const val FROM_PAGE = "from_page"
+        const val DEVICE = "device"
     }
 }

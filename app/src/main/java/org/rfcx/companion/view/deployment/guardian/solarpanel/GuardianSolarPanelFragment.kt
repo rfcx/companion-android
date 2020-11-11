@@ -59,6 +59,7 @@ class GuardianSolarPanelFragment : Fragment() {
         }
 
         solarFinishButton.setOnClickListener {
+            analytics?.trackClickNextEvent(Screen.GUARDIAN_SOLAR_PANEL.id)
             deploymentProtocol?.nextStep()
         }
 

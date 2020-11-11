@@ -33,6 +33,5 @@ enum class Event(val id: String) {
     REGISTER_GUARDIAN ("register_guardian"),
     SELECT_GUARDIAN_PROFILE ("select_guardian_profile"),
     CREATE_NEW_GUARDIAN_PROFILE("create_new_guardian_profile"),
-    SYNC_ADVANCED ("sync_advanced"),
     CREATE_GUARDIAN_DEPLOYMENT ("create_guardian_deployment")
 }

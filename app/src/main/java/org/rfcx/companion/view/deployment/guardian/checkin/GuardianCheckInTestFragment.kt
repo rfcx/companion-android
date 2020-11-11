@@ -43,6 +43,7 @@ class GuardianCheckInTestFragment : Fragment() {
         setCheckInTestView()
 
         checkInFinishButton.setOnClickListener {
+            analytics?.trackClickNextEvent(Screen.GUARDIAN_CHECKIN_TEST.id)
             deploymentProtocol?.nextStep()
         }
     }
