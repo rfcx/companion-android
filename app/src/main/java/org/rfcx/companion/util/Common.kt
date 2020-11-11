@@ -20,5 +20,5 @@ fun Context.getIntColor(res: Int): Int {
 
 private val chars = ('A'..'F') + ('0'..'9')
 private val numbers = (0..9)
-fun randomDeploymentId(): String = List(8) { chars.random() }.joinToString("")
+fun randomDeploymentId(): String = List(16) { chars.random() }.joinToString("")
 fun randomDeploymentIdOnlyNumber(): String = List(8) { numbers.random() }.joinToString("")
