@@ -25,6 +25,7 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.mapbox.android.core.location.*
 import com.mapbox.mapboxsdk.Mapbox
@@ -211,7 +212,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             existingRadioButton.isClickable = false
             existingRadioButton.alpha = 0.5f
             newLocationRadioButton.alpha = 0.5f
-            changeGroupTextView.alpha = 0.5f
+            changeGroupTextView.visibility = View.INVISIBLE
         }
     }
 
