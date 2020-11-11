@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_deploy.*
 import org.rfcx.companion.R
+import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.view.deployment.BaseImageFragment
@@ -38,6 +39,7 @@ class GuardianDeployFragment : BaseImageFragment() {
         setupImageRecycler()
 
         finishButton.setOnClickListener {
+            analytics?.trackAddDeploymentImageEvent(Device.GUARDIAN.value)
             val images = imageAdapter.getNewAttachImage()
             deploymentProtocol?.setImages(images)
             deploymentProtocol?.nextStep()

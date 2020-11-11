@@ -21,6 +21,7 @@ import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.toLocationGroup
 import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.service.LocationGroupSyncWorker
+import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.view.deployment.locate.SearchResultFragment
 import org.rfcx.companion.view.detail.EditLocationActivity.Companion.EXTRA_LOCATION_GROUP
@@ -35,6 +36,7 @@ class CreateNewGroupActivity : AppCompatActivity(), (ColorPickerItem, Int) -> Un
     private val colorPickerAdapter by lazy { ColorPickerAdapter(this) }
     private var colorPickerState = ArrayList<ColorPickerItem>()
     private var colorPickerList = listOf<String>()
+    private val analytics by lazy { Analytics(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +67,8 @@ class CreateNewGroupActivity : AppCompatActivity(), (ColorPickerItem, Int) -> Un
                 )
                 locationGroupDb.insertOrUpdateLocationGroup(group)
                 LocationGroupSyncWorker.enqueue(this)
+
+                analytics.trackSaveNewGroupEvent()
 
                 val intent = Intent()
                 intent.putExtra(EXTRA_LOCATION_GROUP, group.toLocationGroup())

@@ -14,6 +14,8 @@ import kotlinx.android.synthetic.main.fragment_initial_tone_playing.*
 import kotlinx.android.synthetic.main.fragment_play_sync_tone.*
 import kotlinx.android.synthetic.main.fragment_start_sync_process.*
 import org.rfcx.companion.R
+import org.rfcx.companion.entity.Screen
+import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.view.deployment.EdgeDeploymentProtocol
 
 class SyncFragment : Fragment() {
@@ -21,6 +23,7 @@ class SyncFragment : Fragment() {
     private var status: String? = null
     private lateinit var switchAnimation: AnimationDrawable
     private lateinit var flashingRedAnimation: AnimationDrawable
+    private val analytics by lazy { context?.let { Analytics(it) } }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -68,6 +71,7 @@ class SyncFragment : Fragment() {
 
     private fun startSyncProcess() {
         playToneButton.setOnClickListener {
+            analytics?.trackPlayToneEvent()
             edgeDeploymentProtocol?.playTone()
         }
     }
@@ -93,12 +97,14 @@ class SyncFragment : Fragment() {
         flashingRedAnimation.start()
 
         yesButton.setOnClickListener {
+            analytics?.trackPlayToneCompletedEvent()
             edgeDeploymentProtocol?.stopPlaySound()
             edgeDeploymentProtocol?.startSyncing(PLAY_SYNC_TONE)
 
         }
 
         noButton.setOnClickListener {
+            analytics?.trackRetryPlayToneEvent()
             edgeDeploymentProtocol?.stopPlaySound()
             edgeDeploymentProtocol?.startSyncing(START_SYNC)
         }
@@ -107,6 +113,7 @@ class SyncFragment : Fragment() {
     private fun playSyncTone() {
         playSyncToneButton.isSoundEffectsEnabled = false
         playSyncToneButton.setOnClickListener {
+            analytics?.trackPlaySyncToneEvent()
             edgeDeploymentProtocol?.playSyncSound()
             edgeDeploymentProtocol?.startSyncing(AFTER_PLAY_SYNC_TONE)
         }
@@ -114,11 +121,13 @@ class SyncFragment : Fragment() {
 
     private fun afterPlaySyncTone(view: View) {
         yesButton.setOnClickListener {
+            analytics?.trackPlaySyncToneCompletedEvent()
             edgeDeploymentProtocol?.stopPlaySound()
             edgeDeploymentProtocol?.nextStep()
         }
 
         noButton.setOnClickListener {
+            analytics?.trackRetryPlayToneEvent()
             edgeDeploymentProtocol?.stopPlaySound()
             edgeDeploymentProtocol?.startSyncing(START_SYNC)
         }
@@ -127,6 +136,11 @@ class SyncFragment : Fragment() {
     override fun onDetach() {
         super.onDetach()
         edgeDeploymentProtocol?.stopPlaySound()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        analytics?.trackScreen(Screen.SYNC)
     }
 
     companion object {

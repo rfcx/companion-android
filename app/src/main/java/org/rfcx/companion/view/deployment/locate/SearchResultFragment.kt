@@ -87,6 +87,7 @@ class SearchResultFragment : Fragment() {
                 if (response.isSuccessful && response.body() != null) {
                     val result = response.body()?.features()
                     showSearchResult(result)
+                    analytics?.trackSearchLocationEvent()
                 } else {
                     showSearchResult(null)
                 }

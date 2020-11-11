@@ -25,6 +25,8 @@ import kotlinx.android.synthetic.main.fragment_edit_location.locationNameEditTex
 import kotlinx.android.synthetic.main.fragment_edit_location.locationValueTextView
 import kotlinx.android.synthetic.main.fragment_edit_location.pinDeploymentImageView
 import org.rfcx.companion.R
+import org.rfcx.companion.entity.Screen
+import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.convertLatLngLabel
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 
@@ -35,6 +37,7 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     private var nameLocation: String? = null
+    private val analytics by lazy { context?.let { Analytics(it) } }
 
     private var editLocationActivityListener: EditLocationActivityListener? = null
 
@@ -70,10 +73,12 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
 
         changeButton.setOnClickListener {
             openMapPickerPage()
+            analytics?.trackChangeLocationEvent(Screen.EDIT_LOCATION.id)
         }
 
         viewMapBox.setOnClickListener {
             openMapPickerPage()
+            analytics?.trackChangeLocationEvent(Screen.EDIT_LOCATION.id)
         }
 
         saveButton.setOnClickListener {
@@ -84,11 +89,13 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
+                analytics?.trackSaveLocationEvent(Screen.EDIT_LOCATION.id)
                 editLocationActivityListener?.updateDeploymentDetail(locationNameEditText.text.toString())
             }
         }
 
         editGroupButton.setOnClickListener {
+            analytics?.trackChangeLocationGroupEvent(Screen.EDIT_LOCATION.id)
             editLocationActivityListener?.startLocationGroupPage()
         }
     }

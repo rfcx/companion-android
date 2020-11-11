@@ -13,9 +13,11 @@ import kotlinx.android.synthetic.main.fragment_location_group.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.LocationGroups
 import org.rfcx.companion.entity.Screen
+import org.rfcx.companion.entity.Status
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.service.LocationGroupSyncWorker
+import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.showCommonDialog
@@ -28,6 +30,7 @@ class LocationGroupFragment : Fragment(), LocationGroupListener {
     private var locationGroupProtocol: LocationGroupProtocol? = null
     private var selectedGroup: String? = null
     private var screen: String? = null
+    private val analytics by lazy { context?.let { Analytics(it) } }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -56,6 +59,7 @@ class LocationGroupFragment : Fragment(), LocationGroupListener {
         }
 
         locationGroupLinearLayout.setOnClickListener {
+            analytics?.trackCreateNewGroupEvent()
             locationGroupProtocol?.onCreateNewGroup()
         }
         locationGroupAdapter.selectedGroup = selectedGroup ?: getString(R.string.none)
@@ -93,9 +97,11 @@ class LocationGroupFragment : Fragment(), LocationGroupListener {
                         LocationGroupSyncWorker.enqueue(requireActivity())
                         locationGroupAdapter.removeGroup(group.id)
                         locationGroupAdapter.notifyDataSetChanged()
+                        analytics?.trackDeleteLocationGroupEvent(Status.SUCCESS.id)
                     }
                     override fun onFailure(errorMessage: String) {
                         requireActivity().showCommonDialog(errorMessage)
+                        analytics?.trackDeleteLocationGroupEvent(Status.FAILURE.id)
                     }
                 })
                 dialog.dismiss()

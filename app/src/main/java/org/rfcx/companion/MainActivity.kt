@@ -39,6 +39,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     private var _showDeployments: List<DeploymentDetailView> = listOf()
 
     private var addTooltip: SimpleTooltip? = null
+    private val analytics by lazy { Analytics(this) }
 
     override fun getShowDeployments(): List<DeploymentDetailView> = this._showDeployments
 
@@ -253,6 +254,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
 
     override fun onLogout() {
         this.logout()
+        analytics.trackLogoutEvent()
         finish()
     }
 

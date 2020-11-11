@@ -117,6 +117,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
         selectButton.setOnClickListener {
             val currentCameraPosition = mapboxMap?.cameraPosition?.target
             currentCameraPosition?.let {
+                analytics?.trackSelectLocationEvent()
                 mapPickerProtocol?.startLocationPage(it.latitude, it.longitude, nameLocation ?: "")
             }
         }

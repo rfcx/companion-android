@@ -19,6 +19,7 @@ import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.service.DeploymentSyncWorker
+import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.AudioMothChimeConnector
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
@@ -62,6 +63,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     private var currentCheck = 0
     private var currentCheckName = ""
     private var passedChecks = RealmList<Int>()
+    private val analytics by lazy { Analytics(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -225,6 +227,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
             saveImages(it)
             deploymentDb.updateDeployment(it)
+            analytics.trackCreateAudiomothDeploymentEvent()
 
             DeploymentSyncWorker.enqueue(this@EdgeDeploymentActivity)
             hideLoading()

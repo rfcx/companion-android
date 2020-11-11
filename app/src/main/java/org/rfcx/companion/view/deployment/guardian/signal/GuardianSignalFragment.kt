@@ -55,6 +55,7 @@ class GuardianSignalFragment : Fragment() {
         retrieveGuardianSignal()
 
         finishButton.setOnClickListener {
+            analytics?.trackClickNextEvent(Screen.GUARDIAN_SIGNAL.id)
             deploymentProtocol?.nextStep()
         }
     }
