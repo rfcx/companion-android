@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
+import org.rfcx.companion.util.randomLocationGroup
 import java.util.*
 
 @RealmClass
@@ -12,7 +13,7 @@ open class LocationGroups(
     var id: Int = 0,
     var name: String = "None",
     var color: String = "",
-    var serverId: String? = null,
+    var serverId: String? = randomLocationGroup(),
     @Expose(serialize = false)
     var syncState: Int = 0,
     var deletedAt: Date? = null
