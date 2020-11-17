@@ -4,8 +4,8 @@ import org.rfcx.companion.entity.LocationGroups
 import java.util.*
 
 data class EdgeGroupRequest(
-    var name: String = "",
-    var color: String = "",
+    var name: String? = null,
+    var color: String? = null,
     val deletedAt: Date? = null
 )
 

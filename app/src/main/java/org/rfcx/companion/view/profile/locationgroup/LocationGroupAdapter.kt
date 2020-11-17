@@ -35,7 +35,7 @@ class LocationGroupAdapter(private val locationGroupListener: LocationGroupListe
     override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: LocationGroupAdapterViewHolder, position: Int) {
-        holder.bind(items[position].name)
+        holder.bind(items[position].name ?: holder.itemView.context.getString(R.string.none))
         holder.itemView.setOnClickListener {
             locationGroupListener.onClicked(items[position])
         }

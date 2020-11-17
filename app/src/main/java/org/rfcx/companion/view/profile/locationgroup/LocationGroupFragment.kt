@@ -92,7 +92,7 @@ class LocationGroupFragment : Fragment(), LocationGroupListener {
                 locationGroupDb.deleteLocationGroup(group.id, object : DatabaseCallback {
                     override fun onSuccess() {
                         if(group.name == groupName) {
-                            preferences.putString(Preferences.GROUP, getString(R.string.none))
+                            preferences?.putString(Preferences.GROUP, getString(R.string.none))
                         }
                         LocationGroupSyncWorker.enqueue(requireActivity())
                         locationGroupAdapter.removeGroup(group.id)
