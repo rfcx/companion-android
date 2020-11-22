@@ -4,8 +4,7 @@
  * June 2020
  *****************************************************************************/
 
-package info.openacousticdevices.audiomothchime
-
+package org.rfcx.companion.util
 import java.util.*
 
 class AudioMothChimeConnector {
@@ -187,6 +186,10 @@ class AudioMothChimeConnector {
             )
         )
 
+    }
+
+    fun stopPlay() {
+        audioMothChime.stop()
     }
 
 }

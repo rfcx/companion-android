@@ -4,8 +4,7 @@
  * June 2020
  *****************************************************************************/
 
-package info.openacousticdevices.audiomothchime
-
+package org.rfcx.companion.util
 import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioManager
@@ -45,6 +44,8 @@ class AudioMothChime {
 
     private val MIN_TONE_DURATION: Int = 500
     private val MAX_TONE_DURATION: Int = 60000
+
+    private var player: AudioTrack? = null
 
     /* Note parsing constants */
 
@@ -622,7 +623,7 @@ class AudioMothChime {
             AudioFormat.ENCODING_PCM_16BIT
         )
 
-        val player = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        player = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             AudioTrack.Builder()
                 .setAudioAttributes(
                     AudioAttributes.Builder()
@@ -687,9 +688,9 @@ class AudioMothChime {
 
         println("AUDIOMOTH CHIME: Start")
 
-        player.play()
+        player?.play()
 
-        player.write(buffer, 0, waveform.size)
+        player?.write(buffer, 0, waveform.size)
 
         println("AUDIOMOTH CHIME: Done")
 
@@ -707,6 +708,12 @@ class AudioMothChime {
 
         play(sendTime, null, byteArray, noteArray)
 
+    }
+
+    fun stop() {
+        player?.stop()
+        player?.release()
+        player = null
     }
 
 }
