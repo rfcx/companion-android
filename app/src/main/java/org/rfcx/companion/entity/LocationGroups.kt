@@ -13,7 +13,7 @@ open class LocationGroups(
     var id: Int = 0,
     var name: String? = null,
     var color: String? = null,
-    var serverId: String? = randomLocationGroup(),
+    var serverId: String? = null,
     @Expose(serialize = false)
     var syncState: Int = 0,
     var deletedAt: Date? = null

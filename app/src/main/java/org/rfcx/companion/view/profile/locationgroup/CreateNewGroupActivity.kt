@@ -23,6 +23,7 @@ import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.service.LocationGroupSyncWorker
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.RealmHelper
+import org.rfcx.companion.util.randomLocationGroup
 import org.rfcx.companion.view.deployment.locate.SearchResultFragment
 import org.rfcx.companion.view.detail.EditLocationActivity.Companion.EXTRA_LOCATION_GROUP
 import java.util.*
@@ -63,7 +64,8 @@ class CreateNewGroupActivity : AppCompatActivity(), (ColorPickerItem, Int) -> Un
             } else {
                 val group = LocationGroups(
                     name = locationGroupEditText.text.toString(),
-                    color = color.color
+                    color = color.color,
+                    serverId = randomLocationGroup()
                 )
                 locationGroupDb.insertOrUpdateLocationGroup(group)
                 LocationGroupSyncWorker.enqueue(this)
