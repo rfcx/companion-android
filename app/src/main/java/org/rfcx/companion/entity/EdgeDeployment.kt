@@ -6,7 +6,6 @@ import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
 import org.rfcx.companion.util.randomDeploymentId
-import org.rfcx.companion.util.randomDeploymentIdOnlyNumber
 import java.util.*
 
 @RealmClass

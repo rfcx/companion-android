@@ -58,9 +58,9 @@ class Firestore(val context: Context) {
         return userDocument.collection(COLLECTION_PROFILES).add(profile).await()
     }
 
-    suspend fun sendGroup(group: EdgeGroupRequest): DocumentReference? {
+    suspend fun sendGroup(group: EdgeGroupRequest, docId: String) {
         val userDocument = db.collection(COLLECTION_USERS).document(uid)
-        return userDocument.collection(COLLECTION_GROUPS).add(group).await()
+        userDocument.collection(COLLECTION_GROUPS).document(docId).set(group).await()
     }
 
     suspend fun sendImage(imageRequest: ImageRequest): DocumentReference? {

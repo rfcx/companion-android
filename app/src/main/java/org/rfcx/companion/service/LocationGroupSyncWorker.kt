@@ -20,26 +20,27 @@ class LocationGroupSyncWorker(appContext: Context, params: WorkerParameters) :
         var someFailed = false
 
         locatesNeedToSync.forEach {
-            if (it.serverId == null) {
-                val docRef = firestore.sendGroup(it.toRequestBody())
-                if (docRef != null) {
-                    db.markSent(docRef.id, it.id)
+            if (it.serverId != null) {
+                if (it.deletedAt == null) {
+                    try {
+                        firestore.sendGroup(it.toRequestBody(), it.serverId!!)
+                        db.markSent(it.serverId!!, it.id)
+                    } catch (e: Exception) {
+                        db.markUnsent(it.id)
+                        someFailed = true
+                    }
                 } else {
-                    db.markUnsent(it.id)
-                    someFailed = true
-                }
-            } else {
-                try {
-                    firestore.updateGroup(it.serverId!!, it.toRequestBody())
-                    db.markSent(it.serverId!!, it.id)
-                    if (it.deletedAt != null) {
+                    try {
+                        firestore.updateGroup(it.serverId!!, it.toRequestBody())
+                        db.markSent(it.serverId!!, it.id)
+                        
                         val isExisted = db.isExisted(it.name)
                         if (isExisted)
                             db.deleteLocationGroupFromLocal(it.id)
+                    } catch (e: Exception) {
+                        db.markUnsent(it.id)
+                        someFailed = true
                     }
-                } catch (e: Exception) {
-                    db.markUnsent(it.id)
-                    someFailed = true
                 }
             }
         }
