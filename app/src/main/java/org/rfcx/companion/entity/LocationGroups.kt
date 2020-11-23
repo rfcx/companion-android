@@ -11,8 +11,8 @@ import java.util.*
 open class LocationGroups(
     @PrimaryKey
     var id: Int = 0,
-    var name: String = "None",
-    var color: String = "",
+    var name: String? = null,
+    var color: String? = null,
     var serverId: String? = randomLocationGroup(),
     @Expose(serialize = false)
     var syncState: Int = 0,
