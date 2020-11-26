@@ -77,7 +77,7 @@ abstract class BaseImageFragment : Fragment() {
         attachImageDialog.dismiss()
     }
 
-    private fun takePhoto() {
+    fun takePhoto() {
         if (!cameraPermissions.allowed()) {
             imageFile = null
             cameraPermissions.check { }
@@ -124,7 +124,7 @@ abstract class BaseImageFragment : Fragment() {
         }
     }
 
-    private fun openGallery() {
+    fun openGallery() {
         if (!galleryPermissions.allowed()) {
             imageFile = null
             galleryPermissions.check { }

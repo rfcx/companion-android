@@ -39,6 +39,15 @@ class DeployFragment : BaseImageFragment() {
         }
 
         setupImageRecycler()
+
+        takePhotoButton.setOnClickListener {
+            takePhoto()
+        }
+
+        openGalleryButton.setOnClickListener {
+            openGallery()
+        }
+
         finishButton.setOnClickListener {
             val images = imageAdapter.getNewAttachImage()
             if(images.isNotEmpty()) {

@@ -168,6 +168,8 @@
     <string name="these_photos_already_exists">These photos already exist</string>
     <string name="this_photo_already_exists">This photo already exists</string>
     <string name="can_not_create_image">Unable to create image file.</string>
+    <string name="open_gallery">Open gallery</string>
+    <string name="take_photo">Take photo</string>
 
     <!--  MapDetailBottomSheetFragment  -->
     <string name="see_deployment_detail">See Detail</string>
