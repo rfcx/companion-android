@@ -8,11 +8,9 @@ import android.provider.MediaStore
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.zhihu.matisse.Matisse
 import com.zhihu.matisse.MimeType
 import java.io.File
-import kotlinx.android.synthetic.main.buttom_sheet_attach_image_layout.view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.util.*
 
@@ -24,14 +22,12 @@ abstract class BaseImageFragment : Fragment() {
     protected val imageAdapter by lazy { ImageAdapter() }
     private var imageFile: File? = null
 
-    private lateinit var attachImageDialog: BottomSheetDialog
     private val cameraPermissions by lazy { CameraPermissions(context as Activity) }
     private val galleryPermissions by lazy { GalleryPermissions(context as Activity) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setupAttachImageDialog()
         setupImages()
     }
 
@@ -46,35 +42,14 @@ abstract class BaseImageFragment : Fragment() {
         imageAdapter.onImageAdapterClickListener =
             object :
                 OnImageAdapterClickListener {
-                override fun onAddImageClick() {
-                    attachImageDialog.show()
-                }
 
                 override fun onDeleteImageClick(position: Int, imagePath: String) {
                     imageAdapter.removeAt(position)
-                    dismissImagePickerOptionsDialog()
                     didRemoveImage(imagePath)
                 }
             }
 
         imageAdapter.setImages(arrayListOf())
-        dismissImagePickerOptionsDialog()
-    }
-
-    private fun setupAttachImageDialog() {
-        val bottomSheetView =
-            layoutInflater.inflate(R.layout.buttom_sheet_attach_image_layout, null)
-
-        bottomSheetView.menuGallery.setOnClickListener { openGallery() }
-
-        bottomSheetView.menuTakePhoto.setOnClickListener { takePhoto() }
-
-        context?.let { attachImageDialog = BottomSheetDialog(it) }
-        attachImageDialog.setContentView(bottomSheetView)
-    }
-
-    private fun dismissImagePickerOptionsDialog() {
-        attachImageDialog.dismiss()
     }
 
     fun takePhoto() {
@@ -114,7 +89,6 @@ abstract class BaseImageFragment : Fragment() {
                 imageAdapter.addImages(pathList)
                 didAddImages(pathList)
             }
-            dismissImagePickerOptionsDialog()
         } else {
             // remove file image
             imageFile?.let {
@@ -159,6 +133,5 @@ abstract class BaseImageFragment : Fragment() {
         }
         imageAdapter.addImages(pathList)
         didAddImages(pathList)
-        dismissImagePickerOptionsDialog()
     }
 }
