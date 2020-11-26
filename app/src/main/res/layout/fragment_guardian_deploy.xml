@@ -77,23 +77,27 @@
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/takePhotoButton"
         style="@style/GuardianButton.GreenButton.Line"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"
-        android:layout_marginEnd="@dimen/margin_padding_large"
+        android:layout_marginEnd="@dimen/margin_padding_small"
         android:layout_marginBottom="@dimen/margin_padding_normal"
         android:text="@string/take_photo"
-        app:layout_constraintBottom_toTopOf="@id/openGalleryButton" />
+        app:layout_constraintEnd_toStartOf="@id/openGalleryButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/finishButton" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/openGalleryButton"
         style="@style/GuardianButton.GreenButton.Line"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginStart="@dimen/margin_padding_small"
         android:layout_marginEnd="@dimen/margin_padding_large"
         android:layout_marginBottom="@dimen/margin_padding_normal"
         android:text="@string/open_gallery"
+        app:layout_constraintStart_toEndOf="@id/takePhotoButton"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/finishButton" />
 
     <androidx.appcompat.widget.AppCompatButton
