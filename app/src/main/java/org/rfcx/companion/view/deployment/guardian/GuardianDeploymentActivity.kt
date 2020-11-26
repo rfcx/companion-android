@@ -231,6 +231,10 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         return locationGroupDb.getLocationGroup(name)
     }
 
+    override fun getImages(): List<String> {
+        return this._images
+    }
+
     override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
         val deployment = _deployment ?: GuardianDeployment()
         deployment.state = DeploymentState.Guardian.Locate.key // state

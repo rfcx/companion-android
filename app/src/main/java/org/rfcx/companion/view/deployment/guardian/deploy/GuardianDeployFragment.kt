@@ -56,6 +56,16 @@ class GuardianDeployFragment : BaseImageFragment() {
             deploymentProtocol?.setImages(images)
             deploymentProtocol?.nextStep()
         }
+
+        val deployment = deploymentProtocol?.getImages()
+        if (deployment != null && deployment.isNotEmpty()) {
+            val pathList = mutableListOf<String>()
+            deployment.forEach {
+                pathList.add(it)
+            }
+            imageAdapter.addImages(pathList)
+            didAddImages(pathList)
+        }
     }
 
     private fun setupImageRecycler() {
