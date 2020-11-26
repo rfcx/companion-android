@@ -83,28 +83,6 @@
     </ScrollView>
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/takePhotoButton"
-        style="@style/GuardianButton.GreenButton.Line"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_large"
-        android:layout_marginEnd="@dimen/margin_padding_large"
-        android:layout_marginBottom="@dimen/margin_padding_normal"
-        android:text="@string/take_photo"
-        app:layout_constraintBottom_toTopOf="@id/openGalleryButton" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/openGalleryButton"
-        style="@style/GuardianButton.GreenButton.Line"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_large"
-        android:layout_marginEnd="@dimen/margin_padding_large"
-        android:layout_marginBottom="@dimen/margin_padding_normal"
-        android:text="@string/open_gallery"
-        app:layout_constraintBottom_toTopOf="@id/finishButton" />
-
-    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/finishButton"
         style="@style/AudioMothButton.GreenButton"
         android:layout_width="match_parent"

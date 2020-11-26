@@ -7,6 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_deploy.*
+import kotlinx.android.synthetic.main.fragment_deploy.attachImageRecycler
+import kotlinx.android.synthetic.main.fragment_deploy.finishButton
+import kotlinx.android.synthetic.main.fragment_deploy.takePhotosTextView
+import kotlinx.android.synthetic.main.fragment_guardian_deploy.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Screen
@@ -37,6 +41,14 @@ class GuardianDeployFragment : BaseImageFragment() {
         }
 
         setupImageRecycler()
+
+        takePhotoButton.setOnClickListener {
+            takePhoto()
+        }
+
+        openGalleryButton.setOnClickListener {
+            openGallery()
+        }
 
         finishButton.setOnClickListener {
             analytics?.trackAddDeploymentImageEvent(Device.GUARDIAN.value)
