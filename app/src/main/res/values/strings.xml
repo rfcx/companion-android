@@ -58,7 +58,7 @@
     <string name="should_see">Now you should see either flashing \nred (recording) or flashing green (sleeping)</string>
     <string name="play_initial_tone">play initial tone</string>
     <string name="play_sync_tone">play sync tone</string>
-    <string name="audiomoth_firmware_support">Require AudioMoth firmware version 1.5 or above</string>
+    <string name="audiomoth_firmware_support">Check your AudioMoth has firmware version 1.5 or above</string>
 
     <!-- DetailDeploymentActivity -->
     <string name="title_deployment_detail">Location name</string>

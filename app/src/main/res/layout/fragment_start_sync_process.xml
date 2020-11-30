@@ -50,6 +50,7 @@
         app:layout_constraintTop_toBottomOf="@id/view0" />
 
     <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/syncSwitchDescText"
         style="@style/AudioMothText.Subhead.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -57,17 +58,18 @@
         android:text="@string/switch_to_off"
         app:layout_constraintEnd_toEndOf="@id/guidelineVerticalRight"
         app:layout_constraintStart_toStartOf="@id/guidelineVerticalLeft"
-        app:layout_constraintTop_toBottomOf="@id/audioMothOffPhoneImageView" />
+        app:layout_constraintTop_toBottomOf="@id/syncCheckDescText" />
 
     <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/syncCheckDescText"
         style="@style/AudioMothText.Subhead.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/audiomoth_firmware_support"
-        android:layout_marginBottom="@dimen/margin_padding_normal"
+        android:layout_marginTop="@dimen/margin_padding_normal"
         app:layout_constraintEnd_toEndOf="@id/guidelineVerticalRight"
         app:layout_constraintStart_toStartOf="@id/guidelineVerticalLeft"
-        app:layout_constraintBottom_toTopOf="@id/playToneButton"/>
+        app:layout_constraintTop_toBottomOf="@id/audioMothOffPhoneImageView" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/playToneButton"
