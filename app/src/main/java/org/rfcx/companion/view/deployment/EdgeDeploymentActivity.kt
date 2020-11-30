@@ -27,9 +27,7 @@ import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
 import org.rfcx.companion.view.deployment.sync.SyncFragment
 import org.rfcx.companion.view.detail.MapPickerProtocol
-import org.rfcx.companion.view.dialog.CompleteFragment
-import org.rfcx.companion.view.dialog.CompleteListener
-import org.rfcx.companion.view.dialog.LoadingDialogFragment
+import org.rfcx.companion.view.dialog.*
 import java.util.*
 
 class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, CompleteListener,
@@ -177,6 +175,17 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     override fun setDeployment(deployment: EdgeDeployment) {
         this._deployment = deployment
+    }
+
+    override fun showSyncInstruction() {
+        val instructionDialog: SyncInstructionDialogFragment =
+            supportFragmentManager.findFragmentByTag(TAG_SYNC_INSTRUCTION_DIALOG) as SyncInstructionDialogFragment?
+                ?: run {
+                    SyncInstructionDialogFragment()
+                }
+        instructionDialog.show(supportFragmentManager,
+            TAG_SYNC_INSTRUCTION_DIALOG
+        )
     }
 
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
@@ -421,6 +430,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     companion object {
         const val loadingDialogTag = "LoadingDialog"
+        const val TAG_SYNC_INSTRUCTION_DIALOG = "SyncInstructionDialogFragment"
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
 
         private var fromUnfinishedDeployment = false

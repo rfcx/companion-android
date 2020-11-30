@@ -71,6 +71,19 @@
         app:layout_constraintStart_toStartOf="@id/guidelineVerticalLeft"
         app:layout_constraintTop_toBottomOf="@id/audioMothOffPhoneImageView" />
 
+    <TextView
+        android:id="@+id/syncInstruction1Text"
+        style="@style/AudioMothText.Body.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/syncing_instruction"
+        android:drawableEnd="@drawable/ic_help"
+        android:drawablePadding="@dimen/margin_padding_xsmall"
+        android:layout_marginBottom="@dimen/margin_padding_small"
+        app:layout_constraintBottom_toTopOf="@id/playToneButton"
+        app:layout_constraintStart_toStartOf="@id/playToneButton"
+        app:layout_constraintEnd_toEndOf="@id/playToneButton"/>
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/playToneButton"
         style="@style/AudioMothButton.GreenButton"

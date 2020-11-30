@@ -8,8 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
+import kotlinx.android.synthetic.main.fragment_after_play_initial_tone.*
 import kotlinx.android.synthetic.main.fragment_after_play_initial_tone.noButton
 import kotlinx.android.synthetic.main.fragment_after_play_initial_tone.yesButton
+import kotlinx.android.synthetic.main.fragment_after_play_sync_tone.*
 import kotlinx.android.synthetic.main.fragment_initial_tone_playing.*
 import kotlinx.android.synthetic.main.fragment_play_sync_tone.*
 import kotlinx.android.synthetic.main.fragment_start_sync_process.*
@@ -67,6 +69,7 @@ class SyncFragment : Fragment() {
             PLAY_SYNC_TONE -> playSyncTone()
             AFTER_PLAY_SYNC_TONE -> afterPlaySyncTone(view)
         }
+
     }
 
     private fun startSyncProcess() {
@@ -74,6 +77,7 @@ class SyncFragment : Fragment() {
             analytics?.trackPlayToneEvent()
             edgeDeploymentProtocol?.playTone()
         }
+        syncInstruction1Text.setOnClickListener { edgeDeploymentProtocol?.showSyncInstruction() }
     }
 
     private fun initialTonePlaying(view: View) {
@@ -87,6 +91,8 @@ class SyncFragment : Fragment() {
             edgeDeploymentProtocol?.stopPlaySound()
             edgeDeploymentProtocol?.startSyncing(AFTER_PLAY_INITIAL_TONE)
         }
+
+        syncInstruction2Text.setOnClickListener { edgeDeploymentProtocol?.showSyncInstruction() }
     }
 
     private fun afterPlayInitialTone(view: View) {
@@ -108,6 +114,8 @@ class SyncFragment : Fragment() {
             edgeDeploymentProtocol?.stopPlaySound()
             edgeDeploymentProtocol?.startSyncing(START_SYNC)
         }
+
+        syncInstruction3Text.setOnClickListener { edgeDeploymentProtocol?.showSyncInstruction() }
     }
 
     private fun playSyncTone() {
@@ -117,6 +125,8 @@ class SyncFragment : Fragment() {
             edgeDeploymentProtocol?.playSyncSound()
             edgeDeploymentProtocol?.startSyncing(AFTER_PLAY_SYNC_TONE)
         }
+
+        syncInstruction4Text.setOnClickListener { edgeDeploymentProtocol?.showSyncInstruction() }
     }
 
     private fun afterPlaySyncTone(view: View) {
@@ -131,6 +141,8 @@ class SyncFragment : Fragment() {
             edgeDeploymentProtocol?.stopPlaySound()
             edgeDeploymentProtocol?.startSyncing(START_SYNC)
         }
+
+        syncInstruction5Text.setOnClickListener { edgeDeploymentProtocol?.showSyncInstruction() }
     }
 
     override fun onDetach() {

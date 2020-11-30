@@ -59,6 +59,7 @@
     <string name="play_initial_tone">play initial tone</string>
     <string name="play_sync_tone">play sync tone</string>
     <string name="audiomoth_firmware_support">Check your AudioMoth has firmware version 1.5 or above</string>
+    <string name="syncing_instruction">Having problems</string>
 
     <!-- DetailDeploymentActivity -->
     <string name="title_deployment_detail">Location name</string>
