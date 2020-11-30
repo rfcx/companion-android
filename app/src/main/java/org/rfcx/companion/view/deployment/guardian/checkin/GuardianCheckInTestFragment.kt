@@ -2,6 +2,7 @@ package org.rfcx.companion.view.deployment.guardian.checkin
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,13 +12,21 @@ import kotlinx.android.synthetic.main.fragment_guardian_checkin_test.*
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.SocketManager
 import org.rfcx.companion.entity.Screen
+import org.rfcx.companion.entity.socket.response.CheckIn
+import org.rfcx.companion.entity.socket.response.CheckInTestResponse
 import org.rfcx.companion.util.Analytics
+import org.rfcx.companion.util.TimeAgo
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
+import java.net.Socket
+import java.util.*
 
 class GuardianCheckInTestFragment : Fragment() {
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
     private val analytics by lazy { context?.let { Analytics(it) } }
+
+    private var state = ""
+    private var apiUrl = ""
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -54,13 +63,35 @@ class GuardianCheckInTestFragment : Fragment() {
             checkInStatusValueTextView.text = res.checkin.state
             checkInDeliveryTimeValueTextView.text = res.checkin.deliveryTime
 
-            checkInFinishButton.isEnabled = res.checkin.state == CHECKIN_SUCCESS
+            state = res.checkin.state
+            apiUrl = res.checkin.apiUrl
+            if (state == CHECKIN_SUCCESS) {
+                deploymentProtocol?.setLastCheckInTime(System.currentTimeMillis())
+            }
+            val lastCheckInTime = deploymentProtocol?.getLastCheckInTime()
+            if (lastCheckInTime != null) {
+                checkInFinishButton.isEnabled = true
+            }
+            checkInLastValueTextView.text = getLastCheckInRelativeTime()
         })
+        checkInLastValueTextView.text = getLastCheckInRelativeTime()
+    }
+
+    private fun getLastCheckInRelativeTime(): String {
+        val lastCheckInTime = deploymentProtocol?.getLastCheckInTime()
+        if (lastCheckInTime != null) {
+            val timeDiff = System.currentTimeMillis() - lastCheckInTime
+            Log.d("time", timeDiff.toString())
+            return TimeAgo.toDuration(timeDiff) ?: getString(R.string.dash)
+        }
+        return getString(R.string.dash)
     }
 
     override fun onDetach() {
         super.onDetach()
-        SocketManager.getCheckInTest() // to stop listening checkin test
+        if (state == CHECKIN_SUCCESS) {
+            SocketManager.checkInTest.value = CheckInTestResponse(CheckIn(apiUrl = apiUrl, state = "not published"))
+        }
     }
 
     override fun onResume() {

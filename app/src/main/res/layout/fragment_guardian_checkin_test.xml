@@ -85,6 +85,24 @@
             android:text="@string/dash"
             tools:text="12 seconds" />
 
+        <TextView
+            android:id="@+id/checkInLastTextView"
+            style="@style/AudioMothText.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/last_checkin"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_small" />
+
+        <TextView
+            android:id="@+id/checkInLastValueTextView"
+            style="@style/AudioMothText.Body.Secondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/margin_padding_small"
+            android:text="@string/dash"
+            tools:text="12 seconds ago" />
+
     </LinearLayout>
 
     <TextView
