@@ -2,7 +2,6 @@ package org.rfcx.companion.view.deployment.guardian.checkin
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -81,7 +80,6 @@ class GuardianCheckInTestFragment : Fragment() {
         val lastCheckInTime = deploymentProtocol?.getLastCheckInTime()
         if (lastCheckInTime != null) {
             val timeDiff = System.currentTimeMillis() - lastCheckInTime
-            Log.d("time", timeDiff.toString())
             return TimeAgo.toDuration(timeDiff) ?: getString(R.string.dash)
         }
         return getString(R.string.dash)
