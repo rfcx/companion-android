@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.fragment_deploy.*
+import kotlinx.android.synthetic.main.fragment_guardian_deploy.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Screen
@@ -38,11 +38,29 @@ class GuardianDeployFragment : BaseImageFragment() {
 
         setupImageRecycler()
 
+        takePhotoButton.setOnClickListener {
+            takePhoto()
+        }
+
+        openGalleryButton.setOnClickListener {
+            openGallery()
+        }
+
         finishButton.setOnClickListener {
             analytics?.trackAddDeploymentImageEvent(Device.GUARDIAN.value)
             val images = imageAdapter.getNewAttachImage()
             deploymentProtocol?.setImages(images)
             deploymentProtocol?.nextStep()
+        }
+
+        val deployment = deploymentProtocol?.getImages()
+        if (deployment != null && deployment.isNotEmpty()) {
+            val pathList = mutableListOf<String>()
+            deployment.forEach {
+                pathList.add(it)
+            }
+            imageAdapter.addImages(pathList)
+            didAddImages(pathList)
         }
     }
 

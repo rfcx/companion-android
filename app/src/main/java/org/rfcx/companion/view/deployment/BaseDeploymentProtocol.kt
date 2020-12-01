@@ -13,6 +13,7 @@ interface BaseDeploymentProtocol {
 
     fun getDeploymentLocation(): DeploymentLocation?
     fun getLocationGroup(name: String): LocationGroups?
+    fun getImages(): List<String>
 
     fun setDeployLocation(locate: Locate, isExisted: Boolean)
     fun setImages(images: List<String>)

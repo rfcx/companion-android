@@ -178,13 +178,7 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
     inner class AddImageViewHolder(
         itemView: View,
         private val onImageAdapterClickListener: OnImageAdapterClickListener?
-    ) : RecyclerView.ViewHolder(itemView) {
-        init {
-            itemView.setOnClickListener {
-                onImageAdapterClickListener?.onAddImageClick()
-            }
-        }
-    }
+    ) : RecyclerView.ViewHolder(itemView) { }
 
     class ImageAdapterDiffUtil : DiffUtil.ItemCallback<BaseListItem>() {
         override fun areItemsTheSame(oldItem: BaseListItem, newItem: BaseListItem): Boolean {
@@ -208,6 +202,5 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
 }
 
 interface OnImageAdapterClickListener {
-    fun onAddImageClick()
     fun onDeleteImageClick(position: Int, imagePath: String)
 }

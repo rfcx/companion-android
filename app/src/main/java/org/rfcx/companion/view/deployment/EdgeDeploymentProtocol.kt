@@ -9,7 +9,6 @@ interface EdgeDeploymentProtocol : BaseDeploymentProtocol {
     fun startSyncing(status: String)
 
     fun getDeployment(): EdgeDeployment?
-    fun getImages(): List<String>
 
     fun setDeployment(deployment: EdgeDeployment)
 
