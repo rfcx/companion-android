@@ -80,6 +80,13 @@
         <item>Waiting for Guardian to Initialize</item>
     </string-array>
 
+    <string-array name="audiomoth_sync_instructions">
+        <item>Running v1.5+ AudioMoth firmware</item>
+        <item>Mid to high volume set on phone</item>
+        <item>AudioMoth microphone close to phone speaker</item>
+        <item>Not too much background noise</item>
+    </string-array>
+
     <string-array name="bitrate_entries">
         <item>4 kbps</item>
         <item>8 kbps</item>

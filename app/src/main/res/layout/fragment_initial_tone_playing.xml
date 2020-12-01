@@ -41,6 +41,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/audioMothSwitchImageView" />
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/syncInstruction2Text"
+        style="@style/AudioMothText.Body.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/syncing_instruction"
+        android:drawableEnd="@drawable/ic_help"
+        android:drawablePadding="@dimen/margin_padding_xsmall"
+        android:layout_marginBottom="@dimen/margin_padding_small"
+        app:layout_constraintEnd_toEndOf="@id/guidelineVerticalRight"
+        app:layout_constraintStart_toStartOf="@id/guidelineVerticalLeft"
+        app:layout_constraintBottom_toTopOf="@id/nextButton"/>
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/nextButton"
         style="@style/AudioMothButton.GreenButton"
