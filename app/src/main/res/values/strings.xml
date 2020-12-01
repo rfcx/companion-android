@@ -332,6 +332,7 @@
     <string name="delivery_time">Delivery Time</string>
     <string name="dash">-</string>
     <string name="correct_mark">\u2713</string>
+    <string name="last_checkin">Last checkin</string>
 
     <!-- GuardianSolarPanelFragment -->
     <string name="solar_panel_feedback">Solar Panel Info</string>

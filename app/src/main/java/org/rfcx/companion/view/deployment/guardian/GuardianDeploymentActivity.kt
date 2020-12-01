@@ -73,6 +73,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private var latitude = 0.0
     private var longitude = 0.0
 
+    private var lastCheckInTime: Long? = null
+
     private var prefsChanges = mapOf<String, String>()
     private var prefsEditor: SharedPreferences.Editor? = null
 
@@ -137,6 +139,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             is GuardianConfigureFragment -> startFragment(GuardianSelectProfileFragment.newInstance())
             is GuardianCheckListFragment -> {
                 SocketManager.resetAllValuesToDefault()
+                setLastCheckInTime(null)
                 SocketManager.getCheckInTest() // to stop getting checkin test
                 passedChecks.clear() // remove all passed
                 unregisterWifiConnectionLostListener()
@@ -186,6 +189,10 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         this.onDeployClicked = true
     }
 
+    override fun setLastCheckInTime(time: Long?) {
+        this.lastCheckInTime = time
+    }
+
     override fun addRegisteredToPassedCheck() {
         if (1 !in passedChecks) {
             passedChecks.add(1)
@@ -224,6 +231,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     override fun getSampleRate(): Int = _sampleRate
 
     override fun getWifiName(): String = _deployment?.wifiName ?: ""
+
+    override fun getLastCheckInTime(): Long? = lastCheckInTime
 
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
