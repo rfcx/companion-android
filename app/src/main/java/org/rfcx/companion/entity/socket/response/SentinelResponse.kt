@@ -25,5 +25,6 @@ data class SentinelSystem(
 data class SentinelBattery(
     val current: Int = 0,
     val voltage: Int = 0,
-    val power: Int = 0
+    val power: Int = 0,
+    val percentage: Int = 0
 )

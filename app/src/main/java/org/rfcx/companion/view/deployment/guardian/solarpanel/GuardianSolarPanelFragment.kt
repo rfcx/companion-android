@@ -107,7 +107,7 @@ class GuardianSolarPanelFragment : Fragment() {
     }
 
     private fun isSentinelConnected(input: SentinelInput): Boolean {
-        return input.voltage != 0 && input.current != 0 && input.power != 0
+        return input.voltage != 0 || input.current != 0 || input.power != 0
     }
 
     private fun setVoltageValue(value: Int) {
