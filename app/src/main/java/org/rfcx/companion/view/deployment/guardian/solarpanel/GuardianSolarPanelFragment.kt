@@ -11,10 +11,12 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import kotlinx.android.synthetic.main.fragment_configure.view.*
 import java.util.*
 import kotlinx.android.synthetic.main.fragment_guardian_solar_panel.*
 import org.rfcx.companion.R
@@ -81,17 +83,20 @@ class GuardianSolarPanelFragment : Fragment() {
 
         SocketManager.sentinel.observe(viewLifecycleOwner, Observer { sentinelResponse ->
             val input = sentinelResponse.sentinel.input
+            val battery = sentinelResponse.sentinel.battery
             if (isSentinelConnected(input)) {
                 hideAssembleWarn()
 
                 val voltage = input.voltage
                 val current = input.current
                 val power = input.power
+                val batteryPercentage = battery.percentage
 
                 // set 3 top value
                 setVoltageValue(voltage)
                 setCurrentValue(current)
                 setPowerValue(power)
+                setBatteryPercentage(batteryPercentage)
 
                 // update power and voltage to chart
                 updateData(voltage, power)
@@ -122,9 +127,13 @@ class GuardianSolarPanelFragment : Fragment() {
         powerValueTextView.text = value.toString()
     }
 
+    private fun setBatteryPercentage(value: Int) {
+        batteryValueTextView.text = value.toString()
+    }
+
     private fun convertVoltageAndPowerToEntry(voltage: Int, power: Int): Pair<Entry, Entry> {
-        val voltageDataSet = feedbackChart.data.getDataSetByIndex(0) as LineDataSet
-        val powerDataSet = feedbackChart.data.getDataSetByIndex(1) as LineDataSet
+        val voltageDataSet = feedbackChart.data.getDataSetByLabel("Voltage", true) as LineDataSet
+        val powerDataSet = feedbackChart.data.getDataSetByLabel("Power", true) as LineDataSet
         return Pair(
             Entry((voltageDataSet.entryCount - 1).toFloat(), voltage.toFloat()),
             Entry((powerDataSet.entryCount - 1).toFloat(), power.toFloat())
@@ -180,6 +189,7 @@ class GuardianSolarPanelFragment : Fragment() {
             formSize = FORM_SIZE
             valueTextSize = CHART_TEXT_SIZE
             enableDashedHighlightLine(10f, 5f, 0f)
+            axisDependency = YAxis.AxisDependency.LEFT
         }
         powerLineDataSet = LineDataSet(arrayListOf<Entry>(), "Power").apply {
             setDrawIcons(false)
@@ -192,6 +202,7 @@ class GuardianSolarPanelFragment : Fragment() {
             formSize = FORM_SIZE
             valueTextSize = CHART_TEXT_SIZE
             enableDashedHighlightLine(10f, 5f, 0f)
+            axisDependency = YAxis.AxisDependency.RIGHT
         }
 
         val dataSets = arrayListOf<ILineDataSet>()
@@ -205,12 +216,12 @@ class GuardianSolarPanelFragment : Fragment() {
     private fun updateData(voltage: Int, power: Int) {
         val pair = convertVoltageAndPowerToEntry(voltage, power)
         // get voltage data set
-        voltageLineDataSet = feedbackChart.data.getDataSetByIndex(0) as LineDataSet
+        voltageLineDataSet = feedbackChart.data.getDataSetByLabel("Voltage", true) as LineDataSet
         voltageLineDataSet.addEntry(pair.first)
         voltageLineDataSet.notifyDataSetChanged()
 
         // get power data set
-        powerLineDataSet = feedbackChart.data.getDataSetByIndex(1) as LineDataSet
+        powerLineDataSet = feedbackChart.data.getDataSetByLabel("Power", true) as LineDataSet
         powerLineDataSet.addEntry(pair.second)
         powerLineDataSet.notifyDataSetChanged()
 
@@ -254,7 +265,7 @@ class GuardianSolarPanelFragment : Fragment() {
         private const val MILLI_PERIOD = 1000L
 
         private const val X_AXIS_MAXIMUM = 100f
-        private const val LEFT_AXIS_MAXIMUM = 200f
+        private const val LEFT_AXIS_MAXIMUM = 3000f
         private const val RIGHT_AXIS_MAXIMUM = 150f
         private const val AXIS_MINIMUM = 0f
         private const val AXIS_LINE_WIDTH = 2f
