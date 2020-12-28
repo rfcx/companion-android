@@ -100,6 +100,8 @@ dependencies {
     implementation 'com.zhihu.android:matisse:0.5.3-beta3'
     implementation 'jp.wasabeef:glide-transformations:3.0.1'
 
+    implementation 'id.zelory:compressor:2.1.0'
+
     implementation 'com.github.douglasjunior:android-simple-tooltip:0.2.3'
     implementation "com.airbnb.android:lottie:3.4.1"
 
