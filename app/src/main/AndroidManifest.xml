@@ -41,6 +41,9 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
+        <activity android:name="org.rfcx.companion.view.detail.DisplayImageActivity"
+            android:screenOrientation="portrait" />
+
         <activity
             android:name="org.rfcx.companion.view.profile.locationgroup.CreateNewGroupActivity"
             android:screenOrientation="portrait" />

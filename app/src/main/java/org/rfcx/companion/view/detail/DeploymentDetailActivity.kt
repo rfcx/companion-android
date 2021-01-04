@@ -35,11 +35,11 @@ import org.rfcx.companion.view.BaseActivity
 import org.rfcx.companion.view.deployment.EdgeDeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 
-class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
+class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (DeploymentImageView) -> Unit {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
-    private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
+    private val deploymentImageAdapter by lazy { DeploymentImageAdapter(this) }
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
 
     private lateinit var mapView: MapView
@@ -290,5 +290,9 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback {
             intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
             context.startActivity(intent)
         }
+    }
+
+    override fun invoke(deploymentImage: DeploymentImageView) {
+        DisplayImageActivity.startActivity(this, deploymentImage.remotePath ?: deploymentImage.localPath)
     }
 }

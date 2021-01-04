@@ -13,7 +13,7 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.SyncState
 import org.rfcx.companion.extension.setDeploymentImage
 
-class DeploymentImageAdapter : ListAdapter<DeploymentImageView,
+class DeploymentImageAdapter(private val itemClickListener: (DeploymentImageView) -> Unit) : ListAdapter<DeploymentImageView,
         DeploymentImageAdapter.ImageDetailViewHolder>(DeploymentImageViewDiff()) {
 
     override fun onCreateViewHolder(
@@ -45,6 +45,9 @@ class DeploymentImageAdapter : ListAdapter<DeploymentImageView,
 
     override fun onBindViewHolder(holder: ImageDetailViewHolder, position: Int) {
         holder.bind(getItem(position))
+        holder.itemView.setOnClickListener {
+            this.itemClickListener(getItem(position))
+        }
     }
 
     inner class ImageDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
