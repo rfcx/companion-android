@@ -88,7 +88,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     private fun saveImages(deployment: EdgeDeployment) {
         deploymentImageDb.deleteImages(deployment.id)
-        deploymentImageDb.insertImage(deployment, _images)
+        deploymentImageDb.insertImage(deployment, null, _images)
     }
 
     override fun openWithEdgeDevice() {
