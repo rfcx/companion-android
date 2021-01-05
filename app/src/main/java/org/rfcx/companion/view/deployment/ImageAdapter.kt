@@ -9,10 +9,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import kotlinx.android.synthetic.main.item_add_image.view.*
 import kotlinx.android.synthetic.main.item_image.view.*
 import org.rfcx.companion.R
-import org.rfcx.companion.adapter.AddImageItem
 import org.rfcx.companion.adapter.BaseListItem
 import org.rfcx.companion.adapter.LocalImageItem
 import org.rfcx.companion.adapter.RemoteImageItem
@@ -40,23 +38,11 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
             }
             index++
         }
-        if (imagesSource.count() < MAX_IMAGE_SIZE) {
-            imagesSource.add(AddImageItem())
-        }
-
         submitList(ArrayList(imagesSource))
     }
 
     fun removeAt(index: Int) {
-        if (getItem(imagesSource.count() - 1) is AddImageItem) {
-            imagesSource.removeAt(imagesSource.count() - 1)
-        }
-
         imagesSource.removeAt(index)
-
-        if (imagesSource.count() < MAX_IMAGE_SIZE) {
-            imagesSource.add(AddImageItem())
-        }
         submitList(ArrayList(imagesSource))
     }
 
@@ -80,9 +66,6 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
             }
         }
 
-        if (getItem(imagesSource.count() - 1) is AddImageItem) {
-            imagesSource.removeAt(imagesSource.count() - 1)
-        }
         var index: Int = if (imagesSource.isEmpty()) 0 else {
             imagesSource[imagesSource.count() - 1].getItemId() + 1
         }
@@ -106,22 +89,15 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
                     .show()
             }
         }
-
-        if (imagesSource.count() < MAX_IMAGE_SIZE) {
-            imagesSource.add(AddImageItem())
-        }
         submitList(ArrayList(imagesSource))
     }
 
-    fun getImageCount(): Int =
-        if (imagesSource[imagesSource.count() - 1] is AddImageItem) imagesSource.count() - 1
-        else imagesSource.count()
+    fun getImageCount(): Int = imagesSource.count()
 
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
             is LocalImageItem -> VIEW_TYPE_IMAGE
             is RemoteImageItem -> VIEW_TYPE_IMAGE
-            is AddImageItem -> VIEW_TYPE_ADD_IMAGE
             else -> throw IllegalStateException("Item class not found ${getItem(position)::class.java.simpleName}")
         }
     }
@@ -134,11 +110,6 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
                 val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.item_image, parent, false)
                 ImageAdapterViewHolder(view, onImageAdapterClickListener)
-            }
-            VIEW_TYPE_ADD_IMAGE -> {
-                val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_add_image, parent, false)
-                AddImageViewHolder(view, onImageAdapterClickListener)
             }
             else -> throw IllegalAccessException("View type $viewType not found.")
         }
@@ -188,15 +159,12 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
         override fun areContentsTheSame(oldItem: BaseListItem, newItem: BaseListItem): Boolean {
             return if (newItem is LocalImageItem && oldItem is LocalImageItem) {
                 (newItem.imageId == oldItem.imageId && newItem.localPath == oldItem.localPath)
-            } else if (newItem is RemoteImageItem && oldItem is RemoteImageItem) {
-                (newItem.imageId == oldItem.imageId && newItem.remotePath == oldItem.remotePath)
-            } else newItem is AddImageItem && oldItem is AddImageItem
+            } else newItem is RemoteImageItem && oldItem is RemoteImageItem
         }
     }
 
     companion object {
         const val VIEW_TYPE_IMAGE = 1
-        const val VIEW_TYPE_ADD_IMAGE = 2
         const val MAX_IMAGE_SIZE = 5
     }
 }

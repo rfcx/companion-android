@@ -40,16 +40,6 @@
                 android:background="@color/colorPrimary"
                 app:layout_constraintTop_toBottomOf="@id/deploymentWillUploadedTextView" />
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/configImageView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/margin_padding_small"
-                android:src="@drawable/audiomoth_switch_custom"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/view0" />
-
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/takePhotosTextView"
                 style="@style/AudioMothText.Subhead.Small"
@@ -62,8 +52,33 @@
                 android:text="@string/take_photos"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/configImageView" />
+                app:layout_constraintTop_toBottomOf="@id/view0" />
 
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/takePhotoButton"
+                style="@style/GuardianButton.GreenButton.Line"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginEnd="@dimen/margin_padding_small"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:text="@string/take_photo"
+                app:layout_constraintEnd_toStartOf="@id/openGalleryButton"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/takePhotosTextView" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/openGalleryButton"
+                style="@style/GuardianButton.GreenButton.Line"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_small"
+                android:layout_marginEnd="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:text="@string/open_gallery"
+                app:layout_constraintStart_toEndOf="@id/takePhotoButton"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/takePhotosTextView" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/attachImageRecycler"
@@ -73,40 +88,13 @@
                 android:layout_marginTop="@dimen/margin_padding_normal"
                 android:layout_marginEnd="@dimen/margin_padding_large"
                 android:clipToPadding="false"
-                android:visibility="visible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/takePhotosTextView"
+                app:layout_constraintTop_toBottomOf="@+id/openGalleryButton"
                 tools:layoutManager="android.support.v7.widget.LinearLayoutManager"
                 tools:orientation="horizontal" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/takePhotoButton"
-        style="@style/GuardianButton.GreenButton.Line"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_large"
-        android:layout_marginEnd="@dimen/margin_padding_small"
-        android:layout_marginBottom="@dimen/margin_padding_normal"
-        android:text="@string/take_photo"
-        app:layout_constraintEnd_toStartOf="@id/openGalleryButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/finishButton" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/openGalleryButton"
-        style="@style/GuardianButton.GreenButton.Line"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_small"
-        android:layout_marginEnd="@dimen/margin_padding_large"
-        android:layout_marginBottom="@dimen/margin_padding_normal"
-        android:text="@string/open_gallery"
-        app:layout_constraintStart_toEndOf="@id/takePhotoButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/finishButton" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/finishButton"

@@ -8,7 +8,6 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import io.realm.Realm
-import java.util.*
 import kotlinx.android.synthetic.main.activity_guardian_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
@@ -22,12 +21,10 @@ import org.rfcx.companion.entity.LocationGroups
 import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.guardian.GuardianProfile
-import org.rfcx.companion.entity.socket.response.Signal
-import org.rfcx.companion.entity.socket.response.SignalResponse
+import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
-import org.rfcx.companion.localdb.guardian.GuardianDeploymentImageDb
 import org.rfcx.companion.localdb.guardian.GuardianProfileDb
 import org.rfcx.companion.service.GuardianDeploymentSyncWorker
 import org.rfcx.companion.util.Analytics
@@ -47,6 +44,7 @@ import org.rfcx.companion.view.deployment.locate.MapPickerFragment
 import org.rfcx.companion.view.detail.MapPickerProtocol
 import org.rfcx.companion.view.dialog.*
 import org.rfcx.companion.view.prefs.SyncPreferenceListener
+import java.util.*
 
 class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtocol,
     CompleteListener, MapPickerProtocol, SyncPreferenceListener {
@@ -56,7 +54,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
     private val profileDb by lazy { GuardianProfileDb(realm) }
     private val deploymentDb by lazy { GuardianDeploymentDb(realm) }
-    private val deploymentImageDb by lazy { GuardianDeploymentImageDb(realm) }
+    private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
 
     private var _profiles: List<GuardianProfile> = listOf()
     private var _profile: GuardianProfile? = null
@@ -273,7 +271,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                 }
             }
 
-            deploymentImageDb.insertImage(it, _images)
+            deploymentImageDb.insertImage(null, it, _images)
             deploymentDb.updateDeployment(it)
             analytics.trackCreateGuardianDeploymentEvent()
 

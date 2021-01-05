@@ -5,11 +5,13 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.provider.MediaStore
+import android.view.View
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import com.zhihu.matisse.Matisse
 import com.zhihu.matisse.MimeType
+import kotlinx.android.synthetic.main.fragment_deploy.*
 import java.io.File
 import org.rfcx.companion.R
 import org.rfcx.companion.util.*
@@ -46,6 +48,7 @@ abstract class BaseImageFragment : Fragment() {
                 override fun onDeleteImageClick(position: Int, imagePath: String) {
                     imageAdapter.removeAt(position)
                     didRemoveImage(imagePath)
+                    hideAddImagesButton()
                 }
             }
 
@@ -88,6 +91,7 @@ abstract class BaseImageFragment : Fragment() {
                 val pathList = listOf(it.absolutePath)
                 imageAdapter.addImages(pathList)
                 didAddImages(pathList)
+                hideAddImagesButton()
             }
         } else {
             // remove file image
@@ -133,5 +137,11 @@ abstract class BaseImageFragment : Fragment() {
         }
         imageAdapter.addImages(pathList)
         didAddImages(pathList)
+        hideAddImagesButton()
+    }
+
+    private fun hideAddImagesButton() {
+        takePhotoButton.isEnabled = imageAdapter.getImageCount() < 5
+        openGalleryButton.isEnabled = imageAdapter.getImageCount() < 5
     }
 }
