@@ -293,6 +293,13 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
     }
 
     override fun invoke(deploymentImage: DeploymentImageView) {
-        DisplayImageActivity.startActivity(this, deploymentImage.remotePath ?: deploymentImage.localPath)
+        val list = arrayListOf<String>()
+        deploymentImages.forEach { list.add(it.remotePath ?: it.localPath) }
+        
+        val index = list.indexOf(deploymentImage.remotePath ?: deploymentImage.localPath)
+        list.removeAt(index)
+        list.add(0, deploymentImage.remotePath ?: deploymentImage.localPath)
+
+        DisplayImageActivity.startActivity(this, list)
     }
 }
