@@ -8,7 +8,6 @@ import com.veinhorn.scrollgalleryview.MediaInfo
 import com.veinhorn.scrollgalleryview.ScrollGalleryView
 import com.veinhorn.scrollgalleryview.loader.picasso.PicassoImageLoader
 import kotlinx.android.synthetic.main.activity_display_image.*
-import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 
 class DisplayImageActivity : AppCompatActivity() {
@@ -17,7 +16,6 @@ class DisplayImageActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_display_image)
-        setupToolbar()
 
         val paths = intent.extras?.getStringArrayList(PATH_IMAGE) ?: ArrayList()
         val infoImage: ArrayList<MediaInfo> = ArrayList(paths.size)
@@ -30,20 +28,6 @@ class DisplayImageActivity : AppCompatActivity() {
             .setFragmentManager(supportFragmentManager)
             .addMedia(infoImage)
             .setZoom(true)
-    }
-
-    private fun setupToolbar() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
-            setDisplayShowHomeEnabled(true)
-            title = getString(R.string.image)
-        }
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        onBackPressed()
-        return true
     }
 
     companion object {

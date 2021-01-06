@@ -4,10 +4,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <include
-        android:id="@+id/toolbarLayout"
-        layout="@layout/toolbar_default" />
-
     <com.veinhorn.scrollgalleryview.ScrollGalleryView
         android:id="@+id/scrollGalleryView"
         android:layout_width="match_parent"

@@ -69,7 +69,6 @@
     <string name="detail_sec">%d second</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
-    <string name="image">Image</string>
     <string name="delete_location">Delete Location?</string>
     <string name="are_you_sure_delete_location">The device and its location will be removed</string>
 
