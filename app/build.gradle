@@ -99,6 +99,8 @@ dependencies {
     kapt 'com.github.bumptech.glide:compiler:4.11.0'
     implementation 'com.zhihu.android:matisse:0.5.3-beta3'
     implementation 'jp.wasabeef:glide-transformations:3.0.1'
+    implementation 'com.veinhorn.scrollgalleryview:library:1.2.6'
+    implementation 'com.veinhorn.scrollgalleryview:picasso-loader:1.2.4'
 
     implementation 'id.zelory:compressor:2.1.0'
 
