@@ -294,11 +294,11 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
 
     override fun invoke(deploymentImage: DeploymentImageView) {
         val list = arrayListOf<String>()
-        deploymentImages.forEach { list.add(it.remotePath ?: it.localPath) }
+        deploymentImages.forEach { list.add(it.remotePath ?: "file://${it.localPath}") }
         
-        val index = list.indexOf(deploymentImage.remotePath ?: deploymentImage.localPath)
+        val index = list.indexOf(deploymentImage.remotePath ?: "file://${deploymentImage.localPath}")
         list.removeAt(index)
-        list.add(0, deploymentImage.remotePath ?: deploymentImage.localPath)
+        list.add(0, deploymentImage.remotePath ?: "file://${deploymentImage.localPath}")
 
         DisplayImageActivity.startActivity(this, list)
     }

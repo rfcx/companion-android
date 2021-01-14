@@ -5,16 +5,17 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.provider.MediaStore
-import android.view.View
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import com.zhihu.matisse.Matisse
 import com.zhihu.matisse.MimeType
 import kotlinx.android.synthetic.main.fragment_deploy.*
-import java.io.File
 import org.rfcx.companion.R
+import org.rfcx.companion.entity.DeploymentImage
 import org.rfcx.companion.util.*
+import org.rfcx.companion.view.detail.DisplayImageActivity
+import java.io.File
 
 abstract class BaseImageFragment : Fragment() {
 
@@ -23,6 +24,7 @@ abstract class BaseImageFragment : Fragment() {
 
     protected val imageAdapter by lazy { ImageAdapter() }
     private var imageFile: File? = null
+    private var deploymentImages = listOf<DeploymentImage>()
 
     private val cameraPermissions by lazy { CameraPermissions(context as Activity) }
     private val galleryPermissions by lazy { GalleryPermissions(context as Activity) }
@@ -49,6 +51,16 @@ abstract class BaseImageFragment : Fragment() {
                     imageAdapter.removeAt(position)
                     didRemoveImage(imagePath)
                     hideAddImagesButton()
+                }
+
+                override fun onImageClick(imagePath: String) {
+                    val list = arrayListOf<String>()
+                    imageAdapter.getNewAttachImage().forEach { list.add("file://$it") }
+                    val index = list.indexOf("file://$imagePath")
+                    list.removeAt(index)
+                    list.add(0, "file://$imagePath")
+
+                    context?.let { DisplayImageActivity.startActivity(it, list) }
                 }
             }
 
