@@ -23,6 +23,7 @@ import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.Storage
 import org.rfcx.companion.util.getEmailUser
+import org.rfcx.companion.util.getUserNickname
 
 class Firestore(val context: Context) {
     val db = Firebase.firestore
@@ -287,7 +288,8 @@ class Firestore(val context: Context) {
             "from" to context.getEmailUser(),
             "inputFeedback" to text,
             "pathImages" to arrayListOf<String>(),
-            "timeStamp" to Timestamp(System.currentTimeMillis()).toString()
+            "timeStamp" to Date(),
+            "name" to context.getUserNickname()
         )
 
         feedbackDocument.add(docData)
