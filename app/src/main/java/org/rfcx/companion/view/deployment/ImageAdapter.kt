@@ -139,6 +139,10 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
                 .error(R.drawable.bg_grey_light)
                 .into(imageView)
 
+            itemView.setOnClickListener {
+                onImageAdapterClickListener?.onImageClick(imagePath)
+            }
+
             deleteButton.setOnClickListener {
                 onImageAdapterClickListener?.onDeleteImageClick(adapterPosition, imagePath)
             }
@@ -171,4 +175,5 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
 
 interface OnImageAdapterClickListener {
     fun onDeleteImageClick(position: Int, imagePath: String)
+    fun onImageClick(imagePath: String)
 }
