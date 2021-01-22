@@ -65,7 +65,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var locationEngine: LocationEngine? = null
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
-    private var altitude: Double = 0.0
+    private var altitude: Double? = null
     private var nameLocation: String? = null
     private var group: String? = null
 
@@ -159,6 +159,10 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
         if (nameLocation != "" && nameLocation != null) {
             locationNameEditText.setText(nameLocation)
+        }
+
+        if (altitude != null) {
+            altitudeEditText.setText(altitude.toString())
         }
 
         finishButton.setOnClickListener {
@@ -261,7 +265,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     name = name,
                     latitude = it.latitude,
                     longitude = it.longitude,
-                    altitude = altitude,
+                    altitude = altitude ?: 0.0,
                     locationGroup = getLocationGroup()
                 )
                 deploymentProtocol?.setDeployLocation(locate, false)
@@ -337,6 +341,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         locateItem?.let {
             moveCamera(it.getLatLng(), DEFAULT_ZOOM)
             setLatLogLabel(it.getLatLng())
+            altitudeEditText.setText(it.altitude.toString())
         }
         locationNameTextInput.visibility = View.GONE
         locationNameSpinner.visibility = View.VISIBLE
@@ -356,6 +361,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun onPressedNewLocation() {
+        val altitudeText = if(altitude == null) "0.0" else altitude.toString()
+        altitudeEditText.setText(altitudeText)
+
         getLastLocation()
 
         if (lastLocation != null) {
@@ -439,6 +447,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     val latLng = it.getLatLng()
                     moveCamera(latLng, DEFAULT_ZOOM)
                     setLatLogLabel(latLng)
+                    altitudeEditText.setText(it.altitude.toString())
 
                     if (locationGroupDb.isExisted(it.locationGroup?.group)) {
                         group = it.locationGroup?.group
