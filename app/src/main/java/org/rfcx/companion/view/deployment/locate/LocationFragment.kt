@@ -25,7 +25,6 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.mapbox.android.core.location.*
 import com.mapbox.mapboxsdk.Mapbox
@@ -66,6 +65,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var locationEngine: LocationEngine? = null
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
+    private var altitude: Double = 0.0
     private var nameLocation: String? = null
     private var group: String? = null
 
@@ -135,6 +135,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         arguments?.let {
             latitude = it.getDouble(ARG_LATITUDE)
             longitude = it.getDouble(ARG_LONGITUDE)
+            altitude = it.getDouble(ARG_ALTITUDE)
             nameLocation = it.getString(ARG_LOCATION_NAME)
         }
     }
@@ -162,11 +163,21 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
         finishButton.setOnClickListener {
             analytics?.trackSaveLocationEvent(Screen.LOCATION.id)
-            if (existingRadioButton.isChecked) {
-                handleExistLocate()
-            } else if (newLocationRadioButton.isChecked) {
-                getLastLocation()
-                verifyInput()
+            val altitudeValue = altitudeEditText.text.toString()
+            if (altitudeValue.isNotEmpty()) {
+                this.altitude = altitudeValue.toDouble()
+                if (existingRadioButton.isChecked) {
+                    handleExistLocate()
+                } else if (newLocationRadioButton.isChecked) {
+                    getLastLocation()
+                    verifyInput()
+                }
+            } else {
+                Toast.makeText(
+                    context,
+                    getString(R.string.altitude_is_required),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
@@ -250,6 +261,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     name = name,
                     latitude = it.latitude,
                     longitude = it.longitude,
+                    altitude = altitude,
                     locationGroup = getLocationGroup()
                 )
                 deploymentProtocol?.setDeployLocation(locate, false)
@@ -273,6 +285,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 it.name,
                 it.latitude,
                 it.longitude,
+                it.altitude,
                 it.createdAt,
                 it.deletedAt,
                 it.lastDeploymentId,
@@ -661,6 +674,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         const val DEFAULT_ZOOM = 15.0
         const val ARG_LATITUDE = "ARG_LATITUDE"
         const val ARG_LONGITUDE = "ARG_LONGITUDE"
+        const val ARG_ALTITUDE = "ARG_ALTITUDE"
         const val ARG_LOCATION_NAME = "ARG_LOCATION_NAME"
 
         const val DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L

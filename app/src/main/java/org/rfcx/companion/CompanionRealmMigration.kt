@@ -29,6 +29,9 @@ class CompanionRealmMigration : RealmMigration {
         if (oldVersion < 7L && newVersion >= 7L) {
             migrateToV7(realm)
         }
+        if (oldVersion < 8L && newVersion >= 8L) {
+            migrateToV8(realm)
+        }
     }
 
     private fun migrateToV2(realm: DynamicRealm) {
@@ -159,6 +162,18 @@ class CompanionRealmMigration : RealmMigration {
         locationGroups?.apply {
             setNullable(LocationGroups.LOCATION_GROUPS_NAME, true)
             setNullable(LocationGroups.LOCATION_GROUPS_COLOR, true)
+        }
+    }
+
+    private fun migrateToV8(realm: DynamicRealm) {
+        val locate = realm.schema.get(Locate.TABLE_NAME)
+        locate?.apply {
+            addField(Locate.FIELD_ALTITUDE, Double::class.java)
+        }
+
+        val deploymentLocation = realm.schema.get(DeploymentLocation.TABLE_NAME)
+        deploymentLocation?.apply {
+            addField(DeploymentLocation.FIELD_ALTITUDE, Double::class.java)
         }
     }
 
