@@ -192,6 +192,7 @@
                 android:layout_marginStart="@dimen/margin_padding_large"
                 android:layout_marginEnd="@dimen/margin_padding_large"
                 android:layout_marginTop="@dimen/margin_padding_small"
+                android:enabled="false"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/altitudeTitleTextView">
@@ -201,7 +202,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:imeOptions="actionDone"
-                    android:inputType="text"
+                    android:inputType="number"
                     android:lines="1"
                     android:textColor="@color/text_primary"
                     android:textSize="@dimen/text_small" />
