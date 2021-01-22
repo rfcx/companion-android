@@ -135,7 +135,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         arguments?.let {
             latitude = it.getDouble(ARG_LATITUDE)
             longitude = it.getDouble(ARG_LONGITUDE)
-            altitude = it.getDouble(ARG_ALTITUDE)
             nameLocation = it.getString(ARG_LOCATION_NAME)
         }
     }
@@ -342,6 +341,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             moveCamera(it.getLatLng(), DEFAULT_ZOOM)
             setLatLogLabel(it.getLatLng())
             altitudeEditText.setText(it.altitude.toString())
+            altitudeEditText.isEnabled = false
         }
         locationNameTextInput.visibility = View.GONE
         locationNameSpinner.visibility = View.VISIBLE
@@ -363,7 +363,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private fun onPressedNewLocation() {
         val altitudeText = if(altitude == null) "0.0" else altitude.toString()
         altitudeEditText.setText(altitudeText)
-
+        altitudeEditText.isEnabled = true
         getLastLocation()
 
         if (lastLocation != null) {
@@ -683,7 +683,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         const val DEFAULT_ZOOM = 15.0
         const val ARG_LATITUDE = "ARG_LATITUDE"
         const val ARG_LONGITUDE = "ARG_LONGITUDE"
-        const val ARG_ALTITUDE = "ARG_ALTITUDE"
         const val ARG_LOCATION_NAME = "ARG_LOCATION_NAME"
 
         const val DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L
