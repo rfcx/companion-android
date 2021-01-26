@@ -140,7 +140,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
 
     private fun observeDeploymentImage(deploymentId: Int) {
         deployImageLiveData =
-            Transformations.map(deploymentImageDb.getAllResultsAsync(deploymentId).asLiveData()) {
+            Transformations.map(deploymentImageDb.getAllResultsAsync(deploymentId, device = Device.GUARDIAN.value).asLiveData()) {
                 it
             }
         deployImageLiveData.observeForever(deploymentImageObserve)
