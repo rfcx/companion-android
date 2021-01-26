@@ -407,7 +407,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun retrieveImages(context: Context) {
-        Firestore(context).retrieveImages(edgeDeploymentDb, deploymentImageDb)
+        Firestore(context).retrieveImages(edgeDeploymentDb, guardianDeploymentDb, deploymentImageDb)
     }
 
     private fun fetchJobSyncing() {

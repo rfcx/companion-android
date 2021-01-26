@@ -172,7 +172,7 @@ class DeploymentImageDb(private val realm: Realm) {
         }
     }
 
-    fun insertOrUpdate(deploymentImageResponse: DeploymentImageResponse, deploymentId: Int?) {
+    fun insertOrUpdate(deploymentImageResponse: DeploymentImageResponse, deploymentId: Int?, device: String) {
         realm.executeTransaction {
             val image =
                 it.where(DeploymentImage::class.java)
@@ -186,6 +186,7 @@ class DeploymentImageDb(private val realm: Realm) {
                 deploymentImage.deploymentId = deploymentId
                 deploymentImage.syncState = SyncState.Sent.key
                 deploymentImage.syncToFireStoreState = SyncState.Sent.key
+                deploymentImage.device = device
                 it.insert(deploymentImage)
             }
         }
