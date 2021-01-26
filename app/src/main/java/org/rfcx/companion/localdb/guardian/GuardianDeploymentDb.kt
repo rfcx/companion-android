@@ -145,9 +145,6 @@ class GuardianDeploymentDb(private val realm: Realm) {
         val images =
             realm.where(DeploymentImage::class.java).equalTo(DeploymentImage.FIELD_ID, deploymentId)
                 .findAll()
-        images?.forEach {
-            Log.i("saveDeploymentIdToImage", it.localPath)
-        }
         realm.executeTransaction { transition ->
             images?.forEach {
                 val image = it.apply {
