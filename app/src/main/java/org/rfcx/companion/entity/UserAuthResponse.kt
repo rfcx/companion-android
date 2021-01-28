@@ -10,7 +10,8 @@ data class UserAuthResponse(
     val roles: Set<String> = setOf(),
     val accessibleSites: Set<String> = setOf(),
     val defaultSite: String? = null,
-    val picture: String?
+    val picture: String?,
+    val expires: Long
 ) {
     val isRFCxUser: Boolean get() = roles.contains("rfcxUser") && defaultSite != null
 }
