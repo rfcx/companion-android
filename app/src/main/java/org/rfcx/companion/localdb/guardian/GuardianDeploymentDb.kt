@@ -114,6 +114,16 @@ class GuardianDeploymentDb(private val realm: Realm) {
         return null
     }
 
+    fun getDeploymentByServerId(serverId: String): GuardianDeployment? {
+        val deployment =
+            realm.where(GuardianDeployment::class.java)
+                .equalTo(GuardianDeployment.FIELD_SERVER_ID, serverId).findFirst()
+        if (deployment != null) {
+            return realm.copyFromRealm(deployment)
+        }
+        return null
+    }
+
     fun lockUnsent(): List<GuardianDeployment> {
         var unsentCopied: List<GuardianDeployment> = listOf()
         realm.executeTransaction {
@@ -145,9 +155,6 @@ class GuardianDeploymentDb(private val realm: Realm) {
         val images =
             realm.where(DeploymentImage::class.java).equalTo(DeploymentImage.FIELD_ID, deploymentId)
                 .findAll()
-        images?.forEach {
-            Log.i("saveDeploymentIdToImage", it.localPath)
-        }
         realm.executeTransaction { transition ->
             images?.forEach {
                 val image = it.apply {

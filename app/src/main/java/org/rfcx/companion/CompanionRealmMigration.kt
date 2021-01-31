@@ -175,6 +175,12 @@ class CompanionRealmMigration : RealmMigration {
         deploymentLocation?.apply {
             addField(DeploymentLocation.FIELD_ALTITUDE, Double::class.java)
         }
+
+        val deploymentImage = realm.schema.get(DeploymentImage.TABLE_NAME)
+        deploymentImage?.apply {
+            addField(DeploymentImage.FIELD_DEVICE, String::class.java)
+                .setNullable(DeploymentImage.FIELD_DEVICE, false)
+        }
     }
 
     override fun hashCode(): Int {

@@ -4,8 +4,6 @@ import android.content.Context
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import java.sql.Timestamp
-import java.util.*
 import kotlinx.coroutines.tasks.await
 import org.rfcx.companion.entity.DeploymentLocation
 import org.rfcx.companion.entity.Device
@@ -24,6 +22,7 @@ import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.Storage
 import org.rfcx.companion.util.getEmailUser
 import org.rfcx.companion.util.getUserNickname
+import java.util.*
 
 class Firestore(val context: Context) {
     val db = Firebase.firestore
@@ -226,6 +225,7 @@ class Firestore(val context: Context) {
 
     fun retrieveImages(
         edgeDeploymentDb: EdgeDeploymentDb,
+        guardianDeploymentDb: GuardianDeploymentDb,
         deploymentImageDb: DeploymentImageDb,
         callback: ResponseCallback<List<DeploymentImageResponse>>? = null
     ) {
@@ -243,7 +243,16 @@ class Firestore(val context: Context) {
                     deploymentImageResponses.forEach { lr ->
                         val edgeDeploymentId =
                             edgeDeploymentDb.getDeploymentByServerId(lr.deploymentServerId)
-                        deploymentImageDb.insertOrUpdate(lr, edgeDeploymentId?.id)
+                        val guardianDeploymentId =
+                            guardianDeploymentDb.getDeploymentByServerId(lr.deploymentServerId)
+
+                        if (edgeDeploymentId != null) {
+                            deploymentImageDb.insertOrUpdate(lr, edgeDeploymentId.id, Device.EDGE.value)
+                        }
+
+                        if (guardianDeploymentId != null) {
+                            deploymentImageDb.insertOrUpdate(lr, guardianDeploymentId.id, Device.GUARDIAN.value)
+                        }
                     }
 
                     callback?.onSuccessCallback(deploymentImageResponses)

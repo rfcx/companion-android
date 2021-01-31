@@ -8,42 +8,59 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.Transformations
 import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonArray
-import com.mapbox.mapboxsdk.geometry.LatLng
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_guardian_diagnostic.*
+import kotlinx.android.synthetic.main.activity_guardian_diagnostic.deploymentImageRecycler
+import kotlinx.android.synthetic.main.activity_guardian_diagnostic.locationValueTextView
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.SocketManager
+import org.rfcx.companion.entity.DeploymentImage
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.guardian.*
 import org.rfcx.companion.entity.socket.response.Status
+import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.localdb.guardian.DiagnosticDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.service.DiagnosticSyncWorker
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.RealmHelper
+import org.rfcx.companion.util.asLiveData
 import org.rfcx.companion.util.convertLatLngLabel
-import org.rfcx.companion.view.detail.EditLocationActivity
+import org.rfcx.companion.view.detail.*
 import org.rfcx.companion.view.dialog.LoadingDialogFragment
 import org.rfcx.companion.view.prefs.GuardianPrefsFragment
 import org.rfcx.companion.view.prefs.SyncPreferenceListener
 
-class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
+class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (DeploymentImageView) -> Unit {
 
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val diagnosticDb: DiagnosticDb by lazy { DiagnosticDb(realm) }
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
+    private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
+    private val deploymentImageAdapter by lazy { DeploymentImageAdapter(this) }
+
     private val diagnosticInfo: DiagnosticInfo by lazy {
         diagnosticDb.getDiagnosticInfo(
             deploymentServerId
         )
+    }
+
+    private lateinit var deployImageLiveData: LiveData<List<DeploymentImage>>
+    private var deploymentImages = listOf<DeploymentImage>()
+    private val deploymentImageObserve = Observer<List<DeploymentImage>> {
+        deploymentImages = it
+        updateDeploymentImages(deploymentImages)
     }
 
     private var collapseAdvanced = false
@@ -68,6 +85,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
         setContentView(R.layout.activity_guardian_diagnostic)
         getIntentExtra()
         setupToolbar()
+        setupImageRecycler()
         setupUiByConnection()
         setupLocationData()
         retrieveDiagnosticInfo()
@@ -79,6 +97,15 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
         if (isConnected == false) {
             disableAllComponent(diagnosticScrollView)
         }
+    }
+
+    private fun setupImageRecycler() {
+        deploymentImageRecycler.apply {
+            adapter = deploymentImageAdapter
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            setHasFixedSize(true)
+        }
+        deployment?.id?.let { observeDeploymentImage(it) }
     }
 
     private fun getIntentExtra() {
@@ -109,6 +136,23 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
                     ContextCompat.getDrawable(this, R.drawable.ic_drop_down)
             }
         }
+    }
+
+    private fun observeDeploymentImage(deploymentId: Int) {
+        deployImageLiveData =
+            Transformations.map(deploymentImageDb.getAllResultsAsync(deploymentId, device = Device.GUARDIAN.value).asLiveData()) {
+                it
+            }
+        deployImageLiveData.observeForever(deploymentImageObserve)
+    }
+
+    private fun updateDeploymentImages(deploymentImages: List<DeploymentImage>) {
+        photoTitle.visibility = if (deploymentImages.isNotEmpty()) View.VISIBLE else View.GONE
+        separateLine5.visibility = if (deploymentImages.isNotEmpty()) View.VISIBLE else View.GONE
+        deploymentImageRecycler.visibility =
+            if (deploymentImages.isNotEmpty()) View.VISIBLE else View.GONE
+        val items = deploymentImages.map { it.toDeploymentImageView() }
+        deploymentImageAdapter.submitList(items)
     }
 
     private fun setupToolbar() {
@@ -381,4 +425,14 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener {
             context.startActivity(intent)
         }
     }
+
+    override fun invoke(deploymentImage: DeploymentImageView) {
+        val list = arrayListOf<String>()
+        deploymentImages.forEach { list.add(it.remotePath ?: "file://${it.localPath}") }
+
+        val index = list.indexOf(deploymentImage.remotePath ?: "file://${deploymentImage.localPath}")
+        list.removeAt(index)
+        list.add(0, deploymentImage.remotePath ?: "file://${deploymentImage.localPath}")
+
+        DisplayImageActivity.startActivity(this, list)    }
 }
