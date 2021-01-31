@@ -30,26 +30,40 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_padding_xsmall">
 
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guidelineVertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.50" />
+
                 <TextView
                     android:id="@+id/deploymentLocationTitle"
-                    style="@style/AudioMothText.Body.Small.Label"
+                    style="@style/GuardianText.Title.Bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/location"
-                    android:textStyle="bold"
+                    android:textColor="@color/text_secondary"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/locationValueTextView"
-                    style="@style/AudioMothText.Body.Secondary"
+                <TextView
+                    android:id="@+id/latitudeLabel"
+                    style="@style/GuardianText.Label.Bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/margin_padding_large"
-                    android:layout_marginTop="@dimen/margin_padding_small"
-                    android:textSize="@dimen/text_xsmall"
-                    app:layout_constraintStart_toStartOf="parent"
+                    android:text="@string/latitude"
+                    app:layout_constraintStart_toStartOf="@+id/deploymentLocationTitle"
                     app:layout_constraintTop_toBottomOf="@id/deploymentLocationTitle" />
+
+                <TextView
+                    android:id="@+id/latitudeValue"
+                    style="@style/GuardianText.Label.Value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="@id/latitudeLabel"
+                    app:layout_constraintTop_toBottomOf="@id/latitudeLabel"
+                    tools:text="50.00" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/editLocationButton"
@@ -60,9 +74,48 @@
                     android:textAllCaps="true"
                     android:textColor="@color/colorPrimary"
                     android:textSize="@dimen/text_small"
-                    app:layout_constraintBottom_toBottomOf="@id/locationValueTextView"
+                    app:layout_constraintBottom_toBottomOf="@id/deploymentLocationTitle"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@id/deploymentLocationTitle" />
+
+                <TextView
+                    android:id="@+id/longitudeLabel"
+                    style="@style/GuardianText.Label.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="0dp"
+                    android:text="@string/longitude"
+                    app:layout_constraintStart_toEndOf="@id/guidelineVertical"
+                    app:layout_constraintTop_toBottomOf="@id/deploymentLocationTitle" />
+
+                <TextView
+                    android:id="@+id/longitudeValue"
+                    style="@style/GuardianText.Label.Value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="@id/longitudeLabel"
+                    app:layout_constraintTop_toBottomOf="@id/longitudeLabel"
+                    tools:text="50.00" />
+
+
+                <TextView
+                    android:id="@+id/altitudeLabel"
+                    style="@style/GuardianText.Label.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="0dp"
+                    android:text="@string/altitude"
+                    app:layout_constraintStart_toStartOf="@id/latitudeValue"
+                    app:layout_constraintTop_toBottomOf="@id/latitudeValue" />
+
+                <TextView
+                    android:id="@+id/altitudeValue"
+                    style="@style/GuardianText.Label.Value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="@id/altitudeLabel"
+                    app:layout_constraintTop_toBottomOf="@id/altitudeLabel"
+                    tools:text="50.00" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
