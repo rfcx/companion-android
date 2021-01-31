@@ -165,10 +165,11 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         observeDeploymentImage(deployment.id)
 
         val location = deployment.location
-        locationValueTextView.text =
-            location?.let { locate ->
-                convertLatLngLabel(this, locate.latitude, locate.longitude)
-            }
+        location?.let { locate ->
+            latitudeValue.text = locate.latitude.latitudeCoordinates(this)
+            longitudeValue.text = locate.longitude.longitudeCoordinates(this)
+            altitudeValue.text = locate.altitude.toString()
+        }
         changePinColorByGroup(location?.locationGroup?.group ?: getString(R.string.none))
     }
 
