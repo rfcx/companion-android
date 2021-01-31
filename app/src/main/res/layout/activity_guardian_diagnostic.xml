@@ -74,11 +74,47 @@
                 android:background="@color/separateLine"
                 app:layout_constraintTop_toBottomOf="@id/diagnosticLocationLayout" />
 
+            <TextView
+                android:id="@+id/photoTitle"
+                style="@style/GuardianText.Title.Bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/photos"
+                android:visibility="gone"
+                android:textColor="@color/text_secondary"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/separateLine2" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/deploymentImageRecycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:layout_marginEnd="@dimen/margin_padding_large"
+                android:clipToPadding="false"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/photoLabel"
+                tools:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_image"
+                tools:orientation="horizontal" />
+
+            <View
+                android:id="@+id/separateLine5"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/separate_line_size"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:background="@color/separateLine"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/deploymentImageRecycler" />
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/diagnosticDetailLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/separateLine2">
+                app:layout_constraintTop_toBottomOf="@id/separateLine5">
 
                 <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/guidelineVertical2"

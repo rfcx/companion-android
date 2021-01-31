@@ -17,17 +17,20 @@ open class DeploymentImage(
     var localPath: String = "",
     var remotePath: String? = null,
     var createdAt: Date = Date(),
+    var device: String = "",
     @Expose(serialize = false)
     var syncState: Int = 0,
     @Expose(serialize = false)
     var syncToFireStoreState: Int = 0
 ) : RealmModel {
     companion object {
+        const val TABLE_NAME = "DeploymentImage"
         const val FIELD_ID = "id"
         const val FIELD_DEPLOYMENT_ID = "deploymentId"
         const val FIELD_SYNC_STATE = "syncState"
         const val FIELD_REMOTE_PATH = "remotePath"
         const val FIELD_LOCAL_PATH = "localPath"
+        const val FIELD_DEVICE = "device"
         const val FIELD_DEPLOYMENT_SERVER_ID = "deploymentServerId"
     }
 }
