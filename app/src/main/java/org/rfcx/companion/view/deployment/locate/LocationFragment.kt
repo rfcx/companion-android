@@ -25,7 +25,6 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.mapbox.android.core.location.*
 import com.mapbox.mapboxsdk.Mapbox
@@ -66,6 +65,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var locationEngine: LocationEngine? = null
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
+    private var altitude: Double? = null
     private var nameLocation: String? = null
     private var group: String? = null
 
@@ -160,13 +160,27 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             locationNameEditText.setText(nameLocation)
         }
 
+        if (altitude != null) {
+            altitudeEditText.setText(altitude.toString())
+        }
+
         finishButton.setOnClickListener {
             analytics?.trackSaveLocationEvent(Screen.LOCATION.id)
-            if (existingRadioButton.isChecked) {
-                handleExistLocate()
-            } else if (newLocationRadioButton.isChecked) {
-                getLastLocation()
-                verifyInput()
+            val altitudeValue = altitudeEditText.text.toString()
+            if (altitudeValue.isNotEmpty()) {
+                this.altitude = altitudeValue.toDouble()
+                if (existingRadioButton.isChecked) {
+                    handleExistLocate()
+                } else if (newLocationRadioButton.isChecked) {
+                    getLastLocation()
+                    verifyInput()
+                }
+            } else {
+                Toast.makeText(
+                    context,
+                    getString(R.string.altitude_is_required),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
@@ -250,6 +264,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     name = name,
                     latitude = it.latitude,
                     longitude = it.longitude,
+                    altitude = altitude ?: 0.0,
                     locationGroup = getLocationGroup()
                 )
                 deploymentProtocol?.setDeployLocation(locate, false)
@@ -273,6 +288,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 it.name,
                 it.latitude,
                 it.longitude,
+                it.altitude,
                 it.createdAt,
                 it.deletedAt,
                 it.lastDeploymentId,
@@ -324,6 +340,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         locateItem?.let {
             moveCamera(it.getLatLng(), DEFAULT_ZOOM)
             setLatLogLabel(it.getLatLng())
+            altitudeEditText.setText(it.altitude.toString())
+            altitudeEditText.isEnabled = false
         }
         locationNameTextInput.visibility = View.GONE
         locationNameSpinner.visibility = View.VISIBLE
@@ -343,6 +361,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun onPressedNewLocation() {
+        val altitudeText = if(altitude == null) "0.0" else altitude.toString()
+        altitudeEditText.setText(altitudeText)
+        altitudeEditText.isEnabled = true
         getLastLocation()
 
         if (lastLocation != null) {
@@ -426,6 +447,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     val latLng = it.getLatLng()
                     moveCamera(latLng, DEFAULT_ZOOM)
                     setLatLogLabel(latLng)
+                    altitudeEditText.setText(it.altitude.toString())
 
                     if (locationGroupDb.isExisted(it.locationGroup?.group)) {
                         group = it.locationGroup?.group

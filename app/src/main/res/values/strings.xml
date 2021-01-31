@@ -99,11 +99,13 @@
     <string name="existing">Existing</string>
     <string name="next">Next</string>
     <string name="change">change</string>
+    <string name="altitude">Altitude</string>
 
     <!--  MapPickerFragment  -->
     <string name="select">Select</string>
     <string name="selected_location">Selected location</string>
     <string name="please_fill_information">Location name is required.</string>
+    <string name="altitude_is_required">Altitude is required.</string>
 
     <!--  SelectProfileFragment  -->
     <string name="use_an_existing">Use an existing profile</string>

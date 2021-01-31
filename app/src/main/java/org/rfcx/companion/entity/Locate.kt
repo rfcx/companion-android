@@ -16,6 +16,7 @@ open class Locate(
     var name: String = "",
     var latitude: Double = 0.0,
     var longitude: Double = 0.0,
+    var altitude: Double = 0.0,
     var createdAt: Date = Date(),
     var deletedAt: Date? = null,
     var lastDeploymentId: Int = 0,
@@ -55,6 +56,7 @@ open class Locate(
             name = name,
             latitude = latitude,
             longitude = longitude,
+            altitude = altitude,
             locationGroup = locationGroup
         )
     }
@@ -67,5 +69,6 @@ open class Locate(
         const val FIELD_DELETED_AT = "deletedAt"
         const val FIELD_LAST_EDGE_DEPLOYMENT_SERVER_ID = "lastDeploymentServerId"
         const val FIELD_LAST_EDGE_DEPLOYMENT_ID = "lastDeploymentId"
+        const val FIELD_ALTITUDE = "altitude"
     }
 }

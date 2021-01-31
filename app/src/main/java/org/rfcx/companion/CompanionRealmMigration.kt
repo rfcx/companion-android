@@ -166,6 +166,16 @@ class CompanionRealmMigration : RealmMigration {
     }
 
     private fun migrateToV8(realm: DynamicRealm) {
+        val locate = realm.schema.get(Locate.TABLE_NAME)
+        locate?.apply {
+            addField(Locate.FIELD_ALTITUDE, Double::class.java)
+        }
+
+        val deploymentLocation = realm.schema.get(DeploymentLocation.TABLE_NAME)
+        deploymentLocation?.apply {
+            addField(DeploymentLocation.FIELD_ALTITUDE, Double::class.java)
+        }
+
         val deploymentImage = realm.schema.get(DeploymentImage.TABLE_NAME)
         deploymentImage?.apply {
             addField(DeploymentImage.FIELD_DEVICE, String::class.java)
