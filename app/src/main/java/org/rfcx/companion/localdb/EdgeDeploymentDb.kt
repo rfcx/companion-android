@@ -157,6 +157,7 @@ class EdgeDeploymentDb(private val realm: Realm) {
         locationName: String,
         latitude: Double,
         longitude: Double,
+        altitude: Double,
         callback: DatabaseCallback
     ) {
         realm.executeTransactionAsync({ bgRealm ->
@@ -168,6 +169,7 @@ class EdgeDeploymentDb(private val realm: Realm) {
                 edgeDeployment.location?.name = locationName
                 edgeDeployment.location?.latitude = latitude
                 edgeDeployment.location?.longitude = longitude
+                edgeDeployment.location?.altitude = altitude
                 edgeDeployment.updatedAt = Date()
                 edgeDeployment.syncState = SyncState.Unsent.key
             }
@@ -185,6 +187,7 @@ class EdgeDeploymentDb(private val realm: Realm) {
             if (location != null) {
                 location.latitude = latitude
                 location.longitude = longitude
+                location.altitude = altitude
                 location.name = locationName
                 location.syncState = SyncState.Unsent.key
             }

@@ -94,7 +94,8 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
                 ).show()
             } else {
                 analytics?.trackSaveLocationEvent(Screen.EDIT_LOCATION.id)
-                editLocationActivityListener?.updateDeploymentDetail(locationNameEditText.text.toString())
+                altitude = altitudeEditText.text.toString().toDouble()
+                editLocationActivityListener?.updateDeploymentDetail(locationNameEditText.text.toString(), altitude)
             }
         }
 

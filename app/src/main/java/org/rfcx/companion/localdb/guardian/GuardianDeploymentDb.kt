@@ -173,6 +173,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
         locationName: String,
         latitude: Double,
         longitude: Double,
+        altitude: Double,
         callback: DatabaseCallback
     ) {
         realm.executeTransactionAsync({ bgRealm ->
@@ -184,6 +185,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
                 guardianDeployment.location?.name = locationName
                 guardianDeployment.location?.latitude = latitude
                 guardianDeployment.location?.longitude = longitude
+                guardianDeployment.location?.altitude = altitude
                 guardianDeployment.updatedAt = Date()
                 guardianDeployment.syncState = SyncState.Unsent.key
             }
@@ -201,6 +203,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
             if (location != null) {
                 location.latitude = latitude
                 location.longitude = longitude
+                location.altitude = altitude
                 location.name = locationName
                 location.syncState = SyncState.Unsent.key
             }

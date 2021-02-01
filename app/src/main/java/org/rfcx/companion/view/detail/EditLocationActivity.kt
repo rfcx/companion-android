@@ -119,7 +119,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
         startFragment(MapPickerFragment.newInstance(latitude, longitude, name))
     }
 
-    override fun updateDeploymentDetail(name: String) {
+    override fun updateDeploymentDetail(name: String, altitude: Double) {
         val group = groupName ?: ""
         showLoading()
         deploymentId?.let { id ->
@@ -129,6 +129,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
                     locationName = name,
                     latitude = latitude,
                     longitude = longitude,
+                    altitude = altitude,
                     callback = object : DatabaseCallback {
                         override fun onSuccess() {
                             hideLoading()
@@ -147,6 +148,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
                     locationName = name,
                     latitude = latitude,
                     longitude = longitude,
+                    altitude = altitude,
                     callback = object : DatabaseCallback {
                         override fun onSuccess() {
                             hideLoading()
