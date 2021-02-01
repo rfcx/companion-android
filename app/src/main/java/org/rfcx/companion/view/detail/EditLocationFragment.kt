@@ -1,8 +1,7 @@
 package org.rfcx.companion.view.detail
 
 import android.content.Context
-import android.graphics.PorterDuff
-import android.os.Build
+import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -21,6 +20,8 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import kotlinx.android.synthetic.main.fragment_edit_location.*
+import kotlinx.android.synthetic.main.fragment_edit_location.altitudeEditText
+import kotlinx.android.synthetic.main.fragment_edit_location.locationGroupValueTextView
 import kotlinx.android.synthetic.main.fragment_edit_location.locationNameEditText
 import kotlinx.android.synthetic.main.fragment_edit_location.locationValueTextView
 import kotlinx.android.synthetic.main.fragment_edit_location.pinDeploymentImageView
@@ -66,6 +67,7 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         mapView = view.findViewById(R.id.mapBoxView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
+        view.viewTreeObserver.addOnGlobalLayoutListener { setOnFocusEditText() }
 
         setHideKeyboard()
 
@@ -108,6 +110,20 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
             longitude,
             locationNameEditText.text.toString()
         )
+    }
+
+    private fun setOnFocusEditText() {
+        val screenHeight: Int = view?.rootView?.height ?: 0
+        val r = Rect()
+        view?.getWindowVisibleDisplayFrame(r)
+        val keypadHeight: Int = screenHeight - r.bottom
+        if (keypadHeight > screenHeight * 0.15) {
+            saveButton.visibility = View.GONE
+        } else {
+            if (saveButton != null) {
+                saveButton.visibility = View.VISIBLE
+            }
+        }
     }
 
     private fun setHideKeyboard() {
