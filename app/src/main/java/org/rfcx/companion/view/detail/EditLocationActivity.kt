@@ -37,6 +37,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
 
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
+    private var altitude: Double = 0.0
     private var nameLocation: String? = null
     private var deploymentId: Int? = null
     private var groupName: String? = null
@@ -85,6 +86,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
         intent.extras?.let {
             latitude = it.getDouble(EXTRA_LATITUDE)
             longitude = it.getDouble(EXTRA_LONGITUDE)
+            altitude = it.getDouble(ARG_ALTITUDE)
             nameLocation = it.getString(EXTRA_LOCATION_NAME)
             deploymentId = it.getInt(EXTRA_DEPLOYMENT_ID)
             groupName = it.getString(EXTRA_LOCATION_GROUP_NAME)
@@ -108,7 +110,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
     override fun startLocationPage(latitude: Double, longitude: Double, name: String) {
         toolbarLayout.visibility = View.VISIBLE
         setLatLng(latitude, longitude)
-        startFragment(EditLocationFragment.newInstance(latitude, longitude, name))
+        startFragment(EditLocationFragment.newInstance(latitude, longitude, altitude, name))
     }
 
     override fun startMapPickerPage(latitude: Double, longitude: Double, name: String) {
@@ -238,6 +240,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
     companion object {
         const val EXTRA_LATITUDE = "EXTRA_LATITUDE"
         const val EXTRA_LONGITUDE = "EXTRA_LONGITUDE"
+        const val ARG_ALTITUDE = "ARG_ALTITUDE"
         const val EXTRA_LOCATION_NAME = "EXTRA_LOCATION_NAME"
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
         const val EXTRA_LOCATION_GROUP_NAME = "EXTRA_LOCATION_GROUP_NAME"
@@ -248,6 +251,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
             context: Context,
             lat: Double,
             lng: Double,
+            altitude: Double,
             name: String,
             deploymentId: Int,
             groupName: String,
@@ -257,6 +261,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
             val intent = Intent(context, EditLocationActivity::class.java)
             intent.putExtra(EXTRA_LATITUDE, lat)
             intent.putExtra(EXTRA_LONGITUDE, lng)
+            intent.putExtra(ARG_ALTITUDE, altitude)
             intent.putExtra(EXTRA_LOCATION_NAME, name)
             intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
             intent.putExtra(EXTRA_LOCATION_GROUP_NAME, groupName)

@@ -90,6 +90,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
                             this,
                             locate.latitude,
                             locate.longitude,
+                            locate.altitude,
                             locate.name,
                             deploymentId,
                             if (isGroupExisted) group else getString(R.string.none),

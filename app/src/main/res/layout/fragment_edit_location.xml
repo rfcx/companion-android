@@ -129,7 +129,6 @@
                 android:layout_marginStart="@dimen/margin_padding_large"
                 android:layout_marginTop="@dimen/margin_padding_small"
                 android:layout_marginEnd="@dimen/margin_padding_large"
-                android:enabled="false"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/altitudeTitleTextView">

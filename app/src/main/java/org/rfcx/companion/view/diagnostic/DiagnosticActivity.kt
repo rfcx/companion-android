@@ -267,6 +267,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
                     this,
                     locate.latitude,
                     locate.longitude,
+                    locate.altitude,
                     locate.name,
                     it.id,
                     if (isGroupExisted) group else getString(R.string.none),
