@@ -361,7 +361,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun onPressedNewLocation() {
-        val altitudeText = if(altitude == null) "0.0" else altitude.toString()
+        val altitudeText = if(altitude == null) getString(R.string.altitude_default) else altitude.toString()
         altitudeEditText.setText(altitudeText)
         altitudeEditText.isEnabled = true
         getLastLocation()
