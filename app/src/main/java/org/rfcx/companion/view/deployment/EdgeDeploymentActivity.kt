@@ -56,6 +56,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     private var latitude = 0.0
     private var longitude = 0.0
+    private var altitude = 0.0
     private var nameLocation: String = ""
 
     private var currentCheck = 0
@@ -151,7 +152,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                             startCheckList()
                         }
                         else -> {
-                            startLocationPage(this.latitude, this.longitude, this.nameLocation)
+                            startLocationPage(this.latitude, this.longitude, this.altitude, this.nameLocation)
                         }
                     }
                 } else if (!isFragmentPopped) {
@@ -214,9 +215,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         return this._images
     }
 
-    private fun setLatLng(latitude: Double, longitude: Double, name: String) {
+    private fun setLatLng(latitude: Double, longitude: Double, altitude: Double, name: String) {
         this.latitude = latitude
         this.longitude = longitude
+        this.altitude = altitude
         this.nameLocation = name
     }
 
@@ -287,8 +289,8 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         startFragment(SyncFragment.newInstance(status))
     }
 
-    override fun startLocationPage(latitude: Double, longitude: Double, name: String) {
-        startFragment(LocationFragment.newInstance(latitude, longitude, name))
+    override fun startLocationPage(latitude: Double, longitude: Double, altitude: Double, name: String) {
+        startFragment(LocationFragment.newInstance(latitude, longitude, altitude, name))
     }
 
     override fun playSyncSound() {
@@ -315,9 +317,9 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         audioMothConnector.stopPlay()
     }
 
-    override fun startMapPicker(latitude: Double, longitude: Double, name: String) {
-        setLatLng(latitude, longitude, name)
-        startFragment(MapPickerFragment.newInstance(latitude, longitude, name))
+    override fun startMapPicker(latitude: Double, longitude: Double, altitude: Double, name: String) {
+        setLatLng(latitude, longitude, altitude, name)
+        startFragment(MapPickerFragment.newInstance(latitude, longitude, altitude, name))
     }
 
     private fun handleDeploymentStep(deploymentId: Int) {

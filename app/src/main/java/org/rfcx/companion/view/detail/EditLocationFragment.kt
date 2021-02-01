@@ -109,6 +109,7 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         editLocationActivityListener?.startMapPickerPage(
             latitude,
             longitude,
+            altitudeEditText.text.toString().toDouble(),
             locationNameEditText.text.toString()
         )
     }

@@ -51,7 +51,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
         initIntent()
         setupToolbar()
         toolbarLayout.visibility = View.VISIBLE
-        startFragment(MapPickerFragment.newInstance(latitude, longitude, nameLocation ?: ""))
+        startFragment(MapPickerFragment.newInstance(latitude, longitude, altitude, nameLocation ?: ""))
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -94,9 +94,10 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
         }
     }
 
-    private fun setLatLng(latitude: Double, longitude: Double) {
+    private fun setLatLng(latitude: Double, longitude: Double, altitude: Double) {
         this.latitude = latitude
         this.longitude = longitude
+        this.altitude = altitude
     }
 
     override fun showAppbar() {
@@ -107,16 +108,16 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
         toolbarLayout.visibility = View.GONE
     }
 
-    override fun startLocationPage(latitude: Double, longitude: Double, name: String) {
+    override fun startLocationPage(latitude: Double, longitude: Double, altitude: Double, name: String) {
         toolbarLayout.visibility = View.VISIBLE
-        setLatLng(latitude, longitude)
+        setLatLng(latitude, longitude, altitude)
         startFragment(EditLocationFragment.newInstance(latitude, longitude, altitude, name))
     }
 
-    override fun startMapPickerPage(latitude: Double, longitude: Double, name: String) {
+    override fun startMapPickerPage(latitude: Double, longitude: Double, altitude: Double, name: String) {
         toolbarLayout.visibility = View.VISIBLE
-        setLatLng(latitude, longitude)
-        startFragment(MapPickerFragment.newInstance(latitude, longitude, name))
+        setLatLng(latitude, longitude, altitude)
+        startFragment(MapPickerFragment.newInstance(latitude, longitude, altitude, name))
     }
 
     override fun updateDeploymentDetail(name: String, altitude: Double) {
