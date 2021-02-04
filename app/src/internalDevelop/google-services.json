@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "878758824141",
+    "project_id": "rfcx-deployment-dev",
+    "storage_bucket": "rfcx-deployment-dev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:878758824141:android:a157b2d937603af9748184",
+        "android_client_info": {
+          "package_name": "org.rfcx.companion.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "878758824141-2r7sfugvsg7m4hbq5os8tgd3dlnsu80t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZRFJAm4M6ilAudTfs6ZsIPpNNgL9IdlI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "878758824141-2r7sfugvsg7m4hbq5os8tgd3dlnsu80t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
