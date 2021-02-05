@@ -148,8 +148,7 @@ class LoginActivity : AppCompatActivity() {
     private fun saveUserToFirestore(result: UserAuthResponse, uid: String) {
         val name = result.nickname ?: "Companion"
         val email = result.email ?: "Email"
-        val idToken = result.idToken
-        val user = User(name, email, idToken)
+        val user = User(name, email)
 
         Firestore(this@LoginActivity)
             .saveUser(user, uid) { string, isSuccess ->
