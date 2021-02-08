@@ -70,6 +70,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     private var latitude = 0.0
     private var longitude = 0.0
+    private var altitude = 0.0
 
     private var lastCheckInTime: Long? = null
 
@@ -418,18 +419,19 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         }
     }
 
-    override fun startMapPicker(latitude: Double, longitude: Double, name: String) {
-        setLatLng(latitude, longitude)
-        startFragment(MapPickerFragment.newInstance(latitude, longitude, name))
+    override fun startMapPicker(latitude: Double, longitude: Double, altitude: Double, name: String) {
+        setLatLng(latitude, longitude, altitude)
+        startFragment(MapPickerFragment.newInstance(latitude, longitude, altitude, name))
     }
 
-    private fun setLatLng(latitude: Double, longitude: Double) {
+    private fun setLatLng(latitude: Double, longitude: Double, altitude: Double) {
         this.latitude = latitude
         this.longitude = longitude
+        this.altitude = altitude
     }
 
-    override fun startLocationPage(latitude: Double, longitude: Double, name: String) {
-        startFragment(LocationFragment.newInstance(latitude, longitude, name))
+    override fun startLocationPage(latitude: Double, longitude: Double, altitude: Double, name: String) {
+        startFragment(LocationFragment.newInstance(latitude, longitude, altitude, name))
     }
 
     override fun onBackPressed() {

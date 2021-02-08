@@ -1,8 +1,7 @@
 package org.rfcx.companion.view.detail
 
 import android.content.Context
-import android.graphics.PorterDuff
-import android.os.Build
+import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -21,6 +20,8 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import kotlinx.android.synthetic.main.fragment_edit_location.*
+import kotlinx.android.synthetic.main.fragment_edit_location.altitudeEditText
+import kotlinx.android.synthetic.main.fragment_edit_location.locationGroupValueTextView
 import kotlinx.android.synthetic.main.fragment_edit_location.locationNameEditText
 import kotlinx.android.synthetic.main.fragment_edit_location.locationValueTextView
 import kotlinx.android.synthetic.main.fragment_edit_location.pinDeploymentImageView
@@ -36,6 +37,7 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
 
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
+    private var altitude: Double = 0.0
     private var nameLocation: String? = null
     private val analytics by lazy { context?.let { Analytics(it) } }
 
@@ -65,10 +67,12 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         mapView = view.findViewById(R.id.mapBoxView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
+        view.viewTreeObserver.addOnGlobalLayoutListener { setOnFocusEditText() }
 
         setHideKeyboard()
 
         locationNameEditText.setText(nameLocation)
+        altitudeEditText.setText(altitude.toString())
         locationValueTextView.text = context?.let { convertLatLngLabel(it, latitude, longitude) }
 
         changeButton.setOnClickListener {
@@ -90,7 +94,8 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
                 ).show()
             } else {
                 analytics?.trackSaveLocationEvent(Screen.EDIT_LOCATION.id)
-                editLocationActivityListener?.updateDeploymentDetail(locationNameEditText.text.toString())
+                altitude = altitudeEditText.text.toString().toDouble()
+                editLocationActivityListener?.updateDeploymentDetail(locationNameEditText.text.toString(), altitude)
             }
         }
 
@@ -104,8 +109,23 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         editLocationActivityListener?.startMapPickerPage(
             latitude,
             longitude,
+            altitudeEditText.text.toString().toDouble(),
             locationNameEditText.text.toString()
         )
+    }
+
+    private fun setOnFocusEditText() {
+        val screenHeight: Int = view?.rootView?.height ?: 0
+        val r = Rect()
+        view?.getWindowVisibleDisplayFrame(r)
+        val keypadHeight: Int = screenHeight - r.bottom
+        if (keypadHeight > screenHeight * 0.15) {
+            saveButton.visibility = View.GONE
+        } else {
+            if (saveButton != null) {
+                saveButton.visibility = View.VISIBLE
+            }
+        }
     }
 
     private fun setHideKeyboard() {
@@ -124,6 +144,7 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         arguments?.let {
             latitude = it.getDouble(ARG_LATITUDE)
             longitude = it.getDouble(ARG_LONGITUDE)
+            altitude = it.getDouble(ARG_ALTITUDE)
             nameLocation = it.getString(ARG_LOCATION_NAME)
         }
     }
@@ -202,14 +223,16 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
     companion object {
         private const val ARG_LATITUDE = "ARG_LATITUDE"
         private const val ARG_LONGITUDE = "ARG_LONGITUDE"
+        private const val ARG_ALTITUDE = "ARG_ALTITUDE"
         private const val ARG_LOCATION_NAME = "ARG_LOCATION_NAME"
 
         @JvmStatic
-        fun newInstance(lat: Double, lng: Double, name: String) =
+        fun newInstance(lat: Double, lng: Double, altitude: Double, name: String) =
             EditLocationFragment().apply {
                 arguments = Bundle().apply {
                     putDouble(ARG_LATITUDE, lat)
                     putDouble(ARG_LONGITUDE, lng)
+                    putDouble(ARG_ALTITUDE, altitude)
                     putString(ARG_LOCATION_NAME, name)
                 }
             }

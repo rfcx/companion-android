@@ -3,7 +3,7 @@ package org.rfcx.companion.view.deployment
 import org.rfcx.companion.entity.*
 
 interface BaseDeploymentProtocol {
-    fun startMapPicker(latitude: Double, longitude: Double, name: String)
+    fun startMapPicker(latitude: Double, longitude: Double, altitude: Double, name: String)
     fun startCheckList()
 
     fun isOpenedFromUnfinishedDeployment(): Boolean

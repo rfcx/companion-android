@@ -65,7 +65,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var locationEngine: LocationEngine? = null
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
-    private var altitude: Double? = null
+    private var altitude: Double = 0.0
     private var nameLocation: String? = null
     private var group: String? = null
 
@@ -135,6 +135,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         arguments?.let {
             latitude = it.getDouble(ARG_LATITUDE)
             longitude = it.getDouble(ARG_LONGITUDE)
+            altitude = it.getDouble(ARG_ALTITUDE)
             nameLocation = it.getString(ARG_LOCATION_NAME)
         }
     }
@@ -160,9 +161,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             locationNameEditText.setText(nameLocation)
         }
 
-        if (altitude != null) {
-            altitudeEditText.setText(altitude.toString())
-        }
+        altitudeEditText.setText(altitude.toString())
 
         finishButton.setOnClickListener {
             analytics?.trackSaveLocationEvent(Screen.LOCATION.id)
@@ -186,7 +185,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
         changeTextView.setOnClickListener {
             val name = locationNameEditText.text.toString()
-            startMapPicker(name)
+            val altitude = altitudeEditText.text.toString().toDouble()
+            startMapPicker(name, altitude)
             analytics?.trackChangeLocationEvent(Screen.LOCATION.id)
         }
 
@@ -207,15 +207,16 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         viewOfMapBox.setOnClickListener {
             if (newLocationRadioButton.isChecked) {
                 val name = locationNameEditText.text.toString()
-                startMapPicker(name)
+                val altitude = altitudeEditText.text.toString().toDouble()
+                startMapPicker(name, altitude)
                 analytics?.trackChangeLocationEvent(Screen.LOCATION.id)
             }
         }
     }
 
-    private fun startMapPicker(name: String) {
+    private fun startMapPicker(name: String, altitude: Double) {
         deploymentProtocol?.let {
-            it.startMapPicker(latitude, longitude, name)
+            it.startMapPicker(latitude, longitude, altitude, name)
             it.hideToolbar()
         }
     }
@@ -361,7 +362,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun onPressedNewLocation() {
-        val altitudeText = if(altitude == null) "0.0" else altitude.toString()
+        val altitudeText = if(altitude == null) getString(R.string.altitude_default) else altitude.toString()
         altitudeEditText.setText(altitudeText)
         altitudeEditText.isEnabled = true
         getLastLocation()
@@ -683,6 +684,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         const val DEFAULT_ZOOM = 15.0
         const val ARG_LATITUDE = "ARG_LATITUDE"
         const val ARG_LONGITUDE = "ARG_LONGITUDE"
+        const val ARG_ALTITUDE = "ARG_ALTITUDE"
         const val ARG_LOCATION_NAME = "ARG_LOCATION_NAME"
 
         const val DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L
@@ -692,11 +694,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             return LocationFragment()
         }
 
-        fun newInstance(latitude: Double, longitude: Double, name: String) = LocationFragment()
+        fun newInstance(latitude: Double, longitude: Double, altitude: Double, name: String) = LocationFragment()
             .apply {
                 arguments = Bundle().apply {
                     putDouble(ARG_LATITUDE, latitude)
                     putDouble(ARG_LONGITUDE, longitude)
+                    putDouble(ARG_ALTITUDE, altitude)
                     putString(ARG_LOCATION_NAME, name)
                 }
             }

@@ -17,12 +17,15 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonArray
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_guardian_diagnostic.*
+import kotlinx.android.synthetic.main.activity_guardian_diagnostic.altitudeValue
 import kotlinx.android.synthetic.main.activity_guardian_diagnostic.deploymentImageRecycler
-import kotlinx.android.synthetic.main.activity_guardian_diagnostic.locationValueTextView
+import kotlinx.android.synthetic.main.activity_guardian_diagnostic.latitudeValue
+import kotlinx.android.synthetic.main.activity_guardian_diagnostic.longitudeValue
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.SocketManager
 import org.rfcx.companion.entity.DeploymentImage
+import org.rfcx.companion.entity.DeploymentLocation
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.guardian.*
@@ -32,10 +35,7 @@ import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.localdb.guardian.DiagnosticDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.service.DiagnosticSyncWorker
-import org.rfcx.companion.util.Analytics
-import org.rfcx.companion.util.RealmHelper
-import org.rfcx.companion.util.asLiveData
-import org.rfcx.companion.util.convertLatLngLabel
+import org.rfcx.companion.util.*
 import org.rfcx.companion.view.detail.*
 import org.rfcx.companion.view.dialog.LoadingDialogFragment
 import org.rfcx.companion.view.prefs.GuardianPrefsFragment
@@ -71,6 +71,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
 
     private var lat: Double? = null
     private var long: Double? = null
+    private var altitude: Double? = null
     private var locationName: String? = null
     private var isConnected: Boolean? = null
     private var deployment: GuardianDeployment? = null
@@ -113,6 +114,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
         deployment = intent.extras?.getSerializable(DEPLOYMENT) as GuardianDeployment
         lat = deployment?.location?.latitude ?: 0.0
         long = deployment?.location?.longitude ?: 0.0
+        altitude = deployment?.location?.altitude ?: 0.0
         locationName = deployment?.location?.name ?: ""
         deploymentServerId = deployment?.serverId ?: ""
         configuration = deployment?.configuration ?: GuardianConfiguration()
@@ -170,7 +172,9 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
         val latitude = lat
         val longitude = long
         if(latitude != null && longitude != null) {
-            locationValueTextView.text = convertLatLngLabel(this, latitude, longitude)
+            latitudeValue.text = latitude.latitudeCoordinates(this)
+            longitudeValue.text = longitude.longitudeCoordinates(this)
+            altitudeValue.text = altitude.toString()
         }
     }
 
@@ -263,6 +267,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
                     this,
                     locate.latitude,
                     locate.longitude,
+                    locate.altitude,
                     locate.name,
                     it.id,
                     if (isGroupExisted) group else getString(R.string.none),
@@ -301,10 +306,11 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
 
     private fun updateDeploymentDetailView(deployment: GuardianDeployment) {
         val location = deployment.location
-        locationValueTextView.text =
-            location?.let { locate ->
-                convertLatLngLabel(this, locate.latitude, locate.longitude)
-            }
+        location?.let { locate ->
+            latitudeValue.text = locate.latitude.latitudeCoordinates(this)
+            longitudeValue.text = locate.longitude.longitudeCoordinates(this)
+            altitudeValue.text = locate.altitude.toString()
+        }
     }
 
     private fun showLoading() {

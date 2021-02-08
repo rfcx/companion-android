@@ -90,6 +90,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
                             this,
                             locate.latitude,
                             locate.longitude,
+                            locate.altitude,
                             locate.name,
                             deploymentId,
                             if (isGroupExisted) group else getString(R.string.none),
@@ -165,10 +166,11 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         observeDeploymentImage(deployment.id)
 
         val location = deployment.location
-        locationValueTextView.text =
-            location?.let { locate ->
-                convertLatLngLabel(this, locate.latitude, locate.longitude)
-            }
+        location?.let { locate ->
+            latitudeValue.text = locate.latitude.latitudeCoordinates(this)
+            longitudeValue.text = locate.longitude.longitudeCoordinates(this)
+            altitudeValue.text = locate.altitude.toString()
+        }
         changePinColorByGroup(location?.locationGroup?.group ?: getString(R.string.none))
     }
 

@@ -37,6 +37,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
 
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
+    private var altitude: Double = 0.0
     private var nameLocation: String? = null
     private var deploymentId: Int? = null
     private var groupName: String? = null
@@ -50,7 +51,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
         initIntent()
         setupToolbar()
         toolbarLayout.visibility = View.VISIBLE
-        startFragment(MapPickerFragment.newInstance(latitude, longitude, nameLocation ?: ""))
+        startFragment(MapPickerFragment.newInstance(latitude, longitude, altitude, nameLocation ?: ""))
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -85,6 +86,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
         intent.extras?.let {
             latitude = it.getDouble(EXTRA_LATITUDE)
             longitude = it.getDouble(EXTRA_LONGITUDE)
+            altitude = it.getDouble(ARG_ALTITUDE)
             nameLocation = it.getString(EXTRA_LOCATION_NAME)
             deploymentId = it.getInt(EXTRA_DEPLOYMENT_ID)
             groupName = it.getString(EXTRA_LOCATION_GROUP_NAME)
@@ -92,9 +94,10 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
         }
     }
 
-    private fun setLatLng(latitude: Double, longitude: Double) {
+    private fun setLatLng(latitude: Double, longitude: Double, altitude: Double) {
         this.latitude = latitude
         this.longitude = longitude
+        this.altitude = altitude
     }
 
     override fun showAppbar() {
@@ -105,19 +108,19 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
         toolbarLayout.visibility = View.GONE
     }
 
-    override fun startLocationPage(latitude: Double, longitude: Double, name: String) {
+    override fun startLocationPage(latitude: Double, longitude: Double, altitude: Double, name: String) {
         toolbarLayout.visibility = View.VISIBLE
-        setLatLng(latitude, longitude)
-        startFragment(EditLocationFragment.newInstance(latitude, longitude, name))
+        setLatLng(latitude, longitude, altitude)
+        startFragment(EditLocationFragment.newInstance(latitude, longitude, altitude, name))
     }
 
-    override fun startMapPickerPage(latitude: Double, longitude: Double, name: String) {
+    override fun startMapPickerPage(latitude: Double, longitude: Double, altitude: Double, name: String) {
         toolbarLayout.visibility = View.VISIBLE
-        setLatLng(latitude, longitude)
-        startFragment(MapPickerFragment.newInstance(latitude, longitude, name))
+        setLatLng(latitude, longitude, altitude)
+        startFragment(MapPickerFragment.newInstance(latitude, longitude, altitude, name))
     }
 
-    override fun updateDeploymentDetail(name: String) {
+    override fun updateDeploymentDetail(name: String, altitude: Double) {
         val group = groupName ?: ""
         showLoading()
         deploymentId?.let { id ->
@@ -127,6 +130,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
                     locationName = name,
                     latitude = latitude,
                     longitude = longitude,
+                    altitude = altitude,
                     callback = object : DatabaseCallback {
                         override fun onSuccess() {
                             hideLoading()
@@ -145,6 +149,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
                     locationName = name,
                     latitude = latitude,
                     longitude = longitude,
+                    altitude = altitude,
                     callback = object : DatabaseCallback {
                         override fun onSuccess() {
                             hideLoading()
@@ -238,6 +243,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
     companion object {
         const val EXTRA_LATITUDE = "EXTRA_LATITUDE"
         const val EXTRA_LONGITUDE = "EXTRA_LONGITUDE"
+        const val ARG_ALTITUDE = "ARG_ALTITUDE"
         const val EXTRA_LOCATION_NAME = "EXTRA_LOCATION_NAME"
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
         const val EXTRA_LOCATION_GROUP_NAME = "EXTRA_LOCATION_GROUP_NAME"
@@ -248,6 +254,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
             context: Context,
             lat: Double,
             lng: Double,
+            altitude: Double,
             name: String,
             deploymentId: Int,
             groupName: String,
@@ -257,6 +264,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
             val intent = Intent(context, EditLocationActivity::class.java)
             intent.putExtra(EXTRA_LATITUDE, lat)
             intent.putExtra(EXTRA_LONGITUDE, lng)
+            intent.putExtra(ARG_ALTITUDE, altitude)
             intent.putExtra(EXTRA_LOCATION_NAME, name)
             intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
             intent.putExtra(EXTRA_LOCATION_GROUP_NAME, groupName)

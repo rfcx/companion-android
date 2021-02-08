@@ -55,6 +55,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
     private var selectedLocation: Location? = null
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
+    private var altitude: Double = 0.0
     private var nameLocation: String? = null
 
     private val analytics by lazy { context?.let { Analytics(it) } }
@@ -118,7 +119,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
             val currentCameraPosition = mapboxMap?.cameraPosition?.target
             currentCameraPosition?.let {
                 analytics?.trackSelectLocationEvent()
-                mapPickerProtocol?.startLocationPage(it.latitude, it.longitude, nameLocation ?: "")
+                mapPickerProtocol?.startLocationPage(it.latitude, it.longitude, altitude, nameLocation ?: "")
             }
         }
 
@@ -137,6 +138,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
         arguments?.let {
             latitude = it.getDouble(ARG_LATITUDE)
             longitude = it.getDouble(ARG_LONGITUDE)
+            altitude = it.getDouble(ARG_ALTITUDE)
             nameLocation = it.getString(ARG_LOCATION_NAME)
         }
     }
@@ -430,15 +432,17 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
     companion object {
         private const val ARG_LATITUDE = "ARG_LATITUDE"
         private const val ARG_LONGITUDE = "ARG_LONGITUDE"
+        private const val ARG_ALTITUDE = "ARG_ALTITUDE"
         private const val ARG_LOCATION_NAME = "ARG_LOCATION_NAME"
 
         @JvmStatic
-        fun newInstance(lat: Double, lng: Double, name: String) =
+        fun newInstance(lat: Double, lng: Double, altitude: Double, name: String) =
             MapPickerFragment()
                 .apply {
                     arguments = Bundle().apply {
                         putDouble(ARG_LATITUDE, lat)
                         putDouble(ARG_LONGITUDE, lng)
+                        putDouble(ARG_ALTITUDE, altitude)
                         putString(ARG_LOCATION_NAME, name)
                     }
                 }
