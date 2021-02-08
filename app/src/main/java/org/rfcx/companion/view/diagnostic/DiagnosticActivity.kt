@@ -111,7 +111,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
 
     private fun getIntentExtra() {
         isConnected = intent.extras?.getBoolean(IS_CONNECTED)
-        deployment = GuardianDeployment(location = DeploymentLocation(latitude = 12.34, longitude = 14.55, altitude = 9.9))
+        deployment = intent.extras?.getSerializable(DEPLOYMENT) as GuardianDeployment
         lat = deployment?.location?.latitude ?: 0.0
         long = deployment?.location?.longitude ?: 0.0
         altitude = deployment?.location?.altitude ?: 0.0
