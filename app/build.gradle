@@ -35,9 +35,16 @@ android {
     productFlavors {
         common {
             buildConfigField 'boolean', 'ENABLE_GUARDIAN', 'false'
+            buildConfigField 'String', 'FIREBASE_AUTH_DOMAIN', '"https://us-central1-rfcx-deployment.cloudfunctions.net/auth/"'
         }
         internal {
             buildConfigField 'boolean', 'ENABLE_GUARDIAN', 'true'
+            buildConfigField 'String', 'FIREBASE_AUTH_DOMAIN', '"https://us-central1-rfcx-deployment.cloudfunctions.net/auth/"'
+        }
+        internalDevelop {
+            buildConfigField 'boolean', 'ENABLE_GUARDIAN', 'true'
+            buildConfigField 'String', 'FIREBASE_AUTH_DOMAIN', '"https://us-central1-rfcx-deployment-dev.cloudfunctions.net/auth/"'
+            applicationIdSuffix '.dev'
         }
     }
     compileOptions {
