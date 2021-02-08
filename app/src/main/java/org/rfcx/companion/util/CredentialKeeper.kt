@@ -10,6 +10,7 @@ class CredentialKeeper(val context: Context) {
         // Required
         preferences.putString(Preferences.USER_GUID, user.guid)
         preferences.putString(Preferences.ID_TOKEN, user.idToken)
+        preferences.putLong(Preferences.TOKEN_EXPIRES_AT, user.expires * 1000)
 
         // Optional
         if (user.accessToken != null) {
@@ -41,8 +42,13 @@ class CredentialKeeper(val context: Context) {
 
     fun hasValidCredentials(): Boolean {
         val preferences = Preferences.getInstance(context)
-        val idToken = preferences.getString(Preferences.ID_TOKEN)
+        val idToken = if (!isTokenExpired()) preferences.getString(Preferences.ID_TOKEN) else null
         val userFirebaseUid = preferences.getString(Preferences.USER_FIREBASE_UID)
         return idToken != null && userFirebaseUid != null
+    }
+
+    private fun isTokenExpired(): Boolean {
+        val preferences = Preferences.getInstance(context)
+        return System.currentTimeMillis() > preferences.getLong(Preferences.TOKEN_EXPIRES_AT, 0)
     }
 }

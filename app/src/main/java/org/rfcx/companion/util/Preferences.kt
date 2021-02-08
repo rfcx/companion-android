@@ -33,6 +33,7 @@ class Preferences(context: Context) {
         const val USER_FIREBASE_UID = "${PREFIX}USER_FIREBASE_UID"
         const val DISPLAY_THEME = "${PREFIX}DISPLAY_THEME"
         const val GROUP = "${PREFIX}GROUP"
+        const val TOKEN_EXPIRES_AT = "${PREFIX}TOKEN_EXPIRES_AT"
     }
 
     init {
@@ -50,6 +51,14 @@ class Preferences(context: Context) {
 
     fun getBoolean(key: String, defaultValue: Boolean = false): Boolean {
         return sharedPreferences.getBoolean(key, defaultValue)
+    }
+
+    fun getLong(key: String, defValue: Long): Long {
+        return sharedPreferences.getLong(key, defValue)
+    }
+
+    fun putLong(key: String, long: Long) {
+        sharedPreferences.edit().putLong(key, long).apply()
     }
 
     fun putBoolean(key: String, value: Boolean) {
