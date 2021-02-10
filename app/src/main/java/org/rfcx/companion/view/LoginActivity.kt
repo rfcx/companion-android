@@ -264,7 +264,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun getFirebaseAuth(authUser: String, result: UserAuthResponse) {
-        ApiManager.getInstance().apiFirebaseAuth.firebaseAuth(authUser)
+        ApiManager.getInstance().deviceApi.firebaseAuth(authUser)
             .enqueue(object : Callback<FirebaseAuthResponse> {
                 override fun onFailure(call: Call<FirebaseAuthResponse>, t: Throwable) {
                     loading(false)

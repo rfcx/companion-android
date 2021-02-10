@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class ApiManager {
     var apiRest: ApiRestInterface
-    var apiFirebaseAuth: FirebaseAuthInterface
+    var deviceApi: DeviceApiInterface
 
     companion object {
         @Volatile
@@ -24,7 +24,7 @@ class ApiManager {
 
     init {
         apiRest = setRetrofitBaseUrl(DEPLOY_DOMAIN).create(ApiRestInterface::class.java)
-        apiFirebaseAuth = setRetrofitBaseUrl(BuildConfig.FIREBASE_AUTH_DOMAIN).create(FirebaseAuthInterface::class.java)
+        deviceApi = setRetrofitBaseUrl(BuildConfig.FIREBASE_AUTH_DOMAIN).create(DeviceApiInterface::class.java)
     }
 
     private fun setRetrofitBaseUrl(baseUrl: String): Retrofit {
