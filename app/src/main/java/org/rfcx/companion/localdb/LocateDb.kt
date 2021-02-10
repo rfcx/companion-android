@@ -178,7 +178,7 @@ class LocateDb(private val realm: Realm) {
                 locationGroupObj?.let { obj ->
                     val locationGroup = locationResponse.locationGroup
                     if (locationGroup != null) {
-                        obj.group = locationGroup.group
+                        obj.name = locationGroup.name
                         obj.color = locationGroup.color
                         obj.coreId = locationGroup.coreId
                     }

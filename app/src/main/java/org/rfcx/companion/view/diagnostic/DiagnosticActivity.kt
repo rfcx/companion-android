@@ -259,8 +259,8 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
         deployment?.let {
             val location = deployment?.stream
             location?.let { locate ->
-                val group = locate.project?.group ?: getString(R.string.none)
-                val isGroupExisted = locationGroupDb.isExisted(locate.project?.group)
+                val group = locate.project?.name ?: getString(R.string.none)
+                val isGroupExisted = locationGroupDb.isExisted(locate.project?.name)
                 analytics.trackEditLocationEvent()
                 EditLocationActivity.startActivity(
                     this,

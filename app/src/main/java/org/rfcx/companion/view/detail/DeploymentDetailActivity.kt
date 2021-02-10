@@ -82,8 +82,8 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
             deployment?.let {
                 val location = deployment?.stream
                 location?.let { locate ->
-                    val group = locate.project?.group ?: getString(R.string.none)
-                    val isGroupExisted = locationGroupDb.isExisted(locate.project?.group)
+                    val group = locate.project?.name ?: getString(R.string.none)
+                    val isGroupExisted = locationGroupDb.isExisted(locate.project?.name)
                     intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)?.let { deploymentId ->
                         analytics.trackEditLocationEvent()
                         EditLocationActivity.startActivity(
@@ -171,7 +171,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
             longitudeValue.text = locate.longitude.longitudeCoordinates(this)
             altitudeValue.text = locate.altitude.toString()
         }
-        changePinColorByGroup(location?.project?.group ?: getString(R.string.none))
+        changePinColorByGroup(location?.project?.name ?: getString(R.string.none))
     }
 
     private fun observeDeploymentImage(deploymentId: Int) {

@@ -595,7 +595,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun EdgeDeployment.toMark(): DeploymentMarker {
         val color = stream?.project?.color
-        val group = stream?.project?.group
+        val group = stream?.project?.name
         val isGroupExisted = locationGroupDb.isExisted(group)
         val pinImage =
             if (state == Edge.ReadyToUpload.key) {

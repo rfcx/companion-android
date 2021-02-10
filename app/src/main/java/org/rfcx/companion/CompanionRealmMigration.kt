@@ -81,7 +81,7 @@ class CompanionRealmMigration : RealmMigration {
         // Add LocationGroup class
         val locationGroup = realm.schema.create(LocationGroup.TABLE_NAME)
         locationGroup.apply {
-            addField(LocationGroup.FIELD_GROUP, String::class.java)
+            addField("group", String::class.java)
             addField(LocationGroup.FIELD_COLOR, String::class.java)
             addField("serverId", String::class.java)
         }
@@ -192,6 +192,7 @@ class CompanionRealmMigration : RealmMigration {
         val project = realm.schema.get(LocationGroup.TABLE_NAME)
         project?.apply {
             renameField("serverId", LocationGroup.FIELD_CORE_ID)
+            renameField("group", LocationGroup.FIELD_NAME)
         }
 
         val stream = realm.schema.get(DeploymentLocation.TABLE_NAME)

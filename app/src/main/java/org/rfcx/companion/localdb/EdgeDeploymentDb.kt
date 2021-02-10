@@ -215,7 +215,7 @@ class EdgeDeploymentDb(private val realm: Realm) {
                 //update location group
                 if (edgeDeployment.stream?.project != null) {
                     edgeDeployment.stream?.project?.let {
-                        it.group = locationGroup.group
+                        it.name = locationGroup.name
                         it.color = locationGroup.color
                         it.coreId = locationGroup.coreId
                     }
@@ -223,7 +223,7 @@ class EdgeDeploymentDb(private val realm: Realm) {
                     val locationGroupObj = bgRealm.createObject(LocationGroup::class.java)
                     locationGroupObj.let {
                         it.color = locationGroup.color
-                        it.group = locationGroup.group
+                        it.name = locationGroup.name
                         it.coreId = locationGroup.coreId
                     }
                     edgeDeployment.stream?.project = locationGroupObj
@@ -242,7 +242,7 @@ class EdgeDeploymentDb(private val realm: Realm) {
                 if (location?.locationGroup != null) {
                     val groupLocation = location.locationGroup
                     if (groupLocation != null) {
-                        groupLocation.group =  locationGroup.group
+                        groupLocation.name =  locationGroup.name
                         groupLocation.color = locationGroup.color
                         groupLocation.coreId = locationGroup.coreId
                         location.syncState = SyncState.Unsent.key

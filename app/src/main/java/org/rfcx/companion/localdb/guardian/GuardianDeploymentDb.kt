@@ -230,7 +230,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
                 //update location group
                 if (guardianDeployment.stream?.project != null) {
                     guardianDeployment.stream?.project?.let {
-                        it.group = locationGroup.group
+                        it.name = locationGroup.name
                         it.color = locationGroup.color
                         it.coreId = locationGroup.coreId
                     }
@@ -238,7 +238,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
                     val locationGroupObj = bgRealm.createObject(LocationGroup::class.java)
                     locationGroupObj.let {
                         it.color = locationGroup.color
-                        it.group = locationGroup.group
+                        it.name = locationGroup.name
                         it.coreId = locationGroup.coreId
                     }
                     guardianDeployment.stream?.project = locationGroupObj

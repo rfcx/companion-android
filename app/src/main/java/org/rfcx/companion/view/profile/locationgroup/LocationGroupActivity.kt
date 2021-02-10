@@ -53,7 +53,7 @@ class LocationGroupActivity : BaseActivity(), LocationGroupProtocol {
         when (screen) {
             Screen.LOCATION.id -> {
                 val preferences = Preferences.getInstance(this)
-                group.group?.let { preferences.putString(Preferences.GROUP, it) }
+                group.name?.let { preferences.putString(Preferences.GROUP, it) }
                 finish()
             }
             Screen.EDIT_LOCATION.id -> {
