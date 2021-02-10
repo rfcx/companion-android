@@ -7,9 +7,9 @@ import org.rfcx.companion.entity.EdgeDeployment
 
 data class DeploymentRequest(
     var device: String,
-    var deploymentId: String? = null,
+    var deploymentKey: String? = null,
     var deployedAt: Date = Date(),
-    var location: DeploymentLocation? = null,
+    var stream: DeploymentLocation? = null,
     var createdAt: Date = Date(),
     var updatedAt: Date? = null,
     var deletedAt: Date? = null
@@ -19,9 +19,9 @@ fun EdgeDeployment.toRequestBody(): DeploymentRequest {
     return DeploymentRequest(
         device = Device.EDGE.value,
         deployedAt = this.deployedAt,
-        location = this.stream,
+        stream = this.stream,
         createdAt = this.createdAt,
-        deploymentId = this.deploymentKey,
+        deploymentKey = this.deploymentKey,
         updatedAt = this.updatedAt,
         deletedAt = this.deletedAt
     )

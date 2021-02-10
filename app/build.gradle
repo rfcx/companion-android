@@ -44,6 +44,7 @@ android {
         internalDevelop {
             buildConfigField 'boolean', 'ENABLE_GUARDIAN', 'true'
             buildConfigField 'String', 'FIREBASE_AUTH_DOMAIN', '"https://us-central1-rfcx-deployment-dev.cloudfunctions.net/auth/"'
+            buildConfigField 'String', 'DEVICE_API_DOMAIN', '"https://us-central1-rfcx-deployment-dev.cloudfunctions.net/api/"'
             applicationIdSuffix '.dev'
         }
     }

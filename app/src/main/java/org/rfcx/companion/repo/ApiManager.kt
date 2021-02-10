@@ -1,15 +1,16 @@
 package org.rfcx.companion.repo
 
-import java.util.concurrent.TimeUnit
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.rfcx.companion.BuildConfig
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 class ApiManager {
     var apiRest: ApiRestInterface
     var apiFirebaseAuth: FirebaseAuthInterface
+    private var deviceApi: DeviceApiInterface
 
     companion object {
         @Volatile
@@ -24,8 +25,13 @@ class ApiManager {
 
     init {
         apiRest = setRetrofitBaseUrl(DEPLOY_DOMAIN).create(ApiRestInterface::class.java)
-        apiFirebaseAuth = setRetrofitBaseUrl(BuildConfig.FIREBASE_AUTH_DOMAIN).create(FirebaseAuthInterface::class.java)
+        apiFirebaseAuth =
+            setRetrofitBaseUrl(BuildConfig.FIREBASE_AUTH_DOMAIN).create(FirebaseAuthInterface::class.java)
+        deviceApi =
+            setRetrofitBaseUrl(BuildConfig.DEVICE_API_DOMAIN).create(DeviceApiInterface::class.java)
     }
+
+    fun getDeviceApi(): DeviceApiInterface = deviceApi
 
     private fun setRetrofitBaseUrl(baseUrl: String): Retrofit {
         return Retrofit.Builder()
