@@ -43,7 +43,7 @@ class GuardianDeploymentSyncWorker(val context: Context, params: WorkerParameter
                     someFailed = true
                 }
             } else {
-                val deploymentLocation = it.location
+                val deploymentLocation = it.stream
                 deploymentLocation?.let { it1 ->
                     firestore.updateGuardianDeploymentLocation(it.serverId!!, it1, it.updatedAt ?: Date())
                     db.markSent(it.serverId!!, it.id)

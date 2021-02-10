@@ -18,11 +18,11 @@ data class EdgeDeploymentResponse(
 
 fun EdgeDeploymentResponse.toEdgeDeployment(): EdgeDeployment {
     return EdgeDeployment(
-        deploymentId = this.deploymentId,
+        deploymentKey = this.deploymentId,
         serverId = this.serverId,
         deployedAt = this.deployedAt ?: Date(),
         state = DeploymentState.Edge.ReadyToUpload.key,
-        location = this.location,
+        stream = this.location,
         createdAt = this.createdAt ?: Date(),
         syncState = SyncState.Sent.key,
         updatedAt = this.updatedAt,

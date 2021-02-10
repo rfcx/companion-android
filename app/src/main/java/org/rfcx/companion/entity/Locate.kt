@@ -57,7 +57,7 @@ open class Locate(
             latitude = latitude,
             longitude = longitude,
             altitude = altitude,
-            locationGroup = locationGroup
+            project = locationGroup
         )
     }
 

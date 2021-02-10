@@ -19,9 +19,9 @@ fun EdgeDeployment.toRequestBody(): DeploymentRequest {
     return DeploymentRequest(
         device = Device.EDGE.value,
         deployedAt = this.deployedAt,
-        location = this.location,
+        location = this.stream,
         createdAt = this.createdAt,
-        deploymentId = this.deploymentId,
+        deploymentId = this.deploymentKey,
         updatedAt = this.updatedAt,
         deletedAt = this.deletedAt
     )

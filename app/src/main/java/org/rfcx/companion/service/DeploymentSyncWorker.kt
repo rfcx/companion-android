@@ -44,7 +44,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                     someFailed = true
                 }
             } else {
-                val deploymentLocation = it.location
+                val deploymentLocation = it.stream
                 deploymentLocation?.let { it1 ->
                     if (it.deletedAt != null) {
                         firestore.updateDeleteDeployment(it.serverId!!, it.deletedAt!!)

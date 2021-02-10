@@ -48,7 +48,7 @@ class EdgeDeploymentDb(private val realm: Realm) {
                     ?.toInt() ?: 0) + 1
                 deployment.id = id
             }
-            deployment.location = location // add deploy location
+            deployment.stream = location // add deploy location
             it.insertOrUpdate(deployment)
         }
         return id
@@ -68,13 +68,13 @@ class EdgeDeploymentDb(private val realm: Realm) {
                 deploymentObj.id = id
                 it.insert(deploymentObj)
             } else if (deployment.syncState == SyncState.Sent.key) {
-                deployment.deploymentId = deploymentResponse.deploymentId
+                deployment.deploymentKey = deploymentResponse.deploymentId
                 deployment.serverId = deploymentResponse.serverId
                 deployment.deployedAt = deploymentResponse.deployedAt ?: deployment.deployedAt
 
                 val newLocation = deploymentResponse.location
                 if (newLocation != null) {
-                    deployment.location = it.copyToRealm(newLocation)
+                    deployment.stream = it.copyToRealm(newLocation)
                 }
 
                 deployment.createdAt = deploymentResponse.createdAt ?: deployment.createdAt
@@ -118,7 +118,7 @@ class EdgeDeploymentDb(private val realm: Realm) {
             val edgeDeployment =
                 bgRealm.where(EdgeDeployment::class.java).equalTo(EdgeDeployment.FIELD_ID, id)
                     .findFirst()
-            if (edgeDeployment?.location != null) {
+            if (edgeDeployment?.stream != null) {
                 edgeDeployment.deletedAt = Date()
                 edgeDeployment.updatedAt = Date()
                 edgeDeployment.syncState = SyncState.Unsent.key
@@ -165,11 +165,11 @@ class EdgeDeploymentDb(private val realm: Realm) {
             val edgeDeployment =
                 bgRealm.where(EdgeDeployment::class.java).equalTo(EdgeDeployment.FIELD_ID, id)
                     .findFirst()
-            if (edgeDeployment?.location != null) {
-                edgeDeployment.location?.name = locationName
-                edgeDeployment.location?.latitude = latitude
-                edgeDeployment.location?.longitude = longitude
-                edgeDeployment.location?.altitude = altitude
+            if (edgeDeployment?.stream != null) {
+                edgeDeployment.stream?.name = locationName
+                edgeDeployment.stream?.latitude = latitude
+                edgeDeployment.stream?.longitude = longitude
+                edgeDeployment.stream?.altitude = altitude
                 edgeDeployment.updatedAt = Date()
                 edgeDeployment.syncState = SyncState.Unsent.key
             }
@@ -208,25 +208,25 @@ class EdgeDeploymentDb(private val realm: Realm) {
             val edgeDeployment =
                 bgRealm.where(EdgeDeployment::class.java).equalTo(EdgeDeployment.FIELD_ID, id)
                     .findFirst()
-            if (edgeDeployment?.location != null) {
+            if (edgeDeployment?.stream != null) {
                 edgeDeployment.updatedAt = Date()
                 edgeDeployment.syncState = SyncState.Unsent.key
 
                 //update location group
-                if (edgeDeployment.location?.locationGroup != null) {
-                    edgeDeployment.location?.locationGroup?.let {
+                if (edgeDeployment.stream?.project != null) {
+                    edgeDeployment.stream?.project?.let {
                         it.group = locationGroup.group
                         it.color = locationGroup.color
-                        it.serverId = locationGroup.serverId
+                        it.coreId = locationGroup.coreId
                     }
                 } else {
                     val locationGroupObj = bgRealm.createObject(LocationGroup::class.java)
                     locationGroupObj.let {
                         it.color = locationGroup.color
                         it.group = locationGroup.group
-                        it.serverId = locationGroup.serverId
+                        it.coreId = locationGroup.coreId
                     }
-                    edgeDeployment.location?.locationGroup = locationGroupObj
+                    edgeDeployment.stream?.project = locationGroupObj
                 }
 
                 // do update location group
@@ -244,7 +244,7 @@ class EdgeDeploymentDb(private val realm: Realm) {
                     if (groupLocation != null) {
                         groupLocation.group =  locationGroup.group
                         groupLocation.color = locationGroup.color
-                        groupLocation.serverId = locationGroup.serverId
+                        groupLocation.coreId = locationGroup.coreId
                         location.syncState = SyncState.Unsent.key
                     }
                 }
@@ -281,7 +281,7 @@ class EdgeDeploymentDb(private val realm: Realm) {
     fun getDeploymentByDeploymentId(deploymentId: String): EdgeDeployment? {
         val deployment =
             realm.where(EdgeDeployment::class.java)
-                .equalTo(EdgeDeployment.FIELD_DEPLOYMENT_ID, deploymentId).findFirst()
+                .equalTo(EdgeDeployment.FIELD_DEPLOYMENT_KEY, deploymentId).findFirst()
         if (deployment != null) {
             return realm.copyFromRealm(deployment)
         }

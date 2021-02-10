@@ -61,16 +61,16 @@ fun EdgeDeployment.toEdgeDeploymentView(): DeploymentDetailView.EdgeDeploymentVi
     return DeploymentDetailView.EdgeDeploymentView(
         id = this.id,
         serverId = this.serverId,
-        deploymentId = this.deploymentId ?: "",
+        deploymentId = this.deploymentKey ?: "",
         deployedAt = this.deployedAt,
         state = this.state,
         createdAt = this.createdAt,
         syncState = this.syncState,
         updatedAt = this.updatedAt,
         deletedAt = this.deletedAt,
-        locationName = this.location?.name ?: "",
-        latitude = this.location?.latitude ?: 0.0,
-        longitude = this.location?.longitude ?: 0.0
+        locationName = this.stream?.name ?: "",
+        latitude = this.stream?.latitude ?: 0.0,
+        longitude = this.stream?.longitude ?: 0.0
     )
 }
 
@@ -84,8 +84,8 @@ fun GuardianDeployment.toGuardianDeploymentView(): DeploymentDetailView.Guardian
         createdAt = this.createdAt,
         updatedAt = this.updatedAt,
         syncState = this.syncState,
-        locationName = this.location?.name ?: "",
-        latitude = this.location?.latitude ?: 0.0,
-        longitude = this.location?.longitude ?: 0.0
+        locationName = this.stream?.name ?: "",
+        latitude = this.stream?.latitude ?: 0.0,
+        longitude = this.stream?.longitude ?: 0.0
     )
 }

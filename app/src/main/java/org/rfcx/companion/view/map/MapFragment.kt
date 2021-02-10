@@ -594,13 +594,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun EdgeDeployment.toMark(): DeploymentMarker {
-        val color = location?.locationGroup?.color
-        val group = location?.locationGroup?.group
+        val color = stream?.project?.color
+        val group = stream?.project?.group
         val isGroupExisted = locationGroupDb.isExisted(group)
         val pinImage =
             if (state == Edge.ReadyToUpload.key) {
                 if (color != null && color.isNotEmpty() && group != null && isGroupExisted ) {
-                    location?.locationGroup?.color
+                    stream?.project?.color
                 } else {
                     Battery.BATTERY_PIN_GREEN
                 }
@@ -614,20 +614,20 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             getString(R.string.format_in_progress_step)
 
         return DeploymentMarker(
-            id, location?.name ?: "",
-            location?.longitude ?: 0.0,
-            location?.latitude ?: 0.0,
+            id, stream?.name ?: "",
+            stream?.longitude ?: 0.0,
+            stream?.latitude ?: 0.0,
             pinImage, description, Device.EDGE.value, createdAt, updatedAt
         )
     }
 
     private fun GuardianDeployment.toMark(): DeploymentMarker {
-        val color = location?.locationGroup?.color
+        val color = stream?.project?.color
         val pinImage =
             if (state == Guardian.ReadyToUpload.key) {
                 if (WifiHotspotUtils.isConnectedWithGuardian(requireContext(), this.wifiName!!)) {
                     if (color != null && color.isNotEmpty()) {
-                        location?.locationGroup?.color
+                        stream?.project?.color
                     } else {
                         GuardianPin.CONNECTED_GUARDIAN
                     }
@@ -639,9 +639,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             } ?: GuardianPin.CONNECTED_GUARDIAN
         return DeploymentMarker(
             id,
-            location?.name ?: "",
-            location?.longitude ?: 0.0,
-            location?.latitude ?: 0.0,
+            stream?.name ?: "",
+            stream?.longitude ?: 0.0,
+            stream?.latitude ?: 0.0,
             pinImage,
             "-",
             Device.GUARDIAN.value,

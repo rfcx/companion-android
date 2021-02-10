@@ -22,7 +22,7 @@ fun GuardianDeployment.toRequestBody(): GuardianDeploymentRequest {
         deployedAt = this.deployedAt,
         wifi = this.wifiName!!,
         configuration = this.configuration,
-        location = this.location,
+        location = this.stream,
         updatedAt= this.updatedAt,
         createdAt = this.createdAt
     )

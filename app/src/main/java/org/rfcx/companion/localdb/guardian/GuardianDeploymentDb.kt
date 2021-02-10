@@ -1,6 +1,5 @@
 package org.rfcx.companion.localdb.guardian
 
-import android.util.Log
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
@@ -38,7 +37,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
                     ?.toInt() ?: 0) + 1
                 deployment.id = id
             }
-            deployment.location = location // add deploy location
+            deployment.stream = location // add deploy location
             it.insertOrUpdate(deployment)
         }
         return id
@@ -63,7 +62,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
 
                 val newLocation = deploymentResponse.location
                 if (newLocation != null) {
-                    deployment.location = it.copyToRealm(newLocation)
+                    deployment.stream = it.copyToRealm(newLocation)
                 }
 
                 deployment.createdAt = deploymentResponse.createdAt ?: deployment.createdAt
@@ -181,11 +180,11 @@ class GuardianDeploymentDb(private val realm: Realm) {
             val guardianDeployment =
                 bgRealm.where(GuardianDeployment::class.java).equalTo(GuardianDeployment.FIELD_ID, id)
                     .findFirst()
-            if (guardianDeployment?.location != null) {
-                guardianDeployment.location?.name = locationName
-                guardianDeployment.location?.latitude = latitude
-                guardianDeployment.location?.longitude = longitude
-                guardianDeployment.location?.altitude = altitude
+            if (guardianDeployment?.stream != null) {
+                guardianDeployment.stream?.name = locationName
+                guardianDeployment.stream?.latitude = latitude
+                guardianDeployment.stream?.longitude = longitude
+                guardianDeployment.stream?.altitude = altitude
                 guardianDeployment.updatedAt = Date()
                 guardianDeployment.syncState = SyncState.Unsent.key
             }
@@ -224,25 +223,25 @@ class GuardianDeploymentDb(private val realm: Realm) {
             val guardianDeployment =
                 bgRealm.where(GuardianDeployment::class.java).equalTo(GuardianDeployment.FIELD_ID, id)
                     .findFirst()
-            if (guardianDeployment?.location != null) {
+            if (guardianDeployment?.stream != null) {
                 guardianDeployment.updatedAt = Date()
                 guardianDeployment.syncState = SyncState.Unsent.key
 
                 //update location group
-                if (guardianDeployment.location?.locationGroup != null) {
-                    guardianDeployment.location?.locationGroup?.let {
+                if (guardianDeployment.stream?.project != null) {
+                    guardianDeployment.stream?.project?.let {
                         it.group = locationGroup.group
                         it.color = locationGroup.color
-                        it.serverId = locationGroup.serverId
+                        it.coreId = locationGroup.coreId
                     }
                 } else {
                     val locationGroupObj = bgRealm.createObject(LocationGroup::class.java)
                     locationGroupObj.let {
                         it.color = locationGroup.color
                         it.group = locationGroup.group
-                        it.serverId = locationGroup.serverId
+                        it.coreId = locationGroup.coreId
                     }
-                    guardianDeployment.location?.locationGroup = locationGroupObj
+                    guardianDeployment.stream?.project = locationGroupObj
                 }
             }
         }, {

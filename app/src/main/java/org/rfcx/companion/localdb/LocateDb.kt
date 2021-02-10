@@ -180,7 +180,7 @@ class LocateDb(private val realm: Realm) {
                     if (locationGroup != null) {
                         obj.group = locationGroup.group
                         obj.color = locationGroup.color
-                        obj.serverId = locationGroup.serverId
+                        obj.coreId = locationGroup.coreId
                     }
                 }
                 location.locationGroup = locationGroupObj

@@ -26,7 +26,7 @@ fun GuardianDeploymentResponse.toGuardianDeployment(): GuardianDeployment {
         device = this.device,
         wifiName = this.wifi,
         configuration = this.configuration,
-        location = this.location,
+        stream = this.location,
         createdAt = this.createdAt ?: Date(),
         updatedAt = this.updatedAt,
         syncState = SyncState.Sent.key

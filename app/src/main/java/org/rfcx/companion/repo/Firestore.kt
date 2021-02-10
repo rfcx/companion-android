@@ -86,7 +86,7 @@ class Firestore(val context: Context) {
     ) {
         val userDocument = db.collection(COLLECTION_USERS).document(uid)
         val updates = hashMapOf<String, Any>(
-            EdgeDeployment.FIELD_LOCATION to deploymentLocation,
+            EdgeDeployment.FIELD_STREAM to deploymentLocation,
             EdgeDeployment.FIELD_UPDATED_AT to updatedAt
         )
         userDocument.collection(COLLECTION_DEPLOYMENTS).document(serverId)
@@ -100,7 +100,7 @@ class Firestore(val context: Context) {
     ) {
         val userDocument = db.collection(COLLECTION_USERS).document(uid)
         val updates = hashMapOf<String, Any>(
-            GuardianDeployment.FIELD_LOCATION to deploymentLocation,
+            GuardianDeployment.FIELD_STREAM to deploymentLocation,
             GuardianDeployment.FIELD_UPDATED_AT to updatedAt
         )
         userDocument.collection(COLLECTION_DEPLOYMENTS).document(serverId)
