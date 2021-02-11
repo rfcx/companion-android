@@ -9,7 +9,7 @@ data class DeploymentRequest(
     var device: String,
     var deploymentKey: String? = null,
     var deployedAt: Date = Date(),
-    var stream: DeploymentLocation? = null,
+    var stream: StreamRequest? = null,
     var createdAt: Date = Date(),
     var updatedAt: Date? = null,
     var deletedAt: Date? = null
@@ -19,7 +19,7 @@ fun EdgeDeployment.toRequestBody(): DeploymentRequest {
     return DeploymentRequest(
         device = Device.EDGE.value,
         deployedAt = this.deployedAt,
-        stream = this.stream,
+        stream = if (this.stream == null) null else this.stream?.toRequestBody(),
         createdAt = this.createdAt,
         deploymentKey = this.deploymentKey,
         updatedAt = this.updatedAt,
