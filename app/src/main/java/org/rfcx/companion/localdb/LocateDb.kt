@@ -148,8 +148,6 @@ class LocateDb(private val realm: Realm) {
                     } else {
                         lastGuardianDeploymentServerId = deploymentServerId
                     }
-                    // set sync state to unsent after deploymentServerId have been change
-                    syncState = SyncState.Unsent.key
                 }
         }
     }

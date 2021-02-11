@@ -5,13 +5,15 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import io.realm.Realm
-import java.util.*
 import org.rfcx.companion.entity.request.toRequestBody
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
+import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.repo.Firestore
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.RealmHelper
+import org.rfcx.companion.util.getIdToken
+import java.util.*
 
 /**
  * For syncing data to server. Ref from Ranger Android App
@@ -34,11 +36,15 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
             Log.d(TAG, "doWork: sending id ${it.id}")
 
             if (it.serverId == null) {
-                val result = firestore.sendDeployment(it.toRequestBody())
+                val token = "Bearer ${context.getIdToken()}"
+                val result = ApiManager.getInstance().getDeviceApi()
+                    .createDeployment(token, it.toRequestBody()).execute()
 
-                if (result != null) {
-                    db.markSent(result.id, it.id)
-                    locateDb.updateDeploymentServerId(it.id, result.id)
+                if (result.isSuccessful) {
+                    result.body()?.string()?.let { docId ->
+                        db.markSent(docId, it.id)
+                        locateDb.updateDeploymentServerId(it.id, docId)
+                    }
                 } else {
                     db.markUnsent(it.id)
                     someFailed = true
