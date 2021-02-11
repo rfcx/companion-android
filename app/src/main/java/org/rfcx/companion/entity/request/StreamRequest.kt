@@ -17,7 +17,7 @@ fun DeploymentLocation.toRequestBody(): StreamRequest {
         latitude = this.latitude,
         longitude = this.longitude,
         altitude = this.altitude,
-        project = if (this.project == null) null else this.project?.toRequestBody(),
+        project = if (this.project?.name == null) null else this.project?.toRequestBody(),
         coreId = this.coreId
     )
 }
