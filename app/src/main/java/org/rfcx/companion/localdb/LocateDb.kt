@@ -65,52 +65,6 @@ class LocateDb(private val realm: Realm) {
         }
     }
 
-    fun unlockSent(): List<Locate> {
-        var unsentCopied: List<Locate> = listOf()
-        realm.executeTransaction {
-            val unsent = it.where(Locate::class.java)
-                .equalTo("syncState", SyncState.Unsent.key)
-                .and()
-                .isNotNull("lastDeploymentServerId")
-                .and()
-                .isNotEmpty("lastDeploymentServerId")
-                .or()
-                .isNotNull("lastGuardianDeploymentServerId")
-                .and()
-                .isNotEmpty("lastGuardianDeploymentServerId")
-                .findAll()
-                .createSnapshot()
-            unsentCopied = unsent.toList()
-            unsent.forEach { locate ->
-                locate.syncState = SyncState.Sending.key
-            }
-        }
-        return unsentCopied
-    }
-
-    fun markUnsent(id: Int) {
-        mark(id = id, syncState = SyncState.Unsent.key)
-    }
-
-    fun markSent(serverId: String, id: Int) {
-        mark(id, serverId, SyncState.Sent.key)
-    }
-
-    fun markUploading(id: Int) {
-        mark(id = id, syncState = SyncState.Sending.key)
-    }
-
-    private fun mark(id: Int, serverId: String? = null, syncState: Int) {
-        realm.executeTransaction {
-            val locate =
-                it.where(Locate::class.java).equalTo(Locate.FIELD_ID, id).findFirst()
-            if (locate != null) {
-                locate.serverId = serverId
-                locate.syncState = syncState
-            }
-        }
-    }
-
     fun insertOrUpdateLocate(deploymentId: Int, locate: Locate, isGuardian: Boolean = false) {
         realm.executeTransaction {
             if (locate.id == 0) {

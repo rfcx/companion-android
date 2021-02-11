@@ -43,11 +43,6 @@ class Firestore(val context: Context) {
             }
     }
 
-    suspend fun sendDeployment(deployment: DeploymentRequest): DocumentReference? {
-        val userDocument = db.collection(COLLECTION_USERS).document(uid)
-        return userDocument.collection(COLLECTION_DEPLOYMENTS).add(deployment).await()
-    }
-
     suspend fun sendDeployment(deployment: GuardianDeploymentRequest): DocumentReference? {
         val userDocument = db.collection(COLLECTION_USERS).document(uid)
         return userDocument.collection(COLLECTION_DEPLOYMENTS).add(deployment).await()
@@ -66,17 +61,6 @@ class Firestore(val context: Context) {
     suspend fun sendImage(imageRequest: ImageRequest): DocumentReference? {
         val userDocument = db.collection(COLLECTION_USERS).document(uid)
         return userDocument.collection(COLLECTION_IMAGES).add(imageRequest).await()
-    }
-
-    suspend fun sendLocation(locateRequest: LocateRequest): DocumentReference? {
-        val userDocument = db.collection(COLLECTION_USERS).document(uid)
-        return userDocument.collection(COLLECTION_LOCATIONS).add(locateRequest).await()
-    }
-
-    suspend fun updateLocation(locateServerId: String, locateRequest: LocateRequest) {
-        val userDocument = db.collection(COLLECTION_USERS).document(uid)
-        userDocument.collection(COLLECTION_LOCATIONS).document(locateServerId)
-            .set(locateRequest).await()
     }
 
     suspend fun updateDeploymentLocation(
