@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.toColorInt
@@ -47,7 +48,6 @@ import org.rfcx.companion.entity.DeploymentState.Edge
 import org.rfcx.companion.entity.DeploymentState.Guardian
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.response.EdgeDeploymentResponse
-import org.rfcx.companion.entity.response.toEdgeDeployment
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
@@ -61,7 +61,6 @@ import org.rfcx.companion.util.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.util.*
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -342,18 +341,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             it.getLastDeploymentId()
         })
 
-        val showEdgeDeployments = this.edgeDeployments.filter {
-            showDeployIds.contains(it.serverId) || showDeployIds.contains(it.id.toString())
-        }
-
         val showGuardianDeployments = this.guardianDeployments.filter {
             showDeployIds.contains(it.serverId) || showDeployIds.contains(it.id.toString())
         }
 
-        val edgeDeploymentMarkers = showEdgeDeployments.map { it.toMark() }
+        val edgeDeploymentMarkers = this.edgeDeployments.map { it.toMark() }
         val guardianDeploymentMarkers = showGuardianDeployments.map { it.toMark() }
         val deploymentMarkers = edgeDeploymentMarkers + guardianDeploymentMarkers
-        handleShowDeployment(showEdgeDeployments, showGuardianDeployments)
+        handleShowDeployment(this.edgeDeployments, showGuardianDeployments)
         handleMarkerDeployment(deploymentMarkers)
     }
 
@@ -402,15 +397,17 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         ApiManager.getInstance().getDeviceApi().getDeployments(token)
             .enqueue(object : Callback<List<EdgeDeploymentResponse>> {
                 override fun onFailure(call: Call<List<EdgeDeploymentResponse>>, t: Throwable) {
-//                    Log.d("getDeployments", "onFailure ${t.message}")
+                    Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT).show()
                 }
 
                 override fun onResponse(
                     call: Call<List<EdgeDeploymentResponse>>,
                     response: Response<List<EdgeDeploymentResponse>>
                 ) {
-                    val req = response.body()
-//                    Log.d("getDeployments", "onFailure ${req}")
+                    response.body()?.forEach { item ->
+                        item.serverId = randomLocationGroup() // TODO:: save serverId but now not send id from response
+                        edgeDeploymentDb.insertOrUpdate(item)
+                    }
                 }
             })
     }
