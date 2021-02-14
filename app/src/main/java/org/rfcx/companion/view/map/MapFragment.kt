@@ -46,15 +46,22 @@ import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.DeploymentState.Edge
 import org.rfcx.companion.entity.DeploymentState.Guardian
 import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.response.EdgeDeploymentResponse
+import org.rfcx.companion.entity.response.toEdgeDeployment
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.localdb.guardian.DiagnosticDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
+import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.repo.Firestore
 import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.util.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.util.*
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -391,7 +398,21 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun retrieveDeployments(context: Context) {
-        Firestore(context).retrieveDeployments(edgeDeploymentDb, guardianDeploymentDb)
+        val token = "Bearer ${context.getIdToken()}"
+        ApiManager.getInstance().getDeviceApi().getDeployments(token)
+            .enqueue(object : Callback<List<EdgeDeploymentResponse>> {
+                override fun onFailure(call: Call<List<EdgeDeploymentResponse>>, t: Throwable) {
+//                    Log.d("getDeployments", "onFailure ${t.message}")
+                }
+
+                override fun onResponse(
+                    call: Call<List<EdgeDeploymentResponse>>,
+                    response: Response<List<EdgeDeploymentResponse>>
+                ) {
+                    val req = response.body()
+//                    Log.d("getDeployments", "onFailure ${req}")
+                }
+            })
     }
 
     private fun retrieveLocations(context: Context) {

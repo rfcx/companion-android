@@ -68,16 +68,20 @@ class EdgeDeploymentDb(private val realm: Realm) {
                 deploymentObj.id = id
                 it.insert(deploymentObj)
             } else if (deployment.syncState == SyncState.Sent.key) {
-                deployment.deploymentKey = deploymentResponse.deploymentId
+                deployment.deploymentKey = deploymentResponse.deploymentKey
                 deployment.serverId = deploymentResponse.serverId
-                deployment.deployedAt = deploymentResponse.deployedAt ?: deployment.deployedAt
+                deployment.deployedAt =
+                    deploymentResponse.deployedAt?.seconds?.let { deployedAt -> Date(deployedAt.times(1000)) }
+                        ?: deployment.deployedAt
 
-                val newLocation = deploymentResponse.location
+                val newLocation = deploymentResponse.stream
                 if (newLocation != null) {
                     deployment.stream = it.copyToRealm(newLocation)
                 }
 
-                deployment.createdAt = deploymentResponse.createdAt ?: deployment.createdAt
+                deployment.createdAt =
+                    deploymentResponse.createdAt?.seconds?.let { createdAt -> Date(createdAt.times(1000)) }
+                        ?: deployment.createdAt
             }
         }
     }
