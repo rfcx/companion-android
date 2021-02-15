@@ -12,6 +12,6 @@ fun LocationGroup.toRequestBody(): ProjectRequest {
     return ProjectRequest(
         name = this.name,
         color = this.color,
-        coreId = null // TODO:: Change after remove random id (to this.core)
+        coreId = this.coreId
     )
 }

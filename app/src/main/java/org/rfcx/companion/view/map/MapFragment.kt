@@ -407,7 +407,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     response: Response<List<DeploymentResponse>>
                 ) {
                     response.body()?.forEach { item ->
-                        item.serverId = item.deploymentKey // TODO:: save serverId but now not send id from response
+                        item.serverId = item.serverId
                         if(item.device == Device.GUARDIAN.value) {
                             guardianDeploymentDb.insertOrUpdate(item)
                         } else {

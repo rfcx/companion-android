@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_create_new_group.*
-import kotlinx.android.synthetic.main.layout_search_view.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.LocationGroups
@@ -24,11 +23,8 @@ import org.rfcx.companion.service.LocationGroupSyncWorker
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.randomLocationGroup
-import org.rfcx.companion.view.deployment.locate.SearchResultFragment
 import org.rfcx.companion.view.detail.EditLocationActivity.Companion.EXTRA_LOCATION_GROUP
-import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.concurrent.schedule
 
 class CreateNewGroupActivity : AppCompatActivity(), (ColorPickerItem, Int) -> Unit {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
@@ -65,7 +61,7 @@ class CreateNewGroupActivity : AppCompatActivity(), (ColorPickerItem, Int) -> Un
                 val group = LocationGroups(
                     name = locationGroupEditText.text.toString(),
                     color = color.color,
-                    serverId = randomLocationGroup()
+                    serverId = null
                 )
                 locationGroupDb.insertOrUpdateLocationGroup(group)
                 LocationGroupSyncWorker.enqueue(this)

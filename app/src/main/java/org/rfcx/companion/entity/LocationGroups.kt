@@ -4,7 +4,6 @@ import com.google.gson.annotations.Expose
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
-import org.rfcx.companion.util.randomLocationGroup
 import java.util.*
 
 @RealmClass
