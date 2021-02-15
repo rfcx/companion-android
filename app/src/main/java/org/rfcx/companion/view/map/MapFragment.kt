@@ -47,6 +47,7 @@ import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.DeploymentState.Edge
 import org.rfcx.companion.entity.DeploymentState.Guardian
 import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.EdgeDeploymentResponse
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.EdgeDeploymentDb
@@ -395,14 +396,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private fun retrieveDeployments(context: Context) {
         val token = "Bearer ${context.getIdToken()}"
         ApiManager.getInstance().getDeviceApi().getDeployments(token)
-            .enqueue(object : Callback<List<EdgeDeploymentResponse>> {
-                override fun onFailure(call: Call<List<EdgeDeploymentResponse>>, t: Throwable) {
+            .enqueue(object : Callback<List<DeploymentResponse>> {
+                override fun onFailure(call: Call<List<DeploymentResponse>>, t: Throwable) {
                     Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT).show()
                 }
 
                 override fun onResponse(
-                    call: Call<List<EdgeDeploymentResponse>>,
-                    response: Response<List<EdgeDeploymentResponse>>
+                    call: Call<List<DeploymentResponse>>,
+                    response: Response<List<DeploymentResponse>>
                 ) {
                     response.body()?.forEach { item ->
                         item.serverId = randomLocationGroup() // TODO:: save serverId but now not send id from response

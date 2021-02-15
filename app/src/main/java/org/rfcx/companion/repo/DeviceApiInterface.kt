@@ -2,6 +2,7 @@ package org.rfcx.companion.repo
 
 import okhttp3.ResponseBody
 import org.rfcx.companion.entity.request.DeploymentRequest
+import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.EdgeDeploymentResponse
 import retrofit2.Call
 import retrofit2.http.Body
@@ -15,6 +16,6 @@ interface DeviceApiInterface {
                          @Body deploymentRequest: DeploymentRequest): Call<ResponseBody>
 
     @GET("deployments")
-    fun getDeployments(@Header("Authorization") authUser: String): Call<List<EdgeDeploymentResponse>>
+    fun getDeployments(@Header("Authorization") authUser: String): Call<List<DeploymentResponse>>
 
 }
