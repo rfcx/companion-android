@@ -407,7 +407,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 ) {
                     response.body()?.forEach { item ->
                         item.serverId = randomLocationGroup() // TODO:: save serverId but now not send id from response
-                        edgeDeploymentDb.insertOrUpdate(item)
+                        if(item.device == Device.GUARDIAN.value) {
+                            guardianDeploymentDb.insertOrUpdate(item)
+                        } else {
+                            edgeDeploymentDb.insertOrUpdate(item)
+                        }
                     }
                 }
             })

@@ -145,7 +145,7 @@ class Firestore(val context: Context) {
 
                 // store guardian deployment
                 guardianResponses.forEach { dr ->
-                    guardianDeploymentDb.insertOrUpdate(dr)
+//                    guardianDeploymentDb.insertOrUpdate(dr)
                 }
 
                 callback?.onSuccessCallback(true)

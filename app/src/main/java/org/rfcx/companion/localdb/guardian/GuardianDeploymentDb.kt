@@ -5,6 +5,7 @@ import io.realm.RealmResults
 import io.realm.Sort
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.GuardianDeploymentResponse
 import org.rfcx.companion.entity.response.toGuardianDeployment
 import org.rfcx.companion.localdb.DatabaseCallback
@@ -43,7 +44,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
         return id
     }
 
-    fun insertOrUpdate(deploymentResponse: GuardianDeploymentResponse) {
+    fun insertOrUpdate(deploymentResponse: DeploymentResponse) {
         realm.executeTransaction {
             val deployment =
                 it.where(GuardianDeployment::class.java)
@@ -52,7 +53,8 @@ class GuardianDeploymentDb(private val realm: Realm) {
 
             if (deployment != null) {
                 deployment.serverId = deploymentResponse.serverId
-                deployment.deployedAt = deploymentResponse.deployedAt ?: deployment.deployedAt
+                deployment.deployedAt = deploymentResponse.deployedAt?.seconds?.let { deployedAt -> Date(deployedAt.times(1000)) }
+                    ?: deployment.deployedAt
                 deployment.wifiName = deploymentResponse.wifi
 
                 val newConfig = deploymentResponse.configuration
@@ -60,12 +62,13 @@ class GuardianDeploymentDb(private val realm: Realm) {
                     deployment.configuration = it.copyToRealm(newConfig)
                 }
 
-                val newLocation = deploymentResponse.location
+                val newLocation = deploymentResponse.stream
                 if (newLocation != null) {
                     deployment.stream = it.copyToRealm(newLocation)
                 }
 
-                deployment.createdAt = deploymentResponse.createdAt ?: deployment.createdAt
+                deployment.createdAt = deploymentResponse.createdAt?.seconds?.let { deployedAt -> Date(deployedAt.times(1000)) }
+                    ?: deployment.createdAt
             } else {
                 val deploymentObj = deploymentResponse.toGuardianDeployment()
                 val id = (it.where(GuardianDeployment::class.java).max(GuardianDeployment.FIELD_ID)
