@@ -22,7 +22,6 @@ import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.service.LocationGroupSyncWorker
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.RealmHelper
-import org.rfcx.companion.util.randomLocationGroup
 import org.rfcx.companion.view.detail.EditLocationActivity.Companion.EXTRA_LOCATION_GROUP
 import kotlin.collections.ArrayList
 

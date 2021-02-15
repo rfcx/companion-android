@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import io.realm.Realm
+import org.rfcx.companion.entity.request.EditDeploymentRequest
 import org.rfcx.companion.entity.request.toRequestBody
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
@@ -13,7 +14,6 @@ import org.rfcx.companion.repo.Firestore
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.getIdToken
-import java.util.*
 
 /**
  * For syncing data to server. Ref from Ranger Android App
@@ -28,6 +28,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
         val locateDb = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val firestore = Firestore(context)
         val deployments = db.lockUnsent()
+        val token = "Bearer ${context.getIdToken()}"
 
         Log.d(TAG, "doWork: found ${deployments.size} unsent")
         var someFailed = false
@@ -36,7 +37,6 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
             Log.d(TAG, "doWork: sending id ${it.id}")
 
             if (it.serverId == null) {
-                val token = "Bearer ${context.getIdToken()}"
                 val result = ApiManager.getInstance().getDeviceApi()
                     .createDeployment(token, it.toRequestBody()).execute()
 
@@ -51,17 +51,21 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                 }
             } else {
                 val deploymentLocation = it.stream
-                deploymentLocation?.let { it1 ->
+                deploymentLocation?.let { location ->
                     if (it.deletedAt != null) {
                         firestore.updateDeleteDeployment(it.serverId!!, it.deletedAt!!)
                         db.markSent(it.serverId!!, it.id)
                     } else {
-                        firestore.updateDeploymentLocation(
-                            it.serverId!!,
-                            it1,
-                            it.updatedAt ?: Date()
+                        val req = EditDeploymentRequest(
+                            location.toRequestBody(),
+                            location.project?.toRequestBody()
                         )
-                        db.markSent(it.serverId!!, it.id)
+                        val serverId = it.serverId ?: ""
+                        val result = ApiManager.getInstance().getDeviceApi()
+                            .editDeployments(token, serverId, req).execute()
+                        if (result.isSuccessful) {
+                            db.markSent(it.serverId!!, it.id)
+                        }
                     }
                 }
             }
