@@ -48,7 +48,8 @@ import org.rfcx.companion.entity.DeploymentState.Edge
 import org.rfcx.companion.entity.DeploymentState.Guardian
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.response.DeploymentResponse
-import org.rfcx.companion.entity.response.EdgeDeploymentResponse
+import org.rfcx.companion.entity.response.toLocationGroupsResponse
+import org.rfcx.companion.entity.response.toLocationResponse
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
@@ -412,17 +413,27 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         } else {
                             edgeDeploymentDb.insertOrUpdate(item)
                         }
+                        /* Save Streams and Projects in local database */
+                        if (item.stream != null) {
+                            locateDb.insertOrUpdate(item.stream!!.toLocationResponse())
+
+                            if(item.stream!!.project != null) {
+                                locationGroupDb.insertOrUpdate(item.stream!!.project!!.toLocationGroupsResponse())
+                            }
+                        }
                     }
                 }
             })
     }
 
     private fun retrieveLocations(context: Context) {
-        Firestore(context).retrieveLocations(locateDb)
+        // TODO:: call get Streams in here
+//        Firestore(context).retrieveLocations(locateDb)
     }
 
     private fun retrieveLocationGroups(context: Context) {
-        Firestore(context).retrieveLocationGroups(locationGroupDb)
+        // TODO:: call get Projects in here
+//        Firestore(context).retrieveLocationGroups(locationGroupDb)
     }
 
     private fun retrieveDiagnostics(context: Context) {

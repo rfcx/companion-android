@@ -1,9 +1,7 @@
 package org.rfcx.companion.entity.response
 
+import org.rfcx.companion.entity.*
 import java.util.*
-import org.rfcx.companion.entity.Locate
-import org.rfcx.companion.entity.LocationGroup
-import org.rfcx.companion.entity.SyncState
 
 /**
  * Firestore response for getting a location
@@ -32,5 +30,19 @@ fun LocationResponse.toLocate(): Locate {
         lastDeploymentServerId = this.lastDeploymentServerId,
         lastGuardianDeploymentServerId = this.lastGuardianDeploymentServerId,
         syncState = SyncState.Sent.key
+    )
+}
+
+fun DeploymentLocation.toLocationResponse(): LocationResponse {
+    return LocationResponse(
+        serverId = this.coreId,
+        name = this.name,
+        latitude = this.latitude,
+        longitude = this.longitude,
+        createdAt = Date(),
+        deletedAt = null,
+        locationGroup = this.project,
+        lastDeploymentServerId = null,
+        lastGuardianDeploymentServerId = null
     )
 }
