@@ -55,38 +55,6 @@ class EdgeDeploymentDb(private val realm: Realm) {
         return id
     }
 
-    fun insertOrUpdate(deploymentResponse: EdgeDeploymentResponse) { // TODO:: Delete
-        realm.executeTransaction {
-            val deployment =
-                it.where(EdgeDeployment::class.java)
-                    .equalTo(EdgeDeployment.FIELD_SERVER_ID, deploymentResponse.serverId)
-                    .findFirst()
-
-            if (deployment == null) {
-                val deploymentObj = deploymentResponse.toEdgeDeployment()
-                val id = (it.where(EdgeDeployment::class.java).max(EdgeDeployment.FIELD_ID)
-                    ?.toInt() ?: 0) + 1
-                deploymentObj.id = id
-                it.insert(deploymentObj)
-            } else if (deployment.syncState == SyncState.Sent.key) {
-                deployment.deploymentKey = deploymentResponse.deploymentKey
-                deployment.serverId = deploymentResponse.serverId
-                deployment.deployedAt =
-                    deploymentResponse.deployedAt?.seconds?.let { deployedAt -> Date(deployedAt.times(1000)) }
-                        ?: deployment.deployedAt
-
-                val newLocation = deploymentResponse.stream
-                if (newLocation != null) {
-                    deployment.stream = it.copyToRealm(newLocation)
-                }
-
-                deployment.createdAt =
-                    deploymentResponse.createdAt?.seconds?.let { createdAt -> Date(createdAt.times(1000)) }
-                        ?: deployment.createdAt
-            }
-        }
-    }
-
     fun insertOrUpdate(deploymentResponse: DeploymentResponse) {
         realm.executeTransaction {
             val deployment =

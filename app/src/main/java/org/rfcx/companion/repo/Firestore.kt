@@ -114,47 +114,6 @@ class Firestore(val context: Context) {
             .set(group).await()
     }
 
-    fun retrieveDeployments(
-        edgeDeploymentDb: EdgeDeploymentDb,
-        guardianDeploymentDb: GuardianDeploymentDb,
-        callback: ResponseCallback<Boolean>? = null
-    ) {
-        val userDocument = db.collection(COLLECTION_USERS).document(uid)
-        userDocument.collection(COLLECTION_DEPLOYMENTS).get()
-            .addOnSuccessListener {
-                val edgeResponses = arrayListOf<EdgeDeploymentResponse>()
-                val guardianResponses = arrayListOf<GuardianDeploymentResponse>()
-                // verify response
-                it.documents.forEach { doc ->
-                    if (doc == null) return@forEach
-                    if (doc.getString("device") == Device.GUARDIAN.value) {
-                        val response = doc.toObject(GuardianDeploymentResponse::class.java)
-                        response?.serverId = doc.id
-                        response?.let { it1 -> guardianResponses.add(it1) }
-                    } else {
-                        val response = doc.toObject(EdgeDeploymentResponse::class.java)
-                        response?.serverId = doc.id
-                        response?.let { it1 -> edgeResponses.add(it1) }
-                    }
-                }
-
-                // verify response and store deployment
-                edgeResponses.forEach { dr ->
-                    edgeDeploymentDb.insertOrUpdate(dr)
-                }
-
-                // store guardian deployment
-                guardianResponses.forEach { dr ->
-//                    guardianDeploymentDb.insertOrUpdate(dr)
-                }
-
-                callback?.onSuccessCallback(true)
-            }
-            .addOnFailureListener {
-                callback?.onFailureCallback(it.localizedMessage)
-            }
-    }
-
     fun retrieveLocations(
         locateDb: LocateDb,
         callback: ResponseCallback<List<LocationResponse>>? = null
