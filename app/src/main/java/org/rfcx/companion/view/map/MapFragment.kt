@@ -347,10 +347,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             showDeployIds.contains(it.serverId) || showDeployIds.contains(it.id.toString())
         }
 
-        val edgeDeploymentMarkers = this.edgeDeployments.map { it.toMark() }
+        val showDeployments = this.edgeDeployments.filter {it.isCompleted()}
+        val edgeDeploymentMarkers = showDeployments.map { it.toMark() }
         val guardianDeploymentMarkers = showGuardianDeployments.map { it.toMark() }
         val deploymentMarkers = edgeDeploymentMarkers + guardianDeploymentMarkers
-        handleShowDeployment(this.edgeDeployments, showGuardianDeployments)
+        handleShowDeployment(showDeployments, showGuardianDeployments)
         handleMarkerDeployment(deploymentMarkers)
     }
 

@@ -141,7 +141,6 @@ class EdgeDeploymentDb(private val realm: Realm) {
 
             if (location != null) {
                 location.deletedAt = Date()
-                location.syncState = SyncState.Unsent.key
             }
         }, {
             // success

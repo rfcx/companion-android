@@ -1,6 +1,5 @@
 package org.rfcx.companion.repo
 
-import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import org.rfcx.companion.entity.request.DeploymentRequest
 import org.rfcx.companion.entity.request.EditDeploymentRequest
@@ -23,6 +22,12 @@ interface DeviceApiInterface {
         @Header("Authorization") authUser: String,
         @Path("id") id: String,
         @Body editDeploymentRequest: EditDeploymentRequest
+    ): Call<ResponseBody>
+
+    @DELETE("deployments/{id}")
+    fun deleteDeployments(
+        @Header("Authorization") authUser: String,
+        @Path("id") id: String
     ): Call<ResponseBody>
 
 }

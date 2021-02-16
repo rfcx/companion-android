@@ -26,6 +26,10 @@ open class EdgeDeployment(
     var passedChecks: RealmList<Int>? = null
 ) : RealmModel {
 
+    fun isCompleted(): Boolean {
+        return deletedAt == null
+    }
+
     companion object {
         const val TABLE_NAME = "EdgeDeployment"
         const val FIELD_ID = "id"

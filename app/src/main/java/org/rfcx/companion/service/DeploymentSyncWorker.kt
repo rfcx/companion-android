@@ -26,7 +26,6 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
 
         val db = EdgeDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val locateDb = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
-        val firestore = Firestore(context)
         val deployments = db.lockUnsent()
         val token = "Bearer ${context.getIdToken()}"
 
@@ -51,16 +50,19 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                 }
             } else {
                 val deploymentLocation = it.stream
+                val serverId = it.serverId ?: ""
                 deploymentLocation?.let { location ->
                     if (it.deletedAt != null) {
-                        firestore.updateDeleteDeployment(it.serverId!!, it.deletedAt!!)
-                        db.markSent(it.serverId!!, it.id)
+                        val result = ApiManager.getInstance().getDeviceApi()
+                            .deleteDeployments(token, serverId).execute()
+                        if (result.isSuccessful) {
+                            db.deleteDeployment(it.id)
+                        }
                     } else {
                         val req = EditDeploymentRequest(
                             location.toRequestBody(),
                             location.project?.toRequestBody()
                         )
-                        val serverId = it.serverId ?: ""
                         val result = ApiManager.getInstance().getDeviceApi()
                             .editDeployments(token, serverId, req).execute()
                         if (result.isSuccessful) {
