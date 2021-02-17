@@ -294,7 +294,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     }
 
     override fun playSyncSound() {
-        val deploymentId = getDeployment()?.deploymentId
+        val deploymentId = getDeployment()?.deploymentKey
         val deploymentIdArrayInt = deploymentId?.chunked(2)?.map { it.toInt(radix = 16) }?.toTypedArray() ?: arrayOf()
         Thread {
             audioMothConnector.playTimeAndDeploymentID(
@@ -327,8 +327,8 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         if (deployment != null) {
             setDeployment(deployment)
 
-            if (deployment.location != null) {
-                _deployLocation = deployment.location
+            if (deployment.stream != null) {
+                _deployLocation = deployment.stream
             }
 
             if (deployment.passedChecks != null) {

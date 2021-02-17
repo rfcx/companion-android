@@ -8,4 +8,5 @@ import retrofit2.http.Header
 interface FirebaseAuthInterface {
     @GET("firebaseToken")
     fun firebaseAuth(@Header("Authorization") authUser: String): Call<FirebaseAuthResponse>
+
 }

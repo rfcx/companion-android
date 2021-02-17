@@ -450,9 +450,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     setLatLogLabel(latLng)
                     altitudeEditText.setText(it.altitude.toString())
 
-                    if (locationGroupDb.isExisted(it.locationGroup?.group)) {
-                        group = it.locationGroup?.group
-                        locationGroupValueTextView.text = it.locationGroup?.group
+                    if (locationGroupDb.isExisted(it.locationGroup?.name)) {
+                        group = it.locationGroup?.name
+                        locationGroupValueTextView.text = it.locationGroup?.name
                         it.locationGroup?.color?.let { it1 -> setPinColorByGroup(it1) }
                     } else {
                         group = getString(R.string.none)

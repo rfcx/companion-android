@@ -5,13 +5,15 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import io.realm.Realm
+import org.rfcx.companion.entity.request.EditDeploymentRequest
 import org.rfcx.companion.entity.request.toRequestBody
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
+import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.repo.Firestore
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.RealmHelper
-import java.util.*
+import org.rfcx.companion.util.getIdToken
 
 /**
  * For syncing data to server. Ref from Ranger Android App
@@ -26,6 +28,7 @@ class GuardianDeploymentSyncWorker(val context: Context, params: WorkerParameter
         val locateDb = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val firestore = Firestore(context)
         val deployments = db.lockUnsent()
+        val token = "Bearer ${context.getIdToken()}"
 
         Log.d(TAG, "doWork: found ${deployments.size} unsent")
         var someFailed = false
@@ -43,10 +46,18 @@ class GuardianDeploymentSyncWorker(val context: Context, params: WorkerParameter
                     someFailed = true
                 }
             } else {
-                val deploymentLocation = it.location
-                deploymentLocation?.let { it1 ->
-                    firestore.updateGuardianDeploymentLocation(it.serverId!!, it1, it.updatedAt ?: Date())
-                    db.markSent(it.serverId!!, it.id)
+                val deploymentLocation = it.stream
+                deploymentLocation?.let { location ->
+                    val req = EditDeploymentRequest(
+                        location.toRequestBody(),
+                        location.project?.toRequestBody()
+                    )
+                    val serverId = it.serverId ?: ""
+                    val result = ApiManager.getInstance().getDeviceApi()
+                        .editDeployments(token, serverId, req).execute()
+                    if (result.isSuccessful) {
+                        db.markSent(it.serverId!!, it.id)
+                    }
                 }
             }
         }

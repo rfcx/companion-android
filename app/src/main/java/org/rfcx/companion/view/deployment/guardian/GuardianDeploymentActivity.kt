@@ -98,8 +98,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             if (deployment != null) {
                 setDeployment(deployment)
 
-                if (deployment.location != null) {
-                    _deployLocation = deployment.location
+                if (deployment.stream != null) {
+                    _deployLocation = deployment.stream
                 }
 
                 if (deployment.configuration != null) {

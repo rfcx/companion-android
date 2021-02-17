@@ -43,11 +43,6 @@ class Firestore(val context: Context) {
             }
     }
 
-    suspend fun sendDeployment(deployment: DeploymentRequest): DocumentReference? {
-        val userDocument = db.collection(COLLECTION_USERS).document(uid)
-        return userDocument.collection(COLLECTION_DEPLOYMENTS).add(deployment).await()
-    }
-
     suspend fun sendDeployment(deployment: GuardianDeploymentRequest): DocumentReference? {
         val userDocument = db.collection(COLLECTION_USERS).document(uid)
         return userDocument.collection(COLLECTION_DEPLOYMENTS).add(deployment).await()
@@ -68,17 +63,6 @@ class Firestore(val context: Context) {
         return userDocument.collection(COLLECTION_IMAGES).add(imageRequest).await()
     }
 
-    suspend fun sendLocation(locateRequest: LocateRequest): DocumentReference? {
-        val userDocument = db.collection(COLLECTION_USERS).document(uid)
-        return userDocument.collection(COLLECTION_LOCATIONS).add(locateRequest).await()
-    }
-
-    suspend fun updateLocation(locateServerId: String, locateRequest: LocateRequest) {
-        val userDocument = db.collection(COLLECTION_USERS).document(uid)
-        userDocument.collection(COLLECTION_LOCATIONS).document(locateServerId)
-            .set(locateRequest).await()
-    }
-
     suspend fun updateDeploymentLocation(
         serverId: String,
         deploymentLocation: DeploymentLocation,
@@ -86,7 +70,7 @@ class Firestore(val context: Context) {
     ) {
         val userDocument = db.collection(COLLECTION_USERS).document(uid)
         val updates = hashMapOf<String, Any>(
-            EdgeDeployment.FIELD_LOCATION to deploymentLocation,
+            EdgeDeployment.FIELD_STREAM to deploymentLocation,
             EdgeDeployment.FIELD_UPDATED_AT to updatedAt
         )
         userDocument.collection(COLLECTION_DEPLOYMENTS).document(serverId)
@@ -100,7 +84,7 @@ class Firestore(val context: Context) {
     ) {
         val userDocument = db.collection(COLLECTION_USERS).document(uid)
         val updates = hashMapOf<String, Any>(
-            GuardianDeployment.FIELD_LOCATION to deploymentLocation,
+            GuardianDeployment.FIELD_STREAM to deploymentLocation,
             GuardianDeployment.FIELD_UPDATED_AT to updatedAt
         )
         userDocument.collection(COLLECTION_DEPLOYMENTS).document(serverId)
@@ -128,47 +112,6 @@ class Firestore(val context: Context) {
         val userDocument = db.collection(COLLECTION_USERS).document(uid)
         userDocument.collection(COLLECTION_GROUPS).document(groupServerId)
             .set(group).await()
-    }
-
-    fun retrieveDeployments(
-        edgeDeploymentDb: EdgeDeploymentDb,
-        guardianDeploymentDb: GuardianDeploymentDb,
-        callback: ResponseCallback<Boolean>? = null
-    ) {
-        val userDocument = db.collection(COLLECTION_USERS).document(uid)
-        userDocument.collection(COLLECTION_DEPLOYMENTS).get()
-            .addOnSuccessListener {
-                val edgeResponses = arrayListOf<EdgeDeploymentResponse>()
-                val guardianResponses = arrayListOf<GuardianDeploymentResponse>()
-                // verify response
-                it.documents.forEach { doc ->
-                    if (doc == null) return@forEach
-                    if (doc.getString("device") == Device.GUARDIAN.value) {
-                        val response = doc.toObject(GuardianDeploymentResponse::class.java)
-                        response?.serverId = doc.id
-                        response?.let { it1 -> guardianResponses.add(it1) }
-                    } else {
-                        val response = doc.toObject(EdgeDeploymentResponse::class.java)
-                        response?.serverId = doc.id
-                        response?.let { it1 -> edgeResponses.add(it1) }
-                    }
-                }
-
-                // verify response and store deployment
-                edgeResponses.forEach { dr ->
-                    edgeDeploymentDb.insertOrUpdate(dr)
-                }
-
-                // store guardian deployment
-                guardianResponses.forEach { dr ->
-                    guardianDeploymentDb.insertOrUpdate(dr)
-                }
-
-                callback?.onSuccessCallback(true)
-            }
-            .addOnFailureListener {
-                callback?.onFailureCallback(it.localizedMessage)
-            }
     }
 
     fun retrieveLocations(

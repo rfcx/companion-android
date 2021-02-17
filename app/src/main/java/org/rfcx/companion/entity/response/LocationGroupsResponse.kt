@@ -1,5 +1,6 @@
 package org.rfcx.companion.entity.response
 
+import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.LocationGroups
 import java.util.*
 
@@ -19,5 +20,14 @@ fun LocationGroupsResponse.toLocationGroups(): LocationGroups {
         color = this.color,
         serverId = this.serverId,
         deletedAt = this.deletedAt
+    )
+}
+
+fun LocationGroup.toLocationGroupsResponse(): LocationGroupsResponse {
+    return LocationGroupsResponse(
+        name = this.name ?: "",
+        color = this.color ?: "",
+        serverId = this.coreId,
+        deletedAt = null
     )
 }

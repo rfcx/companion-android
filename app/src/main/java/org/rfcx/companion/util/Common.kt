@@ -20,4 +20,3 @@ fun Context.getIntColor(res: Int): Int {
 
 private val chars = ('A'..'F') + ('0'..'9')
 fun randomDeploymentId(): String = List(16) { chars.random() }.joinToString("")
-fun randomLocationGroup(): String = List(20) { chars.random() }.joinToString("")

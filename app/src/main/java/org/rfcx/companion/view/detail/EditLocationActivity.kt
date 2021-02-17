@@ -61,9 +61,9 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
                 LocationGroupActivity.RESULT_OK -> {
                     locationGroup = data?.getSerializableExtra(EXTRA_LOCATION_GROUP) as LocationGroup
                     locationGroup?.let {
-                        val isGroupExisted = locationGroupDb.isExisted(locationGroup?.group)
+                        val isGroupExisted = locationGroupDb.isExisted(locationGroup?.name)
                         groupName = if (isGroupExisted) {
-                            it.group
+                            it.name
                         } else {
                             getString(R.string.none)
                         }

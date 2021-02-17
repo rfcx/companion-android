@@ -22,6 +22,11 @@ fun Context.getEmailUser(): String {
     return email ?: getUserNickname()
 }
 
+fun Context.getIdToken(): String? {
+    val preferences = this.let { Preferences.getInstance(it) }
+    return preferences.getString(Preferences.ID_TOKEN)
+}
+
 fun Context.logout() {
     Preferences.getInstance(this).clear()
     Realm.getInstance(RealmHelper.migrationConfig()).use { realm ->

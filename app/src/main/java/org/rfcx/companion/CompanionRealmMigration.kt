@@ -32,6 +32,10 @@ class CompanionRealmMigration : RealmMigration {
         if (oldVersion < 8L && newVersion >= 8L) {
             migrateToV8(realm)
         }
+
+        if (oldVersion < 9L && newVersion >= 9L) {
+            migrateToV9(realm)
+        }
     }
 
     private fun migrateToV2(realm: DynamicRealm) {
@@ -77,9 +81,9 @@ class CompanionRealmMigration : RealmMigration {
         // Add LocationGroup class
         val locationGroup = realm.schema.create(LocationGroup.TABLE_NAME)
         locationGroup.apply {
-            addField(LocationGroup.FIELD_GROUP, String::class.java)
+            addField("group", String::class.java)
             addField(LocationGroup.FIELD_COLOR, String::class.java)
-            addField(LocationGroup.FIELD_SERVER_ID, String::class.java)
+            addField("serverId", String::class.java)
         }
 
         // Add LocationGroups class
@@ -110,7 +114,7 @@ class CompanionRealmMigration : RealmMigration {
 
         val deploymentLocation = realm.schema.get(DeploymentLocation.TABLE_NAME)
         deploymentLocation?.apply {
-            addRealmObjectField(DeploymentLocation.FIELD_LOCATION_GROUP, locationGroup)
+            addRealmObjectField("locationGroup", locationGroup)
         }
 
         // Delete field first to avoid ref error
@@ -180,6 +184,32 @@ class CompanionRealmMigration : RealmMigration {
         deploymentImage?.apply {
             addField(DeploymentImage.FIELD_DEVICE, String::class.java)
                 .setNullable(DeploymentImage.FIELD_DEVICE, false)
+        }
+    }
+
+    private fun migrateToV9(realm: DynamicRealm) {
+
+        val project = realm.schema.get(LocationGroup.TABLE_NAME)
+        project?.apply {
+            renameField("serverId", LocationGroup.FIELD_CORE_ID)
+            renameField("group", LocationGroup.FIELD_NAME)
+        }
+
+        val stream = realm.schema.get(DeploymentLocation.TABLE_NAME)
+        stream?.apply {
+            renameField("locationGroup", DeploymentLocation.FIELD_PROJECT)
+            addField(DeploymentLocation.FIELD_CORE_ID, String::class.java)
+        }
+
+        val edgeDeployment = realm.schema.get(EdgeDeployment.TABLE_NAME)
+        edgeDeployment?.apply {
+            renameField("location", EdgeDeployment.FIELD_STREAM)
+            renameField("deploymentId", EdgeDeployment.FIELD_DEPLOYMENT_KEY)
+        }
+
+        val guardianDeployment = realm.schema.get(GuardianDeployment.TABLE_NAME)
+        guardianDeployment?.apply {
+            renameField("location", GuardianDeployment.FIELD_STREAM)
         }
     }
 

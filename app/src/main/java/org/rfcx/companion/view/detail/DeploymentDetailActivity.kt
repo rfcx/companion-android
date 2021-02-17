@@ -80,10 +80,10 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
 
         editButton.setOnClickListener {
             deployment?.let {
-                val location = deployment?.location
+                val location = deployment?.stream
                 location?.let { locate ->
-                    val group = locate.locationGroup?.group ?: getString(R.string.none)
-                    val isGroupExisted = locationGroupDb.isExisted(locate.locationGroup?.group)
+                    val group = locate.project?.name ?: getString(R.string.none)
+                    val isGroupExisted = locationGroupDb.isExisted(locate.project?.name)
                     intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)?.let { deploymentId ->
                         analytics.trackEditLocationEvent()
                         EditLocationActivity.startActivity(
@@ -156,7 +156,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
             }
 
             supportActionBar?.apply {
-                title = deployment?.location?.name ?: getString(R.string.title_deployment_detail)
+                title = deployment?.stream?.name ?: getString(R.string.title_deployment_detail)
             }
         }
     }
@@ -165,13 +165,13 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         // setup deployment images view
         observeDeploymentImage(deployment.id)
 
-        val location = deployment.location
+        val location = deployment.stream
         location?.let { locate ->
             latitudeValue.text = locate.latitude.latitudeCoordinates(this)
             longitudeValue.text = locate.longitude.longitudeCoordinates(this)
             altitudeValue.text = locate.altitude.toString()
         }
-        changePinColorByGroup(location?.locationGroup?.group ?: getString(R.string.none))
+        changePinColorByGroup(location?.project?.name ?: getString(R.string.none))
     }
 
     private fun observeDeploymentImage(deploymentId: Int) {
@@ -223,7 +223,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
     }
 
     private fun setLocationOnMap(deployment: EdgeDeployment) {
-        val location = deployment.location
+        val location = deployment.stream
         location?.let { locate ->
             val latLng = LatLng(locate.latitude, locate.longitude)
             moveCamera(latLng, LocationFragment.DEFAULT_ZOOM)
@@ -239,7 +239,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
-            title = deployment?.location?.name ?: getString(R.string.title_deployment_detail)
+            title = deployment?.stream?.name ?: getString(R.string.title_deployment_detail)
         }
     }
 

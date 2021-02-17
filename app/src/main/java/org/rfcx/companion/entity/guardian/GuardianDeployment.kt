@@ -20,7 +20,7 @@ open class GuardianDeployment(
     var device: String? = Device.GUARDIAN.value,
     var wifiName: String? = "",
     var configuration: GuardianConfiguration? = null,
-    var location: DeploymentLocation? = null,
+    var stream: DeploymentLocation? = null,
     var createdAt: Date = Date(),
     var updatedAt: Date? = null,
     @Expose(serialize = false)
@@ -33,7 +33,7 @@ open class GuardianDeployment(
         const val FIELD_SERVER_ID = "serverId"
         const val FIELD_STATE = "state"
         const val FIELD_SYNC_STATE = "syncState"
-        const val FIELD_LOCATION = "location"
+        const val FIELD_STREAM = "stream"
         const val FIELD_UPDATED_AT = "updatedAt"
     }
 }

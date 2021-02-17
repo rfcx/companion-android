@@ -5,13 +5,15 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import io.realm.Realm
-import java.util.*
+import org.rfcx.companion.entity.request.EditDeploymentRequest
 import org.rfcx.companion.entity.request.toRequestBody
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
+import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.repo.Firestore
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.RealmHelper
+import org.rfcx.companion.util.getIdToken
 
 /**
  * For syncing data to server. Ref from Ranger Android App
@@ -24,8 +26,8 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
 
         val db = EdgeDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val locateDb = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
-        val firestore = Firestore(context)
         val deployments = db.lockUnsent()
+        val token = "Bearer ${context.getIdToken()}"
 
         Log.d(TAG, "doWork: found ${deployments.size} unsent")
         var someFailed = false
@@ -34,28 +36,38 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
             Log.d(TAG, "doWork: sending id ${it.id}")
 
             if (it.serverId == null) {
-                val result = firestore.sendDeployment(it.toRequestBody())
+                val result = ApiManager.getInstance().getDeviceApi()
+                    .createDeployment(token, it.toRequestBody()).execute()
 
-                if (result != null) {
-                    db.markSent(result.id, it.id)
-                    locateDb.updateDeploymentServerId(it.id, result.id)
+                if (result.isSuccessful) {
+                    result.body()?.string()?.let { docId ->
+                        db.markSent(docId, it.id)
+                        locateDb.updateDeploymentServerId(it.id, docId)
+                    }
                 } else {
                     db.markUnsent(it.id)
                     someFailed = true
                 }
             } else {
-                val deploymentLocation = it.location
-                deploymentLocation?.let { it1 ->
+                val deploymentLocation = it.stream
+                val serverId = it.serverId ?: ""
+                deploymentLocation?.let { location ->
                     if (it.deletedAt != null) {
-                        firestore.updateDeleteDeployment(it.serverId!!, it.deletedAt!!)
-                        db.markSent(it.serverId!!, it.id)
+                        val result = ApiManager.getInstance().getDeviceApi()
+                            .deleteDeployments(token, serverId).execute()
+                        if (result.isSuccessful) {
+                            db.deleteDeployment(it.id)
+                        }
                     } else {
-                        firestore.updateDeploymentLocation(
-                            it.serverId!!,
-                            it1,
-                            it.updatedAt ?: Date()
+                        val req = EditDeploymentRequest(
+                            location.toRequestBody(),
+                            location.project?.toRequestBody()
                         )
-                        db.markSent(it.serverId!!, it.id)
+                        val result = ApiManager.getInstance().getDeviceApi()
+                            .editDeployments(token, serverId, req).execute()
+                        if (result.isSuccessful) {
+                            db.markSent(it.serverId!!, it.id)
+                        }
                     }
                 }
             }

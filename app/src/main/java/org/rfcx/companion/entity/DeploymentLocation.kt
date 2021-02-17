@@ -10,11 +10,13 @@ open class DeploymentLocation(
     var latitude: Double = 0.0,
     var longitude: Double = 0.0,
     var altitude: Double = 0.0,
-    var locationGroup: LocationGroup? = null
+    var project: LocationGroup? = null,
+    var coreId: String? = null
 ) : RealmModel, Serializable {
     companion object {
         const val TABLE_NAME = "DeploymentLocation"
-        const val FIELD_LOCATION_GROUP = "locationGroup"
+        const val FIELD_PROJECT = "project"
         const val FIELD_ALTITUDE = "altitude"
+        const val FIELD_CORE_ID = "coreId"
     }
 }

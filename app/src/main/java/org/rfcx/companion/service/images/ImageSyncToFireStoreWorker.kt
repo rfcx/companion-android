@@ -8,7 +8,6 @@ import io.realm.Realm
 import org.rfcx.companion.entity.request.toRequestBody
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.repo.Firestore
-import org.rfcx.companion.service.LocationSyncWorker
 import org.rfcx.companion.util.RealmHelper
 
 class ImageSyncToFireStoreWorker(val context: Context, params: WorkerParameters) :
@@ -31,8 +30,6 @@ class ImageSyncToFireStoreWorker(val context: Context, params: WorkerParameters)
             }
             someFailed = result == null
         }
-
-        LocationSyncWorker.enqueue(context)
 
         return if (someFailed) Result.retry() else Result.success()
     }

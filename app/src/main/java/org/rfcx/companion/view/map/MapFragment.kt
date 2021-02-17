@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.toColorInt
@@ -46,15 +47,22 @@ import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.DeploymentState.Edge
 import org.rfcx.companion.entity.DeploymentState.Guardian
 import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.response.DeploymentResponse
+import org.rfcx.companion.entity.response.toLocationGroupsResponse
+import org.rfcx.companion.entity.response.toLocationResponse
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.localdb.guardian.DiagnosticDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
+import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.repo.Firestore
 import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.util.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -335,18 +343,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             it.getLastDeploymentId()
         })
 
-        val showEdgeDeployments = this.edgeDeployments.filter {
-            showDeployIds.contains(it.serverId) || showDeployIds.contains(it.id.toString())
-        }
-
         val showGuardianDeployments = this.guardianDeployments.filter {
             showDeployIds.contains(it.serverId) || showDeployIds.contains(it.id.toString())
         }
 
-        val edgeDeploymentMarkers = showEdgeDeployments.map { it.toMark() }
+        val showDeployments = this.edgeDeployments.filter {it.isCompleted()}
+        val edgeDeploymentMarkers = showDeployments.map { it.toMark() }
         val guardianDeploymentMarkers = showGuardianDeployments.map { it.toMark() }
         val deploymentMarkers = edgeDeploymentMarkers + guardianDeploymentMarkers
-        handleShowDeployment(showEdgeDeployments, showGuardianDeployments)
+        handleShowDeployment(showDeployments, showGuardianDeployments)
         handleMarkerDeployment(deploymentMarkers)
     }
 
@@ -391,15 +396,45 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun retrieveDeployments(context: Context) {
-        Firestore(context).retrieveDeployments(edgeDeploymentDb, guardianDeploymentDb)
+        val token = "Bearer ${context.getIdToken()}"
+        ApiManager.getInstance().getDeviceApi().getDeployments(token)
+            .enqueue(object : Callback<List<DeploymentResponse>> {
+                override fun onFailure(call: Call<List<DeploymentResponse>>, t: Throwable) {
+                    Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onResponse(
+                    call: Call<List<DeploymentResponse>>,
+                    response: Response<List<DeploymentResponse>>
+                ) {
+                    response.body()?.forEach { item ->
+                        item.serverId = item.serverId
+                        if(item.device == Device.GUARDIAN.value) {
+                            guardianDeploymentDb.insertOrUpdate(item)
+                        } else {
+                            edgeDeploymentDb.insertOrUpdate(item)
+                        }
+                        /* Save Streams and Projects in local database */
+                        if (item.stream != null) {
+                            locateDb.insertOrUpdate(item.stream!!.toLocationResponse())
+
+                            if(item.stream!!.project != null) {
+                                locationGroupDb.insertOrUpdate(item.stream!!.project!!.toLocationGroupsResponse())
+                            }
+                        }
+                    }
+                }
+            })
     }
 
     private fun retrieveLocations(context: Context) {
-        Firestore(context).retrieveLocations(locateDb)
+        // TODO:: call get Streams in here
+//        Firestore(context).retrieveLocations(locateDb)
     }
 
     private fun retrieveLocationGroups(context: Context) {
-        Firestore(context).retrieveLocationGroups(locationGroupDb)
+        // TODO:: call get Projects in here
+//        Firestore(context).retrieveLocationGroups(locationGroupDb)
     }
 
     private fun retrieveDiagnostics(context: Context) {
@@ -594,13 +629,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun EdgeDeployment.toMark(): DeploymentMarker {
-        val color = location?.locationGroup?.color
-        val group = location?.locationGroup?.group
+        val color = stream?.project?.color
+        val group = stream?.project?.name
         val isGroupExisted = locationGroupDb.isExisted(group)
         val pinImage =
             if (state == Edge.ReadyToUpload.key) {
                 if (color != null && color.isNotEmpty() && group != null && isGroupExisted ) {
-                    location?.locationGroup?.color
+                    stream?.project?.color
                 } else {
                     Battery.BATTERY_PIN_GREEN
                 }
@@ -614,20 +649,20 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             getString(R.string.format_in_progress_step)
 
         return DeploymentMarker(
-            id, location?.name ?: "",
-            location?.longitude ?: 0.0,
-            location?.latitude ?: 0.0,
+            id, stream?.name ?: "",
+            stream?.longitude ?: 0.0,
+            stream?.latitude ?: 0.0,
             pinImage, description, Device.EDGE.value, createdAt, updatedAt
         )
     }
 
     private fun GuardianDeployment.toMark(): DeploymentMarker {
-        val color = location?.locationGroup?.color
+        val color = stream?.project?.color
         val pinImage =
             if (state == Guardian.ReadyToUpload.key) {
                 if (WifiHotspotUtils.isConnectedWithGuardian(requireContext(), this.wifiName!!)) {
                     if (color != null && color.isNotEmpty()) {
-                        location?.locationGroup?.color
+                        stream?.project?.color
                     } else {
                         GuardianPin.CONNECTED_GUARDIAN
                     }
@@ -639,9 +674,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             } ?: GuardianPin.CONNECTED_GUARDIAN
         return DeploymentMarker(
             id,
-            location?.name ?: "",
-            location?.longitude ?: 0.0,
-            location?.latitude ?: 0.0,
+            stream?.name ?: "",
+            stream?.longitude ?: 0.0,
+            stream?.latitude ?: 0.0,
             pinImage,
             "-",
             Device.GUARDIAN.value,

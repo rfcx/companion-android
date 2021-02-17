@@ -8,24 +8,24 @@ import org.rfcx.companion.entity.*
  */
 data class EdgeDeploymentResponse(
     var serverId: String? = null,
-    var deploymentId: String? = null,
-    var deployedAt: Date? = Date(),
-    var location: DeploymentLocation? = null,
-    var createdAt: Date? = Date(),
-    var updatedAt: Date? = null,
-    var deletedAt: Date? = null
+    var deploymentKey: String? = null,
+    var deployedAt: DateResponse? = DateResponse(),
+    var stream: DeploymentLocation? = null,
+    var createdAt: DateResponse? = DateResponse(),
+    var updatedAt: DateResponse? = null,
+    var deletedAt: DateResponse? = null
 )
 
 fun EdgeDeploymentResponse.toEdgeDeployment(): EdgeDeployment {
     return EdgeDeployment(
-        deploymentId = this.deploymentId,
+        deploymentKey = this.deploymentKey,
         serverId = this.serverId,
-        deployedAt = this.deployedAt ?: Date(),
+        deployedAt = this.deployedAt?.seconds?.let { Date(it.times(1000)) } ?: Date(),
         state = DeploymentState.Edge.ReadyToUpload.key,
-        location = this.location,
-        createdAt = this.createdAt ?: Date(),
+        stream = this.stream,
+        createdAt = this.createdAt?.seconds?.let { Date(it.times(1000)) } ?: Date(),
         syncState = SyncState.Sent.key,
-        updatedAt = this.updatedAt,
-        deletedAt = this.deletedAt
+        updatedAt = this.updatedAt?.seconds?.let { Date(it.times(1000)) },
+        deletedAt = this.deletedAt?.seconds?.let { Date(it.times(1000)) }
     )
 }

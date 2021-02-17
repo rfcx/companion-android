@@ -25,7 +25,6 @@ import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.SocketManager
 import org.rfcx.companion.entity.DeploymentImage
-import org.rfcx.companion.entity.DeploymentLocation
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.guardian.*
@@ -112,10 +111,10 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
     private fun getIntentExtra() {
         isConnected = intent.extras?.getBoolean(IS_CONNECTED)
         deployment = intent.extras?.getSerializable(DEPLOYMENT) as GuardianDeployment
-        lat = deployment?.location?.latitude ?: 0.0
-        long = deployment?.location?.longitude ?: 0.0
-        altitude = deployment?.location?.altitude ?: 0.0
-        locationName = deployment?.location?.name ?: ""
+        lat = deployment?.stream?.latitude ?: 0.0
+        long = deployment?.stream?.longitude ?: 0.0
+        altitude = deployment?.stream?.altitude ?: 0.0
+        locationName = deployment?.stream?.name ?: ""
         deploymentServerId = deployment?.serverId ?: ""
         configuration = deployment?.configuration ?: GuardianConfiguration()
     }
@@ -258,10 +257,10 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
 
     private fun editLocation() {
         deployment?.let {
-            val location = deployment?.location
+            val location = deployment?.stream
             location?.let { locate ->
-                val group = locate.locationGroup?.group ?: getString(R.string.none)
-                val isGroupExisted = locationGroupDb.isExisted(locate.locationGroup?.group)
+                val group = locate.project?.name ?: getString(R.string.none)
+                val isGroupExisted = locationGroupDb.isExisted(locate.project?.name)
                 analytics.trackEditLocationEvent()
                 EditLocationActivity.startActivity(
                     this,
@@ -299,13 +298,13 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
             }
 
             supportActionBar?.apply {
-                title = deployment?.location?.name ?: getString(R.string.title_deployment_detail)
+                title = deployment?.stream?.name ?: getString(R.string.title_deployment_detail)
             }
         }
     }
 
     private fun updateDeploymentDetailView(deployment: GuardianDeployment) {
-        val location = deployment.location
+        val location = deployment.stream
         location?.let { locate ->
             latitudeValue.text = locate.latitude.latitudeCoordinates(this)
             longitudeValue.text = locate.longitude.longitudeCoordinates(this)
