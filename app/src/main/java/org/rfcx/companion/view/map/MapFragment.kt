@@ -400,7 +400,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         ApiManager.getInstance().getDeviceApi().getDeployments(token)
             .enqueue(object : Callback<List<DeploymentResponse>> {
                 override fun onFailure(call: Call<List<DeploymentResponse>>, t: Throwable) {
-                    Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT).show()
+                    combinedData()
+                    if(context.isNetworkAvailable()) {
+                        Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT).show()
+                    }
                 }
 
                 override fun onResponse(
