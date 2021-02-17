@@ -54,12 +54,12 @@ class CreateNewGroupActivity : AppCompatActivity(), (ColorPickerItem, Int) -> Un
 
         saveButton.setOnClickListener {
             val color = colorPickerState.firstOrNull { it.selected }
-            if (locationGroupEditText.text.isNullOrBlank() || color == null) {
+            if (locationGroupEditText.text.isNullOrBlank()) {
                 Toast.makeText(this, R.string.missing_name_group, Toast.LENGTH_LONG).show()
             } else {
                 val group = LocationGroups(
                     name = locationGroupEditText.text.toString(),
-                    color = color.color,
+                    color = null,
                     serverId = null
                 )
                 locationGroupDb.insertOrUpdateLocationGroup(group)

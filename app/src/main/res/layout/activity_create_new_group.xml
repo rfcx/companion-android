@@ -46,6 +46,7 @@
         android:layout_marginTop="@dimen/margin_padding_normal"
         android:layout_marginEnd="@dimen/margin_padding_normal"
         android:text="@string/select_a_color"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/locationGroupTextInput" />
 
@@ -56,6 +57,7 @@
         android:layout_marginStart="@dimen/margin_padding_normal"
         android:layout_marginTop="@dimen/margin_padding_small"
         android:layout_marginEnd="@dimen/margin_padding_normal"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/selectColorTextView" />

@@ -96,6 +96,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                             isFirstTime = false
                             this@LocationFragment.lastLocation =
                                 this@LocationFragment.currentUserLocation
+
+                            retrieveDeployLocations()
+                            setupLocationSpinner()
                             updateLocationAdapter()
                         }
                     }
@@ -392,15 +395,16 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             locationNameSpinner.setSelection(spinnerPosition)
         } else {
             val nearLocations = findNearLocations(lastLocation, locateItems)
+            val nearItems = nearLocations?.filter { it.second < 50 }
 
             // lat & lng from selecting new location
-            if (locateItems.isNotEmpty() && nearLocations != null &&
+            if (locateItems.isNotEmpty() && nearItems != null &&
                 latitude == 0.0 && longitude == 0.0
             ) {
                 // enable exiting radio button
                 enableExistingLocationButton()
                 // set selected locate Item
-                val nearItem = nearLocations.minBy { it.second }
+                val nearItem = nearItems.minBy { it.second }
                 val position = locateItems.indexOf(nearItem?.first)
                 locationNameSpinner.setSelection(position)
                 locateItem = locateItems[position]
@@ -428,6 +432,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setupLocationSpinner() {
+        this.locateAdapter?.clear()
+        this.locateAdapter?.notifyDataSetChanged()
+
         locateItems.mapTo(locateNames, { it.name })
         this.locateAdapter = context?.let {
             ArrayAdapter(
@@ -471,11 +478,17 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         locateItems.clear()
         val locations = locateDb.getLocations()
         val showLocations = locations.filter { it.isCompleted() }
-        locateItems.addAll(showLocations)
+        val nearLocations = findNearLocations(lastLocation, ArrayList(showLocations))?.sortedBy { it.second }
+        val locationsItems = nearLocations?.map { it.first }
+        if (locationsItems != null) {
+            locateItems.addAll(locationsItems)
+        } else {
+            locateItems.addAll(showLocations)
+        }
     }
 
     /**
-     * Return [List<Locate, Distance( < 50m )>]]
+     * Return [List<Locate, Distance>]]
      * */
     private fun findNearLocations(
         lastLocation: Location?,
@@ -493,8 +506,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 val distance = loc.distanceTo(this.lastLocation) // return in meters
                 Pair(it, distance)
             })
-            val nearItems = itemsWithDistance.filter { it.second < 50 }
-            return if (nearItems.isEmpty()) null else nearItems
+            return itemsWithDistance
         }
         return null
     }
