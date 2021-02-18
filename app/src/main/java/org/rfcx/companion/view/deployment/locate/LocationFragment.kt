@@ -174,12 +174,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             val altitudeValue = altitudeEditText.text.toString()
             if (altitudeValue.isNotEmpty()) {
                 this.altitude = altitudeValue.toDouble()
-//                if (existingRadioButton.isChecked) {
-//                    handleExistLocate()
-//                } else if (newLocationRadioButton.isChecked) {
-//                    getLastLocation()
-//                    verifyInput()
-//                }
+                if (isCreateNewSite) {
+                    getLastLocation()
+                    verifyInput()
+                } else {
+                    handleExistLocate()
+                }
             } else {
                 Toast.makeText(
                     context,
@@ -211,13 +211,15 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
 
         viewOfMapBox.setOnClickListener {
-//            if (newLocationRadioButton.isChecked) {
-//                val name = locationNameEditText.text.toString()
-//                val altitude = altitudeEditText.text.toString().toDouble()
-//                startMapPicker(name, altitude)
-//                analytics?.trackChangeLocationEvent(Screen.LOCATION.id)
-//            }
+            if (isCreateNewSite) {
+                val name = locationNameEditText.text.toString()
+                val altitude = altitudeEditText.text.toString().toDouble()
+                startMapPicker(name, altitude)
+                analytics?.trackChangeLocationEvent(Screen.LOCATION.id)
+            }
         }
+
+        enableExistingLocation(!isCreateNewSite)
     }
 
     private fun startMapPicker(name: String, altitude: Double) {
@@ -239,14 +241,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private fun setViewFromDeploymentState() {
         val fromUnfinishedDeployment = deploymentProtocol?.isOpenedFromUnfinishedDeployment() ?: false
-//        existingRadioButton.isEnabled = !fromUnfinishedDeployment
-//        newLocationRadioButton.isEnabled = !fromUnfinishedDeployment
         locationNameSpinner.isEnabled = !fromUnfinishedDeployment
         changeGroupTextView.isEnabled = !fromUnfinishedDeployment
         if (fromUnfinishedDeployment) {
-//            existingRadioButton.isClickable = false
-//            existingRadioButton.alpha = 0.5f
-//            newLocationRadioButton.alpha = 0.5f
             changeGroupTextView.visibility = View.INVISIBLE
         }
     }
@@ -265,7 +262,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             }
             retrieveDeployLocations()
             setupLocationSpinner()
-//            setupLocationOptions()
             updateLocationAdapter()
             enableLocationComponent()
         }
@@ -325,24 +321,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         return LocationGroup(locationGroup.name, locationGroup.color, locationGroup.serverId)
     }
 
-//    private fun setupLocationOptions() {
-//        radioGroup.setOnCheckedChangeListener { _, checkedId ->
-//            when (checkedId) {
-//                R.id.newLocationRadioButton -> {
-//                    changeTextView.visibility = View.VISIBLE
-//                    changeGroupTextView.visibility = View.VISIBLE
-//                    onPressedNewLocation()
-//                }
-//
-//                R.id.existingRadioButton -> {
-//                    changeTextView.visibility = View.GONE
-//                    changeGroupTextView.visibility = View.GONE
-//                    onPressedExisting()
-//                }
-//            }
-//        }
-//    }
-
     private fun setLatLogLabel(location: LatLng) {
         context?.let {
             val latLng =
@@ -358,10 +336,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             moveCamera(it.getLatLng(), DEFAULT_ZOOM)
             setLatLogLabel(it.getLatLng())
             altitudeEditText.setText(it.altitude.toString())
-            altitudeEditText.isEnabled = false
         }
-//        locationNameTextInput.visibility = View.GONE
-//        locationNameSpinner.visibility = View.VISIBLE
     }
 
     private fun getLastLocation() {
@@ -380,7 +355,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private fun onPressedNewLocation() {
         val altitudeText = if(altitude == null) getString(R.string.altitude_default) else altitude.toString()
         altitudeEditText.setText(altitudeText)
-        altitudeEditText.isEnabled = true
         getLastLocation()
 
         if (lastLocation != null) {
@@ -394,8 +368,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             setLatLogLabel(LatLng(0.0, 0.0))
             moveCamera(LatLng(0.0, 0.0), DEFAULT_ZOOM)
         }
-//        locationNameTextInput.visibility = View.VISIBLE
-//        locationNameSpinner.visibility = View.GONE
     }
 
     private fun updateLocationAdapter() {
@@ -403,8 +375,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         val deploymentLocation = deploymentProtocol?.getDeploymentLocation()
         if (deploymentLocation != null && locateAdapter != null) {
             val spinnerPosition = locateAdapter!!.getPosition(deploymentLocation.name)
-            // enable exiting radio button
-//            enableExistingLocationButton()
             locationNameSpinner.setSelection(spinnerPosition)
         } else {
             val nearLocations = findNearLocations(lastLocation, locateItems)
@@ -414,8 +384,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             if (locateItems.isNotEmpty() && nearItems != null &&
                 latitude == 0.0 && longitude == 0.0
             ) {
-                // enable exiting radio button
-//                enableExistingLocationButton()
                 // set selected locate Item
                 val nearItem = nearItems.minBy { it.second }
                 val position = locateItems.indexOf(nearItem?.first)
@@ -424,7 +392,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
                 onPressedExisting()
             } else {
-//                enableNewLocationButton()
                 onPressedNewLocation()
 //                if (locateItems.isNullOrEmpty()) {
 //                    existingRadioButton.isEnabled = false
@@ -432,17 +399,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             }
         }
     }
-
-//    private fun enableExistingLocationButton() {
-//        existingRadioButton.isChecked = true
-//        existingRadioButton.isEnabled = true
-//        newLocationRadioButton.isChecked = false
-//    }
-//
-//    private fun enableNewLocationButton() {
-//        newLocationRadioButton.isChecked = true
-//        existingRadioButton.isChecked = false
-//    }
 
     private fun setupLocationSpinner() {
         this.locateAdapter?.clear()
@@ -465,38 +421,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             val position = locateNames.indexOf(name)
             locationNameSpinner.setSelection(position)
             locateItem = locateItems[position]
-//            locationNameEditText.setText(nameLocation)
-
         }
-
-//        locationNameSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-//            override fun onItemSelected(
-//                parent: AdapterView<*>?,
-//                view: View?,
-//                position: Int,
-//                id: Long
-//            ) {
-//                locateItem = locateItems[position]
-//                locateItem?.let {
-//                    val latLng = it.getLatLng()
-//                    moveCamera(latLng, DEFAULT_ZOOM)
-//                    setLatLogLabel(latLng)
-//                    altitudeEditText.setText(it.altitude.toString())
-//
-//                    if (locationGroupDb.isExisted(it.locationGroup?.name)) {
-//                        group = it.locationGroup?.name
-//                        locationGroupValueTextView.text = it.locationGroup?.name
-//                        it.locationGroup?.color?.let { it1 -> setPinColorByGroup(it1) }
-//                    } else {
-//                        group = getString(R.string.none)
-//                        locationGroupValueTextView.text = getString(R.string.none)
-//                        it.locationGroup?.color?.let { setPinColorByGroup("#2AA841") }
-//                    }
-//                }
-//            }
-//
-//            override fun onNothingSelected(parent: AdapterView<*>?) {}
-//        }
     }
 
     private fun retrieveDeployLocations() {
@@ -657,6 +582,15 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         )
 
         locationEngine?.getLastLocation(mapboxLocationChangeCallback)
+    }
+
+    private val isCreateNewSite: Boolean = if (locationNameSpinner != null) locationNameSpinner.selectedItem.toString() == "New site" else false
+
+    private fun enableExistingLocation(enable: Boolean) {
+        locationNameTextInput.visibility = if(enable) View.GONE else View.VISIBLE
+        altitudeEditText.isEnabled = !enable
+        changeTextView.visibility = if(enable) View.GONE else View.VISIBLE
+        changeGroupTextView.visibility = if(enable) View.GONE else View.VISIBLE
     }
 
     override fun onStart() {
