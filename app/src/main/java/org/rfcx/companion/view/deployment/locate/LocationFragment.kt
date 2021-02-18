@@ -18,7 +18,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import android.widget.Toast
@@ -229,7 +228,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun startSelectingExistedSite() {
-        lastLocation?.let { lastLocate ->
+        val locate = if (lastLocation == null) currentUserLocation else lastLocation
+        locate?.let { lastLocate ->
             deploymentProtocol?.let {
                 it.startSelectingExistedSite(lastLocate.latitude, lastLocate.longitude)
                 it.hideToolbar()
@@ -360,8 +360,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             altitudeEditText.setText(it.altitude.toString())
             altitudeEditText.isEnabled = false
         }
-        locationNameTextInput.visibility = View.GONE
-        locationNameSpinner.visibility = View.VISIBLE
+//        locationNameTextInput.visibility = View.GONE
+//        locationNameSpinner.visibility = View.VISIBLE
     }
 
     private fun getLastLocation() {
@@ -394,8 +394,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             setLatLogLabel(LatLng(0.0, 0.0))
             moveCamera(LatLng(0.0, 0.0), DEFAULT_ZOOM)
         }
-        locationNameTextInput.visibility = View.VISIBLE
-        locationNameSpinner.visibility = View.GONE
+//        locationNameTextInput.visibility = View.VISIBLE
+//        locationNameSpinner.visibility = View.GONE
     }
 
     private fun updateLocationAdapter() {
@@ -457,8 +457,17 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             )
         }
 
-        locationNameSpinner.isEnabled  = false
+        locationNameSpinner.isEnabled = false // TODO :: Change to user another way
         locationNameSpinner.adapter = locateAdapter
+
+        if (nameLocation != "" && nameLocation != null) {
+            val name = nameLocation
+            val position = locateNames.indexOf(name)
+            locationNameSpinner.setSelection(position)
+            locateItem = locateItems[position]
+//            locationNameEditText.setText(nameLocation)
+
+        }
 
 //        locationNameSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
 //            override fun onItemSelected(
