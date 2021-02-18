@@ -41,6 +41,7 @@ import org.rfcx.companion.view.deployment.guardian.signal.GuardianSignalFragment
 import org.rfcx.companion.view.deployment.guardian.solarpanel.GuardianSolarPanelFragment
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
+import org.rfcx.companion.view.deployment.locate.SelectingExistedSiteFragment
 import org.rfcx.companion.view.detail.MapPickerProtocol
 import org.rfcx.companion.view.dialog.*
 import org.rfcx.companion.view.prefs.SyncPreferenceListener
@@ -156,6 +157,10 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun startCheckList() {
         startFragment(GuardianCheckListFragment.newInstance())
+    }
+
+    override fun startSelectingExistedSite(latitude: Double, longitude: Double) {
+        startFragment(SelectingExistedSiteFragment.newInstance(latitude, longitude))
     }
 
     override fun isOpenedFromUnfinishedDeployment(): Boolean = false // guardian not have this feature so return false

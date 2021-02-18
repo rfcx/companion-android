@@ -224,6 +224,15 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    private fun startSelectingExistedSite() {
+        lastLocation?.let { lastLocate ->
+            deploymentProtocol?.let {
+                it.startSelectingExistedSite(lastLocate.latitude, lastLocate.longitude)
+                it.hideToolbar()
+            }
+        }
+    }
+
     private fun setViewFromDeploymentState() {
         val fromUnfinishedDeployment = deploymentProtocol?.isOpenedFromUnfinishedDeployment() ?: false
         existingRadioButton.isEnabled = !fromUnfinishedDeployment

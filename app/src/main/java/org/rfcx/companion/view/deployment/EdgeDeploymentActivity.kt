@@ -25,6 +25,7 @@ import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
+import org.rfcx.companion.view.deployment.locate.SelectingExistedSiteFragment
 import org.rfcx.companion.view.deployment.sync.SyncFragment
 import org.rfcx.companion.view.detail.MapPickerProtocol
 import org.rfcx.companion.view.dialog.*
@@ -166,6 +167,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     override fun startCheckList() {
         startFragment(EdgeCheckListFragment.newInstance())
+    }
+
+    override fun startSelectingExistedSite(latitude: Double, longitude: Double) {
+        startFragment(SelectingExistedSiteFragment.newInstance(latitude, longitude))
     }
 
     override fun getDeployment(): EdgeDeployment? = this._deployment ?: EdgeDeployment()
