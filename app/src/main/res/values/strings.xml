@@ -39,7 +39,6 @@
     <string name="recommended">Recommended</string>
     <string name="custom">Custom</string>
     <string name="recommended_text">Record for 5 minutes, sleep for 10 minutes</string>
-    <string name="will_run_out_on">The battery at %s location will run out on %s</string>
     <string name="edge_device_battery">RFCx Edge device battery</string>
     <string name="minimum_1_second">The minimum is 1 second</string>
     <string name="minimum_5_second">The minimum is 5 seconds</string>
@@ -49,7 +48,7 @@
     <string name="no_retry">TRY AGAIN</string>
     <string name="yes">Yes</string>
     <string name="ok_complete">OK, COMPLETE</string>
-    <string name="ready_send_configuration">Ready to sync tone to the device</string>
+    <string name="ready_send_configuration">Ready to synchronize using tone</string>
     <string name="switch_to_off">Switch device to \"OFF\" and place near your phone</string>
     <string name="switch_to_custom">Move switch to \"CUSTOM\" while initial tone is playing</string>
     <string name="solid_red_flashing_green">Do you see a solid red LED and flashing green LED?</string>
@@ -58,19 +57,18 @@
     <string name="should_see">Now you should see either flashing \nred (recording) or flashing green (sleeping)</string>
     <string name="play_initial_tone">play initial tone</string>
     <string name="play_sync_tone">play sync tone</string>
-    <string name="audiomoth_firmware_support">Check your AudioMoth has firmware version 1.5 or above</string>
     <string name="syncing_instruction">Having problems</string>
 
     <!-- DetailDeploymentActivity -->
-    <string name="title_deployment_detail">Location name</string>
+    <string name="title_deployment_detail">Site name</string>
     <string name="sleep_duration_title">Sleep duration</string>
     <string name="estimated_battery_duration">Estimated battery remaining</string>
     <string name="photos">Photos</string>
     <string name="detail_sec">%d second</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
-    <string name="delete_location">Delete Location?</string>
-    <string name="are_you_sure_delete_location">The device and its location will be removed</string>
+    <string name="delete_location">Delete site?</string>
+    <string name="are_you_sure_delete_location">The device and its site will be removed</string>
 
     <!--  Perform Battery  -->
     <string name="test">test</string>
@@ -93,9 +91,9 @@
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
     <string name="finish">finish</string>
-    <string name="name_location">Location name</string>
+    <string name="name_location">Site name</string>
     <string name="define_the_precise">Define the precise device location</string>
-    <string name="new_location">New location</string>
+    <string name="new_location">New site</string>
     <string name="existing">Existing</string>
     <string name="next">Next</string>
     <string name="change">change</string>
@@ -105,8 +103,8 @@
 
     <!--  MapPickerFragment  -->
     <string name="select">Select</string>
-    <string name="selected_location">Selected location</string>
-    <string name="please_fill_information">Location name is required.</string>
+    <string name="selected_location">Selected site</string>
+    <string name="please_fill_information">Site name is required.</string>
     <string name="altitude_is_required">Altitude is required.</string>
 
     <!--  SelectProfileFragment  -->
@@ -129,18 +127,18 @@
     <string name="version_app">%s (%s)</string>
     <string name="profile_feedback_label">Feedback</string>
     <string name="coordinates">Coordinates</string>
-    <string name="location">Location</string>
+    <string name="location">Site</string>
     <string name="display">Display</string>
     <string name="theme">Theme</string>
     <string name="dark_theme">Dark</string>
     <string name="light_theme">Light</string>
     <string name="system_default">System default</string>
-    <string name="location_group">Location group</string>
-    <string name="create_new_group">Create new group</string>
+    <string name="location_group">Project</string>
+    <string name="create_new_group">Create new project</string>
     <string name="select_a_color">Select a color</string>
-    <string name="missing_name_group">Missing name group</string>
+    <string name="missing_name_group">Missing name project</string>
     <string name="none">None</string>
-    <string name="group_already_exists">The group already exists</string>
+    <string name="group_already_exists">The project already exists</string>
 
     <string name="dd_coordinates">DD</string>
     <string name="ddm_coordinates">DDM</string>
@@ -149,7 +147,7 @@
     <string name="ddm_coordinates_format">0°0.0000\'N 0°0.0000\'E</string>
     <string name="dms_coordinates_format">0°0\'0.0\"N 0°0\'0.0\"E</string>
 
-    <string name="delete_location_group_title">Do you want to delete this group?</string>
+    <string name="delete_location_group_title">Do you want to delete this project?</string>
 
     <!--  FeedbackActivity  -->
     <string name="app_feedback_share_ideas">Leave app feedback or share your ideas</string>
@@ -164,7 +162,7 @@
     <string name="deployment_will_uploaded">Images will be uploaded to your account</string>
     <string name="almost_there">Almost there!</string>
     <string name="switch_to_deploy">Switch your device to DEPLOY</string>
-    <string name="take_photos">Take some photos of the deploy \nlocation (optional)</string>
+    <string name="take_photos">Take some photos of the deploy \nsite (optional)</string>
 
     <string name="read_storage_permission_msg">Deploy App would like to read your storage</string>
     <string name="go_to_setting">Settings</string>
@@ -188,12 +186,12 @@
     <string name="battery_depleted">battery depleted</string>
 
     <!--  EditLocationActivity  -->
-    <string name="edit_location">Edit location</string>
+    <string name="edit_location">Edit site</string>
     <string name="save">save</string>
 
     <!--  ChooseDeviceFragment  -->
     <string name="choose_your_device">Choose your device</string>
-    <string name="rfcx_edge_audiomoth">AudioMoth</string>
+    <string name="rfcx_edge_audiomoth">AudioMoth (1.5+)</string>
     <string name="rfcx_guardian">RFCx Guardian</string>
 
     <string name="location_permission_msg">Companion App would like to use your location</string>
