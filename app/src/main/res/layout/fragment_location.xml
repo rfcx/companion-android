@@ -40,35 +40,35 @@
                 android:background="@color/colorPrimary"
                 app:layout_constraintTop_toBottomOf="@id/deployDeviceTextView" />
 
-            <RadioGroup
-                android:id="@+id/radioGroup"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingStart="@dimen/margin_padding_large"
-                android:paddingTop="@dimen/margin_padding_small"
-                android:paddingEnd="@dimen/margin_padding_large"
-                app:layout_constraintTop_toBottomOf="@id/view1">
+<!--            <RadioGroup-->
+<!--                android:id="@+id/radioGroup"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:orientation="horizontal"-->
+<!--                android:paddingStart="@dimen/margin_padding_large"-->
+<!--                android:paddingTop="@dimen/margin_padding_small"-->
+<!--                android:paddingEnd="@dimen/margin_padding_large"-->
+<!--                app:layout_constraintTop_toBottomOf="@id/view1">-->
 
-                <androidx.appcompat.widget.AppCompatRadioButton
-                    android:id="@+id/newLocationRadioButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/new_location"
-                    android:textColor="@color/text_primary"
-                    android:textSize="@dimen/text_small" />
+<!--                <androidx.appcompat.widget.AppCompatRadioButton-->
+<!--                    android:id="@+id/newLocationRadioButton"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:text="@string/new_location"-->
+<!--                    android:textColor="@color/text_primary"-->
+<!--                    android:textSize="@dimen/text_small" />-->
 
-                <androidx.appcompat.widget.AppCompatRadioButton
-                    android:id="@+id/existingRadioButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/existing"
-                    android:textColor="@color/text_primary"
-                    android:textSize="@dimen/text_small" />
+<!--                <androidx.appcompat.widget.AppCompatRadioButton-->
+<!--                    android:id="@+id/existingRadioButton"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:text="@string/existing"-->
+<!--                    android:textColor="@color/text_primary"-->
+<!--                    android:textSize="@dimen/text_small" />-->
 
-            </RadioGroup>
+<!--            </RadioGroup>-->
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/locationNameTextInput"
@@ -76,12 +76,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_normal"
                 android:layout_marginEnd="@dimen/margin_padding_large"
                 android:hint="@string/name_location"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/radioGroup">
+                app:layout_constraintTop_toBottomOf="@id/locationNameSpinner">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/locationNameEditText"
@@ -100,11 +101,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_normal"
                 android:layout_marginEnd="@dimen/margin_padding_large"
-                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/locationNameTextInput" />
+                app:layout_constraintTop_toBottomOf="@id/view1" />
+
+            <View
+                android:id="@+id/siteSpinnerView"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintStart_toStartOf="@id/locationNameSpinner"
+                app:layout_constraintEnd_toEndOf="@id/locationNameSpinner"
+                app:layout_constraintTop_toTopOf="@id/locationNameSpinner"
+                app:layout_constraintBottom_toBottomOf="@id/locationNameSpinner"/>
 
             <com.mapbox.mapboxsdk.maps.MapView
                 android:id="@+id/mapBoxView"
@@ -116,7 +126,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/locationNameSpinner" />
+                app:layout_constraintTop_toBottomOf="@id/locationNameTextInput" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/pinDeploymentImageView"

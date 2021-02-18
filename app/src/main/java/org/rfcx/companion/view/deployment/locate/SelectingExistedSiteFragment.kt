@@ -1,5 +1,6 @@
 package org.rfcx.companion.view.deployment.locate
 
+import android.content.Context
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
@@ -15,9 +16,11 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.util.RealmHelper
+import org.rfcx.companion.view.detail.MapPickerProtocol
 
 class SelectingExistedSiteFragment : Fragment(), (Locate) -> Unit {
     private val existedSiteAdapter by lazy { ExistedSiteAdapter(this) }
+    private var mapPickerProtocol: MapPickerProtocol? = null
 
     val realm: Realm = Realm.getInstance(RealmHelper.migrationConfig())
     private val locateDb by lazy { LocateDb(realm) }
@@ -28,6 +31,11 @@ class SelectingExistedSiteFragment : Fragment(), (Locate) -> Unit {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initIntent()
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        mapPickerProtocol = context as MapPickerProtocol
     }
 
     private fun initIntent() {
@@ -106,5 +114,6 @@ class SelectingExistedSiteFragment : Fragment(), (Locate) -> Unit {
 
     override fun invoke(locate: Locate) {
         Log.d("locate", locate.name)
+        mapPickerProtocol?.startLocationPage(locate.latitude, locate.longitude, locate.altitude, locate.name)
     }
 }
