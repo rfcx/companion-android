@@ -49,7 +49,7 @@
     <string name="no_retry">TRY AGAIN</string>
     <string name="yes">Yes</string>
     <string name="ok_complete">OK, COMPLETE</string>
-    <string name="ready_send_configuration">Ready to sync tone to the device</string>
+    <string name="ready_send_configuration">Ready to synchronize using tone</string>
     <string name="switch_to_off">Switch device to \"OFF\" and place near your phone</string>
     <string name="switch_to_custom">Move switch to \"CUSTOM\" while initial tone is playing</string>
     <string name="solid_red_flashing_green">Do you see a solid red LED and flashing green LED?</string>
@@ -58,7 +58,6 @@
     <string name="should_see">Now you should see either flashing \nred (recording) or flashing green (sleeping)</string>
     <string name="play_initial_tone">play initial tone</string>
     <string name="play_sync_tone">play sync tone</string>
-    <string name="audiomoth_firmware_support">Check your AudioMoth has firmware version 1.5 or above</string>
     <string name="syncing_instruction">Having problems</string>
 
     <!-- DetailDeploymentActivity -->
@@ -193,7 +192,7 @@
 
     <!--  ChooseDeviceFragment  -->
     <string name="choose_your_device">Choose your device</string>
-    <string name="rfcx_edge_audiomoth">AudioMoth</string>
+    <string name="rfcx_edge_audiomoth">AudioMoth (1.5.0+)</string>
     <string name="rfcx_guardian">RFCx Guardian</string>
 
     <string name="location_permission_msg">Companion App would like to use your location</string>
