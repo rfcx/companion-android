@@ -23,8 +23,8 @@
     </string-array>
 
     <string-array name="edge_setup_checks">
-        <item>Set device\'s location</item>
-        <item>Sync time</item>
+        <item>Set deployment site</item>
+        <item>Synchronize with AudioMoth</item>
     </string-array>
 
     <string-array name="edge_optional_checks">

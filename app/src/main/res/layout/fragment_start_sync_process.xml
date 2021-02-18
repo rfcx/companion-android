@@ -62,21 +62,9 @@
         style="@style/AudioMothText.Subhead.Small"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_padding_large"
-        android:gravity="center"
-        android:text="@string/switch_to_off"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/syncCheckDescText" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/syncCheckDescText"
-        style="@style/AudioMothText.Subhead.Small"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_padding_normal"
         android:gravity="center"
-        android:text="@string/audiomoth_firmware_support"
+        android:text="@string/switch_to_off"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/audioMothOffPhoneImageView" />
