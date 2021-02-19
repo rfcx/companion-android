@@ -382,7 +382,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         } else {
             val locate = if (lastLocation == null) currentUserLocation else lastLocation
             val nearLocations = findNearLocations(locate, locateItems)
-            val nearItems = nearLocations?.filter { it.second < 0 } ?: listOf() // 10000m == 10km
+            val nearItems = nearLocations?.filter { it.second < 10000 } ?: listOf() // 10000m == 10km
             if (latitude == 0.0 && longitude == 0.0) {
                 if (nearItems.isNotEmpty()) {
                     val nearItem = nearItems.minBy { it.second }
