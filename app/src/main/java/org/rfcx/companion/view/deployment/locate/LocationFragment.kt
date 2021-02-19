@@ -335,6 +335,15 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             moveCamera(it.getLatLng(), DEFAULT_ZOOM)
             setLatLogLabel(it.getLatLng())
             altitudeEditText.setText(it.altitude.toString())
+            if (locationGroupDb.isExisted(it.locationGroup?.name)) {
+                group = it.locationGroup?.name
+                locationGroupValueTextView.text = it.locationGroup?.name
+                it.locationGroup?.color?.let { it1 -> setPinColorByGroup(it1) }
+            } else {
+                group = getString(R.string.none)
+                locationGroupValueTextView.text = getString(R.string.none)
+                it.locationGroup?.color?.let { setPinColorByGroup("#2AA841") }
+            }
         }
     }
 
@@ -418,11 +427,13 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         locationNameSpinner.isEnabled = false // TODO :: Change to user another way
         locationNameSpinner.adapter = locateAdapter
 
-        if (nameLocation != "" && nameLocation != null && !locateItems.isNullOrEmpty()) {
+        if (nameLocation != "" && nameLocation != null) {
             val name = nameLocation
             val position = locateNames.indexOf(name)
-            locationNameSpinner.setSelection(position)
-            locateItem = locateItems[position]
+            if(position >= 0) {
+                locationNameSpinner.setSelection(position)
+                locateItem = locateItems[position]
+            }
         }
     }
 
