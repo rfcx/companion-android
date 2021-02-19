@@ -332,6 +332,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun onPressedExisting() {
+        enableExistingLocation(true)
         locateItem?.let {
             moveCamera(it.getLatLng(), DEFAULT_ZOOM)
             setLatLogLabel(it.getLatLng())
@@ -353,7 +354,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun onPressedNewLocation() {
-        val altitudeText = if(altitude == null) getString(R.string.altitude_default) else altitude.toString()
+        enableExistingLocation(false)
+
+        val altitudeText = altitude.toString()
         altitudeEditText.setText(altitudeText)
         getLastLocation()
 
@@ -377,25 +380,25 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             val spinnerPosition = locateAdapter!!.getPosition(deploymentLocation.name)
             locationNameSpinner.setSelection(spinnerPosition)
         } else {
-            val nearLocations = findNearLocations(lastLocation, locateItems)
-            val nearItems = nearLocations?.filter { it.second < 50 }
-
-            // lat & lng from selecting new location
-            if (locateItems.isNotEmpty() && nearItems != null &&
-                latitude == 0.0 && longitude == 0.0
-            ) {
-                // set selected locate Item
-                val nearItem = nearItems.minBy { it.second }
-                val position = locateItems.indexOf(nearItem?.first)
-                locationNameSpinner.setSelection(position)
-                locateItem = locateItems[position]
-
-                onPressedExisting()
+            val locate = if (lastLocation == null) currentUserLocation else lastLocation
+            val nearLocations = findNearLocations(locate, locateItems)
+            val nearItems = nearLocations?.filter { it.second < 0 } ?: listOf() // 10000m == 10km
+            if (latitude == 0.0 && longitude == 0.0) {
+                if (nearItems.isNotEmpty()) {
+                    val nearItem = nearItems.minBy { it.second }
+                    val position = locateItems.indexOf(nearItem?.first)
+                    locationNameSpinner.setSelection(position)
+                    locateItem = locateItems[position]
+                    onPressedExisting()
+                } else {
+                    onPressedNewLocation()
+                }
             } else {
-                onPressedNewLocation()
-//                if (locateItems.isNullOrEmpty()) {
-//                    existingRadioButton.isEnabled = false
-//                }
+                if(isCreateNewSite){
+                    onPressedNewLocation()
+                } else {
+                    onPressedExisting()
+                }
             }
         }
     }
@@ -584,13 +587,14 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         locationEngine?.getLastLocation(mapboxLocationChangeCallback)
     }
 
-    private val isCreateNewSite: Boolean = if (locationNameSpinner != null) locationNameSpinner.selectedItem.toString() == "New site" else false
+    private val isCreateNewSite: Boolean =
+        if (locationNameSpinner != null) locationNameSpinner.selectedItem.toString() == "New site" else false
 
     private fun enableExistingLocation(enable: Boolean) {
-        locationNameTextInput.visibility = if(enable) View.GONE else View.VISIBLE
+        locationNameTextInput.visibility = if (enable) View.GONE else View.VISIBLE
         altitudeEditText.isEnabled = !enable
-        changeTextView.visibility = if(enable) View.GONE else View.VISIBLE
-        changeGroupTextView.visibility = if(enable) View.GONE else View.VISIBLE
+        changeTextView.visibility = if (enable) View.GONE else View.VISIBLE
+        changeGroupTextView.visibility = if (enable) View.GONE else View.VISIBLE
     }
 
     override fun onStart() {
