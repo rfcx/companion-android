@@ -159,7 +159,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
         setHideKeyboard()
 
-        if (nameLocation != "" && nameLocation != null) {
+        if (nameLocation != "" && nameLocation != null && this.nameLocation != getString(R.string.create_new_site)) {
             locationNameEditText.setText(nameLocation)
         }
 
@@ -174,7 +174,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             val altitudeValue = altitudeEditText.text.toString()
             if (altitudeValue.isNotEmpty()) {
                 this.altitude = altitudeValue.toDouble()
-                if (isCreateNewSite) {
+                if (locationNameSpinner.selectedItemPosition == 0) {
                     getLastLocation()
                     verifyInput()
                 } else {
@@ -211,7 +211,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
 
         viewOfMapBox.setOnClickListener {
-            if (isCreateNewSite) {
+            if (locationNameSpinner.selectedItemPosition == 0) {
                 val name = locationNameEditText.text.toString()
                 val altitude = altitudeEditText.text.toString().toDouble()
                 startMapPicker(name, altitude)
@@ -219,7 +219,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-        enableExistingLocation(!isCreateNewSite)
     }
 
     private fun startMapPicker(name: String, altitude: Double) {
@@ -240,7 +239,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setViewFromDeploymentState() {
-        val fromUnfinishedDeployment = deploymentProtocol?.isOpenedFromUnfinishedDeployment() ?: false
+        val fromUnfinishedDeployment =
+            deploymentProtocol?.isOpenedFromUnfinishedDeployment() ?: false
         locationNameSpinner.isEnabled = !fromUnfinishedDeployment
         changeGroupTextView.isEnabled = !fromUnfinishedDeployment
         if (fromUnfinishedDeployment) {
@@ -382,8 +382,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         } else {
             val locate = if (lastLocation == null) currentUserLocation else lastLocation
             val nearLocations = findNearLocations(locate, locateItems)
-            val nearItems = nearLocations?.filter { it.second < 10000 } ?: listOf() // 10000m == 10km
-            if (latitude == 0.0 && longitude == 0.0) {
+            val nearItems =
+                nearLocations?.filter { it.second < 10000 } ?: listOf() // 10000m == 10km
+            if (latitude == 0.0 && longitude == 0.0 && this.nameLocation != getString(R.string.create_new_site)) {
                 if (nearItems.isNotEmpty()) {
                     val nearItem = nearItems.minBy { it.second }
                     val position = locateItems.indexOf(nearItem?.first)
@@ -394,7 +395,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     onPressedNewLocation()
                 }
             } else {
-                if(isCreateNewSite){
+                if (locationNameSpinner.selectedItemPosition == 0) {
                     onPressedNewLocation()
                 } else {
                     onPressedExisting()
@@ -419,7 +420,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         locationNameSpinner.isEnabled = false // TODO :: Change to user another way
         locationNameSpinner.adapter = locateAdapter
 
-        if (nameLocation != "" && nameLocation != null) {
+        if (nameLocation != "" && nameLocation != null && locateItems.isNullOrEmpty()) {
             val name = nameLocation
             val position = locateNames.indexOf(name)
             locationNameSpinner.setSelection(position)
@@ -431,12 +432,14 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         locateItems.clear()
         val locations = locateDb.getLocations()
         val showLocations = locations.filter { it.isCompleted() }
-        val nearLocations = findNearLocations(lastLocation, ArrayList(showLocations))?.sortedBy { it.second }
+        val nearLocations =
+            findNearLocations(lastLocation, ArrayList(showLocations))?.sortedBy { it.second }
         val locationsItems = nearLocations?.map { it.first }
+        val createNew = listOf(Locate(id = -1, name = getString(R.string.create_new_site)))
         if (locationsItems != null) {
-            locateItems.addAll(locationsItems)
+            locateItems.addAll(createNew + locationsItems)
         } else {
-            locateItems.addAll(showLocations)
+            locateItems.addAll(createNew + showLocations)
         }
     }
 
@@ -587,9 +590,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         locationEngine?.getLastLocation(mapboxLocationChangeCallback)
     }
 
-    private val isCreateNewSite: Boolean =
-        if (locationNameSpinner != null) locationNameSpinner.selectedItem.toString() == "New site" else false
-
     private fun enableExistingLocation(enable: Boolean) {
         locationNameTextInput.visibility = if (enable) View.GONE else View.VISIBLE
         altitudeEditText.isEnabled = !enable
@@ -669,14 +669,15 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             return LocationFragment()
         }
 
-        fun newInstance(latitude: Double, longitude: Double, altitude: Double, name: String) = LocationFragment()
-            .apply {
-                arguments = Bundle().apply {
-                    putDouble(ARG_LATITUDE, latitude)
-                    putDouble(ARG_LONGITUDE, longitude)
-                    putDouble(ARG_ALTITUDE, altitude)
-                    putString(ARG_LOCATION_NAME, name)
+        fun newInstance(latitude: Double, longitude: Double, altitude: Double, name: String) =
+            LocationFragment()
+                .apply {
+                    arguments = Bundle().apply {
+                        putDouble(ARG_LATITUDE, latitude)
+                        putDouble(ARG_LONGITUDE, longitude)
+                        putDouble(ARG_ALTITUDE, altitude)
+                        putString(ARG_LOCATION_NAME, name)
+                    }
                 }
-            }
     }
 }

@@ -4,7 +4,6 @@ import android.content.Context
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -73,8 +72,16 @@ class SelectingExistedSiteFragment : Fragment(), (Locate) -> Unit {
         val showLocations = locations.filter { it.isCompleted() }
         val nearLocations =
             findNearLocations(lastLocation, ArrayList(showLocations))?.sortedBy { it.second }
-        val locationsItems = nearLocations?.map { it.first }
-        existedSiteAdapter.items = locationsItems ?: listOf()
+        val createNew = listOf(
+            Locate(
+                id = -1,
+                name = getString(R.string.create_new_site),
+                latitude = latitude,
+                longitude = longitude
+            )
+        )
+        val locationsItems: List<Locate> = nearLocations?.map { it.first } ?: listOf()
+        existedSiteAdapter.items = createNew + locationsItems
     }
 
     private fun findNearLocations(
@@ -113,7 +120,11 @@ class SelectingExistedSiteFragment : Fragment(), (Locate) -> Unit {
     }
 
     override fun invoke(locate: Locate) {
-        Log.d("locate", locate.name)
-        mapPickerProtocol?.startLocationPage(locate.latitude, locate.longitude, locate.altitude, locate.name)
+        mapPickerProtocol?.startLocationPage(
+            locate.latitude,
+            locate.longitude,
+            locate.altitude,
+            locate.name
+        )
     }
 }

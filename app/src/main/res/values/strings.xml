@@ -189,6 +189,9 @@
     <string name="edit_location">Edit site</string>
     <string name="save">save</string>
 
+    <!-- SelectingExistedSiteFragment -->
+    <string name="create_new_site">Create new site</string>
+
     <!--  ChooseDeviceFragment  -->
     <string name="choose_your_device">Choose your device</string>
     <string name="rfcx_edge_audiomoth">AudioMoth (1.5+)</string>
