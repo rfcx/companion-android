@@ -163,8 +163,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             locationNameEditText.setText(nameLocation)
         }
 
-        altitudeEditText.setText(altitude.toString())
-
         siteSpinnerView.setOnClickListener {
             startSelectingExistedSite()
         }
@@ -420,7 +418,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         locationNameSpinner.isEnabled = false // TODO :: Change to user another way
         locationNameSpinner.adapter = locateAdapter
 
-        if (nameLocation != "" && nameLocation != null && locateItems.isNullOrEmpty()) {
+        if (nameLocation != "" && nameLocation != null && !locateItems.isNullOrEmpty()) {
             val name = nameLocation
             val position = locateNames.indexOf(name)
             locationNameSpinner.setSelection(position)

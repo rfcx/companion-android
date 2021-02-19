@@ -124,6 +124,7 @@ class LocateDb(private val realm: Realm) {
                 location.name = locationResponse.name ?: location.name
                 location.latitude = locationResponse.latitude ?: location.latitude
                 location.longitude = locationResponse.longitude ?: location.longitude
+                location.altitude = locationResponse.altitude ?: location.altitude
                 location.createdAt = locationResponse.createdAt ?: location.createdAt
 
                 val locationGroupObj = it.createObject(LocationGroup::class.java)
