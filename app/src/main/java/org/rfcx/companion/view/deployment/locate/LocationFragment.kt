@@ -330,10 +330,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private fun onPressedExisting() {
         enableExistingLocation(true)
+        isEnableSetAltitude(false)
         locateItem?.let {
             moveCamera(it.getLatLng(), DEFAULT_ZOOM)
             setLatLogLabel(it.getLatLng())
             altitudeEditText.setText(it.altitude.toString())
+            altitudeValue.text = it.altitude.toString()
             if (locationGroupDb.isExisted(it.locationGroup?.name)) {
                 group = it.locationGroup?.name
                 locationGroupValueTextView.text = it.locationGroup?.name
@@ -361,9 +363,11 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private fun onPressedNewLocation() {
         enableExistingLocation(false)
+        isEnableSetAltitude(true)
         siteValueTextView.text = getString(R.string.create_new_site)
         val altitudeText = altitude.toString()
         altitudeEditText.setText(altitudeText)
+        altitudeValue.text = altitudeText
         getLastLocation()
 
         if (lastLocation != null) {
@@ -437,6 +441,14 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 locateItem = locateItems[position]
             }
         }
+    }
+
+    private fun isEnableSetAltitude(enable: Boolean) {
+        altitudeTitleTextView.visibility = if (enable) View.VISIBLE else View.GONE
+        altitudeTextInput.visibility = if (enable) View.VISIBLE else View.GONE
+
+        altitudeLabel.visibility = if (enable) View.GONE else View.VISIBLE
+        altitudeValue.visibility = if (enable) View.GONE else View.VISIBLE
     }
 
     private fun retrieveDeployLocations() {

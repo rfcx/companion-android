@@ -20,6 +20,13 @@
             android:layout_height="wrap_content"
             android:paddingBottom="@dimen/padding_bottom">
 
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guidelineVertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.60" />
+
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/deployDeviceTextView"
                 style="@style/AudioMothText.Subhead.Bold"
@@ -82,10 +89,10 @@
                 android:id="@+id/siteView"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                app:layout_constraintStart_toStartOf="@id/siteTitleTextView"
+                app:layout_constraintBottom_toBottomOf="@id/siteValueTextView"
                 app:layout_constraintEnd_toEndOf="@id/siteTitleTextView"
-                app:layout_constraintTop_toTopOf="@id/siteTitleTextView"
-                app:layout_constraintBottom_toBottomOf="@id/siteValueTextView"/>
+                app:layout_constraintStart_toStartOf="@id/siteTitleTextView"
+                app:layout_constraintTop_toTopOf="@id/siteTitleTextView" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/siteTitleTextView"
@@ -136,10 +143,10 @@
                 android:id="@+id/viewOfMapBox"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                app:layout_constraintStart_toStartOf="@id/mapBoxView"
+                app:layout_constraintBottom_toBottomOf="@id/mapBoxView"
                 app:layout_constraintEnd_toEndOf="@id/mapBoxView"
-                app:layout_constraintTop_toTopOf="@id/mapBoxView"
-                app:layout_constraintBottom_toBottomOf="@id/mapBoxView"/>
+                app:layout_constraintStart_toStartOf="@id/mapBoxView"
+                app:layout_constraintTop_toTopOf="@id/mapBoxView" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/locationTitleTextView"
@@ -163,16 +170,37 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/locationTitleTextView" />
 
+            <TextView
+                android:id="@+id/altitudeLabel"
+                style="@style/AudioMothText.Body.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="0dp"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:text="@string/altitude"
+                app:layout_constraintStart_toEndOf="@id/guidelineVertical"
+                app:layout_constraintTop_toBottomOf="@id/mapBoxView" />
+
+            <TextView
+                android:id="@+id/altitudeValue"
+                style="@style/AudioMothText.Body.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_padding_small"
+                app:layout_constraintStart_toStartOf="@id/altitudeLabel"
+                app:layout_constraintTop_toBottomOf="@id/altitudeLabel"
+                tools:text="50.00" />
+
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/changeTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/margin_padding_large"
                 android:text="@string/change"
-                android:textSize="@dimen/text_small"
                 android:textAllCaps="true"
-                android:visibility="invisible"
                 android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/text_small"
+                android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="@id/locationValueTextView"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/locationTitleTextView" />
@@ -194,8 +222,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_large"
-                android:layout_marginEnd="@dimen/margin_padding_large"
                 android:layout_marginTop="@dimen/margin_padding_small"
+                android:layout_marginEnd="@dimen/margin_padding_large"
                 android:enabled="false"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -205,8 +233,8 @@
                     android:id="@+id/altitudeEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:imeOptions="actionDone"
                     android:digits="@string/altitude_digits"
+                    android:imeOptions="actionDone"
                     android:lines="1"
                     android:textColor="@color/text_primary"
                     android:textSize="@dimen/text_small" />
@@ -230,8 +258,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_large"
                 android:layout_marginTop="@dimen/margin_padding_small"
-                android:textSize="@dimen/text_xsmall"
                 android:text="@string/none"
+                android:textSize="@dimen/text_xsmall"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/locationGroupTitleTextView" />
 
@@ -241,10 +269,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/margin_padding_large"
                 android:text="@string/change"
-                android:textSize="@dimen/text_small"
                 android:textAllCaps="true"
-                android:visibility="invisible"
                 android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/text_small"
+                android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="@id/locationGroupValueTextView"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/locationGroupTitleTextView" />
