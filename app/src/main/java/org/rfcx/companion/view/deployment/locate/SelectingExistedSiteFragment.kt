@@ -73,14 +73,17 @@ class SelectingExistedSiteFragment : Fragment(), (Locate) -> Unit {
         val nearLocations =
             findNearLocations(lastLocation, ArrayList(showLocations))?.sortedBy { it.second }
         val createNew = listOf(
-            Locate(
-                id = -1,
-                name = getString(R.string.create_new_site),
-                latitude = latitude,
-                longitude = longitude
+            SiteItem(
+                Locate(
+                    id = -1,
+                    name = getString(R.string.create_new_site),
+                    latitude = latitude,
+                    longitude = longitude
+                ),
+                0F
             )
         )
-        val locationsItems: List<Locate> = nearLocations?.map { it.first } ?: listOf()
+        val locationsItems: List<SiteItem> = nearLocations?.map { SiteItem(it.first, it.second) } ?: listOf()
         existedSiteAdapter.items = createNew + locationsItems
     }
 

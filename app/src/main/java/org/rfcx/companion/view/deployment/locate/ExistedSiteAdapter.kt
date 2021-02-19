@@ -10,7 +10,7 @@ import org.rfcx.companion.entity.Locate
 
 class ExistedSiteAdapter(private val itemClickListener: (Locate) -> Unit) :
     RecyclerView.Adapter<ExistedSiteAdapter.ExistedSiteAdapterViewHolder>() {
-    var items: List<Locate> = arrayListOf()
+    var items: List<SiteItem> = arrayListOf()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -28,18 +28,22 @@ class ExistedSiteAdapter(private val itemClickListener: (Locate) -> Unit) :
     override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: ExistedSiteAdapterViewHolder, position: Int) {
-        val locate = items[position]
-        holder.bind(locate)
+        val site = items[position]
+        holder.bind(site)
         holder.itemView.setOnClickListener {
-            this.itemClickListener(locate)
+            this.itemClickListener(site.locate)
         }
     }
 
     inner class ExistedSiteAdapterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val siteTextView = itemView.siteTextView
+        private val distanceTextView = itemView.distanceTextView
 
-        fun bind(locate: Locate) {
-            siteTextView.text = locate.name
+        fun bind(site: SiteItem) {
+            siteTextView.text = site.locate.name
+            distanceTextView.visibility =
+                if (site.locate.name == itemView.context.getString(R.string.create_new_site)) View.GONE else View.VISIBLE
+            distanceTextView.text = "${String.format("%.2f", site.distance)} m"
         }
     }
 }
