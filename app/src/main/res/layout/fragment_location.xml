@@ -52,7 +52,7 @@
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/locationNameSpinner">
+                app:layout_constraintTop_toBottomOf="@id/siteValueTextView">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/locationNameEditText"
@@ -73,18 +73,42 @@
                 android:layout_marginStart="@dimen/margin_padding_large"
                 android:layout_marginTop="@dimen/margin_padding_normal"
                 android:layout_marginEnd="@dimen/margin_padding_large"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/view1" />
 
             <View
-                android:id="@+id/siteSpinnerView"
+                android:id="@+id/siteView"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                app:layout_constraintStart_toStartOf="@id/locationNameSpinner"
-                app:layout_constraintEnd_toEndOf="@id/locationNameSpinner"
-                app:layout_constraintTop_toTopOf="@id/locationNameSpinner"
-                app:layout_constraintBottom_toBottomOf="@id/locationNameSpinner"/>
+                app:layout_constraintStart_toStartOf="@id/siteTitleTextView"
+                app:layout_constraintEnd_toEndOf="@id/siteTitleTextView"
+                app:layout_constraintTop_toTopOf="@id/siteTitleTextView"
+                app:layout_constraintBottom_toBottomOf="@id/siteValueTextView"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/siteTitleTextView"
+                style="@style/AudioMothText.Body.Small"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:text="@string/site"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view1" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/siteValueTextView"
+                style="@style/AudioMothText.Body.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_small"
+                android:textSize="@dimen/text_xsmall"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/siteTitleTextView" />
 
             <com.mapbox.mapboxsdk.maps.MapView
                 android:id="@+id/mapBoxView"

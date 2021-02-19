@@ -163,7 +163,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             locationNameEditText.setText(nameLocation)
         }
 
-        siteSpinnerView.setOnClickListener {
+        siteView.setOnClickListener {
             startSelectingExistedSite()
         }
 
@@ -362,7 +362,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private fun onPressedNewLocation() {
         enableExistingLocation(false)
-
+        siteValueTextView.text = getString(R.string.create_new_site)
         val altitudeText = altitude.toString()
         altitudeEditText.setText(altitudeText)
         getLastLocation()
@@ -386,6 +386,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         if (deploymentLocation != null && locateAdapter != null) {
             val spinnerPosition = locateAdapter!!.getPosition(deploymentLocation.name)
             locationNameSpinner.setSelection(spinnerPosition)
+            siteValueTextView.text = deploymentLocation.name
         } else {
             val locate = if (lastLocation == null) currentUserLocation else lastLocation
             val nearLocations = findNearLocations(locate, locateItems)
@@ -397,6 +398,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     val position = locateItems.indexOf(nearItem?.first)
                     locationNameSpinner.setSelection(position)
                     locateItem = locateItems[position]
+                    siteValueTextView.text = locateItems[position].name
                     onPressedExisting()
                 } else {
                     onPressedNewLocation()
@@ -432,6 +434,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             val position = locateNames.indexOf(name)
             if(position >= 0) {
                 locationNameSpinner.setSelection(position)
+                siteValueTextView.text = locateItems[position].name
                 locateItem = locateItems[position]
             }
         }

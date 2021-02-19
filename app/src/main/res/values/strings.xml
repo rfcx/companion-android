@@ -191,6 +191,7 @@
 
     <!-- SelectingExistedSiteFragment -->
     <string name="create_new_site">Create new site</string>
+    <string name="site">Site</string>
 
     <!--  ChooseDeviceFragment  -->
     <string name="choose_your_device">Choose your device</string>
