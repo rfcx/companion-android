@@ -28,7 +28,7 @@
     </string-array>
 
     <string-array name="edge_optional_checks">
-        <item>Add Deployment Photo(s)</item>
+        <item>Add Photo(s)</item>
     </string-array>
     
     <!--  Guardian  -->
@@ -58,7 +58,7 @@
     </string-array>
 
     <string-array name="guardian_optional_checks">
-        <item>Add Deployment Photo(s)</item>
+        <item>Add Photo(s)</item>
         <item>Advanced Configuration</item>
     </string-array>
 
