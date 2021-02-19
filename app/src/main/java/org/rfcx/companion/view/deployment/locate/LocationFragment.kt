@@ -231,7 +231,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         locate?.let { lastLocate ->
             deploymentProtocol?.let {
                 it.startSelectingExistedSite(lastLocate.latitude, lastLocate.longitude)
-                it.hideToolbar()
             }
         }
     }
