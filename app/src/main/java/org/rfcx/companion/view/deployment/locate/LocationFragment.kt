@@ -398,7 +398,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             val nearItems = nearLocations?.filter { it.second < 50 }
 
             // lat & lng from selecting new location
-            if (locateItems.isNotEmpty() && nearItems != null &&
+            if (locateItems.isNotEmpty() && nearItems != null && nearItems.isNotEmpty() &&
                 latitude == 0.0 && longitude == 0.0
             ) {
                 // enable exiting radio button

@@ -176,8 +176,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         context?.let {
             retrieveDeployments(it)
-            retrieveLocations(it)
-            retrieveLocationGroups(it)
             retrieveDiagnostics(it)
         }
 
@@ -411,33 +409,23 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     response: Response<List<DeploymentResponse>>
                 ) {
                     response.body()?.forEach { item ->
-                        item.serverId = item.serverId
-                        if(item.device == Device.GUARDIAN.value) {
+                        item.id = item.id
+                        if(item.deploymentType == Device.GUARDIAN.value) {
                             guardianDeploymentDb.insertOrUpdate(item)
                         } else {
                             edgeDeploymentDb.insertOrUpdate(item)
                         }
                         /* Save Streams and Projects in local database */
                         if (item.stream != null) {
-                            locateDb.insertOrUpdate(item.stream!!.toLocationResponse())
+                            locateDb.insertOrUpdate(item.stream!!)
 
                             if(item.stream!!.project != null) {
-                                locationGroupDb.insertOrUpdate(item.stream!!.project!!.toLocationGroupsResponse())
+                                locationGroupDb.insertOrUpdate(item.stream!!.project!!)
                             }
                         }
                     }
                 }
             })
-    }
-
-    private fun retrieveLocations(context: Context) {
-        // TODO:: call get Streams in here
-//        Firestore(context).retrieveLocations(locateDb)
-    }
-
-    private fun retrieveLocationGroups(context: Context) {
-        // TODO:: call get Projects in here
-//        Firestore(context).retrieveLocationGroups(locationGroupDb)
     }
 
     private fun retrieveDiagnostics(context: Context) {

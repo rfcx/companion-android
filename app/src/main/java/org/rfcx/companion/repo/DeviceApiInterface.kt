@@ -4,10 +4,13 @@ import okhttp3.ResponseBody
 import org.rfcx.companion.entity.request.DeploymentRequest
 import org.rfcx.companion.entity.request.EditDeploymentRequest
 import org.rfcx.companion.entity.response.DeploymentResponse
+import org.rfcx.companion.entity.response.ProjectResponse
+import org.rfcx.companion.entity.response.StreamResponse
 import retrofit2.Call
 import retrofit2.http.*
 
 interface DeviceApiInterface {
+    //deployment
     @POST("deployments")
     fun createDeployment(
         @Header("Authorization") authUser: String,

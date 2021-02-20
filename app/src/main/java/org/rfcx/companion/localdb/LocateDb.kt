@@ -7,7 +7,7 @@ import io.realm.kotlin.deleteFromRealm
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.SyncState
-import org.rfcx.companion.entity.response.LocationResponse
+import org.rfcx.companion.entity.response.StreamResponse
 import org.rfcx.companion.entity.response.toLocate
 
 class LocateDb(private val realm: Realm) {
@@ -106,40 +106,36 @@ class LocateDb(private val realm: Realm) {
         }
     }
 
-    fun insertOrUpdate(locationResponse: LocationResponse) {
+    fun insertOrUpdate(streamResponse: StreamResponse) {
         realm.executeTransaction {
             val location =
                 it.where(Locate::class.java)
-                    .equalTo(Locate.FIELD_SERVER_ID, locationResponse.serverId)
+                    .equalTo(Locate.FIELD_SERVER_ID, streamResponse.id)
                     .findFirst()
 
             if (location == null) {
-                val locate = locationResponse.toLocate()
+                val locate = streamResponse.toLocate()
                 val id = (it.where(Locate::class.java).max(Locate.FIELD_ID)
                     ?.toInt() ?: 0) + 1
                 locate.id = id
                 it.insert(locate)
             } else if (location.syncState == SyncState.Sent.key) {
-                location.serverId = locationResponse.serverId
-                location.name = locationResponse.name ?: location.name
-                location.latitude = locationResponse.latitude ?: location.latitude
-                location.longitude = locationResponse.longitude ?: location.longitude
-                location.createdAt = locationResponse.createdAt ?: location.createdAt
+                location.serverId = streamResponse.id
+                location.name = streamResponse.name ?: location.name
+                location.latitude = streamResponse.latitude ?: location.latitude
+                location.longitude = streamResponse.longitude ?: location.longitude
+                location.createdAt = streamResponse.createdAt ?: location.createdAt
 
                 val locationGroupObj = it.createObject(LocationGroup::class.java)
                 locationGroupObj?.let { obj ->
-                    val locationGroup = locationResponse.locationGroup
+                    val locationGroup = streamResponse.project
                     if (locationGroup != null) {
                         obj.name = locationGroup.name
                         obj.color = locationGroup.color
-                        obj.coreId = locationGroup.coreId
+                        obj.coreId = locationGroup.id
                     }
                 }
                 location.locationGroup = locationGroupObj
-
-                location.lastDeploymentServerId = locationResponse.lastDeploymentServerId
-                location.lastGuardianDeploymentServerId =
-                    locationResponse.lastGuardianDeploymentServerId
             }
         }
     }
