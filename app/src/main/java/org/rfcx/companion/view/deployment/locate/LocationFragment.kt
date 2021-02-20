@@ -65,6 +65,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     private var altitude: Double = 0.0
+    private var altitudeFromLocation: Double = 0.0
     private var nameLocation: String? = null
     private var group: String? = null
 
@@ -88,6 +89,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     mapboxMap?.let {
                         this@LocationFragment.currentUserLocation = location
                         it.locationComponent.forceLocationUpdate(location)
+                        altitudeFromLocation = location.altitude
+
+                        if (locationNameSpinner.selectedItemPosition == 0) {
+                            altitudeValue.text = String.format("%.2f", location.altitude)
+                        }
+
                         if (isFirstTime && lastLocation == null &&
                             latitude == 0.0 && longitude == 0.0
                         ) {
@@ -169,28 +176,19 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
         finishButton.setOnClickListener {
             analytics?.trackSaveLocationEvent(Screen.LOCATION.id)
-            val altitudeValue = altitudeEditText.text.toString()
-            if (altitudeValue.isNotEmpty()) {
-                this.altitude = altitudeValue.toDouble()
-                if (locationNameSpinner.selectedItemPosition == 0) {
-                    getLastLocation()
-                    verifyInput()
-                } else {
-                    handleExistLocate()
-                }
+            this.altitude = altitudeFromLocation
+            if (locationNameSpinner.selectedItemPosition == 0) {
+                getLastLocation()
+                verifyInput()
             } else {
-                Toast.makeText(
-                    context,
-                    getString(R.string.altitude_is_required),
-                    Toast.LENGTH_SHORT
-                ).show()
+                handleExistLocate()
             }
+
         }
 
         changeTextView.setOnClickListener {
             val name = locationNameEditText.text.toString()
-            val altitude = altitudeEditText.text.toString().toDouble()
-            startMapPicker(name, altitude)
+            startMapPicker(name, altitudeFromLocation)
             analytics?.trackChangeLocationEvent(Screen.LOCATION.id)
         }
 
@@ -211,8 +209,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         viewOfMapBox.setOnClickListener {
             if (locationNameSpinner.selectedItemPosition == 0) {
                 val name = locationNameEditText.text.toString()
-                val altitude = altitudeEditText.text.toString().toDouble()
-                startMapPicker(name, altitude)
+                startMapPicker(name, altitudeFromLocation)
                 analytics?.trackChangeLocationEvent(Screen.LOCATION.id)
             }
         }
@@ -330,11 +327,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private fun onPressedExisting() {
         enableExistingLocation(true)
-        isEnableSetAltitude(false)
         locateItem?.let {
             moveCamera(it.getLatLng(), DEFAULT_ZOOM)
             setLatLogLabel(it.getLatLng())
-            altitudeEditText.setText(it.altitude.toString())
             altitudeValue.text = it.altitude.toString()
             if (locationGroupDb.isExisted(it.locationGroup?.name)) {
                 group = it.locationGroup?.name
@@ -363,10 +358,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private fun onPressedNewLocation() {
         enableExistingLocation(false)
-        isEnableSetAltitude(true)
         siteValueTextView.text = getString(R.string.create_new_site)
-        val altitudeText = altitude.toString()
-        altitudeEditText.setText(altitudeText)
+        val altitudeText = altitudeFromLocation.toString()
         altitudeValue.text = altitudeText
         getLastLocation()
 
@@ -435,20 +428,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         if (nameLocation != "" && nameLocation != null) {
             val name = nameLocation
             val position = locateNames.indexOf(name)
-            if(position >= 0) {
+            if (position >= 0) {
                 locationNameSpinner.setSelection(position)
                 siteValueTextView.text = locateItems[position].name
                 locateItem = locateItems[position]
             }
         }
-    }
-
-    private fun isEnableSetAltitude(enable: Boolean) {
-        altitudeTitleTextView.visibility = if (enable) View.VISIBLE else View.GONE
-        altitudeTextInput.visibility = if (enable) View.VISIBLE else View.GONE
-
-        altitudeLabel.visibility = if (enable) View.GONE else View.VISIBLE
-        altitudeValue.visibility = if (enable) View.GONE else View.VISIBLE
     }
 
     private fun retrieveDeployLocations() {
@@ -615,8 +600,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private fun enableExistingLocation(enable: Boolean) {
         locationNameTextInput.visibility = if (enable) View.GONE else View.VISIBLE
-        altitudeEditText.isEnabled = !enable
-        changeTextView.visibility = if (enable) View.GONE else View.VISIBLE
+//        changeTextView.visibility = if (enable) View.GONE else View.VISIBLE // New design for this
         changeGroupTextView.visibility = if (enable) View.GONE else View.VISIBLE
     }
 
