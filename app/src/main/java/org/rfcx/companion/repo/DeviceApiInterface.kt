@@ -1,5 +1,6 @@
 package org.rfcx.companion.repo
 
+import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import org.rfcx.companion.entity.request.DeploymentRequest
 import org.rfcx.companion.entity.request.EditDeploymentRequest
@@ -31,6 +32,14 @@ interface DeviceApiInterface {
     fun deleteDeployments(
         @Header("Authorization") authUser: String,
         @Path("id") id: String
+    ): Call<ResponseBody>
+
+    @Multipart
+    @POST("deployments/{id}/assets")
+    fun uploadImage(
+        @Header("Authorization") authUser: String,
+        @Path("id") id: String,
+        @Part file: MultipartBody.Part
     ): Call<ResponseBody>
 
 }
