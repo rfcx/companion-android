@@ -39,7 +39,7 @@ class ImageSyncWorker(val context: Context, params: WorkerParameters) :
             if (result.isSuccessful) {
                 Log.d(TAG, "doWork: success $result")
                 //TODO: get url back when uploaded
-                db.markSent(it.id, "")
+                db.markSent(it.id, null)
             } else {
                 db.markUnsent(it.id)
                 someFailed = true
