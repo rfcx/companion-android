@@ -271,7 +271,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     name = name,
                     latitude = it.latitude,
                     longitude = it.longitude,
-                    altitude = altitude ?: 0.0,
+                    altitude = altitude,
                     locationGroup = getLocationGroup()
                 )
                 deploymentProtocol?.setDeployLocation(locate, false)
@@ -330,7 +330,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         locateItem?.let {
             moveCamera(it.getLatLng(), DEFAULT_ZOOM)
             setLatLogLabel(it.getLatLng())
-            altitudeValue.text = it.altitude.toString()
+            altitudeValue.text = String.format("%.2f", it.altitude)
             if (locationGroupDb.isExisted(it.locationGroup?.name)) {
                 group = it.locationGroup?.name
                 locationGroupValueTextView.text = it.locationGroup?.name
@@ -359,8 +359,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private fun onPressedNewLocation() {
         enableExistingLocation(false)
         siteValueTextView.text = getString(R.string.create_new_site)
-        val altitudeText = altitudeFromLocation.toString()
-        altitudeValue.text = altitudeText
+        altitudeValue.text = String.format("%.2f", altitudeFromLocation)
         getLastLocation()
 
         if (lastLocation != null) {
@@ -383,6 +382,20 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             val spinnerPosition = locateAdapter!!.getPosition(deploymentLocation.name)
             locationNameSpinner.setSelection(spinnerPosition)
             siteValueTextView.text = deploymentLocation.name
+
+            enableExistingLocation(true)
+            moveCamera(LatLng(deploymentLocation.latitude, deploymentLocation.longitude), DEFAULT_ZOOM)
+            setLatLogLabel(LatLng(deploymentLocation.latitude, deploymentLocation.longitude))
+            altitudeValue.text = String.format("%.2f", deploymentLocation.altitude)
+            if (locationGroupDb.isExisted(deploymentLocation.project?.name)) {
+                group = deploymentLocation.project?.name
+                locationGroupValueTextView.text = deploymentLocation.project?.name
+                deploymentLocation.project?.color?.let { it1 -> setPinColorByGroup(it1) }
+            } else {
+                group = getString(R.string.none)
+                locationGroupValueTextView.text = getString(R.string.none)
+                deploymentLocation.project?.color?.let { setPinColorByGroup("#2AA841") }
+            }
         } else {
             val locate = if (lastLocation == null) currentUserLocation else lastLocation
             val nearLocations = findNearLocations(locate, locateItems)
