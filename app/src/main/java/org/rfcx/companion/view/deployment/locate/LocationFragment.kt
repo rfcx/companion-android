@@ -182,6 +182,30 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             startSelectingExistedSite()
         }
 
+        usedCurrentLocationButton.setOnClickListener {
+            var locate = Locate()
+            locateItem?.let {
+                locate = Locate(
+                    it.id,
+                    it.serverId,
+                    getLocationGroup(),
+                    it.name,
+                    currentUserLocation?.latitude ?: it.latitude,
+                    currentUserLocation?.longitude ?: it.longitude,
+                    it.altitude,
+                    it.createdAt,
+                    it.deletedAt,
+                    it.lastDeploymentId,
+                    it.lastDeploymentServerId,
+                    it.lastGuardianDeploymentId,
+                    it.lastGuardianDeploymentServerId,
+                    it.syncState
+                )
+                moveCamera(LatLng(locate.getLatLng()), DEFAULT_ZOOM)
+            }
+            locateItem = locate
+        }
+
         finishButton.setOnClickListener {
             analytics?.trackSaveLocationEvent(Screen.LOCATION.id)
             this.altitude = altitudeFromLocation
@@ -365,12 +389,14 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
             val siteItem = distanceLocate?.filterIndexed { _, site -> site.locate == it }
             if (siteItem != null) {
-                if (siteItem[0].distance <= 20) {
-                    within20mCheckBox.isChecked = true
-                    within100mCheckBox.isChecked = false
-                } else {
-                    within20mCheckBox.isChecked = false
-                    within100mCheckBox.isChecked = true
+                if (siteItem.isNotEmpty()) {
+                    if (siteItem[0].distance <= 20) {
+                        within20mCheckBox.isChecked = true
+                        within100mCheckBox.isChecked = false
+                    } else {
+                        within20mCheckBox.isChecked = false
+                        within100mCheckBox.isChecked = true
+                    }
                 }
             }
         }

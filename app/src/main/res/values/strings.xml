@@ -95,6 +95,7 @@
     <string name="new_location">New site</string>
     <string name="existing">Existing</string>
     <string name="next">Next</string>
+    <string name="use_your_current_location">Use your current location</string>
     <string name="change">change</string>
     <string name="choose">Choose</string>
     <string name="altitude">Altitude</string>
