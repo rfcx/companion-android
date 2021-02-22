@@ -38,12 +38,15 @@ class ExistedSiteAdapter(private val itemClickListener: (Locate) -> Unit) :
     inner class ExistedSiteAdapterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val siteTextView = itemView.siteTextView
         private val distanceTextView = itemView.distanceTextView
+        private val iconAddImageView = itemView.iconAddImageView
 
         fun bind(site: SiteItem) {
             siteTextView.text = site.locate.name
             distanceTextView.visibility =
                 if (site.locate.name == itemView.context.getString(R.string.create_new_site)) View.GONE else View.VISIBLE
             distanceTextView.text = "${String.format("%.2f", site.distance)} m"
+            iconAddImageView.visibility =
+                if (site.locate.name == itemView.context.getString(R.string.create_new_site)) View.VISIBLE else View.GONE
         }
     }
 }
