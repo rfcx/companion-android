@@ -42,4 +42,10 @@ interface DeviceApiInterface {
         @Part file: MultipartBody.Part
     ): Call<ResponseBody>
 
+    @GET("streams")
+    fun getStreams(@Header("Authorization") authUser: String): Call<List<StreamResponse>>
+
+    @GET("projects")
+    fun getProjects(@Header("Authorization") authUser: String): Call<List<ProjectResponse>>
+
 }
