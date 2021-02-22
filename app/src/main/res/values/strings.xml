@@ -92,7 +92,6 @@
     <string name="longitude">Longitude</string>
     <string name="finish">finish</string>
     <string name="name_location">Site name</string>
-    <string name="define_the_precise">Define the precise device location</string>
     <string name="new_location">New site</string>
     <string name="existing">Existing</string>
     <string name="next">Next</string>

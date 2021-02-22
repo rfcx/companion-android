@@ -27,26 +27,6 @@
                 android:orientation="vertical"
                 app:layout_constraintGuide_percent="0.55" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/deployDeviceTextView"
-                style="@style/AudioMothText.Subhead.Bold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/margin_padding_normal"
-                android:text="@string/define_the_precise"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <View
-                android:id="@+id/view1"
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_marginStart="@dimen/margin_padding_large"
-                android:layout_marginEnd="@dimen/margin_padding_large"
-                android:background="@color/colorPrimary"
-                app:layout_constraintTop_toBottomOf="@id/deployDeviceTextView" />
-
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/locationNameTextInput"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -83,7 +63,7 @@
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/view1" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <View
                 android:id="@+id/siteView"
@@ -104,7 +84,7 @@
                 android:text="@string/site"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/view1" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/siteValueTextView"

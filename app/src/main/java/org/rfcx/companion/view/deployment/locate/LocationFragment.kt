@@ -90,6 +90,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                         this@LocationFragment.currentUserLocation = location
                         it.locationComponent.forceLocationUpdate(location)
                         altitudeFromLocation = location.altitude
+                        setCurrentUserLocation()
 
                         if (locationNameSpinner.selectedItemPosition == 0) {
                             altitudeValue.text = String.format("%.2f", location.altitude)
@@ -252,7 +253,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             lastLocation?.let { lastLocation ->
                 val latLng = LatLng(lastLocation.latitude, lastLocation.longitude)
                 moveCamera(latLng, DEFAULT_ZOOM)
-                setLatLogLabel(latLng)
             }
             retrieveDeployLocations()
             setupLocationSpinner()
@@ -329,7 +329,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         enableExistingLocation(true)
         locateItem?.let {
             moveCamera(it.getLatLng(), DEFAULT_ZOOM)
-            setLatLogLabel(it.getLatLng())
             altitudeValue.text = String.format("%.2f", it.altitude)
             if (locationGroupDb.isExisted(it.locationGroup?.name)) {
                 group = it.locationGroup?.name
@@ -365,13 +364,19 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         if (lastLocation != null) {
             lastLocation?.let {
                 val latLng = LatLng(it.latitude, it.longitude)
-                setLatLogLabel(latLng)
                 moveCamera(latLng, DEFAULT_ZOOM)
             }
         } else {
             // not found current location
             setLatLogLabel(LatLng(0.0, 0.0))
             moveCamera(LatLng(0.0, 0.0), DEFAULT_ZOOM)
+        }
+    }
+
+    private fun setCurrentUserLocation() {
+        currentUserLocation?.let { lastLocation ->
+            val latLng = LatLng(lastLocation.latitude, lastLocation.longitude)
+            setLatLogLabel(latLng)
         }
     }
 
@@ -385,7 +390,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
             enableExistingLocation(true)
             moveCamera(LatLng(deploymentLocation.latitude, deploymentLocation.longitude), DEFAULT_ZOOM)
-            setLatLogLabel(LatLng(deploymentLocation.latitude, deploymentLocation.longitude))
             altitudeValue.text = String.format("%.2f", deploymentLocation.altitude)
             if (locationGroupDb.isExisted(deploymentLocation.project?.name)) {
                 group = deploymentLocation.project?.name
