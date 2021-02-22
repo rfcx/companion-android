@@ -522,6 +522,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         val oppositeLat = userPosition.latitude - (nearestSite.latitude - userPosition.latitude)
         val oppositeLng = userPosition.longitude - (nearestSite.longitude - userPosition.longitude)
         val oppositeNearestSite = LatLng(oppositeLat, oppositeLng)
+        if (oppositeNearestSite.distanceTo(userPosition) < 30) {
+            return CameraUpdateFactory.newLatLngZoom(userPosition, zoom)
+        }
         val latLngBounds = LatLngBounds.Builder()
             .include(oppositeNearestSite)
             .include(nearestSite)
