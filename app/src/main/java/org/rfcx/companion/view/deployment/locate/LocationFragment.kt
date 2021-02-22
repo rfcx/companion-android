@@ -57,6 +57,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var isFirstTime = true
     private var lastLocation: Location? = null
     private var locateItems = ArrayList<Locate>()
+    private var distanceLocate: ArrayList<SiteItem>? = null
     private var locateNames = ArrayList<String>()
     private var locateItem: Locate? = null
     private var locateAdapter: ArrayAdapter<String>? = null
@@ -95,6 +96,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                         if (locationNameSpinner.selectedItemPosition == 0) {
                             altitudeValue.text = String.format("%.2f", location.altitude)
                         }
+
+                        setCheckbox()
 
                         if (isFirstTime && lastLocation == null &&
                             latitude == 0.0 && longitude == 0.0
@@ -330,6 +333,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private fun onPressedExisting() {
         enableExistingLocation(true)
+        enableCheckBox(true)
+
         locateItem?.let {
             moveCamera(it.getLatLng(), DEFAULT_ZOOM)
             altitudeValue.text = String.format("%.2f", it.altitude)
@@ -341,6 +346,32 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 group = getString(R.string.none)
                 locationGroupValueTextView.text = getString(R.string.none)
                 it.locationGroup?.color?.let { setPinColorByGroup("#2AA841") }
+            }
+        }
+    }
+
+    fun setCheckbox() {
+        locateItem?.let {
+            val locate = if (lastLocation == null) currentUserLocation else lastLocation
+            val nearLocations = findNearLocations(locate, locateItems)
+            distanceLocate = nearLocations?.let { location ->
+                ArrayList(location.map {
+                    SiteItem(
+                        it.first,
+                        it.second
+                    )
+                })
+            }
+
+            val siteItem = distanceLocate?.filterIndexed { _, site -> site.locate == it }
+            if (siteItem != null) {
+                if (siteItem[0].distance <= 20) {
+                    within20mCheckBox.isChecked = true
+                    within100mCheckBox.isChecked = false
+                } else {
+                    within20mCheckBox.isChecked = false
+                    within100mCheckBox.isChecked = true
+                }
             }
         }
     }
@@ -360,6 +391,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private fun onPressedNewLocation() {
         enableExistingLocation(false)
+        enableCheckBox(false)
         siteValueTextView.text = getString(R.string.create_new_site)
         altitudeValue.text = String.format("%.2f", altitudeFromLocation)
         getLastLocation()
@@ -392,7 +424,10 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             siteValueTextView.text = deploymentLocation.name
 
             enableExistingLocation(true)
-            moveCamera(LatLng(deploymentLocation.latitude, deploymentLocation.longitude), DEFAULT_ZOOM)
+            moveCamera(
+                LatLng(deploymentLocation.latitude, deploymentLocation.longitude),
+                DEFAULT_ZOOM
+            )
             altitudeValue.text = String.format("%.2f", deploymentLocation.altitude)
             if (locationGroupDb.isExisted(deploymentLocation.project?.name)) {
                 group = deploymentLocation.project?.name
@@ -427,6 +462,11 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 }
             }
         }
+    }
+
+    private fun enableCheckBox(enable: Boolean) {
+        within20mCheckBox.visibility = if (enable) View.VISIBLE else View.GONE
+        within100mCheckBox.visibility = if (enable) View.VISIBLE else View.GONE
     }
 
     private fun setupLocationSpinner() {
@@ -487,7 +527,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 val loc = Location(LocationManager.GPS_PROVIDER)
                 loc.latitude = it.latitude
                 loc.longitude = it.longitude
-                val distance = loc.distanceTo(this.lastLocation) // return in meters
+                val distance = loc.distanceTo(this.currentUserLocation) // return in meters
                 Pair(it, distance)
             })
             return itemsWithDistance
