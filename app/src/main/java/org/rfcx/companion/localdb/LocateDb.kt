@@ -120,10 +120,12 @@ class LocateDb(private val realm: Realm) {
                 locate.id = id
                 it.insert(locate)
             } else if (location.syncState == SyncState.Sent.key) {
+
                 location.serverId = streamResponse.id
                 location.name = streamResponse.name ?: location.name
                 location.latitude = streamResponse.latitude ?: location.latitude
                 location.longitude = streamResponse.longitude ?: location.longitude
+                location.altitude = streamResponse.altitude ?: location.altitude
                 location.createdAt = streamResponse.createdAt ?: location.createdAt
 
                 val locationGroupObj = it.createObject(LocationGroup::class.java)
