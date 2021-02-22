@@ -240,7 +240,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private fun setViewFromDeploymentState() {
         val fromUnfinishedDeployment =
             deploymentProtocol?.isOpenedFromUnfinishedDeployment() ?: false
-        locationNameSpinner.isEnabled = !fromUnfinishedDeployment
         changeGroupTextView.isEnabled = !fromUnfinishedDeployment
         if (fromUnfinishedDeployment) {
             changeGroupTextView.visibility = View.INVISIBLE
@@ -387,7 +386,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private fun updateLocationAdapter() {
         // already have deployment location?
         val deploymentLocation = deploymentProtocol?.getDeploymentLocation()
-        if (deploymentLocation != null && locateAdapter != null) {
+        if (deploymentLocation != null && locateAdapter != null && latitude == 0.0 && longitude == 0.0) {
             val spinnerPosition = locateAdapter!!.getPosition(deploymentLocation.name)
             locationNameSpinner.setSelection(spinnerPosition)
             siteValueTextView.text = deploymentLocation.name
