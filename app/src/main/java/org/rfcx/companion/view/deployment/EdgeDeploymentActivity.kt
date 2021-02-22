@@ -157,7 +157,13 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                             startCheckList()
                         }
                         else -> {
-                            startLocationPage(this.latitude, this.longitude, this.altitude, this.nameLocation)
+                            startLocationPage(
+                                this.latitude,
+                                this.longitude,
+                                this.altitude,
+                                this.nameLocation,
+                                true
+                            )
                         }
                     }
                 } else if (!isFragmentPopped) {
@@ -303,8 +309,14 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         startFragment(SyncFragment.newInstance(status))
     }
 
-    override fun startLocationPage(latitude: Double, longitude: Double, altitude: Double, name: String) {
-        startFragment(LocationFragment.newInstance(latitude, longitude, altitude, name))
+    override fun startLocationPage(
+        latitude: Double,
+        longitude: Double,
+        altitude: Double,
+        name: String,
+        fromPicker: Boolean
+    ) {
+        startFragment(LocationFragment.newInstance(latitude, longitude, altitude, name, fromPicker))
     }
 
     override fun playSyncSound() {

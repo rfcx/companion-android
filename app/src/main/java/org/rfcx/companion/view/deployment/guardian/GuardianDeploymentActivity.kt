@@ -445,8 +445,14 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         this.altitude = altitude
     }
 
-    override fun startLocationPage(latitude: Double, longitude: Double, altitude: Double, name: String) {
-        startFragment(LocationFragment.newInstance(latitude, longitude, altitude, name))
+    override fun startLocationPage(
+        latitude: Double,
+        longitude: Double,
+        altitude: Double,
+        name: String,
+        fromPicker: Boolean
+    ) {
+        startFragment(LocationFragment.newInstance(latitude, longitude, altitude, name, fromPicker))
     }
 
     override fun onBackPressed() {

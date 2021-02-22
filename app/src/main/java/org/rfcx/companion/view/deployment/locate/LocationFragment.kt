@@ -152,6 +152,11 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 longitude = loc.longitude
                 altitude = loc.altitude
             }
+            if (it.getBoolean(ARG_FROM_PICKER)) {
+                latitude = it.getDouble(ARG_LATITUDE)
+                longitude = it.getDouble(ARG_LONGITUDE)
+                altitude = it.getDouble(ARG_ALTITUDE)
+            }
             nameLocation = it.getString(ARG_LOCATION_NAME)
         }
     }
@@ -374,7 +379,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         if (lastLocation != null) {
             lastLocation?.let {
                 val latLng = LatLng(it.latitude, it.longitude)
-                moveCamera(LatLng(lastLocation?.latitude ?: 0.0, lastLocation?.longitude ?: 0.0), latLng, DEFAULT_ZOOM)
+                moveCamera(latLng, null, DEFAULT_ZOOM)
             }
         } else {
             // not found current location
@@ -713,6 +718,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         const val ARG_LONGITUDE = "ARG_LONGITUDE"
         const val ARG_ALTITUDE = "ARG_ALTITUDE"
         const val ARG_LOCATION_NAME = "ARG_LOCATION_NAME"
+        const val ARG_FROM_PICKER = "ARG_FROM_PICKER"
 
         const val DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L
         const val DEFAULT_MAX_WAIT_TIME = DEFAULT_INTERVAL_IN_MILLISECONDS * 5
@@ -721,7 +727,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             return LocationFragment()
         }
 
-        fun newInstance(latitude: Double, longitude: Double, altitude: Double, name: String) =
+        fun newInstance(latitude: Double, longitude: Double, altitude: Double, name: String, fromPicker: Boolean) =
             LocationFragment()
                 .apply {
                     arguments = Bundle().apply {
@@ -729,6 +735,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                         putDouble(ARG_LONGITUDE, longitude)
                         putDouble(ARG_ALTITUDE, altitude)
                         putString(ARG_LOCATION_NAME, name)
+                        putBoolean(ARG_FROM_PICKER, fromPicker)
                     }
                 }
     }
