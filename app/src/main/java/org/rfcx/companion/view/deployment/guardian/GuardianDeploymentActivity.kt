@@ -3,6 +3,8 @@ package org.rfcx.companion.view.deployment.guardian
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -66,6 +68,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private var _locate: Locate? = null
 
     private var useExistedLocation: Boolean = false
+
+    private var currentLocation: Location? = null
 
     private var _sampleRate = 24000
 
@@ -248,6 +252,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         return this._images
     }
 
+    override fun getCurrentLocation(): Location = currentLocation ?: Location(LocationManager.GPS_PROVIDER)
+
     override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
         val deployment = _deployment ?: GuardianDeployment()
         deployment.state = DeploymentState.Guardian.Locate.key // state
@@ -284,6 +290,10 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             GuardianDeploymentSyncWorker.enqueue(this@GuardianDeploymentActivity)
             showComplete()
         }
+    }
+
+    override fun setCurrentLocation(location: Location) {
+        this.currentLocation = location
     }
 
     override fun startSetupConfigure(profile: GuardianProfile) {

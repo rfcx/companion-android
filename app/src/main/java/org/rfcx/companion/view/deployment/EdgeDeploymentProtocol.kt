@@ -1,5 +1,6 @@
 package org.rfcx.companion.view.deployment
 
+import android.location.Location
 import org.rfcx.companion.entity.*
 
 interface EdgeDeploymentProtocol : BaseDeploymentProtocol {

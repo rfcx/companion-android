@@ -27,8 +27,10 @@ import androidx.core.graphics.toColorInt
 import androidx.fragment.app.Fragment
 import com.mapbox.android.core.location.*
 import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.camera.CameraUpdate
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
@@ -85,6 +87,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     val location = result?.lastLocation
 
                     location ?: return
+                    deploymentProtocol?.setCurrentLocation(location)
 
                     mapboxMap?.let {
                         this@LocationFragment.currentUserLocation = location
@@ -143,9 +146,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private fun initIntent() {
         arguments?.let {
-            latitude = it.getDouble(ARG_LATITUDE)
-            longitude = it.getDouble(ARG_LONGITUDE)
-            altitude = it.getDouble(ARG_ALTITUDE)
+            val currentLocation = deploymentProtocol?.getCurrentLocation()
+            currentLocation?.let { loc ->
+                latitude = loc.latitude
+                longitude = loc.longitude
+                altitude = loc.altitude
+            }
             nameLocation = it.getString(ARG_LOCATION_NAME)
         }
     }
@@ -255,7 +261,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         mapboxMap.setStyle(Style.OUTDOORS) {
             lastLocation?.let { lastLocation ->
                 val latLng = LatLng(lastLocation.latitude, lastLocation.longitude)
-                moveCamera(latLng, DEFAULT_ZOOM)
+                moveCamera(latLng, null, DEFAULT_ZOOM)
             }
             retrieveDeployLocations()
             setupLocationSpinner()
@@ -329,9 +335,10 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun onPressedExisting() {
+        getLastLocation()
         enableExistingLocation(true)
         locateItem?.let {
-            moveCamera(it.getLatLng(), DEFAULT_ZOOM)
+            moveCamera(LatLng(latitude, longitude), it.getLatLng(), DEFAULT_ZOOM)
             altitudeValue.text = String.format("%.2f", it.altitude)
             if (locationGroupDb.isExisted(it.locationGroup?.name)) {
                 group = it.locationGroup?.name
@@ -367,7 +374,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         if (lastLocation != null) {
             lastLocation?.let {
                 val latLng = LatLng(it.latitude, it.longitude)
-                moveCamera(latLng, DEFAULT_ZOOM)
+                moveCamera(LatLng(lastLocation?.latitude ?: 0.0, lastLocation?.longitude ?: 0.0), latLng, DEFAULT_ZOOM)
             }
         } else {
             // not found current location
@@ -392,7 +399,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             siteValueTextView.text = deploymentLocation.name
 
             enableExistingLocation(true)
-            moveCamera(LatLng(deploymentLocation.latitude, deploymentLocation.longitude), DEFAULT_ZOOM)
+            moveCamera(LatLng(lastLocation?.latitude ?: 0.0, lastLocation?.longitude ?: 0.0), LatLng(deploymentLocation.latitude, deploymentLocation.longitude), DEFAULT_ZOOM)
             altitudeValue.text = String.format("%.2f", deploymentLocation.altitude)
             if (locationGroupDb.isExisted(deploymentLocation.project?.name)) {
                 group = deploymentLocation.project?.name
@@ -496,7 +503,25 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun moveCamera(latLng: LatLng, zoom: Double) {
-        mapboxMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom))
+        mapboxMap?.moveCamera(calculateLatLngForZoom(latLng, null, zoom))
+    }
+
+    private fun moveCamera(userPosition: LatLng, nearestSite: LatLng?, zoom: Double) {
+        mapboxMap?.moveCamera(calculateLatLngForZoom(userPosition, nearestSite, zoom))
+    }
+
+    private fun calculateLatLngForZoom(userPosition: LatLng, nearestSite: LatLng? = null, zoom: Double): CameraUpdate {
+        if (nearestSite == null) {
+            return CameraUpdateFactory.newLatLngZoom(userPosition, zoom)
+        }
+        val oppositeLat = userPosition.latitude - (nearestSite.latitude - userPosition.latitude)
+        val oppositeLng = userPosition.longitude - (nearestSite.longitude - userPosition.longitude)
+        val oppositeNearestSite = LatLng(oppositeLat, oppositeLng)
+        val latLngBounds = LatLngBounds.Builder()
+            .include(oppositeNearestSite)
+            .include(nearestSite)
+            .build()
+        return CameraUpdateFactory.newLatLngBounds(latLngBounds, 100)
     }
 
     private fun changePinColorByGroup(group: String) {

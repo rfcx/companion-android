@@ -1,5 +1,6 @@
 package org.rfcx.companion.view.deployment
 
+import android.location.Location
 import org.rfcx.companion.entity.*
 
 interface BaseDeploymentProtocol {
@@ -15,10 +16,13 @@ interface BaseDeploymentProtocol {
     fun getDeploymentLocation(): DeploymentLocation?
     fun getLocationGroup(name: String): LocationGroups?
     fun getImages(): List<String>
+    fun getCurrentLocation(): Location
 
     fun setDeployLocation(locate: Locate, isExisted: Boolean)
     fun setImages(images: List<String>)
     fun setReadyToDeploy()
+    fun setCurrentLocation(location: Location)
+
 
     fun handleCheckClicked(number: Int)
     fun getPassedChecks(): List<Int>
