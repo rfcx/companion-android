@@ -75,6 +75,19 @@
                 app:layout_constraintTop_toTopOf="@id/siteTitleTextView" />
 
             <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/chooseTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/margin_padding_large"
+                android:text="@string/choose"
+                android:textAllCaps="true"
+                android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/text_small"
+                app:layout_constraintBottom_toBottomOf="@id/siteView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/siteView" />
+
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/siteTitleTextView"
                 style="@style/AudioMothText.Body.Small"
                 android:layout_width="match_parent"

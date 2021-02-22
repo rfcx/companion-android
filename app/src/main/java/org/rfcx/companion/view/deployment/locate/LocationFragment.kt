@@ -175,6 +175,10 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             startSelectingExistedSite()
         }
 
+        chooseTextView.setOnClickListener {
+            startSelectingExistedSite()
+        }
+
         finishButton.setOnClickListener {
             analytics?.trackSaveLocationEvent(Screen.LOCATION.id)
             this.altitude = altitudeFromLocation

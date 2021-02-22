@@ -96,6 +96,7 @@
     <string name="existing">Existing</string>
     <string name="next">Next</string>
     <string name="change">change</string>
+    <string name="choose">Choose</string>
     <string name="altitude">Altitude</string>
     <string name="altitude_default">0.0</string>
     <string name="altitude_digits">0123456789.</string>
