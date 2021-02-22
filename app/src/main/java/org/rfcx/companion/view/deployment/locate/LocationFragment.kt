@@ -366,11 +366,11 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             val siteItem = distanceLocate?.filterIndexed { _, site -> site.locate == it }
             if (siteItem != null) {
                 if (siteItem[0].distance <= 20) {
-                    within20mCheckBox.isChecked = true
-                    within100mCheckBox.isChecked = false
+                    withinTextView.text = getString(R.string.within, 20)
+                } else if (siteItem[0].distance > 20 && siteItem[0].distance <= 100){
+                    withinTextView.text = getString(R.string.within, 100)
                 } else {
-                    within20mCheckBox.isChecked = false
-                    within100mCheckBox.isChecked = true
+                    withinTextView.text = getString(R.string.more_than)
                 }
             }
         }
@@ -465,8 +465,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun enableCheckBox(enable: Boolean) {
-        within20mCheckBox.visibility = if (enable) View.VISIBLE else View.GONE
-        within100mCheckBox.visibility = if (enable) View.VISIBLE else View.GONE
+        withinTextView.visibility = if (enable) View.VISIBLE else View.GONE
     }
 
     private fun setupLocationSpinner() {
