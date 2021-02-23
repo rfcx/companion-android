@@ -146,6 +146,8 @@
                 style="@style/AudioMothText.Body.Secondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_checklist"
+                android:drawablePadding="@dimen/margin_padding_small"
                 android:layout_marginStart="@dimen/margin_padding_large"
                 android:layout_marginTop="@dimen/margin_padding_small"
                 android:layout_marginEnd="@dimen/margin_padding_large"

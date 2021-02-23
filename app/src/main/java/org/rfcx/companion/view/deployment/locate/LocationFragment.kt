@@ -366,11 +366,25 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             val siteItem = distanceLocate?.filterIndexed { _, site -> site.locate == it }
             if (siteItem != null) {
                 if (siteItem[0].distance <= 20) {
-                    withinTextView.text = getString(R.string.within, 20)
-                } else if (siteItem[0].distance > 20 && siteItem[0].distance <= 100){
-                    withinTextView.text = getString(R.string.within, 100)
+                    withinTextView.text = getString(R.string.within)
+                    withinTextView.setCompoundDrawablesWithIntrinsicBounds(
+                        R.drawable.ic_checklist_passed,
+                        0,
+                        0,
+                        0
+                    )
                 } else {
-                    withinTextView.text = getString(R.string.more_than)
+                    withinTextView.setCompoundDrawablesWithIntrinsicBounds(
+                        R.drawable.ic_checklist_cross,
+                        0,
+                        0,
+                        0
+                    )
+                    if(siteItem[0].distance >= 1000 ) {
+                        withinTextView.text = getString(R.string.more_than_km,String.format("%.2f", siteItem[0].distance/1000))
+                    } else {
+                        withinTextView.text = getString(R.string.more_than_m,String.format("%.2f", siteItem[0].distance))
+                    }
                 }
             }
         }
@@ -481,10 +495,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 locateNames
             )
         }
-
-        locationNameSpinner.isEnabled = false // TODO :: Change to user another way
         locationNameSpinner.adapter = locateAdapter
-
         if (nameLocation != "" && nameLocation != null) {
             val name = nameLocation
             val position = locateNames.indexOf(name)
