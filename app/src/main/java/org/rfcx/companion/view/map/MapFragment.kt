@@ -4,7 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.PointF
 import android.graphics.PorterDuff
+import android.location.Location
 import android.os.Bundle
+import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +22,7 @@ import androidx.lifecycle.Transformations
 import androidx.work.WorkInfo
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
+import com.mapbox.android.core.location.*
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
@@ -60,6 +64,7 @@ import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.repo.Firestore
 import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.util.*
+import org.rfcx.companion.view.deployment.locate.LocationFragment
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -69,6 +74,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     // map
     private lateinit var mapView: MapView
     private var mapboxMap: MapboxMap? = null
+    private var locationEngine: LocationEngine? = null
     private var deploymentSource: GeoJsonSource? = null
     private var siteSource: GeoJsonSource? = null
     private var deploymentFeatures: FeatureCollection? = null
@@ -100,9 +106,34 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var listener: MainActivityListener? = null
     private var deploymentListener: DeploymentListener? = null
 
+    private var isFirstTime = true
+    private var currentUserLocation: Location? = null
+
     private var groupColors = listOf<String>()
 
     private val analytics by lazy { context?.let { Analytics(it) } }
+
+    private val mapboxLocationChangeCallback =
+        object : LocationEngineCallback<LocationEngineResult> {
+            override fun onSuccess(result: LocationEngineResult?) {
+                if (activity != null) {
+                    val location = result?.lastLocation
+                    location ?: return
+
+                    mapboxMap?.let {
+                        this@MapFragment.currentUserLocation = location
+                    }
+                    if (isFirstTime) {
+                        moveCameraOnStart()
+                        isFirstTime = false
+                    }
+                }
+            }
+
+            override fun onFailure(exception: Exception) {
+                Log.e(LocationFragment.TAG, exception.localizedMessage ?: "empty localizedMessage")
+            }
+        }
 
     // observer
     private val workInfoObserve = Observer<List<WorkInfo>> {
@@ -221,7 +252,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setupImages(style: Style) {
-        val drawablePinSite = ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map_grey, null)
+        val drawablePinSite =
+            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map_grey, null)
         val mBitmapPinSite = BitmapUtils.getBitmapFromDrawable(drawablePinSite)
         if (mBitmapPinSite != null) {
             style.addImage(SITE_MARKER, mBitmapPinSite)
@@ -315,9 +347,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 ) {
                     features[index]?.let { setFeatureSelectState(it, true) }
                     val deploymentId =
-                        selectedFeature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID).toInt()
+                        selectedFeature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID)
+                            .toInt()
                     val deploymentDevice =
-                        selectedFeature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEVICE).toString()
+                        selectedFeature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEVICE)
+                            .toString()
                     (activity as MainActivityListener).showBottomSheet(
                         DeploymentViewPagerFragment.newInstance(deploymentId, deploymentDevice)
                     )
@@ -372,7 +406,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         val showDeployments = this.edgeDeployments.filter { it.isCompleted() }
         val usedSites = showDeployments.map { it.stream?.coreId }
-        val filteredShowLocations = showLocations.filter { loc -> !usedSites.contains(loc.serverId)}
+        val filteredShowLocations =
+            showLocations.filter { loc -> !usedSites.contains(loc.serverId) }
 
         val edgeDeploymentMarkers = showDeployments.map { it.toMark() }
         val guardianDeploymentMarkers = showGuardianDeployments.map { it.toMark() }
@@ -381,6 +416,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         handleShowDeployment(showDeployments, showGuardianDeployments)
 
         handleMarker(deploymentMarkers, locationMarkers)
+    }
+
+    private fun getFurthestSiteFromCurrentLocation(
+        currentLatLng: LatLng,
+        sites: List<Locate>
+    ): Locate? {
+        return sites.maxBy {
+            currentLatLng.distanceTo(LatLng(it.latitude, it.longitude))
+        }
     }
 
     private fun handleShowDeployment(
@@ -547,7 +591,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun handleMarker(deploymentMarkers: List<DeploymentMarker>, siteMarkers: List<SiteMarker>) {
+    private fun handleMarker(
+        deploymentMarkers: List<DeploymentMarker>,
+        siteMarkers: List<SiteMarker>
+    ) {
         val deploymentFeatures = this.deploymentFeatures?.features()
         val deploymentSelecting = deploymentFeatures?.firstOrNull { feature ->
             feature.getBooleanProperty(PROPERTY_DEPLOYMENT_SELECTED) ?: false
@@ -591,12 +638,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         this.deploymentFeatures = FeatureCollection.fromFeatures(deploymentPointFeatures)
         this.siteFeatures = FeatureCollection.fromFeatures(sitePointFeature)
         refreshSource()
-
-        val lastDeployment = deploymentMarkers.maxBy { it.updatedAt ?: it.createdAt }
-        val state = listener?.getBottomSheetState() ?: 0
-        if (lastDeployment != null && state != BottomSheetBehavior.STATE_EXPANDED) {
-            moveCamera(LatLng(lastDeployment.latitude, lastDeployment.longitude))
-        }
     }
 
     private fun refreshSource() {
@@ -608,8 +649,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun moveCamera(latLng: LatLng) {
-        mapboxMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0))
+    private fun moveCamera(userLoc: LatLng, targetLoc: LatLng? = null, zoom: Double) {
+        mapboxMap?.moveCamera(MapboxCameraUtils.calculateLatLngForZoom(userLoc, targetLoc, zoom))
     }
 
     private fun checkThenAccquireLocation(style: Style) {
@@ -646,6 +687,38 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 renderMode = RenderMode.COMPASS
             }
         }
+
+        initLocationEngine()
+    }
+
+    private fun initLocationEngine() {
+        locationEngine = context?.let { LocationEngineProvider.getBestLocationEngine(it) }
+        val request =
+            LocationEngineRequest.Builder(LocationFragment.DEFAULT_INTERVAL_IN_MILLISECONDS)
+                .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
+                .setMaxWaitTime(LocationFragment.DEFAULT_MAX_WAIT_TIME).build()
+
+        locationEngine?.requestLocationUpdates(
+            request,
+            mapboxLocationChangeCallback,
+            Looper.getMainLooper()
+        )
+
+        locationEngine?.getLastLocation(mapboxLocationChangeCallback)
+    }
+
+    private fun moveCameraOnStart() {
+        mapboxMap?.locationComponent?.lastKnownLocation?.let { curLoc ->
+            val currentLatLng = LatLng(curLoc.latitude, curLoc.longitude)
+            val furthestSite = getFurthestSiteFromCurrentLocation(currentLatLng, this.locations)
+            furthestSite?.let {
+                moveCamera(
+                    currentLatLng,
+                    LatLng(furthestSite.latitude, furthestSite.longitude),
+                    15.0
+                )
+            }
+        }
     }
 
     fun moveToDeploymentMarker(lat: Double, lng: Double, markerLocationId: String) {
@@ -657,7 +730,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         val features = this.deploymentFeatures!!.features()!!
         features.forEachIndexed { index, feature ->
-            if (markerLocationId == feature.getProperty(PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID).toString()) {
+            if (markerLocationId == feature.getProperty(PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID)
+                    .toString()
+            ) {
                 features[index]?.let { setFeatureSelectState(it, true) }
             } else {
                 features[index]?.let { setFeatureSelectState(it, false) }
@@ -698,6 +773,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         edgeDeployLiveData.removeObserver(edgeDeploymentObserve)
         locateLiveData.removeObserver(locateObserve)
         locationGroupLiveData.removeObserver(locationGroupObserve)
+        locationEngine?.removeLocationUpdates(mapboxLocationChangeCallback)
         mapView.onDestroy()
     }
 
@@ -785,7 +861,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         private const val PROPERTY_DEPLOYMENT_MARKER_IMAGE = "deployment.marker.image"
 
         private const val PROPERTY_SITE_MARKER_IMAGE = "site.marker.image"
-
 
 
         fun newInstance(): MapFragment {
