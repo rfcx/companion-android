@@ -152,7 +152,7 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
         val deploymentIndex = showDeployments.indexOf(showDeployments.find {
             when (it) {
                 is DeploymentDetailView.EdgeDeploymentView -> {
-                    Device.EDGE.value == selectedDevice && it.id == selectedId
+                    Device.AUDIOMOTH.value == selectedDevice && it.id == selectedId
                 }
                 is DeploymentDetailView.GuardianDeploymentView -> {
                     Device.GUARDIAN.value == selectedDevice && it.id == selectedId

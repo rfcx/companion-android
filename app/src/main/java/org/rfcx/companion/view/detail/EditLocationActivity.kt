@@ -124,7 +124,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
         val group = groupName ?: ""
         showLoading()
         deploymentId?.let { id ->
-            if (device == Device.EDGE.value) {
+            if (device == Device.AUDIOMOTH.value) {
                 edgeDeploymentDb.editLocation(
                     id = id,
                     locationName = name,
@@ -164,7 +164,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
                     })
             }
 
-            if (device == Device.EDGE.value) {
+            if (device == Device.AUDIOMOTH.value) {
                 edgeDeploymentDb.editLocationGroup(id, getLocationGroup(group), object :
                     DatabaseCallback {
                     override fun onSuccess() {

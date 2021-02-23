@@ -94,7 +94,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
                             locate.name,
                             deploymentId,
                             if (isGroupExisted) group else getString(R.string.none),
-                            Device.EDGE.value,
+                            Device.AUDIOMOTH.value,
                             DEPLOYMENT_REQUEST_CODE
                         )
                     }

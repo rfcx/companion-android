@@ -53,7 +53,7 @@ class DeployFragment : BaseImageFragment() {
         finishButton.setOnClickListener {
             val images = imageAdapter.getNewAttachImage()
             if(images.isNotEmpty()) {
-                analytics?.trackAddDeploymentImageEvent(Device.EDGE.value)
+                analytics?.trackAddDeploymentImageEvent(Device.AUDIOMOTH.value)
             }
             edgeDeploymentProtocol?.setImages(images)
             edgeDeploymentProtocol?.nextStep()
