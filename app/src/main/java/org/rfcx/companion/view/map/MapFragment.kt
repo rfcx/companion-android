@@ -44,6 +44,8 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.BitmapUtils
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_map.*
+import kotlinx.android.synthetic.main.fragment_map.currentLocationButton
+import kotlinx.android.synthetic.main.fragment_map_picker.*
 import org.rfcx.companion.DeploymentListener
 import org.rfcx.companion.MainActivityListener
 import org.rfcx.companion.R
@@ -194,6 +196,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         fetchJobSyncing()
         fetchData()
         progressBar.visibility = View.VISIBLE
+
+        currentLocationButton.setOnClickListener { moveCameraOnStart() }
     }
 
     private fun getGroupsColor() {
