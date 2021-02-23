@@ -47,9 +47,7 @@ import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.DeploymentState.Edge
 import org.rfcx.companion.entity.DeploymentState.Guardian
 import org.rfcx.companion.entity.guardian.GuardianDeployment
-import org.rfcx.companion.entity.response.DeploymentResponse
-import org.rfcx.companion.entity.response.toLocationGroupsResponse
-import org.rfcx.companion.entity.response.toLocationResponse
+import org.rfcx.companion.entity.response.*
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
@@ -177,7 +175,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         context?.let {
             retrieveDeployments(it)
             retrieveLocations(it)
-            retrieveLocationGroups(it)
+            retrieveProjects(it)
             retrieveDiagnostics(it)
         }
 
@@ -347,7 +345,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             showDeployIds.contains(it.serverId) || showDeployIds.contains(it.id.toString())
         }
 
-        val showDeployments = this.edgeDeployments.filter {it.isCompleted()}
+        val showDeployments = this.edgeDeployments.filter { it.isCompleted() }
         val edgeDeploymentMarkers = showDeployments.map { it.toMark() }
         val guardianDeploymentMarkers = showGuardianDeployments.map { it.toMark() }
         val deploymentMarkers = edgeDeploymentMarkers + guardianDeploymentMarkers
@@ -401,8 +399,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             .enqueue(object : Callback<List<DeploymentResponse>> {
                 override fun onFailure(call: Call<List<DeploymentResponse>>, t: Throwable) {
                     combinedData()
-                    if(context.isNetworkAvailable()) {
-                        Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT).show()
+                    if (context.isNetworkAvailable()) {
+                        Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT)
+                            .show()
                     }
                 }
 
@@ -411,19 +410,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     response: Response<List<DeploymentResponse>>
                 ) {
                     response.body()?.forEach { item ->
-                        item.serverId = item.serverId
-                        if(item.device == Device.GUARDIAN.value) {
+                        if (item.deploymentType == Device.GUARDIAN.value) {
                             guardianDeploymentDb.insertOrUpdate(item)
                         } else {
                             edgeDeploymentDb.insertOrUpdate(item)
-                        }
-                        /* Save Streams and Projects in local database */
-                        if (item.stream != null) {
-                            locateDb.insertOrUpdate(item.stream!!.toLocationResponse())
-
-                            if(item.stream!!.project != null) {
-                                locationGroupDb.insertOrUpdate(item.stream!!.project!!.toLocationGroupsResponse())
-                            }
                         }
                     }
                 }
@@ -431,13 +421,49 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun retrieveLocations(context: Context) {
-        // TODO:: call get Streams in here
-//        Firestore(context).retrieveLocations(locateDb)
+        val token = "Bearer ${context.getIdToken()}"
+        ApiManager.getInstance().getDeviceApi().getStreams(token)
+            .enqueue(object : Callback<List<StreamResponse>> {
+                override fun onFailure(call: Call<List<StreamResponse>>, t: Throwable) {
+                    combinedData()
+                    if (context.isNetworkAvailable()) {
+                        Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
+
+                override fun onResponse(
+                    call: Call<List<StreamResponse>>,
+                    response: Response<List<StreamResponse>>
+                ) {
+                    response.body()?.forEach { item ->
+                        locateDb.insertOrUpdate(item)
+                    }
+                }
+            })
     }
 
-    private fun retrieveLocationGroups(context: Context) {
-        // TODO:: call get Projects in here
-//        Firestore(context).retrieveLocationGroups(locationGroupDb)
+    private fun retrieveProjects(context: Context) {
+        val token = "Bearer ${context.getIdToken()}"
+        ApiManager.getInstance().getDeviceApi().getProjects(token)
+            .enqueue(object : Callback<List<ProjectResponse>> {
+                override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
+                    combinedData()
+                    if (context.isNetworkAvailable()) {
+                        Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
+
+                override fun onResponse(
+                    call: Call<List<ProjectResponse>>,
+                    response: Response<List<ProjectResponse>>
+                ) {
+                    response.body()?.forEach { item ->
+                        locationGroupDb.insertOrUpdate(item)
+                    }
+                }
+            })
     }
 
     private fun retrieveDiagnostics(context: Context) {
@@ -637,7 +663,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val isGroupExisted = locationGroupDb.isExisted(group)
         val pinImage =
             if (state == Edge.ReadyToUpload.key) {
-                if (color != null && color.isNotEmpty() && group != null && isGroupExisted ) {
+                if (color != null && color.isNotEmpty() && group != null && isGroupExisted) {
                     stream?.project?.color
                 } else {
                     Battery.BATTERY_PIN_GREEN

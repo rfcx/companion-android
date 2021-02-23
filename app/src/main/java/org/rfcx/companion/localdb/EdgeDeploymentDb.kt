@@ -6,7 +6,7 @@ import io.realm.Sort
 import io.realm.kotlin.deleteFromRealm
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.response.DeploymentResponse
-import org.rfcx.companion.entity.response.EdgeDeploymentResponse
+import org.rfcx.companion.entity.response.toDeploymentLocation
 import org.rfcx.companion.entity.response.toEdgeDeployment
 import java.util.*
 
@@ -59,7 +59,7 @@ class EdgeDeploymentDb(private val realm: Realm) {
         realm.executeTransaction {
             val deployment =
                 it.where(EdgeDeployment::class.java)
-                    .equalTo(EdgeDeployment.FIELD_SERVER_ID, deploymentResponse.serverId)
+                    .equalTo(EdgeDeployment.FIELD_SERVER_ID, deploymentResponse.id)
                     .findFirst()
 
             if (deployment == null) {
@@ -69,20 +69,17 @@ class EdgeDeploymentDb(private val realm: Realm) {
                 deploymentObj.id = id
                 it.insert(deploymentObj)
             } else if (deployment.syncState == SyncState.Sent.key) {
-                deployment.deploymentKey = deploymentResponse.deploymentKey
-                deployment.serverId = deploymentResponse.serverId
-                deployment.deployedAt =
-                    deploymentResponse.deployedAt?.seconds?.let { deployedAt -> Date(deployedAt.times(1000)) }
-                        ?: deployment.deployedAt
+                deployment.deploymentKey = deploymentResponse.id
+                deployment.serverId = deploymentResponse.id
+                deployment.deployedAt = deploymentResponse.deployedAt ?: deployment.deployedAt
 
                 val newLocation = deploymentResponse.stream
                 if (newLocation != null) {
-                    deployment.stream = it.copyToRealm(newLocation)
+                    deployment.stream = it.copyToRealm(newLocation.toDeploymentLocation())
                 }
 
                 deployment.createdAt =
-                    deploymentResponse.createdAt?.seconds?.let { createdAt -> Date(createdAt.times(1000)) }
-                        ?: deployment.createdAt
+                    deploymentResponse.createdAt ?: deployment.createdAt
             }
         }
     }

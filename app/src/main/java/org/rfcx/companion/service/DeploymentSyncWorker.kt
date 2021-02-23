@@ -40,10 +40,10 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                     .createDeployment(token, it.toRequestBody()).execute()
 
                 if (result.isSuccessful) {
-                    result.body()?.string()?.let { docId ->
-                        db.markSent(docId, it.id)
-                        locateDb.updateDeploymentServerId(it.id, docId)
-                    }
+                    val fullId = result.headers().get("Location")
+                    val id = fullId?.substring(fullId.lastIndexOf("/") + 1, fullId.length) ?: ""
+                    db.markSent(id, it.id)
+                    locateDb.updateDeploymentServerId(it.id, id)
                 } else {
                     db.markUnsent(it.id)
                     someFailed = true
