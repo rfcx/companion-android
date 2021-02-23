@@ -26,6 +26,7 @@ import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
+import com.mapbox.mapboxsdk.location.LocationComponentOptions
 import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
@@ -193,15 +194,31 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
         if (hasPermissions()) {
             val loadedMapStyle = mapboxMap?.style
             val locationComponent = mapboxMap?.locationComponent
-            context?.let {
-                locationComponent?.activateLocationComponent(
-                    LocationComponentActivationOptions.builder(it, loadedMapStyle!!)
-                        .useDefaultLocationEngine(false)
-                        .build()
-                )
+            // Activate the LocationComponent
+            val customLocationComponentOptions = context?.let {
+                LocationComponentOptions.builder(it)
+                    .trackingGesturesManagement(true)
+                    .accuracyColor(ContextCompat.getColor(it, R.color.colorPrimary))
+                    .build()
             }
-            locationComponent?.isLocationComponentEnabled = false
-            locationComponent?.renderMode = RenderMode.COMPASS
+
+            val locationComponentActivationOptions =
+                context?.let {
+                    LocationComponentActivationOptions.builder(it, loadedMapStyle!!)
+                        .locationComponentOptions(customLocationComponentOptions)
+                        .build()
+                }
+
+            mapboxMap?.let { it ->
+                it.locationComponent.apply {
+                    if (locationComponentActivationOptions != null) {
+                        activateLocationComponent(locationComponentActivationOptions)
+                    }
+
+                    isLocationComponentEnabled = true
+                    renderMode = RenderMode.COMPASS
+                }
+            }
 
             if (latitude != 0.0 && longitude != 0.0) {
                 moveCamera(LatLng(latitude, longitude), DEFAULT_ZOOM)
