@@ -214,6 +214,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     it.lastGuardianDeploymentServerId,
                     it.syncState
                 )
+                createSiteSymbol(locate.getLatLng())
                 moveCamera(LatLng(locate.getLatLng()), DEFAULT_ZOOM)
             }
             enableCheckBox(false)
