@@ -203,6 +203,55 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/locationTitleTextView" />
 
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/currentLocateGroupView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                app:constraint_referenced_ids="currentLocateView,currentLocationIcon,arrowIcon,pinMapIcon" />
+
+            <View
+                android:id="@+id/currentLocateView"
+                android:layout_width="80dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_button_green_outline"
+                app:layout_constraintStart_toStartOf="@id/pinMapIcon"
+                app:layout_constraintTop_toTopOf="@id/arrowIcon"
+                app:layout_constraintBottom_toBottomOf="@id/arrowIcon"
+                app:layout_constraintEnd_toEndOf="@id/currentLocationIcon"/>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/currentLocationIcon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginEnd="@dimen/margin_padding_xlarge"
+                android:src="@drawable/ic_current_location"
+                android:tint="@color/colorPrimary"
+                app:layout_constraintBottom_toBottomOf="@id/locationValueTextView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/locationTitleTextView" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/arrowIcon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:rotation="180"
+                android:src="@drawable/ic_baseline_arrow_back_24"
+                android:tint="@color/colorPrimary"
+                app:layout_constraintBottom_toBottomOf="@id/locationValueTextView"
+                app:layout_constraintEnd_toStartOf="@id/currentLocationIcon"
+                app:layout_constraintTop_toTopOf="@id/locationTitleTextView" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/pinMapIcon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_pin_map"
+                android:tint="@color/colorPrimary"
+                app:layout_constraintBottom_toBottomOf="@id/locationValueTextView"
+                app:layout_constraintEnd_toStartOf="@id/arrowIcon"
+                app:layout_constraintTop_toTopOf="@id/locationTitleTextView" />
+
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/currentLocateTextView"
                 android:layout_width="wrap_content"

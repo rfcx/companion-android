@@ -195,7 +195,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             startSelectingExistedSite()
         }
 
-        currentLocateTextView.setOnClickListener {
+        currentLocateView.setOnClickListener {
             var locate = Locate()
             locateItem?.let {
                 locate = Locate(
@@ -739,7 +739,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         locationNameTextInput.visibility = if (enable) View.GONE else View.VISIBLE
         changeTextView.visibility = if (enable) View.GONE else View.VISIBLE
         changeGroupTextView.visibility = if (enable) View.GONE else View.VISIBLE
-        currentLocateTextView.visibility = if (enable) View.VISIBLE else View.GONE
+//        currentLocateTextView.visibility = if (enable) View.VISIBLE else View.GONE
+        currentLocateGroupView.visibility = if (enable) View.VISIBLE else View.GONE
     }
 
     override fun onStart() {
