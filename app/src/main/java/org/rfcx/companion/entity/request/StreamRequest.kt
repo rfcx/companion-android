@@ -8,7 +8,7 @@ data class StreamRequest(
     var longitude: Double = 0.0,
     var altitude: Double = 0.0,
     var project: ProjectRequest? = null,
-    var coreId: String? = null
+    var id: String? = null
 )
 
 fun DeploymentLocation.toRequestBody(): StreamRequest {
@@ -18,6 +18,6 @@ fun DeploymentLocation.toRequestBody(): StreamRequest {
         longitude = this.longitude,
         altitude = this.altitude,
         project = if (this.project?.name == null) null else this.project?.toRequestBody(),
-        coreId = this.coreId
+        id = this.coreId
     )
 }

@@ -5,17 +5,12 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
-import org.rfcx.companion.entity.DeploymentLocation
 import org.rfcx.companion.entity.Device
-import org.rfcx.companion.entity.EdgeDeployment
 import org.rfcx.companion.entity.User
-import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.request.*
 import org.rfcx.companion.entity.response.*
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.EdgeDeploymentDb
-import org.rfcx.companion.localdb.LocateDb
-import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.localdb.guardian.DiagnosticDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.util.Preferences
@@ -63,40 +58,6 @@ class Firestore(val context: Context) {
         return userDocument.collection(COLLECTION_IMAGES).add(imageRequest).await()
     }
 
-    suspend fun updateDeploymentLocation(
-        serverId: String,
-        deploymentLocation: DeploymentLocation,
-        updatedAt: Date
-    ) {
-        val userDocument = db.collection(COLLECTION_USERS).document(uid)
-        val updates = hashMapOf<String, Any>(
-            EdgeDeployment.FIELD_STREAM to deploymentLocation,
-            EdgeDeployment.FIELD_UPDATED_AT to updatedAt
-        )
-        userDocument.collection(COLLECTION_DEPLOYMENTS).document(serverId)
-            .update(updates).await()
-    }
-
-    suspend fun updateGuardianDeploymentLocation(
-        serverId: String,
-        deploymentLocation: DeploymentLocation,
-        updatedAt: Date
-    ) {
-        val userDocument = db.collection(COLLECTION_USERS).document(uid)
-        val updates = hashMapOf<String, Any>(
-            GuardianDeployment.FIELD_STREAM to deploymentLocation,
-            GuardianDeployment.FIELD_UPDATED_AT to updatedAt
-        )
-        userDocument.collection(COLLECTION_DEPLOYMENTS).document(serverId)
-            .update(updates).await()
-    }
-
-    suspend fun updateDeleteDeployment(serverId: String, deletedAt: Date) {
-        val userDocument = db.collection(COLLECTION_USERS).document(uid)
-        userDocument.collection(COLLECTION_DEPLOYMENTS).document(serverId)
-            .update(EdgeDeployment.FIELD_DELETED_AT, deletedAt).await()
-    }
-
     suspend fun sendDiagnostic(diagnosticRequest: DiagnosticRequest): DocumentReference? {
         val userDocument = db.collection(COLLECTION_USERS).document(uid)
         return userDocument.collection(COLLECTION_DIAGNOSTIC).add(diagnosticRequest).await()
@@ -112,58 +73,6 @@ class Firestore(val context: Context) {
         val userDocument = db.collection(COLLECTION_USERS).document(uid)
         userDocument.collection(COLLECTION_GROUPS).document(groupServerId)
             .set(group).await()
-    }
-
-    fun retrieveLocations(
-        locateDb: LocateDb,
-        callback: ResponseCallback<List<LocationResponse>>? = null
-    ) {
-        val userDocument = db.collection(COLLECTION_USERS).document(uid)
-        userDocument.collection(COLLECTION_LOCATIONS).get()
-            .addOnSuccessListener {
-                val locationResponses = arrayListOf<LocationResponse>()
-                it.documents.forEach { doc ->
-                    val locationResponse = doc.toObject(LocationResponse::class.java)
-                    locationResponse?.serverId = doc.id
-                    locationResponse?.let { it1 -> locationResponses.add(it1) }
-                }
-
-                // verify response and store deployment
-                locationResponses.forEach { lr ->
-                    locateDb.insertOrUpdate(lr)
-                }
-
-                callback?.onSuccessCallback(locationResponses)
-            }
-            .addOnFailureListener {
-                callback?.onFailureCallback(it.localizedMessage)
-            }
-    }
-
-    fun retrieveLocationGroups(
-        locationGroupDb: LocationGroupDb,
-        callback: ResponseCallback<List<LocationGroupsResponse>>? = null
-    ) {
-        val userDocument = db.collection(COLLECTION_USERS).document(uid)
-        userDocument.collection(COLLECTION_GROUPS).get()
-            .addOnSuccessListener {
-                val groupResponses = arrayListOf<LocationGroupsResponse>()
-                it.documents.forEach { doc ->
-                    val groupResponse = doc.toObject(LocationGroupsResponse::class.java)
-                    groupResponse?.serverId = doc.id
-                    groupResponse?.let { it1 -> groupResponses.add(it1) }
-                }
-
-                // verify response and store deployment
-                groupResponses.forEach { lr ->
-                    locationGroupDb.insertOrUpdate(lr)
-                }
-
-                callback?.onSuccessCallback(groupResponses)
-            }
-            .addOnFailureListener {
-                callback?.onFailureCallback(it.localizedMessage)
-            }
     }
 
     fun retrieveImages(
@@ -190,7 +99,7 @@ class Firestore(val context: Context) {
                             guardianDeploymentDb.getDeploymentByServerId(lr.deploymentServerId)
 
                         if (edgeDeploymentId != null) {
-                            deploymentImageDb.insertOrUpdate(lr, edgeDeploymentId.id, Device.EDGE.value)
+                            deploymentImageDb.insertOrUpdate(lr, edgeDeploymentId.id, Device.AUDIOMOTH.value)
                         }
 
                         if (guardianDeploymentId != null) {

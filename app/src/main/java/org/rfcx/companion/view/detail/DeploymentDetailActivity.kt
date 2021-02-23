@@ -94,7 +94,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
                             locate.name,
                             deploymentId,
                             if (isGroupExisted) group else getString(R.string.none),
-                            Device.EDGE.value,
+                            Device.AUDIOMOTH.value,
                             DEPLOYMENT_REQUEST_CODE
                         )
                     }
@@ -164,7 +164,6 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
     private fun updateDeploymentDetailView(deployment: EdgeDeployment) {
         // setup deployment images view
         observeDeploymentImage(deployment.id)
-
         val location = deployment.stream
         location?.let { locate ->
             latitudeValue.text = locate.latitude.latitudeCoordinates(this)

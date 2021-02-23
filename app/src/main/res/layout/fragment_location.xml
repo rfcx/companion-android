@@ -141,28 +141,19 @@
                 app:layout_constraintStart_toStartOf="@id/mapBoxView"
                 app:layout_constraintTop_toTopOf="@id/mapBoxView" />
 
-            <androidx.appcompat.widget.AppCompatCheckBox
-                android:id="@+id/within20mCheckBox"
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/withinTextView"
                 style="@style/AudioMothText.Body.Secondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_normal"
+                android:drawableStart="@drawable/ic_checklist"
+                android:drawablePadding="@dimen/margin_padding_small"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_small"
                 android:layout_marginEnd="@dimen/margin_padding_large"
-                android:clickable="false"
                 android:textSize="@dimen/text_xsmall"
-                android:text="@string/within_20m"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/mapBoxView" />
-
-            <androidx.appcompat.widget.AppCompatCheckBox
-                android:id="@+id/within100mCheckBox"
-                style="@style/AudioMothText.Body.Secondary"                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_normal"
-                android:layout_marginEnd="@dimen/margin_padding_large"
-                android:clickable="false"
-                android:textSize="@dimen/text_xsmall"
-                android:text="@string/within_100m"
-                app:layout_constraintTop_toBottomOf="@id/within20mCheckBox" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/locationTitleTextView"
@@ -173,7 +164,7 @@
                 android:layout_marginTop="@dimen/margin_padding_normal"
                 android:text="@string/coordinates"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/within100mCheckBox" />
+                app:layout_constraintTop_toBottomOf="@id/withinTextView" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/locationValueTextView"
@@ -195,7 +186,7 @@
                 android:layout_marginTop="@dimen/margin_padding_normal"
                 android:text="@string/altitude"
                 app:layout_constraintStart_toEndOf="@id/guidelineVertical"
-                app:layout_constraintTop_toBottomOf="@id/within100mCheckBox" />
+                app:layout_constraintTop_toBottomOf="@id/withinTextView" />
 
             <TextView
                 android:id="@+id/altitudeValue"

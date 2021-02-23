@@ -78,7 +78,7 @@ class DeploymentImageDb(private val realm: Realm) {
      * */
     fun getAllResultsAsync(
         deploymentId: Int,
-        device: String = Device.EDGE.value,
+        device: String = Device.AUDIOMOTH.value,
         sort: Sort = Sort.DESCENDING
     ): RealmResults<DeploymentImage> {
         return realm.where(DeploymentImage::class.java)
@@ -101,7 +101,7 @@ class DeploymentImageDb(private val realm: Realm) {
                         deploymentId = deployment.id,
                         localPath = attachImage,
                         createdAt = imageCreateAt,
-                        device = Device.EDGE.value
+                        device = Device.AUDIOMOTH.value
                     )
                     it.insertOrUpdate(deploymentImage)
                 }

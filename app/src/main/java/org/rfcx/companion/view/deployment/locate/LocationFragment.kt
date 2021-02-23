@@ -389,13 +389,25 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
             val siteItem = distanceLocate?.filterIndexed { _, site -> site.locate == it }
             if (siteItem != null) {
-                if (siteItem.isNotEmpty()) {
-                    if (siteItem[0].distance <= 20) {
-                        within20mCheckBox.isChecked = true
-                        within100mCheckBox.isChecked = false
+                if (siteItem[0].distance <= 20) {
+                    withinTextView.text = getString(R.string.within)
+                    withinTextView.setCompoundDrawablesWithIntrinsicBounds(
+                        R.drawable.ic_checklist_passed,
+                        0,
+                        0,
+                        0
+                    )
+                } else {
+                    withinTextView.setCompoundDrawablesWithIntrinsicBounds(
+                        R.drawable.ic_checklist_cross,
+                        0,
+                        0,
+                        0
+                    )
+                    if(siteItem[0].distance >= 1000 ) {
+                        withinTextView.text = getString(R.string.more_than_km,String.format("%.2f", siteItem[0].distance/1000))
                     } else {
-                        within20mCheckBox.isChecked = false
-                        within100mCheckBox.isChecked = true
+                        withinTextView.text = getString(R.string.more_than_m,String.format("%.2f", siteItem[0].distance))
                     }
                 }
             }
@@ -465,6 +477,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 deploymentLocation.project?.color?.let { setPinColorByGroup("#2AA841") }
             }
         } else {
+
             val locate = if (lastLocation == null) currentUserLocation else lastLocation
             val nearLocations = findNearLocations(locate, locateItems)
             val nearItems =
@@ -491,8 +504,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun enableCheckBox(enable: Boolean) {
-        within20mCheckBox.visibility = if (enable) View.VISIBLE else View.GONE
-        within100mCheckBox.visibility = if (enable) View.VISIBLE else View.GONE
+        withinTextView.visibility = if (enable) View.VISIBLE else View.GONE
     }
 
     private fun setupLocationSpinner() {
@@ -507,10 +519,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 locateNames
             )
         }
-
-        locationNameSpinner.isEnabled = false // TODO :: Change to user another way
         locationNameSpinner.adapter = locateAdapter
-
         if (nameLocation != "" && nameLocation != null) {
             val name = nameLocation
             val position = locateNames.indexOf(name)

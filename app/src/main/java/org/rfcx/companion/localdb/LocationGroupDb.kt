@@ -6,7 +6,7 @@ import io.realm.Sort
 import io.realm.kotlin.deleteFromRealm
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.LocationGroups.Companion.LOCATION_GROUPS_DELETE_AT
-import org.rfcx.companion.entity.response.LocationGroupsResponse
+import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.entity.response.toLocationGroups
 import java.util.*
 
@@ -63,7 +63,8 @@ class LocationGroupDb(private val realm: Realm) {
     }
 
     fun getLocationGroups(): List<LocationGroups> {
-        return realm.where(LocationGroups::class.java).isNull(LOCATION_GROUPS_DELETE_AT).findAll() ?: arrayListOf()
+        return realm.where(LocationGroups::class.java).isNull(LOCATION_GROUPS_DELETE_AT).findAll()
+            ?: arrayListOf()
     }
 
     fun getAllResultsAsync(sort: Sort = Sort.DESCENDING): RealmResults<LocationGroups> {
@@ -77,25 +78,24 @@ class LocationGroupDb(private val realm: Realm) {
             .equalTo(LocationGroups.LOCATION_GROUPS_NAME, name).findFirst() ?: LocationGroups()
     }
 
-    fun insertOrUpdate(groupsResponse: LocationGroupsResponse) {
+    fun insertOrUpdate(groupsResponse: ProjectResponse) {
         realm.executeTransaction {
-            if (groupsResponse.deletedAt == null) {
-                val group =
-                    it.where(LocationGroups::class.java)
-                        .equalTo(LocationGroups.LOCATION_GROUPS_SERVER_ID, groupsResponse.serverId)
-                        .findFirst()
+            val group =
+                it.where(LocationGroups::class.java)
+                    .equalTo(LocationGroups.LOCATION_GROUPS_SERVER_ID, groupsResponse.id)
+                    .findFirst()
 
-                if (group == null) {
-                    val locationGroup = groupsResponse.toLocationGroups()
-                    val id = (it.where(LocationGroups::class.java).max(LocationGroups.LOCATION_GROUPS_ID)
+            if (group == null) {
+                val locationGroup = groupsResponse.toLocationGroups()
+                val id =
+                    (it.where(LocationGroups::class.java).max(LocationGroups.LOCATION_GROUPS_ID)
                         ?.toInt() ?: 0) + 1
-                    locationGroup.id = id
-                    it.insert(locationGroup)
-                } else if (group.syncState == SyncState.Sent.key) {
-                    group.serverId = groupsResponse.serverId
-                    group.name = groupsResponse.name
-                    group.color = groupsResponse.color
-                }
+                locationGroup.id = id
+                it.insert(locationGroup)
+            } else if (group.syncState == SyncState.Sent.key) {
+                group.serverId = groupsResponse.id
+                group.name = groupsResponse.name
+                group.color = groupsResponse.color
             }
         }
     }
@@ -103,7 +103,8 @@ class LocationGroupDb(private val realm: Realm) {
     fun deleteLocationGroup(id: Int, callback: DatabaseCallback) {
         realm.executeTransactionAsync({ bgRealm ->
             val locationGroup =
-                bgRealm.where(LocationGroups::class.java).equalTo(LocationGroups.LOCATION_GROUPS_ID, id)
+                bgRealm.where(LocationGroups::class.java)
+                    .equalTo(LocationGroups.LOCATION_GROUPS_ID, id)
                     .findFirst()
             if (locationGroup != null) {
                 locationGroup.deletedAt = Date()
@@ -127,7 +128,7 @@ class LocationGroupDb(private val realm: Realm) {
 
     fun isExisted(name: String?): Boolean {
         return if (name != null) {
-            val locationGroup =  realm.where(LocationGroups::class.java)
+            val locationGroup = realm.where(LocationGroups::class.java)
                 .equalTo(LocationGroups.LOCATION_GROUPS_NAME, name).findFirst()
             locationGroup != null
         } else {

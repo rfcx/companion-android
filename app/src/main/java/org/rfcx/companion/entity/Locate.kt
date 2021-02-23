@@ -53,6 +53,7 @@ open class Locate(
 
     fun asDeploymentLocation(): DeploymentLocation {
         return DeploymentLocation(
+            coreId = serverId,
             name = name,
             latitude = latitude,
             longitude = longitude,
