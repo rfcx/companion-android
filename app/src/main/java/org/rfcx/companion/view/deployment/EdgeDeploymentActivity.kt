@@ -3,6 +3,8 @@ package org.rfcx.companion.view.deployment
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -51,6 +53,8 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     private var _locate: Locate? = null
 
     private var useExistedLocation: Boolean = false
+
+    private var currentLocation: Location? = null
 
     private var audioMothConnector = AudioMothChimeConnector()
     private var calendar = Calendar.getInstance()
@@ -153,7 +157,13 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                             startCheckList()
                         }
                         else -> {
-                            startLocationPage(this.latitude, this.longitude, this.altitude, this.nameLocation)
+                            startLocationPage(
+                                this.latitude,
+                                this.longitude,
+                                this.altitude,
+                                this.nameLocation,
+                                true
+                            )
                         }
                     }
                 } else if (!isFragmentPopped) {
@@ -174,6 +184,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     }
 
     override fun getDeployment(): EdgeDeployment? = this._deployment ?: EdgeDeployment()
+    override fun getCurrentLocation(): Location = currentLocation ?: Location(LocationManager.GPS_PROVIDER)
 
     override fun getLocationGroup(name: String): LocationGroups? {
         return locationGroupDb.getLocationGroup(name)
@@ -181,6 +192,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     override fun setDeployment(deployment: EdgeDeployment) {
         this._deployment = deployment
+    }
+
+    override fun setCurrentLocation(location: Location) {
+        this.currentLocation = location
     }
 
     override fun showSyncInstruction() {
@@ -294,8 +309,14 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         startFragment(SyncFragment.newInstance(status))
     }
 
-    override fun startLocationPage(latitude: Double, longitude: Double, altitude: Double, name: String) {
-        startFragment(LocationFragment.newInstance(latitude, longitude, altitude, name))
+    override fun startLocationPage(
+        latitude: Double,
+        longitude: Double,
+        altitude: Double,
+        name: String,
+        fromPicker: Boolean
+    ) {
+        startFragment(LocationFragment.newInstance(latitude, longitude, altitude, name, fromPicker))
     }
 
     override fun playSyncSound() {

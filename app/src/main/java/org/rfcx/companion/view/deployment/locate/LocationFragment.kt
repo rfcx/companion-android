@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.PorterDuff
 import android.graphics.Rect
 import android.location.Location
 import android.location.LocationManager
@@ -23,17 +22,23 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.toColorInt
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import com.mapbox.android.core.location.*
 import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.camera.CameraUpdate
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
+import com.mapbox.mapboxsdk.location.LocationComponentOptions
+import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.companion.R
@@ -53,6 +58,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private val locateDb by lazy { LocateDb(realm) }
 
     private var mapboxMap: MapboxMap? = null
+    private var symbolManager: SymbolManager? = null
     private lateinit var mapView: MapView
     private var isFirstTime = true
     private var lastLocation: Location? = null
@@ -86,6 +92,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     val location = result?.lastLocation
 
                     location ?: return
+                    deploymentProtocol?.setCurrentLocation(location)
 
                     mapboxMap?.let {
                         this@LocationFragment.currentUserLocation = location
@@ -146,9 +153,17 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private fun initIntent() {
         arguments?.let {
-            latitude = it.getDouble(ARG_LATITUDE)
-            longitude = it.getDouble(ARG_LONGITUDE)
-            altitude = it.getDouble(ARG_ALTITUDE)
+            val currentLocation = deploymentProtocol?.getCurrentLocation()
+            currentLocation?.let { loc ->
+                latitude = loc.latitude
+                longitude = loc.longitude
+                altitude = loc.altitude
+            }
+            if (it.getBoolean(ARG_FROM_PICKER)) {
+                latitude = it.getDouble(ARG_LATITUDE)
+                longitude = it.getDouble(ARG_LONGITUDE)
+                altitude = it.getDouble(ARG_ALTITUDE)
+            }
             nameLocation = it.getString(ARG_LOCATION_NAME)
         }
     }
@@ -258,13 +273,31 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         mapboxMap.setStyle(Style.OUTDOORS) {
             lastLocation?.let { lastLocation ->
                 val latLng = LatLng(lastLocation.latitude, lastLocation.longitude)
-                moveCamera(latLng, DEFAULT_ZOOM)
+                moveCamera(latLng, null, DEFAULT_ZOOM)
             }
+            setupSymbolManager(it)
             retrieveDeployLocations()
             setupLocationSpinner()
             updateLocationAdapter()
             enableLocationComponent()
         }
+    }
+
+    private fun setupSymbolManager(style: Style) {
+        this.mapboxMap?.let { mapboxMap ->
+            symbolManager = SymbolManager(this.mapView, mapboxMap, style)
+            symbolManager?.iconAllowOverlap = true
+
+            style.addImage(PROPERTY_MARKER_IMAGE, ResourcesCompat.getDrawable(this.resources, R.drawable.ic_pin_map, null)!!)
+        }
+    }
+
+    private fun createSiteSymbol(latLng: LatLng) {
+        symbolManager?.deleteAll()
+        symbolManager?.create(SymbolOptions()
+            .withLatLng(latLng)
+            .withIconImage(PROPERTY_MARKER_IMAGE)
+            .withIconSize(0.75f))
     }
 
     private fun verifyInput() {
@@ -332,20 +365,20 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun onPressedExisting() {
+        getLastLocation()
         enableExistingLocation(true)
         enableCheckBox(true)
 
         locateItem?.let {
-            moveCamera(it.getLatLng(), DEFAULT_ZOOM)
+            createSiteSymbol(it.getLatLng())
+            moveCamera(LatLng(latitude, longitude), it.getLatLng(), DEFAULT_ZOOM)
             altitudeValue.text = String.format("%.2f", it.altitude)
             if (locationGroupDb.isExisted(it.locationGroup?.name)) {
                 group = it.locationGroup?.name
                 locationGroupValueTextView.text = it.locationGroup?.name
-                it.locationGroup?.color?.let { it1 -> setPinColorByGroup(it1) }
             } else {
                 group = getString(R.string.none)
                 locationGroupValueTextView.text = getString(R.string.none)
-                it.locationGroup?.color?.let { setPinColorByGroup("#2AA841") }
             }
         }
     }
@@ -413,7 +446,13 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         if (lastLocation != null) {
             lastLocation?.let {
                 val latLng = LatLng(it.latitude, it.longitude)
-                moveCamera(latLng, DEFAULT_ZOOM)
+                createSiteSymbol(latLng)
+                val currentLocation = deploymentProtocol?.getCurrentLocation()
+                if (currentLocation != null) {
+                    moveCamera(LatLng(currentLocation.latitude, currentLocation.longitude), latLng, DEFAULT_ZOOM)
+                } else {
+                    moveCamera(latLng, null, DEFAULT_ZOOM)
+                }
             }
         } else {
             // not found current location
@@ -438,19 +477,14 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             siteValueTextView.text = deploymentLocation.name
 
             enableExistingLocation(true)
-            moveCamera(
-                LatLng(deploymentLocation.latitude, deploymentLocation.longitude),
-                DEFAULT_ZOOM
-            )
+            moveCamera(LatLng(lastLocation?.latitude ?: 0.0, lastLocation?.longitude ?: 0.0), LatLng(deploymentLocation.latitude, deploymentLocation.longitude), DEFAULT_ZOOM)
             altitudeValue.text = String.format("%.2f", deploymentLocation.altitude)
             if (locationGroupDb.isExisted(deploymentLocation.project?.name)) {
                 group = deploymentLocation.project?.name
                 locationGroupValueTextView.text = deploymentLocation.project?.name
-                deploymentLocation.project?.color?.let { it1 -> setPinColorByGroup(it1) }
             } else {
                 group = getString(R.string.none)
                 locationGroupValueTextView.text = getString(R.string.none)
-                deploymentLocation.project?.color?.let { setPinColorByGroup("#2AA841") }
             }
         } else {
 
@@ -547,37 +581,28 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun moveCamera(latLng: LatLng, zoom: Double) {
-        mapboxMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom))
+        mapboxMap?.moveCamera(calculateLatLngForZoom(latLng, null, zoom))
     }
 
-    private fun changePinColorByGroup(group: String) {
-        val locationGroup = deploymentProtocol?.getLocationGroup(group)
-        val color = locationGroup?.color
-        if (color != null) {
-            setPinColorByGroup(color)
-        }
+    private fun moveCamera(userPosition: LatLng, nearestSite: LatLng?, zoom: Double) {
+        mapboxMap?.moveCamera(calculateLatLngForZoom(userPosition, nearestSite, zoom))
     }
 
-    private fun setPinColorByGroup(color: String) {
-        val pinDrawable = pinDeploymentImageView.drawable
-        if (color.isNotEmpty() && group != getString(R.string.none)) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                pinDrawable.setColorFilter(color.toColorInt(), PorterDuff.Mode.SRC_ATOP)
-            } else {
-                pinDrawable.setTint(color.toColorInt())
-            }
-        } else {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                pinDrawable.setColorFilter(
-                    ContextCompat.getColor(
-                        requireContext(),
-                        R.color.colorPrimary
-                    ), PorterDuff.Mode.SRC_ATOP
-                )
-            } else {
-                pinDrawable.setTint(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
-            }
+    private fun calculateLatLngForZoom(userPosition: LatLng, nearestSite: LatLng? = null, zoom: Double): CameraUpdate {
+        if (nearestSite == null) {
+            return CameraUpdateFactory.newLatLngZoom(userPosition, zoom)
         }
+        val oppositeLat = userPosition.latitude - (nearestSite.latitude - userPosition.latitude)
+        val oppositeLng = userPosition.longitude - (nearestSite.longitude - userPosition.longitude)
+        val oppositeNearestSite = LatLng(oppositeLat, oppositeLng)
+        if (oppositeNearestSite.distanceTo(userPosition) < 30) {
+            return CameraUpdateFactory.newLatLngZoom(userPosition, zoom)
+        }
+        val latLngBounds = LatLngBounds.Builder()
+            .include(oppositeNearestSite)
+            .include(nearestSite)
+            .build()
+        return CameraUpdateFactory.newLatLngBounds(latLngBounds, 100)
     }
 
     private fun setOnFocusEditText() {
@@ -633,12 +658,29 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             val loadedMapStyle = mapboxMap?.style
             val locationComponent = mapboxMap?.locationComponent
             // Activate the LocationComponent
-            context?.let {
-                locationComponent?.activateLocationComponent(
+            val customLocationComponentOptions = context?.let {
+                LocationComponentOptions.builder(it)
+                    .trackingGesturesManagement(true)
+                    .accuracyColor(ContextCompat.getColor(it, R.color.colorPrimary))
+                    .build()
+            }
+
+            val locationComponentActivationOptions =
+                context?.let {
                     LocationComponentActivationOptions.builder(it, loadedMapStyle!!)
-                        .useDefaultLocationEngine(false)
+                        .locationComponentOptions(customLocationComponentOptions)
                         .build()
-                )
+                }
+
+            mapboxMap?.let { it ->
+                it.locationComponent.apply {
+                    if (locationComponentActivationOptions != null) {
+                        activateLocationComponent(locationComponentActivationOptions)
+                    }
+
+                    isLocationComponentEnabled = true
+                    renderMode = RenderMode.COMPASS
+                }
             }
 
             this.currentUserLocation = locationComponent?.lastKnownLocation
@@ -688,7 +730,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         val preferences = context?.let { Preferences.getInstance(it) }
         group = preferences?.getString(Preferences.GROUP, getString(R.string.none))
         locationGroupValueTextView.text = group
-        changePinColorByGroup(group ?: "")
     }
 
     override fun onPause() {
@@ -739,6 +780,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         const val ARG_LONGITUDE = "ARG_LONGITUDE"
         const val ARG_ALTITUDE = "ARG_ALTITUDE"
         const val ARG_LOCATION_NAME = "ARG_LOCATION_NAME"
+        const val ARG_FROM_PICKER = "ARG_FROM_PICKER"
+
+        const val PROPERTY_MARKER_IMAGE = "marker2.image"
 
         const val DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L
         const val DEFAULT_MAX_WAIT_TIME = DEFAULT_INTERVAL_IN_MILLISECONDS * 5
@@ -747,7 +791,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             return LocationFragment()
         }
 
-        fun newInstance(latitude: Double, longitude: Double, altitude: Double, name: String) =
+        fun newInstance(latitude: Double, longitude: Double, altitude: Double, name: String, fromPicker: Boolean) =
             LocationFragment()
                 .apply {
                     arguments = Bundle().apply {
@@ -755,6 +799,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                         putDouble(ARG_LONGITUDE, longitude)
                         putDouble(ARG_ALTITUDE, altitude)
                         putString(ARG_LOCATION_NAME, name)
+                        putBoolean(ARG_FROM_PICKER, fromPicker)
                     }
                 }
     }

@@ -127,7 +127,8 @@ class SelectingExistedSiteFragment : Fragment(), (Locate) -> Unit {
             locate.latitude,
             locate.longitude,
             locate.altitude,
-            locate.name
+            locate.name,
+            false
         )
     }
 }
