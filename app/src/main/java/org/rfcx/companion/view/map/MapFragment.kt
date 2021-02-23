@@ -683,7 +683,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             id, stream?.name ?: "",
             stream?.longitude ?: 0.0,
             stream?.latitude ?: 0.0,
-            pinImage, description, Device.EDGE.value, createdAt, updatedAt
+            pinImage, description, Device.AUDIOMOTH.value, createdAt, updatedAt
         )
     }
 

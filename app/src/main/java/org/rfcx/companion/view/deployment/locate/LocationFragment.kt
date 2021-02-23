@@ -63,6 +63,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var isFirstTime = true
     private var lastLocation: Location? = null
     private var locateItems = ArrayList<Locate>()
+    private var distanceLocate: ArrayList<SiteItem>? = null
     private var locateNames = ArrayList<String>()
     private var locateItem: Locate? = null
     private var locateAdapter: ArrayAdapter<String>? = null
@@ -102,6 +103,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                         if (locationNameSpinner.selectedItemPosition == 0) {
                             altitudeValue.text = String.format("%.2f", location.altitude)
                         }
+
+                        setCheckbox()
 
                         if (isFirstTime && lastLocation == null &&
                             latitude == 0.0 && longitude == 0.0
@@ -364,6 +367,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private fun onPressedExisting() {
         getLastLocation()
         enableExistingLocation(true)
+        enableCheckBox(true)
+
         locateItem?.let {
             createSiteSymbol(it.getLatLng())
             moveCamera(LatLng(latitude, longitude), it.getLatLng(), DEFAULT_ZOOM)
@@ -374,6 +379,46 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             } else {
                 group = getString(R.string.none)
                 locationGroupValueTextView.text = getString(R.string.none)
+            }
+        }
+    }
+
+    fun setCheckbox() {
+        locateItem?.let {
+            val locate = if (lastLocation == null) currentUserLocation else lastLocation
+            val nearLocations = findNearLocations(locate, locateItems)
+            distanceLocate = nearLocations?.let { location ->
+                ArrayList(location.map {
+                    SiteItem(
+                        it.first,
+                        it.second
+                    )
+                })
+            }
+
+            val siteItem = distanceLocate?.filterIndexed { _, site -> site.locate == it }
+            if (siteItem != null) {
+                if (siteItem[0].distance <= 20) {
+                    withinTextView.text = getString(R.string.within)
+                    withinTextView.setCompoundDrawablesWithIntrinsicBounds(
+                        R.drawable.ic_checklist_passed,
+                        0,
+                        0,
+                        0
+                    )
+                } else {
+                    withinTextView.setCompoundDrawablesWithIntrinsicBounds(
+                        R.drawable.ic_checklist_cross,
+                        0,
+                        0,
+                        0
+                    )
+                    if(siteItem[0].distance >= 1000 ) {
+                        withinTextView.text = getString(R.string.more_than_km, String.format("%.1f", siteItem[0].distance/1000))
+                    } else {
+                        withinTextView.text = getString(R.string.more_than_m, String.format("%.0f", siteItem[0].distance))
+                    }
+                }
             }
         }
     }
@@ -393,6 +438,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private fun onPressedNewLocation() {
         enableExistingLocation(false)
+        enableCheckBox(false)
         siteValueTextView.text = getString(R.string.create_new_site)
         altitudeValue.text = String.format("%.2f", altitudeFromLocation)
         getLastLocation()
@@ -467,6 +513,10 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    private fun enableCheckBox(enable: Boolean) {
+        withinTextView.visibility = if (enable) View.VISIBLE else View.GONE
+    }
+
     private fun setupLocationSpinner() {
         this.locateAdapter?.clear()
         this.locateAdapter?.notifyDataSetChanged()
@@ -479,10 +529,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 locateNames
             )
         }
-
-        locationNameSpinner.isEnabled = false // TODO :: Change to user another way
         locationNameSpinner.adapter = locateAdapter
-
         if (nameLocation != "" && nameLocation != null) {
             val name = nameLocation
             val position = locateNames.indexOf(name)
@@ -525,7 +572,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 val loc = Location(LocationManager.GPS_PROVIDER)
                 loc.latitude = it.latitude
                 loc.longitude = it.longitude
-                val distance = loc.distanceTo(this.lastLocation) // return in meters
+                val distance = loc.distanceTo(this.currentUserLocation) // return in meters
                 Pair(it, distance)
             })
             return itemsWithDistance
