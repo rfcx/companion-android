@@ -108,6 +108,17 @@ class EdgeDeploymentDb(private val realm: Realm) {
         }
     }
 
+    fun updateIsActive(id: Int) {
+        realm.executeTransaction {
+            val deployment =
+                it.where(EdgeDeployment::class.java).equalTo(EdgeDeployment.FIELD_ID, id)
+                    .findFirst()
+            if (deployment != null) {
+                deployment.isActive = false
+            }
+        }
+    }
+
     fun updateDeployment(deployment: EdgeDeployment) {
         realm.executeTransaction {
             it.insertOrUpdate(deployment)

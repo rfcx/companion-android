@@ -23,6 +23,7 @@ open class EdgeDeployment(
     var syncState: Int = 0,
     var updatedAt: Date? = null,
     var deletedAt: Date? = null,
+    var isActive: Boolean = true,
     var passedChecks: RealmList<Int>? = null
 ) : RealmModel {
 
