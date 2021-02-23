@@ -19,6 +19,8 @@ import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.pluginscalebar.ScaleBarOptions
+import com.mapbox.pluginscalebar.ScaleBarPlugin
 import kotlinx.android.synthetic.main.fragment_edit_location.*
 import kotlinx.android.synthetic.main.fragment_edit_location.altitudeEditText
 import kotlinx.android.synthetic.main.fragment_edit_location.locationGroupValueTextView
@@ -157,9 +159,17 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         mapboxMap.uiSettings.isLogoEnabled = false
 
         mapboxMap.setStyle(Style.OUTDOORS) {
+            setupScale()
             val latLng = LatLng(latitude, longitude)
             moveCamera(latLng, LocationFragment.DEFAULT_ZOOM)
         }
+    }
+
+    private fun setupScale() {
+        val scaleBarPlugin = ScaleBarPlugin(mapView, mapboxMap!!)
+        val options = ScaleBarOptions(requireContext())
+        options.setMarginTop(R.dimen.legend_top_margin)
+        scaleBarPlugin.create(options)
     }
 
     private fun moveCamera(latLng: LatLng, zoom: Double) {

@@ -31,6 +31,8 @@ import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.pluginscalebar.ScaleBarOptions
+import com.mapbox.pluginscalebar.ScaleBarPlugin
 import java.util.*
 import kotlin.concurrent.schedule
 import kotlinx.android.synthetic.main.fragment_map_picker.*
@@ -158,6 +160,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
         mapboxMap.uiSettings.isLogoEnabled = false
         mapboxMap.setStyle(Style.OUTDOORS) {
             enableLocationComponent()
+            setupScale()
         }
 
         mapboxMap.addOnCameraMoveListener {
@@ -214,6 +217,13 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
         } else {
             requestPermissions()
         }
+    }
+
+    private fun setupScale() {
+        val scaleBarPlugin = ScaleBarPlugin(mapView, mapboxMap!!)
+        val options = ScaleBarOptions(requireContext())
+        options.setMarginTop(R.dimen.legend_top_margin)
+        scaleBarPlugin.create(options)
     }
 
     @SuppressLint("MissingPermission")
