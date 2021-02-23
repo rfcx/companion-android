@@ -96,9 +96,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                         if (locationNameSpinner.selectedItemPosition == 0) {
                             altitudeValue.text = String.format("%.2f", location.altitude)
                         }
-
-                        setCheckbox()
-
                         if (isFirstTime && lastLocation == null &&
                             latitude == 0.0 && longitude == 0.0
                         ) {
@@ -111,6 +108,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                             setupLocationSpinner()
                             updateLocationAdapter()
                         }
+                        setCheckbox()
                     }
                 }
             }
@@ -203,6 +201,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 )
                 moveCamera(LatLng(locate.getLatLng()), DEFAULT_ZOOM)
             }
+            enableCheckBox(false)
             locateItem = locate
         }
 
