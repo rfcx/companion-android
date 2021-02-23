@@ -316,7 +316,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         if (edgeDeploymentId != null) {
             val deployment = edgeDeploymentDb.getDeploymentByDeploymentId(edgeDeploymentId)
             deployment?.let {
-                showBottomSheet(DeploymentViewPagerFragment.newInstance(it.id, Device.EDGE.value))
+                showBottomSheet(DeploymentViewPagerFragment.newInstance(it.id, Device.AUDIOMOTH.value))
             }
         }
     }
