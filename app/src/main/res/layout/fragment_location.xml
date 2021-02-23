@@ -122,16 +122,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/locationNameTextInput" />
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/pinDeploymentImageView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_pin_map"
-                app:layout_constraintBottom_toBottomOf="@id/mapBoxView"
-                app:layout_constraintEnd_toEndOf="@id/mapBoxView"
-                app:layout_constraintStart_toStartOf="@id/mapBoxView"
-                app:layout_constraintTop_toTopOf="@id/mapBoxView" />
-
             <View
                 android:id="@+id/viewOfMapBox"
                 android:layout_width="0dp"

@@ -119,7 +119,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
             val currentCameraPosition = mapboxMap?.cameraPosition?.target
             currentCameraPosition?.let {
                 analytics?.trackSelectLocationEvent()
-                mapPickerProtocol?.startLocationPage(it.latitude, it.longitude, altitude, nameLocation ?: "")
+                mapPickerProtocol?.startLocationPage(it.latitude, it.longitude, altitude, nameLocation ?: "", true)
             }
         }
 
