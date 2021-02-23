@@ -182,7 +182,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             startSelectingExistedSite()
         }
 
-        usedCurrentLocationButton.setOnClickListener {
+        currentLocateTextView.setOnClickListener {
             var locate = Locate()
             locateItem?.let {
                 locate = Locate(
@@ -388,7 +388,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             }
 
             val siteItem = distanceLocate?.filterIndexed { _, site -> site.locate == it }
-            if (siteItem != null) {
+            if (siteItem != null && siteItem.isNotEmpty()) {
                 if (siteItem[0].distance <= 20) {
                     withinTextView.text = getString(R.string.within)
                     withinTextView.setCompoundDrawablesWithIntrinsicBounds(
@@ -695,8 +695,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private fun enableExistingLocation(enable: Boolean) {
         locationNameTextInput.visibility = if (enable) View.GONE else View.VISIBLE
-//        changeTextView.visibility = if (enable) View.GONE else View.VISIBLE // New design for this
+        changeTextView.visibility = if (enable) View.GONE else View.VISIBLE
         changeGroupTextView.visibility = if (enable) View.GONE else View.VISIBLE
+        currentLocateTextView.visibility = if (enable) View.VISIBLE else View.GONE
     }
 
     override fun onStart() {
