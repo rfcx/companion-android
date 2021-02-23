@@ -405,9 +405,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                         0
                     )
                     if(siteItem[0].distance >= 1000 ) {
-                        withinTextView.text = getString(R.string.more_than_km,String.format("%.2f", siteItem[0].distance/1000))
+                        withinTextView.text = getString(R.string.more_than_km, String.format("%.1f", siteItem[0].distance/1000))
                     } else {
-                        withinTextView.text = getString(R.string.more_than_m,String.format("%.2f", siteItem[0].distance))
+                        withinTextView.text = getString(R.string.more_than_m, String.format("%.0f", siteItem[0].distance))
                     }
                 }
             }
