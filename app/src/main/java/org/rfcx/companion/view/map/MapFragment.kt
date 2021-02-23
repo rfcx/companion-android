@@ -123,7 +123,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     mapboxMap?.let {
                         this@MapFragment.currentUserLocation = location
                     }
-                    if (isFirstTime) {
+                    if (isFirstTime && locations.isNotEmpty()) {
                         moveCameraOnStart()
                         isFirstTime = false
                     }
