@@ -164,7 +164,6 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
     private fun updateDeploymentDetailView(deployment: EdgeDeployment) {
         // setup deployment images view
         observeDeploymentImage(deployment.id)
-
         val location = deployment.stream
         location?.let { locate ->
             latitudeValue.text = locate.latitude.latitudeCoordinates(this)

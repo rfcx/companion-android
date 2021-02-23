@@ -419,6 +419,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 deploymentLocation.project?.color?.let { setPinColorByGroup("#2AA841") }
             }
         } else {
+
             val locate = if (lastLocation == null) currentUserLocation else lastLocation
             val nearLocations = findNearLocations(locate, locateItems)
             val nearItems =
