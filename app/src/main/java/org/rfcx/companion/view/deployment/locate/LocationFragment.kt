@@ -401,7 +401,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             lastLocation?.let {
                 val latLng = LatLng(it.latitude, it.longitude)
                 createSiteSymbol(latLng)
-                moveCamera(latLng, null, DEFAULT_ZOOM)
+                val currentLocation = deploymentProtocol?.getCurrentLocation()
+                if (currentLocation != null) {
+                    moveCamera(LatLng(currentLocation.latitude, currentLocation.longitude), latLng, DEFAULT_ZOOM)
+                } else {
+                    moveCamera(latLng, null, DEFAULT_ZOOM)
+                }
             }
         } else {
             // not found current location
