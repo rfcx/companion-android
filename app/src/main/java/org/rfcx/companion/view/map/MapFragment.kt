@@ -47,7 +47,9 @@ import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.DeploymentState.Edge
 import org.rfcx.companion.entity.DeploymentState.Guardian
 import org.rfcx.companion.entity.guardian.GuardianDeployment
-import org.rfcx.companion.entity.response.*
+import org.rfcx.companion.entity.response.DeploymentResponse
+import org.rfcx.companion.entity.response.ProjectResponse
+import org.rfcx.companion.entity.response.StreamResponse
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
