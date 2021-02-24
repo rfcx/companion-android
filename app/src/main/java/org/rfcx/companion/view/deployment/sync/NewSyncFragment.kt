@@ -1,10 +1,12 @@
 package org.rfcx.companion.view.deployment.sync
 
 import android.content.Context
+import android.graphics.drawable.AnimationDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_new_sync.*
 import org.rfcx.companion.R
@@ -12,6 +14,7 @@ import org.rfcx.companion.view.deployment.EdgeDeploymentProtocol
 
 class NewSyncFragment : Fragment() {
     private var edgeDeploymentProtocol: EdgeDeploymentProtocol? = null
+    private lateinit var switchAnimation: AnimationDrawable
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -34,38 +37,64 @@ class NewSyncFragment : Fragment() {
             it.setToolbarTitle()
         }
 
-        setStep(0)
+        view.findViewById<ImageView>(R.id.switchCustomImageView).apply {
+            setBackgroundResource(R.drawable.audiomoth_switch_to_custom)
+            switchAnimation = background as AnimationDrawable
+        }
+        switchAnimation.start()
+
+        setStep(1)
 
         beginSyncButton.setOnClickListener {
-            setStep(1)
+            setStep(2)
         }
         notHearButton.setOnClickListener {
-            setStep(0)
+            setStep(1)
         }
         hearButton.setOnClickListener {
+            setStep(3)
+        }
+        notSwitchButton.setOnClickListener {
             setStep(2)
+        }
+        switchButton.setOnClickListener {
+            setStep(4)
         }
     }
 
     private fun setStep(step: Int) {
         when(step) {
-            0 -> {
+            1 -> {
+                setHardwareSwitchToOffLayout.visibility = View.VISIBLE
                 finishSetHardwareLayout.visibility = View.GONE
                 hearAudioToneLayout.visibility = View.GONE
-                setHardwareSwitchToOffLayout.visibility = View.VISIBLE
-
-            }
-            1 -> {
-                finishSetHardwareLayout.visibility = View.VISIBLE
-                hearAudioToneLayout.visibility = View.VISIBLE
-                setHardwareSwitchToOffLayout.visibility = View.GONE
-
+                finishHearAudioToneLayout.visibility = View.GONE
+                switchToCustomLayout.visibility = View.GONE
+                finishSwitchToCustomLayout.visibility = View.GONE
             }
             2 -> {
-                finishSetHardwareLayout.visibility = View.VISIBLE
-                finishHearAudioToneLayout.visibility = View.VISIBLE
                 setHardwareSwitchToOffLayout.visibility = View.GONE
+                finishSetHardwareLayout.visibility = View.VISIBLE
+                hearAudioToneLayout.visibility = View.VISIBLE
+                finishHearAudioToneLayout.visibility = View.GONE
+                switchToCustomLayout.visibility = View.GONE
+                finishSwitchToCustomLayout.visibility = View.GONE
+            }
+            3 -> {
+                setHardwareSwitchToOffLayout.visibility = View.GONE
+                finishSetHardwareLayout.visibility = View.VISIBLE
                 hearAudioToneLayout.visibility = View.GONE
+                finishHearAudioToneLayout.visibility = View.VISIBLE
+                switchToCustomLayout.visibility = View.VISIBLE
+                finishSwitchToCustomLayout.visibility = View.GONE
+            }
+            4 -> {
+                setHardwareSwitchToOffLayout.visibility = View.GONE
+                finishSetHardwareLayout.visibility = View.VISIBLE
+                hearAudioToneLayout.visibility = View.GONE
+                finishHearAudioToneLayout.visibility = View.VISIBLE
+                switchToCustomLayout.visibility = View.GONE
+                finishSwitchToCustomLayout.visibility = View.VISIBLE
             }
         }
     }

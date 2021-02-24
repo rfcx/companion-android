@@ -106,6 +106,7 @@
 
     <!--  NewSyncFragment  -->
     <string name="set_hardware_switch_to_off">Set hardware switch to OFF</string>
+    <string name="set_hardware_switch_to_custom">Set hardware switch to CUSTOM</string>
     <string name="begin_sync">Begin Sync</string>
     <string name="one">1)</string>
     <string name="two">2) Do you hear a loud audio tone?</string>
