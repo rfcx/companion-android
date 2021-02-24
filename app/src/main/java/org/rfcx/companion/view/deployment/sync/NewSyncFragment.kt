@@ -15,6 +15,7 @@ import org.rfcx.companion.view.deployment.EdgeDeploymentProtocol
 class NewSyncFragment : Fragment() {
     private var edgeDeploymentProtocol: EdgeDeploymentProtocol? = null
     private lateinit var switchAnimation: AnimationDrawable
+    private lateinit var flashingRedAnimation: AnimationDrawable
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -43,6 +44,12 @@ class NewSyncFragment : Fragment() {
         }
         switchAnimation.start()
 
+        view.findViewById<ImageView>(R.id.lightsAudiomothImageView).apply {
+            setBackgroundResource(R.drawable.audiomoth_green_flashing)
+            flashingRedAnimation = background as AnimationDrawable
+        }
+        flashingRedAnimation.start()
+
         setStep(1)
 
         beginSyncButton.setOnClickListener {
@@ -60,10 +67,16 @@ class NewSyncFragment : Fragment() {
         switchButton.setOnClickListener {
             setStep(4)
         }
+        notSeeLightsAudiomothButton.setOnClickListener {
+            setStep(3)
+        }
+        seeLightsAudiomothButton.setOnClickListener {
+            setStep(5)
+        }
     }
 
     private fun setStep(step: Int) {
-        when(step) {
+        when (step) {
             1 -> {
                 setHardwareSwitchToOffLayout.visibility = View.VISIBLE
                 finishSetHardwareLayout.visibility = View.GONE
@@ -71,6 +84,8 @@ class NewSyncFragment : Fragment() {
                 finishHearAudioToneLayout.visibility = View.GONE
                 switchToCustomLayout.visibility = View.GONE
                 finishSwitchToCustomLayout.visibility = View.GONE
+                lightsAudiomothLayout.visibility = View.GONE
+                finishLightsAudiomothLayout.visibility = View.GONE
             }
             2 -> {
                 setHardwareSwitchToOffLayout.visibility = View.GONE
@@ -79,6 +94,8 @@ class NewSyncFragment : Fragment() {
                 finishHearAudioToneLayout.visibility = View.GONE
                 switchToCustomLayout.visibility = View.GONE
                 finishSwitchToCustomLayout.visibility = View.GONE
+                lightsAudiomothLayout.visibility = View.GONE
+                finishLightsAudiomothLayout.visibility = View.GONE
             }
             3 -> {
                 setHardwareSwitchToOffLayout.visibility = View.GONE
@@ -87,6 +104,8 @@ class NewSyncFragment : Fragment() {
                 finishHearAudioToneLayout.visibility = View.VISIBLE
                 switchToCustomLayout.visibility = View.VISIBLE
                 finishSwitchToCustomLayout.visibility = View.GONE
+                lightsAudiomothLayout.visibility = View.GONE
+                finishLightsAudiomothLayout.visibility = View.GONE
             }
             4 -> {
                 setHardwareSwitchToOffLayout.visibility = View.GONE
@@ -95,6 +114,18 @@ class NewSyncFragment : Fragment() {
                 finishHearAudioToneLayout.visibility = View.VISIBLE
                 switchToCustomLayout.visibility = View.GONE
                 finishSwitchToCustomLayout.visibility = View.VISIBLE
+                lightsAudiomothLayout.visibility = View.VISIBLE
+                finishLightsAudiomothLayout.visibility = View.GONE
+            }
+            5 -> {
+                setHardwareSwitchToOffLayout.visibility = View.GONE
+                finishSetHardwareLayout.visibility = View.VISIBLE
+                hearAudioToneLayout.visibility = View.GONE
+                finishHearAudioToneLayout.visibility = View.VISIBLE
+                switchToCustomLayout.visibility = View.GONE
+                finishSwitchToCustomLayout.visibility = View.VISIBLE
+                lightsAudiomothLayout.visibility = View.GONE
+                finishLightsAudiomothLayout.visibility = View.VISIBLE
             }
         }
     }

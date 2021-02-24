@@ -107,6 +107,7 @@
     <!--  NewSyncFragment  -->
     <string name="set_hardware_switch_to_off">Set hardware switch to OFF</string>
     <string name="set_hardware_switch_to_custom">Set hardware switch to CUSTOM</string>
+    <string name="lights_audiomoth">Lights on AudioMoth should be: \nFLASHING GREEN &amp; SOLID RED</string>
     <string name="begin_sync">Begin Sync</string>
     <string name="one">1)</string>
     <string name="two">2) Do you hear a loud audio tone?</string>
@@ -117,7 +118,7 @@
     <string name="one_text">1) Sync with AudioMoth started...</string>
     <string name="two_text">2) Initial audio tone playing...</string>
     <string name="three_text">3) Hardware switch set to CUSTOM</string>
-    <string name="four_text">4) AudioMoth Lights are: FLASHING GREEN amp SOLID RED</string>
+    <string name="four_text">4) AudioMoth Lights are: FLASHING GREEN &amp; SOLID RED</string>
     <string name="five_text">5) Profile sent to AudioMoth</string>
     <string name="no">No</string>
 
