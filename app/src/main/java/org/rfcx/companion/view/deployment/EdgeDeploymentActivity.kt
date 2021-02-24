@@ -28,7 +28,7 @@ import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
 import org.rfcx.companion.view.deployment.locate.SelectingExistedSiteFragment
-import org.rfcx.companion.view.deployment.sync.SyncFragment
+import org.rfcx.companion.view.deployment.sync.NewSyncFragment
 import org.rfcx.companion.view.detail.MapPickerProtocol
 import org.rfcx.companion.view.dialog.*
 import java.util.*
@@ -67,6 +67,9 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     private var currentCheck = 0
     private var currentCheckName = ""
     private var passedChecks = RealmList<Int>()
+
+    private var needTone = true
+
     private val analytics by lazy { Analytics(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -213,6 +216,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
         val deployment = _deployment ?: EdgeDeployment()
+        deployment.isActive = locate.serverId == null
         deployment.state = DeploymentState.Edge.Locate.key // state
 
         this._deployLocation = locate.asDeploymentLocation()
@@ -247,6 +251,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         _deployment?.let {
             it.deployedAt = Date()
             it.updatedAt = Date()
+            it.isActive = true
             it.state = DeploymentState.Edge.ReadyToUpload.key
             setDeployment(it)
 
@@ -279,7 +284,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             }
             1 -> {
                 updateDeploymentState(DeploymentState.Edge.Sync)
-                startFragment(SyncFragment.newInstance(SyncFragment.START_SYNC))
+                startFragment(NewSyncFragment.newInstance())
             }
             2 -> {
                 updateDeploymentState(DeploymentState.Edge.Deploy)
@@ -309,7 +314,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     }
 
     override fun startSyncing(status: String) {
-        startFragment(SyncFragment.newInstance(status))
+        startFragment(NewSyncFragment.newInstance())
     }
 
     override fun startLocationPage(
@@ -326,23 +331,37 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         val deploymentId = getDeployment()?.deploymentKey
         val deploymentIdArrayInt = deploymentId?.chunked(2)?.map { it.toInt(radix = 16) }?.toTypedArray() ?: arrayOf()
         Thread {
-            audioMothConnector.playTimeAndDeploymentID(
-                calendar,
-                deploymentIdArrayInt
-            )
+            for (i in 1..3){
+                audioMothConnector.playTimeAndDeploymentID(
+                    calendar,
+                    deploymentIdArrayInt
+                )
+            }
+            this@EdgeDeploymentActivity.runOnUiThread {
+                startFragment(NewSyncFragment.newInstance(6))
+            }
         }.start()
     }
 
-    override fun playTone() {
-        startSyncing(SyncFragment.INITIAL_TONE_PLAYING)
+    override fun playTone(duration: Int) {
+        needTone = true
         Thread {
-            audioMothConnector.playTone(
-                5000
-            )
+            var durationCount = 0
+            val durationFrac = duration % TONE_DURATION
+            do {
+                durationCount += if (durationCount + durationFrac == duration) {
+                    audioMothConnector.playTone(durationFrac)
+                    durationFrac
+                } else {
+                    audioMothConnector.playTone(TONE_DURATION)
+                    TONE_DURATION
+                }
+            } while (durationCount < duration && duration >= TONE_DURATION && needTone)
         }.start()
     }
 
     override fun stopPlaySound() {
+        needTone = false
         audioMothConnector.stopPlay()
     }
 
@@ -463,6 +482,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         const val loadingDialogTag = "LoadingDialog"
         const val TAG_SYNC_INSTRUCTION_DIALOG = "SyncInstructionDialogFragment"
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
+        const val TONE_DURATION = 10000
 
         private var fromUnfinishedDeployment = false
 

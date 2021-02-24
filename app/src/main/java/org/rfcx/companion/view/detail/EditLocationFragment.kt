@@ -211,7 +211,6 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
     private fun setupScale() {
         val scaleBarPlugin = ScaleBarPlugin(mapView, mapboxMap!!)
         val options = ScaleBarOptions(requireContext())
-        options.setMarginTop(R.dimen.legend_top_margin)
         scaleBarPlugin.create(options)
     }
     override fun onRequestPermissionsResult(
