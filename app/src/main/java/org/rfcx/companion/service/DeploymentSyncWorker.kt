@@ -59,10 +59,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                             db.deleteDeployment(it.id)
                         }
                     } else {
-                        val req = EditDeploymentRequest(
-                            location.toRequestBody(),
-                            location.project?.toRequestBody()
-                        )
+                        val req = EditDeploymentRequest(location.toRequestBody())
                         val result = ApiManager.getInstance().getDeviceApi()
                             .editDeployments(token, serverId, req).execute()
                         if (result.isSuccessful) {
