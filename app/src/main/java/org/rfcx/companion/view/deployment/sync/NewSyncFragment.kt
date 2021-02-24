@@ -34,8 +34,16 @@ class NewSyncFragment : Fragment() {
             it.setToolbarTitle()
         }
 
+        setStep(0)
+
         beginSyncButton.setOnClickListener {
             setStep(1)
+        }
+        notHearButton.setOnClickListener {
+            setStep(0)
+        }
+        hearButton.setOnClickListener {
+            setStep(2)
         }
     }
 
@@ -43,11 +51,21 @@ class NewSyncFragment : Fragment() {
         when(step) {
             0 -> {
                 finishSetHardwareLayout.visibility = View.GONE
+                hearAudioToneLayout.visibility = View.GONE
                 setHardwareSwitchToOffLayout.visibility = View.VISIBLE
+
             }
             1 -> {
                 finishSetHardwareLayout.visibility = View.VISIBLE
+                hearAudioToneLayout.visibility = View.VISIBLE
                 setHardwareSwitchToOffLayout.visibility = View.GONE
+
+            }
+            2 -> {
+                finishSetHardwareLayout.visibility = View.VISIBLE
+                finishHearAudioToneLayout.visibility = View.VISIBLE
+                setHardwareSwitchToOffLayout.visibility = View.GONE
+                hearAudioToneLayout.visibility = View.GONE
             }
         }
     }
