@@ -213,6 +213,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
         val deployment = _deployment ?: EdgeDeployment()
+        deployment.isActive = locate.serverId == null
         deployment.state = DeploymentState.Edge.Locate.key // state
 
         this._deployLocation = locate.asDeploymentLocation()
@@ -247,6 +248,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         _deployment?.let {
             it.deployedAt = Date()
             it.updatedAt = Date()
+            it.isActive = true
             it.state = DeploymentState.Edge.ReadyToUpload.key
             setDeployment(it)
 
