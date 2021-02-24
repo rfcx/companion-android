@@ -3,6 +3,7 @@ package org.rfcx.companion.view.deployment.sync
 import android.content.Context
 import android.graphics.drawable.AnimationDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_new_sync.*
 import org.rfcx.companion.R
+import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.view.deployment.EdgeDeploymentProtocol
 
@@ -29,6 +31,16 @@ class NewSyncFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_new_sync, container, false)
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        edgeDeploymentProtocol?.stopPlaySound()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        analytics?.trackScreen(Screen.SYNC)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -55,29 +67,35 @@ class NewSyncFragment : Fragment() {
         setStep(1)
 
         beginSyncButton.setOnClickListener {
+            edgeDeploymentProtocol?.playTone()
             setStep(2)
         }
         notHearButton.setOnClickListener {
+            edgeDeploymentProtocol?.stopPlaySound()
             setStep(1)
         }
         hearButton.setOnClickListener {
             setStep(3)
         }
         notSwitchButton.setOnClickListener {
+            edgeDeploymentProtocol?.stopPlaySound()
             setStep(1)
         }
         switchButton.setOnClickListener {
             setStep(4)
         }
         notSeeLightsAudiomothButton.setOnClickListener {
+            edgeDeploymentProtocol?.stopPlaySound()
             setStep(1)
         }
         seeLightsAudiomothButton.setOnClickListener {
+            edgeDeploymentProtocol?.stopPlaySound()
             setStep(5)
         }
         syncAudioMothButton.setOnClickListener {
             movePhoneNearTextView.text = getString(R.string.keep_phone_near)
             syncAudioMothButton.isEnabled = false
+            edgeDeploymentProtocol?.playSyncSound()
         }
     }
 
@@ -143,11 +161,18 @@ class NewSyncFragment : Fragment() {
                 movePhoneNearLayout.visibility = View.VISIBLE
                 finishMovePhoneNearLayout.visibility = View.GONE
             }
+            6 -> {
+                Log.d("startStepSix","startStepSix")
+            }
         }
     }
 
     companion object {
         @JvmStatic
         fun newInstance() = NewSyncFragment()
+    }
+
+    fun startStepSix() {
+        setStep(6)
     }
 }

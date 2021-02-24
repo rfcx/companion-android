@@ -330,14 +330,16 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 calendar,
                 deploymentIdArrayInt
             )
+            this@EdgeDeploymentActivity.runOnUiThread {
+                NewSyncFragment().startStepSix()
+            }
         }.start()
     }
 
     override fun playTone() {
-        startSyncing(SyncFragment.INITIAL_TONE_PLAYING)
         Thread {
             audioMothConnector.playTone(
-                5000
+                100000
             )
         }.start()
     }
