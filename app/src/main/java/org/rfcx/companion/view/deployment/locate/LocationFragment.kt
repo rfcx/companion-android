@@ -26,10 +26,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import com.mapbox.android.core.location.*
 import com.mapbox.mapboxsdk.Mapbox
-import com.mapbox.mapboxsdk.camera.CameraUpdate
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
 import com.mapbox.mapboxsdk.location.LocationComponentOptions
 import com.mapbox.mapboxsdk.location.modes.RenderMode
@@ -78,6 +75,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var altitudeFromLocation: Double = 0.0
     private var nameLocation: String? = null
     private var group: String? = null
+    private var isUseCurrentLocation = false
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
@@ -118,7 +116,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                             setupLocationSpinner()
                             updateLocationAdapter()
                         }
-                        setCheckbox()
+                        if (!isUseCurrentLocation){
+                            setCheckbox()
+                        }
                     }
                 }
             }
@@ -220,6 +220,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 createSiteSymbol(locate.getLatLng())
                 moveCamera(LatLng(locate.getLatLng()), DEFAULT_ZOOM)
             }
+            this.isUseCurrentLocation = true
             setWithinText()
             locateItem = locate
         }
@@ -445,9 +446,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             }
 
             val siteItem = distanceLocate?.filter{ site ->
-                Log.d("map", "${site.locate.serverId} ${it.serverId }")
                 site.locate.serverId == it.serverId
-
             }
             if (siteItem != null && siteItem.isNotEmpty()) {
                 if (siteItem[0].distance <= 20) {
@@ -521,14 +520,19 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             val siteLatLng = LatLng(deploymentLocation.latitude, deploymentLocation.longitude)
             locationNameSpinner.setSelection(spinnerPosition)
             siteValueTextView.text = deploymentLocation.name
+            val position = locateNames.indexOf(deploymentLocation.name)
+            if (position >= 0) {
+                locateItem = locateItems[position]
+            }
 
             //assign to make setCheckbox work
             val currentLocation = deploymentProtocol!!.getCurrentLocation()
             val currentLatLng = LatLng(currentLocation.latitude, currentLocation.longitude)
             getLastLocation()
             createSiteSymbol(siteLatLng)
-            setCheckboxForResumeDeployment(currentLatLng, siteLatLng)
-
+            if (!isUseCurrentLocation) {
+                setCheckboxForResumeDeployment(currentLatLng, siteLatLng)
+            }
             enableExistingLocation(true)
             moveCamera(currentLatLng, siteLatLng, DEFAULT_ZOOM)
             altitudeValue.text = deploymentLocation.altitude.setFormatLabel()
