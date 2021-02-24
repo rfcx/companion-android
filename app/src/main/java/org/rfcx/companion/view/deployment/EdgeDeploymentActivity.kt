@@ -331,7 +331,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 deploymentIdArrayInt
             )
             this@EdgeDeploymentActivity.runOnUiThread {
-                NewSyncFragment().startStepSix()
+                startFragment(NewSyncFragment.newInstance(6))
             }
         }.start()
     }

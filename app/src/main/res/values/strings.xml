@@ -110,6 +110,7 @@
     <string name="lights_audiomoth">Lights on AudioMoth should be: \nFLASHING GREEN &amp; SOLID RED</string>
     <string name="move_phone_near">Move phone near to AudioMoth</string>
     <string name="keep_phone_near">Keep phone near to AudioMoth</string>
+    <string name="confirm_light">Confirm that the RED light is NOT SOLID</string>
     <string name="begin_sync">Begin Sync</string>
     <string name="sync_audiomoth">Sync to AudioMoth</string>
     <string name="one">1)</string>
@@ -117,7 +118,7 @@
     <string name="three">3)</string>
     <string name="four">4)</string>
     <string name="five">5)</string>
-    <string name="six">6)</string>
+    <string name="six">6) Confirm that the RED light is NOT SOLID</string>
     <string name="one_text">1) Sync with AudioMoth started...</string>
     <string name="two_text">2) Initial audio tone playing...</string>
     <string name="three_text">3) Hardware switch set to CUSTOM</string>
