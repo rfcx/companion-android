@@ -2,11 +2,15 @@ package org.rfcx.companion.service
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import io.realm.Realm
+import org.rfcx.companion.R
 import org.rfcx.companion.entity.request.EditDeploymentRequest
 import org.rfcx.companion.entity.request.toRequestBody
+import org.rfcx.companion.entity.response.DeploymentResponse
+import org.rfcx.companion.entity.response.toEdgeDeployment
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.repo.ApiManager
@@ -14,6 +18,10 @@ import org.rfcx.companion.repo.Firestore
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.getIdToken
+import org.rfcx.companion.util.isNetworkAvailable
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 /**
  * For syncing data to server. Ref from Ranger Android App
@@ -43,7 +51,14 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                     val fullId = result.headers().get("Location")
                     val id = fullId?.substring(fullId.lastIndexOf("/") + 1, fullId.length) ?: ""
                     db.markSent(id, it.id)
-                    locateDb.updateDeploymentServerId(it.id, id)
+
+                    //update core siteId when deployment created
+                    val updatedDp = ApiManager.getInstance().getDeviceApi()
+                        .getDeployment(token, id).execute().body()
+                    updatedDp?.let { dp ->
+                        db.updateDeploymentByServerId(updatedDp.toEdgeDeployment())
+                        locateDb.updateSiteServerId(it.id, dp.stream!!.id!!)
+                    }
                 } else {
                     db.markUnsent(it.id)
                     someFailed = true
@@ -59,10 +74,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                             db.deleteDeployment(it.id)
                         }
                     } else {
-                        val req = EditDeploymentRequest(
-                            location.toRequestBody(),
-                            location.project?.toRequestBody()
-                        )
+                        val req = EditDeploymentRequest(location.toRequestBody())
                         val result = ApiManager.getInstance().getDeviceApi()
                             .editDeployments(token, serverId, req).execute()
                         if (result.isSuccessful) {

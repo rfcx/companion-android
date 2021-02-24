@@ -343,7 +343,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     override fun playTone() {
         Thread {
             audioMothConnector.playTone(
-                100000
+                50000
             )
         }.start()
     }

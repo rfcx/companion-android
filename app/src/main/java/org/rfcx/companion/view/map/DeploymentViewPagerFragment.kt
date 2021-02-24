@@ -128,8 +128,7 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
     }
 
     private fun onDeleteLocationOfNoDeployment() {
-        if (edgeDeploymentViewId != null && locateId != null) {
-            locateDb.deleteLocate(locateId!!)
+        if (edgeDeploymentViewId != null) {
             edgeDeploymentDb.deleteDeployment(edgeDeploymentViewId!!)
             deleteDialog.dismiss()
             analytics?.trackDeleteDeploymentEvent(Status.SUCCESS.id)
