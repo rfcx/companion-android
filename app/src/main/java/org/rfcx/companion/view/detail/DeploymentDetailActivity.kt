@@ -170,7 +170,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         location?.let { locate ->
             latitudeValue.text = locate.latitude.latitudeCoordinates(this)
             longitudeValue.text = locate.longitude.longitudeCoordinates(this)
-            altitudeValue.text = locate.altitude.toString()
+            altitudeValue.text = locate.altitude.setFormatLabel()
         }
         changePinColorByGroup(location?.project?.name ?: getString(R.string.none))
     }

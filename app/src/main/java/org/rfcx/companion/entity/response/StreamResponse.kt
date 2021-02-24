@@ -22,6 +22,7 @@ fun StreamResponse.toLocate(): Locate {
         name = this.name ?: "-",
         latitude = this.latitude ?: 0.0,
         longitude = this.longitude ?: 0.0,
+        altitude = this.altitude ?: 0.0,
         createdAt = this.createdAt ?: Date(),
         locationGroup = this.project?.toLocationGroup(),
         syncState = SyncState.Sent.key
@@ -34,6 +35,7 @@ fun StreamResponse.toDeploymentLocation(): DeploymentLocation {
         name = this.name ?: "-",
         latitude = this.latitude ?: 0.0,
         longitude = this.longitude ?: 0.0,
+        altitude = this.altitude ?: 0.0,
         project = this.project?.toLocationGroup()
     )
 }
@@ -44,6 +46,7 @@ fun DeploymentLocation.toLocationResponse(): StreamResponse {
         name = this.name,
         latitude = this.latitude,
         longitude = this.longitude,
+        altitude = this.altitude,
         createdAt = Date(),
         project = this.project?.toLocationGroupsResponse()
     )
