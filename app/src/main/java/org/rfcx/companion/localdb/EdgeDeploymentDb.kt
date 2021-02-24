@@ -125,6 +125,18 @@ class EdgeDeploymentDb(private val realm: Realm) {
         }
     }
 
+    fun updateDeploymentByServerId(deployment: EdgeDeployment) {
+        realm.executeTransaction {
+            val dp =
+                it.where(EdgeDeployment::class.java).equalTo(EdgeDeployment.FIELD_SERVER_ID, deployment.serverId)
+                    .findFirst()
+            dp?.apply {
+                stream?.coreId = deployment.stream?.coreId
+                it.insertOrUpdate(this)
+            }
+        }
+    }
+
     /**
      * Delete Locate
      * */

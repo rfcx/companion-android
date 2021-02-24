@@ -530,9 +530,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             val currentLatLng = LatLng(currentLocation.latitude, currentLocation.longitude)
             getLastLocation()
             createSiteSymbol(siteLatLng)
-            if (!isUseCurrentLocation) {
-                setCheckboxForResumeDeployment(currentLatLng, siteLatLng)
-            }
+            setCheckboxForResumeDeployment(currentLatLng, siteLatLng)
+
             enableExistingLocation(true)
             moveCamera(currentLatLng, siteLatLng, DEFAULT_ZOOM)
             altitudeValue.text = deploymentLocation.altitude.setFormatLabel()

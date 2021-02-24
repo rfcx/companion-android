@@ -53,37 +53,12 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                     db.markSent(id, it.id)
 
                     //update core siteId when deployment created
-                    ApiManager.getInstance().getDeviceApi()
-                        .getDeployments(token).enqueue(object :
-                            Callback<List<DeploymentResponse>> {
-                            override fun onResponse(
-                                call: Call<List<DeploymentResponse>>,
-                                response: Response<List<DeploymentResponse>>
-                            ) {
-                                val coreDp = response.body()?.find { dp -> dp.id == id }
-                                coreDp?.let { dp ->
-//                                    db.updateDeployment(dp.toEdgeDeployment())
-                                }
-                            }
-
-                            override fun onFailure(
-                                call: Call<List<DeploymentResponse>>,
-                                t: Throwable
-                            ) {
-                                if (context.isNetworkAvailable()) {
-                                    Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT)
-                                        .show()
-                                }
-                            }
-
-                        })
-
-                    //send update site when deployment created
-                    if (it.stream != null && it.stream?.coreId != null) {
-                        ApiManager.getInstance().getDeviceApi()
-                            .editDeployments(token, id, EditDeploymentRequest(it.stream!!.toRequestBody())).execute()
+                    val updatedDp = ApiManager.getInstance().getDeviceApi()
+                        .getDeployment(token, id).execute().body()
+                    updatedDp?.let { dp ->
+                        db.updateDeploymentByServerId(updatedDp.toEdgeDeployment())
+                        locateDb.updateSiteServerId(it.id, dp.stream!!.id!!)
                     }
-                    locateDb.updateDeploymentServerId(it.id, id)
                 } else {
                     db.markUnsent(it.id)
                     someFailed = true
