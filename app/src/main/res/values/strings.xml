@@ -102,8 +102,7 @@
     <string name="altitude_default">0.0</string>
     <string name="altitude_digits">0123456789.</string>
     <string name="within">You are currently within 20m of the site</string>
-    <string name="more_than_m">You are %sm from the site</string>
-    <string name="more_than_km">You are %skm from the site</string>
+    <string name="more_than">You are %s from the site</string>
 
     <!--  MapPickerFragment  -->
     <string name="select">Select</string>

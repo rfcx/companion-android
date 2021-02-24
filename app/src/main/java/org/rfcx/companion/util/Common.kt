@@ -18,5 +18,13 @@ fun Context.getIntColor(res: Int): Int {
     return ContextCompat.getColor(this, res)
 }
 
+fun Double.setFormatLabel(): String {
+    return if (this >= 1000) "${String.format("%.1f", this/1000)}km" else "${String.format("%.2f", this)}m"
+}
+
+fun Float.setFormatLabel(): String {
+    return if (this >= 1000) "${String.format("%.1f", this/1000)}km" else "${String.format("%.0f", this)}m"
+}
+
 private val chars = ('A'..'F') + ('0'..'9')
 fun randomDeploymentId(): String = List(16) { chars.random() }.joinToString("")

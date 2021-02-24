@@ -101,7 +101,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                         setCurrentUserLocation()
 
                         if (locationNameSpinner.selectedItemPosition == 0) {
-                            altitudeValue.text = String.format("%.2f", location.altitude)
+                            altitudeValue.text = location.altitude.setFormatLabel()
                         }
                         if (isFirstTime && lastLocation == null &&
                             latitude == 0.0 && longitude == 0.0
@@ -217,7 +217,13 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 createSiteSymbol(locate.getLatLng())
                 moveCamera(LatLng(locate.getLatLng()), DEFAULT_ZOOM)
             }
-            enableCheckBox(false)
+            withinTextView.text = getString(R.string.within)
+            withinTextView.setCompoundDrawablesWithIntrinsicBounds(
+                R.drawable.ic_checklist_passed,
+                0,
+                0,
+                0
+            )
             locateItem = locate
         }
 
@@ -396,7 +402,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         locateItem?.let {
             createSiteSymbol(it.getLatLng())
             moveCamera(LatLng(latitude, longitude), it.getLatLng(), DEFAULT_ZOOM)
-            altitudeValue.text = String.format("%.2f", it.altitude)
+            altitudeValue.text = it.altitude.setFormatLabel()
             if (locationGroupDb.isExisted(it.locationGroup?.name)) {
                 group = it.locationGroup?.name
                 locationGroupValueTextView.text = it.locationGroup?.name
@@ -437,11 +443,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                         0,
                         0
                     )
-                    if(siteItem[0].distance >= 1000 ) {
-                        withinTextView.text = getString(R.string.more_than_km, String.format("%.1f", siteItem[0].distance/1000))
-                    } else {
-                        withinTextView.text = getString(R.string.more_than_m, String.format("%.0f", siteItem[0].distance))
-                    }
+                    withinTextView.text = getString(R.string.more_than, siteItem[0].distance.setFormatLabel())
                 }
             }
         }
@@ -464,7 +466,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         enableExistingLocation(false)
         enableCheckBox(false)
         siteValueTextView.text = getString(R.string.create_new_site)
-        altitudeValue.text = String.format("%.2f", altitudeFromLocation)
+        altitudeValue.text = altitudeFromLocation.setFormatLabel()
         getLastLocation()
 
         if (lastLocation != null) {
@@ -502,7 +504,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
             enableExistingLocation(true)
             moveCamera(LatLng(lastLocation?.latitude ?: 0.0, lastLocation?.longitude ?: 0.0), LatLng(deploymentLocation.latitude, deploymentLocation.longitude), DEFAULT_ZOOM)
-            altitudeValue.text = String.format("%.2f", deploymentLocation.altitude)
+            altitudeValue.text = deploymentLocation.altitude.setFormatLabel()
             if (locationGroupDb.isExisted(deploymentLocation.project?.name)) {
                 group = deploymentLocation.project?.name
                 locationGroupValueTextView.text = deploymentLocation.project?.name
@@ -739,7 +741,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         locationNameTextInput.visibility = if (enable) View.GONE else View.VISIBLE
         changeTextView.visibility = if (enable) View.GONE else View.VISIBLE
         changeGroupTextView.visibility = if (enable) View.GONE else View.VISIBLE
-//        currentLocateTextView.visibility = if (enable) View.VISIBLE else View.GONE
         currentLocateGroupView.visibility = if (enable) View.VISIBLE else View.GONE
     }
 

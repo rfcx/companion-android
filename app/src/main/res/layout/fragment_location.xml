@@ -137,6 +137,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawableStart="@drawable/ic_checklist"
+                android:text="@string/within"
                 android:drawablePadding="@dimen/margin_padding_small"
                 android:layout_marginStart="@dimen/margin_padding_large"
                 android:layout_marginTop="@dimen/margin_padding_small"
@@ -250,20 +251,6 @@
                 android:tint="@color/colorPrimary"
                 app:layout_constraintBottom_toBottomOf="@id/locationValueTextView"
                 app:layout_constraintEnd_toStartOf="@id/arrowIcon"
-                app:layout_constraintTop_toTopOf="@id/locationTitleTextView" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/currentLocateTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/margin_padding_large"
-                android:text="@string/use_your_current_location"
-                android:textAllCaps="true"
-                android:textColor="@color/colorPrimary"
-                android:visibility="gone"
-                android:textSize="@dimen/text_xsmall"
-                app:layout_constraintBottom_toBottomOf="@id/locationTitleTextView"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/locationTitleTextView" />
 
             <androidx.appcompat.widget.AppCompatTextView
