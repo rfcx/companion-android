@@ -29,7 +29,6 @@ import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
 import org.rfcx.companion.view.deployment.locate.SelectingExistedSiteFragment
 import org.rfcx.companion.view.deployment.sync.NewSyncFragment
-import org.rfcx.companion.view.deployment.sync.SyncFragment
 import org.rfcx.companion.view.detail.MapPickerProtocol
 import org.rfcx.companion.view.dialog.*
 import java.util.*
@@ -280,7 +279,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             }
             1 -> {
                 updateDeploymentState(DeploymentState.Edge.Sync)
-//                startFragment(SyncFragment.newInstance(SyncFragment.START_SYNC))
                 startFragment(NewSyncFragment.newInstance())
             }
             2 -> {
@@ -311,7 +309,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     }
 
     override fun startSyncing(status: String) {
-//        startFragment(SyncFragment.newInstance(status))
         startFragment(NewSyncFragment.newInstance())
     }
 
