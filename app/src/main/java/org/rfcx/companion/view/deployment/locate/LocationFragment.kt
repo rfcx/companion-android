@@ -39,6 +39,8 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
+import com.mapbox.pluginscalebar.ScaleBarOptions
+import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.companion.R
@@ -50,6 +52,7 @@ import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
+import org.rfcx.companion.view.map.MapboxCameraUtils
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 
 class LocationFragment : Fragment(), OnMapReadyCallback {
@@ -310,6 +313,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             setupLocationSpinner()
             updateLocationAdapter()
             enableLocationComponent()
+            setupScale()
         }
     }
 
@@ -607,28 +611,11 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun moveCamera(latLng: LatLng, zoom: Double) {
-        mapboxMap?.moveCamera(calculateLatLngForZoom(latLng, null, zoom))
+        mapboxMap?.moveCamera(MapboxCameraUtils.calculateLatLngForZoom(latLng, null, zoom))
     }
 
     private fun moveCamera(userPosition: LatLng, nearestSite: LatLng?, zoom: Double) {
-        mapboxMap?.moveCamera(calculateLatLngForZoom(userPosition, nearestSite, zoom))
-    }
-
-    private fun calculateLatLngForZoom(userPosition: LatLng, nearestSite: LatLng? = null, zoom: Double): CameraUpdate {
-        if (nearestSite == null) {
-            return CameraUpdateFactory.newLatLngZoom(userPosition, zoom)
-        }
-        val oppositeLat = userPosition.latitude - (nearestSite.latitude - userPosition.latitude)
-        val oppositeLng = userPosition.longitude - (nearestSite.longitude - userPosition.longitude)
-        val oppositeNearestSite = LatLng(oppositeLat, oppositeLng)
-        if (oppositeNearestSite.distanceTo(userPosition) < 30) {
-            return CameraUpdateFactory.newLatLngZoom(userPosition, zoom)
-        }
-        val latLngBounds = LatLngBounds.Builder()
-            .include(oppositeNearestSite)
-            .include(nearestSite)
-            .build()
-        return CameraUpdateFactory.newLatLngBounds(latLngBounds, 100)
+        mapboxMap?.moveCamera(MapboxCameraUtils.calculateLatLngForZoom(userPosition, nearestSite, zoom))
     }
 
     private fun setOnFocusEditText() {
@@ -716,6 +703,11 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         } else {
             requestPermissions()
         }
+    }
+
+    private fun setupScale() {
+        val scaleBarPlugin = ScaleBarPlugin(mapView, mapboxMap!!)
+        scaleBarPlugin.create(ScaleBarOptions(requireContext()))
     }
 
     /**
