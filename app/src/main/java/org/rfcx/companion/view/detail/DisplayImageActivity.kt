@@ -3,12 +3,15 @@ package org.rfcx.companion.view.detail
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.veinhorn.scrollgalleryview.MediaInfo
 import com.veinhorn.scrollgalleryview.ScrollGalleryView
-import com.veinhorn.scrollgalleryview.loader.picasso.PicassoImageLoader
 import kotlinx.android.synthetic.main.activity_display_image.*
+import ogbe.ozioma.com.glideimageloader.GlideImageLoader
 import org.rfcx.companion.R
+import org.rfcx.companion.extension.toGlideWithHeader
+import org.rfcx.companion.util.getIdToken
 
 class DisplayImageActivity : AppCompatActivity() {
     lateinit var galleryView: ScrollGalleryView
@@ -19,7 +22,10 @@ class DisplayImageActivity : AppCompatActivity() {
 
         val paths = intent.extras?.getStringArrayList(PATH_IMAGE) ?: ArrayList()
         val infoImage: ArrayList<MediaInfo> = ArrayList(paths.size)
-        for (url in paths) infoImage.add(MediaInfo.mediaLoader(PicassoImageLoader(url)))
+        for (url in paths) {
+            Log.d("image", url.toGlideWithHeader(this.getIdToken()!!))
+            infoImage.add(MediaInfo.mediaLoader(GlideImageLoader(url.toGlideWithHeader(this.getIdToken()!!))))
+        }
 
         galleryView = scrollGalleryView
         galleryView

@@ -110,6 +110,7 @@ dependencies {
     implementation 'jp.wasabeef:glide-transformations:3.0.1'
     implementation 'com.veinhorn.scrollgalleryview:library:1.2.6'
     implementation 'com.veinhorn.scrollgalleryview:picasso-loader:1.2.4'
+    implementation 'com.veinhorn.scrollgalleryview:glide-loader:1.2.4'
 
     implementation 'id.zelory:compressor:2.1.0'
 

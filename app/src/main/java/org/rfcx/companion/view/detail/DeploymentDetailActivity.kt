@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -25,6 +26,7 @@ import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_deployment_detail.*
 import kotlinx.android.synthetic.main.toolbar_default.*
+import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.localdb.DatabaseCallback
@@ -303,8 +305,13 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
 
     override fun invoke(deploymentImage: DeploymentImageView) {
         val list = arrayListOf<String>()
-        deploymentImages.forEach { list.add(it.remotePath ?: "file://${it.localPath}") }
-        
+        deploymentImages.forEach {
+            if (it.remotePath != null) {
+                list.add(BuildConfig.DEVICE_API_DOMAIN + it.remotePath)
+            } else {
+                list.add("file://${it.localPath}")
+            }
+        }
         val index = list.indexOf(deploymentImage.remotePath ?: "file://${deploymentImage.localPath}")
         list.removeAt(index)
         list.add(0, deploymentImage.remotePath ?: "file://${deploymentImage.localPath}")
