@@ -40,13 +40,3 @@ fun ImageView.setDeploymentImage(url: String, blur: Boolean, fromServer: Boolean
         }
     }
 }
-
-fun String.toGlideWithHeader(token: String): String {
-    val glideUrl = GlideUrl(
-        this,
-        LazyHeaders.Builder()
-            .addHeader("Authorization", "Bearer $token")
-            .build()
-    )
-    return glideUrl.toStringUrl()
-}
