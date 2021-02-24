@@ -23,14 +23,17 @@ class EdgeDeploymentDb(private val realm: Realm) {
             .count()
     }
 
-    fun getDeploymentsSent(): ArrayList<String> {
+    fun getDeploymentsBySiteId(streamId: String): ArrayList<EdgeDeployment> {
         val deployments = realm.where(EdgeDeployment::class.java)
             .equalTo(EdgeDeployment.FIELD_STATE, DeploymentState.Edge.ReadyToUpload.key)
             .and()
-            .equalTo(EdgeDeployment.FIELD_SYNC_STATE, SyncState.Sent.key).findAllAsync()
-        val arrayOfId = arrayListOf<String>()
+            .equalTo(EdgeDeployment.FIELD_SYNC_STATE, SyncState.Sent.key)
+            .and()
+            .equalTo("stream.coreId", streamId)
+            .findAllAsync()
+        val arrayOfId = arrayListOf<EdgeDeployment>()
         deployments.forEach {
-            it.serverId?.let { it1 -> arrayOfId.add(it1) }
+            it?.let { it1 -> arrayOfId.add(it1) }
         }
         return arrayOfId
     }
@@ -101,6 +104,17 @@ class EdgeDeploymentDb(private val realm: Realm) {
             if (deployment != null) {
                 deployment.serverId = serverId
                 deployment.syncState = syncState
+            }
+        }
+    }
+
+    fun updateIsActive(id: Int) {
+        realm.executeTransaction {
+            val deployment =
+                it.where(EdgeDeployment::class.java).equalTo(EdgeDeployment.FIELD_ID, id)
+                    .findFirst()
+            if (deployment != null) {
+                deployment.isActive = false
             }
         }
     }

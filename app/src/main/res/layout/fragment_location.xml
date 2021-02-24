@@ -137,6 +137,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawableStart="@drawable/ic_checklist"
+                android:text="@string/within"
                 android:drawablePadding="@dimen/margin_padding_small"
                 android:layout_marginStart="@dimen/margin_padding_large"
                 android:layout_marginTop="@dimen/margin_padding_small"
@@ -172,11 +173,11 @@
                 style="@style/AudioMothText.Body.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="0dp"
+                android:layout_marginStart="@dimen/margin_padding_large"
                 android:layout_marginTop="@dimen/margin_padding_normal"
                 android:text="@string/altitude"
-                app:layout_constraintStart_toEndOf="@id/guidelineVertical"
-                app:layout_constraintTop_toBottomOf="@id/withinTextView" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/locationValueTextView" />
 
             <TextView
                 android:id="@+id/altitudeValue"
@@ -203,6 +204,55 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/locationTitleTextView" />
 
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/currentLocateGroupView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                app:constraint_referenced_ids="currentLocateView,currentLocationIcon,arrowIcon,pinMapIcon" />
+
+            <View
+                android:id="@+id/currentLocateView"
+                android:layout_width="80dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_button_green_outline"
+                app:layout_constraintStart_toStartOf="@id/pinMapIcon"
+                app:layout_constraintTop_toTopOf="@id/arrowIcon"
+                app:layout_constraintBottom_toBottomOf="@id/arrowIcon"
+                app:layout_constraintEnd_toEndOf="@id/currentLocationIcon"/>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/currentLocationIcon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginEnd="@dimen/margin_padding_xlarge"
+                android:src="@drawable/ic_current_location"
+                android:tint="@color/colorPrimary"
+                app:layout_constraintBottom_toBottomOf="@id/locationValueTextView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/locationTitleTextView" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/arrowIcon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:rotation="180"
+                android:src="@drawable/ic_baseline_arrow_back_24"
+                android:tint="@color/colorPrimary"
+                app:layout_constraintBottom_toBottomOf="@id/locationValueTextView"
+                app:layout_constraintEnd_toStartOf="@id/currentLocationIcon"
+                app:layout_constraintTop_toTopOf="@id/locationTitleTextView" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/pinMapIcon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_pin_map"
+                android:tint="@color/colorPrimary"
+                app:layout_constraintBottom_toBottomOf="@id/locationValueTextView"
+                app:layout_constraintEnd_toStartOf="@id/arrowIcon"
+                app:layout_constraintTop_toTopOf="@id/locationTitleTextView" />
+
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/locationGroupTitleTextView"
                 style="@style/AudioMothText.Body.Small"
@@ -212,7 +262,7 @@
                 android:layout_marginTop="@dimen/margin_padding_normal"
                 android:text="@string/location_group"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/locationValueTextView" />
+                app:layout_constraintTop_toBottomOf="@id/altitudeValue" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/locationGroupValueTextView"

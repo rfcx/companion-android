@@ -36,6 +36,10 @@ class CompanionRealmMigration : RealmMigration {
         if (oldVersion < 9L && newVersion >= 9L) {
             migrateToV9(realm)
         }
+
+        if (oldVersion < 10L && newVersion >= 10L) {
+            migrateToV10(realm)
+        }
     }
 
     private fun migrateToV2(realm: DynamicRealm) {
@@ -210,6 +214,13 @@ class CompanionRealmMigration : RealmMigration {
         val guardianDeployment = realm.schema.get(GuardianDeployment.TABLE_NAME)
         guardianDeployment?.apply {
             renameField("location", GuardianDeployment.FIELD_STREAM)
+        }
+    }
+
+    private fun migrateToV10(realm: DynamicRealm) {
+        val edgeDeployment = realm.schema.get(EdgeDeployment.TABLE_NAME)
+        edgeDeployment?.apply {
+            addField("isActive", Boolean::class.java)
         }
     }
 
