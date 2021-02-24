@@ -16,7 +16,7 @@ class DisplayImageActivity : AppCompatActivity() {
 
         val paths = intent.extras?.getStringArrayList(PATH_IMAGE) ?: arrayListOf()
         val adapter = DisplayImageAdapter(paths, this)
-        imageViewPager.orientation = ViewPager2.ORIENTATION_VERTICAL
+        imageViewPager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
         imageViewPager.adapter = adapter
     }
 
