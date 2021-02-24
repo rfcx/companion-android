@@ -24,6 +24,12 @@ interface DeviceApiInterface {
         @Query("active") active: Boolean = true
     ): Call<List<DeploymentResponse>>
 
+    @GET("deployment/{id}")
+    fun getDeployment(
+        @Header("Authorization") authUser: String,
+        @Path("id") id: String
+    ): Call<DeploymentResponse>
+
     @PATCH("deployments/{id}")
     fun editDeployments(
         @Header("Authorization") authUser: String,
