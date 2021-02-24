@@ -127,13 +127,11 @@ class EdgeDeploymentDb(private val realm: Realm) {
 
     fun updateDeploymentByServerId(deployment: EdgeDeployment) {
         realm.executeTransaction {
-            val dp =
-                it.where(EdgeDeployment::class.java).equalTo(EdgeDeployment.FIELD_SERVER_ID, deployment.serverId)
-                    .findFirst()
-            dp?.apply {
-                stream?.coreId = deployment.stream?.coreId
-                it.insertOrUpdate(this)
-            }
+            it.where(EdgeDeployment::class.java)
+                .equalTo(EdgeDeployment.FIELD_SERVER_ID, deployment.serverId)
+                .findFirst()?.apply {
+                    stream?.coreId = deployment.stream?.coreId
+                }
         }
     }
 
@@ -259,7 +257,10 @@ class EdgeDeploymentDb(private val realm: Realm) {
                 // do update location group
                 val location = if (edgeDeployment.serverId != null) {
                     bgRealm.where(Locate::class.java)
-                        .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_SERVER_ID, edgeDeployment.serverId)
+                        .equalTo(
+                            Locate.FIELD_LAST_EDGE_DEPLOYMENT_SERVER_ID,
+                            edgeDeployment.serverId
+                        )
                         .findFirst()
                 } else {
                     bgRealm.where(Locate::class.java)
@@ -269,7 +270,7 @@ class EdgeDeploymentDb(private val realm: Realm) {
                 if (location?.locationGroup != null) {
                     val groupLocation = location.locationGroup
                     if (groupLocation != null) {
-                        groupLocation.name =  locationGroup.name
+                        groupLocation.name = locationGroup.name
                         groupLocation.color = locationGroup.color
                         groupLocation.coreId = locationGroup.coreId
                         location.syncState = SyncState.Unsent.key
