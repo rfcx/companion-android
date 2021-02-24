@@ -326,10 +326,12 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         val deploymentId = getDeployment()?.deploymentKey
         val deploymentIdArrayInt = deploymentId?.chunked(2)?.map { it.toInt(radix = 16) }?.toTypedArray() ?: arrayOf()
         Thread {
-            audioMothConnector.playTimeAndDeploymentID(
-                calendar,
-                deploymentIdArrayInt
-            )
+            for (i in 1..3){
+                audioMothConnector.playTimeAndDeploymentID(
+                    calendar,
+                    deploymentIdArrayInt
+                )
+            }
             this@EdgeDeploymentActivity.runOnUiThread {
                 startFragment(NewSyncFragment.newInstance(6))
             }
