@@ -543,7 +543,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 locationGroupValueTextView.text = getString(R.string.none)
             }
         } else {
-
+            this.currentUserLocation = deploymentProtocol?.getCurrentLocation()
             val locate = if (lastLocation == null) currentUserLocation else lastLocation
             val nearLocations = findNearLocations(locate, locateItems)
             val nearItems =
