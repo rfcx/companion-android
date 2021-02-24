@@ -42,6 +42,8 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.BitmapUtils
+import com.mapbox.pluginscalebar.ScaleBarOptions
+import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.fragment_map.currentLocationButton
@@ -223,6 +225,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             setupSources(it)
             setupImages(it)
             setupMarkerLayers(it)
+            setupScale()
 
             mapboxMap.addOnMapClickListener { latLng ->
                 handleClickIcon(mapboxMap.projection.toScreenLocation(latLng))
@@ -337,6 +340,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
         style.addLayer(deploymentMarkerLayer)
         style.addLayer(siteMarkerLayer)
+    }
+
+    private fun setupScale() {
+        val scaleBarPlugin = ScaleBarPlugin(mapView, mapboxMap!!)
+        scaleBarPlugin.create(ScaleBarOptions(requireContext()))
     }
 
     private fun handleClickIcon(screenPoint: PointF): Boolean {

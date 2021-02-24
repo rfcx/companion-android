@@ -39,6 +39,8 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
+import com.mapbox.pluginscalebar.ScaleBarOptions
+import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.companion.R
@@ -281,6 +283,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             setupLocationSpinner()
             updateLocationAdapter()
             enableLocationComponent()
+            setupScale()
         }
     }
 
@@ -674,6 +677,11 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         } else {
             requestPermissions()
         }
+    }
+
+    private fun setupScale() {
+        val scaleBarPlugin = ScaleBarPlugin(mapView, mapboxMap!!)
+        scaleBarPlugin.create(ScaleBarOptions(requireContext()))
     }
 
     /**
