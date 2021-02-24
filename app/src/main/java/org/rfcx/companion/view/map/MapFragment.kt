@@ -199,7 +199,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         fetchData()
         progressBar.visibility = View.VISIBLE
 
-        currentLocationButton.setOnClickListener { moveCameraOnStart() }
+        currentLocationButton.setOnClickListener {
+            moveCameraOnStart()
+        }
     }
 
     private fun getGroupsColor() {
