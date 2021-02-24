@@ -220,13 +220,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 createSiteSymbol(locate.getLatLng())
                 moveCamera(LatLng(locate.getLatLng()), DEFAULT_ZOOM)
             }
-            withinTextView.text = getString(R.string.within)
-            withinTextView.setCompoundDrawablesWithIntrinsicBounds(
-                R.drawable.ic_checklist_passed,
-                0,
-                0,
-                0
-            )
+            setWithinText()
             locateItem = locate
         }
 
@@ -417,6 +411,26 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    private fun setWithinText() {
+        withinTextView.text = getString(R.string.within)
+        withinTextView.setCompoundDrawablesWithIntrinsicBounds(
+            R.drawable.ic_checklist_passed,
+            0,
+            0,
+            0
+        )
+    }
+
+    private fun setNotWithinText(distance: String) {
+        withinTextView.setCompoundDrawablesWithIntrinsicBounds(
+            R.drawable.ic_checklist_cross,
+            0,
+            0,
+            0
+        )
+        withinTextView.text = getString(R.string.more_than, distance)
+    }
+
     fun setCheckbox() {
         locateItem?.let {
             val locate = if (lastLocation == null) currentUserLocation else lastLocation
@@ -430,26 +444,27 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 })
             }
 
-            val siteItem = distanceLocate?.filterIndexed { _, site -> site.locate == it }
+            val siteItem = distanceLocate?.filter{ site ->
+                Log.d("map", "${site.locate.serverId} ${it.serverId }")
+                site.locate.serverId == it.serverId
+
+            }
             if (siteItem != null && siteItem.isNotEmpty()) {
                 if (siteItem[0].distance <= 20) {
-                    withinTextView.text = getString(R.string.within)
-                    withinTextView.setCompoundDrawablesWithIntrinsicBounds(
-                        R.drawable.ic_checklist_passed,
-                        0,
-                        0,
-                        0
-                    )
+                    setWithinText()
                 } else {
-                    withinTextView.setCompoundDrawablesWithIntrinsicBounds(
-                        R.drawable.ic_checklist_cross,
-                        0,
-                        0,
-                        0
-                    )
-                    withinTextView.text = getString(R.string.more_than, siteItem[0].distance.setFormatLabel())
+                    setNotWithinText(siteItem[0].distance.setFormatLabel())
                 }
             }
+        }
+    }
+
+    private fun setCheckboxForResumeDeployment(curLoc: LatLng, target: LatLng) {
+        val distance = curLoc.distanceTo(target)
+        if (distance <= 20) {
+            setWithinText()
+        } else {
+            setNotWithinText(distance.setFormatLabel())
         }
     }
 
@@ -460,7 +475,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             loc.longitude = longitude
             lastLocation = loc
         } else {
-            lastLocation = currentUserLocation // get new current location
+            lastLocation = currentUserLocation ?: deploymentProtocol?.getCurrentLocation() // get new current location
             this.latitude = lastLocation?.latitude ?: 0.0
             this.longitude = lastLocation?.longitude ?: 0.0
         }
@@ -503,11 +518,19 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         val deploymentLocation = deploymentProtocol?.getDeploymentLocation()
         if (deploymentLocation != null && locateAdapter != null && latitude == 0.0 && longitude == 0.0) {
             val spinnerPosition = locateAdapter!!.getPosition(deploymentLocation.name)
+            val siteLatLng = LatLng(deploymentLocation.latitude, deploymentLocation.longitude)
             locationNameSpinner.setSelection(spinnerPosition)
             siteValueTextView.text = deploymentLocation.name
 
+            //assign to make setCheckbox work
+            val currentLocation = deploymentProtocol!!.getCurrentLocation()
+            val currentLatLng = LatLng(currentLocation.latitude, currentLocation.longitude)
+            getLastLocation()
+            createSiteSymbol(siteLatLng)
+            setCheckboxForResumeDeployment(currentLatLng, siteLatLng)
+
             enableExistingLocation(true)
-            moveCamera(LatLng(lastLocation?.latitude ?: 0.0, lastLocation?.longitude ?: 0.0), LatLng(deploymentLocation.latitude, deploymentLocation.longitude), DEFAULT_ZOOM)
+            moveCamera(currentLatLng, siteLatLng, DEFAULT_ZOOM)
             altitudeValue.text = deploymentLocation.altitude.setFormatLabel()
             if (locationGroupDb.isExisted(deploymentLocation.project?.name)) {
                 group = deploymentLocation.project?.name
