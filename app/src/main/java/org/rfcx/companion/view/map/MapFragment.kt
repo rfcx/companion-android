@@ -42,8 +42,12 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.BitmapUtils
+import com.mapbox.pluginscalebar.ScaleBarOptions
+import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_map.*
+import kotlinx.android.synthetic.main.fragment_map.currentLocationButton
+import kotlinx.android.synthetic.main.fragment_map_picker.*
 import org.rfcx.companion.DeploymentListener
 import org.rfcx.companion.MainActivityListener
 import org.rfcx.companion.R
@@ -194,6 +198,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         fetchJobSyncing()
         fetchData()
         progressBar.visibility = View.VISIBLE
+
+        currentLocationButton.setOnClickListener { moveCameraOnStart() }
     }
 
     private fun getGroupsColor() {
@@ -219,6 +225,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             setupSources(it)
             setupImages(it)
             setupMarkerLayers(it)
+            setupScale()
 
             mapboxMap.addOnMapClickListener { latLng ->
                 handleClickIcon(mapboxMap.projection.toScreenLocation(latLng))
@@ -333,6 +340,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
         style.addLayer(deploymentMarkerLayer)
         style.addLayer(siteMarkerLayer)
+    }
+
+    private fun setupScale() {
+        val scaleBarPlugin = ScaleBarPlugin(mapView, mapboxMap!!)
+        scaleBarPlugin.create(ScaleBarOptions(requireContext()))
     }
 
     private fun handleClickIcon(screenPoint: PointF): Boolean {

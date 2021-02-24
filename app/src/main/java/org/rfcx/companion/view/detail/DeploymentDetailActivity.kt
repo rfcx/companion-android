@@ -20,6 +20,8 @@ import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.pluginscalebar.ScaleBarOptions
+import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_deployment_detail.*
 import kotlinx.android.synthetic.main.toolbar_default.*
@@ -217,8 +219,14 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         }
 
         mapboxMap.setStyle(Style.OUTDOORS) {
+            setupScale()
             deployment?.let { it1 -> setLocationOnMap(it1) }
         }
+    }
+
+    private fun setupScale() {
+        val scaleBarPlugin = ScaleBarPlugin(mapView, mapBoxMap)
+        scaleBarPlugin.create(ScaleBarOptions(this))
     }
 
     private fun setLocationOnMap(deployment: EdgeDeployment) {

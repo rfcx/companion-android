@@ -37,8 +37,8 @@
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/currentLocationButton"
-            android:layout_width="@dimen/size_battery_lv_button"
-            android:layout_height="@dimen/size_battery_lv_button"
+            android:layout_width="@dimen/current_loc_size"
+            android:layout_height="@dimen/current_loc_size"
             android:layout_margin="@dimen/margin_padding_normal"
             android:src="@drawable/ic_current_location"
             app:backgroundTint="@color/white"

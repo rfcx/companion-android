@@ -1,7 +1,11 @@
 package org.rfcx.companion.view.detail
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Rect
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,15 +14,21 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
 import androidx.fragment.app.Fragment
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
+import com.mapbox.mapboxsdk.location.LocationComponentOptions
+import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.pluginscalebar.ScaleBarOptions
+import com.mapbox.pluginscalebar.ScaleBarPlugin
 import kotlinx.android.synthetic.main.fragment_edit_location.*
 import kotlinx.android.synthetic.main.fragment_edit_location.altitudeEditText
 import kotlinx.android.synthetic.main.fragment_edit_location.locationGroupValueTextView
@@ -157,10 +167,65 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         mapboxMap.uiSettings.isLogoEnabled = false
 
         mapboxMap.setStyle(Style.OUTDOORS) {
+            setupScale()
+            enableLocationComponent()
             val latLng = LatLng(latitude, longitude)
             moveCamera(latLng, LocationFragment.DEFAULT_ZOOM)
         }
     }
+
+    @SuppressLint("MissingPermission")
+    private fun enableLocationComponent() {
+        if (hasPermissions()) {
+            val loadedMapStyle = mapboxMap?.style
+            // Activate the LocationComponent
+            val customLocationComponentOptions = context?.let {
+                LocationComponentOptions.builder(it)
+                    .trackingGesturesManagement(true)
+                    .accuracyColor(ContextCompat.getColor(it, R.color.colorPrimary))
+                    .build()
+            }
+
+            val locationComponentActivationOptions =
+                context?.let {
+                    LocationComponentActivationOptions.builder(it, loadedMapStyle!!)
+                        .locationComponentOptions(customLocationComponentOptions)
+                        .build()
+                }
+
+            mapboxMap?.let { it ->
+                it.locationComponent.apply {
+                    if (locationComponentActivationOptions != null) {
+                        activateLocationComponent(locationComponentActivationOptions)
+                    }
+
+                    isLocationComponentEnabled = true
+                    renderMode = RenderMode.COMPASS
+                }
+            }
+        } else {
+            requestPermissions()
+        }
+    }
+
+    private fun setupScale() {
+        val scaleBarPlugin = ScaleBarPlugin(mapView, mapboxMap!!)
+        val options = ScaleBarOptions(requireContext())
+        options.setMarginTop(R.dimen.legend_top_margin)
+        scaleBarPlugin.create(options)
+    }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == LocationFragment.REQUEST_PERMISSIONS_REQUEST_CODE) {
+            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                enableLocationComponent()
+            }
+        }
+    }
+
 
     private fun moveCamera(latLng: LatLng, zoom: Double) {
         mapboxMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom))
@@ -181,6 +246,27 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         val inputManager =
             context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputManager.hideSoftInputFromWindow(windowToken, 0)
+    }
+
+    private fun hasPermissions(): Boolean {
+        val permissionState = context?.let {
+            ActivityCompat.checkSelfPermission(
+                it,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        }
+        return permissionState == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            activity?.requestPermissions(
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LocationFragment.REQUEST_PERMISSIONS_REQUEST_CODE
+            )
+        } else {
+            throw Exception("Request permissions not required before API 23 (should never happen)")
+        }
     }
 
     override fun onStart() {
