@@ -254,9 +254,12 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             if (useExistedLocation) {
                 this._locate?.let { locate ->
                     locateDb.insertOrUpdateLocate(it.id, locate) // update locate - last deployment
+                    val deployments = locate.serverId?.let { it1 -> deploymentDb.getDeploymentsBySiteId(it1) }
+                    deployments?.forEach { deployment ->
+                        deploymentDb.updateIsActive(deployment.id)
+                    }
                 }
             }
-
             saveImages(it)
             deploymentDb.updateDeployment(it)
             analytics.trackCreateAudiomothDeploymentEvent()

@@ -39,6 +39,8 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
+import com.mapbox.pluginscalebar.ScaleBarOptions
+import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.companion.R
@@ -50,6 +52,7 @@ import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
+import org.rfcx.companion.view.map.MapboxCameraUtils
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 
 class LocationFragment : Fragment(), OnMapReadyCallback {
@@ -101,11 +104,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                         setCurrentUserLocation()
 
                         if (locationNameSpinner.selectedItemPosition == 0) {
-                            altitudeValue.text = String.format("%.2f", location.altitude)
+                            altitudeValue.text = location.altitude.setFormatLabel()
                         }
-
-                        setCheckbox()
-
                         if (isFirstTime && lastLocation == null &&
                             latitude == 0.0 && longitude == 0.0
                         ) {
@@ -118,6 +118,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                             setupLocationSpinner()
                             updateLocationAdapter()
                         }
+                        setCheckbox()
                     }
                 }
             }
@@ -195,6 +196,38 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
         chooseTextView.setOnClickListener {
             startSelectingExistedSite()
+        }
+
+        currentLocateView.setOnClickListener {
+            var locate = Locate()
+            locateItem?.let {
+                locate = Locate(
+                    it.id,
+                    it.serverId,
+                    getLocationGroup(),
+                    it.name,
+                    currentUserLocation?.latitude ?: it.latitude,
+                    currentUserLocation?.longitude ?: it.longitude,
+                    it.altitude,
+                    it.createdAt,
+                    it.deletedAt,
+                    it.lastDeploymentId,
+                    it.lastDeploymentServerId,
+                    it.lastGuardianDeploymentId,
+                    it.lastGuardianDeploymentServerId,
+                    it.syncState
+                )
+                createSiteSymbol(locate.getLatLng())
+                moveCamera(LatLng(locate.getLatLng()), DEFAULT_ZOOM)
+            }
+            withinTextView.text = getString(R.string.within)
+            withinTextView.setCompoundDrawablesWithIntrinsicBounds(
+                R.drawable.ic_checklist_passed,
+                0,
+                0,
+                0
+            )
+            locateItem = locate
         }
 
         finishButton.setOnClickListener {
@@ -280,6 +313,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             setupLocationSpinner()
             updateLocationAdapter()
             enableLocationComponent()
+            setupScale()
         }
     }
 
@@ -372,7 +406,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         locateItem?.let {
             createSiteSymbol(it.getLatLng())
             moveCamera(LatLng(latitude, longitude), it.getLatLng(), DEFAULT_ZOOM)
-            altitudeValue.text = String.format("%.2f", it.altitude)
+            altitudeValue.text = it.altitude.setFormatLabel()
             if (locationGroupDb.isExisted(it.locationGroup?.name)) {
                 group = it.locationGroup?.name
                 locationGroupValueTextView.text = it.locationGroup?.name
@@ -397,7 +431,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             }
 
             val siteItem = distanceLocate?.filterIndexed { _, site -> site.locate == it }
-            if (siteItem != null) {
+            if (siteItem != null && siteItem.isNotEmpty()) {
                 if (siteItem[0].distance <= 20) {
                     withinTextView.text = getString(R.string.within)
                     withinTextView.setCompoundDrawablesWithIntrinsicBounds(
@@ -413,11 +447,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                         0,
                         0
                     )
-                    if(siteItem[0].distance >= 1000 ) {
-                        withinTextView.text = getString(R.string.more_than_km, String.format("%.1f", siteItem[0].distance/1000))
-                    } else {
-                        withinTextView.text = getString(R.string.more_than_m, String.format("%.0f", siteItem[0].distance))
-                    }
+                    withinTextView.text = getString(R.string.more_than, siteItem[0].distance.setFormatLabel())
                 }
             }
         }
@@ -440,7 +470,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         enableExistingLocation(false)
         enableCheckBox(false)
         siteValueTextView.text = getString(R.string.create_new_site)
-        altitudeValue.text = String.format("%.2f", altitudeFromLocation)
+        altitudeValue.text = altitudeFromLocation.setFormatLabel()
         getLastLocation()
 
         if (lastLocation != null) {
@@ -478,7 +508,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
             enableExistingLocation(true)
             moveCamera(LatLng(lastLocation?.latitude ?: 0.0, lastLocation?.longitude ?: 0.0), LatLng(deploymentLocation.latitude, deploymentLocation.longitude), DEFAULT_ZOOM)
-            altitudeValue.text = String.format("%.2f", deploymentLocation.altitude)
+            altitudeValue.text = deploymentLocation.altitude.setFormatLabel()
             if (locationGroupDb.isExisted(deploymentLocation.project?.name)) {
                 group = deploymentLocation.project?.name
                 locationGroupValueTextView.text = deploymentLocation.project?.name
@@ -581,28 +611,11 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun moveCamera(latLng: LatLng, zoom: Double) {
-        mapboxMap?.moveCamera(calculateLatLngForZoom(latLng, null, zoom))
+        mapboxMap?.moveCamera(MapboxCameraUtils.calculateLatLngForZoom(latLng, null, zoom))
     }
 
     private fun moveCamera(userPosition: LatLng, nearestSite: LatLng?, zoom: Double) {
-        mapboxMap?.moveCamera(calculateLatLngForZoom(userPosition, nearestSite, zoom))
-    }
-
-    private fun calculateLatLngForZoom(userPosition: LatLng, nearestSite: LatLng? = null, zoom: Double): CameraUpdate {
-        if (nearestSite == null) {
-            return CameraUpdateFactory.newLatLngZoom(userPosition, zoom)
-        }
-        val oppositeLat = userPosition.latitude - (nearestSite.latitude - userPosition.latitude)
-        val oppositeLng = userPosition.longitude - (nearestSite.longitude - userPosition.longitude)
-        val oppositeNearestSite = LatLng(oppositeLat, oppositeLng)
-        if (oppositeNearestSite.distanceTo(userPosition) < 30) {
-            return CameraUpdateFactory.newLatLngZoom(userPosition, zoom)
-        }
-        val latLngBounds = LatLngBounds.Builder()
-            .include(oppositeNearestSite)
-            .include(nearestSite)
-            .build()
-        return CameraUpdateFactory.newLatLngBounds(latLngBounds, 100)
+        mapboxMap?.moveCamera(MapboxCameraUtils.calculateLatLngForZoom(userPosition, nearestSite, zoom))
     }
 
     private fun setOnFocusEditText() {
@@ -692,6 +705,11 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    private fun setupScale() {
+        val scaleBarPlugin = ScaleBarPlugin(mapView, mapboxMap!!)
+        scaleBarPlugin.create(ScaleBarOptions(requireContext()))
+    }
+
     /**
      * Set up the LocationEngine and the parameters for querying the device's location
      */
@@ -713,8 +731,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private fun enableExistingLocation(enable: Boolean) {
         locationNameTextInput.visibility = if (enable) View.GONE else View.VISIBLE
-//        changeTextView.visibility = if (enable) View.GONE else View.VISIBLE // New design for this
+        changeTextView.visibility = if (enable) View.GONE else View.VISIBLE
         changeGroupTextView.visibility = if (enable) View.GONE else View.VISIBLE
+        currentLocateGroupView.visibility = if (enable) View.VISIBLE else View.GONE
     }
 
     override fun onStart() {

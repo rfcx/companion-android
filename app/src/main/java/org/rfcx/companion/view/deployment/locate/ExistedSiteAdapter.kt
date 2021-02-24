@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_existed_site.view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Locate
+import org.rfcx.companion.util.setFormatLabel
 
 class ExistedSiteAdapter(private val itemClickListener: (Locate) -> Unit) :
     RecyclerView.Adapter<ExistedSiteAdapter.ExistedSiteAdapterViewHolder>() {
@@ -44,7 +45,7 @@ class ExistedSiteAdapter(private val itemClickListener: (Locate) -> Unit) :
             siteTextView.text = site.locate.name
             distanceTextView.visibility =
                 if (site.locate.name == itemView.context.getString(R.string.create_new_site)) View.GONE else View.VISIBLE
-            distanceTextView.text = "${String.format("%.2f", site.distance)} m"
+            distanceTextView.text = site.distance.setFormatLabel()
             iconAddImageView.visibility =
                 if (site.locate.name == itemView.context.getString(R.string.create_new_site)) View.VISIBLE else View.GONE
         }

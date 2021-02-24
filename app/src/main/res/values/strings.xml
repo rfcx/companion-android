@@ -95,14 +95,14 @@
     <string name="new_location">New site</string>
     <string name="existing">Existing</string>
     <string name="next">Next</string>
+    <string name="use_your_current_location">Use current location</string>
     <string name="change">change</string>
     <string name="choose">Choose</string>
     <string name="altitude">Altitude</string>
     <string name="altitude_default">0.0</string>
     <string name="altitude_digits">0123456789.</string>
     <string name="within">You are currently within 20m of the site</string>
-    <string name="more_than_m">You are %sm from the site</string>
-    <string name="more_than_km">You are %skm from the site</string>
+    <string name="more_than">You are %s from the site</string>
 
     <!--  NewSyncFragment  -->
     <string name="set_hardware_switch_to_off">Set hardware switch to OFF</string>
@@ -128,7 +128,7 @@
 
     <!--  MapPickerFragment  -->
     <string name="select">Select</string>
-    <string name="selected_location">Selected site</string>
+    <string name="selected_location">Selected location</string>
     <string name="please_fill_information">Site name is required.</string>
     <string name="altitude_is_required">Altitude is required.</string>
 
