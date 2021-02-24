@@ -17,7 +17,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_padding_normal"
             android:layout_marginTop="@dimen/margin_padding_normal"
-            android:layout_marginEnd="@dimen/margin_padding_normal">
+            android:layout_marginEnd="@dimen/margin_padding_normal"
+            android:layout_marginBottom="@dimen/margin_padding_normal">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/setHardwareSwitchToOffLayout"
@@ -172,6 +173,7 @@
                     style="@style/AudioMothText.Body.Small"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_padding_normal"
                     android:gravity="center"
                     android:text="@string/set_hardware_switch_to_custom"
                     app:layout_constraintStart_toStartOf="parent"
@@ -249,6 +251,7 @@
                     style="@style/AudioMothText.Body.Small"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_padding_normal"
                     android:gravity="center"
                     android:text="@string/lights_audiomoth"
                     app:layout_constraintStart_toStartOf="parent"
@@ -293,6 +296,71 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/four_text"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/movePhoneNearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layout_constraintTop_toBottomOf="@id/finishLightsAudiomothLayout">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/stepFiveTextView"
+                    style="@style/AudioMothText.Body.Small"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/five"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/movePhoneNearImageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/audiomoth_sync_phone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/movePhoneNearTextView"
+                    style="@style/AudioMothText.Body.Small"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/move_phone_near"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/movePhoneNearImageView" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/syncAudioMothButton"
+                    style="@style/AudioMothButton.GreenButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_padding_normal"
+                    android:text="@string/sync_audiomoth"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/movePhoneNearTextView" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/finishMovePhoneNearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/margin_padding_normal"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/movePhoneNearLayout">
+
+                <TextView
+                    style="@style/GuardianText.Label.Value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/five_text"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 

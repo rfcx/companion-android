@@ -108,7 +108,10 @@
     <string name="set_hardware_switch_to_off">Set hardware switch to OFF</string>
     <string name="set_hardware_switch_to_custom">Set hardware switch to CUSTOM</string>
     <string name="lights_audiomoth">Lights on AudioMoth should be: \nFLASHING GREEN &amp; SOLID RED</string>
+    <string name="move_phone_near">Move phone near to AudioMoth</string>
+    <string name="keep_phone_near">Keep phone near to AudioMoth</string>
     <string name="begin_sync">Begin Sync</string>
+    <string name="sync_audiomoth">Sync to AudioMoth</string>
     <string name="one">1)</string>
     <string name="two">2) Do you hear a loud audio tone?</string>
     <string name="three">3)</string>
