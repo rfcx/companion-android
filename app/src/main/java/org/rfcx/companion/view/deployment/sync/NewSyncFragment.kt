@@ -74,7 +74,7 @@ class NewSyncFragment : Fragment() {
 
         beginSyncButton.setOnClickListener {
             analytics?.trackPlayToneEvent()
-            edgeDeploymentProtocol?.playTone()
+            edgeDeploymentProtocol?.playTone(100000)
             setStep(2)
         }
         notHearButton.setOnClickListener {

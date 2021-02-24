@@ -1,6 +1,5 @@
 package org.rfcx.companion.view.deployment
 
-import android.location.Location
 import org.rfcx.companion.entity.*
 
 interface EdgeDeploymentProtocol : BaseDeploymentProtocol {
@@ -17,7 +16,7 @@ interface EdgeDeploymentProtocol : BaseDeploymentProtocol {
 
     fun playSyncSound()
 
-    fun playTone()
+    fun playTone(duration: Int = 10000)
 
     fun stopPlaySound()
 }

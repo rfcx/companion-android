@@ -67,6 +67,9 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     private var currentCheck = 0
     private var currentCheckName = ""
     private var passedChecks = RealmList<Int>()
+
+    private var needTone = true
+
     private val analytics by lazy { Analytics(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -340,15 +343,25 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         }.start()
     }
 
-    override fun playTone() {
+    override fun playTone(duration: Int) {
+        needTone = true
         Thread {
-            audioMothConnector.playTone(
-                50000
-            )
+            var durationCount = 0
+            val durationFrac = duration % TONE_DURATION
+            do {
+                durationCount += if (durationCount + durationFrac == duration) {
+                    audioMothConnector.playTone(durationFrac)
+                    durationFrac
+                } else {
+                    audioMothConnector.playTone(TONE_DURATION)
+                    TONE_DURATION
+                }
+            } while (durationCount < duration && duration >= TONE_DURATION && needTone)
         }.start()
     }
 
     override fun stopPlaySound() {
+        needTone = false
         audioMothConnector.stopPlay()
     }
 
@@ -469,6 +482,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         const val loadingDialogTag = "LoadingDialog"
         const val TAG_SYNC_INSTRUCTION_DIALOG = "SyncInstructionDialogFragment"
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
+        const val TONE_DURATION = 10000
 
         private var fromUnfinishedDeployment = false
 
