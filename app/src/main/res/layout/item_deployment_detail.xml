@@ -63,6 +63,32 @@
                 app:layout_constraintTop_toBottomOf="@id/locationNameTextView"
                 tools:text="Deployed at 11/03/2020 11:30" />
 
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/keyImageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_normal"
+                android:layout_marginTop="@dimen/margin_padding_small"
+                android:src="@drawable/ic_vpn_key"
+                android:tint="@color/grey_active"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/dateTextView" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/deploymentIdTextView"
+                style="@style/AudioMothText.Body.Secondary"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_small"
+                android:layout_marginTop="@dimen/margin_padding_small"
+                android:layout_marginEnd="@dimen/margin_padding_normal"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/keyImageView"
+                app:layout_constraintTop_toBottomOf="@id/dateTextView"
+                tools:text="ABCDEFGHIJKLM1234" />
+
             <TextView
                 android:id="@+id/seeDetailTextView"
                 style="@style/AudioMothText.Title"
