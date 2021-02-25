@@ -220,7 +220,7 @@
 
     <!--  ChooseDeviceFragment  -->
     <string name="choose_your_device">Choose your device</string>
-    <string name="rfcx_edge_audiomoth">AudioMoth (firmware v1.5+)</string>
+    <string name="rfcx_edge_audiomoth">AudioMoth (v1.5+ firmware)</string>
     <string name="rfcx_guardian">RFCx Guardian</string>
 
     <string name="location_permission_msg">Companion App would like to use your location</string>
