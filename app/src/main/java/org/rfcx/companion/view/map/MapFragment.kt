@@ -201,7 +201,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         progressBar.visibility = View.VISIBLE
 
         currentLocationButton.setOnClickListener {
-            moveCameraToCurrentLocation()
+            mapboxMap?.locationComponent?.isLocationComponentActivated?.let {
+                if (it) {
+                    moveCameraToCurrentLocation()
+                }
+            }
         }
     }
 
@@ -390,9 +394,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private val edgeDeploymentObserve = Observer<List<EdgeDeployment>> {
         this.edgeDeployments = it
-        context?.let { context ->
-            retrieveImages(context)
-        }
         combinedData()
     }
 
@@ -505,6 +506,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                             edgeDeploymentDb.insertOrUpdate(item)
                         }
                     }
+                    retrieveImages(context)
                 }
             })
     }
