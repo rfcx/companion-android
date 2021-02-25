@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
+import android.text.style.UnderlineSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -150,6 +151,7 @@ class NewSyncFragment : Fragment() {
 
         val confirmLight = SpannableString(getString(R.string.six))
         confirmLight.setSpan(red, 20, 23, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        confirmLight.setSpan(UnderlineSpan(), 33, 36, 0)
         stepSixTextView.text = confirmLight
     }
 

@@ -122,7 +122,8 @@
     <string name="one_text">1) Sync with AudioMoth started...</string>
     <string name="two_text">2) Initial audio tone playing...</string>
     <string name="three_text">3) Hardware switch set to CUSTOM</string>
-    <string name="four_text">4) AudioMoth Lights are: \nFLASHING GREEN &amp; SOLID RED</string>
+    <string name="four_text">4) AudioMoth Lights are:</string>
+    <string name="four_text_two">FLASHING GREEN &amp; SOLID RED</string>
     <string name="five_text">5) Profile sent to AudioMoth</string>
     <string name="no">No</string>
 

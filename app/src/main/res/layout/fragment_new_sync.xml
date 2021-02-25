@@ -320,11 +320,21 @@
 
                 <TextView
                     style="@style/AudioMothText.Subhead.Secondary"
+                    android:id="@+id/firstText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/four_text"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    style="@style/AudioMothText.Subhead.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/four_text_two"
+                    android:layout_marginStart="@dimen/margin_padding_normal"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/firstText" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
