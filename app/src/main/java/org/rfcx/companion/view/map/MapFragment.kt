@@ -200,7 +200,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         progressBar.visibility = View.VISIBLE
 
         currentLocationButton.setOnClickListener {
-            moveCameraOnStart()
+            moveCameraToCurrentLocation()
         }
     }
 
@@ -732,6 +732,17 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     15.0
                 )
             }
+        }
+    }
+
+    private fun moveCameraToCurrentLocation() {
+        mapboxMap?.locationComponent?.lastKnownLocation?.let { curLoc ->
+            val currentLatLng = LatLng(curLoc.latitude, curLoc.longitude)
+            moveCamera(
+                currentLatLng,
+                null,
+                mapboxMap?.cameraPosition?.zoom ?: 15.0
+            )
         }
     }
 
