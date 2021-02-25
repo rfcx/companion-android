@@ -4,30 +4,20 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.veinhorn.scrollgalleryview.MediaInfo
-import com.veinhorn.scrollgalleryview.ScrollGalleryView
-import com.veinhorn.scrollgalleryview.loader.picasso.PicassoImageLoader
+import androidx.viewpager2.widget.ViewPager2
 import kotlinx.android.synthetic.main.activity_display_image.*
 import org.rfcx.companion.R
 
 class DisplayImageActivity : AppCompatActivity() {
-    lateinit var galleryView: ScrollGalleryView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_display_image)
 
-        val paths = intent.extras?.getStringArrayList(PATH_IMAGE) ?: ArrayList()
-        val infoImage: ArrayList<MediaInfo> = ArrayList(paths.size)
-        for (url in paths) infoImage.add(MediaInfo.mediaLoader(PicassoImageLoader(url)))
-
-        galleryView = scrollGalleryView
-        galleryView
-            .withHiddenThumbnails(true)
-            .setThumbnailSize(100)
-            .setFragmentManager(supportFragmentManager)
-            .addMedia(infoImage)
-            .setZoom(true)
+        val paths = intent.extras?.getStringArrayList(PATH_IMAGE) ?: arrayListOf()
+        val adapter = DisplayImageAdapter(paths, this)
+        imageViewPager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
+        imageViewPager.adapter = adapter
     }
 
     companion object {

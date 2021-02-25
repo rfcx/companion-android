@@ -204,6 +204,10 @@ class EdgeDeploymentDb(private val realm: Realm) {
                 bgRealm.where(Locate::class.java)
                     .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_SERVER_ID, edgeDeployment.serverId)
                     .findFirst()
+                    ?: 
+                bgRealm.where(Locate::class.java)
+                    .equalTo(Locate.FIELD_SERVER_ID, edgeDeployment.stream?.coreId)
+                    .findFirst()
             } else {
                 bgRealm.where(Locate::class.java)
                     .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_ID, id).findFirst()
@@ -214,7 +218,6 @@ class EdgeDeploymentDb(private val realm: Realm) {
                 location.longitude = longitude
                 location.altitude = altitude
                 location.name = locationName
-                location.syncState = SyncState.Unsent.key
             }
         }, {
             // success

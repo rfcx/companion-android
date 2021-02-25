@@ -4,8 +4,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.veinhorn.scrollgalleryview.ScrollGalleryView
-        android:id="@+id/scrollGalleryView"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/imageViewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 </LinearLayout>

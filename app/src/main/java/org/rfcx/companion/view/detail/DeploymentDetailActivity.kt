@@ -25,6 +25,7 @@ import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_deployment_detail.*
 import kotlinx.android.synthetic.main.toolbar_default.*
+import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.localdb.DatabaseCallback
@@ -302,8 +303,9 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
     }
 
     override fun invoke(deploymentImage: DeploymentImageView) {
-        val list = arrayListOf<String>()
-        deploymentImages.forEach { list.add(it.remotePath ?: "file://${it.localPath}") }
+        val list = deploymentImages.map {
+            if (it.remotePath != null) BuildConfig.DEVICE_API_DOMAIN + it.remotePath else "file://${it.localPath}"
+        } as ArrayList
         
         val index = list.indexOf(deploymentImage.remotePath ?: "file://${deploymentImage.localPath}")
         list.removeAt(index)
