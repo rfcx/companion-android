@@ -18,6 +18,7 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.view.deployment.EdgeDeploymentProtocol
+import org.rfcx.companion.view.dialog.CompleteFragment
 
 class NewSyncFragment : Fragment() {
     private var edgeDeploymentProtocol: EdgeDeploymentProtocol? = null
@@ -113,6 +114,7 @@ class NewSyncFragment : Fragment() {
         syncAudioMothButton.setOnClickListener {
             movePhoneNearTextView.text = getString(R.string.keep_phone_near)
             syncAudioMothButton.isEnabled = false
+            syncAudioMothButton.text = getString(R.string.sync_in_progress)
             analytics?.trackPlaySyncToneEvent()
             edgeDeploymentProtocol?.playSyncSound()
         }
@@ -124,8 +126,18 @@ class NewSyncFragment : Fragment() {
         confirmLightButton.setOnClickListener {
             analytics?.trackPlaySyncToneCompletedEvent()
             edgeDeploymentProtocol?.stopPlaySound()
-            edgeDeploymentProtocol?.nextStep()
+            showComplete()
         }
+    }
+
+    private fun showComplete() {
+        val completeFragment: CompleteFragment =
+            childFragmentManager.findFragmentByTag(CompleteFragment.tag) as CompleteFragment?
+                ?: run {
+                    CompleteFragment()
+                }
+        completeFragment.isCancelable = false
+        completeFragment.show(childFragmentManager, CompleteFragment.tag)
     }
 
     private fun setLabelColor(view: View) {

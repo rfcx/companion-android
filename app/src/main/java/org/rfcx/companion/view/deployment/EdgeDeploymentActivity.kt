@@ -439,7 +439,11 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     }
 
     override fun onAnimationEnd() {
-        finish()
+        if(supportFragmentManager.fragments.last() is NewSyncFragment) {
+            nextStep()
+        } else {
+            finish()
+        }
     }
 
     override fun onBackPressed() {

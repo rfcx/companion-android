@@ -110,6 +110,7 @@
     <string name="lights_audiomoth">Lights on AudioMoth should be: \nFLASHING GREEN &amp; SOLID RED</string>
     <string name="move_phone_near">Move phone near to AudioMoth</string>
     <string name="keep_phone_near">Keep phone near to AudioMoth</string>
+    <string name="sync_in_progress">Sync to AudioMoth in progress</string>
     <string name="begin_sync">Begin Sync</string>
     <string name="sync_audiomoth">Sync to AudioMoth</string>
     <string name="one">1)</string>
@@ -219,7 +220,7 @@
 
     <!--  ChooseDeviceFragment  -->
     <string name="choose_your_device">Choose your device</string>
-    <string name="rfcx_edge_audiomoth">AudioMoth (1.5+)</string>
+    <string name="rfcx_edge_audiomoth">AudioMoth (firmware v1.5+)</string>
     <string name="rfcx_guardian">RFCx Guardian</string>
 
     <string name="location_permission_msg">Companion App would like to use your location</string>
