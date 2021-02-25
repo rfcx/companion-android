@@ -92,6 +92,13 @@
                 android:layout_height="0dp"
                 app:layout_constraintTop_toBottomOf="@id/finishSetHardwareLayout">
 
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guidelineVertical1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.4" />
+
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/stepTwoTextView"
                     style="@style/AudioMothText.Body"
@@ -104,25 +111,27 @@
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/notHearButton"
                     style="@style/GuardianButton.RedButton"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="@dimen/margin_padding_normal"
+                    android:layout_marginEnd="@dimen/margin_padding_small"
                     android:gravity="center"
                     android:text="@string/no"
-                    app:layout_constraintEnd_toStartOf="@id/hearButton"
+                    app:layout_constraintEnd_toStartOf="@id/guidelineVertical1"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/stepTwoTextView" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/hearButton"
                     style="@style/AudioMothButton.GreenButton"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_normal"
+                    android:layout_marginStart="@dimen/margin_padding_small"
                     android:text="@string/yes"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/notHearButton"
+                    app:layout_constraintStart_toEndOf="@id/guidelineVertical1"
                     app:layout_constraintTop_toBottomOf="@id/stepTwoTextView" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -168,6 +177,13 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guidelineVertical2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.4" />
+
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/switchCustomTextView"
                     style="@style/AudioMothText.Body"
@@ -182,25 +198,27 @@
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/notSwitchButton"
                     style="@style/GuardianButton.RedButton"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="@dimen/margin_padding_normal"
+                    android:layout_marginEnd="@dimen/margin_padding_small"
                     android:gravity="center"
                     android:text="@string/no"
-                    app:layout_constraintEnd_toStartOf="@id/switchButton"
+                    app:layout_constraintEnd_toStartOf="@id/guidelineVertical2"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/switchCustomTextView" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/switchButton"
                     style="@style/AudioMothButton.GreenButton"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_normal"
+                    android:layout_marginStart="@dimen/margin_padding_small"
                     android:text="@string/yes"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/notSwitchButton"
+                    app:layout_constraintStart_toEndOf="@id/guidelineVertical2"
                     app:layout_constraintTop_toBottomOf="@id/switchCustomTextView" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -228,6 +246,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 app:layout_constraintTop_toBottomOf="@id/finishSwitchToCustomLayout">
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guidelineVertical3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.4" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/stepFourTextView"
@@ -260,25 +285,27 @@
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/notSeeLightsAudiomothButton"
                     style="@style/GuardianButton.RedButton"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="@dimen/margin_padding_normal"
+                    android:layout_marginEnd="@dimen/margin_padding_small"
                     android:gravity="center"
                     android:text="@string/no"
-                    app:layout_constraintEnd_toStartOf="@id/seeLightsAudiomothButton"
+                    app:layout_constraintEnd_toStartOf="@id/guidelineVertical3"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/lightsAudiomothTextView" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/seeLightsAudiomothButton"
                     style="@style/AudioMothButton.GreenButton"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_normal"
+                    android:layout_marginStart="@dimen/margin_padding_small"
                     android:text="@string/yes"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/notSeeLightsAudiomothButton"
+                    app:layout_constraintStart_toEndOf="@id/guidelineVertical3"
                     app:layout_constraintTop_toBottomOf="@id/lightsAudiomothTextView" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -372,6 +399,13 @@
                 android:layout_height="0dp"
                 app:layout_constraintTop_toBottomOf="@id/finishMovePhoneNearLayout">
 
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guidelineVertical4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.4" />
+
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/stepSixTextView"
                     style="@style/AudioMothText.Body"
@@ -384,25 +418,27 @@
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/notConfirmLightButton"
                     style="@style/GuardianButton.RedButton"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="@dimen/margin_padding_normal"
+                    android:layout_marginEnd="@dimen/margin_padding_small"
                     android:gravity="center"
                     android:text="@string/no"
-                    app:layout_constraintEnd_toStartOf="@id/confirmLightButton"
+                    app:layout_constraintEnd_toStartOf="@id/guidelineVertical4"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/stepSixTextView" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/confirmLightButton"
                     style="@style/AudioMothButton.GreenButton"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_normal"
+                    android:layout_marginStart="@dimen/margin_padding_small"
                     android:text="@string/yes"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/notConfirmLightButton"
+                    app:layout_constraintStart_toEndOf="@id/guidelineVertical4"
                     app:layout_constraintTop_toBottomOf="@id/stepSixTextView" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
