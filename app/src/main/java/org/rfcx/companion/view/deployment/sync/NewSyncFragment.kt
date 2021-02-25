@@ -1,12 +1,17 @@
 package org.rfcx.companion.view.deployment.sync
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.drawable.AnimationDrawable
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_new_sync.*
 import org.rfcx.companion.R
@@ -72,6 +77,8 @@ class NewSyncFragment : Fragment() {
             setStep(1)
         }
 
+        setLabelColor(view)
+
         beginSyncButton.setOnClickListener {
             analytics?.trackPlayToneEvent()
             edgeDeploymentProtocol?.playTone(100000)
@@ -119,6 +126,19 @@ class NewSyncFragment : Fragment() {
             edgeDeploymentProtocol?.stopPlaySound()
             edgeDeploymentProtocol?.nextStep()
         }
+    }
+
+    private fun setLabelColor(view: View) {
+        val spannableString = SpannableString(getString(R.string.lights_audiomoth))
+        val red = ForegroundColorSpan(Color.RED) //red color
+        val green = ForegroundColorSpan(ContextCompat.getColor(view.context, R.color.colorPrimary)) //green color
+        spannableString.setSpan(green, 32, 46, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        spannableString.setSpan(red, 48, 58, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        lightsAudiomothTextView.text = spannableString
+
+        val confirmLight = SpannableString(getString(R.string.six))
+        confirmLight.setSpan(red, 20, 23, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        stepSixTextView.text = confirmLight
     }
 
     private fun setStep(step: Int) {
