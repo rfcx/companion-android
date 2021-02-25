@@ -4,9 +4,11 @@ import android.content.Context
 import android.util.Log
 import androidx.work.*
 import io.realm.Realm
+import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.localdb.guardian.GuardianProfileDb
+import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.service.profile.GuardianProfileSyncWorker
 import org.rfcx.companion.util.RealmHelper
 import java.util.concurrent.TimeUnit
@@ -46,6 +48,13 @@ class DeploymentCleanupWorker(val context: Context, params: WorkerParameters) :
         guardianProfileDb.unlockSending()
         if (guardianProfileUnsent > 0) {
             GuardianProfileSyncWorker.enqueue(context)
+        }
+
+        val imageDb = DeploymentImageDb(realm)
+        val imageUnsent = imageDb.unsentCount()
+        imageDb.unlockSending()
+        if (imageUnsent > 0) {
+            ImageSyncWorker.enqueue(context)
         }
     }
 

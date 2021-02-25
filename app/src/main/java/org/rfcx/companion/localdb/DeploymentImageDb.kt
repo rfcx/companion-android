@@ -12,9 +12,25 @@ import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.EdgeDeployment
 import org.rfcx.companion.entity.SyncState
 import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.guardian.GuardianProfile
 import org.rfcx.companion.entity.response.DeploymentImageResponse
 
 class DeploymentImageDb(private val realm: Realm) {
+
+    fun unsentCount(): Long {
+        return realm.where(DeploymentImage::class.java)
+            .notEqualTo(DeploymentImage.FIELD_SYNC_STATE, SyncState.Sent.key)
+            .count()
+    }
+
+    fun unlockSending() {
+        realm.executeTransaction {
+            val snapshot = it.where(DeploymentImage::class.java).equalTo(DeploymentImage.FIELD_SYNC_STATE, SyncState.Sending.key).findAll().createSnapshot()
+            snapshot.forEach { profile ->
+                profile.syncState = SyncState.Unsent.key
+            }
+        }
+    }
 
     fun getImageByDeploymentId(id: Int): List<DeploymentImage> {
         return realm.where(DeploymentImage::class.java)
