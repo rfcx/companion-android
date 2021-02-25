@@ -303,14 +303,10 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
     }
 
     override fun invoke(deploymentImage: DeploymentImageView) {
-        val list = arrayListOf<String>()
-        deploymentImages.forEach {
-            if (it.remotePath != null) {
-                list.add(BuildConfig.DEVICE_API_DOMAIN + it.remotePath)
-            } else {
-                list.add("file://${it.localPath}")
-            }
-        }
+        val list = deploymentImages.map {
+            if (it.remotePath != null) BuildConfig.DEVICE_API_DOMAIN + it.remotePath else "file://${it.localPath}"
+        } as ArrayList
+        
         val index = list.indexOf(deploymentImage.remotePath ?: "file://${deploymentImage.localPath}")
         list.removeAt(index)
         list.add(0, deploymentImage.remotePath ?: "file://${deploymentImage.localPath}")
