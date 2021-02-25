@@ -82,6 +82,8 @@ class EdgeDeploymentDetailViewHolder(
     private val vDeploymentDetail = itemView.deploymentDetailView
     private val ivSync = itemView.syncImageView
     private val vMoreIconView = itemView.moreIconView
+    private val deploymentIdTextView = itemView.deploymentIdTextView
+    private val keyImageView = itemView.keyImageView
 
     fun bind(deployment: DeploymentDetailView.EdgeDeploymentView) {
         val isReadyToUpload = deployment.state == DeploymentState.Edge.ReadyToUpload.key
@@ -92,6 +94,12 @@ class EdgeDeploymentDetailViewHolder(
                 deployment.syncImage
             )
         )
+
+        if(deployment.serverId != null) {
+            deploymentIdTextView.text = deployment.serverId
+            deploymentIdTextView.visibility = if (isReadyToUpload) View.VISIBLE else View.GONE
+            keyImageView.visibility = if (isReadyToUpload) View.VISIBLE else View.GONE
+        }
 
         tvGuardianBadge.visibility = View.GONE
         tvLocation.text = deployment.locationName
@@ -127,6 +135,8 @@ class GuardianDeploymentDetailViewHolder(
     private val vMoreIconView = itemView.moreIconView
     private val ivSync = itemView.syncImageView
     private val itemLayout = itemView.deploymentDetailLayout
+    private val deploymentIdTextView = itemView.deploymentIdTextView
+    private val keyImageView = itemView.keyImageView
 
     fun bind(deployment: DeploymentDetailView.GuardianDeploymentView) {
         tvGuardianBadge.visibility = View.VISIBLE
@@ -140,6 +150,11 @@ class GuardianDeploymentDetailViewHolder(
 
         itemLayout.setOnClickListener {
             itemClickListener.onClickedGuardianDeploymentDetail(deployment)
+        }
+        if(deployment.serverId != null) {
+            deploymentIdTextView.text = deployment.serverId
+            deploymentIdTextView.visibility = View.VISIBLE
+            keyImageView.visibility = View.VISIBLE
         }
         ivSync.setImageDrawable(
             ContextCompat.getDrawable(

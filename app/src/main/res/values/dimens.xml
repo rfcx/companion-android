@@ -63,4 +63,8 @@
     <dimen name="current_loc_margin">64dp</dimen>
     <dimen name="legend_top_margin">64dp</dimen>
 
+    <!-- Sync -->
+    <dimen name="height_audiomoth_near_phone">180dp</dimen>
+
+
 </resources>
