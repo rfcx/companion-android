@@ -162,6 +162,7 @@
         android:orientation="vertical"
         android:paddingTop="@dimen/margin_padding_normal"
         android:paddingBottom="@dimen/margin_padding_normal"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/coordinatesLinearLayout">
 
         <TextView
