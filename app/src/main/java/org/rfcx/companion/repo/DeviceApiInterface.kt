@@ -4,6 +4,7 @@ import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import org.rfcx.companion.entity.request.DeploymentRequest
 import org.rfcx.companion.entity.request.EditDeploymentRequest
+import org.rfcx.companion.entity.response.DeploymentImageResponse
 import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.entity.response.StreamResponse
@@ -50,6 +51,12 @@ interface DeviceApiInterface {
         @Path("id") id: String,
         @Part file: MultipartBody.Part
     ): Call<ResponseBody>
+
+    @GET("deployments/{id}/assets")
+    fun getImages(
+        @Header("Authorization") authUser: String,
+        @Path("id") id: String
+    ): Call<List<DeploymentImageResponse>>
 
     @GET("streams")
     fun getStreams(@Header("Authorization") authUser: String): Call<List<StreamResponse>>

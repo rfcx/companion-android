@@ -55,6 +55,7 @@ import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.DeploymentState.Edge
 import org.rfcx.companion.entity.DeploymentState.Guardian
 import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.response.DeploymentImageResponse
 import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.entity.response.StreamResponse
@@ -559,7 +560,38 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun retrieveImages(context: Context) {
-        Firestore(context).retrieveImages(edgeDeploymentDb, guardianDeploymentDb, deploymentImageDb)
+        val token = "Bearer ${context.getIdToken()}"
+
+        edgeDeployments.forEach { dp ->
+            if (dp.serverId != null) {
+                ApiManager.getInstance().getDeviceApi().getImages(token, dp.serverId!!)
+                    .enqueue(object : Callback<List<DeploymentImageResponse>> {
+                        override fun onFailure(
+                            call: Call<List<DeploymentImageResponse>>,
+                            t: Throwable
+                        ) {
+                            combinedData()
+                            if (context.isNetworkAvailable()) {
+                                Toast.makeText(
+                                    context,
+                                    R.string.error_has_occurred,
+                                    Toast.LENGTH_SHORT
+                                )
+                                    .show()
+                            }
+                        }
+
+                        override fun onResponse(
+                            call: Call<List<DeploymentImageResponse>>,
+                            response: Response<List<DeploymentImageResponse>>
+                        ) {
+                            response.body()?.forEach { item ->
+                                deploymentImageDb.insertOrUpdate(item, dp.id, Device.AUDIOMOTH.value)
+                            }
+                        }
+                    })
+            }
+        }
     }
 
     private fun fetchJobSyncing() {

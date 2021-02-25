@@ -53,11 +53,6 @@ class Firestore(val context: Context) {
         userDocument.collection(COLLECTION_GROUPS).document(docId).set(group).await()
     }
 
-    suspend fun sendImage(imageRequest: ImageRequest): DocumentReference? {
-        val userDocument = db.collection(COLLECTION_USERS).document(uid)
-        return userDocument.collection(COLLECTION_IMAGES).add(imageRequest).await()
-    }
-
     suspend fun sendDiagnostic(diagnosticRequest: DiagnosticRequest): DocumentReference? {
         val userDocument = db.collection(COLLECTION_USERS).document(uid)
         return userDocument.collection(COLLECTION_DIAGNOSTIC).add(diagnosticRequest).await()
@@ -73,46 +68,6 @@ class Firestore(val context: Context) {
         val userDocument = db.collection(COLLECTION_USERS).document(uid)
         userDocument.collection(COLLECTION_GROUPS).document(groupServerId)
             .set(group).await()
-    }
-
-    fun retrieveImages(
-        edgeDeploymentDb: EdgeDeploymentDb,
-        guardianDeploymentDb: GuardianDeploymentDb,
-        deploymentImageDb: DeploymentImageDb,
-        callback: ResponseCallback<List<DeploymentImageResponse>>? = null
-    ) {
-        if (uid != "") {
-            val userDocument = db.collection(COLLECTION_USERS).document(uid)
-            userDocument.collection(COLLECTION_IMAGES).get()
-                .addOnSuccessListener {
-                    val deploymentImageResponses = arrayListOf<DeploymentImageResponse>()
-                    it.documents.forEach { doc ->
-                        val deploymentImageResponse =
-                            doc.toObject(DeploymentImageResponse::class.java)
-                        deploymentImageResponse?.let { it1 -> deploymentImageResponses.add(it1) }
-                    }
-
-                    deploymentImageResponses.forEach { lr ->
-                        val edgeDeploymentId =
-                            edgeDeploymentDb.getDeploymentByServerId(lr.deploymentServerId)
-                        val guardianDeploymentId =
-                            guardianDeploymentDb.getDeploymentByServerId(lr.deploymentServerId)
-
-                        if (edgeDeploymentId != null) {
-                            deploymentImageDb.insertOrUpdate(lr, edgeDeploymentId.id, Device.AUDIOMOTH.value)
-                        }
-
-                        if (guardianDeploymentId != null) {
-                            deploymentImageDb.insertOrUpdate(lr, guardianDeploymentId.id, Device.GUARDIAN.value)
-                        }
-                    }
-
-                    callback?.onSuccessCallback(deploymentImageResponses)
-                }
-                .addOnFailureListener {
-                    callback?.onFailureCallback(it.localizedMessage)
-                }
-        }
     }
 
     fun retrieveDiagnostics(

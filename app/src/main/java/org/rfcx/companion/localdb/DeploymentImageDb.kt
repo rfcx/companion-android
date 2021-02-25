@@ -176,18 +176,19 @@ class DeploymentImageDb(private val realm: Realm) {
         realm.executeTransaction {
             val image =
                 it.where(DeploymentImage::class.java)
-                    .equalTo(DeploymentImage.FIELD_REMOTE_PATH, deploymentImageResponse.remotePath)
+                    .equalTo(DeploymentImage.FIELD_REMOTE_PATH, "assets/${deploymentImageResponse.id}")
                     .findFirst()
 
             if (image == null && deploymentId != null) {
-                val deploymentImage = deploymentImageResponse.toDeploymentImage()
-                val id = (it.where(DeploymentImage::class.java).max(FIELD_ID)?.toInt() ?: 0) + 1
-                deploymentImage.id = id
-                deploymentImage.deploymentId = deploymentId
-                deploymentImage.syncState = SyncState.Sent.key
-                deploymentImage.syncToFireStoreState = SyncState.Sent.key
-                deploymentImage.device = device
-                it.insert(deploymentImage)
+                if (deploymentImageResponse.mimeType.startsWith("image")) {
+                    val deploymentImage = deploymentImageResponse.toDeploymentImage()
+                    val id = (it.where(DeploymentImage::class.java).max(FIELD_ID)?.toInt() ?: 0) + 1
+                    deploymentImage.id = id
+                    deploymentImage.deploymentId = deploymentId
+                    deploymentImage.syncState = SyncState.Sent.key
+                    deploymentImage.device = device
+                    it.insert(deploymentImage)
+                }
             }
         }
     }
