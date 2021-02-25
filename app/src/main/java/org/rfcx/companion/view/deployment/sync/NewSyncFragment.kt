@@ -113,6 +113,7 @@ class NewSyncFragment : Fragment() {
         syncAudioMothButton.setOnClickListener {
             movePhoneNearTextView.text = getString(R.string.keep_phone_near)
             syncAudioMothButton.isEnabled = false
+            syncAudioMothButton.text = getString(R.string.sync_in_progress)
             analytics?.trackPlaySyncToneEvent()
             edgeDeploymentProtocol?.playSyncSound()
         }
