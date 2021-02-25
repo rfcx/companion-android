@@ -59,9 +59,13 @@ interface DeviceApiInterface {
     ): Call<List<DeploymentImageResponse>>
 
     @GET("streams")
-    fun getStreams(@Header("Authorization") authUser: String): Call<List<StreamResponse>>
+    fun getStreams(@Header("Authorization") authUser: String,
+                   @Query("limit") limit: Int = 100,
+                   @Query("offset") offset: Int = 0): Call<List<StreamResponse>>
 
     @GET("projects")
-    fun getProjects(@Header("Authorization") authUser: String): Call<List<ProjectResponse>>
+    fun getProjects(@Header("Authorization") authUser: String,
+                    @Query("limit") limit: Int = 100,
+                    @Query("offset") offset: Int = 0): Call<List<ProjectResponse>>
 
 }
