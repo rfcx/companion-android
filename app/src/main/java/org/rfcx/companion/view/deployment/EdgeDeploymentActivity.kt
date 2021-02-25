@@ -186,7 +186,12 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         startFragment(SelectingExistedSiteFragment.newInstance(latitude, longitude))
     }
 
-    override fun getDeployment(): EdgeDeployment? = this._deployment ?: EdgeDeployment()
+    override fun getDeployment(): EdgeDeployment? {
+        if (this._deployment == null) {
+            this._deployment = EdgeDeployment()
+        }
+        return this._deployment
+    }
     override fun getCurrentLocation(): Location = currentLocation ?: Location(LocationManager.GPS_PROVIDER)
 
     override fun getLocationGroup(name: String): LocationGroups? {
