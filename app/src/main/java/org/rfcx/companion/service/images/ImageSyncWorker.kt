@@ -11,6 +11,8 @@ import okhttp3.RequestBody
 import org.rfcx.companion.entity.request.toRequestBody
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.repo.ApiManager
+import org.rfcx.companion.util.FileUtils
+import org.rfcx.companion.util.FileUtils.getMimeType
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.Storage
 import org.rfcx.companion.util.getIdToken
@@ -31,15 +33,19 @@ class ImageSyncWorker(val context: Context, params: WorkerParameters) :
         val token = "Bearer ${context.getIdToken()}"
         deploymentImage.forEach {
             val file = File(it.localPath)
-            val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
+            val mimeType = file.getMimeType()
+            val requestFile = RequestBody.create(MediaType.parse(mimeType), file)
             val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
             val result = ApiManager.getInstance().getDeviceApi()
                 .uploadImage(token, it.deploymentServerId!!, body).execute()
 
             if (result.isSuccessful) {
+                val assetPath = result.headers().get("Location")
+                assetPath?.let { path ->
+                    db.markSent(it.id, path.substring(1, path.length))
+                }
+
                 Log.d(TAG, "doWork: success $result")
-                //TODO: get url back when uploaded
-                db.markSent(it.id, null)
             } else {
                 db.markUnsent(it.id)
                 someFailed = true

@@ -1,5 +1,6 @@
 package org.rfcx.companion.view.detail
 
+import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.DeploymentImage
 import org.rfcx.companion.entity.SyncState
@@ -24,7 +25,7 @@ fun DeploymentImage.toDeploymentImageView(): DeploymentImageView {
     return DeploymentImageView(
         id = this.id,
         localPath = this.localPath,
-        remotePath = this.remotePath,
+        remotePath = if (this.remotePath != null) BuildConfig.DEVICE_API_DOMAIN + this.remotePath else null,
         syncState = if (this.syncToFireStoreState != SyncState.Sent.key) {
             this.syncState
         } else {

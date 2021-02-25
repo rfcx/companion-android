@@ -12,6 +12,7 @@ import kotlinx.android.synthetic.main.item_detail_image.view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.SyncState
 import org.rfcx.companion.extension.setDeploymentImage
+import org.rfcx.companion.util.getIdToken
 
 class DeploymentImageAdapter(private val itemClickListener: (DeploymentImageView) -> Unit) : ListAdapter<DeploymentImageView,
         DeploymentImageAdapter.ImageDetailViewHolder>(DeploymentImageViewDiff()) {
@@ -62,9 +63,13 @@ class DeploymentImageAdapter(private val itemClickListener: (DeploymentImageView
                 )
             )
 
+            val token = itemView.context.getIdToken()
+            val fromServer = item.remotePath != null
             imageView.setDeploymentImage(
                 url = item.remotePath ?: item.localPath,
-                blur = item.syncState != SyncState.Sent.key
+                blur = item.syncState != SyncState.Sent.key,
+                fromServer = fromServer,
+                token = token
             )
 
             // handle hide syncing image view after sent in 2sec
