@@ -144,8 +144,8 @@ class NewSyncFragment : Fragment() {
         val spannableString = SpannableString(getString(R.string.lights_audiomoth))
         val red = ForegroundColorSpan(Color.RED) //red color
         val green = ForegroundColorSpan(ContextCompat.getColor(view.context, R.color.colorPrimary)) //green color
-        spannableString.setSpan(green, 32, 46, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        spannableString.setSpan(red, 48, 58, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        spannableString.setSpan(red, 32, 41, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        spannableString.setSpan(green, 44, 58, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         lightsAudiomothTextView.text = spannableString
 
         val confirmLight = SpannableString(getString(R.string.six))
