@@ -118,6 +118,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
+    private var currentSiteLoading = 0
+
     private val mapboxLocationChangeCallback =
         object : LocationEngineCallback<LocationEngineResult> {
             override fun onSuccess(result: LocationEngineResult?) {
@@ -222,7 +224,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         context?.let {
             retrieveDeployments(it)
-            retrieveLocations(it)
+            retrieveLocations(it, 0)
             retrieveProjects(it)
             retrieveDiagnostics(it)
         }
@@ -511,9 +513,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             })
     }
 
-    private fun retrieveLocations(context: Context) {
+    private fun retrieveLocations(context: Context, offset: Int) {
         val token = "Bearer ${context.getIdToken()}"
-        ApiManager.getInstance().getDeviceApi().getStreams(token, 1000, 0)
+        ApiManager.getInstance().getDeviceApi().getStreams(token, SITES_LIMIT_GETTING, offset)
             .enqueue(object : Callback<List<StreamResponse>> {
                 override fun onFailure(call: Call<List<StreamResponse>>, t: Throwable) {
                     combinedData()
@@ -527,9 +529,17 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     call: Call<List<StreamResponse>>,
                     response: Response<List<StreamResponse>>
                 ) {
-                    response.body()?.forEach { item ->
+                    val sites = response.body()
+                    sites?.forEach { item ->
                         locateDb.insertOrUpdate(item)
                     }
+                    sites?.let {
+                        if (it.size == SITES_LIMIT_GETTING) {
+                            currentSiteLoading += SITES_LIMIT_GETTING
+                            retrieveLocations(context, currentSiteLoading)
+                        }
+                    }
+
                 }
             })
     }
@@ -921,6 +931,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         private const val PROPERTY_SITE_MARKER_IMAGE = "site.marker.image"
 
+        private const val SITES_LIMIT_GETTING = 100
 
         fun newInstance(): MapFragment {
             return MapFragment()
