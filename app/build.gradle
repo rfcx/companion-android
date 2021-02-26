@@ -14,7 +14,7 @@ android {
         manifestPlaceholders = [auth0Domain: "@string/auth0_domain", auth0Scheme: "@string/auth0_scheme"]
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 27
+        versionCode 28
         versionName "1.2.2"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -40,12 +40,12 @@ android {
         internal {
             buildConfigField 'boolean', 'ENABLE_GUARDIAN', 'true'
             buildConfigField 'String', 'FIREBASE_AUTH_DOMAIN', '"https://us-central1-rfcx-deployment.cloudfunctions.net/auth/"'
-            buildConfigField 'String', 'DEVICE_API_DOMAIN', '"https://staging-device-api.rfcx.org/"'
+            buildConfigField 'String', 'DEVICE_API_DOMAIN', '"https://device-api.rfcx.org/"'
         }
         internalDevelop {
             buildConfigField 'boolean', 'ENABLE_GUARDIAN', 'true'
             buildConfigField 'String', 'FIREBASE_AUTH_DOMAIN', '"https://us-central1-rfcx-deployment-dev.cloudfunctions.net/auth/"'
-            buildConfigField 'String', 'DEVICE_API_DOMAIN', '"https://device-api.rfcx.org/"'
+            buildConfigField 'String', 'DEVICE_API_DOMAIN', '"https://staging-device-api.rfcx.org/"'
             applicationIdSuffix '.dev'
         }
     }
