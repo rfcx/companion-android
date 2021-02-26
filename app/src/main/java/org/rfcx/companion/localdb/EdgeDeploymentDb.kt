@@ -87,6 +87,37 @@ class EdgeDeploymentDb(private val realm: Realm) {
         }
     }
 
+    fun insertOrUpdate(deploymentResponses: List<DeploymentResponse>) {
+        realm.executeTransaction {
+            deploymentResponses.forEach { deploymentResponse ->
+                val deployment =
+                    it.where(EdgeDeployment::class.java)
+                        .equalTo(EdgeDeployment.FIELD_SERVER_ID, deploymentResponse.id)
+                        .findFirst()
+
+                if (deployment == null) {
+                    val deploymentObj = deploymentResponse.toEdgeDeployment()
+                    val id = (it.where(EdgeDeployment::class.java).max(EdgeDeployment.FIELD_ID)
+                        ?.toInt() ?: 0) + 1
+                    deploymentObj.id = id
+                    it.insert(deploymentObj)
+                } else if (deployment.syncState == SyncState.Sent.key) {
+                    deployment.deploymentKey = deploymentResponse.id
+                    deployment.serverId = deploymentResponse.id
+                    deployment.deployedAt = deploymentResponse.deployedAt ?: deployment.deployedAt
+
+                    val newLocation = deploymentResponse.stream
+                    if (newLocation != null) {
+                        deployment.stream = it.copyToRealm(newLocation.toDeploymentLocation())
+                    }
+
+                    deployment.createdAt =
+                        deploymentResponse.createdAt ?: deployment.createdAt
+                }
+            }
+        }
+    }
+
     fun markUnsent(id: Int) {
         mark(id = id, syncState = SyncState.Unsent.key)
     }

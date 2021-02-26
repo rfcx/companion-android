@@ -130,6 +130,9 @@ class LocateDb(private val realm: Realm) {
                 locate.id = id
                 it.insert(locate)
             } else if (location.syncState == SyncState.Sent.key) {
+                if (location.serverId == streamResponse.id && location.name == streamResponse.name && location.latitude == streamResponse.latitude && location.longitude == streamResponse.longitude && location.altitude == streamResponse.altitude) {
+                    return@executeTransaction
+                }
 
                 location.serverId = streamResponse.id
                 location.name = streamResponse.name ?: location.name
@@ -148,6 +151,47 @@ class LocateDb(private val realm: Realm) {
                     }
                 }
                 location.locationGroup = locationGroupObj
+            }
+        }
+    }
+
+    fun insertOrUpdate(streamResponses: List<StreamResponse>) {
+        realm.executeTransaction {
+            streamResponses.forEach { streamResponse ->
+                val location =
+                    it.where(Locate::class.java)
+                        .equalTo(Locate.FIELD_SERVER_ID, streamResponse.id)
+                        .findFirst()
+
+                if (location == null) {
+                    val locate = streamResponse.toLocate()
+                    val id = (it.where(Locate::class.java).max(Locate.FIELD_ID)
+                        ?.toInt() ?: 0) + 1
+                    locate.id = id
+                    it.insert(locate)
+                } else if (location.syncState == SyncState.Sent.key) {
+                    if (location.serverId == streamResponse.id && location.name == streamResponse.name && location.latitude == streamResponse.latitude && location.longitude == streamResponse.longitude && location.altitude == streamResponse.altitude) {
+                        return@executeTransaction
+                    }
+
+                    location.serverId = streamResponse.id
+                    location.name = streamResponse.name ?: location.name
+                    location.latitude = streamResponse.latitude ?: location.latitude
+                    location.longitude = streamResponse.longitude ?: location.longitude
+                    location.altitude = streamResponse.altitude ?: location.altitude
+                    location.createdAt = streamResponse.createdAt ?: location.createdAt
+
+                    val locationGroupObj = it.createObject(LocationGroup::class.java)
+                    locationGroupObj?.let { obj ->
+                        val locationGroup = streamResponse.project
+                        if (locationGroup != null) {
+                            obj.name = locationGroup.name
+                            obj.color = locationGroup.color
+                            obj.coreId = locationGroup.id
+                        }
+                    }
+                    location.locationGroup = locationGroupObj
+                }
             }
         }
     }

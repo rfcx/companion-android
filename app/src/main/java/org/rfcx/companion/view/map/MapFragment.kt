@@ -325,8 +325,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val deploymentMarkerLayer = SymbolLayer(MARKER_DEPLOYMENT_ID, SOURCE_DEPLOYMENT).apply {
             withProperties(
                 PropertyFactory.iconImage("{$PROPERTY_DEPLOYMENT_MARKER_IMAGE}"),
-                PropertyFactory.iconAllowOverlap(true),
-                PropertyFactory.iconIgnorePlacement(true),
+                PropertyFactory.iconAllowOverlap(false),
+                PropertyFactory.iconIgnorePlacement(false),
                 PropertyFactory.iconSize(
                     Expression.match(
                         Expression.toString(
@@ -342,8 +342,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val siteMarkerLayer = SymbolLayer(MARKER_SITE_ID, SOURCE_SITE).apply {
             withProperties(
                 PropertyFactory.iconImage("{$PROPERTY_SITE_MARKER_IMAGE}"),
-                PropertyFactory.iconAllowOverlap(true),
-                PropertyFactory.iconIgnorePlacement(true),
+                PropertyFactory.iconAllowOverlap(false),
+                PropertyFactory.iconIgnorePlacement(false),
                 PropertyFactory.iconSize(0.8f)
             )
         }
@@ -509,6 +509,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         }
                     }
                     retrieveImages(context)
+                    combinedData()
                 }
             })
     }
@@ -530,16 +531,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     response: Response<List<StreamResponse>>
                 ) {
                     val sites = response.body()
-                    sites?.forEach { item ->
-                        locateDb.insertOrUpdate(item)
-                    }
                     sites?.let {
+                        locateDb.insertOrUpdate(it)
                         if (it.size == SITES_LIMIT_GETTING) {
                             currentSiteLoading += SITES_LIMIT_GETTING
                             retrieveLocations(context, currentSiteLoading)
                         }
                     }
-
+                    combinedData()
                 }
             })
     }
@@ -563,6 +562,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     response.body()?.forEach { item ->
                         locationGroupDb.insertOrUpdate(item)
                     }
+                    combinedData()
                 }
             })
     }
