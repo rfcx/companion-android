@@ -208,7 +208,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     it.name,
                     currentUserLocation?.latitude ?: it.latitude,
                     currentUserLocation?.longitude ?: it.longitude,
-                    it.altitude,
+                    currentUserLocation?.altitude ?: it.longitude,
                     it.createdAt,
                     it.deletedAt,
                     it.lastDeploymentId,
@@ -446,7 +446,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             }
 
             val siteItem = distanceLocate?.filter{ site ->
-                site.locate.serverId == it.serverId
+                site.locate.id == it.id
             }
             if (siteItem != null && siteItem.isNotEmpty()) {
                 if (siteItem[0].distance <= 20) {
@@ -517,17 +517,44 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         val deploymentLocation = deploymentProtocol?.getDeploymentLocation()
         if (deploymentLocation != null && locateAdapter != null && latitude == 0.0 && longitude == 0.0) {
             val spinnerPosition = locateAdapter!!.getPosition(deploymentLocation.name)
-            val siteLatLng = LatLng(deploymentLocation.latitude, deploymentLocation.longitude)
             locationNameSpinner.setSelection(spinnerPosition)
             siteValueTextView.text = deploymentLocation.name
             val position = locateNames.indexOf(deploymentLocation.name)
             if (position >= 0) {
+                var locate = Locate()
                 locateItem = locateItems[position]
+                locateItem?.let {
+                    locate = Locate(
+                        it.id,
+                        it.serverId,
+                        getLocationGroup(),
+                        it.name,
+                        deploymentLocation.latitude,
+                        deploymentLocation.longitude,
+                        deploymentLocation.altitude,
+                        it.createdAt,
+                        it.deletedAt,
+                        it.lastDeploymentId,
+                        it.lastDeploymentServerId,
+                        it.lastGuardianDeploymentId,
+                        it.lastGuardianDeploymentServerId,
+                        it.syncState
+                    )
+                }
+                locateItem = locate
+                val currentSite = locateItems.findLast {
+                    it.serverId == deploymentLocation.coreId
+                }
+                if (currentSite != null) {
+                    locateItems.remove(currentSite)
+                    locateItems.add(locate)
+                }
             }
 
             //assign to make setCheckbox work
             val currentLocation = deploymentProtocol!!.getCurrentLocation()
             val currentLatLng = LatLng(currentLocation.latitude, currentLocation.longitude)
+            val siteLatLng = LatLng(locateItem?.latitude ?: deploymentLocation.latitude, locateItem?.longitude ?: deploymentLocation.longitude)
             getLastLocation()
             createSiteSymbol(siteLatLng)
             setCheckboxForResumeDeployment(currentLatLng, siteLatLng)
