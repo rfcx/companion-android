@@ -5,6 +5,8 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
+import org.rfcx.companion.view.map.MapFragment
+import org.rfcx.companion.view.map.SiteMarker
 import java.util.*
 
 @RealmClass
@@ -72,4 +74,8 @@ open class Locate(
         const val FIELD_LAST_EDGE_DEPLOYMENT_ID = "lastDeploymentId"
         const val FIELD_ALTITUDE = "altitude"
     }
+}
+
+fun Locate.toMark(): SiteMarker {
+    return SiteMarker(id, name, latitude, longitude, MapFragment.SITE_MARKER)
 }

@@ -1,11 +1,16 @@
 package org.rfcx.companion.entity
 
+import android.content.Context
 import com.google.gson.annotations.Expose
 import io.realm.RealmList
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
+import org.rfcx.companion.R
+import org.rfcx.companion.localdb.LocationGroupDb
+import org.rfcx.companion.util.Battery
 import org.rfcx.companion.util.randomDeploymentId
+import org.rfcx.companion.view.map.DeploymentMarker
 import java.util.*
 
 @RealmClass
@@ -43,4 +48,32 @@ open class EdgeDeployment(
         const val FIELD_DELETED_AT = "deletedAt"
         const val FIELD_PASSED_CHECKS = "passedChecks"
     }
+}
+
+fun EdgeDeployment.toMark(context: Context, locationGroupDb: LocationGroupDb): DeploymentMarker {
+    val color = stream?.project?.color
+    val group = stream?.project?.name
+    val isGroupExisted = locationGroupDb.isExisted(group)
+    val pinImage =
+        if (state == DeploymentState.Edge.ReadyToUpload.key) {
+            if (color != null && color.isNotEmpty() && group != null && isGroupExisted) {
+                stream?.project?.color
+            } else {
+                Battery.BATTERY_PIN_GREEN
+            }
+        } else {
+            Battery.BATTERY_PIN_GREY
+        } ?: Battery.BATTERY_PIN_GREEN
+
+    val description = if (state >= DeploymentState.Edge.ReadyToUpload.key)
+        context.getString(R.string.format_deployed)
+    else
+        context.getString(R.string.format_in_progress_step)
+
+    return DeploymentMarker(
+        id, stream?.name ?: "",
+        stream?.longitude ?: 0.0,
+        stream?.latitude ?: 0.0,
+        pinImage, description, Device.AUDIOMOTH.value, createdAt, updatedAt
+    )
 }

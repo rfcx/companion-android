@@ -1,5 +1,6 @@
 package org.rfcx.companion.entity.guardian
 
+import android.content.Context
 import com.google.gson.annotations.Expose
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
@@ -7,7 +8,11 @@ import io.realm.annotations.RealmClass
 import java.io.Serializable
 import java.util.*
 import org.rfcx.companion.entity.DeploymentLocation
+import org.rfcx.companion.entity.DeploymentState
 import org.rfcx.companion.entity.Device
+import org.rfcx.companion.util.GuardianPin
+import org.rfcx.companion.util.WifiHotspotUtils
+import org.rfcx.companion.view.map.DeploymentMarker
 
 @RealmClass
 open class GuardianDeployment(
@@ -36,4 +41,33 @@ open class GuardianDeployment(
         const val FIELD_STREAM = "stream"
         const val FIELD_UPDATED_AT = "updatedAt"
     }
+}
+
+fun GuardianDeployment.toMark(context: Context): DeploymentMarker {
+    val color = stream?.project?.color
+    val pinImage =
+        if (state == DeploymentState.Guardian.ReadyToUpload.key) {
+            if (WifiHotspotUtils.isConnectedWithGuardian(context, this.wifiName!!)) {
+                if (color != null && color.isNotEmpty()) {
+                    stream?.project?.color
+                } else {
+                    GuardianPin.CONNECTED_GUARDIAN
+                }
+            } else {
+                GuardianPin.NOT_CONNECTED_GUARDIAN
+            }
+        } else {
+            GuardianPin.NOT_CONNECTED_GUARDIAN
+        } ?: GuardianPin.CONNECTED_GUARDIAN
+    return DeploymentMarker(
+        id,
+        stream?.name ?: "",
+        stream?.longitude ?: 0.0,
+        stream?.latitude ?: 0.0,
+        pinImage,
+        "-",
+        Device.GUARDIAN.value,
+        createdAt,
+        updatedAt
+    )
 }
