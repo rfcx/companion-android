@@ -215,7 +215,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         context?.let {
             retrieveDeployments(it)
-            retrieveLocations(it, 0)
+            retrieveLocations(it, 0, locateDb.getMaxUpdatedAt())
             retrieveProjects(it)
             retrieveDiagnostics(it)
         }
@@ -490,9 +490,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             })
     }
 
-    private fun retrieveLocations(context: Context, offset: Int) {
+    private fun retrieveLocations(context: Context, offset: Int, maxUpdatedAt: String?) {
         val token = "Bearer ${context.getIdToken()}"
-        ApiManager.getInstance().getDeviceApi().getStreams(token, SITES_LIMIT_GETTING, offset)
+        ApiManager.getInstance().getDeviceApi().getStreams(token, SITES_LIMIT_GETTING, offset, maxUpdatedAt)
             .enqueue(object : Callback<List<StreamResponse>> {
                 override fun onFailure(call: Call<List<StreamResponse>>, t: Throwable) {
                     combinedData()
@@ -511,7 +511,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         locateDb.insertOrUpdate(it)
                         if (it.size == SITES_LIMIT_GETTING) {
                             currentSiteLoading += SITES_LIMIT_GETTING
-                            retrieveLocations(context, currentSiteLoading)
+                            retrieveLocations(context, currentSiteLoading, locateDb.getMaxUpdatedAt())
                         }
                     }
                     combinedData()

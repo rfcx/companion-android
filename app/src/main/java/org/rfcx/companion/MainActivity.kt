@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -18,7 +19,10 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
 import org.rfcx.companion.entity.Device
+import org.rfcx.companion.entity.response.StreamResponse
 import org.rfcx.companion.localdb.EdgeDeploymentDb
+import org.rfcx.companion.localdb.LocateDb
+import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.EdgeDeploymentActivity
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
@@ -27,10 +31,14 @@ import org.rfcx.companion.view.map.DeploymentViewPagerFragment
 import org.rfcx.companion.view.map.MapFragment
 import org.rfcx.companion.view.profile.ProfileFragment
 import org.rfcx.companion.widget.BottomNavigationMenuItem
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListener {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
+    private val locateDb by lazy { LocateDb(realm) }
 
     private var currentFragment: Fragment? = null
     private val locationPermissions by lazy { LocationPermissions(this) }
@@ -40,6 +48,8 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
 
     private var addTooltip: SimpleTooltip? = null
     private val analytics by lazy { Analytics(this) }
+
+    private var currentSiteLoading = 0
 
     override fun getShowDeployments(): List<DeploymentDetailView> = this._showDeployments
 
@@ -111,6 +121,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
                     val addGuardian = tip.findViewById<ConstraintLayout>(R.id.guardianLayout)
                     addEdgeOrAudioMoth?.setOnClickListener {
                         EdgeDeploymentActivity.startActivity(this)
+                        refreshGettingSites(0, locateDb.getMaxUpdatedAt())
                         tip.dismiss()
                     }
                     addGuardian?.setOnClickListener {
@@ -149,6 +160,34 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
                 }
             }
         })
+    }
+
+    private fun refreshGettingSites(offset: Int, maxUpdatedAt: String?) {
+        val token = "Bearer ${this.getIdToken()}"
+        ApiManager.getInstance().getDeviceApi().getStreams(token,
+            SITES_LIMIT_GETTING, offset, maxUpdatedAt)
+            .enqueue(object : Callback<List<StreamResponse>> {
+                override fun onFailure(call: Call<List<StreamResponse>>, t: Throwable) {
+                    if (this@MainActivity.isNetworkAvailable()) {
+                        Toast.makeText(this@MainActivity, R.string.error_has_occurred, Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
+
+                override fun onResponse(
+                    call: Call<List<StreamResponse>>,
+                    response: Response<List<StreamResponse>>
+                ) {
+                    val sites = response.body()
+                    sites?.let {
+                        locateDb.insertOrUpdate(it)
+                        if (it.size == SITES_LIMIT_GETTING) {
+                            currentSiteLoading += SITES_LIMIT_GETTING
+                            refreshGettingSites(currentSiteLoading, locateDb.getMaxUpdatedAt())
+                        }
+                    }
+                }
+            })
     }
 
     private fun setupSimpleTooltip() {
@@ -325,6 +364,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
         private const val BOTTOM_SHEET = "BOTTOM_SHEET"
         const val CREATE_DEPLOYMENT_REQUEST_CODE = 1002
+        private const val SITES_LIMIT_GETTING = 100
 
         fun startActivity(context: Context, deploymentId: String? = null) {
             val intent = Intent(context, MainActivity::class.java)

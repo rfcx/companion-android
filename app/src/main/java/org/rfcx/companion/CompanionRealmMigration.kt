@@ -40,6 +40,10 @@ class CompanionRealmMigration : RealmMigration {
         if (oldVersion < 10L && newVersion >= 10L) {
             migrateToV10(realm)
         }
+
+        if (oldVersion < 11L && newVersion >= 11L) {
+            migrateToV11(realm)
+        }
     }
 
     private fun migrateToV2(realm: DynamicRealm) {
@@ -221,6 +225,13 @@ class CompanionRealmMigration : RealmMigration {
         val edgeDeployment = realm.schema.get(EdgeDeployment.TABLE_NAME)
         edgeDeployment?.apply {
             addField("isActive", Boolean::class.java)
+        }
+    }
+
+    private fun migrateToV11(realm: DynamicRealm) {
+        val locate = realm.schema.get(Locate.TABLE_NAME)
+        locate?.apply {
+            addField("updatedAt", Date::class.java)
         }
     }
 
