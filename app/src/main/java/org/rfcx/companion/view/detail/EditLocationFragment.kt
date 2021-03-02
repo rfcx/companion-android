@@ -230,17 +230,6 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         mapboxMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom))
     }
 
-    private fun changePinColorByGroup(group: String) {
-        val locationGroup = editLocationActivityListener?.getLocationGroup(group)
-        val color = locationGroup?.color
-        val pinDrawable = pinDeploymentImageView
-        if (color != null && color.isNotEmpty() && group != getString(R.string.none)) {
-            pinDrawable.setColorFilter(color.toColorInt())
-        } else {
-            pinDrawable.setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
-        }
-    }
-
     private fun View.hideKeyboard() = this.let {
         val inputManager =
             context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -278,9 +267,6 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         mapView.onResume()
 
         editLocationActivityListener?.let {
-            changePinColorByGroup(
-                it.getLocationGroupName()
-            )
             locationGroupValueTextView.text = it.getLocationGroupName()
         }
     }

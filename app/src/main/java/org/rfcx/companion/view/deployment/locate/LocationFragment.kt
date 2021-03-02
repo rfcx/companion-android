@@ -101,9 +101,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                         altitudeFromLocation = location.altitude
                         setCurrentUserLocation()
 
-                        if (locationNameSpinner.selectedItemPosition == 0) {
-                            altitudeValue.text = location.altitude.setFormatLabel()
-                        }
+                        altitudeValue.text = location.altitude.setFormatLabel()
+
                         if (isFirstTime && lastLocation == null &&
                             latitude == 0.0 && longitude == 0.0
                         ) {
@@ -211,6 +210,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     currentUserLocation?.altitude ?: it.longitude,
                     it.createdAt,
                     it.deletedAt,
+                    it.updatedAt,
                     it.lastDeploymentId,
                     it.lastDeploymentServerId,
                     it.lastGuardianDeploymentId,
@@ -366,6 +366,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 it.altitude,
                 it.createdAt,
                 it.deletedAt,
+                it.updatedAt,
                 it.lastDeploymentId,
                 it.lastDeploymentServerId,
                 it.lastGuardianDeploymentId,
@@ -401,7 +402,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         locateItem?.let {
             createSiteSymbol(it.getLatLng())
             moveCamera(LatLng(latitude, longitude), it.getLatLng(), DEFAULT_ZOOM)
-            altitudeValue.text = it.altitude.setFormatLabel()
             if (locationGroupDb.isExisted(it.locationGroup?.name)) {
                 group = it.locationGroup?.name
                 locationGroupValueTextView.text = it.locationGroup?.name
@@ -534,6 +534,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                         deploymentLocation.altitude,
                         it.createdAt,
                         it.deletedAt,
+                        it.updatedAt,
                         it.lastDeploymentId,
                         it.lastDeploymentServerId,
                         it.lastGuardianDeploymentId,
@@ -561,7 +562,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
             enableExistingLocation(true)
             moveCamera(currentLatLng, siteLatLng, DEFAULT_ZOOM)
-            altitudeValue.text = deploymentLocation.altitude.setFormatLabel()
             if (locationGroupDb.isExisted(deploymentLocation.project?.name)) {
                 group = deploymentLocation.project?.name
                 locationGroupValueTextView.text = deploymentLocation.project?.name

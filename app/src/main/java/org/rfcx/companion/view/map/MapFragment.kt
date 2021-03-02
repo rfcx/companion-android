@@ -3,7 +3,6 @@ package org.rfcx.companion.view.map
 import android.content.Context
 import android.content.Intent
 import android.graphics.PointF
-import android.graphics.PorterDuff
 import android.location.Location
 import android.os.Bundle
 import android.os.Looper
@@ -14,7 +13,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.graphics.toColorInt
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -46,15 +44,12 @@ import com.mapbox.pluginscalebar.ScaleBarOptions
 import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_map.*
-import kotlinx.android.synthetic.main.fragment_map.currentLocationButton
-import kotlinx.android.synthetic.main.fragment_map_picker.*
 import org.rfcx.companion.DeploymentListener
 import org.rfcx.companion.MainActivityListener
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
-import org.rfcx.companion.entity.DeploymentState.Edge
-import org.rfcx.companion.entity.DeploymentState.Guardian
 import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.guardian.toMark
 import org.rfcx.companion.entity.response.DeploymentImageResponse
 import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.ProjectResponse
@@ -113,8 +108,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private var isFirstTime = true
     private var currentUserLocation: Location? = null
-
-    private var groupColors = listOf<String>()
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
@@ -206,13 +199,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             mapboxMap?.locationComponent?.isLocationComponentActivated?.let {
                 if (it) {
                     moveCameraToCurrentLocation()
+                } else {
+                    mapboxMap?.style?.let { style ->
+                        checkThenAccquireLocation(style)
+                    }
                 }
             }
         }
-    }
-
-    private fun getGroupsColor() {
-        groupColors = requireContext().resources.getStringArray(R.array.group_color_picker).toList()
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
@@ -220,11 +213,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mapboxMap.uiSettings.isAttributionEnabled = false
         mapboxMap.uiSettings.isLogoEnabled = false
 
-        getGroupsColor()
-
         context?.let {
             retrieveDeployments(it)
-            retrieveLocations(it, 0)
+            retrieveLocations(it, 0, locateDb.getMaxUpdatedAt())
             retrieveProjects(it)
             retrieveDiagnostics(it)
         }
@@ -303,21 +294,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val mBitmapPinMapGrey = BitmapUtils.getBitmapFromDrawable(drawablePinMapGrey)
         if (mBitmapPinMapGrey != null) {
             style.addImage(Battery.BATTERY_PIN_GREY, mBitmapPinMapGrey)
-        }
-
-        //Pin color for each groups
-        groupColors.forEach {
-            val drawablePinMap =
-                ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map, null)
-            if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M) {
-                drawablePinMap?.setColorFilter(it.toColorInt(), PorterDuff.Mode.SRC_ATOP)
-            } else {
-                drawablePinMap?.setTint(it.toColorInt())
-            }
-            val mBitmapPinMap = BitmapUtils.getBitmapFromDrawable(drawablePinMap)
-            if (mBitmapPinMap != null) {
-                style.addImage(it, mBitmapPinMap)
-            }
         }
     }
 
@@ -427,8 +403,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val filteredShowLocations =
             showLocations.filter { loc -> !usedSites.contains(loc.serverId) }
 
-        val edgeDeploymentMarkers = showDeployments.map { it.toMark() }
-        val guardianDeploymentMarkers = showGuardianDeployments.map { it.toMark() }
+        val edgeDeploymentMarkers = showDeployments.map { it.toMark(requireContext(), locationGroupDb) }
+        val guardianDeploymentMarkers = showGuardianDeployments.map { it.toMark(requireContext()) }
         val deploymentMarkers = edgeDeploymentMarkers + guardianDeploymentMarkers
         val locationMarkers = filteredShowLocations.map { it.toMark() }
         handleShowDeployment(showDeployments, showGuardianDeployments)
@@ -514,9 +490,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             })
     }
 
-    private fun retrieveLocations(context: Context, offset: Int) {
+    private fun retrieveLocations(context: Context, offset: Int, maxUpdatedAt: String?) {
         val token = "Bearer ${context.getIdToken()}"
-        ApiManager.getInstance().getDeviceApi().getStreams(token, SITES_LIMIT_GETTING, offset)
+        ApiManager.getInstance().getDeviceApi().getStreams(token, SITES_LIMIT_GETTING, offset, maxUpdatedAt)
             .enqueue(object : Callback<List<StreamResponse>> {
                 override fun onFailure(call: Call<List<StreamResponse>>, t: Throwable) {
                     combinedData()
@@ -535,7 +511,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         locateDb.insertOrUpdate(it)
                         if (it.size == SITES_LIMIT_GETTING) {
                             currentSiteLoading += SITES_LIMIT_GETTING
-                            retrieveLocations(context, currentSiteLoading)
+                            retrieveLocations(context, currentSiteLoading, locateDb.getMaxUpdatedAt())
                         }
                     }
                     combinedData()
@@ -844,72 +820,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         locationGroupLiveData.removeObserver(locationGroupObserve)
         locationEngine?.removeLocationUpdates(mapboxLocationChangeCallback)
         mapView.onDestroy()
-    }
-
-    private fun EdgeDeployment.toMark(): DeploymentMarker {
-        val color = stream?.project?.color
-        val group = stream?.project?.name
-        val isGroupExisted = locationGroupDb.isExisted(group)
-        val pinImage =
-            if (state == Edge.ReadyToUpload.key) {
-                if (color != null && color.isNotEmpty() && group != null && isGroupExisted) {
-                    stream?.project?.color
-                } else {
-                    Battery.BATTERY_PIN_GREEN
-                }
-            } else {
-                Battery.BATTERY_PIN_GREY
-            } ?: Battery.BATTERY_PIN_GREEN
-
-        val description = if (state >= Edge.ReadyToUpload.key)
-            getString(R.string.format_deployed)
-        else
-            getString(R.string.format_in_progress_step)
-
-        return DeploymentMarker(
-            id, stream?.name ?: "",
-            stream?.longitude ?: 0.0,
-            stream?.latitude ?: 0.0,
-            pinImage, description, Device.AUDIOMOTH.value, createdAt, updatedAt
-        )
-    }
-
-    private fun GuardianDeployment.toMark(): DeploymentMarker {
-        val color = stream?.project?.color
-        val pinImage =
-            if (state == Guardian.ReadyToUpload.key) {
-                if (WifiHotspotUtils.isConnectedWithGuardian(requireContext(), this.wifiName!!)) {
-                    if (color != null && color.isNotEmpty()) {
-                        stream?.project?.color
-                    } else {
-                        GuardianPin.CONNECTED_GUARDIAN
-                    }
-                } else {
-                    GuardianPin.NOT_CONNECTED_GUARDIAN
-                }
-            } else {
-                GuardianPin.NOT_CONNECTED_GUARDIAN
-            } ?: GuardianPin.CONNECTED_GUARDIAN
-        return DeploymentMarker(
-            id,
-            stream?.name ?: "",
-            stream?.longitude ?: 0.0,
-            stream?.latitude ?: 0.0,
-            pinImage,
-            "-",
-            Device.GUARDIAN.value,
-            createdAt,
-            updatedAt
-        )
-    }
-
-    private fun Locate.toMark(): SiteMarker {
-        return SiteMarker(id, name, latitude, longitude, SITE_MARKER)
-    }
-
-    private fun isBatteryRemaining(timestamp: Long): Boolean {
-        val currentMillis = System.currentTimeMillis()
-        return timestamp > currentMillis
     }
 
     companion object {

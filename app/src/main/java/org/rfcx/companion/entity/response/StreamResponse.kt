@@ -13,6 +13,7 @@ data class StreamResponse(
     var longitude: Double? = null,
     var altitude: Double? = null,
     var createdAt: Date? = null,
+    var updatedAt: Date? = null,
     var project: ProjectResponse? = null
 )
 
@@ -24,6 +25,7 @@ fun StreamResponse.toLocate(): Locate {
         longitude = this.longitude ?: 0.0,
         altitude = this.altitude ?: 0.0,
         createdAt = this.createdAt ?: Date(),
+        updatedAt = this.updatedAt,
         locationGroup = this.project?.toLocationGroup(),
         syncState = SyncState.Sent.key
     )

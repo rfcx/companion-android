@@ -9,6 +9,7 @@ import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.SyncState
 import org.rfcx.companion.entity.response.StreamResponse
 import org.rfcx.companion.entity.response.toLocate
+import org.rfcx.companion.util.toISO8601Format
 
 class LocateDb(private val realm: Realm) {
 
@@ -180,6 +181,7 @@ class LocateDb(private val realm: Realm) {
                     location.longitude = streamResponse.longitude ?: location.longitude
                     location.altitude = streamResponse.altitude ?: location.altitude
                     location.createdAt = streamResponse.createdAt ?: location.createdAt
+                    location.updatedAt = streamResponse.updatedAt ?: location.updatedAt
 
                     val locationGroupObj = it.createObject(LocationGroup::class.java)
                     locationGroupObj?.let { obj ->
@@ -194,5 +196,9 @@ class LocateDb(private val realm: Realm) {
                 }
             }
         }
+    }
+
+    fun getMaxUpdatedAt(): String? {
+        return realm.where(Locate::class.java).isNotNull(Locate.FIELD_SERVER_ID).isNotNull(Locate.FIELD_UPDATED_AT).findAll().maxBy { it.updatedAt!! }?.updatedAt?.toISO8601Format()
     }
 }

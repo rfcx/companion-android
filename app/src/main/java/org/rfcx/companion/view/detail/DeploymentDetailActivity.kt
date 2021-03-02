@@ -173,7 +173,6 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
             longitudeValue.text = locate.longitude.longitudeCoordinates(this)
             altitudeValue.text = locate.altitude.setFormatLabel()
         }
-        changePinColorByGroup(location?.project?.name ?: getString(R.string.none))
     }
 
     private fun observeDeploymentImage(deploymentId: Int) {
@@ -197,17 +196,6 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
             adapter = deploymentImageAdapter
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             setHasFixedSize(true)
-        }
-    }
-
-    private fun changePinColorByGroup(group: String) {
-        val locationGroup = locationGroupDb.getLocationGroup(group).toLocationGroup()
-        val color = locationGroup.color
-        val pinDrawable = pinDetailDeploymentImageView
-        if (color != null && color.isNotEmpty() && group != getString(R.string.none)) {
-            pinDrawable.setColorFilter(color.toColorInt())
-        } else {
-            pinDrawable.setColorFilter(ContextCompat.getColor(this, R.color.colorPrimary))
         }
     }
 
