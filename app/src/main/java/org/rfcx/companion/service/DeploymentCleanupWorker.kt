@@ -56,6 +56,8 @@ class DeploymentCleanupWorker(val context: Context, params: WorkerParameters) :
         if (imageUnsent > 0) {
             ImageSyncWorker.enqueue(context)
         }
+
+        DeleteStreamsWorker.enqueue(context)
     }
 
     companion object {
