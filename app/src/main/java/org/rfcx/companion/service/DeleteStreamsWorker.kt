@@ -26,15 +26,14 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
         streams = listOf()
         currentStreamsLoading = 0
         someFailed = false
-        
+
         Log.d(TAG, "doWork on DeleteStreams")
 
         val db = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val token = "Bearer ${context.getIdToken()}"
-
+        val savedStreams = db.getLocations().filter { it.serverId != null }
         val result = getStreams(token, currentStreamsLoading)
         if (result) {
-            val savedStreams = db.getLocations().filter { it.serverId != null }
             val downloadedStreams = streams.map { it.toLocate().serverId }
             val filteredStreams = savedStreams.filter { stream -> !downloadedStreams.contains(stream.serverId) }
             filteredStreams.forEach {
