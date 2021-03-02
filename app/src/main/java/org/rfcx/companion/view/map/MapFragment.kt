@@ -171,9 +171,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         locationPermissions?.handleRequestResult(requestCode, grantResults)
-        this.mapboxMap?.style?.let {
-            checkThenAccquireLocation(it)
-        }
     }
 
     override fun onCreateView(
@@ -202,6 +199,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             mapboxMap?.locationComponent?.isLocationComponentActivated?.let {
                 if (it) {
                     moveCameraToCurrentLocation()
+                } else {
+                    mapboxMap?.style?.let { style ->
+                        checkThenAccquireLocation(style)
+                    }
                 }
             }
         }
