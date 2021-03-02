@@ -171,6 +171,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         locationPermissions?.handleRequestResult(requestCode, grantResults)
+        this.mapboxMap?.style?.let {
+            checkThenAccquireLocation(it)
+        }
     }
 
     override fun onCreateView(
