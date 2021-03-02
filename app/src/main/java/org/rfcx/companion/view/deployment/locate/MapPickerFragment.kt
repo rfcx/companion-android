@@ -178,17 +178,6 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
         mapboxMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom))
     }
 
-    private fun changePinColorByGroup(group: String) {
-        val locationGroup = editLocationActivityListener?.getLocationGroup(group)
-        val color = locationGroup?.color
-        val pinDrawable = pinDeploymentImageView
-        if (color != null && color.isNotEmpty() && group != getString(R.string.none)) {
-            pinDrawable.setColorFilter(color.toColorInt())
-        } else {
-            pinDrawable.setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
-        }
-    }
-
     @SuppressLint("MissingPermission")
     private fun enableLocationComponent() {
         if (hasPermissions()) {
@@ -312,10 +301,6 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
         super.onResume()
         mapView.onResume()
         analytics?.trackScreen(Screen.MAP_PICKER)
-
-        editLocationActivityListener?.let {
-            changePinColorByGroup(it.getLocationGroupName())
-        }
     }
 
     override fun onPause() {

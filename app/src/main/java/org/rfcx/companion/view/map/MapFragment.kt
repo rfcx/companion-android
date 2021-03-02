@@ -3,7 +3,6 @@ package org.rfcx.companion.view.map
 import android.content.Context
 import android.content.Intent
 import android.graphics.PointF
-import android.graphics.PorterDuff
 import android.location.Location
 import android.os.Bundle
 import android.os.Looper
@@ -14,7 +13,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.graphics.toColorInt
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -45,16 +43,11 @@ import com.mapbox.mapboxsdk.utils.BitmapUtils
 import com.mapbox.pluginscalebar.ScaleBarOptions
 import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
-import io.realm.RealmModel
 import kotlinx.android.synthetic.main.fragment_map.*
-import kotlinx.android.synthetic.main.fragment_map.currentLocationButton
-import kotlinx.android.synthetic.main.fragment_map_picker.*
 import org.rfcx.companion.DeploymentListener
 import org.rfcx.companion.MainActivityListener
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
-import org.rfcx.companion.entity.DeploymentState.Edge
-import org.rfcx.companion.entity.DeploymentState.Guardian
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.guardian.toMark
 import org.rfcx.companion.entity.response.DeploymentImageResponse
@@ -115,8 +108,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private var isFirstTime = true
     private var currentUserLocation: Location? = null
-
-    private var groupColors = listOf<String>()
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
@@ -213,16 +204,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun getGroupsColor() {
-        groupColors = requireContext().resources.getStringArray(R.array.group_color_picker).toList()
-    }
-
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
         mapboxMap.uiSettings.isAttributionEnabled = false
         mapboxMap.uiSettings.isLogoEnabled = false
-
-        getGroupsColor()
 
         context?.let {
             retrieveDeployments(it)
@@ -305,21 +290,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val mBitmapPinMapGrey = BitmapUtils.getBitmapFromDrawable(drawablePinMapGrey)
         if (mBitmapPinMapGrey != null) {
             style.addImage(Battery.BATTERY_PIN_GREY, mBitmapPinMapGrey)
-        }
-
-        //Pin color for each groups
-        groupColors.forEach {
-            val drawablePinMap =
-                ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map, null)
-            if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M) {
-                drawablePinMap?.setColorFilter(it.toColorInt(), PorterDuff.Mode.SRC_ATOP)
-            } else {
-                drawablePinMap?.setTint(it.toColorInt())
-            }
-            val mBitmapPinMap = BitmapUtils.getBitmapFromDrawable(drawablePinMap)
-            if (mBitmapPinMap != null) {
-                style.addImage(it, mBitmapPinMap)
-            }
         }
     }
 
