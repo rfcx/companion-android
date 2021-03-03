@@ -331,6 +331,19 @@ class EdgeDeploymentDb(private val realm: Realm) {
         }
     }
 
+    fun deleteDeploymentByStreamId(id: String) {
+        realm.executeTransaction {
+            val deployments =
+                it.where(EdgeDeployment::class.java).equalTo("stream.coreId", id)
+                    .findAll()
+            deployments.forEach { dp ->
+                dp.deletedAt = Date()
+                dp.isActive = false
+                dp.syncState = SyncState.Unsent.key
+            }
+        }
+    }
+
     fun getDeploymentById(id: Int): EdgeDeployment? {
         val deployment =
             realm.where(EdgeDeployment::class.java).equalTo(EdgeDeployment.FIELD_ID, id).findFirst()

@@ -7,8 +7,10 @@ import androidx.work.*
 import io.realm.Realm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.rfcx.companion.entity.EdgeDeployment
 import org.rfcx.companion.entity.response.StreamResponse
 import org.rfcx.companion.entity.response.toLocate
+import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.RealmHelper
@@ -32,13 +34,20 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
         val token = "Bearer ${context.getIdToken()}"
         val result = getStreams(token, currentStreamsLoading)
         if (result) {
-            val db = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
-            val savedStreams = db.getLocations().filter { it.serverId != null }
+            val streamDb = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
+            val deploymentDb = EdgeDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
+            val savedStreams = streamDb.getLocations().filter { it.serverId != null }
             val downloadedStreams = streams.map { it.toLocate().serverId }
             val filteredStreams = savedStreams.filter { stream -> !downloadedStreams.contains(stream.serverId) }
-            filteredStreams.forEach {
-                Log.d(TAG, "remove stream: ${it.id}")
-                db.deleteLocate(it.id)
+            if (filteredStreams.isNotEmpty()) {
+                filteredStreams.forEach {
+                    Log.d(TAG, "remove stream: ${it.id}")
+                    // delete deployment that has this stream
+                    deploymentDb.deleteDeploymentByStreamId(it.serverId!!)
+                    streamDb.deleteLocate(it.id)
+                }
+                // force delete deployment on device-api
+                DeploymentSyncWorker.enqueue(context)
             }
         } else {
             someFailed = true
