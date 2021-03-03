@@ -165,7 +165,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     private fun refreshGettingSites(offset: Int, maxUpdatedAt: String?) {
         val token = "Bearer ${this.getIdToken()}"
         ApiManager.getInstance().getDeviceApi().getStreams(token,
-            SITES_LIMIT_GETTING, offset, maxUpdatedAt)
+            SITES_LIMIT_GETTING, offset, maxUpdatedAt, "updated_at")
             .enqueue(object : Callback<List<StreamResponse>> {
                 override fun onFailure(call: Call<List<StreamResponse>>, t: Throwable) {
                     if (this@MainActivity.isNetworkAvailable()) {

@@ -492,7 +492,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun retrieveLocations(context: Context, offset: Int, maxUpdatedAt: String?) {
         val token = "Bearer ${context.getIdToken()}"
-        ApiManager.getInstance().getDeviceApi().getStreams(token, SITES_LIMIT_GETTING, offset, maxUpdatedAt)
+        ApiManager.getInstance().getDeviceApi().getStreams(token, SITES_LIMIT_GETTING, offset, maxUpdatedAt, "updated_at")
             .enqueue(object : Callback<List<StreamResponse>> {
                 override fun onFailure(call: Call<List<StreamResponse>>, t: Throwable) {
                     combinedData()
