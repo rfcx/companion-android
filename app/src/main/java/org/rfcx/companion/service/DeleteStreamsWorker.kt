@@ -17,9 +17,9 @@ import org.rfcx.companion.util.getIdToken
 class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
 
-    var streams = listOf<StreamResponse>()
-    var currentStreamsLoading = 0
-    var someFailed = false
+    private var streams = listOf<StreamResponse>()
+    private var currentStreamsLoading = 0
+    private var someFailed = false
 
     override suspend fun doWork(): Result {
         //reset to default
@@ -29,21 +29,20 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
 
         Log.d(TAG, "doWork on DeleteStreams")
 
-        val db = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val token = "Bearer ${context.getIdToken()}"
-        val savedStreams = db.getLocations().filter { it.serverId != null }
         val result = getStreams(token, currentStreamsLoading)
         if (result) {
+            val db = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
+            val savedStreams = db.getLocations().filter { it.serverId != null }
             val downloadedStreams = streams.map { it.toLocate().serverId }
             val filteredStreams = savedStreams.filter { stream -> !downloadedStreams.contains(stream.serverId) }
             filteredStreams.forEach {
+                Log.d(TAG, "remove stream: ${it.id}")
                 db.deleteLocate(it.id)
             }
         } else {
             someFailed = true
         }
-
-
         return if (someFailed) Result.retry() else Result.success()
     }
 
