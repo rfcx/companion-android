@@ -363,7 +363,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 it.name,
                 it.latitude,
                 it.longitude,
-                it.altitude,
+                currentUserLocation?.altitude ?: it.longitude,
                 it.createdAt,
                 it.deletedAt,
                 it.updatedAt,
