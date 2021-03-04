@@ -71,9 +71,11 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
         }
 
         if (localPathImagesForAdd.isNotEmpty()) {
-            if (localPathImagesForAdd.size != uris.size) {
-                Toast.makeText(context, R.string.some_photo_already_exists, Toast.LENGTH_SHORT)
-                    .show()
+            if (context != null) {
+                if (localPathImagesForAdd.size != uris.size) {
+                    Toast.makeText(context, R.string.some_photo_already_exists, Toast.LENGTH_SHORT)
+                        .show()
+                }
             }
 
             localPathImagesForAdd.forEach {
@@ -81,12 +83,18 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
                 index++
             }
         } else {
-            if (uris.size > 1) {
-                Toast.makeText(context, R.string.these_photos_already_exists, Toast.LENGTH_SHORT)
-                    .show()
-            } else {
-                Toast.makeText(context, R.string.this_photo_already_exists, Toast.LENGTH_SHORT)
-                    .show()
+            if (context != null) {
+                if (uris.size > 1) {
+                    Toast.makeText(
+                        context,
+                        R.string.these_photos_already_exists,
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
+                } else {
+                    Toast.makeText(context, R.string.this_photo_already_exists, Toast.LENGTH_SHORT)
+                        .show()
+                }
             }
         }
         submitList(ArrayList(imagesSource))
@@ -153,7 +161,7 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
     inner class AddImageViewHolder(
         itemView: View,
         private val onImageAdapterClickListener: OnImageAdapterClickListener?
-    ) : RecyclerView.ViewHolder(itemView) { }
+    ) : RecyclerView.ViewHolder(itemView) {}
 
     class ImageAdapterDiffUtil : DiffUtil.ItemCallback<BaseListItem>() {
         override fun areItemsTheSame(oldItem: BaseListItem, newItem: BaseListItem): Boolean {
