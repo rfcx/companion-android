@@ -508,7 +508,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 ) {
                     val sites = response.body()
                     sites?.let {
-                        locateDb.insertOrUpdate(it)
+                        it.forEach { item ->
+                            locateDb.insertOrUpdate(item)
+                        }
                         if (it.size == SITES_LIMIT_GETTING) {
                             currentSiteLoading += SITES_LIMIT_GETTING
                             retrieveLocations(context, currentSiteLoading, locateDb.getMaxUpdatedAt())
