@@ -7,15 +7,24 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_selecting_existed_site.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Locate
+import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.localdb.LocateDb
+import org.rfcx.companion.localdb.LocationGroupDb
+import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.RealmHelper
+import org.rfcx.companion.util.getIdToken
+import org.rfcx.companion.util.isNetworkAvailable
 import org.rfcx.companion.view.detail.MapPickerProtocol
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class SelectingExistedSiteFragment : Fragment(), (Locate) -> Unit {
     private val existedSiteAdapter by lazy { ExistedSiteAdapter(this) }
@@ -23,6 +32,7 @@ class SelectingExistedSiteFragment : Fragment(), (Locate) -> Unit {
 
     val realm: Realm = Realm.getInstance(RealmHelper.migrationConfig())
     private val locateDb by lazy { LocateDb(realm) }
+    private val locationGroupDb by lazy { LocationGroupDb(realm) }
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     private var lastLocation: Location? = null
@@ -122,6 +132,28 @@ class SelectingExistedSiteFragment : Fragment(), (Locate) -> Unit {
             }
     }
 
+    private fun retrieveProjects(context: Context) {
+        val token = "Bearer ${context.getIdToken()}"
+        ApiManager.getInstance().getDeviceApi().getProjects(token)
+            .enqueue(object : Callback<List<ProjectResponse>> {
+                override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
+                    if (context.isNetworkAvailable()) {
+                        Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
+
+                override fun onResponse(
+                    call: Call<List<ProjectResponse>>,
+                    response: Response<List<ProjectResponse>>
+                ) {
+                    response.body()?.forEach { item ->
+                        locationGroupDb.insertOrUpdate(item)
+                    }
+                }
+            })
+    }
+
     override fun invoke(locate: Locate) {
         mapPickerProtocol?.startLocationPage(
             locate.latitude,
@@ -130,5 +162,6 @@ class SelectingExistedSiteFragment : Fragment(), (Locate) -> Unit {
             locate.name,
             false
         )
+        context?.let { retrieveProjects(it) }
     }
 }
