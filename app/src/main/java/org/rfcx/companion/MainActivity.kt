@@ -180,7 +180,9 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
                 ) {
                     val sites = response.body()
                     sites?.let {
-                        locateDb.insertOrUpdate(it)
+                        it.forEach { item ->
+                            locateDb.insertOrUpdate(item)
+                        }
                         if (it.size == SITES_LIMIT_GETTING) {
                             currentSiteLoading += SITES_LIMIT_GETTING
                             refreshGettingSites(currentSiteLoading, locateDb.getMaxUpdatedAt())
