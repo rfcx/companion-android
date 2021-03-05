@@ -79,9 +79,8 @@ class SelectingExistedSiteFragment : Fragment(), (Locate) -> Unit {
 
     private fun setupView() {
         val locations = locateDb.getLocations()
-        val showLocations = locations.filter { it.isCompleted() }
         val nearLocations =
-            findNearLocations(lastLocation, ArrayList(showLocations))?.sortedBy { it.second }
+            findNearLocations(lastLocation, ArrayList(locations))?.sortedBy { it.second }
         val createNew = listOf(
             SiteItem(
                 Locate(
