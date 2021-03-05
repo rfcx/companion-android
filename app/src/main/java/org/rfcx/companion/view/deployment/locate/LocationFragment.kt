@@ -210,7 +210,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     currentUserLocation?.altitude ?: it.longitude,
                     it.createdAt,
                     it.updatedAt,
-                    it.deletedAt,
                     it.lastDeploymentId,
                     it.lastDeploymentServerId,
                     it.lastGuardianDeploymentId,
@@ -366,7 +365,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 currentUserLocation?.altitude ?: it.longitude,
                 it.createdAt,
                 it.updatedAt,
-                it.deletedAt,
                 it.lastDeploymentId,
                 it.lastDeploymentServerId,
                 it.lastGuardianDeploymentId,
@@ -534,7 +532,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                         deploymentLocation.altitude,
                         it.createdAt,
                         it.updatedAt,
-                        it.deletedAt,
                         it.lastDeploymentId,
                         it.lastDeploymentServerId,
                         it.lastGuardianDeploymentId,
@@ -627,15 +624,14 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private fun retrieveDeployLocations() {
         locateItems.clear()
         val locations = locateDb.getLocations()
-        val showLocations = locations.filter { it.isCompleted() }
         val nearLocations =
-            findNearLocations(lastLocation, ArrayList(showLocations))?.sortedBy { it.second }
+            findNearLocations(lastLocation, ArrayList(locations))?.sortedBy { it.second }
         val locationsItems = nearLocations?.map { it.first }
         val createNew = listOf(Locate(id = -1, name = getString(R.string.create_new_site)))
         if (locationsItems != null) {
             locateItems.addAll(createNew + locationsItems)
         } else {
-            locateItems.addAll(createNew + showLocations)
+            locateItems.addAll(createNew + locations)
         }
     }
 
