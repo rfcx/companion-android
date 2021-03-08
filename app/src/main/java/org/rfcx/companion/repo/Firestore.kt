@@ -5,7 +5,6 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
-import org.rfcx.companion.entity.User
 import org.rfcx.companion.entity.request.DiagnosticRequest
 import org.rfcx.companion.entity.request.EdgeGroupRequest
 import org.rfcx.companion.entity.request.GuardianDeploymentRequest
@@ -26,16 +25,6 @@ class Firestore(val context: Context) {
         Preferences.getInstance(context)
     private val uid = preferences.getString(Preferences.USER_FIREBASE_UID, "")
     private val feedbackDocument = db.collection(COLLECTION_FEEDBACK)
-
-    fun saveUser(user: User, uid: String, callback: (String?, Boolean) -> Unit) {
-        db.collection(COLLECTION_USERS).document(uid).set(user)
-            .addOnSuccessListener {
-                callback(null, true)
-            }
-            .addOnFailureListener { e ->
-                callback(e.message, false)
-            }
-    }
 
     suspend fun sendDeployment(deployment: GuardianDeploymentRequest): DocumentReference? {
         val userDocument = db.collection(COLLECTION_USERS).document(uid)
