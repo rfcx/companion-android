@@ -1,15 +1,12 @@
 package org.rfcx.companion.repo
 
 import android.content.Context
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 import org.rfcx.companion.entity.User
-import org.rfcx.companion.entity.request.DiagnosticRequest
 import org.rfcx.companion.entity.request.EdgeGroupRequest
 import org.rfcx.companion.entity.response.DiagnosticResponse
-import org.rfcx.companion.localdb.guardian.DiagnosticDb
 import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.Storage
 import org.rfcx.companion.util.getEmailUser
@@ -40,45 +37,10 @@ class Firestore(val context: Context) {
         userDocument.collection(COLLECTION_GROUPS).document(docId).set(group).await()
     }
 
-    suspend fun sendDiagnostic(diagnosticRequest: DiagnosticRequest): DocumentReference? {
-        val userDocument = db.collection(COLLECTION_USERS).document(uid)
-        return userDocument.collection(COLLECTION_DIAGNOSTIC).add(diagnosticRequest).await()
-    }
-
-    suspend fun updateDiagnostic(diagnosticServerId: String, diagnosticRequest: DiagnosticRequest) {
-        val userDocument = db.collection(COLLECTION_USERS).document(uid)
-        userDocument.collection(COLLECTION_DIAGNOSTIC).document(diagnosticServerId)
-            .set(diagnosticRequest).await()
-    }
-
     suspend fun updateGroup(groupServerId: String, group: EdgeGroupRequest) {
         val userDocument = db.collection(COLLECTION_USERS).document(uid)
         userDocument.collection(COLLECTION_GROUPS).document(groupServerId)
             .set(group).await()
-    }
-
-    fun retrieveDiagnostics(
-        diagnosticDb: DiagnosticDb,
-        callback: ResponseCallback<List<DiagnosticResponse>>? = null
-    ) {
-        val userDocument = db.collection(COLLECTION_USERS).document(uid)
-        userDocument.collection(COLLECTION_DIAGNOSTIC).get()
-            .addOnSuccessListener {
-                val diagnosticResponses = arrayListOf<DiagnosticResponse>()
-                it.documents.forEach { doc ->
-                    val diagnosticResponse = doc.toObject(DiagnosticResponse::class.java)
-                    diagnosticResponse?.serverId = doc.id
-                    diagnosticResponse?.let { it1 -> diagnosticResponses.add(it1) }
-                }
-                // verify response and store diagnostic
-                diagnosticResponses.forEach { diagnostic ->
-                    diagnosticDb.insertOrUpdate(diagnostic)
-                }
-                callback?.onSuccessCallback(diagnosticResponses)
-            }
-            .addOnFailureListener {
-                callback?.onFailureCallback(it.localizedMessage)
-            }
     }
 
     fun saveFeedback(

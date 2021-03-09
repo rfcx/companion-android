@@ -58,7 +58,6 @@ import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.LocationGroupDb
-import org.rfcx.companion.localdb.guardian.DiagnosticDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.repo.Firestore
@@ -87,7 +86,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
-    private val diagnosticDb by lazy { DiagnosticDb(realm) }
 
     // data
     private var guardianDeployments = listOf<GuardianDeployment>()
@@ -217,7 +215,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             retrieveDeployments(it)
             retrieveLocations(it, 0, locateDb.getMaxUpdatedAt())
             retrieveProjects(it)
-            retrieveDiagnostics(it)
         }
 
         mapboxMap.setStyle(Style.OUTDOORS) {
@@ -544,10 +541,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     combinedData()
                 }
             })
-    }
-
-    private fun retrieveDiagnostics(context: Context) {
-        Firestore(context).retrieveDiagnostics(diagnosticDb)
     }
 
     private fun retrieveImages(context: Context) {

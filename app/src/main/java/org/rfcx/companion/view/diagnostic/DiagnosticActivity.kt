@@ -31,9 +31,7 @@ import org.rfcx.companion.entity.guardian.*
 import org.rfcx.companion.entity.socket.response.Status
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.LocationGroupDb
-import org.rfcx.companion.localdb.guardian.DiagnosticDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
-import org.rfcx.companion.service.DiagnosticSyncWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.detail.*
 import org.rfcx.companion.view.dialog.LoadingDialogFragment
@@ -43,17 +41,10 @@ import org.rfcx.companion.view.prefs.SyncPreferenceListener
 class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (DeploymentImageView) -> Unit {
 
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val diagnosticDb: DiagnosticDb by lazy { DiagnosticDb(realm) }
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val deploymentImageAdapter by lazy { DeploymentImageAdapter(this) }
-
-    private val diagnosticInfo: DiagnosticInfo by lazy {
-        diagnosticDb.getDiagnosticInfo(
-            deploymentServerId
-        )
-    }
 
     private lateinit var deployImageLiveData: LiveData<List<DeploymentImage>>
     private var deploymentImages = listOf<DeploymentImage>()
@@ -163,7 +154,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
             title =
-                if (isConnected != false) locationName else "$locationName (${diagnosticInfo.getRelativeTimeSpan()})"
+                if (isConnected != false) locationName else locationName
         }
     }
 
@@ -211,11 +202,6 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
                     setupCurrentPrefs(prefsData)
                     hideLoading()
                 }
-
-                if (!firstTimeEntered) {
-                    saveNewDiagnostic()
-                }
-                firstTimeEntered = false
             })
         } else {
             setupLastKnownDiagnostic()
@@ -336,11 +322,6 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
                 disableAllComponent(child)
             }
         }
-    }
-
-    private fun saveNewDiagnostic() {
-        diagnosticDb.insertOrUpdate(this.deploymentServerId)
-        DiagnosticSyncWorker.enqueue(this)
     }
 
     override fun onSupportNavigateUp(): Boolean {
