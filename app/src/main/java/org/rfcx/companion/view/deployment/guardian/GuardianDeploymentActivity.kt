@@ -22,19 +22,16 @@ import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.LocationGroups
 import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import org.rfcx.companion.entity.guardian.GuardianDeployment
-import org.rfcx.companion.entity.guardian.GuardianProfile
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
-import org.rfcx.companion.localdb.guardian.GuardianProfileDb
 import org.rfcx.companion.service.GuardianDeploymentSyncWorker
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.view.deployment.guardian.advanced.GuardianAdvancedFragment
 import org.rfcx.companion.view.deployment.guardian.checkin.GuardianCheckInTestFragment
 import org.rfcx.companion.view.deployment.guardian.configure.GuardianConfigureFragment
-import org.rfcx.companion.view.deployment.guardian.configure.GuardianSelectProfileFragment
 import org.rfcx.companion.view.deployment.guardian.connect.ConnectGuardianFragment
 import org.rfcx.companion.view.deployment.guardian.deploy.GuardianDeployFragment
 import org.rfcx.companion.view.deployment.guardian.microphone.GuardianMicrophoneFragment
@@ -55,12 +52,9 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val locateDb by lazy { LocateDb(realm) }
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
-    private val profileDb by lazy { GuardianProfileDb(realm) }
     private val deploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
 
-    private var _profiles: List<GuardianProfile> = listOf()
-    private var _profile: GuardianProfile? = null
     private var _deployment: GuardianDeployment? = null
     private var _deployLocation: DeploymentLocation? = null
     private var _configuration: GuardianConfiguration? = null
@@ -140,7 +134,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
         when (container) {
             is MapPickerFragment -> startFragment(LocationFragment.newInstance())
-            is GuardianConfigureFragment -> startFragment(GuardianSelectProfileFragment.newInstance())
             is GuardianCheckListFragment -> {
                 SocketManager.resetAllValuesToDefault()
                 setLastCheckInTime(null)
@@ -168,14 +161,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     }
 
     override fun isOpenedFromUnfinishedDeployment(): Boolean = false // guardian not have this feature so return false
-
-    override fun getProfiles(): List<GuardianProfile> = _profiles
-
-    override fun getProfile(): GuardianProfile? = _profile
-
-    override fun setProfile(profile: GuardianProfile) {
-        this._profile = profile
-    }
 
     override fun getDeployment(): GuardianDeployment? = this._deployment
 
@@ -221,17 +206,12 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         currentCheckName = name
     }
 
-    override fun setDeploymentConfigure(profile: GuardianProfile) {
-        setProfile(profile)
-        this._configuration = profile.asConfiguration()
+    override fun setDeploymentConfigure(config: GuardianConfiguration) {
+        this._configuration = config
         this._deployment?.configuration = _configuration
 
         // update deployment
         this._deployment?.let { deploymentDb.updateDeployment(it) }
-        // update profile
-        if (profile.name.isNotEmpty()) {
-            profileDb.insertOrUpdateProfile(profile)
-        }
     }
 
     override fun getConfiguration(): GuardianConfiguration? = _configuration
@@ -296,8 +276,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         this.currentLocation = location
     }
 
-    override fun startSetupConfigure(profile: GuardianProfile) {
-        setProfile(profile)
+    override fun startSetupConfigure() {
         startFragment(GuardianConfigureFragment.newInstance())
     }
 
@@ -326,9 +305,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                 startFragment(GuardianMicrophoneFragment.newInstance())
             }
             4 -> {
-                this._profiles = profileDb.getProfiles()
                 updateDeploymentState(DeploymentState.Guardian.Config)
-                startFragment(GuardianSelectProfileFragment.newInstance())
+                startFragment(GuardianConfigureFragment.newInstance())
             }
             5 -> {
                 updateDeploymentState(DeploymentState.Guardian.Locate)

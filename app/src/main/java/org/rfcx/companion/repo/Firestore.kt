@@ -8,8 +8,6 @@ import kotlinx.coroutines.tasks.await
 import org.rfcx.companion.entity.User
 import org.rfcx.companion.entity.request.DiagnosticRequest
 import org.rfcx.companion.entity.request.EdgeGroupRequest
-import org.rfcx.companion.entity.request.GuardianDeploymentRequest
-import org.rfcx.companion.entity.request.GuardianProfileRequest
 import org.rfcx.companion.entity.response.DiagnosticResponse
 import org.rfcx.companion.localdb.guardian.DiagnosticDb
 import org.rfcx.companion.util.Preferences
@@ -35,16 +33,6 @@ class Firestore(val context: Context) {
             .addOnFailureListener { e ->
                 callback(e.message, false)
             }
-    }
-
-    suspend fun sendDeployment(deployment: GuardianDeploymentRequest): DocumentReference? {
-        val userDocument = db.collection(COLLECTION_USERS).document(uid)
-        return userDocument.collection(COLLECTION_DEPLOYMENTS).add(deployment).await()
-    }
-
-    suspend fun sendProfile(profile: GuardianProfileRequest): DocumentReference? {
-        val userDocument = db.collection(COLLECTION_USERS).document(uid)
-        return userDocument.collection(COLLECTION_PROFILES).add(profile).await()
     }
 
     suspend fun sendGroup(group: EdgeGroupRequest, docId: String) {

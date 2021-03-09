@@ -12,7 +12,6 @@ import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.EdgeDeployment
 import org.rfcx.companion.entity.SyncState
 import org.rfcx.companion.entity.guardian.GuardianDeployment
-import org.rfcx.companion.entity.guardian.GuardianProfile
 import org.rfcx.companion.entity.response.DeploymentImageResponse
 
 class DeploymentImageDb(private val realm: Realm) {
