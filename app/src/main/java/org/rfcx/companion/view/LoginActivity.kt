@@ -23,7 +23,6 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.response.FirebaseAuthResponse
 import org.rfcx.companion.repo.ApiManager
-import org.rfcx.companion.repo.Firestore
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.CredentialKeeper
 import org.rfcx.companion.util.CredentialVerifier
@@ -143,23 +142,6 @@ class LoginActivity : AppCompatActivity() {
                     }
                 }
             })
-    }
-
-    private fun saveUserToFirestore(result: UserAuthResponse, uid: String) {
-        val name = result.nickname ?: "Companion"
-        val email = result.email ?: "Email"
-        val user = User(name, email)
-
-        Firestore(this@LoginActivity)
-            .saveUser(user, uid) { string, isSuccess ->
-                if (isSuccess) {
-                    MainActivity.startActivity(this@LoginActivity)
-                    finish()
-                } else {
-                    Toast.makeText(this@LoginActivity, string, Toast.LENGTH_SHORT).show()
-                    loading(false)
-                }
-            }
     }
 
     private fun loginWithFacebook() {
@@ -292,7 +274,8 @@ class LoginActivity : AppCompatActivity() {
                     val user = auth.currentUser
                     user?.uid?.let {
                         preferences.putString(USER_FIREBASE_UID, it)
-                        saveUserToFirestore(result, it)
+                        MainActivity.startActivity(this@LoginActivity)
+                        finish()
                     }
                 } else {
                     loading(false)
