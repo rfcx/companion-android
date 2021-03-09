@@ -28,9 +28,14 @@ open class GuardianDeployment(
     var stream: DeploymentLocation? = null,
     var createdAt: Date = Date(),
     var updatedAt: Date? = null,
+    var isActive: Boolean = true,
     @Expose(serialize = false)
     var syncState: Int = 0
 ) : RealmModel, Serializable {
+
+    fun isCompleted(): Boolean {
+        return isActive
+    }
 
     companion object {
         const val TABLE_NAME = "GuardianDeployment"

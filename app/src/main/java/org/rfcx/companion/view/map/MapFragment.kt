@@ -394,14 +394,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             it.getLastDeploymentId()
         })
 
-        val showGuardianDeployments = this.guardianDeployments.filter {
-            showDeployIds.contains(it.serverId) || showDeployIds.contains(it.id.toString())
-        }
+        val showGuardianDeployments = this.guardianDeployments.filter  { it.isCompleted() }
+        val usedSitesOnGuardian = showGuardianDeployments.map { it.stream?.coreId }
 
         val showDeployments = this.edgeDeployments.filter { it.isCompleted() }
-        val usedSites = showDeployments.map { it.stream?.coreId }
+        val usedSitesOnEdge = showDeployments.map { it.stream?.coreId }
+
+        val allUsedSites = usedSitesOnEdge + usedSitesOnGuardian
         val filteredShowLocations =
-            showLocations.filter { loc -> !usedSites.contains(loc.serverId) }
+            showLocations.filter { loc -> !allUsedSites.contains(loc.serverId) }
 
         val edgeDeploymentMarkers = showDeployments.map { it.toMark(requireContext(), locationGroupDb) }
         val guardianDeploymentMarkers = showGuardianDeployments.map { it.toMark(requireContext()) }
