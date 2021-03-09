@@ -7,6 +7,8 @@ import androidx.work.*
 import io.realm.Realm
 import org.rfcx.companion.entity.request.EditDeploymentRequest
 import org.rfcx.companion.entity.request.toRequestBody
+import org.rfcx.companion.entity.response.toEdgeDeployment
+import org.rfcx.companion.entity.response.toGuardianDeployment
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
@@ -26,7 +28,6 @@ class GuardianDeploymentSyncWorker(val context: Context, params: WorkerParameter
 
         val db = GuardianDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val locateDb = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
-        val firestore = Firestore(context)
         val deployments = db.lockUnsent()
         val token = "Bearer ${context.getIdToken()}"
 
@@ -36,11 +37,21 @@ class GuardianDeploymentSyncWorker(val context: Context, params: WorkerParameter
         deployments.forEach {
             Log.d(TAG, "doWork: sending id ${it.id}")
             if (it.serverId == null) {
-                val result = firestore.sendDeployment(it.toRequestBody())
+                val result = ApiManager.getInstance().getDeviceApi()
+                    .createGuardianDeployment(token, it.toRequestBody()).execute()
 
-                if (result != null) {
-                    db.markSent(result.id, it.id)
-                    locateDb.updateDeploymentServerId(it.id, result.id, true)
+                if (result.isSuccessful) {
+                    val fullId = result.headers().get("Location")
+                    val id = fullId?.substring(fullId.lastIndexOf("/") + 1, fullId.length) ?: ""
+                    db.markSent(id, it.id)
+
+                    //update core siteId when deployment created
+                    val updatedDp = ApiManager.getInstance().getDeviceApi()
+                        .getDeployment(token, id).execute().body()
+                    updatedDp?.let { dp ->
+                        db.updateDeploymentByServerId(updatedDp.toGuardianDeployment())
+                        locateDb.updateSiteServerId(it.id, dp.stream!!.id!!)
+                    }
                 } else {
                     db.markUnsent(it.id)
                     someFailed = true

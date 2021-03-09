@@ -255,4 +255,14 @@ class GuardianDeploymentDb(private val realm: Realm) {
             callback.onFailure(it.localizedMessage ?: "")
         })
     }
+
+    fun updateDeploymentByServerId(deployment: GuardianDeployment) {
+        realm.executeTransaction {
+            it.where(GuardianDeployment::class.java)
+                .equalTo(GuardianDeployment.FIELD_SERVER_ID, deployment.serverId)
+                .findFirst()?.apply {
+                    stream?.coreId = deployment.stream?.coreId
+                }
+        }
+    }
 }

@@ -5,25 +5,22 @@ import org.rfcx.companion.entity.DeploymentLocation
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.util.toISO8601Format
 
 data class GuardianDeploymentRequest(
-    var device: String,
-    var deployedAt: Date = Date(),
+    var deploymentType: String,
+    var deployedAt: String = Date().toISO8601Format(),
     var wifi: String,
     var configuration: GuardianConfiguration? = null,
-    var location: DeploymentLocation? = null,
-    var updatedAt: Date? = null,
-    var createdAt: Date = Date()
+    var stream: StreamRequest? = null
 )
 
 fun GuardianDeployment.toRequestBody(): GuardianDeploymentRequest {
     return GuardianDeploymentRequest(
-        device = Device.GUARDIAN.value,
-        deployedAt = this.deployedAt,
+        deploymentType = Device.GUARDIAN.value,
+        deployedAt = this.deployedAt.toISO8601Format(),
         wifi = this.wifiName!!,
         configuration = this.configuration,
-        location = this.stream,
-        updatedAt= this.updatedAt,
-        createdAt = this.createdAt
+        stream = if (this.stream?.name == null) null else this.stream?.toRequestBody()
     )
 }
