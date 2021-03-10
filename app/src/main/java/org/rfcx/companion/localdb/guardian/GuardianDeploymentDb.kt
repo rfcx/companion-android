@@ -1,5 +1,6 @@
 package org.rfcx.companion.localdb.guardian
 
+import android.util.Log
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
@@ -38,8 +39,8 @@ class GuardianDeploymentDb(private val realm: Realm) {
                     ?.toInt() ?: 0) + 1
                 deployment.id = id
             }
-            deployment.stream = location // add deploy location
-            it.insertOrUpdate(deployment)
+            Log.d("loc", location.latitude.toString())
+            deployment.stream = it.copyToRealm(location)
         }
         return id
     }
@@ -54,7 +55,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
             if (deployment != null) {
                 deployment.serverId = deploymentResponse.id
                 deployment.deployedAt = deploymentResponse.deployedAt ?: deployment.deployedAt
-                deployment.wifiName = deploymentResponse.wifi
+                deployment.wifiName = deploymentResponse.wifi ?: ""
 
                 val newConfig = deploymentResponse.configuration
                 if (newConfig != null) {

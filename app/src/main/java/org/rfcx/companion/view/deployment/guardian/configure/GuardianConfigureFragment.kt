@@ -92,6 +92,7 @@ class GuardianConfigureFragment : Fragment() {
             analytics?.trackClickNextEvent(Screen.GUARDIAN_CONFIGURE.id)
             setNextButton(false)
             syncConfig()
+            deploymentProtocol?.setDeploymentConfigure(getConfiguration())
             deploymentProtocol?.setSampleRate(sampleRate)
         }
     }

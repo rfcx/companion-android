@@ -34,7 +34,7 @@ open class GuardianDeployment(
 ) : RealmModel, Serializable {
 
     fun isCompleted(): Boolean {
-        return isActive
+        return isActive && state == DeploymentState.Guardian.ReadyToUpload.key
     }
 
     companion object {

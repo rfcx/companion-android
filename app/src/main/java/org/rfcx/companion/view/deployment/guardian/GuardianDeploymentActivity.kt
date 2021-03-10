@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -236,9 +237,11 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
         val deployment = _deployment ?: GuardianDeployment()
+        deployment.isActive = locate.serverId == null
         deployment.state = DeploymentState.Guardian.Locate.key // state
 
         this._deployLocation = locate.asDeploymentLocation()
+        Log.d("loc", _deployLocation!!.latitude.toString())
         val deploymentId = deploymentDb.insertOrUpdateDeployment(deployment, _deployLocation!!)
 
         useExistedLocation = isExisted
