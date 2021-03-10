@@ -8,6 +8,13 @@
     android:background="@color/backgroundColor"
     tools:context=".view.map.MapFragment">
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineVertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.9" />
+
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
@@ -23,17 +30,43 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/currentLocationButton"
-            android:layout_width="@dimen/current_loc_size"
-            android:layout_height="@dimen/current_loc_size"
-            android:layout_marginEnd="@dimen/margin_padding_normal"
-            android:layout_marginBottom="@dimen/current_loc_margin"
-            app:fabCustomSize="@dimen/current_loc_size"
-            android:src="@drawable/ic_current_location"
-            app:backgroundTint="@color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:tint="@color/colorPrimary" />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/zoomInButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_padding_small"
+        android:src="@drawable/ic_add"
+        app:backgroundTint="@color/white"
+        app:fabCustomSize="@dimen/zoom_loc_size"
+        app:layout_constraintBottom_toTopOf="@id/zoomOutButton"
+        app:layout_constraintStart_toStartOf="@id/guidelineVertical"
+        app:layout_constraintEnd_toEndOf="@id/guidelineVertical"
+        app:tint="@color/colorPrimary" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/zoomOutButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_padding_small"
+        android:src="@drawable/ic_remove"
+        app:backgroundTint="@color/white"
+        app:fabCustomSize="@dimen/zoom_loc_size"
+        app:layout_constraintBottom_toTopOf="@id/currentLocationButton"
+        app:layout_constraintStart_toStartOf="@id/guidelineVertical"
+        app:layout_constraintEnd_toEndOf="@id/guidelineVertical"
+        app:tint="@color/colorPrimary" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/currentLocationButton"
+        android:layout_width="@dimen/current_loc_size"
+        android:layout_height="@dimen/current_loc_size"
+        android:layout_marginBottom="@dimen/current_loc_margin"
+        android:src="@drawable/ic_current_location"
+        app:backgroundTint="@color/white"
+        app:fabCustomSize="@dimen/current_loc_size"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guidelineVertical"
+        app:layout_constraintEnd_toEndOf="@id/guidelineVertical"
+        app:tint="@color/colorPrimary" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

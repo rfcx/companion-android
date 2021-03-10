@@ -43,6 +43,7 @@ import com.mapbox.mapboxsdk.utils.BitmapUtils
 import com.mapbox.pluginscalebar.ScaleBarOptions
 import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
+import kotlinx.android.synthetic.main.fragment_configure.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import org.rfcx.companion.DeploymentListener
 import org.rfcx.companion.MainActivityListener
@@ -204,6 +205,18 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         checkThenAccquireLocation(style)
                     }
                 }
+            }
+        }
+
+        zoomOutButton.setOnClickListener {
+            mapboxMap?.let {
+                it.animateCamera(CameraUpdateFactory.zoomOut(), DURATION)
+            }
+        }
+
+        zoomInButton.setOnClickListener {
+            mapboxMap?.let {
+                it.animateCamera(CameraUpdateFactory.zoomIn(), DURATION)
             }
         }
     }
@@ -843,6 +856,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         private const val PROPERTY_SITE_MARKER_IMAGE = "site.marker.image"
 
         private const val SITES_LIMIT_GETTING = 100
+        private const val DURATION = 700
 
         fun newInstance(): MapFragment {
             return MapFragment()
