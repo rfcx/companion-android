@@ -59,7 +59,7 @@
     <dimen name="tooltip_icon_size">24dp</dimen>
 
     <!-- Map -->
-    <dimen name="current_loc_size">56dp</dimen>
+    <dimen name="current_loc_size">50dp</dimen>
     <dimen name="current_loc_margin">64dp</dimen>
     <dimen name="legend_top_margin">64dp</dimen>
 
