@@ -206,6 +206,18 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 }
             }
         }
+
+        zoomOutButton.setOnClickListener {
+            mapboxMap?.let {
+                it.moveCamera(CameraUpdateFactory.zoomOut())
+            }
+        }
+
+        zoomInButton.setOnClickListener {
+            mapboxMap?.let {
+                it.moveCamera(CameraUpdateFactory.zoomIn())
+            }
+        }
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
