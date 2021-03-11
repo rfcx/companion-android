@@ -452,6 +452,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         handleShowDeployment(showDeployments, showGuardianDeployments)
 
         handleMarker(deploymentMarkers, locationMarkers)
+
+        if (deploymentMarkers.isNotEmpty()) {
+            val lastReport = deploymentMarkers.sortedByDescending { it.updatedAt }.first()
+            mapboxMap?.let {
+                it.moveCamera(
+                    CameraUpdateFactory.newLatLngZoom(LatLng(lastReport.latitude, lastReport.longitude), it.cameraPosition.zoom)
+                )
+            }
+        }
     }
 
     private fun getFurthestSiteFromCurrentLocation(
