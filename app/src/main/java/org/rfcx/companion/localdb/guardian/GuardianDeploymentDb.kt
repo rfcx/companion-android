@@ -1,6 +1,5 @@
 package org.rfcx.companion.localdb.guardian
 
-import android.util.Log
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
@@ -39,7 +38,6 @@ class GuardianDeploymentDb(private val realm: Realm) {
                     ?.toInt() ?: 0) + 1
                 deployment.id = id
             }
-            Log.d("loc", location.latitude.toString())
             deployment.stream = it.copyToRealm(location)
         }
         return id
@@ -73,6 +71,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
                 val id = (it.where(GuardianDeployment::class.java).max(GuardianDeployment.FIELD_ID)
                     ?.toInt() ?: 0) + 1
                 deploymentObj.id = id
+                deploymentObj.isActive = true
                 it.insert(deploymentObj)
             }
         }

@@ -399,10 +399,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         // hide loading progress
         progressBar.visibility = View.INVISIBLE
 
-        val showDeployIds = locations.mapTo(arrayListOf(), {
-            it.getLastDeploymentId()
-        })
-
         val showGuardianDeployments = this.guardianDeployments.filter  { it.isCompleted() }
         val usedSitesOnGuardian = showGuardianDeployments.map { it.stream?.coreId }
 
@@ -411,7 +407,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         val allUsedSites = usedSitesOnEdge + usedSitesOnGuardian
         val filteredShowLocations = locations.filter { loc -> !allUsedSites.contains(loc.serverId) }
-        
+
         val edgeDeploymentMarkers = showDeployments.map { it.toMark(requireContext(), locationGroupDb) }
         val guardianDeploymentMarkers = showGuardianDeployments.map { it.toMark(requireContext()) }
         val deploymentMarkers = edgeDeploymentMarkers + guardianDeploymentMarkers
