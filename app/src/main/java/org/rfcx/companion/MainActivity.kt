@@ -19,7 +19,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
 import org.rfcx.companion.entity.Device
-import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.response.StreamResponse
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
@@ -28,7 +27,6 @@ import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.EdgeDeploymentActivity
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
-import org.rfcx.companion.view.detail.EditLocationActivity
 import org.rfcx.companion.view.map.DeploymentDetailView
 import org.rfcx.companion.view.map.DeploymentViewPagerFragment
 import org.rfcx.companion.view.map.MapFragment

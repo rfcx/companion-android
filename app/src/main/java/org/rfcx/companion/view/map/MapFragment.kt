@@ -809,6 +809,23 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    private fun moveCameraOnStartWithProject() {
+        mapboxMap?.locationComponent?.lastKnownLocation?.let { curLoc ->
+            val currentLatLng = LatLng(curLoc.latitude, curLoc.longitude)
+            val preferences = context?.let { Preferences.getInstance(it) }
+            val projectName = preferences?.getString(Preferences.SELECTED_PROJECT, "")
+            val locations = this.locations.filter { it.locationGroup?.name == projectName }
+            val furthestSite = getFurthestSiteFromCurrentLocation(currentLatLng, if(projectName != "") locations else this.locations)
+            furthestSite?.let {
+                moveCamera(
+                    currentLatLng,
+                    LatLng(furthestSite.latitude, furthestSite.longitude),
+                    15.0
+                )
+            }
+        }
+    }
+
     private fun moveCameraToCurrentLocation() {
         mapboxMap?.locationComponent?.lastKnownLocation?.let { curLoc ->
             val currentLatLng = LatLng(curLoc.latitude, curLoc.longitude)
@@ -851,6 +868,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             projectNameTextView.text =
                 if (it.getProjectName() != getString(R.string.none)) it.getProjectName() else ""
             combinedData()
+            moveCameraOnStartWithProject()
         }
         analytics?.trackScreen(Screen.MAP)
     }
