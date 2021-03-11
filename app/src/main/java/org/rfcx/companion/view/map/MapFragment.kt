@@ -43,7 +43,6 @@ import com.mapbox.mapboxsdk.utils.BitmapUtils
 import com.mapbox.pluginscalebar.ScaleBarOptions
 import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
-import kotlinx.android.synthetic.main.fragment_edit_location.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import org.rfcx.companion.DeploymentListener
 import org.rfcx.companion.MainActivityListener
@@ -66,7 +65,6 @@ import org.rfcx.companion.repo.Firestore
 import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.locate.LocationFragment
-import org.rfcx.companion.view.detail.EditLocationActivity.Companion.EXTRA_LOCATION_GROUP
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import retrofit2.Call
 import retrofit2.Callback
@@ -420,14 +418,20 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             it.getLastDeploymentId()
         })
 
-        val showGuardianDeployments = this.guardianDeployments.filter {
+        var showGuardianDeployments = this.guardianDeployments.filter {
             showDeployIds.contains(it.serverId) || showDeployIds.contains(it.id.toString())
         }
 
-        val showDeployments = this.edgeDeployments.filter { it.isCompleted() }
+        var showDeployments = this.edgeDeployments.filter { it.isCompleted() }
         val usedSites = showDeployments.map { it.stream?.coreId }
-        val filteredShowLocations =
+        var filteredShowLocations =
             locations.filter { loc -> !usedSites.contains(loc.serverId) }
+
+        if(listener?.getProjectName() != null && listener?.getProjectName() != "") {
+            filteredShowLocations = filteredShowLocations.filter { it.locationGroup?.name ==  listener?.getProjectName()}
+            showDeployments = showDeployments.filter { it.stream?.project?.name ==  listener?.getProjectName()}
+            showGuardianDeployments = showGuardianDeployments.filter { it.stream?.project?.name ==  listener?.getProjectName()}
+        }
 
         val edgeDeploymentMarkers = showDeployments.map { it.toMark(requireContext(), locationGroupDb) }
         val guardianDeploymentMarkers = showGuardianDeployments.map { it.toMark(requireContext()) }
@@ -823,6 +827,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mapView.onResume()
         listener?.let {
             projectNameTextView.text = it.getProjectName()
+            combinedData()
         }
         analytics?.trackScreen(Screen.MAP)
     }
