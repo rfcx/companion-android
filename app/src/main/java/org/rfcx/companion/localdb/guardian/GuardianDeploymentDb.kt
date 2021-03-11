@@ -266,4 +266,30 @@ class GuardianDeploymentDb(private val realm: Realm) {
                 }
         }
     }
+
+    fun updateIsActive(id: Int) {
+        realm.executeTransaction {
+            val deployment =
+                it.where(GuardianDeployment::class.java).equalTo(GuardianDeployment.FIELD_ID, id)
+                    .findFirst()
+            if (deployment != null) {
+                deployment.isActive = false
+            }
+        }
+    }
+
+    fun getDeploymentsBySiteId(streamId: String): ArrayList<GuardianDeployment> {
+        val deployments = realm.where(GuardianDeployment::class.java)
+            .equalTo(GuardianDeployment.FIELD_STATE, DeploymentState.Edge.ReadyToUpload.key)
+            .and()
+            .equalTo(GuardianDeployment.FIELD_SYNC_STATE, SyncState.Sent.key)
+            .and()
+            .equalTo("stream.coreId", streamId)
+            .findAllAsync()
+        val arrayOfId = arrayListOf<GuardianDeployment>()
+        deployments.forEach {
+            it?.let { it1 -> arrayOfId.add(it1) }
+        }
+        return arrayOfId
+    }
 }

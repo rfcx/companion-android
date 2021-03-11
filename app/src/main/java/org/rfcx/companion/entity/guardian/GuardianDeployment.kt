@@ -28,13 +28,13 @@ open class GuardianDeployment(
     var stream: DeploymentLocation? = null,
     var createdAt: Date = Date(),
     var updatedAt: Date? = null,
-    var isActive: Boolean = true,
+    var isActive: Boolean = false,
     @Expose(serialize = false)
     var syncState: Int = 0
 ) : RealmModel, Serializable {
 
     fun isCompleted(): Boolean {
-        return isActive && state == DeploymentState.Guardian.ReadyToUpload.key
+        return isActive
     }
 
     companion object {

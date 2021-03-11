@@ -3,6 +3,7 @@ package org.rfcx.companion.entity.guardian
 import com.google.gson.annotations.SerializedName
 import io.realm.RealmModel
 import io.realm.annotations.RealmClass
+import org.rfcx.companion.entity.request.GuardianConfigurationRequest
 import java.io.Serializable
 
 @RealmClass
@@ -30,5 +31,14 @@ fun GuardianConfiguration.toReadableFormat(): GuardianConfiguration {
         bitrate = bitrate / 1024,
         fileFormat = fileFormat,
         duration = duration
+    )
+}
+
+fun GuardianConfiguration.toRequestBody(): GuardianConfigurationRequest {
+    return GuardianConfigurationRequest(
+        sampleRate = this.sampleRate,
+        bitrate = this.bitrate,
+        duration = this.duration,
+        fileFormat = this.fileFormat
     )
 }

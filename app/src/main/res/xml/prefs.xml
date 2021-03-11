@@ -143,32 +143,32 @@
 
     <androidx.preference.ListPreference
         android:defaultValue="@string/prefs_value_default_audio_encode_codec"
-        android:dialogTitle="audio_encode_codec"
+        android:dialogTitle="audio_stream_codec"
         android:entries="@array/audio_codec"
         android:entryValues="@array/audio_codec"
-        android:key="audio_encode_codec"
+        android:key="audio_stream_codec"
         android:summary="string - codec"
-        android:title="audio_encode_codec"
+        android:title="audio_stream_codec"
         app:iconSpaceReserved="false" />
 
     <androidx.preference.ListPreference
         android:defaultValue="@string/prefs_value_default_audio_encode_bitrate"
-        android:dialogTitle="audio_encode_bitrate"
+        android:dialogTitle="audio_stream_bitrate"
         android:entries="@array/bitrate_entries"
         android:entryValues="@array/bitrate_values"
-        android:key="audio_encode_bitrate"
+        android:key="audio_stream_bitrate"
         android:summary="int - kbits per second"
-        android:title="audio_encode_bitrate"
+        android:title="audio_stream_bitrate"
         app:iconSpaceReserved="false" />
 
     <androidx.preference.ListPreference
         android:defaultValue="@string/prefs_value_default_audio_sample_rate"
-        android:dialogTitle="audio_sample_rate"
+        android:dialogTitle="audio_stream_sample_rate"
         android:entries="@array/sample_rate_entries"
         android:entryValues="@array/sample_rate_values"
-        android:key="audio_sample_rate"
+        android:key="audio_stream_sample_rate"
         android:summary="int - hertz"
-        android:title="audio_sample_rate"
+        android:title="audio_stream_sample_rate"
         app:iconSpaceReserved="false" />
 
     <!-- Battery Cutoff Thresholds -->

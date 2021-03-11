@@ -24,6 +24,7 @@ import org.rfcx.companion.entity.LocationGroups
 import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.localdb.DeploymentImageDb
+import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
@@ -54,6 +55,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private val locateDb by lazy { LocateDb(realm) }
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
     private val deploymentDb by lazy { GuardianDeploymentDb(realm) }
+    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
 
     private var _deployment: GuardianDeployment? = null
@@ -257,12 +259,23 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         showLoading()
         this._deployment?.let {
             it.deployedAt = Date()
+            it.updatedAt = Date()
+            it.deployedAt = Date()
+            it.isActive = true
             it.state = DeploymentState.Guardian.ReadyToUpload.key
             setDeployment(it)
 
             if (useExistedLocation) {
                 this._locate?.let { locate ->
                     locateDb.insertOrUpdateLocate(it.id, locate, true) // update locate - last deployment
+                    val deployments = locate.serverId?.let { it1 -> deploymentDb.getDeploymentsBySiteId(it1) }
+                    val edgeDeployments = locate.serverId?.let { it1 -> edgeDeploymentDb.getDeploymentsBySiteId(it1) }
+                    deployments?.forEach { deployment ->
+                        deploymentDb.updateIsActive(deployment.id)
+                    }
+                    edgeDeployments?.forEach { deployment ->
+                        edgeDeploymentDb.updateIsActive(deployment.id)
+                    }
                 }
             }
 
