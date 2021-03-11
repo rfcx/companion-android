@@ -64,12 +64,8 @@ class GuardianConfigureFragment : Fragment() {
         }
 
         setNextButton(true)
-        setFileFormatLayout()
-        setSampleRateLayout()
-        setBitrateLayout()
-        setDuration()
-        createNotificationChannel()
-        setNextOnClick()
+        deploymentProtocol?.showLoading()
+        retrieveCurrentConfigure()
     }
 
     private fun setPredefinedConfiguration(context: Context) {
@@ -112,18 +108,21 @@ class GuardianConfigureFragment : Fragment() {
         return GuardianConfiguration(sampleRate, bitrate, fileFormat, duration)
     }
 
-    private fun createNotificationChannel() {
-        val notificationManager =
-            context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    private fun retrieveCurrentConfigure() {
+        SocketManager.getCurrentConfiguration()
+        SocketManager.currentConfiguration.observe(viewLifecycleOwner, Observer { curConfig ->
+            bitrate = curConfig.configure.bitrate
+            sampleRate = curConfig.configure.sampleRate
+            duration = curConfig.configure.duration
+            fileFormat = if (curConfig.configure.fileFormat.toIntOrNull() == null) curConfig.configure.fileFormat else "opus"
+            deploymentProtocol?.hideLoading()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationChannel =
-                NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH)
-            notificationChannel.enableLights(true)
-            notificationChannel.lightColor = Color.GREEN
-            notificationChannel.enableVibration(false)
-            notificationManager.createNotificationChannel(notificationChannel)
-        }
+            setFileFormatLayout()
+            setSampleRateLayout()
+            setBitrateLayout()
+            setDuration()
+            setNextOnClick()
+        })
     }
 
     private fun setBitrateLayout() {
@@ -223,9 +222,6 @@ class GuardianConfigureFragment : Fragment() {
     }
 
     companion object {
-        const val CHANNEL_ID = "Guardian Notification"
-        const val CHANNEL_NAME = "Notification"
-
         fun newInstance(): GuardianConfigureFragment {
             return GuardianConfigureFragment()
         }
