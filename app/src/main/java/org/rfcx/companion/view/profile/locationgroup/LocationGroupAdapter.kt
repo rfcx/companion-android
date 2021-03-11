@@ -56,7 +56,14 @@ class LocationGroupAdapter(private val locationGroupListener: LocationGroupListe
                 checkImageView.visibility =
                     if (locationGroup == selectedGroup) View.VISIBLE else View.GONE
             }
+
             locationGroupTextView.text = locationGroup
+
+            if (screen == Screen.MAP.id) {
+                if(locationGroup == itemView.context.getString(R.string.none)){
+                    locationGroupTextView.text = itemView.context.getString(R.string.projects)
+                }
+            }
         }
     }
 }

@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
                 groupName = if (isGroupExisted) {
                     project.name
                 } else {
-                    getString(R.string.none)
+                    ""
                 }
             }
         }

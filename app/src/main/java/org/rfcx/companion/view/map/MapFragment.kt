@@ -222,10 +222,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
 
         menuImageView.setOnClickListener {
+            var projectName: String? = null
+            listener?.let {
+                projectName = if (it.getProjectName() == "") getString(R.string.none) else it.getProjectName()
+            }
+
             context?.let { it1 ->
                 LocationGroupActivity.startActivity(
                     it1,
-                    null,
+                    projectName,
                     Screen.MAP.id,
                     REQUEST_CODE
                 )
@@ -427,7 +432,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         var filteredShowLocations =
             locations.filter { loc -> !usedSites.contains(loc.serverId) }
 
-        if(listener?.getProjectName() != null && listener?.getProjectName() != "") {
+        if(listener?.getProjectName() != null && listener?.getProjectName() != ""&& listener?.getProjectName() != getString(R.string.none)) {
             filteredShowLocations = filteredShowLocations.filter { it.locationGroup?.name ==  listener?.getProjectName()}
             showDeployments = showDeployments.filter { it.stream?.project?.name ==  listener?.getProjectName()}
             showGuardianDeployments = showGuardianDeployments.filter { it.stream?.project?.name ==  listener?.getProjectName()}
