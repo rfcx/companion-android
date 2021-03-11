@@ -96,7 +96,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var locations = listOf<Locate>()
     private var locationGroups = listOf<LocationGroups>()
     private var lastSyncingInfo: SyncInfo? = null
-    private var project: LocationGroup? = null
 
     private lateinit var guardianDeployLiveData: LiveData<List<GuardianDeployment>>
     private lateinit var edgeDeployLiveData: LiveData<List<EdgeDeployment>>

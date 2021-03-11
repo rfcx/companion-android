@@ -50,7 +50,6 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
 
     private var addTooltip: SimpleTooltip? = null
     private val analytics by lazy { Analytics(this) }
-    private var groupName: String? = null
 
     private var currentSiteLoading = 0
 
