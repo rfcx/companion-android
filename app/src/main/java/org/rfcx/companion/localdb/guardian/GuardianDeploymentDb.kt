@@ -280,7 +280,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
 
     fun getDeploymentsBySiteId(streamId: String): ArrayList<GuardianDeployment> {
         val deployments = realm.where(GuardianDeployment::class.java)
-            .equalTo(GuardianDeployment.FIELD_STATE, DeploymentState.Edge.ReadyToUpload.key)
+            .equalTo(GuardianDeployment.FIELD_STATE, DeploymentState.Guardian.ReadyToUpload.key)
             .and()
             .equalTo(GuardianDeployment.FIELD_SYNC_STATE, SyncState.Sent.key)
             .and()
