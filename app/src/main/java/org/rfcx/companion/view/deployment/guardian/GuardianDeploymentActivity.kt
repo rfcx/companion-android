@@ -17,10 +17,7 @@ import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.SocketManager
 import org.rfcx.companion.connection.wifi.WifiHotspotManager
 import org.rfcx.companion.connection.wifi.WifiLostListener
-import org.rfcx.companion.entity.DeploymentLocation
-import org.rfcx.companion.entity.DeploymentState
-import org.rfcx.companion.entity.Locate
-import org.rfcx.companion.entity.LocationGroups
+import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.localdb.DeploymentImageDb
@@ -243,7 +240,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         deployment.state = DeploymentState.Guardian.Locate.key // state
 
         this._deployLocation = locate.asDeploymentLocation()
-        Log.d("loc", _deployLocation!!.latitude.toString())
         val deploymentId = deploymentDb.insertOrUpdateDeployment(deployment, _deployLocation!!)
 
         useExistedLocation = isExisted
@@ -260,7 +256,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         this._deployment?.let {
             it.deployedAt = Date()
             it.updatedAt = Date()
-            it.deployedAt = Date()
             it.isActive = true
             it.state = DeploymentState.Guardian.ReadyToUpload.key
             setDeployment(it)
@@ -279,13 +274,19 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                 }
             }
 
-            deploymentImageDb.insertImage(null, it, _images)
+            saveImages(it)
             deploymentDb.updateDeployment(it)
             analytics.trackCreateGuardianDeploymentEvent()
 
+            SocketManager.getCheckInTest() // to stop getting checkin test
             GuardianDeploymentSyncWorker.enqueue(this@GuardianDeploymentActivity)
             showComplete()
         }
+    }
+
+    private fun saveImages(deployment: GuardianDeployment) {
+        deploymentImageDb.deleteImages(deployment.id)
+        deploymentImageDb.insertImage(null, deployment, _images)
     }
 
     override fun setCurrentLocation(location: Location) {

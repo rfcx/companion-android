@@ -59,10 +59,7 @@ class GuardianDeploymentSyncWorker(val context: Context, params: WorkerParameter
             } else {
                 val deploymentLocation = it.stream
                 deploymentLocation?.let { location ->
-                    val req = EditDeploymentRequest(
-                        location.toRequestBody(),
-                        location.project?.toRequestBody()
-                    )
+                    val req = EditDeploymentRequest(location.toRequestBody())
                     val serverId = it.serverId ?: ""
                     val result = ApiManager.getInstance().getDeviceApi()
                         .editDeployments(token, serverId, req).execute()
