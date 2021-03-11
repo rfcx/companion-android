@@ -43,6 +43,7 @@ import com.mapbox.mapboxsdk.utils.BitmapUtils
 import com.mapbox.pluginscalebar.ScaleBarOptions
 import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
+import kotlinx.android.synthetic.main.fragment_configure.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import org.rfcx.companion.DeploymentListener
 import org.rfcx.companion.MainActivityListener
@@ -202,6 +203,18 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         checkThenAccquireLocation(style)
                     }
                 }
+            }
+        }
+
+        zoomOutButton.setOnClickListener {
+            mapboxMap?.let {
+                it.animateCamera(CameraUpdateFactory.zoomOut(), DURATION)
+            }
+        }
+
+        zoomInButton.setOnClickListener {
+            mapboxMap?.let {
+                it.animateCamera(CameraUpdateFactory.zoomIn(), DURATION)
             }
         }
     }
@@ -386,8 +399,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         // hide loading progress
         progressBar.visibility = View.INVISIBLE
 
-        val showLocations = locations.filter { it.isCompleted() }
-        val showDeployIds = showLocations.mapTo(arrayListOf(), {
+        val showDeployIds = locations.mapTo(arrayListOf(), {
             it.getLastDeploymentId()
         })
 
@@ -398,9 +410,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val usedSitesOnEdge = showDeployments.map { it.stream?.coreId }
 
         val allUsedSites = usedSitesOnEdge + usedSitesOnGuardian
-        val filteredShowLocations =
-            showLocations.filter { loc -> !allUsedSites.contains(loc.serverId) }
-
+        val filteredShowLocations = locations.filter { loc -> !allUsedSites.contains(loc.serverId) }
+        
         val edgeDeploymentMarkers = showDeployments.map { it.toMark(requireContext(), locationGroupDb) }
         val guardianDeploymentMarkers = showGuardianDeployments.map { it.toMark(requireContext()) }
         val deploymentMarkers = edgeDeploymentMarkers + guardianDeploymentMarkers
@@ -408,6 +419,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         handleShowDeployment(showDeployments, showGuardianDeployments)
 
         handleMarker(deploymentMarkers, locationMarkers)
+
+        if (deploymentMarkers.isNotEmpty()) {
+            val lastReport = deploymentMarkers.sortedByDescending { it.updatedAt }.first()
+            mapboxMap?.let {
+                it.moveCamera(
+                    CameraUpdateFactory.newLatLngZoom(LatLng(lastReport.latitude, lastReport.longitude), it.cameraPosition.zoom)
+                )
+            }
+        }
     }
 
     private fun getFurthestSiteFromCurrentLocation(
@@ -838,6 +858,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         private const val PROPERTY_SITE_MARKER_IMAGE = "site.marker.image"
 
         private const val SITES_LIMIT_GETTING = 100
+        private const val DURATION = 700
 
         fun newInstance(): MapFragment {
             return MapFragment()

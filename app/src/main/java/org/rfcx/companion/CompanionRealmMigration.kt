@@ -44,6 +44,10 @@ class CompanionRealmMigration : RealmMigration {
         if (oldVersion < 11L && newVersion >= 11L) {
             migrateToV11(realm)
         }
+
+        if (oldVersion < 12L && newVersion >= 12L) {
+            migrateToV12(realm)
+        }
     }
 
     private fun migrateToV2(realm: DynamicRealm) {
@@ -232,6 +236,16 @@ class CompanionRealmMigration : RealmMigration {
         val locate = realm.schema.get(Locate.TABLE_NAME)
         locate?.apply {
             addField("updatedAt", Date::class.java)
+        }
+    }
+
+    private fun migrateToV12(realm: DynamicRealm) {
+        val locate = realm.schema.get(Locate.TABLE_NAME)
+        locate?.apply {
+            val hasDeletedAt = this.hasField(Locate.FIELD_DELETED_AT)
+            if (hasDeletedAt) {
+                removeField(Locate.FIELD_DELETED_AT)
+            }
         }
     }
 

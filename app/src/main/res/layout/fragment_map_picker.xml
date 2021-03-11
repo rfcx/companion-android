@@ -42,6 +42,7 @@
             android:layout_margin="@dimen/margin_padding_normal"
             android:src="@drawable/ic_current_location"
             app:backgroundTint="@color/white"
+            app:fabCustomSize="@dimen/current_loc_size"
             app:tint="@color/colorPrimary" />
 
     </RelativeLayout>

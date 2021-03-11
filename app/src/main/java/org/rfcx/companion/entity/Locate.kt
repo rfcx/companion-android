@@ -21,7 +21,6 @@ open class Locate(
     var altitude: Double = 0.0,
     var createdAt: Date = Date(),
     var updatedAt: Date? = null,
-    var deletedAt: Date? = null,
     var lastDeploymentId: Int = 0,
     var lastDeploymentServerId: String? = null,
     var lastGuardianDeploymentId: Int = 0,
@@ -29,10 +28,6 @@ open class Locate(
     @Expose(serialize = false)
     var syncState: Int = 0
 ) : RealmModel {
-
-    fun isCompleted(): Boolean {
-        return deletedAt == null
-    }
 
     fun getLastDeploymentId(): String {
         // is sent?

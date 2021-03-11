@@ -180,20 +180,6 @@ class EdgeDeploymentDb(private val realm: Realm) {
                 edgeDeployment.updatedAt = Date()
                 edgeDeployment.syncState = SyncState.Unsent.key
             }
-
-            // do set delete location
-            val location = if (edgeDeployment?.serverId != null) {
-                bgRealm.where(Locate::class.java)
-                    .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_SERVER_ID, edgeDeployment.serverId)
-                    .findFirst()
-            } else {
-                bgRealm.where(Locate::class.java)
-                    .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_ID, id).findFirst()
-            }
-
-            if (location != null) {
-                location.deletedAt = Date()
-            }
         }, {
             // success
             realm.close()
