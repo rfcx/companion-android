@@ -84,14 +84,6 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         currentFragment?.let {
             if (it is MapFragment) {
                 it.onActivityResult(requestCode, resultCode, data)
-                val project =
-                    data?.getSerializableExtra(EditLocationActivity.EXTRA_LOCATION_GROUP) as LocationGroup
-                val isGroupExisted = locationGroupDb.isExisted(project.name)
-                groupName = if (isGroupExisted) {
-                    project.name
-                } else {
-                    ""
-                }
             }
         }
     }
@@ -319,7 +311,10 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         }
     }
 
-    override fun getProjectName(): String = groupName ?: ""
+    override fun getProjectName(): String {
+        val preferences = Preferences.getInstance(this)
+        return preferences.getString(Preferences.SELECTED_PROJECT, getString(R.string.none))
+    }
 
     override fun hidBottomAppBar() {
         createLocationButton.visibility = View.INVISIBLE

@@ -224,7 +224,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         menuImageView.setOnClickListener {
             var projectName: String? = null
             listener?.let {
-                projectName = if (it.getProjectName() == "") getString(R.string.none) else it.getProjectName()
+                projectName =
+                    if (it.getProjectName() == "") getString(R.string.none) else it.getProjectName()
             }
 
             context?.let { it1 ->
@@ -432,13 +433,20 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         var filteredShowLocations =
             locations.filter { loc -> !usedSites.contains(loc.serverId) }
 
-        if(listener?.getProjectName() != null && listener?.getProjectName() != ""&& listener?.getProjectName() != getString(R.string.none)) {
-            filteredShowLocations = filteredShowLocations.filter { it.locationGroup?.name ==  listener?.getProjectName()}
-            showDeployments = showDeployments.filter { it.stream?.project?.name ==  listener?.getProjectName()}
-            showGuardianDeployments = showGuardianDeployments.filter { it.stream?.project?.name ==  listener?.getProjectName()}
+        if (listener?.getProjectName() != null && listener?.getProjectName() != "" && listener?.getProjectName() != getString(
+                R.string.none
+            )
+        ) {
+            filteredShowLocations =
+                filteredShowLocations.filter { it.locationGroup?.name == listener?.getProjectName() }
+            showDeployments =
+                showDeployments.filter { it.stream?.project?.name == listener?.getProjectName() }
+            showGuardianDeployments =
+                showGuardianDeployments.filter { it.stream?.project?.name == listener?.getProjectName() }
         }
 
-        val edgeDeploymentMarkers = showDeployments.map { it.toMark(requireContext(), locationGroupDb) }
+        val edgeDeploymentMarkers =
+            showDeployments.map { it.toMark(requireContext(), locationGroupDb) }
         val guardianDeploymentMarkers = showGuardianDeployments.map { it.toMark(requireContext()) }
         val deploymentMarkers = edgeDeploymentMarkers + guardianDeploymentMarkers
         val locationMarkers = filteredShowLocations.map { it.toMark() }
@@ -527,7 +535,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun retrieveLocations(context: Context, offset: Int, maxUpdatedAt: String?) {
         val token = "Bearer ${context.getIdToken()}"
-        ApiManager.getInstance().getDeviceApi().getStreams(token, SITES_LIMIT_GETTING, offset, maxUpdatedAt, "updated_at")
+        ApiManager.getInstance().getDeviceApi()
+            .getStreams(token, SITES_LIMIT_GETTING, offset, maxUpdatedAt, "updated_at")
             .enqueue(object : Callback<List<StreamResponse>> {
                 override fun onFailure(call: Call<List<StreamResponse>>, t: Throwable) {
                     combinedData()
@@ -548,7 +557,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         }
                         if (it.size == SITES_LIMIT_GETTING) {
                             currentSiteLoading += SITES_LIMIT_GETTING
-                            retrieveLocations(context, currentSiteLoading, locateDb.getMaxUpdatedAt())
+                            retrieveLocations(
+                                context,
+                                currentSiteLoading,
+                                locateDb.getMaxUpdatedAt()
+                            )
                         }
                     }
                     combinedData()
@@ -611,7 +624,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                             response: Response<List<DeploymentImageResponse>>
                         ) {
                             response.body()?.forEach { item ->
-                                deploymentImageDb.insertOrUpdate(item, dp.id, Device.AUDIOMOTH.value)
+                                deploymentImageDb.insertOrUpdate(
+                                    item,
+                                    dp.id,
+                                    Device.AUDIOMOTH.value
+                                )
                             }
                         }
                     })
@@ -831,7 +848,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         super.onResume()
         mapView.onResume()
         listener?.let {
-            projectNameTextView.text = it.getProjectName()
+            projectNameTextView.text =
+                if (it.getProjectName() != getString(R.string.none)) it.getProjectName() else ""
             combinedData()
         }
         analytics?.trackScreen(Screen.MAP)

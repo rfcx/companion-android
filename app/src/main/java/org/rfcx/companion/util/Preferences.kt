@@ -33,6 +33,7 @@ class Preferences(context: Context) {
         const val USER_FIREBASE_UID = "${PREFIX}USER_FIREBASE_UID"
         const val DISPLAY_THEME = "${PREFIX}DISPLAY_THEME"
         const val GROUP = "${PREFIX}GROUP"
+        const val SELECTED_PROJECT = "${PREFIX}SELECTED_PROJECT"
         const val TOKEN_EXPIRES_AT = "${PREFIX}TOKEN_EXPIRES_AT"
     }
 
