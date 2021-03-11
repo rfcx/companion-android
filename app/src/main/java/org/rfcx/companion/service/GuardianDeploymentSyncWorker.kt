@@ -7,12 +7,10 @@ import androidx.work.*
 import io.realm.Realm
 import org.rfcx.companion.entity.request.EditDeploymentRequest
 import org.rfcx.companion.entity.request.toRequestBody
-import org.rfcx.companion.entity.response.toEdgeDeployment
 import org.rfcx.companion.entity.response.toGuardianDeployment
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
-import org.rfcx.companion.repo.Firestore
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.getIdToken

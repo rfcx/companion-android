@@ -48,6 +48,10 @@ class CompanionRealmMigration : RealmMigration {
         if (oldVersion < 12L && newVersion >= 12L) {
             migrateToV12(realm)
         }
+
+        if (oldVersion < 13L && newVersion >= 13L) {
+            migrateToV13(realm)
+        }
     }
 
     private fun migrateToV2(realm: DynamicRealm) {
@@ -246,6 +250,17 @@ class CompanionRealmMigration : RealmMigration {
             if (hasDeletedAt) {
                 removeField(Locate.FIELD_DELETED_AT)
             }
+        }
+    }
+
+    private fun migrateToV13(realm: DynamicRealm) {
+        val profile = realm.schema.get("GuardianProfile")
+        val diagnostic = realm.schema.get("DiagnosticInfo")
+        profile?.let {
+            realm.schema.remove("GuardianProfile")
+        }
+        diagnostic?.let {
+            realm.schema.remove("DiagnosticInfo")
         }
     }
 
