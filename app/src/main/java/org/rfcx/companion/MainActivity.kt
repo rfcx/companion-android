@@ -19,13 +19,16 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
 import org.rfcx.companion.entity.Device
+import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.response.StreamResponse
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
+import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.EdgeDeploymentActivity
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
+import org.rfcx.companion.view.detail.EditLocationActivity
 import org.rfcx.companion.view.map.DeploymentDetailView
 import org.rfcx.companion.view.map.DeploymentViewPagerFragment
 import org.rfcx.companion.view.map.MapFragment
@@ -39,6 +42,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
+    private val locationGroupDb by lazy { LocationGroupDb(realm) }
 
     private var currentFragment: Fragment? = null
     private val locationPermissions by lazy { LocationPermissions(this) }
@@ -48,6 +52,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
 
     private var addTooltip: SimpleTooltip? = null
     private val analytics by lazy { Analytics(this) }
+    private var groupName: String? = null
 
     private var currentSiteLoading = 0
 
@@ -79,6 +84,14 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         currentFragment?.let {
             if (it is MapFragment) {
                 it.onActivityResult(requestCode, resultCode, data)
+                val project =
+                    data?.getSerializableExtra(EditLocationActivity.EXTRA_LOCATION_GROUP) as LocationGroup
+                val isGroupExisted = locationGroupDb.isExisted(project.name)
+                groupName = if (isGroupExisted) {
+                    project.name
+                } else {
+                    getString(R.string.none)
+                }
             }
         }
     }
@@ -306,6 +319,8 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         }
     }
 
+    override fun getProjectName(): String = groupName ?: ""
+
     override fun hidBottomAppBar() {
         createLocationButton.visibility = View.INVISIBLE
         bottomBar.visibility = View.INVISIBLE
@@ -387,4 +402,5 @@ interface MainActivityListener {
     fun hideSnackbar()
     fun onLogout()
     fun moveMapIntoDeploymentMarker(lat: Double, lng: Double, markerLocationId: String)
+    fun getProjectName(): String
 }

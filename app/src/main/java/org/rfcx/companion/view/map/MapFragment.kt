@@ -43,7 +43,7 @@ import com.mapbox.mapboxsdk.utils.BitmapUtils
 import com.mapbox.pluginscalebar.ScaleBarOptions
 import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
-import kotlinx.android.synthetic.main.fragment_configure.*
+import kotlinx.android.synthetic.main.fragment_edit_location.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import org.rfcx.companion.DeploymentListener
 import org.rfcx.companion.MainActivityListener
@@ -66,6 +66,8 @@ import org.rfcx.companion.repo.Firestore
 import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.locate.LocationFragment
+import org.rfcx.companion.view.detail.EditLocationActivity.Companion.EXTRA_LOCATION_GROUP
+import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -96,6 +98,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var locations = listOf<Locate>()
     private var locationGroups = listOf<LocationGroups>()
     private var lastSyncingInfo: SyncInfo? = null
+    private var project: LocationGroup? = null
 
     private lateinit var guardianDeployLiveData: LiveData<List<GuardianDeployment>>
     private lateinit var edgeDeployLiveData: LiveData<List<EdgeDeployment>>
@@ -217,6 +220,17 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         zoomInButton.setOnClickListener {
             mapboxMap?.let {
                 it.animateCamera(CameraUpdateFactory.zoomIn(), DURATION)
+            }
+        }
+
+        menuImageView.setOnClickListener {
+            context?.let { it1 ->
+                LocationGroupActivity.startActivity(
+                    it1,
+                    null,
+                    Screen.MAP.id,
+                    REQUEST_CODE
+                )
             }
         }
     }
@@ -807,6 +821,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     override fun onResume() {
         super.onResume()
         mapView.onResume()
+        listener?.let {
+            projectNameTextView.text = it.getProjectName()
+        }
         analytics?.trackScreen(Screen.MAP)
     }
 
@@ -857,6 +874,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         private const val SITES_LIMIT_GETTING = 100
         private const val DURATION = 700
+        const val REQUEST_CODE = 1006
 
         fun newInstance(): MapFragment {
             return MapFragment()
