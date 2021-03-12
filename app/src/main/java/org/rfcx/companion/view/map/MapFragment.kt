@@ -28,6 +28,7 @@ import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
 import com.mapbox.mapboxsdk.location.LocationComponentOptions
 import com.mapbox.mapboxsdk.location.modes.CameraMode
@@ -37,7 +38,6 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.style.expressions.Expression
-import com.mapbox.mapboxsdk.style.layers.CircleLayer
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
@@ -256,7 +256,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 GeoJsonOptions()
                     .withCluster(true)
                     .withClusterMaxZoom(15)
-                    .withClusterRadius(20)
+                    .withClusterRadius(50)
             )
 
         siteSource =
@@ -266,7 +266,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 GeoJsonOptions()
                     .withCluster(true)
                     .withClusterMaxZoom(15)
-                    .withClusterRadius(20)
+                    .withClusterRadius(50)
             )
 
         style.addSource(deploymentSource!!)
@@ -362,7 +362,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 PropertyFactory.iconSize(0.8f),
                 PropertyFactory.iconAllowOverlap(true)
             )
-            val deploymentPointCount = Expression.toNumber(Expression.get(DEPLOYMENT_POINT_COUNT))
+            val deploymentPointCount = Expression.toNumber(Expression.get(POINT_COUNT))
 
             deploymentSymbolLayer.setFilter(
                 if (i == 0) {
@@ -381,7 +381,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 PropertyFactory.iconSize(0.8f),
                 PropertyFactory.iconAllowOverlap(true)
             )
-            val sitePointCount = Expression.toNumber(Expression.get(SITE_POINT_COUNT))
+            val sitePointCount = Expression.toNumber(Expression.get(POINT_COUNT))
 
             siteSymbolLayer.setFilter(
                 if (i == 0) {
@@ -400,7 +400,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         val siteCount = SymbolLayer(SITE_COUNT, SOURCE_SITE)
         siteCount.setProperties(
-            PropertyFactory.textField(Expression.toString(Expression.get(SITE_POINT_COUNT))),
+            PropertyFactory.textField(Expression.toString(Expression.get(POINT_COUNT))),
             PropertyFactory.textSize(12f),
             PropertyFactory.textColor(Color.BLACK),
             PropertyFactory.textIgnorePlacement(true),
@@ -408,8 +408,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         )
 
         val deploymentCount = SymbolLayer(DEPLOYMENT_COUNT, SOURCE_DEPLOYMENT)
-        siteCount.setProperties(
-            PropertyFactory.textField(Expression.toString(Expression.get(DEPLOYMENT_POINT_COUNT))),
+        deploymentCount.setProperties(
+            PropertyFactory.textField(Expression.toString(Expression.get(POINT_COUNT))),
             PropertyFactory.textSize(12f),
             PropertyFactory.textColor(Color.BLACK),
             PropertyFactory.textIgnorePlacement(true),
@@ -427,6 +427,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun handleClickIcon(screenPoint: PointF): Boolean {
         val deploymentFeatures = mapboxMap?.queryRenderedFeatures(screenPoint, MARKER_DEPLOYMENT_ID)
+        val siteClusterFeatures = mapboxMap?.queryRenderedFeatures(screenPoint, "$SITE_CLUSTER-0")
+        val deploymentClusterFeatures = mapboxMap?.queryRenderedFeatures(screenPoint, "$DEPLOYMENT_CLUSTER-0")
         if (deploymentFeatures != null && deploymentFeatures.isNotEmpty()) {
             val selectedFeature = deploymentFeatures[0]
             val features = this.deploymentFeatures!!.features()!!
@@ -454,8 +456,46 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         } else {
             (activity as MainActivityListener).hideBottomSheet()
         }
+
+        if (siteClusterFeatures != null && siteClusterFeatures.isNotEmpty()) {
+            val pinCount = if (siteClusterFeatures[0].getProperty(POINT_COUNT) != null) siteClusterFeatures[0].getProperty(POINT_COUNT).asInt else 0
+            if (pinCount > 0 ) {
+                val clusterLeavesFeatureCollection = siteSource?.getClusterLeaves(siteClusterFeatures[0], 8000, 0)
+                if (clusterLeavesFeatureCollection != null) {
+                    moveCameraToLeavesBounds(clusterLeavesFeatureCollection)
+                }
+            }
+        }
+
+        if (deploymentClusterFeatures != null && deploymentClusterFeatures.isNotEmpty()) {
+            val pinCount = if (deploymentClusterFeatures[0].getProperty(POINT_COUNT) != null) deploymentClusterFeatures[0].getProperty(POINT_COUNT).asInt else 0
+            if (pinCount > 0 ) {
+                val clusterLeavesFeatureCollection = deploymentSource?.getClusterLeaves(deploymentClusterFeatures[0], 8000, 0)
+                if (clusterLeavesFeatureCollection != null) {
+                    moveCameraToLeavesBounds(clusterLeavesFeatureCollection)
+                }
+            }
+        }
         clearFeatureSelected()
         return false
+    }
+
+    private fun moveCameraToLeavesBounds(featureCollectionToInspect: FeatureCollection) {
+        val latLngList: ArrayList<LatLng> = ArrayList()
+        if (featureCollectionToInspect.features() != null) {
+            for (singleClusterFeature in featureCollectionToInspect.features()!!) {
+                val clusterPoint = singleClusterFeature.geometry() as Point?
+                if (clusterPoint != null) {
+                    latLngList.add(LatLng(clusterPoint.latitude(), clusterPoint.longitude()))
+                }
+            }
+            if (latLngList.size > 1) {
+                val latLngBounds = LatLngBounds.Builder()
+                    .includes(latLngList)
+                    .build()
+                mapboxMap?.easeCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 230), 1300)
+            }
+        }
     }
 
     private val guardianDeploymentObserve = Observer<List<GuardianDeployment>> {
@@ -961,8 +1001,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         private const val SITE_CLUSTER = "site.cluster"
         private const val DEPLOYMENT_CLUSTER = "deployment.cluster"
-        private const val SITE_POINT_COUNT = "site.point_count"
-        private const val DEPLOYMENT_POINT_COUNT = "deployment.point_count"
+        private const val POINT_COUNT = "point_count"
         private const val SITE_COUNT = "site.count"
         private const val DEPLOYMENT_COUNT = "deployment.count"
 
