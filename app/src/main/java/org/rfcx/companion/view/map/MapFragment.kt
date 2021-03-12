@@ -208,6 +208,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
+        searchImageView.setOnClickListener {
+            if (searchView.visibility == View.VISIBLE) {
+                searchView.visibility = View.GONE
+                projectNameTextView.visibility = View.VISIBLE
+            } else {
+                searchView.visibility = View.VISIBLE
+                projectNameTextView.visibility = View.GONE
+            }
+        }
+
         zoomOutButton.setOnClickListener {
             mapboxMap?.let {
                 it.animateCamera(CameraUpdateFactory.zoomOut(), DURATION)
