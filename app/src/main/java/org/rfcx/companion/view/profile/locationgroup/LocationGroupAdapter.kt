@@ -60,7 +60,7 @@ class LocationGroupAdapter(private val locationGroupListener: LocationGroupListe
             locationGroupTextView.text = locationGroup
 
             if (screen == Screen.MAP.id) {
-                if(locationGroup == itemView.context.getString(R.string.none)){
+                if (locationGroup == itemView.context.getString(R.string.none)) {
                     locationGroupTextView.text = itemView.context.getString(R.string.projects)
                 }
             }

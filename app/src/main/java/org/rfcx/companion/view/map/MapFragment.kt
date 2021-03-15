@@ -231,15 +231,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
 
         menuImageView.setOnClickListener {
-            var projectName: String? = null
-            listener?.let {
-                projectName =
-                    if (it.getProjectName() == "") getString(R.string.none) else it.getProjectName()
-            }
-
-            context?.let { it1 ->
+            val projectName = listener?.getProjectName() ?: getString(R.string.none)
+            context?.let { context ->
                 LocationGroupActivity.startActivity(
-                    it1,
+                    context,
                     projectName,
                     Screen.MAP.id,
                     REQUEST_CODE
@@ -441,11 +436,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val usedSites = showDeployments.map { it.stream?.coreId }
         var filteredShowLocations =
             locations.filter { loc -> !usedSites.contains(loc.serverId) }
-
-        if (listener?.getProjectName() != null && listener?.getProjectName() != "" && listener?.getProjectName() != getString(
-                R.string.none
-            )
-        ) {
+        val projectName = listener?.getProjectName() ?: getString(R.string.none)
+        if (projectName != getString(R.string.none)) {
             filteredShowLocations =
                 filteredShowLocations.filter { it.locationGroup?.name == listener?.getProjectName() }
             showDeployments =
@@ -467,7 +459,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             val lastReport = deploymentMarkers.sortedByDescending { it.updatedAt }.first()
             mapboxMap?.let {
                 it.moveCamera(
-                    CameraUpdateFactory.newLatLngZoom(LatLng(lastReport.latitude, lastReport.longitude), it.cameraPosition.zoom)
+                    CameraUpdateFactory.newLatLngZoom(
+                        LatLng(
+                            lastReport.latitude,
+                            lastReport.longitude
+                        ), it.cameraPosition.zoom
+                    )
                 )
             }
         }
@@ -831,9 +828,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mapboxMap?.locationComponent?.lastKnownLocation?.let { curLoc ->
             val currentLatLng = LatLng(curLoc.latitude, curLoc.longitude)
             val preferences = context?.let { Preferences.getInstance(it) }
-            val projectName = preferences?.getString(Preferences.SELECTED_PROJECT, "")
+            val projectName = preferences?.getString(Preferences.SELECTED_PROJECT, getString(R.string.none))
             val locations = this.locations.filter { it.locationGroup?.name == projectName }
-            val furthestSite = getFurthestSiteFromCurrentLocation(currentLatLng, if(projectName != "") locations else this.locations)
+            val furthestSite = getFurthestSiteFromCurrentLocation(
+                currentLatLng,
+                if (projectName != getString(R.string.none)) locations else this.locations
+            )
             furthestSite?.let {
                 moveCamera(
                     currentLatLng,
