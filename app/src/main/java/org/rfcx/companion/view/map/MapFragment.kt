@@ -227,9 +227,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     if (it.getProjectName() == "") getString(R.string.none) else it.getProjectName()
             }
 
-            context?.let { it1 ->
+            context?.let { context ->
                 LocationGroupActivity.startActivity(
-                    it1,
+                    context,
                     projectName,
                     Screen.MAP.id,
                     REQUEST_CODE
