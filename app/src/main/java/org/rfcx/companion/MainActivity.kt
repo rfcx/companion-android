@@ -51,6 +51,8 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
 
     private var currentSiteLoading = 0
 
+    private var siteSyncing = false
+
     override fun getShowDeployments(): List<DeploymentDetailView> = this._showDeployments
 
     override fun setShowDeployments(deployments: List<DeploymentDetailView>) {
@@ -117,6 +119,9 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
                     .build()
 
                 addTooltip?.let { tip ->
+                    val warning = tip.findViewById<ConstraintLayout>(R.id.warningLayout)
+                    warning.visibility =  if (siteSyncing) View.VISIBLE else View.GONE
+
                     val addEdgeOrAudioMoth = tip.findViewById<ConstraintLayout>(R.id.audioMothLayout)
                     val addGuardian = tip.findViewById<ConstraintLayout>(R.id.guardianLayout)
                     addEdgeOrAudioMoth?.setOnClickListener {
@@ -306,6 +311,10 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         }
     }
 
+    override fun setSiteSyncing(status: Boolean) {
+        siteSyncing = status
+    }
+
     override fun hidBottomAppBar() {
         createLocationButton.visibility = View.INVISIBLE
         bottomBar.visibility = View.INVISIBLE
@@ -387,4 +396,5 @@ interface MainActivityListener {
     fun hideSnackbar()
     fun onLogout()
     fun moveMapIntoDeploymentMarker(lat: Double, lng: Double, markerLocationId: String)
+    fun setSiteSyncing(status: Boolean)
 }
