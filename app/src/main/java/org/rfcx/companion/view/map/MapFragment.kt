@@ -40,8 +40,7 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.style.expressions.Expression.*
 import com.mapbox.mapboxsdk.style.layers.CircleLayer
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory
-import com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleColor
-import com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleRadius
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
@@ -321,15 +320,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         val unclusteredSiteLayer =
             SymbolLayer(MARKER_SITE_ID, SOURCE_DEPLOYMENT).withProperties(
-                PropertyFactory.iconImage("{$PROPERTY_SITE_MARKER_IMAGE}"),
-                PropertyFactory.iconSize(0.8f),
-                PropertyFactory.iconAllowOverlap(true)
+                iconImage("{$PROPERTY_SITE_MARKER_IMAGE}"),
+                iconSize(0.8f),
+                iconAllowOverlap(true)
             )
 
         val unclusteredDeploymentLayer =
             SymbolLayer(MARKER_DEPLOYMENT_ID, SOURCE_DEPLOYMENT).withProperties(
-                PropertyFactory.iconImage("{$PROPERTY_DEPLOYMENT_MARKER_IMAGE}"),
-                PropertyFactory.iconSize(
+                iconImage("{$PROPERTY_DEPLOYMENT_MARKER_IMAGE}"),
+                iconSize(
                     match(
                         toString(
                             get(
@@ -338,7 +337,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         ), literal(0.8f), stop("true", 1.0f)
                     )
                 ),
-                PropertyFactory.iconAllowOverlap(true)
+                iconAllowOverlap(true)
             )
 
         style.addLayer(unclusteredSiteLayer)
@@ -350,7 +349,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             val deploymentSymbolLayer = CircleLayer("$DEPLOYMENT_CLUSTER-$i", SOURCE_DEPLOYMENT)
             val hasDeploymentAtLeastOne = toNumber(get(PROPERTY_CLUSTER_TYPE))
             val pointCount = toNumber(get(POINT_COUNT))
-            deploymentSymbolLayer.setProperties(circleColor(ly[1]), circleRadius(10f))
+            deploymentSymbolLayer.setProperties(circleColor(ly[1]), circleRadius(16f))
             deploymentSymbolLayer.setFilter(
                 if (i == 0) {
                     all(
@@ -370,11 +369,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         val deploymentCount = SymbolLayer(DEPLOYMENT_COUNT, SOURCE_DEPLOYMENT)
         deploymentCount.setProperties(
-            PropertyFactory.textField(toString(get(POINT_COUNT))),
-            PropertyFactory.textSize(12f),
-            PropertyFactory.textColor(Color.BLACK),
-            PropertyFactory.textIgnorePlacement(true),
-            PropertyFactory.textAllowOverlap(true)
+            textField(format(formatEntry(toString(get(POINT_COUNT)), FormatOption.formatFontScale(1.5)))),
+            textSize(12f),
+            textColor(Color.WHITE),
+            textIgnorePlacement(true),
+            textOffset(arrayOf(0f, -0.2f)),
+            textAllowOverlap(true)
         )
 
         style.addLayer(deploymentCount)
