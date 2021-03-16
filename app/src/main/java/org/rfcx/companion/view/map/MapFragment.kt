@@ -511,16 +511,18 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-        list = ArrayList(locations.map { it.name })
-        adapter = context?.let {
-            ArrayAdapter(
+        list = ArrayList(locations.filter { loc ->
+            loc.locationGroup?.name == projectName || projectName == getString(R.string.none)
+        }.map { it.name })
+
+        context?.let {
+            adapter = ArrayAdapter(
                 it,
                 android.R.layout.simple_list_item_1,
                 list
             )
-        }!!
-        listView.adapter = adapter
-
+            listView.adapter = adapter
+        }
     }
 
     private fun getFurthestSiteFromCurrentLocation(
