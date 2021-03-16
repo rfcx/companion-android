@@ -14,6 +14,7 @@ import io.realm.Realm
 import io.realm.RealmList
 import kotlinx.android.synthetic.main.activity_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
+import org.rfcx.companion.MainActivity
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.localdb.DeploymentImageDb
@@ -21,6 +22,7 @@ import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.service.DeploymentSyncWorker
+import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.AudioMothChimeConnector
 import org.rfcx.companion.util.RealmHelper
@@ -217,6 +219,17 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         )
     }
 
+    override fun showSiteLoadingDialog() {
+        val siteLoadingDialog: SiteLoadingDialogFragment =
+            supportFragmentManager.findFragmentByTag(TAG_SITE_LOADING_DIALOG) as SiteLoadingDialogFragment?
+                ?: run {
+                    SiteLoadingDialogFragment()
+                }
+        siteLoadingDialog.show(supportFragmentManager,
+            TAG_SITE_LOADING_DIALOG
+        )
+    }
+
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
     override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
@@ -370,6 +383,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         audioMothConnector.stopPlay()
     }
 
+    override fun isSiteLoading(): Boolean {
+        return DownloadStreamsWorker.isRunning()
+    }
+
     override fun startMapPicker(latitude: Double, longitude: Double, altitude: Double, name: String) {
         setLatLng(latitude, longitude, altitude, name)
         startFragment(MapPickerFragment.newInstance(latitude, longitude, altitude, name))
@@ -490,6 +507,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     companion object {
         const val loadingDialogTag = "LoadingDialog"
         const val TAG_SYNC_INSTRUCTION_DIALOG = "SyncInstructionDialogFragment"
+        const val TAG_SITE_LOADING_DIALOG = "SiteLoadingDialogFragment"
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
         const val TONE_DURATION = 10000
 

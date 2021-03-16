@@ -21,6 +21,7 @@ import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.getIdToken
 import org.rfcx.companion.util.isNetworkAvailable
+import org.rfcx.companion.view.deployment.EdgeDeploymentProtocol
 import org.rfcx.companion.view.detail.MapPickerProtocol
 import retrofit2.Call
 import retrofit2.Callback
@@ -29,6 +30,7 @@ import retrofit2.Response
 class SelectingExistedSiteFragment : Fragment(), (Locate) -> Unit {
     private val existedSiteAdapter by lazy { ExistedSiteAdapter(this) }
     private var mapPickerProtocol: MapPickerProtocol? = null
+    private var deploymentProtocol: EdgeDeploymentProtocol? = null
 
     val realm: Realm = Realm.getInstance(RealmHelper.migrationConfig())
     private val locateDb by lazy { LocateDb(realm) }
@@ -45,6 +47,7 @@ class SelectingExistedSiteFragment : Fragment(), (Locate) -> Unit {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mapPickerProtocol = context as MapPickerProtocol
+        deploymentProtocol = context as EdgeDeploymentProtocol
     }
 
     private fun initIntent() {
@@ -75,6 +78,15 @@ class SelectingExistedSiteFragment : Fragment(), (Locate) -> Unit {
         lastLocation = lastLocate
 
         setupView()
+
+        showDialog()
+    }
+
+    private fun showDialog() {
+        val shouldShow = deploymentProtocol?.isSiteLoading()
+        if (shouldShow == true) {
+            deploymentProtocol?.showSiteLoadingDialog()
+        }
     }
 
     private fun setupView() {

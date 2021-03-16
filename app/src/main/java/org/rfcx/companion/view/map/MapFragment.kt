@@ -68,6 +68,7 @@ import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.repo.Firestore
 import org.rfcx.companion.service.DeploymentSyncWorker
+import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 import retrofit2.Call
@@ -230,7 +231,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         context?.let {
             retrieveDeployments(it)
-            retrieveLocations(it, 0, locateDb.getMaxUpdatedAt())
+            retrieveLocations(it)
             retrieveProjects(it)
         }
 
@@ -464,6 +465,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private val locateObserve = Observer<List<Locate>> {
         this.locations = it
+        if (DownloadStreamsWorker.isRunning()) {
+            listener?.showSnackbar("Sites downloading", Snackbar.LENGTH_SHORT)
+        }
         combinedData()
     }
 
@@ -591,46 +595,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             })
     }
 
-    private fun retrieveLocations(context: Context, offset: Int, maxUpdatedAt: String?) {
-        listener?.setSiteSyncing(true)
-        listener?.showSnackbar("Downloading sites", Snackbar.LENGTH_SHORT)
-        val token = "Bearer ${context.getIdToken()}"
-        ApiManager.getInstance().getDeviceApi()
-            .getStreams(token, SITES_LIMIT_GETTING, offset, maxUpdatedAt, "updated_at")
-            .enqueue(object : Callback<List<StreamResponse>> {
-                override fun onFailure(call: Call<List<StreamResponse>>, t: Throwable) {
-                    listener?.setSiteSyncing(false)
-                    combinedData()
-                    if (context.isNetworkAvailable()) {
-                        Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT)
-                            .show()
-                    }
-                }
-
-                override fun onResponse(
-                    call: Call<List<StreamResponse>>,
-                    response: Response<List<StreamResponse>>
-                ) {
-                    val sites = response.body()
-                    sites?.let {
-                        it.forEach { item ->
-                            locateDb.insertOrUpdate(item)
-                        }
-                        if (it.size == SITES_LIMIT_GETTING) {
-                            currentSiteLoading += SITES_LIMIT_GETTING
-                            retrieveLocations(
-                                context,
-                                currentSiteLoading,
-                                locateDb.getMaxUpdatedAt()
-                            )
-                        } else {
-                            listener?.setSiteSyncing(false)
-                            listener?.showSnackbar("Sites downloaded", Snackbar.LENGTH_SHORT)
-                        }
-                    }
-                    combinedData()
-                }
-            })
+    private fun retrieveLocations(context: Context) {
+        DownloadStreamsWorker.enqueue(context)
     }
 
     private fun retrieveProjects(context: Context) {

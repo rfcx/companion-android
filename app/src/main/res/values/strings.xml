@@ -401,4 +401,7 @@
     <!-- WifiLostDialog -->
     <string name="wifi_lost_dialog">Guardian Hotspot connection was lost. \n Please reconnect to continue the deployment.</string>
 
+    <!-- SelectExistedSites -->
+    <string name="sites_loading_dialog">Sites is still downloading. \n Beware missing sites</string>
+
 </resources>
