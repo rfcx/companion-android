@@ -344,20 +344,23 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         style.addLayer(unclusteredSiteLayer)
         style.addLayer(unclusteredDeploymentLayer)
 
-        val layers = intArrayOf(2)
+        val layers = arrayOf(intArrayOf(0, Color.parseColor("#98A0A9")), intArrayOf(1, Color.parseColor("#2AA841")))
 
-        layers.indices.forEach { i ->
+        layers.forEachIndexed { i, ly ->
             val deploymentSymbolLayer = CircleLayer("$DEPLOYMENT_CLUSTER-$i", SOURCE_DEPLOYMENT)
-            deploymentSymbolLayer.setProperties(circleColor("#FF0000"), circleRadius(10f))
-            val deploymentPointCount = toNumber(get(POINT_COUNT))
-            val hasDeploymentAtLeastOne = get(toNumber(get(PROPERTY_CLUSTER_TYPE)), literal(1))
+            val hasDeploymentAtLeastOne = toNumber(get(PROPERTY_CLUSTER_TYPE))
+            val pointCount = toNumber(get(POINT_COUNT))
+            deploymentSymbolLayer.setProperties(circleColor(ly[1]), circleRadius(10f))
             deploymentSymbolLayer.setFilter(
                 if (i == 0) {
-                    gte(deploymentPointCount, literal(layers[i]))
+                    all(
+                        gte(hasDeploymentAtLeastOne, literal(ly[0])),
+                        gte(pointCount, literal(1))
+                    )
                 } else {
                     all(
-                        gte(deploymentPointCount, literal(layers[i])),
-                        lt(deploymentPointCount, literal(layers[i - 1]))
+                        gte(hasDeploymentAtLeastOne, literal(ly[0])),
+                        gt(hasDeploymentAtLeastOne, literal(layers[i-1][0]))
                     )
                 }
             )
@@ -888,11 +891,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         val features = this.mapFeatures!!.features()!!
         features.forEachIndexed { index, feature ->
-            if (markerLocationId == feature.getProperty(PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID).toString()
-            ) {
-                features[index]?.let { setFeatureSelectState(it, true) }
-            } else {
-                features[index]?.let { setFeatureSelectState(it, false) }
+            feature.getProperty(PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID)?.let { property ->
+                if (markerLocationId == property.toString()
+                ) {
+                    features[index]?.let { setFeatureSelectState(it, true) }
+                } else {
+                    features[index]?.let { setFeatureSelectState(it, false) }
+                }
             }
         }
     }
