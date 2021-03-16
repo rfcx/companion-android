@@ -274,6 +274,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         if (searchView.isIconified) {
             buttonOnMapGroup.visibility = View.VISIBLE
         }
+
+        listView.setOnItemClickListener { parent, view, position, id ->
+            val item = adapter.getItem(position)?.let { locateDb.getLocateByName(it) }
+            item?.let { mapboxMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(it, 15.0)) }
+            searchView.isIconified = true
+            if (!searchView.isIconified) {
+                searchView.isIconified = true
+            }
+        }
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {

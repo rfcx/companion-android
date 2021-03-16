@@ -1,5 +1,6 @@
 package org.rfcx.companion.localdb
 
+import com.mapbox.mapboxsdk.geometry.LatLng
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
@@ -23,8 +24,9 @@ class LocateDb(private val realm: Realm) {
         return realm.where(Locate::class.java).findAll() ?: arrayListOf()
     }
 
-    fun getLocateById(id: Int): Locate? {
-        return realm.where(Locate::class.java).equalTo(Locate.FIELD_ID, id).findFirst()
+    fun getLocateByName(name: String): LatLng? {
+        val locate = realm.where(Locate::class.java).equalTo(Locate.FIELD_NAME, name).findFirst()
+        return locate?.getLatLng()
     }
 
     fun getLocateByEdgeDeploymentId(deploymentId: Int): Locate? {
