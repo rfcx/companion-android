@@ -10,6 +10,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -114,6 +116,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private var currentSiteLoading = 0
 
+    lateinit var list: ArrayList<String>
+    lateinit var adapter: ArrayAdapter<String>
+
     private val mapboxLocationChangeCallback =
         object : LocationEngineCallback<LocationEngineResult> {
             override fun onSuccess(result: LocationEngineResult?) {
@@ -194,6 +199,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mapView.getMapAsync(this)
         fetchJobSyncing()
         fetchData()
+        setupSearch()
         progressBar.visibility = View.VISIBLE
 
         currentLocationButton.setOnClickListener {
@@ -205,16 +211,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         checkThenAccquireLocation(style)
                     }
                 }
-            }
-        }
-
-        searchImageView.setOnClickListener {
-            if (searchView.visibility == View.VISIBLE) {
-                searchView.visibility = View.GONE
-                projectNameTextView.visibility = View.VISIBLE
-            } else {
-                searchView.visibility = View.VISIBLE
-                projectNameTextView.visibility = View.GONE
             }
         }
 
@@ -240,6 +236,43 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     REQUEST_CODE
                 )
             }
+        }
+    }
+
+    private fun setupSearch() {
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                if (list.contains(query)) {
+                    adapter.filter.filter(query)
+                } else {
+                    Toast.makeText(context, "No Match found", Toast.LENGTH_LONG).show()
+                }
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                adapter.filter.filter(newText)
+                return false
+            }
+        })
+
+        searchView.setOnSearchClickListener {
+            listView.visibility = View.VISIBLE
+            buttonOnMapGroup.visibility = View.GONE
+            projectNameTextView.visibility = View.GONE
+            listener?.hidBottomAppBar()
+        }
+
+        searchView.setOnCloseListener {
+            listView.visibility = View.GONE
+            buttonOnMapGroup.visibility = View.VISIBLE
+            projectNameTextView.visibility = View.VISIBLE
+            listener?.showBottomAppBar()
+            false
+        }
+
+        if (searchView.isIconified) {
+            buttonOnMapGroup.visibility = View.VISIBLE
         }
     }
 
@@ -468,6 +501,17 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 )
             }
         }
+
+        list = ArrayList(locations.map { it.name })
+        adapter = context?.let {
+            ArrayAdapter(
+                it,
+                android.R.layout.simple_list_item_1,
+                list
+            )
+        }!!
+        listView.adapter = adapter
+
     }
 
     private fun getFurthestSiteFromCurrentLocation(
@@ -828,7 +872,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mapboxMap?.locationComponent?.lastKnownLocation?.let { curLoc ->
             val currentLatLng = LatLng(curLoc.latitude, curLoc.longitude)
             val preferences = context?.let { Preferences.getInstance(it) }
-            val projectName = preferences?.getString(Preferences.SELECTED_PROJECT, getString(R.string.none))
+            val projectName =
+                preferences?.getString(Preferences.SELECTED_PROJECT, getString(R.string.none))
             val locations = this.locations.filter { it.locationGroup?.name == projectName }
             val furthestSite = getFurthestSiteFromCurrentLocation(
                 currentLatLng,

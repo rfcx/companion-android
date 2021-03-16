@@ -15,7 +15,7 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.9" />
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topBarLayout"
         android:layout_width="match_parent"
         android:layout_height="?android:actionBarSize"
@@ -29,42 +29,51 @@
             android:layout_gravity="center_vertical"
             android:layout_marginStart="@dimen/margin_padding_normal"
             android:src="@drawable/ic_menu_24px"
-            android:tint="@color/iconColor" />
+            android:tint="@color/iconColor"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/projectNameTextView"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="@dimen/margin_padding_normal"
-            android:layout_weight="1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/searchView"
+            app:layout_constraintStart_toEndOf="@id/menuImageView"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="Puerto Rico" />
 
-        <include
+        <SearchView
             android:id="@+id/searchView"
-            layout="@layout/layout_search_view"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:visibility="gone" />
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/searchImageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|end"
-            android:layout_marginEnd="@dimen/margin_padding_normal"
-            android:src="@drawable/ic_baseline_search_24"
-            android:tint="@color/iconColor" />
+            android:layout_marginStart="@dimen/margin_padding_normal"
+            android:queryHint="Search site"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/topBarLayout" />
+
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/backgroundColor"
+        android:dividerHeight="1dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topBarLayout" />
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -75,6 +84,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/buttonOnMapGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="zoomInButton,zoomOutButton,currentLocationButton" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/zoomInButton"
