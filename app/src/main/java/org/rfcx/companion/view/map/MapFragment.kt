@@ -276,8 +276,24 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
 
         listView.setOnItemClickListener { parent, view, position, id ->
-            val item = adapter.getItem(position)?.let { locateDb.getLocateByName(it) }
-            item?.let { mapboxMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(it, 15.0)) }
+            val projectName = adapter.getItem(position)
+
+            projectName?.let { name ->
+                val item = locateDb.getLocateByName(name)
+                item?.let { mapboxMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(it, 15.0)) }
+
+                val deployment = edgeDeploymentDb.getDeploymentBySiteName(name)
+                if (deployment != null) {
+                    (activity as MainActivityListener).showBottomSheet(
+                        DeploymentViewPagerFragment.newInstance(
+                            deployment.id,
+                            Device.AUDIOMOTH.value
+                        )
+                    )
+                    listener?.hidBottomAppBar()
+                }
+            }
+
             searchView.isIconified = true
             if (!searchView.isIconified) {
                 searchView.isIconified = true

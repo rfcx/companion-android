@@ -38,6 +38,15 @@ class EdgeDeploymentDb(private val realm: Realm) {
         return arrayOfId
     }
 
+    fun getDeploymentBySiteName(name: String): EdgeDeployment? {
+        val deployment =
+            realm.where(EdgeDeployment::class.java).equalTo("stream.name", name).findFirst()
+        if (deployment != null) {
+            return realm.copyFromRealm(deployment)
+        }
+        return null
+    }
+
     fun getAllResultsAsync(sort: Sort = Sort.DESCENDING): RealmResults<EdgeDeployment> {
         return realm.where(EdgeDeployment::class.java)
             .sort(EdgeDeployment.FIELD_ID, sort)
@@ -221,10 +230,9 @@ class EdgeDeploymentDb(private val realm: Realm) {
                 bgRealm.where(Locate::class.java)
                     .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_SERVER_ID, edgeDeployment.serverId)
                     .findFirst()
-                    ?: 
-                bgRealm.where(Locate::class.java)
-                    .equalTo(Locate.FIELD_SERVER_ID, edgeDeployment.stream?.coreId)
-                    .findFirst()
+                    ?: bgRealm.where(Locate::class.java)
+                        .equalTo(Locate.FIELD_SERVER_ID, edgeDeployment.stream?.coreId)
+                        .findFirst()
             } else {
                 bgRealm.where(Locate::class.java)
                     .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_ID, id).findFirst()
