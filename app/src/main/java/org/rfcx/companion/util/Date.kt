@@ -6,7 +6,7 @@ import java.util.*
 private const val timeFormat = "HH:mm"
 private const val standardDateFormat = "MMMM d, yyyy HH:mm"
 private const val dateFormat = "dd/MM/yyyy HH:mm"
-private const val iso8601Format = "yyyy-MM-dd'T'HH:mm:ssZ"
+private const val iso8601Format = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
 
 private val outputTimeSdf by lazy {
     val sdf = SimpleDateFormat(timeFormat, Locale.getDefault())
@@ -27,7 +27,7 @@ private val outputDateSdf by lazy {
 
 private val iso8601DateSdf by lazy {
     val sdf = SimpleDateFormat(iso8601Format, Locale.getDefault())
-    sdf.timeZone = TimeZone.getDefault()
+    sdf.timeZone = TimeZone.getTimeZone("UTC")
     sdf
 }
 

@@ -171,9 +171,6 @@ class LocateDb(private val realm: Realm) {
                     locate.id = id
                     it.insert(locate)
                 } else if (location.syncState == SyncState.Sent.key) {
-                    if (location.serverId == streamResponse.id && location.name == streamResponse.name && location.latitude == streamResponse.latitude && location.longitude == streamResponse.longitude && location.altitude == streamResponse.altitude) {
-                        return@executeTransaction
-                    }
 
                     location.serverId = streamResponse.id
                     location.name = streamResponse.name ?: location.name

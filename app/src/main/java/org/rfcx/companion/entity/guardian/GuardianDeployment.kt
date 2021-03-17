@@ -5,14 +5,14 @@ import com.google.gson.annotations.Expose
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
-import java.io.Serializable
-import java.util.*
 import org.rfcx.companion.entity.DeploymentLocation
 import org.rfcx.companion.entity.DeploymentState
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.util.GuardianPin
 import org.rfcx.companion.util.WifiHotspotUtils
-import org.rfcx.companion.view.map.DeploymentMarker
+import org.rfcx.companion.view.map.MapMarker
+import java.io.Serializable
+import java.util.*
 
 @RealmClass
 open class GuardianDeployment(
@@ -43,7 +43,7 @@ open class GuardianDeployment(
     }
 }
 
-fun GuardianDeployment.toMark(context: Context): DeploymentMarker {
+fun GuardianDeployment.toMark(context: Context): MapMarker.DeploymentMarker {
     val color = stream?.project?.color
     val pinImage =
         if (state == DeploymentState.Guardian.ReadyToUpload.key) {
@@ -59,7 +59,7 @@ fun GuardianDeployment.toMark(context: Context): DeploymentMarker {
         } else {
             GuardianPin.NOT_CONNECTED_GUARDIAN
         } ?: GuardianPin.CONNECTED_GUARDIAN
-    return DeploymentMarker(
+    return MapMarker.DeploymentMarker(
         id,
         stream?.name ?: "",
         stream?.longitude ?: 0.0,

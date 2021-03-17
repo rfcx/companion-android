@@ -225,6 +225,7 @@
     <string name="choose_your_device">Choose your device</string>
     <string name="rfcx_edge_audiomoth">AudioMoth (v1.5+ firmware)</string>
     <string name="rfcx_guardian">RFCx Guardian</string>
+    <string name="warning_text">Sites is downloading \nBeware missing sites</string>
 
     <string name="location_permission_msg">Companion App would like to use your location</string>
 
@@ -401,5 +402,12 @@
 
     <!-- WifiLostDialog -->
     <string name="wifi_lost_dialog">Guardian Hotspot connection was lost. \n Please reconnect to continue the deployment.</string>
+
+    <!-- SelectExistedSites -->
+    <string name="sites_loading_dialog">Sites is still downloading. \n Beware missing sites</string>
+
+    <!-- MapFragment -->
+    <string name="sites_downloading">Sites downloading</string>
+    <string name="sites_synced">All sites synced</string>
 
 </resources>
