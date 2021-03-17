@@ -50,7 +50,7 @@ class DownloadStreamsWorker(val context: Context, params: WorkerParameters) :
                 count += resultBody.size
                 streamDb.insertOrUpdate(resultBody)
                 if (it.size == SITES_LIMIT_GETTING) {
-                    if (maxUpdatedAt == null || streamDb.getMaxUpdatedAt() == maxUpdatedAt) {
+                    if (streamDb.getMaxUpdatedAt() == maxUpdatedAt) {
                         currentStreamsLoading += SITES_LIMIT_GETTING
                     } else {
                         currentStreamsLoading = 0
