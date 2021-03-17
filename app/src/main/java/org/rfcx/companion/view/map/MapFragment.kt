@@ -339,8 +339,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 FeatureCollection.fromFeatures(listOf()),
                 GeoJsonOptions()
                     .withCluster(true)
-                    .withClusterMaxZoom(15)
-                    .withClusterRadius(50)
+                    .withClusterMaxZoom(20)
+                    .withClusterRadius(30)
                     .withClusterProperty(PROPERTY_CLUSTER_TYPE, sum(accumulated(), get(PROPERTY_CLUSTER_TYPE)), switchCase(
                         eq(get(PROPERTY_DEPLOYMENT_MARKER_IMAGE), Battery.BATTERY_PIN_GREEN), literal(1), literal(0)))
             )
