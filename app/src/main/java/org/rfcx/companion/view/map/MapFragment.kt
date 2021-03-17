@@ -10,6 +10,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -114,6 +116,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private var currentSiteLoading = 0
 
+    private lateinit var arrayListOfSite: ArrayList<String>
+    private lateinit var adapterOfSearchSite: ArrayAdapter<String>
+
     private val mapboxLocationChangeCallback =
         object : LocationEngineCallback<LocationEngineResult> {
             override fun onSuccess(result: LocationEngineResult?) {
@@ -194,6 +199,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mapView.getMapAsync(this)
         fetchJobSyncing()
         fetchData()
+        setupSearch()
         progressBar.visibility = View.VISIBLE
 
         currentLocationButton.setOnClickListener {
@@ -229,6 +235,73 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     Screen.MAP.id,
                     REQUEST_CODE
                 )
+            }
+        }
+    }
+
+    private fun setupSearch() {
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                if (arrayListOfSite.contains(query)) {
+                    adapterOfSearchSite.filter.filter(query)
+                } else {
+                    Toast.makeText(context, R.string.no_result_found, Toast.LENGTH_LONG).show()
+                }
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                adapterOfSearchSite.filter.filter(newText)
+                return false
+            }
+        })
+
+        searchView.setOnSearchClickListener {
+            listView.visibility = View.VISIBLE
+            buttonOnMapGroup.visibility = View.GONE
+            projectNameTextView.visibility = View.GONE
+            val state = listener?.getBottomSheetState() ?: 0
+            if (state == BottomSheetBehavior.STATE_EXPANDED) {
+                listener?.hideBottomSheetAndBottomAppBar()
+            } else {
+                listener?.hidBottomAppBar()
+            }
+        }
+
+        searchView.setOnCloseListener {
+            listView.visibility = View.GONE
+            buttonOnMapGroup.visibility = View.VISIBLE
+            projectNameTextView.visibility = View.VISIBLE
+            listener?.showBottomAppBar()
+            listener?.clearFeatureSelectedOnMap()
+            false
+        }
+
+        if (searchView.isIconified) {
+            buttonOnMapGroup.visibility = View.VISIBLE
+        }
+
+        listView.setOnItemClickListener { parent, view, position, id ->
+            val projectName = adapterOfSearchSite.getItem(position)
+
+            projectName?.let { name ->
+                val item = locateDb.getLocateByName(name)
+                item?.let { mapboxMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(it.getLatLng(), 15.0)) }
+
+                val deployment = edgeDeploymentDb.getDeploymentBySiteName(name)
+                if (deployment != null) {
+                    (activity as MainActivityListener).showBottomSheet(
+                        DeploymentViewPagerFragment.newInstance(
+                            deployment.id,
+                            Device.AUDIOMOTH.value
+                        )
+                    )
+                }
+            }
+
+            searchView.isIconified = true
+            if (!searchView.isIconified) {
+                searchView.isIconified = true
             }
         }
     }
@@ -457,6 +530,19 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     )
                 )
             }
+        }
+
+        arrayListOfSite = ArrayList(locations.filter { loc ->
+            loc.locationGroup?.name == projectName || projectName == getString(R.string.none)
+        }.map { it.name })
+
+        context?.let {
+            adapterOfSearchSite = ArrayAdapter(
+                it,
+                android.R.layout.simple_list_item_1,
+                arrayListOfSite
+            )
+            listView.adapter = adapterOfSearchSite
         }
     }
 
@@ -818,7 +904,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mapboxMap?.locationComponent?.lastKnownLocation?.let { curLoc ->
             val currentLatLng = LatLng(curLoc.latitude, curLoc.longitude)
             val preferences = context?.let { Preferences.getInstance(it) }
-            val projectName = preferences?.getString(Preferences.SELECTED_PROJECT, getString(R.string.none))
+            val projectName =
+                preferences?.getString(Preferences.SELECTED_PROJECT, getString(R.string.none))
             val locations = this.locations.filter { it.locationGroup?.name == projectName }
             val furthestSite = getFurthestSiteFromCurrentLocation(
                 currentLatLng,

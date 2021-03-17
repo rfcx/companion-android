@@ -23,8 +23,8 @@ class LocateDb(private val realm: Realm) {
         return realm.where(Locate::class.java).findAll() ?: arrayListOf()
     }
 
-    fun getLocateById(id: Int): Locate? {
-        return realm.where(Locate::class.java).equalTo(Locate.FIELD_ID, id).findFirst()
+    fun getLocateByName(name: String): Locate? {
+        return realm.where(Locate::class.java).equalTo(Locate.FIELD_NAME, name).findFirst()
     }
 
     fun getLocateByEdgeDeploymentId(deploymentId: Int): Locate? {
