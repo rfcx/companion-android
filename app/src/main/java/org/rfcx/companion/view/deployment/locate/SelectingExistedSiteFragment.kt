@@ -9,7 +9,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_selecting_existed_site.*
 import org.rfcx.companion.R
@@ -18,7 +22,9 @@ import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.repo.ApiManager
+import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.RealmHelper
+import org.rfcx.companion.util.asLiveData
 import org.rfcx.companion.util.getIdToken
 import org.rfcx.companion.util.isNetworkAvailable
 import org.rfcx.companion.view.deployment.EdgeDeploymentProtocol
@@ -38,6 +44,14 @@ class SelectingExistedSiteFragment : Fragment(), (Locate) -> Unit {
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     private var lastLocation: Location? = null
+
+    private lateinit var locateLiveData: LiveData<List<Locate>>
+    private var locations = listOf<Locate>()
+
+    private val locateObserve = Observer<List<Locate>> {
+        this.locations = it
+        setupView()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,6 +91,7 @@ class SelectingExistedSiteFragment : Fragment(), (Locate) -> Unit {
         lastLocate.longitude = longitude
         lastLocation = lastLocate
 
+        getSiteData()
         setupView()
 
         showDialog()
@@ -86,11 +101,19 @@ class SelectingExistedSiteFragment : Fragment(), (Locate) -> Unit {
         val shouldShow = deploymentProtocol?.isSiteLoading()
         if (shouldShow == true) {
             deploymentProtocol?.showSiteLoadingDialog()
+        } else {
+            deploymentProtocol?.showSiteLoadingDialog()
         }
     }
 
+    private fun getSiteData() {
+        locateLiveData = Transformations.map(locateDb.getAllResultsAsync().asLiveData()) {
+            it
+        }
+        locateLiveData.observeForever(locateObserve)
+    }
+
     private fun setupView() {
-        val locations = locateDb.getLocations()
         val nearLocations =
             findNearLocations(lastLocation, ArrayList(locations))?.sortedBy { it.second }
         val createNew = listOf(
@@ -127,6 +150,11 @@ class SelectingExistedSiteFragment : Fragment(), (Locate) -> Unit {
             return itemsWithDistance
         }
         return null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        locateLiveData.removeObserver(locateObserve)
     }
 
     companion object {
