@@ -132,6 +132,7 @@
     <string name="selected_location">Selected location</string>
     <string name="please_fill_information">Site name is required.</string>
     <string name="altitude_is_required">Altitude is required.</string>
+    <string name="no_result_found">No result found</string>
 
     <!--  SelectProfileFragment  -->
     <string name="use_an_existing">Use an existing profile</string>

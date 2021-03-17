@@ -245,7 +245,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 if (list.contains(query)) {
                     adapter.filter.filter(query)
                 } else {
-                    Toast.makeText(context, "No Match found", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, R.string.no_result_found, Toast.LENGTH_LONG).show()
                 }
                 return false
             }
