@@ -116,8 +116,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private var currentSiteLoading = 0
 
-    lateinit var list: ArrayList<String>
-    lateinit var adapter: ArrayAdapter<String>
+    private lateinit var arrayListOfSite: ArrayList<String>
+    private lateinit var adapterOfSearchSite: ArrayAdapter<String>
 
     private val mapboxLocationChangeCallback =
         object : LocationEngineCallback<LocationEngineResult> {
@@ -242,8 +242,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private fun setupSearch() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
-                if (list.contains(query)) {
-                    adapter.filter.filter(query)
+                if (arrayListOfSite.contains(query)) {
+                    adapterOfSearchSite.filter.filter(query)
                 } else {
                     Toast.makeText(context, R.string.no_result_found, Toast.LENGTH_LONG).show()
                 }
@@ -251,7 +251,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                adapter.filter.filter(newText)
+                adapterOfSearchSite.filter.filter(newText)
                 return false
             }
         })
@@ -281,11 +281,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
 
         listView.setOnItemClickListener { parent, view, position, id ->
-            val projectName = adapter.getItem(position)
+            val projectName = adapterOfSearchSite.getItem(position)
 
             projectName?.let { name ->
                 val item = locateDb.getLocateByName(name)
-                item?.let { mapboxMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(it, 15.0)) }
+                item?.let { mapboxMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(it.getLatLng(), 15.0)) }
 
                 val deployment = edgeDeploymentDb.getDeploymentBySiteName(name)
                 if (deployment != null) {
@@ -531,17 +531,17 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-        list = ArrayList(locations.filter { loc ->
+        arrayListOfSite = ArrayList(locations.filter { loc ->
             loc.locationGroup?.name == projectName || projectName == getString(R.string.none)
         }.map { it.name })
 
         context?.let {
-            adapter = ArrayAdapter(
+            adapterOfSearchSite = ArrayAdapter(
                 it,
                 android.R.layout.simple_list_item_1,
-                list
+                arrayListOfSite
             )
-            listView.adapter = adapter
+            listView.adapter = adapterOfSearchSite
         }
     }
 
