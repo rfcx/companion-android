@@ -22,6 +22,7 @@ import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.response.StreamResponse
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
+import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.EdgeDeploymentActivity
@@ -39,6 +40,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
+    private val locationGroupDb by lazy { LocationGroupDb(realm) }
 
     private var currentFragment: Fragment? = null
     private val locationPermissions by lazy { LocationPermissions(this) }
@@ -306,6 +308,11 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         }
     }
 
+    override fun getProjectName(): String {
+        val preferences = Preferences.getInstance(this)
+        return preferences.getString(Preferences.SELECTED_PROJECT, getString(R.string.none))
+    }
+
     override fun hidBottomAppBar() {
         createLocationButton.visibility = View.INVISIBLE
         bottomBar.visibility = View.INVISIBLE
@@ -387,4 +394,5 @@ interface MainActivityListener {
     fun hideSnackbar()
     fun onLogout()
     fun moveMapIntoDeploymentMarker(lat: Double, lng: Double, markerLocationId: String)
+    fun getProjectName(): String
 }
