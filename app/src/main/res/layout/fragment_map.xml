@@ -15,10 +15,65 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.9" />
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/topBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="?android:actionBarSize"
+        android:background="@color/topBar"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/menuImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="@dimen/margin_padding_normal"
+            android:src="@drawable/ic_menu_24px"
+            android:tint="@color/iconColor"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/projectNameTextView"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="@dimen/margin_padding_normal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/searchView"
+            app:layout_constraintStart_toEndOf="@id/menuImageView"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Puerto Rico" />
+
+        <SearchView
+            android:id="@+id/searchView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_padding_normal"
+            android:queryHint="Search site"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/topBarLayout" />
+
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/backgroundColor"
+        android:dividerHeight="1dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topBarLayout" />
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -30,6 +85,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/buttonOnMapGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="zoomInButton,zoomOutButton,currentLocationButton" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/zoomInButton"
         android:layout_width="wrap_content"
@@ -39,8 +101,8 @@
         app:backgroundTint="@color/white"
         app:fabCustomSize="@dimen/zoom_loc_size"
         app:layout_constraintBottom_toTopOf="@id/zoomOutButton"
-        app:layout_constraintStart_toStartOf="@id/guidelineVertical"
         app:layout_constraintEnd_toEndOf="@id/guidelineVertical"
+        app:layout_constraintStart_toStartOf="@id/guidelineVertical"
         app:tint="@color/colorPrimary" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -52,8 +114,8 @@
         app:backgroundTint="@color/white"
         app:fabCustomSize="@dimen/zoom_loc_size"
         app:layout_constraintBottom_toTopOf="@id/currentLocationButton"
-        app:layout_constraintStart_toStartOf="@id/guidelineVertical"
         app:layout_constraintEnd_toEndOf="@id/guidelineVertical"
+        app:layout_constraintStart_toStartOf="@id/guidelineVertical"
         app:tint="@color/colorPrimary" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -65,8 +127,8 @@
         app:backgroundTint="@color/white"
         app:fabCustomSize="@dimen/current_loc_size"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@id/guidelineVertical"
         app:layout_constraintEnd_toEndOf="@id/guidelineVertical"
+        app:layout_constraintStart_toStartOf="@id/guidelineVertical"
         app:tint="@color/colorPrimary" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

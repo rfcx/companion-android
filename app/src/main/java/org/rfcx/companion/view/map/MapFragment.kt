@@ -11,6 +11,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -39,7 +41,6 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.style.expressions.Expression.*
 import com.mapbox.mapboxsdk.style.layers.CircleLayer
-import com.mapbox.mapboxsdk.style.layers.PropertyFactory
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
@@ -58,7 +59,6 @@ import org.rfcx.companion.entity.guardian.toMark
 import org.rfcx.companion.entity.response.DeploymentImageResponse
 import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.ProjectResponse
-import org.rfcx.companion.entity.response.StreamResponse
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
@@ -71,6 +71,7 @@ import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.locate.LocationFragment
+import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -116,6 +117,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val analytics by lazy { context?.let { Analytics(it) } }
 
     private var currentSiteLoading = 0
+
+    private lateinit var arrayListOfSite: ArrayList<String>
+    private lateinit var adapterOfSearchSite: ArrayAdapter<String>
 
     private val mapboxLocationChangeCallback =
         object : LocationEngineCallback<LocationEngineResult> {
@@ -197,6 +201,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mapView.getMapAsync(this)
         fetchJobSyncing()
         fetchData()
+        setupSearch()
         progressBar.visibility = View.VISIBLE
 
         currentLocationButton.setOnClickListener {
@@ -220,6 +225,85 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         zoomInButton.setOnClickListener {
             mapboxMap?.let {
                 it.animateCamera(CameraUpdateFactory.zoomIn(), DURATION)
+            }
+        }
+
+        menuImageView.setOnClickListener {
+            val projectName = listener?.getProjectName() ?: getString(R.string.none)
+            context?.let { context ->
+                LocationGroupActivity.startActivity(
+                    context,
+                    projectName,
+                    Screen.MAP.id,
+                    REQUEST_CODE
+                )
+            }
+        }
+    }
+
+    private fun setupSearch() {
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                if (arrayListOfSite.contains(query)) {
+                    adapterOfSearchSite.filter.filter(query)
+                } else {
+                    Toast.makeText(context, R.string.no_result_found, Toast.LENGTH_LONG).show()
+                }
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                adapterOfSearchSite.filter.filter(newText)
+                return false
+            }
+        })
+
+        searchView.setOnSearchClickListener {
+            listView.visibility = View.VISIBLE
+            buttonOnMapGroup.visibility = View.GONE
+            projectNameTextView.visibility = View.GONE
+            val state = listener?.getBottomSheetState() ?: 0
+            if (state == BottomSheetBehavior.STATE_EXPANDED) {
+                listener?.hideBottomSheetAndBottomAppBar()
+            } else {
+                listener?.hidBottomAppBar()
+            }
+        }
+
+        searchView.setOnCloseListener {
+            listView.visibility = View.GONE
+            buttonOnMapGroup.visibility = View.VISIBLE
+            projectNameTextView.visibility = View.VISIBLE
+            listener?.showBottomAppBar()
+            listener?.clearFeatureSelectedOnMap()
+            false
+        }
+
+        if (searchView.isIconified) {
+            buttonOnMapGroup.visibility = View.VISIBLE
+        }
+
+        listView.setOnItemClickListener { parent, view, position, id ->
+            val projectName = adapterOfSearchSite.getItem(position)
+
+            projectName?.let { name ->
+                val item = locateDb.getLocateByName(name)
+                item?.let { mapboxMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(it.getLatLng(), 15.0)) }
+
+                val deployment = edgeDeploymentDb.getDeploymentBySiteName(name)
+                if (deployment != null) {
+                    (activity as MainActivityListener).showBottomSheet(
+                        DeploymentViewPagerFragment.newInstance(
+                            deployment.id,
+                            Device.AUDIOMOTH.value
+                        )
+                    )
+                }
+            }
+
+            searchView.isIconified = true
+            if (!searchView.isIconified) {
+                searchView.isIconified = true
             }
         }
     }
@@ -484,14 +568,23 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             it.getLastDeploymentId()
         })
 
-        val showGuardianDeployments = this.guardianDeployments.filter {
+        var showGuardianDeployments = this.guardianDeployments.filter {
             showDeployIds.contains(it.serverId) || showDeployIds.contains(it.id.toString())
         }
 
-        val showDeployments = this.edgeDeployments.filter { it.isCompleted() }
+        var showDeployments = this.edgeDeployments.filter { it.isCompleted() }
         val usedSites = showDeployments.map { it.stream?.coreId }
-        val filteredShowLocations =
+        var filteredShowLocations =
             locations.filter { loc -> !usedSites.contains(loc.serverId) }
+        val projectName = listener?.getProjectName() ?: getString(R.string.none)
+        if (projectName != getString(R.string.none)) {
+            filteredShowLocations =
+                filteredShowLocations.filter { it.locationGroup?.name == listener?.getProjectName() }
+            showDeployments =
+                showDeployments.filter { it.stream?.project?.name == listener?.getProjectName() }
+            showGuardianDeployments =
+                showGuardianDeployments.filter { it.stream?.project?.name == listener?.getProjectName() }
+        }
 
         val edgeDeploymentMarkers =
             showDeployments.map { it.toMark(requireContext(), locationGroupDb) }
@@ -514,6 +607,19 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     )
                 )
             }
+        }
+
+        arrayListOfSite = ArrayList(locations.filter { loc ->
+            loc.locationGroup?.name == projectName || projectName == getString(R.string.none)
+        }.map { it.name })
+
+        context?.let {
+            adapterOfSearchSite = ArrayAdapter(
+                it,
+                android.R.layout.simple_list_item_1,
+                arrayListOfSite
+            )
+            listView.adapter = adapterOfSearchSite
         }
     }
 
@@ -837,6 +943,27 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    private fun moveCameraOnStartWithProject() {
+        mapboxMap?.locationComponent?.lastKnownLocation?.let { curLoc ->
+            val currentLatLng = LatLng(curLoc.latitude, curLoc.longitude)
+            val preferences = context?.let { Preferences.getInstance(it) }
+            val projectName =
+                preferences?.getString(Preferences.SELECTED_PROJECT, getString(R.string.none))
+            val locations = this.locations.filter { it.locationGroup?.name == projectName }
+            val furthestSite = getFurthestSiteFromCurrentLocation(
+                currentLatLng,
+                if (projectName != getString(R.string.none)) locations else this.locations
+            )
+            furthestSite?.let {
+                moveCamera(
+                    currentLatLng,
+                    LatLng(furthestSite.latitude, furthestSite.longitude),
+                    15.0
+                )
+            }
+        }
+    }
+
     private fun moveCameraToCurrentLocation() {
         mapboxMap?.locationComponent?.lastKnownLocation?.let { curLoc ->
             val currentLatLng = LatLng(curLoc.latitude, curLoc.longitude)
@@ -876,6 +1003,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     override fun onResume() {
         super.onResume()
         mapView.onResume()
+        listener?.let {
+            projectNameTextView.text =
+                if (it.getProjectName() != getString(R.string.none)) it.getProjectName() else ""
+            combinedData()
+            moveCameraOnStartWithProject()
+        }
         analytics?.trackScreen(Screen.MAP)
     }
 
@@ -931,6 +1064,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         private const val SITES_LIMIT_GETTING = 100
         private const val DURATION = 700
+        const val REQUEST_CODE = 1006
 
         fun newInstance(): MapFragment {
             return MapFragment()

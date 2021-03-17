@@ -108,7 +108,8 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
                     .build()
 
                 addTooltip?.let { tip ->
-                    val addEdgeOrAudioMoth = tip.findViewById<ConstraintLayout>(R.id.audioMothLayout)
+                    val addEdgeOrAudioMoth =
+                        tip.findViewById<ConstraintLayout>(R.id.audioMothLayout)
                     val addGuardian = tip.findViewById<ConstraintLayout>(R.id.guardianLayout)
                     addEdgeOrAudioMoth?.setOnClickListener {
                         EdgeDeploymentActivity.startActivity(this)
@@ -141,7 +142,6 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
-                    showBottomAppBar()
                     val bottomSheetFragment =
                         supportFragmentManager.findFragmentByTag(BOTTOM_SHEET)
                     if (bottomSheetFragment != null) {
@@ -149,6 +149,9 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
                             .remove(bottomSheetFragment)
                             .commit()
                     }
+                }
+                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                    hidBottomAppBar()
                 }
             }
         })
@@ -268,9 +271,14 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         }
     }
 
+    override fun getProjectName(): String {
+        val preferences = Preferences.getInstance(this)
+        return preferences.getString(Preferences.SELECTED_PROJECT, getString(R.string.none))
+    }
+
     override fun hidBottomAppBar() {
-        createLocationButton.visibility = View.INVISIBLE
-        bottomBar.visibility = View.INVISIBLE
+        createLocationButton.visibility = View.GONE
+        bottomBar.visibility = View.GONE
     }
 
     override fun showBottomAppBar() {
@@ -296,6 +304,12 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     }
 
     override fun hideBottomSheet() {
+        showBottomAppBar()
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
+
+    override fun hideBottomSheetAndBottomAppBar() {
+        hidBottomAppBar()
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
 
@@ -303,12 +317,19 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         addTooltip?.dismiss()
         if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
             hideBottomSheet()
-            val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
-            if (mapFragment is MapFragment) {
-                mapFragment.clearFeatureSelected()
-            }
+            clearFeatureSelectedOnMap()
+        } else if (!searchView.isIconified){
+            searchView.isIconified = true
+            clearFeatureSelectedOnMap()
         } else {
             return super.onBackPressed()
+        }
+    }
+
+    override fun clearFeatureSelectedOnMap() {
+        val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
+        if (mapFragment is MapFragment) {
+            mapFragment.clearFeatureSelected()
         }
     }
 
@@ -319,7 +340,12 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         if (edgeDeploymentId != null) {
             val deployment = edgeDeploymentDb.getDeploymentByDeploymentId(edgeDeploymentId)
             deployment?.let {
-                showBottomSheet(DeploymentViewPagerFragment.newInstance(it.id, Device.AUDIOMOTH.value))
+                showBottomSheet(
+                    DeploymentViewPagerFragment.newInstance(
+                        it.id,
+                        Device.AUDIOMOTH.value
+                    )
+                )
             }
         }
     }
@@ -344,8 +370,11 @@ interface MainActivityListener {
     fun showBottomAppBar()
     fun hidBottomAppBar()
     fun hideBottomSheet()
+    fun hideBottomSheetAndBottomAppBar()
     fun showSnackbar(msg: String, duration: Int)
     fun hideSnackbar()
     fun onLogout()
     fun moveMapIntoDeploymentMarker(lat: Double, lng: Double, markerLocationId: String)
+    fun getProjectName(): String
+    fun clearFeatureSelectedOnMap()
 }

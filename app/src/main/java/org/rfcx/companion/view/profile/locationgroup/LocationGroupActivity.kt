@@ -50,9 +50,9 @@ class LocationGroupActivity : BaseActivity(), LocationGroupProtocol {
 
     private fun locationGroupSelected(group: LocationGroup) {
         val screen: String? = intent?.getStringExtra(EXTRA_SCREEN)
+        val preferences = Preferences.getInstance(this)
         when (screen) {
             Screen.LOCATION.id -> {
-                val preferences = Preferences.getInstance(this)
                 group.name?.let { preferences.putString(Preferences.GROUP, it) }
                 finish()
             }
@@ -60,6 +60,10 @@ class LocationGroupActivity : BaseActivity(), LocationGroupProtocol {
                 val intent = Intent()
                 intent.putExtra(EXTRA_LOCATION_GROUP, group)
                 setResult(RESULT_OK, intent)
+                finish()
+            }
+            Screen.MAP.id  -> {
+                group.name?.let { preferences.putString(Preferences.SELECTED_PROJECT, it) }
                 finish()
             }
         }

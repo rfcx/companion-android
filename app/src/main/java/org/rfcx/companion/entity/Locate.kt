@@ -70,6 +70,7 @@ open class Locate(
         const val FIELD_LAST_EDGE_DEPLOYMENT_SERVER_ID = "lastDeploymentServerId"
         const val FIELD_LAST_EDGE_DEPLOYMENT_ID = "lastDeploymentId"
         const val FIELD_ALTITUDE = "altitude"
+        const val FIELD_NAME = "name"
     }
 }
 
