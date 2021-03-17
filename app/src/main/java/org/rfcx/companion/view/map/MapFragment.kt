@@ -550,7 +550,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val locateObserve = Observer<List<Locate>> {
         this.locations = it
         if (DownloadStreamsWorker.isRunning()) {
-            listener?.showSnackbar("Sites downloading", Snackbar.LENGTH_SHORT)
+            listener?.showSnackbar(requireContext().getString(R.string.sites_downloading), Snackbar.LENGTH_SHORT)
+        } else {
+            listener?.showSnackbar(requireContext().getString(R.string.sites_synced), Snackbar.LENGTH_SHORT)
         }
         combinedData()
     }
@@ -1062,7 +1064,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         private const val POINT_COUNT = "point_count"
         private const val DEPLOYMENT_COUNT = "deployment.count"
 
-        private const val SITES_LIMIT_GETTING = 100
         private const val DURATION = 700
         const val REQUEST_CODE = 1006
 

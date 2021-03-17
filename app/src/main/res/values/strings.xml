@@ -406,4 +406,8 @@
     <!-- SelectExistedSites -->
     <string name="sites_loading_dialog">Sites is still downloading. \n Beware missing sites</string>
 
+    <!-- MapFragment -->
+    <string name="sites_downloading">Sites downloading</string>
+    <string name="sites_synced">All sites synced</string>
+
 </resources>
