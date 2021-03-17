@@ -1005,11 +1005,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     override fun onResume() {
         super.onResume()
         mapView.onResume()
-        listener?.let {
+        listener?.let { it ->
             projectNameTextView.text =
                 if (it.getProjectName() != getString(R.string.none)) it.getProjectName() else ""
             combinedData()
-            moveCameraOnStartWithProject()
+            mapboxMap?.locationComponent?.isLocationComponentActivated?.let { isActivated ->
+                if (isActivated) {
+                    moveCameraOnStartWithProject()
+                }
+            }
         }
         analytics?.trackScreen(Screen.MAP)
     }
