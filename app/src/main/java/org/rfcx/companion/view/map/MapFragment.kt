@@ -260,7 +260,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             listView.visibility = View.VISIBLE
             buttonOnMapGroup.visibility = View.GONE
             projectNameTextView.visibility = View.GONE
-            listener?.hidBottomAppBar()
+            val state = listener?.getBottomSheetState() ?: 0
+            if (state == BottomSheetBehavior.STATE_EXPANDED) {
+                listener?.hideBottomSheetAndBottomAppBar()
+            } else {
+                listener?.hidBottomAppBar()
+            }
         }
 
         searchView.setOnCloseListener {
@@ -290,7 +295,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                             Device.AUDIOMOTH.value
                         )
                     )
-                    listener?.hidBottomAppBar()
                 }
             }
 
