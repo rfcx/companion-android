@@ -273,6 +273,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             buttonOnMapGroup.visibility = View.VISIBLE
             projectNameTextView.visibility = View.VISIBLE
             listener?.showBottomAppBar()
+            listener?.clearFeatureSelectedOnMap()
             false
         }
 

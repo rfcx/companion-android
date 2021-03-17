@@ -323,8 +323,8 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     }
 
     override fun hidBottomAppBar() {
-        createLocationButton.visibility = View.INVISIBLE
-        bottomBar.visibility = View.INVISIBLE
+        createLocationButton.visibility = View.GONE
+        bottomBar.visibility = View.GONE
     }
 
     override fun showBottomAppBar() {
@@ -363,12 +363,19 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         addTooltip?.dismiss()
         if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
             hideBottomSheet()
-            val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
-            if (mapFragment is MapFragment) {
-                mapFragment.clearFeatureSelected()
-            }
+            clearFeatureSelectedOnMap()
+        } else if (!searchView.isIconified){
+            searchView.isIconified = true
+            clearFeatureSelectedOnMap()
         } else {
             return super.onBackPressed()
+        }
+    }
+
+    override fun clearFeatureSelectedOnMap() {
+        val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
+        if (mapFragment is MapFragment) {
+            mapFragment.clearFeatureSelected()
         }
     }
 
@@ -416,4 +423,5 @@ interface MainActivityListener {
     fun onLogout()
     fun moveMapIntoDeploymentMarker(lat: Double, lng: Double, markerLocationId: String)
     fun getProjectName(): String
+    fun clearFeatureSelectedOnMap()
 }
