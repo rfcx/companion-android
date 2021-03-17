@@ -116,7 +116,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                             updateLocationAdapter()
                         }
                         if (!isUseCurrentLocation){
-                            setCheckbox()
+                            if (locationNameSpinner.selectedItemPosition != 0) {
+                                setCheckbox()
+                            }
                         }
                     }
                 }
@@ -395,7 +397,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private fun onPressedExisting() {
         getLastLocation()
         enableExistingLocation(true)
-        enableCheckBox(true)
 
         locateItem?.let {
             createSiteSymbol(it.getLatLng())
@@ -480,7 +481,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private fun onPressedNewLocation() {
         enableExistingLocation(false)
-        enableCheckBox(false)
         siteValueTextView.text = getString(R.string.create_new_site)
         altitudeValue.text = altitudeFromLocation.setFormatLabel()
         getLastLocation()
@@ -489,6 +489,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             lastLocation?.let {
                 val latLng = LatLng(it.latitude, it.longitude)
                 createSiteSymbol(latLng)
+                distanceSite(it.latitude, it.longitude)
                 val currentLocation = deploymentProtocol?.getCurrentLocation()
                 if (currentLocation != null) {
                     moveCamera(LatLng(currentLocation.latitude, currentLocation.longitude), latLng, DEFAULT_ZOOM)
@@ -500,6 +501,20 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             // not found current location
             setLatLogLabel(LatLng(0.0, 0.0))
             moveCamera(LatLng(0.0, 0.0), DEFAULT_ZOOM)
+            distanceSite(0.0,0.0)
+        }
+    }
+
+    private fun distanceSite(lat: Double, lng: Double) {
+        val loc = Location(LocationManager.GPS_PROVIDER)
+        loc.latitude = lat
+        loc.longitude = lng
+
+        val distance = loc.distanceTo(this.currentUserLocation)
+        if (distance <= 20) {
+            setWithinText()
+        } else {
+            setNotWithinText(distance.setFormatLabel())
         }
     }
 
@@ -591,10 +606,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 }
             }
         }
-    }
-
-    private fun enableCheckBox(enable: Boolean) {
-        withinTextView.visibility = if (enable) View.VISIBLE else View.GONE
     }
 
     private fun setupLocationSpinner() {
