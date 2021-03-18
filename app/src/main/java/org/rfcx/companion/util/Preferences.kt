@@ -35,6 +35,7 @@ class Preferences(context: Context) {
         const val GROUP = "${PREFIX}GROUP"
         const val SELECTED_PROJECT = "${PREFIX}SELECTED_PROJECT"
         const val TOKEN_EXPIRES_AT = "${PREFIX}TOKEN_EXPIRES_AT"
+        const val ENABLE_LOCATION_TRACKING = "${PREFIX}ENABLE_LOCATION_TRACKING"
     }
 
     init {

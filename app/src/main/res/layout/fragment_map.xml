@@ -92,6 +92,19 @@
         app:constraint_referenced_ids="trackingButton,zoomInButton,zoomOutButton,currentLocationButton" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/trackingButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_padding_small"
+        android:src="@drawable/ic_tacking"
+        app:backgroundTint="@color/white"
+        app:fabCustomSize="@dimen/zoom_loc_size"
+        app:layout_constraintBottom_toTopOf="@id/zoomInButton"
+        app:layout_constraintEnd_toEndOf="@id/guidelineVertical"
+        app:layout_constraintStart_toStartOf="@id/guidelineVertical"
+        app:tint="@color/grey_active" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/zoomInButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -123,19 +136,6 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/margin_padding_small"
         android:src="@drawable/ic_current_location"
-        app:backgroundTint="@color/white"
-        app:fabCustomSize="@dimen/zoom_loc_size"
-        app:layout_constraintBottom_toTopOf="@id/trackingButton"
-        app:layout_constraintEnd_toEndOf="@id/guidelineVertical"
-        app:layout_constraintStart_toStartOf="@id/guidelineVertical"
-        app:tint="@color/colorPrimary" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/trackingButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/margin_padding_small"
-        android:src="@drawable/ic_pin_map"
         app:backgroundTint="@color/white"
         app:fabCustomSize="@dimen/zoom_loc_size"
         app:layout_constraintBottom_toTopOf="@id/addButton"

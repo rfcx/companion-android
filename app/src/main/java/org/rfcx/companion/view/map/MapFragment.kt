@@ -201,6 +201,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         fetchJobSyncing()
         fetchData()
         setupSearch()
+        setColorTrackingButton()
         progressBar.visibility = View.VISIBLE
 
         currentLocationButton.setOnClickListener {
@@ -258,6 +259,27 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 ViewAnimation().showOut(currentLocationButton)
             }
         }
+
+        trackingButton.setOnClickListener {
+            val preferences = context?.let { it1 -> Preferences.getInstance(it1) }
+            val enableTracking =
+                preferences?.getBoolean(Preferences.ENABLE_LOCATION_TRACKING, false) ?: false
+            preferences?.putBoolean(Preferences.ENABLE_LOCATION_TRACKING, !enableTracking)
+            setColorTrackingButton()
+        }
+    }
+
+    private fun setColorTrackingButton() {
+        val preferences = context?.let { it1 -> Preferences.getInstance(it1) }
+        val enableTracking =
+            preferences?.getBoolean(Preferences.ENABLE_LOCATION_TRACKING, false) ?: false
+        trackingButton.supportImageTintList =
+            context?.let { it1 ->
+                ContextCompat.getColorStateList(
+                    it1,
+                    if (enableTracking) R.color.colorPrimary else R.color.grey_active
+                )
+            }
     }
 
     private fun setupSearch() {
