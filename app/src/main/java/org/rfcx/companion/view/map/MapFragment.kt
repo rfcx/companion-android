@@ -116,10 +116,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
-    private var currentSiteLoading = 0
-
     private lateinit var arrayListOfSite: ArrayList<String>
     private lateinit var adapterOfSearchSite: ArrayAdapter<String>
+    private var isRotate = false
 
     private val mapboxLocationChangeCallback =
         object : LocationEngineCallback<LocationEngineResult> {
@@ -239,6 +238,26 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 )
             }
         }
+
+        ViewAnimation().init(trackingButton)
+        ViewAnimation().init(zoomInButton)
+        ViewAnimation().init(zoomOutButton)
+        ViewAnimation().init(currentLocationButton)
+
+        addButton.setOnClickListener {
+            isRotate = ViewAnimation().rotateFab(it, !isRotate)
+            if (isRotate) {
+                ViewAnimation().showIn(trackingButton)
+                ViewAnimation().showIn(zoomInButton)
+                ViewAnimation().showIn(zoomOutButton)
+                ViewAnimation().showIn(currentLocationButton)
+            } else {
+                ViewAnimation().showOut(trackingButton)
+                ViewAnimation().showOut(zoomInButton)
+                ViewAnimation().showOut(zoomOutButton)
+                ViewAnimation().showOut(currentLocationButton)
+            }
+        }
     }
 
     private fun setupSearch() {
@@ -288,7 +307,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
             projectName?.let { name ->
                 val item = locateDb.getLocateByName(name)
-                item?.let { mapboxMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(it.getLatLng(), 15.0)) }
+                item?.let {
+                    mapboxMap?.animateCamera(
+                        CameraUpdateFactory.newLatLngZoom(
+                            it.getLatLng(),
+                            15.0
+                        )
+                    )
+                }
 
                 val deployment = edgeDeploymentDb.getDeploymentBySiteName(name)
                 if (deployment != null) {
@@ -341,8 +367,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     .withCluster(true)
                     .withClusterMaxZoom(20)
                     .withClusterRadius(30)
-                    .withClusterProperty(PROPERTY_CLUSTER_TYPE, sum(accumulated(), get(PROPERTY_CLUSTER_TYPE)), switchCase(
-                        eq(get(PROPERTY_DEPLOYMENT_MARKER_IMAGE), Battery.BATTERY_PIN_GREEN), literal(1), literal(0)))
+                    .withClusterProperty(
+                        PROPERTY_CLUSTER_TYPE,
+                        sum(accumulated(), get(PROPERTY_CLUSTER_TYPE)),
+                        switchCase(
+                            eq(get(PROPERTY_DEPLOYMENT_MARKER_IMAGE), Battery.BATTERY_PIN_GREEN),
+                            literal(1),
+                            literal(0)
+                        )
+                    )
             )
 
         style.addSource(mapSource!!)
@@ -428,7 +461,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         style.addLayer(unclusteredSiteLayer)
         style.addLayer(unclusteredDeploymentLayer)
 
-        val layers = arrayOf(intArrayOf(0, Color.parseColor("#98A0A9")), intArrayOf(1, Color.parseColor("#2AA841")))
+        val layers = arrayOf(
+            intArrayOf(0, Color.parseColor("#98A0A9")),
+            intArrayOf(1, Color.parseColor("#2AA841"))
+        )
 
         layers.forEachIndexed { i, ly ->
             val deploymentSymbolLayer = CircleLayer("$DEPLOYMENT_CLUSTER-$i", SOURCE_DEPLOYMENT)
@@ -444,7 +480,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 } else {
                     all(
                         gte(hasDeploymentAtLeastOne, literal(ly[0])),
-                        gt(hasDeploymentAtLeastOne, literal(layers[i-1][0]))
+                        gt(hasDeploymentAtLeastOne, literal(layers[i - 1][0]))
                     )
                 }
             )
@@ -454,7 +490,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         val deploymentCount = SymbolLayer(DEPLOYMENT_COUNT, SOURCE_DEPLOYMENT)
         deploymentCount.setProperties(
-            textField(format(formatEntry(toString(get(POINT_COUNT)), FormatOption.formatFontScale(1.5)))),
+            textField(
+                format(
+                    formatEntry(
+                        toString(get(POINT_COUNT)),
+                        FormatOption.formatFontScale(1.5)
+                    )
+                )
+            ),
             textSize(12f),
             textColor(Color.WHITE),
             textIgnorePlacement(true),
@@ -550,9 +593,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val locateObserve = Observer<List<Locate>> {
         this.locations = it
         if (DownloadStreamsWorker.isRunning()) {
-            listener?.showSnackbar(requireContext().getString(R.string.sites_downloading), Snackbar.LENGTH_SHORT)
+            listener?.showSnackbar(
+                requireContext().getString(R.string.sites_downloading),
+                Snackbar.LENGTH_SHORT
+            )
         } else {
-            listener?.showSnackbar(requireContext().getString(R.string.sites_synced), Snackbar.LENGTH_SHORT)
+            listener?.showSnackbar(
+                requireContext().getString(R.string.sites_synced),
+                Snackbar.LENGTH_SHORT
+            )
         }
         combinedData()
     }
