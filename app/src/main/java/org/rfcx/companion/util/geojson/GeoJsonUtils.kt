@@ -9,7 +9,7 @@ import java.io.FileWriter
 
 object GeoJsonUtils {
 
-    fun generateGeoJson(context: Context, fileName: String, points: List<DoubleArray>) {
+    fun generateGeoJson(context: Context, fileName: String, points: List<DoubleArray>): File {
         val gson = Gson()
         val json = JsonObject()
         //add Type
@@ -42,8 +42,9 @@ object GeoJsonUtils {
         val writer = FileWriter(file)
         gson.toJson(json, writer)
 
-        //close
+        //close writer
         writer.close()
+        return file
     }
 
     private fun DoubleArray.toJsonArray(): JsonArray {
