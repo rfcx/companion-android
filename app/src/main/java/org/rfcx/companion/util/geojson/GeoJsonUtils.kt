@@ -6,8 +6,13 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import java.io.File
 import java.io.FileWriter
+import java.util.*
 
 object GeoJsonUtils {
+
+    fun generateFileName(deployedAt: Date, deploymentId: String): String {
+        return "$deployedAt-$deploymentId.geojson"
+    }
 
     fun generateGeoJson(context: Context, fileName: String, points: List<DoubleArray>): File {
         val gson = Gson()

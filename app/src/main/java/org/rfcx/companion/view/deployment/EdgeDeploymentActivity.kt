@@ -284,6 +284,8 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             }
             saveImages(it)
             deploymentDb.updateDeployment(it)
+            //todo save tracking here
+            //trackingDb.insert(...)
             analytics.trackCreateAudiomothDeploymentEvent()
 
             DeploymentSyncWorker.enqueue(this@EdgeDeploymentActivity)
