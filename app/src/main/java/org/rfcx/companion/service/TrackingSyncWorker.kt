@@ -10,12 +10,14 @@ import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import org.rfcx.companion.entity.request.toRequestBody
+import org.rfcx.companion.localdb.TrackingFileDb
 import org.rfcx.companion.localdb.guardian.DiagnosticDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.repo.Firestore
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.FileUtils.getMimeType
 import org.rfcx.companion.util.RealmHelper
+import org.rfcx.companion.util.getIdToken
 import java.io.File
 
 class TrackingSyncWorker(val context: Context, params: WorkerParameters) :
@@ -24,33 +26,33 @@ class TrackingSyncWorker(val context: Context, params: WorkerParameters) :
     override suspend fun doWork(): Result {
         Log.d(TAG, "doWork")
 
-        //todo: use tracking db here
-        //val db = TrackingDb(Realm.getInstance(RealmHelper.migrationConfig()))
-        //val tracking = db.unlockSent()
+        val db = TrackingFileDb(Realm.getInstance(RealmHelper.migrationConfig()))
+        val tracking = db.lockUnsent()
 
         var someFailed = false
-        //Log.d(TAG, "doWork: found ${diagnostic.size} unsent")
+        Log.d(TAG, "doWork: found ${tracking.size} unsent")
 
-//        tracking.forEach {
-//            val file = File(it.localPath)
-//            val mimeType = file.getMimeType()
-//            val requestFile = RequestBody.create(MediaType.parse(mimeType), file)
-//            val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
-//            val result = ApiManager.getInstance().getDeviceApi()
-//                .uploadImage(token, it.deploymentServerId!!, body).execute()
-//
-//            if (result.isSuccessful) {
-//                val assetPath = result.headers().get("Location")
-//                assetPath?.let { path ->
-//                    db.markSent(it.id, path.substring(1, path.length))
-//                }
-//
-//                Log.d(ImageSyncWorker.TAG, "doWork: success $result")
-//            } else {
-//                db.markUnsent(it.id)
-//                someFailed = true
-//            }
-//        }
+        val token = "Bearer ${context.getIdToken()}"
+        tracking.forEach {
+            val file = File(it.localPath)
+            val mimeType = file.getMimeType()
+            val requestFile = RequestBody.create(MediaType.parse(mimeType), file)
+            val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
+            val result = ApiManager.getInstance().getDeviceApi()
+                .uploadImage(token, it.deploymentServerId!!, body).execute()
+
+            if (result.isSuccessful) {
+                val assetPath = result.headers().get("Location")
+                assetPath?.let { path ->
+                    db.markSent(it.id, path.substring(1, path.length))
+                }
+
+                Log.d(TAG, "doWork: success $result")
+            } else {
+                db.markUnsent(it.id)
+                someFailed = true
+            }
+        }
 
         return if (someFailed) Result.retry() else Result.success()
     }

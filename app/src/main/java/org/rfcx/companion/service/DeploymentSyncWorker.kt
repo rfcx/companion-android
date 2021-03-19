@@ -53,7 +53,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                     }
 
                     //send tracking if there is
-                    //TrackingSyncWorker.enqueue(context)
+                    TrackingSyncWorker.enqueue(context)
                 } else {
                     db.markUnsent(it.id)
                     someFailed = true
