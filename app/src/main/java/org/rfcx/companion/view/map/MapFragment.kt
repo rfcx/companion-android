@@ -49,6 +49,7 @@ import com.mapbox.mapboxsdk.utils.BitmapUtils
 import com.mapbox.pluginscalebar.ScaleBarOptions
 import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
+import io.realm.RealmList
 import kotlinx.android.synthetic.main.fragment_map.*
 import org.rfcx.companion.DeploymentListener
 import org.rfcx.companion.MainActivityListener
@@ -59,10 +60,7 @@ import org.rfcx.companion.entity.guardian.toMark
 import org.rfcx.companion.entity.response.DeploymentImageResponse
 import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.ProjectResponse
-import org.rfcx.companion.localdb.DeploymentImageDb
-import org.rfcx.companion.localdb.EdgeDeploymentDb
-import org.rfcx.companion.localdb.LocateDb
-import org.rfcx.companion.localdb.LocationGroupDb
+import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.DiagnosticDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
@@ -75,6 +73,8 @@ import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -92,6 +92,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
+    private val trackingDb by lazy { TrackingDb(realm) }
     private val diagnosticDb by lazy { DiagnosticDb(realm) }
 
     // data
@@ -116,10 +117,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
-    private var currentSiteLoading = 0
-
     private lateinit var arrayListOfSite: ArrayList<String>
     private lateinit var adapterOfSearchSite: ArrayAdapter<String>
+    private var isRotate = false
+    private var points: RealmList<Coordinate>? = null
+    private var tracking: Tracking? = null
 
     private val mapboxLocationChangeCallback =
         object : LocationEngineCallback<LocationEngineResult> {
@@ -134,6 +136,20 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     if (isFirstTime && locations.isNotEmpty()) {
                         moveCameraOnStart()
                         isFirstTime = false
+                    }
+
+                    val preferences = context?.let { it1 -> Preferences.getInstance(it1) }
+                    val enableTracking =
+                        preferences?.getBoolean(Preferences.ENABLE_LOCATION_TRACKING, false)
+                            ?: false
+                    if (enableTracking) {
+                        points?.add(
+                            Coordinate(
+                                latitude = location.latitude,
+                                longitude = location.longitude,
+                                altitude = location.altitude
+                            )
+                        )
                     }
                 }
             }
@@ -202,6 +218,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         fetchJobSyncing()
         fetchData()
         setupSearch()
+        setColorTrackingButton()
         progressBar.visibility = View.VISIBLE
 
         currentLocationButton.setOnClickListener {
@@ -239,6 +256,61 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 )
             }
         }
+
+        ViewAnimation().init(trackingButton)
+        ViewAnimation().init(zoomInButton)
+        ViewAnimation().init(zoomOutButton)
+        ViewAnimation().init(currentLocationButton)
+
+        addButton.setOnClickListener {
+            isRotate = ViewAnimation().rotateFab(it, !isRotate)
+            if (isRotate) {
+                ViewAnimation().showIn(trackingButton)
+                ViewAnimation().showIn(zoomInButton)
+                ViewAnimation().showIn(zoomOutButton)
+                ViewAnimation().showIn(currentLocationButton)
+            } else {
+                ViewAnimation().showOut(trackingButton)
+                ViewAnimation().showOut(zoomInButton)
+                ViewAnimation().showOut(zoomOutButton)
+                ViewAnimation().showOut(currentLocationButton)
+            }
+        }
+
+        trackingButton.setOnClickListener {
+            val preferences = context?.let { it1 -> Preferences.getInstance(it1) }
+            val enableTracking =
+                preferences?.getBoolean(Preferences.ENABLE_LOCATION_TRACKING, false) ?: false
+            preferences?.putBoolean(Preferences.ENABLE_LOCATION_TRACKING, !enableTracking)
+            setColorTrackingButton()
+            if (!enableTracking) {
+                points = RealmList()
+                tracking = Tracking(startAt = Date())
+            } else {
+                tracking?.let {
+                    trackingDb.insertOrUpdate(
+                        Tracking(
+                            startAt = it.startAt,
+                            stopAt = Date(),
+                            points = points
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    private fun setColorTrackingButton() {
+        val preferences = context?.let { it1 -> Preferences.getInstance(it1) }
+        val enableTracking =
+            preferences?.getBoolean(Preferences.ENABLE_LOCATION_TRACKING, false) ?: false
+        trackingButton.supportImageTintList =
+            context?.let { it1 ->
+                ContextCompat.getColorStateList(
+                    it1,
+                    if (enableTracking) R.color.colorPrimary else R.color.grey_active
+                )
+            }
     }
 
     private fun setupSearch() {
@@ -288,7 +360,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
             projectName?.let { name ->
                 val item = locateDb.getLocateByName(name)
-                item?.let { mapboxMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(it.getLatLng(), 15.0)) }
+                item?.let {
+                    mapboxMap?.animateCamera(
+                        CameraUpdateFactory.newLatLngZoom(
+                            it.getLatLng(),
+                            15.0
+                        )
+                    )
+                }
 
                 val deployment = edgeDeploymentDb.getDeploymentBySiteName(name)
                 if (deployment != null) {
@@ -341,8 +420,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     .withCluster(true)
                     .withClusterMaxZoom(20)
                     .withClusterRadius(30)
-                    .withClusterProperty(PROPERTY_CLUSTER_TYPE, sum(accumulated(), get(PROPERTY_CLUSTER_TYPE)), switchCase(
-                        eq(get(PROPERTY_DEPLOYMENT_MARKER_IMAGE), Battery.BATTERY_PIN_GREEN), literal(1), literal(0)))
+                    .withClusterProperty(
+                        PROPERTY_CLUSTER_TYPE,
+                        sum(accumulated(), get(PROPERTY_CLUSTER_TYPE)),
+                        switchCase(
+                            eq(get(PROPERTY_DEPLOYMENT_MARKER_IMAGE), Battery.BATTERY_PIN_GREEN),
+                            literal(1),
+                            literal(0)
+                        )
+                    )
             )
 
         style.addSource(mapSource!!)
@@ -428,7 +514,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         style.addLayer(unclusteredSiteLayer)
         style.addLayer(unclusteredDeploymentLayer)
 
-        val layers = arrayOf(intArrayOf(0, Color.parseColor("#98A0A9")), intArrayOf(1, Color.parseColor("#2AA841")))
+        val layers = arrayOf(
+            intArrayOf(0, Color.parseColor("#98A0A9")),
+            intArrayOf(1, Color.parseColor("#2AA841"))
+        )
 
         layers.forEachIndexed { i, ly ->
             val deploymentSymbolLayer = CircleLayer("$DEPLOYMENT_CLUSTER-$i", SOURCE_DEPLOYMENT)
@@ -444,7 +533,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 } else {
                     all(
                         gte(hasDeploymentAtLeastOne, literal(ly[0])),
-                        gt(hasDeploymentAtLeastOne, literal(layers[i-1][0]))
+                        gt(hasDeploymentAtLeastOne, literal(layers[i - 1][0]))
                     )
                 }
             )
@@ -454,7 +543,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         val deploymentCount = SymbolLayer(DEPLOYMENT_COUNT, SOURCE_DEPLOYMENT)
         deploymentCount.setProperties(
-            textField(format(formatEntry(toString(get(POINT_COUNT)), FormatOption.formatFontScale(1.5)))),
+            textField(
+                format(
+                    formatEntry(
+                        toString(get(POINT_COUNT)),
+                        FormatOption.formatFontScale(1.5)
+                    )
+                )
+            ),
             textSize(12f),
             textColor(Color.WHITE),
             textIgnorePlacement(true),
@@ -550,9 +646,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val locateObserve = Observer<List<Locate>> {
         this.locations = it
         if (DownloadStreamsWorker.isRunning()) {
-            listener?.showSnackbar(requireContext().getString(R.string.sites_downloading), Snackbar.LENGTH_SHORT)
+            listener?.showSnackbar(
+                requireContext().getString(R.string.sites_downloading),
+                Snackbar.LENGTH_SHORT
+            )
         } else {
-            listener?.showSnackbar(requireContext().getString(R.string.sites_synced), Snackbar.LENGTH_SHORT)
+            listener?.showSnackbar(
+                requireContext().getString(R.string.sites_synced),
+                Snackbar.LENGTH_SHORT
+            )
         }
         combinedData()
     }
