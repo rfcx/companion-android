@@ -7,13 +7,13 @@ import io.realm.annotations.RealmClass
 import java.util.*
 
 @RealmClass
-open class Tracking : RealmObject() {
+open class Tracking(
     @PrimaryKey
-    var id: Int = 0
-    var startAt: Date = Date()
-    var stopAt: Date? = null
+    var id: Int = 0,
+    var startAt: Date = Date(),
+    var stopAt: Date? = null,
     var points: RealmList<Coordinate>? = null
-
+) : RealmObject() {
     companion object {
         const val TABLE_NAME = "Tracking"
         const val TRACKING_ID = "id"

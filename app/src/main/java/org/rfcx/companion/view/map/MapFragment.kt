@@ -49,6 +49,7 @@ import com.mapbox.mapboxsdk.utils.BitmapUtils
 import com.mapbox.pluginscalebar.ScaleBarOptions
 import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
+import io.realm.RealmList
 import kotlinx.android.synthetic.main.fragment_map.*
 import org.rfcx.companion.DeploymentListener
 import org.rfcx.companion.MainActivityListener
@@ -59,10 +60,7 @@ import org.rfcx.companion.entity.guardian.toMark
 import org.rfcx.companion.entity.response.DeploymentImageResponse
 import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.ProjectResponse
-import org.rfcx.companion.localdb.DeploymentImageDb
-import org.rfcx.companion.localdb.EdgeDeploymentDb
-import org.rfcx.companion.localdb.LocateDb
-import org.rfcx.companion.localdb.LocationGroupDb
+import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.DiagnosticDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
@@ -75,6 +73,8 @@ import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -92,6 +92,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
+    private val trackingDb by lazy { TrackingDb(realm) }
     private val diagnosticDb by lazy { DiagnosticDb(realm) }
 
     // data
@@ -119,6 +120,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private lateinit var arrayListOfSite: ArrayList<String>
     private lateinit var adapterOfSearchSite: ArrayAdapter<String>
     private var isRotate = false
+    private var points: RealmList<Coordinate>? = null
+    private var tracking: Tracking? = null
 
     private val mapboxLocationChangeCallback =
         object : LocationEngineCallback<LocationEngineResult> {
@@ -133,6 +136,20 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     if (isFirstTime && locations.isNotEmpty()) {
                         moveCameraOnStart()
                         isFirstTime = false
+                    }
+
+                    val preferences = context?.let { it1 -> Preferences.getInstance(it1) }
+                    val enableTracking =
+                        preferences?.getBoolean(Preferences.ENABLE_LOCATION_TRACKING, false)
+                            ?: false
+                    if (enableTracking) {
+                        points?.add(
+                            Coordinate(
+                                latitude = location.latitude,
+                                longitude = location.longitude,
+                                altitude = location.altitude
+                            )
+                        )
                     }
                 }
             }
@@ -266,6 +283,20 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 preferences?.getBoolean(Preferences.ENABLE_LOCATION_TRACKING, false) ?: false
             preferences?.putBoolean(Preferences.ENABLE_LOCATION_TRACKING, !enableTracking)
             setColorTrackingButton()
+            if (!enableTracking) {
+                points = RealmList()
+                tracking = Tracking(startAt = Date())
+            } else {
+                tracking?.let {
+                    trackingDb.insertOrUpdate(
+                        Tracking(
+                            startAt = it.startAt,
+                            stopAt = Date(),
+                            points = points
+                        )
+                    )
+                }
+            }
         }
     }
 
