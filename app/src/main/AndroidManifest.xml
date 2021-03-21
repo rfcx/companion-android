@@ -84,10 +84,6 @@
 
         <activity android:name="org.rfcx.companion.view.diagnostic.DiagnosticActivity" />
 
-        <service
-            android:name=".service.LocationTrackerService"
-            android:exported="false"
-            android:foregroundServiceType="location" />
     </application>
 
 </manifest>
