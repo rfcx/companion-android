@@ -57,7 +57,7 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.guardian.toMark
-import org.rfcx.companion.entity.response.DeploymentImageResponse
+import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.localdb.*
@@ -93,6 +93,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val locateDb by lazy { LocateDb(realm) }
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
     private val trackingDb by lazy { TrackingDb(realm) }
+    private val trackingFileDb by lazy { TrackingFileDb(realm) }
     private val diagnosticDb by lazy { DiagnosticDb(realm) }
 
     // data
@@ -799,7 +800,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                             edgeDeploymentDb.insertOrUpdate(item)
                         }
                     }
-                    retrieveImages(context)
+                    retrieveAssets(context)
                     combinedData()
                 }
             })
@@ -837,15 +838,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         Firestore(context).retrieveDiagnostics(diagnosticDb)
     }
 
-    private fun retrieveImages(context: Context) {
+    private fun retrieveAssets(context: Context) {
         val token = "Bearer ${context.getIdToken()}"
 
         edgeDeployments.forEach { dp ->
             if (dp.serverId != null) {
-                ApiManager.getInstance().getDeviceApi().getImages(token, dp.serverId!!)
-                    .enqueue(object : Callback<List<DeploymentImageResponse>> {
+                ApiManager.getInstance().getDeviceApi().getAssets(token, dp.serverId!!)
+                    .enqueue(object : Callback<List<DeploymentAssetResponse>> {
                         override fun onFailure(
-                            call: Call<List<DeploymentImageResponse>>,
+                            call: Call<List<DeploymentAssetResponse>>,
                             t: Throwable
                         ) {
                             combinedData()
@@ -860,15 +861,23 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         }
 
                         override fun onResponse(
-                            call: Call<List<DeploymentImageResponse>>,
-                            response: Response<List<DeploymentImageResponse>>
+                            call: Call<List<DeploymentAssetResponse>>,
+                            response: Response<List<DeploymentAssetResponse>>
                         ) {
                             response.body()?.forEach { item ->
-                                deploymentImageDb.insertOrUpdate(
-                                    item,
-                                    dp.id,
-                                    Device.AUDIOMOTH.value
-                                )
+                                if (item.mimeType.startsWith("image")) {
+                                    deploymentImageDb.insertOrUpdate(
+                                        item,
+                                        dp.id,
+                                        Device.AUDIOMOTH.value
+                                    )
+                                } else if(item.mimeType.endsWith("geo+json")) {
+                                    trackingFileDb.insertOrUpdate(
+                                        item,
+                                        dp.id,
+                                        Device.AUDIOMOTH.value
+                                    )
+                                }
                             }
                         }
                     })

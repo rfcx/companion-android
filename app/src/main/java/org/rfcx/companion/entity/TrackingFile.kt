@@ -14,7 +14,8 @@ open class TrackingFile(
     var localPath: String = "",
     var remotePath: String? = null,
     @Expose(serialize = false)
-    var syncState: Int = 0
+    var syncState: Int = 0,
+    var device: String = ""
 ) : RealmModel {
     companion object {
         const val TABLE_NAME = "DeploymentImage"
@@ -24,5 +25,6 @@ open class TrackingFile(
         const val FIELD_SYNC_STATE = "syncState"
         const val FIELD_REMOTE_PATH = "remotePath"
         const val FIELD_LOCAL_PATH = "localPath"
+        const val FIELD_DEVICE = "device"
     }
 }

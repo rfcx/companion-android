@@ -9,12 +9,8 @@ import io.realm.Realm
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import org.rfcx.companion.entity.request.toRequestBody
 import org.rfcx.companion.localdb.TrackingFileDb
-import org.rfcx.companion.localdb.guardian.DiagnosticDb
 import org.rfcx.companion.repo.ApiManager
-import org.rfcx.companion.repo.Firestore
-import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.FileUtils.getMimeType
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.getIdToken
@@ -39,7 +35,7 @@ class TrackingSyncWorker(val context: Context, params: WorkerParameters) :
             val requestFile = RequestBody.create(MediaType.parse(mimeType), file)
             val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
             val result = ApiManager.getInstance().getDeviceApi()
-                .uploadImage(token, it.deploymentServerId!!, body).execute()
+                .uploadAssets(token, it.deploymentServerId!!, body).execute()
 
             if (result.isSuccessful) {
                 val assetPath = result.headers().get("Location")

@@ -21,22 +21,19 @@ object GeoJsonUtils {
         json.addProperty("type", "FeatureCollection")
 
         //create features
-        val features = points.map {
-            val tempJson = JsonObject()
-            tempJson.addProperty("type", "Feature")
+        val tempJson = JsonObject()
+        tempJson.addProperty("type", "Feature")
 
-            //create Geometry type
-            val geometry = JsonObject()
-            geometry.addProperty("type", "Point")
-            //create Geometry coordinate
-            geometry.add("coordinates", it.toJsonArray())
+        //create Geometry type
+        val geometry = JsonObject()
+        geometry.addProperty("type", "LineString")
+        //create Geometry coordinate
+        geometry.add("coordinates", points.toJsonArray())
 
-            tempJson.add("geometry", geometry)
-            tempJson
-        }
+        tempJson.add("geometry", geometry)
 
         //combine all data
-        json.add("features", gson.toJsonTree(features).asJsonArray)
+        json.add("features", gson.toJsonTree(tempJson))
 
         //write to file
         val dir = File(context.filesDir, "deployment-tracking")
@@ -52,10 +49,14 @@ object GeoJsonUtils {
         return file
     }
 
-    private fun DoubleArray.toJsonArray(): JsonArray {
+    private fun List<DoubleArray>.toJsonArray(): JsonArray {
         val jsonArray = JsonArray()
-        this.forEach {
-            jsonArray.add(it)
+        this.forEach { dbArray ->
+            val tempJsonArray = JsonArray()
+            dbArray.forEach { db ->
+                tempJsonArray.add(db)
+            }
+            jsonArray.add(tempJsonArray)
         }
         return jsonArray
     }

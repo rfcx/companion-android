@@ -5,7 +5,7 @@ import org.rfcx.companion.entity.DeploymentImage
 import org.rfcx.companion.entity.SyncState
 import org.rfcx.companion.entity.Tracking
 import org.rfcx.companion.entity.TrackingFile
-import org.rfcx.companion.entity.response.DeploymentImageResponse
+import org.rfcx.companion.entity.response.DeploymentAssetResponse
 
 class TrackingFileDb(private val realm: Realm) {
 
@@ -17,7 +17,9 @@ class TrackingFileDb(private val realm: Realm) {
 
     fun unlockSending() {
         realm.executeTransaction {
-            val snapshot = it.where(TrackingFile::class.java).equalTo(TrackingFile.FIELD_SYNC_STATE, SyncState.Sending.key).findAll().createSnapshot()
+            val snapshot = it.where(TrackingFile::class.java)
+                .equalTo(TrackingFile.FIELD_SYNC_STATE, SyncState.Sending.key).findAll()
+                .createSnapshot()
             snapshot.forEach { file ->
                 file.syncState = SyncState.Unsent.key
             }
@@ -42,7 +44,8 @@ class TrackingFileDb(private val realm: Realm) {
 
     fun markUnsent(id: Int) {
         realm.executeTransaction {
-            val file = it.where(TrackingFile::class.java).equalTo(TrackingFile.FIELD_ID, id).findFirst()
+            val file =
+                it.where(TrackingFile::class.java).equalTo(TrackingFile.FIELD_ID, id).findFirst()
             if (file != null) {
                 file.syncState = SyncState.Unsent.key
             }
@@ -51,7 +54,8 @@ class TrackingFileDb(private val realm: Realm) {
 
     fun markSent(id: Int, remotePath: String?) {
         realm.executeTransaction {
-            val file = it.where(TrackingFile::class.java).equalTo(TrackingFile.FIELD_ID, id).findFirst()
+            val file =
+                it.where(TrackingFile::class.java).equalTo(TrackingFile.FIELD_ID, id).findFirst()
             if (file != null) {
                 file.syncState = SyncState.Sent.key
                 file.remotePath = remotePath
@@ -71,25 +75,26 @@ class TrackingFileDb(private val realm: Realm) {
         }
     }
 
-    fun insertOrUpdate(deploymentImageResponse: DeploymentImageResponse, deploymentId: Int?, device: String) {
+    fun insertOrUpdate(
+        deploymentAssetResponse: DeploymentAssetResponse,
+        deploymentId: Int?,
+        device: String
+    ) {
         realm.executeTransaction {
-            val image =
+            val file =
                 it.where(DeploymentImage::class.java)
-                    .equalTo(DeploymentImage.FIELD_REMOTE_PATH, "assets/${deploymentImageResponse.id}")
+                    .equalTo(TrackingFile.FIELD_REMOTE_PATH, "assets/${deploymentAssetResponse.id}")
                     .findFirst()
 
-            if (image == null && deploymentId != null) {
-                if (deploymentImageResponse.mimeType.startsWith("image")) {
-                    val deploymentImage = deploymentImageResponse.toDeploymentImage()
-                    val id = (it.where(DeploymentImage::class.java).max(DeploymentImage.FIELD_ID)?.toInt() ?: 0) + 1
-                    deploymentImage.id = id
-                    deploymentImage.deploymentId = deploymentId
-                    deploymentImage.syncState = SyncState.Sent.key
-                    deploymentImage.device = device
-                    it.insert(deploymentImage)
-                } else {
-                    //TODO: for geojson file
-                }
+            if (file == null && deploymentId != null) {
+                val deploymentTracking = deploymentAssetResponse.toDeploymentTrack()
+                val id = (it.where(TrackingFile::class.java).max(TrackingFile.FIELD_ID)?.toInt()
+                    ?: 0) + 1
+                deploymentTracking.id = id
+                deploymentTracking.deploymentId = deploymentId
+                deploymentTracking.syncState = SyncState.Sent.key
+                deploymentTracking.device = device
+                it.insert(deploymentTracking)
             }
         }
     }

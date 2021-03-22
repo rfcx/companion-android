@@ -292,7 +292,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             //track getting
             if (preferences.getBoolean(ENABLE_LOCATION_TRACKING)) {
                 val track = Tracking()
-                val point = track.points.map { cd -> cd.toDoubleArray() }
+                val point = listOf(listOf(16.81424, 100.30112).toDoubleArray(), listOf(16.81552, 100.30143).toDoubleArray(), listOf(16.81668, 100.30173).toDoubleArray(), listOf(16.81696, 100.30085).toDoubleArray(), listOf(16.81715, 100.29997).toDoubleArray())
                 val trackingFile = TrackingFile(
                     deploymentId = it.id,
                     localPath = GeoJsonUtils.generateGeoJson(this, GeoJsonUtils.generateFileName(it.deployedAt, it.deploymentKey!!), point).absolutePath
