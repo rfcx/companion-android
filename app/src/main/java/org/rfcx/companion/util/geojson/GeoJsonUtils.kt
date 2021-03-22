@@ -7,6 +7,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.repo.ApiManager
+import org.rfcx.companion.util.toISO8601Format
 import java.io.File
 import java.io.FileOutputStream
 import java.io.FileWriter
@@ -17,7 +18,7 @@ import java.util.*
 object GeoJsonUtils {
 
     fun generateFileName(deployedAt: Date, deploymentId: String): String {
-        return "$deployedAt-$deploymentId.json"
+        return "${deployedAt.toISO8601Format()}-$deploymentId.json"
     }
 
     fun generateGeoJson(context: Context, fileName: String, points: List<DoubleArray>): File {
