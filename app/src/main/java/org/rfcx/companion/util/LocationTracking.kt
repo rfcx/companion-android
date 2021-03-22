@@ -2,7 +2,6 @@ package org.rfcx.companion.util
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.core.content.ContextCompat
 import org.rfcx.companion.service.LocationTrackerService
 
@@ -24,7 +23,6 @@ class LocationTracking {
                 Preferences.ENABLE_LOCATION_TRACKING,
                 if (on) TRACKING_ON else TRACKING_OFF
             )
-            Log.i("LocationTrackerService", "on $on")
             updateService(context)
         }
 

@@ -16,6 +16,15 @@ class TrackingDb(private val realm: Realm) {
         }
     }
 
+    fun deleteTracking(id: Int) {
+        realm.executeTransaction {
+            val tracking =
+                it.where(Tracking::class.java).equalTo(Tracking.TRACKING_ID, id)
+                    .findFirst()
+            tracking?.deleteFromRealm()
+        }
+    }
+
     fun getTracking(): List<Tracking> {
         return realm.where(Tracking::class.java).findAll() ?: arrayListOf()
     }
