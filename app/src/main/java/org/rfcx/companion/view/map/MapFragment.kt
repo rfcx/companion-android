@@ -73,8 +73,6 @@ import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.util.*
-import kotlin.collections.ArrayList
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -120,8 +118,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private lateinit var arrayListOfSite: ArrayList<String>
     private lateinit var adapterOfSearchSite: ArrayAdapter<String>
     private var isRotate = false
-    private var points: RealmList<Coordinate>? = null
-    private var tracking: Tracking? = null
 
     private val mapboxLocationChangeCallback =
         object : LocationEngineCallback<LocationEngineResult> {
@@ -136,20 +132,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     if (isFirstTime && locations.isNotEmpty()) {
                         moveCameraOnStart()
                         isFirstTime = false
-                    }
-
-                    val preferences = context?.let { it1 -> Preferences.getInstance(it1) }
-                    val enableTracking =
-                        preferences?.getBoolean(Preferences.ENABLE_LOCATION_TRACKING, false)
-                            ?: false
-                    if (enableTracking) {
-                        points?.add(
-                            Coordinate(
-                                latitude = location.latitude,
-                                longitude = location.longitude,
-                                altitude = location.altitude
-                            )
-                        )
                     }
                 }
             }
@@ -281,22 +263,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             val preferences = context?.let { it1 -> Preferences.getInstance(it1) }
             val enableTracking =
                 preferences?.getBoolean(Preferences.ENABLE_LOCATION_TRACKING, false) ?: false
-            preferences?.putBoolean(Preferences.ENABLE_LOCATION_TRACKING, !enableTracking)
-            setColorTrackingButton()
             if (!enableTracking) {
-                points = RealmList()
-                tracking = Tracking(startAt = Date())
+                context?.let { context -> LocationTracking.set(context, true) }
             } else {
-                tracking?.let {
-                    trackingDb.insertOrUpdate(
-                        Tracking(
-                            startAt = it.startAt,
-                            stopAt = Date(),
-                            points = points
-                        )
-                    )
-                }
+                context?.let { context -> LocationTracking.set(context, false) }
             }
+            setColorTrackingButton()
         }
     }
 

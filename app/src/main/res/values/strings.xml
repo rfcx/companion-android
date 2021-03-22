@@ -331,6 +331,11 @@
     <string name="signal_sim_card">The Guardian does not have a SIM card inserted.\nPlease insert a SIM card.</string>
     <string name="signal_lost">WiFi hotspot connection lost.\nPlease try again.</string>
 
+    <!-- LocationTrackerService -->
+    On-duty and tracking enabled
+    <string name="tracking_enabled">On-duty and tracking enabled</string>
+    <string name="location_setting">Please enable your device\'s location settings</string>
+
     <!-- Search Location -->
     <string name="search_box_hint">Search here</string>
     <string name="search_title">Search</string>
