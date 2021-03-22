@@ -5,9 +5,12 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.PointF
 import android.location.Location
+import android.net.Uri
+import android.net.Uri.fromFile
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
+import android.util.Property
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -41,6 +44,10 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.style.expressions.Expression.*
 import com.mapbox.mapboxsdk.style.layers.CircleLayer
+import com.mapbox.mapboxsdk.style.layers.LineLayer
+import com.mapbox.mapboxsdk.style.layers.Property.LINE_CAP_ROUND
+import com.mapbox.mapboxsdk.style.layers.Property.LINE_JOIN_ROUND
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
@@ -75,6 +82,8 @@ import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.File
+import java.net.URI
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -85,12 +94,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var mapboxMap: MapboxMap? = null
     private var locationEngine: LocationEngine? = null
     private var mapSource: GeoJsonSource? = null
+    private var lineSource: GeoJsonSource? = null
     private var mapFeatures: FeatureCollection? = null
 
     // database manager
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
-    private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
@@ -434,7 +443,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     )
             )
 
+        lineSource = GeoJsonSource(SOURCE_LINE)
+
         style.addSource(mapSource!!)
+        style.addSource(lineSource!!)
     }
 
     fun clearFeatureSelected() {
@@ -491,6 +503,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setupMarkerLayers(style: Style) {
+
+        val line = LineLayer("line-layer", SOURCE_LINE)
+        line.setProperties()
+        style.addLayer(line)
 
         val unclusteredSiteLayer =
             SymbolLayer(MARKER_SITE_ID, SOURCE_DEPLOYMENT).withProperties(
@@ -1067,6 +1083,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    fun showTrackOnMap(id: Int) {
+        val track = trackingFileDb.getTrackingFileByDeploymentId(id)
+        track?.let {
+            val json = File(it.localPath).readText()
+            lineSource!!.setGeoJson(json)
+        }
+    }
+
     override fun onStart() {
         super.onStart()
         mapView.onStart()
@@ -1121,6 +1145,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         private const val SOURCE_DEPLOYMENT = "source.deployment"
         private const val MARKER_DEPLOYMENT_ID = "marker.deployment"
         private const val MARKER_SITE_ID = "marker.site"
+
+        private const val SOURCE_LINE = "source.line"
 
         private const val PROPERTY_DEPLOYMENT_SELECTED = "deployment.selected"
         private const val PROPERTY_DEPLOYMENT_MARKER_DEVICE = "deployment.device"

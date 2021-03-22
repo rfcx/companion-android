@@ -1,10 +1,7 @@
 package org.rfcx.companion.localdb
 
 import io.realm.Realm
-import org.rfcx.companion.entity.DeploymentImage
-import org.rfcx.companion.entity.SyncState
-import org.rfcx.companion.entity.Tracking
-import org.rfcx.companion.entity.TrackingFile
+import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 
 class TrackingFileDb(private val realm: Realm) {
@@ -61,6 +58,12 @@ class TrackingFileDb(private val realm: Realm) {
                 file.remotePath = remotePath
             }
         }
+    }
+
+    fun getTrackingFileByDeploymentId(id: Int): TrackingFile? {
+        return realm.where(TrackingFile::class.java)
+            .equalTo(TrackingFile.FIELD_DEPLOYMENT_ID, id)
+            .findFirst()
     }
 
     fun insertOrUpdate(file: TrackingFile) {

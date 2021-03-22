@@ -215,6 +215,7 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
                         it.longitude,
                         "\"${it.locationName}.${it.id}\""
                     )
+                    (activity as MainActivity).showTrackOnMap(it.id)
                 }
             }
         }

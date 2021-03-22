@@ -28,19 +28,22 @@ object GeoJsonUtils {
         json.addProperty("type", "FeatureCollection")
 
         //create features
-        val tempJson = JsonObject()
-        tempJson.addProperty("type", "Feature")
+        val featureArray = JsonArray()
+
+        val featureItem = JsonObject()
+        featureItem.addProperty("type", "Feature")
 
         //create Geometry type
         val geometry = JsonObject()
         geometry.addProperty("type", "LineString")
         //create Geometry coordinate
         geometry.add("coordinates", points.toJsonArray())
+        featureItem.add("geometry", geometry)
 
-        tempJson.add("geometry", geometry)
+        featureArray.add(featureItem)
 
         //combine all data
-        json.add("features", gson.toJsonTree(tempJson))
+        json.add("features", gson.toJsonTree(featureArray).asJsonArray)
 
         //write to file
         return createFile(context, fileName, json)
