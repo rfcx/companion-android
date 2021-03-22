@@ -291,7 +291,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
             //track getting
             if (preferences.getBoolean(ENABLE_LOCATION_TRACKING)) {
-                val track = trackingDb.getTracking()[0]
+                val track = Tracking()
                 val point = track.points.map { cd -> cd.toDoubleArray() }
                 val trackingFile = TrackingFile(
                     deploymentId = it.id,

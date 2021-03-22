@@ -11,7 +11,7 @@ import java.util.*
 object GeoJsonUtils {
 
     fun generateFileName(deployedAt: Date, deploymentId: String): String {
-        return "$deployedAt-$deploymentId.geojson"
+        return "$deployedAt-$deploymentId.json"
     }
 
     fun generateGeoJson(context: Context, fileName: String, points: List<DoubleArray>): File {

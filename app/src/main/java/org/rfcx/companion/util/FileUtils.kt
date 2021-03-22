@@ -7,7 +7,8 @@ import java.util.*
 
 object FileUtils {
 
-    fun File.getMimeType(fallback: String = "image/*"): String {
+    // default for json file
+    fun File.getMimeType(fallback: String = "application/json"): String {
         return MimeTypeMap.getFileExtensionFromUrl(toString())
             ?.run { MimeTypeMap.getSingleton().getMimeTypeFromExtension(toLowerCase(Locale.getDefault())) }
             ?: fallback

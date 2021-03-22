@@ -292,7 +292,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         Tracking(
                             startAt = it.startAt,
                             stopAt = Date(),
-                            points = points
+                            points = points!!
                         )
                     )
                 }
