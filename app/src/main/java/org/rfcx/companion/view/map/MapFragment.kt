@@ -66,8 +66,10 @@ import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.repo.Firestore
 import org.rfcx.companion.service.DeploymentSyncWorker
+import org.rfcx.companion.service.DownloadAssetsWorker
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
+import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import retrofit2.Call
@@ -839,50 +841,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun retrieveAssets(context: Context) {
-        val token = "Bearer ${context.getIdToken()}"
-
-        edgeDeployments.forEach { dp ->
-            if (dp.serverId != null) {
-                ApiManager.getInstance().getDeviceApi().getAssets(token, dp.serverId!!)
-                    .enqueue(object : Callback<List<DeploymentAssetResponse>> {
-                        override fun onFailure(
-                            call: Call<List<DeploymentAssetResponse>>,
-                            t: Throwable
-                        ) {
-                            combinedData()
-                            if (context.isNetworkAvailable()) {
-                                Toast.makeText(
-                                    context,
-                                    R.string.error_has_occurred,
-                                    Toast.LENGTH_SHORT
-                                )
-                                    .show()
-                            }
-                        }
-
-                        override fun onResponse(
-                            call: Call<List<DeploymentAssetResponse>>,
-                            response: Response<List<DeploymentAssetResponse>>
-                        ) {
-                            response.body()?.forEach { item ->
-                                if (item.mimeType.startsWith("image")) {
-                                    deploymentImageDb.insertOrUpdate(
-                                        item,
-                                        dp.id,
-                                        Device.AUDIOMOTH.value
-                                    )
-                                } else if(item.mimeType.endsWith("geo+json")) {
-                                    trackingFileDb.insertOrUpdate(
-                                        item,
-                                        dp.id,
-                                        Device.AUDIOMOTH.value
-                                    )
-                                }
-                            }
-                        }
-                    })
-            }
-        }
+        DownloadAssetsWorker.enqueue(context)
     }
 
     private fun fetchJobSyncing() {

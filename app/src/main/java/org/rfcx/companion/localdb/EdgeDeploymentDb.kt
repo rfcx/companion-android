@@ -53,6 +53,12 @@ class EdgeDeploymentDb(private val realm: Realm) {
             .findAllAsync()
     }
 
+    fun getAll(sort: Sort = Sort.DESCENDING): RealmResults<EdgeDeployment> {
+        return realm.where(EdgeDeployment::class.java)
+            .sort(EdgeDeployment.FIELD_ID, sort)
+            .findAll()
+    }
+
     fun insertOrUpdate(deployment: EdgeDeployment, location: DeploymentLocation): Int {
         var id = deployment.id
         realm.executeTransaction {

@@ -58,6 +58,13 @@ interface DeviceApiInterface {
         @Path("id") id: String
     ): Call<List<DeploymentAssetResponse>>
 
+    @Streaming
+    @GET("assets/{id}")
+    fun getGeoJsonFile(
+        @Header("Authorization") authUser: String,
+        @Path("id") id: String
+    ): Call<ResponseBody>
+
     @GET("streams")
     fun getStreams(@Header("Authorization") authUser: String,
                    @Query("limit") limit: Int = 100,
