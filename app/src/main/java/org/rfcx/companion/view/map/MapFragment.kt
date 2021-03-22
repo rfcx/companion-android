@@ -90,7 +90,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
-    private val trackingDb by lazy { TrackingDb(realm) }
     private val diagnosticDb by lazy { DiagnosticDb(realm) }
 
     // data

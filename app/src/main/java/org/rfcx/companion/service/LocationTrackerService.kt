@@ -16,21 +16,29 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
+import io.realm.Realm
+import io.realm.RealmList
 import org.rfcx.companion.MainActivity
 import org.rfcx.companion.R
+import org.rfcx.companion.entity.Coordinate
+import org.rfcx.companion.entity.Tracking
+import org.rfcx.companion.localdb.TrackingDb
 import org.rfcx.companion.util.Preferences
+import org.rfcx.companion.util.RealmHelper
+import java.util.*
 
 class LocationTrackerService : Service() {
+    private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
+    private val trackingDb by lazy { TrackingDb(realm) }
+
     private val binder = LocationTrackerServiceBinder()
     private var mLocationManager: LocationManager? = null
     private var isLocationAvailability: Boolean = true
+    private var tracking = Tracking()
 
     private val locationListener = object : LocationListener {
         override fun onLocationChanged(location: Location?) {
-            Log.i(
-                TAG,
-                "onLocationChanged ${location?.longitude}, ${location?.longitude}, ${location?.altitude}"
-            )
+            location?.let { saveLocation(it) }
         }
 
         override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
@@ -49,6 +57,25 @@ class LocationTrackerService : Service() {
         if (Preferences.getInstance(this).getString(Preferences.ID_TOKEN, "").isNotEmpty()) {
             startTracker()
         }
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
+        return START_NOT_STICKY
+    }
+
+    private fun saveLocation(location: Location) {
+        tracking.id = 1
+        tracking.stopAt = Date()
+        tracking.points = tracking.points ?: RealmList<Coordinate>()
+        tracking.points?.add(
+            Coordinate(
+                latitude = location.latitude,
+                longitude = location.longitude,
+                altitude = location.altitude
+            )
+        )
+        trackingDb.insertOrUpdate(tracking)
     }
 
     private fun startTracker() {
