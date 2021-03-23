@@ -5,8 +5,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.PointF
 import android.location.Location
-import android.net.Uri
-import android.net.Uri.fromFile
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
@@ -45,8 +43,7 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.style.expressions.Expression.*
 import com.mapbox.mapboxsdk.style.layers.CircleLayer
 import com.mapbox.mapboxsdk.style.layers.LineLayer
-import com.mapbox.mapboxsdk.style.layers.Property.LINE_CAP_ROUND
-import com.mapbox.mapboxsdk.style.layers.Property.LINE_JOIN_ROUND
+import com.mapbox.mapboxsdk.style.layers.Property.*
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
@@ -64,7 +61,6 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.guardian.toMark
-import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.localdb.*
@@ -83,7 +79,6 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
-import java.net.URI
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -504,8 +499,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun setupMarkerLayers(style: Style) {
 
-        val line = LineLayer("line-layer", SOURCE_LINE)
-        line.setProperties()
+        val line = LineLayer("line-layer", SOURCE_LINE).withProperties(
+            lineCap(LINE_CAP_SQUARE),
+            lineJoin(LINE_JOIN_MITER),
+            lineOpacity(.7f),
+            lineWidth(7f),
+            lineColor(Color.parseColor("#3bb2d0"))
+        )
+
         style.addLayer(line)
 
         val unclusteredSiteLayer =
@@ -615,6 +616,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             return true
         } else {
             (activity as MainActivityListener).hideBottomSheet()
+            hideTrackOnMap()
         }
 
         if (deploymentClusterFeatures != null && deploymentClusterFeatures.isNotEmpty()) {
@@ -1084,11 +1086,18 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     fun showTrackOnMap(id: Int) {
+        //remove the previous one
+        hideTrackOnMap()
         val track = trackingFileDb.getTrackingFileByDeploymentId(id)
         track?.let {
             val json = File(it.localPath).readText()
-            lineSource!!.setGeoJson(json)
+            lineSource!!.setGeoJson(FeatureCollection.fromJson(json))
         }
+    }
+
+    private fun hideTrackOnMap() {
+        //reset source
+        lineSource!!.setGeoJson(FeatureCollection.fromFeatures(listOf()))
     }
 
     override fun onStart() {
