@@ -8,12 +8,14 @@ import android.location.Location
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.SearchView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
@@ -72,6 +74,8 @@ import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -90,6 +94,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val locateDb by lazy { LocateDb(realm) }
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
     private val diagnosticDb by lazy { DiagnosticDb(realm) }
+    private val trackingDb by lazy { TrackingDb(realm) }
 
     // data
     private var guardianDeployments = listOf<GuardianDeployment>()
@@ -262,11 +267,57 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             val enableTracking =
                 preferences?.getBoolean(Preferences.ENABLE_LOCATION_TRACKING, false) ?: false
             if (!enableTracking) {
-                context?.let { context -> LocationTracking.set(context, true) }
+                withinTenMin()
             } else {
                 context?.let { context -> LocationTracking.set(context, false) }
             }
             setColorTrackingButton()
+        }
+    }
+
+    private fun withinTenMin() {
+        if (trackingDb.getCountTracking() != 0) {
+            val time = trackingDb.getTracking()[0].stopAt?.time?.plus(10 * 60000)
+            time?.let {
+                if (it > Date().time) {
+                    confirmationDialog()
+                } else {
+                    trackingDb.deleteTracking(1)
+                    context?.let { context -> LocationTracking.set(context, true) }
+                    setColorTrackingButton()
+                }
+            }
+        } else {
+            context?.let { context -> LocationTracking.set(context, true) }
+            setColorTrackingButton()
+        }
+    }
+
+    private fun confirmationDialog() {
+        context?.let {
+            val builder = AlertDialog.Builder(it, R.style.DialogCustom)
+            builder.setTitle(getString(R.string.continue_tracking))
+            builder.setMessage(getString(R.string.want_to_continue))
+
+            builder.setPositiveButton(getString(R.string.continue_text)) { _, _ ->
+                context?.let { context -> LocationTracking.set(context, true) }
+                setColorTrackingButton()
+            }
+            builder.setNegativeButton(getString(R.string.cancel)) { _, _ -> }
+            builder.setNeutralButton(getString(R.string.new_tracking)) { _, _ ->
+                trackingDb.deleteTracking(1)
+                context?.let { context -> LocationTracking.set(context, true) }
+                setColorTrackingButton()
+            }
+
+            val dialog: AlertDialog = builder.create()
+            dialog.show()
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                .setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0f)
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                .setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0f)
+            dialog.getButton(AlertDialog.BUTTON_NEUTRAL)
+                .setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0f)
         }
     }
 

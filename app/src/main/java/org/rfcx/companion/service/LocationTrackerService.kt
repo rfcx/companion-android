@@ -12,12 +12,10 @@ import android.os.Binder
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import io.realm.Realm
-import io.realm.RealmList
 import org.rfcx.companion.MainActivity
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Coordinate
@@ -25,7 +23,6 @@ import org.rfcx.companion.entity.Tracking
 import org.rfcx.companion.localdb.TrackingDb
 import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.RealmHelper
-import java.util.*
 
 class LocationTrackerService : Service() {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
@@ -66,16 +63,12 @@ class LocationTrackerService : Service() {
 
     private fun saveLocation(location: Location) {
         tracking.id = 1
-        tracking.stopAt = Date()
-        tracking.points = tracking.points ?: RealmList<Coordinate>()
-        tracking.points?.add(
-            Coordinate(
-                latitude = location.latitude,
-                longitude = location.longitude,
-                altitude = location.altitude
-            )
+        val coordinate = Coordinate(
+            latitude = location.latitude,
+            longitude = location.longitude,
+            altitude = location.altitude
         )
-        trackingDb.insertOrUpdate(tracking)
+        trackingDb.insertOrUpdate(tracking, coordinate)
     }
 
     private fun startTracker() {
