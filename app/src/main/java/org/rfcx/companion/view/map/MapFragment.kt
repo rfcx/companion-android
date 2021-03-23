@@ -266,7 +266,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         searchView.setOnSearchClickListener {
             listView.visibility = View.VISIBLE
-            buttonOnMapGroup.visibility = View.GONE
+            hideButtonOnMap()
             projectNameTextView.visibility = View.GONE
             val state = listener?.getBottomSheetState() ?: 0
             if (state == BottomSheetBehavior.STATE_EXPANDED) {
@@ -278,7 +278,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         searchView.setOnCloseListener {
             listView.visibility = View.GONE
-            buttonOnMapGroup.visibility = View.VISIBLE
+            showButtonOnMap()
             projectNameTextView.visibility = View.VISIBLE
             listener?.showBottomAppBar()
             listener?.clearFeatureSelectedOnMap()
@@ -286,7 +286,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
 
         if (searchView.isIconified) {
-            buttonOnMapGroup.visibility = View.VISIBLE
+            showButtonOnMap()
         }
 
         listView.setOnItemClickListener { parent, view, position, id ->
@@ -1001,6 +1001,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 }
             }
         }
+    }
+
+    fun showButtonOnMap() {
+        buttonOnMapGroup.visibility = View.VISIBLE
+    }
+
+    fun hideButtonOnMap() {
+        buttonOnMapGroup.visibility = View.GONE
     }
 
     override fun onStart() {
