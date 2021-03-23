@@ -20,15 +20,9 @@ import org.rfcx.companion.util.getIdToken
 class DownloadAssetsWorker(val context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
 
-    private var count = 0
-    private var currentStreamsLoading = 0
     private var someFailed = false
 
     override suspend fun doWork(): Result {
-        //reset to default
-        count = 0
-        currentStreamsLoading = 0
-        someFailed = false
 
         Log.d(TAG, "doWork on DownloadAssets")
 

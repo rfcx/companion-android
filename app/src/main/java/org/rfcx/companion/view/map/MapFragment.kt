@@ -129,8 +129,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private lateinit var arrayListOfSite: ArrayList<String>
     private lateinit var adapterOfSearchSite: ArrayAdapter<String>
     private var isRotate = false
-    private var points: RealmList<Coordinate>? = null
-    private var tracking: Tracking? = null
 
     private val mapboxLocationChangeCallback =
         object : LocationEngineCallback<LocationEngineResult> {

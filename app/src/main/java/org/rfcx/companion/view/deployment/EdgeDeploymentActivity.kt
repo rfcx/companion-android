@@ -291,13 +291,15 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
             //track getting
             if (preferences.getBoolean(ENABLE_LOCATION_TRACKING)) {
-                val track = Tracking()
-                val point = listOf(listOf(100.30112, 16.81424).toDoubleArray(), listOf(100.30143, 16.81552).toDoubleArray(), listOf(100.30173, 16.81668).toDoubleArray(), listOf(100.30085, 16.81696).toDoubleArray(), listOf(100.29997, 16.81715).toDoubleArray())
-                val trackingFile = TrackingFile(
-                    deploymentId = it.id,
-                    localPath = GeoJsonUtils.generateGeoJson(this, GeoJsonUtils.generateFileName(it.deployedAt, it.deploymentKey!!), point).absolutePath
-                )
-                trackingFileDb.insertOrUpdate(trackingFile)
+                val track = trackingDb.getFirstTracking()
+                track?.let { t ->
+                    val point = t.points.toListDoubleArray()
+                    val trackingFile = TrackingFile(
+                        deploymentId = it.id,
+                        localPath = GeoJsonUtils.generateGeoJson(this, GeoJsonUtils.generateFileName(it.deployedAt, it.deploymentKey!!), point).absolutePath
+                    )
+                    trackingFileDb.insertOrUpdate(trackingFile)
+                }
             }
 
             analytics.trackCreateAudiomothDeploymentEvent()

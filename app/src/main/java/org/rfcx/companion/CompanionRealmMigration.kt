@@ -273,7 +273,6 @@ class CompanionRealmMigration : RealmMigration {
                 .setNullable(Tracking.TRACKING_START_AT, false)
             addField(Tracking.TRACKING_STOP_AT, Date::class.java)
             addRealmListField(Tracking.TRACKING_POINTS, coordinate)
-                .setNullable(Tracking.TRACKING_POINTS, false)
         }
     }
 

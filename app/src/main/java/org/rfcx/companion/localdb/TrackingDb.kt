@@ -32,6 +32,10 @@ class TrackingDb(private val realm: Realm) {
         }
     }
 
+    fun getFirstTracking(): Tracking? {
+        return realm.where(Tracking::class.java).findFirst()
+    }
+
     fun getTracking(): List<Tracking> {
         return realm.where(Tracking::class.java).findAll() ?: arrayListOf()
     }
