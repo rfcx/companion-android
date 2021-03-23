@@ -9,12 +9,14 @@ import android.os.Bundle
 import android.os.Looper
 import android.util.Log
 import android.util.Property
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.SearchView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
@@ -143,20 +145,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     if (isFirstTime && locations.isNotEmpty()) {
                         moveCameraOnStart()
                         isFirstTime = false
-                    }
-
-                    val preferences = context?.let { it1 -> Preferences.getInstance(it1) }
-                    val enableTracking =
-                        preferences?.getBoolean(Preferences.ENABLE_LOCATION_TRACKING, false)
-                            ?: false
-                    if (enableTracking) {
-                        points?.add(
-                            Coordinate(
-                                latitude = location.latitude,
-                                longitude = location.longitude,
-                                altitude = location.altitude
-                            )
-                        )
                     }
                 }
             }
@@ -288,22 +276,58 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             val preferences = context?.let { it1 -> Preferences.getInstance(it1) }
             val enableTracking =
                 preferences?.getBoolean(Preferences.ENABLE_LOCATION_TRACKING, false) ?: false
-            preferences?.putBoolean(Preferences.ENABLE_LOCATION_TRACKING, !enableTracking)
-            setColorTrackingButton()
             if (!enableTracking) {
-                points = RealmList()
-                tracking = Tracking(startAt = Date())
+                withinTenMin()
             } else {
-                tracking?.let {
-                    trackingDb.insertOrUpdate(
-                        Tracking(
-                            startAt = it.startAt,
-                            stopAt = Date(),
-                            points = points!!
-                        )
-                    )
+                context?.let { context -> LocationTracking.set(context, false) }
+            }
+            setColorTrackingButton()
+        }
+    }
+
+    private fun withinTenMin() {
+        if (trackingDb.getCountTracking() != 0) {
+            val time = trackingDb.getTracking()[0].stopAt?.time?.plus(10 * 60000)
+            time?.let {
+                if (it > Date().time) {
+                    confirmationDialog()
+                } else {
+                    trackingDb.deleteTracking(1)
+                    context?.let { context -> LocationTracking.set(context, true) }
+                    setColorTrackingButton()
                 }
             }
+        } else {
+            context?.let { context -> LocationTracking.set(context, true) }
+            setColorTrackingButton()
+        }
+    }
+
+    private fun confirmationDialog() {
+        context?.let {
+            val builder = AlertDialog.Builder(it, R.style.DialogCustom)
+            builder.setTitle(getString(R.string.continue_tracking))
+            builder.setMessage(getString(R.string.want_to_continue))
+
+            builder.setPositiveButton(getString(R.string.continue_text)) { _, _ ->
+                context?.let { context -> LocationTracking.set(context, true) }
+                setColorTrackingButton()
+            }
+            builder.setNegativeButton(getString(R.string.cancel)) { _, _ -> }
+            builder.setNeutralButton(getString(R.string.new_tracking)) { _, _ ->
+                trackingDb.deleteTracking(1)
+                context?.let { context -> LocationTracking.set(context, true) }
+                setColorTrackingButton()
+            }
+
+            val dialog: AlertDialog = builder.create()
+            dialog.show()
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                .setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0f)
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                .setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0f)
+            dialog.getButton(AlertDialog.BUTTON_NEUTRAL)
+                .setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0f)
         }
     }
 

@@ -1,18 +1,34 @@
 package org.rfcx.companion.localdb
 
 import io.realm.Realm
+import org.rfcx.companion.entity.Coordinate
 import org.rfcx.companion.entity.Tracking
+import java.util.*
 
 class TrackingDb(private val realm: Realm) {
-    fun insertOrUpdate(tracking: Tracking) {
+    fun insertOrUpdate(tracking: Tracking, coordinate: Coordinate) {
         realm.executeTransaction {
-            if (tracking.id == 0) {
-                val id =
-                    (realm.where(Tracking::class.java).max(Tracking.TRACKING_ID)
-                        ?.toInt() ?: 0) + 1
-                tracking.id = id
+            val track =
+                it.where(Tracking::class.java).equalTo(Tracking.TRACKING_ID, tracking.id)
+                    .findFirst()
+
+            if (track != null) {
+                tracking.startAt = track.startAt
+                tracking.points = track.points
             }
+
+            tracking.stopAt = Date()
+            tracking.points.add(coordinate)
             it.insertOrUpdate(tracking)
+        }
+    }
+
+    fun deleteTracking(id: Int) {
+        realm.executeTransaction {
+            val tracking =
+                it.where(Tracking::class.java).equalTo(Tracking.TRACKING_ID, id)
+                    .findFirst()
+            tracking?.deleteFromRealm()
         }
     }
 
