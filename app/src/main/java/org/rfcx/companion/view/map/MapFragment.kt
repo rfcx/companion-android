@@ -242,7 +242,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-        ViewAnimation().init(trackingButton)
         ViewAnimation().init(zoomInButton)
         ViewAnimation().init(zoomOutButton)
         ViewAnimation().init(currentLocationButton)
@@ -250,28 +249,36 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         addButton.setOnClickListener {
             isRotate = ViewAnimation().rotateFab(it, !isRotate)
             if (isRotate) {
-                ViewAnimation().showIn(trackingButton)
                 ViewAnimation().showIn(zoomInButton)
                 ViewAnimation().showIn(zoomOutButton)
                 ViewAnimation().showIn(currentLocationButton)
             } else {
-                ViewAnimation().showOut(trackingButton)
                 ViewAnimation().showOut(zoomInButton)
                 ViewAnimation().showOut(zoomOutButton)
                 ViewAnimation().showOut(currentLocationButton)
             }
         }
 
-        trackingButton.setOnClickListener {
-            val preferences = context?.let { it1 -> Preferences.getInstance(it1) }
-            val enableTracking =
-                preferences?.getBoolean(Preferences.ENABLE_LOCATION_TRACKING, false) ?: false
-            if (!enableTracking) {
+        locationTrackingSwitch.setOnCheckedChangeListener { _, isChecked ->
+            setTrackingSwitch(isChecked)
+            if (isChecked) {
                 withinTenMin()
             } else {
                 context?.let { context -> LocationTracking.set(context, false) }
             }
-            setColorTrackingButton()
+        }
+    }
+
+    private fun setTrackingSwitch(isChecked: Boolean) {
+        statusTextView.text =
+            if (isChecked) getString(R.string.on_duty) else getString(R.string.not_tracking)
+        context?.let {
+            statusTextView.setTextColor(
+                ContextCompat.getColor(
+                    it,
+                    if (isChecked) R.color.colorPrimary else R.color.text_secondary
+                )
+            )
         }
     }
 
@@ -296,6 +303,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private fun confirmationDialog() {
         context?.let {
             val builder = AlertDialog.Builder(it, R.style.DialogCustom)
+            builder.setCancelable(false)
             builder.setTitle(getString(R.string.continue_tracking))
             builder.setMessage(getString(R.string.want_to_continue))
 
@@ -303,7 +311,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 context?.let { context -> LocationTracking.set(context, true) }
                 setColorTrackingButton()
             }
-            builder.setNegativeButton(getString(R.string.cancel)) { _, _ -> }
+            builder.setNegativeButton(getString(R.string.cancel)) { _, _ ->
+                locationTrackingSwitch.isChecked = false
+            }
             builder.setNeutralButton(getString(R.string.new_tracking)) { _, _ ->
                 trackingDb.deleteTracking(1)
                 context?.let { context -> LocationTracking.set(context, true) }
@@ -325,13 +335,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val preferences = context?.let { it1 -> Preferences.getInstance(it1) }
         val enableTracking =
             preferences?.getBoolean(Preferences.ENABLE_LOCATION_TRACKING, false) ?: false
-        trackingButton.supportImageTintList =
-            context?.let { it1 ->
-                ContextCompat.getColorStateList(
-                    it1,
-                    if (enableTracking) R.color.colorPrimary else R.color.grey_active
-                )
-            }
+        setTrackingSwitch(enableTracking)
+        locationTrackingSwitch.isChecked = enableTracking
     }
 
     private fun setupSearch() {

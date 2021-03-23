@@ -89,20 +89,7 @@
         android:id="@+id/buttonOnMapGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="trackingButton,zoomInButton,zoomOutButton,currentLocationButton" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/trackingButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/margin_padding_small"
-        android:src="@drawable/ic_tacking"
-        app:backgroundTint="@color/white"
-        app:fabCustomSize="@dimen/zoom_loc_size"
-        app:layout_constraintBottom_toTopOf="@id/zoomInButton"
-        app:layout_constraintEnd_toEndOf="@id/guidelineVertical"
-        app:layout_constraintStart_toStartOf="@id/guidelineVertical"
-        app:tint="@color/grey_active" />
+        app:constraint_referenced_ids="locationTrackingSwitch,statusTextView,zoomInButton,zoomOutButton,currentLocationButton" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/zoomInButton"
@@ -148,13 +135,36 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/current_loc_margin"
+        android:rotation="180"
         android:src="@drawable/ic_drop_down"
         app:backgroundTint="@color/white"
-        android:rotation="180"
         app:fabCustomSize="@dimen/current_loc_size"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/guidelineVertical"
         app:layout_constraintStart_toStartOf="@id/guidelineVertical"
         app:tint="@color/colorPrimary" />
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/locationTrackingSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/statusTextView"
+        app:layout_constraintEnd_toEndOf="@id/statusTextView"
+        app:layout_constraintStart_toStartOf="@id/statusTextView"
+        app:showText="false"
+        tools:checked="false" />
+
+    <TextView
+        android:id="@+id/statusTextView"
+        style="@style/AudioMothText.Title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_normal"
+        android:layout_marginBottom="@dimen/current_loc_margin"
+        android:text="@string/not_tracking"
+        android:textAllCaps="false"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
