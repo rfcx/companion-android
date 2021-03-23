@@ -339,6 +339,8 @@
     <string name="continue_tracking">Continue tracking?</string>
     <string name="want_to_continue">Do you want to continue your tracking location or not</string>
     <string name="new_tracking">New tracking</string>
+    <string name="on_duty">On duty</string>
+    <string name="not_tracking">Not tracking</string>
 
     <!-- Search Location -->
     <string name="search_box_hint">Search here</string>
