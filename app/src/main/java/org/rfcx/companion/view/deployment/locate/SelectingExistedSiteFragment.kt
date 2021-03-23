@@ -4,16 +4,14 @@ import android.content.Context
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.snackbar.Snackbar
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_selecting_existed_site.*
 import org.rfcx.companion.R
@@ -22,7 +20,6 @@ import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.repo.ApiManager
-import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.asLiveData
 import org.rfcx.companion.util.getIdToken
@@ -33,7 +30,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class SelectingExistedSiteFragment : Fragment(), (Locate) -> Unit {
+class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener, (Locate) -> Unit {
     private val existedSiteAdapter by lazy { ExistedSiteAdapter(this) }
     private var mapPickerProtocol: MapPickerProtocol? = null
     private var deploymentProtocol: EdgeDeploymentProtocol? = null
@@ -56,6 +53,18 @@ class SelectingExistedSiteFragment : Fragment(), (Locate) -> Unit {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initIntent()
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.search_menu, menu)
+        val searchItem = menu.findItem(R.id.searchView)
+
+        val searchView: SearchView = searchItem.actionView as SearchView
+        searchView.queryHint = getString(R.string.search_box_hint)
+        searchView.setOnQueryTextListener(this)
+
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onAttach(context: Context) {
@@ -127,8 +136,9 @@ class SelectingExistedSiteFragment : Fragment(), (Locate) -> Unit {
                 0F
             )
         )
-        val locationsItems: List<SiteItem> = nearLocations?.map { SiteItem(it.first, it.second) } ?: listOf()
-        existedSiteAdapter.items = createNew + locationsItems
+        val locationsItems: List<SiteItem> =
+            nearLocations?.map { SiteItem(it.first, it.second) } ?: listOf()
+        existedSiteAdapter.items = ArrayList(createNew + locationsItems)
     }
 
     private fun findNearLocations(
@@ -158,6 +168,7 @@ class SelectingExistedSiteFragment : Fragment(), (Locate) -> Unit {
     }
 
     companion object {
+        const val tag = "SelectingExistedSiteFragment"
         const val ARG_LATITUDE = "ARG_LATITUDE"
         const val ARG_LONGITUDE = "ARG_LONGITUDE"
 
@@ -202,5 +213,17 @@ class SelectingExistedSiteFragment : Fragment(), (Locate) -> Unit {
             false
         )
         context?.let { retrieveProjects(it) }
+    }
+
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        Toast.makeText(context, "Query Inserted", Toast.LENGTH_SHORT).show()
+        return true
+    }
+
+    override fun onQueryTextChange(newText: String?): Boolean {
+        if (newText != null) {
+            existedSiteAdapter.filter(newText)
+        }
+        return true
     }
 }
