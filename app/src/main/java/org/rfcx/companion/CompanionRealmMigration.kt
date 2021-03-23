@@ -255,11 +255,11 @@ class CompanionRealmMigration : RealmMigration {
         val coordinate = realm.schema.create(Coordinate.TABLE_NAME)
         coordinate.apply {
             addField(Coordinate.COORDINATE_LATITUDE, Double::class.java)
-                .setNullable(Coordinate.COORDINATE_LATITUDE, true)
+                .setNullable(Coordinate.COORDINATE_LATITUDE, false)
             addField(Coordinate.COORDINATE_LONGITUDE, Double::class.java)
-                .setNullable(Coordinate.COORDINATE_LONGITUDE, true)
+                .setNullable(Coordinate.COORDINATE_LONGITUDE, false)
             addField(Coordinate.COORDINATE_ALTITUDE, Double::class.java)
-                .setNullable(Coordinate.COORDINATE_ALTITUDE, true)
+                .setNullable(Coordinate.COORDINATE_ALTITUDE, false)
         }
 
         val tracking = realm.schema.create(Tracking.TABLE_NAME)
