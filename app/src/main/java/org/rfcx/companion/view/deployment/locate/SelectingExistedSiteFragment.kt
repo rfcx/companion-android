@@ -22,6 +22,7 @@ import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.repo.ApiManager
+import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.asLiveData
@@ -51,6 +52,9 @@ class SelectingExistedSiteFragment : Fragment(), (Locate) -> Unit {
     private val locateObserve = Observer<List<Locate>> {
         this.locations = it
         setupView()
+        if (deploymentProtocol?.isSiteLoading() == DownloadStreamState.FINISH) {
+            showDialog()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -98,11 +102,9 @@ class SelectingExistedSiteFragment : Fragment(), (Locate) -> Unit {
     }
 
     private fun showDialog() {
-        val shouldShow = deploymentProtocol?.isSiteLoading()
-        if (shouldShow == true) {
-            deploymentProtocol?.showSiteLoadingDialog()
-        } else {
-            deploymentProtocol?.showSiteLoadingDialog()
+        when(deploymentProtocol?.isSiteLoading()) {
+            DownloadStreamState.RUNNING -> deploymentProtocol?.showSiteLoadingDialog(requireContext().getString(R.string.sites_loading_dialog))
+            DownloadStreamState.FINISH -> deploymentProtocol?.showSiteLoadingDialog(requireContext().getString(R.string.sites_loading_finish_dialog))
         }
     }
 
