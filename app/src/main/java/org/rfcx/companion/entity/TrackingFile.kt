@@ -18,7 +18,7 @@ open class TrackingFile(
     var device: String = ""
 ) : RealmModel {
     companion object {
-        const val TABLE_NAME = "DeploymentImage"
+        const val TABLE_NAME = "TrackingFile"
         const val FIELD_ID = "id"
         const val FIELD_DEPLOYMENT_ID = "deploymentId"
         const val FIELD_DEPLOYMENT_SERVER_ID = "deploymentServerId"
