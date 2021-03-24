@@ -75,6 +75,41 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/topBarLayout" />
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/showLabelLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/listView"
+        app:layout_constraintEnd_toEndOf="@id/listView"
+        app:layout_constraintStart_toStartOf="@id/listView"
+        app:layout_constraintTop_toTopOf="@id/listView">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/notHaveSiteTextView"
+            style="@style/AudioMothText.Subhead.Bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/not_have_sites"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/notHaveResultTextView"
+            style="@style/AudioMothText.Subhead.Bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_result_found"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="@dimen/progress_bar"

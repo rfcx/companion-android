@@ -116,8 +116,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
-    private var currentSiteLoading = 0
-
     private lateinit var arrayListOfSite: ArrayList<String>
     private lateinit var adapterOfSearchSite: ArrayAdapter<String>
 
@@ -203,6 +201,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         fetchData()
         setupSearch()
         progressBar.visibility = View.VISIBLE
+        hideLabel()
 
         currentLocationButton.setOnClickListener {
             mapboxMap?.locationComponent?.isLocationComponentActivated?.let {
@@ -247,19 +246,33 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    private fun showLabel(isNotFound: Boolean) {
+        if (!searchView.isIconified) {
+            showLabelLayout.visibility = View.VISIBLE
+            notHaveSiteTextView.visibility = if (isNotFound) View.GONE else View.VISIBLE
+            notHaveResultTextView.visibility = if (isNotFound) View.VISIBLE else View.GONE
+        }
+    }
+
+    private fun hideLabel() {
+        showLabelLayout.visibility = View.GONE
+    }
+
     private fun setupSearch() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
-                if (arrayListOfSite.contains(query)) {
-                    adapterOfSearchSite.filter.filter(query)
-                } else {
-                    Toast.makeText(context, R.string.no_result_found, Toast.LENGTH_LONG).show()
-                }
-                return false
+                return true
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                adapterOfSearchSite.filter.filter(newText)
+                context?.let {
+                    val text = newText.toLowerCase()
+                    val newList: ArrayList<String> = arrayListOf()
+                    newList.addAll(arrayListOfSite.filter { site -> site.toLowerCase().contains(text) })
+                    adapterOfSearchSite = ArrayAdapter(it, android.R.layout.simple_list_item_1, newList)
+                    if (newList.isEmpty()) showLabel(true) else hideLabel()
+                    listView.adapter = adapterOfSearchSite
+                }
                 return false
             }
         })
@@ -274,9 +287,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             } else {
                 listener?.hidBottomAppBar()
             }
+
+            if (listView.adapter.isEmpty) {
+                showLabel(false)
+            } else {
+                hideLabel()
+            }
         }
 
         searchView.setOnCloseListener {
+            hideLabel()
             listView.visibility = View.GONE
             showButtonOnMap()
             projectNameTextView.visibility = View.VISIBLE
@@ -294,7 +314,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
             projectName?.let { name ->
                 val item = locateDb.getLocateByName(name)
-                item?.let { mapboxMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(it.getLatLng(), DEFAULT_ZOOM_LEVEL)) }
+                item?.let {
+                    mapboxMap?.animateCamera(
+                        CameraUpdateFactory.newLatLngZoom(
+                            it.getLatLng(),
+                            DEFAULT_ZOOM_LEVEL
+                        )
+                    )
+                }
 
                 val deployment = edgeDeploymentDb.getDeploymentBySiteName(name)
                 if (deployment != null) {
@@ -347,8 +374,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     .withCluster(true)
                     .withClusterMaxZoom(20)
                     .withClusterRadius(30)
-                    .withClusterProperty(PROPERTY_CLUSTER_TYPE, sum(accumulated(), get(PROPERTY_CLUSTER_TYPE)), switchCase(
-                        eq(get(PROPERTY_DEPLOYMENT_MARKER_IMAGE), Battery.BATTERY_PIN_GREEN), literal(1), literal(0)))
+                    .withClusterProperty(
+                        PROPERTY_CLUSTER_TYPE,
+                        sum(accumulated(), get(PROPERTY_CLUSTER_TYPE)),
+                        switchCase(
+                            eq(get(PROPERTY_DEPLOYMENT_MARKER_IMAGE), Battery.BATTERY_PIN_GREEN),
+                            literal(1),
+                            literal(0)
+                        )
+                    )
             )
 
         style.addSource(mapSource!!)
@@ -434,7 +468,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         style.addLayer(unclusteredSiteLayer)
         style.addLayer(unclusteredDeploymentLayer)
 
-        val layers = arrayOf(intArrayOf(0, Color.parseColor("#98A0A9")), intArrayOf(1, Color.parseColor("#2AA841")))
+        val layers = arrayOf(
+            intArrayOf(0, Color.parseColor("#98A0A9")),
+            intArrayOf(1, Color.parseColor("#2AA841"))
+        )
 
         layers.forEachIndexed { i, ly ->
             val deploymentSymbolLayer = CircleLayer("$DEPLOYMENT_CLUSTER-$i", SOURCE_DEPLOYMENT)
@@ -450,7 +487,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 } else {
                     all(
                         gte(hasDeploymentAtLeastOne, literal(ly[0])),
-                        gt(hasDeploymentAtLeastOne, literal(layers[i-1][0]))
+                        gt(hasDeploymentAtLeastOne, literal(layers[i - 1][0]))
                     )
                 }
             )
@@ -460,7 +497,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         val deploymentCount = SymbolLayer(DEPLOYMENT_COUNT, SOURCE_DEPLOYMENT)
         deploymentCount.setProperties(
-            textField(format(formatEntry(toString(get(POINT_COUNT)), FormatOption.formatFontScale(1.5)))),
+            textField(
+                format(
+                    formatEntry(
+                        toString(get(POINT_COUNT)),
+                        FormatOption.formatFontScale(1.5)
+                    )
+                )
+            ),
             textSize(12f),
             textColor(Color.WHITE),
             textIgnorePlacement(true),
@@ -556,9 +600,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val locateObserve = Observer<List<Locate>> {
         this.locations = it
         if (DownloadStreamsWorker.isRunning()) {
-            listener?.showSnackbar(requireContext().getString(R.string.sites_downloading), Snackbar.LENGTH_SHORT)
+            listener?.showSnackbar(
+                requireContext().getString(R.string.sites_downloading),
+                Snackbar.LENGTH_SHORT
+            )
         } else {
-            listener?.showSnackbar(requireContext().getString(R.string.sites_synced), Snackbar.LENGTH_SHORT)
+            listener?.showSnackbar(
+                requireContext().getString(R.string.sites_synced),
+                Snackbar.LENGTH_SHORT
+            )
         }
         combinedData()
     }
@@ -628,6 +678,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 arrayListOfSite
             )
             listView.adapter = adapterOfSearchSite
+        }
+
+        if (filteredShowLocations.isEmpty()) {
+            showLabel(false)
+        } else {
+            hideLabel()
         }
     }
 

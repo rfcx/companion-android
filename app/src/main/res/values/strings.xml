@@ -133,6 +133,7 @@
     <string name="please_fill_information">Site name is required.</string>
     <string name="altitude_is_required">Altitude is required.</string>
     <string name="no_result_found">No result found</string>
+    <string name="not_have_sites">There are no sites in this project.</string>
 
     <!--  SelectProfileFragment  -->
     <string name="use_an_existing">Use an existing profile</string>
