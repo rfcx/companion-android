@@ -11,7 +11,7 @@ import org.rfcx.companion.util.setFormatLabel
 
 class ExistedSiteAdapter(private val itemClickListener: (Locate) -> Unit) :
     RecyclerView.Adapter<ExistedSiteAdapter.ExistedSiteAdapterViewHolder>() {
-    var items: List<SiteItem> = arrayListOf()
+    var items: ArrayList<SiteItem> = arrayListOf()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -49,5 +49,11 @@ class ExistedSiteAdapter(private val itemClickListener: (Locate) -> Unit) :
             iconAddImageView.visibility =
                 if (site.locate.name == itemView.context.getString(R.string.create_new_site)) View.VISIBLE else View.GONE
         }
+    }
+
+    fun setFilter(newList: ArrayList<SiteItem>?) {
+        items = arrayListOf()
+        items.addAll(newList ?: arrayListOf())
+        notifyDataSetChanged()
     }
 }
