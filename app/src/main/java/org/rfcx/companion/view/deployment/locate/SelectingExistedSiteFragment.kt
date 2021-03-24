@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.view.*
 import android.widget.SearchView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -63,6 +65,12 @@ class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener,
         val searchView: SearchView = searchItem.actionView as SearchView
         searchView.queryHint = getString(R.string.search_box_hint)
         searchView.setOnQueryTextListener(this)
+        context?.let {
+            DrawableCompat.setTint(
+                DrawableCompat.wrap(searchItem.icon),
+                ContextCompat.getColor(it, R.color.iconColor)
+            )
+        }
 
         super.onCreateOptionsMenu(menu, inflater)
     }
