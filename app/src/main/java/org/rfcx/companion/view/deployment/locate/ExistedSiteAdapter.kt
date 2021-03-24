@@ -11,10 +11,8 @@ import org.rfcx.companion.util.setFormatLabel
 
 class ExistedSiteAdapter(private val itemClickListener: (Locate) -> Unit) :
     RecyclerView.Adapter<ExistedSiteAdapter.ExistedSiteAdapterViewHolder>() {
-    private val copyList = arrayListOf<SiteItem>()
     var items: ArrayList<SiteItem> = arrayListOf()
         set(value) {
-            copyList.addAll(items)
             field = value
             notifyDataSetChanged()
         }
@@ -53,17 +51,9 @@ class ExistedSiteAdapter(private val itemClickListener: (Locate) -> Unit) :
         }
     }
 
-    fun filter(queryText: String) {
-        items.clear()
-        if (queryText.isEmpty()) {
-            items.addAll(copyList)
-        } else {
-            for (item in copyList) {
-                if (item.locate.name.toLowerCase().contains(queryText.toLowerCase())) {
-                    items.add(item)
-                }
-            }
-        }
+    fun setFilter(newList: ArrayList<SiteItem>?) {
+        items = arrayListOf()
+        items.addAll(newList ?: arrayListOf())
         notifyDataSetChanged()
     }
 }

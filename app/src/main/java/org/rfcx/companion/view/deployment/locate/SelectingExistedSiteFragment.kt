@@ -5,6 +5,7 @@ import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import android.widget.SearchView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -46,6 +47,7 @@ class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener,
 
     private lateinit var locateLiveData: LiveData<List<Locate>>
     private var locations = listOf<Locate>()
+    private var sites = arrayListOf<SiteItem>()
 
     private val locateObserve = Observer<List<Locate>> {
         this.locations = it
@@ -146,6 +148,7 @@ class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener,
         )
         val locationsItems: List<SiteItem> =
             nearLocations?.map { SiteItem(it.first, it.second) } ?: listOf()
+        sites = ArrayList(createNew + locationsItems)
         existedSiteAdapter.items = ArrayList(createNew + locationsItems)
     }
 
@@ -220,6 +223,7 @@ class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener,
             locate.name,
             false
         )
+        view?.hideKeyboard()
         context?.let { retrieveProjects(it) }
     }
 
@@ -230,8 +234,18 @@ class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener,
 
     override fun onQueryTextChange(newText: String?): Boolean {
         if (newText != null) {
-            existedSiteAdapter.filter(newText)
+            val text = newText.toLowerCase()
+            val newList: ArrayList<SiteItem> = ArrayList()
+            newList.addAll(sites.filter { it.locate.name.toLowerCase().contains(text) })
+            existedSiteAdapter.setFilter(newList)
         }
         return true
     }
+
+    private fun View.hideKeyboard() = this.let {
+        val inputManager =
+            context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputManager.hideSoftInputFromWindow(windowToken, 0)
+    }
+
 }
