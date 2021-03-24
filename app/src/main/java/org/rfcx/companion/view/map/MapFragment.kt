@@ -238,6 +238,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     REQUEST_CODE
                 )
             }
+
+            val state = listener?.getBottomSheetState() ?: 0
+            if (state == BottomSheetBehavior.STATE_EXPANDED) {
+                clearFeatureSelected()
+                listener?.hideBottomSheet()
+            }
         }
     }
 
