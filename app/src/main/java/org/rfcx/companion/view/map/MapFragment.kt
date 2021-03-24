@@ -260,7 +260,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         searchView.setOnSearchClickListener {
             listView.visibility = View.VISIBLE
-            buttonOnMapGroup.visibility = View.GONE
+            hideButtonOnMap()
             projectNameTextView.visibility = View.GONE
             val state = listener?.getBottomSheetState() ?: 0
             if (state == BottomSheetBehavior.STATE_EXPANDED) {
@@ -272,7 +272,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         searchView.setOnCloseListener {
             listView.visibility = View.GONE
-            buttonOnMapGroup.visibility = View.VISIBLE
+            showButtonOnMap()
             projectNameTextView.visibility = View.VISIBLE
             listener?.showBottomAppBar()
             listener?.clearFeatureSelectedOnMap()
@@ -280,7 +280,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
 
         if (searchView.isIconified) {
-            buttonOnMapGroup.visibility = View.VISIBLE
+            showButtonOnMap()
         }
 
         listView.setOnItemClickListener { parent, view, position, id ->
@@ -288,7 +288,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
             projectName?.let { name ->
                 val item = locateDb.getLocateByName(name)
-                item?.let { mapboxMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(it.getLatLng(), 15.0)) }
+                item?.let { mapboxMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(it.getLatLng(), DEFAULT_ZOOM_LEVEL)) }
 
                 val deployment = edgeDeploymentDb.getDeploymentBySiteName(name)
                 if (deployment != null) {
@@ -939,7 +939,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 moveCamera(
                     currentLatLng,
                     LatLng(furthestSite.latitude, furthestSite.longitude),
-                    15.0
+                    DEFAULT_ZOOM_LEVEL
                 )
             }
         }
@@ -960,7 +960,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 moveCamera(
                     currentLatLng,
                     LatLng(furthestSite.latitude, furthestSite.longitude),
-                    15.0
+                    DEFAULT_ZOOM_LEVEL
                 )
             }
         }
@@ -972,7 +972,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             moveCamera(
                 currentLatLng,
                 null,
-                mapboxMap?.cameraPosition?.zoom ?: 15.0
+                mapboxMap?.cameraPosition?.zoom ?: DEFAULT_ZOOM_LEVEL
             )
         }
     }
@@ -980,7 +980,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     fun moveToDeploymentMarker(lat: Double, lng: Double, markerLocationId: String) {
         mapboxMap?.let {
             it.moveCamera(
-                CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), it.cameraPosition.zoom)
+                CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), DEFAULT_ZOOM_LEVEL)
             )
         }
 
@@ -995,6 +995,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 }
             }
         }
+    }
+
+    fun showButtonOnMap() {
+        buttonOnMapGroup.visibility = View.VISIBLE
+    }
+
+    fun hideButtonOnMap() {
+        buttonOnMapGroup.visibility = View.GONE
     }
 
     override fun onStart() {
@@ -1047,6 +1055,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     companion object {
         const val tag = "MapFragment"
         const val SITE_MARKER = "SITE_MARKER"
+        private const val DEFAULT_ZOOM_LEVEL = 15.0
 
         private const val SOURCE_DEPLOYMENT = "source.deployment"
         private const val MARKER_DEPLOYMENT_ID = "marker.deployment"

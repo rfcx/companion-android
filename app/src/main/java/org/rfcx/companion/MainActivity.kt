@@ -279,11 +279,21 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     override fun hidBottomAppBar() {
         createLocationButton.visibility = View.GONE
         bottomBar.visibility = View.GONE
+
+        val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
+        if (mapFragment is MapFragment) {
+            mapFragment.hideButtonOnMap()
+        }
     }
 
     override fun showBottomAppBar() {
         bottomBar.visibility = View.VISIBLE
         createLocationButton.visibility = View.VISIBLE
+
+        val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
+        if (mapFragment is MapFragment) {
+            mapFragment.showButtonOnMap()
+        }
     }
 
     override fun getBottomSheetState(): Int {
