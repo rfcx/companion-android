@@ -228,7 +228,6 @@ class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener,
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
-        Toast.makeText(context, "Query Inserted", Toast.LENGTH_SHORT).show()
         return true
     }
 
@@ -237,6 +236,7 @@ class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener,
             val text = newText.toLowerCase()
             val newList: ArrayList<SiteItem> = ArrayList()
             newList.addAll(sites.filter { it.locate.name.toLowerCase().contains(text) })
+            noResultFound.visibility = if (newList.isEmpty()) View.VISIBLE else View.GONE
             existedSiteAdapter.setFilter(newList)
         }
         return true
