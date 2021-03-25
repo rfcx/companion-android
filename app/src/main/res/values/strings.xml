@@ -410,6 +410,7 @@
     <!-- MapFragment -->
     <string name="sites_downloading">Sites downloading</string>
     <string name="sites_synced">All sites synced</string>
+    <string name="no_deployments">No deployments</string>
 
     <string name="time_second">Just now</string>
     <string name="yesterday">Yesterday</string>

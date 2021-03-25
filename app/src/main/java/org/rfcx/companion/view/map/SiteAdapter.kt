@@ -7,12 +7,12 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_site.view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Locate
-import org.rfcx.companion.util.toDateString
 import org.rfcx.companion.util.toTimeSinceStringAlternativeTimeAgo
+import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 
 class SiteAdapter(private val itemClickListener: (Locate) -> Unit) :
     RecyclerView.Adapter<SiteAdapter.SiteAdapterViewHolder>() {
-    var items: ArrayList<Locate> = arrayListOf()
+    var items: ArrayList<SiteWithLastDeploymentItem> = arrayListOf()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -33,11 +33,11 @@ class SiteAdapter(private val itemClickListener: (Locate) -> Unit) :
         val site = items[position]
         holder.bind(site)
         holder.itemView.setOnClickListener {
-            this.itemClickListener(site)
+            this.itemClickListener(site.locate)
         }
     }
 
-    fun setFilter(newList: ArrayList<Locate>?) {
+    fun setFilter(newList: ArrayList<SiteWithLastDeploymentItem>?) {
         items = arrayListOf()
         items.addAll(newList ?: arrayListOf())
         notifyDataSetChanged()
@@ -47,9 +47,12 @@ class SiteAdapter(private val itemClickListener: (Locate) -> Unit) :
         private val siteNameTextView = itemView.siteNameTextView
         private val detailTextView = itemView.detailTextView
 
-        fun bind(site: Locate) {
-            siteNameTextView.text = site.name
-            detailTextView.text = site.updatedAt?.toTimeSinceStringAlternativeTimeAgo(itemView.context)
+        fun bind(site: SiteWithLastDeploymentItem) {
+            siteNameTextView.text = site.locate.name
+            detailTextView.text =
+                if (site.date != null) site.date.toTimeSinceStringAlternativeTimeAgo(itemView.context) else itemView.context.getString(
+                    R.string.no_deployments
+                )
         }
     }
 }

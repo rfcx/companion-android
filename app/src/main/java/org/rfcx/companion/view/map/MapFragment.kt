@@ -50,7 +50,6 @@ import com.mapbox.pluginscalebar.ScaleBarOptions
 import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_map.*
-import kotlinx.android.synthetic.main.fragment_selecting_existed_site.*
 import org.rfcx.companion.DeploymentListener
 import org.rfcx.companion.MainActivityListener
 import org.rfcx.companion.R
@@ -72,6 +71,7 @@ import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.locate.LocationFragment
+import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import retrofit2.Call
 import retrofit2.Callback
@@ -117,7 +117,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
-    private lateinit var arrayListOfSite: ArrayList<Locate>
+    private lateinit var arrayListOfSite: ArrayList<SiteWithLastDeploymentItem>
     private val siteAdapter by lazy { SiteAdapter(this) }
 
     private val mapboxLocationChangeCallback =
@@ -273,9 +273,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
             override fun onQueryTextChange(newText: String): Boolean {
                 context?.let {
                     val text = newText.toLowerCase()
-                    val newList: ArrayList<Locate> = arrayListOf()
+                    val newList: ArrayList<SiteWithLastDeploymentItem> = arrayListOf()
                     newList.addAll(arrayListOfSite.filter { site ->
-                        site.name.toLowerCase().contains(text)
+                        site.locate.name.toLowerCase().contains(text)
                     })
                     if (newList.isEmpty()) showLabel(true) else hideLabel()
                     siteAdapter.setFilter(newList)
@@ -645,8 +645,17 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
 
         arrayListOfSite = ArrayList(locations.filter { loc ->
             loc.locationGroup?.name == projectName || projectName == getString(R.string.none)
-        }.map { it })
-        siteAdapter.items = ArrayList(arrayListOfSite.sortedByDescending { it.updatedAt })
+        }.map {
+            SiteWithLastDeploymentItem(
+                it,
+                showDeployments.find { dp -> dp.stream?.name == it.name }?.deployedAt
+            )
+        })
+        val sortDate = arrayListOfSite.filter { it.date != null }.sortedByDescending { it.date }
+        val sortName =
+            arrayListOfSite.filter { it.date == null }.sortedBy { it.locate.name }
+
+        siteAdapter.items = ArrayList(sortDate + sortName)
 
         if (arrayListOfSite.isEmpty()) {
             showLabel(false)
