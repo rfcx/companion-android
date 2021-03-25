@@ -124,7 +124,7 @@
         android:id="@+id/buttonOnMapGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="locationTrackingSwitch,statusTextView,zoomInButton,zoomOutButton,currentLocationButton" />
+        app:constraint_referenced_ids="addButton,locationTrackingSwitch,statusTextView,zoomInButton,zoomOutButton,currentLocationButton" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/zoomInButton"
