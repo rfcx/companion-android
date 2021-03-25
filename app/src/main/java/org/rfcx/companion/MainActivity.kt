@@ -265,6 +265,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     }
 
     override fun moveMapIntoDeploymentMarker(lat: Double, lng: Double, markerLocationId: String) {
+        hidBottomAppBar()
         val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
         if (mapFragment is MapFragment) {
             mapFragment.moveToDeploymentMarker(lat, lng, markerLocationId)
