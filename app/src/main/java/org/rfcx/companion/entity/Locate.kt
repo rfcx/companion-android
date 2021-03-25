@@ -1,6 +1,7 @@
 package org.rfcx.companion.entity
 
 import com.google.gson.annotations.Expose
+import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
@@ -47,7 +48,7 @@ open class Locate(
         }
     }
 
-    fun getLatLng(): LatLng = LatLng(latitude, longitude)
+    fun getPoint(): Point = Point.fromLngLat(longitude, latitude)
 
     fun asDeploymentLocation(): DeploymentLocation {
         return DeploymentLocation(
