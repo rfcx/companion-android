@@ -17,15 +17,15 @@ import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.MainActivity
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
-import org.rfcx.companion.localdb.DeploymentImageDb
-import org.rfcx.companion.localdb.EdgeDeploymentDb
-import org.rfcx.companion.localdb.LocateDb
-import org.rfcx.companion.localdb.LocationGroupDb
+import org.rfcx.companion.localdb.*
 import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.AudioMothChimeConnector
+import org.rfcx.companion.util.Preferences
+import org.rfcx.companion.util.Preferences.Companion.ENABLE_LOCATION_TRACKING
 import org.rfcx.companion.util.RealmHelper
+import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
@@ -47,6 +47,8 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     private val locateDb by lazy { LocateDb(realm) }
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
+    private val trackingDb by lazy { TrackingDb(realm) }
+    private val trackingFileDb by lazy { TrackingFileDb(realm) }
 
     private var _deployment: EdgeDeployment? = null
     private var _deployLocation: DeploymentLocation? = null
@@ -71,6 +73,8 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     private var passedChecks = RealmList<Int>()
 
     private var needTone = true
+
+    private val preferences = Preferences.getInstance(this)
 
     private val analytics by lazy { Analytics(this) }
 
@@ -284,6 +288,20 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             }
             saveImages(it)
             deploymentDb.updateDeployment(it)
+
+            //track getting
+            if (preferences.getBoolean(ENABLE_LOCATION_TRACKING)) {
+                val track = trackingDb.getFirstTracking()
+                track?.let { t ->
+                    val point = t.points.toListDoubleArray()
+                    val trackingFile = TrackingFile(
+                        deploymentId = it.id,
+                        localPath = GeoJsonUtils.generateGeoJson(this, GeoJsonUtils.generateFileName(it.deployedAt, it.deploymentKey!!), point).absolutePath
+                    )
+                    trackingFileDb.insertOrUpdate(trackingFile)
+                }
+            }
+
             analytics.trackCreateAudiomothDeploymentEvent()
 
             DeploymentSyncWorker.enqueue(this@EdgeDeploymentActivity)

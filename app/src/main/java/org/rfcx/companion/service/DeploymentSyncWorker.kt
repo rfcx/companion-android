@@ -2,26 +2,18 @@ package org.rfcx.companion.service
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import io.realm.Realm
-import org.rfcx.companion.R
 import org.rfcx.companion.entity.request.EditDeploymentRequest
 import org.rfcx.companion.entity.request.toRequestBody
-import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.toEdgeDeployment
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.repo.ApiManager
-import org.rfcx.companion.repo.Firestore
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.getIdToken
-import org.rfcx.companion.util.isNetworkAvailable
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 /**
  * For syncing data to server. Ref from Ranger Android App
@@ -59,6 +51,9 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                         db.updateDeploymentByServerId(updatedDp.toEdgeDeployment())
                         locateDb.updateSiteServerId(it.id, dp.stream!!.id!!)
                     }
+
+                    //send tracking if there is
+                    TrackingSyncWorker.enqueue(context)
                 } else {
                     db.markUnsent(it.id)
                     someFailed = true

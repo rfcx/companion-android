@@ -255,11 +255,8 @@ class CompanionRealmMigration : RealmMigration {
         val coordinate = realm.schema.create(Coordinate.TABLE_NAME)
         coordinate.apply {
             addField(Coordinate.COORDINATE_LATITUDE, Double::class.java)
-                .setNullable(Coordinate.COORDINATE_LATITUDE, true)
             addField(Coordinate.COORDINATE_LONGITUDE, Double::class.java)
-                .setNullable(Coordinate.COORDINATE_LONGITUDE, true)
             addField(Coordinate.COORDINATE_ALTITUDE, Double::class.java)
-                .setNullable(Coordinate.COORDINATE_ALTITUDE, true)
         }
 
         val tracking = realm.schema.create(Tracking.TABLE_NAME)
@@ -273,7 +270,23 @@ class CompanionRealmMigration : RealmMigration {
                 .setNullable(Tracking.TRACKING_START_AT, false)
             addField(Tracking.TRACKING_STOP_AT, Date::class.java)
             addRealmListField(Tracking.TRACKING_POINTS, coordinate)
-                .setNullable(Tracking.TRACKING_POINTS, false)
+        }
+
+        val trackingFile = realm.schema.create(TrackingFile.TABLE_NAME)
+        trackingFile.apply {
+            addField(
+                TrackingFile.FIELD_ID,
+                Int::class.java,
+                FieldAttribute.PRIMARY_KEY
+            )
+            addField(TrackingFile.FIELD_DEPLOYMENT_ID, Int::class.java)
+            addField(TrackingFile.FIELD_DEPLOYMENT_SERVER_ID, String::class.java)
+            addField(TrackingFile.FIELD_LOCAL_PATH, String::class.java)
+                .setNullable(TrackingFile.FIELD_LOCAL_PATH, false)
+            addField(TrackingFile.FIELD_REMOTE_PATH, String::class.java)
+            addField(TrackingFile.FIELD_SYNC_STATE, Int::class.java)
+            addField(TrackingFile.FIELD_DEVICE, String::class.java)
+                .setNullable(TrackingFile.FIELD_DEVICE, false)
         }
     }
 

@@ -12,7 +12,7 @@ open class Tracking(
     var id: Int = 0,
     var startAt: Date = Date(),
     var stopAt: Date? = null,
-    var points: RealmList<Coordinate> = RealmList<Coordinate>()
+    var points: RealmList<Coordinate> = RealmList()
 ) : RealmObject() {
     companion object {
         const val TABLE_NAME = "Tracking"
@@ -21,4 +21,10 @@ open class Tracking(
         const val TRACKING_STOP_AT = "stopAt"
         const val TRACKING_POINTS = "points"
     }
+}
+
+fun RealmList<Coordinate>.toListDoubleArray(): List<DoubleArray> {
+    return this.map {
+        listOf(it.longitude, it.latitude).toDoubleArray()
+    }.toList()
 }

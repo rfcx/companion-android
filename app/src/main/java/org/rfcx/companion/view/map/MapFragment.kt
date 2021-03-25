@@ -8,6 +8,7 @@ import android.location.Location
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
+import android.util.Property
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -43,6 +44,9 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.style.expressions.Expression.*
 import com.mapbox.mapboxsdk.style.layers.CircleLayer
+import com.mapbox.mapboxsdk.style.layers.LineLayer
+import com.mapbox.mapboxsdk.style.layers.Property.*
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
@@ -51,6 +55,7 @@ import com.mapbox.mapboxsdk.utils.BitmapUtils
 import com.mapbox.pluginscalebar.ScaleBarOptions
 import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
+import io.realm.RealmList
 import kotlinx.android.synthetic.main.fragment_map.*
 import org.rfcx.companion.DeploymentListener
 import org.rfcx.companion.MainActivityListener
@@ -58,7 +63,6 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.guardian.toMark
-import org.rfcx.companion.entity.response.DeploymentImageResponse
 import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.localdb.*
@@ -67,13 +71,16 @@ import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.repo.Firestore
 import org.rfcx.companion.service.DeploymentSyncWorker
+import org.rfcx.companion.service.DownloadAssetsWorker
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
+import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -84,17 +91,18 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var mapboxMap: MapboxMap? = null
     private var locationEngine: LocationEngine? = null
     private var mapSource: GeoJsonSource? = null
+    private var lineSource: GeoJsonSource? = null
     private var mapFeatures: FeatureCollection? = null
 
     // database manager
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
-    private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
-    private val diagnosticDb by lazy { DiagnosticDb(realm) }
     private val trackingDb by lazy { TrackingDb(realm) }
+    private val trackingFileDb by lazy { TrackingFileDb(realm) }
+    private val diagnosticDb by lazy { DiagnosticDb(realm) }
 
     // data
     private var guardianDeployments = listOf<GuardianDeployment>()
@@ -457,7 +465,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     )
             )
 
+        lineSource = GeoJsonSource(SOURCE_LINE)
+
         style.addSource(mapSource!!)
+        style.addSource(lineSource!!)
     }
 
     fun clearFeatureSelected() {
@@ -514,6 +525,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setupMarkerLayers(style: Style) {
+
+        val line = LineLayer("line-layer", SOURCE_LINE).withProperties(
+            lineCap(LINE_CAP_SQUARE),
+            lineJoin(LINE_JOIN_MITER),
+            lineOpacity(.7f),
+            lineWidth(7f),
+            lineColor(Color.parseColor("#3bb2d0"))
+        )
+
+        style.addLayer(line)
 
         val unclusteredSiteLayer =
             SymbolLayer(MARKER_SITE_ID, SOURCE_DEPLOYMENT).withProperties(
@@ -622,6 +643,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             return true
         } else {
             (activity as MainActivityListener).hideBottomSheet()
+            hideTrackOnMap()
         }
 
         if (deploymentClusterFeatures != null && deploymentClusterFeatures.isNotEmpty()) {
@@ -825,7 +847,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                             edgeDeploymentDb.insertOrUpdate(item)
                         }
                     }
-                    retrieveImages(context)
+                    retrieveAssets(context)
                     combinedData()
                 }
             })
@@ -863,43 +885,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         Firestore(context).retrieveDiagnostics(diagnosticDb)
     }
 
-    private fun retrieveImages(context: Context) {
-        val token = "Bearer ${context.getIdToken()}"
-
-        edgeDeployments.forEach { dp ->
-            if (dp.serverId != null) {
-                ApiManager.getInstance().getDeviceApi().getImages(token, dp.serverId!!)
-                    .enqueue(object : Callback<List<DeploymentImageResponse>> {
-                        override fun onFailure(
-                            call: Call<List<DeploymentImageResponse>>,
-                            t: Throwable
-                        ) {
-                            combinedData()
-                            if (context.isNetworkAvailable()) {
-                                Toast.makeText(
-                                    context,
-                                    R.string.error_has_occurred,
-                                    Toast.LENGTH_SHORT
-                                )
-                                    .show()
-                            }
-                        }
-
-                        override fun onResponse(
-                            call: Call<List<DeploymentImageResponse>>,
-                            response: Response<List<DeploymentImageResponse>>
-                        ) {
-                            response.body()?.forEach { item ->
-                                deploymentImageDb.insertOrUpdate(
-                                    item,
-                                    dp.id,
-                                    Device.AUDIOMOTH.value
-                                )
-                            }
-                        }
-                    })
-            }
-        }
+    private fun retrieveAssets(context: Context) {
+        DownloadAssetsWorker.enqueue(context)
     }
 
     private fun fetchJobSyncing() {
@@ -1125,6 +1112,21 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    fun showTrackOnMap(id: Int) {
+        //remove the previous one
+        hideTrackOnMap()
+        val track = trackingFileDb.getTrackingFileByDeploymentId(id)
+        track?.let {
+            val json = File(it.localPath).readText()
+            lineSource!!.setGeoJson(FeatureCollection.fromJson(json))
+        }
+    }
+
+    private fun hideTrackOnMap() {
+        //reset source
+        lineSource!!.setGeoJson(FeatureCollection.fromFeatures(listOf()))
+    }
+
     override fun onStart() {
         super.onStart()
         mapView.onStart()
@@ -1179,6 +1181,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         private const val SOURCE_DEPLOYMENT = "source.deployment"
         private const val MARKER_DEPLOYMENT_ID = "marker.deployment"
         private const val MARKER_SITE_ID = "marker.site"
+
+        private const val SOURCE_LINE = "source.line"
 
         private const val PROPERTY_DEPLOYMENT_SELECTED = "deployment.selected"
         private const val PROPERTY_DEPLOYMENT_MARKER_DEVICE = "deployment.device"
