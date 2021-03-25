@@ -8,6 +8,7 @@ import kotlinx.android.synthetic.main.item_site.view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.util.toDateString
+import org.rfcx.companion.util.toTimeSinceStringAlternativeTimeAgo
 
 class SiteAdapter(private val itemClickListener: (Locate) -> Unit) :
     RecyclerView.Adapter<SiteAdapter.SiteAdapterViewHolder>() {
@@ -48,7 +49,7 @@ class SiteAdapter(private val itemClickListener: (Locate) -> Unit) :
 
         fun bind(site: Locate) {
             siteNameTextView.text = site.name
-            detailTextView.text = site.updatedAt?.toDateString()
+            detailTextView.text = site.updatedAt?.toTimeSinceStringAlternativeTimeAgo(itemView.context)
         }
     }
 }
