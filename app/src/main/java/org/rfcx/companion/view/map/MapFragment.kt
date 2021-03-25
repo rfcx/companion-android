@@ -213,6 +213,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         setupSearch()
         setColorTrackingButton()
         progressBar.visibility = View.VISIBLE
+        hideLabel()
 
         currentLocationButton.setOnClickListener {
             mapboxMap?.locationComponent?.isLocationComponentActivated?.let {
@@ -247,6 +248,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     Screen.MAP.id,
                     REQUEST_CODE
                 )
+            }
+
+            val state = listener?.getBottomSheetState() ?: 0
+            if (state == BottomSheetBehavior.STATE_EXPANDED) {
+                clearFeatureSelected()
+                listener?.hideBottomSheet()
             }
         }
 
@@ -347,26 +354,40 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         locationTrackingSwitch.isChecked = enableTracking
     }
 
+    private fun showLabel(isNotFound: Boolean) {
+        if (!searchView.isIconified) {
+            showLabelLayout.visibility = View.VISIBLE
+            notHaveSiteTextView.visibility = if (isNotFound) View.GONE else View.VISIBLE
+            notHaveResultTextView.visibility = if (isNotFound) View.VISIBLE else View.GONE
+        }
+    }
+
+    private fun hideLabel() {
+        showLabelLayout.visibility = View.GONE
+    }
+
     private fun setupSearch() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
-                if (arrayListOfSite.contains(query)) {
-                    adapterOfSearchSite.filter.filter(query)
-                } else {
-                    Toast.makeText(context, R.string.no_result_found, Toast.LENGTH_LONG).show()
-                }
-                return false
+                return true
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                adapterOfSearchSite.filter.filter(newText)
+                context?.let {
+                    val text = newText.toLowerCase()
+                    val newList: ArrayList<String> = arrayListOf()
+                    newList.addAll(arrayListOfSite.filter { site -> site.toLowerCase().contains(text) })
+                    adapterOfSearchSite = ArrayAdapter(it, android.R.layout.simple_list_item_1, newList)
+                    if (newList.isEmpty()) showLabel(true) else hideLabel()
+                    listView.adapter = adapterOfSearchSite
+                }
                 return false
             }
         })
 
         searchView.setOnSearchClickListener {
             listView.visibility = View.VISIBLE
-            buttonOnMapGroup.visibility = View.GONE
+            hideButtonOnMap()
             projectNameTextView.visibility = View.GONE
             val state = listener?.getBottomSheetState() ?: 0
             if (state == BottomSheetBehavior.STATE_EXPANDED) {
@@ -374,11 +395,18 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             } else {
                 listener?.hidBottomAppBar()
             }
+
+            if (listView.adapter.isEmpty) {
+                showLabel(false)
+            } else {
+                hideLabel()
+            }
         }
 
         searchView.setOnCloseListener {
+            hideLabel()
             listView.visibility = View.GONE
-            buttonOnMapGroup.visibility = View.VISIBLE
+            showButtonOnMap()
             projectNameTextView.visibility = View.VISIBLE
             listener?.showBottomAppBar()
             listener?.clearFeatureSelectedOnMap()
@@ -386,7 +414,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
 
         if (searchView.isIconified) {
-            buttonOnMapGroup.visibility = View.VISIBLE
+            showButtonOnMap()
         }
 
         listView.setOnItemClickListener { parent, view, position, id ->
@@ -398,7 +426,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     mapboxMap?.animateCamera(
                         CameraUpdateFactory.newLatLngZoom(
                             it.getLatLng(),
-                            15.0
+                            DEFAULT_ZOOM_LEVEL
                         )
                     )
                 }
@@ -773,6 +801,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             )
             listView.adapter = adapterOfSearchSite
         }
+
+        if (filteredShowLocations.isEmpty()) {
+            showLabel(false)
+        } else {
+            hideLabel()
+        }
     }
 
     private fun getFurthestSiteFromCurrentLocation(
@@ -1054,7 +1088,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 moveCamera(
                     currentLatLng,
                     LatLng(furthestSite.latitude, furthestSite.longitude),
-                    15.0
+                    DEFAULT_ZOOM_LEVEL
                 )
             }
         }
@@ -1075,7 +1109,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 moveCamera(
                     currentLatLng,
                     LatLng(furthestSite.latitude, furthestSite.longitude),
-                    15.0
+                    DEFAULT_ZOOM_LEVEL
                 )
             }
         }
@@ -1087,7 +1121,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             moveCamera(
                 currentLatLng,
                 null,
-                mapboxMap?.cameraPosition?.zoom ?: 15.0
+                mapboxMap?.cameraPosition?.zoom ?: DEFAULT_ZOOM_LEVEL
             )
         }
     }
@@ -1095,7 +1129,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     fun moveToDeploymentMarker(lat: Double, lng: Double, markerLocationId: String) {
         mapboxMap?.let {
             it.moveCamera(
-                CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), it.cameraPosition.zoom)
+                CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), DEFAULT_ZOOM_LEVEL)
             )
         }
 
@@ -1125,6 +1159,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private fun hideTrackOnMap() {
         //reset source
         lineSource!!.setGeoJson(FeatureCollection.fromFeatures(listOf()))
+    }
+
+    fun showButtonOnMap() {
+        buttonOnMapGroup.visibility = View.VISIBLE
+    }
+
+    fun hideButtonOnMap() {
+        buttonOnMapGroup.visibility = View.GONE
     }
 
     override fun onStart() {
@@ -1177,6 +1219,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     companion object {
         const val tag = "MapFragment"
         const val SITE_MARKER = "SITE_MARKER"
+        private const val DEFAULT_ZOOM_LEVEL = 15.0
 
         private const val SOURCE_DEPLOYMENT = "source.deployment"
         private const val MARKER_DEPLOYMENT_ID = "marker.deployment"
