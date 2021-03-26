@@ -336,12 +336,6 @@
     On-duty and tracking enabled
     <string name="tracking_enabled">On-duty and tracking enabled</string>
     <string name="location_setting">Please enable your device\'s location settings</string>
-    <string name="continue_text">continue</string>
-    <string name="continue_tracking">Continue tracking?</string>
-    <string name="want_to_continue">Do you want to continue your tracking location or not</string>
-    <string name="new_tracking">New tracking</string>
-    <string name="on_duty">On duty</string>
-    <string name="not_tracking">Not tracking</string>
     <string name="notification_traking_message_format">%d minutes recorded</string>
     <string name="notification_location_not_availability">Please enable your device\'s location settings</string>
 
