@@ -23,21 +23,18 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.Fragment
 import com.mapbox.android.core.location.*
-import com.mapbox.mapboxsdk.Mapbox
-import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
-import com.mapbox.mapboxsdk.location.LocationComponentOptions
-import com.mapbox.mapboxsdk.location.modes.RenderMode
-import com.mapbox.mapboxsdk.maps.MapView
-import com.mapbox.mapboxsdk.maps.MapboxMap
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
-import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
-import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
-import com.mapbox.pluginscalebar.ScaleBarOptions
-import com.mapbox.pluginscalebar.ScaleBarPlugin
+import com.mapbox.geojson.Point
+import com.mapbox.maps.MapView
+import com.mapbox.maps.MapboxMap
+import com.mapbox.maps.Style
+import com.mapbox.maps.plugin.annotation.generated.SymbolManager
+import com.mapbox.maps.plugin.annotation.generated.SymbolOptions
+import com.mapbox.maps.plugin.annotation.generated.createSymbolManager
+import com.mapbox.maps.plugin.annotation.getAnnotationPlugin
+import com.mapbox.maps.plugin.delegates.MapDelegateProvider
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.companion.R
@@ -95,9 +92,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     location ?: return
                     deploymentProtocol?.setCurrentLocation(location)
 
-                    mapboxMap?.let {
+                    mapboxMap.let {
                         this@LocationFragment.currentUserLocation = location
-                        it.locationComponent.forceLocationUpdate(location)
                         altitudeFromLocation = location.altitude
                         setCurrentUserLocation()
 
@@ -149,7 +145,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        context?.let { Mapbox.getInstance(it, getString(R.string.mapbox_token)) }
+        mapView.getMapboxMap().loadStyleUri(Style.OUTDOORS)
         initIntent()
     }
 
@@ -173,6 +169,19 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        mapView.getMapboxMap().getStyle() { style ->
+            lastLocation?.let { lastLocation ->
+                val latLng = Point.fromLngLat(lastLocation.longitude, lastLocation.latitude)
+                moveCamera(latLng, null, DEFAULT_ZOOM)
+            }
+            setupSymbolManager(style)
+            retrieveDeployLocations()
+            setupLocationSpinner()
+            updateLocationAdapter()
+            enableLocationComponent()
+            setupScale()
+        }
+
         deploymentProtocol?.let {
             it.showToolbar()
             it.setToolbarTitle()
@@ -181,8 +190,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         setViewFromDeploymentState()
 
         mapView = view.findViewById(R.id.mapBoxView)
-        mapView.onCreate(savedInstanceState)
-        mapView.getMapAsync(this)
         view.viewTreeObserver.addOnGlobalLayoutListener { setOnFocusEditText() }
 
         setHideKeyboard()
@@ -218,8 +225,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     it.lastGuardianDeploymentServerId,
                     it.syncState
                 )
-                createSiteSymbol(locate.getLatLng())
-                moveCamera(LatLng(locate.getLatLng()), DEFAULT_ZOOM)
+                createSiteSymbol(locate.getPoint())
+                moveCamera(locate.getPoint(), DEFAULT_ZOOM)
             }
             this.isUseCurrentLocation = true
             setWithinText()
@@ -293,38 +300,18 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    override fun onMapReady(mapboxMap: MapboxMap) {
-        this.mapboxMap = mapboxMap
-        mapboxMap.uiSettings.setAllGesturesEnabled(false)
-        mapboxMap.uiSettings.isAttributionEnabled = false
-        mapboxMap.uiSettings.isLogoEnabled = false
-
-        mapboxMap.setStyle(Style.OUTDOORS) {
-            lastLocation?.let { lastLocation ->
-                val latLng = LatLng(lastLocation.latitude, lastLocation.longitude)
-                moveCamera(latLng, null, DEFAULT_ZOOM)
-            }
-            setupSymbolManager(it)
-            retrieveDeployLocations()
-            setupLocationSpinner()
-            updateLocationAdapter()
-            enableLocationComponent()
-            setupScale()
-        }
-    }
-
     private fun setupSymbolManager(style: Style) {
-        this.mapboxMap?.let { mapboxMap ->
-            symbolManager = SymbolManager(this.mapView, mapboxMap, style)
-            symbolManager?.iconAllowOverlap = true
+        val annotationPlugin = mapView.getAnnotationPlugin()
+        symbolManager = annotationPlugin.createSymbolManager(mapView)
+        symbolManager?.iconAllowOverlap = true
 
-            style.addImage(PROPERTY_MARKER_IMAGE, ResourcesCompat.getDrawable(this.resources, R.drawable.ic_pin_map, null)!!)
-        }
+        style.addImage(PROPERTY_MARKER_IMAGE, ResourcesCompat.getDrawable(this.resources, R.drawable.ic_pin_map, null)!!.toBitmap())
     }
 
-    private fun createSiteSymbol(latLng: LatLng) {
+    private fun createSiteSymbol(latLng: Point) {
         symbolManager?.deleteAll()
-        symbolManager?.create(SymbolOptions()
+        symbolManager?.create(
+            SymbolOptions()
             .withLatLng(latLng)
             .withIconImage(PROPERTY_MARKER_IMAGE)
             .withIconSize(0.75f))

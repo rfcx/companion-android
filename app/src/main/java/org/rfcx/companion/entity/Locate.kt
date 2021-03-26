@@ -2,7 +2,6 @@ package org.rfcx.companion.entity
 
 import com.google.gson.annotations.Expose
 import com.mapbox.geojson.Point
-import com.mapbox.mapboxsdk.geometry.LatLng
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
