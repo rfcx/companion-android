@@ -210,7 +210,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         fetchJobSyncing()
         fetchData()
         setupSearch()
-        setColorTrackingButton()
         progressBar.visibility = View.VISIBLE
         hideLabel()
 
@@ -272,87 +271,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 ViewAnimation().showOut(currentLocationButton)
             }
         }
-
-        locationTrackingSwitch.setOnCheckedChangeListener { _, isChecked ->
-            setTrackingSwitch(isChecked)
-            if (isChecked) {
-                withinTenMin()
-            } else {
-                context?.let { context -> LocationTracking.set(context, false) }
-            }
-        }
-    }
-
-    private fun setTrackingSwitch(isChecked: Boolean) {
-        statusTextView.text =
-            if (isChecked) getString(R.string.on_duty) else getString(R.string.not_tracking)
-        context?.let {
-            statusTextView.setTextColor(
-                ContextCompat.getColor(
-                    it,
-                    if (isChecked) R.color.colorPrimary else R.color.text_secondary
-                )
-            )
-        }
-    }
-
-    private fun withinTenMin() {
-        if (trackingDb.getCountTracking() != 0) {
-            val time = trackingDb.getTracking()[0].stopAt?.time?.plus(10 * 60000)
-            time?.let {
-                if (it > Date().time) {
-                    confirmationDialog()
-                } else {
-                    context?.let { context ->
-                        LocationTracking.set(context, true)
-                        trackingDb.deleteTracking(1, context)
-                    }
-                    setColorTrackingButton()
-                }
-            }
-        } else {
-            context?.let { context -> LocationTracking.set(context, true) }
-            setColorTrackingButton()
-        }
-    }
-
-    private fun confirmationDialog() {
-        context?.let {
-            val builder = AlertDialog.Builder(it, R.style.DialogCustom)
-            builder.setCancelable(false)
-            builder.setTitle(getString(R.string.continue_tracking))
-            builder.setMessage(getString(R.string.want_to_continue))
-
-            builder.setPositiveButton(getString(R.string.continue_text)) { _, _ ->
-                context?.let { context -> LocationTracking.set(context, true) }
-                setColorTrackingButton()
-            }
-            builder.setNegativeButton(getString(R.string.cancel)) { _, _ ->
-                locationTrackingSwitch.isChecked = false
-            }
-            builder.setNeutralButton(getString(R.string.new_tracking)) { _, _ ->
-                trackingDb.deleteTracking(1, it)
-                context?.let { context -> LocationTracking.set(context, true) }
-                setColorTrackingButton()
-            }
-
-            val dialog: AlertDialog = builder.create()
-            dialog.show()
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                .setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0f)
-            dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-                .setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0f)
-            dialog.getButton(AlertDialog.BUTTON_NEUTRAL)
-                .setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0f)
-        }
-    }
-
-    private fun setColorTrackingButton() {
-        val preferences = context?.let { it1 -> Preferences.getInstance(it1) }
-        val enableTracking =
-            preferences?.getBoolean(Preferences.ENABLE_LOCATION_TRACKING, false) ?: false
-        setTrackingSwitch(enableTracking)
-        locationTrackingSwitch.isChecked = enableTracking
     }
 
     private fun showLabel(isNotFound: Boolean) {

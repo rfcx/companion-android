@@ -215,27 +215,4 @@
         app:layout_constraintStart_toStartOf="@id/guidelineVertical"
         app:tint="@color/colorPrimary" />
 
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/locationTrackingSwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/statusTextView"
-        app:layout_constraintEnd_toEndOf="@id/statusTextView"
-        app:layout_constraintStart_toStartOf="@id/statusTextView"
-        app:showText="false"
-        tools:checked="false" />
-
-    <TextView
-        android:id="@+id/statusTextView"
-        style="@style/AudioMothText.Title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_normal"
-        android:layout_marginBottom="@dimen/current_loc_margin"
-        android:text="@string/not_tracking"
-        android:textAllCaps="false"
-        android:textColor="@color/text_secondary"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
