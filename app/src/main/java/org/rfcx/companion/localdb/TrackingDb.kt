@@ -1,8 +1,10 @@
 package org.rfcx.companion.localdb
 
+import android.content.Context
 import io.realm.Realm
 import org.rfcx.companion.entity.Coordinate
 import org.rfcx.companion.entity.Tracking
+import org.rfcx.companion.util.Preferences
 import java.util.*
 
 class TrackingDb(private val realm: Realm) {
@@ -23,12 +25,14 @@ class TrackingDb(private val realm: Realm) {
         }
     }
 
-    fun deleteTracking(id: Int) {
+    fun deleteTracking(id: Int, context: Context) {
         realm.executeTransaction {
             val tracking =
                 it.where(Tracking::class.java).equalTo(Tracking.TRACKING_ID, id)
                     .findFirst()
             tracking?.deleteFromRealm()
+            val preferences = Preferences.getInstance(context)
+            preferences.putLong(Preferences.ON_DUTY_LAST_OPEN, 0L)
         }
     }
 

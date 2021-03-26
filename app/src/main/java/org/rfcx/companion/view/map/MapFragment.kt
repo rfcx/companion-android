@@ -303,8 +303,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 if (it > Date().time) {
                     confirmationDialog()
                 } else {
-                    trackingDb.deleteTracking(1)
-                    context?.let { context -> LocationTracking.set(context, true) }
+                    context?.let { context ->
+                        LocationTracking.set(context, true)
+                        trackingDb.deleteTracking(1, context)
+                    }
                     setColorTrackingButton()
                 }
             }
@@ -329,7 +331,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 locationTrackingSwitch.isChecked = false
             }
             builder.setNeutralButton(getString(R.string.new_tracking)) { _, _ ->
-                trackingDb.deleteTracking(1)
+                trackingDb.deleteTracking(1, it)
                 context?.let { context -> LocationTracking.set(context, true) }
                 setColorTrackingButton()
             }
