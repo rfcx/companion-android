@@ -8,7 +8,6 @@ import android.location.Location
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
-import android.util.Property
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -45,8 +44,8 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.style.expressions.Expression.*
 import com.mapbox.mapboxsdk.style.layers.CircleLayer
 import com.mapbox.mapboxsdk.style.layers.LineLayer
-import com.mapbox.mapboxsdk.style.layers.Property.*
-import com.mapbox.mapboxsdk.style.layers.PropertyFactory
+import com.mapbox.mapboxsdk.style.layers.Property.LINE_CAP_SQUARE
+import com.mapbox.mapboxsdk.style.layers.Property.LINE_JOIN_MITER
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
@@ -55,7 +54,6 @@ import com.mapbox.mapboxsdk.utils.BitmapUtils
 import com.mapbox.pluginscalebar.ScaleBarOptions
 import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
-import io.realm.RealmList
 import kotlinx.android.synthetic.main.fragment_map.*
 import org.rfcx.companion.DeploymentListener
 import org.rfcx.companion.MainActivityListener
@@ -74,7 +72,6 @@ import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.DownloadAssetsWorker
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
-import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import retrofit2.Call
@@ -376,8 +373,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 context?.let {
                     val text = newText.toLowerCase()
                     val newList: ArrayList<String> = arrayListOf()
-                    newList.addAll(arrayListOfSite.filter { site -> site.toLowerCase().contains(text) })
-                    adapterOfSearchSite = ArrayAdapter(it, android.R.layout.simple_list_item_1, newList)
+                    newList.addAll(arrayListOfSite.filter { site ->
+                        site.toLowerCase().contains(text)
+                    })
+                    adapterOfSearchSite =
+                        ArrayAdapter(it, android.R.layout.simple_list_item_1, newList)
                     if (newList.isEmpty()) showLabel(true) else hideLabel()
                     listView.adapter = adapterOfSearchSite
                 }
@@ -447,6 +447,26 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 searchView.isIconified = true
             }
         }
+
+        trackingLayout.setOnClickListener {
+            if (trackingTextView.text == "Track") {
+                trackingImageView.setImageDrawable(context?.let { it1 ->
+                    ContextCompat.getDrawable(
+                        it1,
+                        R.drawable.ic_tracking_on
+                    )
+                })
+                trackingTextView.text = "0.0 km 0 min"
+            } else {
+                trackingTextView.text = "Track"
+                trackingImageView.setImageDrawable(context?.let { it1 ->
+                    ContextCompat.getDrawable(
+                        it1,
+                        R.drawable.ic_tracking_off
+                    )
+                })
+            }
+        }
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
@@ -465,7 +485,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             setupSources(it)
             setupImages(it)
             setupMarkerLayers(it)
-            setupScale()
+//            setupScale()
 
             mapboxMap.addOnMapClickListener { latLng ->
                 handleClickIcon(mapboxMap.projection.toScreenLocation(latLng))
