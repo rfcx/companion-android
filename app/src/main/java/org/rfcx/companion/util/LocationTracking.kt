@@ -10,6 +10,7 @@ class LocationTracking {
 
         private const val TRACKING_ON = true
         private const val TRACKING_OFF = false
+        private const val MILLI_SECS_PER_MINUTE = (60 * 1000).toLong()
 
         private fun isOn(context: Context): Boolean {
             val preferences = Preferences.getInstance(context)
@@ -32,8 +33,52 @@ class LocationTracking {
                     context,
                     Intent(context, LocationTrackerService::class.java)
                 )
+                startDutyTracking(context)
             } else {
                 context.stopService(Intent(context, LocationTrackerService::class.java))
+                stopDutyTracking(context)
+            }
+        }
+
+        private fun startDutyTracking(context: Context) {
+            val preferences = Preferences.getInstance(context)
+            if (preferences.getLong(Preferences.ON_DUTY_LAST_OPEN, 0L) == 0L) {
+                preferences.putLong(Preferences.ON_DUTY_LAST_OPEN, System.currentTimeMillis())
+            }
+        }
+
+        private fun stopDutyTracking(context: Context) {
+            val preferences = Preferences.getInstance(context)
+            val lastOpen: Long = preferences.getLong(Preferences.ON_DUTY_LAST_OPEN, 0L)
+            val stopTime = System.currentTimeMillis()
+            preferences.putLong(Preferences.ON_DUTY_LAST_OPEN, 0L)
+
+            if (lastOpen != 0L && stopTime > lastOpen) {
+                val onDutyMinute = ((stopTime - lastOpen) / MILLI_SECS_PER_MINUTE).toInt()
+                adjustOnDuty(context, onDutyMinute)
+            }
+
+        }
+
+        private fun adjustOnDuty(context: Context, minutes: Int) {
+            val preferences = Preferences.getInstance(context)
+            var lastedDuty: Long = preferences.getLong(Preferences.ON_DUTY, 0L)
+            lastedDuty += minutes
+            preferences.putLong(Preferences.ON_DUTY, lastedDuty)
+        }
+
+        fun getOnDutyTimeMinute(context: Context): Long {
+            val preferences = Preferences.getInstance(context)
+            val lastOnDutyTime = preferences.getLong(Preferences.ON_DUTY, 0L)
+            val lastDutyOpenTime = preferences.getLong(Preferences.ON_DUTY_LAST_OPEN, 0L)
+
+            return if (lastDutyOpenTime != 0L) {
+                val currentTime = System.currentTimeMillis()
+                val difTime = currentTime - lastDutyOpenTime
+                val onDutyNow = difTime / MILLI_SECS_PER_MINUTE
+                lastOnDutyTime + onDutyNow
+            } else {
+                preferences.getLong(Preferences.ON_DUTY, 0L)
             }
         }
     }
