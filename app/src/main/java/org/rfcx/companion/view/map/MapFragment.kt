@@ -16,6 +16,7 @@ import android.widget.SearchView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -30,10 +31,7 @@ import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
 import com.mapbox.maps.*
-import com.mapbox.maps.extension.style.expressions.dsl.generated.accumulated
-import com.mapbox.maps.extension.style.expressions.dsl.generated.all
-import com.mapbox.maps.extension.style.expressions.dsl.generated.sum
-import com.mapbox.maps.extension.style.expressions.dsl.generated.switchCase
+import com.mapbox.maps.extension.style.expressions.dsl.generated.*
 import com.mapbox.maps.extension.style.expressions.generated.Expression
 import com.mapbox.maps.extension.style.layers.addLayer
 import com.mapbox.maps.extension.style.layers.generated.CircleLayer
@@ -41,6 +39,7 @@ import com.mapbox.maps.extension.style.layers.generated.SymbolLayer
 import com.mapbox.maps.extension.style.sources.addSource
 import com.mapbox.maps.extension.style.sources.generated.GeoJsonSource
 import com.mapbox.maps.extension.style.sources.getClusterLeaves
+import com.mapbox.maps.extension.style.types.formatted
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.easeTo
 import com.mapbox.maps.plugin.animation.flyTo
@@ -416,39 +415,32 @@ class MapFragment : Fragment() {
     }
 
     private fun setupImages(style: Style) {
-        val drawablePinSite =
-            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map_grey, null)
-        val mBitmapPinSite = BitmapUtils.getBitmapFromDrawable(drawablePinSite)
+        val mBitmapPinSite =
+            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map_grey, null)?.toBitmap()
         if (mBitmapPinSite != null) {
             style.addImage(SITE_MARKER, mBitmapPinSite)
         }
 
-        val drawablePinConnectedGuardian =
-            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map, null)
         val mBitmapPinConnectedGuardian =
-            BitmapUtils.getBitmapFromDrawable(drawablePinConnectedGuardian)
+            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map, null)?.toBitmap()
         if (mBitmapPinConnectedGuardian != null) {
             style.addImage(GuardianPin.CONNECTED_GUARDIAN, mBitmapPinConnectedGuardian)
         }
 
-        val drawablePinNotConnectedGuardian =
-            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map_grey, null)
         val mBitmapPinNotConnectedGuardian =
-            BitmapUtils.getBitmapFromDrawable(drawablePinNotConnectedGuardian)
+            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map_grey, null)?.toBitmap()
         if (mBitmapPinNotConnectedGuardian != null) {
             style.addImage(GuardianPin.NOT_CONNECTED_GUARDIAN, mBitmapPinNotConnectedGuardian)
         }
 
-        val drawablePinMapGreen =
-            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map, null)
-        val mBitmapPinMapGreen = BitmapUtils.getBitmapFromDrawable(drawablePinMapGreen)
+        val mBitmapPinMapGreen =
+            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map, null)?.toBitmap()
         if (mBitmapPinMapGreen != null) {
             style.addImage(Battery.BATTERY_PIN_GREEN, mBitmapPinMapGreen)
         }
 
-        val drawablePinMapGrey =
-            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map_grey, null)
-        val mBitmapPinMapGrey = BitmapUtils.getBitmapFromDrawable(drawablePinMapGrey)
+        val mBitmapPinMapGrey =
+            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map_grey, null)?.toBitmap()
         if (mBitmapPinMapGrey != null) {
             style.addImage(Battery.BATTERY_PIN_GREY, mBitmapPinMapGrey)
         }
@@ -457,26 +449,27 @@ class MapFragment : Fragment() {
     private fun setupMarkerLayers(style: Style) {
 
         val unclusteredSiteLayer =
-            SymbolLayer(MARKER_SITE_ID, SOURCE_DEPLOYMENT).withProperties(
-                iconImage("{$PROPERTY_SITE_MARKER_IMAGE}"),
-                iconSize(0.8f),
-                iconAllowOverlap(true)
-            )
+            SymbolLayer(
+                MARKER_SITE_ID,
+                SOURCE_DEPLOYMENT
+            ).iconImage("{$PROPERTY_SITE_MARKER_IMAGE}").iconSize(0.8).iconAllowOverlap(true)
 
         val unclusteredDeploymentLayer =
-            SymbolLayer(MARKER_DEPLOYMENT_ID, SOURCE_DEPLOYMENT).withProperties(
-                iconImage("{$PROPERTY_DEPLOYMENT_MARKER_IMAGE}"),
-                iconSize(
-                    match(
-                        toString(
-                            get(
-                                PROPERTY_DEPLOYMENT_SELECTED
-                            )
-                        ), literal(0.8f), stop("true", 1.0f)
+            SymbolLayer(
+                MARKER_DEPLOYMENT_ID,
+                SOURCE_DEPLOYMENT
+            ).iconImage("{$PROPERTY_DEPLOYMENT_MARKER_IMAGE}").iconSize(match {
+                toString {
+                    get(
+                        PROPERTY_DEPLOYMENT_SELECTED
                     )
-                ),
-                iconAllowOverlap(true)
-            )
+                    literal(0.8)
+                    stop {
+                        literal("true")
+                        literal(0.8)
+                    }
+                }
+            }).iconAllowOverlap(true)
 
         style.addLayer(unclusteredSiteLayer)
         style.addLayer(unclusteredDeploymentLayer)
@@ -488,20 +481,32 @@ class MapFragment : Fragment() {
 
         layers.forEachIndexed { i, ly ->
             val deploymentSymbolLayer = CircleLayer("$DEPLOYMENT_CLUSTER-$i", SOURCE_DEPLOYMENT)
-            val hasDeploymentAtLeastOne = toNumber(get(PROPERTY_CLUSTER_TYPE))
-            val pointCount = toNumber(get(POINT_COUNT))
-            deploymentSymbolLayer.setProperties(circleColor(ly[1]), circleRadius(16f))
-            deploymentSymbolLayer.setFilter(
+            deploymentSymbolLayer.circleColor(ly[1]).circleRadius(16.0)
+            deploymentSymbolLayer.filter(
                 if (i == 0) {
-                    all(
-                        gte(hasDeploymentAtLeastOne, literal(ly[0])),
-                        gte(pointCount, literal(1))
-                    )
+                    all {
+                        gte {
+                            //hasDeploymentAtLeastOne
+                            toNumber { get(PROPERTY_CLUSTER_TYPE) }
+                            literal(ly[0].toLong())
+                        }
+                        gte {
+                            //pointCount
+                            toNumber { get(POINT_COUNT) }
+                            literal(1)
+                        }
+                    }
                 } else {
-                    all(
-                        gte(hasDeploymentAtLeastOne, literal(ly[0])),
-                        gt(hasDeploymentAtLeastOne, literal(layers[i - 1][0]))
-                    )
+                    all {
+                        gte {
+                            toNumber { get(PROPERTY_CLUSTER_TYPE) }
+                            literal(ly[0].toLong())
+                        }
+                        gt {
+                            toNumber { get(PROPERTY_CLUSTER_TYPE) }
+                            literal(layers[i - 1][0].toLong())
+                        }
+                    }
                 }
             )
 
@@ -509,98 +514,93 @@ class MapFragment : Fragment() {
         }
 
         val deploymentCount = SymbolLayer(DEPLOYMENT_COUNT, SOURCE_DEPLOYMENT)
-        deploymentCount.setProperties(
-            textField(
-                format(
-                    formatEntry(
-                        toString(get(POINT_COUNT)),
-                        FormatOption.formatFontScale(1.5)
-                    )
-                )
-            ),
-            textSize(12f),
-            textColor(Color.WHITE),
-            textIgnorePlacement(true),
-            textOffset(arrayOf(0f, -0.2f)),
-            textAllowOverlap(true)
-        )
+            .textField( formatted {
+                formattedSection (toString { get(POINT_COUNT) }.toString()) {
+                    fontScale = 1.5
+                }
+            })
+            .textField(toString { get(POINT_COUNT) })
+            .textSize(12.0)
+            .textColor(Color.WHITE)
+            .textIgnorePlacement(true)
+            .textOffset(listOf(0.0, -0.2))
+            .textAllowOverlap(true)
 
         style.addLayer(deploymentCount)
     }
 
     private fun setupScale() {
         val scaleBarPlugin = mapView.getScaleBarPlugin()
-        val settings = scaleBarPlugin.getSettings()
-        scaleBarPlugin.updateSettings(settings)
+        scaleBarPlugin.updateSettings {
+
+        }
     }
 
     private fun handleClickIcon(screenPoint: ScreenCoordinate): Boolean {
         mapboxMap?.queryRenderedFeatures(screenPoint, RenderedQueryOptions(
             listOf(MARKER_DEPLOYMENT_ID), null
-        ), object : QueryFeaturesCallback {
-            override fun run(features: Expected<MutableList<Feature>, String>) {
-                if (features.value.isNullOrEmpty()) {
-                    (activity as MainActivityListener).hideBottomSheet()
-                } else {
-                    val selectedFeature = features.value!!.get(0)
-                    val mapFeatures = mapFeatures!!.features()!!
-                    mapFeatures.forEachIndexed { index, feature ->
-                        if (selectedFeature.getProperty(PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID) == feature.getProperty(
-                                PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID
+        )
+        ) { features ->
+            if (features.value.isNullOrEmpty()) {
+                (activity as MainActivityListener).hideBottomSheet()
+            } else {
+                val selectedFeature = features.value!!.get(0)
+                val mapFeatures = mapFeatures!!.features()!!
+                mapFeatures.forEachIndexed { index, feature ->
+                    if (selectedFeature.getProperty(PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID) == feature.getProperty(
+                            PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID
+                        )
+                    ) {
+                        mapFeatures[index]?.let { setFeatureSelectState(it, true) }
+                        val deploymentId =
+                            selectedFeature.getStringProperty(
+                                PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID
                             )
-                        ) {
-                            mapFeatures[index]?.let { setFeatureSelectState(it, true) }
-                            val deploymentId =
-                                selectedFeature.getStringProperty(
-                                    PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID
-                                )
-                                    .toInt()
-                            val deploymentDevice =
-                                selectedFeature.getStringProperty(
-                                    PROPERTY_DEPLOYMENT_MARKER_DEVICE
-                                )
-                                    .toString()
-                            (activity as MainActivityListener).showBottomSheet(
-                                DeploymentViewPagerFragment.newInstance(
-                                    deploymentId,
-                                    deploymentDevice
-                                )
+                                .toInt()
+                        val deploymentDevice =
+                            selectedFeature.getStringProperty(
+                                PROPERTY_DEPLOYMENT_MARKER_DEVICE
                             )
-                            analytics?.trackClickPinEvent()
-                        } else {
-                            mapFeatures[index]?.let { setFeatureSelectState(it, false) }
-                        }
+                                .toString()
+                        (activity as MainActivityListener).showBottomSheet(
+                            DeploymentViewPagerFragment.newInstance(
+                                deploymentId,
+                                deploymentDevice
+                            )
+                        )
+                        analytics?.trackClickPinEvent()
+                    } else {
+                        mapFeatures[index]?.let { setFeatureSelectState(it, false) }
                     }
                 }
             }
-        })
+        }
 
         mapboxMap?.queryRenderedFeatures(screenPoint, RenderedQueryOptions(
             listOf(MARKER_DEPLOYMENT_ID), null
-        ), object : QueryFeaturesCallback {
-            override fun run(features: Expected<MutableList<Feature>, String>) {
-                if (features.value != null && features.value!!.isNotEmpty()) {
-                    val pinCount =
-                        if (features.value!!.get(0)
-                                .getProperty(POINT_COUNT) != null
-                        ) features.value!!.get(0).getProperty(
-                            POINT_COUNT
-                        ).asInt else 0
-                    if (pinCount > 0) {
-                        val clusterLeavesFeatureCollection =
-                            mapSource?.getClusterLeaves(
-                                features.value!!.get(0).getProperty("cluster_id").asInt, 8000, 0
-                            )
-                        if (clusterLeavesFeatureCollection != null) {
-                            val boundBox =
-                                FeatureCollection.fromFeatures(clusterLeavesFeatureCollection)
-                                    .bbox()
-                            moveCameraToLeavesBounds(boundBox)
-                        }
+        )
+        ) { features ->
+            if (features.value != null && features.value!!.isNotEmpty()) {
+                val pinCount =
+                    if (features.value!!.get(0)
+                            .getProperty(POINT_COUNT) != null
+                    ) features.value!!.get(0).getProperty(
+                        POINT_COUNT
+                    ).asInt else 0
+                if (pinCount > 0) {
+                    val clusterLeavesFeatureCollection =
+                        mapSource?.getClusterLeaves(
+                            features.value!!.get(0).getProperty("cluster_id").asInt, 8000, 0
+                        )
+                    if (clusterLeavesFeatureCollection != null) {
+                        val boundBox =
+                            FeatureCollection.fromFeatures(clusterLeavesFeatureCollection)
+                                .bbox()
+                        moveCameraToLeavesBounds(boundBox)
                     }
                 }
             }
-        })
+        }
         clearFeatureSelected()
         return false
     }
