@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.PointF
 import android.location.Location
 import android.os.Bundle
+import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.util.TypedValue
@@ -126,6 +127,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private lateinit var arrayListOfSite: ArrayList<String>
     private lateinit var adapterOfSearchSite: ArrayAdapter<String>
     private var isRotate = false
+    private val handler: Handler = Handler()
 
     private val mapboxLocationChangeCallback =
         object : LocationEngineCallback<LocationEngineResult> {
@@ -450,6 +452,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         trackingLayout.setOnClickListener {
             if (trackingTextView.text == "Track") {
+                context?.let { context -> LocationTracking.set(context, true) }
                 trackingImageView.setImageDrawable(context?.let { it1 ->
                     ContextCompat.getDrawable(
                         it1,
@@ -457,7 +460,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     )
                 })
                 trackingTextView.text = "0.0 km 0 min"
+                startCounting()
             } else {
+                context?.let { context -> LocationTracking.set(context, false) }
+                handler.removeCallbacks(run)
                 trackingTextView.text = "Track"
                 trackingImageView.setImageDrawable(context?.let { it1 ->
                     ContextCompat.getDrawable(
@@ -466,6 +472,19 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     )
                 })
             }
+        }
+    }
+
+    private fun startCounting() {
+        handler.post(run)
+    }
+
+    private val run: Runnable = object : Runnable {
+        override fun run() {
+            context?.let {
+                trackingTextView.text = "0.0 km ${LocationTracking.getOnDutyTimeMinute(it)} min"
+            }
+            handler.postDelayed(this, 1000)
         }
     }
 
