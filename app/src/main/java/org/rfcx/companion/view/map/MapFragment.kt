@@ -30,18 +30,28 @@ import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
 import com.mapbox.maps.*
+import com.mapbox.maps.extension.style.expressions.dsl.generated.accumulated
+import com.mapbox.maps.extension.style.expressions.dsl.generated.all
+import com.mapbox.maps.extension.style.expressions.dsl.generated.sum
+import com.mapbox.maps.extension.style.expressions.dsl.generated.switchCase
+import com.mapbox.maps.extension.style.expressions.generated.Expression
 import com.mapbox.maps.extension.style.layers.addLayer
 import com.mapbox.maps.extension.style.layers.generated.CircleLayer
 import com.mapbox.maps.extension.style.layers.generated.SymbolLayer
+import com.mapbox.maps.extension.style.sources.addSource
 import com.mapbox.maps.extension.style.sources.generated.GeoJsonSource
 import com.mapbox.maps.extension.style.sources.getClusterLeaves
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.easeTo
 import com.mapbox.maps.plugin.animation.flyTo
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
+import com.mapbox.maps.plugin.locationcomponent.LocationComponentConstants
+import com.mapbox.maps.plugin.locationcomponent.LocationComponentPlugin
+import com.mapbox.maps.plugin.locationcomponent.LocationComponentPluginImpl
 import com.mapbox.maps.plugin.locationcomponent.getLocationComponentPlugin
 import com.mapbox.maps.plugin.scalebar.ScaleBarPlugin
 import com.mapbox.maps.plugin.scalebar.getScaleBarPlugin
+import com.mapbox.turf.TurfMeasurement
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_map.*
 import org.rfcx.companion.DeploymentListener
@@ -183,20 +193,20 @@ class MapFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        context?.let { Mapbox.getInstance(it, getString(R.string.mapbox_token)) }
+        mapView.getMapboxMap().loadStyleUri(Style.OUTDOORS)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mapView = view.findViewById(R.id.mapView)
-        mapView.getMapboxMap().loadStyleUri(Style.OUTDOORS) { style ->
+        mapView.getMapboxMap().getStyle() { style ->
             context?.let {
                 retrieveDeployments(it)
                 retrieveLocations(it)
                 retrieveProjects(it)
             }
 
-            checkThenAccquireLocation(style)
+            checkThenAccquireLocation()
             setupSources(style)
             setupImages(style)
             setupMarkerLayers(style)
@@ -207,7 +217,6 @@ class MapFragment : Fragment() {
             }
             mapboxMap = mapView.getMapboxMap()
         }
-        mapView.getLocationComponentPlugin().enabled = true
 
         fetchJobSyncing()
         fetchData()
@@ -220,24 +229,30 @@ class MapFragment : Fragment() {
                 if (it) {
                     moveCameraToCurrentLocation()
                 } else {
-                    mapView.getMapboxMap().getStyle()?.let { style ->
-                        checkThenAccquireLocation(style)
-                    }
+                    checkThenAccquireLocation()
                 }
             }
         }
 
         zoomOutButton.setOnClickListener {
             mapboxMap?.let {
-                it.flyTo(CameraOptions.Builder().zoom(it.getCameraOptions().zoom!! - 1.0).build(), MapAnimationOptions.Builder().duration(
-                    DURATION).build())
+                it.flyTo(
+                    CameraOptions.Builder().zoom(it.getCameraOptions().zoom!! - 1.0).build(),
+                    MapAnimationOptions.Builder().duration(
+                        DURATION
+                    ).build()
+                )
             }
         }
 
         zoomInButton.setOnClickListener {
             mapboxMap?.let {
-                it.flyTo(CameraOptions.Builder().zoom(it.getCameraOptions().zoom!! + 1.0).build(), MapAnimationOptions.Builder().duration(
-                    DURATION).build())
+                it.flyTo(
+                    CameraOptions.Builder().zoom(it.getCameraOptions().zoom!! + 1.0).build(),
+                    MapAnimationOptions.Builder().duration(
+                        DURATION
+                    ).build()
+                )
             }
         }
 
@@ -333,8 +348,12 @@ class MapFragment : Fragment() {
                 val item = locateDb.getLocateByName(name)
                 item?.let { loc ->
                     mapboxMap?.let {
-                        it.flyTo(CameraOptions.Builder().zoom(DEFAULT_ZOOM_LEVEL).center(loc.getPoint()).build(), MapAnimationOptions.Builder().duration(
-                            DURATION).build())
+                        it.flyTo(
+                            CameraOptions.Builder().zoom(DEFAULT_ZOOM_LEVEL).center(loc.getPoint())
+                                .build(), MapAnimationOptions.Builder().duration(
+                                DURATION
+                            ).build()
+                        )
                     }
                 }
 
@@ -358,23 +377,26 @@ class MapFragment : Fragment() {
 
     private fun setupSources(style: Style) {
         mapSource =
-            GeoJsonSource(
-                SOURCE_DEPLOYMENT,
-                FeatureCollection.fromFeatures(listOf()),
-                GeoJsonOptions()
-                    .withCluster(true)
-                    .withClusterMaxZoom(20)
-                    .withClusterRadius(30)
-                    .withClusterProperty(
-                        PROPERTY_CLUSTER_TYPE,
-                        sum(accumulated(), get(PROPERTY_CLUSTER_TYPE)),
-                        switchCase(
-                            eq(get(PROPERTY_DEPLOYMENT_MARKER_IMAGE), Battery.BATTERY_PIN_GREEN),
-                            literal(1),
-                            literal(0)
-                        )
-                    )
-            )
+            GeoJsonSource.Builder(SOURCE_DEPLOYMENT)
+                .data(FeatureCollection.fromFeatures(listOf()).toJson().toString())
+                .cluster(true)
+                .clusterMaxZoom(20)
+                .clusterRadius(30)
+                .clusterProperty(
+                    PROPERTY_CLUSTER_TYPE,
+                    sum {
+                        accumulated()
+                        get(PROPERTY_CLUSTER_TYPE)
+                    },
+                    switchCase {
+                        eq {
+                            get(PROPERTY_DEPLOYMENT_MARKER_IMAGE)
+                            Battery.BATTERY_PIN_GREEN
+                        }
+                        literal(1)
+                        literal(0)
+                    })
+                .build()
 
         style.addSource(mapSource!!)
     }
@@ -566,7 +588,9 @@ class MapFragment : Fragment() {
                         ).asInt else 0
                     if (pinCount > 0) {
                         val clusterLeavesFeatureCollection =
-                            mapSource?.getClusterLeaves(features.value!!.get(0), 8000, 0)
+                            mapSource?.getClusterLeaves(
+                                features.value!!.get(0).getProperty("cluster_id").asInt, 8000, 0
+                            )
                         if (clusterLeavesFeatureCollection != null) {
                             val boundBox =
                                 FeatureCollection.fromFeatures(clusterLeavesFeatureCollection)
@@ -584,7 +608,14 @@ class MapFragment : Fragment() {
     private fun moveCameraToLeavesBounds(boundBox: BoundingBox?) {
         if (boundBox != null) {
             val latLngBounds = CoordinateBounds(boundBox.southwest(), boundBox.northeast())
-            mapboxMap?.easeTo(mapboxMap!!.cameraForCoordinateBounds(latLngBounds, EdgeInsets(1300.0, 1300.0, 1300.0, 1300.0), null, null))
+            mapboxMap?.easeTo(
+                mapboxMap!!.cameraForCoordinateBounds(
+                    latLngBounds,
+                    EdgeInsets(100.0, 100.0, 100.0, 100.0),
+                    null,
+                    null
+                )
+            )
 
         }
     }
@@ -658,18 +689,14 @@ class MapFragment : Fragment() {
         if (deploymentMarkers.isNotEmpty()) {
             val lastReport = deploymentMarkers.sortedByDescending { it.updatedAt }.first()
             mapboxMap?.let {
-                it.moveCamera(
-                    CameraUpdateFactory.newLatLngZoom(
-                        LatLng(
-                            lastReport.latitude,
-                            lastReport.longitude
-                        ), it.cameraPosition.zoom
-                    )
+                it.flyTo(
+                    CameraOptions.Builder()
+                        .center(Point.fromLngLat(lastReport.longitude, lastReport.latitude))
+                        .zoom(it.getCameraOptions().zoom!!).build(),
+                    MapAnimationOptions.Builder().duration(
+                        DURATION
+                    ).build()
                 )
-            }
-            mapboxMap?.let {
-                it.flyTo(CameraOptions.Builder().zoom(it.getCameraOptions().zoom!! - 1.0).build(), MapAnimationOptions.Builder().duration(
-                    DURATION).build())
             }
         }
 
@@ -694,11 +721,11 @@ class MapFragment : Fragment() {
     }
 
     private fun getFurthestSiteFromCurrentLocation(
-        currentLatLng: LatLng,
+        currentLatLng: Point,
         sites: List<Locate>
     ): Locate? {
         return sites.maxBy {
-            currentLatLng.distanceTo(LatLng(it.latitude, it.longitude))
+            TurfMeasurement.distance(currentLatLng, Point.fromLngLat(it.longitude, it.latitude))
         }
     }
 
@@ -937,49 +964,31 @@ class MapFragment : Fragment() {
 
     private fun refreshSource() {
         if (mapSource != null && mapFeatures != null) {
-            mapSource!!.setGeoJson(mapFeatures)
+            mapSource!!.data(mapFeatures!!.toJson().toString())
         }
     }
 
-    private fun moveCamera(userLoc: LatLng, targetLoc: LatLng? = null, zoom: Double) {
-        mapboxMap?.moveCamera(MapboxCameraUtils.calculateLatLngForZoom(userLoc, targetLoc, zoom))
+    private fun moveCamera(userLoc: Point, targetLoc: Point? = null, zoom: Double) {
+        mapboxMap?.flyTo(
+            MapboxCameraUtils.calculateLatLngForZoom(
+                userLoc,
+                targetLoc,
+                mapboxMap,
+                zoom
+            )
+        )
     }
 
-    private fun checkThenAccquireLocation(style: Style) {
+    private fun checkThenAccquireLocation() {
         locationPermissions?.check { isAllowed: Boolean ->
             if (isAllowed) {
-                enableLocationComponent(style)
+                enableLocationComponent()
             }
         }
     }
 
-    private fun enableLocationComponent(style: Style) {
-        val customLocationComponentOptions = context?.let {
-            LocationComponentOptions.builder(it)
-                .trackingGesturesManagement(true)
-                .accuracyColor(ContextCompat.getColor(it, R.color.colorPrimary))
-                .build()
-        }
-
-        val locationComponentActivationOptions =
-            context?.let {
-                LocationComponentActivationOptions.builder(it, style)
-                    .locationComponentOptions(customLocationComponentOptions)
-                    .build()
-            }
-
-        mapboxMap?.let { it ->
-            it.locationComponent.apply {
-                if (locationComponentActivationOptions != null) {
-                    activateLocationComponent(locationComponentActivationOptions)
-                }
-
-                isLocationComponentEnabled = true
-                cameraMode = CameraMode.TRACKING
-                renderMode = RenderMode.COMPASS
-            }
-        }
-
+    private fun enableLocationComponent() {
+        mapView.getLocationComponentPlugin().enabled = true
         initLocationEngine()
     }
 
@@ -1000,13 +1009,13 @@ class MapFragment : Fragment() {
     }
 
     private fun moveCameraOnStart() {
-        mapboxMap?.locationComponent?.lastKnownLocation?.let { curLoc ->
-            val currentLatLng = LatLng(curLoc.latitude, curLoc.longitude)
+        currentUserLocation?.let { curLoc ->
+            val currentLatLng = Point.fromLngLat(curLoc.longitude, curLoc.latitude)
             val furthestSite = getFurthestSiteFromCurrentLocation(currentLatLng, this.locations)
             furthestSite?.let {
                 moveCamera(
                     currentLatLng,
-                    LatLng(furthestSite.latitude, furthestSite.longitude),
+                    Point.fromLngLat(furthestSite.longitude, furthestSite.latitude),
                     DEFAULT_ZOOM_LEVEL
                 )
             }
@@ -1014,8 +1023,8 @@ class MapFragment : Fragment() {
     }
 
     private fun moveCameraOnStartWithProject() {
-        mapboxMap?.locationComponent?.lastKnownLocation?.let { curLoc ->
-            val currentLatLng = LatLng(curLoc.latitude, curLoc.longitude)
+        currentUserLocation?.let { curLoc ->
+            val currentLatLng = Point.fromLngLat(curLoc.longitude, curLoc.latitude)
             val preferences = context?.let { Preferences.getInstance(it) }
             val projectName =
                 preferences?.getString(Preferences.SELECTED_PROJECT, getString(R.string.none))
@@ -1027,7 +1036,7 @@ class MapFragment : Fragment() {
             furthestSite?.let {
                 moveCamera(
                     currentLatLng,
-                    LatLng(furthestSite.latitude, furthestSite.longitude),
+                    Point.fromLngLat(furthestSite.longitude, furthestSite.latitude),
                     DEFAULT_ZOOM_LEVEL
                 )
             }
@@ -1035,20 +1044,23 @@ class MapFragment : Fragment() {
     }
 
     private fun moveCameraToCurrentLocation() {
-        mapboxMap?.locationComponent?.lastKnownLocation?.let { curLoc ->
-            val currentLatLng = LatLng(curLoc.latitude, curLoc.longitude)
+        currentUserLocation?.let { curLoc ->
+            val currentLatLng = Point.fromLngLat(curLoc.longitude, curLoc.latitude)
             moveCamera(
                 currentLatLng,
                 null,
-                mapboxMap?.cameraPosition?.zoom ?: DEFAULT_ZOOM_LEVEL
+                mapboxMap?.getCameraOptions()?.zoom ?: DEFAULT_ZOOM_LEVEL
             )
         }
     }
 
     fun moveToDeploymentMarker(lat: Double, lng: Double, markerLocationId: String) {
         mapboxMap?.let {
-            it.moveCamera(
-                CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), DEFAULT_ZOOM_LEVEL)
+            it.flyTo(
+                CameraOptions.Builder().center(Point.fromLngLat(lng, lat)).zoom(DEFAULT_ZOOM_LEVEL)
+                    .build(), MapAnimationOptions.Builder().duration(
+                    DURATION
+                ).build()
             )
         }
 
@@ -1080,23 +1092,16 @@ class MapFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        mapView.onResume()
         listener?.let { it ->
             projectNameTextView.text =
                 if (it.getProjectName() != getString(R.string.none)) it.getProjectName() else ""
             combinedData()
-            mapboxMap?.locationComponent?.isLocationComponentActivated?.let { isActivated ->
-                if (isActivated) {
-                    moveCameraOnStartWithProject()
-                }
+            if (mapView.getLocationComponentPlugin().enabled) {
+                moveCameraOnStartWithProject()
             }
+
         }
         analytics?.trackScreen(Screen.MAP)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        mapView.onPause()
     }
 
     override fun onStop() {

@@ -1,25 +1,27 @@
 package org.rfcx.companion.view.map
 
-import com.mapbox.mapboxsdk.camera.CameraUpdate
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
-import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.geometry.LatLngBounds
+import com.mapbox.geojson.Point
+import com.mapbox.maps.CameraOptions
+import com.mapbox.maps.CoordinateBounds
+import com.mapbox.maps.EdgeInsets
+import com.mapbox.maps.MapboxMap
+import com.mapbox.turf.TurfMeasurement
 
 object MapboxCameraUtils {
-    fun calculateLatLngForZoom(userPosition: LatLng, nearestSite: LatLng? = null, zoom: Double): CameraUpdate {
+    fun calculateLatLngForZoom(userPosition: Point, nearestSite: Point? = null, mapboxMap: MapboxMap? = null, zoom: Double): CameraOptions {
         if (nearestSite == null) {
-            return CameraUpdateFactory.newLatLngZoom(userPosition, zoom)
+            return CameraOptions.Builder().center(userPosition).zoom(zoom).build()
         }
-        val oppositeLat = userPosition.latitude - (nearestSite.latitude - userPosition.latitude)
-        val oppositeLng = userPosition.longitude - (nearestSite.longitude - userPosition.longitude)
-        val oppositeNearestSite = LatLng(oppositeLat, oppositeLng)
-        if (oppositeNearestSite.distanceTo(userPosition) < 30) {
-            return CameraUpdateFactory.newLatLngZoom(userPosition, zoom)
+        val oppositeLat = userPosition.latitude() - (nearestSite.latitude() - userPosition.latitude())
+        val oppositeLng = userPosition.longitude() - (nearestSite.longitude() - userPosition.longitude())
+        val oppositeNearestSite = Point.fromLngLat(oppositeLng, oppositeLat)
+        if (TurfMeasurement.distance(oppositeNearestSite, userPosition) < 0.03) {
+            return CameraOptions.Builder().center(userPosition).zoom(zoom).build()
         }
-        val latLngBounds = LatLngBounds.Builder()
-            .include(oppositeNearestSite)
-            .include(nearestSite)
-            .build()
-        return CameraUpdateFactory.newLatLngBounds(latLngBounds, 100)
+        if (mapboxMap != null) {
+            val latLngBounds = CoordinateBounds(oppositeNearestSite, nearestSite)
+            return mapboxMap.cameraForCoordinateBounds(latLngBounds, EdgeInsets(100.0, 100.0, 100.0, 100.0), null, null)
+        }
+        return CameraOptions.Builder().center(userPosition).zoom(zoom).build()
     }
 }
