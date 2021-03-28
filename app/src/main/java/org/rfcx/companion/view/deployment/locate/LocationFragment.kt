@@ -149,7 +149,6 @@ class LocationFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mapView.getMapboxMap().loadStyleUri(Style.OUTDOORS)
         initIntent()
     }
 
@@ -173,7 +172,8 @@ class LocationFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mapView.getMapboxMap().getStyle() { style ->
+        mapView = view.findViewById(R.id.mapBoxView)
+        mapView.getMapboxMap().loadStyleUri(Style.OUTDOORS) { style ->
             lastLocation?.let { lastLocation ->
                 val latLng = Point.fromLngLat(lastLocation.longitude, lastLocation.latitude)
                 moveCamera(latLng, null, DEFAULT_ZOOM)

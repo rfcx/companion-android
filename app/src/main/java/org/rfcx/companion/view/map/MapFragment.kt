@@ -7,6 +7,7 @@ import android.location.Location
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +16,7 @@ import android.widget.SearchView
 import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -28,7 +30,10 @@ import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
 import com.mapbox.maps.*
-import com.mapbox.maps.extension.style.expressions.dsl.generated.*
+import com.mapbox.maps.extension.style.expressions.dsl.generated.all
+import com.mapbox.maps.extension.style.expressions.dsl.generated.sum
+import com.mapbox.maps.extension.style.expressions.dsl.generated.switchCase
+import com.mapbox.maps.extension.style.expressions.dsl.generated.toString
 import com.mapbox.maps.extension.style.layers.addLayer
 import com.mapbox.maps.extension.style.layers.generated.CircleLayer
 import com.mapbox.maps.extension.style.layers.generated.SymbolLayer
@@ -182,21 +187,16 @@ class MapFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_map, container, false)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        mapView.getMapboxMap().loadStyleUri(Style.OUTDOORS)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        MapboxOptions.setDefaultResourceOptions(requireContext(), requireContext().getString(R.string.mapbox_access_token))
         mapView = view.findViewById(R.id.mapView)
-        mapView.getMapboxMap().getStyle() { style ->
+        mapView.getMapboxMap().loadStyleUri(Style.OUTDOORS) { style ->
             context?.let {
                 retrieveDeployments(it)
                 retrieveLocations(it)
                 retrieveProjects(it)
             }
-
             checkThenAccquireLocation()
             setupSources(style)
             setupImages(style)
@@ -376,7 +376,6 @@ class MapFragment : Fragment() {
                 .clusterProperty(
                     PROPERTY_CLUSTER_TYPE,
                     sum {
-                        accumulated()
                         get(PROPERTY_CLUSTER_TYPE)
                     },
                     switchCase {
@@ -450,18 +449,9 @@ class MapFragment : Fragment() {
             SymbolLayer(
                 MARKER_DEPLOYMENT_ID,
                 SOURCE_DEPLOYMENT
-            ).iconImage("{$PROPERTY_DEPLOYMENT_MARKER_IMAGE}").iconSize(match {
-                toString {
-                    get(
-                        PROPERTY_DEPLOYMENT_SELECTED
-                    )
-                    literal(0.8)
-                    stop {
-                        literal("true")
-                        literal(0.8)
-                    }
-                }
-            }).iconAllowOverlap(true)
+            )
+                .iconImage("{$PROPERTY_DEPLOYMENT_MARKER_IMAGE}")
+                .iconSize(0.8).iconAllowOverlap(true)
 
         style.addLayer(unclusteredSiteLayer)
         style.addLayer(unclusteredDeploymentLayer)
@@ -524,7 +514,7 @@ class MapFragment : Fragment() {
     private fun setupScale() {
         val scaleBarPlugin = mapView.getScaleBarPlugin()
         scaleBarPlugin.updateSettings {
-
+            position = Gravity.AXIS_PULL_AFTER
         }
     }
 

@@ -3,7 +3,6 @@ package org.rfcx.companion.view.detail
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.util.TypedValue
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -23,7 +22,10 @@ import kotlinx.android.synthetic.main.activity_deployment_detail.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.R
-import org.rfcx.companion.entity.*
+import org.rfcx.companion.entity.DeploymentImage
+import org.rfcx.companion.entity.Device
+import org.rfcx.companion.entity.EdgeDeployment
+import org.rfcx.companion.entity.Status
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.EdgeDeploymentDb
@@ -56,16 +58,15 @@ class DeploymentDetailActivity : BaseActivity(), (DeploymentImageView) -> Unit {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_deployment_detail)
+        // Setup Mapbox
+        mapView = findViewById(R.id.mapBoxView)
         mapView.getMapboxMap().loadStyleUri(Style.OUTDOORS) {
             mapBoxMap = mapView.getMapboxMap()
 
             setupScale()
             deployment?.let { it1 -> setLocationOnMap(it1) }
         }
-        setContentView(R.layout.activity_deployment_detail)
-
-        // Setup Mapbox
-        mapView = findViewById(R.id.mapBoxView)
 
         deployment =
             intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)

@@ -411,4 +411,6 @@
     <string name="sites_downloading">Sites downloading</string>
     <string name="sites_synced">All sites synced</string>
 
+    <string name="mapbox_access_token">pk.eyJ1IjoidG9vc2VyaXV6IiwiYSI6ImNrbW9wZW5lajI2c2MydW1pa2tqMTVpYjcifQ.c2Vqkq_suI-D7spwacCxFA</string>
+
 </resources>

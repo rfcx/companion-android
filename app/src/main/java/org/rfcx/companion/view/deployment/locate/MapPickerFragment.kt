@@ -100,14 +100,13 @@ class MapPickerFragment : Fragment(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mapView.getMapboxMap().loadStyleUri(Style.OUTDOORS)
         initIntent()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mapView = view.findViewById(R.id.mapBoxPickerView)
-        mapView.getMapboxMap().getStyle() { style ->
+        mapView.getMapboxMap().loadStyleUri(Style.OUTDOORS) { style ->
             mapboxMap = mapView.getMapboxMap()
 
             enableLocationComponent()

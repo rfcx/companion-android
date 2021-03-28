@@ -15,7 +15,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
@@ -26,10 +25,6 @@ import com.mapbox.maps.plugin.animation.flyTo
 import com.mapbox.maps.plugin.locationcomponent.getLocationComponentPlugin
 import com.mapbox.maps.plugin.scalebar.getScaleBarPlugin
 import kotlinx.android.synthetic.main.fragment_edit_location.*
-import kotlinx.android.synthetic.main.fragment_edit_location.altitudeEditText
-import kotlinx.android.synthetic.main.fragment_edit_location.locationGroupValueTextView
-import kotlinx.android.synthetic.main.fragment_edit_location.locationNameEditText
-import kotlinx.android.synthetic.main.fragment_edit_location.locationValueTextView
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
@@ -55,7 +50,6 @@ class EditLocationFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mapView.getMapboxMap().loadStyleUri(Style.OUTDOORS)
         initIntent()
     }
 
@@ -71,7 +65,7 @@ class EditLocationFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mapView = view.findViewById(R.id.mapBoxView)
-        mapView.getMapboxMap().getStyle() { style ->
+        mapView.getMapboxMap().loadStyleUri(Style.OUTDOORS) { style ->
             this.mapboxMap = mapView.getMapboxMap()
 
             setupScale()
