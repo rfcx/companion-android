@@ -126,7 +126,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var arrayListOfSite: ArrayList<String>
     private lateinit var adapterOfSearchSite: ArrayAdapter<String>
-    private var isRotate = false
     private val handler: Handler = Handler()
 
     private val mapboxLocationChangeCallback =
@@ -252,23 +251,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             if (state == BottomSheetBehavior.STATE_EXPANDED) {
                 clearFeatureSelected()
                 listener?.hideBottomSheet()
-            }
-        }
-
-        ViewAnimation().init(zoomInButton)
-        ViewAnimation().init(zoomOutButton)
-        ViewAnimation().init(currentLocationButton)
-
-        addButton.setOnClickListener {
-            isRotate = ViewAnimation().rotateFab(it, !isRotate)
-            if (isRotate) {
-                ViewAnimation().showIn(zoomInButton)
-                ViewAnimation().showIn(zoomOutButton)
-                ViewAnimation().showIn(currentLocationButton)
-            } else {
-                ViewAnimation().showOut(zoomInButton)
-                ViewAnimation().showOut(zoomOutButton)
-                ViewAnimation().showOut(currentLocationButton)
             }
         }
     }
