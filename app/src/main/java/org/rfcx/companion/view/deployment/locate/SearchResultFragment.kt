@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.mapbox.api.geocoding.v5.MapboxGeocoding
 import com.mapbox.api.geocoding.v5.models.CarmenFeature
 import com.mapbox.api.geocoding.v5.models.GeocodingResponse
-import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.geojson.Point
 import java.util.*
 import kotlinx.android.synthetic.main.layout_search_result.*
 import org.rfcx.companion.R
@@ -163,7 +163,7 @@ class SearchResultFragment : Fragment() {
     private fun setupAdapter() {
         searchLocationResultAdapter.onItemClick = { _, latitude, longitude, placeName ->
             (parentFragment as OnSearchResultListener?)?.onLocationSelected(
-                LatLng(latitude, longitude), placeName
+                Point.fromLngLat(longitude, latitude), placeName
             )
         }
         searchLocationRecyclerView.apply {
@@ -194,6 +194,6 @@ class SearchResultFragment : Fragment() {
     }
 
     interface OnSearchResultListener {
-        fun onLocationSelected(latLng: LatLng, placeName: String)
+        fun onLocationSelected(latLng: Point, placeName: String)
     }
 }

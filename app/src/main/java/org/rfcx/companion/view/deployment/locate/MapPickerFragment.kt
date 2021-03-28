@@ -19,21 +19,17 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.toColorInt
 import androidx.fragment.app.Fragment
 import com.mapbox.android.core.location.*
-import com.mapbox.mapboxsdk.Mapbox
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
-import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
-import com.mapbox.mapboxsdk.location.LocationComponentOptions
-import com.mapbox.mapboxsdk.location.modes.RenderMode
-import com.mapbox.mapboxsdk.maps.MapView
-import com.mapbox.mapboxsdk.maps.MapboxMap
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
-import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.pluginscalebar.ScaleBarOptions
-import com.mapbox.pluginscalebar.ScaleBarPlugin
+import com.mapbox.geojson.Point
+import com.mapbox.maps.CameraOptions
+import com.mapbox.maps.MapView
+import com.mapbox.maps.MapboxMap
+import com.mapbox.maps.Style
+import com.mapbox.maps.plugin.animation.flyTo
+import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
+import com.mapbox.maps.plugin.locationcomponent.getLocationComponentPlugin
+import com.mapbox.maps.plugin.scalebar.getScaleBarPlugin
 import java.util.*
 import kotlin.concurrent.schedule
 import kotlinx.android.synthetic.main.fragment_map_picker.*
@@ -47,7 +43,7 @@ import org.rfcx.companion.view.deployment.locate.LocationFragment.Companion.DEFA
 import org.rfcx.companion.view.detail.EditLocationActivityListener
 import org.rfcx.companion.view.detail.MapPickerProtocol
 
-class MapPickerFragment : Fragment(), OnMapReadyCallback,
+class MapPickerFragment : Fragment(),
     SearchResultFragment.OnSearchResultListener {
     private var mapboxMap: MapboxMap? = null
     private lateinit var mapView: MapView
@@ -104,32 +100,56 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        context?.let { Mapbox.getInstance(it, getString(R.string.mapbox_token)) }
+        mapView.getMapboxMap().loadStyleUri(Style.OUTDOORS)
         initIntent()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mapView = view.findViewById(R.id.mapBoxPickerView)
-        mapView.onCreate(savedInstanceState)
-        mapView.getMapAsync(this)
+        mapView.getMapboxMap().getStyle() { style ->
+            mapboxMap = mapView.getMapboxMap()
+
+            enableLocationComponent()
+            setupScale()
+
+            mapView.getMapboxMap().addOnCameraChangeListener {
+                val currentCameraPosition = mapView.getMapboxMap().getCameraOptions().center!!
+                val loc = Location(LocationManager.GPS_PROVIDER)
+                loc.latitude = currentCameraPosition.latitude()
+                loc.longitude = currentCameraPosition.longitude()
+                selectedLocation = loc
+                setLatLogLabel(
+                    Point.fromLngLat(
+                        currentCameraPosition.longitude(),
+                        currentCameraPosition.latitude()
+                    )
+                )
+            }
+        }
 
         showLoading(true)
-        setLatLogLabel(LatLng(0.0, 0.0))
-        moveCamera(LatLng(0.0, 0.0), DEFAULT_ZOOM)
+        setLatLogLabel(Point.fromLngLat(0.0, 0.0))
+        moveCamera(Point.fromLngLat(0.0, 0.0), DEFAULT_ZOOM)
 
         selectButton.setOnClickListener {
-            val currentCameraPosition = mapboxMap?.cameraPosition?.target
+            val currentCameraPosition = mapboxMap?.getCameraOptions()?.center
             currentCameraPosition?.let {
                 analytics?.trackSelectLocationEvent()
-                mapPickerProtocol?.startLocationPage(it.latitude, it.longitude, altitude, nameLocation ?: "", true)
+                mapPickerProtocol?.startLocationPage(
+                    it.latitude(),
+                    it.longitude(),
+                    altitude,
+                    nameLocation ?: "",
+                    true
+                )
             }
         }
 
         currentLocationButton.setOnClickListener {
             selectedLocation = currentUserLocation
             selectedLocation?.let {
-                val latLng = LatLng(it.latitude, it.longitude)
+                val latLng = Point.fromLngLat(it.longitude, it.latitude)
                 moveCamera(latLng, DEFAULT_ZOOM)
                 setLatLogLabel(latLng)
             }
@@ -155,70 +175,17 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
             )
     }
 
-    override fun onMapReady(mapboxMap: MapboxMap) {
-        this.mapboxMap = mapboxMap
-        mapboxMap.uiSettings.isAttributionEnabled = false
-        mapboxMap.uiSettings.isLogoEnabled = false
-        mapboxMap.setStyle(Style.OUTDOORS) {
-            enableLocationComponent()
-            setupScale()
-        }
-
-        mapboxMap.addOnCameraMoveListener {
-            val currentCameraPosition = mapboxMap.cameraPosition.target
-            val loc = Location(LocationManager.GPS_PROVIDER)
-            loc.latitude = currentCameraPosition.latitude
-            loc.longitude = currentCameraPosition.longitude
-            selectedLocation = loc
-            setLatLogLabel(LatLng(currentCameraPosition.latitude, currentCameraPosition.longitude))
-        }
-    }
-
-    private fun moveCamera(latLng: LatLng, zoom: Double) {
-        mapboxMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom))
+    private fun moveCamera(latLng: Point, zoom: Double) {
+        mapboxMap?.flyTo(CameraOptions.Builder().center(latLng).zoom(zoom).build())
     }
 
     @SuppressLint("MissingPermission")
     private fun enableLocationComponent() {
         if (hasPermissions()) {
-            val loadedMapStyle = mapboxMap?.style
-            val locationComponent = mapboxMap?.locationComponent
-            // Activate the LocationComponent
-            val customLocationComponentOptions = context?.let {
-                LocationComponentOptions.builder(it)
-                    .trackingGesturesManagement(true)
-                    .accuracyColor(ContextCompat.getColor(it, R.color.colorPrimary))
-                    .build()
-            }
+            mapView.getLocationComponentPlugin().enabled = true
 
-            val locationComponentActivationOptions =
-                context?.let {
-                    LocationComponentActivationOptions.builder(it, loadedMapStyle!!)
-                        .locationComponentOptions(customLocationComponentOptions)
-                        .build()
-                }
-
-            mapboxMap?.let { it ->
-                it.locationComponent.apply {
-                    if (locationComponentActivationOptions != null) {
-                        activateLocationComponent(locationComponentActivationOptions)
-                    }
-
-                    isLocationComponentEnabled = true
-                    renderMode = RenderMode.COMPASS
-                }
-            }
-
-            if (latitude != 0.0 && longitude != 0.0) {
-                moveCamera(LatLng(latitude, longitude), DEFAULT_ZOOM)
-                setLatLogLabel(LatLng(latitude, longitude))
-            } else {
-                val lastKnownLocation = locationComponent?.lastKnownLocation
-                lastKnownLocation?.let {
-                    this.currentUserLocation = it
-                    moveCamera(LatLng(it.latitude, it.longitude), DEFAULT_ZOOM)
-                }
-            }
+            moveCamera(Point.fromLngLat(longitude, latitude), DEFAULT_ZOOM)
+            setLatLogLabel(Point.fromLngLat(longitude, latitude))
             initLocationEngine()
         } else {
             requestPermissions()
@@ -226,10 +193,10 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun setupScale() {
-        val scaleBarPlugin = ScaleBarPlugin(mapView, mapboxMap!!)
-        val options = ScaleBarOptions(requireContext())
-        options.setMarginTop(R.dimen.legend_top_margin)
-        scaleBarPlugin.create(options)
+        val scaleBarPlugin = mapView.getScaleBarPlugin()
+        scaleBarPlugin.updateSettings {
+            marginTop = 64f
+        }
     }
 
     @SuppressLint("MissingPermission")
@@ -270,12 +237,14 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
         }
     }
 
-    private fun setLatLogLabel(location: LatLng) {
+    private fun setLatLogLabel(location: Point) {
         context?.let {
             val latLng =
-                "${location.latitude.latitudeCoordinates(it)}, ${location.longitude.longitudeCoordinates(
-                    it
-                )}"
+                "${location.latitude().latitudeCoordinates(it)}, ${
+                    location.longitude().longitudeCoordinates(
+                        it
+                    )
+                }"
             locationTextView.text = latLng
         }
     }
@@ -299,13 +268,11 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
 
     override fun onResume() {
         super.onResume()
-        mapView.onResume()
         analytics?.trackScreen(Screen.MAP_PICKER)
     }
 
     override fun onPause() {
         super.onPause()
-        mapView.onPause()
     }
 
     override fun onStop() {
@@ -429,13 +396,13 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
     }
 
     // callback from SearchResultFragment
-    override fun onLocationSelected(latLng: LatLng, placename: String) {
+    override fun onLocationSelected(latLng: Point, placename: String) {
         clearSearchInputAndHideSoftInput()
         hideSearchFragment()
         searchLayoutSearchEditText.setText(placename)
         selectedLocation = Location("SEARCH").apply {
-            latitude = latLng.latitude
-            longitude = latLng.longitude
+            latitude = latLng.latitude()
+            longitude = latLng.longitude()
         }
         moveCamera(latLng, DEFAULT_ZOOM)
         setLatLogLabel(latLng)

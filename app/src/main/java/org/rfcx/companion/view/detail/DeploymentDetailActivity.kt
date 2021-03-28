@@ -7,21 +7,17 @@ import android.os.PersistableBundle
 import android.util.TypedValue
 import android.view.View
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.toColorInt
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.mapbox.mapboxsdk.Mapbox
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
-import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.maps.MapView
-import com.mapbox.mapboxsdk.maps.MapboxMap
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
-import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.pluginscalebar.ScaleBarOptions
-import com.mapbox.pluginscalebar.ScaleBarPlugin
+import com.mapbox.geojson.Point
+import com.mapbox.maps.CameraOptions
+import com.mapbox.maps.MapView
+import com.mapbox.maps.MapboxMap
+import com.mapbox.maps.Style
+import com.mapbox.maps.plugin.animation.flyTo
+import com.mapbox.maps.plugin.scalebar.getScaleBarPlugin
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_deployment_detail.*
 import kotlinx.android.synthetic.main.toolbar_default.*
@@ -38,7 +34,7 @@ import org.rfcx.companion.view.BaseActivity
 import org.rfcx.companion.view.deployment.EdgeDeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 
-class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (DeploymentImageView) -> Unit {
+class DeploymentDetailActivity : BaseActivity(), (DeploymentImageView) -> Unit {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
@@ -60,13 +56,16 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Mapbox.getInstance(this, getString(R.string.mapbox_token))
+        mapView.getMapboxMap().loadStyleUri(Style.OUTDOORS) {
+            mapBoxMap = mapView.getMapboxMap()
+
+            setupScale()
+            deployment?.let { it1 -> setLocationOnMap(it1) }
+        }
         setContentView(R.layout.activity_deployment_detail)
 
         // Setup Mapbox
         mapView = findViewById(R.id.mapBoxView)
-        mapView.onCreate(savedInstanceState)
-        mapView.getMapAsync(this)
 
         deployment =
             intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
@@ -199,35 +198,23 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         }
     }
 
-    override fun onMapReady(mapboxMap: MapboxMap) {
-        mapBoxMap = mapboxMap
-        mapboxMap.uiSettings.apply {
-            setAllGesturesEnabled(false)
-            isAttributionEnabled = false
-            isLogoEnabled = false
-        }
-
-        mapboxMap.setStyle(Style.OUTDOORS) {
-            setupScale()
-            deployment?.let { it1 -> setLocationOnMap(it1) }
-        }
-    }
-
     private fun setupScale() {
-        val scaleBarPlugin = ScaleBarPlugin(mapView, mapBoxMap)
-        scaleBarPlugin.create(ScaleBarOptions(this))
+        val scaleBarPlugin = mapView.getScaleBarPlugin()
+        scaleBarPlugin.updateSettings {
+
+        }
     }
 
     private fun setLocationOnMap(deployment: EdgeDeployment) {
         val location = deployment.stream
         location?.let { locate ->
-            val latLng = LatLng(locate.latitude, locate.longitude)
+            val latLng = Point.fromLngLat(locate.longitude, locate.latitude)
             moveCamera(latLng, LocationFragment.DEFAULT_ZOOM)
         }
     }
 
-    private fun moveCamera(latLng: LatLng, zoom: Double) {
-        mapBoxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom))
+    private fun moveCamera(latLng: Point, zoom: Double) {
+        mapBoxMap.flyTo(CameraOptions.Builder().center(latLng).zoom(zoom).build())
     }
 
     private fun setupToolbar() {
@@ -255,16 +242,6 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         mapView.onStart()
     }
 
-    override fun onResume() {
-        super.onResume()
-        mapView.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        mapView.onPause()
-    }
-
     override fun onStop() {
         super.onStop()
         mapView.onStop()
@@ -273,11 +250,6 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
     override fun onLowMemory() {
         super.onLowMemory()
         mapView.onLowMemory()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
-        super.onSaveInstanceState(outState, outPersistentState)
-        mapView.onSaveInstanceState(outState)
     }
 
     companion object {

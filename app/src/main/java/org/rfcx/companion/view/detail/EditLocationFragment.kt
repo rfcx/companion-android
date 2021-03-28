@@ -16,32 +16,27 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.toColorInt
 import androidx.fragment.app.Fragment
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
-import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
-import com.mapbox.mapboxsdk.location.LocationComponentOptions
-import com.mapbox.mapboxsdk.location.modes.RenderMode
-import com.mapbox.mapboxsdk.maps.MapView
-import com.mapbox.mapboxsdk.maps.MapboxMap
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
-import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.pluginscalebar.ScaleBarOptions
-import com.mapbox.pluginscalebar.ScaleBarPlugin
+import com.mapbox.geojson.Point
+import com.mapbox.maps.CameraOptions
+import com.mapbox.maps.MapView
+import com.mapbox.maps.MapboxMap
+import com.mapbox.maps.Style
+import com.mapbox.maps.plugin.animation.flyTo
+import com.mapbox.maps.plugin.locationcomponent.getLocationComponentPlugin
+import com.mapbox.maps.plugin.scalebar.getScaleBarPlugin
 import kotlinx.android.synthetic.main.fragment_edit_location.*
 import kotlinx.android.synthetic.main.fragment_edit_location.altitudeEditText
 import kotlinx.android.synthetic.main.fragment_edit_location.locationGroupValueTextView
 import kotlinx.android.synthetic.main.fragment_edit_location.locationNameEditText
 import kotlinx.android.synthetic.main.fragment_edit_location.locationValueTextView
-import kotlinx.android.synthetic.main.fragment_edit_location.pinDeploymentImageView
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.convertLatLngLabel
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 
-class EditLocationFragment : Fragment(), OnMapReadyCallback {
+class EditLocationFragment : Fragment() {
     private var mapboxMap: MapboxMap? = null
     private lateinit var mapView: MapView
 
@@ -60,6 +55,7 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        mapView.getMapboxMap().loadStyleUri(Style.OUTDOORS)
         initIntent()
     }
 
@@ -75,8 +71,14 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mapView = view.findViewById(R.id.mapBoxView)
-        mapView.onCreate(savedInstanceState)
-        mapView.getMapAsync(this)
+        mapView.getMapboxMap().getStyle() { style ->
+            this.mapboxMap = mapView.getMapboxMap()
+
+            setupScale()
+            enableLocationComponent()
+            val latLng = Point.fromLngLat(longitude, latitude)
+            moveCamera(latLng, LocationFragment.DEFAULT_ZOOM)
+        }
         view.viewTreeObserver.addOnGlobalLayoutListener { setOnFocusEditText() }
 
         setHideKeyboard()
@@ -159,59 +161,19 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    override fun onMapReady(mapboxMap: MapboxMap) {
-        this.mapboxMap = mapboxMap
-
-        mapboxMap.uiSettings.setAllGesturesEnabled(false)
-        mapboxMap.uiSettings.isAttributionEnabled = false
-        mapboxMap.uiSettings.isLogoEnabled = false
-
-        mapboxMap.setStyle(Style.OUTDOORS) {
-            setupScale()
-            enableLocationComponent()
-            val latLng = LatLng(latitude, longitude)
-            moveCamera(latLng, LocationFragment.DEFAULT_ZOOM)
-        }
-    }
-
     @SuppressLint("MissingPermission")
     private fun enableLocationComponent() {
         if (hasPermissions()) {
-            val loadedMapStyle = mapboxMap?.style
-            // Activate the LocationComponent
-            val customLocationComponentOptions = context?.let {
-                LocationComponentOptions.builder(it)
-                    .trackingGesturesManagement(true)
-                    .accuracyColor(ContextCompat.getColor(it, R.color.colorPrimary))
-                    .build()
-            }
-
-            val locationComponentActivationOptions =
-                context?.let {
-                    LocationComponentActivationOptions.builder(it, loadedMapStyle!!)
-                        .locationComponentOptions(customLocationComponentOptions)
-                        .build()
-                }
-
-            mapboxMap?.let { it ->
-                it.locationComponent.apply {
-                    if (locationComponentActivationOptions != null) {
-                        activateLocationComponent(locationComponentActivationOptions)
-                    }
-
-                    isLocationComponentEnabled = true
-                    renderMode = RenderMode.COMPASS
-                }
-            }
+            mapView.getLocationComponentPlugin().enabled = true
         } else {
             requestPermissions()
         }
     }
 
     private fun setupScale() {
-        val scaleBarPlugin = ScaleBarPlugin(mapView, mapboxMap!!)
-        val options = ScaleBarOptions(requireContext())
-        scaleBarPlugin.create(options)
+        val scaleBarPlugin = mapView.getScaleBarPlugin()
+        scaleBarPlugin.updateSettings {
+        }
     }
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -226,8 +188,8 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
     }
 
 
-    private fun moveCamera(latLng: LatLng, zoom: Double) {
-        mapboxMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom))
+    private fun moveCamera(latLng: Point, zoom: Double) {
+        mapboxMap?.flyTo(CameraOptions.Builder().center(latLng).zoom(zoom).build())
     }
 
     private fun View.hideKeyboard() = this.let {
@@ -264,16 +226,10 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
 
     override fun onResume() {
         super.onResume()
-        mapView.onResume()
 
         editLocationActivityListener?.let {
             locationGroupValueTextView.text = it.getLocationGroupName()
         }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        mapView.onPause()
     }
 
     override fun onStop() {

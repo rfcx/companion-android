@@ -30,11 +30,15 @@ import com.mapbox.geojson.Point
 import com.mapbox.maps.MapView
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.Style
+import com.mapbox.maps.plugin.animation.flyTo
 import com.mapbox.maps.plugin.annotation.generated.SymbolManager
 import com.mapbox.maps.plugin.annotation.generated.SymbolOptions
 import com.mapbox.maps.plugin.annotation.generated.createSymbolManager
 import com.mapbox.maps.plugin.annotation.getAnnotationPlugin
 import com.mapbox.maps.plugin.delegates.MapDelegateProvider
+import com.mapbox.maps.plugin.locationcomponent.getLocationComponentPlugin
+import com.mapbox.maps.plugin.scalebar.getScaleBarPlugin
+import com.mapbox.turf.TurfMeasurement
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.companion.R
@@ -49,7 +53,7 @@ import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.map.MapboxCameraUtils
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 
-class LocationFragment : Fragment(), OnMapReadyCallback {
+class LocationFragment : Fragment() {
     val realm: Realm = Realm.getInstance(RealmHelper.migrationConfig())
     private val locationGroupDb = LocationGroupDb(realm)
     private val locateDb by lazy { LocateDb(realm) }
@@ -111,7 +115,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                             setupLocationSpinner()
                             updateLocationAdapter()
                         }
-                        if (!isUseCurrentLocation){
+                        if (!isUseCurrentLocation) {
                             if (locationNameSpinner.selectedItemPosition != 0) {
                                 setCheckbox()
                             }
@@ -305,16 +309,20 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         symbolManager = annotationPlugin.createSymbolManager(mapView)
         symbolManager?.iconAllowOverlap = true
 
-        style.addImage(PROPERTY_MARKER_IMAGE, ResourcesCompat.getDrawable(this.resources, R.drawable.ic_pin_map, null)!!.toBitmap())
+        style.addImage(
+            PROPERTY_MARKER_IMAGE,
+            ResourcesCompat.getDrawable(this.resources, R.drawable.ic_pin_map, null)!!.toBitmap()
+        )
     }
 
     private fun createSiteSymbol(latLng: Point) {
         symbolManager?.deleteAll()
         symbolManager?.create(
             SymbolOptions()
-            .withLatLng(latLng)
-            .withIconImage(PROPERTY_MARKER_IMAGE)
-            .withIconSize(0.75f))
+                .withPoint(latLng)
+                .withIconImage(PROPERTY_MARKER_IMAGE)
+                .withIconSize(0.75)
+        )
     }
 
     private fun verifyInput() {
@@ -371,12 +379,14 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         return LocationGroup(locationGroup.name, locationGroup.color, locationGroup.serverId)
     }
 
-    private fun setLatLogLabel(location: LatLng) {
+    private fun setLatLogLabel(location: Point) {
         context?.let {
             val latLng =
-                "${location.latitude.latitudeCoordinates(it)}, ${location.longitude.longitudeCoordinates(
-                    it
-                )}"
+                "${location.latitude().latitudeCoordinates(it)}, ${
+                    location.longitude().longitudeCoordinates(
+                        it
+                    )
+                }"
             locationValueTextView.text = latLng
         }
     }
@@ -386,8 +396,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         enableExistingLocation(true)
 
         locateItem?.let {
-            createSiteSymbol(it.getLatLng())
-            moveCamera(LatLng(latitude, longitude), it.getLatLng(), DEFAULT_ZOOM)
+            createSiteSymbol(it.getPoint())
+            moveCamera(Point.fromLngLat(longitude, latitude), it.getPoint(), DEFAULT_ZOOM)
             if (locationGroupDb.isExisted(it.locationGroup?.name)) {
                 group = it.locationGroup?.name
                 locationGroupValueTextView.text = it.locationGroup?.name
@@ -431,7 +441,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 })
             }
 
-            val siteItem = distanceLocate?.filter{ site ->
+            val siteItem = distanceLocate?.filter { site ->
                 site.locate.id == it.id
             }
             if (siteItem != null && siteItem.isNotEmpty()) {
@@ -444,8 +454,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun setCheckboxForResumeDeployment(curLoc: LatLng, target: LatLng) {
-        val distance = curLoc.distanceTo(target)
+    private fun setCheckboxForResumeDeployment(curLoc: Point, target: Point) {
+        val distance = TurfMeasurement.distance(curLoc, target)
         if (distance <= 20) {
             setWithinText()
         } else {
@@ -460,7 +470,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             loc.longitude = longitude
             lastLocation = loc
         } else {
-            lastLocation = currentUserLocation ?: deploymentProtocol?.getCurrentLocation() // get new current location
+            lastLocation = currentUserLocation
+                ?: deploymentProtocol?.getCurrentLocation() // get new current location
             this.latitude = lastLocation?.latitude ?: 0.0
             this.longitude = lastLocation?.longitude ?: 0.0
         }
@@ -474,21 +485,26 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
         if (lastLocation != null) {
             lastLocation?.let {
-                val latLng = LatLng(it.latitude, it.longitude)
+                val latLng = Point.fromLngLat(it.longitude, it.latitude)
                 createSiteSymbol(latLng)
                 distanceSite(it.latitude, it.longitude)
                 val currentLocation = deploymentProtocol?.getCurrentLocation()
                 if (currentLocation != null) {
-                    moveCamera(LatLng(currentLocation.latitude, currentLocation.longitude), latLng, DEFAULT_ZOOM)
+                    moveCamera(
+                        Point.fromLngLat(
+                            currentLocation.longitude,
+                            currentLocation.latitude
+                        ), latLng, DEFAULT_ZOOM
+                    )
                 } else {
                     moveCamera(latLng, null, DEFAULT_ZOOM)
                 }
             }
         } else {
             // not found current location
-            setLatLogLabel(LatLng(0.0, 0.0))
-            moveCamera(LatLng(0.0, 0.0), DEFAULT_ZOOM)
-            distanceSite(0.0,0.0)
+            setLatLogLabel(Point.fromLngLat(0.0, 0.0))
+            moveCamera(Point.fromLngLat(0.0, 0.0), DEFAULT_ZOOM)
+            distanceSite(0.0, 0.0)
         }
     }
 
@@ -507,7 +523,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private fun setCurrentUserLocation() {
         currentUserLocation?.let { lastLocation ->
-            val latLng = LatLng(lastLocation.latitude, lastLocation.longitude)
+            val latLng = Point.fromLngLat(lastLocation.longitude, lastLocation.latitude)
             setLatLogLabel(latLng)
         }
     }
@@ -553,8 +569,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
             //assign to make setCheckbox work
             val currentLocation = deploymentProtocol!!.getCurrentLocation()
-            val currentLatLng = LatLng(currentLocation.latitude, currentLocation.longitude)
-            val siteLatLng = LatLng(locateItem?.latitude ?: deploymentLocation.latitude, locateItem?.longitude ?: deploymentLocation.longitude)
+            val currentLatLng =
+                Point.fromLngLat(currentLocation.longitude, currentLocation.latitude)
+            val siteLatLng = Point.fromLngLat(
+                locateItem?.longitude ?: deploymentLocation.longitude,
+                locateItem?.latitude ?: deploymentLocation.latitude
+            )
             getLastLocation()
             createSiteSymbol(siteLatLng)
             setCheckboxForResumeDeployment(currentLatLng, siteLatLng)
@@ -657,12 +677,19 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         return null
     }
 
-    private fun moveCamera(latLng: LatLng, zoom: Double) {
-        mapboxMap?.moveCamera(MapboxCameraUtils.calculateLatLngForZoom(latLng, null, zoom))
+    private fun moveCamera(latLng: Point, zoom: Double) {
+        mapboxMap?.flyTo(MapboxCameraUtils.calculateLatLngForZoom(latLng, null, mapboxMap, zoom))
     }
 
-    private fun moveCamera(userPosition: LatLng, nearestSite: LatLng?, zoom: Double) {
-        mapboxMap?.moveCamera(MapboxCameraUtils.calculateLatLngForZoom(userPosition, nearestSite, zoom))
+    private fun moveCamera(userPosition: Point, nearestSite: Point?, zoom: Double) {
+        mapboxMap?.flyTo(
+            MapboxCameraUtils.calculateLatLngForZoom(
+                userPosition,
+                nearestSite,
+                mapboxMap,
+                zoom
+            )
+        )
     }
 
     private fun setOnFocusEditText() {
@@ -715,37 +742,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     @SuppressLint("MissingPermission")
     private fun enableLocationComponent() {
         if (hasPermissions()) {
-            val loadedMapStyle = mapboxMap?.style
-            val locationComponent = mapboxMap?.locationComponent
-            // Activate the LocationComponent
-            val customLocationComponentOptions = context?.let {
-                LocationComponentOptions.builder(it)
-                    .trackingGesturesManagement(true)
-                    .accuracyColor(ContextCompat.getColor(it, R.color.colorPrimary))
-                    .build()
-            }
-
-            val locationComponentActivationOptions =
-                context?.let {
-                    LocationComponentActivationOptions.builder(it, loadedMapStyle!!)
-                        .locationComponentOptions(customLocationComponentOptions)
-                        .build()
-                }
-
-            mapboxMap?.let { it ->
-                it.locationComponent.apply {
-                    if (locationComponentActivationOptions != null) {
-                        activateLocationComponent(locationComponentActivationOptions)
-                    }
-
-                    isLocationComponentEnabled = true
-                    renderMode = RenderMode.COMPASS
-                }
-            }
-
-            this.currentUserLocation = locationComponent?.lastKnownLocation
-            this.lastLocation = this.currentUserLocation
-
+            mapView.getLocationComponentPlugin().enabled = true
             initLocationEngine()
         } else {
             requestPermissions()
@@ -753,8 +750,10 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setupScale() {
-        val scaleBarPlugin = ScaleBarPlugin(mapView, mapboxMap!!)
-        scaleBarPlugin.create(ScaleBarOptions(requireContext()))
+        val scaleBarPlugin = mapView.getScaleBarPlugin()
+        scaleBarPlugin.updateSettings {
+
+        }
     }
 
     /**
@@ -790,17 +789,11 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     override fun onResume() {
         super.onResume()
-        mapView.onResume()
         analytics?.trackScreen(Screen.LOCATION)
 
         val preferences = context?.let { Preferences.getInstance(it) }
         group = preferences?.getString(Preferences.GROUP, getString(R.string.none))
         locationGroupValueTextView.text = group
-    }
-
-    override fun onPause() {
-        super.onPause()
-        mapView.onPause()
     }
 
     override fun onStop() {
@@ -857,7 +850,13 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             return LocationFragment()
         }
 
-        fun newInstance(latitude: Double, longitude: Double, altitude: Double, name: String, fromPicker: Boolean) =
+        fun newInstance(
+            latitude: Double,
+            longitude: Double,
+            altitude: Double,
+            name: String,
+            fromPicker: Boolean
+        ) =
             LocationFragment()
                 .apply {
                     arguments = Bundle().apply {
