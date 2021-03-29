@@ -29,6 +29,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.mapbox.android.core.location.*
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
+import com.mapbox.geojson.LineString
 import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
@@ -1120,11 +1121,18 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    fun moveToDeploymentMarker(lat: Double, lng: Double, markerLocationId: String) {
+    fun moveToDeploymentMarker(lat: Double, lng: Double, markerLocationId: String, trackingLatLng: List<LatLng>? = null) {
         mapboxMap?.let {
-            it.moveCamera(
-                CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), DEFAULT_ZOOM_LEVEL)
-            )
+            if (trackingLatLng != null) {
+                val latLngBounds = LatLngBounds.Builder()
+                    .includes(trackingLatLng + LatLng(lat, lng))
+                    .build()
+                mapboxMap?.easeCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 200), 1300)
+            } else {
+                it.moveCamera(
+                    CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), DEFAULT_ZOOM_LEVEL)
+                )
+            }
         }
 
         val features = this.mapFeatures!!.features()!!
@@ -1140,13 +1148,22 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    fun showTrackOnMap(id: Int) {
+    fun showTrackOnMap(id: Int, lat: Double, lng: Double, markerLocationId: String) {
         //remove the previous one
         hideTrackOnMap()
         val track = trackingFileDb.getTrackingFileByDeploymentId(id)
-        track?.let {
-            val json = File(it.localPath).readText()
-            lineSource!!.setGeoJson(FeatureCollection.fromJson(json))
+        if (track != null) {
+            val json = File(track.localPath).readText()
+            val featureCollection = FeatureCollection.fromJson(json)
+            lineSource!!.setGeoJson(featureCollection)
+
+            val lineString = featureCollection.features()?.get(0)?.geometry() as LineString
+            val coordinates = lineString.coordinates().toList().map { point ->
+                LatLng(point.latitude(), point.longitude())
+            }
+            moveToDeploymentMarker(lat, lng, markerLocationId, coordinates)
+        } else {
+            moveToDeploymentMarker(lat, lng, markerLocationId)
         }
     }
 

@@ -271,10 +271,10 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         }
     }
 
-    override fun showTrackOnMap(id: Int) {
+    override fun showTrackOnMap(id: Int, lat: Double, lng: Double, markerLocationId: String) {
         val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
         if (mapFragment is MapFragment) {
-            mapFragment.showTrackOnMap(id)
+            mapFragment.showTrackOnMap(id, lat, lng, markerLocationId)
         }
     }
 
@@ -392,7 +392,7 @@ interface MainActivityListener {
     fun hideSnackbar()
     fun onLogout()
     fun moveMapIntoDeploymentMarker(lat: Double, lng: Double, markerLocationId: String)
-    fun showTrackOnMap(id: Int)
+    fun showTrackOnMap(id: Int, lat: Double, lng: Double, markerLocationId: String)
     fun getProjectName(): String
     fun clearFeatureSelectedOnMap()
 }
