@@ -385,6 +385,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             setSearchView()
             searchLayout.setBackgroundResource(R.color.backgroundColor)
         } else {
+            searchLayoutSearchEditText.text = null
             searchLayout.setBackgroundResource(R.color.transparent)
 
             hideLabel()
