@@ -16,6 +16,7 @@
     <color name="tooltipColor">#1F2D3D</color>
     <color name="tooltipTextColor">#ffffff</color>
     <color name="statusColor">#aaa</color>
+    <color name="trackingText">#47525E</color>
 
     <color name="colorPrimary">#2AA841</color>
     <color name="colorPrimaryDark">#ff2c9a46</color>
