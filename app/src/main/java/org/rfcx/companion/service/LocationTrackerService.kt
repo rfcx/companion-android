@@ -21,8 +21,11 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.Coordinate
 import org.rfcx.companion.entity.Tracking
 import org.rfcx.companion.localdb.TrackingDb
+import org.rfcx.companion.util.LocationTracking
 import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.RealmHelper
+import java.util.*
+import kotlin.concurrent.fixedRateTimer
 
 class LocationTrackerService : Service() {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
@@ -32,6 +35,8 @@ class LocationTrackerService : Service() {
     private var mLocationManager: LocationManager? = null
     private var isLocationAvailability: Boolean = true
     private var tracking = Tracking()
+
+    private var trackingStatTimer: Timer? = null
 
     private val locationListener = object : LocationListener {
         override fun onLocationChanged(location: Location?) {
@@ -93,6 +98,14 @@ class LocationTrackerService : Service() {
                 locationListener
             )
             startForeground(NOTIFICATION_LOCATION_ID, createLocationTrackerNotification(true))
+
+            trackingStatTimer?.cancel()
+            trackingStatTimer = fixedRateTimer("timer", false, 60 * 1000, 60 * 1000) {
+                getNotificationManager().notify(
+                    NOTIFICATION_LOCATION_ID,
+                    createLocationTrackerNotification(isLocationAvailability)
+                )
+            }
         } catch (ex: SecurityException) {
             ex.printStackTrace()
         } catch (ex: IllegalArgumentException) {
@@ -109,8 +122,15 @@ class LocationTrackerService : Service() {
         return NotificationCompat.Builder(this, NOTIFICATION_LOCATION_CHANNEL_ID).apply {
             setContentTitle(getString(R.string.tracking_enabled))
             this@LocationTrackerService.isLocationAvailability = isLocationAvailability
-            if (!this@LocationTrackerService.isLocationAvailability) {
-                setContentText(getString(R.string.location_setting))
+            if (this@LocationTrackerService.isLocationAvailability) {
+                setContentText(
+                    getString(
+                        R.string.notification_traking_message_format,
+                        LocationTracking.getOnDutyTimeMinute(this@LocationTrackerService)
+                    )
+                )
+            } else {
+                setContentText(getString(R.string.notification_location_not_availability))
             }
             setSmallIcon(R.drawable.ic_notification)
             setOnlyAlertOnce(true)
@@ -141,6 +161,7 @@ class LocationTrackerService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         mLocationManager?.removeUpdates(locationListener)
+        trackingStatTimer?.cancel()
     }
 
     inner class LocationTrackerServiceBinder : Binder() {
