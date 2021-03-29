@@ -348,11 +348,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     )
                 }
             }
-
-            searchView.isIconified = true
-            if (!searchView.isIconified) {
-                searchView.isIconified = true
-            }
+            showSearchBar(false)
         }
 
         trackingLayout.setOnClickListener {
