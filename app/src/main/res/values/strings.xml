@@ -334,6 +334,7 @@
 
     <!-- LocationTrackerService -->
     On-duty and tracking enabled
+    <string name="track">Track</string>
     <string name="tracking_enabled">On-duty and tracking enabled</string>
     <string name="location_setting">Please enable your device\'s location settings</string>
     <string name="notification_traking_message_format">%d minutes recorded</string>

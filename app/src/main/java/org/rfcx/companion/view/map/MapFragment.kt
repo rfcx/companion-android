@@ -77,6 +77,8 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -352,14 +354,31 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         trackingLayout.setOnClickListener {
             context?.let { context ->
                 if (LocationTracking.isTrackingOn(context)) {
-                    setTextTrackingButton(false)
-                    LocationTracking.set(context, false)
+                    setLocationTrackingService(context, false)
                 } else {
-                    setTextTrackingButton(true)
-                    LocationTracking.set(context, true)
+                    val tracking = trackingDb.getFirstTracking()
+                    if (tracking != null) {
+                        val time = tracking.stopAt?.time?.plus(WITHIN_TIME * 60000)
+                        time?.let {
+                            if (it > Date().time) {
+                                setLocationTrackingService(context, true)
+                            } else {
+                                trackingDb.deleteTracking(1, context)
+                                setLocationTrackingService(context, true)
+                            }
+                        }
+
+                    } else {
+                        setLocationTrackingService(context, true)
+                    }
                 }
             }
         }
+    }
+
+    private fun setLocationTrackingService(context: Context, isOn: Boolean) {
+        setTextTrackingButton(isOn)
+        LocationTracking.set(context, isOn)
     }
 
     private fun setTextTrackingButton(isOn: Boolean) {
@@ -374,7 +393,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 startCounting()
             } else {
                 handler.removeCallbacks(run)
-                trackingTextView.text = "Track"
+                trackingTextView.text = getString(R.string.track)
                 trackingImageView.setImageDrawable(
                     ContextCompat.getDrawable(
                         context,
@@ -392,8 +411,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val run: Runnable = object : Runnable {
         override fun run() {
             context?.let {
-                trackingTextView.text = "${LocationTracking.getDistance(trackingDb) 
-                    .setFormatLabel()} ${LocationTracking.getOnDutyTimeMinute(it)} min"
+                trackingTextView.text = "${LocationTracking.getDistance(trackingDb)
+                    .setFormatLabel()}  ${LocationTracking.getOnDutyTimeMinute(it)} min"
             }
             handler.postDelayed(this, 20 * 1000)
         }
@@ -1192,6 +1211,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         private const val DEPLOYMENT_CLUSTER = "deployment.cluster"
         private const val POINT_COUNT = "point_count"
         private const val DEPLOYMENT_COUNT = "deployment.count"
+        private const val WITHIN_TIME = (60 * 3)     // 3 hr
 
         private const val DURATION = 700
         const val REQUEST_CODE = 1006
