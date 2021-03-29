@@ -286,6 +286,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             showSearchBar(true)
         }
 
+        searchViewActionRightButton.setOnClickListener {
+            if (searchLayoutSearchEditText.text.isNullOrBlank()) {
+                showSearchBar(false)
+            } else {
+                searchLayoutSearchEditText.text = null
+            }
+        }
+
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 return true
@@ -400,6 +408,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun showSearchBar(show: Boolean) {
         searchLayout.visibility = if (show) View.VISIBLE else View.INVISIBLE
+        searchViewActionRightButton.visibility = if (show) View.VISIBLE else View.INVISIBLE
         searchButton.visibility = if (show) View.GONE else View.VISIBLE
         trackingLayout.visibility = if (show) View.GONE else View.VISIBLE
     }
