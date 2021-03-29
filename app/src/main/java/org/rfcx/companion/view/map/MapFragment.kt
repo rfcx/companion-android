@@ -320,12 +320,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-        if (searchView.isIconified) {
-            showButtonOnMap()
-        }
-
         listView.setOnItemClickListener { parent, view, position, id ->
             val projectName = adapterOfSearchSite.getItem(position)
+            view.hideKeyboard()
 
             projectName?.let { name ->
                 val item = locateDb.getLocateByName(name)
@@ -376,12 +373,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun showSearchBar(show: Boolean) {
+    fun showSearchBar(show: Boolean) {
         searchLayout.visibility = if (show) View.VISIBLE else View.INVISIBLE
         listView.visibility = if (show) View.VISIBLE else View.INVISIBLE
         searchViewActionRightButton.visibility = if (show) View.VISIBLE else View.INVISIBLE
         searchButton.visibility = if (show) View.GONE else View.VISIBLE
         trackingLayout.visibility = if (show) View.GONE else View.VISIBLE
+        topBarLayout.visibility = if (show) View.GONE else View.VISIBLE
 
         if (show) {
             setSearchView()
