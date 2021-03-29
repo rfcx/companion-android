@@ -414,6 +414,7 @@
 
     <!-- SelectExistedSites -->
     <string name="sites_loading_dialog">Your full site list is still downloading.\nSome sites may not be visible until the download is complete.</string>
+    <string name="sites_loading_finish_dialog">Your full site list is downloaded.</string>
 
     <!-- MapFragment -->
     <string name="sites_downloading">Sites downloading</string>

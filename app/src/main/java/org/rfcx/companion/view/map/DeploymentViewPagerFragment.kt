@@ -210,12 +210,12 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
                 val detailView = viewPagerAdapter.getItemByPosition(position)
                 detailView?.let {
                     this@DeploymentViewPagerFragment.currentPosition = position
-                    (activity as MainActivity).moveMapIntoDeploymentMarker(
+
+                    (activity as MainActivity).showTrackOnMap(
+                        it.id,
                         it.latitude,
                         it.longitude,
-                        "\"${it.locationName}.${it.id}\""
-                    )
-                    (activity as MainActivity).showTrackOnMap(it.id)
+                        "\"${it.locationName}.${it.id}\"")
                 }
             }
         }

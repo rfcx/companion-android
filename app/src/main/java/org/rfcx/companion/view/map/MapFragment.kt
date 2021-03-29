@@ -1,5 +1,8 @@
 package org.rfcx.companion.view.map
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -12,6 +15,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.LinearInterpolator
 import android.widget.ArrayAdapter
 import android.widget.SearchView
 import android.widget.Toast
@@ -27,6 +31,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.mapbox.android.core.location.*
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
+import com.mapbox.geojson.LineString
 import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
@@ -69,8 +74,10 @@ import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.repo.Firestore
 import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.DownloadAssetsWorker
+import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
+import org.rfcx.companion.view.animator.PointEvaluator
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import retrofit2.Call
@@ -125,6 +132,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private lateinit var arrayListOfSite: ArrayList<String>
     private lateinit var adapterOfSearchSite: ArrayAdapter<String>
     private val handler: Handler = Handler()
+
+    //for animate line string
+    private var routeCoordinateList: List<Point> = listOf()
+    private var routeIndex = 0
+    private var markerLinePointList = arrayListOf<Point>()
+    private var currentAnimator: Animator? = null
 
     private val mapboxLocationChangeCallback =
         object : LocationEngineCallback<LocationEngineResult> {
@@ -279,8 +292,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     newList.addAll(arrayListOfSite.filter { site ->
                         site.toLowerCase().contains(text)
                     })
-                    adapterOfSearchSite =
-                        ArrayAdapter(it, android.R.layout.simple_list_item_1, newList)
+                    adapterOfSearchSite = ArrayAdapter(
+                        it,
+                        android.R.layout.simple_list_item_1,
+                        newList
+                    )
                     if (newList.isEmpty()) showLabel(true) else hideLabel()
                     listView.adapter = adapterOfSearchSite
                 }
@@ -690,13 +706,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private val locateObserve = Observer<List<Locate>> {
         this.locations = it
-        if (DownloadStreamsWorker.isRunning()) {
-            listener?.showSnackbar(
+        when (DownloadStreamsWorker.isRunning()) {
+            DownloadStreamState.RUNNING -> listener?.showSnackbar(
                 requireContext().getString(R.string.sites_downloading),
                 Snackbar.LENGTH_SHORT
             )
-        } else {
-            listener?.showSnackbar(
+            DownloadStreamState.FINISH -> listener?.showSnackbar(
                 requireContext().getString(R.string.sites_synced),
                 Snackbar.LENGTH_SHORT
             )
@@ -1095,11 +1110,23 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    fun moveToDeploymentMarker(lat: Double, lng: Double, markerLocationId: String) {
+    fun moveToDeploymentMarker(
+        lat: Double,
+        lng: Double,
+        markerLocationId: String,
+        trackingLatLng: List<LatLng>? = null
+    ) {
         mapboxMap?.let {
-            it.moveCamera(
-                CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), DEFAULT_ZOOM_LEVEL)
-            )
+            if (trackingLatLng != null) {
+                val latLngBounds = LatLngBounds.Builder()
+                    .includes(trackingLatLng + LatLng(lat, lng))
+                    .build()
+                mapboxMap?.easeCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 200), 1300)
+            } else {
+                it.moveCamera(
+                    CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), DEFAULT_ZOOM_LEVEL)
+                )
+            }
         }
 
         val features = this.mapFeatures!!.features()!!
@@ -1115,19 +1142,72 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    fun showTrackOnMap(id: Int) {
+    fun showTrackOnMap(id: Int, lat: Double, lng: Double, markerLocationId: String) {
         //remove the previous one
         hideTrackOnMap()
         val track = trackingFileDb.getTrackingFileByDeploymentId(id)
-        track?.let {
-            val json = File(it.localPath).readText()
-            lineSource!!.setGeoJson(FeatureCollection.fromJson(json))
+        if (track != null) {
+            val json = File(track.localPath).readText()
+            val featureCollection = FeatureCollection.fromJson(json)
+
+            //track always has 1 item so using get(0) is okay - also it can only be LineString
+            val lineString = featureCollection.features()?.get(0)?.geometry() as LineString
+            routeCoordinateList = lineString.coordinates().toList()
+            moveToDeploymentMarker(
+                lat,
+                lng,
+                markerLocationId,
+                routeCoordinateList.map { point -> LatLng(point.latitude(), point.longitude()) })
+            animate()
+        } else {
+            moveToDeploymentMarker(lat, lng, markerLocationId)
         }
+    }
+
+    private fun animate() {
+        if (routeCoordinateList.size - 1 > routeIndex) {
+            val indexPoint = routeCoordinateList[routeIndex]
+            val newPoint = routeCoordinateList[routeIndex + 1]
+            currentAnimator = createLatLngAnimator(indexPoint, newPoint)
+            currentAnimator?.start()
+            routeIndex++
+        }
+    }
+
+    private fun createLatLngAnimator(currentPosition: Point, targetPosition: Point): Animator {
+        val latLngAnimator: ValueAnimator =
+            ValueAnimator.ofObject(PointEvaluator(), currentPosition, targetPosition)
+        latLngAnimator.duration = 300 // fixed to 300 milliseconds
+        latLngAnimator.interpolator = LinearInterpolator()
+        latLngAnimator.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?) {
+                super.onAnimationEnd(animation)
+                animate()
+            }
+        })
+        latLngAnimator.addUpdateListener { animation ->
+            val point = animation.animatedValue as Point
+            markerLinePointList.add(point)
+            lineSource!!.setGeoJson(
+                Feature.fromGeometry(
+                    LineString.fromLngLats(
+                        markerLinePointList
+                    )
+                )
+            )
+        }
+
+        return latLngAnimator
     }
 
     private fun hideTrackOnMap() {
         //reset source
         lineSource!!.setGeoJson(FeatureCollection.fromFeatures(listOf()))
+        routeCoordinateList = listOf()
+        routeIndex = 0
+        markerLinePointList = arrayListOf()
+        currentAnimator?.cancel()
+        currentAnimator = null
     }
 
     fun showButtonOnMap() {
@@ -1182,6 +1262,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         locateLiveData.removeObserver(locateObserve)
         locationGroupLiveData.removeObserver(locationGroupObserve)
         locationEngine?.removeLocationUpdates(mapboxLocationChangeCallback)
+        currentAnimator?.cancel()
         mapView.onDestroy()
     }
 
