@@ -293,7 +293,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
             if (state == BottomSheetBehavior.STATE_EXPANDED) {
                 listener?.hideBottomSheetAndBottomAppBar()
             } else {
-                listener?.hidBottomAppBar()
+                listener?.hideBottomAppBar()
             }
 
             if (siteAdapter.itemCount == 0) {
