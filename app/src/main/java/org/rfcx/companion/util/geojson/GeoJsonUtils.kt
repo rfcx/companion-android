@@ -1,6 +1,7 @@
 package org.rfcx.companion.util.geojson
 
 import android.content.Context
+import android.graphics.Color
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.JsonArray
@@ -16,7 +17,6 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.FileWriter
 import java.io.InputStream
-import java.lang.Exception
 import java.util.*
 
 object GeoJsonUtils {
@@ -36,6 +36,10 @@ object GeoJsonUtils {
 
         val featureItem = JsonObject()
         featureItem.addProperty("type", "Feature")
+
+        val propertyItem = JsonObject()
+        propertyItem.addProperty("color", randomColor())
+        featureItem.add("properties", propertyItem)
 
         //create Geometry type
         val geometry = JsonObject()
@@ -131,6 +135,12 @@ object GeoJsonUtils {
             jsonArray.add(tempJsonArray)
         }
         return jsonArray
+    }
+
+    private fun randomColor(): String {
+        val rnd = Random()
+        val color = rnd.nextInt(0xffffff + 1)
+        return String.format("#%06x", color).toUpperCase(Locale.getDefault())
     }
 
     interface DownloadTrackCallback {

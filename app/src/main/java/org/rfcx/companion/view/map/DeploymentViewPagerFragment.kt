@@ -214,9 +214,7 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
                     val site = locateDb.getLocateByName(it.locationName)
                     site?.let { obj ->
                         (activity as MainActivity).showTrackOnMap(
-                            obj.id, // site id
-                            it.latitude,
-                            it.longitude,
+                            obj,
                             "\"${it.locationName}.${it.id}\"")
                     }
                 }

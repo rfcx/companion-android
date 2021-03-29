@@ -49,8 +49,8 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.style.expressions.Expression.*
 import com.mapbox.mapboxsdk.style.layers.CircleLayer
 import com.mapbox.mapboxsdk.style.layers.LineLayer
-import com.mapbox.mapboxsdk.style.layers.Property.LINE_CAP_SQUARE
-import com.mapbox.mapboxsdk.style.layers.Property.LINE_JOIN_MITER
+import com.mapbox.mapboxsdk.style.layers.Property.LINE_CAP_ROUND
+import com.mapbox.mapboxsdk.style.layers.Property.LINE_JOIN_ROUND
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
@@ -73,7 +73,10 @@ import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.DiagnosticDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
-import org.rfcx.companion.service.*
+import org.rfcx.companion.service.DeploymentSyncWorker
+import org.rfcx.companion.service.DownloadImagesWorker
+import org.rfcx.companion.service.DownloadStreamState
+import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.view.animator.PointEvaluator
@@ -138,6 +141,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var markerLinePointList = arrayListOf<ArrayList<Point>>()
     private var currentAnimator: Animator? = null
     private var queue = arrayListOf<List<Point>>()
+    private var queueColor = arrayListOf<String>()
     private var queuePivot = 0
 
     private val mapboxLocationChangeCallback =
@@ -571,11 +575,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private fun setupMarkerLayers(style: Style) {
 
         val line = LineLayer("line-layer", SOURCE_LINE).withProperties(
-            lineCap(LINE_CAP_SQUARE),
-            lineJoin(LINE_JOIN_MITER),
-            lineOpacity(.7f),
-            lineWidth(7f),
-            lineColor(Color.parseColor("#3bb2d0"))
+            lineCap(LINE_CAP_ROUND),
+            lineJoin(LINE_JOIN_ROUND),
+            lineWidth(5f),
+            lineColor(get("color"))
         )
 
         style.addLayer(line)
@@ -685,35 +688,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID
                     ).asString
                     val site = locateDb.getLocateByName(markerId.split(".")[0])
-                    site?.let { obj ->
-                        showTrackOnMap(obj.id, obj.latitude, obj.longitude, markerId)
-                        if (site.serverId != null) {
-                            retrieveTracking(
-                                requireContext(),
-                                site.id,
-                                site.serverId!!,
-                                object : ApiCallbackInjector {
-                                    override fun onSuccess() {
-                                        showTrackOnMap(
-                                            obj.id,
-                                            obj.latitude,
-                                            obj.longitude,
-                                            markerId
-                                        )
-                                    }
-
-                                    override fun onFailed() {
-                                        showTrackOnMap(
-                                            obj.id,
-                                            obj.latitude,
-                                            obj.longitude,
-                                            markerId
-                                        )
-                                    }
-                                })
-                        }
-                    }
-
+                    gettingTracksAndMoveToPin(site, markerId)
                     analytics?.trackClickPinEvent()
                 } else {
                     features[index]?.let { setFeatureSelectState(it, false) }
@@ -734,35 +709,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     val site = locateDb.getLocateById(
                         selectedFeature.getProperty(PROPERTY_SITE_MARKER_SITE_ID).asInt
                     )
-                    site?.let { obj ->
-                        showTrackOnMap(obj.id, obj.latitude, obj.longitude, markerId.asString)
-                        if (site.serverId != null) {
-                            retrieveTracking(
-                                requireContext(),
-                                site.id,
-                                site.serverId!!,
-                                object : ApiCallbackInjector {
-                                    override fun onSuccess() {
-                                        showTrackOnMap(
-                                            obj.id,
-                                            obj.latitude,
-                                            obj.longitude,
-                                            markerId.asString
-                                        )
-                                    }
-
-                                    override fun onFailed() {
-                                        showTrackOnMap(
-                                            obj.id,
-                                            obj.latitude,
-                                            obj.longitude,
-                                            markerId.asString
-                                        )
-                                    }
-                                })
-                        }
-                        analytics?.trackClickPinEvent()
-                    }
+                    gettingTracksAndMoveToPin(site, markerId.asString)
+                    analytics?.trackClickPinEvent()
                 }
             }
             return true
@@ -785,6 +733,37 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
         clearFeatureSelected()
         return false
+    }
+
+    fun gettingTracksAndMoveToPin(site: Locate?, markerId: String) {
+        site?.let { obj ->
+            showTrackOnMap(obj.id, obj.latitude, obj.longitude, markerId)
+            if (site.serverId != null) {
+                retrieveTracking(
+                    requireContext(),
+                    site.id,
+                    site.serverId!!,
+                    object : ApiCallbackInjector {
+                        override fun onSuccess() {
+                            showTrackOnMap(
+                                obj.id,
+                                obj.latitude,
+                                obj.longitude,
+                                markerId
+                            )
+                        }
+
+                        override fun onFailed() {
+                            showTrackOnMap(
+                                obj.id,
+                                obj.latitude,
+                                obj.longitude,
+                                markerId
+                            )
+                        }
+                    })
+            }
+        }
     }
 
     private fun moveCameraToLeavesBounds(featureCollectionToInspect: FeatureCollection) {
@@ -1314,14 +1293,22 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val tracks = trackingFileDb.getTrackingFileBySiteId(id)
         if (tracks.isNotEmpty()) {
             //get all track first
+            val tempTrack = arrayListOf<Feature>()
             tracks.forEach { track ->
                 val json = File(track.localPath).readText()
                 val featureCollection = FeatureCollection.fromJson(json)
+                val feature =  featureCollection.features()?.get(0)
+                feature?.let {
+                    tempTrack.add(it)
+                }
 
                 //track always has 1 item so using get(0) is okay - also it can only be LineString
-                val lineString = featureCollection.features()?.get(0)?.geometry() as LineString
+                val lineString = feature?.geometry() as LineString
+//                val color = featureCollection.features()?.get(0)?.properties()?.get("color")?.asString ?: "#3bb2d0"
+//                queueColor.add(color)
                 queue.add(lineString.coordinates().toList())
             }
+            lineSource!!.setGeoJson(FeatureCollection.fromFeatures(tempTrack))
 
             //move camera to pin
             moveToDeploymentMarker(
@@ -1332,61 +1319,63 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     .map { point -> LatLng(point.latitude(), point.longitude()) })
 
             //animate track
-            routeCoordinateList = queue[0]
-            animate()
+//            routeCoordinateList = queue[0]
+//            animate()
 
         } else {
             moveToDeploymentMarker(lat, lng, markerLocationId)
         }
     }
 
-    private fun animate() {
-        if (routeCoordinateList.size - 1 > routeIndex) {
-            val indexPoint = routeCoordinateList[routeIndex]
-            val newPoint = routeCoordinateList[routeIndex + 1]
-            currentAnimator = createLatLngAnimator(indexPoint, newPoint)
-            currentAnimator?.start()
-            routeIndex++
-        } else {
-            queuePivot += 1
-            if (queuePivot <= queue.size - 1) {
-                routeCoordinateList = queue[queuePivot]
-                routeIndex = 0
-                animate()
-            }
-        }
-    }
-
-    private fun createLatLngAnimator(currentPosition: Point, targetPosition: Point): Animator {
-        val latLngAnimator: ValueAnimator =
-            ValueAnimator.ofObject(PointEvaluator(), currentPosition, targetPosition)
-        latLngAnimator.duration = 100 // fixed to 100 milliseconds
-        latLngAnimator.interpolator = LinearInterpolator()
-
-        latLngAnimator.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                super.onAnimationEnd(animation)
-                animate()
-            }
-        })
-
-        latLngAnimator.addUpdateListener { animation ->
-            val point = animation.animatedValue as Point
-            if (markerLinePointList.size <= queuePivot + 1) {
-                markerLinePointList.add(arrayListOf())
-            }
-            markerLinePointList[queuePivot].add(point)
-
-            val listOfFeature = arrayListOf<Feature>()
-            markerLinePointList.forEach {
-                listOfFeature.add(Feature.fromGeometry(LineString.fromLngLats(it)))
-            }
-
-            lineSource!!.setGeoJson(FeatureCollection.fromFeatures(listOfFeature))
-        }
-
-        return latLngAnimator
-    }
+//    private fun animate() {
+//        if (routeCoordinateList.size - 1 > routeIndex) {
+//            val indexPoint = routeCoordinateList[routeIndex]
+//            val newPoint = routeCoordinateList[routeIndex + 1]
+//            currentAnimator = createLatLngAnimator(indexPoint, newPoint)
+//            currentAnimator?.start()
+//            routeIndex++
+//        } else {
+//            queuePivot += 1
+//            if (queuePivot <= queue.size - 1) {
+//                routeCoordinateList = queue[queuePivot]
+//                routeIndex = 0
+//                animate()
+//            }
+//        }
+//    }
+//
+//    private fun createLatLngAnimator(currentPosition: Point, targetPosition: Point): Animator {
+//        val latLngAnimator: ValueAnimator =
+//            ValueAnimator.ofObject(PointEvaluator(), currentPosition, targetPosition)
+//        latLngAnimator.duration = 100 // fixed to 100 milliseconds
+//        latLngAnimator.interpolator = LinearInterpolator()
+//
+//        latLngAnimator.addListener(object : AnimatorListenerAdapter() {
+//            override fun onAnimationEnd(animation: Animator?) {
+//                super.onAnimationEnd(animation)
+//                animate()
+//            }
+//        })
+//
+//        latLngAnimator.addUpdateListener { animation ->
+//            val point = animation.animatedValue as Point
+//            if (markerLinePointList.size <= queuePivot + 1) {
+//                markerLinePointList.add(arrayListOf())
+//            }
+//            markerLinePointList[queuePivot].add(point)
+//
+//            val listOfFeature = arrayListOf<Feature>()
+//            markerLinePointList.forEachIndexed { index, it ->
+//                val feature = Feature.fromGeometry(LineString.fromLngLats(it))
+//                feature.addStringProperty("color", queueColor.getOrNull(0) ?: "#3bb2d0")
+//                listOfFeature.add(feature)
+//            }
+//
+//            lineSource!!.setGeoJson(FeatureCollection.fromFeatures(listOfFeature))
+//        }
+//
+//        return latLngAnimator
+//    }
 
     private fun hideTrackOnMap() {
         //reset source
@@ -1396,6 +1385,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         markerLinePointList.clear()
         queuePivot = 0
         queue.clear()
+        queueColor.clear()
         currentAnimator?.end()
         currentAnimator = null
     }
