@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.PointF
 import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
@@ -71,8 +72,9 @@ import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
+import org.rfcx.companion.view.deployment.locate.ExistedSiteAdapter
 import org.rfcx.companion.view.deployment.locate.LocationFragment
-import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
+import org.rfcx.companion.view.deployment.locate.SiteItem
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import retrofit2.Call
 import retrofit2.Callback
@@ -118,8 +120,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
-    private lateinit var arrayListOfSite: ArrayList<SiteWithLastDeploymentItem>
-    private val siteAdapter by lazy { SiteAdapter(this) }
+    private lateinit var arrayListOfSite: ArrayList<SiteItem>
+    private val siteAdapter by lazy { ExistedSiteAdapter(this) }
 
     private val mapboxLocationChangeCallback =
         object : LocationEngineCallback<LocationEngineResult> {
@@ -274,7 +276,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
             override fun onQueryTextChange(newText: String): Boolean {
                 context?.let {
                     val text = newText.toLowerCase()
-                    val newList: ArrayList<SiteWithLastDeploymentItem> = arrayListOf()
+                    val newList: ArrayList<SiteItem> = arrayListOf()
                     newList.addAll(arrayListOfSite.filter { site ->
                         site.locate.name.toLowerCase().contains(text)
                     })
@@ -576,9 +578,15 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
 
     private val locateObserve = Observer<List<Locate>> {
         this.locations = it
-        when(DownloadStreamsWorker.isRunning()) {
-            DownloadStreamState.RUNNING -> listener?.showSnackbar(requireContext().getString(R.string.sites_downloading), Snackbar.LENGTH_SHORT)
-            DownloadStreamState.FINISH -> listener?.showSnackbar(requireContext().getString(R.string.sites_synced), Snackbar.LENGTH_SHORT)
+        when (DownloadStreamsWorker.isRunning()) {
+            DownloadStreamState.RUNNING -> listener?.showSnackbar(
+                requireContext().getString(R.string.sites_downloading),
+                Snackbar.LENGTH_SHORT
+            )
+            DownloadStreamState.FINISH -> listener?.showSnackbar(
+                requireContext().getString(R.string.sites_synced),
+                Snackbar.LENGTH_SHORT
+            )
         }
         combinedData()
     }
@@ -637,25 +645,41 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
             }
         }
 
-        arrayListOfSite = ArrayList(locations.filter { loc ->
-            loc.locationGroup?.name == projectName || projectName == getString(R.string.none)
-        }.map {
-            SiteWithLastDeploymentItem(
-                it,
-                showDeployments.find { dp -> dp.stream?.name == it.name }?.deployedAt
-            )
-        })
-        val sortDate = arrayListOfSite.filter { it.date != null }.sortedByDescending { it.date }
-        val sortName =
-            arrayListOfSite.filter { it.date == null }.sortedBy { it.locate.name }
+        val nearLocations =
+            findNearLocations(ArrayList(locations.filter { loc ->
+                loc.locationGroup?.name == projectName || projectName == getString(
+                    R.string.none
+                )
+            }))?.sortedBy { it.second }
 
-        siteAdapter.items = ArrayList(sortDate + sortName)
+        val locationsItems: List<SiteItem> =
+            nearLocations?.map { SiteItem(it.first, it.second) } ?: listOf()
+        arrayListOfSite = ArrayList(locationsItems)
+        siteAdapter.items = ArrayList(locationsItems)
 
         if (arrayListOfSite.isEmpty()) {
             showLabel(false)
         } else {
             hideLabel()
         }
+    }
+
+    private fun findNearLocations(locateItems: ArrayList<Locate>): List<Pair<Locate, Float>>? {
+        currentUserLocation ?: return null
+
+        if (locateItems.isNotEmpty()) {
+            val itemsWithDistance = arrayListOf<Pair<Locate, Float>>()
+            // Find locate distances
+            locateItems.mapTo(itemsWithDistance, {
+                val loc = Location(LocationManager.GPS_PROVIDER)
+                loc.latitude = it.latitude
+                loc.longitude = it.longitude
+                val distance = loc.distanceTo(this.currentUserLocation) // return in meters
+                Pair(it, distance)
+            })
+            return itemsWithDistance
+        }
+        return null
     }
 
     private fun getFurthestSiteFromCurrentLocation(
