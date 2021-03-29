@@ -97,7 +97,7 @@
                 android:text="@string/site"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/withinTextView" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/siteValueTextView"
@@ -118,9 +118,8 @@
                 android:layout_marginTop="@dimen/margin_padding_normal"
                 android:layout_marginEnd="@dimen/margin_padding_large"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/locationNameTextInput" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <View
                 android:id="@+id/viewOfMapBox"
@@ -155,7 +154,7 @@
                 android:layout_marginTop="@dimen/margin_padding_normal"
                 android:text="@string/coordinates"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/withinTextView" />
+                app:layout_constraintTop_toBottomOf="@id/locationNameTextInput" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/locationValueTextView"

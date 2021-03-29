@@ -72,6 +72,7 @@ import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.repo.Firestore
 import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.DownloadAssetsWorker
+import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.geojson.GeoJsonUtils
@@ -721,16 +722,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private val locateObserve = Observer<List<Locate>> {
         this.locations = it
-        if (DownloadStreamsWorker.isRunning()) {
-            listener?.showSnackbar(
-                requireContext().getString(R.string.sites_downloading),
-                Snackbar.LENGTH_SHORT
-            )
-        } else {
-            listener?.showSnackbar(
-                requireContext().getString(R.string.sites_synced),
-                Snackbar.LENGTH_SHORT
-            )
+        when(DownloadStreamsWorker.isRunning()) {
+            DownloadStreamState.RUNNING -> listener?.showSnackbar(requireContext().getString(R.string.sites_downloading), Snackbar.LENGTH_SHORT)
+            DownloadStreamState.FINISH -> listener?.showSnackbar(requireContext().getString(R.string.sites_synced), Snackbar.LENGTH_SHORT)
         }
         combinedData()
     }

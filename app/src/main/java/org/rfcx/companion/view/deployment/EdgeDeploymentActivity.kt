@@ -19,6 +19,7 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.localdb.*
 import org.rfcx.companion.service.DeploymentSyncWorker
+import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.AudioMothChimeConnector
@@ -223,12 +224,16 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         )
     }
 
-    override fun showSiteLoadingDialog() {
-        val siteLoadingDialog: SiteLoadingDialogFragment =
+    override fun showSiteLoadingDialog(text: String) {
+        var siteLoadingDialog: SiteLoadingDialogFragment =
             supportFragmentManager.findFragmentByTag(TAG_SITE_LOADING_DIALOG) as SiteLoadingDialogFragment?
                 ?: run {
-                    SiteLoadingDialogFragment()
+                    SiteLoadingDialogFragment(text)
                 }
+        if (siteLoadingDialog.isAdded) {
+            siteLoadingDialog.dismiss()
+            siteLoadingDialog = SiteLoadingDialogFragment(text)
+        }
         siteLoadingDialog.show(supportFragmentManager,
             TAG_SITE_LOADING_DIALOG
         )
@@ -401,7 +406,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         audioMothConnector.stopPlay()
     }
 
-    override fun isSiteLoading(): Boolean {
+    override fun isSiteLoading(): DownloadStreamState {
         return DownloadStreamsWorker.isRunning()
     }
 
