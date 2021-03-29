@@ -2,6 +2,8 @@ package org.rfcx.companion.util
 
 import android.content.Context
 import android.net.ConnectivityManager
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 
 internal fun Context?.isNetworkAvailable(): Boolean {
@@ -24,6 +26,12 @@ fun Double.setFormatLabel(): String {
 
 fun Float.setFormatLabel(): String {
     return if (this >= 1000) "${String.format("%.1f", this/1000)}km" else "${String.format("%.0f", this)}m"
+}
+
+fun View.hideKeyboard() = this.let {
+    val inputManager =
+        context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    inputManager.hideSoftInputFromWindow(windowToken, 0)
 }
 
 private val chars = ('A'..'F') + ('0'..'9')

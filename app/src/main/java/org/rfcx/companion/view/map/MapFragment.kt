@@ -289,6 +289,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         searchViewActionRightButton.setOnClickListener {
             if (searchLayoutSearchEditText.text.isNullOrBlank()) {
                 showSearchBar(false)
+                it.hideKeyboard()
             } else {
                 searchLayoutSearchEditText.text = null
             }
@@ -319,21 +320,21 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         })
 
         searchView.setOnSearchClickListener {
-            listView.visibility = View.VISIBLE
-            hideButtonOnMap()
-            projectNameTextView.visibility = View.GONE
-            val state = listener?.getBottomSheetState() ?: 0
-            if (state == BottomSheetBehavior.STATE_EXPANDED) {
-                listener?.hideBottomSheetAndBottomAppBar()
-            } else {
-                listener?.hidBottomAppBar()
-            }
-
-            if (listView.adapter.isEmpty) {
-                showLabel(false)
-            } else {
-                hideLabel()
-            }
+//            listView.visibility = View.VISIBLE
+//            hideButtonOnMap()
+//            projectNameTextView.visibility = View.GONE
+//            val state = listener?.getBottomSheetState() ?: 0
+//            if (state == BottomSheetBehavior.STATE_EXPANDED) {
+//                listener?.hideBottomSheetAndBottomAppBar()
+//            } else {
+//                listener?.hidBottomAppBar()
+//            }
+//
+//            if (listView.adapter.isEmpty) {
+//                showLabel(false)
+//            } else {
+//                hideLabel()
+//            }
         }
 
         searchView.setOnCloseListener {
@@ -408,9 +409,41 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun showSearchBar(show: Boolean) {
         searchLayout.visibility = if (show) View.VISIBLE else View.INVISIBLE
+        listView.visibility = if (show) View.VISIBLE else View.INVISIBLE
         searchViewActionRightButton.visibility = if (show) View.VISIBLE else View.INVISIBLE
         searchButton.visibility = if (show) View.GONE else View.VISIBLE
         trackingLayout.visibility = if (show) View.GONE else View.VISIBLE
+
+        if (show) {
+            setSearchView()
+            searchLayout.setBackgroundResource(R.color.backgroundColor)
+        } else {
+            searchLayout.setBackgroundResource(R.color.transparent)
+
+            hideLabel()
+            showButtonOnMap()
+
+            listView.visibility = View.GONE
+
+            listener?.showBottomAppBar()
+            listener?.clearFeatureSelectedOnMap()
+        }
+    }
+
+    private fun setSearchView() {
+        hideButtonOnMap()
+        val state = listener?.getBottomSheetState() ?: 0
+        if (state == BottomSheetBehavior.STATE_EXPANDED) {
+            listener?.hideBottomSheetAndBottomAppBar()
+        } else {
+            listener?.hidBottomAppBar()
+        }
+
+        if (listView.adapter.isEmpty) {
+            showLabel(false)
+        } else {
+            hideLabel()
+        }
     }
 
     private fun setLocationTrackingService(context: Context, isOn: Boolean) {

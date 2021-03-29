@@ -73,7 +73,7 @@
         android:dividerHeight="1dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/topBarLayout" />
+        app:layout_constraintTop_toBottomOf="@id/searchLayout" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/showLabelLayout"
