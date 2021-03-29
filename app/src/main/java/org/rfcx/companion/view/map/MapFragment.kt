@@ -11,6 +11,8 @@ import android.location.Location
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -270,7 +272,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun showLabel(isNotFound: Boolean) {
-        if (!searchView.isIconified) {
+        if (searchButton.visibility != View.VISIBLE) {
             showLabelLayout.visibility = View.VISIBLE
             notHaveSiteTextView.visibility = if (isNotFound) View.GONE else View.VISIBLE
             notHaveResultTextView.visibility = if (isNotFound) View.VISIBLE else View.GONE
@@ -295,14 +297,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String): Boolean {
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String): Boolean {
+        searchLayoutSearchEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
                 context?.let {
-                    val text = newText.toLowerCase()
+                    val text = s.toString().toLowerCase()
                     val newList: ArrayList<String> = arrayListOf()
                     newList.addAll(arrayListOfSite.filter { site ->
                         site.toLowerCase().contains(text)
@@ -315,37 +313,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     if (newList.isEmpty()) showLabel(true) else hideLabel()
                     listView.adapter = adapterOfSearchSite
                 }
-                return false
             }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
-
-        searchView.setOnSearchClickListener {
-//            listView.visibility = View.VISIBLE
-//            hideButtonOnMap()
-//            projectNameTextView.visibility = View.GONE
-//            val state = listener?.getBottomSheetState() ?: 0
-//            if (state == BottomSheetBehavior.STATE_EXPANDED) {
-//                listener?.hideBottomSheetAndBottomAppBar()
-//            } else {
-//                listener?.hidBottomAppBar()
-//            }
-//
-//            if (listView.adapter.isEmpty) {
-//                showLabel(false)
-//            } else {
-//                hideLabel()
-//            }
-        }
-
-        searchView.setOnCloseListener {
-            hideLabel()
-            listView.visibility = View.GONE
-            showButtonOnMap()
-            projectNameTextView.visibility = View.VISIBLE
-            listener?.showBottomAppBar()
-            listener?.clearFeatureSelectedOnMap()
-            false
-        }
 
         if (searchView.isIconified) {
             showButtonOnMap()
