@@ -301,6 +301,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                     val point = t.points.toListDoubleArray()
                     val trackingFile = TrackingFile(
                         deploymentId = it.id,
+                        siteId = this._locate!!.id,
                         localPath = GeoJsonUtils.generateGeoJson(this, GeoJsonUtils.generateFileName(it.deployedAt, it.deploymentKey!!), point).absolutePath
                     )
                     trackingFileDb.insertOrUpdate(trackingFile)

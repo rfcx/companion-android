@@ -66,18 +66,16 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.guardian.toMark
+import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.DiagnosticDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
-import org.rfcx.companion.repo.Firestore
-import org.rfcx.companion.service.DeploymentSyncWorker
-import org.rfcx.companion.service.DownloadAssetsWorker
-import org.rfcx.companion.service.DownloadStreamState
-import org.rfcx.companion.service.DownloadStreamsWorker
+import org.rfcx.companion.service.*
 import org.rfcx.companion.util.*
+import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.view.animator.PointEvaluator
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
@@ -135,10 +133,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var isRotate = false
 
     //for animate line string
-    private var routeCoordinateList: List<Point> = listOf()
+    private var routeCoordinateList = listOf<Point>()
     private var routeIndex = 0
-    private var markerLinePointList = arrayListOf<Point>()
+    private var markerLinePointList = arrayListOf<ArrayList<Point>>()
     private var currentAnimator: Animator? = null
+    private var queue = arrayListOf<List<Point>>()
+    private var queuePivot = 0
 
     private val mapboxLocationChangeCallback =
         object : LocationEngineCallback<LocationEngineResult> {
@@ -659,6 +659,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun handleClickIcon(screenPoint: PointF): Boolean {
         val deploymentFeatures = mapboxMap?.queryRenderedFeatures(screenPoint, MARKER_DEPLOYMENT_ID)
+        val siteFeatures = mapboxMap?.queryRenderedFeatures(screenPoint, MARKER_SITE_ID)
         val deploymentClusterFeatures =
             mapboxMap?.queryRenderedFeatures(screenPoint, "$DEPLOYMENT_CLUSTER-0")
         if (deploymentFeatures != null && deploymentFeatures.isNotEmpty()) {
@@ -679,6 +680,40 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     (activity as MainActivityListener).showBottomSheet(
                         DeploymentViewPagerFragment.newInstance(deploymentId, deploymentDevice)
                     )
+
+                    val markerId = selectedFeature.getProperty(
+                        PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID
+                    ).asString
+                    val site = locateDb.getLocateByName(markerId.split(".")[0])
+                    site?.let { obj ->
+                        showTrackOnMap(obj.id, obj.latitude, obj.longitude, markerId)
+                        if (site.serverId != null) {
+                            retrieveTracking(
+                                requireContext(),
+                                site.id,
+                                site.serverId!!,
+                                object : ApiCallbackInjector {
+                                    override fun onSuccess() {
+                                        showTrackOnMap(
+                                            obj.id,
+                                            obj.latitude,
+                                            obj.longitude,
+                                            markerId
+                                        )
+                                    }
+
+                                    override fun onFailed() {
+                                        showTrackOnMap(
+                                            obj.id,
+                                            obj.latitude,
+                                            obj.longitude,
+                                            markerId
+                                        )
+                                    }
+                                })
+                        }
+                    }
+
                     analytics?.trackClickPinEvent()
                 } else {
                     features[index]?.let { setFeatureSelectState(it, false) }
@@ -687,6 +722,51 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             return true
         } else {
             (activity as MainActivityListener).hideBottomSheet()
+            hideTrackOnMap()
+        }
+
+        if (siteFeatures != null && siteFeatures.isNotEmpty()) {
+            val selectedFeature = siteFeatures[0]
+            val features = this.mapFeatures!!.features()!!
+            features.forEach { feature ->
+                val markerId = selectedFeature.getProperty(PROPERTY_SITE_MARKER_ID)
+                if (markerId == feature.getProperty(PROPERTY_SITE_MARKER_ID)) {
+                    val site = locateDb.getLocateById(
+                        selectedFeature.getProperty(PROPERTY_SITE_MARKER_SITE_ID).asInt
+                    )
+                    site?.let { obj ->
+                        showTrackOnMap(obj.id, obj.latitude, obj.longitude, markerId.asString)
+                        if (site.serverId != null) {
+                            retrieveTracking(
+                                requireContext(),
+                                site.id,
+                                site.serverId!!,
+                                object : ApiCallbackInjector {
+                                    override fun onSuccess() {
+                                        showTrackOnMap(
+                                            obj.id,
+                                            obj.latitude,
+                                            obj.longitude,
+                                            markerId.asString
+                                        )
+                                    }
+
+                                    override fun onFailed() {
+                                        showTrackOnMap(
+                                            obj.id,
+                                            obj.latitude,
+                                            obj.longitude,
+                                            markerId.asString
+                                        )
+                                    }
+                                })
+                        }
+                        analytics?.trackClickPinEvent()
+                    }
+                }
+            }
+            return true
+        } else {
             hideTrackOnMap()
         }
 
@@ -930,12 +1010,65 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             })
     }
 
-    private fun retrieveDiagnostics(context: Context) {
-        Firestore(context).retrieveDiagnostics(diagnosticDb)
+    private fun retrieveAssets(context: Context) {
+        DownloadImagesWorker.enqueue(context)
     }
 
-    private fun retrieveAssets(context: Context) {
-        DownloadAssetsWorker.enqueue(context)
+    private fun retrieveTracking(
+        context: Context,
+        siteId: Int,
+        siteServerId: String,
+        callback: ApiCallbackInjector
+    ) {
+        val token = "Bearer ${context.getIdToken()}"
+        ApiManager.getInstance().getDeviceApi().getStreamAssets(token, siteServerId)
+            .enqueue(object : Callback<List<DeploymentAssetResponse>> {
+                override fun onFailure(call: Call<List<DeploymentAssetResponse>>, t: Throwable) {
+                    if (context.isNetworkAvailable()) {
+                        Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                    callback.onFailed()
+                }
+
+                override fun onResponse(
+                    call: Call<List<DeploymentAssetResponse>>,
+                    response: Response<List<DeploymentAssetResponse>>
+                ) {
+                    val siteAssets = response.body()
+                    siteAssets?.forEachIndexed { index, item ->
+                        if (item.mimeType.endsWith("geo+json")) {
+                            val trackingFileDb =
+                                TrackingFileDb(Realm.getInstance(RealmHelper.migrationConfig()))
+                            GeoJsonUtils.downloadGeoJsonFile(
+                                context,
+                                token,
+                                item,
+                                siteServerId,
+                                Date(),
+                                object : GeoJsonUtils.DownloadTrackCallback {
+                                    override fun onSuccess(filePath: String) {
+                                        trackingFileDb.insertOrUpdate(
+                                            item,
+                                            filePath,
+                                            siteId,
+                                            Device.AUDIOMOTH.value
+                                        )
+                                        if (index == siteAssets.size - 1) {
+                                            callback.onSuccess()
+                                        }
+                                    }
+
+                                    override fun onFailed(msg: String) {
+                                        listener?.showSnackbar(msg, Snackbar.LENGTH_SHORT)
+                                    }
+
+                                }
+                            )
+                        }
+                    }
+                }
+            })
     }
 
     private fun fetchJobSyncing() {
@@ -1017,7 +1150,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 }
                 is MapMarker.SiteMarker -> {
                     val properties = mapOf(
-                        Pair(PROPERTY_SITE_MARKER_IMAGE, it.pin)
+                        Pair(PROPERTY_SITE_MARKER_IMAGE, it.pin),
+                        Pair(PROPERTY_SITE_MARKER_SITE_ID, it.id.toString()),
+                        Pair(PROPERTY_SITE_MARKER_ID, "${it.name}.${it.id}")
                     )
 
                     Feature.fromGeometry(
@@ -1176,20 +1311,30 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     fun showTrackOnMap(id: Int, lat: Double, lng: Double, markerLocationId: String) {
         //remove the previous one
         hideTrackOnMap()
-        val track = trackingFileDb.getTrackingFileByDeploymentId(id)
-        if (track != null) {
-            val json = File(track.localPath).readText()
-            val featureCollection = FeatureCollection.fromJson(json)
+        val tracks = trackingFileDb.getTrackingFileBySiteId(id)
+        if (tracks.isNotEmpty()) {
+            //get all track first
+            tracks.forEach { track ->
+                val json = File(track.localPath).readText()
+                val featureCollection = FeatureCollection.fromJson(json)
 
-            //track always has 1 item so using get(0) is okay - also it can only be LineString
-            val lineString = featureCollection.features()?.get(0)?.geometry() as LineString
-            routeCoordinateList = lineString.coordinates().toList()
+                //track always has 1 item so using get(0) is okay - also it can only be LineString
+                val lineString = featureCollection.features()?.get(0)?.geometry() as LineString
+                queue.add(lineString.coordinates().toList())
+            }
+
+            //move camera to pin
             moveToDeploymentMarker(
                 lat,
                 lng,
                 markerLocationId,
-                routeCoordinateList.map { point -> LatLng(point.latitude(), point.longitude()) })
+                queue.flatten()
+                    .map { point -> LatLng(point.latitude(), point.longitude()) })
+
+            //animate track
+            routeCoordinateList = queue[0]
             animate()
+
         } else {
             moveToDeploymentMarker(lat, lng, markerLocationId)
         }
@@ -1202,30 +1347,42 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             currentAnimator = createLatLngAnimator(indexPoint, newPoint)
             currentAnimator?.start()
             routeIndex++
+        } else {
+            queuePivot += 1
+            if (queuePivot <= queue.size - 1) {
+                routeCoordinateList = queue[queuePivot]
+                routeIndex = 0
+                animate()
+            }
         }
     }
 
     private fun createLatLngAnimator(currentPosition: Point, targetPosition: Point): Animator {
         val latLngAnimator: ValueAnimator =
             ValueAnimator.ofObject(PointEvaluator(), currentPosition, targetPosition)
-        latLngAnimator.duration = 300 // fixed to 300 milliseconds
+        latLngAnimator.duration = 100 // fixed to 100 milliseconds
         latLngAnimator.interpolator = LinearInterpolator()
+
         latLngAnimator.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
                 super.onAnimationEnd(animation)
                 animate()
             }
         })
+
         latLngAnimator.addUpdateListener { animation ->
             val point = animation.animatedValue as Point
-            markerLinePointList.add(point)
-            lineSource!!.setGeoJson(
-                Feature.fromGeometry(
-                    LineString.fromLngLats(
-                        markerLinePointList
-                    )
-                )
-            )
+            if (markerLinePointList.size <= queuePivot + 1) {
+                markerLinePointList.add(arrayListOf())
+            }
+            markerLinePointList[queuePivot].add(point)
+
+            val listOfFeature = arrayListOf<Feature>()
+            markerLinePointList.forEach {
+                listOfFeature.add(Feature.fromGeometry(LineString.fromLngLats(it)))
+            }
+
+            lineSource!!.setGeoJson(FeatureCollection.fromFeatures(listOfFeature))
         }
 
         return latLngAnimator
@@ -1236,8 +1393,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         lineSource!!.setGeoJson(FeatureCollection.fromFeatures(listOf()))
         routeCoordinateList = listOf()
         routeIndex = 0
-        markerLinePointList = arrayListOf()
-        currentAnimator?.cancel()
+        markerLinePointList.clear()
+        queuePivot = 0
+        queue.clear()
+        currentAnimator?.end()
         currentAnimator = null
     }
 
@@ -1317,6 +1476,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         private const val PROPERTY_DEPLOYMENT_MARKER_IMAGE = "deployment.marker.image"
 
         private const val PROPERTY_SITE_MARKER_IMAGE = "site.marker.image"
+        private const val PROPERTY_SITE_MARKER_ID = "site.id"
+        private const val PROPERTY_SITE_MARKER_SITE_ID = "site.stream.id"
 
         private const val PROPERTY_CLUSTER_TYPE = "cluster.type"
 
@@ -1330,5 +1491,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         fun newInstance(): MapFragment {
             return MapFragment()
         }
+    }
+
+    interface ApiCallbackInjector {
+        fun onSuccess()
+        fun onFailed()
     }
 }

@@ -53,7 +53,13 @@ interface DeviceApiInterface {
     ): Call<ResponseBody>
 
     @GET("deployments/{id}/assets")
-    fun getAssets(
+    fun getDeploymentAssets(
+        @Header("Authorization") authUser: String,
+        @Path("id") id: String
+    ): Call<List<DeploymentAssetResponse>>
+
+    @GET("streams/{id}/assets")
+    fun getStreamAssets(
         @Header("Authorization") authUser: String,
         @Path("id") id: String
     ): Call<List<DeploymentAssetResponse>>

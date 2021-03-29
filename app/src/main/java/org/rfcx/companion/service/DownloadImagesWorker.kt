@@ -5,19 +5,16 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import io.realm.Realm
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.EdgeDeploymentDb
-import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.TrackingFileDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.util.getIdToken
 
-class DownloadAssetsWorker(val context: Context, params: WorkerParameters) :
+class DownloadImagesWorker(val context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
 
     private var someFailed = false
@@ -29,7 +26,7 @@ class DownloadAssetsWorker(val context: Context, params: WorkerParameters) :
         val edgeDeploymentDb = EdgeDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
         edgeDeploymentDb.getAll().forEach { dp ->
             val token = "Bearer ${context.getIdToken()}"
-            val result = ApiManager.getInstance().getDeviceApi().getAssets(token, dp.serverId!!).execute()
+            val result = ApiManager.getInstance().getDeviceApi().getDeploymentAssets(token, dp.serverId!!).execute()
             if (result.isSuccessful) {
                 val dpAssets = result.body()
                 dpAssets?.forEach { item ->
@@ -40,23 +37,6 @@ class DownloadAssetsWorker(val context: Context, params: WorkerParameters) :
                             dp.id,
                             Device.AUDIOMOTH.value
                         )
-                    } else if(item.mimeType.endsWith("geo+json")) {
-                        val trackingFileDb = TrackingFileDb(Realm.getInstance(RealmHelper.migrationConfig()))
-                        val filePath = GeoJsonUtils.downloadGeoJsonFile(
-                            context,
-                            token,
-                            item,
-                            dp.serverId!!,
-                            dp.deployedAt
-                        )
-                        if (filePath != null) {
-                            trackingFileDb.insertOrUpdate(
-                                item,
-                                filePath,
-                                dp.id,
-                                Device.AUDIOMOTH.value
-                            )
-                        }
                     }
                 }
             } else {
@@ -74,7 +54,7 @@ class DownloadAssetsWorker(val context: Context, params: WorkerParameters) :
             val constraints =
                 Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
             val workRequest =
-                OneTimeWorkRequestBuilder<DownloadAssetsWorker>().setConstraints(constraints)
+                OneTimeWorkRequestBuilder<DownloadImagesWorker>().setConstraints(constraints)
                     .build()
             WorkManager.getInstance(context)
                 .enqueueUniqueWork(UNIQUE_WORK_KEY, ExistingWorkPolicy.REPLACE, workRequest)
