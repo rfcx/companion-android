@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.location.Location
+import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
@@ -11,11 +12,14 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.SearchView
-import android.widget.Toast
+import android.widget.*
+import androidx.annotation.RequiresApi
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.view.children
+import androidx.core.view.marginLeft
+import androidx.core.view.marginTop
 import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
@@ -46,6 +50,8 @@ import com.mapbox.maps.plugin.animation.easeTo
 import com.mapbox.maps.plugin.animation.flyTo
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import com.mapbox.maps.plugin.locationcomponent.getLocationComponentPlugin
+import com.mapbox.maps.plugin.scalebar.ScaleBarImpl
+import com.mapbox.maps.plugin.scalebar.ScaleBarPluginImpl
 import com.mapbox.maps.plugin.scalebar.getScaleBarPlugin
 import com.mapbox.turf.TurfMeasurement
 import io.realm.Realm
@@ -189,7 +195,10 @@ class MapFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        MapboxOptions.setDefaultResourceOptions(requireContext(), requireContext().getString(R.string.mapbox_access_token))
+        MapboxOptions.setDefaultResourceOptions(
+            requireContext(),
+            requireContext().getString(R.string.mapbox_access_token)
+        )
         mapView = view.findViewById(R.id.mapView)
         mapView.getMapboxMap().loadStyleUri(Style.OUTDOORS) { style ->
             context?.let {
@@ -496,8 +505,8 @@ class MapFragment : Fragment() {
         }
 
         val deploymentCount = SymbolLayer(DEPLOYMENT_COUNT, SOURCE_DEPLOYMENT)
-            .textField( formatted {
-                formattedSection (toString { get(POINT_COUNT) }.toString()) {
+            .textField(formatted {
+                formattedSection(toString { get(POINT_COUNT) }.toString()) {
                     fontScale = 1.5
                 }
             })
@@ -511,17 +520,26 @@ class MapFragment : Fragment() {
         style.addLayer(deploymentCount)
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun setupScale() {
         val scaleBarPlugin = mapView.getScaleBarPlugin()
         scaleBarPlugin.updateSettings {
-            position = Gravity.AXIS_PULL_AFTER
+            position = Gravity.BOTTOM
         }
+        val scale = mapView.children.toList()[4]
+        mapView.removeView(scale)
+
+        val layout = view?.findViewById<LinearLayout>(R.id.scaleBarLayout)
+        layout?.addView(scale)
+
+        (scale.layoutParams as LinearLayout.LayoutParams).gravity = Gravity.BOTTOM
     }
 
     private fun handleClickIcon(screenPoint: ScreenCoordinate): Boolean {
-        mapboxMap?.queryRenderedFeatures(screenPoint, RenderedQueryOptions(
-            listOf(MARKER_DEPLOYMENT_ID), null
-        )
+        mapboxMap?.queryRenderedFeatures(
+            screenPoint, RenderedQueryOptions(
+                listOf(MARKER_DEPLOYMENT_ID), null
+            )
         ) { features ->
             if (features.value.isNullOrEmpty()) {
                 (activity as MainActivityListener).hideBottomSheet()
@@ -558,9 +576,10 @@ class MapFragment : Fragment() {
             }
         }
 
-        mapboxMap?.queryRenderedFeatures(screenPoint, RenderedQueryOptions(
-            listOf(MARKER_DEPLOYMENT_ID), null
-        )
+        mapboxMap?.queryRenderedFeatures(
+            screenPoint, RenderedQueryOptions(
+                listOf(MARKER_DEPLOYMENT_ID), null
+            )
         ) { features ->
             if (features.value != null && features.value!!.isNotEmpty()) {
                 val pinCount =
