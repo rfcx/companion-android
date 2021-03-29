@@ -59,6 +59,7 @@ import com.mapbox.pluginscalebar.ScaleBarOptions
 import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_map.*
+import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.DeploymentListener
 import org.rfcx.companion.MainActivityListener
 import org.rfcx.companion.R
@@ -219,6 +220,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mapView.getMapAsync(this)
         fetchJobSyncing()
         fetchData()
+        showSearchBar(false)
         setupSearch()
         progressBar.visibility = View.VISIBLE
         hideLabel()
@@ -280,6 +282,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setupSearch() {
+        searchButton.setOnClickListener {
+            showSearchBar(true)
+        }
+
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 return true
@@ -390,6 +396,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 }
             }
         }
+    }
+
+    private fun showSearchBar(show: Boolean) {
+        searchLayout.visibility = if (show) View.VISIBLE else View.INVISIBLE
+        searchButton.visibility = if (show) View.GONE else View.VISIBLE
+        trackingLayout.visibility = if (show) View.GONE else View.VISIBLE
     }
 
     private fun setLocationTrackingService(context: Context, isOn: Boolean) {
