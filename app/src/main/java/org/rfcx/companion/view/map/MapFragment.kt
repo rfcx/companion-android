@@ -144,6 +144,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var queueColor = arrayListOf<String>()
     private var queuePivot = 0
 
+    private var currentMarkId = ""
+
     private val mapboxLocationChangeCallback =
         object : LocationEngineCallback<LocationEngineResult> {
             override fun onSuccess(result: LocationEngineResult?) {
@@ -736,6 +738,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     fun gettingTracksAndMoveToPin(site: Locate?, markerId: String) {
+        currentMarkId = markerId
         site?.let { obj ->
             showTrackOnMap(obj.id, obj.latitude, obj.longitude, markerId)
             if (site.serverId != null) {
@@ -1293,30 +1296,32 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val tracks = trackingFileDb.getTrackingFileBySiteId(id)
         if (tracks.isNotEmpty()) {
             //get all track first
-            val tempTrack = arrayListOf<Feature>()
-            tracks.forEach { track ->
-                val json = File(track.localPath).readText()
-                val featureCollection = FeatureCollection.fromJson(json)
-                val feature =  featureCollection.features()?.get(0)
-                feature?.let {
-                    tempTrack.add(it)
-                }
+            if (currentMarkId == markerLocationId) {
+                val tempTrack = arrayListOf<Feature>()
+                tracks.forEach { track ->
+                    val json = File(track.localPath).readText()
+                    val featureCollection = FeatureCollection.fromJson(json)
+                    val feature = featureCollection.features()?.get(0)
+                    feature?.let {
+                        tempTrack.add(it)
+                    }
 
-                //track always has 1 item so using get(0) is okay - also it can only be LineString
-                val lineString = feature?.geometry() as LineString
+                    //track always has 1 item so using get(0) is okay - also it can only be LineString
+                    val lineString = feature?.geometry() as LineString
 //                val color = featureCollection.features()?.get(0)?.properties()?.get("color")?.asString ?: "#3bb2d0"
 //                queueColor.add(color)
-                queue.add(lineString.coordinates().toList())
-            }
-            lineSource!!.setGeoJson(FeatureCollection.fromFeatures(tempTrack))
+                    queue.add(lineString.coordinates().toList())
+                }
+                lineSource!!.setGeoJson(FeatureCollection.fromFeatures(tempTrack))
 
-            //move camera to pin
-            moveToDeploymentMarker(
-                lat,
-                lng,
-                markerLocationId,
-                queue.flatten()
-                    .map { point -> LatLng(point.latitude(), point.longitude()) })
+                //move camera to pin
+                moveToDeploymentMarker(
+                    lat,
+                    lng,
+                    markerLocationId,
+                    queue.flatten()
+                        .map { point -> LatLng(point.latitude(), point.longitude()) })
+            }
 
             //animate track
 //            routeCoordinateList = queue[0]
