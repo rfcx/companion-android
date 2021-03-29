@@ -9,14 +9,12 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.SearchView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
@@ -64,7 +62,10 @@ import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.guardian.toMark
 import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.ProjectResponse
-import org.rfcx.companion.localdb.*
+import org.rfcx.companion.localdb.EdgeDeploymentDb
+import org.rfcx.companion.localdb.LocateDb
+import org.rfcx.companion.localdb.LocationGroupDb
+import org.rfcx.companion.localdb.TrackingFileDb
 import org.rfcx.companion.localdb.guardian.DiagnosticDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
@@ -79,8 +80,6 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
-import java.util.*
-import kotlin.collections.ArrayList
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -98,7 +97,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
-    private val trackingDb by lazy { TrackingDb(realm) }
     private val trackingFileDb by lazy { TrackingFileDb(realm) }
     private val diagnosticDb by lazy { DiagnosticDb(realm) }
 
@@ -211,6 +209,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         setupSearch()
         progressBar.visibility = View.VISIBLE
         hideLabel()
+        context?.let { setTextTrackingButton(LocationTracking.isTrackingOn(it)) }
 
         currentLocationButton.setOnClickListener {
             mapboxMap?.locationComponent?.isLocationComponentActivated?.let {
@@ -353,26 +352,37 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
 
         trackingLayout.setOnClickListener {
-            if (trackingTextView.text == "Track") {
-                context?.let { context -> LocationTracking.set(context, true) }
-                trackingImageView.setImageDrawable(context?.let { it1 ->
+            context?.let { context ->
+                if (LocationTracking.isTrackingOn(context)) {
+                    setTextTrackingButton(false)
+                    LocationTracking.set(context, false)
+                } else {
+                    setTextTrackingButton(true)
+                    LocationTracking.set(context, true)
+                }
+            }
+        }
+    }
+
+    private fun setTextTrackingButton(isOn: Boolean) {
+        context?.let { context ->
+            if (isOn) {
+                trackingImageView.setImageDrawable(
                     ContextCompat.getDrawable(
-                        it1,
+                        context,
                         R.drawable.ic_tracking_on
                     )
-                })
-                trackingTextView.text = "0.0 km 0 min"
+                )
                 startCounting()
             } else {
-                context?.let { context -> LocationTracking.set(context, false) }
                 handler.removeCallbacks(run)
                 trackingTextView.text = "Track"
-                trackingImageView.setImageDrawable(context?.let { it1 ->
+                trackingImageView.setImageDrawable(
                     ContextCompat.getDrawable(
-                        it1,
+                        context,
                         R.drawable.ic_tracking_off
                     )
-                })
+                )
             }
         }
     }

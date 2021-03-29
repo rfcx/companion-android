@@ -12,7 +12,7 @@ class LocationTracking {
         private const val TRACKING_OFF = false
         private const val MILLI_SECS_PER_MINUTE = (60 * 1000).toLong()
 
-        private fun isOn(context: Context): Boolean {
+        fun isTrackingOn(context: Context): Boolean {
             val preferences = Preferences.getInstance(context)
             val state = preferences.getBoolean(Preferences.ENABLE_LOCATION_TRACKING, TRACKING_OFF)
             return state == TRACKING_ON
@@ -28,7 +28,7 @@ class LocationTracking {
         }
 
         private fun updateService(context: Context) {
-            if (isOn(context)) {
+            if (isTrackingOn(context)) {
                 ContextCompat.startForegroundService(
                     context,
                     Intent(context, LocationTrackerService::class.java)
