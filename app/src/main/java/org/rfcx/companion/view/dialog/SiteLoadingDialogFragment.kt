@@ -10,7 +10,7 @@ import androidx.fragment.app.DialogFragment
 import kotlinx.android.synthetic.main.fragment_sites_loading.*
 import org.rfcx.companion.R
 
-class SiteLoadingDialogFragment : DialogFragment() {
+class SiteLoadingDialogFragment(private val text: String) : DialogFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -23,6 +23,8 @@ class SiteLoadingDialogFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        siteLoadingText.text = this.text
 
         siteLoadingButton.setOnClickListener {
             dismissDialog()
@@ -39,6 +41,6 @@ class SiteLoadingDialogFragment : DialogFragment() {
     }
 
     companion object {
-        fun newInstance() = SiteLoadingDialogFragment()
+        fun newInstance(text: String) = SiteLoadingDialogFragment(text)
     }
 }
