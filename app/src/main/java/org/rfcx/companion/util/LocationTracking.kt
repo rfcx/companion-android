@@ -3,6 +3,8 @@ package org.rfcx.companion.util
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat
+import com.mapbox.mapboxsdk.geometry.LatLng
+import org.rfcx.companion.localdb.TrackingDb
 import org.rfcx.companion.service.LocationTrackerService
 
 class LocationTracking {
@@ -80,6 +82,22 @@ class LocationTracking {
             } else {
                 preferences.getLong(Preferences.ON_DUTY, 0L)
             }
+        }
+
+        fun getDistance(trackingDb: TrackingDb): Double {
+            var distance = 0.0
+            trackingDb.getFirstTracking()?.let { tracking ->
+                tracking.points.forEachIndexed { index, element ->
+                    if (index != 0 && tracking.points[index - 1] != null) {
+                        val latLng = LatLng(
+                            tracking.points[index - 1]?.latitude ?: 0.0,
+                            tracking.points[index - 1]?.longitude ?: 0.0
+                        )
+                        distance += LatLng(element.latitude, element.longitude).distanceTo(latLng)
+                    }
+                }
+            }
+            return distance
         }
     }
 }

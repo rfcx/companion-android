@@ -62,10 +62,7 @@ import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.guardian.toMark
 import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.ProjectResponse
-import org.rfcx.companion.localdb.EdgeDeploymentDb
-import org.rfcx.companion.localdb.LocateDb
-import org.rfcx.companion.localdb.LocationGroupDb
-import org.rfcx.companion.localdb.TrackingFileDb
+import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.DiagnosticDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
@@ -98,6 +95,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val locateDb by lazy { LocateDb(realm) }
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
     private val trackingFileDb by lazy { TrackingFileDb(realm) }
+    private val trackingDb by lazy { TrackingDb(realm) }
     private val diagnosticDb by lazy { DiagnosticDb(realm) }
 
     // data
@@ -394,9 +392,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val run: Runnable = object : Runnable {
         override fun run() {
             context?.let {
-                trackingTextView.text = "0.0 km ${LocationTracking.getOnDutyTimeMinute(it)} min"
+                trackingTextView.text = "${LocationTracking.getDistance(trackingDb) 
+                    .setFormatLabel()} ${LocationTracking.getOnDutyTimeMinute(it)} min"
             }
-            handler.postDelayed(this, 1000)
+            handler.postDelayed(this, 20 * 1000)
         }
     }
 
