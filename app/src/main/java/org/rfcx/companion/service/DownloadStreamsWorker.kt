@@ -31,16 +31,16 @@ class DownloadStreamsWorker(val context: Context, params: WorkerParameters) :
         val result = getStreams(token, currentStreamsLoading)
         if (result) {
             Log.d(TAG, "downloaded $count sites")
-            isRunning = false
+            isRunning = DownloadStreamState.FINISH
         } else {
-            isRunning = false
+            isRunning = DownloadStreamState.NOT_RUNNING
             someFailed = true
         }
         return if (someFailed) Result.retry() else Result.success()
     }
 
     private suspend fun getStreams(token: String, offset: Int, maxUpdatedAt: String? = null): Boolean = withContext(Dispatchers.IO) {
-        isRunning = true
+        isRunning = DownloadStreamState.RUNNING
         val result = ApiManager.getInstance().getDeviceApi()
             .getStreams(token, SITES_LIMIT_GETTING, offset, maxUpdatedAt, "updated_at,name").execute()
         if (result.isSuccessful) {
@@ -70,7 +70,7 @@ class DownloadStreamsWorker(val context: Context, params: WorkerParameters) :
         private const val TAG = "DownloadStreamsWorker"
         private const val UNIQUE_WORK_KEY = "DownloadStreamsWorkerUniqueKey"
         private const val SITES_LIMIT_GETTING = 100
-        private var isRunning = false
+        private var isRunning = DownloadStreamState.NOT_RUNNING
 
         fun enqueue(context: Context) {
             val constraints =
@@ -90,3 +90,5 @@ class DownloadStreamsWorker(val context: Context, params: WorkerParameters) :
         }
     }
 }
+
+enum class DownloadStreamState { NOT_RUNNING, RUNNING, FINISH}
