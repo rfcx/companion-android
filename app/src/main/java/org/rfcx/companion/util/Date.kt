@@ -72,3 +72,23 @@ fun String.toDate(): Date {
 fun Date.toISO8601Format(): String {
     return iso8601DateSdf.format(this)
 }
+
+@SuppressLint("SimpleDateFormat")
+fun Date.toTimeSinceStringAlternativeTimeAgo(context: Context): String {
+    val niceDateStr = DateUtils.getRelativeTimeSpanString(
+        this.time, Calendar.getInstance().timeInMillis,
+        DateUtils.MINUTE_IN_MILLIS
+    )
+
+    return when {
+        niceDateStr.toString() == "0 minutes ago" -> {
+            context.getString(R.string.time_second)
+        }
+        niceDateStr.toString() == "Yesterday" -> {
+            "${context.getString(R.string.yesterday)} ${this.toTimeString()}"
+        }
+        else -> {
+            niceDateStr.toString()
+        }
+    }
+}

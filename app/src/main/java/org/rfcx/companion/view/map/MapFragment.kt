@@ -81,7 +81,7 @@ import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.view.deployment.locate.ExistedSiteAdapter
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.deployment.locate.SiteItem
-import org.rfcx.companion.view.detail.EditLocationActivity
+import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import retrofit2.Call
 import retrofit2.Callback
@@ -108,7 +108,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
     private val trackingFileDb by lazy { TrackingFileDb(realm) }
     private val trackingDb by lazy { TrackingDb(realm) }
-    private val diagnosticDb by lazy { DiagnosticDb(realm) }
 
     // data
     private var guardianDeployments = listOf<GuardianDeployment>()
@@ -147,7 +146,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
 
     private var screen = ""
 
-    private val siteAdapter by lazy { ExistedSiteAdapter(this) }
+    private val siteAdapter by lazy { SiteAdapter(this) }
 
     private val mapboxLocationChangeCallback =
         object : LocationEngineCallback<LocationEngineResult> {
@@ -314,7 +313,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
             override fun afterTextChanged(s: Editable?) {
                 context?.let {
                     val text = s.toString().toLowerCase()
-                    val newList: ArrayList<SiteItem> = arrayListOf()
+                    val newList: ArrayList<SiteWithLastDeploymentItem> = arrayListOf()
+
                     val projectName = listener?.getProjectName()
                     val nearLocations =
                         findNearLocations(ArrayList(locations.filter { loc ->
@@ -322,14 +322,22 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
                                 R.string.none
                             )
                         }))?.sortedBy { it.second }
-                    val locationsItems: List<SiteItem> =
-                        nearLocations?.map { SiteItem(it.first, it.second) } ?: listOf()
+
+                    var showDeployments = edgeDeployments.filter { it.isCompleted() }
+                    if (projectName != getString(R.string.none)) {
+                        showDeployments =
+                            showDeployments.filter { it.stream?.project?.name == listener?.getProjectName() }
+                    }
+
+                    val locationsItems: List<SiteWithLastDeploymentItem> =
+                        nearLocations?.map { SiteWithLastDeploymentItem(it.first, showDeployments.find { dp -> dp.stream?.name == it.first.name }?.deployedAt, it.second) } ?: listOf()
                     val arrayListOfSite = ArrayList(locationsItems)
                     newList.addAll(arrayListOfSite.filter { site ->
                         site.locate.name.toLowerCase().contains(text)
                     })
+
                     if (newList.isEmpty()) showLabel(true) else hideLabel()
-                    siteAdapter.setFilter(newList)
+                    siteAdapter.setFilter(ArrayList(newList.sortedByDescending { it.date }))
                 }
             }
 
@@ -847,9 +855,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
                 )
             }))?.sortedBy { it.second }
 
-        val locationsItems: List<SiteItem> =
-            nearLocations?.map { SiteItem(it.first, it.second) } ?: listOf()
-        siteAdapter.items = ArrayList(locationsItems)
+        val locationsItems: List<SiteWithLastDeploymentItem> =
+            nearLocations?.map { SiteWithLastDeploymentItem(it.first, showDeployments.find { dp -> dp.stream?.name == it.first.name }?.deployedAt, it.second) } ?: listOf()
+        val sortDate = locationsItems.filter { it.date != null }.sortedByDescending { it.date }
+        val notDeployment = locationsItems.filter { it.date == null }
+
+        siteAdapter.items = ArrayList(sortDate + notDeployment)
 
         if (locationsItems.isEmpty()) {
             showLabel(false)
