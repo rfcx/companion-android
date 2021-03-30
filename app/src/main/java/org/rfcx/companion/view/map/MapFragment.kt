@@ -850,24 +850,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
         }
     }
 
-    private fun findNearLocations(locateItems: ArrayList<Locate>): List<Pair<Locate, Float>>? {
-        currentUserLocation ?: return null
-
-        if (locateItems.isNotEmpty()) {
-            val itemsWithDistance = arrayListOf<Pair<Locate, Float>>()
-            // Find locate distances
-            locateItems.mapTo(itemsWithDistance, {
-                val loc = Location(LocationManager.GPS_PROVIDER)
-                loc.latitude = it.latitude
-                loc.longitude = it.longitude
-                val distance = loc.distanceTo(this.currentUserLocation) // return in meters
-                Pair(it, distance)
-            })
-            return itemsWithDistance
-        }
-        return null
-    }
-
     private fun getFurthestSiteFromCurrentLocation(
         currentLatLng: LatLng,
         sites: List<Locate>
