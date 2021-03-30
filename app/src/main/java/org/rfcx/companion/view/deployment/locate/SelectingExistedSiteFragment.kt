@@ -18,38 +18,43 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_selecting_existed_site.*
 import org.rfcx.companion.R
+import org.rfcx.companion.entity.EdgeDeployment
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.response.ProjectResponse
+import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.service.DownloadStreamState
-import org.rfcx.companion.service.DownloadStreamsWorker
-import org.rfcx.companion.util.RealmHelper
-import org.rfcx.companion.util.asLiveData
-import org.rfcx.companion.util.getIdToken
-import org.rfcx.companion.util.isNetworkAvailable
+import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.EdgeDeploymentProtocol
 import org.rfcx.companion.view.detail.MapPickerProtocol
+import org.rfcx.companion.view.map.SiteAdapter
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener, (Locate) -> Unit {
-    private val existedSiteAdapter by lazy { ExistedSiteAdapter(this) }
+    private val existedSiteAdapter by lazy { SiteAdapter(this) }
     private var mapPickerProtocol: MapPickerProtocol? = null
     private var deploymentProtocol: EdgeDeploymentProtocol? = null
 
     val realm: Realm = Realm.getInstance(RealmHelper.migrationConfig())
     private val locateDb by lazy { LocateDb(realm) }
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
+    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
+
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     private var lastLocation: Location? = null
 
     private lateinit var locateLiveData: LiveData<List<Locate>>
     private var locations = listOf<Locate>()
-    private var sites = arrayListOf<SiteItem>()
+
+    private lateinit var edgeDeployLiveData: LiveData<List<EdgeDeployment>>
+    private var edgeDeployments = listOf<EdgeDeployment>()
+
+    private var sites = arrayListOf<SiteWithLastDeploymentItem>()
 
     private val locateObserve = Observer<List<Locate>> {
         this.locations = it
@@ -57,6 +62,11 @@ class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener,
         if (deploymentProtocol?.isSiteLoading() == DownloadStreamState.FINISH) {
             showDialog()
         }
+    }
+
+    private val edgeDeploymentObserve = Observer<List<EdgeDeployment>> {
+        this.edgeDeployments = it
+        setupView()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -122,9 +132,17 @@ class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener,
     }
 
     private fun showDialog() {
-        when(deploymentProtocol?.isSiteLoading()) {
-            DownloadStreamState.RUNNING -> deploymentProtocol?.showSiteLoadingDialog(requireContext().getString(R.string.sites_loading_dialog))
-            DownloadStreamState.FINISH -> deploymentProtocol?.showSiteLoadingDialog(requireContext().getString(R.string.sites_loading_finish_dialog))
+        when (deploymentProtocol?.isSiteLoading()) {
+            DownloadStreamState.RUNNING -> deploymentProtocol?.showSiteLoadingDialog(
+                requireContext().getString(
+                    R.string.sites_loading_dialog
+                )
+            )
+            DownloadStreamState.FINISH -> deploymentProtocol?.showSiteLoadingDialog(
+                requireContext().getString(
+                    R.string.sites_loading_finish_dialog
+                )
+            )
         }
     }
 
@@ -133,52 +151,32 @@ class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener,
             it
         }
         locateLiveData.observeForever(locateObserve)
+
+        edgeDeployLiveData =
+            Transformations.map(edgeDeploymentDb.getAllResultsAsync().asLiveData()) {
+                it
+            }
+        edgeDeployLiveData.observeForever(edgeDeploymentObserve)
     }
 
     private fun setupView() {
-        val nearLocations =
-            findNearLocations(lastLocation, ArrayList(locations))?.sortedBy { it.second }
-        val createNew = listOf(
-            SiteItem(
-                Locate(
-                    id = -1,
-                    name = getString(R.string.create_new_site),
-                    latitude = latitude,
-                    longitude = longitude
-                ),
-                0F
+        val currentLocation = lastLocation
+        if (currentLocation != null) {
+            sites = getListSite(
+                requireContext(),
+                edgeDeployments.filter { it.isCompleted() },
+                "None",
+                currentLocation,
+                locations
             )
-        )
-        val locationsItems: List<SiteItem> =
-            nearLocations?.map { SiteItem(it.first, it.second) } ?: listOf()
-        sites = ArrayList(createNew + locationsItems)
-        existedSiteAdapter.items = ArrayList(createNew + locationsItems)
-    }
-
-    private fun findNearLocations(
-        lastLocation: Location?,
-        locateItems: ArrayList<Locate>
-    ): List<Pair<Locate, Float>>? {
-        lastLocation ?: return null
-
-        if (locateItems.isNotEmpty()) {
-            val itemsWithDistance = arrayListOf<Pair<Locate, Float>>()
-            // Find locate distances
-            locateItems.mapTo(itemsWithDistance, {
-                val loc = Location(LocationManager.GPS_PROVIDER)
-                loc.latitude = it.latitude
-                loc.longitude = it.longitude
-                val distance = loc.distanceTo(this.lastLocation) // return in meters
-                Pair(it, distance)
-            })
-            return itemsWithDistance
+            existedSiteAdapter.items = sites
         }
-        return null
     }
 
     override fun onDestroy() {
         super.onDestroy()
         locateLiveData.removeObserver(locateObserve)
+        edgeDeployLiveData.removeObserver(edgeDeploymentObserve)
     }
 
     companion object {
@@ -237,7 +235,7 @@ class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener,
     override fun onQueryTextChange(newText: String?): Boolean {
         if (newText != null) {
             val text = newText.toLowerCase()
-            val newList: ArrayList<SiteItem> = ArrayList()
+            val newList: ArrayList<SiteWithLastDeploymentItem> = ArrayList()
             newList.addAll(sites.filter { it.locate.name.toLowerCase().contains(text) })
             noResultFound.visibility = if (newList.isEmpty()) View.VISIBLE else View.GONE
             existedSiteAdapter.setFilter(newList)
