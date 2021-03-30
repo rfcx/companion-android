@@ -1,18 +1,22 @@
 package org.rfcx.companion.util.geojson
 
 import android.content.Context
+import android.graphics.Color
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import okhttp3.ResponseBody
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.toISO8601Format
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.io.File
 import java.io.FileOutputStream
 import java.io.FileWriter
 import java.io.InputStream
-import java.lang.Exception
 import java.util.*
 
 object GeoJsonUtils {
@@ -32,6 +36,10 @@ object GeoJsonUtils {
 
         val featureItem = JsonObject()
         featureItem.addProperty("type", "Feature")
+
+        val propertyItem = JsonObject()
+        propertyItem.addProperty("color", randomColor())
+        featureItem.add("properties", propertyItem)
 
         //create Geometry type
         val geometry = JsonObject()
@@ -89,11 +97,32 @@ object GeoJsonUtils {
         return ""
     }
 
-    fun downloadGeoJsonFile(context: Context, token: String, asset: DeploymentAssetResponse, deploymentId: String, deployedAt: Date): String? {
-        val result = ApiManager.getInstance().getDeviceApi().getGeoJsonFile(token, asset.id).execute()
-        return result.body()?.byteStream()?.let {
-            return@let createFile(context, generateFileName(deployedAt, deploymentId), it)
-        }
+    fun downloadGeoJsonFile(
+        context: Context,
+        token: String,
+        asset: DeploymentAssetResponse,
+        deploymentId: String,
+        deployedAt: Date,
+        callback: DownloadTrackCallback
+    ) {
+        ApiManager.getInstance().getDeviceApi().getGeoJsonFile(token, asset.id)
+            .enqueue(object : Callback<ResponseBody> {
+                override fun onResponse(
+                    call: Call<ResponseBody>,
+                    response: Response<ResponseBody>
+                ) {
+                    response.body()?.byteStream()?.let {
+                        val path =
+                            createFile(context, generateFileName(deployedAt, deploymentId), it)
+                        callback.onSuccess(path)
+                    }
+                }
+
+                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                    callback.onFailed(t.message ?: "error occur")
+                }
+
+            })
     }
 
     private fun List<DoubleArray>.toJsonArray(): JsonArray {
@@ -106,5 +135,16 @@ object GeoJsonUtils {
             jsonArray.add(tempJsonArray)
         }
         return jsonArray
+    }
+
+    private fun randomColor(): String {
+        val rnd = Random()
+        val color = rnd.nextInt(0xffffff + 1)
+        return String.format("#%06x", color).toUpperCase(Locale.getDefault())
+    }
+
+    interface DownloadTrackCallback {
+        fun onSuccess(filePath: String)
+        fun onFailed(msg: String)
     }
 }

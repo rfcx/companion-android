@@ -211,11 +211,12 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
                 detailView?.let {
                     this@DeploymentViewPagerFragment.currentPosition = position
 
-                    (activity as MainActivity).showTrackOnMap(
-                        it.id,
-                        it.latitude,
-                        it.longitude,
-                        "\"${it.locationName}.${it.id}\"")
+                    val site = locateDb.getLocateByName(it.locationName)
+                    site?.let { obj ->
+                        (activity as MainActivity).showTrackOnMap(
+                            obj,
+                            "\"${it.locationName}.${it.id}\"")
+                    }
                 }
             }
         }

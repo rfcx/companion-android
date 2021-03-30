@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
 import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.entity.Device
+import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
@@ -272,10 +273,12 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         }
     }
 
-    override fun showTrackOnMap(id: Int, lat: Double, lng: Double, markerLocationId: String) {
+    override fun showTrackOnMap(site: Locate?, markerLocationId: String) {
         val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
         if (mapFragment is MapFragment) {
-            mapFragment.showTrackOnMap(id, lat, lng, markerLocationId)
+            site?.let {
+                mapFragment.gettingTracksAndMoveToPin(it, markerLocationId)
+            }
         }
     }
 
@@ -400,7 +403,7 @@ interface MainActivityListener {
     fun hideSnackbar()
     fun onLogout()
     fun moveMapIntoDeploymentMarker(lat: Double, lng: Double, markerLocationId: String)
-    fun showTrackOnMap(id: Int, lat: Double, lng: Double, markerLocationId: String)
+    fun showTrackOnMap(site: Locate?, markerLocationId: String)
     fun getProjectName(): String
     fun clearFeatureSelectedOnMap()
 }

@@ -287,6 +287,8 @@ class CompanionRealmMigration : RealmMigration {
             addField(TrackingFile.FIELD_SYNC_STATE, Int::class.java)
             addField(TrackingFile.FIELD_DEVICE, String::class.java)
                 .setNullable(TrackingFile.FIELD_DEVICE, false)
+            addField(TrackingFile.FIELD_SITE_ID, Int::class.java)
+            addField(TrackingFile.FIELD_SITE_SERVER_ID, String::class.java)
         }
     }
 

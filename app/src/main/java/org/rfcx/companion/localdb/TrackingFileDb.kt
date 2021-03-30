@@ -1,8 +1,10 @@
 package org.rfcx.companion.localdb
 
 import io.realm.Realm
+import io.realm.RealmResults
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
+import java.io.File
 
 class TrackingFileDb(private val realm: Realm) {
 
@@ -60,10 +62,10 @@ class TrackingFileDb(private val realm: Realm) {
         }
     }
 
-    fun getTrackingFileByDeploymentId(id: Int): TrackingFile? {
+    fun getTrackingFileBySiteId(id: Int): RealmResults<TrackingFile> {
         return realm.where(TrackingFile::class.java)
-            .equalTo(TrackingFile.FIELD_DEPLOYMENT_ID, id)
-            .findFirst()
+            .equalTo(TrackingFile.FIELD_SITE_ID, id)
+            .findAll()
     }
 
     fun insertOrUpdate(file: TrackingFile) {
@@ -86,7 +88,7 @@ class TrackingFileDb(private val realm: Realm) {
     ) {
         realm.executeTransaction {
             val file =
-                it.where(DeploymentImage::class.java)
+                it.where(TrackingFile::class.java)
                     .equalTo(TrackingFile.FIELD_REMOTE_PATH, "assets/${deploymentAssetResponse.id}")
                     .findFirst()
 
@@ -95,11 +97,13 @@ class TrackingFileDb(private val realm: Realm) {
                 val id = (it.where(TrackingFile::class.java).max(TrackingFile.FIELD_ID)?.toInt()
                     ?: 0) + 1
                 deploymentTracking.id = id
-                deploymentTracking.deploymentId = deploymentId
+                deploymentTracking.siteId = deploymentId
                 deploymentTracking.syncState = SyncState.Sent.key
                 deploymentTracking.localPath = filePath
                 deploymentTracking.device = device
                 it.insert(deploymentTracking)
+            } else {
+                File(filePath).delete()
             }
         }
     }

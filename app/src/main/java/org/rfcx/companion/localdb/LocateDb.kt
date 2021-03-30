@@ -7,6 +7,7 @@ import io.realm.kotlin.deleteFromRealm
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.SyncState
+import org.rfcx.companion.entity.TrackingFile
 import org.rfcx.companion.entity.response.StreamResponse
 import org.rfcx.companion.entity.response.toLocate
 import org.rfcx.companion.util.toISO8601Format
@@ -17,6 +18,12 @@ class LocateDb(private val realm: Realm) {
         return realm.where(Locate::class.java)
             .sort(Locate.FIELD_ID, sort)
             .findAllAsync()
+    }
+
+    fun getAll(sort: Sort = Sort.DESCENDING): RealmResults<Locate> {
+        return realm.where(Locate::class.java)
+            .sort(Locate.FIELD_ID, sort)
+            .findAll()
     }
 
     fun getLocations(): List<Locate> {
@@ -40,6 +47,10 @@ class LocateDb(private val realm: Realm) {
             return realm.copyFromRealm(locate)
         }
         return null
+    }
+
+    fun getLocateById(id: Int): Locate? {
+        return realm.where(Locate::class.java).equalTo(Locate.FIELD_ID, id).findFirst()
     }
 
     fun getDeleteLocateId(name: String, latitude: Double, longitude: Double): Int? {
@@ -109,9 +120,16 @@ class LocateDb(private val realm: Realm) {
 
     fun updateSiteServerId(deploymentId: Int, serverId: String) {
         realm.executeTransaction {
+            //update server id in site
             it.where(Locate::class.java).equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_ID, deploymentId)
                 .findFirst()?.apply {
                     this.serverId = serverId
+                }
+
+            //update server id in track
+            it.where(TrackingFile::class.java).equalTo(TrackingFile.FIELD_DEPLOYMENT_ID, deploymentId)
+                .findFirst()?.apply {
+                    this.siteServerId = serverId
                 }
         }
     }
