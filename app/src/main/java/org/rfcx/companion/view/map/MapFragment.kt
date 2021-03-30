@@ -11,6 +11,8 @@ import android.location.Location
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -59,6 +61,7 @@ import com.mapbox.pluginscalebar.ScaleBarOptions
 import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_map.*
+import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.DeploymentListener
 import org.rfcx.companion.MainActivityListener
 import org.rfcx.companion.R
@@ -219,6 +222,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mapView.getMapAsync(this)
         fetchJobSyncing()
         fetchData()
+        showSearchBar(false)
         setupSearch()
         progressBar.visibility = View.VISIBLE
         hideLabel()
@@ -268,7 +272,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun showLabel(isNotFound: Boolean) {
-        if (!searchView.isIconified) {
+        if (searchButton.visibility != View.VISIBLE) {
             showLabelLayout.visibility = View.VISIBLE
             notHaveSiteTextView.visibility = if (isNotFound) View.GONE else View.VISIBLE
             notHaveResultTextView.visibility = if (isNotFound) View.VISIBLE else View.GONE
@@ -280,14 +284,23 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setupSearch() {
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String): Boolean {
-                return true
-            }
+        searchButton.setOnClickListener {
+            showSearchBar(true)
+        }
 
-            override fun onQueryTextChange(newText: String): Boolean {
+        searchViewActionRightButton.setOnClickListener {
+            if (searchLayoutSearchEditText.text.isNullOrBlank()) {
+                showSearchBar(false)
+                it.hideKeyboard()
+            } else {
+                searchLayoutSearchEditText.text = null
+            }
+        }
+
+        searchLayoutSearchEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
                 context?.let {
-                    val text = newText.toLowerCase()
+                    val text = s.toString().toLowerCase()
                     val newList: ArrayList<String> = arrayListOf()
                     newList.addAll(arrayListOfSite.filter { site ->
                         site.toLowerCase().contains(text)
@@ -300,44 +313,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     if (newList.isEmpty()) showLabel(true) else hideLabel()
                     listView.adapter = adapterOfSearchSite
                 }
-                return false
             }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
-
-        searchView.setOnSearchClickListener {
-            listView.visibility = View.VISIBLE
-            hideButtonOnMap()
-            projectNameTextView.visibility = View.GONE
-            val state = listener?.getBottomSheetState() ?: 0
-            if (state == BottomSheetBehavior.STATE_EXPANDED) {
-                listener?.hideBottomSheetAndBottomAppBar()
-            } else {
-                listener?.hidBottomAppBar()
-            }
-
-            if (listView.adapter.isEmpty) {
-                showLabel(false)
-            } else {
-                hideLabel()
-            }
-        }
-
-        searchView.setOnCloseListener {
-            hideLabel()
-            listView.visibility = View.GONE
-            showButtonOnMap()
-            projectNameTextView.visibility = View.VISIBLE
-            listener?.showBottomAppBar()
-            listener?.clearFeatureSelectedOnMap()
-            false
-        }
-
-        if (searchView.isIconified) {
-            showButtonOnMap()
-        }
 
         listView.setOnItemClickListener { parent, view, position, id ->
             val projectName = adapterOfSearchSite.getItem(position)
+            view.hideKeyboard()
 
             projectName?.let { name ->
                 val item = locateDb.getLocateByName(name)
@@ -360,11 +345,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     )
                 }
             }
-
-            searchView.isIconified = true
-            if (!searchView.isIconified) {
-                searchView.isIconified = true
-            }
+            showSearchBar(false)
         }
 
         trackingLayout.setOnClickListener {
@@ -389,6 +370,47 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     }
                 }
             }
+        }
+    }
+
+    fun showSearchBar(show: Boolean) {
+        searchLayout.visibility = if (show) View.VISIBLE else View.INVISIBLE
+        listView.visibility = if (show) View.VISIBLE else View.INVISIBLE
+        searchViewActionRightButton.visibility = if (show) View.VISIBLE else View.INVISIBLE
+        searchButton.visibility = if (show) View.GONE else View.VISIBLE
+        trackingLayout.visibility = if (show) View.GONE else View.VISIBLE
+        topBarLayout.visibility = if (show) View.GONE else View.VISIBLE
+
+        if (show) {
+            setSearchView()
+            searchLayout.setBackgroundResource(R.color.backgroundColor)
+        } else {
+            searchLayoutSearchEditText.text = null
+            searchLayout.setBackgroundResource(R.color.transparent)
+
+            hideLabel()
+            showButtonOnMap()
+
+            listView.visibility = View.GONE
+
+            listener?.showBottomAppBar()
+            listener?.clearFeatureSelectedOnMap()
+        }
+    }
+
+    private fun setSearchView() {
+        hideButtonOnMap()
+        val state = listener?.getBottomSheetState() ?: 0
+        if (state == BottomSheetBehavior.STATE_EXPANDED) {
+            listener?.hideBottomSheetAndBottomAppBar()
+        } else {
+            listener?.hidBottomAppBar()
+        }
+
+        if (listView.adapter.isEmpty) {
+            showLabel(false)
+        } else {
+            hideLabel()
         }
     }
 
