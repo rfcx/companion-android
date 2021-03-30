@@ -16,7 +16,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -371,7 +370,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
 
             hideLabel()
             siteRecyclerView.visibility = View.GONE
-
             listener?.showBottomAppBar()
             listener?.clearFeatureSelectedOnMap()
         }
@@ -849,6 +847,24 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
         } else {
             hideLabel()
         }
+    }
+
+    private fun findNearLocations(locateItems: ArrayList<Locate>): List<Pair<Locate, Float>>? {
+        currentUserLocation ?: return null
+
+        if (locateItems.isNotEmpty()) {
+            val itemsWithDistance = arrayListOf<Pair<Locate, Float>>()
+            // Find locate distances
+            locateItems.mapTo(itemsWithDistance, {
+                val loc = Location(LocationManager.GPS_PROVIDER)
+                loc.latitude = it.latitude
+                loc.longitude = it.longitude
+                val distance = loc.distanceTo(this.currentUserLocation) // return in meters
+                Pair(it, distance)
+            })
+            return itemsWithDistance
+        }
+        return null
     }
 
     private fun getFurthestSiteFromCurrentLocation(
