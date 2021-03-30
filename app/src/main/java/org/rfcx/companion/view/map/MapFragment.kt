@@ -1008,9 +1008,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     call: Call<List<DeploymentAssetResponse>>,
                     response: Response<List<DeploymentAssetResponse>>
                 ) {
+                    var fileCount = 0
+                    var fileCreated = 0
                     val siteAssets = response.body()
-                    siteAssets?.forEachIndexed { index, item ->
+                    siteAssets?.forEach{ item ->
                         if (item.mimeType.endsWith("geo+json")) {
+                            fileCount += 1
                             val trackingFileDb =
                                 TrackingFileDb(Realm.getInstance(RealmHelper.migrationConfig()))
                             GeoJsonUtils.downloadGeoJsonFile(
@@ -1021,13 +1024,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                                 Date(),
                                 object : GeoJsonUtils.DownloadTrackCallback {
                                     override fun onSuccess(filePath: String) {
+                                        fileCreated += 1
                                         trackingFileDb.insertOrUpdate(
                                             item,
                                             filePath,
                                             siteId,
                                             Device.AUDIOMOTH.value
                                         )
-                                        if (index == siteAssets.size - 1) {
+                                        if (fileCount == fileCreated) {
                                             callback.onSuccess()
                                         }
                                     }
@@ -1289,6 +1293,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             //get all track first
             if (currentMarkId == markerLocationId) {
                 val tempTrack = arrayListOf<Feature>()
+                Log.d("track", "${tracks.size}")
                 tracks.forEach { track ->
                     val json = File(track.localPath).readText()
                     val featureCollection = FeatureCollection.fromJson(json)
@@ -1296,7 +1301,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     feature?.let {
                         tempTrack.add(it)
                     }
-
                     //track always has 1 item so using get(0) is okay - also it can only be LineString
                     val lineString = feature?.geometry() as LineString
 //                val color = featureCollection.features()?.get(0)?.properties()?.get("color")?.asString ?: "#3bb2d0"

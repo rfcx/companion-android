@@ -88,13 +88,12 @@ object GeoJsonUtils {
                 }
                 output.flush()
             }
-            return file.absolutePath
         } catch (e: Exception) {
             Log.e("GeoJsonUtils-createFile", e.toString())
         } finally {
             inputStream.close()
+            return file.absolutePath
         }
-        return ""
     }
 
     fun downloadGeoJsonFile(
