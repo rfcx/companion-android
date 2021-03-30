@@ -81,6 +81,7 @@ import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.view.deployment.locate.ExistedSiteAdapter
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.deployment.locate.SiteItem
+import org.rfcx.companion.view.detail.EditLocationActivity
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import retrofit2.Call
 import retrofit2.Callback
@@ -144,6 +145,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
 
     private var currentMarkId = ""
 
+    private var screen = ""
+
     private val siteAdapter by lazy { ExistedSiteAdapter(this) }
 
     private val mapboxLocationChangeCallback =
@@ -195,6 +198,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         locationPermissions?.handleActivityResult(requestCode, resultCode)
+        screen = data?.getStringExtra(LocationGroupActivity.EXTRA_SCREEN) ?: ""
     }
 
     override fun onRequestPermissionsResult(
@@ -1406,7 +1410,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
                 if (it.getProjectName() != getString(R.string.none)) it.getProjectName() else ""
             combinedData()
             mapboxMap?.locationComponent?.isLocationComponentActivated?.let { isActivated ->
-                if (isActivated) {
+                if (isActivated && screen == Screen.PROJECT.id) {
                     moveCameraOnStartWithProject()
                 }
             }
