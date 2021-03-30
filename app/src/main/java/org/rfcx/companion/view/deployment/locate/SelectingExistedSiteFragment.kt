@@ -169,7 +169,7 @@ class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener,
                 currentLocation,
                 locations
             )
-            existedSiteAdapter.items = sites
+            existedSiteAdapter.items = ArrayList(createNewItem() + sites)
         }
     }
 
@@ -238,7 +238,7 @@ class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener,
             val newList: ArrayList<SiteWithLastDeploymentItem> = ArrayList()
             newList.addAll(sites.filter { it.locate.name.toLowerCase().contains(text) })
             noResultFound.visibility = if (newList.isEmpty()) View.VISIBLE else View.GONE
-            existedSiteAdapter.setFilter(newList)
+            existedSiteAdapter.setFilter(ArrayList(createNewItem() + newList))
         }
         return true
     }
@@ -249,4 +249,18 @@ class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener,
         inputManager.hideSoftInputFromWindow(windowToken, 0)
     }
 
+    private fun createNewItem(): List<SiteWithLastDeploymentItem> {
+        return listOf(
+            SiteWithLastDeploymentItem(
+                Locate(
+                    id = -1,
+                    name = getString(R.string.create_new_site),
+                    latitude = latitude,
+                    longitude = longitude
+                ),
+                null,
+                0F
+            )
+        )
+    }
 }

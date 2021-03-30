@@ -48,12 +48,19 @@ class SiteAdapter(private val itemClickListener: (Locate) -> Unit) :
         private val siteNameTextView = itemView.siteNameTextView
         private val detailTextView = itemView.detailTextView
         private val distanceTextView = itemView.distanceTextView
+        private val iconAddImageView = itemView.iconAddImageView
 
         fun bind(site: SiteWithLastDeploymentItem) {
             siteNameTextView.text = site.locate.name
             detailTextView.text = site.date?.toTimeSinceStringAlternativeTimeAgo(itemView.context)
                 ?: itemView.context.getString(R.string.no_deployments)
             distanceTextView.text = site.distance.setFormatLabel()
+            distanceTextView.visibility =
+                if (site.locate.name == itemView.context.getString(R.string.create_new_site)) View.GONE else View.VISIBLE
+            detailTextView.visibility =
+                if (site.locate.name == itemView.context.getString(R.string.create_new_site)) View.GONE else View.VISIBLE
+            iconAddImageView.visibility =
+                if (site.locate.name == itemView.context.getString(R.string.create_new_site)) View.VISIBLE else View.GONE
         }
     }
 }

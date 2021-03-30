@@ -361,7 +361,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
         searchViewActionRightButton.visibility = if (show) View.VISIBLE else View.INVISIBLE
         searchButton.visibility = if (show) View.GONE else View.VISIBLE
         trackingLayout.visibility = if (show) View.GONE else View.VISIBLE
-        topBarLayout.visibility = if (show) View.GONE else View.VISIBLE
 
         if (show) {
             setSearchView()
