@@ -57,8 +57,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/topBarLayout" />
 
-    <ListView
-        android:id="@+id/listView"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/siteRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="@color/backgroundColor"
@@ -72,10 +72,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/listView"
-        app:layout_constraintEnd_toEndOf="@id/listView"
-        app:layout_constraintStart_toStartOf="@id/listView"
-        app:layout_constraintTop_toTopOf="@id/listView">
+        app:layout_constraintBottom_toBottomOf="@id/siteRecyclerView"
+        app:layout_constraintEnd_toEndOf="@id/siteRecyclerView"
+        app:layout_constraintStart_toStartOf="@id/siteRecyclerView"
+        app:layout_constraintTop_toTopOf="@id/siteRecyclerView">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/notHaveSiteTextView"

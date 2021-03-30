@@ -153,7 +153,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
                     }
                 }
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                    hidBottomAppBar()
+                    hideBottomAppBar()
                 }
             }
         })
@@ -267,6 +267,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     }
 
     override fun moveMapIntoDeploymentMarker(lat: Double, lng: Double, markerLocationId: String) {
+        hideBottomAppBar()
         val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
         if (mapFragment is MapFragment) {
             mapFragment.moveToDeploymentMarker(lat, lng, markerLocationId)
@@ -287,7 +288,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         return preferences.getString(Preferences.SELECTED_PROJECT, getString(R.string.none))
     }
 
-    override fun hidBottomAppBar() {
+    override fun hideBottomAppBar() {
         createLocationButton.visibility = View.GONE
         bottomBar.visibility = View.GONE
 
@@ -313,7 +314,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
 
     override fun showBottomSheet(fragment: Fragment) {
         hideSnackbar()
-        hidBottomAppBar()
+        hideBottomAppBar()
         val layoutParams: CoordinatorLayout.LayoutParams = bottomSheetContainer.layoutParams
                 as CoordinatorLayout.LayoutParams
         layoutParams.anchorGravity = Gravity.BOTTOM
@@ -330,7 +331,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     }
 
     override fun hideBottomSheetAndBottomAppBar() {
-        hidBottomAppBar()
+        hideBottomAppBar()
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
 
@@ -396,7 +397,7 @@ interface MainActivityListener {
     fun getBottomSheetState(): Int
     fun showBottomSheet(fragment: Fragment)
     fun showBottomAppBar()
-    fun hidBottomAppBar()
+    fun hideBottomAppBar()
     fun hideBottomSheet()
     fun hideBottomSheetAndBottomAppBar()
     fun showSnackbar(msg: String, duration: Int)
