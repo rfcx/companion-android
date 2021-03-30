@@ -9,9 +9,9 @@ import android.graphics.Color
 import android.graphics.PointF
 import android.location.Location
 import android.os.Bundle
+import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +19,6 @@ import android.view.animation.LinearInterpolator
 import android.widget.ArrayAdapter
 import android.widget.SearchView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
@@ -105,8 +104,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
-    private val trackingDb by lazy { TrackingDb(realm) }
     private val trackingFileDb by lazy { TrackingFileDb(realm) }
+    private val trackingDb by lazy { TrackingDb(realm) }
     private val diagnosticDb by lazy { DiagnosticDb(realm) }
 
     // data
@@ -133,7 +132,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var arrayListOfSite: ArrayList<String>
     private lateinit var adapterOfSearchSite: ArrayAdapter<String>
-    private var isRotate = false
+    private val handler: Handler = Handler()
 
     //for animate line string
     private var routeCoordinateList = listOf<Point>()
@@ -227,9 +226,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         fetchJobSyncing()
         fetchData()
         setupSearch()
-        setColorTrackingButton()
         progressBar.visibility = View.VISIBLE
         hideLabel()
+        context?.let { setTextTrackingButton(LocationTracking.isTrackingOn(it)) }
 
         currentLocationButton.setOnClickListener {
             mapboxMap?.locationComponent?.isLocationComponentActivated?.let {
@@ -272,102 +271,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 listener?.hideBottomSheet()
             }
         }
-
-        ViewAnimation().init(zoomInButton)
-        ViewAnimation().init(zoomOutButton)
-        ViewAnimation().init(currentLocationButton)
-
-        addButton.setOnClickListener {
-            isRotate = ViewAnimation().rotateFab(it, !isRotate)
-            if (isRotate) {
-                ViewAnimation().showIn(zoomInButton)
-                ViewAnimation().showIn(zoomOutButton)
-                ViewAnimation().showIn(currentLocationButton)
-            } else {
-                ViewAnimation().showOut(zoomInButton)
-                ViewAnimation().showOut(zoomOutButton)
-                ViewAnimation().showOut(currentLocationButton)
-            }
-        }
-
-        locationTrackingSwitch.setOnCheckedChangeListener { _, isChecked ->
-            setTrackingSwitch(isChecked)
-            if (isChecked) {
-                withinTenMin()
-            } else {
-                context?.let { context -> LocationTracking.set(context, false) }
-            }
-        }
-    }
-
-    private fun setTrackingSwitch(isChecked: Boolean) {
-        statusTextView.text =
-            if (isChecked) getString(R.string.on_duty) else getString(R.string.not_tracking)
-        context?.let {
-            statusTextView.setTextColor(
-                ContextCompat.getColor(
-                    it,
-                    if (isChecked) R.color.colorPrimary else R.color.text_secondary
-                )
-            )
-        }
-    }
-
-    private fun withinTenMin() {
-        if (trackingDb.getCountTracking() != 0) {
-            val time = trackingDb.getTracking()[0].stopAt?.time?.plus(10 * 60000)
-            time?.let {
-                if (it > Date().time) {
-                    confirmationDialog()
-                } else {
-                    trackingDb.deleteTracking(1)
-                    context?.let { context -> LocationTracking.set(context, true) }
-                    setColorTrackingButton()
-                }
-            }
-        } else {
-            context?.let { context -> LocationTracking.set(context, true) }
-            setColorTrackingButton()
-        }
-    }
-
-    private fun confirmationDialog() {
-        context?.let {
-            val builder = AlertDialog.Builder(it, R.style.DialogCustom)
-            builder.setCancelable(false)
-            builder.setTitle(getString(R.string.continue_tracking))
-            builder.setMessage(getString(R.string.want_to_continue))
-
-            builder.setPositiveButton(getString(R.string.continue_text)) { _, _ ->
-                context?.let { context -> LocationTracking.set(context, true) }
-                setColorTrackingButton()
-            }
-            builder.setNegativeButton(getString(R.string.cancel)) { _, _ ->
-                locationTrackingSwitch.isChecked = false
-            }
-            builder.setNeutralButton(getString(R.string.new_tracking)) { _, _ ->
-                trackingDb.deleteTracking(1)
-                context?.let { context -> LocationTracking.set(context, true) }
-                setColorTrackingButton()
-            }
-
-            val dialog: AlertDialog = builder.create()
-            dialog.show()
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                .setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0f)
-            dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-                .setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0f)
-            dialog.getButton(AlertDialog.BUTTON_NEUTRAL)
-                .setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0f)
-        }
-    }
-
-    private fun setColorTrackingButton() {
-        val preferences = context?.let { it1 -> Preferences.getInstance(it1) }
-        val enableTracking =
-            preferences?.getBoolean(Preferences.ENABLE_LOCATION_TRACKING, false) ?: false
-        setTrackingSwitch(enableTracking)
-        locationTrackingSwitch.isChecked = enableTracking
     }
 
     private fun showLabel(isNotFound: Boolean) {
@@ -469,6 +372,72 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 searchView.isIconified = true
             }
         }
+
+        trackingLayout.setOnClickListener {
+            context?.let { context ->
+                if (LocationTracking.isTrackingOn(context)) {
+                    setLocationTrackingService(context, false)
+                } else {
+                    val tracking = trackingDb.getFirstTracking()
+                    if (tracking != null) {
+                        val time = tracking.stopAt?.time?.plus(WITHIN_TIME * 60000)
+                        time?.let {
+                            if (it > Date().time) {
+                                setLocationTrackingService(context, true)
+                            } else {
+                                trackingDb.deleteTracking(1, context)
+                                setLocationTrackingService(context, true)
+                            }
+                        }
+
+                    } else {
+                        setLocationTrackingService(context, true)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setLocationTrackingService(context: Context, isOn: Boolean) {
+        setTextTrackingButton(isOn)
+        LocationTracking.set(context, isOn)
+    }
+
+    private fun setTextTrackingButton(isOn: Boolean) {
+        context?.let { context ->
+            if (isOn) {
+                trackingImageView.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        context,
+                        R.drawable.ic_tracking_on
+                    )
+                )
+                startCounting()
+            } else {
+                handler.removeCallbacks(run)
+                trackingTextView.text = getString(R.string.track)
+                trackingImageView.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        context,
+                        R.drawable.ic_tracking_off
+                    )
+                )
+            }
+        }
+    }
+
+    private fun startCounting() {
+        handler.post(run)
+    }
+
+    private val run: Runnable = object : Runnable {
+        override fun run() {
+            context?.let {
+                trackingTextView.text = "${LocationTracking.getDistance(trackingDb)
+                    .setFormatLabel()}  ${LocationTracking.getOnDutyTimeMinute(it)} min"
+            }
+            handler.postDelayed(this, 20 * 1000)
+        }
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
@@ -487,7 +456,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             setupSources(it)
             setupImages(it)
             setupMarkerLayers(it)
-            setupScale()
+//            setupScale()
 
             mapboxMap.addOnMapClickListener { latLng ->
                 handleClickIcon(mapboxMap.projection.toScreenLocation(latLng))
@@ -1479,6 +1448,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         private const val DEPLOYMENT_CLUSTER = "deployment.cluster"
         private const val POINT_COUNT = "point_count"
         private const val DEPLOYMENT_COUNT = "deployment.count"
+        private const val WITHIN_TIME = (60 * 3)     // 3 hr
 
         private const val DURATION = 700
         const val REQUEST_CODE = 1006
