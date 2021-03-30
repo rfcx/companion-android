@@ -79,6 +79,8 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
+    private val preferences by lazy { context?.let { Preferences.getInstance(it) } }
+
     private var deploymentProtocol: BaseDeploymentProtocol? = null
     private val locationPermissions by lazy { activity?.let { LocationPermissions(it) } }
     private val mapboxLocationChangeCallback =
@@ -485,6 +487,10 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         altitudeValue.text = altitudeFromLocation.setFormatLabel()
         getLastLocation()
 
+        val selectedProject = preferences?.getString(Preferences.SELECTED_PROJECT, getString(R.string.none)) ?: getString(R.string.none)
+        group = selectedProject
+        locationGroupValueTextView.text = selectedProject
+
         if (lastLocation != null) {
             lastLocation?.let {
                 val latLng = LatLng(it.latitude, it.longitude)
@@ -806,7 +812,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         mapView.onResume()
         analytics?.trackScreen(Screen.LOCATION)
 
-        val preferences = context?.let { Preferences.getInstance(it) }
         group = preferences?.getString(Preferences.GROUP, getString(R.string.none))
         locationGroupValueTextView.text = group
     }

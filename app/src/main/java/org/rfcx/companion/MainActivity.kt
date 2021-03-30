@@ -17,7 +17,9 @@ import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
+import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.entity.Device
+import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
@@ -272,6 +274,15 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         }
     }
 
+    override fun showTrackOnMap(site: Locate?, markerLocationId: String) {
+        val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
+        if (mapFragment is MapFragment) {
+            site?.let {
+                mapFragment.gettingTracksAndMoveToPin(it, markerLocationId)
+            }
+        }
+    }
+
     override fun getProjectName(): String {
         val preferences = Preferences.getInstance(this)
         return preferences.getString(Preferences.SELECTED_PROJECT, getString(R.string.none))
@@ -326,14 +337,21 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
 
     override fun onBackPressed() {
         addTooltip?.dismiss()
-        if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
-            hideBottomSheet()
-            clearFeatureSelectedOnMap()
-        } else if (!searchView.isIconified){
-            searchView.isIconified = true
-            clearFeatureSelectedOnMap()
-        } else {
-            return super.onBackPressed()
+        when {
+            bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED -> {
+                hideBottomSheet()
+                clearFeatureSelectedOnMap()
+            }
+            searchLayout.visibility == View.VISIBLE -> {
+                clearFeatureSelectedOnMap()
+                val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
+                if (mapFragment is MapFragment) {
+                    mapFragment.showSearchBar(false)
+                }
+            }
+            else -> {
+                return super.onBackPressed()
+            }
         }
     }
 
@@ -386,6 +404,7 @@ interface MainActivityListener {
     fun hideSnackbar()
     fun onLogout()
     fun moveMapIntoDeploymentMarker(lat: Double, lng: Double, markerLocationId: String)
+    fun showTrackOnMap(site: Locate?, markerLocationId: String)
     fun getProjectName(): String
     fun clearFeatureSelectedOnMap()
 }

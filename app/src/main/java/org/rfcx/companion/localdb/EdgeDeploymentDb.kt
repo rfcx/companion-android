@@ -53,6 +53,12 @@ class EdgeDeploymentDb(private val realm: Realm) {
             .findAllAsync()
     }
 
+    fun getAll(sort: Sort = Sort.DESCENDING): RealmResults<EdgeDeployment> {
+        return realm.where(EdgeDeployment::class.java)
+            .sort(EdgeDeployment.FIELD_ID, sort)
+            .findAll()
+    }
+
     fun insertOrUpdate(deployment: EdgeDeployment, location: DeploymentLocation): Int {
         var id = deployment.id
         realm.executeTransaction {
@@ -134,6 +140,7 @@ class EdgeDeploymentDb(private val realm: Realm) {
     fun markSent(serverId: String, id: Int) {
         mark(id, serverId, SyncState.Sent.key)
         saveDeploymentServerIdToImage(serverId, id)
+        saveDeploymentServerIdToTrack(serverId, id)
     }
 
     private fun mark(id: Int, serverId: String? = null, syncState: Int) {
@@ -401,6 +408,21 @@ class EdgeDeploymentDb(private val realm: Realm) {
                 .findAll()
         realm.executeTransaction { transition ->
             images?.forEach {
+                val image = it.apply {
+                    this.deploymentServerId = serverId
+                }
+                transition.insertOrUpdate(image)
+            }
+        }
+    }
+
+    private fun saveDeploymentServerIdToTrack(serverId: String, deploymentId: Int) {
+        val file =
+            realm.where(TrackingFile::class.java)
+                .equalTo(TrackingFile.FIELD_DEPLOYMENT_ID, deploymentId)
+                .findAll()
+        realm.executeTransaction { transition ->
+            file?.forEach {
                 val image = it.apply {
                     this.deploymentServerId = serverId
                 }

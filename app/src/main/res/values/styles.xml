@@ -42,6 +42,11 @@
         <item name="android:textColor">@color/color_button_text</item>
     </style>
 
+    <style name="AudioMothButton.WhiteButton" parent="AudioMothButton">
+        <item name="android:background">@drawable/bg_color_white_button</item>
+        <item name="android:textColor">@color/color_button_text</item>
+    </style>
+
     <style name="AudioMothButton.FacebookButton" parent="AudioMothButton">
         <item name="android:background">@drawable/bg_facebook_login_button</item>
     </style>

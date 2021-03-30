@@ -1,5 +1,6 @@
 package org.rfcx.companion.view.map
 
+import android.animation.Animator
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -7,12 +8,14 @@ import android.graphics.PointF
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
+import android.os.Handler
 import android.os.Looper
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.SearchView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -27,6 +30,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.mapbox.android.core.location.*
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
+import com.mapbox.geojson.LineString
 import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
@@ -42,6 +46,9 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.style.expressions.Expression.*
 import com.mapbox.mapboxsdk.style.layers.CircleLayer
+import com.mapbox.mapboxsdk.style.layers.LineLayer
+import com.mapbox.mapboxsdk.style.layers.Property.LINE_CAP_ROUND
+import com.mapbox.mapboxsdk.style.layers.Property.LINE_JOIN_ROUND
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
@@ -51,34 +58,34 @@ import com.mapbox.pluginscalebar.ScaleBarOptions
 import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_map.*
+import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.DeploymentListener
 import org.rfcx.companion.MainActivityListener
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.guardian.toMark
-import org.rfcx.companion.entity.response.DeploymentImageResponse
+import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.ProjectResponse
-import org.rfcx.companion.localdb.DeploymentImageDb
-import org.rfcx.companion.localdb.EdgeDeploymentDb
-import org.rfcx.companion.localdb.LocateDb
-import org.rfcx.companion.localdb.LocationGroupDb
-import org.rfcx.companion.localdb.guardian.DiagnosticDb
+import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
-import org.rfcx.companion.repo.Firestore
 import org.rfcx.companion.service.DeploymentSyncWorker
+import org.rfcx.companion.service.DownloadImagesWorker
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
-import org.rfcx.companion.view.deployment.locate.ExistedSiteAdapter
+import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.view.deployment.locate.LocationFragment
-import org.rfcx.companion.view.deployment.locate.SiteItem
+import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.File
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
 
@@ -87,16 +94,17 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
     private var mapboxMap: MapboxMap? = null
     private var locationEngine: LocationEngine? = null
     private var mapSource: GeoJsonSource? = null
+    private var lineSource: GeoJsonSource? = null
     private var mapFeatures: FeatureCollection? = null
 
     // database manager
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
-    private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
-    private val diagnosticDb by lazy { DiagnosticDb(realm) }
+    private val trackingFileDb by lazy { TrackingFileDb(realm) }
+    private val trackingDb by lazy { TrackingDb(realm) }
 
     // data
     private var guardianDeployments = listOf<GuardianDeployment>()
@@ -120,8 +128,23 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
-    private lateinit var arrayListOfSite: ArrayList<SiteItem>
-    private val siteAdapter by lazy { ExistedSiteAdapter(this) }
+    private val handler: Handler = Handler()
+
+    //for animate line string
+    private var routeCoordinateList = listOf<Point>()
+    private var routeIndex = 0
+    private var markerLinePointList = arrayListOf<ArrayList<Point>>()
+    private var currentAnimator: Animator? = null
+    private var queue = arrayListOf<List<Point>>()
+    private var queueColor = arrayListOf<String>()
+    private var queuePivot = 0
+
+    private var currentMarkId = ""
+
+    private var screen = ""
+
+    private val siteAdapter by lazy { SiteAdapter(this) }
+    private var adapterOfSearchSite: ArrayList<SiteWithLastDeploymentItem>? = null
 
     private val mapboxLocationChangeCallback =
         object : LocationEngineCallback<LocationEngineResult> {
@@ -134,7 +157,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
                         this@MapFragment.currentUserLocation = location
                     }
                     if (isFirstTime && locations.isNotEmpty()) {
-                        moveCameraOnStart()
+                        moveCameraOnStartWithProject()
                         isFirstTime = false
                     }
                 }
@@ -172,6 +195,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         locationPermissions?.handleActivityResult(requestCode, resultCode)
+        screen = data?.getStringExtra(LocationGroupActivity.EXTRA_SCREEN) ?: ""
     }
 
     override fun onRequestPermissionsResult(
@@ -203,9 +227,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
         mapView.getMapAsync(this)
         fetchJobSyncing()
         fetchData()
-        setupSearch()
+        showSearchBar(false)
         progressBar.visibility = View.VISIBLE
         hideLabel()
+        context?.let { setTextTrackingButton(LocationTracking.isTrackingOn(it)) }
+
+        searchLayoutSearchEditText.hint = getString(R.string.site_name_hint)
 
         currentLocationButton.setOnClickListener {
             mapboxMap?.locationComponent?.isLocationComponentActivated?.let {
@@ -243,7 +270,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
             }
 
             val state = listener?.getBottomSheetState() ?: 0
-            if (state == BottomSheetBehavior.STATE_EXPANDED) {
+            if (state == BottomSheetBehavior.STATE_EXPANDED && searchLayout.visibility != View.VISIBLE) {
                 clearFeatureSelected()
                 listener?.hideBottomSheet()
             }
@@ -256,7 +283,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
     }
 
     private fun showLabel(isNotFound: Boolean) {
-        if (!searchView.isIconified) {
+        if (searchButton.visibility != View.VISIBLE) {
             showLabelLayout.visibility = View.VISIBLE
             notHaveSiteTextView.visibility = if (isNotFound) View.GONE else View.VISIBLE
             notHaveResultTextView.visibility = if (isNotFound) View.VISIBLE else View.GONE
@@ -268,55 +295,141 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
     }
 
     private fun setupSearch() {
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String): Boolean {
-                return true
+        searchButton.setOnClickListener {
+            showSearchBar(true)
+        }
+
+        searchViewActionRightButton.setOnClickListener {
+            if (searchLayoutSearchEditText.text.isNullOrBlank()) {
+                showSearchBar(false)
+                it.hideKeyboard()
+            } else {
+                searchLayoutSearchEditText.text = null
+            }
+        }
+
+        searchLayoutSearchEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                context?.let {
+                    val text = s.toString().toLowerCase()
+                    val newList: ArrayList<SiteWithLastDeploymentItem> = arrayListOf()
+                    adapterOfSearchSite?.let {
+                        newList.addAll(it.filter { site ->
+                            site.locate.name.toLowerCase().contains(text)
+                        })
+
+                        if (newList.isEmpty()) showLabel(true) else hideLabel()
+                        siteAdapter.setFilter(ArrayList(newList.sortedByDescending { it.date }))
+                    }
+                }
             }
 
-            override fun onQueryTextChange(newText: String): Boolean {
-                context?.let {
-                    val text = newText.toLowerCase()
-                    val newList: ArrayList<SiteItem> = arrayListOf()
-                    newList.addAll(arrayListOfSite.filter { site ->
-                        site.locate.name.toLowerCase().contains(text)
-                    })
-                    if (newList.isEmpty()) showLabel(true) else hideLabel()
-                    siteAdapter.setFilter(newList)
-                }
-                return false
-            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-        searchView.setOnSearchClickListener {
-            siteRecyclerView.visibility = View.VISIBLE
-            hideButtonOnMap()
-            projectNameTextView.visibility = View.GONE
-            val state = listener?.getBottomSheetState() ?: 0
-            if (state == BottomSheetBehavior.STATE_EXPANDED) {
-                listener?.hideBottomSheetAndBottomAppBar()
-            } else {
-                listener?.hideBottomAppBar()
-            }
+        trackingLayout.setOnClickListener {
+            context?.let { context ->
+                if (LocationTracking.isTrackingOn(context)) {
+                    setLocationTrackingService(context, false)
+                } else {
+                    val tracking = trackingDb.getFirstTracking()
+                    if (tracking != null) {
+                        val time = tracking.stopAt?.time?.plus(WITHIN_TIME * 60000)
+                        time?.let {
+                            if (it > Date().time) {
+                                setLocationTrackingService(context, true)
+                            } else {
+                                trackingDb.deleteTracking(1, context)
+                                setLocationTrackingService(context, true)
+                            }
+                        }
 
-            if (siteAdapter.itemCount == 0) {
-                showLabel(false)
-            } else {
-                hideLabel()
+                    } else {
+                        setLocationTrackingService(context, true)
+                    }
+                }
             }
         }
+    }
 
-        searchView.setOnCloseListener {
+    fun showSearchBar(show: Boolean) {
+        searchLayout.visibility = if (show) View.VISIBLE else View.INVISIBLE
+        siteRecyclerView.visibility = if (show) View.VISIBLE else View.INVISIBLE
+        searchViewActionRightButton.visibility = if (show) View.VISIBLE else View.INVISIBLE
+        searchButton.visibility = if (show) View.GONE else View.VISIBLE
+        trackingLayout.visibility = if (show) View.GONE else View.VISIBLE
+
+        if (show) {
+            setSearchView()
+            searchLayout.setBackgroundResource(R.color.backgroundColorSite)
+        } else {
+            searchLayoutSearchEditText.text = null
+            searchLayout.setBackgroundResource(R.color.transparent)
+
             hideLabel()
             siteRecyclerView.visibility = View.GONE
-            showButtonOnMap()
-            projectNameTextView.visibility = View.VISIBLE
             listener?.showBottomAppBar()
             listener?.clearFeatureSelectedOnMap()
-            false
+        }
+    }
+
+    private fun setSearchView() {
+        hideButtonOnMap()
+        val state = listener?.getBottomSheetState() ?: 0
+        if (state == BottomSheetBehavior.STATE_EXPANDED) {
+            listener?.hideBottomSheetAndBottomAppBar()
+        } else {
+            listener?.hideBottomAppBar()
         }
 
-        if (searchView.isIconified) {
-            showButtonOnMap()
+        if (siteAdapter.itemCount == 0) {
+            showLabel(false)
+        } else {
+            hideLabel()
+        }
+    }
+
+    private fun setLocationTrackingService(context: Context, isOn: Boolean) {
+        setTextTrackingButton(isOn)
+        LocationTracking.set(context, isOn)
+    }
+
+    private fun setTextTrackingButton(isOn: Boolean) {
+        context?.let { context ->
+            if (isOn) {
+                trackingImageView.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        context,
+                        R.drawable.ic_tracking_on
+                    )
+                )
+                startCounting()
+            } else {
+                handler.removeCallbacks(run)
+                trackingTextView.text = getString(R.string.track)
+                trackingImageView.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        context,
+                        R.drawable.ic_tracking_off
+                    )
+                )
+            }
+        }
+    }
+
+    private fun startCounting() {
+        handler.post(run)
+    }
+
+    private val run: Runnable = object : Runnable {
+        override fun run() {
+            context?.let {
+                trackingTextView.text = "${LocationTracking.getDistance(trackingDb)
+                    .setFormatLabel()}  ${LocationTracking.getOnDutyTimeMinute(it)} min"
+            }
+            handler.postDelayed(this, 20 * 1000)
         }
     }
 
@@ -336,7 +449,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
             setupSources(it)
             setupImages(it)
             setupMarkerLayers(it)
-            setupScale()
+            setupSearch()
+//            setupScale()
 
             mapboxMap.addOnMapClickListener { latLng ->
                 handleClickIcon(mapboxMap.projection.toScreenLocation(latLng))
@@ -364,7 +478,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
                     )
             )
 
+        lineSource = GeoJsonSource(SOURCE_LINE)
+
         style.addSource(mapSource!!)
+        style.addSource(lineSource!!)
     }
 
     fun clearFeatureSelected() {
@@ -421,6 +538,15 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
     }
 
     private fun setupMarkerLayers(style: Style) {
+
+        val line = LineLayer("line-layer", SOURCE_LINE).withProperties(
+            lineCap(LINE_CAP_ROUND),
+            lineJoin(LINE_JOIN_ROUND),
+            lineWidth(5f),
+            lineColor(get("color"))
+        )
+
+        style.addLayer(line)
 
         val unclusteredSiteLayer =
             SymbolLayer(MARKER_SITE_ID, SOURCE_DEPLOYMENT).withProperties(
@@ -501,6 +627,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
 
     private fun handleClickIcon(screenPoint: PointF): Boolean {
         val deploymentFeatures = mapboxMap?.queryRenderedFeatures(screenPoint, MARKER_DEPLOYMENT_ID)
+        val siteFeatures = mapboxMap?.queryRenderedFeatures(screenPoint, MARKER_SITE_ID)
         val deploymentClusterFeatures =
             mapboxMap?.queryRenderedFeatures(screenPoint, "$DEPLOYMENT_CLUSTER-0")
         if (deploymentFeatures != null && deploymentFeatures.isNotEmpty()) {
@@ -521,6 +648,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
                     (activity as MainActivityListener).showBottomSheet(
                         DeploymentViewPagerFragment.newInstance(deploymentId, deploymentDevice)
                     )
+
+                    val markerId = selectedFeature.getProperty(
+                        PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID
+                    ).asString
+                    val site = locateDb.getLocateByName(markerId.split(".")[0])
+                    gettingTracksAndMoveToPin(site, markerId)
                     analytics?.trackClickPinEvent()
                 } else {
                     features[index]?.let { setFeatureSelectState(it, false) }
@@ -529,6 +662,25 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
             return true
         } else {
             (activity as MainActivityListener).hideBottomSheet()
+            hideTrackOnMap()
+        }
+
+        if (siteFeatures != null && siteFeatures.isNotEmpty()) {
+            val selectedFeature = siteFeatures[0]
+            val features = this.mapFeatures!!.features()!!
+            features.forEach { feature ->
+                val markerId = selectedFeature.getProperty(PROPERTY_SITE_MARKER_ID)
+                if (markerId == feature.getProperty(PROPERTY_SITE_MARKER_ID)) {
+                    val site = locateDb.getLocateById(
+                        selectedFeature.getProperty(PROPERTY_SITE_MARKER_SITE_ID).asInt
+                    )
+                    gettingTracksAndMoveToPin(site, markerId.asString)
+                    analytics?.trackClickPinEvent()
+                }
+            }
+            return true
+        } else {
+            hideTrackOnMap()
         }
 
         if (deploymentClusterFeatures != null && deploymentClusterFeatures.isNotEmpty()) {
@@ -546,6 +698,38 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
         }
         clearFeatureSelected()
         return false
+    }
+
+    fun gettingTracksAndMoveToPin(site: Locate?, markerId: String) {
+        currentMarkId = markerId
+        site?.let { obj ->
+            showTrackOnMap(obj.id, obj.latitude, obj.longitude, markerId)
+            if (site.serverId != null) {
+                retrieveTracking(
+                    requireContext(),
+                    site.id,
+                    site.serverId!!,
+                    object : ApiCallbackInjector {
+                        override fun onSuccess() {
+                            showTrackOnMap(
+                                obj.id,
+                                obj.latitude,
+                                obj.longitude,
+                                markerId
+                            )
+                        }
+
+                        override fun onFailed() {
+                            showTrackOnMap(
+                                obj.id,
+                                obj.latitude,
+                                obj.longitude,
+                                markerId
+                            )
+                        }
+                    })
+            }
+        }
     }
 
     private fun moveCameraToLeavesBounds(featureCollectionToInspect: FeatureCollection) {
@@ -631,7 +815,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
 
         handleMarker(deploymentMarkers + locationMarkers)
 
-        if (deploymentMarkers.isNotEmpty()) {
+        val state = listener?.getBottomSheetState() ?: 0
+        if (deploymentMarkers.isNotEmpty() && state != BottomSheetBehavior.STATE_EXPANDED) {
             val lastReport = deploymentMarkers.sortedByDescending { it.updatedAt }.first()
             mapboxMap?.let {
                 it.moveCamera(
@@ -645,19 +830,19 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
             }
         }
 
-        val nearLocations =
-            findNearLocations(ArrayList(locations.filter { loc ->
-                loc.locationGroup?.name == projectName || projectName == getString(
-                    R.string.none
-                )
-            }))?.sortedBy { it.second }
+        val currentLocation = currentUserLocation
+        if (currentLocation != null) {
+            adapterOfSearchSite = getListSite(
+                requireContext(),
+                showDeployments,
+                projectName,
+                currentLocation,
+                locations
+            )
+            siteAdapter.items = adapterOfSearchSite ?: ArrayList()
+        }
 
-        val locationsItems: List<SiteItem> =
-            nearLocations?.map { SiteItem(it.first, it.second) } ?: listOf()
-        arrayListOfSite = ArrayList(locationsItems)
-        siteAdapter.items = ArrayList(locationsItems)
-
-        if (arrayListOfSite.isEmpty()) {
+        if (adapterOfSearchSite.isNullOrEmpty()) {
             showLabel(false)
         } else {
             hideLabel()
@@ -754,7 +939,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
                             edgeDeploymentDb.insertOrUpdate(item)
                         }
                     }
-                    retrieveImages(context)
+                    retrieveAssets(context)
                     combinedData()
                 }
             })
@@ -788,47 +973,69 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
             })
     }
 
-    private fun retrieveDiagnostics(context: Context) {
-        Firestore(context).retrieveDiagnostics(diagnosticDb)
+    private fun retrieveAssets(context: Context) {
+        DownloadImagesWorker.enqueue(context)
     }
 
-    private fun retrieveImages(context: Context) {
+    private fun retrieveTracking(
+        context: Context,
+        siteId: Int,
+        siteServerId: String,
+        callback: ApiCallbackInjector
+    ) {
         val token = "Bearer ${context.getIdToken()}"
+        ApiManager.getInstance().getDeviceApi().getStreamAssets(token, siteServerId)
+            .enqueue(object : Callback<List<DeploymentAssetResponse>> {
+                override fun onFailure(call: Call<List<DeploymentAssetResponse>>, t: Throwable) {
+                    if (context.isNetworkAvailable()) {
+                        Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                    callback.onFailed()
+                }
 
-        edgeDeployments.forEach { dp ->
-            if (dp.serverId != null) {
-                ApiManager.getInstance().getDeviceApi().getImages(token, dp.serverId!!)
-                    .enqueue(object : Callback<List<DeploymentImageResponse>> {
-                        override fun onFailure(
-                            call: Call<List<DeploymentImageResponse>>,
-                            t: Throwable
-                        ) {
-                            combinedData()
-                            if (context.isNetworkAvailable()) {
-                                Toast.makeText(
-                                    context,
-                                    R.string.error_has_occurred,
-                                    Toast.LENGTH_SHORT
-                                )
-                                    .show()
-                            }
-                        }
+                override fun onResponse(
+                    call: Call<List<DeploymentAssetResponse>>,
+                    response: Response<List<DeploymentAssetResponse>>
+                ) {
+                    var fileCount = 0
+                    var fileCreated = 0
+                    val siteAssets = response.body()
+                    siteAssets?.forEach { item ->
+                        if (item.mimeType.endsWith("geo+json")) {
+                            fileCount += 1
+                            val trackingFileDb =
+                                TrackingFileDb(Realm.getInstance(RealmHelper.migrationConfig()))
+                            GeoJsonUtils.downloadGeoJsonFile(
+                                context,
+                                token,
+                                item,
+                                siteServerId,
+                                Date(),
+                                object : GeoJsonUtils.DownloadTrackCallback {
+                                    override fun onSuccess(filePath: String) {
+                                        fileCreated += 1
+                                        trackingFileDb.insertOrUpdate(
+                                            item,
+                                            filePath,
+                                            siteId,
+                                            Device.AUDIOMOTH.value
+                                        )
+                                        if (fileCount == fileCreated) {
+                                            callback.onSuccess()
+                                        }
+                                    }
 
-                        override fun onResponse(
-                            call: Call<List<DeploymentImageResponse>>,
-                            response: Response<List<DeploymentImageResponse>>
-                        ) {
-                            response.body()?.forEach { item ->
-                                deploymentImageDb.insertOrUpdate(
-                                    item,
-                                    dp.id,
-                                    Device.AUDIOMOTH.value
-                                )
-                            }
+                                    override fun onFailed(msg: String) {
+                                        listener?.showSnackbar(msg, Snackbar.LENGTH_SHORT)
+                                    }
+
+                                }
+                            )
                         }
-                    })
-            }
-        }
+                    }
+                }
+            })
     }
 
     private fun fetchJobSyncing() {
@@ -910,7 +1117,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
                 }
                 is MapMarker.SiteMarker -> {
                     val properties = mapOf(
-                        Pair(PROPERTY_SITE_MARKER_IMAGE, it.pin)
+                        Pair(PROPERTY_SITE_MARKER_IMAGE, it.pin),
+                        Pair(PROPERTY_SITE_MARKER_SITE_ID, it.id.toString()),
+                        Pair(PROPERTY_SITE_MARKER_ID, "${it.name}.${it.id}")
                     )
 
                     Feature.fromGeometry(
@@ -1034,11 +1243,23 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
         }
     }
 
-    fun moveToDeploymentMarker(lat: Double, lng: Double, markerLocationId: String) {
+    fun moveToDeploymentMarker(
+        lat: Double,
+        lng: Double,
+        markerLocationId: String,
+        trackingLatLng: List<LatLng>? = null
+    ) {
         mapboxMap?.let {
-            it.moveCamera(
-                CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), DEFAULT_ZOOM_LEVEL)
-            )
+            if (trackingLatLng != null) {
+                val latLngBounds = LatLngBounds.Builder()
+                    .includes(trackingLatLng + LatLng(lat, lng))
+                    .build()
+                mapboxMap?.easeCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 200), 1300)
+            } else {
+                it.moveCamera(
+                    CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), DEFAULT_ZOOM_LEVEL)
+                )
+            }
         }
 
         val features = this.mapFeatures!!.features()!!
@@ -1052,6 +1273,110 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
                 }
             }
         }
+    }
+
+    fun showTrackOnMap(id: Int, lat: Double, lng: Double, markerLocationId: String) {
+        //remove the previous one
+        hideTrackOnMap()
+        val tracks = trackingFileDb.getTrackingFileBySiteId(id)
+        if (tracks.isNotEmpty()) {
+            //get all track first
+            if (currentMarkId == markerLocationId) {
+                val tempTrack = arrayListOf<Feature>()
+                tracks.forEach { track ->
+                    val json = File(track.localPath).readText()
+                    val featureCollection = FeatureCollection.fromJson(json)
+                    val feature = featureCollection.features()?.get(0)
+                    feature?.let {
+                        tempTrack.add(it)
+                    }
+                    //track always has 1 item so using get(0) is okay - also it can only be LineString
+                    val lineString = feature?.geometry() as LineString
+//                val color = featureCollection.features()?.get(0)?.properties()?.get("color")?.asString ?: "#3bb2d0"
+//                queueColor.add(color)
+                    queue.add(lineString.coordinates().toList())
+                }
+                lineSource!!.setGeoJson(FeatureCollection.fromFeatures(tempTrack))
+
+                //move camera to pin
+                moveToDeploymentMarker(
+                    lat,
+                    lng,
+                    markerLocationId,
+                    queue.flatten()
+                        .map { point -> LatLng(point.latitude(), point.longitude()) })
+            }
+
+            //animate track
+//            routeCoordinateList = queue[0]
+//            animate()
+
+        } else {
+            moveToDeploymentMarker(lat, lng, markerLocationId)
+        }
+    }
+
+//    private fun animate() {
+//        if (routeCoordinateList.size - 1 > routeIndex) {
+//            val indexPoint = routeCoordinateList[routeIndex]
+//            val newPoint = routeCoordinateList[routeIndex + 1]
+//            currentAnimator = createLatLngAnimator(indexPoint, newPoint)
+//            currentAnimator?.start()
+//            routeIndex++
+//        } else {
+//            queuePivot += 1
+//            if (queuePivot <= queue.size - 1) {
+//                routeCoordinateList = queue[queuePivot]
+//                routeIndex = 0
+//                animate()
+//            }
+//        }
+//    }
+//
+//    private fun createLatLngAnimator(currentPosition: Point, targetPosition: Point): Animator {
+//        val latLngAnimator: ValueAnimator =
+//            ValueAnimator.ofObject(PointEvaluator(), currentPosition, targetPosition)
+//        latLngAnimator.duration = 100 // fixed to 100 milliseconds
+//        latLngAnimator.interpolator = LinearInterpolator()
+//
+//        latLngAnimator.addListener(object : AnimatorListenerAdapter() {
+//            override fun onAnimationEnd(animation: Animator?) {
+//                super.onAnimationEnd(animation)
+//                animate()
+//            }
+//        })
+//
+//        latLngAnimator.addUpdateListener { animation ->
+//            val point = animation.animatedValue as Point
+//            if (markerLinePointList.size <= queuePivot + 1) {
+//                markerLinePointList.add(arrayListOf())
+//            }
+//            markerLinePointList[queuePivot].add(point)
+//
+//            val listOfFeature = arrayListOf<Feature>()
+//            markerLinePointList.forEachIndexed { index, it ->
+//                val feature = Feature.fromGeometry(LineString.fromLngLats(it))
+//                feature.addStringProperty("color", queueColor.getOrNull(0) ?: "#3bb2d0")
+//                listOfFeature.add(feature)
+//            }
+//
+//            lineSource!!.setGeoJson(FeatureCollection.fromFeatures(listOfFeature))
+//        }
+//
+//        return latLngAnimator
+//    }
+
+    private fun hideTrackOnMap() {
+        //reset source
+        lineSource!!.setGeoJson(FeatureCollection.fromFeatures(listOf()))
+        routeCoordinateList = listOf()
+        routeIndex = 0
+        markerLinePointList.clear()
+        queuePivot = 0
+        queue.clear()
+        queueColor.clear()
+        currentAnimator?.end()
+        currentAnimator = null
     }
 
     fun showButtonOnMap() {
@@ -1072,13 +1397,17 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
         mapView.onResume()
         listener?.let { it ->
             projectNameTextView.text =
-                if (it.getProjectName() != getString(R.string.none)) it.getProjectName() else ""
+                if (it.getProjectName() != getString(R.string.none)) it.getProjectName() else getString(R.string.projects)
             combinedData()
             mapboxMap?.locationComponent?.isLocationComponentActivated?.let { isActivated ->
-                if (isActivated) {
+                if (isActivated && screen == Screen.PROJECT.id) {
                     moveCameraOnStartWithProject()
                 }
             }
+        }
+        if(searchLayout.visibility == View.VISIBLE) {
+            hideButtonOnMap()
+            listener?.hideBottomAppBar()
         }
         analytics?.trackScreen(Screen.MAP)
     }
@@ -1106,6 +1435,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
         locateLiveData.removeObserver(locateObserve)
         locationGroupLiveData.removeObserver(locationGroupObserve)
         locationEngine?.removeLocationUpdates(mapboxLocationChangeCallback)
+        currentAnimator?.cancel()
         mapView.onDestroy()
     }
 
@@ -1118,6 +1448,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
         private const val MARKER_DEPLOYMENT_ID = "marker.deployment"
         private const val MARKER_SITE_ID = "marker.site"
 
+        private const val SOURCE_LINE = "source.line"
+
         private const val PROPERTY_DEPLOYMENT_SELECTED = "deployment.selected"
         private const val PROPERTY_DEPLOYMENT_MARKER_DEVICE = "deployment.device"
         private const val PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID = "deployment.location"
@@ -1127,12 +1459,15 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
         private const val PROPERTY_DEPLOYMENT_MARKER_IMAGE = "deployment.marker.image"
 
         private const val PROPERTY_SITE_MARKER_IMAGE = "site.marker.image"
+        private const val PROPERTY_SITE_MARKER_ID = "site.id"
+        private const val PROPERTY_SITE_MARKER_SITE_ID = "site.stream.id"
 
         private const val PROPERTY_CLUSTER_TYPE = "cluster.type"
 
         private const val DEPLOYMENT_CLUSTER = "deployment.cluster"
         private const val POINT_COUNT = "point_count"
         private const val DEPLOYMENT_COUNT = "deployment.count"
+        private const val WITHIN_TIME = (60 * 3)     // 3 hr
 
         private const val DURATION = 700
         const val REQUEST_CODE = 1006
@@ -1143,6 +1478,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
     }
 
     override fun invoke(locate: Locate) {
+        view?.hideKeyboard()
+        showSearchBar(false)
+
         val item = locateDb.getLocateByName(locate.name)
         item?.let {
             mapboxMap?.animateCamera(
@@ -1162,10 +1500,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
                 )
             )
         }
-
-        searchView.isIconified = true
-        if (!searchView.isIconified) {
-            searchView.isIconified = true
-        }
     }
+}
+
+interface ApiCallbackInjector {
+    fun onSuccess()
+    fun onFailed()
 }

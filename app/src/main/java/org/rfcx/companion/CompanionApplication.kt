@@ -5,6 +5,8 @@ import io.realm.Realm
 import io.realm.exceptions.RealmMigrationNeededException
 import org.rfcx.companion.connection.socket.SocketManager
 import org.rfcx.companion.service.DeploymentCleanupWorker
+import org.rfcx.companion.util.LocationTracking
+import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.RealmHelper
 
 class CompanionApplication : Application() {
@@ -14,6 +16,12 @@ class CompanionApplication : Application() {
         Realm.init(this)
         setupRealm()
         DeploymentCleanupWorker.enqueuePeriodically(this)
+
+        val preferences = Preferences.getInstance(this)
+        val state = preferences.getBoolean(Preferences.ENABLE_LOCATION_TRACKING, false)
+        if (state) {
+            LocationTracking.set(this, true)
+        }
     }
 
     private fun setupRealm() {

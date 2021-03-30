@@ -41,21 +41,13 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="@dimen/margin_padding_normal"
+            android:layout_marginEnd="@dimen/margin_padding_xlarge"
+            android:gravity="center"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/searchView"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/menuImageView"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Puerto Rico" />
-
-        <SearchView
-            android:id="@+id/searchView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_padding_normal"
-            android:queryHint="Search site"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -69,11 +61,11 @@
         android:id="@+id/siteRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@color/backgroundColor"
+        android:background="@color/backgroundColorSite"
         android:dividerHeight="1dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/topBarLayout" />
+        app:layout_constraintTop_toBottomOf="@id/searchLayout" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/showLabelLayout"
@@ -110,6 +102,62 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/trackingLayout"
+        android:background="@drawable/bg_tracking_button"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/tracking_size"
+        android:layout_marginStart="@dimen/margin_padding_normal"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:paddingStart="@dimen/margin_padding_normal"
+        android:paddingEnd="@dimen/margin_padding_normal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topBarLayout">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/trackingImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_tracking_off"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/trackingTextView"
+            style="@style/AudioMothText.Subhead.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_padding_small"
+            android:text="@string/track"
+            android:textColor="@color/trackingText"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/trackingImageView"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <include
+        layout="@layout/layout_search_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topBarLayout" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/searchButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:layout_marginEnd="@dimen/margin_padding_normal"
+        android:src="@drawable/ic_baseline_search_24"
+        app:backgroundTint="@color/white"
+        app:fabCustomSize="@dimen/tracking_size"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topBarLayout"
+        app:tint="@color/colorPrimary" />
+
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="@dimen/progress_bar"
@@ -124,8 +172,7 @@
         android:id="@+id/buttonOnMapGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:constraint_referenced_ids="zoomInButton,zoomOutButton,currentLocationButton" />
+        app:constraint_referenced_ids="searchButton,trackingLayout,zoomInButton,zoomOutButton,currentLocationButton" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/zoomInButton"
@@ -155,12 +202,12 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/currentLocationButton"
-        android:layout_width="@dimen/current_loc_size"
-        android:layout_height="@dimen/current_loc_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/current_loc_margin"
         android:src="@drawable/ic_current_location"
         app:backgroundTint="@color/white"
-        app:fabCustomSize="@dimen/current_loc_size"
+        app:fabCustomSize="@dimen/zoom_loc_size"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/guidelineVertical"
         app:layout_constraintStart_toStartOf="@id/guidelineVertical"
