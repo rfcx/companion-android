@@ -80,7 +80,7 @@ class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener,
         val searchItem = menu.findItem(R.id.searchView)
 
         val searchView: SearchView = searchItem.actionView as SearchView
-        searchView.queryHint = getString(R.string.search_box_hint)
+        searchView.queryHint = getString(R.string.site_name_hint)
         searchView.setOnQueryTextListener(this)
         context?.let {
             DrawableCompat.setTint(

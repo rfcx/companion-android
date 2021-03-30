@@ -233,6 +233,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
         hideLabel()
         context?.let { setTextTrackingButton(LocationTracking.isTrackingOn(it)) }
 
+        searchLayoutSearchEditText.hint = getString(R.string.site_name_hint)
+
         currentLocationButton.setOnClickListener {
             mapboxMap?.locationComponent?.isLocationComponentActivated?.let {
                 if (it) {

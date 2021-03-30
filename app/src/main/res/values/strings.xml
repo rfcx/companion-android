@@ -342,6 +342,7 @@
 
     <!-- Search Location -->
     <string name="search_box_hint">Search here</string>
+    <string name="site_name_hint">Site name</string>
     <string name="search_title">Search</string>
     <string name="search_message">by name/lat,long</string>
     <string name="search_not_found_title">No results found</string>
