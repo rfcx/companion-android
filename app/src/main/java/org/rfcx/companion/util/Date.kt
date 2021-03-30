@@ -1,5 +1,9 @@
 package org.rfcx.companion.util
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.text.format.DateUtils
+import org.rfcx.companion.R
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -46,6 +50,10 @@ fun Date.toDateString(): String {
 }
 
 fun Calendar.toTimeString(): String {
+    return outputTimeSdf.format(this.time)
+}
+
+fun Date.toTimeString(): String {
     return outputTimeSdf.format(this.time)
 }
 
