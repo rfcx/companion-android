@@ -379,8 +379,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
             searchLayout.setBackgroundResource(R.color.transparent)
 
             hideLabel()
-            showButtonOnMap()
-
             siteRecyclerView.visibility = View.GONE
 
             listener?.showBottomAppBar()
@@ -1485,6 +1483,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
     }
 
     override fun invoke(locate: Locate) {
+        view?.hideKeyboard()
+        showSearchBar(false)
+
         val item = locateDb.getLocateByName(locate.name)
         item?.let {
             mapboxMap?.animateCamera(
