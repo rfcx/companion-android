@@ -1,8 +1,6 @@
 package org.rfcx.companion.view.map
 
 import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -17,9 +15,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.LinearInterpolator
 import android.widget.ArrayAdapter
-import android.widget.SearchView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -81,7 +77,6 @@ import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.geojson.GeoJsonUtils
-import org.rfcx.companion.view.animator.PointEvaluator
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import retrofit2.Call
@@ -133,7 +128,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
-    private lateinit var arrayListOfSite: ArrayList<String>
     private lateinit var adapterOfSearchSite: ArrayAdapter<String>
     private val handler: Handler = Handler()
 
@@ -308,6 +302,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 context?.let {
                     val text = s.toString().toLowerCase()
                     val newList: ArrayList<String> = arrayListOf()
+                    val projectName = listener?.getProjectName()
+                    val arrayListOfSite = ArrayList(locations.filter { loc ->
+                        loc.locationGroup?.name == projectName || projectName == getString(R.string.none)
+                    }.map { site -> site.name })
                     newList.addAll(arrayListOfSite.filter { site ->
                         site.toLowerCase().contains(text)
                     })
@@ -857,7 +855,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-        arrayListOfSite = ArrayList(locations.filter { loc ->
+        val arrayListOfSite = ArrayList(locations.filter { loc ->
             loc.locationGroup?.name == projectName || projectName == getString(R.string.none)
         }.map { it.name })
 
