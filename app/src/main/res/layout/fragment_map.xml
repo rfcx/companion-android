@@ -104,7 +104,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/trackingLayout"
-        style="@style/AudioMothButton.WhiteButton"
+        android:background="@drawable/bg_tracking_button"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/tracking_size"
         android:layout_marginStart="@dimen/margin_padding_normal"
