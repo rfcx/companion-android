@@ -160,7 +160,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
                         this@MapFragment.currentUserLocation = location
                     }
                     if (isFirstTime && locations.isNotEmpty()) {
-                        moveCameraOnStart()
+                        moveCameraOnStartWithProject()
                         isFirstTime = false
                     }
                 }
@@ -1406,7 +1406,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
         mapView.onResume()
         listener?.let { it ->
             projectNameTextView.text =
-                if (it.getProjectName() != getString(R.string.none)) it.getProjectName() else ""
+                if (it.getProjectName() != getString(R.string.none)) it.getProjectName() else getString(R.string.projects)
             combinedData()
             mapboxMap?.locationComponent?.isLocationComponentActivated?.let { isActivated ->
                 if (isActivated && screen == Screen.PROJECT.id) {
