@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.PointF
 import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -15,7 +16,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -23,6 +23,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.WorkInfo
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
@@ -77,7 +78,9 @@ import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.geojson.GeoJsonUtils
+import org.rfcx.companion.view.deployment.locate.ExistedSiteAdapter
 import org.rfcx.companion.view.deployment.locate.LocationFragment
+import org.rfcx.companion.view.deployment.locate.SiteItem
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import retrofit2.Call
 import retrofit2.Callback
@@ -86,7 +89,7 @@ import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
-class MapFragment : Fragment(), OnMapReadyCallback {
+class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
 
     // map
     private lateinit var mapView: MapView
@@ -128,7 +131,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
-    private lateinit var adapterOfSearchSite: ArrayAdapter<String>
     private val handler: Handler = Handler()
 
     //for animate line string
@@ -141,6 +143,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var queuePivot = 0
 
     private var currentMarkId = ""
+
+    private val siteAdapter by lazy { ExistedSiteAdapter(this) }
 
     private val mapboxLocationChangeCallback =
         object : LocationEngineCallback<LocationEngineResult> {
@@ -269,6 +273,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 listener?.hideBottomSheet()
             }
         }
+
+        siteRecyclerView.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = siteAdapter
+        }
     }
 
     private fun showLabel(isNotFound: Boolean) {
@@ -301,21 +310,22 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             override fun afterTextChanged(s: Editable?) {
                 context?.let {
                     val text = s.toString().toLowerCase()
-                    val newList: ArrayList<String> = arrayListOf()
+                    val newList: ArrayList<SiteItem> = arrayListOf()
                     val projectName = listener?.getProjectName()
-                    val arrayListOfSite = ArrayList(locations.filter { loc ->
-                        loc.locationGroup?.name == projectName || projectName == getString(R.string.none)
-                    }.map { site -> site.name })
+                    val nearLocations =
+                        findNearLocations(ArrayList(locations.filter { loc ->
+                            loc.locationGroup?.name == projectName || projectName == getString(
+                                R.string.none
+                            )
+                        }))?.sortedBy { it.second }
+                    val locationsItems: List<SiteItem> =
+                        nearLocations?.map { SiteItem(it.first, it.second) } ?: listOf()
+                    val arrayListOfSite = ArrayList(locationsItems)
                     newList.addAll(arrayListOfSite.filter { site ->
-                        site.toLowerCase().contains(text)
+                        site.locate.name.toLowerCase().contains(text)
                     })
-                    adapterOfSearchSite = ArrayAdapter(
-                        it,
-                        android.R.layout.simple_list_item_1,
-                        newList
-                    )
                     if (newList.isEmpty()) showLabel(true) else hideLabel()
-                    listView.adapter = adapterOfSearchSite
+                    siteAdapter.setFilter(newList)
                 }
             }
 
@@ -323,34 +333,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
-
-        listView.setOnItemClickListener { parent, view, position, id ->
-            val projectName = adapterOfSearchSite.getItem(position)
-            view.hideKeyboard()
-
-            projectName?.let { name ->
-                val item = locateDb.getLocateByName(name)
-                item?.let {
-                    mapboxMap?.animateCamera(
-                        CameraUpdateFactory.newLatLngZoom(
-                            it.getLatLng(),
-                            DEFAULT_ZOOM_LEVEL
-                        )
-                    )
-                }
-
-                val deployment = edgeDeploymentDb.getDeploymentBySiteName(name)
-                if (deployment != null) {
-                    (activity as MainActivityListener).showBottomSheet(
-                        DeploymentViewPagerFragment.newInstance(
-                            deployment.id,
-                            Device.AUDIOMOTH.value
-                        )
-                    )
-                }
-            }
-            showSearchBar(false)
-        }
 
         trackingLayout.setOnClickListener {
             context?.let { context ->
@@ -379,7 +361,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     fun showSearchBar(show: Boolean) {
         searchLayout.visibility = if (show) View.VISIBLE else View.INVISIBLE
-        listView.visibility = if (show) View.VISIBLE else View.INVISIBLE
+        siteRecyclerView.visibility = if (show) View.VISIBLE else View.INVISIBLE
         searchViewActionRightButton.visibility = if (show) View.VISIBLE else View.INVISIBLE
         searchButton.visibility = if (show) View.GONE else View.VISIBLE
         trackingLayout.visibility = if (show) View.GONE else View.VISIBLE
@@ -395,7 +377,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             hideLabel()
             showButtonOnMap()
 
-            listView.visibility = View.GONE
+            siteRecyclerView.visibility = View.GONE
 
             listener?.showBottomAppBar()
             listener?.clearFeatureSelectedOnMap()
@@ -408,10 +390,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         if (state == BottomSheetBehavior.STATE_EXPANDED) {
             listener?.hideBottomSheetAndBottomAppBar()
         } else {
-            listener?.hidBottomAppBar()
+            listener?.hideBottomAppBar()
         }
 
-        if (listView.adapter.isEmpty) {
+        if (siteAdapter.itemCount == 0) {
             showLabel(false)
         } else {
             hideLabel()
@@ -855,24 +837,40 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-        val arrayListOfSite = ArrayList(locations.filter { loc ->
-            loc.locationGroup?.name == projectName || projectName == getString(R.string.none)
-        }.map { it.name })
+        val nearLocations =
+            findNearLocations(ArrayList(locations.filter { loc ->
+                loc.locationGroup?.name == projectName || projectName == getString(
+                    R.string.none
+                )
+            }))?.sortedBy { it.second }
 
-        context?.let {
-            adapterOfSearchSite = ArrayAdapter(
-                it,
-                android.R.layout.simple_list_item_1,
-                arrayListOfSite
-            )
-            listView.adapter = adapterOfSearchSite
-        }
+        val locationsItems: List<SiteItem> =
+            nearLocations?.map { SiteItem(it.first, it.second) } ?: listOf()
+        siteAdapter.items = ArrayList(locationsItems)
 
-        if (filteredShowLocations.isEmpty()) {
+        if (locationsItems.isEmpty()) {
             showLabel(false)
         } else {
             hideLabel()
         }
+    }
+
+    private fun findNearLocations(locateItems: ArrayList<Locate>): List<Pair<Locate, Float>>? {
+        currentUserLocation ?: return null
+
+        if (locateItems.isNotEmpty()) {
+            val itemsWithDistance = arrayListOf<Pair<Locate, Float>>()
+            // Find locate distances
+            locateItems.mapTo(itemsWithDistance, {
+                val loc = Location(LocationManager.GPS_PROVIDER)
+                loc.latitude = it.latitude
+                loc.longitude = it.longitude
+                val distance = loc.distanceTo(this.currentUserLocation) // return in meters
+                Pair(it, distance)
+            })
+            return itemsWithDistance
+        }
+        return null
     }
 
     private fun getFurthestSiteFromCurrentLocation(
@@ -1009,7 +1007,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     var fileCount = 0
                     var fileCreated = 0
                     val siteAssets = response.body()
-                    siteAssets?.forEach{ item ->
+                    siteAssets?.forEach { item ->
                         if (item.mimeType.endsWith("geo+json")) {
                             fileCount += 1
                             val trackingFileDb =
@@ -1481,8 +1479,30 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    interface ApiCallbackInjector {
-        fun onSuccess()
-        fun onFailed()
+    override fun invoke(locate: Locate) {
+        val item = locateDb.getLocateByName(locate.name)
+        item?.let {
+            mapboxMap?.animateCamera(
+                CameraUpdateFactory.newLatLngZoom(
+                    it.getLatLng(),
+                    DEFAULT_ZOOM_LEVEL
+                )
+            )
+        }
+
+        val deployment = edgeDeploymentDb.getDeploymentBySiteName(locate.name)
+        if (deployment != null) {
+            (activity as MainActivityListener).showBottomSheet(
+                DeploymentViewPagerFragment.newInstance(
+                    deployment.id,
+                    Device.AUDIOMOTH.value
+                )
+            )
+        }
     }
+}
+
+interface ApiCallbackInjector {
+    fun onSuccess()
+    fun onFailed()
 }
