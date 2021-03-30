@@ -827,7 +827,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
 
         handleMarker(deploymentMarkers + locationMarkers)
 
-        if (deploymentMarkers.isNotEmpty()) {
+        val state = listener?.getBottomSheetState() ?: 0
+        if (deploymentMarkers.isNotEmpty() && state != BottomSheetBehavior.STATE_EXPANDED) {
             val lastReport = deploymentMarkers.sortedByDescending { it.updatedAt }.first()
             mapboxMap?.let {
                 it.moveCamera(
