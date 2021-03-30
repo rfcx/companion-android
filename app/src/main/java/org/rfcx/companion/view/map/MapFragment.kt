@@ -271,7 +271,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
             }
 
             val state = listener?.getBottomSheetState() ?: 0
-            if (state == BottomSheetBehavior.STATE_EXPANDED) {
+            if (state == BottomSheetBehavior.STATE_EXPANDED && searchLayout.visibility != View.VISIBLE) {
                 clearFeatureSelected()
                 listener?.hideBottomSheet()
             }
@@ -364,7 +364,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
 
         if (show) {
             setSearchView()
-            searchLayout.setBackgroundResource(R.color.backgroundColor)
+            searchLayout.setBackgroundResource(R.color.backgroundColorSite)
         } else {
             searchLayoutSearchEditText.text = null
             searchLayout.setBackgroundResource(R.color.transparent)
@@ -1388,6 +1388,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
                     moveCameraOnStartWithProject()
                 }
             }
+        }
+        if(searchLayout.visibility == View.VISIBLE) {
+            hideButtonOnMap()
+            listener?.hideBottomAppBar()
         }
         analytics?.trackScreen(Screen.MAP)
     }

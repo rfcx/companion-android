@@ -61,7 +61,7 @@
         android:id="@+id/siteRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@color/backgroundColor"
+        android:background="@color/backgroundColorSite"
         android:dividerHeight="1dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"

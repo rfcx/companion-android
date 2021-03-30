@@ -2,6 +2,7 @@
 <resources>
     <color name="backgroundColor">@color/white</color>
     <color name="backgroundImageCard">@color/grey_light</color>
+    <color name="backgroundColorSite">@color/grey</color>
     <color name="separateLine">@color/grey_light</color>
     <color name="searchColor">@color/white</color>
     <color name="iconColor">#000000</color>
