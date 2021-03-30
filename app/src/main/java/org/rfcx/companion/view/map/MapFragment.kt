@@ -1293,7 +1293,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             //get all track first
             if (currentMarkId == markerLocationId) {
                 val tempTrack = arrayListOf<Feature>()
-                Log.d("track", "${tracks.size}")
                 tracks.forEach { track ->
                     val json = File(track.localPath).readText()
                     val featureCollection = FeatureCollection.fromJson(json)
