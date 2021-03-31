@@ -83,8 +83,7 @@ class TrackingFileDb(private val realm: Realm) {
     fun insertOrUpdate(
         deploymentAssetResponse: DeploymentAssetResponse,
         filePath: String,
-        deploymentId: Int?,
-        device: String
+        deploymentId: Int?
     ) {
         realm.executeTransaction {
             val file =
@@ -100,7 +99,6 @@ class TrackingFileDb(private val realm: Realm) {
                 deploymentTracking.siteId = deploymentId
                 deploymentTracking.syncState = SyncState.Sent.key
                 deploymentTracking.localPath = filePath
-                deploymentTracking.device = device
                 it.insert(deploymentTracking)
             } else {
                 File(filePath).delete()

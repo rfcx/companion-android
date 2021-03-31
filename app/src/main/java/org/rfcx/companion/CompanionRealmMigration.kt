@@ -302,6 +302,13 @@ class CompanionRealmMigration : RealmMigration {
         }
     }
 
+    private fun migrateToV14(realm: DynamicRealm) {
+        val trackingFile = realm.schema.create(TrackingFile.TABLE_NAME)
+        trackingFile.apply {
+            removeField(TrackingFile.FIELD_DEVICE)
+        }
+    }
+
     override fun hashCode(): Int {
         return 1
     }

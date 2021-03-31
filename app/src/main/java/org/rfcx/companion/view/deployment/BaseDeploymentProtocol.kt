@@ -31,4 +31,6 @@ interface BaseDeploymentProtocol {
     fun showToolbar()
     fun hideToolbar()
     fun setToolbarTitle()
+
+    fun showSiteLoadingDialog(text: String)
 }

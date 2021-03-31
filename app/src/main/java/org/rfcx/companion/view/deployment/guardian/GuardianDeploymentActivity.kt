@@ -20,14 +20,14 @@ import org.rfcx.companion.connection.wifi.WifiLostListener
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import org.rfcx.companion.entity.guardian.GuardianDeployment
-import org.rfcx.companion.localdb.DeploymentImageDb
-import org.rfcx.companion.localdb.EdgeDeploymentDb
-import org.rfcx.companion.localdb.LocateDb
-import org.rfcx.companion.localdb.LocationGroupDb
+import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.service.GuardianDeploymentSyncWorker
 import org.rfcx.companion.util.Analytics
+import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.RealmHelper
+import org.rfcx.companion.util.geojson.GeoJsonUtils
+import org.rfcx.companion.view.deployment.EdgeDeploymentActivity
 import org.rfcx.companion.view.deployment.guardian.advanced.GuardianAdvancedFragment
 import org.rfcx.companion.view.deployment.guardian.checkin.GuardianCheckInTestFragment
 import org.rfcx.companion.view.deployment.guardian.configure.GuardianConfigureFragment
@@ -54,6 +54,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private val deploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
+    private val trackingDb by lazy { TrackingDb(realm) }
+    private val trackingFileDb by lazy { TrackingFileDb(realm) }
 
     private var _deployment: GuardianDeployment? = null
     private var _deployLocation: DeploymentLocation? = null
@@ -84,6 +86,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     private lateinit var wifiHotspotManager: WifiHotspotManager
     private val analytics by lazy { Analytics(this) }
+
+    private val preferences = Preferences.getInstance(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -276,6 +280,21 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
             saveImages(it)
             deploymentDb.updateDeployment(it)
+
+            //track getting
+            if (preferences.getBoolean(Preferences.ENABLE_LOCATION_TRACKING)) {
+                val track = trackingDb.getFirstTracking()
+                track?.let { t ->
+                    val point = t.points.toListDoubleArray()
+                    val trackingFile = TrackingFile(
+                        deploymentId = it.id,
+                        siteId = this._locate!!.id,
+                        localPath = GeoJsonUtils.generateGeoJson(this, GeoJsonUtils.generateFileName(it.deployedAt, it.wifiName!!), point).absolutePath
+                    )
+                    trackingFileDb.insertOrUpdate(trackingFile)
+                }
+            }
+
             analytics.trackCreateGuardianDeploymentEvent()
 
             SocketManager.getCheckInTest() // to stop getting checkin test
@@ -364,6 +383,21 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                     ConnectInstructionDialogFragment()
                 }
         instructionDialog.show(supportFragmentManager, TAG_INSTRUCTION_DIALOG)
+    }
+
+    override fun showSiteLoadingDialog(text: String) {
+        var siteLoadingDialog: SiteLoadingDialogFragment =
+            supportFragmentManager.findFragmentByTag(EdgeDeploymentActivity.TAG_SITE_LOADING_DIALOG) as SiteLoadingDialogFragment?
+                ?: run {
+                    SiteLoadingDialogFragment(text)
+                }
+        if (siteLoadingDialog.isAdded) {
+            siteLoadingDialog.dismiss()
+            siteLoadingDialog = SiteLoadingDialogFragment(text)
+        }
+        siteLoadingDialog.show(supportFragmentManager,
+            EdgeDeploymentActivity.TAG_SITE_LOADING_DIALOG
+        )
     }
 
     override fun showLoading() {

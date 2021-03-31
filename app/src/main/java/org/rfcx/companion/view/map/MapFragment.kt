@@ -1014,8 +1014,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
                                         trackingFileDb.insertOrUpdate(
                                             item,
                                             filePath,
-                                            siteId,
-                                            Device.AUDIOMOTH.value
+                                            siteId
                                         )
                                         if (fileCount == fileCreated) {
                                             callback.onSuccess()
