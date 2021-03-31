@@ -12,7 +12,7 @@ import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.EdgeDeployment
 import org.rfcx.companion.entity.SyncState
 import org.rfcx.companion.entity.guardian.GuardianDeployment
-import org.rfcx.companion.entity.response.DeploymentImageResponse
+import org.rfcx.companion.entity.response.DeploymentAssetResponse
 
 class DeploymentImageDb(private val realm: Realm) {
 
@@ -24,7 +24,9 @@ class DeploymentImageDb(private val realm: Realm) {
 
     fun unlockSending() {
         realm.executeTransaction {
-            val snapshot = it.where(DeploymentImage::class.java).equalTo(DeploymentImage.FIELD_SYNC_STATE, SyncState.Sending.key).findAll().createSnapshot()
+            val snapshot = it.where(DeploymentImage::class.java)
+                .equalTo(DeploymentImage.FIELD_SYNC_STATE, SyncState.Sending.key).findAll()
+                .createSnapshot()
             snapshot.forEach { profile ->
                 profile.syncState = SyncState.Unsent.key
             }
@@ -103,7 +105,11 @@ class DeploymentImageDb(private val realm: Realm) {
             .findAllAsync()
     }
 
-    fun insertImage(deployment: EdgeDeployment? = null, guardianDeployment: GuardianDeployment? = null, attachImages: List<String>) {
+    fun insertImage(
+        deployment: EdgeDeployment? = null,
+        guardianDeployment: GuardianDeployment? = null,
+        attachImages: List<String>
+    ) {
         if (deployment != null) {
             val imageCreateAt = deployment.deployedAt
             realm.executeTransaction {
@@ -187,23 +193,28 @@ class DeploymentImageDb(private val realm: Realm) {
         }
     }
 
-    fun insertOrUpdate(deploymentImageResponse: DeploymentImageResponse, deploymentId: Int?, device: String) {
+    fun insertOrUpdate(
+        deploymentAssetResponse: DeploymentAssetResponse,
+        deploymentId: Int?,
+        device: String
+    ) {
         realm.executeTransaction {
             val image =
                 it.where(DeploymentImage::class.java)
-                    .equalTo(DeploymentImage.FIELD_REMOTE_PATH, "assets/${deploymentImageResponse.id}")
+                    .equalTo(
+                        DeploymentImage.FIELD_REMOTE_PATH,
+                        "assets/${deploymentAssetResponse.id}"
+                    )
                     .findFirst()
 
             if (image == null && deploymentId != null) {
-                if (deploymentImageResponse.mimeType.startsWith("image")) {
-                    val deploymentImage = deploymentImageResponse.toDeploymentImage()
-                    val id = (it.where(DeploymentImage::class.java).max(FIELD_ID)?.toInt() ?: 0) + 1
-                    deploymentImage.id = id
-                    deploymentImage.deploymentId = deploymentId
-                    deploymentImage.syncState = SyncState.Sent.key
-                    deploymentImage.device = device
-                    it.insert(deploymentImage)
-                }
+                val deploymentImage = deploymentAssetResponse.toDeploymentImage()
+                val id = (it.where(DeploymentImage::class.java).max(FIELD_ID)?.toInt() ?: 0) + 1
+                deploymentImage.id = id
+                deploymentImage.deploymentId = deploymentId
+                deploymentImage.syncState = SyncState.Sent.key
+                deploymentImage.device = device
+                it.insert(deploymentImage)
             }
         }
     }

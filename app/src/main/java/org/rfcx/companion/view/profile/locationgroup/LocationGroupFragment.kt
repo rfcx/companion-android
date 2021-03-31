@@ -78,7 +78,7 @@ class LocationGroupFragment : Fragment(), LocationGroupListener {
     }
 
     override fun onLongClicked(group: LocationGroups) {
-        showDeleteDialog(group)
+//        showDeleteDialog(group)
     }
 
     private fun showDeleteDialog(group: LocationGroups) {

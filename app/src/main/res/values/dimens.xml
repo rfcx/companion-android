@@ -60,6 +60,7 @@
 
     <!-- Map -->
     <dimen name="current_loc_size">50dp</dimen>
+    <dimen name="tracking_size">50dp</dimen>
     <dimen name="zoom_loc_size">40dp</dimen>
     <dimen name="current_loc_margin">64dp</dimen>
     <dimen name="legend_top_margin">64dp</dimen>

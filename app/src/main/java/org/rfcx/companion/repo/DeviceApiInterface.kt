@@ -5,7 +5,7 @@ import okhttp3.ResponseBody
 import org.rfcx.companion.entity.request.DeploymentRequest
 import org.rfcx.companion.entity.request.EditDeploymentRequest
 import org.rfcx.companion.entity.request.GuardianDeploymentRequest
-import org.rfcx.companion.entity.response.DeploymentImageResponse
+import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.entity.response.StreamResponse
@@ -53,24 +53,37 @@ interface DeviceApiInterface {
 
     @Multipart
     @POST("deployments/{id}/assets")
-    fun uploadImage(
+    fun uploadAssets(
         @Header("Authorization") authUser: String,
         @Path("id") id: String,
         @Part file: MultipartBody.Part
     ): Call<ResponseBody>
 
     @GET("deployments/{id}/assets")
-    fun getImages(
+    fun getDeploymentAssets(
         @Header("Authorization") authUser: String,
         @Path("id") id: String
-    ): Call<List<DeploymentImageResponse>>
+    ): Call<List<DeploymentAssetResponse>>
+
+    @GET("streams/{id}/assets")
+    fun getStreamAssets(
+        @Header("Authorization") authUser: String,
+        @Path("id") id: String
+    ): Call<List<DeploymentAssetResponse>>
+
+    @Streaming
+    @GET("assets/{id}")
+    fun getGeoJsonFile(
+        @Header("Authorization") authUser: String,
+        @Path("id") id: String
+    ): Call<ResponseBody>
 
     @GET("streams")
     fun getStreams(@Header("Authorization") authUser: String,
                    @Query("limit") limit: Int = 100,
                    @Query("offset") offset: Int = 0,
-                   @Query("updated_after") updatedAfter: String? = null,
-                   @Query("sort") sort: String? = null): Call<List<StreamResponse>>
+                   @Query("updated_after", encoded = true) updatedAfter: String? = null,
+                   @Query("sort", encoded = true) sort: String? = null): Call<List<StreamResponse>>
 
     @GET("projects")
     fun getProjects(@Header("Authorization") authUser: String,

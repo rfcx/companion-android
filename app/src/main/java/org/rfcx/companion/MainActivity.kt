@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -18,11 +17,11 @@ import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
+import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.entity.Device
-import org.rfcx.companion.entity.response.StreamResponse
+import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.localdb.EdgeDeploymentDb
-import org.rfcx.companion.localdb.LocateDb
-import org.rfcx.companion.repo.ApiManager
+import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.EdgeDeploymentActivity
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
@@ -31,14 +30,10 @@ import org.rfcx.companion.view.map.DeploymentViewPagerFragment
 import org.rfcx.companion.view.map.MapFragment
 import org.rfcx.companion.view.profile.ProfileFragment
 import org.rfcx.companion.widget.BottomNavigationMenuItem
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListener {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
-    private val locateDb by lazy { LocateDb(realm) }
 
     private var currentFragment: Fragment? = null
     private val locationPermissions by lazy { LocationPermissions(this) }
@@ -48,8 +43,6 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
 
     private var addTooltip: SimpleTooltip? = null
     private val analytics by lazy { Analytics(this) }
-
-    private var currentSiteLoading = 0
 
     override fun getShowDeployments(): List<DeploymentDetailView> = this._showDeployments
 
@@ -117,11 +110,13 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
                     .build()
 
                 addTooltip?.let { tip ->
-                    val addEdgeOrAudioMoth = tip.findViewById<ConstraintLayout>(R.id.audioMothLayout)
+                    val addEdgeOrAudioMoth =
+                        tip.findViewById<ConstraintLayout>(R.id.audioMothLayout)
                     val addGuardian = tip.findViewById<ConstraintLayout>(R.id.guardianLayout)
                     addEdgeOrAudioMoth?.setOnClickListener {
                         EdgeDeploymentActivity.startActivity(this)
-                        refreshGettingSites(0, locateDb.getMaxUpdatedAt())
+                        // refresh sites
+                        DownloadStreamsWorker.enqueue(this)
                         tip.dismiss()
                     }
                     addGuardian?.setOnClickListener {
@@ -149,7 +144,6 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
-                    showBottomAppBar()
                     val bottomSheetFragment =
                         supportFragmentManager.findFragmentByTag(BOTTOM_SHEET)
                     if (bottomSheetFragment != null) {
@@ -158,38 +152,11 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
                             .commit()
                     }
                 }
+                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                    hideBottomAppBar()
+                }
             }
         })
-    }
-
-    private fun refreshGettingSites(offset: Int, maxUpdatedAt: String?) {
-        val token = "Bearer ${this.getIdToken()}"
-        ApiManager.getInstance().getDeviceApi().getStreams(token,
-            SITES_LIMIT_GETTING, offset, maxUpdatedAt, "updated_at")
-            .enqueue(object : Callback<List<StreamResponse>> {
-                override fun onFailure(call: Call<List<StreamResponse>>, t: Throwable) {
-                    if (this@MainActivity.isNetworkAvailable()) {
-                        Toast.makeText(this@MainActivity, R.string.error_has_occurred, Toast.LENGTH_SHORT)
-                            .show()
-                    }
-                }
-
-                override fun onResponse(
-                    call: Call<List<StreamResponse>>,
-                    response: Response<List<StreamResponse>>
-                ) {
-                    val sites = response.body()
-                    sites?.let {
-                        it.forEach { item ->
-                            locateDb.insertOrUpdate(item)
-                        }
-                        if (it.size == SITES_LIMIT_GETTING) {
-                            currentSiteLoading += SITES_LIMIT_GETTING
-                            refreshGettingSites(currentSiteLoading, locateDb.getMaxUpdatedAt())
-                        }
-                    }
-                }
-            })
     }
 
     private fun setupSimpleTooltip() {
@@ -300,20 +267,45 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     }
 
     override fun moveMapIntoDeploymentMarker(lat: Double, lng: Double, markerLocationId: String) {
+        hideBottomAppBar()
         val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
         if (mapFragment is MapFragment) {
             mapFragment.moveToDeploymentMarker(lat, lng, markerLocationId)
         }
     }
 
-    override fun hidBottomAppBar() {
-        createLocationButton.visibility = View.INVISIBLE
-        bottomBar.visibility = View.INVISIBLE
+    override fun showTrackOnMap(site: Locate?, markerLocationId: String) {
+        val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
+        if (mapFragment is MapFragment) {
+            site?.let {
+                mapFragment.gettingTracksAndMoveToPin(it, markerLocationId)
+            }
+        }
+    }
+
+    override fun getProjectName(): String {
+        val preferences = Preferences.getInstance(this)
+        return preferences.getString(Preferences.SELECTED_PROJECT, getString(R.string.none))
+    }
+
+    override fun hideBottomAppBar() {
+        createLocationButton.visibility = View.GONE
+        bottomBar.visibility = View.GONE
+
+        val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
+        if (mapFragment is MapFragment) {
+            mapFragment.hideButtonOnMap()
+        }
     }
 
     override fun showBottomAppBar() {
         bottomBar.visibility = View.VISIBLE
         createLocationButton.visibility = View.VISIBLE
+
+        val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
+        if (mapFragment is MapFragment) {
+            mapFragment.showButtonOnMap()
+        }
     }
 
     override fun getBottomSheetState(): Int {
@@ -322,7 +314,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
 
     override fun showBottomSheet(fragment: Fragment) {
         hideSnackbar()
-        hidBottomAppBar()
+        hideBottomAppBar()
         val layoutParams: CoordinatorLayout.LayoutParams = bottomSheetContainer.layoutParams
                 as CoordinatorLayout.LayoutParams
         layoutParams.anchorGravity = Gravity.BOTTOM
@@ -334,19 +326,39 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     }
 
     override fun hideBottomSheet() {
+        showBottomAppBar()
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
+
+    override fun hideBottomSheetAndBottomAppBar() {
+        hideBottomAppBar()
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
 
     override fun onBackPressed() {
         addTooltip?.dismiss()
-        if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
-            hideBottomSheet()
-            val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
-            if (mapFragment is MapFragment) {
-                mapFragment.clearFeatureSelected()
+        when {
+            bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED -> {
+                hideBottomSheet()
+                clearFeatureSelectedOnMap()
             }
-        } else {
-            return super.onBackPressed()
+            searchLayout.visibility == View.VISIBLE -> {
+                clearFeatureSelectedOnMap()
+                val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
+                if (mapFragment is MapFragment) {
+                    mapFragment.showSearchBar(false)
+                }
+            }
+            else -> {
+                return super.onBackPressed()
+            }
+        }
+    }
+
+    override fun clearFeatureSelectedOnMap() {
+        val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
+        if (mapFragment is MapFragment) {
+            mapFragment.clearFeatureSelected()
         }
     }
 
@@ -357,7 +369,12 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         if (edgeDeploymentId != null) {
             val deployment = edgeDeploymentDb.getDeploymentByDeploymentId(edgeDeploymentId)
             deployment?.let {
-                showBottomSheet(DeploymentViewPagerFragment.newInstance(it.id, Device.AUDIOMOTH.value))
+                showBottomSheet(
+                    DeploymentViewPagerFragment.newInstance(
+                        it.id,
+                        Device.AUDIOMOTH.value
+                    )
+                )
             }
         }
     }
@@ -366,7 +383,6 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
         private const val BOTTOM_SHEET = "BOTTOM_SHEET"
         const val CREATE_DEPLOYMENT_REQUEST_CODE = 1002
-        private const val SITES_LIMIT_GETTING = 100
 
         fun startActivity(context: Context, deploymentId: String? = null) {
             val intent = Intent(context, MainActivity::class.java)
@@ -381,10 +397,14 @@ interface MainActivityListener {
     fun getBottomSheetState(): Int
     fun showBottomSheet(fragment: Fragment)
     fun showBottomAppBar()
-    fun hidBottomAppBar()
+    fun hideBottomAppBar()
     fun hideBottomSheet()
+    fun hideBottomSheetAndBottomAppBar()
     fun showSnackbar(msg: String, duration: Int)
     fun hideSnackbar()
     fun onLogout()
     fun moveMapIntoDeploymentMarker(lat: Double, lng: Double, markerLocationId: String)
+    fun showTrackOnMap(site: Locate?, markerLocationId: String)
+    fun getProjectName(): String
+    fun clearFeatureSelectedOnMap()
 }

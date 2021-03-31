@@ -16,15 +16,17 @@ import kotlinx.android.synthetic.main.activity_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
-import org.rfcx.companion.localdb.DeploymentImageDb
-import org.rfcx.companion.localdb.EdgeDeploymentDb
-import org.rfcx.companion.localdb.LocateDb
-import org.rfcx.companion.localdb.LocationGroupDb
+import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.service.DeploymentSyncWorker
+import org.rfcx.companion.service.DownloadStreamState
+import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.AudioMothChimeConnector
+import org.rfcx.companion.util.Preferences
+import org.rfcx.companion.util.Preferences.Companion.ENABLE_LOCATION_TRACKING
 import org.rfcx.companion.util.RealmHelper
+import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
@@ -43,6 +45,8 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     private val locateDb by lazy { LocateDb(realm) }
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
+    private val trackingDb by lazy { TrackingDb(realm) }
+    private val trackingFileDb by lazy { TrackingFileDb(realm) }
 
     private var _deployment: EdgeDeployment? = null
     private var _deployLocation: DeploymentLocation? = null
@@ -67,6 +71,8 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     private var passedChecks = RealmList<Int>()
 
     private var needTone = true
+
+    private val preferences = Preferences.getInstance(this)
 
     private val analytics by lazy { Analytics(this) }
 
@@ -215,6 +221,21 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         )
     }
 
+    override fun showSiteLoadingDialog(text: String) {
+        var siteLoadingDialog: SiteLoadingDialogFragment =
+            supportFragmentManager.findFragmentByTag(TAG_SITE_LOADING_DIALOG) as SiteLoadingDialogFragment?
+                ?: run {
+                    SiteLoadingDialogFragment(text)
+                }
+        if (siteLoadingDialog.isAdded) {
+            siteLoadingDialog.dismiss()
+            siteLoadingDialog = SiteLoadingDialogFragment(text)
+        }
+        siteLoadingDialog.show(supportFragmentManager,
+            TAG_SITE_LOADING_DIALOG
+        )
+    }
+
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
     override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
@@ -273,6 +294,21 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             }
             saveImages(it)
             deploymentDb.updateDeployment(it)
+
+            //track getting
+            if (preferences.getBoolean(ENABLE_LOCATION_TRACKING)) {
+                val track = trackingDb.getFirstTracking()
+                track?.let { t ->
+                    val point = t.points.toListDoubleArray()
+                    val trackingFile = TrackingFile(
+                        deploymentId = it.id,
+                        siteId = this._locate!!.id,
+                        localPath = GeoJsonUtils.generateGeoJson(this, GeoJsonUtils.generateFileName(it.deployedAt, it.deploymentKey!!), point).absolutePath
+                    )
+                    trackingFileDb.insertOrUpdate(trackingFile)
+                }
+            }
+
             analytics.trackCreateAudiomothDeploymentEvent()
 
             DeploymentSyncWorker.enqueue(this@EdgeDeploymentActivity)
@@ -370,6 +406,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     override fun stopPlaySound() {
         needTone = false
         audioMothConnector.stopPlay()
+    }
+
+    override fun isSiteLoading(): DownloadStreamState {
+        return DownloadStreamsWorker.isRunning()
     }
 
     override fun startMapPicker(latitude: Double, longitude: Double, altitude: Double, name: String) {
@@ -492,6 +532,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     companion object {
         const val loadingDialogTag = "LoadingDialog"
         const val TAG_SYNC_INSTRUCTION_DIALOG = "SyncInstructionDialogFragment"
+        const val TAG_SITE_LOADING_DIALOG = "SiteLoadingDialogFragment"
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
         const val TONE_DURATION = 10000
 

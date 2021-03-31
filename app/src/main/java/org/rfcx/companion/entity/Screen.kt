@@ -8,6 +8,7 @@ enum class Screen(val id: String) {
     FEEDBACK("Feedback"),
     CHOOSE_DEVICE("Choose Device"),
     LOCATION("Location"),
+    PROJECT("Project"),
     SYNC("Sync"),
     EDGE_DETAIL("Edge Detail"),
     MAP_PICKER("Map Picker"),

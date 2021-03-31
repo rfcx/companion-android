@@ -10,7 +10,7 @@ import org.rfcx.companion.R
 import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.util.Battery
 import org.rfcx.companion.util.randomDeploymentId
-import org.rfcx.companion.view.map.DeploymentMarker
+import org.rfcx.companion.view.map.MapMarker
 import java.util.*
 
 @RealmClass
@@ -50,7 +50,7 @@ open class EdgeDeployment(
     }
 }
 
-fun EdgeDeployment.toMark(context: Context, locationGroupDb: LocationGroupDb): DeploymentMarker {
+fun EdgeDeployment.toMark(context: Context, locationGroupDb: LocationGroupDb): MapMarker.DeploymentMarker {
     val color = stream?.project?.color
     val group = stream?.project?.name
     val isGroupExisted = locationGroupDb.isExisted(group)
@@ -70,7 +70,7 @@ fun EdgeDeployment.toMark(context: Context, locationGroupDb: LocationGroupDb): D
     else
         context.getString(R.string.format_in_progress_step)
 
-    return DeploymentMarker(
+    return MapMarker.DeploymentMarker(
         id, stream?.name ?: "",
         stream?.longitude ?: 0.0,
         stream?.latitude ?: 0.0,

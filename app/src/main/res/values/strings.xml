@@ -132,6 +132,8 @@
     <string name="selected_location">Selected location</string>
     <string name="please_fill_information">Site name is required.</string>
     <string name="altitude_is_required">Altitude is required.</string>
+    <string name="no_result_found">No result found</string>
+    <string name="not_have_sites">There are no sites in this project.</string>
 
     <!--  SelectProfileFragment  -->
     <string name="use_an_existing">Use an existing profile</string>
@@ -164,6 +166,7 @@
     <string name="select_a_color">Select a color</string>
     <string name="missing_name_group">Missing name project</string>
     <string name="none">None</string>
+    <string name="projects">All projects</string>
     <string name="group_already_exists">The project already exists</string>
 
     <string name="dd_coordinates">DD</string>
@@ -223,6 +226,7 @@
     <string name="choose_your_device">Choose your device</string>
     <string name="rfcx_edge_audiomoth">AudioMoth (v1.5+ firmware)</string>
     <string name="rfcx_guardian">RFCx Guardian</string>
+    <string name="warning_text">Sites is downloading \nBeware missing sites</string>
 
     <string name="location_permission_msg">Companion App would like to use your location</string>
 
@@ -328,8 +332,17 @@
     <string name="signal_sim_card">The Guardian does not have a SIM card inserted.\nPlease insert a SIM card.</string>
     <string name="signal_lost">WiFi hotspot connection lost.\nPlease try again.</string>
 
+    <!-- LocationTrackerService -->
+    On-duty and tracking enabled
+    <string name="track">Track</string>
+    <string name="tracking_enabled">On-duty and tracking enabled</string>
+    <string name="location_setting">Please enable your device\'s location settings</string>
+    <string name="notification_traking_message_format">%d minutes recorded</string>
+    <string name="notification_location_not_availability">Please enable your device\'s location settings</string>
+
     <!-- Search Location -->
     <string name="search_box_hint">Search here</string>
+    <string name="site_name_hint">Search Sites by Name…</string>
     <string name="search_title">Search</string>
     <string name="search_message">by name/lat,long</string>
     <string name="search_not_found_title">No results found</string>
@@ -400,4 +413,15 @@
     <!-- WifiLostDialog -->
     <string name="wifi_lost_dialog">Guardian Hotspot connection was lost. \n Please reconnect to continue the deployment.</string>
 
+    <!-- SelectExistedSites -->
+    <string name="sites_loading_dialog">Your full site list is still downloading.\nSome sites may not be visible until the download is complete.</string>
+    <string name="sites_loading_finish_dialog">Your full site list is downloaded.</string>
+
+    <!-- MapFragment -->
+    <string name="sites_downloading">Sites downloading</string>
+    <string name="sites_synced">All sites synced</string>
+    <string name="no_deployments">No deployments</string>
+
+    <string name="time_second">Just now</string>
+    <string name="yesterday">Yesterday</string>
 </resources>

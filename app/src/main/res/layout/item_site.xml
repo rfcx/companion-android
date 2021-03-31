@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.7" />
+
+    <LinearLayout
+        android:id="@+id/siteLinearLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="@dimen/margin_padding_normal"
+        app:layout_constraintEnd_toEndOf="@id/guideline_6"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iconAddImageView"
+            android:layout_width="@dimen/ic_add_size"
+            android:layout_height="@dimen/mark_size"
+            android:layout_gravity="center"
+            android:layout_marginEnd="@dimen/margin_padding_small"
+            android:src="@drawable/ic_signs"
+            android:tint="@color/text_primary" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/siteNameTextView"
+            style="@style/AudioMothText.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:ellipsize="end"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_small"
+            tools:text="Site 001" />
+    </LinearLayout>
+
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/distanceTextView"
+        style="@style/AudioMothText.Body.Secondary"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:gravity="end"
+        android:textColor="@color/text_primary"
+        android:textSize="@dimen/text_xsmall"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/guideline_8"
+        app:layout_constraintStart_toStartOf="@id/guideline_6"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="1.234m" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/detailTextView"
+        style="@style/AudioMothText.Body.Secondary"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/margin_padding_normal"
+        android:ellipsize="end"
+        android:gravity="end"
+        android:textColor="@color/text_primary"
+        android:textSize="@dimen/text_xsmall"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline_8"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="5 days ago" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/separateLine"
+        app:layout_constraintTop_toBottomOf="@id/siteLinearLayout" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

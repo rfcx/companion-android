@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="backgroundColor">#141525</color>
+    <color name="backgroundColorSite">#191a2e</color>
     <color name="backgroundImageCard">#232436</color>
     <color name="separateLine">#45485D</color>
     <color name="searchColor">#3b3e53</color>
@@ -16,6 +17,7 @@
     <color name="tooltipColor">#232436</color>
     <color name="tooltipTextColor">#ffffff</color>
     <color name="statusColor">#232436</color>
+    <color name="trackingText">#47525E</color>
 
     <color name="colorPrimary">#2AA841</color>
     <color name="colorPrimaryDark">#2C9A46</color>

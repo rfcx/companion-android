@@ -38,10 +38,25 @@ class EdgeDeploymentDb(private val realm: Realm) {
         return arrayOfId
     }
 
+    fun getDeploymentBySiteName(name: String): EdgeDeployment? {
+        val deployment =
+            realm.where(EdgeDeployment::class.java).equalTo("stream.name", name).findFirst()
+        if (deployment != null) {
+            return realm.copyFromRealm(deployment)
+        }
+        return null
+    }
+
     fun getAllResultsAsync(sort: Sort = Sort.DESCENDING): RealmResults<EdgeDeployment> {
         return realm.where(EdgeDeployment::class.java)
             .sort(EdgeDeployment.FIELD_ID, sort)
             .findAllAsync()
+    }
+
+    fun getAll(sort: Sort = Sort.DESCENDING): RealmResults<EdgeDeployment> {
+        return realm.where(EdgeDeployment::class.java)
+            .sort(EdgeDeployment.FIELD_ID, sort)
+            .findAll()
     }
 
     fun insertOrUpdate(deployment: EdgeDeployment, location: DeploymentLocation): Int {
@@ -125,6 +140,7 @@ class EdgeDeploymentDb(private val realm: Realm) {
     fun markSent(serverId: String, id: Int) {
         mark(id, serverId, SyncState.Sent.key)
         saveDeploymentServerIdToImage(serverId, id)
+        saveDeploymentServerIdToTrack(serverId, id)
     }
 
     private fun mark(id: Int, serverId: String? = null, syncState: Int) {
@@ -221,10 +237,9 @@ class EdgeDeploymentDb(private val realm: Realm) {
                 bgRealm.where(Locate::class.java)
                     .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_SERVER_ID, edgeDeployment.serverId)
                     .findFirst()
-                    ?: 
-                bgRealm.where(Locate::class.java)
-                    .equalTo(Locate.FIELD_SERVER_ID, edgeDeployment.stream?.coreId)
-                    .findFirst()
+                    ?: bgRealm.where(Locate::class.java)
+                        .equalTo(Locate.FIELD_SERVER_ID, edgeDeployment.stream?.coreId)
+                        .findFirst()
             } else {
                 bgRealm.where(Locate::class.java)
                     .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_ID, id).findFirst()
@@ -393,6 +408,21 @@ class EdgeDeploymentDb(private val realm: Realm) {
                 .findAll()
         realm.executeTransaction { transition ->
             images?.forEach {
+                val image = it.apply {
+                    this.deploymentServerId = serverId
+                }
+                transition.insertOrUpdate(image)
+            }
+        }
+    }
+
+    private fun saveDeploymentServerIdToTrack(serverId: String, deploymentId: Int) {
+        val file =
+            realm.where(TrackingFile::class.java)
+                .equalTo(TrackingFile.FIELD_DEPLOYMENT_ID, deploymentId)
+                .findAll()
+        realm.executeTransaction { transition ->
+            file?.forEach {
                 val image = it.apply {
                     this.deploymentServerId = serverId
                 }

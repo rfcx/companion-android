@@ -6,7 +6,7 @@ import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
 import org.rfcx.companion.view.map.MapFragment
-import org.rfcx.companion.view.map.SiteMarker
+import org.rfcx.companion.view.map.MapMarker
 import java.util.*
 
 @RealmClass
@@ -70,9 +70,10 @@ open class Locate(
         const val FIELD_LAST_EDGE_DEPLOYMENT_SERVER_ID = "lastDeploymentServerId"
         const val FIELD_LAST_EDGE_DEPLOYMENT_ID = "lastDeploymentId"
         const val FIELD_ALTITUDE = "altitude"
+        const val FIELD_NAME = "name"
     }
 }
 
-fun Locate.toMark(): SiteMarker {
-    return SiteMarker(id, name, latitude, longitude, MapFragment.SITE_MARKER)
+fun Locate.toMark(): MapMarker.SiteMarker {
+    return MapMarker.SiteMarker(id, name, latitude, longitude, MapFragment.SITE_MARKER)
 }

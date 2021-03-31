@@ -4,10 +4,8 @@ import io.realm.DynamicRealm
 import io.realm.FieldAttribute
 import io.realm.RealmMigration
 import org.rfcx.companion.entity.*
-import java.util.*
-import org.rfcx.companion.entity.EdgeDeployment
-import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.guardian.GuardianDeployment
+import java.util.*
 
 class CompanionRealmMigration : RealmMigration {
     override fun migrate(realm: DynamicRealm, oldVersion: Long, newVersion: Long) {
@@ -165,7 +163,7 @@ class CompanionRealmMigration : RealmMigration {
     private fun migrateToV5(realm: DynamicRealm) {
         val edgeDeployment = realm.schema.get(EdgeDeployment.TABLE_NAME)
         edgeDeployment?.apply {
-            addRealmListField(EdgeDeployment.FIELD_PASSED_CHECKS,  Int::class.java)
+            addRealmListField(EdgeDeployment.FIELD_PASSED_CHECKS, Int::class.java)
                 .setNullable(EdgeDeployment.FIELD_PASSED_CHECKS, true)
         }
     }
@@ -176,7 +174,7 @@ class CompanionRealmMigration : RealmMigration {
             addField(GuardianDeployment.FIELD_UPDATED_AT, Date::class.java)
         }
     }
-    
+
     private fun migrateToV7(realm: DynamicRealm) {
         val locationGroups = realm.schema.get(LocationGroups.TABLE_NAME)
         locationGroups?.apply {
@@ -254,6 +252,7 @@ class CompanionRealmMigration : RealmMigration {
     }
 
     private fun migrateToV13(realm: DynamicRealm) {
+
         val profile = realm.schema.get("GuardianProfile")
         val diagnostic = realm.schema.get("DiagnosticInfo")
         profile?.let {
@@ -261,6 +260,45 @@ class CompanionRealmMigration : RealmMigration {
         }
         diagnostic?.let {
             realm.schema.remove("DiagnosticInfo")
+        }
+
+        val coordinate = realm.schema.create(Coordinate.TABLE_NAME)
+        coordinate.apply {
+            addField(Coordinate.COORDINATE_LATITUDE, Double::class.java)
+            addField(Coordinate.COORDINATE_LONGITUDE, Double::class.java)
+            addField(Coordinate.COORDINATE_ALTITUDE, Double::class.java)
+        }
+
+        val tracking = realm.schema.create(Tracking.TABLE_NAME)
+        tracking.apply {
+            addField(
+                Tracking.TRACKING_ID,
+                Int::class.java,
+                FieldAttribute.PRIMARY_KEY
+            )
+            addField(Tracking.TRACKING_START_AT, Date::class.java)
+                .setNullable(Tracking.TRACKING_START_AT, false)
+            addField(Tracking.TRACKING_STOP_AT, Date::class.java)
+            addRealmListField(Tracking.TRACKING_POINTS, coordinate)
+        }
+
+        val trackingFile = realm.schema.create(TrackingFile.TABLE_NAME)
+        trackingFile.apply {
+            addField(
+                TrackingFile.FIELD_ID,
+                Int::class.java,
+                FieldAttribute.PRIMARY_KEY
+            )
+            addField(TrackingFile.FIELD_DEPLOYMENT_ID, Int::class.java)
+            addField(TrackingFile.FIELD_DEPLOYMENT_SERVER_ID, String::class.java)
+            addField(TrackingFile.FIELD_LOCAL_PATH, String::class.java)
+                .setNullable(TrackingFile.FIELD_LOCAL_PATH, false)
+            addField(TrackingFile.FIELD_REMOTE_PATH, String::class.java)
+            addField(TrackingFile.FIELD_SYNC_STATE, Int::class.java)
+            addField(TrackingFile.FIELD_DEVICE, String::class.java)
+                .setNullable(TrackingFile.FIELD_DEVICE, false)
+            addField(TrackingFile.FIELD_SITE_ID, Int::class.java)
+            addField(TrackingFile.FIELD_SITE_SERVER_ID, String::class.java)
         }
     }
 
