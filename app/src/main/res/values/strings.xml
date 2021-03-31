@@ -341,7 +341,7 @@
     <string name="notification_location_not_availability">Please enable your device\'s location settings</string>
 
     <!-- Search Location -->
-    <string name="search_box_hint">Search here</string>
+    <string name="search_box_hint">Search place, address or lat/long</string>
     <string name="site_name_hint">Search Sites by Name…</string>
     <string name="search_title">Search</string>
     <string name="search_message">by name/lat,long</string>
