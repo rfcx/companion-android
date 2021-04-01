@@ -787,17 +787,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
     private fun combinedData() {
         // hide loading progress
         progressBar.visibility = View.INVISIBLE
-
         var showGuardianDeployments = this.guardianDeployments.filter  { it.isCompleted() }
         val usedSitesOnGuardian = showGuardianDeployments.map { it.stream?.coreId }
 
         var showDeployments = this.edgeDeployments.filter { it.isCompleted() }
         val usedSitesOnEdge = showDeployments.map { it.stream?.coreId }
 
-
-        locations.filter { it.name == "frongs test site 16" }.forEach {
-            Log.d("TESTTEST", it.lastGuardianDeploymentId.toString())
-        }
         val allUsedSites = usedSitesOnEdge + usedSitesOnGuardian
         var filteredShowLocations = locations.filter { loc -> !allUsedSites.contains(loc.serverId) }
         val projectName = listener?.getProjectName() ?: getString(R.string.none)
@@ -812,6 +807,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
 
         val edgeDeploymentMarkers =
             showDeployments.map { it.toMark(requireContext(), locationGroupDb) }
+
         val guardianDeploymentMarkers = showGuardianDeployments.map { it.toMark(requireContext()) }
         val deploymentMarkers = edgeDeploymentMarkers + guardianDeploymentMarkers
         val locationMarkers = filteredShowLocations.map { it.toMark() }

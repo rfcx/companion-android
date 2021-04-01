@@ -61,10 +61,10 @@ fun GuardianDeployment.toMark(context: Context): MapMarker.DeploymentMarker {
                     GuardianPin.CONNECTED_GUARDIAN
                 }
             } else {
-                GuardianPin.NOT_CONNECTED_GUARDIAN
+                GuardianPin.CONNECTED_GUARDIAN
             }
         } else {
-            GuardianPin.NOT_CONNECTED_GUARDIAN
+            GuardianPin.CONNECTED_GUARDIAN
         } ?: GuardianPin.CONNECTED_GUARDIAN
     return MapMarker.DeploymentMarker(
         id,
