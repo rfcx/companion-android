@@ -39,24 +39,19 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                 val result = ApiManager.getInstance().getDeviceApi()
                     .createDeployment(token, it.toRequestBody()).execute()
 
-                if (result.isSuccessful) {
-                    val fullId = result.headers().get("Location")
-                    val id = fullId?.substring(fullId.lastIndexOf("/") + 1, fullId.length) ?: ""
-                    db.markSent(id, it.id)
-
-                    //update core siteId when deployment created
-                    val updatedDp = ApiManager.getInstance().getDeviceApi()
-                        .getDeployment(token, id).execute().body()
-                    updatedDp?.let { dp ->
-                        db.updateDeploymentByServerId(updatedDp.toEdgeDeployment())
-                        locateDb.updateSiteServerId(it.id, dp.stream!!.id!!)
+                when {
+                    result.isSuccessful -> {
+                        val fullId = result.headers().get("Location")
+                        val id = fullId?.substring(fullId.lastIndexOf("/") + 1, fullId.length) ?: ""
+                        markSentDeployment(id, db, locateDb, it.id, token)
                     }
-
-                    //send tracking if there is
-                    TrackingSyncWorker.enqueue(context)
-                } else {
-                    db.markUnsent(it.id)
-                    someFailed = true
+                    result.errorBody()?.string()?.contains("id must be unique") ?: false -> {
+                        markSentDeployment(it.deploymentKey ?: "", db, locateDb, it.id, token)
+                    }
+                    else -> {
+                        db.markUnsent(it.id)
+                        someFailed = true
+                    }
                 }
             } else {
                 val deploymentLocation = it.stream
@@ -83,6 +78,27 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
         ImageSyncWorker.enqueue(context)
 
         return if (someFailed) Result.retry() else Result.success()
+    }
+
+    private fun markSentDeployment(
+        id: String,
+        db: EdgeDeploymentDb,
+        locateDb: LocateDb,
+        deploymentId: Int,
+        token: String
+    ) {
+        db.markSent(id, deploymentId)
+
+        //update core siteId when deployment created
+        val updatedDp = ApiManager.getInstance().getDeviceApi()
+            .getDeployment(token, id).execute().body()
+        updatedDp?.let { dp ->
+            db.updateDeploymentByServerId(updatedDp.toEdgeDeployment())
+            locateDb.updateSiteServerId(deploymentId, dp.stream!!.id!!)
+        }
+
+        //send tracking if there is
+        TrackingSyncWorker.enqueue(context)
     }
 
     companion object {
