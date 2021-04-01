@@ -22,6 +22,8 @@ import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
+import org.rfcx.companion.service.DownloadStreamState
+import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.service.GuardianDeploymentSyncWorker
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.Preferences
@@ -461,6 +463,10 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         supportActionBar?.apply {
             title = currentCheckName
         }
+    }
+
+    override fun isSiteLoading(): DownloadStreamState {
+        return DownloadStreamsWorker.isRunning()
     }
 
     override fun startMapPicker(latitude: Double, longitude: Double, altitude: Double, name: String) {

@@ -20,6 +20,4 @@ interface EdgeDeploymentProtocol : BaseDeploymentProtocol {
     fun playTone(duration: Int = 10000)
 
     fun stopPlaySound()
-
-    fun isSiteLoading(): DownloadStreamState
 }

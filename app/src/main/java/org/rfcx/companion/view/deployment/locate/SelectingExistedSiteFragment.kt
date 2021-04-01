@@ -27,6 +27,7 @@ import org.rfcx.companion.localdb.LocationGroupDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.util.*
+import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.deployment.EdgeDeploymentProtocol
 import org.rfcx.companion.view.detail.MapPickerProtocol
 import org.rfcx.companion.view.map.SiteAdapter
@@ -37,7 +38,7 @@ import retrofit2.Response
 class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener, (Locate) -> Unit {
     private val existedSiteAdapter by lazy { SiteAdapter(this) }
     private var mapPickerProtocol: MapPickerProtocol? = null
-    private var deploymentProtocol: EdgeDeploymentProtocol? = null
+    private var deploymentProtocol: BaseDeploymentProtocol? = null
 
     val realm: Realm = Realm.getInstance(RealmHelper.migrationConfig())
     private val locateDb by lazy { LocateDb(realm) }
@@ -95,7 +96,7 @@ class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener,
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mapPickerProtocol = context as MapPickerProtocol
-        deploymentProtocol = context as EdgeDeploymentProtocol
+        deploymentProtocol = context as BaseDeploymentProtocol
     }
 
     private fun initIntent() {
