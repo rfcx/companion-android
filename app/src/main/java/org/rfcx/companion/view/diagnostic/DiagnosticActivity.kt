@@ -17,17 +17,17 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonArray
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_guardian_diagnostic.*
-import kotlinx.android.synthetic.main.activity_guardian_diagnostic.altitudeValue
-import kotlinx.android.synthetic.main.activity_guardian_diagnostic.deploymentImageRecycler
-import kotlinx.android.synthetic.main.activity_guardian_diagnostic.latitudeValue
-import kotlinx.android.synthetic.main.activity_guardian_diagnostic.longitudeValue
 import kotlinx.android.synthetic.main.toolbar_default.*
+import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.SocketManager
 import org.rfcx.companion.entity.DeploymentImage
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Screen
-import org.rfcx.companion.entity.guardian.*
+import org.rfcx.companion.entity.guardian.GuardianConfiguration
+import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.guardian.getRecordTime
+import org.rfcx.companion.entity.guardian.toReadableFormat
 import org.rfcx.companion.entity.socket.response.Status
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.LocationGroupDb
@@ -418,8 +418,9 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
     }
 
     override fun invoke(deploymentImage: DeploymentImageView) {
-        val list = arrayListOf<String>()
-        deploymentImages.forEach { list.add(it.remotePath ?: "file://${it.localPath}") }
+        val list = deploymentImages.map {
+            if (it.remotePath != null) BuildConfig.DEVICE_API_DOMAIN + it.remotePath else "file://${it.localPath}"
+        } as ArrayList
 
         val index = list.indexOf(deploymentImage.remotePath ?: "file://${deploymentImage.localPath}")
         list.removeAt(index)
