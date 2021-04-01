@@ -33,7 +33,7 @@ open class EdgeDeployment(
 ) : RealmModel {
 
     fun isCompleted(): Boolean {
-        return deletedAt == null && isActive
+        return deletedAt == null && isActive && deploymentKey != null
     }
 
     companion object {

@@ -193,11 +193,11 @@ class GuardianDeploymentDb(private val realm: Realm) {
             // do update location
             val location = if (guardianDeployment?.serverId != null) {
                 bgRealm.where(Locate::class.java)
-                    .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_SERVER_ID, guardianDeployment.serverId)
+                    .equalTo(Locate.FIELD_LAST_GUARDIAN_DEPLOYMENT_SERVER_ID, guardianDeployment.serverId)
                     .findFirst()
             } else {
                 bgRealm.where(Locate::class.java)
-                    .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_ID, id).findFirst()
+                    .equalTo(Locate.FIELD_LAST_GUARDIAN_DEPLOYMENT_ID, id).findFirst()
             }
 
             if (location != null) {

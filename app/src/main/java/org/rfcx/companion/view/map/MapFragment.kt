@@ -794,6 +794,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
         var showDeployments = this.edgeDeployments.filter { it.isCompleted() }
         val usedSitesOnEdge = showDeployments.map { it.stream?.coreId }
 
+
+        locations.filter { it.name == "frongs test site 16" }.forEach {
+            Log.d("TESTTEST", it.lastGuardianDeploymentId.toString())
+        }
         val allUsedSites = usedSitesOnEdge + usedSitesOnGuardian
         var filteredShowLocations = locations.filter { loc -> !allUsedSites.contains(loc.serverId) }
         val projectName = listener?.getProjectName() ?: getString(R.string.none)
@@ -835,6 +839,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
             adapterOfSearchSite = getListSite(
                 requireContext(),
                 showDeployments,
+                showGuardianDeployments,
                 projectName,
                 currentLocation,
                 locations

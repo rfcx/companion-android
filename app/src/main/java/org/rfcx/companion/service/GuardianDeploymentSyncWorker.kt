@@ -7,7 +7,9 @@ import androidx.work.*
 import io.realm.Realm
 import org.rfcx.companion.entity.request.EditDeploymentRequest
 import org.rfcx.companion.entity.request.toRequestBody
+import org.rfcx.companion.entity.response.toEdgeDeployment
 import org.rfcx.companion.entity.response.toGuardianDeployment
+import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
@@ -34,25 +36,24 @@ class GuardianDeploymentSyncWorker(val context: Context, params: WorkerParameter
 
         deployments.forEach {
             Log.d(TAG, "doWork: sending id ${it.id}")
+
             if (it.serverId == null) {
                 val result = ApiManager.getInstance().getDeviceApi()
                     .createGuardianDeployment(token, it.toRequestBody()).execute()
 
-                if (result.isSuccessful) {
-                    val fullId = result.headers().get("Location")
-                    val id = fullId?.substring(fullId.lastIndexOf("/") + 1, fullId.length) ?: ""
-                    db.markSent(id, it.id)
-
-                    //update core siteId when deployment created
-                    val updatedDp = ApiManager.getInstance().getDeviceApi()
-                        .getDeployment(token, id).execute().body()
-                    updatedDp?.let { dp ->
-                        db.updateDeploymentByServerId(updatedDp.toGuardianDeployment())
-                        locateDb.updateSiteServerId(it.id, dp.stream!!.id!!)
+                when {
+                    result.isSuccessful -> {
+                        val fullId = result.headers().get("Location")
+                        val id = fullId?.substring(fullId.lastIndexOf("/") + 1, fullId.length) ?: ""
+                        markSentDeployment(id, db, locateDb, it.id, token)
                     }
-                } else {
-                    db.markUnsent(it.id)
-                    someFailed = true
+                    result.errorBody()?.string()?.contains("id must be unique") ?: false -> {
+                        markSentDeployment(it.deploymentKey, db, locateDb, it.id, token)
+                    }
+                    else -> {
+                        db.markUnsent(it.id)
+                        someFailed = true
+                    }
                 }
             } else {
                 val deploymentLocation = it.stream
@@ -71,6 +72,27 @@ class GuardianDeploymentSyncWorker(val context: Context, params: WorkerParameter
         ImageSyncWorker.enqueue(context)
 
         return if (someFailed) Result.retry() else Result.success()
+    }
+
+    private fun markSentDeployment(
+        id: String,
+        db: GuardianDeploymentDb,
+        locateDb: LocateDb,
+        deploymentId: Int,
+        token: String
+    ) {
+        db.markSent(id, deploymentId)
+
+        //update core siteId when deployment created
+        val updatedDp = ApiManager.getInstance().getDeviceApi()
+            .getDeployment(token, id).execute().body()
+        updatedDp?.let { dp ->
+            db.updateDeploymentByServerId(updatedDp.toGuardianDeployment())
+            locateDb.updateSiteServerId(deploymentId, dp.stream!!.id!!, true)
+        }
+
+        //send tracking if there is
+        TrackingSyncWorker.enqueue(context)
     }
 
     companion object {

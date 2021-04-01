@@ -10,6 +10,7 @@ import org.rfcx.companion.entity.DeploymentState
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.util.GuardianPin
 import org.rfcx.companion.util.WifiHotspotUtils
+import org.rfcx.companion.util.randomDeploymentId
 import org.rfcx.companion.view.map.MapMarker
 import java.io.Serializable
 import java.util.*
@@ -20,6 +21,7 @@ open class GuardianDeployment(
     var id: Int = 0,
     var serverId: String? = null,
     var deployedAt: Date = Date(),
+    var deploymentKey: String = randomDeploymentId(),
     @Expose(serialize = false)
     var state: Int = 0, // 1 = Locate, 2 = Config, 3 = Sync, 4 = Verify, 5 = Deploy, 6 = Ready To Upload
     var device: String? = Device.GUARDIAN.value,
@@ -34,7 +36,7 @@ open class GuardianDeployment(
 ) : RealmModel, Serializable {
 
     fun isCompleted(): Boolean {
-        return isActive
+        return isActive && state == DeploymentState.Guardian.ReadyToUpload.key
     }
 
     companion object {

@@ -50,6 +50,10 @@ class CompanionRealmMigration : RealmMigration {
         if (oldVersion < 13L && newVersion >= 13L) {
             migrateToV13(realm)
         }
+
+        if (oldVersion < 14L && newVersion >= 14L) {
+            migrateToV14(realm)
+        }
     }
 
     private fun migrateToV2(realm: DynamicRealm) {
@@ -253,15 +257,6 @@ class CompanionRealmMigration : RealmMigration {
 
     private fun migrateToV13(realm: DynamicRealm) {
 
-        val profile = realm.schema.get("GuardianProfile")
-        val diagnostic = realm.schema.get("DiagnosticInfo")
-        profile?.let {
-            realm.schema.remove("GuardianProfile")
-        }
-        diagnostic?.let {
-            realm.schema.remove("DiagnosticInfo")
-        }
-
         val coordinate = realm.schema.create(Coordinate.TABLE_NAME)
         coordinate.apply {
             addField(Coordinate.COORDINATE_LATITUDE, Double::class.java)
@@ -303,9 +298,24 @@ class CompanionRealmMigration : RealmMigration {
     }
 
     private fun migrateToV14(realm: DynamicRealm) {
-        val trackingFile = realm.schema.create(TrackingFile.TABLE_NAME)
-        trackingFile.apply {
-            removeField(TrackingFile.FIELD_DEVICE)
+        val trackingFile = realm.schema.get(TrackingFile.TABLE_NAME)
+        trackingFile?.apply {
+//            removeField(TrackingFile.FIELD_DEVICE)
+        }
+
+        val guardianDp = realm.schema.get(GuardianDeployment.TABLE_NAME)
+        guardianDp?.apply {
+            addField("deploymentKey", String::class.java)
+                .setRequired("deploymentKey", true)
+        }
+
+        val profile = realm.schema.get("GuardianProfile")
+        val diagnostic = realm.schema.get("DiagnosticInfo")
+        profile?.let {
+            realm.schema.remove("GuardianProfile")
+        }
+        diagnostic?.let {
+            realm.schema.remove("DiagnosticInfo")
         }
     }
 

@@ -28,7 +28,7 @@ data class GuardianConfigurationRequest(
 
 fun GuardianDeployment.toRequestBody(): GuardianDeploymentRequest {
     return GuardianDeploymentRequest(
-        deploymentKey = randomDeploymentId(),
+        deploymentKey = this.deploymentKey,
         deploymentType = Device.GUARDIAN.value,
         deployedAt = this.deployedAt.toISO8601Format(),
         wifi = this.wifiName,

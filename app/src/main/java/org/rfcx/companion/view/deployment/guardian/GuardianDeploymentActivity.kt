@@ -247,6 +247,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
         this._deployLocation = locate.asDeploymentLocation()
         val deploymentId = deploymentDb.insertOrUpdateDeployment(deployment, _deployLocation!!)
+        deployment.id = deploymentId
 
         useExistedLocation = isExisted
         this._locate = locate

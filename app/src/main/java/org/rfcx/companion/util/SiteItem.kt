@@ -6,6 +6,7 @@ import android.location.LocationManager
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.EdgeDeployment
 import org.rfcx.companion.entity.Locate
+import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 
 private fun findNearLocations(
@@ -29,16 +30,19 @@ private fun findNearLocations(
 
 fun getListSite(
     context: Context,
-    deployments: List<EdgeDeployment>,
+    edgeDeployments: List<EdgeDeployment>,
+    guardianDeployments: List<GuardianDeployment>,
     projectName: String,
     currentUserLocation: Location,
     locations: List<Locate>
 ): ArrayList<SiteWithLastDeploymentItem> {
-    var showDeployments = deployments
+    var showDeployments = edgeDeployments
+    var guardianShowDeployments = guardianDeployments
     if (projectName != context.getString(R.string.none)) {
         showDeployments =
             showDeployments.filter { it.stream?.project?.name == projectName }
-
+        guardianShowDeployments =
+            guardianDeployments.filter { it.stream?.project?.name == projectName }
     }
     val nearLocations =
         findNearLocations(ArrayList(locations.filter { loc ->
@@ -47,7 +51,7 @@ fun getListSite(
             )
         }), currentUserLocation)?.sortedBy { it.second }
 
-    val locationsItems: List<SiteWithLastDeploymentItem> =
+    val edgeLocationsItems: List<SiteWithLastDeploymentItem> =
         nearLocations?.map {
             SiteWithLastDeploymentItem(
                 it.first,
@@ -56,8 +60,17 @@ fun getListSite(
             )
         } ?: listOf()
 
-    val sortDate = locationsItems.filter { it.date != null }.sortedByDescending { it.date }
-    val notDeployment = locationsItems.filter { it.date == null }
+    val guardianLocationItems: List<SiteWithLastDeploymentItem> =
+        nearLocations?.map {
+            SiteWithLastDeploymentItem(
+                it.first,
+                guardianShowDeployments.find { dp -> dp.stream?.name == it.first.name }?.deployedAt,
+                it.second
+            )
+        } ?: listOf()
+
+    val sortDate = (edgeLocationsItems + guardianLocationItems).filter { it.date != null }.sortedByDescending { it.date }
+    val notDeployment = (edgeLocationsItems + guardianLocationItems).filter { it.date == null }
 
     return ArrayList(sortDate + notDeployment)
 }
