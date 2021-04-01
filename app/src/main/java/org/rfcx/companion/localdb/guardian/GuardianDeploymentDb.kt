@@ -34,6 +34,18 @@ class GuardianDeploymentDb(private val realm: Realm) {
             .findAll()
     }
 
+    fun deleteDeploymentByStreamId(id: String) {
+        realm.executeTransaction {
+            val deployments =
+                it.where(GuardianDeployment::class.java).equalTo("stream.coreId", id)
+                    .findAll()
+            deployments.forEach { dp ->
+                dp.isActive = false
+                dp.syncState = SyncState.Unsent.key
+            }
+        }
+    }
+
     fun insertOrUpdateDeployment(
         deployment: GuardianDeployment,
         location: DeploymentLocation
