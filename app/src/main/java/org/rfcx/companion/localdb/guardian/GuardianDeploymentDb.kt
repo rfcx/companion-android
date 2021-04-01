@@ -27,6 +27,13 @@ class GuardianDeploymentDb(private val realm: Realm) {
             .findAllAsync()
     }
 
+    fun getAll(sort: Sort = Sort.DESCENDING): RealmResults<GuardianDeployment> {
+        return realm.where(GuardianDeployment::class.java)
+            .isNotNull(GuardianDeployment.FIELD_SERVER_ID)
+            .sort(GuardianDeployment.FIELD_ID, sort)
+            .findAll()
+    }
+
     fun insertOrUpdateDeployment(
         deployment: GuardianDeployment,
         location: DeploymentLocation
