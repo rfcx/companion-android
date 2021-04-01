@@ -471,7 +471,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
                         PROPERTY_CLUSTER_TYPE,
                         sum(accumulated(), get(PROPERTY_CLUSTER_TYPE)),
                         switchCase(
-                            eq(get(PROPERTY_DEPLOYMENT_MARKER_IMAGE), Battery.BATTERY_PIN_GREEN),
+                            any(
+                                eq(get(PROPERTY_DEPLOYMENT_MARKER_IMAGE), Battery.BATTERY_PIN_GREEN),
+                                eq(get(PROPERTY_DEPLOYMENT_MARKER_IMAGE), GuardianPin.CONNECTED_GUARDIAN),
+                                eq(get(PROPERTY_DEPLOYMENT_MARKER_IMAGE), GuardianPin.NOT_CONNECTED_GUARDIAN)
+                            ),
                             literal(1),
                             literal(0)
                         )
