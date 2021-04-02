@@ -33,6 +33,7 @@ class TrackingDb(private val realm: Realm) {
             tracking?.deleteFromRealm()
             val preferences = Preferences.getInstance(context)
             preferences.putLong(Preferences.ON_DUTY_LAST_OPEN, 0L)
+            preferences.putLong(Preferences.ON_DUTY, 0L)
         }
     }
 
