@@ -54,10 +54,10 @@
         <item>Microphone Capture Test</item>
         <item>Audio Parameter Config</item>
         <item>Guardian Installation Location</item>
-        <item>Confirm CheckIn Status</item>
     </string-array>
 
     <string-array name="guardian_optional_checks">
+        <item>Confirm CheckIn Status</item>
         <item>Add Photo(s)</item>
         <item>Advanced Configuration</item>
     </string-array>

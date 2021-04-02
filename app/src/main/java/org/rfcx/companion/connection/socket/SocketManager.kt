@@ -137,13 +137,15 @@ object SocketManager {
         sendMessage(data)
     }
 
-    fun getCheckInTest() {
-        val data = gson.toJson(
-            SocketRequest(
-                CHECKIN
+    fun getCheckInTest(command: CheckinCommand) {
+        val jsonString = gson.toJson(
+            CheckinRequest(
+                Checkin(
+                    CheckinInfo(command.value)
+                )
             )
         )
-        sendMessage(data)
+        sendMessage(jsonString)
     }
 
     fun getSentinelBoardValue() {

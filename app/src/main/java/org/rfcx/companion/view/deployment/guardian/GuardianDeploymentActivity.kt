@@ -20,6 +20,7 @@ import org.rfcx.companion.connection.wifi.WifiLostListener
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.socket.request.CheckinCommand
 import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.service.DownloadStreamState
@@ -143,7 +144,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             is GuardianCheckListFragment -> {
                 SocketManager.resetAllValuesToDefault()
                 setLastCheckInTime(null)
-                SocketManager.getCheckInTest() // to stop getting checkin test
+                SocketManager.getCheckInTest(CheckinCommand.STOP) // to stop getting checkin test
                 passedChecks.clear() // remove all passed
                 unregisterWifiConnectionLostListener()
                 startFragment(ConnectGuardianFragment.newInstance())
@@ -300,7 +301,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
             analytics.trackCreateGuardianDeploymentEvent()
 
-            SocketManager.getCheckInTest() // to stop getting checkin test
+            SocketManager.getCheckInTest(CheckinCommand.STOP) // to stop getting checkin test
             GuardianDeploymentSyncWorker.enqueue(this@GuardianDeploymentActivity)
             showComplete()
         }
