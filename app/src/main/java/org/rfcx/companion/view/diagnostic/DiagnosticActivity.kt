@@ -354,7 +354,6 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
             SocketManager.syncConfiguration.observe(this, Observer { syncConfiguration ->
                 if (syncConfiguration.sync.status == Status.SUCCESS.value) {
                     showSuccessResponse()
-                    updateGuardianConfig()
                 } else {
                     showFailedResponse()
                 }
