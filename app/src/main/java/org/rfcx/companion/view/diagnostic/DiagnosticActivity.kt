@@ -364,10 +364,6 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
         }
     }
 
-    private fun updateGuardianConfig() {
-
-    }
-
     override fun showSuccessResponse() {
         Snackbar.make(diagRootView, "Sync preferences success", Snackbar.LENGTH_LONG)
             .show()
