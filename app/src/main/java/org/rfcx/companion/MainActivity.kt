@@ -262,6 +262,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
 
     override fun onLogout() {
         this.logout()
+        LocationTracking.set(this, false)
         analytics.trackLogoutEvent()
         finish()
     }
