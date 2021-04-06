@@ -932,12 +932,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, (Locate) -> Unit {
                     call: Call<List<DeploymentResponse>>,
                     response: Response<List<DeploymentResponse>>
                 ) {
-                    response.body()?.forEach { item ->
-                        if (item.deploymentType == Device.GUARDIAN.value) {
-                            guardianDeploymentDb.insertOrUpdate(item)
-                        } else {
-                            edgeDeploymentDb.insertOrUpdate(item)
-                        }
+                    response.body()?.let { item ->
+                        guardianDeploymentDb.insertOrUpdate(item.filter { it.deploymentType == Device.GUARDIAN.value })
+                        edgeDeploymentDb.insertOrUpdate(item.filter { it.deploymentType == Device.AUDIOMOTH.value })
                     }
                     retrieveAssets(context)
                     combinedData()

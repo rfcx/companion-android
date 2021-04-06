@@ -22,7 +22,8 @@ interface DeviceApiInterface {
     @GET("deployments")
     fun getDeployments(
         @Header("Authorization") authUser: String,
-        @Query("active") active: Boolean = true
+        @Query("active") active: Boolean = true,
+        @Query("limit") limit: Int = 200
     ): Call<List<DeploymentResponse>>
 
     @GET("deployments/{id}")
