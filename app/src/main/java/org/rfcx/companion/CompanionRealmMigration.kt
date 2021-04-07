@@ -300,13 +300,14 @@ class CompanionRealmMigration : RealmMigration {
     private fun migrateToV14(realm: DynamicRealm) {
         val trackingFile = realm.schema.get(TrackingFile.TABLE_NAME)
         trackingFile?.apply {
-//            removeField(TrackingFile.FIELD_DEVICE)
+            removeField(TrackingFile.FIELD_DEVICE)
         }
 
         val guardianDp = realm.schema.get(GuardianDeployment.TABLE_NAME)
         guardianDp?.apply {
             addField("deploymentKey", String::class.java)
                 .setRequired("deploymentKey", true)
+            addField("isActive", Boolean::class.java)
         }
 
         val profile = realm.schema.get("GuardianProfile")
