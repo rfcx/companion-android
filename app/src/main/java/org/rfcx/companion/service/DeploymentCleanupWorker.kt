@@ -72,5 +72,9 @@ class DeploymentCleanupWorker(val context: Context, params: WorkerParameters) :
                 workRequest
             )
         }
+
+        fun stopAllWork(context: Context) {
+            WorkManager.getInstance(context).cancelAllWork()
+        }
     }
 }

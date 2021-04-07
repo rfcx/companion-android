@@ -21,6 +21,8 @@ import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.localdb.EdgeDeploymentDb
+import org.rfcx.companion.service.DeleteStreamsWorker
+import org.rfcx.companion.service.DeploymentCleanupWorker
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.EdgeDeploymentActivity
@@ -261,6 +263,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     }
 
     override fun onLogout() {
+        DeploymentCleanupWorker.stopAllWork(this)
         this.logout()
         LocationTracking.set(this, false)
         analytics.trackLogoutEvent()
