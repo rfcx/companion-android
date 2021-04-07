@@ -106,7 +106,6 @@ class GuardianDeploymentDb(private val realm: Realm) {
                     val id = (it.where(GuardianDeployment::class.java).max(GuardianDeployment.FIELD_ID)
                         ?.toInt() ?: 0) + 1
                     deploymentObj.id = id
-                    deploymentObj.isActive = true
                     it.insert(deploymentObj)
                 }
             }

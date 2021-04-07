@@ -812,7 +812,10 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         mapView.onResume()
         analytics?.trackScreen(Screen.LOCATION)
 
-        group = preferences?.getString(Preferences.GROUP, getString(R.string.none))
+        val selectedProject = preferences?.getString(Preferences.SELECTED_PROJECT, getString(R.string.none)) ?: getString(R.string.none)
+        val selectedGroup = preferences?.getString(Preferences.GROUP)
+
+        group = selectedGroup ?: selectedProject
         locationGroupValueTextView.text = group
     }
 
