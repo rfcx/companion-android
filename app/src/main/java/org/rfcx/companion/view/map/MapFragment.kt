@@ -278,7 +278,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
             hideButtonOnMap()
             listener?.hideBottomAppBar()
 
-            if(siteRecyclerView.visibility == View.VISIBLE) {
+            if (siteRecyclerView.visibility == View.VISIBLE) {
                 searchLayout.visibility = View.GONE
                 hideLabel()
                 searchLayoutSearchEditText.text = null
@@ -757,12 +757,16 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                 }
             }
             if (latLngList.size > 1) {
-                val latLngBounds = LatLngBounds.Builder()
-                    .includes(latLngList)
-                    .build()
-                mapboxMap?.easeCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 230), 1300)
+                moveCameraWithLatLngList(latLngList)
             }
         }
+    }
+
+    private fun moveCameraWithLatLngList(latLngList: List<LatLng>) {
+        val latLngBounds = LatLngBounds.Builder()
+            .includes(latLngList)
+            .build()
+        mapboxMap?.easeCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 230), 1300)
     }
 
     private val guardianDeploymentObserve = Observer<List<GuardianDeployment>> {
@@ -1479,7 +1483,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         private const val WITHIN_TIME = (60 * 3)     // 3 hr
 
         private const val DURATION = 700
-        const val REQUEST_CODE = 1006
 
         fun newInstance(): MapFragment {
             return MapFragment()
@@ -1524,14 +1527,28 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                         R.string.projects
                     )
                 combinedData()
-                mapboxMap?.locationComponent?.isLocationComponentActivated?.let { isActivated ->
-                    if (isActivated && screen == Screen.PROJECT.id) {
-                        moveCameraOnStartWithProject()
+                val projects =
+                    adapterOfSearchSite?.map { LatLng(it.locate.latitude, it.locate.longitude) }
+                if (projects != null && projects.isNotEmpty()) {
+                    if (projects.size > 1) {
+                        moveCameraWithLatLngList(projects)
+                    } else {
+                        moveCamera(LatLng(projects[0].latitude, projects[0].longitude), null, LocationFragment.DEFAULT_ZOOM)
+                    }
+                } else {
+                    currentUserLocation?.let { current ->
+                        moveCamera(
+                            LatLng(
+                                current.latitude,
+                                current.longitude
+                            )
+                            , null, LocationFragment.DEFAULT_ZOOM
+                        )
                     }
                 }
             }
 
-            if(siteRecyclerView.visibility == View.VISIBLE) {
+            if (siteRecyclerView.visibility == View.VISIBLE) {
                 searchLayout.visibility = View.VISIBLE
             } else {
                 searchButton.visibility = View.VISIBLE
