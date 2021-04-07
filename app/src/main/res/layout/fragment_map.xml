@@ -22,32 +22,35 @@
         android:background="@color/topBar"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/menuImageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="@dimen/margin_padding_normal"
-            android:src="@drawable/ic_menu_24px"
-            android:tint="@color/iconColor"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/projectNameTextView"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="@dimen/margin_padding_normal"
+            android:paddingTop="@dimen/margin_padding_normal"
+            android:paddingBottom="@dimen/margin_padding_normal"
+            android:layout_marginStart="@dimen/margin_padding_xlarge"
             android:layout_marginEnd="@dimen/margin_padding_xlarge"
+            android:ellipsize="end"
+            android:maxWidth="@dimen/max_width_project_name"
+            android:singleLine="true"
             android:gravity="center"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/menuImageView"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Puerto Rico" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iconOpenProjectList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_drop_down"
+            android:tint="@color/iconColor"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/projectNameTextView"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -66,6 +69,16 @@
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/searchLayout" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/projectRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/backgroundColor"
+        android:dividerHeight="1dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topBarLayout" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/showLabelLayout"
@@ -104,11 +117,11 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/trackingLayout"
-        android:background="@drawable/bg_tracking_button"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/tracking_size"
         android:layout_marginStart="@dimen/margin_padding_normal"
         android:layout_marginTop="@dimen/margin_padding_normal"
+        android:background="@drawable/bg_tracking_button"
         android:paddingStart="@dimen/margin_padding_normal"
         android:paddingEnd="@dimen/margin_padding_normal"
         app:layout_constraintStart_toStartOf="parent"

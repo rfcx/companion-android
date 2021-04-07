@@ -339,16 +339,16 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
     override fun onBackPressed() {
         addTooltip?.dismiss()
         when {
+            projectRecyclerView.visibility == View.VISIBLE -> {
+                projectRecyclerView.visibility = View.GONE
+                setSearchBar()
+            }
+            searchLayout.visibility == View.VISIBLE -> {
+                setSearchBar()
+            }
             bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED -> {
                 hideBottomSheet()
                 clearFeatureSelectedOnMap()
-            }
-            searchLayout.visibility == View.VISIBLE -> {
-                clearFeatureSelectedOnMap()
-                val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
-                if (mapFragment is MapFragment) {
-                    mapFragment.showSearchBar(false)
-                }
             }
             else -> {
                 return super.onBackPressed()
@@ -356,6 +356,13 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         }
     }
 
+    private fun setSearchBar() {
+        clearFeatureSelectedOnMap()
+        val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
+        if (mapFragment is MapFragment) {
+            mapFragment.showSearchBar(false)
+        }
+    }
     override fun clearFeatureSelectedOnMap() {
         val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
         if (mapFragment is MapFragment) {
