@@ -815,7 +815,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                 id = -1,
                 name = getString(R.string.none)
             )
-        ) + it.sortedBy { project -> project.name }
+        ) + locationGroupDb.getLocationGroups()
         locationGroupAdapter.notifyDataSetChanged()
     }
 
