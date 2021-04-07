@@ -1328,7 +1328,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
 //                queueColor.add(color)
                     queue.add(lineString.coordinates().toList())
                 }
-                lineSource!!.setGeoJson(FeatureCollection.fromFeatures(tempTrack))
+                lineSource?.setGeoJson(FeatureCollection.fromFeatures(tempTrack))
 
                 //move camera to pin
                 moveToDeploymentMarker(
@@ -1400,7 +1400,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
 
     private fun hideTrackOnMap() {
         //reset source
-        lineSource!!.setGeoJson(FeatureCollection.fromFeatures(listOf()))
+        lineSource?.setGeoJson(FeatureCollection.fromFeatures(listOf()))
         routeCoordinateList = listOf()
         routeIndex = 0
         markerLinePointList.clear()
