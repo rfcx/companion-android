@@ -62,13 +62,6 @@ class LocationGroupActivity : BaseActivity(), LocationGroupProtocol {
                 setResult(RESULT_OK, intent)
                 finish()
             }
-            Screen.MAP.id  -> {
-                val intent = Intent()
-                intent.putExtra(EXTRA_SCREEN, Screen.PROJECT.id)
-                setResult(RESULT_OK, intent)
-                group.name?.let { preferences.putString(Preferences.SELECTED_PROJECT, it) }
-                finish()
-            }
         }
     }
 

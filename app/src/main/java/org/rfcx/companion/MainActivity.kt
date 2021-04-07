@@ -343,6 +343,14 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
                 hideBottomSheet()
                 clearFeatureSelectedOnMap()
             }
+            projectRecyclerView.visibility == View.VISIBLE -> {
+                projectRecyclerView.visibility = View.GONE
+                clearFeatureSelectedOnMap()
+                val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
+                if (mapFragment is MapFragment) {
+                    mapFragment.showSearchBar(false)
+                }
+            }
             searchLayout.visibility == View.VISIBLE -> {
                 clearFeatureSelectedOnMap()
                 val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
