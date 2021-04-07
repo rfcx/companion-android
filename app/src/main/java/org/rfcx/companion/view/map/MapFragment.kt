@@ -277,6 +277,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
             trackingLayout.visibility = View.GONE
             hideButtonOnMap()
             listener?.hideBottomAppBar()
+
+            if(siteRecyclerView.visibility == View.VISIBLE) {
+                searchLayout.visibility = View.GONE
+                hideLabel()
+                searchLayoutSearchEditText.text = null
+            }
         }
 
         siteRecyclerView.apply {
@@ -292,7 +298,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
     }
 
     private fun showLabel(isNotFound: Boolean) {
-        if (searchButton.visibility != View.VISIBLE) {
+        if (siteRecyclerView.visibility == View.VISIBLE && projectRecyclerView.visibility != View.VISIBLE) {
             showLabelLayout.visibility = View.VISIBLE
             notHaveSiteTextView.visibility = if (isNotFound) View.GONE else View.VISIBLE
             notHaveResultTextView.visibility = if (isNotFound) View.VISIBLE else View.GONE
@@ -1507,8 +1513,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
 
     override fun onClicked(group: LocationGroups) {
         projectRecyclerView.visibility = View.GONE
-        searchButton.visibility = View.VISIBLE
-        trackingLayout.visibility = View.VISIBLE
 
         group.name?.let {
             context?.let { context ->
@@ -1526,9 +1530,15 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                     }
                 }
             }
-            showButtonOnMap()
-            listener?.showBottomAppBar()
 
+            if(siteRecyclerView.visibility == View.VISIBLE) {
+                searchLayout.visibility = View.VISIBLE
+            } else {
+                searchButton.visibility = View.VISIBLE
+                trackingLayout.visibility = View.VISIBLE
+                showButtonOnMap()
+                listener?.showBottomAppBar()
+            }
         }
     }
 
