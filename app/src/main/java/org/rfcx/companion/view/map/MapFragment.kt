@@ -494,7 +494,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                         PROPERTY_CLUSTER_TYPE,
                         sum(accumulated(), get(PROPERTY_CLUSTER_TYPE)),
                         switchCase(
-                            eq(get(PROPERTY_DEPLOYMENT_MARKER_IMAGE), Battery.BATTERY_PIN_GREEN),
+                            any(
+                                eq(get(PROPERTY_DEPLOYMENT_MARKER_IMAGE), Battery.BATTERY_PIN_GREEN),
+                                eq(get(PROPERTY_DEPLOYMENT_MARKER_IMAGE), GuardianPin.CONNECTED_GUARDIAN),
+                                eq(get(PROPERTY_DEPLOYMENT_MARKER_IMAGE), GuardianPin.NOT_CONNECTED_GUARDIAN)
+                            ),
                             literal(1),
                             literal(0)
                         )
@@ -818,19 +822,14 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
     private fun combinedData() {
         // hide loading progress
         progressBar.visibility = View.INVISIBLE
-
-        val showDeployIds = locations.mapTo(arrayListOf(), {
-            it.getLastDeploymentId()
-        })
-
-        var showGuardianDeployments = this.guardianDeployments.filter {
-            showDeployIds.contains(it.serverId) || showDeployIds.contains(it.id.toString())
-        }
+        var showGuardianDeployments = this.guardianDeployments.filter  { it.isCompleted() }
+        val usedSitesOnGuardian = showGuardianDeployments.map { it.stream?.coreId }
 
         var showDeployments = this.edgeDeployments.filter { it.isCompleted() }
-        val usedSites = showDeployments.map { it.stream?.coreId }
-        var filteredShowLocations =
-            locations.filter { loc -> !usedSites.contains(loc.serverId) }
+        val usedSitesOnEdge = showDeployments.map { it.stream?.coreId }
+
+        val allUsedSites = usedSitesOnEdge + usedSitesOnGuardian
+        var filteredShowLocations = locations.filter { loc -> !allUsedSites.contains(loc.serverId) }
         val projectName = listener?.getProjectName() ?: getString(R.string.none)
         if (projectName != getString(R.string.none)) {
             filteredShowLocations =
@@ -843,6 +842,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
 
         val edgeDeploymentMarkers =
             showDeployments.map { it.toMark(requireContext(), locationGroupDb) }
+
         val guardianDeploymentMarkers = showGuardianDeployments.map { it.toMark(requireContext()) }
         val deploymentMarkers = edgeDeploymentMarkers + guardianDeploymentMarkers
         val locationMarkers = filteredShowLocations.map { it.toMark() }
@@ -870,6 +870,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
             adapterOfSearchSite = getListSite(
                 requireContext(),
                 showDeployments,
+                showGuardianDeployments,
                 projectName,
                 currentLocation,
                 locations
@@ -1050,8 +1051,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                                         trackingFileDb.insertOrUpdate(
                                             item,
                                             filePath,
-                                            siteId,
-                                            Device.AUDIOMOTH.value
+                                            siteId
                                         )
                                         if (fileCount == fileCreated) {
                                             callback.onSuccess()

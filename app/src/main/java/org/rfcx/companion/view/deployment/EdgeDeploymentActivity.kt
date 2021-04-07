@@ -14,10 +14,10 @@ import io.realm.Realm
 import io.realm.RealmList
 import kotlinx.android.synthetic.main.activity_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
-import org.rfcx.companion.MainActivity
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.localdb.*
+import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
@@ -40,11 +40,8 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     MapPickerProtocol {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val deploymentDb by lazy {
-        EdgeDeploymentDb(
-            realm
-        )
-    }
+    private val deploymentDb by lazy { EdgeDeploymentDb(realm) }
+    private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
@@ -286,8 +283,12 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 this._locate?.let { locate ->
                     locateDb.insertOrUpdateLocate(it.id, locate) // update locate - last deployment
                     val deployments = locate.serverId?.let { it1 -> deploymentDb.getDeploymentsBySiteId(it1) }
+                    val guardianDeployments = locate.serverId?.let { it1 -> guardianDeploymentDb.getDeploymentsBySiteId(it1) }
                     deployments?.forEach { deployment ->
                         deploymentDb.updateIsActive(deployment.id)
+                    }
+                    guardianDeployments?.forEach { deployment ->
+                        guardianDeploymentDb.updateIsActive(deployment.id)
                     }
                 }
             }

@@ -9,6 +9,7 @@ import org.rfcx.companion.entity.Device
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.TrackingFileDb
+import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.geojson.GeoJsonUtils
@@ -24,9 +25,13 @@ class DownloadImagesWorker(val context: Context, params: WorkerParameters) :
         Log.d(TAG, "doWork on DownloadAssets")
 
         val edgeDeploymentDb = EdgeDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
-        edgeDeploymentDb.getAll().forEach { dp ->
+        val edgeDeployments = edgeDeploymentDb.getAll().map { Triple(it.id, it.serverId!!, Device.AUDIOMOTH.value) }
+        val guardianDeploymentDb = GuardianDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
+        val guardianDeployments = guardianDeploymentDb.getAll().map { Triple(it.id, it.serverId!!, Device.GUARDIAN.value) }
+
+        (edgeDeployments + guardianDeployments).forEach { dp ->
             val token = "Bearer ${context.getIdToken()}"
-            val result = ApiManager.getInstance().getDeviceApi().getDeploymentAssets(token, dp.serverId!!).execute()
+            val result = ApiManager.getInstance().getDeviceApi().getDeploymentAssets(token, dp.second).execute()
             if (result.isSuccessful) {
                 val dpAssets = result.body()
                 dpAssets?.forEach { item ->
@@ -34,8 +39,8 @@ class DownloadImagesWorker(val context: Context, params: WorkerParameters) :
                         val deploymentImageDb = DeploymentImageDb(Realm.getInstance(RealmHelper.migrationConfig()))
                         deploymentImageDb.insertOrUpdate(
                             item,
-                            dp.id,
-                            Device.AUDIOMOTH.value
+                            dp.first,
+                            dp.third
                         )
                     }
                 }

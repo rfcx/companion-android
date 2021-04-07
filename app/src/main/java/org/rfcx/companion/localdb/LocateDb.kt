@@ -118,19 +118,33 @@ class LocateDb(private val realm: Realm) {
         }
     }
 
-    fun updateSiteServerId(deploymentId: Int, serverId: String) {
+    fun updateSiteServerId(deploymentId: Int, serverId: String, fromGuardian: Boolean = false) {
         realm.executeTransaction {
-            //update server id in site
-            it.where(Locate::class.java).equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_ID, deploymentId)
-                .findFirst()?.apply {
-                    this.serverId = serverId
-                }
+            if (!fromGuardian) {
+                //update server id in site
+                it.where(Locate::class.java).equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_ID, deploymentId)
+                    .findFirst()?.apply {
+                        this.serverId = serverId
+                    }
 
-            //update server id in track
-            it.where(TrackingFile::class.java).equalTo(TrackingFile.FIELD_DEPLOYMENT_ID, deploymentId)
-                .findFirst()?.apply {
-                    this.siteServerId = serverId
-                }
+                //update server id in track
+                it.where(TrackingFile::class.java).equalTo(TrackingFile.FIELD_DEPLOYMENT_ID, deploymentId)
+                    .findFirst()?.apply {
+                        this.siteServerId = serverId
+                    }
+            } else {
+                //update server id in site
+                it.where(Locate::class.java).equalTo(Locate.FIELD_LAST_GUARDIAN_DEPLOYMENT_ID, deploymentId)
+                    .findFirst()?.apply {
+                        this.serverId = serverId
+                    }
+
+                //update server id in track
+                it.where(TrackingFile::class.java).equalTo(TrackingFile.FIELD_DEPLOYMENT_ID, deploymentId)
+                    .findFirst()?.apply {
+                        this.siteServerId = serverId
+                    }
+            }
         }
     }
 

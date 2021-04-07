@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.deployment.configure.SelectProfileFragment">
+    tools:context=".view.deployment.guardian.configure.GuardianConfigureFragment">
 
     <ScrollView
         android:id="@+id/scrollView"
@@ -115,25 +115,6 @@
                     android:layout_marginBottom="@dimen/margin_padding_small"
                     android:background="@color/gray_30" />
             </LinearLayout>
-
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/profileTextInput"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_padding_normal"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:hint="@string/profile_name"
-                app:layout_constraintTop_toBottomOf="@+id/configureLayout">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/profileEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:maxLines="1" />
-            </com.google.android.material.textfield.TextInputLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 

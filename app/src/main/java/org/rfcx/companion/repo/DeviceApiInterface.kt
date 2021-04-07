@@ -4,6 +4,7 @@ import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import org.rfcx.companion.entity.request.DeploymentRequest
 import org.rfcx.companion.entity.request.EditDeploymentRequest
+import org.rfcx.companion.entity.request.GuardianDeploymentRequest
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.ProjectResponse
@@ -17,6 +18,12 @@ interface DeviceApiInterface {
     fun createDeployment(
         @Header("Authorization") authUser: String,
         @Body deploymentRequest: DeploymentRequest
+    ): Call<ResponseBody>
+
+    @POST("deployments")
+    fun createGuardianDeployment(
+        @Header("Authorization") authUser: String,
+        @Body deploymentRequest: GuardianDeploymentRequest
     ): Call<ResponseBody>
 
     @GET("deployments")

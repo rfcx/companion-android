@@ -17,7 +17,6 @@ import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.SocketManager
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.guardian.GuardianConfiguration
-import org.rfcx.companion.entity.guardian.GuardianProfile
 import org.rfcx.companion.entity.guardian.toListForGuardian
 import org.rfcx.companion.entity.socket.response.Status
 import org.rfcx.companion.util.Analytics
@@ -41,7 +40,6 @@ class GuardianConfigureFragment : Fragment() {
     private var fileFormat = "opus" // default guardian file format is opus
     private var duration = 90 // default guardian duration is 90
 
-    private var profile: GuardianProfile? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -65,15 +63,9 @@ class GuardianConfigureFragment : Fragment() {
             it.setToolbarTitle()
         }
 
-        profile = deploymentProtocol?.getProfile()
-
         setNextButton(true)
-        setFileFormatLayout()
-        setSampleRateLayout()
-        setBitrateLayout()
-        setDuration()
-        createNotificationChannel()
-        setNextOnClick()
+        deploymentProtocol?.showLoading()
+        retrieveCurrentConfigure()
     }
 
     private fun setPredefinedConfiguration(context: Context) {
@@ -96,7 +88,7 @@ class GuardianConfigureFragment : Fragment() {
             analytics?.trackClickNextEvent(Screen.GUARDIAN_CONFIGURE.id)
             setNextButton(false)
             syncConfig()
-            updateProfile()
+            deploymentProtocol?.setDeploymentConfigure(getConfiguration())
             deploymentProtocol?.setSampleRate(sampleRate)
         }
     }
@@ -112,52 +104,29 @@ class GuardianConfigureFragment : Fragment() {
         })
     }
 
-    private fun updateProfile() {
-        val profileName = profileEditText.text
-        val profileTemp = GuardianProfile(
-            name = profileName?.trim()?.toString() ?: "",
-            sampleRate = sampleRate,
-            bitrate = bitrate,
-            fileFormat = fileFormat,
-            duration = duration
-
-        )
-
-        val newProfile = profile?.let {
-            if (it.name == profileTemp.name) {
-                profileTemp.id = it.id
-            }
-            profileTemp
-        } ?: kotlin.run {
-            profileTemp
-        }
-
-        deploymentProtocol?.setDeploymentConfigure(newProfile)
-    }
-
     private fun getConfiguration(): GuardianConfiguration {
         return GuardianConfiguration(sampleRate, bitrate, fileFormat, duration)
     }
 
-    private fun createNotificationChannel() {
-        val notificationManager =
-            context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    private fun retrieveCurrentConfigure() {
+        SocketManager.getCurrentConfiguration()
+        SocketManager.currentConfiguration.observe(viewLifecycleOwner, Observer { curConfig ->
+            bitrate = curConfig.configure.bitrate
+            sampleRate = curConfig.configure.sampleRate
+            duration = curConfig.configure.duration
+            fileFormat = if (curConfig.configure.fileFormat.toIntOrNull() == null) curConfig.configure.fileFormat else "opus"
+            deploymentProtocol?.hideLoading()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationChannel =
-                NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH)
-            notificationChannel.enableLights(true)
-            notificationChannel.lightColor = Color.GREEN
-            notificationChannel.enableVibration(false)
-            notificationManager.createNotificationChannel(notificationChannel)
-        }
+            setFileFormatLayout()
+            setSampleRateLayout()
+            setBitrateLayout()
+            setDuration()
+            setNextOnClick()
+        })
     }
 
     private fun setBitrateLayout() {
 
-        if (profile != null) {
-            bitrate = profile?.bitrate ?: 28672
-        }
         val indexOfValue = bitrateValues?.indexOf(bitrate.toString()) ?: 6
         bitrateValueTextView.text = bitrateEntries!![indexOfValue]
 
@@ -181,9 +150,6 @@ class GuardianConfigureFragment : Fragment() {
 
     private fun setFileFormatLayout() {
 
-        if (profile != null) {
-            fileFormat = profile?.fileFormat ?: "opus"
-        }
         fileFormatValueTextView.text = fileFormat
 
         fileFormatValueTextView.setOnClickListener {
@@ -206,9 +172,6 @@ class GuardianConfigureFragment : Fragment() {
 
     private fun setSampleRateLayout() {
 
-        if (profile != null) {
-            sampleRate = profile?.sampleRate ?: 24000
-        }
         val indexOfValue = sampleRateValues?.indexOf(sampleRate.toString()) ?: 3
         sampleRateValueTextView.text = sampleRateEntries!![indexOfValue]
 
@@ -231,9 +194,7 @@ class GuardianConfigureFragment : Fragment() {
     }
 
     private fun setDuration() {
-        if (profile != null) {
-            duration = profile?.duration ?: 90
-        }
+
         val indexOfValue = durationValues?.indexOf(duration.toString()) ?: 3
         durationValueTextView.text = durationEntries!![indexOfValue]
 
@@ -261,9 +222,6 @@ class GuardianConfigureFragment : Fragment() {
     }
 
     companion object {
-        const val CHANNEL_ID = "Guardian Notification"
-        const val CHANNEL_NAME = "Notification"
-
         fun newInstance(): GuardianConfigureFragment {
             return GuardianConfigureFragment()
         }

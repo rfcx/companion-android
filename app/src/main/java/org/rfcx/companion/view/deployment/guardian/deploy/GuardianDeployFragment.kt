@@ -47,8 +47,10 @@ class GuardianDeployFragment : BaseImageFragment() {
         }
 
         finishButton.setOnClickListener {
-            analytics?.trackAddDeploymentImageEvent(Device.GUARDIAN.value)
             val images = imageAdapter.getNewAttachImage()
+            if(images.isNotEmpty()) {
+                analytics?.trackAddDeploymentImageEvent(Device.AUDIOMOTH.value)
+            }
             deploymentProtocol?.setImages(images)
             deploymentProtocol?.nextStep()
         }

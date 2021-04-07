@@ -2,6 +2,7 @@ package org.rfcx.companion.view.deployment
 
 import android.location.Location
 import org.rfcx.companion.entity.*
+import org.rfcx.companion.service.DownloadStreamState
 
 interface BaseDeploymentProtocol {
     fun startMapPicker(latitude: Double, longitude: Double, altitude: Double, name: String)
@@ -31,4 +32,7 @@ interface BaseDeploymentProtocol {
     fun showToolbar()
     fun hideToolbar()
     fun setToolbarTitle()
+
+    fun isSiteLoading(): DownloadStreamState
+    fun showSiteLoadingDialog(text: String)
 }

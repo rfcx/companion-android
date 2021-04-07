@@ -20,14 +20,16 @@ import kotlinx.android.synthetic.main.fragment_selecting_existed_site.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.EdgeDeployment
 import org.rfcx.companion.entity.Locate
+import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.LocationGroupDb
+import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.util.*
-import org.rfcx.companion.view.deployment.EdgeDeploymentProtocol
+import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.detail.MapPickerProtocol
 import org.rfcx.companion.view.map.SiteAdapter
 import retrofit2.Call
@@ -37,12 +39,13 @@ import retrofit2.Response
 class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener, (Locate) -> Unit {
     private val existedSiteAdapter by lazy { SiteAdapter(this) }
     private var mapPickerProtocol: MapPickerProtocol? = null
-    private var deploymentProtocol: EdgeDeploymentProtocol? = null
+    private var deploymentProtocol: BaseDeploymentProtocol? = null
 
     val realm: Realm = Realm.getInstance(RealmHelper.migrationConfig())
     private val locateDb by lazy { LocateDb(realm) }
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
+    private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
 
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
@@ -53,6 +56,8 @@ class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener,
 
     private lateinit var edgeDeployLiveData: LiveData<List<EdgeDeployment>>
     private var edgeDeployments = listOf<EdgeDeployment>()
+    private lateinit var guardianDeploymentLiveData: LiveData<List<GuardianDeployment>>
+    private var guardianDeployments = listOf<GuardianDeployment>()
 
     private var sites = arrayListOf<SiteWithLastDeploymentItem>()
 
@@ -66,6 +71,11 @@ class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener,
 
     private val edgeDeploymentObserve = Observer<List<EdgeDeployment>> {
         this.edgeDeployments = it
+        setupView()
+    }
+
+    private val guardianDeploymentObserve = Observer<List<GuardianDeployment>> {
+        this.guardianDeployments = it
         setupView()
     }
 
@@ -95,7 +105,7 @@ class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener,
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mapPickerProtocol = context as MapPickerProtocol
-        deploymentProtocol = context as EdgeDeploymentProtocol
+        deploymentProtocol = context as BaseDeploymentProtocol
     }
 
     private fun initIntent() {
@@ -157,6 +167,12 @@ class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener,
                 it
             }
         edgeDeployLiveData.observeForever(edgeDeploymentObserve)
+
+        guardianDeploymentLiveData =
+            Transformations.map(guardianDeploymentDb.getAllResultsAsync().asLiveData()) {
+            it
+        }
+        guardianDeploymentLiveData.observeForever(guardianDeploymentObserve)
     }
 
     private fun setupView() {
@@ -165,6 +181,7 @@ class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener,
             sites = getListSite(
                 requireContext(),
                 edgeDeployments.filter { it.isCompleted() },
+                guardianDeployments.filter { it.isCompleted() },
                 "None",
                 currentLocation,
                 locations
@@ -177,6 +194,7 @@ class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener,
         super.onDestroy()
         locateLiveData.removeObserver(locateObserve)
         edgeDeployLiveData.removeObserver(edgeDeploymentObserve)
+        guardianDeploymentLiveData.removeObserver(guardianDeploymentObserve)
     }
 
     companion object {

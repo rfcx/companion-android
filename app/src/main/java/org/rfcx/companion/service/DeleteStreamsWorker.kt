@@ -12,6 +12,7 @@ import org.rfcx.companion.entity.response.StreamResponse
 import org.rfcx.companion.entity.response.toLocate
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
+import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.getIdToken
@@ -36,6 +37,7 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
         if (result) {
             val streamDb = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
             val deploymentDb = EdgeDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
+            val guardianDeploymentDb = GuardianDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
             val savedStreams = streamDb.getLocations().filter { it.serverId != null }
             val downloadedStreams = streams.map { it.toLocate().serverId }
             val filteredStreams = savedStreams.filter { stream -> !downloadedStreams.contains(stream.serverId) }
@@ -44,6 +46,7 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
                     Log.d(TAG, "remove stream: ${it.id}")
                     // delete deployment that has this stream
                     deploymentDb.deleteDeploymentByStreamId(it.serverId!!)
+                    guardianDeploymentDb.deleteDeploymentByStreamId(it.serverId!!)
                     streamDb.deleteLocate(it.id)
                 }
                 // force delete deployment on device-api

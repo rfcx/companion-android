@@ -18,8 +18,8 @@ import org.rfcx.companion.DeploymentListener
 import org.rfcx.companion.MainActivity
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.DeploymentState
-import org.rfcx.companion.entity.Status
 import org.rfcx.companion.entity.Device
+import org.rfcx.companion.entity.Status
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
@@ -110,7 +110,7 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
             DiagnosticActivity.startActivity(
                 requireContext(), guardianDeployment,
                 WifiHotspotUtils.isConnectedWithGuardian(
-                    requireContext(), guardianDeploymentView.wifiName ?: ""
+                    requireContext(), guardianDeployment.wifiName ?: ""
                 )
             )
         }

@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -16,25 +17,23 @@ import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.SocketManager
 import org.rfcx.companion.connection.wifi.WifiHotspotManager
 import org.rfcx.companion.connection.wifi.WifiLostListener
-import org.rfcx.companion.entity.DeploymentLocation
-import org.rfcx.companion.entity.DeploymentState
-import org.rfcx.companion.entity.Locate
-import org.rfcx.companion.entity.LocationGroups
+import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import org.rfcx.companion.entity.guardian.GuardianDeployment
-import org.rfcx.companion.entity.guardian.GuardianProfile
-import org.rfcx.companion.localdb.DeploymentImageDb
-import org.rfcx.companion.localdb.LocateDb
-import org.rfcx.companion.localdb.LocationGroupDb
+import org.rfcx.companion.entity.socket.request.CheckinCommand
+import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
-import org.rfcx.companion.localdb.guardian.GuardianProfileDb
+import org.rfcx.companion.service.DownloadStreamState
+import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.service.GuardianDeploymentSyncWorker
 import org.rfcx.companion.util.Analytics
+import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.RealmHelper
+import org.rfcx.companion.util.geojson.GeoJsonUtils
+import org.rfcx.companion.view.deployment.EdgeDeploymentActivity
 import org.rfcx.companion.view.deployment.guardian.advanced.GuardianAdvancedFragment
 import org.rfcx.companion.view.deployment.guardian.checkin.GuardianCheckInTestFragment
 import org.rfcx.companion.view.deployment.guardian.configure.GuardianConfigureFragment
-import org.rfcx.companion.view.deployment.guardian.configure.GuardianSelectProfileFragment
 import org.rfcx.companion.view.deployment.guardian.connect.ConnectGuardianFragment
 import org.rfcx.companion.view.deployment.guardian.deploy.GuardianDeployFragment
 import org.rfcx.companion.view.deployment.guardian.microphone.GuardianMicrophoneFragment
@@ -55,12 +54,12 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val locateDb by lazy { LocateDb(realm) }
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
-    private val profileDb by lazy { GuardianProfileDb(realm) }
     private val deploymentDb by lazy { GuardianDeploymentDb(realm) }
+    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
+    private val trackingDb by lazy { TrackingDb(realm) }
+    private val trackingFileDb by lazy { TrackingFileDb(realm) }
 
-    private var _profiles: List<GuardianProfile> = listOf()
-    private var _profile: GuardianProfile? = null
     private var _deployment: GuardianDeployment? = null
     private var _deployLocation: DeploymentLocation? = null
     private var _configuration: GuardianConfiguration? = null
@@ -90,6 +89,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     private lateinit var wifiHotspotManager: WifiHotspotManager
     private val analytics by lazy { Analytics(this) }
+
+    private val preferences = Preferences.getInstance(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -140,11 +141,10 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
         when (container) {
             is MapPickerFragment -> startFragment(LocationFragment.newInstance())
-            is GuardianConfigureFragment -> startFragment(GuardianSelectProfileFragment.newInstance())
             is GuardianCheckListFragment -> {
                 SocketManager.resetAllValuesToDefault()
                 setLastCheckInTime(null)
-                SocketManager.getCheckInTest() // to stop getting checkin test
+                SocketManager.getCheckInTest(CheckinCommand.STOP) // to stop getting checkin test
                 passedChecks.clear() // remove all passed
                 unregisterWifiConnectionLostListener()
                 startFragment(ConnectGuardianFragment.newInstance())
@@ -168,14 +168,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     }
 
     override fun isOpenedFromUnfinishedDeployment(): Boolean = false // guardian not have this feature so return false
-
-    override fun getProfiles(): List<GuardianProfile> = _profiles
-
-    override fun getProfile(): GuardianProfile? = _profile
-
-    override fun setProfile(profile: GuardianProfile) {
-        this._profile = profile
-    }
 
     override fun getDeployment(): GuardianDeployment? = this._deployment
 
@@ -221,17 +213,12 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         currentCheckName = name
     }
 
-    override fun setDeploymentConfigure(profile: GuardianProfile) {
-        setProfile(profile)
-        this._configuration = profile.asConfiguration()
+    override fun setDeploymentConfigure(config: GuardianConfiguration) {
+        this._configuration = config
         this._deployment?.configuration = _configuration
 
         // update deployment
         this._deployment?.let { deploymentDb.updateDeployment(it) }
-        // update profile
-        if (profile.name.isNotEmpty()) {
-            profileDb.insertOrUpdateProfile(profile)
-        }
     }
 
     override fun getConfiguration(): GuardianConfiguration? = _configuration
@@ -256,10 +243,12 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
         val deployment = _deployment ?: GuardianDeployment()
+        deployment.isActive = locate.serverId == null
         deployment.state = DeploymentState.Guardian.Locate.key // state
 
         this._deployLocation = locate.asDeploymentLocation()
         val deploymentId = deploymentDb.insertOrUpdateDeployment(deployment, _deployLocation!!)
+        deployment.id = deploymentId
 
         useExistedLocation = isExisted
         this._locate = locate
@@ -274,30 +263,60 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         showLoading()
         this._deployment?.let {
             it.deployedAt = Date()
+            it.updatedAt = Date()
+            it.isActive = true
             it.state = DeploymentState.Guardian.ReadyToUpload.key
             setDeployment(it)
 
             if (useExistedLocation) {
                 this._locate?.let { locate ->
                     locateDb.insertOrUpdateLocate(it.id, locate, true) // update locate - last deployment
+                    val deployments = locate.serverId?.let { it1 -> deploymentDb.getDeploymentsBySiteId(it1) }
+                    val edgeDeployments = locate.serverId?.let { it1 -> edgeDeploymentDb.getDeploymentsBySiteId(it1) }
+                    deployments?.forEach { deployment ->
+                        deploymentDb.updateIsActive(deployment.id)
+                    }
+                    edgeDeployments?.forEach { deployment ->
+                        edgeDeploymentDb.updateIsActive(deployment.id)
+                    }
                 }
             }
 
-            deploymentImageDb.insertImage(null, it, _images)
+            saveImages(it)
             deploymentDb.updateDeployment(it)
+
+            //track getting
+            if (preferences.getBoolean(Preferences.ENABLE_LOCATION_TRACKING)) {
+                val track = trackingDb.getFirstTracking()
+                track?.let { t ->
+                    val point = t.points.toListDoubleArray()
+                    val trackingFile = TrackingFile(
+                        deploymentId = it.id,
+                        siteId = this._locate!!.id,
+                        localPath = GeoJsonUtils.generateGeoJson(this, GeoJsonUtils.generateFileName(it.deployedAt, it.wifiName!!), point).absolutePath
+                    )
+                    trackingFileDb.insertOrUpdate(trackingFile)
+                }
+            }
+
             analytics.trackCreateGuardianDeploymentEvent()
 
+            SocketManager.getCheckInTest(CheckinCommand.STOP) // to stop getting checkin test
             GuardianDeploymentSyncWorker.enqueue(this@GuardianDeploymentActivity)
             showComplete()
         }
+    }
+
+    private fun saveImages(deployment: GuardianDeployment) {
+        deploymentImageDb.deleteImages(deployment.id)
+        deploymentImageDb.insertImage(null, deployment, _images)
     }
 
     override fun setCurrentLocation(location: Location) {
         this.currentLocation = location
     }
 
-    override fun startSetupConfigure(profile: GuardianProfile) {
-        setProfile(profile)
+    override fun startSetupConfigure() {
         startFragment(GuardianConfigureFragment.newInstance())
     }
 
@@ -326,9 +345,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                 startFragment(GuardianMicrophoneFragment.newInstance())
             }
             4 -> {
-                this._profiles = profileDb.getProfiles()
                 updateDeploymentState(DeploymentState.Guardian.Config)
-                startFragment(GuardianSelectProfileFragment.newInstance())
+                startFragment(GuardianConfigureFragment.newInstance())
             }
             5 -> {
                 updateDeploymentState(DeploymentState.Guardian.Locate)
@@ -369,6 +387,21 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                     ConnectInstructionDialogFragment()
                 }
         instructionDialog.show(supportFragmentManager, TAG_INSTRUCTION_DIALOG)
+    }
+
+    override fun showSiteLoadingDialog(text: String) {
+        var siteLoadingDialog: SiteLoadingDialogFragment =
+            supportFragmentManager.findFragmentByTag(EdgeDeploymentActivity.TAG_SITE_LOADING_DIALOG) as SiteLoadingDialogFragment?
+                ?: run {
+                    SiteLoadingDialogFragment(text)
+                }
+        if (siteLoadingDialog.isAdded) {
+            siteLoadingDialog.dismiss()
+            siteLoadingDialog = SiteLoadingDialogFragment(text)
+        }
+        siteLoadingDialog.show(supportFragmentManager,
+            EdgeDeploymentActivity.TAG_SITE_LOADING_DIALOG
+        )
     }
 
     override fun showLoading() {
@@ -432,6 +465,10 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         supportActionBar?.apply {
             title = currentCheckName
         }
+    }
+
+    override fun isSiteLoading(): DownloadStreamState {
+        return DownloadStreamsWorker.isRunning()
     }
 
     override fun startMapPicker(latitude: Double, longitude: Double, altitude: Double, name: String) {

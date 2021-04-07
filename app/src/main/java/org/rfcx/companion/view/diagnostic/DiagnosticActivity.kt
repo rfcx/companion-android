@@ -17,23 +17,21 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonArray
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_guardian_diagnostic.*
-import kotlinx.android.synthetic.main.activity_guardian_diagnostic.altitudeValue
-import kotlinx.android.synthetic.main.activity_guardian_diagnostic.deploymentImageRecycler
-import kotlinx.android.synthetic.main.activity_guardian_diagnostic.latitudeValue
-import kotlinx.android.synthetic.main.activity_guardian_diagnostic.longitudeValue
 import kotlinx.android.synthetic.main.toolbar_default.*
+import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.SocketManager
 import org.rfcx.companion.entity.DeploymentImage
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Screen
-import org.rfcx.companion.entity.guardian.*
+import org.rfcx.companion.entity.guardian.GuardianConfiguration
+import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.guardian.getRecordTime
+import org.rfcx.companion.entity.guardian.toReadableFormat
 import org.rfcx.companion.entity.socket.response.Status
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.LocationGroupDb
-import org.rfcx.companion.localdb.guardian.DiagnosticDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
-import org.rfcx.companion.service.DiagnosticSyncWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.detail.*
 import org.rfcx.companion.view.dialog.LoadingDialogFragment
@@ -43,17 +41,10 @@ import org.rfcx.companion.view.prefs.SyncPreferenceListener
 class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (DeploymentImageView) -> Unit {
 
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val diagnosticDb: DiagnosticDb by lazy { DiagnosticDb(realm) }
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val deploymentImageAdapter by lazy { DeploymentImageAdapter(this) }
-
-    private val diagnosticInfo: DiagnosticInfo by lazy {
-        diagnosticDb.getDiagnosticInfo(
-            deploymentServerId
-        )
-    }
 
     private lateinit var deployImageLiveData: LiveData<List<DeploymentImage>>
     private var deploymentImages = listOf<DeploymentImage>()
@@ -163,7 +154,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
             title =
-                if (isConnected != false) locationName else "$locationName (${diagnosticInfo.getRelativeTimeSpan()})"
+                if (isConnected != false) locationName else locationName
         }
     }
 
@@ -211,11 +202,6 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
                     setupCurrentPrefs(prefsData)
                     hideLoading()
                 }
-
-                if (!firstTimeEntered) {
-                    saveNewDiagnostic()
-                }
-                firstTimeEntered = false
             })
         } else {
             setupLastKnownDiagnostic()
@@ -338,11 +324,6 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
         }
     }
 
-    private fun saveNewDiagnostic() {
-        diagnosticDb.insertOrUpdate(this.deploymentServerId)
-        DiagnosticSyncWorker.enqueue(this)
-    }
-
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true
@@ -432,8 +413,9 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
     }
 
     override fun invoke(deploymentImage: DeploymentImageView) {
-        val list = arrayListOf<String>()
-        deploymentImages.forEach { list.add(it.remotePath ?: "file://${it.localPath}") }
+        val list = deploymentImages.map {
+            if (it.remotePath != null) BuildConfig.DEVICE_API_DOMAIN + it.remotePath else "file://${it.localPath}"
+        } as ArrayList
 
         val index = list.indexOf(deploymentImage.remotePath ?: "file://${deploymentImage.localPath}")
         list.removeAt(index)

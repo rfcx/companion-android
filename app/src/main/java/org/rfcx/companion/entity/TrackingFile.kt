@@ -16,8 +16,7 @@ open class TrackingFile(
     var localPath: String = "",
     var remotePath: String? = null,
     @Expose(serialize = false)
-    var syncState: Int = 0,
-    var device: String = ""
+    var syncState: Int = 0
 ) : RealmModel {
     companion object {
         const val TABLE_NAME = "TrackingFile"

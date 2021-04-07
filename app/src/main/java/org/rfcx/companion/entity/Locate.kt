@@ -69,6 +69,8 @@ open class Locate(
         const val FIELD_DELETED_AT = "deletedAt"
         const val FIELD_LAST_EDGE_DEPLOYMENT_SERVER_ID = "lastDeploymentServerId"
         const val FIELD_LAST_EDGE_DEPLOYMENT_ID = "lastDeploymentId"
+        const val FIELD_LAST_GUARDIAN_DEPLOYMENT_SERVER_ID = "lastGuardianDeploymentServerId"
+        const val FIELD_LAST_GUARDIAN_DEPLOYMENT_ID = "lastGuardianDeploymentId"
         const val FIELD_ALTITUDE = "altitude"
         const val FIELD_NAME = "name"
     }

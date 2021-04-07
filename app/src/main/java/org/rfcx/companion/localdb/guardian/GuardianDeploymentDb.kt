@@ -27,6 +27,25 @@ class GuardianDeploymentDb(private val realm: Realm) {
             .findAllAsync()
     }
 
+    fun getAll(sort: Sort = Sort.DESCENDING): RealmResults<GuardianDeployment> {
+        return realm.where(GuardianDeployment::class.java)
+            .isNotNull(GuardianDeployment.FIELD_SERVER_ID)
+            .sort(GuardianDeployment.FIELD_ID, sort)
+            .findAll()
+    }
+
+    fun deleteDeploymentByStreamId(id: String) {
+        realm.executeTransaction {
+            val deployments =
+                it.where(GuardianDeployment::class.java).equalTo("stream.coreId", id)
+                    .findAll()
+            deployments.forEach { dp ->
+                dp.isActive = false
+                dp.syncState = SyncState.Unsent.key
+            }
+        }
+    }
+
     fun insertOrUpdateDeployment(
         deployment: GuardianDeployment,
         location: DeploymentLocation
@@ -38,8 +57,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
                     ?.toInt() ?: 0) + 1
                 deployment.id = id
             }
-            deployment.stream = location // add deploy location
-            it.insertOrUpdate(deployment)
+            deployment.stream = it.copyToRealm(location)
         }
         return id
     }
@@ -54,7 +72,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
             if (deployment != null) {
                 deployment.serverId = deploymentResponse.id
                 deployment.deployedAt = deploymentResponse.deployedAt ?: deployment.deployedAt
-                deployment.wifiName = deploymentResponse.wifi
+                deployment.wifiName = deploymentResponse.wifi ?: ""
 
                 val newConfig = deploymentResponse.configuration
                 if (newConfig != null) {
@@ -72,6 +90,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
                 val id = (it.where(GuardianDeployment::class.java).max(GuardianDeployment.FIELD_ID)
                     ?.toInt() ?: 0) + 1
                 deploymentObj.id = id
+                deploymentObj.isActive = true
                 it.insert(deploymentObj)
             }
         }
@@ -188,7 +207,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
 
     private fun saveDeploymentServerIdToImage(serverId: String, deploymentId: Int) {
         val images =
-            realm.where(DeploymentImage::class.java).equalTo(DeploymentImage.FIELD_ID, deploymentId)
+            realm.where(DeploymentImage::class.java).equalTo(DeploymentImage.FIELD_DEPLOYMENT_ID, deploymentId)
                 .findAll()
         realm.executeTransaction { transition ->
             images?.forEach {
@@ -228,11 +247,11 @@ class GuardianDeploymentDb(private val realm: Realm) {
             // do update location
             val location = if (guardianDeployment?.serverId != null) {
                 bgRealm.where(Locate::class.java)
-                    .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_SERVER_ID, guardianDeployment.serverId)
+                    .equalTo(Locate.FIELD_LAST_GUARDIAN_DEPLOYMENT_SERVER_ID, guardianDeployment.serverId)
                     .findFirst()
             } else {
                 bgRealm.where(Locate::class.java)
-                    .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_ID, id).findFirst()
+                    .equalTo(Locate.FIELD_LAST_GUARDIAN_DEPLOYMENT_ID, id).findFirst()
             }
 
             if (location != null) {
@@ -289,5 +308,41 @@ class GuardianDeploymentDb(private val realm: Realm) {
             realm.close()
             callback.onFailure(it.localizedMessage ?: "")
         })
+    }
+
+    fun updateDeploymentByServerId(deployment: GuardianDeployment) {
+        realm.executeTransaction {
+            it.where(GuardianDeployment::class.java)
+                .equalTo(GuardianDeployment.FIELD_SERVER_ID, deployment.serverId)
+                .findFirst()?.apply {
+                    stream?.coreId = deployment.stream?.coreId
+                }
+        }
+    }
+
+    fun updateIsActive(id: Int) {
+        realm.executeTransaction {
+            val deployment =
+                it.where(GuardianDeployment::class.java).equalTo(GuardianDeployment.FIELD_ID, id)
+                    .findFirst()
+            if (deployment != null) {
+                deployment.isActive = false
+            }
+        }
+    }
+
+    fun getDeploymentsBySiteId(streamId: String): ArrayList<GuardianDeployment> {
+        val deployments = realm.where(GuardianDeployment::class.java)
+            .equalTo(GuardianDeployment.FIELD_STATE, DeploymentState.Guardian.ReadyToUpload.key)
+            .and()
+            .equalTo(GuardianDeployment.FIELD_SYNC_STATE, SyncState.Sent.key)
+            .and()
+            .equalTo("stream.coreId", streamId)
+            .findAllAsync()
+        val arrayOfId = arrayListOf<GuardianDeployment>()
+        deployments.forEach {
+            it?.let { it1 -> arrayOfId.add(it1) }
+        }
+        return arrayOfId
     }
 }
