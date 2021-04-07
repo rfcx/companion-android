@@ -28,14 +28,26 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="@dimen/margin_padding_normal"
+            android:layout_marginStart="@dimen/margin_padding_xlarge"
             android:layout_marginEnd="@dimen/margin_padding_xlarge"
+            android:ellipsize="end"
+            android:maxWidth="@dimen/max_width_project_name"
+            android:singleLine="true"
             android:gravity="center"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Puerto Rico" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_drop_down"
+            android:tint="@color/iconColor"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/projectNameTextView"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -102,11 +114,11 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/trackingLayout"
-        android:background="@drawable/bg_tracking_button"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/tracking_size"
         android:layout_marginStart="@dimen/margin_padding_normal"
         android:layout_marginTop="@dimen/margin_padding_normal"
+        android:background="@drawable/bg_tracking_button"
         android:paddingStart="@dimen/margin_padding_normal"
         android:paddingEnd="@dimen/margin_padding_normal"
         app:layout_constraintStart_toStartOf="parent"
