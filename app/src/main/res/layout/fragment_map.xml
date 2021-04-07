@@ -28,6 +28,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:paddingTop="@dimen/margin_padding_normal"
+            android:paddingBottom="@dimen/margin_padding_normal"
             android:layout_marginStart="@dimen/margin_padding_xlarge"
             android:layout_marginEnd="@dimen/margin_padding_xlarge"
             android:ellipsize="end"
@@ -41,6 +43,7 @@
             tools:text="Puerto Rico" />
 
         <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iconOpenProjectList"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_drop_down"

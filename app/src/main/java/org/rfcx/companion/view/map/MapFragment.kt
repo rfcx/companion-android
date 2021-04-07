@@ -266,23 +266,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         }
 
         projectNameTextView.setOnClickListener {
-            val state = listener?.getBottomSheetState() ?: 0
-            if (state == BottomSheetBehavior.STATE_EXPANDED && searchLayout.visibility != View.VISIBLE) {
-                clearFeatureSelected()
-                listener?.hideBottomSheet()
-            }
+            setOnClickProjectName()
+        }
 
-            projectRecyclerView.visibility = View.VISIBLE
-            searchButton.visibility = View.GONE
-            trackingLayout.visibility = View.GONE
-            hideButtonOnMap()
-            listener?.hideBottomAppBar()
-
-            if (siteRecyclerView.visibility == View.VISIBLE) {
-                searchLayout.visibility = View.GONE
-                hideLabel()
-                searchLayoutSearchEditText.text = null
-            }
+        iconOpenProjectList.setOnClickListener {
+            setOnClickProjectName()
         }
 
         siteRecyclerView.apply {
@@ -294,6 +282,26 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
             layoutManager = LinearLayoutManager(context)
             adapter = locationGroupAdapter
             locationGroupAdapter.screen = Screen.MAP.id
+        }
+    }
+
+    private fun setOnClickProjectName() {
+        val state = listener?.getBottomSheetState() ?: 0
+        if (state == BottomSheetBehavior.STATE_EXPANDED && searchLayout.visibility != View.VISIBLE) {
+            clearFeatureSelected()
+            listener?.hideBottomSheet()
+        }
+
+        projectRecyclerView.visibility = View.VISIBLE
+        searchButton.visibility = View.GONE
+        trackingLayout.visibility = View.GONE
+        hideButtonOnMap()
+        listener?.hideBottomAppBar()
+
+        if (siteRecyclerView.visibility == View.VISIBLE) {
+            searchLayout.visibility = View.GONE
+            hideLabel()
+            searchLayoutSearchEditText.text = null
         }
     }
 
