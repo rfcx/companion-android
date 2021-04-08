@@ -61,14 +61,14 @@ class EdgeCheckListFragment : Fragment(), (Int, String) -> Unit {
         val checkList = arrayListOf<CheckListItem>()
         var number = 0
 
-        checkList.add(CheckListItem.Header("Setup"))
+        checkList.add(CheckListItem.Header(getString(R.string.setup)))
         val setupChecks = requireContext().resources.getStringArray(R.array.edge_setup_checks).toList()
         setupChecks.forEach { name ->
             checkList.add(CheckListItem.CheckItem(number, name, isRequired = true))
             number++
         }
 
-        checkList.add(CheckListItem.Header("Optional"))
+        checkList.add(CheckListItem.Header(getString(R.string.optional)))
         val optionalChecks = requireContext().resources.getStringArray(R.array.edge_optional_checks).toList()
         optionalChecks.forEach { name ->
             checkList.add(CheckListItem.CheckItem(number, name, isRequired = false))

@@ -86,6 +86,11 @@
 
     <!-- EdgeCheckListFragment -->
     <string name="setting_up_edge_checklist">AudioMoth Setup Checklist:</string>
+    <string name="setup">Setup</string>
+    <string name="optional">Optional</string>
+    <string name="set_deployment_site">Set deployment site</string>
+    <string name="synchronize_with_audioMoth">Synchronize with AudioMoth</string>
+    <string name="add_photo">Add Photo(s)</string>
 
     <!--  LocationFragment  -->
     <string name="latitude">Latitude</string>
@@ -333,7 +338,6 @@
     <string name="signal_lost">WiFi hotspot connection lost.\nPlease try again.</string>
 
     <!-- LocationTrackerService -->
-    On-duty and tracking enabled
     <string name="track">Track</string>
     <string name="tracking_enabled">On-duty and tracking enabled</string>
     <string name="location_setting">Please enable your device\'s location settings</string>

@@ -3,14 +3,14 @@
 
     <!--  Common  -->
     <string-array name="theme_more_than_9">
-        <item>Light</item>
-        <item>Dark</item>
-        <item>System Default</item>
+        <item>@string/light_theme</item>
+        <item>@string/dark_theme</item>
+        <item>@string/system_default</item>
     </string-array>
 
     <string-array name="theme_less_than_10">
-        <item>Light</item>
-        <item>Dark</item>
+        <item>@string/light_theme</item>
+        <item>@string/dark_theme</item>
     </string-array>
 
     <!--  Edge  -->
@@ -23,12 +23,12 @@
     </string-array>
 
     <string-array name="edge_setup_checks">
-        <item>Set deployment site</item>
-        <item>Synchronize with AudioMoth</item>
+        <item>@string/set_deployment_site</item>
+        <item>@string/synchronize_with_audioMoth</item>
     </string-array>
 
     <string-array name="edge_optional_checks">
-        <item>Add Photo(s)</item>
+        <item>@string/add_photo</item>
     </string-array>
     
     <!--  Guardian  -->
