@@ -69,9 +69,56 @@ fun getListSite(
             )
         } ?: listOf()
 
-    val sortDate = (edgeLocationsItems + guardianLocationItems).filter { it.date != null }.sortedByDescending { it.date }
+    val sortDate = (edgeLocationsItems + guardianLocationItems).filter { it.date != null }
+        .sortedByDescending { it.date }
     val notDeployment = (edgeLocationsItems + guardianLocationItems).filter { it.date == null }
 
+    return ArrayList(sortDate + notDeployment)
+}
+
+fun getListSiteWithOutCurrentLocation(
+    context: Context,
+    edgeDeployments: List<EdgeDeployment>,
+    guardianDeployments: List<GuardianDeployment>,
+    projectName: String,
+    locations: List<Locate>
+): ArrayList<SiteWithLastDeploymentItem> {
+    var showDeployments = edgeDeployments
+    var guardianShowDeployments = guardianDeployments
+    if (projectName != context.getString(R.string.none)) {
+        showDeployments =
+            showDeployments.filter { it.stream?.project?.name == projectName }
+        guardianShowDeployments =
+            guardianDeployments.filter { it.stream?.project?.name == projectName }
+    }
+
+    val filterLocations = ArrayList(locations.filter { loc ->
+        loc.locationGroup?.name == projectName || projectName == context.getString(
+            R.string.none
+        )
+    })
+
+    val edgeLocationsItems: List<SiteWithLastDeploymentItem> =
+        filterLocations.map {
+            SiteWithLastDeploymentItem(
+                it,
+                showDeployments.find { dp -> dp.stream?.name == it.name }?.deployedAt,
+                null
+            )
+        }
+
+    val guardianLocationItems: List<SiteWithLastDeploymentItem> =
+        filterLocations.map {
+            SiteWithLastDeploymentItem(
+                it,
+                guardianShowDeployments.find { dp -> dp.stream?.name == it.name }?.deployedAt,
+                null
+            )
+        }
+
+    val sortDate = (edgeLocationsItems + guardianLocationItems).filter { it.date != null }
+        .sortedByDescending { it.date }
+    val notDeployment = (edgeLocationsItems + guardianLocationItems).filter { it.date == null }
     return ArrayList(sortDate + notDeployment)
 }
 

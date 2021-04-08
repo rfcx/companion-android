@@ -54,7 +54,12 @@ class SiteAdapter(private val itemClickListener: (Locate) -> Unit) :
             siteNameTextView.text = site.locate.name
             detailTextView.text = site.date?.toTimeSinceStringAlternativeTimeAgo(itemView.context)
                 ?: itemView.context.getString(R.string.no_deployments)
-            distanceTextView.text = site.distance.setFormatLabel()
+            if (site.distance != null) {
+                distanceTextView.visibility = View.VISIBLE
+                distanceTextView.text = site.distance.setFormatLabel()
+            } else {
+                distanceTextView.visibility = View.GONE
+            }
             distanceTextView.visibility =
                 if (site.locate.name == itemView.context.getString(R.string.create_new_site)) View.GONE else View.VISIBLE
             detailTextView.visibility =

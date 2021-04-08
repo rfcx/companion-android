@@ -875,8 +875,16 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                 currentLocation,
                 locations
             )
-            siteAdapter.items = adapterOfSearchSite ?: ArrayList()
+        } else {
+            adapterOfSearchSite = getListSiteWithOutCurrentLocation(
+                requireContext(),
+                showDeployments,
+                showGuardianDeployments,
+                projectName,
+                locations
+            )
         }
+        siteAdapter.items = adapterOfSearchSite ?: ArrayList()
 
         if (adapterOfSearchSite.isNullOrEmpty()) {
             showLabel(false)
