@@ -60,6 +60,7 @@
     <string name="set_hardware_switch_to_custom">Coloque o gravador em CUSTOM</string>
     <string name="lights_audiomoth">As luzes no AudioMoth devem estar: \nVERMELHA E VERDE PISCANDO</string>
     <string name="move_phone_near">Aproxime o telefone perto do AudioMoth</string>
+    <string name="keep_phone_near">Mantenha um telefone perto do AudioMoth</string>
     <string name="two">2) Você ouve um tom de áudio alto?</string>
     <string name="sync_in_progress">Sincronização com AudioMoth em andamento</string>
     <string name="begin_sync">Começo da sincronização</string>

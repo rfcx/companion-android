@@ -20,6 +20,7 @@ import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.view.deployment.EdgeDeploymentProtocol
 import org.rfcx.companion.view.dialog.CompleteFragment
+import java.util.*
 
 class NewSyncFragment : Fragment() {
     private var edgeDeploymentProtocol: EdgeDeploymentProtocol? = null
@@ -142,16 +143,28 @@ class NewSyncFragment : Fragment() {
     }
 
     private fun setLabelColor(view: View) {
+        var isPortuguese = Locale.getDefault().language == "pt"
+
         val spannableString = SpannableString(getString(R.string.lights_audiomoth))
         val red = ForegroundColorSpan(Color.RED) //red color
         val green = ForegroundColorSpan(ContextCompat.getColor(view.context, R.color.colorPrimary)) //green color
-        spannableString.setSpan(red, 32, 41, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        spannableString.setSpan(green, 44, 58, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        if(isPortuguese) {
+            spannableString.setSpan(red, 34, 44, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            spannableString.setSpan(green, 46, 61, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        } else {
+            spannableString.setSpan(red, 32, 41, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            spannableString.setSpan(green, 44, 58, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
         lightsAudiomothTextView.text = spannableString
 
         val confirmLight = SpannableString(getString(R.string.six))
-        confirmLight.setSpan(red, 20, 23, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        confirmLight.setSpan(UnderlineSpan(), 33, 36, 0)
+        if(isPortuguese) {
+            confirmLight.setSpan(red, 22, 30, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            confirmLight.setSpan(UnderlineSpan(), 31, 34, 0)
+        } else {
+            confirmLight.setSpan(red, 20, 23, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            confirmLight.setSpan(UnderlineSpan(), 33, 36, 0)
+        }
         stepSixTextView.text = confirmLight
     }
 
