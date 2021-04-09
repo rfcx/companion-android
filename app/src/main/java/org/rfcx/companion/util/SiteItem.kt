@@ -8,6 +8,8 @@ import org.rfcx.companion.entity.EdgeDeployment
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
+import java.util.*
+import kotlin.collections.ArrayList
 
 private fun findNearLocations(
     locateItems: ArrayList<Locate>,
@@ -51,29 +53,31 @@ fun getListSite(
             )
         }), currentUserLocation)?.sortedBy { it.second }
 
-    val edgeLocationsItems: List<SiteWithLastDeploymentItem> =
+    val locationsItems: List<SiteWithLastDeploymentItem> =
         nearLocations?.map {
             SiteWithLastDeploymentItem(
                 it.first,
-                showDeployments.find { dp -> dp.stream?.name == it.first.name }?.deployedAt,
+                isHaveDeployment(guardianShowDeployments, showDeployments, it.first),
                 it.second
             )
         } ?: listOf()
 
-    val guardianLocationItems: List<SiteWithLastDeploymentItem> =
-        nearLocations?.map {
-            SiteWithLastDeploymentItem(
-                it.first,
-                guardianShowDeployments.find { dp -> dp.stream?.name == it.first.name }?.deployedAt,
-                it.second
-            )
-        } ?: listOf()
-
-    val sortDate = (edgeLocationsItems + guardianLocationItems).filter { it.date != null }
-        .sortedByDescending { it.date }
-    val notDeployment = (edgeLocationsItems + guardianLocationItems).filter { it.date == null }
-
+    val sortDate = locationsItems.filter { it.date != null }.sortedByDescending { it.date }
+    val notDeployment = locationsItems.filter { it.date == null }
     return ArrayList(sortDate + notDeployment)
+}
+
+fun isHaveDeployment(
+    guardians: List<GuardianDeployment>,
+    audioMoths: List<EdgeDeployment>,
+    locate: Locate
+): Date? {
+    val guardianDeployAt = guardians.find { dp -> dp.stream?.name == locate.name }?.deployedAt
+    val audioMothDeployAt = audioMoths.find { dp -> dp.stream?.name == locate.name }?.deployedAt
+
+    return if (audioMothDeployAt != null && guardianDeployAt != null) {
+        if (audioMothDeployAt.time > guardianDeployAt.time) audioMothDeployAt else guardianDeployAt
+    } else audioMothDeployAt ?: guardianDeployAt
 }
 
 fun getListSiteWithOutCurrentLocation(
@@ -98,27 +102,17 @@ fun getListSiteWithOutCurrentLocation(
         )
     })
 
-    val edgeLocationsItems: List<SiteWithLastDeploymentItem> =
+    val locationsItems: List<SiteWithLastDeploymentItem> =
         filterLocations.map {
             SiteWithLastDeploymentItem(
                 it,
-                showDeployments.find { dp -> dp.stream?.name == it.name }?.deployedAt,
+                isHaveDeployment(guardianShowDeployments, showDeployments, it),
                 null
             )
         }
 
-    val guardianLocationItems: List<SiteWithLastDeploymentItem> =
-        filterLocations.map {
-            SiteWithLastDeploymentItem(
-                it,
-                guardianShowDeployments.find { dp -> dp.stream?.name == it.name }?.deployedAt,
-                null
-            )
-        }
-
-    val sortDate = (edgeLocationsItems + guardianLocationItems).filter { it.date != null }
-        .sortedByDescending { it.date }
-    val notDeployment = (edgeLocationsItems + guardianLocationItems).filter { it.date == null }
+    val sortDate = locationsItems.filter { it.date != null }.sortedByDescending { it.date }
+    val notDeployment = locationsItems.filter { it.date == null }
     return ArrayList(sortDate + notDeployment)
 }
 
