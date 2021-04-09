@@ -8,10 +8,8 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
-import android.os.Binder
-import android.os.Build
-import android.os.Bundle
-import android.os.IBinder
+import android.location.LocationProvider
+import android.os.*
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
@@ -21,9 +19,8 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.Coordinate
 import org.rfcx.companion.entity.Tracking
 import org.rfcx.companion.localdb.TrackingDb
-import org.rfcx.companion.util.LocationTracking
-import org.rfcx.companion.util.Preferences
-import org.rfcx.companion.util.RealmHelper
+import org.rfcx.companion.util.*
+import org.rfcx.companion.util.Preferences.Companion.LASTEST_GET_LOCATION_TIME
 import java.util.*
 import kotlin.concurrent.fixedRateTimer
 
@@ -37,17 +34,31 @@ class LocationTrackerService : Service() {
     private var tracking = Tracking()
 
     private var trackingStatTimer: Timer? = null
+    private val handler: Handler = Handler()
 
     private val locationListener = object : LocationListener {
         override fun onLocationChanged(location: Location?) {
             location?.let { saveLocation(it) }
         }
 
-        override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+        override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+            if (status == LocationProvider.TEMPORARILY_UNAVAILABLE) {
+                if ((System.currentTimeMillis() - Preferences.getInstance(this@LocationTrackerService).getLong(LASTEST_GET_LOCATION_TIME, 0L)) > 10 * 1000L) {
+                    getNotificationManager().notify(NOTIFICATION_LOCATION_ID, createLocationTrackerNotification(true))
+                }
 
-        override fun onProviderEnabled(provider: String?) {}
+            } else if (status == LocationProvider.OUT_OF_SERVICE) {
+                getNotificationManager().notify(NOTIFICATION_LOCATION_ID, createLocationTrackerNotification(false))
+            }
+        }
 
-        override fun onProviderDisabled(provider: String?) {}
+        override fun onProviderEnabled(provider: String?) {
+            getNotificationManager().notify(NOTIFICATION_LOCATION_ID, createLocationTrackerNotification(true))
+        }
+
+        override fun onProviderDisabled(provider: String?) {
+            getNotificationManager().notify(NOTIFICATION_LOCATION_ID, createLocationTrackerNotification(false))
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -74,6 +85,7 @@ class LocationTrackerService : Service() {
             altitude = location.altitude
         )
         trackingDb.insertOrUpdate(tracking, coordinate)
+        Preferences.getInstance(this).putLong(LASTEST_GET_LOCATION_TIME, System.currentTimeMillis())
     }
 
     private fun startTracker() {
