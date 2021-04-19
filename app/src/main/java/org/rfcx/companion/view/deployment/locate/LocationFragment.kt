@@ -72,6 +72,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     private var altitude: Double = 0.0
+    private var isFromPicker: Boolean = false
     private var altitudeFromLocation: Double = 0.0
     private var nameLocation: String? = null
     private var group: String? = null
@@ -158,6 +159,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private fun initIntent() {
         arguments?.let {
             val currentLocation = deploymentProtocol?.getCurrentLocation()
+            isFromPicker = it.getBoolean(ARG_FROM_PICKER)
             currentLocation?.let { loc ->
                 latitude = loc.latitude
                 longitude = loc.longitude
@@ -202,30 +204,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
 
         currentLocateView.setOnClickListener {
-            var locate = Locate()
             locateItem?.let {
-                locate = Locate(
-                    it.id,
-                    it.serverId,
-                    getLocationGroup(),
-                    it.name,
-                    currentUserLocation?.latitude ?: it.latitude,
-                    currentUserLocation?.longitude ?: it.longitude,
-                    currentUserLocation?.altitude ?: it.longitude,
-                    it.createdAt,
-                    it.updatedAt,
-                    it.lastDeploymentId,
-                    it.lastDeploymentServerId,
-                    it.lastGuardianDeploymentId,
-                    it.lastGuardianDeploymentServerId,
-                    it.syncState
-                )
-                createSiteSymbol(locate.getLatLng())
-                moveCamera(LatLng(locate.getLatLng()), DEFAULT_ZOOM)
+                updateLocation(currentUserLocation?.latitude ?: it.latitude, currentUserLocation?.longitude ?: it.longitude, currentUserLocation?.altitude ?: it.altitude)
             }
-            this.isUseCurrentLocation = true
-            setWithinText()
-            locateItem = locate
         }
 
         finishButton.setOnClickListener {
@@ -261,20 +242,53 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
 
         viewOfMapBox.setOnClickListener {
-            if (locationNameSpinner.selectedItemPosition == 0) {
-                val name = locationNameEditText.text.toString()
-                startMapPicker(name, altitudeFromLocation)
-                analytics?.trackChangeLocationEvent(Screen.LOCATION.id)
-            }
-        }
+            var name = locationNameEditText.text.toString()
 
+            if (locationNameSpinner.selectedItemPosition != 0) {
+                name = locateItem?.name ?: ""
+            }
+            startMapPicker(name, altitudeFromLocation)
+            analytics?.trackChangeLocationEvent(Screen.LOCATION.id)
+        }
     }
 
     private fun startMapPicker(name: String, altitude: Double) {
         deploymentProtocol?.let {
-            it.startMapPicker(latitude, longitude, altitude, name)
+            if (locationNameSpinner.selectedItemPosition != 0) {
+                it.startMapPicker(locateItem?.latitude ?: latitude, locateItem?.longitude ?: longitude, altitude, name)
+            } else {
+                it.startMapPicker(latitude, longitude, altitude, name)
+            }
             it.hideToolbar()
         }
+    }
+
+    private fun updateLocation(latitude: Double, longitude: Double, altitude: Double) {
+        var locate = Locate()
+        locateItem?.let {
+            locate = Locate(
+                it.id,
+                it.serverId,
+                getLocationGroup(),
+                it.name,
+                latitude,
+                longitude,
+                altitude,
+                it.createdAt,
+                it.updatedAt,
+                it.lastDeploymentId,
+                it.lastDeploymentServerId,
+                it.lastGuardianDeploymentId,
+                it.lastGuardianDeploymentServerId,
+                it.syncState
+            )
+            createSiteSymbol(locate.getLatLng())
+            moveCamera(LatLng(locate.getLatLng()), DEFAULT_ZOOM)
+        }
+        locateItem = locate
+        this.isUseCurrentLocation = true
+        val currentLatLng = LatLng(currentUserLocation?.latitude ?: 0.0, currentUserLocation?.longitude ?: 0.0)
+        setCheckboxForResumeDeployment(currentLatLng, LatLng(latitude, longitude))
     }
 
     private fun startSelectingExistedSite() {
@@ -401,8 +415,14 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         enableExistingLocation(true)
 
         locateItem?.let {
-            createSiteSymbol(it.getLatLng())
-            moveCamera(LatLng(latitude, longitude), it.getLatLng(), DEFAULT_ZOOM)
+            if (isFromPicker) {
+                updateLocation(latitude, longitude, altitude)
+                createSiteSymbol(LatLng(latitude, longitude))
+                moveCamera(LatLng(currentUserLocation?.latitude ?: latitude, currentUserLocation?.longitude ?: longitude), LatLng(latitude, longitude), DEFAULT_ZOOM)
+            } else {
+                createSiteSymbol(it.getLatLng())
+                moveCamera(LatLng(latitude, longitude), it.getLatLng(), DEFAULT_ZOOM)
+            }
             if (locationGroupDb.isExisted(it.locationGroup?.name)) {
                 group = it.locationGroup?.name
                 locationGroupValueTextView.text = it.locationGroup?.name
