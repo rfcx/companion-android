@@ -221,12 +221,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
         }
 
-        changeTextView.setOnClickListener {
-            val name = locationNameEditText.text.toString()
-            startMapPicker(name, altitudeFromLocation)
-            analytics?.trackChangeLocationEvent(Screen.LOCATION.id)
-        }
-
         changeGroupTextView.setOnClickListener {
             val group = locationGroupValueTextView.text.toString()
             val setLocationGroup = if (group == getString(R.string.none)) null else group
@@ -817,7 +811,6 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
     private fun enableExistingLocation(enable: Boolean) {
         locationNameTextInput.visibility = if (enable) View.GONE else View.VISIBLE
-        changeTextView.visibility = if (enable) View.GONE else View.VISIBLE
         changeGroupTextView.visibility = if (enable) View.GONE else View.VISIBLE
         currentLocateGroupView.visibility = if (enable) View.VISIBLE else View.GONE
     }
