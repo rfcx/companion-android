@@ -7,8 +7,6 @@ import android.os.PersistableBundle
 import android.util.TypedValue
 import android.view.View
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.toColorInt
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
@@ -42,7 +40,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
-    private val deploymentImageAdapter by lazy { DeploymentImageAdapter(this) }
+    private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
 
     private lateinit var mapView: MapView
@@ -188,7 +186,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         deploymentImageRecycler.visibility =
             if (deploymentImages.isNotEmpty()) View.VISIBLE else View.GONE
         val items = deploymentImages.map { it.toDeploymentImageView() }
-        deploymentImageAdapter.submitList(items)
+        deploymentImageAdapter.setImages(items)
     }
 
     private fun setupImageRecycler() {
@@ -197,6 +195,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             setHasFixedSize(true)
         }
+        deploymentImageAdapter.setImages(arrayListOf())
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {

@@ -1,6 +1,8 @@
 package org.rfcx.companion.view.detail
 
+import android.content.Context
 import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,54 +10,113 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_detail_image.view.*
+import com.bumptech.glide.Glide
+import kotlinx.android.synthetic.main.item_image.view.*
 import org.rfcx.companion.R
+import org.rfcx.companion.adapter.BaseListItem
 import org.rfcx.companion.entity.SyncState
 import org.rfcx.companion.extension.setDeploymentImage
 import org.rfcx.companion.util.getIdToken
 
-class DeploymentImageAdapter(private val itemClickListener: (DeploymentImageView) -> Unit) : ListAdapter<DeploymentImageView,
-        DeploymentImageAdapter.ImageDetailViewHolder>(DeploymentImageViewDiff()) {
+class DeploymentImageAdapter :
+    ListAdapter<BaseListItem, RecyclerView.ViewHolder>(DeploymentImageViewDiff()) {
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): ImageDetailViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        val view = inflater.inflate(R.layout.item_detail_image, parent, false)
-        return ImageDetailViewHolder(view)
+    private var imagesSource = arrayListOf<BaseListItem>()
+    var onImageAdapterClickListener: OnImageAdapterClickListener? = null
+    private var context: Context? = null
+
+    companion object {
+        const val VIEW_TYPE_IMAGE = 1
+        const val VIEW_TYPE_ADD_IMAGE = 2
+        const val MAX_IMAGE_SIZE = 5
     }
 
-    private class DeploymentImageViewDiff : DiffUtil.ItemCallback<DeploymentImageView>() {
-        override fun areItemsTheSame(
-            oldItem: DeploymentImageView,
-            newItem: DeploymentImageView
-        ): Boolean {
-            return oldItem.id == newItem.id
+    fun getImageCount(): Int =
+        if (imagesSource[imagesSource.count() - 1] is org.rfcx.companion.adapter.AddImageItem) imagesSource.count() - 1
+        else imagesSource.count()
+
+    fun setImages(reportImages: List<DeploymentImageView>) {
+        imagesSource = arrayListOf()
+        var index = 0
+        reportImages.forEach {
+            Log.d("setImages", "${it.remotePath}")
+            if (it.remotePath != null) {
+                imagesSource.add(RemoteImageItem(index, it, false))
+            } else {
+                imagesSource.add(
+                    LocalImageItem(
+                        index,
+                        it,
+                        it.syncState == SyncState.Unsent.key
+                    )
+                )
+            }
+            index++
+        }
+        if (imagesSource.count() < MAX_IMAGE_SIZE) {
+            imagesSource.add(AddImageItem())
         }
 
-        override fun areContentsTheSame(
-            oldItem: DeploymentImageView,
-            newItem: DeploymentImageView
-        ): Boolean {
-            return oldItem.localPath == newItem.localPath &&
-                    oldItem.remotePath == newItem.remotePath &&
-                    oldItem.syncState == newItem.syncState
+        submitList(ArrayList(imagesSource))
+    }
+
+    fun removeAt(index: Int) {
+        if (getItem(imagesSource.count() - 1) is AddImageItem) {
+            imagesSource.removeAt(imagesSource.count() - 1)
+        }
+
+        imagesSource.removeAt(index)
+
+        if (imagesSource.count() < MAX_IMAGE_SIZE) {
+            imagesSource.add(AddImageItem())
+        }
+        submitList(ArrayList(imagesSource))
+    }
+
+    fun getNewAttachImage(): List<String> {
+        return imagesSource.filter {
+            (it is LocalImageItem && it.canDelete)
+        }.map {
+            (it as LocalImageItem).deploymentImage.localPath
         }
     }
 
-    override fun onBindViewHolder(holder: ImageDetailViewHolder, position: Int) {
-        holder.bind(getItem(position))
-        holder.itemView.setOnClickListener {
-            this.itemClickListener(getItem(position))
+    override fun getItemViewType(position: Int): Int {
+        return when (getItem(position)) {
+            is LocalImageItem -> VIEW_TYPE_IMAGE
+            is RemoteImageItem -> VIEW_TYPE_IMAGE
+            is AddImageItem -> VIEW_TYPE_ADD_IMAGE
+            else -> throw IllegalStateException("Item class not found ${getItem(position)::class.java.simpleName}")
         }
     }
 
-    inner class ImageDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val imageView = itemView.imageView
-        private val syncImageView = itemView.syncImageView
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        context = parent.context
+        return when (viewType) {
+            VIEW_TYPE_IMAGE -> {
+                val view = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.item_image, parent, false)
+                ImageAdapterViewHolder(view, onImageAdapterClickListener)
+            }
+            VIEW_TYPE_ADD_IMAGE -> {
+                val view = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.item_add_image, parent, false)
+                AddImageViewHolder(view, onImageAdapterClickListener)
+            }
+            else -> throw IllegalAccessException("View type $viewType not found.")
+        }
+    }
 
-        fun bind(item: DeploymentImageView) {
+    inner class ImageAdapterViewHolder(
+        itemView: View,
+        private val onImageAdapterClickListener: OnImageAdapterClickListener?
+    ) : RecyclerView.ViewHolder(itemView) {
+        private val imageView = itemView.image
+        private val deleteButton = itemView.deleteImageButton
+        private val syncImageView = itemView.syncImage
+
+        fun bind(item: DeploymentImageView, canDelete: Boolean) {
+            syncImageView.visibility = View.VISIBLE
             syncImageView.setImageDrawable(
                 ContextCompat.getDrawable(
                     itemView.context,
@@ -79,6 +140,68 @@ class DeploymentImageAdapter(private val itemClickListener: (DeploymentImageView
                     syncImageView.visibility = View.INVISIBLE
                 }, 2000) // 2s
             }
+
+            itemView.setOnClickListener {
+                onImageAdapterClickListener?.onImageClick(item.localPath)
+            }
+
+            deleteButton.setOnClickListener {
+                onImageAdapterClickListener?.onDeleteImageClick(adapterPosition, item.localPath)
+            }
+            deleteButton.visibility = if (canDelete) View.VISIBLE else View.INVISIBLE
         }
     }
+
+    inner class AddImageViewHolder(
+        itemView: View,
+        private val onImageAdapterClickListener: OnImageAdapterClickListener?
+    ) : RecyclerView.ViewHolder(itemView) {
+        init {
+            itemView.setOnClickListener {
+                onImageAdapterClickListener?.onAddImageClick()
+            }
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (holder is ImageAdapterViewHolder && getItem(position) is LocalImageItem) {
+            val itemImage = getItem(position) as LocalImageItem
+            holder.bind(itemImage.deploymentImage, itemImage.canDelete)
+        } else if (holder is ImageAdapterViewHolder && getItem(position) is RemoteImageItem) {
+            val itemImage = getItem(position) as RemoteImageItem
+            holder.bind(itemImage.deploymentImage, false)
+        }
+    }
+
+    private class DeploymentImageViewDiff : DiffUtil.ItemCallback<BaseListItem>() {
+        override fun areItemsTheSame(oldItem: BaseListItem, newItem: BaseListItem): Boolean {
+            return oldItem.getItemId() == newItem.getItemId()
+        }
+
+        override fun areContentsTheSame(oldItem: BaseListItem, newItem: BaseListItem): Boolean {
+            return if (newItem is org.rfcx.companion.adapter.LocalImageItem && oldItem is org.rfcx.companion.adapter.LocalImageItem) {
+                (newItem.imageId == oldItem.imageId && newItem.localPath == oldItem.localPath)
+            } else newItem is org.rfcx.companion.adapter.RemoteImageItem && oldItem is org.rfcx.companion.adapter.RemoteImageItem
+        }
+    }
+}
+
+data class LocalImageItem(var imageId: Int, val deploymentImage: DeploymentImageView, val canDelete: Boolean) :
+    BaseListItem {
+    override fun getItemId(): Int = imageId
+}
+
+data class RemoteImageItem(var imageId: Int, val deploymentImage: DeploymentImageView, val canDelete: Boolean) :
+    BaseListItem {
+    override fun getItemId(): Int = imageId
+}
+
+data class AddImageItem(val any: Any? = null) : BaseListItem {
+    override fun getItemId(): Int = -11
+}
+
+interface OnImageAdapterClickListener {
+    fun onAddImageClick()
+    fun onImageClick(imagePath: String)
+    fun onDeleteImageClick(position: Int, imagePath: String)
 }
