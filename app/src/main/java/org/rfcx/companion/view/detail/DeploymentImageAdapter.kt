@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -31,9 +32,8 @@ class DeploymentImageAdapter :
         const val MAX_IMAGE_SIZE = 5
     }
 
-    fun getImageCount(): Int =
-        if (imagesSource[imagesSource.count() - 1] is org.rfcx.companion.adapter.AddImageItem) imagesSource.count() - 1
-        else imagesSource.count()
+    fun getImageCount(): Int = if (imagesSource[imagesSource.count() - 1] is AddImageItem) imagesSource.count() - 1
+    else imagesSource.count()
 
     fun setImages(reportImages: List<DeploymentImageView>) {
         imagesSource = arrayListOf()
@@ -66,6 +66,48 @@ class DeploymentImageAdapter :
         }
 
         imagesSource.removeAt(index)
+
+        if (imagesSource.count() < MAX_IMAGE_SIZE) {
+            imagesSource.add(AddImageItem())
+        }
+        submitList(ArrayList(imagesSource))
+    }
+
+    fun addImages(uris: List<String>) {
+        val allLocalPathImages = getNewAttachImage() + uris
+        val groups = allLocalPathImages.groupBy { it }
+        val localPathImages = groups.filter { it.value.size < 2 }
+        val localPathImagesForAdd = ArrayList<String>()
+
+        localPathImages.forEach {
+            if (it.key !in getNewAttachImage()) {
+                localPathImagesForAdd.add(it.key)
+            }
+        }
+
+        if (getItem(imagesSource.count() - 1) is AddImageItem) {
+            imagesSource.removeAt(imagesSource.count() - 1)
+        }
+        var index: Int = if (imagesSource.isEmpty()) 0 else {
+            imagesSource[imagesSource.count() - 1].getItemId() + 1
+        }
+
+        if (localPathImagesForAdd.isNotEmpty()) {
+            if (localPathImagesForAdd.size != uris.size) {
+                Toast.makeText(context, R.string.some_photo_already_exists, Toast.LENGTH_SHORT).show()
+            }
+
+            localPathImagesForAdd.forEach {
+                imagesSource.add(LocalImageItem(index, DeploymentImageView(id= 0, localPath = it, remotePath = null), true))
+                index++
+            }
+        } else {
+            if (uris.size > 1) {
+                Toast.makeText(context, R.string.these_photos_already_exists, Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, R.string.this_photo_already_exists, Toast.LENGTH_SHORT).show()
+            }
+        }
 
         if (imagesSource.count() < MAX_IMAGE_SIZE) {
             imagesSource.add(AddImageItem())
@@ -142,7 +184,7 @@ class DeploymentImageAdapter :
             }
 
             itemView.setOnClickListener {
-                onImageAdapterClickListener?.onImageClick(item.localPath)
+                onImageAdapterClickListener?.onImageClick(item)
             }
 
             deleteButton.setOnClickListener {
@@ -202,6 +244,6 @@ data class AddImageItem(val any: Any? = null) : BaseListItem {
 
 interface OnImageAdapterClickListener {
     fun onAddImageClick()
-    fun onImageClick(imagePath: String)
+    fun onImageClick(deploymentImageView: DeploymentImageView)
     fun onDeleteImageClick(position: Int, imagePath: String)
 }

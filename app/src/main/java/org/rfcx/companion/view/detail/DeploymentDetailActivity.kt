@@ -1,9 +1,13 @@
 package org.rfcx.companion.view.detail
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.provider.MediaStore
+import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -11,6 +15,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -22,6 +27,7 @@ import com.mapbox.pluginscalebar.ScaleBarOptions
 import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_deployment_detail.*
+import kotlinx.android.synthetic.main.buttom_sheet_attach_image_layout.view.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.R
@@ -35,6 +41,10 @@ import org.rfcx.companion.util.*
 import org.rfcx.companion.view.BaseActivity
 import org.rfcx.companion.view.deployment.EdgeDeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
 import org.rfcx.companion.view.deployment.locate.LocationFragment
+import java.io.File
+import androidx.core.content.FileProvider
+import com.zhihu.matisse.Matisse
+import com.zhihu.matisse.MimeType
 
 class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (DeploymentImageView) -> Unit {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
@@ -56,6 +66,11 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         updateDeploymentImages(deploymentImages)
     }
 
+    private var imageFile: File? = null
+    private lateinit var attachImageDialog: BottomSheetDialog
+    private val cameraPermissions by lazy { CameraPermissions(this) }
+    private val galleryPermissions by lazy { GalleryPermissions(this) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Mapbox.getInstance(this, getString(R.string.mapbox_token))
@@ -73,6 +88,9 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         setupToolbar()
         setupImageRecycler()
         deployment?.let { updateDeploymentDetailView(it) }
+
+        setupAttachImageDialog()
+        setupClickListener()
 
         // setup onclick
         deleteButton.setOnClickListener {
@@ -141,11 +159,81 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         }
     }
 
+    private fun setupClickListener() {
+        deploymentImageAdapter.onImageAdapterClickListener = object : OnImageAdapterClickListener {
+            override fun onAddImageClick() {
+                attachImageDialog.show()
+            }
+
+            override fun onImageClick(deploymentImageView: DeploymentImageView) {
+                val list = deploymentImages.map {
+                    if (it.remotePath != null) BuildConfig.DEVICE_API_DOMAIN + it.remotePath else "file://${it.localPath}"
+                } as ArrayList
+
+                val index = list.indexOf(deploymentImageView.remotePath ?: "file://${deploymentImageView.localPath}")
+                list.removeAt(index)
+                list.add(0, deploymentImageView.remotePath ?: "file://${deploymentImageView.localPath}")
+
+                DisplayImageActivity.startActivity(this@DeploymentDetailActivity, list)
+            }
+
+            override fun onDeleteImageClick(position: Int, imagePath: String) {
+                deploymentImageAdapter.removeAt(position)
+                dismissImagePickerOptionsDialog()
+            }
+        }
+
+        deploymentImageAdapter.setImages(arrayListOf())
+        dismissImagePickerOptionsDialog()
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+
+        handleTakePhotoResult(requestCode, resultCode)
+        handleGalleryResult(requestCode, resultCode, data)
+
         if (requestCode == DEPLOYMENT_REQUEST_CODE) {
             forceUpdateDeployment()
         }
+    }
+
+    private fun handleTakePhotoResult(requestCode: Int, resultCode: Int) {
+        if (requestCode != ImageUtils.REQUEST_TAKE_PHOTO) return
+
+        if (resultCode == Activity.RESULT_OK) {
+            imageFile?.let {
+                val pathList = listOf(it.absolutePath)
+                deploymentImageAdapter.addImages(pathList)
+            }
+            dismissImagePickerOptionsDialog()
+
+        } else {
+            // remove file image
+            imageFile?.let {
+                ImageFileUtils.removeFile(it)
+                this.imageFile = null
+            }
+        }
+    }
+
+    private fun handleGalleryResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
+        if (requestCode != ImageUtils.REQUEST_GALLERY || resultCode != Activity.RESULT_OK || intentData == null) return
+
+        val pathList = mutableListOf<String>()
+        val results = Matisse.obtainResult(intentData)
+        results.forEach {
+            val imagePath = ImageFileUtils.findRealPath(this, it)
+            imagePath?.let { path ->
+                pathList.add(path)
+            }
+        }
+        deploymentImageAdapter.addImages(pathList)
+        dismissImagePickerOptionsDialog()
+    }
+
+    private fun dismissImagePickerOptionsDialog() {
+        attachImageDialog.dismiss()
     }
 
     private fun forceUpdateDeployment() {
@@ -277,6 +365,62 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
     override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
         super.onSaveInstanceState(outState, outPersistentState)
         mapView.onSaveInstanceState(outState)
+    }
+
+    private fun setupAttachImageDialog() {
+        val bottomSheetView = layoutInflater.inflate(R.layout.buttom_sheet_attach_image_layout, null)
+
+        bottomSheetView.menuGallery.setOnClickListener {
+            openGallery()
+        }
+
+        bottomSheetView.menuTakePhoto.setOnClickListener {
+            takePhoto()
+        }
+
+        attachImageDialog = BottomSheetDialog(this)
+        attachImageDialog.setContentView(bottomSheetView)
+    }
+
+    private fun takePhoto() {
+        if (!cameraPermissions.allowed()) {
+            imageFile = null
+            cameraPermissions.check { }
+        } else {
+            startTakePhoto()
+        }
+    }
+
+    private fun startTakePhoto() {
+        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        imageFile = ImageUtils.createImageFile()
+        if (imageFile != null) {
+            val photoURI = FileProvider.getUriForFile(this, ImageUtils.FILE_CONTENT_PROVIDER, imageFile!!)
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+            startActivityForResult(takePictureIntent, ImageUtils.REQUEST_TAKE_PHOTO)
+        }
+    }
+
+    private fun openGallery() {
+        if (!galleryPermissions.allowed()) {
+            imageFile = null
+            galleryPermissions.check { }
+        } else {
+            startOpenGallery()
+        }
+    }
+
+    private fun startOpenGallery() {
+        val remainingImage = DeploymentImageAdapter.MAX_IMAGE_SIZE - deploymentImageAdapter.getImageCount()
+        Matisse.from(this)
+            .choose(MimeType.ofImage())
+            .countable(true)
+            .maxSelectable(remainingImage)
+            .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+            .thumbnailScale(0.85f)
+            .imageEngine(GlideV4ImageEngine())
+            .theme(R.style.Matisse_Dracula)
+            .forResult(ImageUtils.REQUEST_GALLERY)
     }
 
     companion object {
