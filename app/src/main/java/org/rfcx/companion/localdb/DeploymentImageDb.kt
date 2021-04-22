@@ -122,7 +122,8 @@ class DeploymentImageDb(private val realm: Realm) {
                         deploymentId = deployment.id,
                         localPath = attachImage,
                         createdAt = imageCreateAt,
-                        device = Device.AUDIOMOTH.value
+                        device = Device.AUDIOMOTH.value,
+                        deploymentServerId = deployment.serverId
                     )
                     it.insertOrUpdate(deploymentImage)
                 }
@@ -140,7 +141,8 @@ class DeploymentImageDb(private val realm: Realm) {
                             deploymentId = guardianDeployment.id,
                             localPath = attachImage,
                             createdAt = imageCreateAt,
-                            device = Device.GUARDIAN.value
+                            device = Device.GUARDIAN.value,
+                            deploymentServerId = guardianDeployment.serverId
                         )
                         it.insertOrUpdate(deploymentImage)
                     }

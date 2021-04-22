@@ -45,6 +45,7 @@ import java.io.File
 import androidx.core.content.FileProvider
 import com.zhihu.matisse.Matisse
 import com.zhihu.matisse.MimeType
+import org.rfcx.companion.service.images.ImageSyncWorker
 
 class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (DeploymentImageView) -> Unit {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
@@ -335,6 +336,10 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         super.onDestroy()
         // remove observer
         deployImageLiveData.removeObserver(deploymentImageObserve)
+        val newImages = deploymentImageAdapter.getNewAttachImage()
+        if(newImages.isNotEmpty()) {
+            deploymentImageDb.insertImage(deployment, null, newImages)
+        }
     }
 
     override fun onStart() {
