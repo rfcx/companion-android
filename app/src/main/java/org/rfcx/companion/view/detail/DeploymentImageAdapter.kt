@@ -117,7 +117,7 @@ class DeploymentImageAdapter :
 
     fun getNewAttachImage(): List<String> {
         return imagesSource.filter {
-            (it is LocalImageItem && it.canDelete)
+            (it is LocalImageItem && it.canDelete && it.deploymentImage.id == 0)
         }.map {
             (it as LocalImageItem).deploymentImage.localPath
         }
@@ -190,7 +190,11 @@ class DeploymentImageAdapter :
             deleteButton.setOnClickListener {
                 onImageAdapterClickListener?.onDeleteImageClick(adapterPosition, item.localPath)
             }
-            deleteButton.visibility = if (canDelete) View.VISIBLE else View.INVISIBLE
+            if (item.id == 0) {
+                deleteButton.visibility = if (canDelete) View.VISIBLE else View.INVISIBLE
+            } else {
+                deleteButton.visibility = View.INVISIBLE
+            }
         }
     }
 

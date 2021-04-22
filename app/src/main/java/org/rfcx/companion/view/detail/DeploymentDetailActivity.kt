@@ -7,7 +7,6 @@ import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.provider.MediaStore
-import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -45,7 +44,6 @@ import java.io.File
 import androidx.core.content.FileProvider
 import com.zhihu.matisse.Matisse
 import com.zhihu.matisse.MimeType
-import org.rfcx.companion.service.images.ImageSyncWorker
 
 class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (DeploymentImageView) -> Unit {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
