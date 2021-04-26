@@ -54,6 +54,7 @@
     <string name="altitude_digits">0123456789.</string>
     <string name="within">Você está atualmente a 20m do local</string>
     <string name="more_than">Você está a %s do local</string>
+    <string name="next">Próximo</string>
 
     <!--  NewSyncFragment  -->
     <string name="set_hardware_switch_to_off">Coloque o gravador em OFF</string>
@@ -65,7 +66,7 @@
     <string name="sync_in_progress">Sincronização com AudioMoth em andamento</string>
     <string name="begin_sync">Começo da sincronização</string>
     <string name="sync_audiomoth">Sincronizar com o AudioMoth</string>
-    <string name="six">6) Confirme que a luz VERMELHA não está ESTÁ PISCANDO</string>
+    <string name="six">6) Confirme que a luz VERMELHA está PISCANDO</string>
     <string name="one_text">1) Sincronização com o AudioMoth começou...</string>
     <string name="two_text">2) Reprodução do tom de áudio inicial...</string>
     <string name="three_text">3) Gravador colocado em modo CUSTOM</string>

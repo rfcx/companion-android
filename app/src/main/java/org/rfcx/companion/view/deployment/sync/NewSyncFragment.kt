@@ -160,7 +160,6 @@ class NewSyncFragment : Fragment() {
         val confirmLight = SpannableString(getString(R.string.six))
         if(isPortuguese) {
             confirmLight.setSpan(red, 22, 30, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-            confirmLight.setSpan(UnderlineSpan(), 31, 34, 0)
         } else {
             confirmLight.setSpan(red, 20, 23, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             confirmLight.setSpan(UnderlineSpan(), 33, 36, 0)
