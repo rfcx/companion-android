@@ -39,7 +39,6 @@ class DeploymentImageAdapter :
         imagesSource = arrayListOf()
         var index = 0
         reportImages.forEach {
-            Log.d("setImages", "${it.remotePath}")
             if (it.remotePath != null) {
                 imagesSource.add(RemoteImageItem(index, it, false))
             } else {
