@@ -30,4 +30,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/syncImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_padding_xsmall"
+        android:contentDescription="@string/sync"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/image"
+        app:layout_constraintStart_toStartOf="@+id/image"
+        app:layout_constraintTop_toTopOf="@+id/image"
+        app:layout_constraintVertical_bias="1"
+        tools:src="@drawable/ic_cloud_done_16dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

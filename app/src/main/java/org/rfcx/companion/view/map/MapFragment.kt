@@ -75,6 +75,7 @@ import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.DownloadImagesWorker
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
+import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.view.deployment.locate.LocationFragment
@@ -1436,6 +1437,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         super.onResume()
         mapView.onResume()
         analytics?.trackScreen(Screen.MAP)
+        context?.let { ImageSyncWorker.enqueue(it) }
     }
 
     override fun onPause() {

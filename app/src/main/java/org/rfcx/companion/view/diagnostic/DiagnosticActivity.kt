@@ -44,7 +44,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
     private val locationGroupDb by lazy { LocationGroupDb(realm) }
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
-    private val deploymentImageAdapter by lazy { DeploymentImageAdapter(this) }
+    private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
 
     private lateinit var deployImageLiveData: LiveData<List<DeploymentImage>>
     private var deploymentImages = listOf<DeploymentImage>()
@@ -144,7 +144,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
         deploymentImageRecycler.visibility =
             if (deploymentImages.isNotEmpty()) View.VISIBLE else View.GONE
         val items = deploymentImages.map { it.toDeploymentImageView() }
-        deploymentImageAdapter.submitList(items)
+        deploymentImageAdapter.setImages(items)
     }
 
     private fun setupToolbar() {
