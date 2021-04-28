@@ -54,6 +54,10 @@ class CompanionRealmMigration : RealmMigration {
         if (oldVersion < 14L && newVersion >= 14L) {
             migrateToV14(realm)
         }
+
+        if (oldVersion < 15L && newVersion >= 15L) {
+            migrateToV15(realm)
+        }
     }
 
     private fun migrateToV2(realm: DynamicRealm) {
@@ -317,6 +321,20 @@ class CompanionRealmMigration : RealmMigration {
         }
         diagnostic?.let {
             realm.schema.remove("DiagnosticInfo")
+        }
+    }
+
+    private fun migrateToV15(realm: DynamicRealm) {
+        val locationGroups = realm.schema.get(LocationGroups.TABLE_NAME)
+        locationGroups?.apply {
+            addField(LocationGroups.LOCATION_MAX_LATITUDE, Double::class.java)
+                .setNullable(LocationGroups.LOCATION_MAX_LATITUDE, true)
+            addField(LocationGroups.LOCATION_MAX_LONGITUDE, Double::class.java)
+                .setNullable(LocationGroups.LOCATION_MAX_LONGITUDE, true)
+            addField(LocationGroups.LOCATION_MIN_LATITUDE, Double::class.java)
+                .setNullable(LocationGroups.LOCATION_MIN_LATITUDE, true)
+            addField(LocationGroups.LOCATION_MIN_LONGITUDE, Double::class.java)
+                .setNullable(LocationGroups.LOCATION_MIN_LONGITUDE, true)
         }
     }
 

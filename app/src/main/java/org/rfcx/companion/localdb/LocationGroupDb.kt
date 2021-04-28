@@ -7,6 +7,7 @@ import io.realm.kotlin.deleteFromRealm
 import org.rfcx.companion.entity.LocationGroups
 import org.rfcx.companion.entity.LocationGroups.Companion.LOCATION_GROUPS_DELETE_AT
 import org.rfcx.companion.entity.SyncState
+import org.rfcx.companion.entity.response.ProjectByIdResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.entity.response.toLocationGroups
 import java.util.*
@@ -98,6 +99,21 @@ class LocationGroupDb(private val realm: Realm) {
                 group.serverId = groupsResponse.id
                 group.name = groupsResponse.name
                 group.color = groupsResponse.color
+            }
+        }
+    }
+
+    fun updateProjectBounds(response: ProjectByIdResponse) {
+        realm.executeTransaction {
+            val project =
+                it.where(LocationGroups::class.java)
+                    .equalTo(LocationGroups.LOCATION_GROUPS_SERVER_ID, response.id)
+                    .findFirst()
+            if (project != null) {
+                project.maxLatitude = response.maxLatitude
+                project.maxLongitude = response.maxLongitude
+                project.minLatitude = response.minLatitude
+                project.minLongitude = response.minLongitude
             }
         }
     }

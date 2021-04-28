@@ -67,6 +67,7 @@ import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.guardian.toMark
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.DeploymentResponse
+import org.rfcx.companion.entity.response.ProjectByIdResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
@@ -818,6 +819,27 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
             )
         ) + locationGroupDb.getLocationGroups()
         locationGroupAdapter.notifyDataSetChanged()
+
+        val updateProjectBounds = it.filter { project -> project.serverId != null && project.maxLatitude == 0.0 }
+        updateProjectBounds.map { projectBounds ->
+            val token = "Bearer ${context?.getIdToken()}"
+            projectBounds.serverId?.let { serverId ->
+                ApiManager.getInstance().getRestApi().getProjectsById(token, serverId)
+                    .enqueue(object : Callback<ProjectByIdResponse> {
+                        override fun onFailure(call: Call<ProjectByIdResponse>, t: Throwable) {}
+
+                        override fun onResponse(
+                            call: Call<ProjectByIdResponse>,
+                            response: Response<ProjectByIdResponse>
+                        ) {
+                            if (response.body() != null && response.body()?.id != null && response.body()?.maxLatitude != null) {
+                                val res = response.body() as ProjectByIdResponse
+                                locationGroupDb.updateProjectBounds(res)
+                            }
+                        }
+                    })
+            }
+        }
     }
 
     private fun combinedData() {
