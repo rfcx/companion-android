@@ -99,6 +99,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
     private var locationEngine: LocationEngine? = null
     private var mapSource: GeoJsonSource? = null
     private var lineSource: GeoJsonSource? = null
+    private var boundsSource: GeoJsonSource? = null
     private var mapFeatures: FeatureCollection? = null
 
     // database manager
@@ -508,9 +509,16 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
             )
 
         lineSource = GeoJsonSource(SOURCE_LINE)
+        boundsSource = GeoJsonSource("line-source", FeatureCollection.fromFeatures(listOf()))
 
         style.addSource(mapSource!!)
         style.addSource(lineSource!!)
+        style.addSource(boundsSource!!)
+
+        style.addLayer(LineLayer("linelayer", "line-source").withProperties(
+            lineWidth(5f),
+            lineColor(Color.parseColor("#D4A5E9"))
+        ))
     }
 
     fun clearFeatureSelected() {
@@ -845,6 +853,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
     private fun combinedData() {
         // hide loading progress
         progressBar.visibility = View.INVISIBLE
+        boundsSource?.setGeoJson(FeatureCollection.fromFeatures(listOf()))
         var showGuardianDeployments = this.guardianDeployments.filter  { it.isCompleted() }
         val usedSitesOnGuardian = showGuardianDeployments.map { it.stream?.coreId }
 
@@ -914,24 +923,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         } else {
             hideLabel()
         }
-    }
 
-    private fun findNearLocations(locateItems: ArrayList<Locate>): List<Pair<Locate, Float>>? {
-        currentUserLocation ?: return null
-
-        if (locateItems.isNotEmpty()) {
-            val itemsWithDistance = arrayListOf<Pair<Locate, Float>>()
-            // Find locate distances
-            locateItems.mapTo(itemsWithDistance, {
-                val loc = Location(LocationManager.GPS_PROVIDER)
-                loc.latitude = it.latitude
-                loc.longitude = it.longitude
-                val distance = loc.distanceTo(this.currentUserLocation) // return in meters
-                Pair(it, distance)
-            })
-            return itemsWithDistance
+        val projectSelected = locationGroups.filter { project -> project.name == projectName}
+        if(projectSelected.isNotEmpty()) {
+            val lngLats = projectSelected[0].toPoints()
+            boundsSource?.setGeoJson(FeatureCollection.fromFeatures(arrayOf(Feature.fromGeometry(LineString.fromLngLats(lngLats)))))
         }
-        return null
     }
 
     private fun getFurthestSiteFromCurrentLocation(

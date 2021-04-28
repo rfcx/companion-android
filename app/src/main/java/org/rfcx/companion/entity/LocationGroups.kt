@@ -2,6 +2,7 @@ package org.rfcx.companion.entity
 
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import com.mapbox.geojson.Point
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
@@ -39,4 +40,14 @@ open class LocationGroups(
 
 fun LocationGroups.toLocationGroup(): LocationGroup {
     return LocationGroup(this.name, this.color, this.serverId)
+}
+
+fun LocationGroups.toPoints(): ArrayList<Point> {
+    val lngLats = ArrayList<Point>()
+    lngLats.add(Point.fromLngLat(this.maxLongitude ?: 0.0, this.minLatitude ?: 0.0))
+    lngLats.add(Point.fromLngLat(this.minLongitude ?: 0.0, this.minLatitude ?: 0.0))
+    lngLats.add(Point.fromLngLat(this.minLongitude ?: 0.0, this.maxLatitude ?: 0.0))
+    lngLats.add(Point.fromLngLat(this.maxLongitude ?: 0.0, this.maxLatitude ?: 0.0))
+    lngLats.add(Point.fromLngLat(this.maxLongitude ?: 0.0, this.minLatitude ?: 0.0))
+    return lngLats
 }
