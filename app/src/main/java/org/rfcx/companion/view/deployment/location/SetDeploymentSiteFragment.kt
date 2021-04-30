@@ -97,9 +97,11 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (L
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setLiveData()
         setupTopBar()
         setupAdapter()
+        setLiveData()
+
+        siteNameEditText.showKeyboard()
     }
 
     private fun combinedData() {
