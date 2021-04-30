@@ -10,6 +10,7 @@ import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.*
 import org.rfcx.companion.R
 
 class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
@@ -49,6 +50,11 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         mapView = view.findViewById(R.id.mapBoxView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
+
+        siteValueTextView.text = siteName
+        coordinatesValueTextView.text = "16.789, 100.1235"
+        altitudeValue.text = "23.3654"
+
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {

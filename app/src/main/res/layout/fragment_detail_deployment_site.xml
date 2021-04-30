@@ -1,9 +1,16 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="org.rfcx.companion.view.deployment.location.DetailDeploymentSiteFragment">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineVertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.55" />
 
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/mapBoxView"
@@ -22,19 +29,164 @@
         app:layout_constraintStart_toStartOf="@id/mapBoxView"
         app:layout_constraintTop_toTopOf="@id/mapBoxView" />
 
+    <LinearLayout
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_margin="@dimen/margin_padding_normal"
+        android:background="@drawable/bg_button_green_outline"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="@id/mapBoxView"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/pinMapIcon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_pin_map"
+            android:tint="@color/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="@id/mapBoxView"
+            app:layout_constraintEnd_toStartOf="@id/arrowIcon" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/arrowIcon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:rotation="180"
+            android:src="@drawable/ic_baseline_arrow_back_24"
+            android:tint="@color/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="@id/mapBoxView"
+            app:layout_constraintEnd_toStartOf="@id/currentLocationIcon" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/currentLocationIcon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_current_location"
+            android:tint="@color/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="@id/mapBoxView"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </LinearLayout>
+
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/withinTextView"
         style="@style/AudioMothText.Body.Secondary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:drawableStart="@drawable/ic_checklist"
-        android:text="@string/within"
-        android:drawablePadding="@dimen/margin_padding_small"
         android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginTop="@dimen/margin_padding_small"
         android:layout_marginEnd="@dimen/margin_padding_large"
+        android:drawableStart="@drawable/ic_checklist"
+        android:drawablePadding="@dimen/margin_padding_small"
+        android:text="@string/within"
         android:textSize="@dimen/text_xsmall"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/mapBoxView" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/siteTitleTextView"
+        style="@style/AudioMothText.Body.Secondary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:text="@string/site"
+        android:textSize="@dimen/text_xsmall"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/withinTextView" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/siteValueTextView"
+        style="@style/AudioMothText.Body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginTop="@dimen/margin_padding_small"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/siteTitleTextView"
+        tools:text="AB01" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/coordinatesTitleTextView"
+        style="@style/AudioMothText.Body.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:text="@string/coordinates"
+        android:textSize="@dimen/text_xsmall"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/siteValueTextView" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/coordinatesValueTextView"
+        style="@style/AudioMothText.Body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginTop="@dimen/margin_padding_small"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/coordinatesTitleTextView"
+        tools:text="16.789, 100.1235" />
+
+    <TextView
+        android:id="@+id/altitudeLabel"
+        style="@style/AudioMothText.Body.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:text="@string/altitude"
+        android:textSize="@dimen/text_xsmall"
+        app:layout_constraintStart_toStartOf="@id/guidelineVertical"
+        app:layout_constraintTop_toBottomOf="@id/siteValueTextView" />
+
+    <TextView
+        android:id="@+id/altitudeValue"
+        style="@style/AudioMothText.Body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_padding_small"
+        app:layout_constraintStart_toStartOf="@id/guidelineVertical"
+        app:layout_constraintTop_toBottomOf="@id/altitudeLabel"
+        tools:text="50.00" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/locationGroupTitleTextView"
+        style="@style/AudioMothText.Body.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:text="@string/location_group"
+        android:textSize="@dimen/text_xsmall"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/altitudeValue" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/locationGroupValueTextView"
+        style="@style/AudioMothText.Body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginTop="@dimen/margin_padding_small"
+        android:text="@string/none"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/locationGroupTitleTextView" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/changeGroupTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/margin_padding_large"
+        android:text="@string/change"
+        android:textAllCaps="true"
+        android:textColor="@color/colorPrimary"
+        android:textSize="@dimen/text_small"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@id/locationGroupValueTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/locationGroupTitleTextView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
