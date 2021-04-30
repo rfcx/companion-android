@@ -31,6 +31,7 @@ import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
 import org.rfcx.companion.view.deployment.locate.SelectingExistedSiteFragment
+import org.rfcx.companion.view.deployment.location.SetDeploymentSiteFragment
 import org.rfcx.companion.view.deployment.sync.NewSyncFragment
 import org.rfcx.companion.view.detail.MapPickerProtocol
 import org.rfcx.companion.view.dialog.*
@@ -323,7 +324,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         when (number) {
             0 -> {
                 updateDeploymentState(DeploymentState.Edge.Locate)
-                startFragment(LocationFragment.newInstance())
+                startFragment(SetDeploymentSiteFragment.newInstance())
             }
             1 -> {
                 updateDeploymentState(DeploymentState.Edge.Sync)

@@ -1,0 +1,45 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="org.rfcx.companion.view.deployment.location.SetDeploymentSiteFragment">
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/siteNameTextInput"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_padding_normal"
+        android:hint="@string/name_location"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/siteNameEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionDone"
+            android:inputType="text"
+            android:lines="1"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_small" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/existedRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        app:layout_constraintTop_toBottomOf="@id/siteNameTextInput" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/noResultFound"
+        style="@style/AudioMothText.Subhead.Bold"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="@string/no_result_found"
+        android:textColor="@color/text_primary"
+        android:visibility="gone" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
