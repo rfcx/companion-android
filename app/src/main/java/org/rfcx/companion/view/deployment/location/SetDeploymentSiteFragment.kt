@@ -2,9 +2,10 @@ package org.rfcx.companion.view.deployment.location
 
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.SearchView
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -19,19 +20,19 @@ import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
-import org.rfcx.companion.util.RealmHelper
-import org.rfcx.companion.util.asLiveData
-import org.rfcx.companion.util.getListSiteWithOutCurrentLocation
+import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
+import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.map.SiteAdapter
 
-class SetDeploymentSiteFragment : Fragment(), (Locate) -> Unit {
+class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (Locate) -> Unit {
 
     // Protocol
     private var deploymentProtocol: BaseDeploymentProtocol? = null
 
     // Adapter
     private val existedSiteAdapter by lazy { SiteAdapter(this) }
+    private var sitesAdapter = arrayListOf<SiteWithLastDeploymentItem>()
 
     // Local database
     val realm: Realm = Realm.getInstance(RealmHelper.migrationConfig())
@@ -66,6 +67,26 @@ class SetDeploymentSiteFragment : Fragment(), (Locate) -> Unit {
         deploymentProtocol = context as BaseDeploymentProtocol
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.search_menu, menu)
+        val searchItem = menu.findItem(R.id.searchView)
+        val searchView: SearchView = searchItem.actionView as SearchView
+        searchView.queryHint = getString(R.string.site_name_hint)
+        searchView.setOnQueryTextListener(this)
+        context?.let {
+            DrawableCompat.setTint(
+                DrawableCompat.wrap(searchItem.icon),
+                ContextCompat.getColor(it, R.color.iconColor)
+            )
+        }
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -83,13 +104,26 @@ class SetDeploymentSiteFragment : Fragment(), (Locate) -> Unit {
 
     private fun combinedData() {
         existedSiteAdapter.items = arrayListOf()
-        existedSiteAdapter.items = getListSiteWithOutCurrentLocation(
-            requireContext(),
-            audioMothDeployments.filter { it.isCompleted() },
-            guardianDeployments.filter { it.isCompleted() },
-            getString(R.string.none),
-            sites
-        )
+        val lasLocation = context?.getLastLocation()
+        if (lasLocation != null) {
+            sitesAdapter = getListSite(
+                requireContext(),
+                audioMothDeployments.filter { it.isCompleted() },
+                guardianDeployments.filter { it.isCompleted() },
+                getString(R.string.none),
+                lasLocation,
+                sites
+            )
+        } else {
+            sitesAdapter = getListSiteWithOutCurrentLocation(
+                requireContext(),
+                audioMothDeployments.filter { it.isCompleted() },
+                guardianDeployments.filter { it.isCompleted() },
+                getString(R.string.none),
+                sites
+            )
+        }
+        existedSiteAdapter.items = sitesAdapter
     }
 
     private fun setupTopBar() {
@@ -123,6 +157,21 @@ class SetDeploymentSiteFragment : Fragment(), (Locate) -> Unit {
                 it
             }
         guardianDeploymentLiveData.observeForever(guardianDeploymentObserve)
+    }
+
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        return true
+    }
+
+    override fun onQueryTextChange(newText: String?): Boolean {
+        if (newText != null) {
+            val text = newText.toLowerCase()
+            val newList: ArrayList<SiteWithLastDeploymentItem> = ArrayList()
+            newList.addAll(sitesAdapter.filter { it.locate.name.toLowerCase().contains(text) })
+            noResultFound.visibility = if (newList.isEmpty()) View.VISIBLE else View.GONE
+            existedSiteAdapter.setFilter(ArrayList(newList))
+        }
+        return true
     }
 
     // On click site item

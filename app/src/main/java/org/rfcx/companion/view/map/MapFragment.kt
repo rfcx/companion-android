@@ -157,6 +157,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                 if (activity != null) {
                     val location = result?.lastLocation
                     location ?: return
+                    context?.let { location.saveLastLocation(it) }
 
                     mapboxMap?.let {
                         this@MapFragment.currentUserLocation = location
@@ -876,6 +877,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                 currentLocation,
                 locations
             )
+            context?.let { currentLocation.saveLastLocation(it) }
         } else {
             adapterOfSearchSite = getListSiteWithOutCurrentLocation(
                 requireContext(),
@@ -1270,6 +1272,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                     DEFAULT_ZOOM_LEVEL
                 )
             }
+            context?.let { currentLatLng.saveLastLocation(it) }
         }
     }
 
