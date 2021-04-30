@@ -47,21 +47,21 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (L
     private var sites = listOf<Locate>()
     private val siteObserve = Observer<List<Locate>> {
         this.sites = it
-        combinedData()
+//        combinedData()
     }
 
     private lateinit var audioMothDeployLiveData: LiveData<List<EdgeDeployment>>
     private var audioMothDeployments = listOf<EdgeDeployment>()
     private val audioMothDeploymentObserve = Observer<List<EdgeDeployment>> {
         this.audioMothDeployments = it
-        combinedData()
+//        combinedData()
     }
 
     private lateinit var guardianDeploymentLiveData: LiveData<List<GuardianDeployment>>
     private var guardianDeployments = listOf<GuardianDeployment>()
     private val guardianDeploymentObserve = Observer<List<GuardianDeployment>> {
         this.guardianDeployments = it
-        combinedData()
+//        combinedData()
     }
 
     private var searchItem: MenuItem? = null
@@ -108,6 +108,19 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (L
         setEditText()
 
         siteNameEditText.showKeyboard()
+
+        existedSiteAdapter.items = arrayListOf(
+            SiteWithLastDeploymentItem(
+                Locate(
+                    id = -1,
+                    name = getString(R.string.create_site, "tree-test"),
+                    latitude = 0.0,
+                    longitude = 0.0
+                ),
+                null,
+                0F
+            )
+        )
     }
 
     private fun setEditText() {
