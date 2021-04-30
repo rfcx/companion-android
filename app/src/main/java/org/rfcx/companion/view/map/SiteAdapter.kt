@@ -60,12 +60,13 @@ class SiteAdapter(private val itemClickListener: (Locate) -> Unit) :
             } else {
                 distanceTextView.visibility = View.GONE
             }
-            distanceTextView.visibility =
-                if (site.locate.name == itemView.context.getString(R.string.create_new_site)) View.GONE else View.VISIBLE
-            detailTextView.visibility =
-                if (site.locate.name == itemView.context.getString(R.string.create_new_site)) View.GONE else View.VISIBLE
-            iconAddImageView.visibility =
-                if (site.locate.name == itemView.context.getString(R.string.create_new_site)) View.VISIBLE else View.GONE
+            setDistanceAndIconAdd(site.locate.latitude == 0.0)
+        }
+
+        private fun setDistanceAndIconAdd(boolean: Boolean) {
+            distanceTextView.visibility = if (boolean) View.GONE else View.VISIBLE
+            detailTextView.visibility = if (boolean) View.GONE else View.VISIBLE
+            iconAddImageView.visibility = if (boolean) View.VISIBLE else View.GONE
         }
     }
 }

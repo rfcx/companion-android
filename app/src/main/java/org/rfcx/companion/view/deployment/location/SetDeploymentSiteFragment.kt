@@ -2,6 +2,8 @@ package org.rfcx.companion.view.deployment.location
 
 import android.content.Context
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.*
 import android.widget.SearchView
 import androidx.core.content.ContextCompat
@@ -13,6 +15,7 @@ import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_set_deployment_site.*
+import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.EdgeDeployment
 import org.rfcx.companion.entity.Locate
@@ -62,6 +65,8 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (L
         combinedData()
     }
 
+    private var searchItem: MenuItem? = null
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         deploymentProtocol = context as BaseDeploymentProtocol
@@ -74,13 +79,14 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (L
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.search_menu, menu)
-        val searchItem = menu.findItem(R.id.searchView)
-        val searchView: SearchView = searchItem.actionView as SearchView
+        searchItem = menu.findItem(R.id.searchView)
+        val menuItem = searchItem
+        val searchView: SearchView = menuItem?.actionView as SearchView
         searchView.queryHint = getString(R.string.site_name_hint)
         searchView.setOnQueryTextListener(this)
         context?.let {
             DrawableCompat.setTint(
-                DrawableCompat.wrap(searchItem.icon),
+                DrawableCompat.wrap(menuItem.icon),
                 ContextCompat.getColor(it, R.color.iconColor)
             )
         }
@@ -100,8 +106,37 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (L
         setupTopBar()
         setupAdapter()
         setLiveData()
+        setEditText()
 
         siteNameEditText.showKeyboard()
+    }
+
+    private fun setEditText() {
+        siteNameEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                searchItem?.isVisible = s?.length == 0
+                if (s?.length == 0) {
+                    existedSiteAdapter.items = sitesAdapter
+                } else {
+                    existedSiteAdapter.items = arrayListOf(
+                        SiteWithLastDeploymentItem(
+                            Locate(
+                                id = -1,
+                                name = getString(R.string.create_site, s.toString()),
+                                latitude = 0.0,
+                                longitude = 0.0
+                            ),
+                            null,
+                            0F
+                        )
+                    )
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
     }
 
     private fun combinedData() {

@@ -428,4 +428,7 @@
 
     <string name="time_second">Just now</string>
     <string name="yesterday">Yesterday</string>
+
+    <!-- SetDeploymentSiteFragment -->
+    <string name="create_site">Create \"%s\"</string>
 </resources>
