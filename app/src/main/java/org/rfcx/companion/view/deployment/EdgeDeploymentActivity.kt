@@ -31,6 +31,7 @@ import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
 import org.rfcx.companion.view.deployment.locate.SelectingExistedSiteFragment
+import org.rfcx.companion.view.deployment.location.DetailDeploymentSiteFragment
 import org.rfcx.companion.view.deployment.location.SetDeploymentSiteFragment
 import org.rfcx.companion.view.deployment.sync.NewSyncFragment
 import org.rfcx.companion.view.detail.MapPickerProtocol
@@ -178,6 +179,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                     super.onBackPressed()
                 }
             }
+            is DetailDeploymentSiteFragment -> startFragment(SetDeploymentSiteFragment.newInstance())
             is ChooseDeviceFragment -> finish()
             else -> startCheckList()
         }
@@ -189,6 +191,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     override fun startSelectingExistedSite(latitude: Double, longitude: Double) {
         startFragment(SelectingExistedSiteFragment.newInstance(latitude, longitude))
+    }
+
+    override fun startDetailDeploymentSite(id: Int, name: String?) {
+        startFragment(DetailDeploymentSiteFragment.newInstance(id, name))
     }
 
     override fun getDeployment(): EdgeDeployment? {

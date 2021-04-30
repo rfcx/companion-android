@@ -15,7 +15,6 @@ import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_set_deployment_site.*
-import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.EdgeDeployment
 import org.rfcx.companion.entity.Locate
@@ -213,7 +212,7 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (L
 
     // On click site item
     override fun invoke(site: Locate) {
-        TODO("Not yet implemented")
+        deploymentProtocol?.startDetailDeploymentSite(site.id, site.name)
     }
 
     override fun onDestroy() {

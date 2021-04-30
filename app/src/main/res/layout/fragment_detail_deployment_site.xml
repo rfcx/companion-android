@@ -1,0 +1,40 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="org.rfcx.companion.view.deployment.location.DetailDeploymentSiteFragment">
+
+    <com.mapbox.mapboxsdk.maps.MapView
+        android:id="@+id/mapBoxView"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/viewOfMapBox"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@id/mapBoxView"
+        app:layout_constraintEnd_toEndOf="@id/mapBoxView"
+        app:layout_constraintStart_toStartOf="@id/mapBoxView"
+        app:layout_constraintTop_toTopOf="@id/mapBoxView" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/withinTextView"
+        style="@style/AudioMothText.Body.Secondary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/ic_checklist"
+        android:text="@string/within"
+        android:drawablePadding="@dimen/margin_padding_small"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginTop="@dimen/margin_padding_small"
+        android:layout_marginEnd="@dimen/margin_padding_large"
+        android:textSize="@dimen/text_xsmall"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/mapBoxView" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
