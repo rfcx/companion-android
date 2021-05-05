@@ -30,6 +30,11 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_detail_deployment_site.*
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.altitudeValue
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.locationGroupValueTextView
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.siteValueTextView
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.withinTextView
+import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.LocationGroup
@@ -154,6 +159,39 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 handleExistLocate()
             }
         }
+
+        currentLocate.setOnClickListener {
+            site?.let {
+                updateLocation(currentUserLocation?.latitude ?: it.latitude, currentUserLocation?.longitude ?: it.longitude, currentUserLocation?.altitude ?: it.altitude)
+            }
+        }
+    }
+
+    private fun updateLocation(latitude: Double, longitude: Double, altitude: Double) {
+        var locate = Locate()
+        site?.let {
+            locate = Locate(
+                it.id,
+                it.serverId,
+                getLocationGroup(),
+                it.name,
+                latitude,
+                longitude,
+                altitude,
+                it.createdAt,
+                it.updatedAt,
+                it.lastDeploymentId,
+                it.lastDeploymentServerId,
+                it.lastGuardianDeploymentId,
+                it.lastGuardianDeploymentServerId,
+                it.syncState
+            )
+            createSiteSymbol(locate.getLatLng())
+            moveCamera(LatLng(locate.getLatLng()), DEFAULT_ZOOM)
+        }
+        site = locate
+        val currentLatLng = LatLng(currentUserLocation?.latitude ?: 0.0, currentUserLocation?.longitude ?: 0.0)
+        setCheckboxForResumeDeployment(currentLatLng, LatLng(latitude, longitude))
     }
 
     private fun createSite() {
@@ -369,6 +407,11 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             )
         )
     }
+
+    private fun moveCamera(latLng: LatLng, zoom: Double) {
+        mapboxMap?.moveCamera(MapboxCameraUtils.calculateLatLngForZoom(latLng, null, zoom))
+    }
+
 
     private fun setCheckboxForResumeDeployment(curLoc: LatLng, target: LatLng) {
         val distance = curLoc.distanceTo(target)
