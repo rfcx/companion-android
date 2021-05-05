@@ -62,6 +62,10 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                             val latLng =
                                 LatLng(currentUserLocation.latitude, currentUserLocation.longitude)
                             moveCamera(latLng, null, DEFAULT_ZOOM)
+                            setCheckboxForResumeDeployment(
+                                currentUserLocation.toLatLng(),
+                                context?.getLastLocation()?.toLatLng() ?: LatLng()
+                            )
                         }
                     }
                 }
@@ -239,6 +243,35 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 zoom
             )
         )
+    }
+
+    private fun setCheckboxForResumeDeployment(curLoc: LatLng, target: LatLng) {
+        val distance = curLoc.distanceTo(target)
+        if (distance <= 20) {
+            setWithinText()
+        } else {
+            setNotWithinText(distance.setFormatLabel())
+        }
+    }
+
+    private fun setWithinText() {
+        withinTextView.text = getString(R.string.within)
+        withinTextView.setCompoundDrawablesWithIntrinsicBounds(
+            R.drawable.ic_checklist_passed,
+            0,
+            0,
+            0
+        )
+    }
+
+    private fun setNotWithinText(distance: String) {
+        withinTextView.setCompoundDrawablesWithIntrinsicBounds(
+            R.drawable.ic_checklist_cross,
+            0,
+            0,
+            0
+        )
+        withinTextView.text = getString(R.string.more_than, distance)
     }
 
     override fun onStart() {
