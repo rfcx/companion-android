@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import com.mapbox.android.core.location.*
 import com.mapbox.mapboxsdk.Mapbox
@@ -23,12 +24,11 @@ import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import kotlinx.android.synthetic.main.fragment_detail_deployment_site.*
 import org.rfcx.companion.R
-import org.rfcx.companion.util.latitudeCoordinates
-import org.rfcx.companion.util.longitudeCoordinates
-import org.rfcx.companion.util.setFormatLabel
-import org.rfcx.companion.util.toLatLng
+import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.map.MapboxCameraUtils
 
@@ -37,6 +37,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     // Mapbox
     private var mapboxMap: MapboxMap? = null
     private lateinit var mapView: MapView
+    private var symbolManager: SymbolManager? = null
 
     // Arguments
     var siteId: Int = 0
@@ -60,7 +61,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                         currentUserLocation?.let { currentUserLocation ->
                             val latLng =
                                 LatLng(currentUserLocation.latitude, currentUserLocation.longitude)
-                            moveCamera(latLng, null, LocationFragment.DEFAULT_ZOOM)
+                            moveCamera(latLng, null, DEFAULT_ZOOM)
                         }
                     }
                 }
@@ -125,8 +126,32 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         mapboxMap.uiSettings.isAttributionEnabled = false
         mapboxMap.uiSettings.isLogoEnabled = false
         mapboxMap.setStyle(Style.OUTDOORS) {
+            setupSymbolManager(it)
+            createSiteSymbol(context?.getLastLocation()?.toLatLng() ?: LatLng())
             enableLocationComponent()
         }
+    }
+
+    private fun setupSymbolManager(style: Style) {
+        this.mapboxMap?.let { mapboxMap ->
+            symbolManager = SymbolManager(this.mapView, mapboxMap, style)
+            symbolManager?.iconAllowOverlap = true
+
+            style.addImage(
+                PROPERTY_MARKER_IMAGE,
+                ResourcesCompat.getDrawable(this.resources, R.drawable.ic_pin_map, null)!!
+            )
+        }
+    }
+
+    private fun createSiteSymbol(latLng: LatLng) {
+        symbolManager?.deleteAll()
+        symbolManager?.create(
+            SymbolOptions()
+                .withLatLng(latLng)
+                .withIconImage(PROPERTY_MARKER_IMAGE)
+                .withIconSize(0.75f)
+        )
     }
 
     private fun hasPermissions(): Boolean {
@@ -250,6 +275,9 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         private const val ARG_SITE_ID = "ARG_SITE_ID"
         private const val ARG_SITE_NAME = "ARG_SITE_NAME"
         private const val ARG_IS_CREATE_NEW = "ARG_IS_CREATE_NEW"
+
+        const val PROPERTY_MARKER_IMAGE = "marker.image"
+        const val DEFAULT_ZOOM = 15.0
 
         @JvmStatic
         fun newInstance(id: Int, name: String?, isCreateNew: Boolean = false) =
