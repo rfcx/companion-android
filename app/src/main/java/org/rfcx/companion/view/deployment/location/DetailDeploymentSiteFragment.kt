@@ -1,17 +1,34 @@
 package org.rfcx.companion.view.deployment.location
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.pm.PackageManager
+import android.location.Location
+import android.os.Build
 import android.os.Bundle
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.mapbox.android.core.location.*
 import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
+import com.mapbox.mapboxsdk.location.LocationComponentOptions
+import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import kotlinx.android.synthetic.main.fragment_detail_deployment_site.*
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.altitudeValue
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.siteValueTextView
 import org.rfcx.companion.R
+import org.rfcx.companion.view.deployment.locate.LocationFragment
+import org.rfcx.companion.view.map.MapboxCameraUtils
 
 class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
 
@@ -22,6 +39,23 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     // Arguments
     var siteId: Int = 0
     var siteName: String = ""
+
+    // Location
+    private var currentUserLocation: Location? = null
+    private var locationEngine: LocationEngine? = null
+    private val mapboxLocationChangeCallback =
+        object : LocationEngineCallback<LocationEngineResult> {
+            override fun onSuccess(result: LocationEngineResult?) {
+                if (activity != null) {
+                    val location = result?.lastLocation
+                    location ?: return
+
+                    currentUserLocation = location
+                }
+            }
+
+            override fun onFailure(exception: Exception) {}
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +96,89 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         mapboxMap.uiSettings.setAllGesturesEnabled(false)
         mapboxMap.uiSettings.isAttributionEnabled = false
         mapboxMap.uiSettings.isLogoEnabled = false
-        mapboxMap.setStyle(Style.OUTDOORS) { }
+        mapboxMap.setStyle(Style.OUTDOORS) {
+            enableLocationComponent()
+        }
+    }
+
+    private fun hasPermissions(): Boolean {
+        val permissionState = context?.let {
+            ActivityCompat.checkSelfPermission(
+                it,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        }
+        return permissionState == PackageManager.PERMISSION_GRANTED
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun enableLocationComponent() {
+        if (hasPermissions()) {
+            val loadedMapStyle = mapboxMap?.style
+            val locationComponent = mapboxMap?.locationComponent
+            // Activate the LocationComponent
+            val customLocationComponentOptions = context?.let {
+                LocationComponentOptions.builder(it)
+                    .trackingGesturesManagement(true)
+                    .accuracyColor(ContextCompat.getColor(it, R.color.colorPrimary))
+                    .build()
+            }
+
+            val locationComponentActivationOptions =
+                context?.let {
+                    LocationComponentActivationOptions.builder(it, loadedMapStyle!!)
+                        .locationComponentOptions(customLocationComponentOptions)
+                        .build()
+                }
+
+            mapboxMap?.let { it ->
+                it.locationComponent.apply {
+                    if (locationComponentActivationOptions != null) {
+                        activateLocationComponent(locationComponentActivationOptions)
+                    }
+
+                    isLocationComponentEnabled = true
+                    renderMode = RenderMode.COMPASS
+                }
+            }
+
+            this.currentUserLocation = locationComponent?.lastKnownLocation
+            initLocationEngine()
+        } else {
+            requestPermissions()
+        }
+    }
+
+    private fun requestPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            activity?.requestPermissions(
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LocationFragment.REQUEST_PERMISSIONS_REQUEST_CODE
+            )
+        } else {
+            throw Exception("Request permissions not required before API 23 (should never happen)")
+        }
+    }
+
+    /**
+     * Set up the LocationEngine and the parameters for querying the device's location
+     */
+    @SuppressLint("MissingPermission")
+    private fun initLocationEngine() {
+        locationEngine = context?.let { LocationEngineProvider.getBestLocationEngine(it) }
+        val request = LocationEngineRequest.Builder(LocationFragment.DEFAULT_INTERVAL_IN_MILLISECONDS)
+            .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
+            .setMaxWaitTime(LocationFragment.DEFAULT_MAX_WAIT_TIME).build()
+        locationEngine?.requestLocationUpdates(
+            request,
+            mapboxLocationChangeCallback,
+            Looper.getMainLooper()
+        )
+        locationEngine?.getLastLocation(mapboxLocationChangeCallback)
+    }
+
+    private fun moveCamera(userPosition: LatLng, nearestSite: LatLng?, zoom: Double) {
+        mapboxMap?.moveCamera(MapboxCameraUtils.calculateLatLngForZoom(userPosition, nearestSite, zoom))
     }
 
     override fun onStart() {
