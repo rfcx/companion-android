@@ -27,12 +27,20 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import kotlinx.android.synthetic.main.fragment_detail_deployment_site.*
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.altitudeValue
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.locationGroupValueTextView
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.siteValueTextView
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.withinTextView
 import org.rfcx.companion.R
+import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.map.MapboxCameraUtils
+import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 
 class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
+    private val analytics by lazy { context?.let { Analytics(it) } }
+    private val preferences by lazy { context?.let { Preferences.getInstance(it) } }
 
     // Mapbox
     private var mapboxMap: MapboxMap? = null
@@ -45,6 +53,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     var isCreateNew: Boolean = false
 
     // Location
+    private var group: String? = null
     private var currentUserLocation: Location? = null
     private var locationEngine: LocationEngine? = null
     private val mapboxLocationChangeCallback =
@@ -103,6 +112,19 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
         updateView()
+
+        changeProjectTextView.setOnClickListener {
+            val group = locationGroupValueTextView.text.toString()
+            val setLocationGroup = if (group == getString(R.string.none)) null else group
+            context?.let { it1 ->
+                LocationGroupActivity.startActivity(
+                    it1,
+                    setLocationGroup,
+                    Screen.DETAIL_DEPLOYMENT_SITE.id
+                )
+                analytics?.trackChangeLocationGroupEvent(Screen.DETAIL_DEPLOYMENT_SITE.id)
+            }
+        }
     }
 
     fun updateView() {
@@ -111,7 +133,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             setLatLngLabel(it.toLatLng())
         }
         siteValueTextView.text = siteName
-        changeGroupTextView.visibility = if (isCreateNew) View.VISIBLE else View.GONE
+        changeProjectTextView.visibility = if (isCreateNew) View.VISIBLE else View.GONE
     }
 
     private fun setLatLngLabel(location: LatLng) {
@@ -282,6 +304,12 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     override fun onResume() {
         super.onResume()
         mapView.onResume()
+
+        val selectedProject = preferences?.getString(Preferences.SELECTED_PROJECT, getString(R.string.none)) ?: getString(R.string.none)
+        val selectedGroup = preferences?.getString(Preferences.GROUP)
+
+        group = selectedGroup ?: selectedProject
+        locationGroupValueTextView.text = group
     }
 
     override fun onPause() {

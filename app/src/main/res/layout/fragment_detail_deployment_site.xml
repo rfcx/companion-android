@@ -176,7 +176,7 @@
         app:layout_constraintTop_toBottomOf="@id/locationGroupTitleTextView" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/changeGroupTextView"
+        android:id="@+id/changeProjectTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/margin_padding_large"
