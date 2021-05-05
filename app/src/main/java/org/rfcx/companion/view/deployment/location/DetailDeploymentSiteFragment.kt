@@ -2,8 +2,10 @@ package org.rfcx.companion.view.deployment.location
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Looper
@@ -32,8 +34,12 @@ import kotlinx.android.synthetic.main.fragment_detail_deployment_site.locationGr
 import kotlinx.android.synthetic.main.fragment_detail_deployment_site.siteValueTextView
 import kotlinx.android.synthetic.main.fragment_detail_deployment_site.withinTextView
 import org.rfcx.companion.R
+import org.rfcx.companion.entity.Locate
+import org.rfcx.companion.entity.LocationGroup
+import org.rfcx.companion.entity.LocationGroups
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.*
+import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.map.MapboxCameraUtils
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
@@ -41,6 +47,7 @@ import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     private val analytics by lazy { context?.let { Analytics(it) } }
     private val preferences by lazy { context?.let { Preferences.getInstance(it) } }
+    private var deploymentProtocol: BaseDeploymentProtocol? = null
 
     // Mapbox
     private var mapboxMap: MapboxMap? = null
@@ -54,6 +61,9 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
 
     // Location
     private var group: String? = null
+    private var latitude: Double = 0.0
+    private var longitude: Double = 0.0
+    private var altitude: Double = 0.0
     private var currentUserLocation: Location? = null
     private var locationEngine: LocationEngine? = null
     private val mapboxLocationChangeCallback =
@@ -105,6 +115,11 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         return inflater.inflate(R.layout.fragment_detail_deployment_site, container, false)
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        deploymentProtocol = context as BaseDeploymentProtocol
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -124,6 +139,48 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 )
                 analytics?.trackChangeLocationGroupEvent(Screen.DETAIL_DEPLOYMENT_SITE.id)
             }
+        }
+
+        nextButton.setOnClickListener {
+            analytics?.trackSaveLocationEvent(Screen.LOCATION.id)
+            this.altitude = currentUserLocation?.altitude ?: 0.0
+            if (isCreateNew) {
+                getLastLocation()
+                createSite()
+            }
+        }
+    }
+
+    private fun createSite() {
+        val name = siteValueTextView.text.toString()
+        currentUserLocation?.let {
+            val locate = Locate(
+                name = name,
+                latitude = it.latitude,
+                longitude = it.longitude,
+                altitude = altitude,
+                locationGroup = getLocationGroup()
+            )
+            deploymentProtocol?.setDeployLocation(locate, false)
+            deploymentProtocol?.nextStep()
+        }
+    }
+
+    private fun getLocationGroup(): LocationGroup {
+        val group = this.group ?: getString(R.string.none)
+        val locationGroup = deploymentProtocol?.getLocationGroup(group) ?: LocationGroups()
+        return LocationGroup(locationGroup.name, locationGroup.color, locationGroup.serverId)
+    }
+
+    private fun getLastLocation() {
+        if (latitude != 0.0 && longitude != 0.0) {
+            val loc = Location(LocationManager.GPS_PROVIDER)
+            loc.latitude = latitude
+            loc.longitude = longitude
+            currentUserLocation = loc
+        } else {
+            currentUserLocation = currentUserLocation
+                ?: deploymentProtocol?.getCurrentLocation() // get new current location
         }
     }
 
@@ -305,7 +362,9 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         super.onResume()
         mapView.onResume()
 
-        val selectedProject = preferences?.getString(Preferences.SELECTED_PROJECT, getString(R.string.none)) ?: getString(R.string.none)
+        val selectedProject =
+            preferences?.getString(Preferences.SELECTED_PROJECT, getString(R.string.none))
+                ?: getString(R.string.none)
         val selectedGroup = preferences?.getString(Preferences.GROUP)
 
         group = selectedGroup ?: selectedProject
