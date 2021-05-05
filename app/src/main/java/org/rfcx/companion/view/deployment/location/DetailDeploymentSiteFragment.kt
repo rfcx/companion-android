@@ -150,6 +150,8 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             if (isCreateNew) {
                 getLastLocation()
                 createSite()
+            } else {
+                handleExistLocate()
             }
         }
     }
@@ -165,6 +167,29 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 locationGroup = getLocationGroup()
             )
             deploymentProtocol?.setDeployLocation(locate, false)
+            deploymentProtocol?.nextStep()
+        }
+    }
+
+    private fun handleExistLocate() {
+        site?.let {
+            val locate = Locate(
+                it.id,
+                it.serverId,
+                getLocationGroup(),
+                it.name,
+                it.latitude,
+                it.longitude,
+                currentUserLocation?.altitude ?: it.longitude,
+                it.createdAt,
+                it.updatedAt,
+                it.lastDeploymentId,
+                it.lastDeploymentServerId,
+                it.lastGuardianDeploymentId,
+                it.lastGuardianDeploymentServerId,
+                it.syncState
+            )
+            deploymentProtocol?.setDeployLocation(locate, true)
             deploymentProtocol?.nextStep()
         }
     }
