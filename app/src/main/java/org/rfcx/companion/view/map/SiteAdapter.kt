@@ -19,6 +19,8 @@ class SiteAdapter(private val itemClickListener: (Locate) -> Unit) :
             notifyDataSetChanged()
         }
 
+    var isNewSite = false
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -51,7 +53,10 @@ class SiteAdapter(private val itemClickListener: (Locate) -> Unit) :
         private val iconAddImageView = itemView.iconAddImageView
 
         fun bind(site: SiteWithLastDeploymentItem) {
-            siteNameTextView.text = site.locate.name
+            siteNameTextView.text = if (isNewSite) itemView.context.getString(
+                R.string.create_site,
+                site.locate.name
+            ) else site.locate.name
             detailTextView.text = site.date?.toTimeSinceStringAlternativeTimeAgo(itemView.context)
                 ?: itemView.context.getString(R.string.no_deployments)
             if (site.distance != null) {

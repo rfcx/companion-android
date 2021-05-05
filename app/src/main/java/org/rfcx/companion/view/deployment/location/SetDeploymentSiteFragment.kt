@@ -109,11 +109,13 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (L
 
         siteNameEditText.showKeyboard()
 
+        // delete --->
+        existedSiteAdapter.isNewSite = true
         existedSiteAdapter.items = arrayListOf(
             SiteWithLastDeploymentItem(
                 Locate(
                     id = -1,
-                    name = getString(R.string.create_site, "tree-test"),
+                    name = "tree-test",
                     latitude = 0.0,
                     longitude = 0.0
                 ),
@@ -121,6 +123,7 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (L
                 0F
             )
         )
+        // < ---- delete
     }
 
     private fun setEditText() {
@@ -128,13 +131,15 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (L
             override fun afterTextChanged(s: Editable?) {
                 searchItem?.isVisible = s?.length == 0
                 if (s?.length == 0) {
+                    existedSiteAdapter.isNewSite = false
                     existedSiteAdapter.items = sitesAdapter
                 } else {
+                    existedSiteAdapter.isNewSite = true
                     existedSiteAdapter.items = arrayListOf(
                         SiteWithLastDeploymentItem(
                             Locate(
                                 id = -1,
-                                name = getString(R.string.create_site, s.toString()),
+                                name = s.toString(),
                                 latitude = 0.0,
                                 longitude = 0.0
                             ),
@@ -172,6 +177,7 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (L
                 sites
             )
         }
+        existedSiteAdapter.isNewSite = false
         existedSiteAdapter.items = sitesAdapter
     }
 

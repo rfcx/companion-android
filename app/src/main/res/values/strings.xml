@@ -430,5 +430,5 @@
     <string name="yesterday">Yesterday</string>
 
     <!-- SetDeploymentSiteFragment -->
-    <string name="create_site">Create \"%s\"</string>
+    <string name="create_site">Create \"%s\"</string> <!-- If change this text, should edit logic in DetailDeploymentSiteFragment -->
 </resources>
