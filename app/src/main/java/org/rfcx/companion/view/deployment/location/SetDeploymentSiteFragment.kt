@@ -47,21 +47,21 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (L
     private var sites = listOf<Locate>()
     private val siteObserve = Observer<List<Locate>> {
         this.sites = it
-//        combinedData()
+        setupView()
     }
 
     private lateinit var audioMothDeployLiveData: LiveData<List<EdgeDeployment>>
     private var audioMothDeployments = listOf<EdgeDeployment>()
     private val audioMothDeploymentObserve = Observer<List<EdgeDeployment>> {
         this.audioMothDeployments = it
-//        combinedData()
+        setupView()
     }
 
     private lateinit var guardianDeploymentLiveData: LiveData<List<GuardianDeployment>>
     private var guardianDeployments = listOf<GuardianDeployment>()
     private val guardianDeploymentObserve = Observer<List<GuardianDeployment>> {
         this.guardianDeployments = it
-//        combinedData()
+        setupView()
     }
 
     private var searchItem: MenuItem? = null
@@ -102,28 +102,12 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (L
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupTopBar()
         setupAdapter()
+        setupTopBar()
         setLiveData()
+        setupView()
         setEditText()
-
         siteNameEditText.showKeyboard()
-
-        // delete --->
-        existedSiteAdapter.isNewSite = true
-        existedSiteAdapter.items = arrayListOf(
-            SiteWithLastDeploymentItem(
-                Locate(
-                    id = -1,
-                    name = "tree-test",
-                    latitude = 0.0,
-                    longitude = 0.0
-                ),
-                null,
-                0F
-            )
-        )
-        // < ---- delete
     }
 
     private fun setEditText() {
@@ -156,7 +140,7 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (L
         })
     }
 
-    private fun combinedData() {
+    private fun setupView() {
         existedSiteAdapter.items = arrayListOf()
         val lasLocation = context?.getLastLocation()
         if (lasLocation != null) {
