@@ -124,3 +124,7 @@ fun Context.getLastLocation(): Location? {
 
     return lastLocate
 }
+
+fun Location.toLatLng(): LatLng {
+    return LatLng(this.latitude, this.longitude)
+}

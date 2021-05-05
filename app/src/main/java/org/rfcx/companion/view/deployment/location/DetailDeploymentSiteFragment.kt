@@ -24,9 +24,11 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import kotlinx.android.synthetic.main.fragment_detail_deployment_site.*
-import kotlinx.android.synthetic.main.fragment_detail_deployment_site.altitudeValue
-import kotlinx.android.synthetic.main.fragment_detail_deployment_site.siteValueTextView
 import org.rfcx.companion.R
+import org.rfcx.companion.util.latitudeCoordinates
+import org.rfcx.companion.util.longitudeCoordinates
+import org.rfcx.companion.util.setFormatLabel
+import org.rfcx.companion.util.toLatLng
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.map.MapboxCameraUtils
 
@@ -53,9 +55,11 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
 
                     currentUserLocation = location
 
-                    if(isCreateNew) {
+                    if (isCreateNew) {
+                        updateView()
                         currentUserLocation?.let { currentUserLocation ->
-                            val latLng = LatLng(currentUserLocation.latitude, currentUserLocation.longitude)
+                            val latLng =
+                                LatLng(currentUserLocation.latitude, currentUserLocation.longitude)
                             moveCamera(latLng, null, LocationFragment.DEFAULT_ZOOM)
                         }
                     }
@@ -93,11 +97,26 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         mapView = view.findViewById(R.id.mapBoxView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
+        updateView()
+    }
 
+    fun updateView() {
+        currentUserLocation?.let {
+            altitudeValue.text = it.altitude.setFormatLabel()
+            setLatLngLabel(it.toLatLng())
+        }
         siteValueTextView.text = siteName
-        coordinatesValueTextView.text = "16.789, 100.1235"
-        altitudeValue.text = "23.3654"
+        changeGroupTextView.visibility = if (isCreateNew) View.VISIBLE else View.GONE
+    }
 
+    private fun setLatLngLabel(location: LatLng) {
+        context?.let {
+            val latLng =
+                "${location.latitude.latitudeCoordinates(it)}, ${location.longitude.longitudeCoordinates(
+                    it
+                )}"
+            coordinatesValueTextView.text = latLng
+        }
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
@@ -175,9 +194,10 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     @SuppressLint("MissingPermission")
     private fun initLocationEngine() {
         locationEngine = context?.let { LocationEngineProvider.getBestLocationEngine(it) }
-        val request = LocationEngineRequest.Builder(LocationFragment.DEFAULT_INTERVAL_IN_MILLISECONDS)
-            .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
-            .setMaxWaitTime(LocationFragment.DEFAULT_MAX_WAIT_TIME).build()
+        val request =
+            LocationEngineRequest.Builder(LocationFragment.DEFAULT_INTERVAL_IN_MILLISECONDS)
+                .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
+                .setMaxWaitTime(LocationFragment.DEFAULT_MAX_WAIT_TIME).build()
         locationEngine?.requestLocationUpdates(
             request,
             mapboxLocationChangeCallback,
@@ -187,7 +207,13 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun moveCamera(userPosition: LatLng, nearestSite: LatLng?, zoom: Double) {
-        mapboxMap?.moveCamera(MapboxCameraUtils.calculateLatLngForZoom(userPosition, nearestSite, zoom))
+        mapboxMap?.moveCamera(
+            MapboxCameraUtils.calculateLatLngForZoom(
+                userPosition,
+                nearestSite,
+                zoom
+            )
+        )
     }
 
     override fun onStart() {
