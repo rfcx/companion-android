@@ -39,6 +39,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     // Arguments
     var siteId: Int = 0
     var siteName: String = ""
+    var isCreateNew: Boolean = false
 
     // Location
     private var currentUserLocation: Location? = null
@@ -51,6 +52,13 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                     location ?: return
 
                     currentUserLocation = location
+
+                    if(isCreateNew) {
+                        currentUserLocation?.let { currentUserLocation ->
+                            val latLng = LatLng(currentUserLocation.latitude, currentUserLocation.longitude)
+                            moveCamera(latLng, null, LocationFragment.DEFAULT_ZOOM)
+                        }
+                    }
                 }
             }
 
@@ -67,6 +75,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         arguments?.let {
             siteId = it.getInt(ARG_SITE_ID)
             siteName = it.getString(ARG_SITE_NAME) ?: ""
+            isCreateNew = it.getBoolean(ARG_IS_CREATE_NEW)
         }
     }
 
@@ -214,13 +223,15 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     companion object {
         private const val ARG_SITE_ID = "ARG_SITE_ID"
         private const val ARG_SITE_NAME = "ARG_SITE_NAME"
+        private const val ARG_IS_CREATE_NEW = "ARG_IS_CREATE_NEW"
 
         @JvmStatic
-        fun newInstance(id: Int, name: String?) =
+        fun newInstance(id: Int, name: String?, isCreateNew: Boolean = false) =
             DetailDeploymentSiteFragment().apply {
                 arguments = Bundle().apply {
                     putInt(ARG_SITE_ID, id)
                     putString(ARG_SITE_NAME, name)
+                    putBoolean(ARG_IS_CREATE_NEW, isCreateNew)
                 }
             }
     }

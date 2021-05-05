@@ -36,7 +36,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener, (Locate) -> Unit {
+class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener, (Locate, Boolean) -> Unit {
     private val existedSiteAdapter by lazy { SiteAdapter(this) }
     private var mapPickerProtocol: MapPickerProtocol? = null
     private var deploymentProtocol: BaseDeploymentProtocol? = null
@@ -234,7 +234,7 @@ class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener,
             })
     }
 
-    override fun invoke(locate: Locate) {
+    override fun invoke(locate: Locate, isNew: Boolean) {
         mapPickerProtocol?.startLocationPage(
             locate.latitude,
             locate.longitude,

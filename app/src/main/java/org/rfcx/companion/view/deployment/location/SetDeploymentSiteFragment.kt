@@ -27,7 +27,7 @@ import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.map.SiteAdapter
 
-class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (Locate) -> Unit {
+class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (Locate, Boolean) -> Unit {
 
     // Protocol
     private var deploymentProtocol: BaseDeploymentProtocol? = null
@@ -230,8 +230,8 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (L
     }
 
     // On click site item
-    override fun invoke(site: Locate) {
-        deploymentProtocol?.startDetailDeploymentSite(site.id, site.name)
+    override fun invoke(site: Locate, isNewSite: Boolean) {
+        deploymentProtocol?.startDetailDeploymentSite(site.id, site.name, isNewSite)
     }
 
     override fun onDestroy() {

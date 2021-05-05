@@ -90,7 +90,7 @@ import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
-class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Locate) -> Unit {
+class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Locate, Boolean) -> Unit {
 
     // map
     private lateinit var mapView: MapView
@@ -1507,7 +1507,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         }
     }
 
-    override fun invoke(locate: Locate) {
+    override fun invoke(locate: Locate, isNew: Boolean) {
         view?.hideKeyboard()
         showSearchBar(false)
 

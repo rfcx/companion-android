@@ -193,8 +193,8 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         startFragment(SelectingExistedSiteFragment.newInstance(latitude, longitude))
     }
 
-    override fun startDetailDeploymentSite(id: Int, name: String?) {
-        startFragment(DetailDeploymentSiteFragment.newInstance(id, name))
+    override fun startDetailDeploymentSite(id: Int, name: String?, isNewSite: Boolean) {
+        startFragment(DetailDeploymentSiteFragment.newInstance(id, name, isNewSite))
     }
 
     override fun getDeployment(): EdgeDeployment? {

@@ -11,7 +11,7 @@ import org.rfcx.companion.util.setFormatLabel
 import org.rfcx.companion.util.toTimeSinceStringAlternativeTimeAgo
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 
-class SiteAdapter(private val itemClickListener: (Locate) -> Unit) :
+class SiteAdapter(private val itemClickListener: (Locate, Boolean) -> Unit) :
     RecyclerView.Adapter<SiteAdapter.SiteAdapterViewHolder>() {
     var items: ArrayList<SiteWithLastDeploymentItem> = arrayListOf()
         set(value) {
@@ -36,7 +36,7 @@ class SiteAdapter(private val itemClickListener: (Locate) -> Unit) :
         val site = items[position]
         holder.bind(site)
         holder.itemView.setOnClickListener {
-            this.itemClickListener(site.locate)
+            this.itemClickListener(site.locate, isNewSite)
         }
     }
 
