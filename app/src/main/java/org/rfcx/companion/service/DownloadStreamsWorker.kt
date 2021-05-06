@@ -91,4 +91,4 @@ class DownloadStreamsWorker(val context: Context, params: WorkerParameters) :
     }
 }
 
-enum class DownloadStreamState { NOT_RUNNING, RUNNING, FINISH}
+enum class DownloadStreamState { NOT_RUNNING, RUNNING, FINISH }

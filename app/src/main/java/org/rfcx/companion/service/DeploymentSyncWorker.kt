@@ -23,6 +23,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
 
     override suspend fun doWork(): Result {
         Log.d(TAG, "doWork")
+        isRunning = DeploymentSyncState.RUNNING
 
         val db = EdgeDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val locateDb = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
@@ -44,13 +45,16 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                         val fullId = result.headers().get("Location")
                         val id = fullId?.substring(fullId.lastIndexOf("/") + 1, fullId.length) ?: ""
                         markSentDeployment(id, db, locateDb, it.id, token)
+                        isRunning = DeploymentSyncState.FINISH
                     }
                     result.errorBody()?.string()?.contains("id must be unique") ?: false -> {
                         markSentDeployment(it.deploymentKey ?: "", db, locateDb, it.id, token)
+                        isRunning = DeploymentSyncState.FINISH
                     }
                     else -> {
                         db.markUnsent(it.id)
                         someFailed = true
+                        isRunning = DeploymentSyncState.NOT_RUNNING
                     }
                 }
             } else {
@@ -63,6 +67,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                         if (result.isSuccessful) {
                             db.deleteDeployment(it.id)
                         }
+                        isRunning = DeploymentSyncState.FINISH
                     } else {
                         val req = EditDeploymentRequest(location.toRequestBody())
                         val result = ApiManager.getInstance().getDeviceApi()
@@ -70,6 +75,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                         if (result.isSuccessful) {
                             db.markSent(it.serverId!!, it.id)
                         }
+                        isRunning = DeploymentSyncState.FINISH
                     }
                 }
             }
@@ -104,6 +110,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
     companion object {
         private const val TAG = "DeploymentSyncWorker"
         private const val UNIQUE_WORK_KEY = "DeploymentSyncWorkerUniqueKey"
+        private var isRunning = DeploymentSyncState.NOT_RUNNING
 
         fun enqueue(context: Context) {
             val constraints =
@@ -115,9 +122,13 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                 .enqueueUniqueWork(UNIQUE_WORK_KEY, ExistingWorkPolicy.REPLACE, workRequest)
         }
 
+        fun isRunning() = isRunning
+
         fun workInfos(context: Context): LiveData<List<WorkInfo>> {
             return WorkManager.getInstance(context)
                 .getWorkInfosForUniqueWorkLiveData(UNIQUE_WORK_KEY)
         }
     }
 }
+
+enum class DeploymentSyncState { NOT_RUNNING, RUNNING, FINISH }
