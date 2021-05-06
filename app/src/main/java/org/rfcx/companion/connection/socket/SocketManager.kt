@@ -60,26 +60,19 @@ object SocketManager {
     val recorderState = MutableLiveData<RecorderStateResponse>()
 
     init {
-        connection.value =
-            ConnectionResponse()
-        diagnostic.value =
-            DiagnosticResponse()
-        currentConfiguration.value =
-            ConfigurationResponse()
-        syncConfiguration.value =
-            SyncConfigurationResponse()
-        prefs.value = PrefsResponse()
-        signal.value = SignalResponse()
-        liveAudio.value =
-            MicrophoneTestResponse()
-        spectrogram.value = ByteArray(2)
-        checkInTest.value =
-            CheckInTestResponse()
-        sentinel.value =
-            SentinelResponse()
-        register.value = RegisterResponse()
-        isRegistered.value = CheckGuardianRegistered()
-        recorderState.value = RecorderStateResponse()
+        connection.postValue(ConnectionResponse())
+        diagnostic.postValue(DiagnosticResponse())
+        currentConfiguration.postValue(ConfigurationResponse())
+        syncConfiguration.postValue(SyncConfigurationResponse())
+        prefs.postValue(PrefsResponse())
+        signal.postValue(SignalResponse())
+        liveAudio.postValue(MicrophoneTestResponse())
+        spectrogram.postValue(ByteArray(2))
+        checkInTest.postValue(CheckInTestResponse())
+        sentinel.postValue(SentinelResponse())
+        register.postValue(RegisterResponse())
+        isRegistered.postValue(CheckGuardianRegistered())
+        recorderState.postValue(RecorderStateResponse())
     }
 
     fun getConnection() {

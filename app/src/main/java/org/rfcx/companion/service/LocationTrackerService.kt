@@ -74,7 +74,7 @@ class LocationTrackerService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
-        return START_NOT_STICKY
+        return START_STICKY
     }
 
     private fun saveLocation(location: Location) {

@@ -196,7 +196,11 @@ class GuardianConfigureFragment : Fragment() {
     private fun setDuration() {
 
         val indexOfValue = durationValues?.indexOf(duration.toString()) ?: 3
-        durationValueTextView.text = durationEntries!![indexOfValue]
+        if (indexOfValue == -1) {
+            durationValueTextView.text = "$duration secs"
+        } else {
+            durationValueTextView.text = durationEntries!![indexOfValue]
+        }
 
         durationValueTextView.setOnClickListener {
             val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
