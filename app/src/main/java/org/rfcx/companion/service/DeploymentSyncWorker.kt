@@ -45,16 +45,13 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                         val fullId = result.headers().get("Location")
                         val id = fullId?.substring(fullId.lastIndexOf("/") + 1, fullId.length) ?: ""
                         markSentDeployment(id, db, locateDb, it.id, token)
-                        isRunning = DeploymentSyncState.FINISH
                     }
                     result.errorBody()?.string()?.contains("id must be unique") ?: false -> {
                         markSentDeployment(it.deploymentKey ?: "", db, locateDb, it.id, token)
-                        isRunning = DeploymentSyncState.FINISH
                     }
                     else -> {
                         db.markUnsent(it.id)
                         someFailed = true
-                        isRunning = DeploymentSyncState.NOT_RUNNING
                     }
                 }
             } else {
@@ -67,7 +64,6 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                         if (result.isSuccessful) {
                             db.deleteDeployment(it.id)
                         }
-                        isRunning = DeploymentSyncState.FINISH
                     } else {
                         val req = EditDeploymentRequest(location.toRequestBody())
                         val result = ApiManager.getInstance().getDeviceApi()
@@ -75,12 +71,11 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                         if (result.isSuccessful) {
                             db.markSent(it.serverId!!, it.id)
                         }
-                        isRunning = DeploymentSyncState.FINISH
                     }
                 }
             }
         }
-
+        isRunning = DeploymentSyncState.FINISH
         ImageSyncWorker.enqueue(context)
 
         return if (someFailed) Result.retry() else Result.success()
