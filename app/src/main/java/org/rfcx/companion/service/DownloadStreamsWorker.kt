@@ -25,18 +25,21 @@ class DownloadStreamsWorker(val context: Context, params: WorkerParameters) :
         currentStreamsLoading = 0
         someFailed = false
 
-        Log.d(TAG, "doWork on DownloadStreams")
+        if(DeploymentSyncWorker.isRunning() != DeploymentSyncState.RUNNING) {
+            Log.d(TAG, "doWork on DownloadStreams")
 
-        val token = "Bearer ${context.getIdToken()}"
-        val result = getStreams(token, currentStreamsLoading)
-        if (result) {
-            Log.d(TAG, "downloaded $count sites")
-            isRunning = DownloadStreamState.FINISH
-        } else {
-            isRunning = DownloadStreamState.NOT_RUNNING
-            someFailed = true
+            val token = "Bearer ${context.getIdToken()}"
+            val result = getStreams(token, currentStreamsLoading)
+            if (result) {
+                Log.d(TAG, "downloaded $count sites")
+                isRunning = DownloadStreamState.FINISH
+            } else {
+                isRunning = DownloadStreamState.NOT_RUNNING
+                someFailed = true
+            }
+            return if (someFailed) Result.retry() else Result.success()
         }
-        return if (someFailed) Result.retry() else Result.success()
+        return Result.retry()
     }
 
     private suspend fun getStreams(token: String, offset: Int, maxUpdatedAt: String? = null): Boolean = withContext(Dispatchers.IO) {
