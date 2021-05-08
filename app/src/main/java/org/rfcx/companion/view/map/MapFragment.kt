@@ -3,6 +3,7 @@ package org.rfcx.companion.view.map
 import android.animation.Animator
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.PointF
 import android.location.Location
@@ -13,6 +14,7 @@ import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import com.mapbox.mapboxsdk.style.layers.Property
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,6 +35,7 @@ import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.LineString
 import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.annotations.BubbleLayout
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
@@ -44,11 +47,12 @@ import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.mapboxsdk.style.expressions.Expression
 import com.mapbox.mapboxsdk.style.expressions.Expression.*
 import com.mapbox.mapboxsdk.style.layers.CircleLayer
 import com.mapbox.mapboxsdk.style.layers.LineLayer
-import com.mapbox.mapboxsdk.style.layers.Property.LINE_CAP_ROUND
-import com.mapbox.mapboxsdk.style.layers.Property.LINE_JOIN_ROUND
+import com.mapbox.mapboxsdk.style.layers.Property.*
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
@@ -58,6 +62,7 @@ import com.mapbox.pluginscalebar.ScaleBarOptions
 import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_map.*
+import kotlinx.android.synthetic.main.layout_map_window_info.view.*
 import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.DeploymentListener
 import org.rfcx.companion.MainActivityListener
@@ -474,6 +479,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
             setupImages(it)
             setupMarkerLayers(it)
             setupSearch()
+            setupWindowInfo(it)
 //            setupScale()
 
             mapboxMap.addOnMapClickListener { latLng ->
@@ -520,6 +526,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
     }
 
     private fun setFeatureSelectState(feature: Feature, selectedState: Boolean) {
+        Log.d("handleClickIcon","setFeatureSelectState $selectedState")
         feature.properties()?.let {
             it.addProperty(PROPERTY_DEPLOYMENT_SELECTED, selectedState)
             refreshSource()
@@ -661,6 +668,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         if (deploymentFeatures != null && deploymentFeatures.isNotEmpty()) {
             val selectedFeature = deploymentFeatures[0]
             val features = this.mapFeatures!!.features()!!
+            Log.d("handleClickIcon","deploymentFeatures")
+
             features.forEachIndexed { index, feature ->
                 if (selectedFeature.getProperty(PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID) == feature.getProperty(
                         PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID
@@ -670,6 +679,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                     val deploymentId =
                         selectedFeature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID)
                             .toInt()
+                    Log.d("handleClickIcon","deploymentFeatures $deploymentId")
+
                     val deploymentDevice =
                         selectedFeature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEVICE)
                             .toString()
@@ -696,14 +707,18 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         if (siteFeatures != null && siteFeatures.isNotEmpty()) {
             val selectedFeature = siteFeatures[0]
             val features = this.mapFeatures!!.features()!!
-            features.forEach { feature ->
+            features.forEachIndexed { index, feature ->
                 val markerId = selectedFeature.getProperty(PROPERTY_SITE_MARKER_ID)
+                Log.d("handleClickIcon","siteFeatures $markerId")
                 if (markerId == feature.getProperty(PROPERTY_SITE_MARKER_ID)) {
                     val site = locateDb.getLocateById(
                         selectedFeature.getProperty(PROPERTY_SITE_MARKER_SITE_ID).asInt
                     )
                     gettingTracksAndMoveToPin(site, markerId.asString)
+                    features[index]?.let { setFeatureSelectState(it, true) }
                     analytics?.trackClickPinEvent()
+                } else {
+                    features[index]?.let { setFeatureSelectState(it, false) }
                 }
             }
             return true
@@ -1160,8 +1175,14 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                     val properties = mapOf(
                         Pair(PROPERTY_SITE_MARKER_IMAGE, it.pin),
                         Pair(PROPERTY_SITE_MARKER_SITE_ID, it.id.toString()),
-                        Pair(PROPERTY_SITE_MARKER_ID, "${it.name}.${it.id}")
+                        Pair(PROPERTY_SITE_MARKER_ID, "${it.name}.${it.id}"),
+                        Pair(PROPERTY_SITE_MARKER_SITE_NAME, it.name),
+                        Pair(PROPERTY_SITE_MARKER_SITE_LATITUDE, "${it.latitude}"),
+                        Pair(PROPERTY_SITE_MARKER_SITE_LONGITUDE, "${it.longitude}")
                     )
+
+                    Log.d("handleClickIcon","PROPERTY_SITE_MARKER_SITE latitude ${it.latitude}")
+                    Log.d("handleClickIcon","PROPERTY_SITE_MARKER_SITE longitude ${it.longitude}")
 
                     Feature.fromGeometry(
                         Point.fromLngLat(it.longitude, it.latitude), properties.toJsonObject()
@@ -1170,8 +1191,49 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
             }
         }
 
+        // Create window info
+        val windowInfoImages = hashMapOf<String, Bitmap>()
+        val inflater = LayoutInflater.from(context)
+        mapMarkerPointFeatures.forEach {
+            val bubbleLayout =
+                inflater.inflate(R.layout.layout_map_window_info, null) as BubbleLayout
+
+            val id = it.getStringProperty(PROPERTY_SITE_MARKER_ID) ?: it.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID)
+
+            val title = it.getStringProperty(PROPERTY_SITE_MARKER_SITE_NAME)
+            bubbleLayout.infoWindowTitle.text = title
+
+            val caption = "${it.getStringProperty(PROPERTY_SITE_MARKER_SITE_LATITUDE)}, ${it.getStringProperty(PROPERTY_SITE_MARKER_SITE_LONGITUDE)}"
+            bubbleLayout.infoWindowDescription.text = caption
+
+            val measureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            bubbleLayout.measure(measureSpec, measureSpec)
+            val measuredWidth = bubbleLayout.measuredWidth
+            bubbleLayout.arrowPosition = (measuredWidth / 2 - 5).toFloat()
+
+            val bitmap = SymbolGenerator.generate(bubbleLayout)
+            windowInfoImages[id] = bitmap
+        }
+
+        setWindowInfoImageGenResults(windowInfoImages)
         this.mapFeatures = FeatureCollection.fromFeatures(mapMarkerPointFeatures)
         refreshSource()
+    }
+
+    private fun setWindowInfoImageGenResults(windowInfoImages: HashMap<String, Bitmap>) {
+        mapboxMap?.style?.addImages(windowInfoImages)
+    }
+
+    private fun setupWindowInfo(it: Style) {
+        it.addLayer(SymbolLayer(WINDOW_MARKER_ID, SOURCE_DEPLOYMENT).apply {
+            withProperties(
+                iconImage("{$PROPERTY_SITE_MARKER_ID}"),
+                iconAnchor(ICON_ANCHOR_BOTTOM),
+                iconOffset(arrayOf(-2f, -20f)),
+                iconAllowOverlap(true)
+            )
+            withFilter(eq(get(PROPERTY_DEPLOYMENT_SELECTED), literal(true)))
+        })
     }
 
     private fun refreshSource() {
@@ -1485,10 +1547,15 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         private const val PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID = "deployment.deployment"
         private const val PROPERTY_DEPLOYMENT_MARKER_CAPTION = "deployment.caption"
         private const val PROPERTY_DEPLOYMENT_MARKER_IMAGE = "deployment.marker.image"
+        private const val WINDOW_MARKER_ID = "info.marker"
+        private const val PROPERTY_SELECTED = "selected"
 
         private const val PROPERTY_SITE_MARKER_IMAGE = "site.marker.image"
         private const val PROPERTY_SITE_MARKER_ID = "site.id"
         private const val PROPERTY_SITE_MARKER_SITE_ID = "site.stream.id"
+        private const val PROPERTY_SITE_MARKER_SITE_NAME = "site.stream.name"
+        private const val PROPERTY_SITE_MARKER_SITE_LATITUDE = "site.stream.latitude"
+        private const val PROPERTY_SITE_MARKER_SITE_LONGITUDE = "site.stream.longitude"
 
         private const val PROPERTY_CLUSTER_TYPE = "cluster.type"
 

@@ -289,7 +289,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
 
     override fun getProjectName(): String {
         val preferences = Preferences.getInstance(this)
-        return preferences.getString(Preferences.SELECTED_PROJECT, getString(R.string.none))
+        return preferences.getString(Preferences.SELECTED_PROJECT, "Web-test-companion-1")
     }
 
     override fun hideBottomAppBar() {
