@@ -13,6 +13,7 @@ import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
 import android.net.wifi.WifiNetworkSpecifier
 import android.os.Build
+import android.os.PatternMatcher
 import androidx.annotation.RequiresApi
 import org.rfcx.companion.util.WifiHotspotUtils
 
@@ -54,14 +55,27 @@ class WifiHotspotManager(private val context: Context) {
                 it.setNetworkSpecifier(wifiNetworkSpecifier)
             }.build()
 
-            val connectionManager =
+            connectivityManager =
                 context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            connectionManager.requestNetwork(
+            connectivityManager.requestNetwork(
                 networkRequest,
                 object : ConnectivityManager.NetworkCallback() {
                     override fun onAvailable(network: Network) {
                         super.onAvailable(network)
+                        println("available")
+                        connectivityManager.bindProcessToNetwork(network)
                         onWifiListener.onWifiConnected()
+                    }
+
+                    override fun onLost(network: Network) {
+                        super.onLost(network)
+                        println("lost")
+                        connectivityManager.bindProcessToNetwork(null)
+                    }
+
+                    override fun onUnavailable() {
+                        super.onUnavailable()
+                        println("unavailable")
                     }
                 })
         } else {

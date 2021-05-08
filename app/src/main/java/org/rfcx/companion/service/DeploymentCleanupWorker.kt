@@ -32,7 +32,9 @@ class DeploymentCleanupWorker(val context: Context, params: WorkerParameters) :
         // In case any failed sending, we can resend (same ranger app)
         edgeDeploymentDb.unlockSending()
         if (unsent > 0) {
-            DeploymentSyncWorker.enqueue(context)
+            if (DeploymentSyncWorker.isRunning() == DeploymentSyncState.FINISH) {
+                DeploymentSyncWorker.enqueue(context)
+            }
         }
 
         val guardianDeploymentDb = GuardianDeploymentDb(realm)
@@ -56,7 +58,9 @@ class DeploymentCleanupWorker(val context: Context, params: WorkerParameters) :
             TrackingSyncWorker.enqueue(context)
         }
 
-        DeleteStreamsWorker.enqueue(context)
+        if (DeploymentSyncWorker.isRunning() == DeploymentSyncState.FINISH) {
+            DeleteStreamsWorker.enqueue(context)
+        }
     }
 
     companion object {

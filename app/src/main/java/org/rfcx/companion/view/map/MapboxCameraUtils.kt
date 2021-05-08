@@ -12,14 +12,17 @@ object MapboxCameraUtils {
         }
         val oppositeLat = userPosition.latitude - (nearestSite.latitude - userPosition.latitude)
         val oppositeLng = userPosition.longitude - (nearestSite.longitude - userPosition.longitude)
-        val oppositeNearestSite = LatLng(oppositeLat, oppositeLng)
-        if (oppositeNearestSite.distanceTo(userPosition) < 30) {
-            return CameraUpdateFactory.newLatLngZoom(userPosition, zoom)
+        if (oppositeLat >= -90 && oppositeLat <= 90 && oppositeLng >= -90 && oppositeLng <= 90) {
+            val oppositeNearestSite = LatLng(oppositeLat, oppositeLng)
+            if (oppositeNearestSite.distanceTo(userPosition) < 30) {
+                return CameraUpdateFactory.newLatLngZoom(userPosition, zoom)
+            }
+            val latLngBounds = LatLngBounds.Builder()
+                .include(oppositeNearestSite)
+                .include(nearestSite)
+                .build()
+            return CameraUpdateFactory.newLatLngBounds(latLngBounds, 100)
         }
-        val latLngBounds = LatLngBounds.Builder()
-            .include(oppositeNearestSite)
-            .include(nearestSite)
-            .build()
-        return CameraUpdateFactory.newLatLngBounds(latLngBounds, 100)
+        return CameraUpdateFactory.newLatLngZoom(userPosition, zoom)
     }
 }

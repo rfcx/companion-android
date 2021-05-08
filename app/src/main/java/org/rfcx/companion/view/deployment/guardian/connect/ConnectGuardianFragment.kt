@@ -12,6 +12,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_connect_guardian.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.SocketManager
 import org.rfcx.companion.connection.wifi.OnWifiListener
@@ -113,18 +116,21 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
 
     private fun checkConnection() {
         SocketManager.getConnection()
-        SocketManager.connection.observe(viewLifecycleOwner, Observer { response ->
-            requireActivity().runOnUiThread {
-                if (response.connection.status == Status.SUCCESS.value) {
-                    hideLoading()
-                    deploymentProtocol?.setDeploymentWifiName(guardianHotspot!!.SSID)
+        GlobalScope.launch(Dispatchers.Main) {
+            SocketManager.connection.observe(viewLifecycleOwner, Observer { response ->
+                requireActivity().runOnUiThread {
                     deploymentProtocol?.startCheckList()
-                    deploymentProtocol?.setWifiManager(wifiHotspotManager)
-                    deploymentProtocol?.registerWifiConnectionLostListener()
-                    SocketManager.getCheckInTest(CheckinCommand.START)
+                    if (response.connection.status == Status.SUCCESS.value) {
+                        hideLoading()
+                        deploymentProtocol?.setDeploymentWifiName(guardianHotspot!!.SSID)
+                        deploymentProtocol?.startCheckList()
+                        deploymentProtocol?.setWifiManager(wifiHotspotManager)
+                        deploymentProtocol?.registerWifiConnectionLostListener()
+                        SocketManager.getCheckInTest(CheckinCommand.START)
+                    }
                 }
-            }
-        })
+            })
+        }
     }
 
     private fun showLoading() {
