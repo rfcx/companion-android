@@ -72,6 +72,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     private var longitude: Double = 0.0
     private var altitude: Double = 0.0
     private var currentUserLocation: Location? = null
+    private var userLocation: Location? = null
     private var locationEngine: LocationEngine? = null
     private val mapboxLocationChangeCallback =
         object : LocationEngineCallback<LocationEngineResult> {
@@ -152,8 +153,8 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         nextButton.setOnClickListener {
             analytics?.trackSaveLocationEvent(Screen.LOCATION.id)
             this.altitude = currentUserLocation?.altitude ?: 0.0
+            getLastLocation()
             if (isCreateNew) {
-                getLastLocation()
                 createSite()
             } else {
                 handleExistLocate()
@@ -163,6 +164,20 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         currentLocate.setOnClickListener {
             site?.let {
                 updateLocation(currentUserLocation?.latitude ?: it.latitude, currentUserLocation?.longitude ?: it.longitude, currentUserLocation?.altitude ?: it.altitude)
+            }
+        }
+
+        viewMapBox.setOnClickListener {
+            deploymentProtocol?.let {
+                if (isCreateNew) {
+                    val currentLocation = currentUserLocation
+                    it.startMapPicker(currentLocation?.latitude ?: 0.0, currentLocation?.longitude ?: 0.0, 0.0, "")
+                } else {
+                    site?.let { site ->
+                        it.startMapPicker(site.latitude, site.longitude, 0.0, "")
+                    }
+                }
+                it.hideToolbar()
             }
         }
     }
@@ -203,7 +218,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
 
     private fun createSite() {
         val name = siteValueTextView.text.toString()
-        currentUserLocation?.let {
+        userLocation?.let {
             val locate = Locate(
                 name = name,
                 latitude = it.latitude,
@@ -223,9 +238,9 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 it.serverId,
                 getLocationGroup(),
                 it.name,
-                it.latitude,
-                it.longitude,
-                currentUserLocation?.altitude ?: it.longitude,
+                userLocation?.latitude ?: it.latitude,
+                userLocation?.longitude ?: it.longitude,
+                currentUserLocation?.altitude ?: it.altitude,
                 it.createdAt,
                 it.updatedAt,
                 it.lastDeploymentId,
@@ -250,10 +265,17 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             val loc = Location(LocationManager.GPS_PROVIDER)
             loc.latitude = latitude
             loc.longitude = longitude
-            currentUserLocation = loc
-        } else {
-            currentUserLocation = currentUserLocation
+            userLocation = loc
+        } else if (isCreateNew) {
+            userLocation = currentUserLocation
                 ?: deploymentProtocol?.getCurrentLocation() // get new current location
+        } else {
+            site?.let {
+                val loc = Location(LocationManager.GPS_PROVIDER)
+                loc.latitude = it.latitude
+                loc.longitude = it.longitude
+                userLocation = loc
+            }
         }
     }
 
