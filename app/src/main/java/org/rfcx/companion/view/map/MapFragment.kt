@@ -526,7 +526,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
     }
 
     private fun setFeatureSelectState(feature: Feature, selectedState: Boolean) {
-        Log.d("handleClickIcon","setFeatureSelectState $selectedState")
         feature.properties()?.let {
             it.addProperty(PROPERTY_DEPLOYMENT_SELECTED, selectedState)
             refreshSource()
@@ -668,7 +667,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         if (deploymentFeatures != null && deploymentFeatures.isNotEmpty()) {
             val selectedFeature = deploymentFeatures[0]
             val features = this.mapFeatures!!.features()!!
-            Log.d("handleClickIcon","deploymentFeatures")
 
             features.forEachIndexed { index, feature ->
                 if (selectedFeature.getProperty(PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID) == feature.getProperty(
@@ -679,7 +677,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                     val deploymentId =
                         selectedFeature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID)
                             .toInt()
-                    Log.d("handleClickIcon","deploymentFeatures $deploymentId")
 
                     val deploymentDevice =
                         selectedFeature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEVICE)
@@ -709,7 +706,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
             val features = this.mapFeatures!!.features()!!
             features.forEachIndexed { index, feature ->
                 val markerId = selectedFeature.getProperty(PROPERTY_SITE_MARKER_ID)
-                Log.d("handleClickIcon","siteFeatures $markerId")
                 if (markerId == feature.getProperty(PROPERTY_SITE_MARKER_ID)) {
                     val site = locateDb.getLocateById(
                         selectedFeature.getProperty(PROPERTY_SITE_MARKER_SITE_ID).asInt
@@ -1181,9 +1177,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                         Pair(PROPERTY_SITE_MARKER_SITE_LONGITUDE, "${it.longitude}")
                     )
 
-                    Log.d("handleClickIcon","PROPERTY_SITE_MARKER_SITE latitude ${it.latitude}")
-                    Log.d("handleClickIcon","PROPERTY_SITE_MARKER_SITE longitude ${it.longitude}")
-
                     Feature.fromGeometry(
                         Point.fromLngLat(it.longitude, it.latitude), properties.toJsonObject()
                     )
@@ -1203,8 +1196,20 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
             val title = it.getStringProperty(PROPERTY_SITE_MARKER_SITE_NAME)
             bubbleLayout.infoWindowTitle.text = title
 
-            val caption = "${it.getStringProperty(PROPERTY_SITE_MARKER_SITE_LATITUDE)}, ${it.getStringProperty(PROPERTY_SITE_MARKER_SITE_LONGITUDE)}"
-            bubbleLayout.infoWindowDescription.text = caption
+            bubbleLayout.infoWindowDescription.text = "Puerto Rico"
+
+            bubbleLayout.createdAtValue.text = "26/04/2021 09:45"
+
+            var latLng = ""
+            val lat = it.getStringProperty(PROPERTY_SITE_MARKER_SITE_LATITUDE) ?: "0.0"
+            val lng = it.getStringProperty(PROPERTY_SITE_MARKER_SITE_LONGITUDE) ?: "0.0"
+            context?.let { context ->
+                latLng =
+                    "${lat.toDouble().latitudeCoordinates(context)}, ${lng.toDouble().longitudeCoordinates(context)}"
+            }
+            bubbleLayout.latLngValue.text = latLng
+
+            bubbleLayout.altValue.text = "76.89 m"
 
             val measureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
             bubbleLayout.measure(measureSpec, measureSpec)

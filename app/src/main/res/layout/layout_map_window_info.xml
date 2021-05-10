@@ -2,8 +2,10 @@
 <com.mapbox.mapboxsdk.annotations.BubbleLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/margin_padding_large"
+    android:layout_marginEnd="@dimen/margin_padding_large"
     android:orientation="vertical"
     android:paddingStart="@dimen/margin_padding_small"
     android:paddingLeft="@dimen/margin_padding_small"
@@ -22,24 +24,100 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="@dimen/margin_padding_small">
 
-        <TextView
-            android:id="@+id/infoWindowTitle"
-            style="@style/TextAppearance.MaterialComponents.Body2"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textStyle="bold"
-            tools:text="Bubble title" />
+            android:layout_marginTop="@dimen/margin_padding_small"
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/infoWindowDescription"
-            style="@style/TextAppearance.MaterialComponents.Caption"
+            <TextView
+                android:id="@+id/infoWindowTitle"
+                style="@style/AudioMothText.Body.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textStyle="bold"
+                tools:text="MA19" />
+
+            <TextView
+                android:id="@+id/infoWindowDescription"
+                style="@style/AudioMothText.Body.Secondary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                tools:text="Puerto Rico" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            tools:text="Bubble description" />
+            android:layout_marginTop="@dimen/margin_padding_normal"
+            android:orientation="horizontal">
 
+            <TextView
+                android:id="@+id/createdAtLabel"
+                style="@style/AudioMothText.Body.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/created_at"
+                tools:text="Created at:" />
+
+            <TextView
+                android:id="@+id/createdAtValue"
+                style="@style/AudioMothText.Body.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_small"
+                tools:text="26/04/2021 09:38" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_padding_xsmall"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/latLngLabel"
+                style="@style/AudioMothText.Body.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lat_lng"
+                tools:text="Lat/Lng:" />
+
+            <TextView
+                android:id="@+id/latLngValue"
+                style="@style/AudioMothText.Body.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_small"
+                tools:text="18.146°N, 100.213°E" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_padding_small"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/altLabel"
+                style="@style/AudioMothText.Body.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/alt"
+                tools:text="Alt:" />
+
+            <TextView
+                android:id="@+id/altValue"
+                style="@style/AudioMothText.Body.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_xsmall"
+                tools:text="767.21 m" />
+        </LinearLayout>
     </LinearLayout>
 </com.mapbox.mapboxsdk.annotations.BubbleLayout>

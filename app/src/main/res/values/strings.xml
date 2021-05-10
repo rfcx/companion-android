@@ -428,4 +428,10 @@
 
     <string name="time_second">Just now</string>
     <string name="yesterday">Yesterday</string>
+
+    <!-- layout_map_window_info -->
+    <string name="created_at">Created at:</string>
+    <string name="lat_lng">Lat/Lng:</string>
+    <string name="alt">Alt:</string>
+
 </resources>
