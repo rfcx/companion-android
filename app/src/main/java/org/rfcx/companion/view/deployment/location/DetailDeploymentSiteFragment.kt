@@ -195,7 +195,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             locate = Locate(
                 it.id,
                 it.serverId,
-                getLocationGroup(),
+                getLocationGroup(it.locationGroup?.name ?: getString(R.string.none)),
                 it.name,
                 latitude,
                 longitude,
@@ -224,7 +224,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 latitude = it.latitude,
                 longitude = it.longitude,
                 altitude = altitude,
-                locationGroup = getLocationGroup()
+                locationGroup = getLocationGroup(group ?: getString(R.string.none))
             )
             deploymentProtocol?.setDeployLocation(locate, false)
             deploymentProtocol?.nextStep()
@@ -236,7 +236,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             val locate = Locate(
                 it.id,
                 it.serverId,
-                getLocationGroup(),
+                getLocationGroup(it.locationGroup?.name ?: getString(R.string.none)),
                 it.name,
                 userLocation?.latitude ?: it.latitude,
                 userLocation?.longitude ?: it.longitude,
@@ -254,8 +254,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun getLocationGroup(): LocationGroup {
-        val group = this.group ?: getString(R.string.none)
+    private fun getLocationGroup(group: String): LocationGroup {
         val locationGroup = deploymentProtocol?.getLocationGroup(group) ?: LocationGroups()
         return LocationGroup(locationGroup.name, locationGroup.color, locationGroup.serverId)
     }
@@ -286,6 +285,9 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         }
         siteValueTextView.text = siteName
         changeProjectTextView.visibility = if (isCreateNew) View.VISIBLE else View.GONE
+        if (!isCreateNew) {
+            locationGroupValueTextView.text = site?.locationGroup?.name ?: getString(R.string.none)
+        }
     }
 
     private fun setLatLngLabel(location: LatLng) {

@@ -83,6 +83,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         setContentView(R.layout.activity_deployment)
 
         setupToolbar()
+        preferences.clearSelectedProject()
 
         val deploymentId = intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
         if (deploymentId != null) {

@@ -92,4 +92,8 @@ class Preferences(context: Context) {
     fun clear() {
         sharedPreferences.edit().clear().apply()
     }
+
+    fun clearSelectedProject() {
+        sharedPreferences.edit().remove(GROUP).apply()
+    }
 }
