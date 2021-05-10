@@ -43,24 +43,22 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (L
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
 
     // Local LiveData
-    private lateinit var siteLiveData: LiveData<List<Locate>>
-    private var sites = listOf<Locate>()
-    private val siteObserve = Observer<List<Locate>> {
-        this.sites = it
-        setupView()
-    }
-
     private lateinit var audioMothDeployLiveData: LiveData<List<EdgeDeployment>>
     private var audioMothDeployments = listOf<EdgeDeployment>()
     private val audioMothDeploymentObserve = Observer<List<EdgeDeployment>> {
         this.audioMothDeployments = it
-        setupView()
     }
 
     private lateinit var guardianDeploymentLiveData: LiveData<List<GuardianDeployment>>
     private var guardianDeployments = listOf<GuardianDeployment>()
     private val guardianDeploymentObserve = Observer<List<GuardianDeployment>> {
         this.guardianDeployments = it
+    }
+
+    private lateinit var siteLiveData: LiveData<List<Locate>>
+    private var sites = listOf<Locate>()
+    private val siteObserve = Observer<List<Locate>> {
+        this.sites = it
         setupView()
     }
 
