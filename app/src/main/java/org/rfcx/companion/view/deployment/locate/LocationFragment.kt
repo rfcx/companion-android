@@ -263,7 +263,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             locate = Locate(
                 it.id,
                 it.serverId,
-                getLocationGroup(),
+                getLocationGroup(it.locationGroup?.name ?: getString(R.string.none)),
                 it.name,
                 latitude,
                 longitude,
@@ -351,7 +351,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     latitude = it.latitude,
                     longitude = it.longitude,
                     altitude = altitude,
-                    locationGroup = getLocationGroup()
+                    locationGroup = getLocationGroup(group ?: getString(R.string.none))
                 )
                 deploymentProtocol?.setDeployLocation(locate, false)
                 deploymentProtocol?.nextStep()
@@ -370,7 +370,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
             val locate = Locate(
                 it.id,
                 it.serverId,
-                getLocationGroup(),
+                getLocationGroup(it.locationGroup?.name ?: getString(R.string.none)),
                 it.name,
                 it.latitude,
                 it.longitude,
@@ -388,8 +388,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun getLocationGroup(): LocationGroup {
-        val group = this.group ?: getString(R.string.none)
+    private fun getLocationGroup(group: String): LocationGroup {
         val locationGroup = deploymentProtocol?.getLocationGroup(group) ?: LocationGroups()
         return LocationGroup(locationGroup.name, locationGroup.color, locationGroup.serverId)
     }
@@ -560,7 +559,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                     locate = Locate(
                         it.id,
                         it.serverId,
-                        getLocationGroup(),
+                        getLocationGroup(it.locationGroup?.name ?: getString(R.string.none)),
                         it.name,
                         deploymentLocation.latitude,
                         deploymentLocation.longitude,

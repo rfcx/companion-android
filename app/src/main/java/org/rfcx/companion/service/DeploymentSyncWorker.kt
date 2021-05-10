@@ -23,6 +23,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
 
     override suspend fun doWork(): Result {
         Log.d(TAG, "doWork")
+        isRunning = DeploymentSyncState.RUNNING
 
         val db = EdgeDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val locateDb = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
@@ -74,7 +75,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                 }
             }
         }
-
+        isRunning = DeploymentSyncState.FINISH
         ImageSyncWorker.enqueue(context)
 
         return if (someFailed) Result.retry() else Result.success()
@@ -104,6 +105,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
     companion object {
         private const val TAG = "DeploymentSyncWorker"
         private const val UNIQUE_WORK_KEY = "DeploymentSyncWorkerUniqueKey"
+        private var isRunning = DeploymentSyncState.NOT_RUNNING
 
         fun enqueue(context: Context) {
             val constraints =
@@ -115,9 +117,13 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                 .enqueueUniqueWork(UNIQUE_WORK_KEY, ExistingWorkPolicy.REPLACE, workRequest)
         }
 
+        fun isRunning() = isRunning
+
         fun workInfos(context: Context): LiveData<List<WorkInfo>> {
             return WorkManager.getInstance(context)
                 .getWorkInfosForUniqueWorkLiveData(UNIQUE_WORK_KEY)
         }
     }
 }
+
+enum class DeploymentSyncState { NOT_RUNNING, RUNNING, FINISH }
