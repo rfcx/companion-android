@@ -4,6 +4,7 @@ import android.content.Context
 import android.location.Location
 import android.location.LocationManager
 import com.mapbox.mapboxsdk.geometry.LatLng
+import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.view.profile.coordinates.CoordinatesActivity.Companion.DDM_FORMAT
 import org.rfcx.companion.view.profile.coordinates.CoordinatesActivity.Companion.DD_FORMAT
 import org.rfcx.companion.view.profile.coordinates.CoordinatesActivity.Companion.DMS_FORMAT
@@ -126,5 +127,9 @@ fun Context.getLastLocation(): Location? {
 }
 
 fun Location.toLatLng(): LatLng {
+    return LatLng(this.latitude, this.longitude)
+}
+
+fun Locate.toLatLng(): LatLng {
     return LatLng(this.latitude, this.longitude)
 }

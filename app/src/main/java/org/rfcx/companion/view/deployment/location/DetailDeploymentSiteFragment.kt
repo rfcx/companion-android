@@ -279,15 +279,20 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     }
 
     fun updateView() {
-        currentUserLocation?.let {
-            altitudeValue.text = it.altitude.setFormatLabel()
-            setLatLngLabel(it.toLatLng())
+        if (isCreateNew) {
+            currentUserLocation?.let {
+                altitudeValue.text = it.altitude.setFormatLabel()
+                setLatLngLabel(it.toLatLng())
+            }
+        } else {
+            site?.let {
+                altitudeValue.text = it.altitude.setFormatLabel()
+                setLatLngLabel(it.toLatLng())
+            }
+            locationGroupValueTextView.text = site?.locationGroup?.name ?: getString(R.string.none)
         }
         siteValueTextView.text = siteName
         changeProjectTextView.visibility = if (isCreateNew) View.VISIBLE else View.GONE
-        if (!isCreateNew) {
-            locationGroupValueTextView.text = site?.locationGroup?.name ?: getString(R.string.none)
-        }
     }
 
     private fun setLatLngLabel(location: LatLng) {
