@@ -6,7 +6,6 @@ import android.content.SharedPreferences
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -481,6 +480,10 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         startFragment(MapPickerFragment.newInstance(latitude, longitude, altitude, name))
     }
 
+    override fun startMapPicker(latitude: Double, longitude: Double, siteId: Int, name: String) {
+        startFragment(MapPickerFragment.newInstance(latitude, longitude, siteId, name))
+    }
+
     private fun setLatLng(latitude: Double, longitude: Double, altitude: Double) {
         this.latitude = latitude
         this.longitude = longitude
@@ -495,6 +498,15 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         fromPicker: Boolean
     ) {
         startFragment(LocationFragment.newInstance(latitude, longitude, altitude, name, fromPicker))
+    }
+
+    override fun onSelectedLocation(
+        latitude: Double,
+        longitude: Double,
+        siteId: Int,
+        name: String
+    ) {
+        startFragment(DetailDeploymentSiteFragment.newInstance(latitude, longitude, siteId, name))
     }
 
     override fun onBackPressed() {

@@ -392,6 +392,15 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         startFragment(LocationFragment.newInstance(latitude, longitude, altitude, name, fromPicker))
     }
 
+    override fun onSelectedLocation(
+        latitude: Double,
+        longitude: Double,
+        siteId: Int,
+        name: String
+    ) {
+        startFragment(DetailDeploymentSiteFragment.newInstance(latitude, longitude, siteId, name))
+    }
+
     override fun playSyncSound() {
         val deploymentId = getDeployment()?.deploymentKey
         val deploymentIdArrayInt = deploymentId?.chunked(2)?.map { it.toInt(radix = 16) }?.toTypedArray() ?: arrayOf()
@@ -437,6 +446,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     override fun startMapPicker(latitude: Double, longitude: Double, altitude: Double, name: String) {
         setLatLng(latitude, longitude, altitude, name)
         startFragment(MapPickerFragment.newInstance(latitude, longitude, altitude, name))
+    }
+
+    override fun startMapPicker(latitude: Double, longitude: Double, siteId: Int, name: String) {
+        startFragment(MapPickerFragment.newInstance(latitude, longitude, siteId, name))
     }
 
     private fun handleDeploymentStep(deploymentId: Int) {

@@ -112,6 +112,8 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             siteId = it.getInt(ARG_SITE_ID)
             siteName = it.getString(ARG_SITE_NAME) ?: ""
             isCreateNew = it.getBoolean(ARG_IS_CREATE_NEW)
+            latitude = it.getDouble(ARG_LATITUDE)
+            longitude = it.getDouble(ARG_LONGITUDE)
         }
     }
 
@@ -171,10 +173,10 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             deploymentProtocol?.let {
                 if (isCreateNew) {
                     val currentLocation = currentUserLocation
-                    it.startMapPicker(currentLocation?.latitude ?: 0.0, currentLocation?.longitude ?: 0.0, 0.0, "")
+                    it.startMapPicker(currentLocation?.latitude ?: 0.0, currentLocation?.longitude ?: 0.0, -1, siteName)
                 } else {
                     site?.let { site ->
-                        it.startMapPicker(site.latitude, site.longitude, 0.0, "")
+                        it.startMapPicker(site.latitude, site.longitude, site.id, site.name)
                     }
                 }
                 it.hideToolbar()
@@ -238,8 +240,8 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 it.serverId,
                 getLocationGroup(it.locationGroup?.name ?: getString(R.string.none)),
                 it.name,
-                userLocation?.latitude ?: it.latitude,
-                userLocation?.longitude ?: it.longitude,
+                if(userLocation?.latitude != 0.0) userLocation?.latitude ?: it.latitude else it.latitude,
+                if(userLocation?.longitude != 0.0) userLocation?.longitude ?: it.longitude else it.longitude,
                 currentUserLocation?.altitude ?: it.altitude,
                 it.createdAt,
                 it.updatedAt,
@@ -279,29 +281,28 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     }
 
     fun updateView() {
-        if (isCreateNew) {
-            currentUserLocation?.let {
-                altitudeValue.text = it.altitude.setFormatLabel()
-                setLatLngLabel(it.toLatLng())
-            }
+        if (!isCreateNew) site = siteDb.getLocateById(siteId)
+        if (latitude != 0.0 && longitude != 0.0) {
+            val alt = if(isCreateNew) currentUserLocation?.altitude else site?.altitude
+            setLatLngLabel(LatLng(latitude, longitude), alt ?: 0.0)
+        } else if (isCreateNew) {
+            currentUserLocation?.let { setLatLngLabel(it.toLatLng(), it.altitude) }
         } else {
-            site?.let {
-                altitudeValue.text = it.altitude.setFormatLabel()
-                setLatLngLabel(it.toLatLng())
-            }
+            site?.let { setLatLngLabel(it.toLatLng(), it.altitude) }
             locationGroupValueTextView.text = site?.locationGroup?.name ?: getString(R.string.none)
         }
         siteValueTextView.text = siteName
         changeProjectTextView.visibility = if (isCreateNew) View.VISIBLE else View.GONE
     }
 
-    private fun setLatLngLabel(location: LatLng) {
+    private fun setLatLngLabel(location: LatLng, altitude: Double) {
         context?.let {
             val latLng =
                 "${location.latitude.latitudeCoordinates(it)}, ${location.longitude.longitudeCoordinates(
                     it
                 )}"
             coordinatesValueTextView.text = latLng
+            altitudeValue.text = altitude.setFormatLabel()
         }
     }
 
@@ -318,11 +319,16 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setPinOnMap() {
-        if (!isCreateNew) {
+        val curLoc = context?.getLastLocation()?.toLatLng() ?: LatLng()
+        if (latitude != 0.0 && longitude != 0.0) {
+            val latLng = LatLng(latitude, longitude)
+            moveCamera(curLoc, latLng, DEFAULT_ZOOM)
+            createSiteSymbol(latLng)
+            setCheckboxForResumeDeployment(curLoc, latLng)
+        } else if (!isCreateNew) {
             site = siteDb.getLocateById(siteId)
             site?.let { locate ->
                 val latLng = locate.getLatLng()
-                val curLoc = context?.getLastLocation()?.toLatLng() ?: LatLng()
                 moveCamera(curLoc, latLng, DEFAULT_ZOOM)
                 setCheckboxForResumeDeployment(
                     curLoc,
@@ -331,7 +337,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 createSiteSymbol(latLng)
             }
         } else {
-            createSiteSymbol(context?.getLastLocation()?.toLatLng() ?: LatLng())
+            createSiteSymbol(curLoc)
         }
     }
 
@@ -520,6 +526,8 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         private const val ARG_SITE_ID = "ARG_SITE_ID"
         private const val ARG_SITE_NAME = "ARG_SITE_NAME"
         private const val ARG_IS_CREATE_NEW = "ARG_IS_CREATE_NEW"
+        private const val ARG_LATITUDE = "ARG_LATITUDE"
+        private const val ARG_LONGITUDE = "ARG_LONGITUDE"
 
         const val PROPERTY_MARKER_IMAGE = "marker.image"
         const val DEFAULT_ZOOM = 15.0
@@ -531,6 +539,17 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                     putInt(ARG_SITE_ID, id)
                     putString(ARG_SITE_NAME, name)
                     putBoolean(ARG_IS_CREATE_NEW, isCreateNew)
+                }
+            }
+
+        fun newInstance(lat: Double, lng: Double, siteId: Int, name: String) =
+            DetailDeploymentSiteFragment().apply {
+                arguments = Bundle().apply {
+                    putDouble(ARG_LATITUDE, lat)
+                    putDouble(ARG_LONGITUDE, lng)
+                    putInt(ARG_SITE_ID, siteId)
+                    putString(ARG_SITE_NAME, name)
+                    putBoolean(ARG_IS_CREATE_NEW, siteId == -1)
                 }
             }
     }

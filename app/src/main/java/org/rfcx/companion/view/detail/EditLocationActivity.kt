@@ -115,6 +115,18 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
         name: String,
         fromPicker: Boolean
     ) {
+        // Remove this func, now used onSelectedLocation()
+        toolbarLayout.visibility = View.VISIBLE
+        setLatLng(latitude, longitude, altitude)
+        startFragment(EditLocationFragment.newInstance(latitude, longitude, altitude, name))
+    }
+
+    override fun onSelectedLocation(
+        latitude: Double,
+        longitude: Double,
+        siteId: Int,
+        name: String
+    ) {
         toolbarLayout.visibility = View.VISIBLE
         setLatLng(latitude, longitude, altitude)
         startFragment(EditLocationFragment.newInstance(latitude, longitude, altitude, name))

@@ -6,6 +6,7 @@ import org.rfcx.companion.service.DownloadStreamState
 
 interface BaseDeploymentProtocol {
     fun startMapPicker(latitude: Double, longitude: Double, altitude: Double, name: String)
+    fun startMapPicker(latitude: Double, longitude: Double, siteId: Int, name: String)
     fun startCheckList()
     fun startSelectingExistedSite(latitude: Double, longitude: Double)
     fun startDetailDeploymentSite(id: Int, name: String?, isNewSite: Boolean)

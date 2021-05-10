@@ -60,6 +60,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
     private var longitude: Double = 0.0
     private var altitude: Double = 0.0
     private var nameLocation: String? = null
+    private var siteId: Int? = null
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
@@ -122,7 +123,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
             val currentCameraPosition = mapboxMap?.cameraPosition?.target
             currentCameraPosition?.let {
                 analytics?.trackSelectLocationEvent()
-                mapPickerProtocol?.startLocationPage(it.latitude, it.longitude, altitude, nameLocation ?: "", true)
+                mapPickerProtocol?.onSelectedLocation(it.latitude, it.longitude, siteId ?: -1, nameLocation ?: "")
             }
         }
 
@@ -143,6 +144,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
             longitude = it.getDouble(ARG_LONGITUDE)
             altitude = it.getDouble(ARG_ALTITUDE)
             nameLocation = it.getString(ARG_LOCATION_NAME)
+            siteId = it.getInt(ARG_SITE_ID)
         }
     }
 
@@ -446,6 +448,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
         private const val ARG_LONGITUDE = "ARG_LONGITUDE"
         private const val ARG_ALTITUDE = "ARG_ALTITUDE"
         private const val ARG_LOCATION_NAME = "ARG_LOCATION_NAME"
+        private const val ARG_SITE_ID = "ARG_SITE_ID"
 
         @JvmStatic
         fun newInstance(lat: Double, lng: Double, altitude: Double, name: String) =
@@ -456,6 +459,17 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
                         putDouble(ARG_LONGITUDE, lng)
                         putDouble(ARG_ALTITUDE, altitude)
                         putString(ARG_LOCATION_NAME, name)
+                    }
+                }
+
+        fun newInstance(lat: Double, lng: Double, siteId: Int, name: String) =
+            MapPickerFragment()
+                .apply {
+                    arguments = Bundle().apply {
+                        putDouble(ARG_LATITUDE, lat)
+                        putDouble(ARG_LONGITUDE, lng)
+                        putString(ARG_LOCATION_NAME, name)
+                        putInt(ARG_SITE_ID, siteId)
                     }
                 }
     }
