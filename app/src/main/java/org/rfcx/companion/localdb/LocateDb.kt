@@ -53,7 +53,7 @@ class LocateDb(private val realm: Realm) {
         return realm.where(Locate::class.java).equalTo(Locate.FIELD_ID, id).findFirst()
     }
 
-    fun getDeleteLocateId(name: String, latitude: Double, longitude: Double): Int? {
+    fun getLocateByNameAndLatLng(name: String, latitude: Double, longitude: Double): Int? {
         var locateId: Int? = null
         realm.executeTransaction {
             val locate = it.where(Locate::class.java)
@@ -122,25 +122,29 @@ class LocateDb(private val realm: Realm) {
         realm.executeTransaction {
             if (!fromGuardian) {
                 //update server id in site
-                it.where(Locate::class.java).equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_ID, deploymentId)
+                it.where(Locate::class.java)
+                    .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_ID, deploymentId)
                     .findFirst()?.apply {
                         this.serverId = serverId
                     }
 
                 //update server id in track
-                it.where(TrackingFile::class.java).equalTo(TrackingFile.FIELD_DEPLOYMENT_ID, deploymentId)
+                it.where(TrackingFile::class.java)
+                    .equalTo(TrackingFile.FIELD_DEPLOYMENT_ID, deploymentId)
                     .findFirst()?.apply {
                         this.siteServerId = serverId
                     }
             } else {
                 //update server id in site
-                it.where(Locate::class.java).equalTo(Locate.FIELD_LAST_GUARDIAN_DEPLOYMENT_ID, deploymentId)
+                it.where(Locate::class.java)
+                    .equalTo(Locate.FIELD_LAST_GUARDIAN_DEPLOYMENT_ID, deploymentId)
                     .findFirst()?.apply {
                         this.serverId = serverId
                     }
 
                 //update server id in track
-                it.where(TrackingFile::class.java).equalTo(TrackingFile.FIELD_DEPLOYMENT_ID, deploymentId)
+                it.where(TrackingFile::class.java)
+                    .equalTo(TrackingFile.FIELD_DEPLOYMENT_ID, deploymentId)
                     .findFirst()?.apply {
                         this.siteServerId = serverId
                     }
@@ -228,6 +232,8 @@ class LocateDb(private val realm: Realm) {
     }
 
     fun getMaxUpdatedAt(): String? {
-        return realm.where(Locate::class.java).isNotNull(Locate.FIELD_SERVER_ID).isNotNull(Locate.FIELD_UPDATED_AT).findAll().maxBy { it.updatedAt!! }?.updatedAt?.toISO8601Format()
+        return realm.where(Locate::class.java).isNotNull(Locate.FIELD_SERVER_ID)
+            .isNotNull(Locate.FIELD_UPDATED_AT).findAll()
+            .maxBy { it.updatedAt!! }?.updatedAt?.toISO8601Format()
     }
 }

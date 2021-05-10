@@ -34,7 +34,6 @@ import kotlinx.android.synthetic.main.fragment_detail_deployment_site.altitudeVa
 import kotlinx.android.synthetic.main.fragment_detail_deployment_site.locationGroupValueTextView
 import kotlinx.android.synthetic.main.fragment_detail_deployment_site.siteValueTextView
 import kotlinx.android.synthetic.main.fragment_detail_deployment_site.withinTextView
-import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.LocationGroup
@@ -130,6 +129,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupTopBar()
 
         mapView = view.findViewById(R.id.mapBoxView)
         mapView.onCreate(savedInstanceState)
@@ -164,6 +164,13 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             site?.let {
                 updateLocation(currentUserLocation?.latitude ?: it.latitude, currentUserLocation?.longitude ?: it.longitude, currentUserLocation?.altitude ?: it.altitude)
             }
+        }
+    }
+
+    private fun setupTopBar() {
+        deploymentProtocol?.let {
+            it.showToolbar()
+            it.setToolbarTitle()
         }
     }
 

@@ -179,7 +179,13 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                     super.onBackPressed()
                 }
             }
-            is DetailDeploymentSiteFragment -> startFragment(SetDeploymentSiteFragment.newInstance())
+            is DetailDeploymentSiteFragment -> {
+                if (_deployLocation == null) {
+                    startFragment(SetDeploymentSiteFragment.newInstance())
+                } else {
+                    startCheckList()
+                }
+            }
             is ChooseDeviceFragment -> finish()
             else -> startCheckList()
         }
@@ -330,7 +336,15 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         when (number) {
             0 -> {
                 updateDeploymentState(DeploymentState.Edge.Locate)
-                startFragment(SetDeploymentSiteFragment.newInstance())
+                val site = _deployLocation
+                if (site == null) {
+                    startFragment(SetDeploymentSiteFragment.newInstance())
+                } else {
+                    val id = locateDb.getLocateByNameAndLatLng(site.name, site.latitude, site.longitude)
+                    id?.let {
+                        startDetailDeploymentSite(it, site.name, false)
+                    }
+                }
             }
             1 -> {
                 updateDeploymentState(DeploymentState.Edge.Sync)
