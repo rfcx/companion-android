@@ -77,5 +77,5 @@ open class Locate(
 }
 
 fun Locate.toMark(): MapMarker.SiteMarker {
-    return MapMarker.SiteMarker(id, name, latitude, longitude, MapFragment.SITE_MARKER)
+    return MapMarker.SiteMarker(id, name, latitude, longitude, altitude, locationGroup?.name,  createdAt, MapFragment.SITE_MARKER)
 }

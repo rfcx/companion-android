@@ -1174,7 +1174,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                         Pair(PROPERTY_SITE_MARKER_ID, "${it.name}.${it.id}"),
                         Pair(PROPERTY_SITE_MARKER_SITE_NAME, it.name),
                         Pair(PROPERTY_SITE_MARKER_SITE_LATITUDE, "${it.latitude}"),
-                        Pair(PROPERTY_SITE_MARKER_SITE_LONGITUDE, "${it.longitude}")
+                        Pair(PROPERTY_SITE_MARKER_SITE_LONGITUDE, "${it.longitude}"),
+                        Pair(PROPERTY_SITE_MARKER_SITE_ALTITUDE, "${it.altitude}"),
+                        Pair(PROPERTY_SITE_MARKER_SITE_PROJECT_NAME, "${it.projectName}"),
+                        Pair(PROPERTY_SITE_MARKER_SITE_CREATED_AT, it.createdAt.toDateString())
                     )
 
                     Feature.fromGeometry(
@@ -1195,11 +1198,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
 
             val title = it.getStringProperty(PROPERTY_SITE_MARKER_SITE_NAME)
             bubbleLayout.infoWindowTitle.text = title
-
-            bubbleLayout.infoWindowDescription.text = "Puerto Rico"
-
-            bubbleLayout.createdAtValue.text = "26/04/2021 09:45"
-
+            val projectName = it.getStringProperty(PROPERTY_SITE_MARKER_SITE_PROJECT_NAME)
+            bubbleLayout.infoWindowDescription.text = projectName
+            val createdAt = it.getStringProperty(PROPERTY_SITE_MARKER_SITE_CREATED_AT)
+            bubbleLayout.createdAtValue.text = createdAt
             var latLng = ""
             val lat = it.getStringProperty(PROPERTY_SITE_MARKER_SITE_LATITUDE) ?: "0.0"
             val lng = it.getStringProperty(PROPERTY_SITE_MARKER_SITE_LONGITUDE) ?: "0.0"
@@ -1208,8 +1210,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                     "${lat.toDouble().latitudeCoordinates(context)}, ${lng.toDouble().longitudeCoordinates(context)}"
             }
             bubbleLayout.latLngValue.text = latLng
-
-            bubbleLayout.altValue.text = "76.89 m"
+            val alt = it.getStringProperty(PROPERTY_SITE_MARKER_SITE_ALTITUDE) ?: "0"
+            bubbleLayout.altValue.text = alt.toDouble().setFormatLabel()
 
             val measureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
             bubbleLayout.measure(measureSpec, measureSpec)
@@ -1561,6 +1563,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         private const val PROPERTY_SITE_MARKER_SITE_NAME = "site.stream.name"
         private const val PROPERTY_SITE_MARKER_SITE_LATITUDE = "site.stream.latitude"
         private const val PROPERTY_SITE_MARKER_SITE_LONGITUDE = "site.stream.longitude"
+        private const val PROPERTY_SITE_MARKER_SITE_ALTITUDE = "site.stream.altitude"
+        private const val PROPERTY_SITE_MARKER_SITE_PROJECT_NAME = "site.stream.project.name"
+        private const val PROPERTY_SITE_MARKER_SITE_CREATED_AT = "site.stream.created.at"
 
         private const val PROPERTY_CLUSTER_TYPE = "cluster.type"
 
