@@ -12,7 +12,7 @@ object MapboxCameraUtils {
         }
         val oppositeLat = userPosition.latitude - (nearestSite.latitude - userPosition.latitude)
         val oppositeLng = userPosition.longitude - (nearestSite.longitude - userPosition.longitude)
-        if (oppositeLat >= -90 && oppositeLat <= 90 && oppositeLng >= -90 && oppositeLng <= 90) {
+        if (oppositeLat >= -90 && oppositeLat <= 90 && oppositeLng >= -180 && oppositeLng <= 180) {
             val oppositeNearestSite = LatLng(oppositeLat, oppositeLng)
             if (oppositeNearestSite.distanceTo(userPosition) < 30) {
                 return CameraUpdateFactory.newLatLngZoom(userPosition, zoom)
