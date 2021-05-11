@@ -46,13 +46,13 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (L
     private lateinit var audioMothDeployLiveData: LiveData<List<EdgeDeployment>>
     private var audioMothDeployments = listOf<EdgeDeployment>()
     private val audioMothDeploymentObserve = Observer<List<EdgeDeployment>> {
-        this.audioMothDeployments = it
+        this.audioMothDeployments = it.filter { deployment->  deployment.isCompleted() }
     }
 
     private lateinit var guardianDeploymentLiveData: LiveData<List<GuardianDeployment>>
     private var guardianDeployments = listOf<GuardianDeployment>()
     private val guardianDeploymentObserve = Observer<List<GuardianDeployment>> {
-        this.guardianDeployments = it
+        this.guardianDeployments = it.filter { deployment->  deployment.isCompleted() }
     }
 
     private lateinit var siteLiveData: LiveData<List<Locate>>
@@ -112,11 +112,10 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (L
         siteNameEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 searchItem?.isVisible = s?.length == 0
+                existedSiteAdapter.isNewSite = s?.length == 0
                 if (s?.length == 0) {
-                    existedSiteAdapter.isNewSite = false
                     existedSiteAdapter.items = sitesAdapter
                 } else {
-                    existedSiteAdapter.isNewSite = true
                     existedSiteAdapter.items = arrayListOf(
                         SiteWithLastDeploymentItem(
                             Locate(
@@ -144,8 +143,8 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (L
         if (lasLocation != null) {
             sitesAdapter = getListSite(
                 requireContext(),
-                audioMothDeployments.filter { it.isCompleted() },
-                guardianDeployments.filter { it.isCompleted() },
+                audioMothDeployments,
+                guardianDeployments,
                 getString(R.string.none),
                 lasLocation,
                 sites
@@ -153,8 +152,8 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (L
         } else {
             sitesAdapter = getListSiteWithOutCurrentLocation(
                 requireContext(),
-                audioMothDeployments.filter { it.isCompleted() },
-                guardianDeployments.filter { it.isCompleted() },
+                audioMothDeployments,
+                guardianDeployments,
                 getString(R.string.none),
                 sites
             )
