@@ -21,11 +21,8 @@ import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
-import org.rfcx.companion.util.Analytics
-import org.rfcx.companion.util.AudioMothChimeConnector
-import org.rfcx.companion.util.Preferences
+import org.rfcx.companion.util.*
 import org.rfcx.companion.util.Preferences.Companion.ENABLE_LOCATION_TRACKING
-import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.companion.view.deployment.locate.LocationFragment
@@ -87,7 +84,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
         setupToolbar()
         preferences.clearSelectedProject()
-
+        this.currentLocation = this.getLastLocation()
         val deploymentId = intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
         if (deploymentId != null) {
             handleDeploymentStep(deploymentId)
@@ -185,7 +182,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             }
             is DetailDeploymentSiteFragment -> {
                 if (_deployLocation == null) {
-                    startFragment(SetDeploymentSiteFragment.newInstance())
+                    startFragment(SetDeploymentSiteFragment.newInstance(currentLocation?.latitude ?: 0.0, currentLocation?.longitude ?: 0.0))
                 } else {
                     startCheckList()
                 }
@@ -348,7 +345,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 updateDeploymentState(DeploymentState.Edge.Locate)
                 val site = _deployLocation
                 if (site == null) {
-                    startFragment(SetDeploymentSiteFragment.newInstance())
+                    startFragment(SetDeploymentSiteFragment.newInstance(currentLocation?.latitude ?: 0.0, currentLocation?.longitude ?: 0.0))
                 } else {
                     val id = locateDb.getLocateByNameAndLatLng(site.name, site.latitude, site.longitude)
                     id?.let {

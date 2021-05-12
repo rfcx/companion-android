@@ -69,6 +69,8 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener,
     }
 
     private var searchItem: MenuItem? = null
+    private var latitude: Double = 0.0
+    private var longitude: Double = 0.0
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -78,6 +80,14 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        initIntent()
+    }
+
+    private fun initIntent() {
+        arguments?.let {
+            latitude = it.getDouble(ARG_LATITUDE)
+            longitude = it.getDouble(ARG_LONGITUDE)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -147,8 +157,8 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener,
         existedSiteAdapter.items = arrayListOf()
         val items = deploymentProtocol?.getSiteItem() ?: arrayListOf()
         val loc = Location(LocationManager.GPS_PROVIDER)
-        loc.latitude = 16.12475
-        loc.longitude = 100.20013
+        loc.latitude = latitude
+        loc.longitude = longitude
         sitesAdapter = getListSite(
             requireContext(),
             audioMothDeployments,
@@ -231,6 +241,15 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener,
     }
 
     companion object {
-        fun newInstance() = SetDeploymentSiteFragment()
+        const val ARG_LATITUDE = "ARG_LATITUDE"
+        const val ARG_LONGITUDE = "ARG_LONGITUDE"
+
+        fun newInstance(lat: Double, lng: Double) =
+            SetDeploymentSiteFragment().apply {
+                arguments = Bundle().apply {
+                    putDouble(ARG_LATITUDE, lat)
+                    putDouble(ARG_LONGITUDE, lng)
+                }
+            }
     }
 }
