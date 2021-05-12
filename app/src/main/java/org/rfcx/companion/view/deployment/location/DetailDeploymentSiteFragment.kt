@@ -30,10 +30,6 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_detail_deployment_site.*
-import kotlinx.android.synthetic.main.fragment_detail_deployment_site.altitudeValue
-import kotlinx.android.synthetic.main.fragment_detail_deployment_site.locationGroupValueTextView
-import kotlinx.android.synthetic.main.fragment_detail_deployment_site.siteValueTextView
-import kotlinx.android.synthetic.main.fragment_detail_deployment_site.withinTextView
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.LocationGroup
@@ -164,8 +160,16 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         }
 
         currentLocate.setOnClickListener {
-            site?.let {
-                updateLocation(currentUserLocation?.latitude ?: it.latitude, currentUserLocation?.longitude ?: it.longitude, currentUserLocation?.altitude ?: it.altitude)
+            if (isCreateNew) {
+                updateLocationOfNewSite()
+            } else {
+                site?.let {
+                    updateLocationOfExistingSite(
+                        currentUserLocation?.latitude ?: it.latitude,
+                        currentUserLocation?.longitude ?: it.longitude,
+                        currentUserLocation?.altitude ?: it.altitude
+                    )
+                }
             }
         }
 
@@ -173,7 +177,12 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             deploymentProtocol?.let {
                 if (isCreateNew) {
                     val currentLocation = currentUserLocation
-                    it.startMapPicker(currentLocation?.latitude ?: 0.0, currentLocation?.longitude ?: 0.0, -1, siteName)
+                    it.startMapPicker(
+                        currentLocation?.latitude ?: 0.0,
+                        currentLocation?.longitude ?: 0.0,
+                        -1,
+                        siteName
+                    )
                 } else {
                     site?.let { site ->
                         it.startMapPicker(site.latitude, site.longitude, site.id, site.name)
@@ -191,7 +200,21 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun updateLocation(latitude: Double, longitude: Double, altitude: Double) {
+    private fun updateLocationOfNewSite() {
+        latitude = 0.0
+        longitude = 0.0
+        val currentLatLng =
+            LatLng(currentUserLocation?.latitude ?: 0.0, currentUserLocation?.longitude ?: 0.0)
+        createSiteSymbol(currentLatLng)
+        moveCamera(LatLng(currentLatLng), DEFAULT_ZOOM)
+        setWithinText()
+    }
+
+    private fun updateLocationOfExistingSite(
+        latitude: Double,
+        longitude: Double,
+        altitude: Double
+    ) {
         var locate = Locate()
         site?.let {
             locate = Locate(
@@ -214,7 +237,8 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             moveCamera(LatLng(locate.getLatLng()), DEFAULT_ZOOM)
         }
         site = locate
-        val currentLatLng = LatLng(currentUserLocation?.latitude ?: 0.0, currentUserLocation?.longitude ?: 0.0)
+        val currentLatLng =
+            LatLng(currentUserLocation?.latitude ?: 0.0, currentUserLocation?.longitude ?: 0.0)
         setCheckboxForResumeDeployment(currentLatLng, LatLng(latitude, longitude))
     }
 
@@ -240,8 +264,10 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 it.serverId,
                 getLocationGroup(it.locationGroup?.name ?: getString(R.string.none)),
                 it.name,
-                if(userLocation?.latitude != 0.0) userLocation?.latitude ?: it.latitude else it.latitude,
-                if(userLocation?.longitude != 0.0) userLocation?.longitude ?: it.longitude else it.longitude,
+                if (userLocation?.latitude != 0.0) userLocation?.latitude
+                    ?: it.latitude else it.latitude,
+                if (userLocation?.longitude != 0.0) userLocation?.longitude
+                    ?: it.longitude else it.longitude,
                 currentUserLocation?.altitude ?: it.altitude,
                 it.createdAt,
                 it.updatedAt,
@@ -283,7 +309,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     fun updateView() {
         if (!isCreateNew) site = siteDb.getLocateById(siteId)
         if (latitude != 0.0 && longitude != 0.0) {
-            val alt = if(isCreateNew) currentUserLocation?.altitude else site?.altitude
+            val alt = if (isCreateNew) currentUserLocation?.altitude else site?.altitude
             setLatLngLabel(LatLng(latitude, longitude), alt ?: 0.0)
         } else if (isCreateNew) {
             currentUserLocation?.let { setLatLngLabel(it.toLatLng(), it.altitude) }
