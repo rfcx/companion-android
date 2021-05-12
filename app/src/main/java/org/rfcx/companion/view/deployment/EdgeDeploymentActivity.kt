@@ -67,6 +67,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     private var longitude = 0.0
     private var altitude = 0.0
     private var nameLocation: String = ""
+    private var siteId: Int = 0
 
     private var currentCheck = 0
     private var currentCheckName = ""
@@ -144,7 +145,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     override fun backStep() {
         val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
         when (container) {
-            is MapPickerFragment -> startFragment(LocationFragment.newInstance())
+            is MapPickerFragment -> startFragment(DetailDeploymentSiteFragment.newInstance(latitude, longitude, siteId, nameLocation))
             is EdgeCheckListFragment -> {
                 _deployment?.let {
                     it.passedChecks = passedChecks
@@ -277,10 +278,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         return this._images
     }
 
-    private fun setLatLng(latitude: Double, longitude: Double, altitude: Double, name: String) {
+    private fun setLatLng(latitude: Double, longitude: Double, siteId: Int, name: String) {
         this.latitude = latitude
         this.longitude = longitude
-        this.altitude = altitude
+        this.siteId = siteId
         this.nameLocation = name
     }
 
@@ -444,11 +445,11 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     }
 
     override fun startMapPicker(latitude: Double, longitude: Double, altitude: Double, name: String) {
-        setLatLng(latitude, longitude, altitude, name)
         startFragment(MapPickerFragment.newInstance(latitude, longitude, altitude, name))
     }
 
     override fun startMapPicker(latitude: Double, longitude: Double, siteId: Int, name: String) {
+        setLatLng(latitude, longitude, siteId, name)
         startFragment(MapPickerFragment.newInstance(latitude, longitude, siteId, name))
     }
 
