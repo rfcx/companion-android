@@ -175,19 +175,16 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
 
         viewMapBox.setOnClickListener {
             deploymentProtocol?.let {
-                if (isCreateNew) {
-                    val currentLocation = currentUserLocation
-                    it.startMapPicker(
-                        currentLocation?.latitude ?: 0.0,
-                        currentLocation?.longitude ?: 0.0,
-                        -1,
-                        siteName
-                    )
-                } else {
-                    site?.let { site ->
-                        it.startMapPicker(site.latitude, site.longitude, site.id, site.name)
-                    }
-                }
+                getLastLocation()
+                val siteLocation = userLocation
+                val siteId = if (isCreateNew) -1 else site?.id ?: -1
+                val nameSite = if (isCreateNew) siteName else site?.name ?: ""
+                it.startMapPicker(
+                    siteLocation?.latitude ?: 0.0,
+                    siteLocation?.longitude ?: 0.0,
+                    siteId,
+                    nameSite
+                )
                 it.hideToolbar()
             }
         }
