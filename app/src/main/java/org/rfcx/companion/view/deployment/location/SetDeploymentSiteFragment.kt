@@ -1,6 +1,8 @@
 package org.rfcx.companion.view.deployment.location
 
 import android.content.Context
+import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -22,12 +24,16 @@ import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
-import org.rfcx.companion.util.*
+import org.rfcx.companion.util.RealmHelper
+import org.rfcx.companion.util.asLiveData
+import org.rfcx.companion.util.getListSite
+import org.rfcx.companion.util.showKeyboard
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.map.SiteAdapter
 
-class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (Locate, Boolean) -> Unit {
+class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener,
+        (Locate, Boolean) -> Unit {
 
     // Protocol
     private var deploymentProtocol: BaseDeploymentProtocol? = null
@@ -46,13 +52,13 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (L
     private lateinit var audioMothDeployLiveData: LiveData<List<EdgeDeployment>>
     private var audioMothDeployments = listOf<EdgeDeployment>()
     private val audioMothDeploymentObserve = Observer<List<EdgeDeployment>> {
-        this.audioMothDeployments = it.filter { deployment->  deployment.isCompleted() }
+        this.audioMothDeployments = it.filter { deployment -> deployment.isCompleted() }
     }
 
     private lateinit var guardianDeploymentLiveData: LiveData<List<GuardianDeployment>>
     private var guardianDeployments = listOf<GuardianDeployment>()
     private val guardianDeploymentObserve = Observer<List<GuardianDeployment>> {
-        this.guardianDeployments = it.filter { deployment->  deployment.isCompleted() }
+        this.guardianDeployments = it.filter { deployment -> deployment.isCompleted() }
     }
 
     private lateinit var siteLiveData: LiveData<List<Locate>>
@@ -103,7 +109,6 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (L
         setupAdapter()
         setupTopBar()
         setLiveData()
-        setupView()
         setEditText()
         siteNameEditText.showKeyboard()
     }
@@ -140,27 +145,29 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (L
 
     private fun setupView() {
         existedSiteAdapter.items = arrayListOf()
-        val lasLocation = context?.getLastLocation()
-        if (lasLocation != null) {
-            sitesAdapter = getListSite(
-                requireContext(),
-                audioMothDeployments,
-                guardianDeployments,
-                getString(R.string.none),
-                lasLocation,
-                sites
-            )
+        val items = deploymentProtocol?.getSiteItem() ?: arrayListOf()
+        val loc = Location(LocationManager.GPS_PROVIDER)
+        loc.latitude = 16.12475
+        loc.longitude = 100.20013
+        sitesAdapter = getListSite(
+            requireContext(),
+            audioMothDeployments,
+            guardianDeployments,
+            getString(R.string.none),
+            loc,
+            sites
+        )
+        if (sitesAdapter[0].date == null && items.isNotEmpty()){
+            handleItemsAdapter(items)
         } else {
-            sitesAdapter = getListSiteWithOutCurrentLocation(
-                requireContext(),
-                audioMothDeployments,
-                guardianDeployments,
-                getString(R.string.none),
-                sites
-            )
+            handleItemsAdapter(sitesAdapter)
         }
+    }
+
+    private fun handleItemsAdapter(sites: ArrayList<SiteWithLastDeploymentItem>) {
         existedSiteAdapter.isNewSite = false
-        existedSiteAdapter.items = sitesAdapter
+        existedSiteAdapter.items = sites
+        deploymentProtocol?.setSiteItem(sites)
     }
 
     private fun setupTopBar() {

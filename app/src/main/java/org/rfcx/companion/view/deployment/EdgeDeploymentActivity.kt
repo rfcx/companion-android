@@ -31,12 +31,14 @@ import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
 import org.rfcx.companion.view.deployment.locate.SelectingExistedSiteFragment
+import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.deployment.location.DetailDeploymentSiteFragment
 import org.rfcx.companion.view.deployment.location.SetDeploymentSiteFragment
 import org.rfcx.companion.view.deployment.sync.NewSyncFragment
 import org.rfcx.companion.view.detail.MapPickerProtocol
 import org.rfcx.companion.view.dialog.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, CompleteListener,
     MapPickerProtocol {
@@ -53,7 +55,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     private var _deployment: EdgeDeployment? = null
     private var _deployLocation: DeploymentLocation? = null
     private var _images: List<String> = listOf()
-    private var _deployLocationGroup: LocationGroup? = null
+    private var _siteItems = arrayListOf<SiteWithLastDeploymentItem>()
     private var _locate: Locate? = null
 
     private var useExistedLocation: Boolean = false
@@ -253,6 +255,8 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
+    override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
+
     override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
         val deployment = _deployment ?: EdgeDeployment()
         deployment.isActive = locate.serverId == null
@@ -268,6 +272,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         }
 
         setDeployment(deployment)
+    }
+
+    override fun setSiteItem(items: ArrayList<SiteWithLastDeploymentItem>) {
+        this._siteItems = items
     }
 
     override fun setImages(images: List<String>) {

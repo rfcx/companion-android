@@ -42,11 +42,13 @@ import org.rfcx.companion.view.deployment.guardian.solarpanel.GuardianSolarPanel
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
 import org.rfcx.companion.view.deployment.locate.SelectingExistedSiteFragment
+import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.deployment.location.DetailDeploymentSiteFragment
 import org.rfcx.companion.view.detail.MapPickerProtocol
 import org.rfcx.companion.view.dialog.*
 import org.rfcx.companion.view.prefs.SyncPreferenceListener
 import java.util.*
+import kotlin.collections.ArrayList
 
 class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtocol,
     CompleteListener, MapPickerProtocol, SyncPreferenceListener {
@@ -65,6 +67,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private var _configuration: GuardianConfiguration? = null
     private var _images: List<String> = listOf()
     private var _locate: Locate? = null
+    private var _siteItems = arrayListOf<SiteWithLastDeploymentItem>()
 
     private var useExistedLocation: Boolean = false
 
@@ -235,6 +238,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
+    override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
+
     override fun getLocationGroup(name: String): LocationGroups? {
         return locationGroupDb.getLocationGroup(name)
     }
@@ -261,6 +266,10 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         }
 
         setDeployment(deployment)
+    }
+
+    override fun setSiteItem(items: ArrayList<SiteWithLastDeploymentItem>) {
+        this._siteItems = items
     }
 
     override fun setReadyToDeploy() {
