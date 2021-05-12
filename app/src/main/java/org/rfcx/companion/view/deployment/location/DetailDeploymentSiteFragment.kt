@@ -56,6 +56,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     var siteId: Int = 0
     var siteName: String = ""
     var isCreateNew: Boolean = false
+    var isUseCurrentLocate: Boolean = false
     var site: Locate? = null
 
     // Local database
@@ -160,6 +161,8 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         }
 
         currentLocate.setOnClickListener {
+            setWithinText()
+            isUseCurrentLocate = true
             if (isCreateNew) {
                 updateLocationOfNewSite()
             } else {
@@ -198,13 +201,16 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun updateLocationOfNewSite() {
-        latitude = 0.0
-        longitude = 0.0
+        setLatLngToDefault()
         val currentLatLng =
             LatLng(currentUserLocation?.latitude ?: 0.0, currentUserLocation?.longitude ?: 0.0)
         createSiteSymbol(currentLatLng)
         moveCamera(LatLng(currentLatLng), DEFAULT_ZOOM)
-        setWithinText()
+    }
+
+    private fun setLatLngToDefault() {
+        latitude = 0.0
+        longitude = 0.0
     }
 
     private fun updateLocationOfExistingSite(
@@ -212,6 +218,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         longitude: Double,
         altitude: Double
     ) {
+        setLatLngToDefault()
         var locate = Locate()
         site?.let {
             locate = Locate(
@@ -234,9 +241,6 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             moveCamera(LatLng(locate.getLatLng()), DEFAULT_ZOOM)
         }
         site = locate
-        val currentLatLng =
-            LatLng(currentUserLocation?.latitude ?: 0.0, currentUserLocation?.longitude ?: 0.0)
-        setCheckboxForResumeDeployment(currentLatLng, LatLng(latitude, longitude))
     }
 
     private fun createSite() {
@@ -304,7 +308,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     }
 
     fun updateView() {
-        if (!isCreateNew) site = siteDb.getLocateById(siteId)
+        if (!isCreateNew) site = site ?: siteDb.getLocateById(siteId)
         if (latitude != 0.0 && longitude != 0.0) {
             val alt = if (isCreateNew) currentUserLocation?.altitude else site?.altitude
             setLatLngLabel(LatLng(latitude, longitude), alt ?: 0.0)
