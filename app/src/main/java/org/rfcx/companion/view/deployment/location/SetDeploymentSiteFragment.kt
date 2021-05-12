@@ -112,10 +112,11 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener, (L
         siteNameEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 searchItem?.isVisible = s?.length == 0
-                existedSiteAdapter.isNewSite = s?.length == 0
                 if (s?.length == 0) {
+                    existedSiteAdapter.isNewSite = false
                     existedSiteAdapter.items = sitesAdapter
                 } else {
+                    existedSiteAdapter.isNewSite = true
                     existedSiteAdapter.items = arrayListOf(
                         SiteWithLastDeploymentItem(
                             Locate(
