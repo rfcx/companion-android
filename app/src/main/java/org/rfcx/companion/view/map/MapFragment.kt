@@ -7,14 +7,12 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.PointF
 import android.location.Location
-import android.location.LocationManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import com.mapbox.mapboxsdk.style.layers.Property
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -47,12 +45,10 @@ import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.mapboxsdk.style.expressions.Expression
 import com.mapbox.mapboxsdk.style.expressions.Expression.*
 import com.mapbox.mapboxsdk.style.layers.CircleLayer
 import com.mapbox.mapboxsdk.style.layers.LineLayer
 import com.mapbox.mapboxsdk.style.layers.Property.*
-import com.mapbox.mapboxsdk.style.layers.PropertyFactory
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
@@ -502,9 +498,18 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                         sum(accumulated(), get(PROPERTY_CLUSTER_TYPE)),
                         switchCase(
                             any(
-                                eq(get(PROPERTY_DEPLOYMENT_MARKER_IMAGE), Battery.BATTERY_PIN_GREEN),
-                                eq(get(PROPERTY_DEPLOYMENT_MARKER_IMAGE), GuardianPin.CONNECTED_GUARDIAN),
-                                eq(get(PROPERTY_DEPLOYMENT_MARKER_IMAGE), GuardianPin.NOT_CONNECTED_GUARDIAN)
+                                eq(
+                                    get(PROPERTY_DEPLOYMENT_MARKER_IMAGE),
+                                    Battery.BATTERY_PIN_GREEN
+                                ),
+                                eq(
+                                    get(PROPERTY_DEPLOYMENT_MARKER_IMAGE),
+                                    GuardianPin.CONNECTED_GUARDIAN
+                                ),
+                                eq(
+                                    get(PROPERTY_DEPLOYMENT_MARKER_IMAGE),
+                                    GuardianPin.NOT_CONNECTED_GUARDIAN
+                                )
                             ),
                             literal(1),
                             literal(0)
@@ -527,6 +532,39 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
 
     private fun setFeatureSelectState(feature: Feature, selectedState: Boolean) {
         feature.properties()?.let {
+            val windowInfoImages = hashMapOf<String, Bitmap>()
+            val inflater = LayoutInflater.from(context)
+
+            val bubbleLayout =
+                inflater.inflate(R.layout.layout_map_window_info, null) as BubbleLayout
+            val id = feature.getStringProperty(PROPERTY_SITE_MARKER_ID) ?: feature.getStringProperty(
+                PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID
+            )
+            val title = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_NAME)
+            bubbleLayout.infoWindowTitle.text = title
+            val projectName = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_PROJECT_NAME)
+            bubbleLayout.infoWindowDescription.text = projectName
+            val createdAt = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_CREATED_AT)
+            bubbleLayout.createdAtValue.text = createdAt
+            var latLng = ""
+            val lat = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_LATITUDE) ?: "0.0"
+            val lng = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_LONGITUDE) ?: "0.0"
+            context?.let { context ->
+                latLng =
+                    "${lat.toDouble().latitudeCoordinates(context)}, ${lng.toDouble()
+                        .longitudeCoordinates(context)}"
+            }
+            bubbleLayout.latLngValue.text = latLng
+            val alt = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_ALTITUDE) ?: "0"
+            bubbleLayout.altValue.text = alt.toDouble().setFormatLabel()
+            val measureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            bubbleLayout.measure(measureSpec, measureSpec)
+            val measuredWidth = bubbleLayout.measuredWidth
+            bubbleLayout.arrowPosition = (measuredWidth / 2 - 5).toFloat()
+            val bitmap = SymbolGenerator.generate(bubbleLayout)
+            windowInfoImages[id] = bitmap
+
+            setWindowInfoImageGenResults(windowInfoImages)
             it.addProperty(PROPERTY_DEPLOYMENT_SELECTED, selectedState)
             refreshSource()
         }
@@ -834,7 +872,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
     private fun combinedData() {
         // hide loading progress
         progressBar.visibility = View.INVISIBLE
-        var showGuardianDeployments = this.guardianDeployments.filter  { it.isCompleted() }
+        var showGuardianDeployments = this.guardianDeployments.filter { it.isCompleted() }
         val usedSitesOnGuardian = showGuardianDeployments.map { it.stream?.coreId }
 
         var showDeployments = this.edgeDeployments.filter { it.isCompleted() }
@@ -903,24 +941,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         } else {
             hideLabel()
         }
-    }
-
-    private fun findNearLocations(locateItems: ArrayList<Locate>): List<Pair<Locate, Float>>? {
-        currentUserLocation ?: return null
-
-        if (locateItems.isNotEmpty()) {
-            val itemsWithDistance = arrayListOf<Pair<Locate, Float>>()
-            // Find locate distances
-            locateItems.mapTo(itemsWithDistance, {
-                val loc = Location(LocationManager.GPS_PROVIDER)
-                loc.latitude = it.latitude
-                loc.longitude = it.longitude
-                val distance = loc.distanceTo(this.currentUserLocation) // return in meters
-                Pair(it, distance)
-            })
-            return itemsWithDistance
-        }
-        return null
     }
 
     private fun getFurthestSiteFromCurrentLocation(
@@ -1186,43 +1206,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                 }
             }
         }
-
-        // Create window info
-        val windowInfoImages = hashMapOf<String, Bitmap>()
-        val inflater = LayoutInflater.from(context)
-        mapMarkerPointFeatures.forEach {
-            val bubbleLayout =
-                inflater.inflate(R.layout.layout_map_window_info, null) as BubbleLayout
-
-            val id = it.getStringProperty(PROPERTY_SITE_MARKER_ID) ?: it.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID)
-
-            val title = it.getStringProperty(PROPERTY_SITE_MARKER_SITE_NAME)
-            bubbleLayout.infoWindowTitle.text = title
-            val projectName = it.getStringProperty(PROPERTY_SITE_MARKER_SITE_PROJECT_NAME)
-            bubbleLayout.infoWindowDescription.text = projectName
-            val createdAt = it.getStringProperty(PROPERTY_SITE_MARKER_SITE_CREATED_AT)
-            bubbleLayout.createdAtValue.text = createdAt
-            var latLng = ""
-            val lat = it.getStringProperty(PROPERTY_SITE_MARKER_SITE_LATITUDE) ?: "0.0"
-            val lng = it.getStringProperty(PROPERTY_SITE_MARKER_SITE_LONGITUDE) ?: "0.0"
-            context?.let { context ->
-                latLng =
-                    "${lat.toDouble().latitudeCoordinates(context)}, ${lng.toDouble().longitudeCoordinates(context)}"
-            }
-            bubbleLayout.latLngValue.text = latLng
-            val alt = it.getStringProperty(PROPERTY_SITE_MARKER_SITE_ALTITUDE) ?: "0"
-            bubbleLayout.altValue.text = alt.toDouble().setFormatLabel()
-
-            val measureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-            bubbleLayout.measure(measureSpec, measureSpec)
-            val measuredWidth = bubbleLayout.measuredWidth
-            bubbleLayout.arrowPosition = (measuredWidth / 2 - 5).toFloat()
-
-            val bitmap = SymbolGenerator.generate(bubbleLayout)
-            windowInfoImages[id] = bitmap
-        }
-
-        setWindowInfoImageGenResults(windowInfoImages)
         this.mapFeatures = FeatureCollection.fromFeatures(mapMarkerPointFeatures)
         refreshSource()
     }
@@ -1625,7 +1608,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                     if (projects.size > 1) {
                         moveCameraWithLatLngList(projects)
                     } else {
-                        moveCamera(LatLng(projects[0].latitude, projects[0].longitude), null, LocationFragment.DEFAULT_ZOOM)
+                        moveCamera(
+                            LatLng(projects[0].latitude, projects[0].longitude),
+                            null,
+                            LocationFragment.DEFAULT_ZOOM
+                        )
                     }
                 } else {
                     currentUserLocation?.let { current ->
