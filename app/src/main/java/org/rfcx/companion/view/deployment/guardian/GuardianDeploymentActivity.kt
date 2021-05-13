@@ -70,7 +70,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     private var currentLocation: Location? = null
 
-    private var _sampleRate = 24000
+    private var _sampleRate = 12000
 
     private var latitude = 0.0
     private var longitude = 0.0

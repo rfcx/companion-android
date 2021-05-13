@@ -331,13 +331,13 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         private val playback = arrayOf("On", "Off")
 
         private const val DELAY = 0L
-        private const val MILLI_PERIOD = 10L
+        private const val MILLI_PERIOD = 250L
 
-        private const val STACK_PERIOD = 10L
+        private const val STACK_PERIOD = 20L
 
         private const val RECORDER_CHECK_PERIOD = 1000L
 
-        private const val DEF_SAMPLERATE = 24000
+        private const val DEF_SAMPLERATE = 12000
 
         enum class MicTestingState { READY, LISTENING, FINISH }
 

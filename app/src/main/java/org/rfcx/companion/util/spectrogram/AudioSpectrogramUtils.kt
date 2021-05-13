@@ -9,7 +9,7 @@ import org.jtransforms.fft.FloatFFT_1D
 
 object AudioSpectrogramUtils {
 
-    private enum class ScrollSpeed(val value: Int) { FAST(256), NORMAL(1024), SLOW(4096) }
+    private enum class ScrollSpeed(val value: Int) { FAST(256), NORMAL(512), SLOW(1024) }
 
     private var fftResolution = 256
 
