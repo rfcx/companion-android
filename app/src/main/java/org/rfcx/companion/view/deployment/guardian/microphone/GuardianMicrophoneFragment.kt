@@ -253,8 +253,8 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         timer?.schedule(object : TimerTask() {
             override fun run() {
                 if (!isTimerPause && isMicTesting) {
-                    SocketManager.getLiveAudioBuffer(microphoneTestUtils)
                     isTimerPause = true
+                    SocketManager.getLiveAudioBuffer(microphoneTestUtils)
                 }
             }
         }, DELAY, MILLI_PERIOD)
@@ -331,7 +331,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         private val playback = arrayOf("On", "Off")
 
         private const val DELAY = 0L
-        private const val MILLI_PERIOD = 250L
+        private const val MILLI_PERIOD = 333L
 
         private const val STACK_PERIOD = 20L
 
