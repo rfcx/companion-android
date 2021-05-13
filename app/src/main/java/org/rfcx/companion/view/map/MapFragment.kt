@@ -78,7 +78,6 @@ import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.geojson.GeoJsonUtils
-import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupAdapter
@@ -170,7 +169,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
             }
 
             override fun onFailure(exception: Exception) {
-                Log.e(LocationFragment.TAG, exception.localizedMessage ?: "empty localizedMessage")
+                Log.e("MapFragment", exception.localizedMessage ?: "empty localizedMessage")
             }
         }
 
@@ -1227,9 +1226,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
     private fun initLocationEngine() {
         locationEngine = context?.let { LocationEngineProvider.getBestLocationEngine(it) }
         val request =
-            LocationEngineRequest.Builder(LocationFragment.DEFAULT_INTERVAL_IN_MILLISECONDS)
+            LocationEngineRequest.Builder(DEFAULT_INTERVAL_IN_MILLISECONDS)
                 .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
-                .setMaxWaitTime(LocationFragment.DEFAULT_MAX_WAIT_TIME).build()
+                .setMaxWaitTime(DEFAULT_MAX_WAIT_TIME).build()
 
         locationEngine?.requestLocationUpdates(
             request,
@@ -1238,20 +1237,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         )
 
         locationEngine?.getLastLocation(mapboxLocationChangeCallback)
-    }
-
-    private fun moveCameraOnStart() {
-        mapboxMap?.locationComponent?.lastKnownLocation?.let { curLoc ->
-            val currentLatLng = LatLng(curLoc.latitude, curLoc.longitude)
-            val furthestSite = getFurthestSiteFromCurrentLocation(currentLatLng, this.locations)
-            furthestSite?.let {
-                moveCamera(
-                    currentLatLng,
-                    LatLng(furthestSite.latitude, furthestSite.longitude),
-                    DEFAULT_ZOOM_LEVEL
-                )
-            }
-        }
     }
 
     private fun moveCameraOnStartWithProject() {
@@ -1269,7 +1254,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                 moveCamera(
                     currentLatLng,
                     LatLng(furthestSite.latitude, furthestSite.longitude),
-                    DEFAULT_ZOOM_LEVEL
+                    DefaultSetupMap.DEFAULT_ZOOM
                 )
             }
             context?.let { currentLatLng.saveLastLocation(it) }
@@ -1282,7 +1267,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
             moveCamera(
                 currentLatLng,
                 null,
-                mapboxMap?.cameraPosition?.zoom ?: DEFAULT_ZOOM_LEVEL
+                mapboxMap?.cameraPosition?.zoom ?: DefaultSetupMap.DEFAULT_ZOOM
             )
         }
     }
@@ -1301,7 +1286,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                 mapboxMap?.easeCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 200), 1300)
             } else {
                 it.moveCamera(
-                    CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), DEFAULT_ZOOM_LEVEL)
+                    CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), DefaultSetupMap.DEFAULT_ZOOM)
                 )
             }
         }
@@ -1473,7 +1458,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
     companion object {
         const val tag = "MapFragment"
         const val SITE_MARKER = "SITE_MARKER"
-        private const val DEFAULT_ZOOM_LEVEL = 15.0
 
         private const val SOURCE_DEPLOYMENT = "source.deployment"
         private const val MARKER_DEPLOYMENT_ID = "marker.deployment"
@@ -1502,6 +1486,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
 
         private const val DURATION = 700
 
+        const val DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L
+        const val DEFAULT_MAX_WAIT_TIME = DEFAULT_INTERVAL_IN_MILLISECONDS * 5
+
         fun newInstance(): MapFragment {
             return MapFragment()
         }
@@ -1516,7 +1503,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
             mapboxMap?.animateCamera(
                 CameraUpdateFactory.newLatLngZoom(
                     it.getLatLng(),
-                    DEFAULT_ZOOM_LEVEL
+                    DefaultSetupMap.DEFAULT_ZOOM
                 )
             )
         }
@@ -1551,7 +1538,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                     if (projects.size > 1) {
                         moveCameraWithLatLngList(projects)
                     } else {
-                        moveCamera(LatLng(projects[0].latitude, projects[0].longitude), null, LocationFragment.DEFAULT_ZOOM)
+                        moveCamera(LatLng(projects[0].latitude, projects[0].longitude), null, DefaultSetupMap.DEFAULT_ZOOM)
                     }
                 } else {
                     currentUserLocation?.let { current ->
@@ -1560,7 +1547,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                                 current.latitude,
                                 current.longitude
                             )
-                            , null, LocationFragment.DEFAULT_ZOOM
+                            , null, DefaultSetupMap.DEFAULT_ZOOM
                         )
                     }
                 }

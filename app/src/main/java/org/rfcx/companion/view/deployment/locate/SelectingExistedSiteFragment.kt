@@ -36,6 +36,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
+// TODO DELETE
 class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener, (Locate, Boolean) -> Unit {
     private val existedSiteAdapter by lazy { SiteAdapter(this) }
     private var mapPickerProtocol: MapPickerProtocol? = null
@@ -235,13 +236,6 @@ class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener,
     }
 
     override fun invoke(locate: Locate, isNew: Boolean) {
-        mapPickerProtocol?.startLocationPage(
-            locate.latitude,
-            locate.longitude,
-            locate.altitude,
-            locate.name,
-            false
-        )
         view?.hideKeyboard()
         context?.let { retrieveProjects(it) }
     }

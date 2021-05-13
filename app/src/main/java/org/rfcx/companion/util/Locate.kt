@@ -10,6 +10,10 @@ import org.rfcx.companion.view.profile.coordinates.CoordinatesActivity.Companion
 import org.rfcx.companion.view.profile.coordinates.CoordinatesActivity.Companion.DMS_FORMAT
 import kotlin.math.absoluteValue
 
+object DefaultSetupMap {
+    const val DEFAULT_ZOOM = 15.0
+}
+
 fun Double?.latitudeCoordinates(context: Context): String {
     val lat = this
     if (lat != null) {

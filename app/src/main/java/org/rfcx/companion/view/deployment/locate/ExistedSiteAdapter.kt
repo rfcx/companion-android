@@ -9,6 +9,7 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.util.setFormatLabel
 
+// TODO DELETE
 class ExistedSiteAdapter(private val itemClickListener: (Locate) -> Unit) :
     RecyclerView.Adapter<ExistedSiteAdapter.ExistedSiteAdapterViewHolder>() {
     var items: ArrayList<SiteItem> = arrayListOf()

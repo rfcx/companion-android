@@ -25,7 +25,6 @@ import org.rfcx.companion.util.*
 import org.rfcx.companion.util.Preferences.Companion.ENABLE_LOCATION_TRACKING
 import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
-import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
 import org.rfcx.companion.view.deployment.locate.SelectingExistedSiteFragment
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
@@ -154,31 +153,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 }
                 passedChecks.clear() // remove all passed
                 finish()
-            }
-            is LocationFragment -> {
-                val isFragmentPopped = handleNestedFragmentBackStack(supportFragmentManager)
-                if (!isFragmentPopped && supportFragmentManager.backStackEntryCount <= 1) {
-                    // if top's fragment is  LocationFragment then finish else show LocationFragment fragment
-                    when {
-                        supportFragmentManager.fragments.firstOrNull() is LocationFragment -> {
-                            startCheckList()
-                        }
-                        supportFragmentManager.fragments.lastOrNull() is LocationFragment -> {
-                            startCheckList()
-                        }
-                        else -> {
-                            startLocationPage(
-                                this.latitude,
-                                this.longitude,
-                                this.altitude,
-                                this.nameLocation,
-                                true
-                            )
-                        }
-                    }
-                } else if (!isFragmentPopped) {
-                    super.onBackPressed()
-                }
             }
             is DetailDeploymentSiteFragment -> {
                 if (_deployLocation == null) {
@@ -388,16 +362,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         startFragment(NewSyncFragment.newInstance())
     }
 
-    override fun startLocationPage(
-        latitude: Double,
-        longitude: Double,
-        altitude: Double,
-        name: String,
-        fromPicker: Boolean
-    ) {
-        startFragment(LocationFragment.newInstance(latitude, longitude, altitude, name, fromPicker))
-    }
-
     override fun onSelectedLocation(
         latitude: Double,
         longitude: Double,
@@ -447,10 +411,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     override fun isSiteLoading(): DownloadStreamState {
         return DownloadStreamsWorker.isRunning()
-    }
-
-    override fun startMapPicker(latitude: Double, longitude: Double, altitude: Double, name: String) {
-        startFragment(MapPickerFragment.newInstance(latitude, longitude, altitude, name))
     }
 
     override fun startMapPicker(latitude: Double, longitude: Double, siteId: Int, name: String) {
@@ -541,8 +501,8 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         val fragment =
-            supportFragmentManager.findFragmentByTag(LocationFragment.TAG) as LocationFragment?
-                ?: LocationFragment.newInstance()
+            supportFragmentManager.findFragmentByTag("DetailDeploymentSiteFragment") as DetailDeploymentSiteFragment?
+                ?: DetailDeploymentSiteFragment.newInstance()
         fragment.onActivityResult(requestCode, resultCode, data)
     }
 

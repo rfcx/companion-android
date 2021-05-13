@@ -38,7 +38,6 @@ import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
-import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.map.MapboxCameraUtils
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 
@@ -85,7 +84,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                         currentUserLocation?.let { currentUserLocation ->
                             val latLng =
                                 LatLng(currentUserLocation.latitude, currentUserLocation.longitude)
-                            moveCamera(latLng, null, DEFAULT_ZOOM)
+                            moveCamera(latLng, null, DefaultSetupMap.DEFAULT_ZOOM)
                             setCheckboxForResumeDeployment(
                                 currentUserLocation.toLatLng(),
                                 context?.getLastLocation()?.toLatLng() ?: LatLng()
@@ -205,7 +204,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         val currentLatLng =
             LatLng(currentUserLocation?.latitude ?: 0.0, currentUserLocation?.longitude ?: 0.0)
         createSiteSymbol(currentLatLng)
-        moveCamera(LatLng(currentLatLng), DEFAULT_ZOOM)
+        moveCamera(LatLng(currentLatLng), DefaultSetupMap.DEFAULT_ZOOM)
     }
 
     private fun setLatLngToDefault() {
@@ -238,7 +237,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 it.syncState
             )
             createSiteSymbol(locate.getLatLng())
-            moveCamera(LatLng(locate.getLatLng()), DEFAULT_ZOOM)
+            moveCamera(LatLng(locate.getLatLng()), DefaultSetupMap.DEFAULT_ZOOM)
         }
         site = locate
     }
@@ -349,14 +348,14 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         val curLoc = context?.getLastLocation()?.toLatLng() ?: LatLng()
         if (latitude != 0.0 && longitude != 0.0) {
             val latLng = LatLng(latitude, longitude)
-            moveCamera(curLoc, latLng, DEFAULT_ZOOM)
+            moveCamera(curLoc, latLng, DefaultSetupMap.DEFAULT_ZOOM)
             createSiteSymbol(latLng)
             setCheckboxForResumeDeployment(curLoc, latLng)
         } else if (!isCreateNew) {
             site = siteDb.getLocateById(siteId)
             site?.let { locate ->
                 val latLng = locate.getLatLng()
-                moveCamera(curLoc, latLng, DEFAULT_ZOOM)
+                moveCamera(curLoc, latLng, DefaultSetupMap.DEFAULT_ZOOM)
                 setCheckboxForResumeDeployment(
                     curLoc,
                     latLng
@@ -442,7 +441,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             activity?.requestPermissions(
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                LocationFragment.REQUEST_PERMISSIONS_REQUEST_CODE
+                REQUEST_PERMISSIONS_REQUEST_CODE
             )
         } else {
             throw Exception("Request permissions not required before API 23 (should never happen)")
@@ -456,9 +455,9 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     private fun initLocationEngine() {
         locationEngine = context?.let { LocationEngineProvider.getBestLocationEngine(it) }
         val request =
-            LocationEngineRequest.Builder(LocationFragment.DEFAULT_INTERVAL_IN_MILLISECONDS)
+            LocationEngineRequest.Builder(DEFAULT_INTERVAL_IN_MILLISECONDS)
                 .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
-                .setMaxWaitTime(LocationFragment.DEFAULT_MAX_WAIT_TIME).build()
+                .setMaxWaitTime(DEFAULT_MAX_WAIT_TIME).build()
         locationEngine?.requestLocationUpdates(
             request,
             mapboxLocationChangeCallback,
@@ -550,6 +549,10 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     }
 
     companion object {
+        const val REQUEST_PERMISSIONS_REQUEST_CODE = 34
+        const val DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L
+        const val DEFAULT_MAX_WAIT_TIME = DEFAULT_INTERVAL_IN_MILLISECONDS * 5
+
         private const val ARG_SITE_ID = "ARG_SITE_ID"
         private const val ARG_SITE_NAME = "ARG_SITE_NAME"
         private const val ARG_IS_CREATE_NEW = "ARG_IS_CREATE_NEW"
@@ -557,9 +560,10 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         private const val ARG_LONGITUDE = "ARG_LONGITUDE"
 
         const val PROPERTY_MARKER_IMAGE = "marker.image"
-        const val DEFAULT_ZOOM = 15.0
 
         @JvmStatic
+        fun newInstance() = DetailDeploymentSiteFragment()
+
         fun newInstance(id: Int, name: String?, isCreateNew: Boolean = false) =
             DetailDeploymentSiteFragment().apply {
                 arguments = Bundle().apply {

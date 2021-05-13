@@ -52,6 +52,7 @@ import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.map.MapboxCameraUtils
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 
+// TODO DELETE
 class LocationFragment : Fragment(), OnMapReadyCallback {
     val realm: Realm = Realm.getInstance(RealmHelper.migrationConfig())
     private val locationGroupDb = LocationGroupDb(realm)
@@ -249,9 +250,9 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     private fun startMapPicker(name: String, altitude: Double) {
         deploymentProtocol?.let {
             if (locationNameSpinner.selectedItemPosition != 0) {
-                it.startMapPicker(locateItem?.latitude ?: latitude, locateItem?.longitude ?: longitude, altitude, name)
+//                it.startMapPicker(locateItem?.latitude ?: latitude, locateItem?.longitude ?: longitude, altitude, name)
             } else {
-                it.startMapPicker(latitude, longitude, altitude, name)
+//                it.startMapPicker(latitude, longitude, altitude, name)
             }
             it.hideToolbar()
         }
