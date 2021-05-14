@@ -2,8 +2,6 @@ package org.rfcx.companion.view.deployment.location
 
 import android.content.Context
 import android.graphics.Rect
-import android.location.Location
-import android.location.LocationManager
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -27,7 +25,6 @@ import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.asLiveData
-import org.rfcx.companion.util.getListSite
 import org.rfcx.companion.util.showKeyboard
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
@@ -177,22 +174,8 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener,
     private fun setupView() {
         existedSiteAdapter.items = arrayListOf()
         val items = deploymentProtocol?.getSiteItem() ?: arrayListOf()
-        val loc = Location(LocationManager.GPS_PROVIDER)
-        loc.latitude = latitude
-        loc.longitude = longitude
-        sitesAdapter = getListSite(
-            requireContext(),
-            audioMothDeployments,
-            guardianDeployments,
-            getString(R.string.none),
-            loc,
-            sites
-        )
-        if (sitesAdapter[0].date == null && items.isNotEmpty()){
-            handleItemsAdapter(items)
-        } else {
-            handleItemsAdapter(sitesAdapter)
-        }
+        sitesAdapter = items
+        handleItemsAdapter(items)
     }
 
     private fun handleItemsAdapter(sites: ArrayList<SiteWithLastDeploymentItem>) {

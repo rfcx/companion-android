@@ -10,12 +10,16 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.Transformations
 import io.realm.Realm
 import io.realm.RealmList
 import kotlinx.android.synthetic.main.activity_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
+import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.service.DeploymentSyncWorker
@@ -34,7 +38,6 @@ import org.rfcx.companion.view.deployment.sync.NewSyncFragment
 import org.rfcx.companion.view.detail.MapPickerProtocol
 import org.rfcx.companion.view.dialog.*
 import java.util.*
-import kotlin.collections.ArrayList
 
 class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, CompleteListener,
     MapPickerProtocol {
@@ -77,11 +80,32 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     private val analytics by lazy { Analytics(this) }
 
+    // Local LiveData
+    private lateinit var audioMothDeployLiveData: LiveData<List<EdgeDeployment>>
+    private var audioMothDeployments = listOf<EdgeDeployment>()
+    private val audioMothDeploymentObserve = Observer<List<EdgeDeployment>> {
+        this.audioMothDeployments = it.filter { deployment -> deployment.isCompleted() }
+    }
+
+    private lateinit var guardianDeploymentLiveData: LiveData<List<GuardianDeployment>>
+    private var guardianDeployments = listOf<GuardianDeployment>()
+    private val guardianDeploymentObserve = Observer<List<GuardianDeployment>> {
+        this.guardianDeployments = it.filter { deployment -> deployment.isCompleted() }
+    }
+
+    private lateinit var siteLiveData: LiveData<List<Locate>>
+    private var sites = listOf<Locate>()
+    private val siteObserve = Observer<List<Locate>> {
+        this.sites = it
+        setSiteItems()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_deployment)
 
         setupToolbar()
+        setLiveData()
         preferences.clearSelectedProject()
         this.currentLocation = this.getLastLocation()
         val deploymentId = intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
@@ -90,6 +114,40 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         } else {
             openWithEdgeDevice()
         }
+    }
+
+    private fun setSiteItems() {
+        val loc = Location(LocationManager.GPS_PROVIDER)
+        loc.latitude = 0.0
+        loc.longitude = 0.0
+
+        _siteItems = getListSite(
+            this,
+            audioMothDeployments,
+            guardianDeployments,
+            getString(R.string.none),
+            currentLocation ?: loc,
+            sites
+        )
+    }
+
+    private fun setLiveData() {
+        siteLiveData = Transformations.map(locateDb.getAllResultsAsync().asLiveData()) {
+            it
+        }
+        siteLiveData.observeForever(siteObserve)
+
+        audioMothDeployLiveData =
+            Transformations.map(deploymentDb.getAllResultsAsync().asLiveData()) {
+                it
+            }
+        audioMothDeployLiveData.observeForever(audioMothDeploymentObserve)
+
+        guardianDeploymentLiveData =
+            Transformations.map(guardianDeploymentDb.getAllResultsAsync().asLiveData()) {
+                it
+            }
+        guardianDeploymentLiveData.observeForever(guardianDeploymentObserve)
     }
 
     private fun setupToolbar() {
@@ -143,7 +201,14 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     override fun backStep() {
         val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
         when (container) {
-            is MapPickerFragment -> startFragment(DetailDeploymentSiteFragment.newInstance(latitude, longitude, siteId, nameLocation))
+            is MapPickerFragment -> startFragment(
+                DetailDeploymentSiteFragment.newInstance(
+                    latitude,
+                    longitude,
+                    siteId,
+                    nameLocation
+                )
+            )
             is EdgeCheckListFragment -> {
                 _deployment?.let {
                     it.passedChecks = passedChecks
@@ -156,7 +221,11 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             }
             is DetailDeploymentSiteFragment -> {
                 if (_deployLocation == null) {
-                    startFragment(SetDeploymentSiteFragment.newInstance(currentLocation?.latitude ?: 0.0, currentLocation?.longitude ?: 0.0))
+                    startFragment(
+                        SetDeploymentSiteFragment.newInstance(
+                            currentLocation?.latitude ?: 0.0, currentLocation?.longitude ?: 0.0
+                        )
+                    )
                 } else {
                     startCheckList()
                 }
@@ -184,7 +253,9 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         }
         return this._deployment
     }
-    override fun getCurrentLocation(): Location = currentLocation ?: Location(LocationManager.GPS_PROVIDER)
+
+    override fun getCurrentLocation(): Location =
+        currentLocation ?: Location(LocationManager.GPS_PROVIDER)
 
     override fun getLocationGroup(name: String): LocationGroups? {
         return locationGroupDb.getLocationGroup(name)
@@ -204,7 +275,8 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 ?: run {
                     SyncInstructionDialogFragment()
                 }
-        instructionDialog.show(supportFragmentManager,
+        instructionDialog.show(
+            supportFragmentManager,
             TAG_SYNC_INSTRUCTION_DIALOG
         )
     }
@@ -219,7 +291,8 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             siteLoadingDialog.dismiss()
             siteLoadingDialog = SiteLoadingDialogFragment(text)
         }
-        siteLoadingDialog.show(supportFragmentManager,
+        siteLoadingDialog.show(
+            supportFragmentManager,
             TAG_SITE_LOADING_DIALOG
         )
     }
@@ -276,8 +349,11 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             if (useExistedLocation) {
                 this._locate?.let { locate ->
                     locateDb.insertOrUpdateLocate(it.id, locate) // update locate - last deployment
-                    val deployments = locate.serverId?.let { it1 -> deploymentDb.getDeploymentsBySiteId(it1) }
-                    val guardianDeployments = locate.serverId?.let { it1 -> guardianDeploymentDb.getDeploymentsBySiteId(it1) }
+                    val deployments =
+                        locate.serverId?.let { it1 -> deploymentDb.getDeploymentsBySiteId(it1) }
+                    val guardianDeployments = locate.serverId?.let { it1 ->
+                        guardianDeploymentDb.getDeploymentsBySiteId(it1)
+                    }
                     deployments?.forEach { deployment ->
                         deploymentDb.updateIsActive(deployment.id)
                     }
@@ -297,7 +373,11 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                     val trackingFile = TrackingFile(
                         deploymentId = it.id,
                         siteId = this._locate!!.id,
-                        localPath = GeoJsonUtils.generateGeoJson(this, GeoJsonUtils.generateFileName(it.deployedAt, it.deploymentKey!!), point).absolutePath
+                        localPath = GeoJsonUtils.generateGeoJson(
+                            this,
+                            GeoJsonUtils.generateFileName(it.deployedAt, it.deploymentKey!!),
+                            point
+                        ).absolutePath
                     )
                     trackingFileDb.insertOrUpdate(trackingFile)
                 }
@@ -319,9 +399,14 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 updateDeploymentState(DeploymentState.Edge.Locate)
                 val site = _deployLocation
                 if (site == null) {
-                    startFragment(SetDeploymentSiteFragment.newInstance(currentLocation?.latitude ?: 0.0, currentLocation?.longitude ?: 0.0))
+                    startFragment(
+                        SetDeploymentSiteFragment.newInstance(
+                            currentLocation?.latitude ?: 0.0, currentLocation?.longitude ?: 0.0
+                        )
+                    )
                 } else {
-                    val id = locateDb.getLocateByNameAndLatLng(site.name, site.latitude, site.longitude)
+                    val id =
+                        locateDb.getLocateByNameAndLatLng(site.name, site.latitude, site.longitude)
                     id?.let {
                         startDetailDeploymentSite(it, site.name, false)
                     }
@@ -373,9 +458,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     override fun playSyncSound() {
         val deploymentId = getDeployment()?.deploymentKey
-        val deploymentIdArrayInt = deploymentId?.chunked(2)?.map { it.toInt(radix = 16) }?.toTypedArray() ?: arrayOf()
+        val deploymentIdArrayInt =
+            deploymentId?.chunked(2)?.map { it.toInt(radix = 16) }?.toTypedArray() ?: arrayOf()
         Thread {
-            for (i in 1..3){
+            for (i in 1..3) {
                 audioMothConnector.playTimeAndDeploymentID(
                     calendar,
                     deploymentIdArrayInt
@@ -487,7 +573,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     }
 
     override fun onAnimationEnd() {
-        if(supportFragmentManager.fragments.last() is NewSyncFragment) {
+        if (supportFragmentManager.fragments.last() is NewSyncFragment) {
             nextStep()
         } else {
             finish()
@@ -528,6 +614,9 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     override fun onDestroy() {
         super.onDestroy()
         fromUnfinishedDeployment = false
+        siteLiveData.removeObserver(siteObserve)
+        audioMothDeployLiveData.removeObserver(audioMothDeploymentObserve)
+        guardianDeploymentLiveData.removeObserver(guardianDeploymentObserve)
     }
 
     companion object {
