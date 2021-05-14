@@ -6,9 +6,6 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.*
-import android.widget.SearchView
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -30,7 +27,7 @@ import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.map.SiteAdapter
 
-class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener,
+class SetDeploymentSiteFragment : Fragment(),
         (Locate, Boolean) -> Unit {
 
     // Protocol
@@ -77,7 +74,6 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener,
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
         initIntent()
     }
 
@@ -86,22 +82,6 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener,
             latitude = it.getDouble(ARG_LATITUDE)
             longitude = it.getDouble(ARG_LONGITUDE)
         }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.search_menu, menu)
-        searchItem = menu.findItem(R.id.searchView)
-        val menuItem = searchItem
-        val searchView: SearchView = menuItem?.actionView as SearchView
-        searchView.queryHint = getString(R.string.site_name_hint)
-        searchView.setOnQueryTextListener(this)
-        context?.let {
-            DrawableCompat.setTint(
-                DrawableCompat.wrap(menuItem.icon),
-                ContextCompat.getColor(it, R.color.iconColor)
-            )
-        }
-        super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onCreateView(
@@ -134,8 +114,7 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener,
         view?.getWindowVisibleDisplayFrame(r)
         val keypadHeight: Int = screenHeight - r.bottom
         if (keypadHeight > screenHeight * 0.15) {
-            val searchItem = searchItem?.actionView as SearchView
-            if (searchItem.isIconified) siteNameEditText.requestFocus()
+            siteNameEditText.requestFocus()
         } else {
             if (siteNameEditText != null) siteNameEditText.clearFocus()
         }
@@ -149,8 +128,11 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener,
                     existedSiteAdapter.isNewSite = false
                     existedSiteAdapter.items = sitesAdapter
                 } else {
-                    existedSiteAdapter.isNewSite = true
-                    existedSiteAdapter.items = arrayListOf(
+                    val text = s.toString().toLowerCase()
+                    val newList: ArrayList<SiteWithLastDeploymentItem> = ArrayList()
+                    newList.addAll(sitesAdapter.filter { it.locate.name.toLowerCase().contains(text) })
+                    noResultFound.visibility = View.GONE
+                    val createNew = arrayListOf(
                         SiteWithLastDeploymentItem(
                             Locate(
                                 id = -1,
@@ -162,6 +144,8 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener,
                             0F
                         )
                     )
+                    existedSiteAdapter.setFilter(ArrayList(createNew + newList))
+                    existedSiteAdapter.isNewSite = true
                 }
             }
 
@@ -215,21 +199,6 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener,
                 it
             }
         guardianDeploymentLiveData.observeForever(guardianDeploymentObserve)
-    }
-
-    override fun onQueryTextSubmit(query: String?): Boolean {
-        return true
-    }
-
-    override fun onQueryTextChange(newText: String?): Boolean {
-        if (newText != null) {
-            val text = newText.toLowerCase()
-            val newList: ArrayList<SiteWithLastDeploymentItem> = ArrayList()
-            newList.addAll(sitesAdapter.filter { it.locate.name.toLowerCase().contains(text) })
-            noResultFound.visibility = if (newList.isEmpty()) View.VISIBLE else View.GONE
-            existedSiteAdapter.setFilter(ArrayList(newList))
-        }
-        return true
     }
 
     // On click site item

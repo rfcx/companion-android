@@ -36,7 +36,7 @@ class SiteAdapter(private val itemClickListener: (Locate, Boolean) -> Unit) :
         val site = items[position]
         holder.bind(site)
         holder.itemView.setOnClickListener {
-            this.itemClickListener(site.locate, isNewSite)
+            this.itemClickListener(site.locate, site.locate.id == -1)
         }
     }
 
@@ -53,7 +53,7 @@ class SiteAdapter(private val itemClickListener: (Locate, Boolean) -> Unit) :
         private val iconAddImageView = itemView.iconAddImageView
 
         fun bind(site: SiteWithLastDeploymentItem) {
-            siteNameTextView.text = if (isNewSite) itemView.context.getString(
+            siteNameTextView.text = if (site.locate.id == -1) itemView.context.getString(
                 R.string.create_site,
                 site.locate.name
             ) else site.locate.name
@@ -65,7 +65,7 @@ class SiteAdapter(private val itemClickListener: (Locate, Boolean) -> Unit) :
             } else {
                 distanceTextView.visibility = View.GONE
             }
-            setDistanceAndIconAdd(site.locate.latitude == 0.0)
+            setDistanceAndIconAdd(site.locate.id == -1)
         }
 
         private fun setDistanceAndIconAdd(boolean: Boolean) {
