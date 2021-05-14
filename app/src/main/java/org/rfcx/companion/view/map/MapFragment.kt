@@ -532,42 +532,77 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
 
     private fun setFeatureSelectState(feature: Feature, selectedState: Boolean) {
         feature.properties()?.let {
-            val windowInfoImages = hashMapOf<String, Bitmap>()
-            val inflater = LayoutInflater.from(context)
-
-            val bubbleLayout =
-                inflater.inflate(R.layout.layout_map_window_info, null) as BubbleLayout
-            val id = feature.getStringProperty(PROPERTY_SITE_MARKER_ID) ?: feature.getStringProperty(
-                PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID
-            )
-            val title = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_NAME)
-            bubbleLayout.infoWindowTitle.text = title
-            val projectName = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_PROJECT_NAME)
-            bubbleLayout.infoWindowDescription.text = projectName
-            val createdAt = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_CREATED_AT)
-            bubbleLayout.createdAtValue.text = createdAt
-            var latLng = ""
-            val lat = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_LATITUDE) ?: "0.0"
-            val lng = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_LONGITUDE) ?: "0.0"
-            context?.let { context ->
-                latLng =
-                    "${lat.toDouble().latitudeCoordinates(context)}, ${lng.toDouble()
-                        .longitudeCoordinates(context)}"
-            }
-            bubbleLayout.latLngValue.text = latLng
-            val alt = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_ALTITUDE) ?: "0"
-            bubbleLayout.altValue.text = alt.toDouble().setFormatLabel()
-            val measureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-            bubbleLayout.measure(measureSpec, measureSpec)
-            val measuredWidth = bubbleLayout.measuredWidth
-            bubbleLayout.arrowPosition = (measuredWidth / 2 - 5).toFloat()
-            val bitmap = SymbolGenerator.generate(bubbleLayout)
-            windowInfoImages[id] = bitmap
-
-            setWindowInfoImageGenResults(windowInfoImages)
             it.addProperty(PROPERTY_DEPLOYMENT_SELECTED, selectedState)
             refreshSource()
         }
+    }
+
+    private fun setDeploymentDetail(feature: Feature){
+        val windowInfoImages = hashMapOf<String, Bitmap>()
+        val inflater = LayoutInflater.from(context)
+
+        val bubbleLayout =
+            inflater.inflate(R.layout.layout_map_window_info, null) as BubbleLayout
+        val id = feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID) ?: ""
+        val title = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_NAME)
+        bubbleLayout.infoWindowTitle.text = title
+        val projectName = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_PROJECT_NAME)
+        bubbleLayout.infoWindowDescription.text = projectName
+        val createdAt = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_CREATED_AT)
+        bubbleLayout.createdAtValue.text = createdAt
+        var latLng = ""
+        val lat = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_LATITUDE) ?: "0.0"
+        val lng = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_LONGITUDE) ?: "0.0"
+        context?.let { context ->
+            latLng =
+                "${lat.toDouble().latitudeCoordinates(context)}, ${lng.toDouble()
+                    .longitudeCoordinates(context)}"
+        }
+        bubbleLayout.latLngValue.text = latLng
+        val alt = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_ALTITUDE) ?: "0"
+        bubbleLayout.altValue.text = alt.toDouble().setFormatLabel()
+        val measureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        bubbleLayout.measure(measureSpec, measureSpec)
+        val measuredWidth = bubbleLayout.measuredWidth
+        bubbleLayout.arrowPosition = (measuredWidth / 2 - 5).toFloat()
+        val bitmap = SymbolGenerator.generate(bubbleLayout)
+        windowInfoImages[id] = bitmap
+
+        setWindowInfoImageGenResults(windowInfoImages)
+    }
+
+    private fun setSiteDetail(feature: Feature){
+        val windowInfoImages = hashMapOf<String, Bitmap>()
+        val inflater = LayoutInflater.from(context)
+
+        val bubbleLayout =
+            inflater.inflate(R.layout.layout_map_window_info, null) as BubbleLayout
+        val id = feature.getStringProperty(PROPERTY_SITE_MARKER_ID) ?: ""
+        val title = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_NAME)
+        bubbleLayout.infoWindowTitle.text = title
+        val projectName = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_PROJECT_NAME)
+        bubbleLayout.infoWindowDescription.text = projectName
+        val createdAt = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_CREATED_AT)
+        bubbleLayout.createdAtValue.text = createdAt
+        var latLng = ""
+        val lat = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_LATITUDE) ?: "0.0"
+        val lng = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_LONGITUDE) ?: "0.0"
+        context?.let { context ->
+            latLng =
+                "${lat.toDouble().latitudeCoordinates(context)}, ${lng.toDouble()
+                    .longitudeCoordinates(context)}"
+        }
+        bubbleLayout.latLngValue.text = latLng
+        val alt = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_ALTITUDE) ?: "0"
+        bubbleLayout.altValue.text = alt.toDouble().setFormatLabel()
+        val measureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        bubbleLayout.measure(measureSpec, measureSpec)
+        val measuredWidth = bubbleLayout.measuredWidth
+        bubbleLayout.arrowPosition = (measuredWidth / 2 - 5).toFloat()
+        val bitmap = SymbolGenerator.generate(bubbleLayout)
+        windowInfoImages[id] = bitmap
+
+        setWindowInfoImageGenResults(windowInfoImages)
     }
 
     private fun setupImages(style: Style) {
@@ -711,7 +746,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                         PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID
                     )
                 ) {
-                    features[index]?.let { setFeatureSelectState(it, true) }
+                    features[index]?.let {
+                        setDeploymentDetail(it)
+                        setFeatureSelectState(it, true)
+                    }
                     val deploymentId =
                         selectedFeature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID)
                             .toInt()
@@ -749,7 +787,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                         selectedFeature.getProperty(PROPERTY_SITE_MARKER_SITE_ID).asInt
                     )
                     gettingTracksAndMoveToPin(site, markerId.asString)
-                    features[index]?.let { setFeatureSelectState(it, true) }
+                    features[index]?.let {
+                        setSiteDetail(it)
+                        setFeatureSelectState(it, true)
+                    }
                     analytics?.trackClickPinEvent()
                 } else {
                     features[index]?.let { setFeatureSelectState(it, false) }
@@ -1176,6 +1217,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                         }
                     val properties = mapOf(
                         Pair(PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID, "${it.locationName}.${it.id}"),
+                        Pair(PROPERTY_WINDOW_INFO_ID, "${it.locationName}.${it.id}"),
                         Pair(PROPERTY_DEPLOYMENT_MARKER_IMAGE, it.pin),
                         Pair(PROPERTY_DEPLOYMENT_MARKER_TITLE, it.locationName),
                         Pair(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID, it.id.toString()),
@@ -1190,6 +1232,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                 is MapMarker.SiteMarker -> {
                     val properties = mapOf(
                         Pair(PROPERTY_SITE_MARKER_IMAGE, it.pin),
+                        Pair(PROPERTY_WINDOW_INFO_ID, "${it.name}.${it.id}"),
                         Pair(PROPERTY_SITE_MARKER_SITE_ID, it.id.toString()),
                         Pair(PROPERTY_SITE_MARKER_ID, "${it.name}.${it.id}"),
                         Pair(PROPERTY_SITE_MARKER_SITE_NAME, it.name),
@@ -1217,7 +1260,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
     private fun setupWindowInfo(it: Style) {
         it.addLayer(SymbolLayer(WINDOW_MARKER_ID, SOURCE_DEPLOYMENT).apply {
             withProperties(
-                iconImage("{$PROPERTY_SITE_MARKER_ID}"),
+                iconImage("{$PROPERTY_WINDOW_INFO_ID}"),
                 iconAnchor(ICON_ANCHOR_BOTTOM),
                 iconOffset(arrayOf(-2f, -20f)),
                 iconAllowOverlap(true)
@@ -1538,7 +1581,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         private const val PROPERTY_DEPLOYMENT_MARKER_CAPTION = "deployment.caption"
         private const val PROPERTY_DEPLOYMENT_MARKER_IMAGE = "deployment.marker.image"
         private const val WINDOW_MARKER_ID = "info.marker"
-        private const val PROPERTY_SELECTED = "selected"
+        private const val PROPERTY_WINDOW_INFO_ID = "window.info.id"
 
         private const val PROPERTY_SITE_MARKER_IMAGE = "site.marker.image"
         private const val PROPERTY_SITE_MARKER_ID = "site.id"
