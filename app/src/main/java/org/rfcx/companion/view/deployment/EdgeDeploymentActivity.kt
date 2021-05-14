@@ -62,7 +62,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     private var currentLocation: Location? = null
 
     private var audioMothConnector = AudioMothChimeConnector()
-    private var calendar = Calendar.getInstance()
 
     private var latitude = 0.0
     private var longitude = 0.0
@@ -458,8 +457,8 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     override fun playSyncSound() {
         val deploymentId = getDeployment()?.deploymentKey
-        val deploymentIdArrayInt =
-            deploymentId?.chunked(2)?.map { it.toInt(radix = 16) }?.toTypedArray() ?: arrayOf()
+        val deploymentIdArrayInt = deploymentId?.chunked(2)?.map { it.toInt(radix = 16) }?.toTypedArray() ?: arrayOf()
+        val calendar = Calendar.getInstance()
         Thread {
             for (i in 1..3) {
                 audioMothConnector.playTimeAndDeploymentID(
