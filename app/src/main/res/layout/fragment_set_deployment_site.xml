@@ -5,41 +5,21 @@
     android:layout_height="match_parent"
     tools:context="org.rfcx.companion.view.deployment.location.SetDeploymentSiteFragment">
 
-    <LinearLayout
-        android:id="@+id/siteNameLayout"
-        android:layout_width="match_parent"
+    <include
+        android:id="@+id/layoutSearchView"
+        layout="@layout/layout_search_view"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:orientation="vertical"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/siteNameTextInput"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin_padding_normal"
-            android:hint="@string/name_location">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/siteNameEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:imeOptions="actionDone"
-                android:inputType="text"
-                android:lines="1"
-                android:textColor="@color/text_primary"
-                android:textSize="@dimen/text_small" />
-        </com.google.android.material.textfield.TextInputLayout>
-    </LinearLayout>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/existedRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_padding_normal"
-        app:layout_constraintTop_toBottomOf="@id/siteNameLayout" />
+        app:layout_constraintTop_toBottomOf="@id/layoutSearchView" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/noResultFound"

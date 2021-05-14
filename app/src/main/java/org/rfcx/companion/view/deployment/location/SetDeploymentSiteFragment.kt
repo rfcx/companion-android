@@ -1,7 +1,6 @@
 package org.rfcx.companion.view.deployment.location
 
 import android.content.Context
-import android.graphics.Rect
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -13,6 +12,7 @@ import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_set_deployment_site.*
+import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.EdgeDeployment
 import org.rfcx.companion.entity.Locate
@@ -22,6 +22,7 @@ import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.asLiveData
+import org.rfcx.companion.util.hideKeyboard
 import org.rfcx.companion.util.showKeyboard
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
@@ -98,30 +99,23 @@ class SetDeploymentSiteFragment : Fragment(),
         setupTopBar()
         setLiveData()
         setEditText()
-        siteNameEditText.showKeyboard()
-
-        view.viewTreeObserver.addOnGlobalLayoutListener { setOnFocusEditText() }
-
-        searchItem?.setOnMenuItemClickListener {
-            siteNameEditText.clearFocus()
-            true
-        }
-    }
-
-    private fun setOnFocusEditText() {
-        val screenHeight: Int = view?.rootView?.height ?: 0
-        val r = Rect()
-        view?.getWindowVisibleDisplayFrame(r)
-        val keypadHeight: Int = screenHeight - r.bottom
-        if (keypadHeight > screenHeight * 0.15) {
-            siteNameEditText.requestFocus()
-        } else {
-            if (siteNameEditText != null) siteNameEditText.clearFocus()
-        }
     }
 
     private fun setEditText() {
-        siteNameEditText.addTextChangedListener(object : TextWatcher {
+        searchLayoutSearchEditText.showKeyboard()
+        searchLayoutSearchEditText.requestFocus()
+        searchViewActionRightButton.visibility = View.VISIBLE
+        searchLayoutSearchEditText.hint = context?.getString(R.string.search_or_create_box_hint)
+
+        searchViewActionRightButton.setOnClickListener {
+            if (searchLayoutSearchEditText.text.isNullOrBlank()) {
+                it.hideKeyboard()
+            } else {
+                searchLayoutSearchEditText.text = null
+            }
+        }
+
+        searchLayoutSearchEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 searchItem?.isVisible = s?.length == 0
                 if (s?.length == 0) {
