@@ -1,6 +1,7 @@
 package org.rfcx.companion.view.deployment.location
 
 import android.content.Context
+import android.graphics.Rect
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
@@ -121,6 +122,26 @@ class SetDeploymentSiteFragment : Fragment(), SearchView.OnQueryTextListener,
         setLiveData()
         setEditText()
         siteNameEditText.showKeyboard()
+
+        view.viewTreeObserver.addOnGlobalLayoutListener { setOnFocusEditText() }
+
+        searchItem?.setOnMenuItemClickListener {
+            siteNameEditText.clearFocus()
+            true
+        }
+    }
+
+    private fun setOnFocusEditText() {
+        val screenHeight: Int = view?.rootView?.height ?: 0
+        val r = Rect()
+        view?.getWindowVisibleDisplayFrame(r)
+        val keypadHeight: Int = screenHeight - r.bottom
+        if (keypadHeight > screenHeight * 0.15) {
+            val searchItem = searchItem?.actionView as SearchView
+            if (searchItem.isIconified) siteNameEditText.requestFocus()
+        } else {
+            if (siteNameEditText != null) siteNameEditText.clearFocus()
+        }
     }
 
     private fun setEditText() {

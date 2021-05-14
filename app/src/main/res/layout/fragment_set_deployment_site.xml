@@ -5,32 +5,41 @@
     android:layout_height="match_parent"
     tools:context="org.rfcx.companion.view.deployment.location.SetDeploymentSiteFragment">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/siteNameTextInput"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+    <LinearLayout
+        android:id="@+id/siteNameLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_padding_normal"
-        android:hint="@string/name_location"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:orientation="vertical"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/siteNameEditText"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/siteNameTextInput"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:imeOptions="actionDone"
-            android:inputType="text"
-            android:lines="1"
-            android:textColor="@color/text_primary"
-            android:textSize="@dimen/text_small" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_margin="@dimen/margin_padding_normal"
+            android:hint="@string/name_location">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/siteNameEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionDone"
+                android:inputType="text"
+                android:lines="1"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_small" />
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/existedRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_padding_normal"
-        app:layout_constraintTop_toBottomOf="@id/siteNameTextInput" />
+        app:layout_constraintTop_toBottomOf="@id/siteNameLayout" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/noResultFound"
