@@ -537,7 +537,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         }
     }
 
-    private fun setDeploymentDetail(feature: Feature){
+    private fun setDeploymentDetail(feature: Feature) {
         val windowInfoImages = hashMapOf<String, Bitmap>()
         val inflater = LayoutInflater.from(context)
 
@@ -559,8 +559,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                     .longitudeCoordinates(context)}"
         }
         bubbleLayout.latLngValue.text = latLng
-        val alt = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_ALTITUDE) ?: "0"
-        bubbleLayout.altValue.text = alt.toDouble().setFormatLabel()
         val measureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
         bubbleLayout.measure(measureSpec, measureSpec)
         val measuredWidth = bubbleLayout.measuredWidth
@@ -571,7 +569,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         setWindowInfoImageGenResults(windowInfoImages)
     }
 
-    private fun setSiteDetail(feature: Feature){
+    private fun setSiteDetail(feature: Feature) {
         val windowInfoImages = hashMapOf<String, Bitmap>()
         val inflater = LayoutInflater.from(context)
 
@@ -593,8 +591,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                     .longitudeCoordinates(context)}"
         }
         bubbleLayout.latLngValue.text = latLng
-        val alt = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_ALTITUDE) ?: "0"
-        bubbleLayout.altValue.text = alt.toDouble().setFormatLabel()
         val measureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
         bubbleLayout.measure(measureSpec, measureSpec)
         val measuredWidth = bubbleLayout.measuredWidth
@@ -1238,8 +1234,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                         Pair(PROPERTY_SITE_MARKER_SITE_NAME, it.name),
                         Pair(PROPERTY_SITE_MARKER_SITE_LATITUDE, "${it.latitude}"),
                         Pair(PROPERTY_SITE_MARKER_SITE_LONGITUDE, "${it.longitude}"),
-                        Pair(PROPERTY_SITE_MARKER_SITE_ALTITUDE, "${it.altitude}"),
-                        Pair(PROPERTY_SITE_MARKER_SITE_PROJECT_NAME, "${it.projectName}"),
+                        Pair(PROPERTY_SITE_MARKER_SITE_PROJECT_NAME, it.projectName ?: ""),
                         Pair(PROPERTY_SITE_MARKER_SITE_CREATED_AT, it.createdAt.toDateString())
                     )
 
@@ -1590,6 +1585,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         private const val PROPERTY_SITE_MARKER_SITE_LATITUDE = "site.stream.latitude"
         private const val PROPERTY_SITE_MARKER_SITE_LONGITUDE = "site.stream.longitude"
         private const val PROPERTY_SITE_MARKER_SITE_ALTITUDE = "site.stream.altitude"
+        private const val PROPERTY_SITE_MARKER_SITE_IS_PUBLIC = "site.stream.isPublic"
         private const val PROPERTY_SITE_MARKER_SITE_PROJECT_NAME = "site.stream.project.name"
         private const val PROPERTY_SITE_MARKER_SITE_CREATED_AT = "site.stream.created.at"
 
