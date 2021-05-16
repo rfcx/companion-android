@@ -811,12 +811,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         this.locationGroups = it
         combinedData()
         locationGroupAdapter.items = listOf()
-        locationGroupAdapter.items = listOf(
-            LocationGroups(
-                id = -1,
-                name = getString(R.string.none)
-            )
-        ) + locationGroupDb.getLocationGroups()
+        locationGroupAdapter.items = locationGroupDb.getLocationGroups()
         locationGroupAdapter.notifyDataSetChanged()
     }
 
@@ -1321,8 +1316,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                     }
                     //track always has 1 item so using get(0) is okay - also it can only be LineString
                     val lineString = feature?.geometry() as LineString
-//                val color = featureCollection.features()?.get(0)?.properties()?.get("color")?.asString ?: "#3bb2d0"
-//                queueColor.add(color)
                     queue.add(lineString.coordinates().toList())
                 }
                 lineSource?.setGeoJson(FeatureCollection.fromFeatures(tempTrack))
@@ -1336,64 +1329,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                         .map { point -> LatLng(point.latitude(), point.longitude()) })
             }
 
-            //animate track
-//            routeCoordinateList = queue[0]
-//            animate()
-
         } else {
             moveToDeploymentMarker(lat, lng, markerLocationId)
         }
     }
-
-//    private fun animate() {
-//        if (routeCoordinateList.size - 1 > routeIndex) {
-//            val indexPoint = routeCoordinateList[routeIndex]
-//            val newPoint = routeCoordinateList[routeIndex + 1]
-//            currentAnimator = createLatLngAnimator(indexPoint, newPoint)
-//            currentAnimator?.start()
-//            routeIndex++
-//        } else {
-//            queuePivot += 1
-//            if (queuePivot <= queue.size - 1) {
-//                routeCoordinateList = queue[queuePivot]
-//                routeIndex = 0
-//                animate()
-//            }
-//        }
-//    }
-//
-//    private fun createLatLngAnimator(currentPosition: Point, targetPosition: Point): Animator {
-//        val latLngAnimator: ValueAnimator =
-//            ValueAnimator.ofObject(PointEvaluator(), currentPosition, targetPosition)
-//        latLngAnimator.duration = 100 // fixed to 100 milliseconds
-//        latLngAnimator.interpolator = LinearInterpolator()
-//
-//        latLngAnimator.addListener(object : AnimatorListenerAdapter() {
-//            override fun onAnimationEnd(animation: Animator?) {
-//                super.onAnimationEnd(animation)
-//                animate()
-//            }
-//        })
-//
-//        latLngAnimator.addUpdateListener { animation ->
-//            val point = animation.animatedValue as Point
-//            if (markerLinePointList.size <= queuePivot + 1) {
-//                markerLinePointList.add(arrayListOf())
-//            }
-//            markerLinePointList[queuePivot].add(point)
-//
-//            val listOfFeature = arrayListOf<Feature>()
-//            markerLinePointList.forEachIndexed { index, it ->
-//                val feature = Feature.fromGeometry(LineString.fromLngLats(it))
-//                feature.addStringProperty("color", queueColor.getOrNull(0) ?: "#3bb2d0")
-//                listOfFeature.add(feature)
-//            }
-//
-//            lineSource!!.setGeoJson(FeatureCollection.fromFeatures(listOfFeature))
-//        }
-//
-//        return latLngAnimator
-//    }
 
     private fun hideTrackOnMap() {
         //reset source
