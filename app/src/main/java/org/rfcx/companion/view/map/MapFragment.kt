@@ -82,6 +82,7 @@ import org.rfcx.companion.util.*
 import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
+import org.rfcx.companion.view.detail.DeploymentDetailActivity
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupAdapter
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupListener
@@ -150,6 +151,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
 
     private val siteAdapter by lazy { SiteAdapter(this) }
     private var adapterOfSearchSite: ArrayList<SiteWithLastDeploymentItem>? = null
+    private val mapInfoViews = hashMapOf<String, View>()
 
     private val locationGroupAdapter by lazy { LocationGroupAdapter(this) }
 
@@ -480,7 +482,14 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
 //            setupScale()
 
             mapboxMap.addOnMapClickListener { latLng ->
-                handleClickIcon(mapboxMap.projection.toScreenLocation(latLng))
+                val screenPoint = mapboxMap.projection.toScreenLocation(latLng)
+                val features = mapboxMap.queryRenderedFeatures(screenPoint, WINDOW_MARKER_ID)
+                val symbolScreenPoint = mapboxMap.projection.toScreenLocation(latLng)
+                if (features.isNotEmpty()) {
+                    handleClickCallout(features[0])
+                } else {
+                    handleClickIcon(symbolScreenPoint)
+                }
             }
         }
     }
@@ -738,13 +747,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         if (deploymentFeatures != null && deploymentFeatures.isNotEmpty()) {
             val selectedFeature = deploymentFeatures[0]
             val features = this.mapFeatures!!.features()!!
-
             features.forEachIndexed { index, feature ->
                 if (selectedFeature.getProperty(PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID) == feature.getProperty(
                         PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID
                     )
                 ) {
-
                     val markerId = selectedFeature.getProperty(
                         PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID
                     ).asString
@@ -810,6 +817,16 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         }
         clearFeatureSelected()
         return false
+    }
+
+    private fun handleClickCallout(feature: Feature): Boolean {
+        val deploymentId = feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID)
+                .toInt()
+        context?.let {
+            DeploymentDetailActivity.startActivity(it, deploymentId)
+            analytics?.trackSeeDetailEvent()
+        }
+        return true
     }
 
     fun gettingTracksAndMoveToPin(site: Locate?, markerId: String) {
