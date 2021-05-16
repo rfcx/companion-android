@@ -547,7 +547,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         }
     }
 
-    private fun setDeploymentDetail(feature: Feature, site: Locate?) {
+    private fun setDeploymentDetail(feature: Feature) {
+        val markerId = feature.getProperty(
+            PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID
+        ).asString
+        val site = locateDb.getLocateByName(markerId.split(".")[0])
+
         val windowInfoImages = hashMapOf<String, Bitmap>()
         val inflater = LayoutInflater.from(context)
 
@@ -760,9 +765,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                     analytics?.trackClickPinEvent()
 
                     features[index]?.let {
-                        Log.d("setDeploymentDetail", "deploymentFeatures")
-
-                        setDeploymentDetail(it, site)
+                        setDeploymentDetail(it)
                         setFeatureSelectState(it, true)
                     }
                 } else {
@@ -821,10 +824,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
 
     private fun handleClickCallout(feature: Feature): Boolean {
         val deploymentId = feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID)
-                .toInt()
-        context?.let {
-            DeploymentDetailActivity.startActivity(it, deploymentId)
-            analytics?.trackSeeDetailEvent()
+        if (deploymentId != null) {
+            context?.let {
+                DeploymentDetailActivity.startActivity(it, deploymentId.toInt())
+                analytics?.trackSeeDetailEvent()
+            }
+        } else {
+            setFeatureSelectState(feature, false)
         }
         return true
     }
@@ -1409,18 +1415,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                 )
             }
         }
-
-        val features = this.mapFeatures!!.features()!!
-        features.forEachIndexed { index, feature ->
-            feature.getProperty(PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID)?.let { property ->
-                if (markerLocationId == property.toString()
-                ) {
-                    features[index]?.let { setFeatureSelectState(it, true) }
-                } else {
-                    features[index]?.let { setFeatureSelectState(it, false) }
-                }
-            }
-        }
     }
 
     fun showTrackOnMap(id: Int, lat: Double, lng: Double, markerLocationId: String) {
@@ -1445,6 +1439,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                     queue.add(lineString.coordinates().toList())
                 }
                 lineSource?.setGeoJson(FeatureCollection.fromFeatures(tempTrack))
+                Log.d("moveToDeploymentMarker","showTrackOnMap 1459")
 
                 //move camera to pin
                 moveToDeploymentMarker(
@@ -1628,16 +1623,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                 CameraUpdateFactory.newLatLngZoom(
                     it.getLatLng(),
                     DEFAULT_ZOOM_LEVEL
-                )
-            )
-        }
-
-        val deployment = edgeDeploymentDb.getDeploymentBySiteName(locate.name)
-        if (deployment != null) {
-            (activity as MainActivityListener).showBottomSheet(
-                DeploymentViewPagerFragment.newInstance(
-                    deployment.id,
-                    Device.AUDIOMOTH.value
                 )
             )
         }
