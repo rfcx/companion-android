@@ -104,7 +104,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
-    private val locationGroupDb by lazy { LocationGroupDb(realm) }
+    private val locationGroupDb by lazy { ProjectDb(realm) }
     private val trackingFileDb by lazy { TrackingFileDb(realm) }
     private val trackingDb by lazy { TrackingDb(realm) }
 
@@ -112,13 +112,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
     private var guardianDeployments = listOf<GuardianDeployment>()
     private var edgeDeployments = listOf<EdgeDeployment>()
     private var locations = listOf<Locate>()
-    private var locationGroups = listOf<LocationGroups>()
+    private var locationGroups = listOf<Project>()
     private var lastSyncingInfo: SyncInfo? = null
 
     private lateinit var guardianDeployLiveData: LiveData<List<GuardianDeployment>>
     private lateinit var edgeDeployLiveData: LiveData<List<EdgeDeployment>>
     private lateinit var locateLiveData: LiveData<List<Locate>>
-    private lateinit var locationGroupLiveData: LiveData<List<LocationGroups>>
+    private lateinit var locationGroupLiveData: LiveData<List<Project>>
     private lateinit var deploymentWorkInfoLiveData: LiveData<List<WorkInfo>>
 
     private val locationPermissions by lazy { activity?.let { LocationPermissions(it) } }
@@ -807,11 +807,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         combinedData()
     }
 
-    private val locationGroupObserve = Observer<List<LocationGroups>> {
+    private val locationGroupObserve = Observer<List<Project>> {
         this.locationGroups = it
         combinedData()
         locationGroupAdapter.items = listOf()
-        locationGroupAdapter.items = locationGroupDb.getLocationGroups()
+        locationGroupAdapter.items = locationGroupDb.getProjects()
         locationGroupAdapter.notifyDataSetChanged()
     }
 
@@ -1458,7 +1458,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         }
     }
 
-    override fun onClicked(group: LocationGroups) {
+    override fun onClicked(group: Project) {
         projectRecyclerView.visibility = View.GONE
 
         group.name?.let {
@@ -1503,7 +1503,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         }
     }
 
-    override fun onLongClicked(group: LocationGroups) {}
+    override fun onLongClicked(group: Project) {}
 }
 
 interface ApiCallbackInjector {

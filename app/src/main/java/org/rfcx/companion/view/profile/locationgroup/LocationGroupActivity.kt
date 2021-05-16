@@ -10,7 +10,7 @@ import kotlinx.android.synthetic.main.activity_location_group.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.LocationGroup
-import org.rfcx.companion.entity.LocationGroups
+import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.toLocationGroup
 import org.rfcx.companion.localdb.EdgeDeploymentDb
@@ -44,7 +44,7 @@ class LocationGroupActivity : BaseActivity(), LocationGroupProtocol {
         CreateNewGroupActivity.startActivity(this, screen, LOCATION_GROUP_REQUEST_CODE)
     }
 
-    override fun onLocationGroupClick(group: LocationGroups) {
+    override fun onLocationGroupClick(group: Project) {
         locationGroupSelected(group.toLocationGroup())
     }
 

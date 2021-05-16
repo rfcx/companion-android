@@ -21,7 +21,7 @@ import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.localdb.EdgeDeploymentDb
-import org.rfcx.companion.service.DeleteStreamsWorker
+import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.service.DeploymentCleanupWorker
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
@@ -36,6 +36,7 @@ import org.rfcx.companion.widget.BottomNavigationMenuItem
 class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListener {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
+    private val projectDb by lazy { ProjectDb(realm) }
 
     private var currentFragment: Fragment? = null
     private val locationPermissions by lazy { LocationPermissions(this) }
@@ -289,7 +290,9 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
 
     override fun getProjectName(): String {
         val preferences = Preferences.getInstance(this)
-        return preferences.getString(Preferences.SELECTED_PROJECT, getString(R.string.none))
+        val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
+        val project = projectDb.getProjectById(projectId)
+        return project!!.name!!
     }
 
     override fun hideBottomAppBar() {

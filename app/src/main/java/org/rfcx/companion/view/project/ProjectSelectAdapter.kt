@@ -6,13 +6,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_location_group.view.*
 import org.rfcx.companion.R
-import org.rfcx.companion.entity.LocationGroups
+import org.rfcx.companion.entity.Project
 
 class ProjectSelectAdapter(private val projectSelectListener: (Int) -> Unit) :
     RecyclerView.Adapter<ProjectSelectAdapter.ProjectSelectViewHolder>() {
 
     var selectedPosition = -1
-    var items: List<LocationGroups> = arrayListOf()
+    var items: List<Project> = arrayListOf()
         set(value) {
             field = value
             notifyDataSetChanged()

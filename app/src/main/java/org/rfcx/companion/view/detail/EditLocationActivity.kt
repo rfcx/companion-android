@@ -16,7 +16,7 @@ import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.toLocationGroup
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.localdb.EdgeDeploymentDb
-import org.rfcx.companion.localdb.LocationGroupDb
+import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.GuardianDeploymentSyncWorker
@@ -33,7 +33,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
-    private val locationGroupDb by lazy { LocationGroupDb(realm) }
+    private val locationGroupDb by lazy { ProjectDb(realm) }
 
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
@@ -204,7 +204,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
     override fun getLocationGroupName(): String = groupName ?: getString(R.string.none)
 
     override fun getLocationGroup(name: String): LocationGroup {
-        return locationGroupDb.getLocationGroup(name).toLocationGroup()
+        return locationGroupDb.getProjectByName(name).toLocationGroup()
     }
 
     override fun startLocationGroupPage() {

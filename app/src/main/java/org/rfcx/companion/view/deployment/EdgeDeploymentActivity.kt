@@ -46,7 +46,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     private val deploymentDb by lazy { EdgeDeploymentDb(realm) }
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
-    private val locationGroupDb by lazy { LocationGroupDb(realm) }
+    private val locationGroupDb by lazy { ProjectDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val trackingDb by lazy { TrackingDb(realm) }
     private val trackingFileDb by lazy { TrackingFileDb(realm) }
@@ -256,8 +256,8 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     override fun getCurrentLocation(): Location =
         currentLocation ?: Location(LocationManager.GPS_PROVIDER)
 
-    override fun getLocationGroup(name: String): LocationGroups? {
-        return locationGroupDb.getLocationGroup(name)
+    override fun getLocationGroup(name: String): Project? {
+        return locationGroupDb.getProjectByName(name)
     }
 
     override fun setDeployment(deployment: EdgeDeployment) {

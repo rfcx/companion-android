@@ -33,7 +33,7 @@ import kotlinx.android.synthetic.main.fragment_detail_deployment_site.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.LocationGroup
-import org.rfcx.companion.entity.LocationGroups
+import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.util.*
@@ -283,7 +283,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun getLocationGroup(group: String): LocationGroup {
-        val locationGroup = deploymentProtocol?.getLocationGroup(group) ?: LocationGroups()
+        val locationGroup = deploymentProtocol?.getLocationGroup(group) ?: Project()
         return LocationGroup(locationGroup.name, locationGroup.color, locationGroup.serverId)
     }
 

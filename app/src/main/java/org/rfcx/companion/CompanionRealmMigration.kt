@@ -105,24 +105,24 @@ class CompanionRealmMigration : RealmMigration {
         }
 
         // Add LocationGroups class
-        val locationGroups = realm.schema.create(LocationGroups.TABLE_NAME)
+        val locationGroups = realm.schema.create(Project.TABLE_NAME)
         locationGroups.apply {
             addField(
-                LocationGroups.LOCATION_GROUPS_ID,
+                Project.PROJECT_ID,
                 Int::class.java,
                 FieldAttribute.PRIMARY_KEY
             )
             addField(
-                LocationGroups.LOCATION_GROUPS_NAME,
+                Project.PROJECT_NAME,
                 String::class.java
-            ).setNullable(LocationGroups.LOCATION_GROUPS_NAME, false)
+            ).setNullable(Project.PROJECT_NAME, false)
 
-            addField(LocationGroups.LOCATION_GROUPS_COLOR, String::class.java)
-                .setNullable(LocationGroups.LOCATION_GROUPS_COLOR, false)
+            addField(Project.PROJECT_COLOR, String::class.java)
+                .setNullable(Project.PROJECT_COLOR, false)
 
-            addField(LocationGroups.LOCATION_GROUPS_SYNC_STATE, Int::class.java)
-            addField(LocationGroups.LOCATION_GROUPS_SERVER_ID, String::class.java)
-            addField(LocationGroups.LOCATION_GROUPS_DELETE_AT, Date::class.java)
+            addField(Project.PROJECT_SYNC_STATE, Int::class.java)
+            addField(Project.PROJECT_SERVER_ID, String::class.java)
+            addField(Project.PROJECT_DELETED_AT, Date::class.java)
         }
 
         val locate = realm.schema.get(Locate.TABLE_NAME)
@@ -180,10 +180,10 @@ class CompanionRealmMigration : RealmMigration {
     }
 
     private fun migrateToV7(realm: DynamicRealm) {
-        val locationGroups = realm.schema.get(LocationGroups.TABLE_NAME)
+        val locationGroups = realm.schema.get(Project.TABLE_NAME)
         locationGroups?.apply {
-            setNullable(LocationGroups.LOCATION_GROUPS_NAME, true)
-            setNullable(LocationGroups.LOCATION_GROUPS_COLOR, true)
+            setNullable(Project.PROJECT_NAME, true)
+            setNullable(Project.PROJECT_COLOR, true)
         }
     }
 

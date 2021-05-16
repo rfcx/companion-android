@@ -11,11 +11,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_location_group.*
 import org.rfcx.companion.R
-import org.rfcx.companion.entity.LocationGroups
+import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.Status
 import org.rfcx.companion.localdb.DatabaseCallback
-import org.rfcx.companion.localdb.LocationGroupDb
+import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.service.LocationGroupSyncWorker
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.Preferences
@@ -24,7 +24,7 @@ import org.rfcx.companion.util.showCommonDialog
 
 class LocationGroupFragment : Fragment(), LocationGroupListener {
     val realm: Realm = Realm.getInstance(RealmHelper.migrationConfig())
-    private val locationGroupDb = LocationGroupDb(realm)
+    private val locationGroupDb = ProjectDb(realm)
 
     private val locationGroupAdapter by lazy { LocationGroupAdapter(this) }
     private var locationGroupProtocol: LocationGroupProtocol? = null
@@ -73,15 +73,15 @@ class LocationGroupFragment : Fragment(), LocationGroupListener {
         }
     }
 
-    override fun onClicked(group: LocationGroups) {
+    override fun onClicked(group: Project) {
         locationGroupProtocol?.onLocationGroupClick(group)
     }
 
-    override fun onLongClicked(group: LocationGroups) {
+    override fun onLongClicked(group: Project) {
 //        showDeleteDialog(group)
     }
 
-    private fun showDeleteDialog(group: LocationGroups) {
+    private fun showDeleteDialog(group: Project) {
         val preferences = context?.let { Preferences.getInstance(it) }
         val groupName = preferences?.getString(Preferences.GROUP, getString(R.string.none))
 
@@ -89,7 +89,7 @@ class LocationGroupFragment : Fragment(), LocationGroupListener {
         builder?.apply {
             setTitle(getString(R.string.delete_location_group_title))
             setPositiveButton(getString(R.string.delete)) { dialog, which ->
-                locationGroupDb.deleteLocationGroup(group.id, object : DatabaseCallback {
+                locationGroupDb.deleteProject(group.id, object : DatabaseCallback {
                     override fun onSuccess() {
                         if(group.name == groupName) {
                             preferences?.putString(Preferences.GROUP, getString(R.string.none))
@@ -116,11 +116,11 @@ class LocationGroupFragment : Fragment(), LocationGroupListener {
     override fun onResume() {
         super.onResume()
         locationGroupAdapter.items = listOf(
-            LocationGroups(
+            Project(
                 id = -1,
                 name = getString(R.string.none)
             )
-        ) + locationGroupDb.getLocationGroups()
+        ) + locationGroupDb.getProjects()
     }
 
     companion object {

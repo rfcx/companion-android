@@ -24,7 +24,7 @@ import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
-import org.rfcx.companion.localdb.LocationGroupDb
+import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.service.DownloadStreamState
@@ -44,7 +44,7 @@ class SelectingExistedSiteFragment : Fragment(), SearchView.OnQueryTextListener,
 
     val realm: Realm = Realm.getInstance(RealmHelper.migrationConfig())
     private val locateDb by lazy { LocateDb(realm) }
-    private val locationGroupDb by lazy { LocationGroupDb(realm) }
+    private val locationGroupDb by lazy { ProjectDb(realm) }
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
 

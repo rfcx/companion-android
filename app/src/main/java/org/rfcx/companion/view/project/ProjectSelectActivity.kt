@@ -12,7 +12,7 @@ import kotlinx.android.synthetic.main.activity_project_select.*
 import org.rfcx.companion.MainActivity
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.response.ProjectResponse
-import org.rfcx.companion.localdb.LocationGroupDb
+import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.RealmHelper
@@ -25,7 +25,7 @@ import retrofit2.Response
 class ProjectSelectActivity : AppCompatActivity(), (Int) -> Unit {
 
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val projectDb by lazy { LocationGroupDb(realm) }
+    private val projectDb by lazy { ProjectDb(realm) }
 
     private val preferences by lazy { Preferences.getInstance(this) }
 
@@ -58,7 +58,7 @@ class ProjectSelectActivity : AppCompatActivity(), (Int) -> Unit {
     }
 
     private fun addProjectsToAdapter() {
-        projectSelectAdapter.items = projectDb.getLocationGroups()
+        projectSelectAdapter.items = projectDb.getProjects()
     }
 
     private fun downloadAccessibleProjects(context: Context) {

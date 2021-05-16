@@ -18,7 +18,7 @@ interface BaseDeploymentProtocol {
 
     fun getDeploymentLocation(): DeploymentLocation?
     fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem>
-    fun getLocationGroup(name: String): LocationGroups?
+    fun getLocationGroup(name: String): Project?
     fun getImages(): List<String>
     fun getCurrentLocation(): Location
 

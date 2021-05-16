@@ -55,7 +55,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val locateDb by lazy { LocateDb(realm) }
-    private val locationGroupDb by lazy { LocationGroupDb(realm) }
+    private val locationGroupDb by lazy { ProjectDb(realm) }
     private val deploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
@@ -242,8 +242,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
 
-    override fun getLocationGroup(name: String): LocationGroups? {
-        return locationGroupDb.getLocationGroup(name)
+    override fun getLocationGroup(name: String): Project? {
+        return locationGroupDb.getProjectByName(name)
     }
 
     override fun getImages(): List<String> {

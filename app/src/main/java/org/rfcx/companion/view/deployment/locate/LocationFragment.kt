@@ -43,10 +43,10 @@ import kotlinx.android.synthetic.main.fragment_location.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.LocationGroup
-import org.rfcx.companion.entity.LocationGroups
+import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.localdb.LocateDb
-import org.rfcx.companion.localdb.LocationGroupDb
+import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.map.MapboxCameraUtils
@@ -55,7 +55,7 @@ import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 // TODO DELETE
 class LocationFragment : Fragment(), OnMapReadyCallback {
     val realm: Realm = Realm.getInstance(RealmHelper.migrationConfig())
-    private val locationGroupDb = LocationGroupDb(realm)
+    private val locationGroupDb = ProjectDb(realm)
     private val locateDb by lazy { LocateDb(realm) }
 
     private var mapboxMap: MapboxMap? = null
@@ -390,7 +390,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun getLocationGroup(group: String): LocationGroup {
-        val locationGroup = deploymentProtocol?.getLocationGroup(group) ?: LocationGroups()
+        val locationGroup = deploymentProtocol?.getLocationGroup(group) ?: Project()
         return LocationGroup(locationGroup.name, locationGroup.color, locationGroup.serverId)
     }
 

@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.work.*
 import io.realm.Realm
 import org.rfcx.companion.entity.request.toRequestBody
-import org.rfcx.companion.localdb.LocationGroupDb
+import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.repo.Firestore
 import org.rfcx.companion.util.RealmHelper
 
@@ -15,7 +15,7 @@ class LocationGroupSyncWorker(appContext: Context, params: WorkerParameters) :
     private val firestore = Firestore(appContext)
 
     override suspend fun doWork(): Result {
-        val db = LocationGroupDb(Realm.getInstance(RealmHelper.migrationConfig()))
+        val db = ProjectDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val locatesNeedToSync = db.unlockSent()
         var someFailed = false
 
@@ -36,7 +36,7 @@ class LocationGroupSyncWorker(appContext: Context, params: WorkerParameters) :
                         
                         val isExisted = db.isExisted(it.name)
                         if (isExisted)
-                            db.deleteLocationGroupFromLocal(it.id)
+                            db.deleteProjectInLocal(it.id)
                     } catch (e: Exception) {
                         db.markUnsent(it.id)
                         someFailed = true
