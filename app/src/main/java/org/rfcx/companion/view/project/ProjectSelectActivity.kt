@@ -3,6 +3,7 @@ package org.rfcx.companion.view.project
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -37,7 +38,8 @@ class ProjectSelectActivity : AppCompatActivity(), (Int) -> Unit {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_project_select)
 
-        if (preferences.getInt(Preferences.SELECTED_PROJECT) == -1) {
+        Log.d("preferences.getInt", preferences.getInt(Preferences.SELECTED_PROJECT).toString())
+        if (preferences.getInt(Preferences.SELECTED_PROJECT) != -1) {
             MainActivity.startActivity(this)
             finish()
         }

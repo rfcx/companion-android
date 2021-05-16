@@ -275,7 +275,7 @@ class LoginActivity : AppCompatActivity() {
                     val user = auth.currentUser
                     user?.uid?.let {
                         preferences.putString(USER_FIREBASE_UID, it)
-                        MainActivity.startActivity(this@LoginActivity)
+                        ProjectSelectActivity.startActivity(this@LoginActivity)
                         finish()
                     }
                 } else {

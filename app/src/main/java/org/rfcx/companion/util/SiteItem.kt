@@ -3,6 +3,7 @@ package org.rfcx.companion.util
 import android.content.Context
 import android.location.Location
 import android.location.LocationManager
+import android.util.Log
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.EdgeDeployment
 import org.rfcx.companion.entity.Locate
@@ -64,7 +65,9 @@ fun getListSite(
 
     val sortDate = locationsItems.filter { it.date != null }.sortedByDescending { it.date }
     val notDeployment = locationsItems.filter { it.date == null }
-    return ArrayList(sortDate + notDeployment)
+
+    val allItems = ArrayList(sortDate + notDeployment)
+    return allItems
 }
 
 fun isHaveDeployment(

@@ -292,7 +292,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         val preferences = Preferences.getInstance(this)
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
         val project = projectDb.getProjectById(projectId)
-        return project!!.name!!
+        return project?.name ?: getString(R.string.none)
     }
 
     override fun hideBottomAppBar() {
