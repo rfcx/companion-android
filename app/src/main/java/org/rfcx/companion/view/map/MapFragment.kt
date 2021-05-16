@@ -58,6 +58,7 @@ import com.mapbox.pluginscalebar.ScaleBarOptions
 import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_map.*
+import kotlinx.android.synthetic.main.layout_deployment_window_info.view.*
 import kotlinx.android.synthetic.main.layout_map_window_info.view.*
 import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.DeploymentListener
@@ -537,33 +538,34 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         }
     }
 
-    private fun setDeploymentDetail(feature: Feature) {
+    private fun setDeploymentDetail(feature: Feature, site: Locate?) {
         val windowInfoImages = hashMapOf<String, Bitmap>()
         val inflater = LayoutInflater.from(context)
 
-        val bubbleLayout =
-            inflater.inflate(R.layout.layout_map_window_info, null) as BubbleLayout
+        val layout =
+            inflater.inflate(R.layout.layout_deployment_window_info, null) as BubbleLayout
         val id = feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID) ?: ""
-        val title = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_NAME)
-        bubbleLayout.infoWindowTitle.text = title
+        val title = feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_TITLE)
+        layout.deploymentSiteTitle.text = title
         val projectName = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_PROJECT_NAME)
-        bubbleLayout.infoWindowDescription.text = projectName
+        layout.projectName.text = projectName
         val createdAt = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_CREATED_AT)
-        bubbleLayout.createdAtValue.text = createdAt
+        layout.createdAt.text = createdAt
+        val deploymentKey = feature.getStringProperty(PROPERTY_DEPLOYMENT_DEPLOYMENT_KEY)
+        layout.deploymentIdTextView.text = deploymentKey
         var latLng = ""
-        val lat = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_LATITUDE) ?: "0.0"
-        val lng = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_LONGITUDE) ?: "0.0"
         context?.let { context ->
             latLng =
-                "${lat.toDouble().latitudeCoordinates(context)}, ${lng.toDouble()
-                    .longitudeCoordinates(context)}"
+                "${site?.latitude.latitudeCoordinates(context)}, ${site?.longitude.longitudeCoordinates(
+                    context
+                )}"
         }
-        bubbleLayout.latLngValue.text = latLng
+        layout.latLngTextView.text = latLng
         val measureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-        bubbleLayout.measure(measureSpec, measureSpec)
-        val measuredWidth = bubbleLayout.measuredWidth
-        bubbleLayout.arrowPosition = (measuredWidth / 2 - 5).toFloat()
-        val bitmap = SymbolGenerator.generate(bubbleLayout)
+        layout.measure(measureSpec, measureSpec)
+        val measuredWidth = layout.measuredWidth
+        layout.arrowPosition = (measuredWidth / 2 - 5).toFloat()
+        val bitmap = SymbolGenerator.generate(layout)
         windowInfoImages[id] = bitmap
 
         setWindowInfoImageGenResults(windowInfoImages)
@@ -742,20 +744,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                         PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID
                     )
                 ) {
-                    features[index]?.let {
-                        setDeploymentDetail(it)
-                        setFeatureSelectState(it, true)
-                    }
-                    val deploymentId =
-                        selectedFeature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID)
-                            .toInt()
-
-                    val deploymentDevice =
-                        selectedFeature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEVICE)
-                            .toString()
-                    (activity as MainActivityListener).showBottomSheet(
-                        DeploymentViewPagerFragment.newInstance(deploymentId, deploymentDevice)
-                    )
 
                     val markerId = selectedFeature.getProperty(
                         PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID
@@ -763,6 +751,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                     val site = locateDb.getLocateByName(markerId.split(".")[0])
                     gettingTracksAndMoveToPin(site, markerId)
                     analytics?.trackClickPinEvent()
+
+                    features[index]?.let {
+                        Log.d("setDeploymentDetail", "deploymentFeatures")
+
+                        setDeploymentDetail(it, site)
+                        setFeatureSelectState(it, true)
+                    }
                 } else {
                     features[index]?.let { setFeatureSelectState(it, false) }
                 }
@@ -774,6 +769,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         }
 
         if (siteFeatures != null && siteFeatures.isNotEmpty()) {
+
             val selectedFeature = siteFeatures[0]
             val features = this.mapFeatures!!.features()!!
             features.forEachIndexed { index, feature ->
@@ -784,6 +780,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                     )
                     gettingTracksAndMoveToPin(site, markerId.asString)
                     features[index]?.let {
+                        Log.d("setDeploymentDetail", "siteFeatures")
+
                         setSiteDetail(it)
                         setFeatureSelectState(it, true)
                     }
@@ -1216,9 +1214,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                         Pair(PROPERTY_WINDOW_INFO_ID, "${it.locationName}.${it.id}"),
                         Pair(PROPERTY_DEPLOYMENT_MARKER_IMAGE, it.pin),
                         Pair(PROPERTY_DEPLOYMENT_MARKER_TITLE, it.locationName),
+                        Pair(PROPERTY_DEPLOYMENT_DEPLOYMENT_KEY, it.deploymentKey),
                         Pair(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID, it.id.toString()),
-                        Pair(PROPERTY_DEPLOYMENT_MARKER_CAPTION, it.description),
                         Pair(PROPERTY_DEPLOYMENT_MARKER_DEVICE, it.device),
+                        Pair(PROPERTY_SITE_MARKER_SITE_PROJECT_NAME, it.projectName ?: ""),
+                        Pair(PROPERTY_SITE_MARKER_SITE_CREATED_AT, it.createdAt.toDateString()),
                         Pair(PROPERTY_DEPLOYMENT_SELECTED, isSelecting.toString())
                     )
                     Feature.fromGeometry(
@@ -1573,8 +1573,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         private const val PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID = "deployment.location"
         private const val PROPERTY_DEPLOYMENT_MARKER_TITLE = "deployment.title"
         private const val PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID = "deployment.deployment"
-        private const val PROPERTY_DEPLOYMENT_MARKER_CAPTION = "deployment.caption"
         private const val PROPERTY_DEPLOYMENT_MARKER_IMAGE = "deployment.marker.image"
+        private const val PROPERTY_DEPLOYMENT_DEPLOYMENT_KEY = "deployment.marker.deployment.key"
         private const val WINDOW_MARKER_ID = "info.marker"
         private const val PROPERTY_WINDOW_INFO_ID = "window.info.id"
 
@@ -1584,8 +1584,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         private const val PROPERTY_SITE_MARKER_SITE_NAME = "site.stream.name"
         private const val PROPERTY_SITE_MARKER_SITE_LATITUDE = "site.stream.latitude"
         private const val PROPERTY_SITE_MARKER_SITE_LONGITUDE = "site.stream.longitude"
-        private const val PROPERTY_SITE_MARKER_SITE_ALTITUDE = "site.stream.altitude"
-        private const val PROPERTY_SITE_MARKER_SITE_IS_PUBLIC = "site.stream.isPublic"
         private const val PROPERTY_SITE_MARKER_SITE_PROJECT_NAME = "site.stream.project.name"
         private const val PROPERTY_SITE_MARKER_SITE_CREATED_AT = "site.stream.created.at"
 

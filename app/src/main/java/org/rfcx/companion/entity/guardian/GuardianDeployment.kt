@@ -74,6 +74,8 @@ fun GuardianDeployment.toMark(context: Context): MapMarker.DeploymentMarker {
         pinImage,
         "-",
         Device.GUARDIAN.value,
+        stream?.project?.name ?: "",
+        deploymentKey,
         createdAt,
         updatedAt
     )
