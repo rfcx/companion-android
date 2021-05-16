@@ -89,7 +89,8 @@ import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
-class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Locate, Boolean) -> Unit {
+class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
+        (Locate, Boolean) -> Unit {
 
     // map
     private lateinit var mapView: MapView
@@ -450,8 +451,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
     private val run: Runnable = object : Runnable {
         override fun run() {
             context?.let {
-                trackingTextView.text = "${LocationTracking.getDistance(trackingDb)
-                    .setFormatLabel()}  ${LocationTracking.getOnDutyTimeMinute(it)} min"
+                trackingTextView.text = "${
+                    LocationTracking.getDistance(trackingDb)
+                        .setFormatLabel()
+                }  ${LocationTracking.getOnDutyTimeMinute(it)} min"
             }
             handler.postDelayed(this, 20 * 1000)
         }
@@ -496,9 +499,18 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                         sum(accumulated(), get(PROPERTY_CLUSTER_TYPE)),
                         switchCase(
                             any(
-                                eq(get(PROPERTY_DEPLOYMENT_MARKER_IMAGE), Battery.BATTERY_PIN_GREEN),
-                                eq(get(PROPERTY_DEPLOYMENT_MARKER_IMAGE), GuardianPin.CONNECTED_GUARDIAN),
-                                eq(get(PROPERTY_DEPLOYMENT_MARKER_IMAGE), GuardianPin.NOT_CONNECTED_GUARDIAN)
+                                eq(
+                                    get(PROPERTY_DEPLOYMENT_MARKER_IMAGE),
+                                    Battery.BATTERY_PIN_GREEN
+                                ),
+                                eq(
+                                    get(PROPERTY_DEPLOYMENT_MARKER_IMAGE),
+                                    GuardianPin.CONNECTED_GUARDIAN
+                                ),
+                                eq(
+                                    get(PROPERTY_DEPLOYMENT_MARKER_IMAGE),
+                                    GuardianPin.NOT_CONNECTED_GUARDIAN
+                                )
                             ),
                             literal(1),
                             literal(0)
@@ -818,7 +830,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
     private fun combinedData() {
         // hide loading progress
         progressBar.visibility = View.INVISIBLE
-        var showGuardianDeployments = this.guardianDeployments.filter  { it.isCompleted() }
+        var showGuardianDeployments = this.guardianDeployments.filter { it.isCompleted() }
         val usedSitesOnGuardian = showGuardianDeployments.map { it.stream?.coreId }
 
         var showDeployments = this.edgeDeployments.filter { it.isCompleted() }
@@ -1237,9 +1249,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
     private fun moveCameraOnStartWithProject() {
         mapboxMap?.locationComponent?.lastKnownLocation?.let { curLoc ->
             val currentLatLng = LatLng(curLoc.latitude, curLoc.longitude)
-            val preferences = context?.let { Preferences.getInstance(it) }
-            val projectName =
-                preferences?.getString(Preferences.SELECTED_PROJECT, getString(R.string.none))
+            val projectName = listener?.getProjectName()
             val locations = this.locations.filter { it.locationGroup?.name == projectName }
             val furthestSite = getFurthestSiteFromCurrentLocation(
                 currentLatLng,
@@ -1281,7 +1291,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                 mapboxMap?.easeCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 200), 1300)
             } else {
                 it.moveCamera(
-                    CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), DefaultSetupMap.DEFAULT_ZOOM)
+                    CameraUpdateFactory.newLatLngZoom(
+                        LatLng(lat, lng),
+                        DefaultSetupMap.DEFAULT_ZOOM
+                    )
                 )
             }
         }
@@ -1461,45 +1474,46 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
     override fun onClicked(group: Project) {
         projectRecyclerView.visibility = View.GONE
 
-        group.name?.let {
-            context?.let { context ->
-                Preferences.getInstance(context).putString(Preferences.SELECTED_PROJECT, it)
-            }
-            listener?.let { listener ->
-                projectNameTextView.text =
-                    if (listener.getProjectName() != getString(R.string.none)) listener.getProjectName() else getString(
-                        R.string.projects
-                    )
-                combinedData()
-                val projects =
-                    adapterOfSearchSite?.map { LatLng(it.locate.latitude, it.locate.longitude) }
-                if (projects != null && projects.isNotEmpty()) {
-                    if (projects.size > 1) {
-                        moveCameraWithLatLngList(projects)
-                    } else {
-                        moveCamera(LatLng(projects[0].latitude, projects[0].longitude), null, DefaultSetupMap.DEFAULT_ZOOM)
-                    }
+        context?.let { context ->
+            Preferences.getInstance(context).putInt(Preferences.SELECTED_PROJECT, group.id)
+        }
+        listener?.let { listener ->
+            projectNameTextView.text =
+                if (listener.getProjectName() != getString(R.string.none)) listener.getProjectName() else getString(
+                    R.string.projects
+                )
+            combinedData()
+            val projects =
+                adapterOfSearchSite?.map { LatLng(it.locate.latitude, it.locate.longitude) }
+            if (projects != null && projects.isNotEmpty()) {
+                if (projects.size > 1) {
+                    moveCameraWithLatLngList(projects)
                 } else {
-                    currentUserLocation?.let { current ->
-                        moveCamera(
-                            LatLng(
-                                current.latitude,
-                                current.longitude
-                            )
-                            , null, DefaultSetupMap.DEFAULT_ZOOM
-                        )
-                    }
+                    moveCamera(
+                        LatLng(projects[0].latitude, projects[0].longitude),
+                        null,
+                        DefaultSetupMap.DEFAULT_ZOOM
+                    )
+                }
+            } else {
+                currentUserLocation?.let { current ->
+                    moveCamera(
+                        LatLng(
+                            current.latitude,
+                            current.longitude
+                        ), null, DefaultSetupMap.DEFAULT_ZOOM
+                    )
                 }
             }
+        }
 
-            if (siteRecyclerView.visibility == View.VISIBLE) {
-                searchLayout.visibility = View.VISIBLE
-            } else {
-                searchButton.visibility = View.VISIBLE
-                trackingLayout.visibility = View.VISIBLE
-                showButtonOnMap()
-                listener?.showBottomAppBar()
-            }
+        if (siteRecyclerView.visibility == View.VISIBLE) {
+            searchLayout.visibility = View.VISIBLE
+        } else {
+            searchButton.visibility = View.VISIBLE
+            trackingLayout.visibility = View.VISIBLE
+            showButtonOnMap()
+            listener?.showBottomAppBar()
         }
     }
 

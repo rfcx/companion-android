@@ -55,7 +55,7 @@ import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 // TODO DELETE
 class LocationFragment : Fragment(), OnMapReadyCallback {
     val realm: Realm = Realm.getInstance(RealmHelper.migrationConfig())
-    private val locationGroupDb = ProjectDb(realm)
+    private val projectDb = ProjectDb(realm)
     private val locateDb by lazy { LocateDb(realm) }
 
     private var mapboxMap: MapboxMap? = null
@@ -417,7 +417,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
                 createSiteSymbol(it.getLatLng())
                 moveCamera(LatLng(latitude, longitude), it.getLatLng(), DEFAULT_ZOOM)
             }
-            if (locationGroupDb.isExisted(it.locationGroup?.name)) {
+            if (projectDb.isExisted(it.locationGroup?.name)) {
                 group = it.locationGroup?.name
                 locationGroupValueTextView.text = it.locationGroup?.name
             } else {
@@ -501,9 +501,12 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         altitudeValue.text = altitudeFromLocation.setFormatLabel()
         getLastLocation()
 
-        val selectedProject = preferences?.getString(Preferences.SELECTED_PROJECT, getString(R.string.none)) ?: getString(R.string.none)
-        group = selectedProject
-        locationGroupValueTextView.text = selectedProject
+        val projectId = preferences?.getInt(Preferences.SELECTED_PROJECT) ?: -1
+        val selectedProject = projectDb.getProjectById(projectId)
+        selectedProject?.let {
+            group = it.name
+            locationGroupValueTextView.text = it.name
+        }
 
         if (lastLocation != null) {
             lastLocation?.let {
@@ -594,7 +597,7 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
 
             enableExistingLocation(true)
             moveCamera(currentLatLng, siteLatLng, DEFAULT_ZOOM)
-            if (locationGroupDb.isExisted(deploymentLocation.project?.name)) {
+            if (projectDb.isExisted(deploymentLocation.project?.name)) {
                 group = deploymentLocation.project?.name
                 locationGroupValueTextView.text = deploymentLocation.project?.name
             } else {
@@ -825,10 +828,11 @@ class LocationFragment : Fragment(), OnMapReadyCallback {
         mapView.onResume()
         analytics?.trackScreen(Screen.LOCATION)
 
-        val selectedProject = preferences?.getString(Preferences.SELECTED_PROJECT, getString(R.string.none)) ?: getString(R.string.none)
+        val projectId = preferences?.getInt(Preferences.SELECTED_PROJECT) ?: -1
+        val selectedProject = projectDb.getProjectById(projectId)
         val selectedGroup = preferences?.getString(Preferences.GROUP)
 
-        group = selectedGroup ?: selectedProject
+        group = selectedGroup ?: (selectedProject?.name ?: getString(R.string.none))
         locationGroupValueTextView.text = group
     }
 

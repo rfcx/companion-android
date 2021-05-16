@@ -204,7 +204,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
     override fun getLocationGroupName(): String = groupName ?: getString(R.string.none)
 
     override fun getLocationGroup(name: String): LocationGroup {
-        return locationGroupDb.getProjectByName(name).toLocationGroup()
+        return locationGroupDb.getProjectByName(name)?.toLocationGroup() ?: LocationGroup()
     }
 
     override fun startLocationGroupPage() {

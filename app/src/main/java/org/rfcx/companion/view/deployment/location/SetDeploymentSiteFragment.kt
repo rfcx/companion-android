@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
@@ -19,11 +20,9 @@ import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
+import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
-import org.rfcx.companion.util.RealmHelper
-import org.rfcx.companion.util.asLiveData
-import org.rfcx.companion.util.hideKeyboard
-import org.rfcx.companion.util.showKeyboard
+import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.map.SiteAdapter
@@ -43,17 +42,26 @@ class SetDeploymentSiteFragment : Fragment(),
     private val locateDb by lazy { LocateDb(realm) }
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
+    private val projectDb by lazy { ProjectDb(realm) }
+
+    private val preferences by lazy { Preferences.getInstance(requireContext()) }
 
     // Local LiveData
     private lateinit var audioMothDeployLiveData: LiveData<List<EdgeDeployment>>
     private var audioMothDeployments = listOf<EdgeDeployment>()
     private val audioMothDeploymentObserve = Observer<List<EdgeDeployment>> {
+        it.forEach { st ->
+            Log.d("SiteJAA", st.stream!!.project!!.name)
+        }
         this.audioMothDeployments = it.filter { deployment -> deployment.isCompleted() }
     }
 
     private lateinit var guardianDeploymentLiveData: LiveData<List<GuardianDeployment>>
     private var guardianDeployments = listOf<GuardianDeployment>()
     private val guardianDeploymentObserve = Observer<List<GuardianDeployment>> {
+        it.forEach { st ->
+            Log.d("SiteJAA", st.stream!!.project!!.name)
+        }
         this.guardianDeployments = it.filter { deployment -> deployment.isCompleted() }
     }
 
@@ -61,6 +69,9 @@ class SetDeploymentSiteFragment : Fragment(),
     private var sites = listOf<Locate>()
     private val siteObserve = Observer<List<Locate>> {
         this.sites = it
+        it.forEach { st ->
+            Log.d("SiteJAA", st.name)
+        }
         setupView()
     }
 
@@ -177,19 +188,23 @@ class SetDeploymentSiteFragment : Fragment(),
     }
 
     private fun setLiveData() {
-        siteLiveData = Transformations.map(locateDb.getAllResultsAsync().asLiveData()) {
+        val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
+        val project = projectDb.getProjectById(projectId)
+        val projectName = project?.name ?: getString(R.string.none)
+        Log.d("Project Name", projectName)
+        siteLiveData = Transformations.map(locateDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()) {
             it
         }
         siteLiveData.observeForever(siteObserve)
 
         audioMothDeployLiveData =
-            Transformations.map(edgeDeploymentDb.getAllResultsAsync().asLiveData()) {
+            Transformations.map(edgeDeploymentDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()) {
                 it
             }
         audioMothDeployLiveData.observeForever(audioMothDeploymentObserve)
 
         guardianDeploymentLiveData =
-            Transformations.map(guardianDeploymentDb.getAllResultsAsync().asLiveData()) {
+            Transformations.map(guardianDeploymentDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()) {
                 it
             }
         guardianDeploymentLiveData.observeForever(guardianDeploymentObserve)

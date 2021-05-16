@@ -54,6 +54,10 @@ class CompanionRealmMigration : RealmMigration {
         if (oldVersion < 14L && newVersion >= 14L) {
             migrateToV14(realm)
         }
+
+        if (oldVersion < 15L && newVersion >= 15L) {
+            migrateToV15(realm)
+        }
     }
 
     private fun migrateToV2(realm: DynamicRealm) {
@@ -317,6 +321,13 @@ class CompanionRealmMigration : RealmMigration {
         }
         diagnostic?.let {
             realm.schema.remove("DiagnosticInfo")
+        }
+    }
+
+    private fun migrateToV15(realm: DynamicRealm) {
+        val locationGroups = realm.schema.get("LocationGroups")
+        locationGroups?.apply {
+            className = "Project"
         }
     }
 

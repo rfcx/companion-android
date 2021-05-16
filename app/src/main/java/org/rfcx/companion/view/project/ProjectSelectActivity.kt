@@ -37,7 +37,7 @@ class ProjectSelectActivity : AppCompatActivity(), (Int) -> Unit {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_project_select)
 
-        if (preferences.getString(Preferences.SELECTED_PROJECT) == null) {
+        if (preferences.getInt(Preferences.SELECTED_PROJECT) == -1) {
             MainActivity.startActivity(this)
             finish()
         }

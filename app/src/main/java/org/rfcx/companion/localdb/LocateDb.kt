@@ -20,6 +20,13 @@ class LocateDb(private val realm: Realm) {
             .findAllAsync()
     }
 
+    fun getAllResultsAsyncWithinProject(sort: Sort = Sort.DESCENDING, project: String): RealmResults<Locate> {
+        return realm.where(Locate::class.java)
+            .equalTo("locationGroup.name", project)
+            .sort(Locate.FIELD_ID, sort)
+            .findAllAsync()
+    }
+
     fun getAll(sort: Sort = Sort.DESCENDING): RealmResults<Locate> {
         return realm.where(Locate::class.java)
             .sort(Locate.FIELD_ID, sort)

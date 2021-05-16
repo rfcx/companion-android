@@ -69,7 +69,7 @@ class Preferences(context: Context) {
     }
 
     fun getInt(key: String): Int {
-        return sharedPreferences.getInt(key, 0)
+        return sharedPreferences.getInt(key, -1)
     }
 
     fun putInt(key: String, int: Int) {

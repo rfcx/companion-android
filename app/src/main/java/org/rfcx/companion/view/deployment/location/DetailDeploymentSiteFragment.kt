@@ -36,6 +36,7 @@ import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.localdb.LocateDb
+import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.map.MapboxCameraUtils
@@ -61,6 +62,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     // Local database
     val realm: Realm = Realm.getInstance(RealmHelper.migrationConfig())
     private val siteDb by lazy { LocateDb(realm) }
+    private val projectDb by lazy { ProjectDb(realm) }
 
     // Location
     private var group: String? = null
@@ -519,12 +521,11 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         super.onResume()
         mapView.onResume()
 
-        val selectedProject =
-            preferences?.getString(Preferences.SELECTED_PROJECT, getString(R.string.none))
-                ?: getString(R.string.none)
+        val projectId = preferences?.getInt(Preferences.SELECTED_PROJECT) ?: -1
+        val selectedProject = projectDb.getProjectById(projectId)
         val selectedGroup = preferences?.getString(Preferences.GROUP)
 
-        group = selectedGroup ?: selectedProject
+        group = selectedGroup ?: (selectedProject?.name ?: getString(R.string.none))
         locationGroupValueTextView.text = group
     }
 
