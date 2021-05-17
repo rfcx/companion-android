@@ -51,6 +51,10 @@
         <item name="android:background">@drawable/bg_facebook_login_button</item>
     </style>
 
+    <style name="AudioMothButton.GoogleButton" parent="AudioMothButton">
+        <item name="android:background">@drawable/btn_google_corner</item>
+    </style>
+
     <style name="AudioMothButton.GrayButton" parent="Widget.AppCompat.Button">
         <item name="android:background">@drawable/bg_color_gray_button</item>
         <item name="android:textStyle">bold</item>

@@ -8,178 +8,204 @@
     android:fitsSystemWindows="true"
     tools:context=".view.LoginActivity">
 
-    <androidx.constraintlayout.widget.Group
-        android:id="@+id/loginGroupView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="visible"
-        app:constraint_referenced_ids="smsLoginButton,poweredByTextView,rfcxLogoImageView,loginEmailEditText,loginPasswordEditText,leftLineView,orTextView,rightLineView,facebookLoginButton,signInButton" />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/bellLogoImageView"
-        android:layout_width="@dimen/ic_audiomoth_size"
-        android:layout_height="@dimen/ic_audiomoth_size"
-        android:layout_marginTop="@dimen/margin_padding_small"
-        android:layout_marginBottom="@dimen/margin_padding_small"
-        android:src="@drawable/ic_logo_gray"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/protectingRainforestsTextView"
-        style="@style/AudioMothText.Body.Headline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_normal"
-        android:layout_marginTop="@dimen/margin_padding_small"
-        android:layout_marginEnd="@dimen/margin_padding_normal"
-        android:text="@string/rfcx_companion"
-        android:textColor="@color/text_black"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/bellLogoImageView" />
-
-    <androidx.appcompat.widget.AppCompatEditText
-        android:id="@+id/loginEmailEditText"
-        style="@style/AudioMothEditText.Background"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_normal"
-        android:layout_marginTop="@dimen/margin_padding_normal"
-        android:layout_marginEnd="@dimen/margin_padding_normal"
-        android:hint="@string/email"
-        android:imeOptions="actionNext"
-        android:inputType="textEmailAddress"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/protectingRainforestsTextView" />
-
-    <androidx.appcompat.widget.AppCompatEditText
-        android:id="@+id/loginPasswordEditText"
-        style="@style/AudioMothEditText.Background"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_normal"
-        android:layout_marginEnd="@dimen/margin_padding_normal"
-        android:hint="@string/password"
-        android:imeOptions="actionDone"
-        android:inputType="textPassword"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/loginEmailEditText" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/signInButton"
-        style="@style/AudioMothButton.GreenButton"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/button_height"
-        android:layout_margin="@dimen/margin_padding_normal"
-        android:layout_marginStart="@dimen/margin_padding_normal"
-        android:layout_marginEnd="@dimen/margin_padding_normal"
-        android:text="@string/login_sign_in_button_label"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/loginPasswordEditText" />
-
-    <View
-        android:id="@+id/leftLineView"
-        android:layout_width="0dp"
-        android:layout_height="0.5dp"
-        android:layout_margin="@dimen/margin_padding_large"
-        android:layout_marginEnd="@dimen/margin_padding_large"
-        android:background="@color/text_secondary"
-        app:layout_constraintEnd_toEndOf="@+id/orTextView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/signInButton" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/orTextView"
-        style="@style/AudioMothText.Label.Secondary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_padding_normal"
-        android:text="@string/or"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/signInButton"
-        tools:text="OR" />
-
-    <View
-        android:id="@+id/rightLineView"
-        android:layout_width="0dp"
-        android:layout_height="0.5dp"
-        android:layout_margin="@dimen/margin_padding_large"
-        android:layout_marginEnd="@dimen/margin_padding_large"
-        android:background="@color/text_secondary"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/orTextView"
-        app:layout_constraintTop_toBottomOf="@+id/signInButton" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/facebookLoginButton"
-        style="@style/AudioMothButton.FacebookButton"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/button_height"
-        android:layout_margin="@dimen/margin_padding_normal"
-        android:layout_marginStart="@dimen/margin_padding_normal"
-        android:layout_marginEnd="@dimen/margin_padding_normal"
-        android:text="@string/connect_with_facebook"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/orTextView" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/smsLoginButton"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/button_height"
-        android:layout_margin="@dimen/margin_padding_normal"
-        android:layout_marginStart="@dimen/margin_padding_normal"
-        android:layout_marginEnd="@dimen/margin_padding_normal"
-        android:background="@drawable/bg_sms_login_button"
-        android:text="@string/connect_with_sms"
-        android:textSize="@dimen/text_button"
-        android:fontFamily="@font/lato_regular"
-        android:textStyle="bold"
-        android:lineSpacingExtra="0.5sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/facebookLoginButton" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/poweredByTextView"
-        style="@style/AudioMothText.Body.Secondary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_padding_xlarge"
-        android:layout_marginBottom="@dimen/margin_padding_small"
-        android:text="@string/powered_by"
-        app:layout_constraintBottom_toTopOf="@id/rfcxLogoImageView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/smsLoginButton" />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/rfcxLogoImageView"
-        android:layout_width="wrap_content"
-        android:layout_height="27dp"
-        android:layout_marginBottom="@dimen/margin_padding_large"
-        android:src="@drawable/rfcx_logo"
-        app:layout_constraintTop_toBottomOf="@id/poweredByTextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <ProgressBar
-        android:id="@+id/loginProgressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="@color/transparent"
-        android:visibility="invisible"
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/protectingRainforestsTextView" />
+        app:layout_constraintTop_toTopOf="parent">
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/loginGroupView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                app:constraint_referenced_ids="googleLoginButton,smsLoginButton,poweredByTextView,rfcxLogoImageView,loginEmailEditText,loginPasswordEditText,leftLineView,orTextView,rightLineView,facebookLoginButton,signInButton" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/bellLogoImageView"
+                android:layout_width="@dimen/ic_audiomoth_size"
+                android:layout_height="@dimen/ic_audiomoth_size"
+                android:layout_marginTop="@dimen/margin_padding_small"
+                android:layout_marginBottom="@dimen/margin_padding_small"
+                android:src="@drawable/ic_logo_gray"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/protectingRainforestsTextView"
+                style="@style/AudioMothText.Body.Headline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_normal"
+                android:layout_marginTop="@dimen/margin_padding_small"
+                android:layout_marginEnd="@dimen/margin_padding_normal"
+                android:text="@string/rfcx_companion"
+                android:textColor="@color/text_black"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/bellLogoImageView" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/loginEmailEditText"
+                style="@style/AudioMothEditText.Background"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_normal"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:layout_marginEnd="@dimen/margin_padding_normal"
+                android:hint="@string/email"
+                android:imeOptions="actionNext"
+                android:inputType="textEmailAddress"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/protectingRainforestsTextView" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/loginPasswordEditText"
+                style="@style/AudioMothEditText.Background"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_normal"
+                android:layout_marginEnd="@dimen/margin_padding_normal"
+                android:hint="@string/password"
+                android:imeOptions="actionDone"
+                android:inputType="textPassword"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/loginEmailEditText" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/signInButton"
+                style="@style/AudioMothButton.GreenButton"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height"
+                android:layout_margin="@dimen/margin_padding_normal"
+                android:layout_marginStart="@dimen/margin_padding_normal"
+                android:layout_marginEnd="@dimen/margin_padding_normal"
+                android:text="@string/login_sign_in_button_label"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/loginPasswordEditText" />
+
+            <View
+                android:id="@+id/leftLineView"
+                android:layout_width="0dp"
+                android:layout_height="0.5dp"
+                android:layout_margin="@dimen/margin_padding_large"
+                android:layout_marginEnd="@dimen/margin_padding_large"
+                android:background="@color/text_secondary"
+                app:layout_constraintEnd_toEndOf="@+id/orTextView"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/signInButton" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/orTextView"
+                style="@style/AudioMothText.Label.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/margin_padding_normal"
+                android:text="@string/or"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/signInButton"
+                tools:text="OR" />
+
+            <View
+                android:id="@+id/rightLineView"
+                android:layout_width="0dp"
+                android:layout_height="0.5dp"
+                android:layout_margin="@dimen/margin_padding_large"
+                android:layout_marginEnd="@dimen/margin_padding_large"
+                android:background="@color/text_secondary"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/orTextView"
+                app:layout_constraintTop_toBottomOf="@+id/signInButton" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/facebookLoginButton"
+                style="@style/AudioMothButton.FacebookButton"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height"
+                android:layout_margin="@dimen/margin_padding_normal"
+                android:layout_marginStart="@dimen/margin_padding_normal"
+                android:layout_marginEnd="@dimen/margin_padding_normal"
+                android:text="@string/connect_with_facebook"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/orTextView" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/googleLoginButton"
+                style="@style/AudioMothButton.GoogleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/margin_padding_normal"
+                android:text="@string/connect_with_google"
+                android:textColor="@android:color/black"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/facebookLoginButton" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/smsLoginButton"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height"
+                android:layout_margin="@dimen/margin_padding_normal"
+                android:layout_marginStart="@dimen/margin_padding_normal"
+                android:layout_marginEnd="@dimen/margin_padding_normal"
+                android:background="@drawable/bg_sms_login_button"
+                android:fontFamily="@font/lato_regular"
+                android:lineSpacingExtra="0.5sp"
+                android:text="@string/connect_with_sms"
+                android:textSize="@dimen/text_button"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/googleLoginButton" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/poweredByTextView"
+                style="@style/AudioMothText.Body.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_padding_xlarge"
+                android:layout_marginBottom="@dimen/margin_padding_small"
+                android:text="@string/powered_by"
+                app:layout_constraintBottom_toTopOf="@id/rfcxLogoImageView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/smsLoginButton" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/rfcxLogoImageView"
+                android:layout_width="wrap_content"
+                android:layout_height="27dp"
+                android:layout_marginBottom="@dimen/margin_padding_large"
+                android:src="@drawable/rfcx_logo"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/poweredByTextView" />
+
+            <ProgressBar
+                android:id="@+id/loginProgressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@color/transparent"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/protectingRainforestsTextView" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -9,6 +9,7 @@
     <string name="pls_fill_email">Missing Email</string>
     <string name="pls_fill_password">Missing Password</string>
     <string name="connect_with_facebook">Login with Facebook</string>
+    <string name="connect_with_google">Login with Google</string>
     <string name="connect_with_sms">Login with Phone Number</string>
     <string name="or">OR</string>
 
