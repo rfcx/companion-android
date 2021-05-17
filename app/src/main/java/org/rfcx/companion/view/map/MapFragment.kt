@@ -169,7 +169,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
             }
 
             override fun onFailure(exception: Exception) {
-                Log.e("MapFragment", exception.localizedMessage ?: "empty localizedMessage")
+                Log.e(MapFragment.tag, exception.localizedMessage ?: "empty localizedMessage")
             }
         }
 
