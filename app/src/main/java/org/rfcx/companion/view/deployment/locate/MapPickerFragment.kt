@@ -41,9 +41,9 @@ import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
+import org.rfcx.companion.util.DefaultSetupMap
 import org.rfcx.companion.util.latitudeCoordinates
 import org.rfcx.companion.util.longitudeCoordinates
-import org.rfcx.companion.view.deployment.locate.LocationFragment.Companion.DEFAULT_ZOOM
 import org.rfcx.companion.view.detail.EditLocationActivityListener
 import org.rfcx.companion.view.detail.MapPickerProtocol
 
@@ -60,6 +60,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
     private var longitude: Double = 0.0
     private var altitude: Double = 0.0
     private var nameLocation: String? = null
+    private var siteId: Int? = null
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
@@ -79,7 +80,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
             }
 
             override fun onFailure(exception: Exception) {
-                Log.e(LocationFragment.TAG, exception.localizedMessage ?: "empty localizedMessage")
+                Log.e(TAG, exception.localizedMessage ?: "empty localizedMessage")
             }
         }
 
@@ -116,13 +117,13 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
 
         showLoading(true)
         setLatLogLabel(LatLng(0.0, 0.0))
-        moveCamera(LatLng(0.0, 0.0), DEFAULT_ZOOM)
+        moveCamera(LatLng(0.0, 0.0), DefaultSetupMap.DEFAULT_ZOOM)
 
         selectButton.setOnClickListener {
             val currentCameraPosition = mapboxMap?.cameraPosition?.target
             currentCameraPosition?.let {
                 analytics?.trackSelectLocationEvent()
-                mapPickerProtocol?.startLocationPage(it.latitude, it.longitude, altitude, nameLocation ?: "", true)
+                mapPickerProtocol?.onSelectedLocation(it.latitude, it.longitude, siteId ?: -1, nameLocation ?: "")
             }
         }
 
@@ -130,7 +131,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
             selectedLocation = currentUserLocation
             selectedLocation?.let {
                 val latLng = LatLng(it.latitude, it.longitude)
-                moveCamera(latLng, DEFAULT_ZOOM)
+                moveCamera(latLng, DefaultSetupMap.DEFAULT_ZOOM)
                 setLatLogLabel(latLng)
             }
         }
@@ -143,6 +144,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
             longitude = it.getDouble(ARG_LONGITUDE)
             altitude = it.getDouble(ARG_ALTITUDE)
             nameLocation = it.getString(ARG_LOCATION_NAME)
+            siteId = it.getInt(ARG_SITE_ID)
         }
     }
 
@@ -210,13 +212,13 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
             }
 
             if (latitude != 0.0 && longitude != 0.0) {
-                moveCamera(LatLng(latitude, longitude), DEFAULT_ZOOM)
+                moveCamera(LatLng(latitude, longitude), DefaultSetupMap.DEFAULT_ZOOM)
                 setLatLogLabel(LatLng(latitude, longitude))
             } else {
                 val lastKnownLocation = locationComponent?.lastKnownLocation
                 lastKnownLocation?.let {
                     this.currentUserLocation = it
-                    moveCamera(LatLng(it.latitude, it.longitude), DEFAULT_ZOOM)
+                    moveCamera(LatLng(it.latitude, it.longitude), DefaultSetupMap.DEFAULT_ZOOM)
                 }
             }
             initLocationEngine()
@@ -236,9 +238,9 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
     private fun initLocationEngine() {
         locationEngine = context?.let { LocationEngineProvider.getBestLocationEngine(it) }
         val request =
-            LocationEngineRequest.Builder(LocationFragment.DEFAULT_INTERVAL_IN_MILLISECONDS)
+            LocationEngineRequest.Builder(DEFAULT_INTERVAL_IN_MILLISECONDS)
                 .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
-                .setMaxWaitTime(LocationFragment.DEFAULT_MAX_WAIT_TIME).build()
+                .setMaxWaitTime(DEFAULT_MAX_WAIT_TIME).build()
 
         locationEngine?.requestLocationUpdates(
             request,
@@ -263,7 +265,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             activity?.requestPermissions(
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                LocationFragment.REQUEST_PERMISSIONS_REQUEST_CODE
+                REQUEST_PERMISSIONS_REQUEST_CODE
             )
         } else {
             throw Exception("Request permissions not required before API 23 (should never happen)")
@@ -285,7 +287,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
         permissions: Array<String>,
         grantResults: IntArray
     ) {
-        if (requestCode == LocationFragment.REQUEST_PERMISSIONS_REQUEST_CODE) {
+        if (requestCode == REQUEST_PERMISSIONS_REQUEST_CODE) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 enableLocationComponent()
             }
@@ -437,15 +439,21 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
             latitude = latLng.latitude
             longitude = latLng.longitude
         }
-        moveCamera(latLng, DEFAULT_ZOOM)
+        moveCamera(latLng, DefaultSetupMap.DEFAULT_ZOOM)
         setLatLogLabel(latLng)
     }
 
     companion object {
+        private const val TAG = "MapPickerFragment"
         private const val ARG_LATITUDE = "ARG_LATITUDE"
         private const val ARG_LONGITUDE = "ARG_LONGITUDE"
         private const val ARG_ALTITUDE = "ARG_ALTITUDE"
         private const val ARG_LOCATION_NAME = "ARG_LOCATION_NAME"
+        private const val ARG_SITE_ID = "ARG_SITE_ID"
+
+        const val REQUEST_PERMISSIONS_REQUEST_CODE = 34
+        const val DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L
+        const val DEFAULT_MAX_WAIT_TIME = DEFAULT_INTERVAL_IN_MILLISECONDS * 5
 
         @JvmStatic
         fun newInstance(lat: Double, lng: Double, altitude: Double, name: String) =
@@ -456,6 +464,17 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
                         putDouble(ARG_LONGITUDE, lng)
                         putDouble(ARG_ALTITUDE, altitude)
                         putString(ARG_LOCATION_NAME, name)
+                    }
+                }
+
+        fun newInstance(lat: Double, lng: Double, siteId: Int, name: String) =
+            MapPickerFragment()
+                .apply {
+                    arguments = Bundle().apply {
+                        putDouble(ARG_LATITUDE, lat)
+                        putDouble(ARG_LONGITUDE, lng)
+                        putString(ARG_LOCATION_NAME, name)
+                        putInt(ARG_SITE_ID, siteId)
                     }
                 }
     }

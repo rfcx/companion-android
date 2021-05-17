@@ -39,6 +39,8 @@ class Preferences(context: Context) {
         const val ON_DUTY = "${PREFIX}ON_DUTY"
         const val ON_DUTY_LAST_OPEN = "${PREFIX}ON_DUTY_LAST_OPEN"
         const val LASTEST_GET_LOCATION_TIME = "${PREFIX}LASTEST_GET_LOCATION_TIME"
+        const val LAST_LATITUDE = "${PREFIX}LAST_LATITUDE"
+        const val LAST_LONGITUDE = "${PREFIX}LAST_LONGITUDE"
     }
 
     init {
@@ -66,6 +68,15 @@ class Preferences(context: Context) {
         sharedPreferences.edit().putLong(key, long).apply()
     }
 
+
+    fun getFloat(key: String): Float {
+        return sharedPreferences.getFloat(key, 0.0F)
+    }
+
+    fun putFloat(key: String, float: Float) {
+        sharedPreferences.edit().putFloat(key, float).apply()
+    }
+
     fun putBoolean(key: String, value: Boolean) {
         sharedPreferences.edit().putBoolean(key, value).apply()
     }
@@ -80,5 +91,9 @@ class Preferences(context: Context) {
 
     fun clear() {
         sharedPreferences.edit().clear().apply()
+    }
+
+    fun clearSelectedProject() {
+        sharedPreferences.edit().remove(GROUP).apply()
     }
 }

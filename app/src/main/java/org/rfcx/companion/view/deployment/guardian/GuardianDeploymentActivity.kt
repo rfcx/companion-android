@@ -39,13 +39,15 @@ import org.rfcx.companion.view.deployment.guardian.microphone.GuardianMicrophone
 import org.rfcx.companion.view.deployment.guardian.register.GuardianRegisterFragment
 import org.rfcx.companion.view.deployment.guardian.signal.GuardianSignalFragment
 import org.rfcx.companion.view.deployment.guardian.solarpanel.GuardianSolarPanelFragment
-import org.rfcx.companion.view.deployment.locate.LocationFragment
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
-import org.rfcx.companion.view.deployment.locate.SelectingExistedSiteFragment
+import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
+import org.rfcx.companion.view.deployment.location.DetailDeploymentSiteFragment
+import org.rfcx.companion.view.deployment.location.SetDeploymentSiteFragment
 import org.rfcx.companion.view.detail.MapPickerProtocol
 import org.rfcx.companion.view.dialog.*
 import org.rfcx.companion.view.prefs.SyncPreferenceListener
 import java.util.*
+import kotlin.collections.ArrayList
 
 class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtocol,
     CompleteListener, MapPickerProtocol, SyncPreferenceListener {
@@ -64,6 +66,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private var _configuration: GuardianConfiguration? = null
     private var _images: List<String> = listOf()
     private var _locate: Locate? = null
+    private var _siteItems = arrayListOf<SiteWithLastDeploymentItem>()
 
     private var useExistedLocation: Boolean = false
 
@@ -74,6 +77,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private var latitude = 0.0
     private var longitude = 0.0
     private var altitude = 0.0
+    private var nameLocation: String = ""
+    private var siteId: Int = 0
 
     private var lastCheckInTime: Long? = null
 
@@ -139,7 +144,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     override fun backStep() {
         val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
         when (container) {
-            is MapPickerFragment -> startFragment(LocationFragment.newInstance())
+            is MapPickerFragment -> startFragment(DetailDeploymentSiteFragment.newInstance(latitude, longitude, siteId, nameLocation))
             is GuardianCheckListFragment -> {
                 SocketManager.resetAllValuesToDefault()
                 setLastCheckInTime(null)
@@ -162,8 +167,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         startFragment(GuardianCheckListFragment.newInstance())
     }
 
-    override fun startSelectingExistedSite(latitude: Double, longitude: Double) {
-        startFragment(SelectingExistedSiteFragment.newInstance(latitude, longitude))
+    override fun startDetailDeploymentSite(id: Int, name: String? , isNewSite: Boolean) {
+        startFragment(DetailDeploymentSiteFragment.newInstance(id, name, isNewSite))
     }
 
     override fun isOpenedFromUnfinishedDeployment(): Boolean = false // guardian not have this feature so return false
@@ -230,6 +235,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
+    override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
+
     override fun getLocationGroup(name: String): LocationGroups? {
         return locationGroupDb.getLocationGroup(name)
     }
@@ -256,6 +263,10 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         }
 
         setDeployment(deployment)
+    }
+
+    override fun setSiteItem(items: ArrayList<SiteWithLastDeploymentItem>) {
+        this._siteItems = items
     }
 
     override fun setReadyToDeploy() {
@@ -349,7 +360,15 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             }
             5 -> {
                 updateDeploymentState(DeploymentState.Guardian.Locate)
-                startFragment(LocationFragment.newInstance())
+                val site = _deployLocation
+                if (site == null) {
+                    startFragment(SetDeploymentSiteFragment.newInstance(currentLocation?.latitude ?: 0.0, currentLocation?.longitude ?: 0.0))
+                } else {
+                    val id = locateDb.getLocateByNameAndLatLng(site.name, site.latitude, site.longitude)
+                    id?.let {
+                        startDetailDeploymentSite(it, site.name, false)
+                    }
+                }
             }
             6 -> {
                 updateDeploymentState(DeploymentState.Guardian.Checkin)
@@ -470,25 +489,25 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         return DownloadStreamsWorker.isRunning()
     }
 
-    override fun startMapPicker(latitude: Double, longitude: Double, altitude: Double, name: String) {
-        setLatLng(latitude, longitude, altitude)
-        startFragment(MapPickerFragment.newInstance(latitude, longitude, altitude, name))
+    override fun startMapPicker(latitude: Double, longitude: Double, siteId: Int, name: String) {
+        setLatLng(latitude, longitude, siteId, name)
+        startFragment(MapPickerFragment.newInstance(latitude, longitude, siteId, name))
     }
 
-    private fun setLatLng(latitude: Double, longitude: Double, altitude: Double) {
+    private fun setLatLng(latitude: Double, longitude: Double, siteId: Int, name: String) {
         this.latitude = latitude
         this.longitude = longitude
-        this.altitude = altitude
+        this.siteId = siteId
+        this.nameLocation = name
     }
 
-    override fun startLocationPage(
+    override fun onSelectedLocation(
         latitude: Double,
         longitude: Double,
-        altitude: Double,
-        name: String,
-        fromPicker: Boolean
+        siteId: Int,
+        name: String
     ) {
-        startFragment(LocationFragment.newInstance(latitude, longitude, altitude, name, fromPicker))
+        startFragment(DetailDeploymentSiteFragment.newInstance(latitude, longitude, siteId, name))
     }
 
     override fun onBackPressed() {

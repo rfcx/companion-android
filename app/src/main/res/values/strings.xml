@@ -346,6 +346,7 @@
 
     <!-- Search Location -->
     <string name="search_box_hint">Search place, address or lat/long</string>
+    <string name="search_or_create_box_hint">Search site or create new</string>
     <string name="site_name_hint">Search Sites by Name…</string>
     <string name="search_title">Search</string>
     <string name="search_message">by name/lat,long</string>
@@ -431,7 +432,8 @@
 
     <!-- layout_map_window_info -->
     <string name="created_at">Created at:</string>
-    <string name="lat_lng">Lat/Lng:</string>
-    <string name="alt">Alt:</string>
+
+    <!-- SetDeploymentSiteFragment -->
+    <string name="create_site">Create \"%s\"</string> <!-- If change this text, should edit logic in DetailDeploymentSiteFragment -->
 
 </resources>
