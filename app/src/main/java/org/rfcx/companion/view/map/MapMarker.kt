@@ -22,6 +22,8 @@ sealed class MapMarker {
         val pin: String,
         val description: String,
         val device: String,
+        val projectName: String?,
+        val deploymentKey: String,
         val createdAt: Date,
         val updatedAt: Date?
     ): MapMarker()
