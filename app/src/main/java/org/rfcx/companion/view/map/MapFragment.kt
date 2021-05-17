@@ -1275,7 +1275,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         }
     }
 
-    private fun moveCamera(userLoc: LatLng, targetLoc: LatLng? = null, zoom: Double) {
+    fun moveCamera(userLoc: LatLng, targetLoc: LatLng? = null, zoom: Double) {
         mapboxMap?.moveCamera(MapboxCameraUtils.calculateLatLngForZoom(userLoc, targetLoc, zoom))
     }
 
@@ -1366,23 +1366,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         }
     }
 
-    fun moveToDeploymentMarker(
-        lat: Double,
-        lng: Double,
-        markerLocationId: String,
-        trackingLatLng: List<LatLng>? = null
-    ) {
+    fun moveToDeploymentMarker(lat: Double, lng: Double) {
         mapboxMap?.let {
-            if (trackingLatLng != null) {
-                val latLngBounds = LatLngBounds.Builder()
-                    .includes(trackingLatLng + LatLng(lat, lng))
-                    .build()
-                mapboxMap?.easeCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 200), 1300)
-            } else {
-                it.moveCamera(
-                    CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), DefaultSetupMap.DEFAULT_ZOOM)
-                )
-            }
+            it.moveCamera(
+                CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), DefaultSetupMap.DEFAULT_ZOOM)
+            )
         }
     }
 
@@ -1408,15 +1396,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                     queue.add(lineString.coordinates().toList())
                 }
                 lineSource?.setGeoJson(FeatureCollection.fromFeatures(tempTrack))
-                Log.d("moveToDeploymentMarker","showTrackOnMap 1459")
 
                 //move camera to pin
-                moveToDeploymentMarker(
-                    lat,
-                    lng,
-                    markerLocationId,
-                    queue.flatten()
-                        .map { point -> LatLng(point.latitude(), point.longitude()) })
+                moveToDeploymentMarker(lat, lng)
             }
 
             //animate track
@@ -1424,7 +1406,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
 //            animate()
 
         } else {
-            moveToDeploymentMarker(lat, lng, markerLocationId)
+            moveToDeploymentMarker(lat, lng)
         }
     }
 
