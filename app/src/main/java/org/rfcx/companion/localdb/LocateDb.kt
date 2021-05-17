@@ -4,11 +4,10 @@ import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
 import io.realm.kotlin.deleteFromRealm
-import org.rfcx.companion.entity.Locate
-import org.rfcx.companion.entity.LocationGroup
-import org.rfcx.companion.entity.SyncState
-import org.rfcx.companion.entity.TrackingFile
+import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.response.StreamResponse
+import org.rfcx.companion.entity.response.toEdgeDeployment
+import org.rfcx.companion.entity.response.toGuardianDeployment
 import org.rfcx.companion.entity.response.toLocate
 import org.rfcx.companion.util.toISO8601Format
 
@@ -226,6 +225,13 @@ class LocateDb(private val realm: Realm) {
                         }
                     }
                     location.locationGroup = locationGroupObj
+                }
+
+                //insert deployment
+                if (streamResponse.deployment?.deploymentType == Device.AUDIOMOTH.value) {
+                    it.insertOrUpdate(streamResponse.deployment!!.toEdgeDeployment())
+                } else {
+                    it.insertOrUpdate(streamResponse.deployment!!.toGuardianDeployment())
                 }
             }
         }

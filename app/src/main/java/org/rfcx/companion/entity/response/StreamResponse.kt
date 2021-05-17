@@ -1,11 +1,10 @@
 package org.rfcx.companion.entity.response
 
 import org.rfcx.companion.entity.*
+import org.rfcx.companion.entity.guardian.GuardianConfiguration
+import org.rfcx.companion.entity.guardian.GuardianDeployment
 import java.util.*
 
-/**
- * Firestore response for getting a location
- */
 data class StreamResponse(
     var id: String? = null,
     var name: String? = null,
@@ -14,8 +13,38 @@ data class StreamResponse(
     var altitude: Double? = null,
     var createdAt: Date? = null,
     var updatedAt: Date? = null,
-    var project: ProjectResponse? = null
+    var project: ProjectResponse? = null,
+    var deployment: DeploymentResponse? = null
 )
+
+fun StreamResponse.toEdgeDeployment(): EdgeDeployment {
+    return EdgeDeployment(
+        deploymentKey = this.id,
+        serverId = this.id,
+        deployedAt = this.deployment?.deployedAt ?: Date(),
+        state = DeploymentState.Edge.ReadyToUpload.key,
+        stream = this.toDeploymentLocation(),
+        createdAt = this.createdAt ?: Date(),
+        syncState = SyncState.Sent.key,
+        updatedAt = this.updatedAt,
+        deletedAt = this.deployment?.deletedAt
+    )
+}
+
+fun StreamResponse.toGuardianDeployment(): GuardianDeployment {
+    return GuardianDeployment(
+        serverId = this.id,
+        deployedAt = this.deployment?.deployedAt ?: Date(),
+        state = DeploymentState.Guardian.ReadyToUpload.key,
+        device = this.deployment?.deploymentType,
+        wifiName = this.deployment?.wifi ?: "",
+        configuration = this.deployment?.configuration ?: GuardianConfiguration(),
+        stream = this.toDeploymentLocation(),
+        createdAt = this.createdAt ?: Date(),
+        syncState = SyncState.Sent.key,
+        updatedAt = this.updatedAt
+    )
+}
 
 fun StreamResponse.toLocate(): Locate {
     return Locate(

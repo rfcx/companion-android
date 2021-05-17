@@ -464,7 +464,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         mapboxMap.uiSettings.isCompassEnabled = false
 
         context?.let {
-            retrieveDeployments(it)
             retrieveLocations(it)
             retrieveProjects(it)
         }
@@ -475,7 +474,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
             setupImages(it)
             setupMarkerLayers(it)
             setupSearch()
-//            setupScale()
 
             mapboxMap.addOnMapClickListener { latLng ->
                 handleClickIcon(mapboxMap.projection.toScreenLocation(latLng))
@@ -963,32 +961,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         locationGroupLiveData.observeForever(locationGroupObserve)
     }
 
-    private fun retrieveDeployments(context: Context) {
-        val token = "Bearer ${context.getIdToken()}"
-        ApiManager.getInstance().getDeviceApi().getDeployments(token)
-            .enqueue(object : Callback<List<DeploymentResponse>> {
-                override fun onFailure(call: Call<List<DeploymentResponse>>, t: Throwable) {
-                    combinedData()
-                    if (context.isNetworkAvailable()) {
-                        Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT)
-                            .show()
-                    }
-                }
-
-                override fun onResponse(
-                    call: Call<List<DeploymentResponse>>,
-                    response: Response<List<DeploymentResponse>>
-                ) {
-                    response.body()?.let { item ->
-                        guardianDeploymentDb.insertOrUpdate(item.filter { it.deploymentType == Device.GUARDIAN.value })
-                        edgeDeploymentDb.insertOrUpdate(item.filter { it.deploymentType == Device.AUDIOMOTH.value })
-                    }
-                    retrieveAssets(context)
-                    combinedData()
-                }
-            })
-    }
-
     private fun retrieveLocations(context: Context) {
         DownloadStreamsWorker.enqueue(context)
     }
@@ -1015,10 +987,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                     combinedData()
                 }
             })
-    }
-
-    private fun retrieveAssets(context: Context) {
-        DownloadImagesWorker.enqueue(context)
     }
 
     private fun retrieveTracking(

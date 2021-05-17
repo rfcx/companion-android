@@ -33,6 +33,9 @@ class DownloadStreamsWorker(val context: Context, params: WorkerParameters) :
             if (result) {
                 Log.d(TAG, "downloaded $count sites")
                 isRunning = DownloadStreamState.FINISH
+
+                //download all assets
+                DownloadImagesWorker.enqueue(context)
             } else {
                 isRunning = DownloadStreamState.NOT_RUNNING
                 someFailed = true
