@@ -8,7 +8,6 @@ import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 interface BaseDeploymentProtocol {
     fun startMapPicker(latitude: Double, longitude: Double, siteId: Int, name: String)
     fun startCheckList()
-    fun startSelectingExistedSite(latitude: Double, longitude: Double)
     fun startDetailDeploymentSite(id: Int, name: String?, isNewSite: Boolean)
 
     fun isOpenedFromUnfinishedDeployment(): Boolean

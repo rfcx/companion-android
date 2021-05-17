@@ -30,7 +30,6 @@ import org.rfcx.companion.util.Preferences.Companion.ENABLE_LOCATION_TRACKING
 import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
-import org.rfcx.companion.view.deployment.locate.SelectingExistedSiteFragment
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.deployment.location.DetailDeploymentSiteFragment
 import org.rfcx.companion.view.deployment.location.SetDeploymentSiteFragment
@@ -241,10 +240,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     override fun startCheckList() {
         startFragment(EdgeCheckListFragment.newInstance())
-    }
-
-    override fun startSelectingExistedSite(latitude: Double, longitude: Double) {
-        startFragment(SelectingExistedSiteFragment.newInstance(latitude, longitude))
     }
 
     override fun startDetailDeploymentSite(id: Int, name: String?, isNewSite: Boolean) {

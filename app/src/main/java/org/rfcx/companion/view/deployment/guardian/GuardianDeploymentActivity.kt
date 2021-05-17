@@ -41,7 +41,6 @@ import org.rfcx.companion.view.deployment.guardian.register.GuardianRegisterFrag
 import org.rfcx.companion.view.deployment.guardian.signal.GuardianSignalFragment
 import org.rfcx.companion.view.deployment.guardian.solarpanel.GuardianSolarPanelFragment
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
-import org.rfcx.companion.view.deployment.locate.SelectingExistedSiteFragment
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.deployment.location.DetailDeploymentSiteFragment
 import org.rfcx.companion.view.deployment.location.SetDeploymentSiteFragment
@@ -227,10 +226,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun startCheckList() {
         startFragment(GuardianCheckListFragment.newInstance())
-    }
-
-    override fun startSelectingExistedSite(latitude: Double, longitude: Double) {
-        startFragment(SelectingExistedSiteFragment.newInstance(latitude, longitude))
     }
 
     override fun startDetailDeploymentSite(id: Int, name: String? , isNewSite: Boolean) {

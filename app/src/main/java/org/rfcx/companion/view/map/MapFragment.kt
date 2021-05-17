@@ -170,7 +170,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             }
 
             override fun onFailure(exception: Exception) {
-                Log.e("MapFragment", exception.localizedMessage ?: "empty localizedMessage")
+                Log.e(MapFragment.tag, exception.localizedMessage ?: "empty localizedMessage")
             }
         }
 
@@ -464,6 +464,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         this.mapboxMap = mapboxMap
         mapboxMap.uiSettings.isAttributionEnabled = false
         mapboxMap.uiSettings.isLogoEnabled = false
+        mapboxMap.uiSettings.isCompassEnabled = false
 
         context?.let {
             retrieveDeployments(it)
