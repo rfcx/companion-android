@@ -461,6 +461,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         this.mapboxMap = mapboxMap
         mapboxMap.uiSettings.isAttributionEnabled = false
         mapboxMap.uiSettings.isLogoEnabled = false
+        mapboxMap.uiSettings.isCompassEnabled = false
 
         context?.let {
             retrieveDeployments(it)
