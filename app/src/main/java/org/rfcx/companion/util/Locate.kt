@@ -2,10 +2,17 @@ package org.rfcx.companion.util
 
 import android.content.Context
 import android.location.Location
-import kotlin.math.absoluteValue
+import android.location.LocationManager
+import com.mapbox.mapboxsdk.geometry.LatLng
+import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.view.profile.coordinates.CoordinatesActivity.Companion.DDM_FORMAT
 import org.rfcx.companion.view.profile.coordinates.CoordinatesActivity.Companion.DD_FORMAT
 import org.rfcx.companion.view.profile.coordinates.CoordinatesActivity.Companion.DMS_FORMAT
+import kotlin.math.absoluteValue
+
+object DefaultSetupMap {
+    const val DEFAULT_ZOOM = 15.0
+}
 
 fun Double?.latitudeCoordinates(context: Context): String {
     val lat = this
@@ -95,4 +102,38 @@ private fun replaceDelimitersDDM(str: String): String {
 
 fun convertLatLngLabel(context: Context, lat: Double, lng: Double): String {
     return "${lat.latitudeCoordinates(context)}, ${lng.longitudeCoordinates(context)}"
+}
+
+fun Location.saveLastLocation(context: Context) {
+    val preferences = Preferences.getInstance(context)
+    preferences.putFloat(Preferences.LAST_LATITUDE, this.latitude.toFloat())
+    preferences.putFloat(Preferences.LAST_LONGITUDE, this.longitude.toFloat())
+}
+
+fun LatLng.saveLastLocation(context: Context) {
+    val preferences = Preferences.getInstance(context)
+    preferences.putFloat(Preferences.LAST_LATITUDE, this.latitude.toFloat())
+    preferences.putFloat(Preferences.LAST_LONGITUDE, this.longitude.toFloat())
+}
+
+fun Context.getLastLocation(): Location? {
+    val preferences = Preferences.getInstance(this)
+    val latitude = preferences.getFloat(Preferences.LAST_LATITUDE)
+    val longitude = preferences.getFloat(Preferences.LAST_LONGITUDE)
+    val lastLocate = Location(LocationManager.GPS_PROVIDER)
+
+    if (latitude == 0.0F && longitude == 0.0F) return null
+
+    lastLocate.latitude = latitude.toDouble()
+    lastLocate.longitude = longitude.toDouble()
+
+    return lastLocate
+}
+
+fun Location.toLatLng(): LatLng {
+    return LatLng(this.latitude, this.longitude)
+}
+
+fun Locate.toLatLng(): LatLng {
+    return LatLng(this.latitude, this.longitude)
 }

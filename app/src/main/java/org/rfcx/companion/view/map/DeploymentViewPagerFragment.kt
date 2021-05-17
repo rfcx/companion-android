@@ -77,7 +77,7 @@ class DeploymentViewPagerFragment : Fragment(), DeploymentDetailClickListener {
 
     // Region {DeploymentViewPagerAdapter.DeploymentDetailClickListener}
     override fun onClickedMoreIcon(edgeDeploymentView: DeploymentDetailView.EdgeDeploymentView) {
-        locateId = locateDb.getDeleteLocateId(
+        locateId = locateDb.getLocateByNameAndLatLng(
             edgeDeploymentView.locationName,
             edgeDeploymentView.latitude,
             edgeDeploymentView.longitude

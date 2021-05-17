@@ -108,12 +108,11 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
         toolbarLayout.visibility = View.GONE
     }
 
-    override fun startLocationPage(
+    override fun onSelectedLocation(
         latitude: Double,
         longitude: Double,
-        altitude: Double,
-        name: String,
-        fromPicker: Boolean
+        siteId: Int,
+        name: String
     ) {
         toolbarLayout.visibility = View.VISIBLE
         setLatLng(latitude, longitude, altitude)

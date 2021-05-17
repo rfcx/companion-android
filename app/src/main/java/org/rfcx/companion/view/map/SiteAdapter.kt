@@ -11,13 +11,15 @@ import org.rfcx.companion.util.setFormatLabel
 import org.rfcx.companion.util.toTimeSinceStringAlternativeTimeAgo
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 
-class SiteAdapter(private val itemClickListener: (Locate) -> Unit) :
+class SiteAdapter(private val itemClickListener: (Locate, Boolean) -> Unit) :
     RecyclerView.Adapter<SiteAdapter.SiteAdapterViewHolder>() {
     var items: ArrayList<SiteWithLastDeploymentItem> = arrayListOf()
         set(value) {
             field = value
             notifyDataSetChanged()
         }
+
+    var isNewSite = false
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -34,7 +36,7 @@ class SiteAdapter(private val itemClickListener: (Locate) -> Unit) :
         val site = items[position]
         holder.bind(site)
         holder.itemView.setOnClickListener {
-            this.itemClickListener(site.locate)
+            this.itemClickListener(site.locate, site.locate.id == -1)
         }
     }
 
@@ -51,7 +53,10 @@ class SiteAdapter(private val itemClickListener: (Locate) -> Unit) :
         private val iconAddImageView = itemView.iconAddImageView
 
         fun bind(site: SiteWithLastDeploymentItem) {
-            siteNameTextView.text = site.locate.name
+            siteNameTextView.text = if (site.locate.id == -1) itemView.context.getString(
+                R.string.create_site,
+                site.locate.name
+            ) else site.locate.name
             detailTextView.text = site.date?.toTimeSinceStringAlternativeTimeAgo(itemView.context)
                 ?: itemView.context.getString(R.string.no_deployments)
             if (site.distance != null) {
@@ -60,12 +65,13 @@ class SiteAdapter(private val itemClickListener: (Locate) -> Unit) :
             } else {
                 distanceTextView.visibility = View.GONE
             }
-            distanceTextView.visibility =
-                if (site.locate.name == itemView.context.getString(R.string.create_new_site)) View.GONE else View.VISIBLE
-            detailTextView.visibility =
-                if (site.locate.name == itemView.context.getString(R.string.create_new_site)) View.GONE else View.VISIBLE
-            iconAddImageView.visibility =
-                if (site.locate.name == itemView.context.getString(R.string.create_new_site)) View.VISIBLE else View.GONE
+            setDistanceAndIconAdd(site.locate.id == -1)
+        }
+
+        private fun setDistanceAndIconAdd(boolean: Boolean) {
+            distanceTextView.visibility = if (boolean) View.GONE else View.VISIBLE
+            detailTextView.visibility = if (boolean) View.GONE else View.VISIBLE
+            iconAddImageView.visibility = if (boolean) View.VISIBLE else View.GONE
         }
     }
 }

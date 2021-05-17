@@ -16,7 +16,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.toColorInt
 import androidx.fragment.app.Fragment
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -34,12 +33,11 @@ import kotlinx.android.synthetic.main.fragment_edit_location.altitudeEditText
 import kotlinx.android.synthetic.main.fragment_edit_location.locationGroupValueTextView
 import kotlinx.android.synthetic.main.fragment_edit_location.locationNameEditText
 import kotlinx.android.synthetic.main.fragment_edit_location.locationValueTextView
-import kotlinx.android.synthetic.main.fragment_edit_location.pinDeploymentImageView
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
+import org.rfcx.companion.util.DefaultSetupMap
 import org.rfcx.companion.util.convertLatLngLabel
-import org.rfcx.companion.view.deployment.locate.LocationFragment
 
 class EditLocationFragment : Fragment(), OnMapReadyCallback {
     private var mapboxMap: MapboxMap? = null
@@ -170,7 +168,7 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
             setupScale()
             enableLocationComponent()
             val latLng = LatLng(latitude, longitude)
-            moveCamera(latLng, LocationFragment.DEFAULT_ZOOM)
+            moveCamera(latLng, DefaultSetupMap.DEFAULT_ZOOM)
         }
     }
 
@@ -218,7 +216,7 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         permissions: Array<String>,
         grantResults: IntArray
     ) {
-        if (requestCode == LocationFragment.REQUEST_PERMISSIONS_REQUEST_CODE) {
+        if (requestCode == REQUEST_PERMISSIONS_REQUEST_CODE) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 enableLocationComponent()
             }
@@ -250,7 +248,7 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             activity?.requestPermissions(
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                LocationFragment.REQUEST_PERMISSIONS_REQUEST_CODE
+                REQUEST_PERMISSIONS_REQUEST_CODE
             )
         } else {
             throw Exception("Request permissions not required before API 23 (should never happen)")
@@ -296,6 +294,7 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         private const val ARG_LONGITUDE = "ARG_LONGITUDE"
         private const val ARG_ALTITUDE = "ARG_ALTITUDE"
         private const val ARG_LOCATION_NAME = "ARG_LOCATION_NAME"
+        private const val REQUEST_PERMISSIONS_REQUEST_CODE = 34
 
         @JvmStatic
         fun newInstance(lat: Double, lng: Double, altitude: Double, name: String) =

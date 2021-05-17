@@ -56,6 +56,10 @@ class LocationGroupActivity : BaseActivity(), LocationGroupProtocol {
                 group.name?.let { preferences.putString(Preferences.GROUP, it) }
                 finish()
             }
+            Screen.DETAIL_DEPLOYMENT_SITE.id -> {
+                group.name?.let { preferences.putString(Preferences.GROUP, it) }
+                finish()
+            }
             Screen.EDIT_LOCATION.id -> {
                 val intent = Intent()
                 intent.putExtra(EXTRA_LOCATION_GROUP, group)

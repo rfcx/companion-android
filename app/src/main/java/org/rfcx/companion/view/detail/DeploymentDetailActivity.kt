@@ -39,7 +39,6 @@ import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.BaseActivity
 import org.rfcx.companion.view.deployment.EdgeDeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
-import org.rfcx.companion.view.deployment.locate.LocationFragment
 import java.io.File
 import androidx.core.content.FileProvider
 import com.zhihu.matisse.Matisse
@@ -308,7 +307,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         val location = deployment.stream
         location?.let { locate ->
             val latLng = LatLng(locate.latitude, locate.longitude)
-            moveCamera(latLng, LocationFragment.DEFAULT_ZOOM)
+            moveCamera(latLng, DEFAULT_ZOOM)
         }
     }
 
@@ -428,6 +427,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
 
     companion object {
         const val DEPLOYMENT_REQUEST_CODE = 1001
+        const val DEFAULT_ZOOM = 15.0
 
         fun startActivity(context: Context, deploymentId: Int) {
             val intent = Intent(context, DeploymentDetailActivity::class.java)
