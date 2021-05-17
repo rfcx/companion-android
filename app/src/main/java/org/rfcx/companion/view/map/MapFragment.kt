@@ -61,7 +61,6 @@ import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_deployment_window_info.view.*
 import kotlinx.android.synthetic.main.layout_map_window_info.view.*
 import kotlinx.android.synthetic.main.layout_search_view.*
-import org.rfcx.companion.DeploymentListener
 import org.rfcx.companion.MainActivityListener
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
@@ -127,7 +126,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
 
     private val locationPermissions by lazy { activity?.let { LocationPermissions(it) } }
     private var listener: MainActivityListener? = null
-    private var deploymentListener: DeploymentListener? = null
 
     private var isFirstTime = true
     private var currentUserLocation: Location? = null
@@ -151,7 +149,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
 
     private val siteAdapter by lazy { SiteAdapter(this) }
     private var adapterOfSearchSite: ArrayList<SiteWithLastDeploymentItem>? = null
-    private val mapInfoViews = hashMapOf<String, View>()
 
     private val locationGroupAdapter by lazy { LocationGroupAdapter(this) }
 
@@ -198,7 +195,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
     override fun onAttach(context: Context) {
         super.onAttach(context)
         this.listener = context as MainActivityListener
-        this.deploymentListener = context as DeploymentListener
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -954,8 +950,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         val guardianDeploymentMarkers = showGuardianDeployments.map { it.toMark(requireContext()) }
         val deploymentMarkers = edgeDeploymentMarkers + guardianDeploymentMarkers
         val locationMarkers = filteredShowLocations.map { it.toMark() }
-        handleShowDeployment(showDeployments, showGuardianDeployments)
-
         handleMarker(deploymentMarkers + locationMarkers)
 
         val state = listener?.getBottomSheetState() ?: 0
@@ -1008,20 +1002,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         return sites.maxBy {
             currentLatLng.distanceTo(LatLng(it.latitude, it.longitude))
         }
-    }
-
-    private fun handleShowDeployment(
-        edgeDeployments: List<EdgeDeployment>,
-        guardianDeployments: List<GuardianDeployment>
-    ) {
-        val deploymentDetails = arrayListOf<DeploymentDetailView>()
-        deploymentDetails.addAll(edgeDeployments.map {
-            it.toEdgeDeploymentView()
-        })
-        deploymentDetails.addAll(guardianDeployments.map {
-            it.toGuardianDeploymentView()
-        })
-        deploymentListener?.setShowDeployments(deploymentDetails)
     }
 
     private fun fetchData() {

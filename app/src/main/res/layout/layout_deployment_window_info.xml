@@ -64,9 +64,7 @@
                 android:layout_gravity="center"
                 android:contentDescription="@string/sync"
                 android:src="@drawable/ic_calendar"
-                android:tint="@color/grey_active"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/locationNameTextView" />
+                android:tint="@color/grey_active" />
 
             <TextView
                 android:id="@+id/createdAtLabel"
@@ -97,9 +95,7 @@
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/sync"
                 android:src="@drawable/ic_key"
-                android:tint="@color/grey_active"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/locationNameTextView" />
+                android:tint="@color/grey_active" />
 
             <TextView
                 android:id="@+id/deploymentIdTextView"
@@ -121,9 +117,7 @@
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/sync"
                 android:src="@drawable/ic_room"
-                android:tint="@color/grey_active"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/locationNameTextView" />
+                android:tint="@color/grey_active" />
 
             <TextView
                 android:id="@+id/latLngTextView"
@@ -145,9 +139,9 @@
                 style="@style/AudioMothText.Body.Small"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center"
                 android:text="@string/see_deployment_detail"
                 android:textAllCaps="true"
-                android:gravity="center"
                 android:textColor="@color/colorPrimary"
                 android:textStyle="bold" />
         </LinearLayout>
