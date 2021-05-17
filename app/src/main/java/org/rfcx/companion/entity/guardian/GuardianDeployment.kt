@@ -77,6 +77,7 @@ fun GuardianDeployment.toMark(context: Context): MapMarker.DeploymentMarker {
         stream?.project?.name ?: "",
         deploymentKey,
         createdAt,
+        deployedAt,
         updatedAt
     )
 }

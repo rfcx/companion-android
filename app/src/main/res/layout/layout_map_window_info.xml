@@ -73,14 +73,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_xsmall"
                 android:text="@string/created_at"
-                tools:text="Created at:" />
+                tools:text="Created" />
 
             <TextView
                 android:id="@+id/createdAtValue"
                 style="@style/AudioMothText.Body.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_small"
+                android:layout_marginStart="@dimen/margin_padding_xsmall"
                 tools:text="26/04/2021 09:38" />
         </LinearLayout>
 

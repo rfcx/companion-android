@@ -560,10 +560,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         layout.deploymentSiteTitle.text = title
         val projectName = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_PROJECT_NAME)
         layout.projectName.text = projectName
-        val createdAt = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_CREATED_AT)
-        layout.createdAt.text = createdAt
-        val deploymentKey = feature.getStringProperty(PROPERTY_DEPLOYMENT_DEPLOYMENT_KEY)
-        layout.deploymentIdTextView.text = deploymentKey
+        val deployedAt = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_CREATED_AT)
+        layout.deployedAt.text = deployedAt
         var latLng = ""
         context?.let { context ->
             latLng =
@@ -787,8 +785,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                     )
                     gettingTracksAndMoveToPin(site, markerId.asString)
                     features[index]?.let {
-                        Log.d("setDeploymentDetail", "siteFeatures")
-
                         setSiteDetail(it)
                         setFeatureSelectState(it, true)
                     }
@@ -1219,11 +1215,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                         Pair(PROPERTY_WINDOW_INFO_ID, "${it.locationName}.${it.id}"),
                         Pair(PROPERTY_DEPLOYMENT_MARKER_IMAGE, it.pin),
                         Pair(PROPERTY_DEPLOYMENT_MARKER_TITLE, it.locationName),
-                        Pair(PROPERTY_DEPLOYMENT_DEPLOYMENT_KEY, it.deploymentKey),
                         Pair(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID, it.id.toString()),
                         Pair(PROPERTY_DEPLOYMENT_MARKER_DEVICE, it.device),
                         Pair(PROPERTY_SITE_MARKER_SITE_PROJECT_NAME, it.projectName ?: ""),
-                        Pair(PROPERTY_SITE_MARKER_SITE_CREATED_AT, it.createdAt.toDateString()),
+                        Pair(PROPERTY_SITE_MARKER_SITE_CREATED_AT,
+                            context?.let { context -> it.deploymentAt.toTimeAgo(context) } ?: ""),
                         Pair(PROPERTY_DEPLOYMENT_SELECTED, isSelecting.toString())
                     )
                     Feature.fromGeometry(
@@ -1240,7 +1236,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                         Pair(PROPERTY_SITE_MARKER_SITE_LATITUDE, "${it.latitude}"),
                         Pair(PROPERTY_SITE_MARKER_SITE_LONGITUDE, "${it.longitude}"),
                         Pair(PROPERTY_SITE_MARKER_SITE_PROJECT_NAME, it.projectName ?: ""),
-                        Pair(PROPERTY_SITE_MARKER_SITE_CREATED_AT, it.createdAt.toDateString())
+                        Pair(PROPERTY_SITE_MARKER_SITE_CREATED_AT,
+                            context?.let { context -> it.createdAt.toTimeAgo(context) } ?: "")
                     )
 
                     Feature.fromGeometry(
@@ -1536,7 +1533,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         private const val PROPERTY_DEPLOYMENT_MARKER_TITLE = "deployment.title"
         private const val PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID = "deployment.deployment"
         private const val PROPERTY_DEPLOYMENT_MARKER_IMAGE = "deployment.marker.image"
-        private const val PROPERTY_DEPLOYMENT_DEPLOYMENT_KEY = "deployment.marker.deployment.key"
         private const val WINDOW_MARKER_ID = "info.marker"
         private const val PROPERTY_WINDOW_INFO_ID = "window.info.id"
 

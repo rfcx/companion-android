@@ -25,6 +25,7 @@ sealed class MapMarker {
         val projectName: String?,
         val deploymentKey: String,
         val createdAt: Date,
+        val deploymentAt: Date,
         val updatedAt: Date?
     ): MapMarker()
 }

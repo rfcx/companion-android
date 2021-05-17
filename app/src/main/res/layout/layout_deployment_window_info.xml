@@ -67,43 +67,20 @@
                 android:tint="@color/grey_active" />
 
             <TextView
-                android:id="@+id/createdAtLabel"
+                android:id="@+id/deployedAtLabel"
                 style="@style/AudioMothText.Body.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_xsmall"
-                android:text="@string/created_at"
-                tools:text="Created at:" />
+                android:text="@string/deployed_at" />
 
             <TextView
-                android:id="@+id/createdAt"
+                android:id="@+id/deployedAt"
                 style="@style/AudioMothText.Body.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_small"
+                android:layout_marginStart="@dimen/margin_padding_xsmall"
                 tools:text="26/04/2021 09:38" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_padding_small"
-            android:orientation="horizontal">
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/sync"
-                android:src="@drawable/ic_key"
-                android:tint="@color/grey_active" />
-
-            <TextView
-                android:id="@+id/deploymentIdTextView"
-                style="@style/AudioMothText.Body.Secondary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_xsmall"
-                tools:text="ABCDEFGHIJKLM1234" />
         </LinearLayout>
 
         <LinearLayout

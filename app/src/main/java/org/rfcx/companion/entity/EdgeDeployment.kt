@@ -84,6 +84,7 @@ fun EdgeDeployment.toMark(
         stream?.project?.name ?: "",
         deploymentKey ?: "",
         createdAt,
+        deployedAt,
         updatedAt
     )
 }

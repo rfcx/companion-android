@@ -68,6 +68,7 @@
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
     <string name="delete_location">Delete site?</string>
+    <string name="deployment_key">Deployment id</string>
     <string name="are_you_sure_delete_location">The device and its site will be removed</string>
 
     <!--  Perform Battery  -->
@@ -428,10 +429,11 @@
     <string name="no_deployments">No deployments</string>
 
     <string name="time_second">Just now</string>
-    <string name="yesterday">Yesterday</string>
+    <string name="yesterday">Yesterday,</string>
 
     <!-- layout_map_window_info -->
-    <string name="created_at">Created at:</string>
+    <string name="created_at">Created</string>
+    <string name="deployed_at">Deployed</string>
 
     <!-- SetDeploymentSiteFragment -->
     <string name="create_site">Create \"%s\"</string> <!-- If change this text, should edit logic in DetailDeploymentSiteFragment -->
