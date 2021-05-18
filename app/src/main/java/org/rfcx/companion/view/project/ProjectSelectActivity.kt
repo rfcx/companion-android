@@ -23,6 +23,7 @@ import org.rfcx.companion.util.isNetworkAvailable
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.ClassCastException
 
 class ProjectSelectActivity : AppCompatActivity(), (Int) -> Unit, SwipeRefreshLayout.OnRefreshListener {
 
@@ -39,9 +40,15 @@ class ProjectSelectActivity : AppCompatActivity(), (Int) -> Unit, SwipeRefreshLa
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_project_select)
 
-        if (preferences.getInt(Preferences.SELECTED_PROJECT) != -1) {
-            MainActivity.startActivity(this)
-            finish()
+        try {
+            if (preferences.getInt(Preferences.SELECTED_PROJECT) != -1) {
+                MainActivity.startActivity(this)
+                finish()
+            }
+        } catch (e: Exception) {
+            if (e is ClassCastException) {
+                preferences.putInt(Preferences.SELECTED_PROJECT, -1)
+            }
         }
 
         projectSwipeRefreshView.apply {

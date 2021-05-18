@@ -467,7 +467,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         mapboxMap.uiSettings.isCompassEnabled = false
 
         context?.let {
-            retrieveDeployments(it)
             retrieveLocations(it)
             retrieveProjects(it)
         }
@@ -479,7 +478,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             setupMarkerLayers(it)
             setupSearch()
             setupWindowInfo(it)
-//            setupScale()
 
             mapboxMap.addOnMapClickListener { latLng ->
                 val screenPoint = mapboxMap.projection.toScreenLocation(latLng)
@@ -1026,32 +1024,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         locationGroupLiveData.observeForever(locationGroupObserve)
     }
 
-    private fun retrieveDeployments(context: Context) {
-        val token = "Bearer ${context.getIdToken()}"
-        ApiManager.getInstance().getDeviceApi().getDeployments(token)
-            .enqueue(object : Callback<List<DeploymentResponse>> {
-                override fun onFailure(call: Call<List<DeploymentResponse>>, t: Throwable) {
-                    combinedData()
-                    if (context.isNetworkAvailable()) {
-                        Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT)
-                            .show()
-                    }
-                }
-
-                override fun onResponse(
-                    call: Call<List<DeploymentResponse>>,
-                    response: Response<List<DeploymentResponse>>
-                ) {
-                    response.body()?.let { item ->
-                        guardianDeploymentDb.insertOrUpdate(item.filter { it.deploymentType == Device.GUARDIAN.value })
-                        edgeDeploymentDb.insertOrUpdate(item.filter { it.deploymentType == Device.AUDIOMOTH.value })
-                    }
-                    retrieveAssets(context)
-                    combinedData()
-                }
-            })
-    }
-
     private fun retrieveLocations(context: Context) {
         DownloadStreamsWorker.enqueue(context)
     }
@@ -1078,10 +1050,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                     combinedData()
                 }
             })
-    }
-
-    private fun retrieveAssets(context: Context) {
-        DownloadImagesWorker.enqueue(context)
     }
 
     private fun retrieveTracking(
@@ -1200,13 +1168,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             // check is this deployment is selecting (to set bigger pin)
             when (it) {
                 is MapMarker.DeploymentMarker -> {
+                    val deploymentId = deploymentSelecting?.getProperty(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID)
                     val isSelecting =
-                        if (deploymentSelecting == null) {
+                        if (deploymentSelecting == null || deploymentId == null) {
                             false
                         } else {
-                            it.id.toString() == deploymentSelecting.getProperty(
-                                PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID
-                            ).asString
+                            it.id.toString() == deploymentId.asString
                         }
                     val properties = mapOf(
                         Pair(PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID, "${it.locationName}.${it.id}"),

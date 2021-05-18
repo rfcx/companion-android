@@ -1,11 +1,10 @@
 package org.rfcx.companion.entity.response
 
 import org.rfcx.companion.entity.*
+import org.rfcx.companion.entity.guardian.GuardianConfiguration
+import org.rfcx.companion.entity.guardian.GuardianDeployment
 import java.util.*
 
-/**
- * Firestore response for getting a location
- */
 data class StreamResponse(
     var id: String? = null,
     var name: String? = null,
@@ -14,8 +13,15 @@ data class StreamResponse(
     var altitude: Double? = null,
     var createdAt: Date? = null,
     var updatedAt: Date? = null,
-    var project: ProjectResponse? = null
+    var project: ProjectResponse? = null,
+    var deployment: DeploymentResponse? = null
 )
+
+fun StreamResponse.convertToDeploymentResponse(): DeploymentResponse {
+    val tempDeployment = this.deployment
+    tempDeployment!!.stream = this
+    return tempDeployment
+}
 
 fun StreamResponse.toLocate(): Locate {
     return Locate(
