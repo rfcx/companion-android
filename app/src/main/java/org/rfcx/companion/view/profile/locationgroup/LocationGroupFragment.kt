@@ -5,24 +5,34 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import io.realm.Realm
+import kotlinx.android.synthetic.main.activity_project_select.*
 import kotlinx.android.synthetic.main.fragment_location_group.*
+import kotlinx.android.synthetic.main.fragment_location_group.projectSwipeRefreshView
+import kotlinx.android.synthetic.main.fragment_map.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.Status
+import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.localdb.ProjectDb
+import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.service.LocationGroupSyncWorker
-import org.rfcx.companion.util.Analytics
-import org.rfcx.companion.util.Preferences
-import org.rfcx.companion.util.RealmHelper
-import org.rfcx.companion.util.showCommonDialog
+import org.rfcx.companion.util.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
-class LocationGroupFragment : Fragment(), LocationGroupListener {
+class LocationGroupFragment : Fragment(), LocationGroupListener, SwipeRefreshLayout.OnRefreshListener {
     val realm: Realm = Realm.getInstance(RealmHelper.migrationConfig())
     private val locationGroupDb = ProjectDb(realm)
 
@@ -30,6 +40,14 @@ class LocationGroupFragment : Fragment(), LocationGroupListener {
     private var locationGroupProtocol: LocationGroupProtocol? = null
     private var selectedGroup: String? = null
     private var screen: String? = null
+
+    private lateinit var locationGroupLiveData: LiveData<List<Project>>
+    private val locationGroupObserve = Observer<List<Project>> {
+        locationGroupAdapter.apply {
+            items = locationGroupDb.getProjects()
+            notifyDataSetChanged()
+        }
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -57,8 +75,17 @@ class LocationGroupFragment : Fragment(), LocationGroupListener {
             adapter = locationGroupAdapter
         }
 
-        locationGroupAdapter.selectedGroup = selectedGroup ?: getString(R.string.none)
-        locationGroupAdapter.screen = screen ?: Screen.PROFILE.id
+        projectSwipeRefreshView.apply {
+            setOnRefreshListener(this@LocationGroupFragment)
+            setColorSchemeResources(R.color.colorPrimary)
+        }
+
+        locationGroupAdapter.apply {
+            this.selectedGroup = selectedGroup
+            this.screen = screen
+        }
+
+        getProjects()
     }
 
     private fun initIntent() {
@@ -68,18 +95,50 @@ class LocationGroupFragment : Fragment(), LocationGroupListener {
         }
     }
 
+    private fun getProjects() {
+        locationGroupLiveData =
+            Transformations.map(locationGroupDb.getAllResultsAsync().asLiveData()) {
+                it
+            }
+        locationGroupLiveData.observeForever(locationGroupObserve)
+    }
+
+    private fun retrieveProjects(context: Context) {
+        val token = "Bearer ${context.getIdToken()}"
+        ApiManager.getInstance().getDeviceApi().getProjects(token)
+            .enqueue(object : Callback<List<ProjectResponse>> {
+                override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
+                    if (context.isNetworkAvailable()) {
+                        Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                    projectSwipeRefreshView.isRefreshing = false
+                }
+
+                override fun onResponse(
+                    call: Call<List<ProjectResponse>>,
+                    response: Response<List<ProjectResponse>>
+                ) {
+                    response.body()?.forEach { item ->
+                        locationGroupDb.insertOrUpdate(item)
+                    }
+                    projectSwipeRefreshView.isRefreshing = false
+                }
+            })
+    }
+
     override fun onClicked(group: Project) {
         locationGroupProtocol?.onLocationGroupClick(group)
     }
 
-    override fun onResume() {
-        super.onResume()
-        locationGroupAdapter.items = listOf(
-            Project(
-                id = -1,
-                name = getString(R.string.none)
-            )
-        ) + locationGroupDb.getProjects()
+    override fun onRefresh() {
+        retrieveProjects(requireContext())
+        projectSwipeRefreshView.isRefreshing = true
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        locationGroupLiveData.removeObserver(locationGroupObserve)
     }
 
     companion object {

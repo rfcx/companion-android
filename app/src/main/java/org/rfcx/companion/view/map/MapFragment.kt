@@ -24,6 +24,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.work.WorkInfo
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
@@ -57,7 +58,9 @@ import com.mapbox.mapboxsdk.utils.BitmapUtils
 import com.mapbox.pluginscalebar.ScaleBarOptions
 import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
+import kotlinx.android.synthetic.main.fragment_location_group.*
 import kotlinx.android.synthetic.main.fragment_map.*
+import kotlinx.android.synthetic.main.fragment_map.projectSwipeRefreshView
 import kotlinx.android.synthetic.main.layout_deployment_window_info.view.*
 import kotlinx.android.synthetic.main.layout_map_window_info.view.*
 import kotlinx.android.synthetic.main.layout_search_view.*
@@ -92,7 +95,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
-        (Locate, Boolean) -> Unit {
+        (Locate, Boolean) -> Unit, SwipeRefreshLayout.OnRefreshListener {
 
     // map
     private lateinit var mapView: MapView
@@ -271,6 +274,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             setOnClickProjectName()
         }
 
+        projectSwipeRefreshView.apply {
+            setOnRefreshListener(this@MapFragment)
+            setColorSchemeResources(R.color.colorPrimary)
+        }
+
         iconOpenProjectList.setOnClickListener {
             setOnClickProjectName()
         }
@@ -295,6 +303,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         }
 
         projectRecyclerView.visibility = View.VISIBLE
+        projectSwipeRefreshView.visibility = View.VISIBLE
         searchButton.visibility = View.GONE
         trackingLayout.visibility = View.GONE
         hideButtonOnMap()
@@ -1038,6 +1047,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                         Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT)
                             .show()
                     }
+                    projectSwipeRefreshView.isRefreshing = false
                 }
 
                 override fun onResponse(
@@ -1047,6 +1057,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                     response.body()?.forEach { item ->
                         locationGroupDb.insertOrUpdate(item)
                     }
+                    projectSwipeRefreshView.isRefreshing = false
                     combinedData()
                 }
             })
@@ -1486,6 +1497,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
     override fun onClicked(group: Project) {
         projectRecyclerView.visibility = View.GONE
+        projectSwipeRefreshView.visibility = View.GONE
 
         context?.let { context ->
             Preferences.getInstance(context).putInt(Preferences.SELECTED_PROJECT, group.id)
@@ -1530,7 +1542,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         }
     }
 
-    override fun onLongClicked(group: Project) {}
+    override fun onRefresh() {
+        retrieveProjects(requireContext())
+        projectSwipeRefreshView.isRefreshing = true
+    }
 }
 
 interface ApiCallbackInjector {
