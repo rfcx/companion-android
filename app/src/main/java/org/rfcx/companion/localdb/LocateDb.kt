@@ -4,10 +4,7 @@ import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
 import io.realm.kotlin.deleteFromRealm
-import org.rfcx.companion.entity.Locate
-import org.rfcx.companion.entity.LocationGroup
-import org.rfcx.companion.entity.SyncState
-import org.rfcx.companion.entity.TrackingFile
+import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.response.StreamResponse
 import org.rfcx.companion.entity.response.toLocate
 import org.rfcx.companion.util.toISO8601Format
