@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_project_select.*
 import org.rfcx.companion.MainActivity
@@ -23,7 +24,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class ProjectSelectActivity : AppCompatActivity(), (Int) -> Unit {
+class ProjectSelectActivity : AppCompatActivity(), (Int) -> Unit, SwipeRefreshLayout.OnRefreshListener {
 
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val projectDb by lazy { ProjectDb(realm) }
@@ -38,10 +39,14 @@ class ProjectSelectActivity : AppCompatActivity(), (Int) -> Unit {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_project_select)
 
-        Log.d("preferences.getInt", preferences.getInt(Preferences.SELECTED_PROJECT).toString())
         if (preferences.getInt(Preferences.SELECTED_PROJECT) != -1) {
             MainActivity.startActivity(this)
             finish()
+        }
+
+        projectSwipeRefreshView.apply {
+            setOnRefreshListener(this@ProjectSelectActivity)
+            setColorSchemeResources(R.color.colorPrimary)
         }
 
         downloadAccessibleProjects(this)
@@ -70,7 +75,7 @@ class ProjectSelectActivity : AppCompatActivity(), (Int) -> Unit {
             .enqueue(object : Callback<List<ProjectResponse>> {
                 override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
                     if (context.isNetworkAvailable()) {
-                        Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT)
+                        Toast.makeText(context, t.message, Toast.LENGTH_SHORT)
                             .show()
                     }
                 }
@@ -91,16 +96,20 @@ class ProjectSelectActivity : AppCompatActivity(), (Int) -> Unit {
     }
 
     private fun showLoading() {
-        downloadProjectLoading.visibility = View.VISIBLE
+        projectSwipeRefreshView.isRefreshing = true
     }
 
     private fun hideLoading() {
-        downloadProjectLoading.visibility = View.GONE
+        projectSwipeRefreshView.isRefreshing = false
     }
 
     override fun invoke(id: Int) {
         selectedProject = id
         selectProjectButton.isEnabled = true
+    }
+
+    override fun onRefresh() {
+        downloadAccessibleProjects(this)
     }
 
     companion object {
