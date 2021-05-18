@@ -1139,18 +1139,15 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                 } else {
                     getString(R.string.format_deploy_uploading)
                 }
-                listener?.showSnackbar(msg, Snackbar.LENGTH_SHORT)
+                statusView.onShow(msg)
             }
             SyncInfo.Uploaded -> {
                 val msg = getString(R.string.format_deploys_uploaded)
-                listener?.showSnackbar(msg, Snackbar.LENGTH_SHORT)
+                statusView.onShowWithDelayed(msg)
             }
             // else also waiting network
             else -> {
-                listener?.showSnackbar(
-                    getString(R.string.format_deploy_waiting_network),
-                    Snackbar.LENGTH_LONG
-                )
+                statusView.onShowWithDelayed(getString(R.string.format_deploy_waiting_network))
             }
         }
     }
