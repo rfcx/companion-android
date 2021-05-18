@@ -306,12 +306,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         deployment.state = DeploymentState.Edge.Locate.key // state
 
         this._deployLocation = locate.asDeploymentLocation()
-        val deploymentId = edgeDeploymentDb.insertOrUpdate(deployment, _deployLocation!!)
-
-        useExistedLocation = isExisted
         this._locate = locate
+        useExistedLocation = isExisted
         if (!useExistedLocation) {
-            locateDb.insertOrUpdateLocate(deploymentId, locate) // update locate - last deployment
+            locateDb.insertOrUpdate(locate)
         }
 
         setDeployment(deployment)
@@ -345,9 +343,15 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             it.state = DeploymentState.Edge.ReadyToUpload.key
             setDeployment(it)
 
+            val deploymentId = edgeDeploymentDb.insertOrUpdate(it, _deployLocation!!)
+            if (!useExistedLocation) {
+                this._locate?.let { loc ->
+                    locateDb.insertOrUpdateLocate(deploymentId, loc) // update locate - last deployment
+                }
+            }
+
             if (useExistedLocation) {
                 this._locate?.let { locate ->
-                    locateDb.insertOrUpdateLocate(it.id, locate) // update locate - last deployment
                     val deployments =
                         locate.serverId?.let { it1 -> edgeDeploymentDb.getDeploymentsBySiteId(it1) }
                     val guardianDeployments = locate.serverId?.let { it1 ->
@@ -362,7 +366,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 }
             }
             saveImages(it)
-            edgeDeploymentDb.updateDeployment(it)
 
             //track getting
             if (preferences.getBoolean(ENABLE_LOCATION_TRACKING)) {
@@ -396,7 +399,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         when (number) {
             0 -> {
                 updateDeploymentState(DeploymentState.Edge.Locate)
-                val site = _deployLocation
+                val site = this._locate
                 if (site == null) {
                     startFragment(
                         SetDeploymentSiteFragment.newInstance(
@@ -404,11 +407,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                         )
                     )
                 } else {
-                    val id =
-                        locateDb.getLocateByNameAndLatLng(site.name, site.latitude, site.longitude)
-                    id?.let {
-                        startDetailDeploymentSite(it, site.name, false)
-                    }
+                    startDetailDeploymentSite(site.id, site.name, false)
                 }
             }
             1 -> {
@@ -452,7 +451,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         siteId: Int,
         name: String
     ) {
-        startFragment(DetailDeploymentSiteFragment.newInstance(latitude, longitude, siteId, name))
+        startFragment(DetailDeploymentSiteFragment.newInstance(latitude, longitude, siteId, name, true))
     }
 
     override fun playSyncSound() {

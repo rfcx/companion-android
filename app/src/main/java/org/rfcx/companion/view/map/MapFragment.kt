@@ -735,11 +735,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         style.addLayer(deploymentCount)
     }
 
-    private fun setupScale() {
-        val scaleBarPlugin = ScaleBarPlugin(mapView, mapboxMap!!)
-        scaleBarPlugin.create(ScaleBarOptions(requireContext()))
-    }
-
     private fun handleClickIcon(screenPoint: PointF): Boolean {
         val deploymentFeatures = mapboxMap?.queryRenderedFeatures(screenPoint, MARKER_DEPLOYMENT_ID)
         val siteFeatures = mapboxMap?.queryRenderedFeatures(screenPoint, MARKER_SITE_ID)
@@ -926,7 +921,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         val usedSitesOnEdge = showDeployments.map { it.stream?.coreId }
 
         val allUsedSites = usedSitesOnEdge + usedSitesOnGuardian
-        var filteredShowLocations = locations.filter { loc -> !allUsedSites.contains(loc.serverId) }
+        var filteredShowLocations = locations.filter { loc -> !allUsedSites.contains(loc.serverId) || (loc.serverId == null && (loc.lastDeploymentId == 0 && loc.lastGuardianDeploymentId == 0)) }
         val projectName = listener?.getProjectName() ?: getString(R.string.none)
         if (projectName != getString(R.string.none)) {
             filteredShowLocations =
@@ -1391,7 +1386,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         super.onResume()
         mapView.onResume()
         analytics?.trackScreen(Screen.MAP)
-        context?.let { ImageSyncWorker.enqueue(it) }
     }
 
     override fun onPause() {

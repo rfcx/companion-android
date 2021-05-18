@@ -29,24 +29,6 @@ open class Locate(
     var syncState: Int = 0
 ) : RealmModel {
 
-    fun getLastDeploymentId(): String {
-        // is sent?
-        return if (lastDeploymentServerId != null || lastGuardianDeploymentServerId != null) {
-            // is last deployment from edge?
-            if (lastDeploymentServerId != null) {
-                lastDeploymentServerId!!
-            } else {
-                lastGuardianDeploymentServerId!!
-            }
-        } else {
-            if (lastDeploymentId != 0) {
-                lastDeploymentId
-            } else {
-                lastGuardianDeploymentId
-            }.toString()
-        }
-    }
-
     fun getLatLng(): LatLng = LatLng(latitude, longitude)
 
     fun asDeploymentLocation(): DeploymentLocation {
