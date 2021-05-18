@@ -92,7 +92,6 @@
                 app:layout_constraintTop_toBottomOf="@id/longitudeLabel"
                 tools:text="50.00" />
 
-
             <TextView
                 android:id="@+id/altitudeLabel"
                 style="@style/GuardianText.Label.Bold"
@@ -112,6 +111,33 @@
                 app:layout_constraintTop_toBottomOf="@id/altitudeLabel"
                 tools:text="50.00" />
 
+            <TextView
+                android:id="@+id/deploymentIdLabel"
+                style="@style/GuardianText.Label.Bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="0dp"
+                android:text="@string/deployment_key"
+                app:layout_constraintStart_toStartOf="@id/altitudeValue"
+                app:layout_constraintTop_toBottomOf="@id/altitudeValue" />
+
+            <LinearLayout
+                android:id="@+id/deploymentIdLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_padding_small"
+                android:orientation="horizontal"
+                app:layout_constraintStart_toStartOf="@id/deploymentIdLabel"
+                app:layout_constraintTop_toBottomOf="@id/deploymentIdLabel">
+
+                <TextView
+                    android:id="@+id/deploymentIdTextView"
+                    style="@style/AudioMothText.Body.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="ABCDEFGHIJKLM1234" />
+            </LinearLayout>
+
             <com.mapbox.mapboxsdk.maps.MapView
                 android:id="@+id/mapBoxView"
                 android:layout_width="match_parent"
@@ -121,7 +147,7 @@
                 android:layout_marginEnd="@dimen/margin_padding_large"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/altitudeValue" />
+                app:layout_constraintTop_toBottomOf="@id/deploymentIdLayout" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/pinDetailDeploymentImageView"

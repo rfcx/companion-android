@@ -71,9 +71,17 @@ fun EdgeDeployment.toMark(context: Context, projectDb: ProjectDb): MapMarker.Dep
         context.getString(R.string.format_in_progress_step)
 
     return MapMarker.DeploymentMarker(
-        id, stream?.name ?: "",
+        id,
+        stream?.name ?: "",
         stream?.longitude ?: 0.0,
         stream?.latitude ?: 0.0,
-        pinImage, description, Device.AUDIOMOTH.value, createdAt, updatedAt
+        pinImage,
+        description,
+        Device.AUDIOMOTH.value,
+        stream?.project?.name ?: "",
+        deploymentKey ?: "",
+        createdAt,
+        deployedAt,
+        updatedAt
     )
 }
