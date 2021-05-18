@@ -197,7 +197,7 @@
     <string name="deployment_will_uploaded">Images will be uploaded to your account</string>
     <string name="almost_there">Almost there!</string>
     <string name="switch_to_deploy">Switch your device to DEPLOY</string>
-    <string name="take_photos">Take some photos of the deploy \nsite (optional)</string>
+    <string name="take_photos">Take up to 5 photos of the deployment \nsite(optional)</string>
 
     <string name="read_storage_permission_msg">Deploy App would like to read your storage</string>
     <string name="go_to_setting">Settings</string>
