@@ -30,7 +30,7 @@ import org.rfcx.companion.entity.guardian.getRecordTime
 import org.rfcx.companion.entity.guardian.toReadableFormat
 import org.rfcx.companion.entity.socket.response.Status
 import org.rfcx.companion.localdb.DeploymentImageDb
-import org.rfcx.companion.localdb.LocationGroupDb
+import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.detail.*
@@ -41,7 +41,7 @@ import org.rfcx.companion.view.prefs.SyncPreferenceListener
 class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (DeploymentImageView) -> Unit {
 
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val locationGroupDb by lazy { LocationGroupDb(realm) }
+    private val locationGroupDb by lazy { ProjectDb(realm) }
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }

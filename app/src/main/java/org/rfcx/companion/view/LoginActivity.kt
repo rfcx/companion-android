@@ -29,6 +29,7 @@ import org.rfcx.companion.util.CredentialVerifier
 import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.Preferences.Companion.DISPLAY_THEME
 import org.rfcx.companion.util.Preferences.Companion.USER_FIREBASE_UID
+import org.rfcx.companion.view.project.ProjectSelectActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -61,7 +62,7 @@ class LoginActivity : AppCompatActivity() {
         setupDisplayTheme()
 
         if (CredentialKeeper(this).hasValidCredentials()) {
-            MainActivity.startActivity(this@LoginActivity)
+            ProjectSelectActivity.startActivity(this@LoginActivity)
             finish()
         }
 
@@ -274,7 +275,7 @@ class LoginActivity : AppCompatActivity() {
                     val user = auth.currentUser
                     user?.uid?.let {
                         preferences.putString(USER_FIREBASE_UID, it)
-                        MainActivity.startActivity(this@LoginActivity)
+                        ProjectSelectActivity.startActivity(this@LoginActivity)
                         finish()
                     }
                 } else {
