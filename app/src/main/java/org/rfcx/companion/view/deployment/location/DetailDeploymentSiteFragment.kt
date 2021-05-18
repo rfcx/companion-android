@@ -58,6 +58,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     var isCreateNew: Boolean = false
     var isUseCurrentLocate: Boolean = false
     var site: Locate? = null
+    var fromMapPicker: Boolean = false
 
     // Local database
     val realm: Realm = Realm.getInstance(RealmHelper.migrationConfig())
@@ -82,7 +83,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                     currentUserLocation = location
                     updateView()
 
-                    if (isCreateNew) {
+                    if (isCreateNew && !fromMapPicker) {
                         currentUserLocation?.let { currentUserLocation ->
                             val latLng =
                                 LatLng(currentUserLocation.latitude, currentUserLocation.longitude)
@@ -112,6 +113,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             isCreateNew = it.getBoolean(ARG_IS_CREATE_NEW)
             latitude = it.getDouble(ARG_LATITUDE)
             longitude = it.getDouble(ARG_LONGITUDE)
+            fromMapPicker = it.getBoolean(ARG_FROM_MAP_PICKER)
         }
     }
 
@@ -559,6 +561,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         private const val ARG_IS_CREATE_NEW = "ARG_IS_CREATE_NEW"
         private const val ARG_LATITUDE = "ARG_LATITUDE"
         private const val ARG_LONGITUDE = "ARG_LONGITUDE"
+        private const val ARG_FROM_MAP_PICKER = "ARG_FROM_MAP_PICKER"
 
         const val PROPERTY_MARKER_IMAGE = "marker.image"
 
@@ -582,6 +585,18 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                     putInt(ARG_SITE_ID, siteId)
                     putString(ARG_SITE_NAME, name)
                     putBoolean(ARG_IS_CREATE_NEW, siteId == -1)
+                }
+            }
+
+        fun newInstance(lat: Double, lng: Double, siteId: Int, name: String, fromMapPicker: Boolean) =
+            DetailDeploymentSiteFragment().apply {
+                arguments = Bundle().apply {
+                    putDouble(ARG_LATITUDE, lat)
+                    putDouble(ARG_LONGITUDE, lng)
+                    putInt(ARG_SITE_ID, siteId)
+                    putString(ARG_SITE_NAME, name)
+                    putBoolean(ARG_IS_CREATE_NEW, siteId == -1)
+                    putBoolean(ARG_FROM_MAP_PICKER, fromMapPicker)
                 }
             }
     }

@@ -568,7 +568,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         siteId: Int,
         name: String
     ) {
-        startFragment(DetailDeploymentSiteFragment.newInstance(latitude, longitude, siteId, name))
+        startFragment(DetailDeploymentSiteFragment.newInstance(latitude, longitude, siteId, name, true))
     }
 
     override fun onBackPressed() {
