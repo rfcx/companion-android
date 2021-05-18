@@ -12,59 +12,30 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
+import com.mapbox.mapboxsdk.geometry.LatLng
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
-import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
 import kotlinx.android.synthetic.main.layout_search_view.*
-import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Locate
-import org.rfcx.companion.localdb.EdgeDeploymentDb
-import org.rfcx.companion.service.DeleteStreamsWorker
 import org.rfcx.companion.service.DeploymentCleanupWorker
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.EdgeDeploymentActivity
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
-import org.rfcx.companion.view.map.DeploymentDetailView
-import org.rfcx.companion.view.map.DeploymentViewPagerFragment
 import org.rfcx.companion.view.map.MapFragment
 import org.rfcx.companion.view.profile.ProfileFragment
 import org.rfcx.companion.widget.BottomNavigationMenuItem
 
-class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListener {
-    private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
-
+class MainActivity : AppCompatActivity(), MainActivityListener {
     private var currentFragment: Fragment? = null
     private val locationPermissions by lazy { LocationPermissions(this) }
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
     private var snackbar: Snackbar? = null
-    private var _showDeployments: List<DeploymentDetailView> = listOf()
 
     private var addTooltip: SimpleTooltip? = null
     private val analytics by lazy { Analytics(this) }
-
-    override fun getShowDeployments(): List<DeploymentDetailView> = this._showDeployments
-
-    override fun setShowDeployments(deployments: List<DeploymentDetailView>) {
-        this._showDeployments = deployments
-        // delete?
-        updateDeploymentDetailPagerView()
-    }
-
-    private fun updateDeploymentDetailPagerView() {
-        val bottomSheetFragment =
-            supportFragmentManager.findFragmentByTag(BOTTOM_SHEET)
-        if (bottomSheetFragment != null && bottomSheetFragment is DeploymentViewPagerFragment) {
-            bottomSheetFragment.updateItems()
-            if (_showDeployments.isEmpty()) {
-                hideBottomSheet()
-                showBottomAppBar()
-            }
-        }
-    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -274,7 +245,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         hideBottomAppBar()
         val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
         if (mapFragment is MapFragment) {
-            mapFragment.moveToDeploymentMarker(lat, lng, markerLocationId)
+            mapFragment.moveToDeploymentMarker(lat, lng)
         }
     }
 
@@ -373,27 +344,9 @@ class MainActivity : AppCompatActivity(), MainActivityListener, DeploymentListen
         }
     }
 
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        val edgeDeploymentId: String? = intent?.getStringExtra(EXTRA_DEPLOYMENT_ID)
-
-        if (edgeDeploymentId != null) {
-            val deployment = edgeDeploymentDb.getDeploymentByDeploymentId(edgeDeploymentId)
-            deployment?.let {
-                showBottomSheet(
-                    DeploymentViewPagerFragment.newInstance(
-                        it.id,
-                        Device.AUDIOMOTH.value
-                    )
-                )
-            }
-        }
-    }
-
     companion object {
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
         private const val BOTTOM_SHEET = "BOTTOM_SHEET"
-        const val CREATE_DEPLOYMENT_REQUEST_CODE = 1002
 
         fun startActivity(context: Context, deploymentId: String? = null) {
             val intent = Intent(context, MainActivity::class.java)
