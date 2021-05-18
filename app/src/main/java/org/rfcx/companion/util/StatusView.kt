@@ -7,9 +7,11 @@ import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.widget_status_view.view.*
 import org.rfcx.companion.R
+import org.rfcx.companion.entity.Theme
 
 class StatusView : FrameLayout {
     private var slideOut: Animation? = null
@@ -28,8 +30,17 @@ class StatusView : FrameLayout {
         val typedArray = context.theme
             .obtainStyledAttributes(attrs, R.styleable.StatusView, 0, 0)
 
+        val preferences = Preferences.getInstance(context)
+        val themeOption = this.resources.getStringArray(R.array.theme_more_than_9)
+        val themeDeviec = preferences.getString(Preferences.DISPLAY_THEME, themeOption[1])
+
         // Get attribute values
-        theme = typedArray.getInt(R.styleable.StatusView_status_theme, 1)
+        theme = typedArray.getInt(R.styleable.StatusView_status_theme, 2)
+
+        when (themeDeviec) {
+            themeOption[0], themeOption[2] -> theme = 0
+            themeOption[1] -> theme = 1
+        }
 
         typedArray.recycle()
 
