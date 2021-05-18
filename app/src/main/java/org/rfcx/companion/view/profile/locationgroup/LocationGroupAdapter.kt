@@ -19,10 +19,6 @@ class LocationGroupAdapter(private val locationGroupListener: LocationGroupListe
             notifyDataSetChanged()
         }
 
-    fun removeGroup(id: Int) {
-        items = items.filter { it.id != id }
-    }
-
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -38,12 +34,6 @@ class LocationGroupAdapter(private val locationGroupListener: LocationGroupListe
         holder.bind(items[position].name ?: holder.itemView.context.getString(R.string.none))
         holder.itemView.setOnClickListener {
             locationGroupListener.onClicked(items[position])
-        }
-        if (items[position].id != -1) {
-            holder.itemView.setOnLongClickListener {
-                locationGroupListener.onLongClicked(items[position])
-                true
-            }
         }
     }
 
@@ -64,5 +54,4 @@ class LocationGroupAdapter(private val locationGroupListener: LocationGroupListe
 
 interface LocationGroupListener {
     fun onClicked(group: Project)
-    fun onLongClicked(group: Project)
 }

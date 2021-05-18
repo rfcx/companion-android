@@ -30,7 +30,6 @@ class LocationGroupFragment : Fragment(), LocationGroupListener {
     private var locationGroupProtocol: LocationGroupProtocol? = null
     private var selectedGroup: String? = null
     private var screen: String? = null
-    private val analytics by lazy { context?.let { Analytics(it) } }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -58,10 +57,6 @@ class LocationGroupFragment : Fragment(), LocationGroupListener {
             adapter = locationGroupAdapter
         }
 
-        locationGroupLinearLayout.setOnClickListener {
-            analytics?.trackCreateNewGroupEvent()
-            locationGroupProtocol?.onCreateNewGroup()
-        }
         locationGroupAdapter.selectedGroup = selectedGroup ?: getString(R.string.none)
         locationGroupAdapter.screen = screen ?: Screen.PROFILE.id
     }
@@ -75,42 +70,6 @@ class LocationGroupFragment : Fragment(), LocationGroupListener {
 
     override fun onClicked(group: Project) {
         locationGroupProtocol?.onLocationGroupClick(group)
-    }
-
-    override fun onLongClicked(group: Project) {
-//        showDeleteDialog(group)
-    }
-
-    private fun showDeleteDialog(group: Project) {
-        val preferences = context?.let { Preferences.getInstance(it) }
-        val groupName = preferences?.getString(Preferences.GROUP, getString(R.string.none))
-
-        val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
-        builder?.apply {
-            setTitle(getString(R.string.delete_location_group_title))
-            setPositiveButton(getString(R.string.delete)) { dialog, which ->
-                locationGroupDb.deleteProject(group.id, object : DatabaseCallback {
-                    override fun onSuccess() {
-                        if(group.name == groupName) {
-                            preferences?.putString(Preferences.GROUP, getString(R.string.none))
-                        }
-                        LocationGroupSyncWorker.enqueue(requireActivity())
-                        locationGroupAdapter.removeGroup(group.id)
-                        locationGroupAdapter.notifyDataSetChanged()
-                        analytics?.trackDeleteLocationGroupEvent(Status.SUCCESS.id)
-                    }
-                    override fun onFailure(errorMessage: String) {
-                        requireActivity().showCommonDialog(errorMessage)
-                        analytics?.trackDeleteLocationGroupEvent(Status.FAILURE.id)
-                    }
-                })
-                dialog.dismiss()
-            }
-            setNegativeButton(getString(R.string.cancel)) { dialog, which ->
-                dialog.dismiss()
-            }
-        }
-        builder?.show()
     }
 
     override fun onResume() {
