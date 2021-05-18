@@ -1389,7 +1389,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         super.onResume()
         mapView.onResume()
         analytics?.trackScreen(Screen.MAP)
-        context?.let { ImageSyncWorker.enqueue(it) }
     }
 
     override fun onPause() {

@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -233,7 +234,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun isOpenedFromUnfinishedDeployment(): Boolean = false // guardian not have this feature so return false
 
-    override fun getDeployment(): GuardianDeployment? = this._deployment
+    override fun getDeployment(): GuardianDeployment? = this._deployment ?: GuardianDeployment()
 
     override fun setDeployment(deployment: GuardianDeployment) {
         this._deployment = deployment

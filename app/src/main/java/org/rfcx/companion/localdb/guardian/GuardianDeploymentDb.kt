@@ -53,10 +53,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
         }
     }
 
-    fun insertOrUpdateDeployment(
-        deployment: GuardianDeployment,
-        location: DeploymentLocation
-    ): Int {
+    fun insertOrUpdateDeployment(deployment: GuardianDeployment, location: DeploymentLocation): Int {
         var id = deployment.id
         realm.executeTransaction {
             if (deployment.id == 0) {
@@ -65,6 +62,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
                 deployment.id = id
             }
             deployment.stream = it.copyToRealm(location)
+            it.insertOrUpdate(deployment)
         }
         return id
     }
