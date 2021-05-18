@@ -43,4 +43,14 @@
         app:layout_constraintVertical_bias="1"
         tools:src="@drawable/ic_cloud_done_16dp" />
 
+    <ProgressBar
+        android:id="@+id/progressBarOfImageView"
+        android:layout_width="@dimen/padding_size"
+        android:layout_height="@dimen/padding_size"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
