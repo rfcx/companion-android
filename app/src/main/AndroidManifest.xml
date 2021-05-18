@@ -42,7 +42,8 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name="org.rfcx.companion.view.detail.DisplayImageActivity"
+        <activity
+            android:name="org.rfcx.companion.view.detail.DisplayImageActivity"
             android:screenOrientation="portrait" />
 
         <activity
@@ -80,10 +81,17 @@
             android:name="org.rfcx.companion.view.deployment.EdgeDeploymentActivity"
             android:screenOrientation="portrait" />
 
-        <activity android:name="org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name="org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity"
+            android:screenOrientation="portrait" />
 
-        <activity android:name="org.rfcx.companion.view.diagnostic.DiagnosticActivity" />
+        <activity
+            android:name="org.rfcx.companion.view.diagnostic.DiagnosticActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".view.project.ProjectSelectActivity"
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".service.LocationTrackerService"

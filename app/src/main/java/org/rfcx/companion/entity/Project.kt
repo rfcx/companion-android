@@ -7,7 +7,7 @@ import io.realm.annotations.RealmClass
 import java.util.*
 
 @RealmClass
-open class LocationGroups(
+open class Project(
     @PrimaryKey
     var id: Int = 0,
     var name: String? = null,
@@ -19,15 +19,15 @@ open class LocationGroups(
 ) : RealmModel {
     companion object {
         const val TABLE_NAME = "LocationGroups"
-        const val LOCATION_GROUPS_ID = "id"
-        const val LOCATION_GROUPS_NAME = "name"
-        const val LOCATION_GROUPS_COLOR = "color"
-        const val LOCATION_GROUPS_SERVER_ID = "serverId"
-        const val LOCATION_GROUPS_SYNC_STATE = "syncState"
-        const val LOCATION_GROUPS_DELETE_AT = "deletedAt"
+        const val PROJECT_ID = "id"
+        const val PROJECT_NAME = "name"
+        const val PROJECT_COLOR = "color"
+        const val PROJECT_SERVER_ID = "serverId"
+        const val PROJECT_SYNC_STATE = "syncState"
+        const val PROJECT_DELETED_AT = "deletedAt"
     }
 }
 
-fun LocationGroups.toLocationGroup(): LocationGroup {
+fun Project.toLocationGroup(): LocationGroup {
     return LocationGroup(this.name, this.color, this.serverId)
 }

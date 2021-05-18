@@ -15,10 +15,10 @@ import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_create_new_group.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
-import org.rfcx.companion.entity.LocationGroups
+import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.toLocationGroup
-import org.rfcx.companion.localdb.LocationGroupDb
+import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.service.LocationGroupSyncWorker
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.RealmHelper
@@ -28,7 +28,7 @@ import kotlin.collections.ArrayList
 class CreateNewGroupActivity : AppCompatActivity(), (ColorPickerItem, Int) -> Unit {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
 
-    private val locationGroupDb by lazy { LocationGroupDb(realm) }
+    private val locationGroupDb by lazy { ProjectDb(realm) }
     private val colorPickerAdapter by lazy { ColorPickerAdapter(this) }
     private var colorPickerState = ArrayList<ColorPickerItem>()
     private var colorPickerList = listOf<String>()
@@ -57,12 +57,12 @@ class CreateNewGroupActivity : AppCompatActivity(), (ColorPickerItem, Int) -> Un
             if (locationGroupEditText.text.isNullOrBlank()) {
                 Toast.makeText(this, R.string.missing_name_group, Toast.LENGTH_LONG).show()
             } else {
-                val group = LocationGroups(
+                val group = Project(
                     name = locationGroupEditText.text.toString(),
                     color = null,
                     serverId = null
                 )
-                locationGroupDb.insertOrUpdateLocationGroup(group)
+                locationGroupDb.insertOrUpdateProject(group)
                 LocationGroupSyncWorker.enqueue(this)
 
                 analytics.trackSaveNewGroupEvent()

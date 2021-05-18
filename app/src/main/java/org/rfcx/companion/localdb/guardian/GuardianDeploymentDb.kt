@@ -27,6 +27,13 @@ class GuardianDeploymentDb(private val realm: Realm) {
             .findAllAsync()
     }
 
+    fun getAllResultsAsyncWithinProject(sort: Sort = Sort.DESCENDING, project: String): RealmResults<GuardianDeployment> {
+        return realm.where(GuardianDeployment::class.java)
+            .equalTo("stream.project.name", project)
+            .sort(GuardianDeployment.FIELD_ID, sort)
+            .findAllAsync()
+    }
+
     fun getAll(sort: Sort = Sort.DESCENDING): RealmResults<GuardianDeployment> {
         return realm.where(GuardianDeployment::class.java)
             .isNotNull(GuardianDeployment.FIELD_SERVER_ID)

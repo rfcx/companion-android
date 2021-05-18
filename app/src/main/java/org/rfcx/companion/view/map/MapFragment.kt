@@ -91,7 +91,8 @@ import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
-class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Locate, Boolean) -> Unit {
+class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
+        (Locate, Boolean) -> Unit {
 
     // map
     private lateinit var mapView: MapView
@@ -106,7 +107,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
-    private val locationGroupDb by lazy { LocationGroupDb(realm) }
+    private val locationGroupDb by lazy { ProjectDb(realm) }
     private val trackingFileDb by lazy { TrackingFileDb(realm) }
     private val trackingDb by lazy { TrackingDb(realm) }
 
@@ -114,13 +115,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
     private var guardianDeployments = listOf<GuardianDeployment>()
     private var edgeDeployments = listOf<EdgeDeployment>()
     private var locations = listOf<Locate>()
-    private var locationGroups = listOf<LocationGroups>()
+    private var locationGroups = listOf<Project>()
     private var lastSyncingInfo: SyncInfo? = null
 
     private lateinit var guardianDeployLiveData: LiveData<List<GuardianDeployment>>
     private lateinit var edgeDeployLiveData: LiveData<List<EdgeDeployment>>
     private lateinit var locateLiveData: LiveData<List<Locate>>
-    private lateinit var locationGroupLiveData: LiveData<List<LocationGroups>>
+    private lateinit var locationGroupLiveData: LiveData<List<Project>>
     private lateinit var deploymentWorkInfoLiveData: LiveData<List<WorkInfo>>
 
     private val locationPermissions by lazy { activity?.let { LocationPermissions(it) } }
@@ -450,8 +451,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
     private val run: Runnable = object : Runnable {
         override fun run() {
             context?.let {
-                trackingTextView.text = "${LocationTracking.getDistance(trackingDb)
-                    .setFormatLabel()}  ${LocationTracking.getOnDutyTimeMinute(it)} min"
+                trackingTextView.text = "${
+                    LocationTracking.getDistance(trackingDb)
+                        .setFormatLabel()
+                }  ${LocationTracking.getOnDutyTimeMinute(it)} min"
             }
             handler.postDelayed(this, 20 * 1000)
         }
@@ -907,16 +910,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         combinedData()
     }
 
-    private val locationGroupObserve = Observer<List<LocationGroups>> {
+    private val locationGroupObserve = Observer<List<Project>> {
         this.locationGroups = it
         combinedData()
         locationGroupAdapter.items = listOf()
-        locationGroupAdapter.items = listOf(
-            LocationGroups(
-                id = -1,
-                name = getString(R.string.none)
-            )
-        ) + locationGroupDb.getLocationGroups()
+        locationGroupAdapter.items = locationGroupDb.getProjects()
         locationGroupAdapter.notifyDataSetChanged()
     }
 
@@ -1333,9 +1331,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
     private fun moveCameraOnStartWithProject() {
         mapboxMap?.locationComponent?.lastKnownLocation?.let { curLoc ->
             val currentLatLng = LatLng(curLoc.latitude, curLoc.longitude)
-            val preferences = context?.let { Preferences.getInstance(it) }
-            val projectName =
-                preferences?.getString(Preferences.SELECTED_PROJECT, getString(R.string.none))
+            val projectName = listener?.getProjectName()
             val locations = this.locations.filter { it.locationGroup?.name == projectName }
             val furthestSite = getFurthestSiteFromCurrentLocation(
                 currentLatLng,
@@ -1388,8 +1384,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                     }
                     //track always has 1 item so using get(0) is okay - also it can only be LineString
                     val lineString = feature?.geometry() as LineString
-//                val color = featureCollection.features()?.get(0)?.properties()?.get("color")?.asString ?: "#3bb2d0"
-//                queueColor.add(color)
                     queue.add(lineString.coordinates().toList())
                 }
                 lineSource?.setGeoJson(FeatureCollection.fromFeatures(tempTrack))
@@ -1398,64 +1392,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
                 moveToDeploymentMarker(lat, lng)
             }
 
-            //animate track
-//            routeCoordinateList = queue[0]
-//            animate()
-
         } else {
             moveToDeploymentMarker(lat, lng)
         }
     }
-
-//    private fun animate() {
-//        if (routeCoordinateList.size - 1 > routeIndex) {
-//            val indexPoint = routeCoordinateList[routeIndex]
-//            val newPoint = routeCoordinateList[routeIndex + 1]
-//            currentAnimator = createLatLngAnimator(indexPoint, newPoint)
-//            currentAnimator?.start()
-//            routeIndex++
-//        } else {
-//            queuePivot += 1
-//            if (queuePivot <= queue.size - 1) {
-//                routeCoordinateList = queue[queuePivot]
-//                routeIndex = 0
-//                animate()
-//            }
-//        }
-//    }
-//
-//    private fun createLatLngAnimator(currentPosition: Point, targetPosition: Point): Animator {
-//        val latLngAnimator: ValueAnimator =
-//            ValueAnimator.ofObject(PointEvaluator(), currentPosition, targetPosition)
-//        latLngAnimator.duration = 100 // fixed to 100 milliseconds
-//        latLngAnimator.interpolator = LinearInterpolator()
-//
-//        latLngAnimator.addListener(object : AnimatorListenerAdapter() {
-//            override fun onAnimationEnd(animation: Animator?) {
-//                super.onAnimationEnd(animation)
-//                animate()
-//            }
-//        })
-//
-//        latLngAnimator.addUpdateListener { animation ->
-//            val point = animation.animatedValue as Point
-//            if (markerLinePointList.size <= queuePivot + 1) {
-//                markerLinePointList.add(arrayListOf())
-//            }
-//            markerLinePointList[queuePivot].add(point)
-//
-//            val listOfFeature = arrayListOf<Feature>()
-//            markerLinePointList.forEachIndexed { index, it ->
-//                val feature = Feature.fromGeometry(LineString.fromLngLats(it))
-//                feature.addStringProperty("color", queueColor.getOrNull(0) ?: "#3bb2d0")
-//                listOfFeature.add(feature)
-//            }
-//
-//            lineSource!!.setGeoJson(FeatureCollection.fromFeatures(listOfFeature))
-//        }
-//
-//        return latLngAnimator
-//    }
 
     private fun hideTrackOnMap() {
         //reset source
@@ -1577,52 +1517,53 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener, (Loca
         }
     }
 
-    override fun onClicked(group: LocationGroups) {
+    override fun onClicked(group: Project) {
         projectRecyclerView.visibility = View.GONE
 
-        group.name?.let {
-            context?.let { context ->
-                Preferences.getInstance(context).putString(Preferences.SELECTED_PROJECT, it)
-            }
-            listener?.let { listener ->
-                projectNameTextView.text =
-                    if (listener.getProjectName() != getString(R.string.none)) listener.getProjectName() else getString(
-                        R.string.projects
-                    )
-                combinedData()
-                val projects =
-                    adapterOfSearchSite?.map { LatLng(it.locate.latitude, it.locate.longitude) }
-                if (projects != null && projects.isNotEmpty()) {
-                    if (projects.size > 1) {
-                        moveCameraWithLatLngList(projects)
-                    } else {
-                        moveCamera(LatLng(projects[0].latitude, projects[0].longitude), null, DefaultSetupMap.DEFAULT_ZOOM)
-                    }
+        context?.let { context ->
+            Preferences.getInstance(context).putInt(Preferences.SELECTED_PROJECT, group.id)
+        }
+        listener?.let { listener ->
+            projectNameTextView.text =
+                if (listener.getProjectName() != getString(R.string.none)) listener.getProjectName() else getString(
+                    R.string.projects
+                )
+            combinedData()
+            val projects =
+                adapterOfSearchSite?.map { LatLng(it.locate.latitude, it.locate.longitude) }
+            if (projects != null && projects.isNotEmpty()) {
+                if (projects.size > 1) {
+                    moveCameraWithLatLngList(projects)
                 } else {
-                    currentUserLocation?.let { current ->
-                        moveCamera(
-                            LatLng(
-                                current.latitude,
-                                current.longitude
-                            )
-                            , null, DefaultSetupMap.DEFAULT_ZOOM
-                        )
-                    }
+                    moveCamera(
+                        LatLng(projects[0].latitude, projects[0].longitude),
+                        null,
+                        DefaultSetupMap.DEFAULT_ZOOM
+                    )
+                }
+            } else {
+                currentUserLocation?.let { current ->
+                    moveCamera(
+                        LatLng(
+                            current.latitude,
+                            current.longitude
+                        ), null, DefaultSetupMap.DEFAULT_ZOOM
+                    )
                 }
             }
+        }
 
-            if (siteRecyclerView.visibility == View.VISIBLE) {
-                searchLayout.visibility = View.VISIBLE
-            } else {
-                searchButton.visibility = View.VISIBLE
-                trackingLayout.visibility = View.VISIBLE
-                showButtonOnMap()
-                listener?.showBottomAppBar()
-            }
+        if (siteRecyclerView.visibility == View.VISIBLE) {
+            searchLayout.visibility = View.VISIBLE
+        } else {
+            searchButton.visibility = View.VISIBLE
+            trackingLayout.visibility = View.VISIBLE
+            showButtonOnMap()
+            listener?.showBottomAppBar()
         }
     }
 
-    override fun onLongClicked(group: LocationGroups) {}
+    override fun onLongClicked(group: Project) {}
 }
 
 interface ApiCallbackInjector {

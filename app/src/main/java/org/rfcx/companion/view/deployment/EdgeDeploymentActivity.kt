@@ -42,10 +42,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     MapPickerProtocol {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val deploymentDb by lazy { EdgeDeploymentDb(realm) }
+    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
-    private val locationGroupDb by lazy { LocationGroupDb(realm) }
+    private val projectDb by lazy { ProjectDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val trackingDb by lazy { TrackingDb(realm) }
     private val trackingFileDb by lazy { TrackingFileDb(realm) }
@@ -83,12 +83,14 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     private var audioMothDeployments = listOf<EdgeDeployment>()
     private val audioMothDeploymentObserve = Observer<List<EdgeDeployment>> {
         this.audioMothDeployments = it.filter { deployment -> deployment.isCompleted() }
+        setSiteItems()
     }
 
     private lateinit var guardianDeploymentLiveData: LiveData<List<GuardianDeployment>>
     private var guardianDeployments = listOf<GuardianDeployment>()
     private val guardianDeploymentObserve = Observer<List<GuardianDeployment>> {
         this.guardianDeployments = it.filter { deployment -> deployment.isCompleted() }
+        setSiteItems()
     }
 
     private lateinit var siteLiveData: LiveData<List<Locate>>
@@ -130,19 +132,22 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     }
 
     private fun setLiveData() {
-        siteLiveData = Transformations.map(locateDb.getAllResultsAsync().asLiveData()) {
+        val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
+        val project = projectDb.getProjectById(projectId)
+        val projectName = project?.name ?: getString(R.string.none)
+        siteLiveData = Transformations.map(locateDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()) {
             it
         }
         siteLiveData.observeForever(siteObserve)
 
         audioMothDeployLiveData =
-            Transformations.map(deploymentDb.getAllResultsAsync().asLiveData()) {
+            Transformations.map(edgeDeploymentDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()) {
                 it
             }
         audioMothDeployLiveData.observeForever(audioMothDeploymentObserve)
 
         guardianDeploymentLiveData =
-            Transformations.map(guardianDeploymentDb.getAllResultsAsync().asLiveData()) {
+            Transformations.map(guardianDeploymentDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()) {
                 it
             }
         guardianDeploymentLiveData.observeForever(guardianDeploymentObserve)
@@ -210,7 +215,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             is EdgeCheckListFragment -> {
                 _deployment?.let {
                     it.passedChecks = passedChecks
-                    deploymentDb.updateDeployment(it)
+                    edgeDeploymentDb.updateDeployment(it)
 
                     saveImages(it)
                 }
@@ -251,8 +256,8 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     override fun getCurrentLocation(): Location =
         currentLocation ?: Location(LocationManager.GPS_PROVIDER)
 
-    override fun getLocationGroup(name: String): LocationGroups? {
-        return locationGroupDb.getLocationGroup(name)
+    override fun getLocationGroup(name: String): Project? {
+        return projectDb.getProjectByName(name)
     }
 
     override fun setDeployment(deployment: EdgeDeployment) {
@@ -301,7 +306,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         deployment.state = DeploymentState.Edge.Locate.key // state
 
         this._deployLocation = locate.asDeploymentLocation()
-        val deploymentId = deploymentDb.insertOrUpdate(deployment, _deployLocation!!)
+        val deploymentId = edgeDeploymentDb.insertOrUpdate(deployment, _deployLocation!!)
 
         useExistedLocation = isExisted
         this._locate = locate
@@ -344,12 +349,12 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 this._locate?.let { locate ->
                     locateDb.insertOrUpdateLocate(it.id, locate) // update locate - last deployment
                     val deployments =
-                        locate.serverId?.let { it1 -> deploymentDb.getDeploymentsBySiteId(it1) }
+                        locate.serverId?.let { it1 -> edgeDeploymentDb.getDeploymentsBySiteId(it1) }
                     val guardianDeployments = locate.serverId?.let { it1 ->
                         guardianDeploymentDb.getDeploymentsBySiteId(it1)
                     }
                     deployments?.forEach { deployment ->
-                        deploymentDb.updateIsActive(deployment.id)
+                        edgeDeploymentDb.updateIsActive(deployment.id)
                     }
                     guardianDeployments?.forEach { deployment ->
                         guardianDeploymentDb.updateIsActive(deployment.id)
@@ -357,7 +362,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 }
             }
             saveImages(it)
-            deploymentDb.updateDeployment(it)
+            edgeDeploymentDb.updateDeployment(it)
 
             //track getting
             if (preferences.getBoolean(ENABLE_LOCATION_TRACKING)) {
@@ -499,7 +504,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     }
 
     private fun handleDeploymentStep(deploymentId: Int) {
-        val deployment = deploymentDb.getDeploymentById(deploymentId)
+        val deployment = edgeDeploymentDb.getDeploymentById(deploymentId)
         if (deployment != null) {
             setDeployment(deployment)
 
@@ -538,7 +543,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     private fun updateDeploymentState(state: DeploymentState.Edge) {
         this._deployment?.state = state.key
-        this._deployment?.let { deploymentDb.updateDeployment(it) }
+        this._deployment?.let { edgeDeploymentDb.updateDeployment(it) }
     }
 
     private fun showLoading() {

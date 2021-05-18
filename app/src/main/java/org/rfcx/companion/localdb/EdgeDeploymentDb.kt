@@ -53,6 +53,13 @@ class EdgeDeploymentDb(private val realm: Realm) {
             .findAllAsync()
     }
 
+    fun getAllResultsAsyncWithinProject(sort: Sort = Sort.DESCENDING, project: String): RealmResults<EdgeDeployment> {
+        return realm.where(EdgeDeployment::class.java)
+            .equalTo("stream.project.name", project)
+            .sort(EdgeDeployment.FIELD_ID, sort)
+            .findAllAsync()
+    }
+
     fun getAll(sort: Sort = Sort.DESCENDING): RealmResults<EdgeDeployment> {
         return realm.where(EdgeDeployment::class.java)
             .isNotNull(EdgeDeployment.FIELD_SERVER_ID)

@@ -1,7 +1,7 @@
 package org.rfcx.companion.entity.response
 
 import org.rfcx.companion.entity.LocationGroup
-import org.rfcx.companion.entity.LocationGroups
+import org.rfcx.companion.entity.Project
 
 /**
  * Firestore response for getting a locationGroups
@@ -12,8 +12,8 @@ data class ProjectResponse(
     var color: String = ""
 )
 
-fun ProjectResponse.toLocationGroups(): LocationGroups {
-    return LocationGroups(
+fun ProjectResponse.toLocationGroups(): Project {
+    return Project(
         name = this.name,
         color = this.color,
         serverId = this.id

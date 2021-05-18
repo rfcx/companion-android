@@ -9,6 +9,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.Transformations
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_guardian_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
@@ -25,9 +28,7 @@ import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.service.GuardianDeploymentSyncWorker
-import org.rfcx.companion.util.Analytics
-import org.rfcx.companion.util.Preferences
-import org.rfcx.companion.util.RealmHelper
+import org.rfcx.companion.util.*
 import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.view.deployment.EdgeDeploymentActivity
 import org.rfcx.companion.view.deployment.guardian.advanced.GuardianAdvancedFragment
@@ -54,8 +55,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val locateDb by lazy { LocateDb(realm) }
-    private val locationGroupDb by lazy { LocationGroupDb(realm) }
-    private val deploymentDb by lazy { GuardianDeploymentDb(realm) }
+    private val projectDb by lazy { ProjectDb(realm) }
+    private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val trackingDb by lazy { TrackingDb(realm) }
@@ -96,15 +97,38 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     private val preferences = Preferences.getInstance(this)
 
+    // Local LiveData
+    private lateinit var audioMothDeployLiveData: LiveData<List<EdgeDeployment>>
+    private var audioMothDeployments = listOf<EdgeDeployment>()
+    private val audioMothDeploymentObserve = Observer<List<EdgeDeployment>> {
+        this.audioMothDeployments = it.filter { deployment -> deployment.isCompleted() }
+        setSiteItems()
+    }
+
+    private lateinit var guardianDeploymentLiveData: LiveData<List<GuardianDeployment>>
+    private var guardianDeployments = listOf<GuardianDeployment>()
+    private val guardianDeploymentObserve = Observer<List<GuardianDeployment>> {
+        this.guardianDeployments = it.filter { deployment -> deployment.isCompleted() }
+        setSiteItems()
+    }
+
+    private lateinit var siteLiveData: LiveData<List<Locate>>
+    private var sites = listOf<Locate>()
+    private val siteObserve = Observer<List<Locate>> {
+        this.sites = it
+        setSiteItems()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_guardian_deployment)
 
         setupToolbar()
+        setLiveData()
 
         val deploymentId = intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
         if (deploymentId != null) {
-            val deployment = deploymentDb.getDeploymentById(deploymentId)
+            val deployment = guardianDeploymentDb.getDeploymentById(deploymentId)
             if (deployment != null) {
                 setDeployment(deployment)
 
@@ -161,6 +185,43 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     override fun onSupportNavigateUp(): Boolean {
         backStep()
         return true
+    }
+
+    private fun setLiveData() {
+        val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
+        val project = projectDb.getProjectById(projectId)
+        val projectName = project?.name ?: getString(R.string.none)
+        siteLiveData = Transformations.map(locateDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()) {
+            it
+        }
+        siteLiveData.observeForever(siteObserve)
+
+        audioMothDeployLiveData =
+            Transformations.map(edgeDeploymentDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()) {
+                it
+            }
+        audioMothDeployLiveData.observeForever(audioMothDeploymentObserve)
+
+        guardianDeploymentLiveData =
+            Transformations.map(guardianDeploymentDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()) {
+                it
+            }
+        guardianDeploymentLiveData.observeForever(guardianDeploymentObserve)
+    }
+
+    private fun setSiteItems() {
+        val loc = Location(LocationManager.GPS_PROVIDER)
+        loc.latitude = 0.0
+        loc.longitude = 0.0
+
+        _siteItems = getListSite(
+            this,
+            audioMothDeployments,
+            guardianDeployments,
+            getString(R.string.none),
+            currentLocation ?: loc,
+            sites
+        )
     }
 
     override fun startCheckList() {
@@ -222,7 +283,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         this._deployment?.configuration = _configuration
 
         // update deployment
-        this._deployment?.let { deploymentDb.updateDeployment(it) }
+        this._deployment?.let { guardianDeploymentDb.updateDeployment(it) }
     }
 
     override fun getConfiguration(): GuardianConfiguration? = _configuration
@@ -237,8 +298,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
 
-    override fun getLocationGroup(name: String): LocationGroups? {
-        return locationGroupDb.getLocationGroup(name)
+    override fun getLocationGroup(name: String): Project? {
+        return projectDb.getProjectByName(name)
     }
 
     override fun getImages(): List<String> {
@@ -253,7 +314,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         deployment.state = DeploymentState.Guardian.Locate.key // state
 
         this._deployLocation = locate.asDeploymentLocation()
-        val deploymentId = deploymentDb.insertOrUpdateDeployment(deployment, _deployLocation!!)
+        val deploymentId = guardianDeploymentDb.insertOrUpdateDeployment(deployment, _deployLocation!!)
         deployment.id = deploymentId
 
         useExistedLocation = isExisted
@@ -281,10 +342,10 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             if (useExistedLocation) {
                 this._locate?.let { locate ->
                     locateDb.insertOrUpdateLocate(it.id, locate, true) // update locate - last deployment
-                    val deployments = locate.serverId?.let { it1 -> deploymentDb.getDeploymentsBySiteId(it1) }
+                    val deployments = locate.serverId?.let { it1 -> guardianDeploymentDb.getDeploymentsBySiteId(it1) }
                     val edgeDeployments = locate.serverId?.let { it1 -> edgeDeploymentDb.getDeploymentsBySiteId(it1) }
                     deployments?.forEach { deployment ->
-                        deploymentDb.updateIsActive(deployment.id)
+                        guardianDeploymentDb.updateIsActive(deployment.id)
                     }
                     edgeDeployments?.forEach { deployment ->
                         edgeDeploymentDb.updateIsActive(deployment.id)
@@ -293,7 +354,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             }
 
             saveImages(it)
-            deploymentDb.updateDeployment(it)
+            guardianDeploymentDb.updateDeployment(it)
 
             //track getting
             if (preferences.getBoolean(Preferences.ENABLE_LOCATION_TRACKING)) {
@@ -395,7 +456,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     private fun updateDeploymentState(state: DeploymentState.Guardian) {
         this._deployment?.state = state.key
-        this._deployment?.let { deploymentDb.updateDeployment(it) }
+        this._deployment?.let { guardianDeploymentDb.updateDeployment(it) }
     }
 
     override fun showConnectInstruction() {
@@ -521,6 +582,9 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     override fun onDestroy() {
         super.onDestroy()
         this.prefsEditor?.clear()?.apply()
+        siteLiveData.removeObserver(siteObserve)
+        audioMothDeployLiveData.removeObserver(audioMothDeploymentObserve)
+        guardianDeploymentLiveData.removeObserver(guardianDeploymentObserve)
         unregisterWifiConnectionLostListener()
     }
 

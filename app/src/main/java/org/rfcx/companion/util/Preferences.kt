@@ -64,13 +64,20 @@ class Preferences(context: Context) {
         return sharedPreferences.getLong(key, defValue)
     }
 
-    fun putLong(key: String, long: Long) {
-        sharedPreferences.edit().putLong(key, long).apply()
-    }
-
-
     fun getFloat(key: String): Float {
         return sharedPreferences.getFloat(key, 0.0F)
+    }
+
+    fun getInt(key: String): Int {
+        return sharedPreferences.getInt(key, -1)
+    }
+
+    fun putInt(key: String, int: Int) {
+        sharedPreferences.edit().putInt(key, int).apply()
+    }
+
+    fun putLong(key: String, long: Long) {
+        sharedPreferences.edit().putLong(key, long).apply()
     }
 
     fun putFloat(key: String, float: Float) {

@@ -14,11 +14,14 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
+import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
 import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.entity.Locate
+import org.rfcx.companion.localdb.EdgeDeploymentDb
+import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.service.DeploymentCleanupWorker
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
@@ -29,6 +32,10 @@ import org.rfcx.companion.view.profile.ProfileFragment
 import org.rfcx.companion.widget.BottomNavigationMenuItem
 
 class MainActivity : AppCompatActivity(), MainActivityListener {
+    private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
+    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
+    private val projectDb by lazy { ProjectDb(realm) }
+
     private var currentFragment: Fragment? = null
     private val locationPermissions by lazy { LocationPermissions(this) }
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
@@ -260,7 +267,9 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
 
     override fun getProjectName(): String {
         val preferences = Preferences.getInstance(this)
-        return preferences.getString(Preferences.SELECTED_PROJECT, getString(R.string.none))
+        val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
+        val project = projectDb.getProjectById(projectId)
+        return project?.name ?: getString(R.string.none)
     }
 
     override fun hideBottomAppBar() {
