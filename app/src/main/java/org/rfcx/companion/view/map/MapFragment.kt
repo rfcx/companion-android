@@ -1168,13 +1168,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             // check is this deployment is selecting (to set bigger pin)
             when (it) {
                 is MapMarker.DeploymentMarker -> {
+                    val deploymentId = deploymentSelecting?.getProperty(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID)
                     val isSelecting =
-                        if (deploymentSelecting == null) {
+                        if (deploymentSelecting == null || deploymentId == null) {
                             false
                         } else {
-                            it.id.toString() == deploymentSelecting.getProperty(
-                                PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID
-                            ).asString
+                            it.id.toString() == deploymentId.asString
                         }
                     val properties = mapOf(
                         Pair(PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID, "${it.locationName}.${it.id}"),
