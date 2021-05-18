@@ -256,6 +256,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
             latitudeValue.text = locate.latitude.latitudeCoordinates(this)
             longitudeValue.text = locate.longitude.longitudeCoordinates(this)
             altitudeValue.text = locate.altitude.setFormatLabel()
+            deploymentIdTextView.text = deployment.deploymentKey
         }
     }
 
