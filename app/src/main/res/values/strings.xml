@@ -161,6 +161,7 @@
     <string name="profile_sign_out_label">Sign out</string>
     <string name="version_app">%s (%s)</string>
     <string name="profile_feedback_label">Feedback</string>
+    <string name="profile_offline_map_label">Offline map</string>
     <string name="coordinates">Coordinates</string>
     <string name="location">Site</string>
     <string name="display">Display</string>
