@@ -107,7 +107,7 @@
     <string name="feedback_submission_failed">Houve uma falha ao enviar o comentário! Por favor tente novamente.</string>
 
     <!--  DeployFragment  -->
-    <string name="take_photos">Faça algumas fotos do local de \ninstalação (opcional)</string>
+    <string name="take_photos">Faça até 5 fotos do local de \ninstalação (opcional)</string>
     <string name="menu_camera">Câmera fotográfica</string>
     <string name="menu_gallery">Galeria</string>
     <string name="some_photo_already_exists">Algumas fotos já existem</string>
