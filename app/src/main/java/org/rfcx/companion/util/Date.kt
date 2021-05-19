@@ -101,10 +101,16 @@ fun Date.toTimeAgo(context: Context): String {
 
     return when {
         niceDateStr.toString() == "0 minutes ago" -> {
-            context.getString(R.string.time_second)
+            context.getString(R.string.just_now)
+        }
+        niceDateStr.contains("minute") -> {
+            niceDateStr.toString()
+        }
+        niceDateStr.contains("hour") -> {
+            niceDateStr.toString()
         }
         niceDateStr.toString() == "Yesterday" -> {
-            "${context.getString(R.string.yesterday)} ${this.toTimeString()}"
+            "${context.getString(R.string.yesterday_time)} ${this.toTimeString()}"
         }
         else -> {
             this.toDateString()

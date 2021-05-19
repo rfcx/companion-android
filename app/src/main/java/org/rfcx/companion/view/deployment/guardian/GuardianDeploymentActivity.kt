@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -48,7 +49,6 @@ import org.rfcx.companion.view.detail.MapPickerProtocol
 import org.rfcx.companion.view.dialog.*
 import org.rfcx.companion.view.prefs.SyncPreferenceListener
 import java.util.*
-import kotlin.collections.ArrayList
 
 class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtocol,
     CompleteListener, MapPickerProtocol, SyncPreferenceListener {
@@ -234,7 +234,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun isOpenedFromUnfinishedDeployment(): Boolean = false // guardian not have this feature so return false
 
-    override fun getDeployment(): GuardianDeployment? = this._deployment
+    override fun getDeployment(): GuardianDeployment? = this._deployment ?: GuardianDeployment()
 
     override fun setDeployment(deployment: GuardianDeployment) {
         this._deployment = deployment
@@ -314,13 +314,10 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         deployment.state = DeploymentState.Guardian.Locate.key // state
 
         this._deployLocation = locate.asDeploymentLocation()
-        val deploymentId = guardianDeploymentDb.insertOrUpdateDeployment(deployment, _deployLocation!!)
-        deployment.id = deploymentId
-
-        useExistedLocation = isExisted
         this._locate = locate
+        useExistedLocation = isExisted
         if (!useExistedLocation) {
-            locateDb.insertOrUpdateLocate(deploymentId, locate, true) // update locate - last deployment
+            locateDb.insertOrUpdate(locate)
         }
 
         setDeployment(deployment)
@@ -339,9 +336,15 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             it.state = DeploymentState.Guardian.ReadyToUpload.key
             setDeployment(it)
 
+            val deploymentId = guardianDeploymentDb.insertOrUpdateDeployment(it, _deployLocation!!)
+            if (!useExistedLocation) {
+                this._locate?.let { loc ->
+                    locateDb.insertOrUpdateLocate(deploymentId, loc, true) // update locate - last deployment
+                }
+            }
+
             if (useExistedLocation) {
                 this._locate?.let { locate ->
-                    locateDb.insertOrUpdateLocate(it.id, locate, true) // update locate - last deployment
                     val deployments = locate.serverId?.let { it1 -> guardianDeploymentDb.getDeploymentsBySiteId(it1) }
                     val edgeDeployments = locate.serverId?.let { it1 -> edgeDeploymentDb.getDeploymentsBySiteId(it1) }
                     deployments?.forEach { deployment ->
@@ -354,7 +357,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             }
 
             saveImages(it)
-            guardianDeploymentDb.updateDeployment(it)
 
             //track getting
             if (preferences.getBoolean(Preferences.ENABLE_LOCATION_TRACKING)) {
@@ -421,14 +423,15 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             }
             5 -> {
                 updateDeploymentState(DeploymentState.Guardian.Locate)
-                val site = _deployLocation
+                val site = this._locate
                 if (site == null) {
-                    startFragment(SetDeploymentSiteFragment.newInstance(currentLocation?.latitude ?: 0.0, currentLocation?.longitude ?: 0.0))
+                    startFragment(
+                        SetDeploymentSiteFragment.newInstance(
+                            currentLocation?.latitude ?: 0.0, currentLocation?.longitude ?: 0.0
+                        )
+                    )
                 } else {
-                    val id = locateDb.getLocateByNameAndLatLng(site.name, site.latitude, site.longitude)
-                    id?.let {
-                        startDetailDeploymentSite(it, site.name, false)
-                    }
+                    startDetailDeploymentSite(site.id, site.name, false)
                 }
             }
             6 -> {
@@ -568,7 +571,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         siteId: Int,
         name: String
     ) {
-        startFragment(DetailDeploymentSiteFragment.newInstance(latitude, longitude, siteId, name))
+        startFragment(DetailDeploymentSiteFragment.newInstance(latitude, longitude, siteId, name, true))
     }
 
     override fun onBackPressed() {

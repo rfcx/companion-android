@@ -429,7 +429,9 @@
     <string name="no_deployments">No deployments</string>
 
     <string name="time_second">Just now</string>
-    <string name="yesterday">Yesterday,</string>
+    <string name="just_now">just now</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="yesterday_time">yesterday,</string>
 
     <!-- layout_map_window_info -->
     <string name="created_at">Created</string>

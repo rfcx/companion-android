@@ -30,7 +30,8 @@ fun DeploymentResponse.toGuardianDeployment(): GuardianDeployment {
         stream = this.stream?.toDeploymentLocation(),
         createdAt = this.createdAt ?: Date(),
         syncState = SyncState.Sent.key,
-        updatedAt = this.updatedAt
+        updatedAt = this.updatedAt,
+        isActive = true
     )
 }
 
