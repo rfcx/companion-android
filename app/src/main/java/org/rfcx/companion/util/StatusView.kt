@@ -7,15 +7,14 @@ import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.widget_status_view.view.*
 import org.rfcx.companion.R
-import org.rfcx.companion.entity.Theme
 
 class StatusView : FrameLayout {
     private var slideOut: Animation? = null
     private var slideIn: Animation? = null
+    private var handlerPostDelayed: Handler = Handler(Looper.getMainLooper())
     private var theme: Int = 1 // normal
 
     constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {
@@ -65,14 +64,16 @@ class StatusView : FrameLayout {
     fun onShowWithDelayed(msg: String) {
         statusText.text = msg
         enterAnimation(this)
-        Handler(Looper.getMainLooper()).postDelayed({
+        handlerPostDelayed.postDelayed({
             exitAnimation(this)
         }, DEFAULT_DELAY)
     }
 
     private fun enterAnimation(enterView: View?) {
         if (enterView == null) return
+        handlerPostDelayed.removeCallbacksAndMessages(null)
         if (enterView.visibility == View.VISIBLE) return
+
         enterView.visibility = View.VISIBLE
         enterView.startAnimation(slideIn)
     }
@@ -82,13 +83,9 @@ class StatusView : FrameLayout {
             return
         exitView.startAnimation(slideOut)
         slideOut?.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationRepeat(animation: Animation?) {
+            override fun onAnimationRepeat(animation: Animation?) {}
 
-            }
-
-            override fun onAnimationStart(animation: Animation?) {
-
-            }
+            override fun onAnimationStart(animation: Animation?) {}
 
             override fun onAnimationEnd(animation: Animation?) {
                 exitView.visibility = View.GONE
