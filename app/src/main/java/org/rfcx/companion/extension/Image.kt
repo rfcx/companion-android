@@ -14,8 +14,16 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import jp.wasabeef.glide.transformations.BlurTransformation
 import org.rfcx.companion.R
+import org.rfcx.companion.util.Preferences
 
 fun ImageView.setDeploymentImage(url: String, blur: Boolean, fromServer: Boolean, token: String? = null, progressBar: ProgressBar) {
+    val preferences = Preferences.getInstance(context)
+    val themeOption = this.resources.getStringArray(R.array.theme_more_than_9)
+    val themeDevice = preferences.getString(Preferences.DISPLAY_THEME, themeOption[1])
+    var placeholder = R.drawable.bg_placeholder_light
+    when (themeDevice) {
+        themeOption[1] -> placeholder = R.drawable.bg_placeholder_dark
+    }
     if (fromServer) {
         progressBar.visibility = View.VISIBLE
 
@@ -50,23 +58,23 @@ fun ImageView.setDeploymentImage(url: String, blur: Boolean, fromServer: Boolean
                     return false
                 }
             })
-            .placeholder(R.drawable.bg_grey_light)
-            .error(R.drawable.bg_grey_light)
+            .placeholder(placeholder)
+            .error(placeholder)
             .into(this)
 
     } else {
         if (blur) {
             Glide.with(this)
                 .load(url)
-                .placeholder(R.drawable.bg_grey_light)
-                .error(R.drawable.bg_grey_light)
+                .placeholder(placeholder)
+                .error(placeholder)
                 .transform(MultiTransformation(BlurTransformation(15, 1)))
                 .into(this)
         } else {
             Glide.with(this)
                 .load(url)
-                .placeholder(R.drawable.bg_grey_light)
-                .error(R.drawable.bg_grey_light)
+                .placeholder(placeholder)
+                .error(placeholder)
                 .into(this)
         }
     }

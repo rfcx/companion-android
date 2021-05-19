@@ -143,8 +143,8 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
         fun bind(imagePath: String, canDelete: Boolean) {
             Glide.with(itemView.context)
                 .load(imagePath)
-                .placeholder(R.drawable.bg_grey_light)
-                .error(R.drawable.bg_grey_light)
+                .placeholder(R.drawable.bg_placeholder_light)
+                .error(R.drawable.bg_placeholder_light)
                 .into(imageView)
 
             itemView.setOnClickListener {
