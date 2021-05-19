@@ -171,16 +171,6 @@
         app:layout_constraintTop_toBottomOf="@id/topBarLayout"
         app:tint="@color/colorPrimary" />
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="@dimen/progress_bar"
-        android:layout_height="@dimen/progress_bar"
-        android:layout_margin="@dimen/margin_padding_large"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <androidx.constraintlayout.widget.Group
         android:id="@+id/buttonOnMapGroup"
         android:layout_width="wrap_content"

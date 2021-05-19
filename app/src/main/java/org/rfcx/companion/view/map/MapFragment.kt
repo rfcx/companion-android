@@ -234,7 +234,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         fetchJobSyncing()
         fetchData()
         showSearchBar(false)
-        progressBar.visibility = View.VISIBLE
         hideLabel()
         context?.let { setTextTrackingButton(LocationTracking.isTrackingOn(it)) }
         projectNameTextView.text =
@@ -912,8 +911,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
     }
 
     private fun combinedData() {
-        // hide loading progress
-        progressBar.visibility = View.INVISIBLE
         var showGuardianDeployments = this.guardianDeployments.filter { it.isCompleted() }
         val usedSitesOnGuardian = showGuardianDeployments.map { it.stream?.coreId }
 
