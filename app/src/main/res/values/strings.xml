@@ -9,6 +9,7 @@
     <string name="pls_fill_email">Missing Email</string>
     <string name="pls_fill_password">Missing Password</string>
     <string name="connect_with_facebook">Login with Facebook</string>
+    <string name="connect_with_google">Login with Google</string>
     <string name="connect_with_sms">Login with Phone Number</string>
     <string name="or">OR</string>
 
@@ -68,7 +69,7 @@
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
     <string name="delete_location">Delete site?</string>
-    <string name="deployment_key">Deployment id</string>
+    <string name="deployment_key">Deployment ID</string>
     <string name="are_you_sure_delete_location">The device and its site will be removed</string>
 
     <!--  Perform Battery  -->
@@ -197,7 +198,7 @@
     <string name="deployment_will_uploaded">Images will be uploaded to your account</string>
     <string name="almost_there">Almost there!</string>
     <string name="switch_to_deploy">Switch your device to DEPLOY</string>
-    <string name="take_photos">Take some photos of the deploy \nsite (optional)</string>
+    <string name="take_photos">Take up to 5 photos of the deployment \nsite(optional)</string>
 
     <string name="read_storage_permission_msg">Deploy App would like to read your storage</string>
     <string name="go_to_setting">Settings</string>
@@ -429,7 +430,9 @@
     <string name="no_deployments">No deployments</string>
 
     <string name="time_second">Just now</string>
-    <string name="yesterday">Yesterday,</string>
+    <string name="just_now">just now</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="yesterday_time">yesterday,</string>
 
     <!-- layout_map_window_info -->
     <string name="created_at">Created</string>
