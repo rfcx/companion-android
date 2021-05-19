@@ -16,9 +16,9 @@ import jp.wasabeef.glide.transformations.BlurTransformation
 import org.rfcx.companion.R
 
 fun ImageView.setDeploymentImage(url: String, blur: Boolean, fromServer: Boolean, token: String? = null, progressBar: ProgressBar) {
-    progressBar.visibility = View.VISIBLE
-
     if (fromServer) {
+        progressBar.visibility = View.VISIBLE
+
         val glideUrl = GlideUrl(
             url,
             LazyHeaders.Builder()
