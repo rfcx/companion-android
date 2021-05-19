@@ -54,11 +54,6 @@ class OfflineMapFragment : Fragment(), LocationGroupListener {
         projectAdapter.items = projectDb.getProjects()
     }
 
-    override fun onClicked(group: Project) {
-        Log.d(TAG,"onClicked ${group.name}")
-    }
-
-    override fun onLongClicked(group: Project) {
-        Log.d(TAG,"onLongClicked")
-    }
+    override fun onClicked(group: Project) {}
+    override fun onLongClicked(group: Project) {}
 }

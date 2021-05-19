@@ -35,7 +35,7 @@ class LocationGroupAdapter(private val locationGroupListener: LocationGroupListe
     override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: LocationGroupAdapterViewHolder, position: Int) {
-        holder.bind(items[position].name ?: holder.itemView.context.getString(R.string.none))
+        holder.bind(items[position])
         holder.itemView.setOnClickListener {
             locationGroupListener.onClicked(items[position])
         }
@@ -52,14 +52,14 @@ class LocationGroupAdapter(private val locationGroupListener: LocationGroupListe
         private val checkImageView = itemView.checkImageView
         private val downloadButton = itemView.downloadButton
 
-        fun bind(locationGroup: String) {
+        fun bind(project: Project) {
             if (screen != Screen.PROFILE.id) {
                 checkImageView.visibility =
-                    if (locationGroup == selectedGroup) View.VISIBLE else View.GONE
+                    if (project.name == selectedGroup) View.VISIBLE else View.GONE
             }
             downloadButton.visibility =
                 if (screen == Screen.OFFLINE_MAP.id) View.VISIBLE else View.GONE
-            locationGroupTextView.text = locationGroup
+            locationGroupTextView.text = project.name
         }
     }
 }
