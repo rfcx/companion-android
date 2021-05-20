@@ -60,15 +60,23 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/topBarLayout" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/siteRecyclerView"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/siteSwipeRefreshView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@color/backgroundColorSite"
-        android:dividerHeight="1dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/searchLayout" />
+        app:layout_constraintTop_toBottomOf="@id/searchLayout">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/siteRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/backgroundColorSite"
+            android:dividerHeight="1dp"
+            android:visibility="gone" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/projectSwipeRefreshView"

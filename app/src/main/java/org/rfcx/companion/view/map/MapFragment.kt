@@ -55,12 +55,8 @@ import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.BitmapUtils
-import com.mapbox.pluginscalebar.ScaleBarOptions
-import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
-import kotlinx.android.synthetic.main.fragment_location_group.*
 import kotlinx.android.synthetic.main.fragment_map.*
-import kotlinx.android.synthetic.main.fragment_map.projectSwipeRefreshView
 import kotlinx.android.synthetic.main.layout_deployment_window_info.view.*
 import kotlinx.android.synthetic.main.layout_map_window_info.view.*
 import kotlinx.android.synthetic.main.layout_search_view.*
@@ -70,16 +66,13 @@ import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.guardian.toMark
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
-import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.service.DeploymentSyncWorker
-import org.rfcx.companion.service.DownloadImagesWorker
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
-import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
@@ -95,7 +88,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
-        (Locate, Boolean) -> Unit, SwipeRefreshLayout.OnRefreshListener {
+        (Locate, Boolean) -> Unit {
 
     // map
     private lateinit var mapView: MapView
@@ -274,7 +267,18 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         }
 
         projectSwipeRefreshView.apply {
-            setOnRefreshListener(this@MapFragment)
+            setOnRefreshListener {
+                retrieveProjects(requireContext())
+                isRefreshing = true
+            }
+            setColorSchemeResources(R.color.colorPrimary)
+        }
+
+        siteSwipeRefreshView.apply {
+            setOnRefreshListener {
+                retrieveLocations(requireContext())
+                isRefreshing = false
+            }
             setColorSchemeResources(R.color.colorPrimary)
         }
 
@@ -390,6 +394,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
     fun showSearchBar(show: Boolean) {
         searchLayout.visibility = if (show) View.VISIBLE else View.INVISIBLE
         siteRecyclerView.visibility = if (show) View.VISIBLE else View.INVISIBLE
+        siteSwipeRefreshView.visibility = if (show) View.VISIBLE else View.INVISIBLE
         searchViewActionRightButton.visibility = if (show) View.VISIBLE else View.INVISIBLE
         searchButton.visibility = if (show) View.GONE else View.VISIBLE
         trackingLayout.visibility = if (show) View.GONE else View.VISIBLE
@@ -1531,11 +1536,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             showButtonOnMap()
             listener?.showBottomAppBar()
         }
-    }
-
-    override fun onRefresh() {
-        retrieveProjects(requireContext())
-        projectSwipeRefreshView.isRefreshing = true
     }
 }
 
