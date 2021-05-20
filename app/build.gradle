@@ -41,11 +41,13 @@ android {
             buildConfigField 'boolean', 'ENABLE_GUARDIAN', 'true'
             buildConfigField 'String', 'FIREBASE_AUTH_DOMAIN', '"https://us-central1-rfcx-deployment.cloudfunctions.net/auth/"'
             buildConfigField 'String', 'DEVICE_API_DOMAIN', '"https://device-api.rfcx.org/"'
+            buildConfigField 'String', 'DEPLOY_DOMAIN', '"https://api.rfcx.org/"'
         }
         internalDevelop {
             buildConfigField 'boolean', 'ENABLE_GUARDIAN', 'true'
             buildConfigField 'String', 'FIREBASE_AUTH_DOMAIN', '"https://us-central1-rfcx-deployment-dev.cloudfunctions.net/auth/"'
             buildConfigField 'String', 'DEVICE_API_DOMAIN', '"https://staging-device-api.rfcx.org/"'
+            buildConfigField 'String', 'DEPLOY_DOMAIN', '"https://staging-api.rfcx.org/"'
             applicationIdSuffix '.dev'
         }
     }
