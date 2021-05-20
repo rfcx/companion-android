@@ -101,10 +101,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/siteRecyclerView"
-        app:layout_constraintEnd_toEndOf="@id/siteRecyclerView"
-        app:layout_constraintStart_toStartOf="@id/siteRecyclerView"
-        app:layout_constraintTop_toTopOf="@id/siteRecyclerView">
+        app:layout_constraintBottom_toBottomOf="@id/siteSwipeRefreshView"
+        app:layout_constraintEnd_toEndOf="@id/siteSwipeRefreshView"
+        app:layout_constraintStart_toStartOf="@id/siteSwipeRefreshView"
+        app:layout_constraintTop_toTopOf="@id/siteSwipeRefreshView">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/notHaveSiteTextView"

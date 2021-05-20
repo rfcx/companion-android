@@ -181,7 +181,11 @@ class SetDeploymentSiteFragment : Fragment(),
     private fun setSwipeSite() {
         siteSwipeRefreshView.apply {
             setOnRefreshListener {
-                DownloadStreamsWorker.enqueue(requireContext())
+                val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
+                val project = projectDb.getProjectById(projectId)
+                project?.serverId?.let {
+                    DownloadStreamsWorker.enqueue(context, it)
+                }
                 isRefreshing = false
             }
             setColorSchemeResources(R.color.colorPrimary)

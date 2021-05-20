@@ -1031,7 +1031,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
     }
 
     private fun retrieveLocations(context: Context) {
-        DownloadStreamsWorker.enqueue(context)
+        val projectId = Preferences.getInstance(context).getInt(Preferences.SELECTED_PROJECT)
+        val project = locationGroupDb.getProjectById(projectId)
+        project?.serverId?.let {
+            DownloadStreamsWorker.enqueue(context, it)
+        }
     }
 
     private fun retrieveProjects(context: Context) {
@@ -1497,6 +1501,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
         context?.let { context ->
             Preferences.getInstance(context).putInt(Preferences.SELECTED_PROJECT, group.id)
+            //reload site to get sites from selected project
+            retrieveLocations(context)
         }
         listener?.let { listener ->
             projectNameTextView.text =
