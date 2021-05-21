@@ -6,9 +6,9 @@ import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.Task
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
-import id.zelory.compressor.Compressor
 import java.io.File
 import kotlinx.coroutines.tasks.await
+import me.echodev.resizer.Resizer
 
 class Storage(val context: Context) {
     private val storage = FirebaseStorage.getInstance()
@@ -76,17 +76,14 @@ class Storage(val context: Context) {
     }
 
     /** compress imagePath to less than 1 MB **/
-    private fun compressFile(context: Context?, file: File): File {
+    fun compressFile(context: Context?, file: File): File {
         if (file.length() <= 0) {
             return file
         }
-        val compressed = Compressor(context)
-            .setQuality(75)
-            .compressToFile(file)
-
-        if (compressed.length() > 1_000_000) {
-            return compressFile(context, compressed)
-        }
-        return compressed
+        return Resizer(context)
+            .setTargetLength(1920)
+            .setQuality(80)
+            .setSourceImage(file)
+            .resizedFile
     }
 }
