@@ -58,7 +58,7 @@ class LocationGroupAdapter(private val locationGroupListener: LocationGroupListe
                     if (project.name == selectedGroup) View.VISIBLE else View.GONE
             }
             downloadButton.visibility =
-                if (screen == Screen.OFFLINE_MAP.id) View.VISIBLE else View.GONE
+                if (project.maxLatitude != null && project.maxLatitude != 0.0) View.VISIBLE else View.GONE
             locationGroupTextView.text = project.name
         }
     }

@@ -7,6 +7,7 @@ import io.realm.kotlin.deleteFromRealm
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Project.Companion.PROJECT_DELETED_AT
 import org.rfcx.companion.entity.SyncState
+import org.rfcx.companion.entity.response.ProjectByIdResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.entity.response.toLocationGroups
 import java.util.*
@@ -28,6 +29,21 @@ class ProjectDb(private val realm: Realm) {
         return realm.where(Project::class.java)
             .notEqualTo(Project.PROJECT_SYNC_STATE, SyncState.Sent.key)
             .count()
+    }
+
+    fun updateProjectBounds(response: ProjectByIdResponse) {
+        realm.executeTransaction {
+            val project =
+                it.where(Project::class.java)
+                    .equalTo(Project.PROJECT_SERVER_ID, response.id)
+                    .findFirst()
+            if (project != null) {
+                project.maxLatitude = response.maxLatitude
+                project.maxLongitude = response.maxLongitude
+                project.minLatitude = response.minLatitude
+                project.minLongitude = response.minLongitude
+            }
+        }
     }
 
     fun unlockSent(): List<Project> {

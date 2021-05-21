@@ -54,8 +54,6 @@ import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.BitmapUtils
-import com.mapbox.pluginscalebar.ScaleBarOptions
-import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_deployment_window_info.view.*
@@ -67,16 +65,14 @@ import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.guardian.toMark
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
-import org.rfcx.companion.entity.response.DeploymentResponse
+import org.rfcx.companion.entity.response.ProjectByIdResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.service.DeploymentSyncWorker
-import org.rfcx.companion.service.DownloadImagesWorker
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
-import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
@@ -908,6 +904,27 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         locationGroupAdapter.items = listOf()
         locationGroupAdapter.items = locationGroupDb.getProjects()
         locationGroupAdapter.notifyDataSetChanged()
+
+        val updateProjectBounds = it.filter { project -> project.serverId != null && project.maxLatitude == null }
+        updateProjectBounds.map { projectBounds ->
+            val token = "Bearer ${context?.getIdToken()}"
+            projectBounds.serverId?.let { serverId ->
+                ApiManager.getInstance().getRestApi().getProjectsById(token, serverId)
+                    .enqueue(object : Callback<ProjectByIdResponse> {
+                        override fun onFailure(call: Call<ProjectByIdResponse>, t: Throwable) {}
+
+                        override fun onResponse(
+                            call: Call<ProjectByIdResponse>,
+                            response: Response<ProjectByIdResponse>
+                        ) {
+                            if (response.body() != null && response.body()?.id != null && response.body()?.maxLatitude != null) {
+                                val res = response.body() as ProjectByIdResponse
+                                locationGroupDb.updateProjectBounds(res)
+                            }
+                        }
+                    })
+            }
+        }
     }
 
     private fun combinedData() {
