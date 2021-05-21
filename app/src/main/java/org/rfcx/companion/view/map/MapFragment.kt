@@ -24,6 +24,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.work.WorkInfo
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
@@ -54,8 +55,6 @@ import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.BitmapUtils
-import com.mapbox.pluginscalebar.ScaleBarOptions
-import com.mapbox.pluginscalebar.ScaleBarPlugin
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_deployment_window_info.view.*
@@ -67,16 +66,13 @@ import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.guardian.toMark
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
-import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.service.DeploymentSyncWorker
-import org.rfcx.companion.service.DownloadImagesWorker
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
-import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
@@ -270,6 +266,22 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             setOnClickProjectName()
         }
 
+        projectSwipeRefreshView.apply {
+            setOnRefreshListener {
+                retrieveProjects(requireContext())
+                isRefreshing = true
+            }
+            setColorSchemeResources(R.color.colorPrimary)
+        }
+
+        siteSwipeRefreshView.apply {
+            setOnRefreshListener {
+                retrieveLocations(requireContext())
+                isRefreshing = false
+            }
+            setColorSchemeResources(R.color.colorPrimary)
+        }
+
         iconOpenProjectList.setOnClickListener {
             setOnClickProjectName()
         }
@@ -294,6 +306,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         }
 
         projectRecyclerView.visibility = View.VISIBLE
+        projectSwipeRefreshView.visibility = View.VISIBLE
         searchButton.visibility = View.GONE
         trackingLayout.visibility = View.GONE
         hideButtonOnMap()
@@ -381,6 +394,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
     fun showSearchBar(show: Boolean) {
         searchLayout.visibility = if (show) View.VISIBLE else View.INVISIBLE
         siteRecyclerView.visibility = if (show) View.VISIBLE else View.INVISIBLE
+        siteSwipeRefreshView.visibility = if (show) View.VISIBLE else View.INVISIBLE
         searchViewActionRightButton.visibility = if (show) View.VISIBLE else View.INVISIBLE
         searchButton.visibility = if (show) View.GONE else View.VISIBLE
         trackingLayout.visibility = if (show) View.GONE else View.VISIBLE
@@ -1017,7 +1031,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
     }
 
     private fun retrieveLocations(context: Context) {
-        DownloadStreamsWorker.enqueue(context)
+        val projectId = Preferences.getInstance(context).getInt(Preferences.SELECTED_PROJECT)
+        val project = locationGroupDb.getProjectById(projectId)
+        project?.serverId?.let {
+            DownloadStreamsWorker.enqueue(context, it)
+        }
     }
 
     private fun retrieveProjects(context: Context) {
@@ -1030,6 +1048,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                         Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT)
                             .show()
                     }
+                    projectSwipeRefreshView.isRefreshing = false
                 }
 
                 override fun onResponse(
@@ -1039,6 +1058,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                     response.body()?.forEach { item ->
                         locationGroupDb.insertOrUpdate(item)
                     }
+                    projectSwipeRefreshView.isRefreshing = false
                     combinedData()
                 }
             })
@@ -1477,9 +1497,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
     override fun onClicked(group: Project) {
         projectRecyclerView.visibility = View.GONE
+        projectSwipeRefreshView.visibility = View.GONE
 
         context?.let { context ->
             Preferences.getInstance(context).putInt(Preferences.SELECTED_PROJECT, group.id)
+            //reload site to get sites from selected project
+            retrieveLocations(context)
         }
         listener?.let { listener ->
             projectNameTextView.text =
@@ -1520,8 +1543,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             listener?.showBottomAppBar()
         }
     }
-
-    override fun onLongClicked(group: Project) {}
 }
 
 interface ApiCallbackInjector {

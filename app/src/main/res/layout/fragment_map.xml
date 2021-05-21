@@ -28,14 +28,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:paddingTop="@dimen/margin_padding_normal"
-            android:paddingBottom="@dimen/margin_padding_normal"
             android:layout_marginStart="@dimen/margin_padding_xlarge"
             android:layout_marginEnd="@dimen/margin_padding_xlarge"
             android:ellipsize="end"
-            android:maxWidth="@dimen/max_width_project_name"
-            android:singleLine="true"
             android:gravity="center"
+            android:maxWidth="@dimen/max_width_project_name"
+            android:paddingTop="@dimen/margin_padding_normal"
+            android:paddingBottom="@dimen/margin_padding_normal"
+            android:singleLine="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -60,35 +60,51 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/topBarLayout" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/siteRecyclerView"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/siteSwipeRefreshView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@color/backgroundColorSite"
-        android:dividerHeight="1dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/searchLayout" />
+        app:layout_constraintTop_toBottomOf="@id/searchLayout">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/projectRecyclerView"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/siteRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/backgroundColorSite"
+            android:dividerHeight="1dp"
+            android:visibility="gone" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/projectSwipeRefreshView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@color/backgroundColor"
-        android:dividerHeight="1dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/topBarLayout" />
+        app:layout_constraintTop_toBottomOf="@id/topBarLayout">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/projectRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/backgroundColor"
+            android:dividerHeight="1dp"
+            android:visibility="gone" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/showLabelLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/siteRecyclerView"
-        app:layout_constraintEnd_toEndOf="@id/siteRecyclerView"
-        app:layout_constraintStart_toStartOf="@id/siteRecyclerView"
-        app:layout_constraintTop_toTopOf="@id/siteRecyclerView">
+        app:layout_constraintBottom_toBottomOf="@id/siteSwipeRefreshView"
+        app:layout_constraintEnd_toEndOf="@id/siteSwipeRefreshView"
+        app:layout_constraintStart_toStartOf="@id/siteSwipeRefreshView"
+        app:layout_constraintTop_toTopOf="@id/siteSwipeRefreshView">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/notHaveSiteTextView"

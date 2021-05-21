@@ -95,8 +95,6 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
                     val addGuardian = tip.findViewById<ConstraintLayout>(R.id.guardianLayout)
                     addEdgeOrAudioMoth?.setOnClickListener {
                         EdgeDeploymentActivity.startActivity(this)
-                        // refresh sites
-                        DownloadStreamsWorker.enqueue(this)
                         tip.dismiss()
                     }
                     addGuardian?.setOnClickListener {
