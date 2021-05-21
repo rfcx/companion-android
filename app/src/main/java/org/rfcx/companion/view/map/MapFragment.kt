@@ -1539,6 +1539,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
     }
 
     override fun onLongClicked(group: Project) {}
+
+    override fun onDownloadClicked(project: Project) {}
 }
 
 interface ApiCallbackInjector {

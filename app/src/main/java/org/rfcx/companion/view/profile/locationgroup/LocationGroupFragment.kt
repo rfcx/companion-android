@@ -81,6 +81,8 @@ class LocationGroupFragment : Fragment(), LocationGroupListener {
 //        showDeleteDialog(group)
     }
 
+    override fun onDownloadClicked(project: Project) {}
+
     private fun showDeleteDialog(group: Project) {
         val preferences = context?.let { Preferences.getInstance(it) }
         val groupName = preferences?.getString(Preferences.GROUP, getString(R.string.none))

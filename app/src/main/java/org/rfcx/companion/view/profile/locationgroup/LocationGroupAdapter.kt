@@ -60,6 +60,10 @@ class LocationGroupAdapter(private val locationGroupListener: LocationGroupListe
             downloadButton.visibility =
                 if (project.maxLatitude != null && project.maxLatitude != 0.0) View.VISIBLE else View.GONE
             locationGroupTextView.text = project.name
+
+            downloadButton.setOnClickListener {
+                locationGroupListener.onDownloadClicked(project)
+            }
         }
     }
 }
@@ -67,4 +71,5 @@ class LocationGroupAdapter(private val locationGroupListener: LocationGroupListe
 interface LocationGroupListener {
     fun onClicked(group: Project)
     fun onLongClicked(group: Project)
+    fun onDownloadClicked(project: Project)
 }
