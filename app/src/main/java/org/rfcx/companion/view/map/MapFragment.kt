@@ -1494,6 +1494,20 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         view?.hideKeyboard()
         showSearchBar(false)
 
+        val features = this.mapFeatures?.features()
+        val selectingDeployment = features?.firstOrNull { feature -> feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_TITLE) == locate.name }
+        val selectingSite = features?.firstOrNull { feature -> feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_NAME) == locate.name }
+
+        if (selectingDeployment == null) {
+            if (selectingSite == null) return
+            setSiteDetail(selectingSite)
+            setFeatureSelectState(selectingSite, true)
+
+        } else {
+            setDeploymentDetail(selectingDeployment)
+            setFeatureSelectState(selectingDeployment, true)
+        }
+
         val item = locateDb.getLocateByName(locate.name)
         item?.let {
             mapboxMap?.animateCamera(
