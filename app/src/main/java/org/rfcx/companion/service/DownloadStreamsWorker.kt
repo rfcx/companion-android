@@ -37,9 +37,6 @@ class DownloadStreamsWorker(val context: Context, params: WorkerParameters) :
             if (result) {
                 Log.d(TAG, "downloaded $count sites")
                 isRunning = DownloadStreamState.FINISH
-
-                //download all assets
-                DownloadImagesWorker.enqueue(context)
             } else {
                 isRunning = DownloadStreamState.NOT_RUNNING
                 someFailed = true
@@ -52,7 +49,7 @@ class DownloadStreamsWorker(val context: Context, params: WorkerParameters) :
     private suspend fun getStreams(token: String, offset: Int, maxUpdatedAt: String? = null): Boolean = withContext(Dispatchers.IO) {
         isRunning = DownloadStreamState.RUNNING
         val result = ApiManager.getInstance().getDeviceApi()
-            .getStreams(token, SITES_LIMIT_GETTING, offset, maxUpdatedAt, "updated_at,name").execute()
+            .getStreams(token, SITES_LIMIT_GETTING, offset, maxUpdatedAt, "updated_at,name", PROJECT_ID).execute()
         if (result.isSuccessful) {
             val resultBody = result.body()
             resultBody?.let {
@@ -90,8 +87,20 @@ class DownloadStreamsWorker(val context: Context, params: WorkerParameters) :
         private const val UNIQUE_WORK_KEY = "DownloadStreamsWorkerUniqueKey"
         private const val SITES_LIMIT_GETTING = 100
         private var isRunning = DownloadStreamState.NOT_RUNNING
+        private var PROJECT_ID: List<String>? = null
 
         fun enqueue(context: Context) {
+            val constraints =
+                Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+            val workRequest =
+                OneTimeWorkRequestBuilder<DownloadStreamsWorker>().setConstraints(constraints)
+                    .build()
+            WorkManager.getInstance(context)
+                .enqueueUniqueWork(UNIQUE_WORK_KEY, ExistingWorkPolicy.REPLACE, workRequest)
+        }
+
+        fun enqueue(context: Context, projectId: String) {
+            PROJECT_ID = listOf(projectId)
             val constraints =
                 Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
             val workRequest =
