@@ -5,6 +5,12 @@
     android:layout_height="match_parent"
     tools:context="org.rfcx.companion.view.deployment.location.SetDeploymentSiteFragment">
 
+    <org.rfcx.companion.util.StatusView
+        android:id="@+id/statusSiteView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"/>
+
     <include
         android:id="@+id/layoutSearchView"
         layout="@layout/layout_search_view"
@@ -12,7 +18,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/statusSiteView" />
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/siteSwipeRefreshView"
