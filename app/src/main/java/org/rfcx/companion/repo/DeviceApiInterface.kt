@@ -84,7 +84,8 @@ interface DeviceApiInterface {
                    @Query("limit") limit: Int = 100,
                    @Query("offset") offset: Int = 0,
                    @Query("updated_after", encoded = true) updatedAfter: String? = null,
-                   @Query("sort", encoded = true) sort: String? = null): Call<List<StreamResponse>>
+                   @Query("sort", encoded = true) sort: String? = null,
+                   @Query("projects") projects: List<String>? = null): Call<List<StreamResponse>>
 
     @GET("projects")
     fun getProjects(@Header("Authorization") authUser: String,
