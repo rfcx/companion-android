@@ -82,6 +82,11 @@ class LoginActivity : AppCompatActivity() {
             loginWithFacebook()
         }
 
+        googleLoginButton.setOnClickListener {
+            loading()
+            loginWithGoogle()
+        }
+
         smsLoginButton.setOnClickListener {
             loading()
             loginMagicLink()
@@ -172,6 +177,42 @@ class LoginActivity : AppCompatActivity() {
                         }
                         is Ok -> {
                             analytics.trackLoginEvent(LoginType.FACEBOOK.id, Status.SUCCESS.id)
+
+                            userTouch(result.value)
+                            CredentialKeeper(this@LoginActivity).save(result.value)
+                        }
+                    }
+                }
+            })
+    }
+
+    private fun loginWithGoogle() {
+        webAuthentication
+            .withConnection("google-oauth2")
+            .withScope(this.getString(R.string.auth0_scopes))
+            .withScheme(this.getString(R.string.auth0_scheme))
+            .withAudience(this.getString(R.string.auth0_audience))
+            .start(this, object : AuthCallback {
+                override fun onFailure(dialog: Dialog) {}
+
+                override fun onFailure(exception: AuthenticationException) {
+                    analytics.trackLoginEvent(LoginType.GOOGLE.id, Status.FAILURE.id)
+
+                    exception.printStackTrace()
+                    loading(false)
+                }
+
+                override fun onSuccess(credentials: Credentials) {
+                    when (val result = CredentialVerifier(this@LoginActivity).verify(credentials)) {
+                        is Err -> {
+                            analytics.trackLoginEvent(LoginType.GOOGLE.id, Status.FAILURE.id)
+
+                            Toast.makeText(this@LoginActivity, result.error, Toast.LENGTH_SHORT)
+                                .show()
+                            loading(false)
+                        }
+                        is Ok -> {
+                            analytics.trackLoginEvent(LoginType.GOOGLE.id, Status.SUCCESS.id)
 
                             userTouch(result.value)
                             CredentialKeeper(this@LoginActivity).save(result.value)
@@ -287,7 +328,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun loading(start: Boolean = true) {
-        loginGroupView.visibility = if (start) View.GONE else View.VISIBLE
+        loginGroupView.visibility = if (start) View.INVISIBLE else View.VISIBLE
         loginProgressBar.visibility = if (start) View.VISIBLE else View.GONE
     }
 

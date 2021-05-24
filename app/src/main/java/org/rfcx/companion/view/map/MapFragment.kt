@@ -24,6 +24,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.work.WorkInfo
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
@@ -234,7 +235,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         fetchJobSyncing()
         fetchData()
         showSearchBar(false)
-        progressBar.visibility = View.VISIBLE
         hideLabel()
         context?.let { setTextTrackingButton(LocationTracking.isTrackingOn(it)) }
         projectNameTextView.text =
@@ -271,6 +271,22 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             setOnClickProjectName()
         }
 
+        projectSwipeRefreshView.apply {
+            setOnRefreshListener {
+                retrieveProjects(requireContext())
+                isRefreshing = true
+            }
+            setColorSchemeResources(R.color.colorPrimary)
+        }
+
+        siteSwipeRefreshView.apply {
+            setOnRefreshListener {
+                retrieveLocations(requireContext())
+                isRefreshing = false
+            }
+            setColorSchemeResources(R.color.colorPrimary)
+        }
+
         iconOpenProjectList.setOnClickListener {
             setOnClickProjectName()
         }
@@ -295,6 +311,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         }
 
         projectRecyclerView.visibility = View.VISIBLE
+        projectSwipeRefreshView.visibility = View.VISIBLE
         searchButton.visibility = View.GONE
         trackingLayout.visibility = View.GONE
         hideButtonOnMap()
@@ -382,6 +399,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
     fun showSearchBar(show: Boolean) {
         searchLayout.visibility = if (show) View.VISIBLE else View.INVISIBLE
         siteRecyclerView.visibility = if (show) View.VISIBLE else View.INVISIBLE
+        siteSwipeRefreshView.visibility = if (show) View.VISIBLE else View.INVISIBLE
         searchViewActionRightButton.visibility = if (show) View.VISIBLE else View.INVISIBLE
         searchButton.visibility = if (show) View.GONE else View.VISIBLE
         trackingLayout.visibility = if (show) View.GONE else View.VISIBLE
@@ -902,8 +920,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
     }
 
     private fun combinedData() {
-        // hide loading progress
-        progressBar.visibility = View.INVISIBLE
         var showGuardianDeployments = this.guardianDeployments.filter { it.isCompleted() }
         val usedSitesOnGuardian = showGuardianDeployments.map { it.stream?.coreId }
 
@@ -1011,7 +1027,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
     }
 
     private fun retrieveLocations(context: Context) {
-        DownloadStreamsWorker.enqueue(context)
+        val projectId = Preferences.getInstance(context).getInt(Preferences.SELECTED_PROJECT)
+        val project = locationGroupDb.getProjectById(projectId)
+        project?.serverId?.let {
+            DownloadStreamsWorker.enqueue(context, it)
+        }
     }
 
     private fun retrieveProjects(context: Context) {
@@ -1024,6 +1044,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                         Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT)
                             .show()
                     }
+                    projectSwipeRefreshView.isRefreshing = false
                 }
 
                 override fun onResponse(
@@ -1033,6 +1054,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                     response.body()?.forEach { item ->
                         locationGroupDb.insertOrUpdate(item)
                     }
+                    projectSwipeRefreshView.isRefreshing = false
                     combinedData()
                 }
             })
@@ -1476,9 +1498,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
     override fun onClicked(group: Project) {
         projectRecyclerView.visibility = View.GONE
+        projectSwipeRefreshView.visibility = View.GONE
 
         context?.let { context ->
             Preferences.getInstance(context).putInt(Preferences.SELECTED_PROJECT, group.id)
+            //reload site to get sites from selected project
+            retrieveLocations(context)
         }
         listener?.let { listener ->
             projectNameTextView.text =
@@ -1519,8 +1544,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             listener?.showBottomAppBar()
         }
     }
-
-    override fun onLongClicked(group: Project) {}
 }
 
 interface ApiCallbackInjector {

@@ -22,9 +22,6 @@ import org.rfcx.companion.view.detail.EditLocationActivity.Companion.EXTRA_LOCAT
 class LocationGroupActivity : BaseActivity(), LocationGroupProtocol {
 
     // For detail page to edit location group
-    private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
-
     private var group: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,12 +35,6 @@ class LocationGroupActivity : BaseActivity(), LocationGroupProtocol {
 
         startFragment(LocationGroupFragment.newInstance(group, screen))
     }
-
-    override fun onCreateNewGroup() {
-        val screen = intent?.getStringExtra(EXTRA_SCREEN) ?: Screen.PROFILE.id
-        CreateNewGroupActivity.startActivity(this, screen, LOCATION_GROUP_REQUEST_CODE)
-    }
-
     override fun onLocationGroupClick(group: Project) {
         locationGroupSelected(group.toLocationGroup())
     }

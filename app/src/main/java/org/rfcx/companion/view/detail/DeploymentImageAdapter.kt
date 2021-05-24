@@ -2,7 +2,6 @@ package org.rfcx.companion.view.detail
 
 import android.content.Context
 import android.os.Handler
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +10,6 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.item_image.view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.adapter.BaseListItem
@@ -155,6 +153,7 @@ class DeploymentImageAdapter :
         private val imageView = itemView.image
         private val deleteButton = itemView.deleteImageButton
         private val syncImageView = itemView.syncImage
+        private val progress = itemView.progressBarOfImageView
 
         fun bind(item: DeploymentImageView, canDelete: Boolean) {
             syncImageView.visibility = View.VISIBLE
@@ -171,7 +170,8 @@ class DeploymentImageAdapter :
                 url = item.remotePath ?: item.localPath,
                 blur = item.syncState != SyncState.Sent.key,
                 fromServer = fromServer,
-                token = token
+                token = token,
+                progressBar = progress
             )
 
             // handle hide syncing image view after sent in 2sec

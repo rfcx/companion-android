@@ -27,6 +27,7 @@ class DisplayImageAdapter(private val imageList: List<String>, private val conte
 
     inner class DisplayImageViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         private val imageView = itemView.displayImage
+        private val progressBar = itemView.progressBarOfImageView
 
         fun bind(item: String) {
             val token = context.getIdToken()
@@ -35,7 +36,8 @@ class DisplayImageAdapter(private val imageList: List<String>, private val conte
                 url = item,
                 blur = false,
                 fromServer = fromServer,
-                token = token
+                token = token,
+                progressBar = progressBar
             )
         }
     }

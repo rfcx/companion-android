@@ -121,8 +121,8 @@ class FeedbackImageAdapter :
 
             Glide.with(itemView.imageFeedbackImageView)
                 .load(imagePath)
-                .placeholder(R.drawable.bg_grey_light)
-                .error(R.drawable.bg_grey_light)
+                .placeholder(R.drawable.bg_placeholder_light)
+                .error(R.drawable.bg_placeholder_light)
                 .into(itemView.imageFeedbackImageView)
 
             itemView.deleteImageFeedbackButton.setOnClickListener {
