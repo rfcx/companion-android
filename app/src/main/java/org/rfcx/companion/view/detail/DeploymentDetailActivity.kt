@@ -41,6 +41,7 @@ import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.service.DeploymentSyncWorker
+import org.rfcx.companion.service.DownloadImagesWorker
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.BaseActivity
@@ -88,8 +89,10 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
 
         setupToolbar()
         setupImageRecycler()
-        deployment?.let { updateDeploymentDetailView(it) }
-
+        deployment?.let {
+            updateDeploymentDetailView(it)
+            downloadPhotos(it.serverId)
+        }
         setupAttachImageDialog()
         setupClickListener()
 
@@ -258,6 +261,12 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
             longitudeValue.text = locate.longitude.longitudeCoordinates(this)
             altitudeValue.text = locate.altitude.setFormatLabel()
             deploymentIdTextView.text = deployment.deploymentKey
+        }
+    }
+
+    private fun downloadPhotos(deploymentServerId: String?) {
+        if (deploymentServerId != null) {
+            DownloadImagesWorker.Companion.enqueue(this, deploymentServerId)
         }
     }
 
