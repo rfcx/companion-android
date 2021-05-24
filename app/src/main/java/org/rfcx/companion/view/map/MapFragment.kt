@@ -71,7 +71,6 @@ import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.service.DeploymentSyncWorker
-import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.geojson.GeoJsonUtils
@@ -120,6 +119,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
     private lateinit var locateLiveData: LiveData<List<Locate>>
     private lateinit var locationGroupLiveData: LiveData<List<Project>>
     private lateinit var deploymentWorkInfoLiveData: LiveData<List<WorkInfo>>
+    private lateinit var downloadStreamsWorkInfoLiveData: LiveData<List<WorkInfo>>
 
     private val locationPermissions by lazy { activity?.let { LocationPermissions(it) } }
     private var listener: MainActivityListener? = null
@@ -177,15 +177,20 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         val currentWorkStatus = it?.getOrNull(0)
         if (currentWorkStatus != null) {
             when (currentWorkStatus.state) {
-                WorkInfo.State.RUNNING -> {
-                    updateSyncInfo(SyncInfo.Uploading)
-                }
-                WorkInfo.State.SUCCEEDED -> {
-                    updateSyncInfo(SyncInfo.Uploaded)
-                }
-                else -> {
-                    updateSyncInfo()
-                }
+                WorkInfo.State.RUNNING -> updateSyncInfo(SyncInfo.Uploading, false)
+                WorkInfo.State.SUCCEEDED -> updateSyncInfo(SyncInfo.Uploaded, false)
+                else -> updateSyncInfo(isSites = false)
+            }
+        }
+    }
+
+    private val downloadStreamsWorkInfoObserve = Observer<List<WorkInfo>> {
+        val currentWorkStatus = it?.getOrNull(0)
+        if (currentWorkStatus != null) {
+            when (currentWorkStatus.state) {
+                WorkInfo.State.RUNNING -> updateSyncInfo(SyncInfo.Uploading, true)
+                WorkInfo.State.SUCCEEDED -> updateSyncInfo(SyncInfo.Uploaded, true)
+                else -> updateSyncInfo(isSites = true)
             }
         }
     }
@@ -466,8 +471,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         override fun run() {
             context?.let {
                 trackingTextView.text = "${
-                    LocationTracking.getDistance(trackingDb)
-                        .setFormatLabel()
+                LocationTracking.getDistance(trackingDb)
+                    .setFormatLabel()
                 }  ${LocationTracking.getOnDutyTimeMinute(it)} min"
             }
             handler.postDelayed(this, 20 * 1000)
@@ -912,16 +917,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
     private val locateObserve = Observer<List<Locate>> {
         this.locations = it
-        when (DownloadStreamsWorker.isRunning()) {
-            DownloadStreamState.RUNNING -> listener?.showSnackbar(
-                requireContext().getString(R.string.sites_downloading),
-                Snackbar.LENGTH_SHORT
-            )
-            DownloadStreamState.FINISH -> listener?.showSnackbar(
-                requireContext().getString(R.string.sites_synced),
-                Snackbar.LENGTH_SHORT
-            )
-        }
         combinedData()
     }
 
@@ -941,7 +936,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         val usedSitesOnEdge = showDeployments.map { it.stream?.coreId }
 
         val allUsedSites = usedSitesOnEdge + usedSitesOnGuardian
-        var filteredShowLocations = locations.filter { loc -> !allUsedSites.contains(loc.serverId) || (loc.serverId == null && (loc.lastDeploymentId == 0 && loc.lastGuardianDeploymentId == 0)) }
+        var filteredShowLocations =
+            locations.filter { loc -> !allUsedSites.contains(loc.serverId) || (loc.serverId == null && (loc.lastDeploymentId == 0 && loc.lastGuardianDeploymentId == 0)) }
         val projectName = listener?.getProjectName() ?: getString(R.string.none)
         if (projectName != getString(R.string.none)) {
             filteredShowLocations =
@@ -1135,43 +1131,46 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
     private fun fetchJobSyncing() {
         context ?: return
+        downloadStreamsWorkInfoLiveData = DownloadStreamsWorker.workInfos(requireContext())
+        downloadStreamsWorkInfoLiveData.observeForever(downloadStreamsWorkInfoObserve)
         deploymentWorkInfoLiveData = DeploymentSyncWorker.workInfos(requireContext())
         deploymentWorkInfoLiveData.observeForever(deploymentWorkInfoObserve)
     }
 
-    private fun updateSyncInfo(syncInfo: SyncInfo? = null) {
+    private fun updateSyncInfo(syncInfo: SyncInfo? = null, isSites: Boolean) {
         val status = syncInfo
             ?: if (context.isNetworkAvailable()) SyncInfo.Starting else SyncInfo.WaitingNetwork
         if (this.lastSyncingInfo == SyncInfo.Uploaded && status == SyncInfo.Uploaded) return
-
         this.lastSyncingInfo = status
-        val state = listener?.getBottomSheetState() ?: 0
-        if (state != BottomSheetBehavior.STATE_EXPANDED) {
-            setSnackbar(status)
-        }
+        setSnackbar(status, isSites)
     }
 
-    private fun setSnackbar(status: SyncInfo) {
+    private fun setSnackbar(status: SyncInfo, isSites: Boolean) {
         val deploymentUnsentCount = edgeDeploymentDb.unsentCount().toInt()
         when (status) {
             SyncInfo.Starting, SyncInfo.Uploading -> {
-                val msg = if (deploymentUnsentCount > 1) {
-                    getString(R.string.format_deploys_uploading, deploymentUnsentCount.toString())
+                val msg = if (isSites) {
+                    getString(R.string.sites_downloading)
                 } else {
-                    getString(R.string.format_deploy_uploading)
+                    if (deploymentUnsentCount > 1) {
+                        getString(R.string.format_deploys_uploading, deploymentUnsentCount.toString())
+                    } else {
+                        getString(R.string.format_deploy_uploading)
+                    }
                 }
-                listener?.showSnackbar(msg, Snackbar.LENGTH_SHORT)
+                statusView.onShow(msg)
             }
             SyncInfo.Uploaded -> {
-                val msg = getString(R.string.format_deploys_uploaded)
-                listener?.showSnackbar(msg, Snackbar.LENGTH_SHORT)
+                val msg = if (isSites) {
+                    getString(R.string.sites_synced)
+                } else {
+                    getString(R.string.format_deploys_uploaded)
+                }
+                statusView.onShowWithDelayed(msg)
             }
             // else also waiting network
             else -> {
-                listener?.showSnackbar(
-                    getString(R.string.format_deploy_waiting_network),
-                    Snackbar.LENGTH_LONG
-                )
+                if (!isSites) statusView.onShowWithDelayed(getString(R.string.format_deploy_waiting_network))
             }
         }
     }
@@ -1189,7 +1188,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             // check is this deployment is selecting (to set bigger pin)
             when (it) {
                 is MapMarker.DeploymentMarker -> {
-                    val deploymentId = deploymentSelecting?.getProperty(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID)
+                    val deploymentId =
+                        deploymentSelecting?.getProperty(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID)
                     val isSelecting =
                         if (deploymentSelecting == null || deploymentId == null) {
                             false
@@ -1435,6 +1435,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
     override fun onDestroy() {
         super.onDestroy()
         deploymentWorkInfoLiveData.removeObserver(deploymentWorkInfoObserve)
+        downloadStreamsWorkInfoLiveData.removeObserver(downloadStreamsWorkInfoObserve)
         guardianDeployLiveData.removeObserver(guardianDeploymentObserve)
         edgeDeployLiveData.removeObserver(edgeDeploymentObserve)
         locateLiveData.removeObserver(locateObserve)

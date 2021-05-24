@@ -56,4 +56,9 @@
     <color name="step_enabled_true">#2AA841</color>
 
     <color name="bottom_bar_icon_default_tint">#5A6978</color>
+
+    <!-- status view -->
+    <color name="widget_status_view_dark_bg">#AD131313</color>
+    <color name="widget_status_view_normal_bg">#FFFFFF</color>
+
 </resources>

@@ -13,6 +13,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.work.WorkInfo
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.fragment_set_deployment_site.*
@@ -22,11 +23,13 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.ProjectDb
+import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.map.SiteAdapter
+import org.rfcx.companion.view.map.SyncInfo
 
 class SetDeploymentSiteFragment : Fragment(),
         (Locate, Boolean) -> Unit {
@@ -49,6 +52,19 @@ class SetDeploymentSiteFragment : Fragment(),
     private lateinit var siteLiveData: LiveData<List<Locate>>
     private val siteObserve = Observer<List<Locate>> {
         setupView()
+    }
+
+    private var lastSyncingInfo: SyncInfo? = null
+    private lateinit var downloadStreamsWorkInfoLiveData: LiveData<List<WorkInfo>>
+    private val downloadStreamsWorkInfoObserve = Observer<List<WorkInfo>> {
+        val currentWorkStatus = it?.getOrNull(0)
+        if (currentWorkStatus != null) {
+            when (currentWorkStatus.state) {
+                WorkInfo.State.RUNNING -> updateSyncInfo(SyncInfo.Uploading, true)
+                WorkInfo.State.SUCCEEDED -> updateSyncInfo(SyncInfo.Uploaded, true)
+                else -> updateSyncInfo(isSites = true)
+            }
+        }
     }
 
     private var searchItem: MenuItem? = null
@@ -84,9 +100,34 @@ class SetDeploymentSiteFragment : Fragment(),
         super.onViewCreated(view, savedInstanceState)
         setupAdapter()
         setupTopBar()
+        fetchJobSyncing()
         setLiveData()
         setEditText()
         setSwipeSite()
+    }
+
+    private fun updateSyncInfo(syncInfo: SyncInfo? = null, isSites: Boolean) {
+        val status = syncInfo
+            ?: if (context.isNetworkAvailable()) SyncInfo.Starting else SyncInfo.WaitingNetwork
+        if (this.lastSyncingInfo == SyncInfo.Uploaded && status == SyncInfo.Uploaded) return
+        this.lastSyncingInfo = status
+        when (status) {
+            SyncInfo.Starting, SyncInfo.Uploading -> {
+                statusSiteView.onShow(getString(R.string.sites_downloading))
+            }
+            SyncInfo.Uploaded -> {
+                statusSiteView.onShowWithDelayed(getString(R.string.sites_synced))
+            }
+            else -> {
+                statusSiteView.onShowWithDelayed(getString(R.string.format_deploy_waiting_network))
+            }
+        }
+    }
+
+    private fun fetchJobSyncing() {
+        context ?: return
+        downloadStreamsWorkInfoLiveData = DownloadStreamsWorker.workInfos(requireContext())
+        downloadStreamsWorkInfoLiveData.observeForever(downloadStreamsWorkInfoObserve)
     }
 
     private fun setEditText() {
@@ -200,6 +241,7 @@ class SetDeploymentSiteFragment : Fragment(),
     override fun onDestroy() {
         super.onDestroy()
         siteLiveData.removeObserver(siteObserve)
+        downloadStreamsWorkInfoLiveData.removeObserver(downloadStreamsWorkInfoObserve)
     }
 
     companion object {

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="RainForestTextView">
+        <attr name="font_name" format="string" />
+    </declare-styleable>
+    <declare-styleable name="StatusView">
+        <attr name="status_theme" format="enum">
+            <enum name="dark" value="0"/>
+            <enum name="normal" value="1"/>
+        </attr>
+    </declare-styleable>
+</resources>
