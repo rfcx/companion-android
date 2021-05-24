@@ -84,6 +84,7 @@ import org.rfcx.companion.util.*
 import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.detail.DeploymentDetailActivity
+import org.rfcx.companion.view.diagnostic.DiagnosticActivity
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupAdapter
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupListener
@@ -823,7 +824,15 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         val deploymentId = feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID)
         if (deploymentId != null) {
             context?.let {
-                DeploymentDetailActivity.startActivity(it, deploymentId.toInt())
+                val device = feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEVICE)
+                if (device == Device.AUDIOMOTH.value) {
+                    DeploymentDetailActivity.startActivity(it, deploymentId.toInt())
+                } else {
+                    val deployment = guardianDeploymentDb.getDeploymentById(deploymentId.toInt())
+                    deployment?.let { dp ->
+                        DiagnosticActivity.startActivity(it, dp, false)
+                    }
+                }
                 analytics?.trackSeeDetailEvent()
             }
         } else {
