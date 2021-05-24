@@ -14,12 +14,15 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.realm.Realm
+import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.fragment_set_deployment_site.*
+import kotlinx.android.synthetic.main.fragment_set_deployment_site.siteSwipeRefreshView
 import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.ProjectDb
+import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
@@ -83,6 +86,7 @@ class SetDeploymentSiteFragment : Fragment(),
         setupTopBar()
         setLiveData()
         setEditText()
+        setSwipeSite()
     }
 
     private fun setEditText() {
@@ -172,6 +176,20 @@ class SetDeploymentSiteFragment : Fragment(),
             it
         }
         siteLiveData.observeForever(siteObserve)
+    }
+
+    private fun setSwipeSite() {
+        siteSwipeRefreshView.apply {
+            setOnRefreshListener {
+                val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
+                val project = projectDb.getProjectById(projectId)
+                project?.serverId?.let {
+                    DownloadStreamsWorker.enqueue(context, it)
+                }
+                isRefreshing = false
+            }
+            setColorSchemeResources(R.color.colorPrimary)
+        }
     }
 
     // On click site item

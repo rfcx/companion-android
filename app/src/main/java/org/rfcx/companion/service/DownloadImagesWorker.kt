@@ -25,13 +25,19 @@ class DownloadImagesWorker(val context: Context, params: WorkerParameters) :
         Log.d(TAG, "doWork on DownloadAssets")
 
         val edgeDeploymentDb = EdgeDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
-        val edgeDeployments = edgeDeploymentDb.getAll().map { Triple(it.id, it.serverId!!, Device.AUDIOMOTH.value) }
+        val edgeDeployment = edgeDeploymentDb.getDeploymentByServerId(deploymentServerId)
         val guardianDeploymentDb = GuardianDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
-        val guardianDeployments = guardianDeploymentDb.getAll().map { Triple(it.id, it.serverId!!, Device.GUARDIAN.value) }
+        val guardianDeployment = guardianDeploymentDb.getDeploymentByServerId(deploymentServerId)
 
-        (edgeDeployments + guardianDeployments).forEach { dp ->
+        val deployment = when {
+            edgeDeployment != null -> Triple(edgeDeployment.id, edgeDeployment.serverId, Device.AUDIOMOTH.value)
+            guardianDeployment != null -> Triple(guardianDeployment.id, guardianDeployment.serverId, Device.GUARDIAN.value)
+            else -> null
+        }
+
+        deployment?.let { dp ->
             val token = "Bearer ${context.getIdToken()}"
-            val result = ApiManager.getInstance().getDeviceApi().getDeploymentAssets(token, dp.second).execute()
+            val result = ApiManager.getInstance().getDeviceApi().getDeploymentAssets(token, dp.second!!).execute()
             if (result.isSuccessful) {
                 val dpAssets = result.body()
                 dpAssets?.forEach { item ->
@@ -54,8 +60,20 @@ class DownloadImagesWorker(val context: Context, params: WorkerParameters) :
     companion object {
         private const val TAG = "DownloadAssetsWorker"
         private const val UNIQUE_WORK_KEY = "DownloadAssetsWorkerUniqueKey"
+        private var deploymentServerId = ""
 
         fun enqueue(context: Context) {
+            val constraints =
+                Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+            val workRequest =
+                OneTimeWorkRequestBuilder<DownloadImagesWorker>().setConstraints(constraints)
+                    .build()
+            WorkManager.getInstance(context)
+                .enqueueUniqueWork(UNIQUE_WORK_KEY, ExistingWorkPolicy.REPLACE, workRequest)
+        }
+
+        fun enqueue(context: Context, deploymentServerId: String) {
+            this.deploymentServerId = deploymentServerId
             val constraints =
                 Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
             val workRequest =

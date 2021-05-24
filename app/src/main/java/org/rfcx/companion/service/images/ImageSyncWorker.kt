@@ -12,6 +12,7 @@ import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.FileUtils.getMimeType
 import org.rfcx.companion.util.RealmHelper
+import org.rfcx.companion.util.Storage
 import org.rfcx.companion.util.getIdToken
 import java.io.File
 
@@ -24,6 +25,8 @@ class ImageSyncWorker(val context: Context, params: WorkerParameters) :
         val db = DeploymentImageDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val deploymentImage = db.lockUnsent()
 
+        val storage = Storage(context)
+
         Log.d(TAG, "doWork: found ${deploymentImage.size} unsent")
         var someFailed = false
 
@@ -31,7 +34,7 @@ class ImageSyncWorker(val context: Context, params: WorkerParameters) :
         deploymentImage.forEach {
             val file = File(it.localPath)
             val mimeType = file.getMimeType()
-            val requestFile = RequestBody.create(MediaType.parse(mimeType), file)
+            val requestFile = RequestBody.create(MediaType.parse(mimeType), storage.compressFile(context, file))
             val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
             val result = ApiManager.getInstance().getDeviceApi()
                 .uploadAssets(token, it.deploymentServerId!!, body).execute()
