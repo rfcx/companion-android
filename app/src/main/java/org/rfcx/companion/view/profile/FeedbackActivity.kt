@@ -104,8 +104,8 @@ class FeedbackActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
             android.R.id.home -> finish()
             R.id.camera -> takePhoto()
             R.id.gallery -> openGallery()
