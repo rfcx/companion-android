@@ -138,7 +138,6 @@ class OfflineMapFragment : Fragment(), LocationGroupListener {
     }
 
     override fun onClicked(group: Project) {}
-    override fun onLongClicked(group: Project) {}
 
     override fun onDownloadClicked(project: Project) {
         offlineMapBox(project)

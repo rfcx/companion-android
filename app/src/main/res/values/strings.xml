@@ -15,8 +15,8 @@
 
     <!--  MainActivity  -->
     <string name="ok">OK</string>
-    <string name="format_deploy_uploading">Syncing a deployment.</string>
-    <string name="format_deploys_uploading">Syncing %s deployments.</string>
+    <string name="format_deploy_uploading">Syncing a deployment</string>
+    <string name="format_deploys_uploading">Syncing %s deployments</string>
     <string name="format_deploy_waiting_network">Unable to sync while there is no connection</string>
     <string name="format_deploys_uploaded">All deployments synced</string>
     <string name="menu_map">MAP</string>

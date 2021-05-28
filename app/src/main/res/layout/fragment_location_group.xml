@@ -3,60 +3,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/scrollView"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/projectSwipeRefreshView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/locationGroupRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent" />
+            android:layout_height="match_parent">
 
             <LinearLayout
-                android:id="@+id/locationGroupLinearLayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
-                android:orientation="horizontal"
-                android:padding="@dimen/margin_padding_normal"
-                android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@id/locationGroupRecyclerView">
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="@dimen/ic_add_size"
-                    android:layout_height="@dimen/mark_size"
-                    android:layout_gravity="center"
-                    android:layout_marginEnd="@dimen/margin_padding_small"
-                    android:src="@drawable/ic_signs"
-                    android:tint="@color/text_primary" />
-
-                <TextView
-                    android:id="@+id/locationGroupTextView"
-                    style="@style/AudioMothText.Subhead"
-                    android:layout_width="wrap_content"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/locationGroupRecyclerView"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:text="@string/create_new_group"
-                    android:textColor="@color/text_primary"
-                    android:textSize="@dimen/text_small" />
+                    app:layout_constraintTop_toTopOf="parent" />
             </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/separateLine"
-                android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@id/locationGroupLinearLayout" />
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -24,6 +24,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.work.WorkInfo
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
@@ -77,6 +78,7 @@ import org.rfcx.companion.util.*
 import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.detail.DeploymentDetailActivity
+import org.rfcx.companion.view.diagnostic.DiagnosticActivity
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupAdapter
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupListener
@@ -119,6 +121,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
     private lateinit var locateLiveData: LiveData<List<Locate>>
     private lateinit var locationGroupLiveData: LiveData<List<Project>>
     private lateinit var deploymentWorkInfoLiveData: LiveData<List<WorkInfo>>
+    private lateinit var downloadStreamsWorkInfoLiveData: LiveData<List<WorkInfo>>
 
     private val locationPermissions by lazy { activity?.let { LocationPermissions(it) } }
     private var listener: MainActivityListener? = null
@@ -176,15 +179,20 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         val currentWorkStatus = it?.getOrNull(0)
         if (currentWorkStatus != null) {
             when (currentWorkStatus.state) {
-                WorkInfo.State.RUNNING -> {
-                    updateSyncInfo(SyncInfo.Uploading)
-                }
-                WorkInfo.State.SUCCEEDED -> {
-                    updateSyncInfo(SyncInfo.Uploaded)
-                }
-                else -> {
-                    updateSyncInfo()
-                }
+                WorkInfo.State.RUNNING -> updateSyncInfo(SyncInfo.Uploading, false)
+                WorkInfo.State.SUCCEEDED -> updateSyncInfo(SyncInfo.Uploaded, false)
+                else -> updateSyncInfo(isSites = false)
+            }
+        }
+    }
+
+    private val downloadStreamsWorkInfoObserve = Observer<List<WorkInfo>> {
+        val currentWorkStatus = it?.getOrNull(0)
+        if (currentWorkStatus != null) {
+            when (currentWorkStatus.state) {
+                WorkInfo.State.RUNNING -> updateSyncInfo(SyncInfo.Uploading, true)
+                WorkInfo.State.SUCCEEDED -> updateSyncInfo(SyncInfo.Uploaded, true)
+                else -> updateSyncInfo(isSites = true)
             }
         }
     }
@@ -266,6 +274,22 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             setOnClickProjectName()
         }
 
+        projectSwipeRefreshView.apply {
+            setOnRefreshListener {
+                retrieveProjects(requireContext())
+                isRefreshing = true
+            }
+            setColorSchemeResources(R.color.colorPrimary)
+        }
+
+        siteSwipeRefreshView.apply {
+            setOnRefreshListener {
+                retrieveLocations(requireContext())
+                isRefreshing = false
+            }
+            setColorSchemeResources(R.color.colorPrimary)
+        }
+
         iconOpenProjectList.setOnClickListener {
             setOnClickProjectName()
         }
@@ -290,6 +314,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         }
 
         projectRecyclerView.visibility = View.VISIBLE
+        projectSwipeRefreshView.visibility = View.VISIBLE
         searchButton.visibility = View.GONE
         trackingLayout.visibility = View.GONE
         hideButtonOnMap()
@@ -377,6 +402,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
     fun showSearchBar(show: Boolean) {
         searchLayout.visibility = if (show) View.VISIBLE else View.INVISIBLE
         siteRecyclerView.visibility = if (show) View.VISIBLE else View.INVISIBLE
+        siteSwipeRefreshView.visibility = if (show) View.VISIBLE else View.INVISIBLE
         searchViewActionRightButton.visibility = if (show) View.VISIBLE else View.INVISIBLE
         searchButton.visibility = if (show) View.GONE else View.VISIBLE
         trackingLayout.visibility = if (show) View.GONE else View.VISIBLE
@@ -447,8 +473,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         override fun run() {
             context?.let {
                 trackingTextView.text = "${
-                    LocationTracking.getDistance(trackingDb)
-                        .setFormatLabel()
+                LocationTracking.getDistance(trackingDb)
+                    .setFormatLabel()
                 }  ${LocationTracking.getOnDutyTimeMinute(it)} min"
             }
             handler.postDelayed(this, 20 * 1000)
@@ -810,7 +836,15 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         val deploymentId = feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID)
         if (deploymentId != null) {
             context?.let {
-                DeploymentDetailActivity.startActivity(it, deploymentId.toInt())
+                val device = feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEVICE)
+                if (device == Device.AUDIOMOTH.value) {
+                    DeploymentDetailActivity.startActivity(it, deploymentId.toInt())
+                } else {
+                    val deployment = guardianDeploymentDb.getDeploymentById(deploymentId.toInt())
+                    deployment?.let { dp ->
+                        DiagnosticActivity.startActivity(it, dp, false)
+                    }
+                }
                 analytics?.trackSeeDetailEvent()
             }
         } else {
@@ -885,16 +919,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
     private val locateObserve = Observer<List<Locate>> {
         this.locations = it
-        when (DownloadStreamsWorker.isRunning()) {
-            DownloadStreamState.RUNNING -> listener?.showSnackbar(
-                requireContext().getString(R.string.sites_downloading),
-                Snackbar.LENGTH_SHORT
-            )
-            DownloadStreamState.FINISH -> listener?.showSnackbar(
-                requireContext().getString(R.string.sites_synced),
-                Snackbar.LENGTH_SHORT
-            )
-        }
         combinedData()
     }
 
@@ -935,7 +959,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         val usedSitesOnEdge = showDeployments.map { it.stream?.coreId }
 
         val allUsedSites = usedSitesOnEdge + usedSitesOnGuardian
-        var filteredShowLocations = locations.filter { loc -> !allUsedSites.contains(loc.serverId) || (loc.serverId == null && (loc.lastDeploymentId == 0 && loc.lastGuardianDeploymentId == 0)) }
+        var filteredShowLocations =
+            locations.filter { loc -> !allUsedSites.contains(loc.serverId) || (loc.serverId == null && (loc.lastDeploymentId == 0 && loc.lastGuardianDeploymentId == 0)) }
         val projectName = listener?.getProjectName() ?: getString(R.string.none)
         if (projectName != getString(R.string.none)) {
             filteredShowLocations =
@@ -1034,7 +1059,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
     }
 
     private fun retrieveLocations(context: Context) {
-        DownloadStreamsWorker.enqueue(context)
+        val projectId = Preferences.getInstance(context).getInt(Preferences.SELECTED_PROJECT)
+        val project = locationGroupDb.getProjectById(projectId)
+        project?.serverId?.let {
+            DownloadStreamsWorker.enqueue(context, it)
+        }
     }
 
     private fun retrieveProjects(context: Context) {
@@ -1047,6 +1076,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                         Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT)
                             .show()
                     }
+                    projectSwipeRefreshView.isRefreshing = false
                 }
 
                 override fun onResponse(
@@ -1056,6 +1086,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                     response.body()?.forEach { item ->
                         locationGroupDb.insertOrUpdate(item)
                     }
+                    projectSwipeRefreshView.isRefreshing = false
                     combinedData()
                 }
             })
@@ -1123,43 +1154,46 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
     private fun fetchJobSyncing() {
         context ?: return
+        downloadStreamsWorkInfoLiveData = DownloadStreamsWorker.workInfos(requireContext())
+        downloadStreamsWorkInfoLiveData.observeForever(downloadStreamsWorkInfoObserve)
         deploymentWorkInfoLiveData = DeploymentSyncWorker.workInfos(requireContext())
         deploymentWorkInfoLiveData.observeForever(deploymentWorkInfoObserve)
     }
 
-    private fun updateSyncInfo(syncInfo: SyncInfo? = null) {
+    private fun updateSyncInfo(syncInfo: SyncInfo? = null, isSites: Boolean) {
         val status = syncInfo
             ?: if (context.isNetworkAvailable()) SyncInfo.Starting else SyncInfo.WaitingNetwork
         if (this.lastSyncingInfo == SyncInfo.Uploaded && status == SyncInfo.Uploaded) return
-
         this.lastSyncingInfo = status
-        val state = listener?.getBottomSheetState() ?: 0
-        if (state != BottomSheetBehavior.STATE_EXPANDED) {
-            setSnackbar(status)
-        }
+        setSnackbar(status, isSites)
     }
 
-    private fun setSnackbar(status: SyncInfo) {
+    private fun setSnackbar(status: SyncInfo, isSites: Boolean) {
         val deploymentUnsentCount = edgeDeploymentDb.unsentCount().toInt()
         when (status) {
             SyncInfo.Starting, SyncInfo.Uploading -> {
-                val msg = if (deploymentUnsentCount > 1) {
-                    getString(R.string.format_deploys_uploading, deploymentUnsentCount.toString())
+                val msg = if (isSites) {
+                    getString(R.string.sites_downloading)
                 } else {
-                    getString(R.string.format_deploy_uploading)
+                    if (deploymentUnsentCount > 1) {
+                        getString(R.string.format_deploys_uploading, deploymentUnsentCount.toString())
+                    } else {
+                        getString(R.string.format_deploy_uploading)
+                    }
                 }
-                listener?.showSnackbar(msg, Snackbar.LENGTH_SHORT)
+                statusView.onShow(msg)
             }
             SyncInfo.Uploaded -> {
-                val msg = getString(R.string.format_deploys_uploaded)
-                listener?.showSnackbar(msg, Snackbar.LENGTH_SHORT)
+                val msg = if (isSites) {
+                    getString(R.string.sites_synced)
+                } else {
+                    getString(R.string.format_deploys_uploaded)
+                }
+                statusView.onShowWithDelayed(msg)
             }
             // else also waiting network
             else -> {
-                listener?.showSnackbar(
-                    getString(R.string.format_deploy_waiting_network),
-                    Snackbar.LENGTH_LONG
-                )
+                if (!isSites) statusView.onShowWithDelayed(getString(R.string.format_deploy_waiting_network))
             }
         }
     }
@@ -1177,7 +1211,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             // check is this deployment is selecting (to set bigger pin)
             when (it) {
                 is MapMarker.DeploymentMarker -> {
-                    val deploymentId = deploymentSelecting?.getProperty(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID)
+                    val deploymentId =
+                        deploymentSelecting?.getProperty(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID)
                     val isSelecting =
                         if (deploymentSelecting == null || deploymentId == null) {
                             false
@@ -1423,6 +1458,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
     override fun onDestroy() {
         super.onDestroy()
         deploymentWorkInfoLiveData.removeObserver(deploymentWorkInfoObserve)
+        downloadStreamsWorkInfoLiveData.removeObserver(downloadStreamsWorkInfoObserve)
         guardianDeployLiveData.removeObserver(guardianDeploymentObserve)
         edgeDeployLiveData.removeObserver(edgeDeploymentObserve)
         locateLiveData.removeObserver(locateObserve)
@@ -1481,6 +1517,20 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         view?.hideKeyboard()
         showSearchBar(false)
 
+        val features = this.mapFeatures?.features()
+        val selectingDeployment = features?.firstOrNull { feature -> feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_TITLE) == locate.name }
+        val selectingSite = features?.firstOrNull { feature -> feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_NAME) == locate.name }
+
+        if (selectingDeployment == null) {
+            if (selectingSite == null) return
+            setSiteDetail(selectingSite)
+            setFeatureSelectState(selectingSite, true)
+
+        } else {
+            setDeploymentDetail(selectingDeployment)
+            setFeatureSelectState(selectingDeployment, true)
+        }
+
         val item = locateDb.getLocateByName(locate.name)
         item?.let {
             mapboxMap?.animateCamera(
@@ -1494,9 +1544,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
     override fun onClicked(group: Project) {
         projectRecyclerView.visibility = View.GONE
+        projectSwipeRefreshView.visibility = View.GONE
 
         context?.let { context ->
             Preferences.getInstance(context).putInt(Preferences.SELECTED_PROJECT, group.id)
+            //reload site to get sites from selected project
+            retrieveLocations(context)
         }
         listener?.let { listener ->
             projectNameTextView.text =
@@ -1537,8 +1590,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             listener?.showBottomAppBar()
         }
     }
-
-    override fun onLongClicked(group: Project) {}
 
     override fun onDownloadClicked(project: Project) {}
 }
