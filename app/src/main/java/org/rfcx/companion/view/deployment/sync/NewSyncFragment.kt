@@ -138,7 +138,7 @@ class NewSyncFragment : Fragment() {
 
     fun showRepeatSync() {
         context?.let {
-            syncAudioMothButton.text = "Repeat syncing sound"
+            syncAudioMothButton.text = getString(R.string.repeat_sound)
             syncAudioMothButton.isEnabled = true
             syncAudioMothFinishButton.visibility = View.VISIBLE
         }

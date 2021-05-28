@@ -133,6 +133,7 @@
     <string name="four_text_two">FLASHING GREEN &amp; SOLID RED</string>
     <string name="five_text">5) Profile sent to AudioMoth</string>
     <string name="no">No</string>
+    <string name="repeat_sound">Repeat syncing sound</string>
 
     <!--  MapPickerFragment  -->
     <string name="select">Select</string>
