@@ -30,7 +30,7 @@
                 android:id="@+id/bellLogoImageView"
                 android:layout_width="@dimen/ic_audiomoth_size"
                 android:layout_height="@dimen/ic_audiomoth_size"
-                android:layout_marginTop="@dimen/margin_padding_small"
+                android:layout_marginTop="@dimen/margin_padding_large"
                 android:layout_marginBottom="@dimen/margin_padding_small"
                 android:src="@drawable/ic_logo_gray"
                 app:layout_constraintEnd_toEndOf="parent"
