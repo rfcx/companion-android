@@ -13,8 +13,6 @@ interface EdgeDeploymentProtocol : BaseDeploymentProtocol {
 
     fun setDeployment(deployment: EdgeDeployment)
 
-    fun showSyncInstruction()
-
     fun playSyncSound()
 
     fun playTone(duration: Int = 10000)

@@ -117,8 +117,12 @@ class NewSyncFragment : Fragment() {
             movePhoneNearTextView.text = getString(R.string.keep_phone_near)
             syncAudioMothButton.isEnabled = false
             syncAudioMothButton.text = getString(R.string.sync_in_progress)
+            syncAudioMothFinishButton.visibility = View.GONE
             analytics?.trackPlaySyncToneEvent()
             edgeDeploymentProtocol?.playSyncSound()
+        }
+        syncAudioMothFinishButton.setOnClickListener {
+            setStep(6)
         }
         notConfirmLightButton.setOnClickListener {
             analytics?.trackRetryPlayToneEvent()
@@ -129,6 +133,14 @@ class NewSyncFragment : Fragment() {
             analytics?.trackPlaySyncToneCompletedEvent()
             edgeDeploymentProtocol?.stopPlaySound()
             showComplete()
+        }
+    }
+
+    fun showRepeatSync() {
+        context?.let {
+            syncAudioMothButton.text = getString(R.string.repeat_sound)
+            syncAudioMothButton.isEnabled = true
+            syncAudioMothFinishButton.visibility = View.VISIBLE
         }
     }
 
