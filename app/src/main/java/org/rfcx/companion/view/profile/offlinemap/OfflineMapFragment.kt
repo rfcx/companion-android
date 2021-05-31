@@ -14,9 +14,11 @@ import com.mapbox.mapboxsdk.offline.*
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_offline_map.*
 import org.rfcx.companion.R
+import org.rfcx.companion.entity.OfflineMapState
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.localdb.ProjectDb
+import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.isNetworkAvailable
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupAdapter
@@ -68,6 +70,8 @@ class OfflineMapFragment : Fragment(), LocationGroupListener {
             val minLng = project.minLongitude
             val maxLng = project.maxLongitude
 
+            setStateOfflineMap(OfflineMapState.DOWNLOADING_STATE.key)
+
             offlineManager?.setOfflineMapboxTileCountLimit(10000)
             val style = Style.OUTDOORS
             if (minLat !== null && maxLat !== null && minLng !== null && maxLng !== null) {
@@ -92,6 +96,7 @@ class OfflineMapFragment : Fragment(), LocationGroupListener {
                         }
 
                         override fun onError(error: String) {
+                            setStateOfflineMap(OfflineMapState.DOWNLOAD_STATE.key)
                             Log.e(TAG, "Error: $error")
                         }
                     })
@@ -122,12 +127,15 @@ class OfflineMapFragment : Fragment(), LocationGroupListener {
                 if (percentage > oldPercentage)
                     if (percentage >= 100) {
                         Log.d(TAG, "Done")
+                        setStateOfflineMap(OfflineMapState.DOWNLOADED_STATE.key)
                     } else {
+                        setStateOfflineMap(OfflineMapState.DOWNLOADING_STATE.key)
                         Log.d(TAG, "$percentage %")
                     }
             }
 
             override fun onError(error: OfflineRegionError) {
+                setStateOfflineMap(OfflineMapState.DOWNLOAD_STATE.key)
                 Log.e(TAG, "Mapbox tile count limit exceeded: $error")
             }
 
@@ -137,9 +145,23 @@ class OfflineMapFragment : Fragment(), LocationGroupListener {
         })
     }
 
+    private fun setStateOfflineMap(state: String) {
+        val preferences = context?.let { Preferences.getInstance(it) }
+        preferences?.putString(Preferences.OFFLINE_MAP_STATE, state)
+
+        projectAdapter.items = projectDb.getProjects()
+
+        if (state == OfflineMapState.DOWNLOADED_STATE.key) {
+            preferences?.clearOfflineMapName()
+        }
+    }
+
     override fun onClicked(group: Project) {}
 
     override fun onDownloadClicked(project: Project) {
+        val preferences = context?.let { Preferences.getInstance(it) }
+        preferences?.putString(Preferences.OFFLINE_MAP_NAME, project.name ?: "")
+
         offlineMapBox(project)
     }
 }

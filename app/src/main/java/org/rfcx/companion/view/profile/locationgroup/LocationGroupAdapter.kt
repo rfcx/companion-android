@@ -6,8 +6,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_location_group.view.*
 import org.rfcx.companion.R
+import org.rfcx.companion.entity.OfflineMapState
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Screen
+import org.rfcx.companion.util.Preferences
 
 class LocationGroupAdapter(private val locationGroupListener: LocationGroupListener) :
     RecyclerView.Adapter<LocationGroupAdapter.LocationGroupAdapterViewHolder>() {
@@ -53,6 +55,35 @@ class LocationGroupAdapter(private val locationGroupListener: LocationGroupListe
 
             downloadButton.setOnClickListener {
                 locationGroupListener.onDownloadClicked(project)
+            }
+
+            val preferences = Preferences.getInstance(itemView.context)
+            if (preferences.getString(Preferences.OFFLINE_MAP_NAME) == project.name) {
+                setViewMapOffline(itemView)
+            }
+        }
+    }
+
+    private fun setViewMapOffline(itemView: View) {
+        val offlineMapProgress = itemView.offlineMapProgress
+        val downloadedTextView = itemView.downloadedTextView
+        val downloadButton = itemView.downloadButton
+        val preferences = Preferences.getInstance(itemView.context)
+        when (preferences.getString(Preferences.OFFLINE_MAP_STATE)) {
+            OfflineMapState.DOWNLOAD_STATE.key -> {
+                offlineMapProgress.visibility = View.GONE
+                downloadedTextView.visibility = View.GONE
+                downloadButton.visibility = View.VISIBLE
+            }
+            OfflineMapState.DOWNLOADING_STATE.key -> {
+                offlineMapProgress.visibility = View.VISIBLE
+                downloadedTextView.visibility = View.VISIBLE
+                downloadButton.visibility = View.GONE
+            }
+            OfflineMapState.DOWNLOADED_STATE.key -> {
+                offlineMapProgress.visibility = View.GONE
+                downloadedTextView.visibility = View.GONE
+                downloadButton.visibility = View.GONE
             }
         }
     }

@@ -41,6 +41,8 @@ class Preferences(context: Context) {
         const val LASTEST_GET_LOCATION_TIME = "${PREFIX}LASTEST_GET_LOCATION_TIME"
         const val LAST_LATITUDE = "${PREFIX}LAST_LATITUDE"
         const val LAST_LONGITUDE = "${PREFIX}LAST_LONGITUDE"
+        const val OFFLINE_MAP_STATE  = "${PREFIX}OFFLINE_MAP_STATE"
+        const val OFFLINE_MAP_NAME  = "${PREFIX}OFFLINE_MAP_NAME"
     }
 
     init {
@@ -102,5 +104,10 @@ class Preferences(context: Context) {
 
     fun clearSelectedProject() {
         sharedPreferences.edit().remove(GROUP).apply()
+    }
+
+    fun clearOfflineMapName() {
+        sharedPreferences.edit().remove(OFFLINE_MAP_NAME).apply()
+        sharedPreferences.edit().remove(OFFLINE_MAP_STATE).apply()
     }
 }
