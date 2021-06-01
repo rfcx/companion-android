@@ -22,15 +22,15 @@ fun Double?.latitudeCoordinates(context: Context): String {
 
         when (context.getCoordinatesFormat()) {
             DD_FORMAT -> {
-                strLatitude = Location.convert(lat.absoluteValue, Location.FORMAT_DEGREES)
+                strLatitude = Location.convert("%.3f".format(lat.absoluteValue).toDouble(), Location.FORMAT_DEGREES)
                 strLatitude = "${replaceDelimitersDD(strLatitude)}$directionLatitude"
             }
             DDM_FORMAT -> {
-                strLatitude = Location.convert(lat.absoluteValue, Location.FORMAT_MINUTES)
+                strLatitude = Location.convert("%.3f".format(lat.absoluteValue).toDouble(), Location.FORMAT_MINUTES)
                 strLatitude = "${replaceDelimitersDDM(strLatitude)}$directionLatitude"
             }
             DMS_FORMAT -> {
-                strLatitude = Location.convert(lat.absoluteValue, Location.FORMAT_SECONDS)
+                strLatitude = Location.convert("%.3f".format(lat.absoluteValue).toDouble(), Location.FORMAT_SECONDS)
                 strLatitude = "${replaceDelimitersDMS(strLatitude)}$directionLatitude"
             }
         }
@@ -47,15 +47,15 @@ fun Double?.longitudeCoordinates(context: Context): String {
 
         when (context.getCoordinatesFormat()) {
             DD_FORMAT -> {
-                strLongitude = Location.convert(longitude.absoluteValue, Location.FORMAT_DEGREES)
+                strLongitude = Location.convert("%.3f".format(longitude.absoluteValue).toDouble(), Location.FORMAT_DEGREES)
                 strLongitude = "${replaceDelimitersDD(strLongitude)}$directionLongitude"
             }
             DDM_FORMAT -> {
-                strLongitude = Location.convert(longitude.absoluteValue, Location.FORMAT_MINUTES)
+                strLongitude = Location.convert("%.3f".format(longitude.absoluteValue).toDouble(), Location.FORMAT_MINUTES)
                 strLongitude = "${replaceDelimitersDDM(strLongitude)}$directionLongitude"
             }
             DMS_FORMAT -> {
-                strLongitude = Location.convert(longitude.absoluteValue, Location.FORMAT_SECONDS)
+                strLongitude = Location.convert("%.3f".format(longitude.absoluteValue).toDouble(), Location.FORMAT_SECONDS)
                 strLongitude = "${replaceDelimitersDMS(strLongitude)}$directionLongitude"
             }
         }
