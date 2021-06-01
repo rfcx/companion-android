@@ -1350,7 +1350,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
     fun moveToDeploymentMarker(lat: Double, lng: Double) {
         mapboxMap?.let {
             it.moveCamera(
-                CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), DefaultSetupMap.DEFAULT_ZOOM)
+                CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), mapboxMap?.cameraPosition?.zoom?: DefaultSetupMap.DEFAULT_ZOOM)
             )
         }
     }
