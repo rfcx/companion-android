@@ -8,7 +8,7 @@ import android.os.Build
 import android.util.Base64
 
 class MicrophoneTestUtils {
-    private var sampleRate = 24000
+    private var sampleRate = 12000
     private val channelConfiguration = AudioFormat.CHANNEL_OUT_MONO
     private val audioEncoding = AudioFormat.ENCODING_PCM_16BIT
     private var audioTrack: AudioTrack? = null

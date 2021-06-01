@@ -175,18 +175,18 @@ class FrequencyView : View {
                 val y: Float = getRelativePosition(
                     Math.pow(10.0, i.toDouble()).toFloat(),
                     1f,
-                    samplingRate / 2.toFloat(),
+                    samplingRate.toFloat(),
                     logFrequency
                 )
                 canvas.drawText("1e$i", rWidth + wColor.toFloat(), (1f - y) * height, paint)
             }
         } else {
             var i = 0
-            while (i < (samplingRate - 500) / 2) {
+            while (i < (samplingRate - 500)) {
                 canvas.drawText(
                     " " + i / 1000,
                     rWidth + wColor.toFloat(),
-                    height * (1f - i.toFloat() / (samplingRate / 2)),
+                    height * (1f - i.toFloat() / (samplingRate)),
                     paint
                 )
                 i += 1000
