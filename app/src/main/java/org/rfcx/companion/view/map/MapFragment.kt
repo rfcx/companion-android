@@ -1510,10 +1510,24 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
         val item = locateDb.getLocateByName(locate.name)
         item?.let {
+            val pointF = mapboxMap?.projection?.toScreenLocation(it.getLatLng()) ?: PointF()
+            val clusterFeatures = mapboxMap?.queryRenderedFeatures(pointF, "$DEPLOYMENT_CLUSTER-0")
+            var zoom = mapboxMap?.cameraPosition?.zoom?: DefaultSetupMap.DEFAULT_ZOOM
+            zoom = if ( zoom > DefaultSetupMap.DEFAULT_ZOOM) zoom else DefaultSetupMap.DEFAULT_ZOOM
+
+            if (!clusterFeatures.isNullOrEmpty()) {
+                val pinCount =
+                    if (clusterFeatures[0].getProperty(POINT_COUNT) != null) clusterFeatures[0].getProperty(
+                        POINT_COUNT
+                    ).asInt else 0
+                if (pinCount > 0) {
+                    zoom += 3
+                }
+            }
             mapboxMap?.animateCamera(
                 CameraUpdateFactory.newLatLngZoom(
                     it.getLatLng(),
-                    DefaultSetupMap.DEFAULT_ZOOM
+                    zoom
                 )
             )
         }
