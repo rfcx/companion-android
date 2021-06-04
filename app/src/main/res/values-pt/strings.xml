@@ -131,7 +131,7 @@
     <string name="site">Local</string>
 
     <!--  ChooseDeviceFragment  -->
-    <string name="rfcx_edge_audiomoth">AudioMoth (v1.5+ firmware)</string>
+    <string name="rfcx_edge_audiomoth">AudioMoth</string>
     <string name="rfcx_guardian">RFCx Guardião</string>
     <string name="error_has_occurred">Ocorreu um erro. Por favor tente novamente.</string>
 
