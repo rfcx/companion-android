@@ -237,6 +237,7 @@ object SocketManager {
         clientThread = Thread(Runnable {
             try {
                 socket = Socket("192.168.43.1", 9999)
+                socket?.keepAlive = true
                 startInComingMessageThread()
                 outputStream = DataOutputStream(socket?.getOutputStream())
                 outputStream?.writeUTF(message)
@@ -372,6 +373,7 @@ object SocketManager {
         // stop server thread
         clientThread?.interrupt()
 
+        outputStream?.flush()
         outputStream?.close()
 
         inputStream?.close()

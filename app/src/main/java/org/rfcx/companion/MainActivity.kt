@@ -322,9 +322,11 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         when {
             projectRecyclerView.visibility == View.VISIBLE -> {
                 projectRecyclerView.visibility = View.GONE
+                projectSwipeRefreshView.visibility = View.GONE
                 setSearchBar()
             }
             searchLayout.visibility == View.VISIBLE -> {
+                siteSwipeRefreshView.visibility = View.GONE
                 setSearchBar()
             }
             bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED -> {

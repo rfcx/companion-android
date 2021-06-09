@@ -121,7 +121,7 @@
     <string name="begin_sync">Begin Sync</string>
     <string name="sync_audiomoth">Sync to AudioMoth</string>
     <string name="one">1)</string>
-    <string name="two">2) Do you hear a loud audio tone?</string>
+    <string name="two">2) Do you hear a loud audio tone?\n(check if volume is too low or in silent mode)</string>
     <string name="three">3)</string>
     <string name="four">4)</string>
     <string name="five">5)</string>
@@ -133,6 +133,7 @@
     <string name="four_text_two">FLASHING GREEN &amp; SOLID RED</string>
     <string name="five_text">5) Profile sent to AudioMoth</string>
     <string name="no">No</string>
+    <string name="repeat_sound">Repeat syncing sound</string>
 
     <!--  MapPickerFragment  -->
     <string name="select">Select</string>
@@ -234,7 +235,7 @@
 
     <!--  ChooseDeviceFragment  -->
     <string name="choose_your_device">Choose your device</string>
-    <string name="rfcx_edge_audiomoth">AudioMoth (v1.5+ firmware)</string>
+    <string name="rfcx_edge_audiomoth">AudioMoth</string>
     <string name="rfcx_guardian">RFCx Guardian</string>
     <string name="warning_text">Sites is downloading \nBeware missing sites</string>
 

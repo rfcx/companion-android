@@ -268,18 +268,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         this.currentLocation = location
     }
 
-    override fun showSyncInstruction() {
-        val instructionDialog: SyncInstructionDialogFragment =
-            supportFragmentManager.findFragmentByTag(TAG_SYNC_INSTRUCTION_DIALOG) as SyncInstructionDialogFragment?
-                ?: run {
-                    SyncInstructionDialogFragment()
-                }
-        instructionDialog.show(
-            supportFragmentManager,
-            TAG_SYNC_INSTRUCTION_DIALOG
-        )
-    }
-
     override fun showSiteLoadingDialog(text: String) {
         var siteLoadingDialog: SiteLoadingDialogFragment =
             supportFragmentManager.findFragmentByTag(TAG_SITE_LOADING_DIALOG) as SiteLoadingDialogFragment?
@@ -459,14 +447,13 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         val deploymentIdArrayInt = deploymentId?.chunked(2)?.map { it.toInt(radix = 16) }?.toTypedArray() ?: arrayOf()
         val calendar = Calendar.getInstance()
         Thread {
-            for (i in 1..3) {
-                audioMothConnector.playTimeAndDeploymentID(
-                    calendar,
-                    deploymentIdArrayInt
-                )
-            }
+            audioMothConnector.playTimeAndDeploymentID(
+                calendar,
+                deploymentIdArrayInt
+            )
             this@EdgeDeploymentActivity.runOnUiThread {
-                startFragment(NewSyncFragment.newInstance(6))
+                val fragment = supportFragmentManager.findFragmentById(R.id.contentContainer) as NewSyncFragment
+                fragment.showRepeatSync()
             }
         }.start()
     }

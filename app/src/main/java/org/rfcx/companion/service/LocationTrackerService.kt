@@ -37,8 +37,8 @@ class LocationTrackerService : Service() {
     private val handler: Handler = Handler()
 
     private val locationListener = object : LocationListener {
-        override fun onLocationChanged(location: Location?) {
-            location?.let { saveLocation(it) }
+        override fun onLocationChanged(location: Location) {
+            saveLocation(location)
         }
 
         override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
@@ -52,16 +52,16 @@ class LocationTrackerService : Service() {
             }
         }
 
-        override fun onProviderEnabled(provider: String?) {
+        override fun onProviderEnabled(provider: String) {
             getNotificationManager().notify(NOTIFICATION_LOCATION_ID, createLocationTrackerNotification(true))
         }
 
-        override fun onProviderDisabled(provider: String?) {
+        override fun onProviderDisabled(provider: String) {
             getNotificationManager().notify(NOTIFICATION_LOCATION_ID, createLocationTrackerNotification(false))
         }
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
+    override fun onBind(intent: Intent?): IBinder {
         return binder
     }
 
@@ -73,7 +73,15 @@ class LocationTrackerService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        super.onStartCommand(intent, flags, startId)
+        if (intent == null) {
+            if (Preferences.getInstance(this).getString(Preferences.ID_TOKEN, "").isNotEmpty()) {
+                startTracker()
+            }
+            return START_STICKY_COMPATIBILITY
+        }
+        if (Preferences.getInstance(this).getString(Preferences.ID_TOKEN, "").isNotEmpty()) {
+            startTracker()
+        }
         return START_STICKY
     }
 
@@ -94,13 +102,18 @@ class LocationTrackerService : Service() {
             Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
         if (!check) {
-            this.stopSelf()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                stopForeground(true)
+            } else {
+                stopSelf()
+            }
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel()
         }
 
+        startForeground(NOTIFICATION_LOCATION_ID, createLocationTrackerNotification(true))
         mLocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager?
         try {
             mLocationManager?.requestLocationUpdates(
@@ -109,7 +122,6 @@ class LocationTrackerService : Service() {
                 LOCATION_DISTANCE,
                 locationListener
             )
-            startForeground(NOTIFICATION_LOCATION_ID, createLocationTrackerNotification(true))
 
             trackingStatTimer?.cancel()
             trackingStatTimer = fixedRateTimer("timer", false, 60 * 1000, 60 * 1000) {
