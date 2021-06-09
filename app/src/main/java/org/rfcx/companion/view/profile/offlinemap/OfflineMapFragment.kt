@@ -129,6 +129,7 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
                 if (percentage > oldPercentage)
                     if (percentage >= 100) {
                         Log.d(TAG, "Done")
+                        projectDb.updateOfflineState(OfflineMapState.DOWNLOADED_STATE.key, project.serverId ?: "")
                         setStateOfflineMap(OfflineMapState.DOWNLOADED_STATE.key)
                     } else {
                         setStateOfflineMap(OfflineMapState.DOWNLOADING_STATE.key, percentage, project)
@@ -167,10 +168,6 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
                 OfflineMapItem(it)
             }
         }
-
-//        if (state == OfflineMapState.DOWNLOADED_STATE.key) {
-//            preferences?.clearOfflineMapName()
-//        }
     }
 
     override fun onDownloadClicked(project: Project) {

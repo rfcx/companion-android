@@ -19,7 +19,8 @@ open class Project(
     var minLatitude: Double? = null,
     var minLongitude: Double? = null,
     var maxLatitude: Double? = null,
-    var maxLongitude: Double? = null
+    var maxLongitude: Double? = null,
+    var offlineMapState: String = OfflineMapState.DOWNLOAD_STATE.key
 ) : RealmModel {
     companion object {
         const val TABLE_NAME = "LocationGroups"
@@ -33,6 +34,7 @@ open class Project(
         const val PROJECT_MIN_LONGITUDE = "minLongitude"
         const val PROJECT_MAX_LATITUDE = "maxLatitude"
         const val PROJECT_MAX_LONGITUDE = "maxLongitude"
+        const val PROJECT_OFFLINE_MAP_STATE = "offlineMapState"
     }
 }
 

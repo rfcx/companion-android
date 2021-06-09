@@ -71,6 +71,18 @@ class ProjectDb(private val realm: Realm) {
         }
     }
 
+    fun updateOfflineState(state: String, id: String) {
+        realm.executeTransaction {
+            val project =
+                it.where(Project::class.java)
+                    .equalTo(Project.PROJECT_SERVER_ID, id)
+                    .findFirst()
+            if (project != null) {
+                project.offlineMapState = state
+            }
+        }
+    }
+
     fun markUnsent(id: Int) {
         mark(id = id, syncState = SyncState.Unsent.key)
     }

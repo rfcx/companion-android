@@ -43,7 +43,7 @@ class ProjectOfflineMapAdapter(private val projectOfflineMapListener: ProjectOff
 
         fun bind(item: OfflineMapItem) {
             downloadButton.visibility =
-                if (item.project.maxLatitude != null && item.project.maxLatitude != 0.0) View.VISIBLE else View.GONE
+                if (item.project.maxLatitude != null && item.project.maxLatitude != 0.0 && item.project.offlineMapState != OfflineMapState.DOWNLOADED_STATE.key) View.VISIBLE else View.GONE
             locationGroupTextView.text = item.project.name
 
             downloadedTextView.visibility = if (item.percentage != null) View.VISIBLE else View.GONE
@@ -56,6 +56,10 @@ class ProjectOfflineMapAdapter(private val projectOfflineMapListener: ProjectOff
             val preferences = Preferences.getInstance(itemView.context)
             if (preferences.getString(Preferences.OFFLINE_MAP_NAME) == item.project.name) {
                 setViewMapOffline(itemView)
+            }
+
+            if (item.project.offlineMapState == OfflineMapState.DOWNLOADED_STATE.key) {
+                preferences.clearOfflineMapName()
             }
         }
     }

@@ -342,6 +342,7 @@ class CompanionRealmMigration : RealmMigration {
             addField(Project.PROJECT_MAX_LONGITUDE, Double::class.java)
             addField(Project.PROJECT_MIN_LATITUDE, Double::class.java)
             addField(Project.PROJECT_MIN_LONGITUDE, Double::class.java)
+            addField(Project.PROJECT_OFFLINE_MAP_STATE, String::class.java)
         }
     }
 
