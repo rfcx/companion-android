@@ -4,6 +4,7 @@ import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
 import io.realm.kotlin.deleteFromRealm
+import org.rfcx.companion.entity.OfflineMapState
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Project.Companion.PROJECT_DELETED_AT
 import org.rfcx.companion.entity.SyncState
@@ -81,6 +82,27 @@ class ProjectDb(private val realm: Realm) {
                 project.offlineMapState = state
             }
         }
+    }
+
+    fun updateOfflineDownloadedState() {
+        realm.executeTransaction {
+            val project =
+                it.where(Project::class.java)
+                    .equalTo(
+                        Project.PROJECT_OFFLINE_MAP_STATE,
+                        OfflineMapState.DOWNLOADING_STATE.key
+                    )
+                    .findFirst()
+            if (project != null) {
+                project.offlineMapState = OfflineMapState.DOWNLOADED_STATE.key
+            }
+        }
+    }
+
+    fun getOfflineDownloading(): Project? {
+        return realm.where(Project::class.java)
+            .equalTo(Project.PROJECT_OFFLINE_MAP_STATE,
+                OfflineMapState.DOWNLOADING_STATE.key).findFirst()
     }
 
     fun markUnsent(id: Int) {

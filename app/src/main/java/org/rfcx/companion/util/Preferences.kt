@@ -42,7 +42,7 @@ class Preferences(context: Context) {
         const val LAST_LATITUDE = "${PREFIX}LAST_LATITUDE"
         const val LAST_LONGITUDE = "${PREFIX}LAST_LONGITUDE"
         const val OFFLINE_MAP_STATE  = "${PREFIX}OFFLINE_MAP_STATE"
-        const val OFFLINE_MAP_NAME  = "${PREFIX}OFFLINE_MAP_NAME"
+        const val OFFLINE_MAP_SERVER_ID  = "${PREFIX}OFFLINE_MAP_SERVER_ID"
     }
 
     init {
@@ -107,7 +107,7 @@ class Preferences(context: Context) {
     }
 
     fun clearOfflineMapName() {
-        sharedPreferences.edit().remove(OFFLINE_MAP_NAME).apply()
+        sharedPreferences.edit().remove(OFFLINE_MAP_SERVER_ID).apply()
         sharedPreferences.edit().remove(OFFLINE_MAP_STATE).apply()
     }
 }

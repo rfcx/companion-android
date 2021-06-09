@@ -7,22 +7,22 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.offline.*
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_offline_map.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.OfflineMapState
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.RealmHelper
+import org.rfcx.companion.util.asLiveData
 import org.rfcx.companion.util.isNetworkAvailable
 
 class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
@@ -38,10 +38,14 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val projectDb by lazy { ProjectDb(realm) }
 
+    private lateinit var projectLiveData: LiveData<List<Project>>
+    private val projectObserve = Observer<List<Project>> {
+        projectAdapter.items = projectDb.getProjects().map { OfflineMapItem(it) }
+        projectAdapter.hideDownloadButton = projectDb.getOfflineDownloading() != null
+    }
+
     private val projectAdapter by lazy { ProjectOfflineMapAdapter(this) }
     lateinit var definition: OfflineTilePyramidRegionDefinition
-    private val viewModelJob = Job()
-    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -54,6 +58,11 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupAdapter()
+        projectLiveData =
+            Transformations.map(projectDb.getAllResultsAsync().asLiveData()) {
+                it
+            }
+        projectLiveData.observeForever(projectObserve)
     }
 
     private fun setupAdapter() {
@@ -61,7 +70,7 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
             layoutManager = LinearLayoutManager(context)
             adapter = projectAdapter
         }
-        projectAdapter.items = projectDb.getProjects().map { OfflineMapItem(it) }
+        projectAdapter.hideDownloadButton = projectDb.getOfflineDownloading() != null
     }
 
     private fun offlineMapBox(project: Project) {
@@ -94,7 +103,7 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
                 offlineManager?.createOfflineRegion(definition, regionName.toByteArray(),
                     object : OfflineManager.CreateOfflineRegionCallback {
                         override fun onCreate(offlineRegion: OfflineRegion) {
-                            uiScope.launch { createOfflineRegion(offlineRegion, project)}
+                            createOfflineRegion(offlineRegion, project)
                         }
 
                         override fun onError(error: String) {
@@ -128,12 +137,10 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
                 this.percentage = percentage
                 if (percentage > oldPercentage)
                     if (percentage >= 100) {
-                        Log.d(TAG, "Done")
-                        projectDb.updateOfflineState(OfflineMapState.DOWNLOADED_STATE.key, project.serverId ?: "")
+                        projectDb.updateOfflineDownloadedState()
                         setStateOfflineMap(OfflineMapState.DOWNLOADED_STATE.key)
                     } else {
-                        setStateOfflineMap(OfflineMapState.DOWNLOADING_STATE.key, percentage, project)
-                        Log.d(TAG, "$percentage %")
+                        setStateOfflineMap(OfflineMapState.DOWNLOADING_STATE.key, percentage)
                     }
             }
 
@@ -150,16 +157,15 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
 
     private fun setStateOfflineMap(
         state: String,
-        percentage: Int? = null,
-        project: Project? = null
+        percentage: Int? = null
     ) {
         val preferences = context?.let { Preferences.getInstance(it) }
         preferences?.putString(Preferences.OFFLINE_MAP_STATE, state)
 
         projectAdapter.items = projectDb.getProjects().map {
-            if (percentage != null && project != null) {
-                if (project.name == it.name) {
-                    Log.d("","")
+            val serverId = preferences?.getString(Preferences.OFFLINE_MAP_SERVER_ID)
+            if (percentage != null && serverId != null) {
+                if (it.offlineMapState == OfflineMapState.DOWNLOADING_STATE.key) {
                     OfflineMapItem(it, percentage)
                 } else {
                     OfflineMapItem(it)
@@ -168,12 +174,19 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
                 OfflineMapItem(it)
             }
         }
+        projectAdapter.hideDownloadButton = projectDb.getOfflineDownloading() != null
     }
 
     override fun onDownloadClicked(project: Project) {
         val preferences = context?.let { Preferences.getInstance(it) }
-        preferences?.putString(Preferences.OFFLINE_MAP_NAME, project.name ?: "")
+        preferences?.putString(Preferences.OFFLINE_MAP_SERVER_ID, project.serverId ?: "")
+        projectDb.updateOfflineState(OfflineMapState.DOWNLOADING_STATE.key, project.serverId ?: "")
 
         offlineMapBox(project)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        projectLiveData.removeObserver(projectObserve)
     }
 }

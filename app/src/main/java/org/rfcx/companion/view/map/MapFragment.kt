@@ -1604,8 +1604,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             listener?.showBottomAppBar()
         }
     }
-
-    override fun onDownloadClicked(project: Project) {}
 }
 
 interface ApiCallbackInjector {

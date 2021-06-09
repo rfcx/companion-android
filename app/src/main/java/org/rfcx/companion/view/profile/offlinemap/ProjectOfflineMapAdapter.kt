@@ -8,7 +8,6 @@ import kotlinx.android.synthetic.main.item_location_group.view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.OfflineMapState
 import org.rfcx.companion.entity.Project
-import org.rfcx.companion.util.Preferences
 
 class ProjectOfflineMapAdapter(private val projectOfflineMapListener: ProjectOfflineMapListener) :
     RecyclerView.Adapter<ProjectOfflineMapAdapter.ProjectOfflineMapViewHolder>() {
@@ -17,6 +16,7 @@ class ProjectOfflineMapAdapter(private val projectOfflineMapListener: ProjectOff
             field = value
             notifyDataSetChanged()
         }
+    var hideDownloadButton = false
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -42,38 +42,31 @@ class ProjectOfflineMapAdapter(private val projectOfflineMapListener: ProjectOff
         private val downloadButton = itemView.downloadButton
 
         fun bind(item: OfflineMapItem) {
-            downloadButton.visibility =
-                if (item.project.maxLatitude != null && item.project.maxLatitude != 0.0 && item.project.offlineMapState != OfflineMapState.DOWNLOADED_STATE.key) View.VISIBLE else View.GONE
             locationGroupTextView.text = item.project.name
-
-            downloadedTextView.visibility = if (item.percentage != null) View.VISIBLE else View.GONE
-            downloadedTextView.text = item.percentage.toString()
 
             downloadButton.setOnClickListener {
                 projectOfflineMapListener.onDownloadClicked(item.project)
             }
 
-            val preferences = Preferences.getInstance(itemView.context)
-            if (preferences.getString(Preferences.OFFLINE_MAP_NAME) == item.project.name) {
-                setViewMapOffline(itemView)
-            }
-
-            if (item.project.offlineMapState == OfflineMapState.DOWNLOADED_STATE.key) {
-                preferences.clearOfflineMapName()
+            setViewMapOffline(itemView, item.project)
+            downloadedTextView.text =
+                if (item.project.offlineMapState != OfflineMapState.DOWNLOADED_STATE.key) "Downloading..." else "Downloaded"// Todo:: change to show %
+            if (hideDownloadButton) {
+                downloadButton.visibility = View.GONE
             }
         }
     }
 
-    private fun setViewMapOffline(itemView: View) {
+    private fun setViewMapOffline(itemView: View, project: Project) {
         val offlineMapProgress = itemView.offlineMapProgress
         val downloadedTextView = itemView.downloadedTextView
         val downloadButton = itemView.downloadButton
-        val preferences = Preferences.getInstance(itemView.context)
-        when (preferences.getString(Preferences.OFFLINE_MAP_STATE)) {
+        when (project.offlineMapState) {
             OfflineMapState.DOWNLOAD_STATE.key -> {
                 offlineMapProgress.visibility = View.GONE
                 downloadedTextView.visibility = View.GONE
-                downloadButton.visibility = View.VISIBLE
+                downloadButton.visibility =
+                    if (project.maxLatitude != null && project.maxLatitude != 0.0 && project.offlineMapState != OfflineMapState.DOWNLOADED_STATE.key) View.VISIBLE else View.GONE
             }
             OfflineMapState.DOWNLOADING_STATE.key -> {
                 offlineMapProgress.visibility = View.VISIBLE
@@ -82,7 +75,7 @@ class ProjectOfflineMapAdapter(private val projectOfflineMapListener: ProjectOff
             }
             OfflineMapState.DOWNLOADED_STATE.key -> {
                 offlineMapProgress.visibility = View.GONE
-                downloadedTextView.visibility = View.GONE
+                downloadedTextView.visibility = View.VISIBLE
                 downloadButton.visibility = View.GONE
             }
         }

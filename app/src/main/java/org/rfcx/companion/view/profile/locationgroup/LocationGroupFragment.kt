@@ -127,8 +127,6 @@ class LocationGroupFragment : Fragment(), LocationGroupListener, SwipeRefreshLay
             })
     }
 
-    override fun onDownloadClicked(project: Project) {}
-
     override fun onClicked(group: Project) {
         locationGroupProtocol?.onLocationGroupClick(group)
     }
