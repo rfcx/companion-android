@@ -80,7 +80,7 @@ class GuardianSolarPanelFragment : Fragment() {
         }, DELAY, MILLI_PERIOD)
 
         SocketManager.sentinel.observe(viewLifecycleOwner, Observer { sentinelResponse ->
-            val input = sentinelResponse.sentinel.input
+            val input = sentinelResponse.sentinel.convertToInfo().input
             if (isSentinelConnected(input)) {
                 hideAssembleWarn()
 
