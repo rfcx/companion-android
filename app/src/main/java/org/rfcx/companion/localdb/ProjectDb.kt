@@ -157,21 +157,17 @@ class ProjectDb(private val realm: Realm) {
         }
     }
 
-    fun deleteProject(id: Int, callback: DatabaseCallback) {
-        realm.executeTransactionAsync({ bgRealm ->
-            val project =
-                bgRealm.where(Project::class.java)
-                    .equalTo(Project.PROJECT_ID, id)
-                    .findFirst()
-            if (project != null) {
-                project.deletedAt = Date()
-                project.syncState = SyncState.Unsent.key
+    fun deleteProjectsByCoreId(coreIds: List<String>) {
+        realm.executeTransaction {
+            coreIds.forEach { id ->
+                val project =
+                    it.where(Project::class.java)
+                        .equalTo(Project.PROJECT_SERVER_ID, id)
+                        .findFirst()
+
+                project?.deleteFromRealm()
             }
-        }, {
-            callback.onSuccess()
-        }, {
-            callback.onFailure(it.localizedMessage ?: "")
-        })
+        }
     }
 
     fun deleteProjectInLocal(id: Int) {
