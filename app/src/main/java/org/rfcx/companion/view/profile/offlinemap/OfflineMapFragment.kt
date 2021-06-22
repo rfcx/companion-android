@@ -87,9 +87,7 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
             ).apply {
                 addItemDecoration(this)
             }
-            val data = projectDb.getProjects().map { OfflineMapItem(it) }
-
-            projectAdapter = ProjectOfflineMapAdapter(data, this@OfflineMapFragment)
+            projectAdapter = ProjectOfflineMapAdapter(projectDb.getProjects(), this@OfflineMapFragment)
             adapter = projectAdapter
         }
         projectAdapter.hideDownloadButton = projectDb.getOfflineDownloading() != null
@@ -166,9 +164,9 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
                     if (percentage >= 100) {
                         projectDb.updateOfflineDownloadedState()
                         setStateOfflineMap(OfflineMapState.DOWNLOADED_STATE.key)
-                        projectAdapter.setDownloading(OfflineMapItem(project))
+                        projectAdapter.setDownloading(project)
                     } else {
-                        projectAdapter.setProgress(OfflineMapItem(project, percentage), percentage)
+                        projectAdapter.setProgress(project, percentage)
                         setStateOfflineMap(OfflineMapState.DOWNLOADING_STATE.key)
                     }
             }

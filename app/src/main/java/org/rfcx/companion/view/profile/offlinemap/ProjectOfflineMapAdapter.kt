@@ -11,8 +11,12 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.OfflineMapState
 import org.rfcx.companion.entity.Project
 
-class ProjectOfflineMapAdapter(var items: List<OfflineMapItem>, private val projectOfflineMapListener: ProjectOfflineMapListener) :
+class ProjectOfflineMapAdapter(var items: List<Project>, private val projectOfflineMapListener: ProjectOfflineMapListener) :
     RecyclerView.Adapter<ProjectOfflineMapAdapter.ProjectOfflineMapViewHolder>() {
+
+    companion object {
+        const val PROGRESS = "progress"
+    }
 
     var hideDownloadButton: Boolean = false
         set(value) {
@@ -30,17 +34,17 @@ class ProjectOfflineMapAdapter(var items: List<OfflineMapItem>, private val proj
     }
 
     override fun onBindViewHolder(holder: ProjectOfflineMapAdapter.ProjectOfflineMapViewHolder, position: Int) {
-        val dummy = items[position]
+        val project = items[position]
         with(holder.itemView) {
-            locationGroupTextView.text = dummy.project.name
+            locationGroupTextView.text = project.name
 
             downloadButton.setOnClickListener {
-                projectOfflineMapListener.onDownloadClicked(dummy.project)
+                projectOfflineMapListener.onDownloadClicked(project)
             }
 
-            setViewMapOffline(this, dummy.project)
-            downloadedTextView.isVisible = dummy.project.offlineMapState == OfflineMapState.DOWNLOADED_STATE.key
-            downloadedTextView.text = "Downloaded"
+            setViewMapOffline(this, project)
+            downloadedTextView.isVisible = project.offlineMapState == OfflineMapState.DOWNLOADED_STATE.key
+            downloadedTextView.text = "Downloaded"  // TODO change to delete button
             if (hideDownloadButton) {
                 downloadButton.visibility = View.GONE
             }
@@ -51,7 +55,7 @@ class ProjectOfflineMapAdapter(var items: List<OfflineMapItem>, private val proj
         super.onBindViewHolder(holder, position, payloads)
         if (payloads.firstOrNull() != null) {
             with(holder.itemView) {
-                (payloads.first() as Bundle).getInt("progress").also {
+                (payloads.first() as Bundle).getInt(PROGRESS).also {
                     downloadedTextView.isVisible = it < 99
                     downloadedTextView.text = "$it %"
                 }
@@ -59,16 +63,13 @@ class ProjectOfflineMapAdapter(var items: List<OfflineMapItem>, private val proj
         }
     }
 
-    fun setDownloading(dummy: OfflineMapItem) {
-        notifyItemChanged(items.indexOf(dummy))
+    fun setDownloading(project: Project) {
+        notifyItemChanged(items.indexOf(project))
     }
 
-    fun setProgress(dummy: OfflineMapItem, progress: Int) {
-        getDummy(dummy)?.percentage = progress
-        notifyItemChanged(items.indexOf(dummy), Bundle().apply { putInt("progress", progress) })
+    fun setProgress(project: Project, progress: Int) {
+        notifyItemChanged(items.indexOf(project), Bundle().apply { putInt(PROGRESS, progress) })
     }
-
-    private fun getDummy(dummy: OfflineMapItem) = items.find { dummy.project.id == it.project.id }
 
     override fun getItemCount(): Int = items.size
 
@@ -102,5 +103,3 @@ class ProjectOfflineMapAdapter(var items: List<OfflineMapItem>, private val proj
 interface ProjectOfflineMapListener {
     fun onDownloadClicked(project: Project)
 }
-
-data class OfflineMapItem(val project: Project = Project(), var percentage: Int? = null)
