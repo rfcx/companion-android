@@ -72,26 +72,7 @@ class ProjectOfflineMapAdapter(var items: List<OfflineMapItem>, private val proj
 
     override fun getItemCount(): Int = items.size
 
-    inner class ProjectOfflineMapViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val locationGroupTextView = itemView.locationGroupTextView
-        private val downloadedTextView = itemView.downloadedTextView
-        private val downloadButton = itemView.downloadButton
-
-        fun bind(item: OfflineMapItem) {
-            locationGroupTextView.text = item.project.name
-
-            downloadButton.setOnClickListener {
-                projectOfflineMapListener.onDownloadClicked(item.project)
-            }
-
-            setViewMapOffline(itemView, item.project)
-            downloadedTextView.text =
-                if (item.project.offlineMapState != OfflineMapState.DOWNLOADED_STATE.key) "Downloading..." else "Downloaded"// Todo:: change to show %
-            if (hideDownloadButton) {
-                downloadButton.visibility = View.GONE
-            }
-        }
-    }
+    inner class ProjectOfflineMapViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     private fun setViewMapOffline(itemView: View, project: Project) {
         val offlineMapProgress = itemView.offlineMapProgress
