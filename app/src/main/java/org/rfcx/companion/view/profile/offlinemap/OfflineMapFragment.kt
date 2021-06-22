@@ -45,8 +45,10 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
 
     private lateinit var projectLiveData: LiveData<List<Project>>
     private val projectObserve = Observer<List<Project>> {
-        projectAdapter.items = projectDb.getProjects().map { OfflineMapItem(it) }
-        projectAdapter.hideDownloadButton = projectDb.getOfflineDownloading() != null
+        if (projectDb.getOfflineDownloading() == null) {
+            projectAdapter.hideDownloadButton = projectDb.getOfflineDownloading() != null
+        }
+
     }
 
     lateinit var definition: OfflineTilePyramidRegionDefinition
@@ -127,6 +129,7 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
                 offlineManager?.createOfflineRegion(definition, regionName.toByteArray(),
                     object : OfflineManager.CreateOfflineRegionCallback {
                         override fun onCreate(offlineRegion: OfflineRegion) {
+                            projectAdapter.hideDownloadButton = true
                             CoroutineScope(Dispatchers.IO).launch { createOfflineRegion(offlineRegion, project) }
                         }
 
@@ -162,8 +165,8 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
                 if (percentage > oldPercentage)
                     if (percentage >= 100) {
                         projectDb.updateOfflineDownloadedState()
-                        projectAdapter.setDownloading(OfflineMapItem(project))
                         setStateOfflineMap(OfflineMapState.DOWNLOADED_STATE.key)
+                        projectAdapter.setDownloading(OfflineMapItem(project))
                     } else {
                         projectAdapter.setProgress(OfflineMapItem(project, percentage), percentage)
                         setStateOfflineMap(OfflineMapState.DOWNLOADING_STATE.key)
@@ -184,7 +187,6 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
     private fun setStateOfflineMap(state: String) {
         val preferences = context?.let { Preferences.getInstance(it) }
         preferences?.putString(Preferences.OFFLINE_MAP_STATE, state)
-        projectAdapter.hideDownloadButton = projectDb.getOfflineDownloading() != null
     }
 
     override fun onDownloadClicked(project: Project) {
