@@ -102,4 +102,5 @@ class ProjectOfflineMapAdapter(var items: List<Project>, private val projectOffl
 
 interface ProjectOfflineMapListener {
     fun onDownloadClicked(project: Project)
+    fun onDeleteClicked(project: Project)
 }

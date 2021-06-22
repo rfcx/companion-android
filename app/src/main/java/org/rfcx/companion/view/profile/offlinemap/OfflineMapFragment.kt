@@ -21,6 +21,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.OfflineMapState
 import org.rfcx.companion.entity.Project
@@ -34,6 +35,9 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
 
     companion object {
         const val TAG = "OfflineMapFragment"
+
+        // JSON encoding/decoding
+        const val JSON_FIELD_REGION_NAME = "FIELD_REGION_NAME"
 
         @JvmStatic
         fun newInstance() = OfflineMapFragment()
@@ -123,22 +127,34 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
                     15.0,
                     context?.resources?.displayMetrics?.density ?: 0.0F
                 )
-                val regionName = "{\"regionName\":\"${project.name}\"}"
-                offlineManager?.createOfflineRegion(definition, regionName.toByteArray(),
-                    object : OfflineManager.CreateOfflineRegionCallback {
-                        override fun onCreate(offlineRegion: OfflineRegion) {
-                            projectAdapter.hideDownloadButton = true
-                            CoroutineScope(Dispatchers.IO).launch { createOfflineRegion(offlineRegion, project) }
-                        }
 
-                        override fun onError(error: String) {
-                            setStateOfflineMap(OfflineMapState.DOWNLOAD_STATE.key)
-                            Log.e(TAG, "Error: $error")
-                        }
-                    })
+                val metadata: ByteArray? = try {
+                    val jsonObject = JSONObject()
+                    val charset = Charsets.UTF_8
+                    jsonObject.put(JSON_FIELD_REGION_NAME, project.name)
+                    val json = jsonObject.toString()
+                    json.toByteArray(charset)
+                } catch (exception: java.lang.Exception) {
+                    null
+                }
+
+                if (metadata != null) {
+                    offlineManager?.createOfflineRegion(definition, metadata,
+                        object : OfflineManager.CreateOfflineRegionCallback {
+                            override fun onCreate(offlineRegion: OfflineRegion) {
+                                projectAdapter.hideDownloadButton = true
+                                CoroutineScope(Dispatchers.IO).launch { createOfflineRegion(offlineRegion, project) }
+                            }
+
+                            override fun onError(error: String) {
+                                setStateOfflineMap(OfflineMapState.DOWNLOAD_STATE.key)
+                                Log.e(TAG, "Error: $error")
+                            }
+                        })
+                }
             }
         } else {
-            Toast.makeText(context, "no_internet_connection", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context?.getString(R.string.no_internet_connection), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -193,6 +209,71 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
         projectDb.updateOfflineState(OfflineMapState.DOWNLOADING_STATE.key, project.serverId ?: "")
 
         offlineMapBox(project)
+    }
+
+    override fun onDeleteClicked(project: Project) {
+        val preferences = context?.let { Preferences.getInstance(it) }
+        preferences?.putString(Preferences.OFFLINE_MAP_SERVER_ID, project.serverId ?: "")
+        projectDb.updateOfflineState(OfflineMapState.DELETING_STATE.key, project.serverId ?: "")
+
+        deleteOfflineRegion(project)
+    }
+
+    private fun deleteOfflineRegion(project: Project, isLogout: Boolean = false) {
+        if (context.isNetworkAvailable()) {
+            if (!isLogout) {
+                setStateOfflineMap(OfflineMapState.DELETING_STATE.key)
+            }
+
+            val offlineManager: OfflineManager? = context?.let { OfflineManager.getInstance(it) }
+            offlineManager?.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
+                override fun onList(offlineRegions: Array<out OfflineRegion>?) {
+                    if (!offlineRegions.isNullOrEmpty()) {
+                        offlineRegions.map {
+                            if (getRegionName(it) == project.name) {
+                                onDeleteOfflineRegion(offlineRegions[0], isLogout)
+                            }
+                        }
+                    }
+                }
+
+                override fun onError(error: String?) {
+                    if (!isLogout) {
+                        setStateOfflineMap(OfflineMapState.DOWNLOADED_STATE.key)
+                    }
+                }
+            })
+        } else {
+            Toast.makeText(context, context?.getString(R.string.no_internet_connection), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun onDeleteOfflineRegion(offRegion: OfflineRegion, isLogout: Boolean = false) {
+        offRegion.delete(object : OfflineRegion.OfflineRegionDeleteCallback {
+            override fun onDelete() {
+                if (!isLogout) {
+                    setStateOfflineMap(OfflineMapState.DOWNLOAD_STATE.key)
+                }
+            }
+
+            override fun onError(error: String) {
+                if (!isLogout) {
+                    setStateOfflineMap(OfflineMapState.DOWNLOADED_STATE.key)
+                }
+            }
+        })
+    }
+
+    private fun getRegionName(offlineRegion: OfflineRegion): String? {
+        // Get the region name from the offline region metadata
+        return try {
+            val metadata = offlineRegion.metadata
+            val json = String(metadata)
+            val jsonObject = JSONObject(json)
+            jsonObject.getString(JSON_FIELD_REGION_NAME)
+        } catch (exception: Exception) {
+            null
+        }
     }
 
     override fun onDestroy() {
