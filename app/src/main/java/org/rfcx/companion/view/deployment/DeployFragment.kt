@@ -51,7 +51,7 @@ class DeployFragment : BaseImageFragment() {
         }
 
         finishButton.setOnClickListener {
-            val images = imageAdapter.getNewAttachImage()
+            val images = getImageAdapter().getNewAttachImage()
             if(images.isNotEmpty()) {
                 analytics?.trackAddDeploymentImageEvent(Device.AUDIOMOTH.value)
             }
@@ -65,18 +65,18 @@ class DeployFragment : BaseImageFragment() {
             deployment.forEach {
                 pathList.add(it)
             }
-            imageAdapter.addImages(pathList)
+            getImageAdapter().addImages(pathList)
             didAddImages(pathList)
         }
     }
 
     private fun setupImageRecycler() {
         attachImageRecycler.apply {
-            adapter = imageAdapter
+            adapter = getImageAdapter()
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             setHasFixedSize(true)
         }
-        imageAdapter.setImages(arrayListOf())
+        getImageAdapter().setImages(arrayListOf())
     }
 
     override fun didAddImages(imagePaths: List<String>) {}
