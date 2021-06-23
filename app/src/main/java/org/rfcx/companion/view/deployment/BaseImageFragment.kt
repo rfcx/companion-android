@@ -5,14 +5,13 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.provider.MediaStore
-import android.widget.Toast
+import android.view.View
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import com.zhihu.matisse.Matisse
 import com.zhihu.matisse.MimeType
 import kotlinx.android.synthetic.main.fragment_deploy.*
 import org.rfcx.companion.R
-import org.rfcx.companion.entity.DeploymentImage
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.detail.DisplayImageActivity
 import java.io.File
@@ -22,12 +21,21 @@ abstract class BaseImageFragment : Fragment() {
     protected abstract fun didAddImages(imagePaths: List<String>)
     protected abstract fun didRemoveImage(imagePath: String)
 
-    protected val imageAdapter by lazy { ImageAdapter() }
-    private var imageFile: File? = null
-    private var deploymentImages = listOf<DeploymentImage>()
+    private var imageAdapter: ImageAdapter? = null
+    private var filePath: String? = null
 
     private val cameraPermissions by lazy { CameraPermissions(context as Activity) }
     private val galleryPermissions by lazy { GalleryPermissions(context as Activity) }
+
+    private val CAMERA_IMAGE_PATH = "cameraImagePath"
+
+    fun getImageAdapter(): ImageAdapter {
+        if (imageAdapter != null) {
+            return imageAdapter!!
+        }
+        imageAdapter = ImageAdapter()
+        return imageAdapter!!
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,27 +43,42 @@ abstract class BaseImageFragment : Fragment() {
         setupImages()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        if (filePath != null) {
+            outState.putString(CAMERA_IMAGE_PATH, filePath.toString())
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        savedInstanceState?.let {
+            if (it.containsKey(CAMERA_IMAGE_PATH)) {
+                filePath = it.getString(CAMERA_IMAGE_PATH)
+            }
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
         handleTakePhotoResult(requestCode, resultCode)
         handleGalleryResult(requestCode, resultCode, data)
     }
 
     private fun setupImages() {
-        imageAdapter.onImageAdapterClickListener =
+        getImageAdapter().onImageAdapterClickListener =
             object :
                 OnImageAdapterClickListener {
 
                 override fun onDeleteImageClick(position: Int, imagePath: String) {
-                    imageAdapter.removeAt(position)
+                    getImageAdapter().removeAt(position)
                     didRemoveImage(imagePath)
                     hideAddImagesButton()
                 }
 
                 override fun onImageClick(imagePath: String) {
                     val list = arrayListOf<String>()
-                    imageAdapter.getNewAttachImage().forEach { list.add("file://$it") }
+                    getImageAdapter().getNewAttachImage().forEach { list.add("file://$it") }
                     val index = list.indexOf("file://$imagePath")
                     list.removeAt(index)
                     list.add(0, "file://$imagePath")
@@ -64,12 +87,12 @@ abstract class BaseImageFragment : Fragment() {
                 }
             }
 
-        imageAdapter.setImages(arrayListOf())
+        getImageAdapter().setImages(arrayListOf())
     }
 
     fun takePhoto() {
         if (!cameraPermissions.allowed()) {
-            imageFile = null
+            filePath = null
             cameraPermissions.check { }
         } else {
             startTakePhoto()
@@ -78,45 +101,42 @@ abstract class BaseImageFragment : Fragment() {
 
     private fun startTakePhoto() {
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        imageFile = ImageUtils.createImageFile()
-        if (imageFile != null) {
-            val photoURI =
-                context?.let {
-                    FileProvider.getUriForFile(
-                        it,
-                        ImageUtils.FILE_CONTENT_PROVIDER,
-                        imageFile!!
-                    )
-                }
-            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-            startActivityForResult(takePictureIntent, ImageUtils.REQUEST_TAKE_PHOTO)
-        } else {
-            Toast.makeText(context, R.string.can_not_create_image, Toast.LENGTH_SHORT).show()
-        }
+        val imageFile = ImageUtils.createImageFile()
+        filePath = imageFile.absolutePath
+        val imageUri =
+            context?.let {
+                FileProvider.getUriForFile(
+                    it,
+                    ImageUtils.FILE_CONTENT_PROVIDER,
+                    imageFile
+                )
+            }
+        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+        startActivityForResult(takePictureIntent, ImageUtils.REQUEST_TAKE_PHOTO)
     }
 
     private fun handleTakePhotoResult(requestCode: Int, resultCode: Int) {
         if (requestCode != ImageUtils.REQUEST_TAKE_PHOTO) return
 
         if (resultCode == Activity.RESULT_OK) {
-            imageFile?.let {
-                val pathList = listOf(it.absolutePath)
-                imageAdapter.addImages(pathList)
+            filePath?.let {
+                val pathList = listOf(it)
+                getImageAdapter().addImages(pathList)
                 didAddImages(pathList)
                 hideAddImagesButton()
             }
         } else {
             // remove file image
-            imageFile?.let {
-                ImageFileUtils.removeFile(it)
-                this.imageFile = null
+            filePath?.let {
+                ImageFileUtils.removeFile(File(it))
+                this.filePath = null
             }
         }
     }
 
     fun openGallery() {
         if (!galleryPermissions.allowed()) {
-            imageFile = null
+            filePath = null
             galleryPermissions.check { }
         } else {
             startOpenGallery()
@@ -124,7 +144,7 @@ abstract class BaseImageFragment : Fragment() {
     }
 
     private fun startOpenGallery() {
-        val remainingImage = ImageAdapter.MAX_IMAGE_SIZE - imageAdapter.getImageCount()
+        val remainingImage = ImageAdapter.MAX_IMAGE_SIZE - getImageAdapter().getImageCount()
         Matisse.from(this)
             .choose(MimeType.ofImage())
             .countable(true)
@@ -147,13 +167,13 @@ abstract class BaseImageFragment : Fragment() {
                 pathList.add(path)
             }
         }
-        imageAdapter.addImages(pathList)
+        getImageAdapter().addImages(pathList)
         didAddImages(pathList)
         hideAddImagesButton()
     }
 
     private fun hideAddImagesButton() {
-        takePhotoButton.isEnabled = imageAdapter.getImageCount() < 5
-        openGalleryButton.isEnabled = imageAdapter.getImageCount() < 5
+        takePhotoButton.isEnabled = getImageAdapter().getImageCount() < 5
+        openGalleryButton.isEnabled = getImageAdapter().getImageCount() < 5
     }
 }
