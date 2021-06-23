@@ -42,11 +42,15 @@ class ProjectOfflineMapAdapter(var items: List<Project>, private val projectOffl
                 projectOfflineMapListener.onDownloadClicked(project)
             }
 
+            deleteButton.setOnClickListener {
+                projectOfflineMapListener.onDeleteClicked(project)
+            }
+
             setViewMapOffline(this, project)
-            downloadedTextView.isVisible = project.offlineMapState == OfflineMapState.DOWNLOADED_STATE.key
-            downloadedTextView.text = "Downloaded"  // TODO change to delete button
+
             if (hideDownloadButton) {
                 downloadButton.visibility = View.GONE
+                deleteButton.visibility = View.GONE
             }
         }
     }
@@ -79,6 +83,8 @@ class ProjectOfflineMapAdapter(var items: List<Project>, private val projectOffl
         val offlineMapProgress = itemView.offlineMapProgress
         val downloadedTextView = itemView.downloadedTextView
         val downloadButton = itemView.downloadButton
+        val deleteButton = itemView.deleteButton
+
         when (project.offlineMapState) {
             OfflineMapState.DOWNLOAD_STATE.key -> {
                 offlineMapProgress.visibility = View.GONE
@@ -93,8 +99,15 @@ class ProjectOfflineMapAdapter(var items: List<Project>, private val projectOffl
             }
             OfflineMapState.DOWNLOADED_STATE.key -> {
                 offlineMapProgress.visibility = View.GONE
-                downloadedTextView.visibility = View.VISIBLE
+                downloadedTextView.visibility = View.GONE
                 downloadButton.visibility = View.GONE
+                deleteButton.visibility = View.VISIBLE
+            }
+            OfflineMapState.DELETING_STATE.key -> {
+                offlineMapProgress.visibility = View.VISIBLE
+                downloadedTextView.visibility = View.GONE
+                downloadButton.visibility = View.GONE
+                deleteButton.visibility = View.GONE
             }
         }
     }

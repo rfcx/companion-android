@@ -43,6 +43,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/deleteButton"
+        style="@style/OfflineMapButton.Delete"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_gravity="center"
+        android:layout_marginEnd="@dimen/margin_padding_normal"
+        android:text="@string/delete"
+        android:visibility="gone"
+        android:textSize="@dimen/text_xxsmall"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
     <TextView
         android:id="@+id/downloadedTextView"
         style="@style/AudioMothText.Body.Secondary"

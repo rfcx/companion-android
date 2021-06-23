@@ -52,7 +52,6 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
         if (projectDb.getOfflineDownloading() == null) {
             projectAdapter.hideDownloadButton = projectDb.getOfflineDownloading() != null
         }
-
     }
 
     lateinit var definition: OfflineTilePyramidRegionDefinition
@@ -219,11 +218,9 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
         deleteOfflineRegion(project)
     }
 
-    private fun deleteOfflineRegion(project: Project, isLogout: Boolean = false) {
+    private fun deleteOfflineRegion(project: Project) {
         if (context.isNetworkAvailable()) {
-            if (!isLogout) {
-                setStateOfflineMap(OfflineMapState.DELETING_STATE.key)
-            }
+            setStateOfflineMap(OfflineMapState.DELETING_STATE.key)
 
             val offlineManager: OfflineManager? = context?.let { OfflineManager.getInstance(it) }
             offlineManager?.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
@@ -231,16 +228,15 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
                     if (!offlineRegions.isNullOrEmpty()) {
                         offlineRegions.map {
                             if (getRegionName(it) == project.name) {
-                                onDeleteOfflineRegion(offlineRegions[0], isLogout)
+                                onDeleteOfflineRegion(it, project)
                             }
                         }
                     }
                 }
 
                 override fun onError(error: String?) {
-                    if (!isLogout) {
-                        setStateOfflineMap(OfflineMapState.DOWNLOADED_STATE.key)
-                    }
+                    setStateOfflineMap(OfflineMapState.DOWNLOADED_STATE.key)
+                    projectDb.updateOfflineState(OfflineMapState.DOWNLOADED_STATE.key, project.serverId ?: "")
                 }
             })
         } else {
@@ -248,18 +244,16 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
         }
     }
 
-    fun onDeleteOfflineRegion(offRegion: OfflineRegion, isLogout: Boolean = false) {
+    fun onDeleteOfflineRegion(offRegion: OfflineRegion, project: Project) {
         offRegion.delete(object : OfflineRegion.OfflineRegionDeleteCallback {
             override fun onDelete() {
-                if (!isLogout) {
-                    setStateOfflineMap(OfflineMapState.DOWNLOAD_STATE.key)
-                }
+                setStateOfflineMap(OfflineMapState.DOWNLOAD_STATE.key)
+                projectDb.updateOfflineState(OfflineMapState.DOWNLOAD_STATE.key, project.serverId ?: "")
             }
 
             override fun onError(error: String) {
-                if (!isLogout) {
-                    setStateOfflineMap(OfflineMapState.DOWNLOADED_STATE.key)
-                }
+                setStateOfflineMap(OfflineMapState.DOWNLOADED_STATE.key)
+                projectDb.updateOfflineState(OfflineMapState.DOWNLOADED_STATE.key, project.serverId ?: "")
             }
         })
     }
