@@ -34,14 +34,14 @@
     <style name="OfflineMapButton" parent="Widget.AppCompat.Button">
         <item name="android:background">@drawable/bg_color_primary_button</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">@color/color_button_text</item>
         <item name="android:textSize">@dimen/text_xxsmall</item>
     </style>
 
     <style name="OfflineMapButton.Delete" parent="Widget.AppCompat.Button">
         <item name="android:background">@drawable/bg_color_red_button</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">@color/color_red_button_text</item>
         <item name="android:textSize">@dimen/text_xxsmall</item>
     </style>
 

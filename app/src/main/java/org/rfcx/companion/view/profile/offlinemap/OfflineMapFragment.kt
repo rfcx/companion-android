@@ -228,6 +228,7 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
                     if (!offlineRegions.isNullOrEmpty()) {
                         offlineRegions.map {
                             if (getRegionName(it) == project.name) {
+                                projectAdapter.hideDownloadButton = true
                                 onDeleteOfflineRegion(it, project)
                             }
                         }

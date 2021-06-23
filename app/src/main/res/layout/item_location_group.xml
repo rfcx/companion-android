@@ -38,6 +38,7 @@
         android:layout_marginEnd="@dimen/margin_padding_normal"
         android:text="@string/download"
         android:visibility="gone"
+        android:enabled="false"
         android:textSize="@dimen/text_xxsmall"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

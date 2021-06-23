@@ -11,7 +11,10 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.OfflineMapState
 import org.rfcx.companion.entity.Project
 
-class ProjectOfflineMapAdapter(var items: List<Project>, private val projectOfflineMapListener: ProjectOfflineMapListener) :
+class ProjectOfflineMapAdapter(
+    var items: List<Project>,
+    private val projectOfflineMapListener: ProjectOfflineMapListener
+) :
     RecyclerView.Adapter<ProjectOfflineMapAdapter.ProjectOfflineMapViewHolder>() {
 
     companion object {
@@ -33,7 +36,10 @@ class ProjectOfflineMapAdapter(var items: List<Project>, private val projectOffl
         return ProjectOfflineMapViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ProjectOfflineMapAdapter.ProjectOfflineMapViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: ProjectOfflineMapAdapter.ProjectOfflineMapViewHolder,
+        position: Int
+    ) {
         val project = items[position]
         with(holder.itemView) {
             locationGroupTextView.text = project.name
@@ -49,13 +55,17 @@ class ProjectOfflineMapAdapter(var items: List<Project>, private val projectOffl
             setViewMapOffline(this, project)
 
             if (hideDownloadButton) {
-                downloadButton.visibility = View.GONE
-                deleteButton.visibility = View.GONE
+                downloadButton.isEnabled = false
+                deleteButton.isEnabled = false
             }
         }
     }
 
-    override fun onBindViewHolder(holder: ProjectOfflineMapAdapter.ProjectOfflineMapViewHolder, position: Int, payloads: MutableList<Any>) {
+    override fun onBindViewHolder(
+        holder: ProjectOfflineMapAdapter.ProjectOfflineMapViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
         super.onBindViewHolder(holder, position, payloads)
         if (payloads.firstOrNull() != null) {
             with(holder.itemView) {
@@ -87,27 +97,33 @@ class ProjectOfflineMapAdapter(var items: List<Project>, private val projectOffl
 
         when (project.offlineMapState) {
             OfflineMapState.DOWNLOAD_STATE.key -> {
+                val canDownload =
+                    project.maxLatitude != null && project.maxLatitude != 0.0 && project.offlineMapState != OfflineMapState.DOWNLOADED_STATE.key
                 offlineMapProgress.visibility = View.GONE
                 downloadedTextView.visibility = View.GONE
-                downloadButton.visibility =
-                    if (project.maxLatitude != null && project.maxLatitude != 0.0 && project.offlineMapState != OfflineMapState.DOWNLOADED_STATE.key) View.VISIBLE else View.GONE
+                downloadButton.visibility = if (canDownload) View.VISIBLE else View.GONE
+                downloadButton.isEnabled = canDownload
             }
             OfflineMapState.DOWNLOADING_STATE.key -> {
                 offlineMapProgress.visibility = View.VISIBLE
                 downloadedTextView.visibility = View.VISIBLE
                 downloadButton.visibility = View.GONE
+                downloadButton.isEnabled = false
             }
             OfflineMapState.DOWNLOADED_STATE.key -> {
                 offlineMapProgress.visibility = View.GONE
                 downloadedTextView.visibility = View.GONE
                 downloadButton.visibility = View.GONE
                 deleteButton.visibility = View.VISIBLE
+                deleteButton.isEnabled = true
             }
             OfflineMapState.DELETING_STATE.key -> {
                 offlineMapProgress.visibility = View.VISIBLE
                 downloadedTextView.visibility = View.GONE
                 downloadButton.visibility = View.GONE
                 deleteButton.visibility = View.GONE
+                downloadButton.isEnabled = false
+                deleteButton.isEnabled = false
             }
         }
     }
