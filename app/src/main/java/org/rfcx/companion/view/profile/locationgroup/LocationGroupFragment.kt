@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -20,19 +19,16 @@ import kotlinx.android.synthetic.main.fragment_location_group.projectSwipeRefres
 import kotlinx.android.synthetic.main.fragment_map.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Project
-import org.rfcx.companion.entity.Screen
-import org.rfcx.companion.entity.Status
 import org.rfcx.companion.entity.response.ProjectResponse
-import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.repo.ApiManager
-import org.rfcx.companion.service.LocationGroupSyncWorker
 import org.rfcx.companion.util.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class LocationGroupFragment : Fragment(), LocationGroupListener, SwipeRefreshLayout.OnRefreshListener {
+class LocationGroupFragment : Fragment(), LocationGroupListener,
+    SwipeRefreshLayout.OnRefreshListener {
     val realm: Realm = Realm.getInstance(RealmHelper.migrationConfig())
     private val locationGroupDb = ProjectDb(realm)
 
@@ -105,7 +101,7 @@ class LocationGroupFragment : Fragment(), LocationGroupListener, SwipeRefreshLay
 
     private fun retrieveProjects(context: Context) {
         val token = "Bearer ${context.getIdToken()}"
-        ApiManager.getInstance().getDeviceApi().getProjects(token)
+        ApiManager.getInstance().getDeviceApi2().getProjects(token)
             .enqueue(object : Callback<List<ProjectResponse>> {
                 override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
                     if (context.isNetworkAvailable()) {
@@ -122,7 +118,32 @@ class LocationGroupFragment : Fragment(), LocationGroupListener, SwipeRefreshLay
                     response.body()?.forEach { item ->
                         locationGroupDb.insertOrUpdate(item)
                     }
-                    projectSwipeRefreshView.isRefreshing = false
+                    deletedProjectsFromCore(context)
+                }
+            })
+    }
+
+    private fun deletedProjectsFromCore(context: Context) {
+        val token = "Bearer ${context.getIdToken()}"
+        ApiManager.getInstance().getDeviceApi2().getDeletedProjects(token)
+            .enqueue(object : Callback<List<ProjectResponse>> {
+                override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
+                    if (context.isNetworkAvailable()) {
+                        Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
+
+                override fun onResponse(
+                    call: Call<List<ProjectResponse>>,
+                    response: Response<List<ProjectResponse>>
+                ) {
+                    if (response.isSuccessful) {
+                        response.body()?.let { projectsRes ->
+                            locationGroupDb.deleteProjectsByCoreId(projectsRes.map { it.id!! }) // remove project with these coreIds
+                        }
+                        projectSwipeRefreshView.isRefreshing = false
+                    }
                 }
             })
     }

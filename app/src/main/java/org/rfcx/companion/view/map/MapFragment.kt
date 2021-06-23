@@ -56,7 +56,9 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.BitmapUtils
 import io.realm.Realm
+import kotlinx.android.synthetic.main.fragment_location_group.*
 import kotlinx.android.synthetic.main.fragment_map.*
+import kotlinx.android.synthetic.main.fragment_map.projectSwipeRefreshView
 import kotlinx.android.synthetic.main.layout_deployment_window_info.view.*
 import kotlinx.android.synthetic.main.layout_map_window_info.view.*
 import kotlinx.android.synthetic.main.layout_search_view.*
@@ -1045,7 +1047,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
     private fun retrieveProjects(context: Context) {
         val token = "Bearer ${context.getIdToken()}"
-        ApiManager.getInstance().getDeviceApi().getProjects(token)
+        ApiManager.getInstance().getDeviceApi2().getProjects(token)
             .enqueue(object : Callback<List<ProjectResponse>> {
                 override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
                     combinedData()
@@ -1063,8 +1065,33 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                     response.body()?.forEach { item ->
                         locationGroupDb.insertOrUpdate(item)
                     }
-                    projectSwipeRefreshView.isRefreshing = false
-                    combinedData()
+                    deletedProjectsFromCore(context)
+                }
+            })
+    }
+
+    private fun deletedProjectsFromCore(context: Context) {
+        val token = "Bearer ${context.getIdToken()}"
+        ApiManager.getInstance().getDeviceApi2().getDeletedProjects(token)
+            .enqueue(object : Callback<List<ProjectResponse>> {
+                override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
+                    if (context.isNetworkAvailable()) {
+                        Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
+
+                override fun onResponse(
+                    call: Call<List<ProjectResponse>>,
+                    response: Response<List<ProjectResponse>>
+                ) {
+                    if (response.isSuccessful) {
+                        response.body()?.let { projectsRes ->
+                            locationGroupDb.deleteProjectsByCoreId(projectsRes.map { it.id!! }) // remove project with these coreIds
+                        }
+                        projectSwipeRefreshView.isRefreshing = false
+                        combinedData()
+                    }
                 }
             })
     }
