@@ -73,6 +73,21 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="50%" />
 
+    <TextView
+        android:id="@+id/unavailableTextView"
+        style="@style/AudioMothText.Body.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginEnd="@dimen/margin_padding_normal"
+        android:gravity="center"
+        android:text="@string/unavailable"
+        android:textSize="@dimen/text_xsmall"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/offlineMapProgress"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ProgressBar
         android:id="@+id/offlineMapProgress"
         android:layout_width="@dimen/mini_progress_loading"

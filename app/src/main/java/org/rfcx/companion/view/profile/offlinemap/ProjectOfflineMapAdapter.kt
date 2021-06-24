@@ -94,6 +94,7 @@ class ProjectOfflineMapAdapter(
         val downloadedTextView = itemView.downloadedTextView
         val downloadButton = itemView.downloadButton
         val deleteButton = itemView.deleteButton
+        val unavailableTextView = itemView.unavailableTextView
 
         when (project.offlineMapState) {
             OfflineMapState.DOWNLOAD_STATE.key -> {
@@ -102,19 +103,21 @@ class ProjectOfflineMapAdapter(
                 offlineMapProgress.visibility = View.GONE
                 downloadedTextView.visibility = View.GONE
                 downloadButton.visibility = if (canDownload) View.VISIBLE else View.GONE
+                unavailableTextView.visibility = View.GONE
                 downloadButton.isEnabled = canDownload
             }
             OfflineMapState.DOWNLOADING_STATE.key -> {
                 offlineMapProgress.visibility = View.VISIBLE
                 downloadedTextView.visibility = View.VISIBLE
+                unavailableTextView.visibility = View.GONE
                 downloadButton.visibility = View.GONE
-                downloadButton.isEnabled = false
             }
             OfflineMapState.DOWNLOADED_STATE.key -> {
                 offlineMapProgress.visibility = View.GONE
                 downloadedTextView.visibility = View.GONE
                 downloadButton.visibility = View.GONE
                 deleteButton.visibility = View.VISIBLE
+                unavailableTextView.visibility = View.GONE
                 deleteButton.isEnabled = true
             }
             OfflineMapState.DELETING_STATE.key -> {
@@ -122,8 +125,15 @@ class ProjectOfflineMapAdapter(
                 downloadedTextView.visibility = View.GONE
                 downloadButton.visibility = View.GONE
                 deleteButton.visibility = View.GONE
+                unavailableTextView.visibility = View.GONE
                 downloadButton.isEnabled = false
                 deleteButton.isEnabled = false
+            }
+            OfflineMapState.UNAVAILABLE.key -> {
+                offlineMapProgress.visibility = View.GONE
+                downloadedTextView.visibility = View.GONE
+                unavailableTextView.visibility = View.VISIBLE
+                downloadButton.visibility = View.GONE
             }
         }
     }

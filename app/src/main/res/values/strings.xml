@@ -189,6 +189,7 @@
 
     <string name="download">Download</string>
     <string name="no_internet_connection">No internet, Please try again.</string>
+    <string name="unavailable">Unavailable \n(area too large)</string>
 
     <!--  FeedbackActivity  -->
     <string name="app_feedback_share_ideas">Leave app feedback or share your ideas</string>
