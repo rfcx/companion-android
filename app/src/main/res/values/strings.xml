@@ -233,6 +233,7 @@
     <!--  ChooseDeviceFragment  -->
     <string name="choose_your_device">Choose your device</string>
     <string name="rfcx_edge_audiomoth">AudioMoth</string>
+    <string name="rfcx_song_meter">Song Meter Mini/Micro</string>
     <string name="rfcx_guardian">RFCx Guardian</string>
     <string name="warning_text">Sites is downloading \nBeware missing sites</string>
 
