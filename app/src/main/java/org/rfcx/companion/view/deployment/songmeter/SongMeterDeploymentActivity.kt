@@ -3,9 +3,12 @@ package org.rfcx.companion.view.deployment.songmeter
 import android.content.Context
 import android.content.Intent
 import android.location.Location
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import io.realm.Realm
+import io.realm.RealmList
 import kotlinx.android.synthetic.main.activity_song_meter_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
@@ -13,9 +16,16 @@ import org.rfcx.companion.entity.DeploymentLocation
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.service.DownloadStreamState
+import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 
 class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProtocol {
+
+    private var currentCheck = 0
+    private var currentCheckName = ""
+    private var passedChecks = RealmList<Int>()
+
+    private var _images: List<String> = listOf()
 
     companion object {
         const val TAG = "SongMeterDeploymentActivity"
@@ -25,6 +35,7 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
             context.startActivity(intent)
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_song_meter_deployment)
@@ -50,7 +61,19 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
     }
 
     override fun nextStep() {
-        TODO("Not yet implemented")
+        if (passedChecks.contains(2) && _images.isNullOrEmpty()) {
+            passedChecks.remove(2)
+        }
+
+        if (currentCheck !in passedChecks) {
+            if (currentCheck == 2 && _images.isNullOrEmpty()) {
+                startCheckList()
+                return
+            } else {
+                passedChecks.add(currentCheck)
+            }
+        }
+        startCheckList()
     }
 
     override fun backStep() {
@@ -106,19 +129,21 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
     }
 
     override fun setCurrentPage(name: String) {
-        TODO("Not yet implemented")
+        currentCheckName = name
     }
 
     override fun showToolbar() {
-        TODO("Not yet implemented")
+        toolbar.visibility = View.VISIBLE
     }
 
     override fun hideToolbar() {
-        TODO("Not yet implemented")
+        toolbar.visibility = View.GONE
     }
 
     override fun setToolbarTitle() {
-        TODO("Not yet implemented")
+        supportActionBar?.apply {
+            title = currentCheckName
+        }
     }
 
     override fun isSiteLoading(): DownloadStreamState {
