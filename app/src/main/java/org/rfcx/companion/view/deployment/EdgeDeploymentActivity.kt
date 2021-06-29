@@ -404,7 +404,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             }
             2 -> {
                 updateDeploymentState(DeploymentState.Edge.Deploy)
-                startFragment(DeployFragment.newInstance())
+                startFragment(DeployFragment.newInstance(Screen.AUDIO_MOTH_CHECK_LIST.id))
             }
         }
     }

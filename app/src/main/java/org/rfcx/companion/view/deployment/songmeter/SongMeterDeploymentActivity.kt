@@ -7,25 +7,22 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import io.realm.Realm
 import io.realm.RealmList
 import kotlinx.android.synthetic.main.activity_song_meter_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
-import org.rfcx.companion.entity.DeploymentLocation
-import org.rfcx.companion.entity.Locate
-import org.rfcx.companion.entity.Project
+import org.rfcx.companion.entity.*
 import org.rfcx.companion.service.DownloadStreamState
-import org.rfcx.companion.util.RealmHelper
+import org.rfcx.companion.view.deployment.DeployFragment
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 
 class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProtocol {
 
+    private var _images: List<String> = listOf()
+
     private var currentCheck = 0
     private var currentCheckName = ""
     private var passedChecks = RealmList<Int>()
-
-    private var _images: List<String> = listOf()
 
     companion object {
         const val TAG = "SongMeterDeploymentActivity"
@@ -93,7 +90,7 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
     }
 
     override fun getImages(): List<String> {
-        TODO("Not yet implemented")
+        return this._images
     }
 
     override fun getCurrentLocation(): Location {
@@ -109,7 +106,7 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
     }
 
     override fun setImages(images: List<String>) {
-        TODO("Not yet implemented")
+        this._images = images
     }
 
     override fun setReadyToDeploy() {
@@ -121,12 +118,22 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
     }
 
     override fun handleCheckClicked(number: Int) {
-        TODO("Not yet implemented")
+        // setup fragment for current step
+        currentCheck = number
+        when (number) {
+            0 -> {
+                // TODO:: Set deployment location
+            }
+            1 -> {
+                // TODO:: Sync process
+            }
+            2 -> {
+                startFragment(DeployFragment.newInstance(Screen.SONG_METER_CHECK_LIST.id))
+            }
+        }
     }
 
-    override fun getPassedChecks(): List<Int> {
-        TODO("Not yet implemented")
-    }
+    override fun getPassedChecks(): List<Int> = passedChecks
 
     override fun setCurrentPage(name: String) {
         currentCheckName = name
