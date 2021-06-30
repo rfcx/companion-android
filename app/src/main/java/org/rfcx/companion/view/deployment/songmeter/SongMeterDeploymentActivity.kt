@@ -7,10 +7,12 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import io.realm.RealmList
 import kotlinx.android.synthetic.main.activity_song_meter_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
+import org.rfcx.companion.base.SongMeterViewModelFactory
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.view.deployment.DeployFragment
@@ -23,6 +25,8 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
     private var currentCheck = 0
     private var currentCheckName = ""
     private var passedChecks = RealmList<Int>()
+
+    private lateinit var songMeterViewModel: SongMeterViewModel
 
     companion object {
         const val TAG = "SongMeterDeploymentActivity"
@@ -39,6 +43,14 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
 
         setupToolbar()
         startCheckList()
+        setViewModel()
+    }
+
+    private fun setViewModel() {
+        songMeterViewModel = ViewModelProvider(
+            this,
+            SongMeterViewModelFactory(application)
+        ).get(SongMeterViewModel::class.java)
     }
 
     override fun startMapPicker(latitude: Double, longitude: Double, siteId: Int, name: String) {
