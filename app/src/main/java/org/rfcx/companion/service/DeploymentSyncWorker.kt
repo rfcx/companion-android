@@ -8,7 +8,7 @@ import io.realm.Realm
 import org.rfcx.companion.entity.request.EditDeploymentRequest
 import org.rfcx.companion.entity.request.toRequestBody
 import org.rfcx.companion.entity.response.toEdgeDeployment
-import org.rfcx.companion.localdb.EdgeDeploymentDb
+import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.service.images.ImageSyncWorker
@@ -25,7 +25,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
         Log.d(TAG, "doWork")
         isRunning = DeploymentSyncState.RUNNING
 
-        val db = EdgeDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
+        val db = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val locateDb = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val deployments = db.lockUnsent()
         val token = "Bearer ${context.getIdToken()}"
@@ -83,7 +83,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
 
     private fun markSentDeployment(
         id: String,
-        db: EdgeDeploymentDb,
+        db: DeploymentDb,
         locateDb: LocateDb,
         deploymentId: Int,
         token: String

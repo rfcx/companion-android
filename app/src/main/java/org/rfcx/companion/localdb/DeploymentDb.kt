@@ -13,7 +13,7 @@ import java.util.*
 /**
  * For Manage the saving and sending of deployment from the local database
  */
-class EdgeDeploymentDb(private val realm: Realm) {
+class DeploymentDb(private val realm: Realm) {
 
     fun unsentCount(): Long {
         return realm.where(Deployment::class.java)
