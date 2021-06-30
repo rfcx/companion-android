@@ -12,19 +12,30 @@ import io.realm.RealmList
 import kotlinx.android.synthetic.main.activity_song_meter_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
-import org.rfcx.companion.base.SongMeterViewModelFactory
+import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
+import org.rfcx.companion.repo.api.DeviceApiHelper
+import org.rfcx.companion.repo.api.DeviceApiServiceImpl
+import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DownloadStreamState
+import org.rfcx.companion.util.getLastLocation
 import org.rfcx.companion.view.deployment.DeployFragment
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
+import org.rfcx.companion.view.deployment.location.DetailDeploymentSiteFragment
+import org.rfcx.companion.view.deployment.location.SetDeploymentSiteFragment
 
 class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProtocol {
 
+    private var _deployment: Deployment? = null
+    private var _deployLocation: DeploymentLocation? = null
     private var _images: List<String> = listOf()
+    private var _siteItems = arrayListOf<SiteWithLastDeploymentItem>()
+    private var _locate: Locate? = null
 
     private var currentCheck = 0
     private var currentCheckName = ""
     private var passedChecks = RealmList<Int>()
+    private var currentLocation: Location? = null
 
     private lateinit var songMeterViewModel: SongMeterViewModel
 
@@ -40,7 +51,7 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_song_meter_deployment)
-
+        this.currentLocation = this.getLastLocation()
         setupToolbar()
         startCheckList()
         setViewModel()
@@ -49,7 +60,11 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
     private fun setViewModel() {
         songMeterViewModel = ViewModelProvider(
             this,
-            SongMeterViewModelFactory(application)
+            ViewModelFactory(
+                application,
+                DeviceApiHelper(DeviceApiServiceImpl()),
+                LocalDataHelper()
+            )
         ).get(SongMeterViewModel::class.java)
     }
 
@@ -62,7 +77,7 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
     }
 
     override fun startDetailDeploymentSite(id: Int, name: String?, isNewSite: Boolean) {
-        TODO("Not yet implemented")
+        startFragment(DetailDeploymentSiteFragment.newInstance(id, name, isNewSite))
     }
 
     override fun isOpenedFromUnfinishedDeployment(): Boolean {
@@ -89,13 +104,9 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
         TODO("Not yet implemented")
     }
 
-    override fun getDeploymentLocation(): DeploymentLocation? {
-        TODO("Not yet implemented")
-    }
+    override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
-    override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> {
-        TODO("Not yet implemented")
-    }
+    override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
 
     override fun getLocationGroup(name: String): Project? {
         TODO("Not yet implemented")
@@ -134,7 +145,16 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
         currentCheck = number
         when (number) {
             0 -> {
-                // TODO:: Set deployment location
+                val site = this._locate
+                if (site == null) {
+                    startFragment(
+                        SetDeploymentSiteFragment.newInstance(
+                            currentLocation?.latitude ?: 0.0, currentLocation?.longitude ?: 0.0
+                        )
+                    )
+                } else {
+                    startDetailDeploymentSite(site.id, site.name, false)
+                }
             }
             1 -> {
                 // TODO:: Sync process

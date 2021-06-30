@@ -38,19 +38,16 @@ class DeploymentDb(private val realm: Realm) {
         return arrayOfId
     }
 
-    fun getDeploymentBySiteName(name: String): Deployment? {
-        val deployment =
-            realm.where(Deployment::class.java).equalTo("stream.name", name).findFirst()
-        if (deployment != null) {
-            return realm.copyFromRealm(deployment)
-        }
-        return null
-    }
-
     fun getAllResultsAsync(sort: Sort = Sort.DESCENDING): RealmResults<Deployment> {
         return realm.where(Deployment::class.java)
             .sort(Deployment.FIELD_ID, sort)
             .findAllAsync()
+    }
+
+    fun getDeployments(): List<Deployment> {
+        return realm.where(Deployment::class.java)
+            .sort(Deployment.FIELD_ID, Sort.DESCENDING)
+            .findAll() ?: arrayListOf()
     }
 
     fun getAllResultsAsyncWithinProject(sort: Sort = Sort.DESCENDING, project: String): RealmResults<Deployment> {
@@ -58,13 +55,6 @@ class DeploymentDb(private val realm: Realm) {
             .equalTo("stream.project.name", project)
             .sort(Deployment.FIELD_ID, sort)
             .findAllAsync()
-    }
-
-    fun getAll(sort: Sort = Sort.DESCENDING): RealmResults<Deployment> {
-        return realm.where(Deployment::class.java)
-            .isNotNull(Deployment.FIELD_SERVER_ID)
-            .sort(Deployment.FIELD_ID, sort)
-            .findAll()
     }
 
     fun insertOrUpdate(deployment: Deployment, location: DeploymentLocation): Int {
