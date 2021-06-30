@@ -3,6 +3,7 @@ package org.rfcx.companion.view.deployment.songmeter
 import android.content.Context
 import android.content.Intent
 import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -19,12 +20,16 @@ import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.util.getLastLocation
+import org.rfcx.companion.util.getListSite
 import org.rfcx.companion.view.deployment.DeployFragment
+import org.rfcx.companion.view.deployment.locate.MapPickerFragment
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.deployment.location.DetailDeploymentSiteFragment
 import org.rfcx.companion.view.deployment.location.SetDeploymentSiteFragment
+import org.rfcx.companion.view.detail.MapPickerProtocol
 
-class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProtocol {
+class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProtocol,
+    MapPickerProtocol {
 
     private var _deployment: Deployment? = null
     private var _deployLocation: DeploymentLocation? = null
@@ -36,6 +41,12 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
     private var currentCheckName = ""
     private var passedChecks = RealmList<Int>()
     private var currentLocation: Location? = null
+    private var useExistedLocation: Boolean = false
+
+    private var latitude = 0.0
+    private var longitude = 0.0
+    private var siteId: Int = 0
+    private var nameLocation: String = ""
 
     private lateinit var songMeterViewModel: SongMeterViewModel
 
@@ -55,6 +66,7 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
         setupToolbar()
         startCheckList()
         setViewModel()
+        setSiteItems()
     }
 
     private fun setViewModel() {
@@ -68,8 +80,27 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
         ).get(SongMeterViewModel::class.java)
     }
 
+    override fun getDeployment(): Deployment? {
+        if (this._deployment == null) {
+            this._deployment = Deployment()
+        }
+        return this._deployment
+    }
+
+    override fun setDeployment(deployment: Deployment) {
+        this._deployment = deployment
+    }
+
     override fun startMapPicker(latitude: Double, longitude: Double, siteId: Int, name: String) {
-        TODO("Not yet implemented")
+        setLatLng(latitude, longitude, siteId, name)
+        startFragment(MapPickerFragment.newInstance(latitude, longitude, siteId, name))
+    }
+
+    private fun setLatLng(latitude: Double, longitude: Double, siteId: Int, name: String) {
+        this.latitude = latitude
+        this.longitude = longitude
+        this.siteId = siteId
+        this.nameLocation = name
     }
 
     override fun startCheckList() {
@@ -100,6 +131,21 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
         startCheckList()
     }
 
+    private fun setSiteItems() {
+        val loc = Location(LocationManager.GPS_PROVIDER)
+        loc.latitude = 0.0
+        loc.longitude = 0.0
+
+        _siteItems = getListSite(
+            this,
+            songMeterViewModel.getDeploymentsFromLocal(),
+            songMeterViewModel.getGuardianDeploymentsFromLocal(),
+            getString(R.string.none),
+            currentLocation ?: loc,
+            songMeterViewModel.getLocatesFromLocal()
+        )
+    }
+
     override fun backStep() {
         TODO("Not yet implemented")
     }
@@ -109,7 +155,7 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
     override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
 
     override fun getLocationGroup(name: String): Project? {
-        TODO("Not yet implemented")
+        return songMeterViewModel.getProjectByName(name)
     }
 
     override fun getImages(): List<String> {
@@ -121,11 +167,22 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
     }
 
     override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
-        TODO("Not yet implemented")
+        val deployment = _deployment ?: Deployment()
+        deployment.isActive = locate.serverId == null
+        deployment.state = DeploymentState.Edge.Locate.key // state
+
+        this._deployLocation = locate.asDeploymentLocation()
+        this._locate = locate
+        useExistedLocation = isExisted
+        if (!useExistedLocation) {
+            songMeterViewModel.setLocateInsertOrUpdate(locate)
+        }
+
+        setDeployment(deployment)
     }
 
     override fun setSiteItem(items: ArrayList<SiteWithLastDeploymentItem>) {
-        TODO("Not yet implemented")
+        this._siteItems = items
     }
 
     override fun setImages(images: List<String>) {
@@ -206,5 +263,14 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
         }
+    }
+
+    override fun onSelectedLocation(
+        latitude: Double,
+        longitude: Double,
+        siteId: Int,
+        name: String
+    ) {
+        startFragment(DetailDeploymentSiteFragment.newInstance(latitude, longitude, siteId, name, true))
     }
 }
