@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.response.ProjectResponse
+import org.rfcx.companion.entity.response.toLocationGroups
 import org.rfcx.companion.util.Resource
 import org.rfcx.companion.util.getIdToken
 import org.rfcx.companion.util.isNetworkAvailable
@@ -73,7 +74,7 @@ class ProjectSelectViewModel(
                     if (response.isSuccessful) {
                         response.body()?.let { projectsRes ->
                             projectSelectRepository.removeProjectFromLocal(projectsRes.map { it.id!! }) // remove project with these coreIds
-                            projects.postValue(Resource.success(null)) // no need to send project data
+                            projects.postValue(Resource.success(projectsRes.map { it.toLocationGroups() })) // no need to send project data
                         }
                     } else {
                         projects.postValue(Resource.error(context.getString(R.string.something_went_wrong), null))

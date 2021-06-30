@@ -3,6 +3,7 @@ package org.rfcx.companion.view.project
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -16,6 +17,7 @@ import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
+import org.rfcx.companion.service.DeploymentCleanupWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.project.viewmodel.ProjectSelectViewModel
 
@@ -24,6 +26,8 @@ class ProjectSelectActivity : AppCompatActivity(), (Int) -> Unit,
 
     private lateinit var projectSelectViewModel: ProjectSelectViewModel
     private val projectSelectAdapter by lazy { ProjectSelectAdapter(this) }
+
+    private val analytics by lazy { Analytics(this) }
 
     private val preferences by lazy { Preferences.getInstance(this) }
 
@@ -89,6 +93,13 @@ class ProjectSelectActivity : AppCompatActivity(), (Int) -> Unit,
                 }
                 Status.SUCCESS -> {
                     hideLoading()
+                    it.data?.let { projects ->
+                        if (projects.isEmpty()) {
+                            noContentTextView.visibility = View.VISIBLE
+                        } else {
+                            noContentTextView.visibility = View.GONE
+                        }
+                    }
                     addProjectsToAdapter()
                 }
                 Status.ERROR -> {
@@ -123,6 +134,15 @@ class ProjectSelectActivity : AppCompatActivity(), (Int) -> Unit,
 
     override fun onRefresh() {
         projectSelectViewModel.refreshProjects()
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        DeploymentCleanupWorker.stopAllWork(this)
+        this.logout()
+        LocationTracking.set(this, false)
+        analytics.trackLogoutEvent()
+        finish()
     }
 
     companion object {
