@@ -444,5 +444,7 @@
 
     <!-- ProjectSelectorActivity -->
     <string name="choose_project">Choose which project you are working with</string>
+    <string name="something_went_wrong">something went wrong</string>
+    <string name="network_not_available">network not available</string>
 
 </resources>

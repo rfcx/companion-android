@@ -3,6 +3,7 @@ package org.rfcx.companion.view.project
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -44,7 +45,12 @@ class ProjectSelectActivity : AppCompatActivity(), (Int) -> Unit,
         }
 
         setViewModel()
-        setObserver()
+        if (this.isNetworkAvailable()) {
+            setObserver()
+        } else {
+            showToast(getString(R.string.error_has_occurred))
+            addProjectsToAdapter()
+        }
 
         projectSwipeRefreshView.apply {
             setOnRefreshListener(this@ProjectSelectActivity)
@@ -87,9 +93,15 @@ class ProjectSelectActivity : AppCompatActivity(), (Int) -> Unit,
                 }
                 Status.ERROR -> {
                     hideLoading()
+                    addProjectsToAdapter()
+                    showToast(it.message ?: getString(R.string.error_has_occurred))
                 }
             }
         })
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
     private fun addProjectsToAdapter() {
