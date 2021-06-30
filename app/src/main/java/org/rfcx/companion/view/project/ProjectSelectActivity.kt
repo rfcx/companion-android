@@ -72,6 +72,14 @@ class ProjectSelectActivity : AppCompatActivity(), (Int) -> Unit,
             finish()
         }
 
+        logoutButton.setOnClickListener {
+            DeploymentCleanupWorker.stopAllWork(this)
+            this.logout()
+            LocationTracking.set(this, false)
+            analytics.trackLogoutEvent()
+            finish()
+        }
+
     }
 
     private fun setViewModel() {
@@ -134,15 +142,6 @@ class ProjectSelectActivity : AppCompatActivity(), (Int) -> Unit,
 
     override fun onRefresh() {
         projectSelectViewModel.refreshProjects()
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        DeploymentCleanupWorker.stopAllWork(this)
-        this.logout()
-        LocationTracking.set(this, false)
-        analytics.trackLogoutEvent()
-        finish()
     }
 
     companion object {

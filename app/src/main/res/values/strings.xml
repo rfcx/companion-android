@@ -447,5 +447,6 @@
     <string name="something_went_wrong">something went wrong</string>
     <string name="network_not_available">network not available</string>
     <string name="no_content_project">There is no accessible project in this account.\nPlease contact an administrator\nor create the project in Arbimon platform.</string>
+    <string name="logout">logout</string>
 
 </resources>
