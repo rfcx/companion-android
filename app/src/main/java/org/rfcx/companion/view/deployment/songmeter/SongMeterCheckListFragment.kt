@@ -48,6 +48,11 @@ class SongMeterCheckListFragment : Fragment(), (Int, String) -> Unit {
             adapter = checkListRecyclerView
         }
         checkListRecyclerView.setCheckList(getAllChecks())
+
+        // set passed checks
+        deploymentProtocol?.getPassedChecks()?.forEach { number ->
+            checkListRecyclerView.setCheckPassed(number)
+        }
     }
 
     private fun setupButton() {
