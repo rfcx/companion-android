@@ -6,7 +6,6 @@ import android.content.SharedPreferences
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -98,9 +97,9 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private val preferences = Preferences.getInstance(this)
 
     // Local LiveData
-    private lateinit var audioMothDeployLiveData: LiveData<List<EdgeDeployment>>
-    private var audioMothDeployments = listOf<EdgeDeployment>()
-    private val audioMothDeploymentObserve = Observer<List<EdgeDeployment>> {
+    private lateinit var audioMothDeployLiveData: LiveData<List<Deployment>>
+    private var audioMothDeployments = listOf<Deployment>()
+    private val audioMothDeploymentObserve = Observer<List<Deployment>> {
         this.audioMothDeployments = it.filter { deployment -> deployment.isCompleted() }
         setSiteItems()
     }

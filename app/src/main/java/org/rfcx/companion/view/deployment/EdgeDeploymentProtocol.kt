@@ -1,7 +1,6 @@
 package org.rfcx.companion.view.deployment
 
 import org.rfcx.companion.entity.*
-import org.rfcx.companion.service.DownloadStreamState
 
 interface EdgeDeploymentProtocol : BaseDeploymentProtocol {
     fun openWithEdgeDevice()
@@ -9,9 +8,9 @@ interface EdgeDeploymentProtocol : BaseDeploymentProtocol {
 
     fun startSyncing(status: String)
 
-    fun getDeployment(): EdgeDeployment?
+    fun getDeployment(): Deployment?
 
-    fun setDeployment(deployment: EdgeDeployment)
+    fun setDeployment(deployment: Deployment)
 
     fun playSyncSound()
 

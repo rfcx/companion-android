@@ -50,7 +50,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     private val trackingDb by lazy { TrackingDb(realm) }
     private val trackingFileDb by lazy { TrackingFileDb(realm) }
 
-    private var _deployment: EdgeDeployment? = null
+    private var _deployment: Deployment? = null
     private var _deployLocation: DeploymentLocation? = null
     private var _images: List<String> = listOf()
     private var _siteItems = arrayListOf<SiteWithLastDeploymentItem>()
@@ -79,9 +79,9 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     private val analytics by lazy { Analytics(this) }
 
     // Local LiveData
-    private lateinit var audioMothDeployLiveData: LiveData<List<EdgeDeployment>>
-    private var audioMothDeployments = listOf<EdgeDeployment>()
-    private val audioMothDeploymentObserve = Observer<List<EdgeDeployment>> {
+    private lateinit var audioMothDeployLiveData: LiveData<List<Deployment>>
+    private var audioMothDeployments = listOf<Deployment>()
+    private val audioMothDeploymentObserve = Observer<List<Deployment>> {
         this.audioMothDeployments = it.filter { deployment -> deployment.isCompleted() }
         setSiteItems()
     }
@@ -162,7 +162,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         }
     }
 
-    private fun saveImages(deployment: EdgeDeployment) {
+    private fun saveImages(deployment: Deployment) {
         deploymentImageDb.deleteImages(deployment.id)
         deploymentImageDb.insertImage(deployment, null, _images)
     }
@@ -246,9 +246,9 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         startFragment(DetailDeploymentSiteFragment.newInstance(id, name, isNewSite))
     }
 
-    override fun getDeployment(): EdgeDeployment? {
+    override fun getDeployment(): Deployment? {
         if (this._deployment == null) {
-            this._deployment = EdgeDeployment()
+            this._deployment = Deployment()
         }
         return this._deployment
     }
@@ -260,7 +260,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         return projectDb.getProjectByName(name)
     }
 
-    override fun setDeployment(deployment: EdgeDeployment) {
+    override fun setDeployment(deployment: Deployment) {
         this._deployment = deployment
     }
 
@@ -289,7 +289,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
 
     override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
-        val deployment = _deployment ?: EdgeDeployment()
+        val deployment = _deployment ?: Deployment()
         deployment.isActive = locate.serverId == null
         deployment.state = DeploymentState.Edge.Locate.key // state
 
