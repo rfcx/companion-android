@@ -80,13 +80,13 @@ class GuardianSolarPanelFragment : Fragment() {
         }, DELAY, MILLI_PERIOD)
 
         SocketManager.sentinel.observe(viewLifecycleOwner, Observer { sentinelResponse ->
-            val input = sentinelResponse.sentinel.input
+            val input = sentinelResponse.sentinel.convertToInfo().input
             if (isSentinelConnected(input)) {
                 hideAssembleWarn()
 
-                val voltage = input.voltage
-                val current = input.current
-                val power = input.power
+                val voltage = input.voltage.toFloat() / 1000
+                val current = input.current.toFloat() / 1000
+                val power = input.power.toFloat() / 1000
 
                 // set 3 top value
                 setVoltageValue(voltage)
@@ -110,24 +110,24 @@ class GuardianSolarPanelFragment : Fragment() {
         return input.voltage != 0 && input.current != 0 && input.power != 0
     }
 
-    private fun setVoltageValue(value: Int) {
+    private fun setVoltageValue(value: Float) {
         voltageValueTextView.text = value.toString()
     }
 
-    private fun setCurrentValue(value: Int) {
+    private fun setCurrentValue(value: Float) {
         currentValueTextView.text = value.toString()
     }
 
-    private fun setPowerValue(value: Int) {
+    private fun setPowerValue(value: Float) {
         powerValueTextView.text = value.toString()
     }
 
-    private fun convertVoltageAndPowerToEntry(voltage: Int, power: Int): Pair<Entry, Entry> {
+    private fun convertVoltageAndPowerToEntry(voltage: Float, power: Float): Pair<Entry, Entry> {
         val voltageDataSet = feedbackChart.data.getDataSetByIndex(0) as LineDataSet
         val powerDataSet = feedbackChart.data.getDataSetByIndex(1) as LineDataSet
         return Pair(
-            Entry((voltageDataSet.entryCount - 1).toFloat(), voltage.toFloat()),
-            Entry((powerDataSet.entryCount - 1).toFloat(), power.toFloat())
+            Entry((voltageDataSet.entryCount - 1).toFloat(), voltage),
+            Entry((powerDataSet.entryCount - 1).toFloat(), power)
         )
     }
 
@@ -202,7 +202,7 @@ class GuardianSolarPanelFragment : Fragment() {
         feedbackChart.data = lineData
     }
 
-    private fun updateData(voltage: Int, power: Int) {
+    private fun updateData(voltage: Float, power: Float) {
         val pair = convertVoltageAndPowerToEntry(voltage, power)
         // get voltage data set
         voltageLineDataSet = feedbackChart.data.getDataSetByIndex(0) as LineDataSet
@@ -254,8 +254,8 @@ class GuardianSolarPanelFragment : Fragment() {
         private const val MILLI_PERIOD = 1000L
 
         private const val X_AXIS_MAXIMUM = 100f
-        private const val LEFT_AXIS_MAXIMUM = 200f
-        private const val RIGHT_AXIS_MAXIMUM = 150f
+        private const val LEFT_AXIS_MAXIMUM = 30f
+        private const val RIGHT_AXIS_MAXIMUM = 30f
         private const val AXIS_MINIMUM = 0f
         private const val AXIS_LINE_WIDTH = 2f
 
