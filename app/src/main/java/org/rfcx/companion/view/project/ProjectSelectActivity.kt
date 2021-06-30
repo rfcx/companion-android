@@ -48,7 +48,7 @@ class ProjectSelectActivity : AppCompatActivity(), (Int) -> Unit,
         if (this.isNetworkAvailable()) {
             setObserver()
         } else {
-            showToast(getString(R.string.error_has_occurred))
+            showToast(getString(R.string.network_not_available))
             addProjectsToAdapter()
         }
 
