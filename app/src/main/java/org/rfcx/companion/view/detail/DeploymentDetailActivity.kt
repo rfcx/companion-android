@@ -174,6 +174,8 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
                     if (it.remotePath != null) BuildConfig.DEVICE_API_DOMAIN + it.remotePath else "file://${it.localPath}"
                 } as ArrayList
 
+                val index = list.indexOf(deploymentImageView.remotePath ?: "file://${deploymentImageView.localPath}")
+                list.removeAt(index)
                 list.add(0, deploymentImageView.remotePath ?: "file://${deploymentImageView.localPath}")
 
                 DisplayImageActivity.startActivity(this@DeploymentDetailActivity, list)
