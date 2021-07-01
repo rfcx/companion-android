@@ -337,10 +337,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             setDeployment(it)
 
             val deploymentId = guardianDeploymentDb.insertOrUpdateDeployment(it, _deployLocation!!)
-            if (!useExistedLocation) {
-                this._locate?.let { loc ->
-                    locateDb.insertOrUpdateLocate(deploymentId, loc, true) // update locate - last deployment
-                }
+            this._locate?.let { loc ->
+                locateDb.insertOrUpdateLocate(deploymentId, loc, true) // update locate - last deployment
             }
 
             if (useExistedLocation) {
