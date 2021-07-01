@@ -46,10 +46,14 @@ class ProjectSelectViewModel(
                 ) {
                     if (response.isSuccessful) {
                         response.body()?.let { projectsRes ->
-                            projectsRes.forEach { item ->
-                                projectSelectRepository.saveProjectToLocal(item)
+                            if (!projectsRes.isNullOrEmpty()) {
+                                projectsRes.forEach { item ->
+                                    projectSelectRepository.saveProjectToLocal(item)
+                                }
+                                fetchDeletedProjects()
+                            } else {
+                                projects.postValue(Resource.success(listOf()))
                             }
-                            fetchDeletedProjects()
                         }
                     } else {
                         projects.postValue(Resource.error(context.getString(R.string.something_went_wrong), null))
@@ -74,7 +78,7 @@ class ProjectSelectViewModel(
                     if (response.isSuccessful) {
                         response.body()?.let { projectsRes ->
                             projectSelectRepository.removeProjectFromLocal(projectsRes.map { it.id!! }) // remove project with these coreIds
-                            projects.postValue(Resource.success(projectsRes.map { it.toLocationGroups() })) // no need to send project data
+                            projects.postValue(Resource.success(null)) // no need to send project data
                         }
                     } else {
                         projects.postValue(Resource.error(context.getString(R.string.something_went_wrong), null))
