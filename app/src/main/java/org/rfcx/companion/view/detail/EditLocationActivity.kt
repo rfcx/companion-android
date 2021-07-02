@@ -15,7 +15,7 @@ import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.toLocationGroup
 import org.rfcx.companion.localdb.DatabaseCallback
-import org.rfcx.companion.localdb.EdgeDeploymentDb
+import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.service.DeploymentSyncWorker
@@ -31,7 +31,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
 
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
+    private val edgeDeploymentDb by lazy { DeploymentDb(realm) }
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locationGroupDb by lazy { ProjectDb(realm) }
 

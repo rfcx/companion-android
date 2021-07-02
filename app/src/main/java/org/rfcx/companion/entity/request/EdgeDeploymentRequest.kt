@@ -1,7 +1,7 @@
 package org.rfcx.companion.entity.request
 
 import org.rfcx.companion.entity.Device
-import org.rfcx.companion.entity.EdgeDeployment
+import org.rfcx.companion.entity.Deployment
 import org.rfcx.companion.util.toISO8601Format
 import java.util.*
 
@@ -12,7 +12,7 @@ data class DeploymentRequest(
     var stream: StreamRequest? = null
 )
 
-fun EdgeDeployment.toRequestBody(): DeploymentRequest {
+fun Deployment.toRequestBody(): DeploymentRequest {
     return DeploymentRequest(
         deploymentType = Device.AUDIOMOTH.value,
         deployedAt = this.deployedAt.toISO8601Format(),

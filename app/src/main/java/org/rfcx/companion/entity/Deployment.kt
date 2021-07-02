@@ -14,7 +14,7 @@ import org.rfcx.companion.view.map.MapMarker
 import java.util.*
 
 @RealmClass
-open class EdgeDeployment(
+open class Deployment(
     @PrimaryKey
     var id: Int = 0,
     var serverId: String? = null,
@@ -29,7 +29,8 @@ open class EdgeDeployment(
     var updatedAt: Date? = null,
     var deletedAt: Date? = null,
     var isActive: Boolean = true,
-    var passedChecks: RealmList<Int>? = null
+    var passedChecks: RealmList<Int>? = null,
+    var deploymentType : String = Device.AUDIOMOTH.value
 ) : RealmModel {
 
     fun isCompleted(): Boolean {
@@ -37,20 +38,21 @@ open class EdgeDeployment(
     }
 
     companion object {
-        const val TABLE_NAME = "EdgeDeployment"
+        const val TABLE_NAME = "Deployment"
         const val FIELD_ID = "id"
         const val FIELD_STATE = "state"
         const val FIELD_SYNC_STATE = "syncState"
         const val FIELD_SERVER_ID = "serverId"
         const val FIELD_DEPLOYMENT_KEY = "deploymentKey"
         const val FIELD_STREAM = "stream"
+        const val FIELD_DEPLOYMENT_TYPE = "deploymentType"
         const val FIELD_UPDATED_AT = "updatedAt"
         const val FIELD_DELETED_AT = "deletedAt"
         const val FIELD_PASSED_CHECKS = "passedChecks"
     }
 }
 
-fun EdgeDeployment.toMark(context: Context, projectDb: ProjectDb): MapMarker.DeploymentMarker {
+fun Deployment.toMark(context: Context, projectDb: ProjectDb): MapMarker.DeploymentMarker {
     val color = stream?.project?.color
     val group = stream?.project?.name
     val isGroupExisted = projectDb.isExisted(group)

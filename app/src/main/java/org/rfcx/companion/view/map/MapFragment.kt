@@ -24,7 +24,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.work.WorkInfo
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
@@ -102,7 +101,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
     // database manager
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
+    private val edgeDeploymentDb by lazy { DeploymentDb(realm) }
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
     private val locationGroupDb by lazy { ProjectDb(realm) }
@@ -111,13 +110,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
     // data
     private var guardianDeployments = listOf<GuardianDeployment>()
-    private var edgeDeployments = listOf<EdgeDeployment>()
+    private var edgeDeployments = listOf<Deployment>()
     private var locations = listOf<Locate>()
     private var locationGroups = listOf<Project>()
     private var lastSyncingInfo: SyncInfo? = null
 
     private lateinit var guardianDeployLiveData: LiveData<List<GuardianDeployment>>
-    private lateinit var edgeDeployLiveData: LiveData<List<EdgeDeployment>>
+    private lateinit var deployLiveData: LiveData<List<Deployment>>
     private lateinit var locateLiveData: LiveData<List<Locate>>
     private lateinit var locationGroupLiveData: LiveData<List<Project>>
     private lateinit var deploymentWorkInfoLiveData: LiveData<List<WorkInfo>>
@@ -912,7 +911,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         combinedData()
     }
 
-    private val edgeDeploymentObserve = Observer<List<EdgeDeployment>> {
+    private val edgeDeploymentObserve = Observer<List<Deployment>> {
         this.edgeDeployments = it
         combinedData()
     }
@@ -1016,7 +1015,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             it
         }
 
-        edgeDeployLiveData =
+        deployLiveData =
             Transformations.map(edgeDeploymentDb.getAllResultsAsync().asLiveData()) {
                 it
             }
@@ -1032,7 +1031,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             }
 
         locateLiveData.observeForever(locateObserve)
-        edgeDeployLiveData.observeForever(edgeDeploymentObserve)
+        deployLiveData.observeForever(edgeDeploymentObserve)
         guardianDeployLiveData.observeForever(guardianDeploymentObserve)
         locationGroupLiveData.observeForever(locationGroupObserve)
     }
@@ -1464,7 +1463,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         deploymentWorkInfoLiveData.removeObserver(deploymentWorkInfoObserve)
         downloadStreamsWorkInfoLiveData.removeObserver(downloadStreamsWorkInfoObserve)
         guardianDeployLiveData.removeObserver(guardianDeploymentObserve)
-        edgeDeployLiveData.removeObserver(edgeDeploymentObserve)
+        deployLiveData.removeObserver(edgeDeploymentObserve)
         locateLiveData.removeObserver(locateObserve)
         locationGroupLiveData.removeObserver(locationGroupObserve)
         locationEngine?.removeLocationUpdates(mapboxLocationChangeCallback)

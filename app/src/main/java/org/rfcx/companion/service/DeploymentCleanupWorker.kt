@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.work.*
 import io.realm.Realm
 import org.rfcx.companion.localdb.DeploymentImageDb
-import org.rfcx.companion.localdb.EdgeDeploymentDb
+import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.localdb.TrackingFileDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.service.images.ImageSyncWorker
@@ -25,7 +25,7 @@ class DeploymentCleanupWorker(val context: Context, params: WorkerParameters) :
 
     private fun resendIfRequired() {
         val realm = Realm.getInstance(RealmHelper.migrationConfig())
-        val edgeDeploymentDb = EdgeDeploymentDb(realm)
+        val edgeDeploymentDb = DeploymentDb(realm)
         val unsent = edgeDeploymentDb.unsentCount()
         Log.d(TAG, "resendIfRequired: found $unsent unsent")
 

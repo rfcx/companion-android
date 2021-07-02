@@ -1,7 +1,7 @@
 package org.rfcx.companion.entity.response
 
 import org.rfcx.companion.entity.DeploymentState
-import org.rfcx.companion.entity.EdgeDeployment
+import org.rfcx.companion.entity.Deployment
 import org.rfcx.companion.entity.SyncState
 import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import org.rfcx.companion.entity.guardian.GuardianDeployment
@@ -36,8 +36,8 @@ fun DeploymentResponse.toGuardianDeployment(): GuardianDeployment {
 }
 
 
-fun DeploymentResponse.toEdgeDeployment(): EdgeDeployment {
-    return EdgeDeployment(
+fun DeploymentResponse.toEdgeDeployment(): Deployment {
+    return Deployment(
         deploymentKey = this.id,
         serverId = this.id,
         deployedAt = this.deployedAt ?: Date(),

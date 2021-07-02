@@ -6,7 +6,6 @@ import android.content.SharedPreferences
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -57,7 +56,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private val locateDb by lazy { LocateDb(realm) }
     private val projectDb by lazy { ProjectDb(realm) }
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
-    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
+    private val edgeDeploymentDb by lazy { DeploymentDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val trackingDb by lazy { TrackingDb(realm) }
     private val trackingFileDb by lazy { TrackingFileDb(realm) }
@@ -98,9 +97,9 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private val preferences = Preferences.getInstance(this)
 
     // Local LiveData
-    private lateinit var audioMothDeployLiveData: LiveData<List<EdgeDeployment>>
-    private var audioMothDeployments = listOf<EdgeDeployment>()
-    private val audioMothDeploymentObserve = Observer<List<EdgeDeployment>> {
+    private lateinit var audioMothDeployLiveData: LiveData<List<Deployment>>
+    private var audioMothDeployments = listOf<Deployment>()
+    private val audioMothDeploymentObserve = Observer<List<Deployment>> {
         this.audioMothDeployments = it.filter { deployment -> deployment.isCompleted() }
         setSiteItems()
     }

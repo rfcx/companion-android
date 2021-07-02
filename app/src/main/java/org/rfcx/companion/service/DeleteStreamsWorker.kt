@@ -7,10 +7,9 @@ import androidx.work.*
 import io.realm.Realm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.rfcx.companion.entity.EdgeDeployment
 import org.rfcx.companion.entity.response.StreamResponse
 import org.rfcx.companion.entity.response.toLocate
-import org.rfcx.companion.localdb.EdgeDeploymentDb
+import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
@@ -36,7 +35,7 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
         val result = getStreams(token, currentStreamsLoading)
         if (result) {
             val streamDb = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
-            val deploymentDb = EdgeDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
+            val deploymentDb = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
             val guardianDeploymentDb = GuardianDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
             val savedStreams = streamDb.getLocations().filter { it.serverId != null }
             val downloadedStreams = streams.map { it.toLocate().serverId }

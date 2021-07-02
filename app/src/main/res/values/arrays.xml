@@ -30,7 +30,17 @@
     <string-array name="edge_optional_checks">
         <item>@string/add_photo</item>
     </string-array>
-    
+
+    <!--  Song Meter  -->
+    <string-array name="song_meter_setup_checks">
+        <item>@string/set_deployment_site</item>
+        <item>@string/synchronize_with_song_meter</item>
+    </string-array>
+
+    <string-array name="song_meter_optional_checks">
+        <item>@string/add_photo</item>
+    </string-array>
+
     <!--  Guardian  -->
     <string-array name="guardian_steps">
         <item>Connect</item>

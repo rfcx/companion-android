@@ -58,6 +58,10 @@ class CompanionRealmMigration : RealmMigration {
         if (oldVersion < 15L && newVersion >= 15L) {
             migrateToV15(realm)
         }
+
+        if (oldVersion < 16L && newVersion >= 16L) {
+            migrateToV16(realm)
+        }
     }
 
     private fun migrateToV2(realm: DynamicRealm) {
@@ -73,7 +77,7 @@ class CompanionRealmMigration : RealmMigration {
         val edgeConfiguration = realm.schema.rename("Configuration", "EdgeConfiguration")
 
         // Rename table Deployment to EdgeDeployment
-        val edgeDeployment = realm.schema.rename("Deployment", EdgeDeployment.TABLE_NAME)
+        val edgeDeployment = realm.schema.rename("Deployment", Deployment.TABLE_NAME)
 
         // Add field updatedAt and deletedAt to EdgeDeployment
         edgeDeployment?.apply {
@@ -89,8 +93,8 @@ class CompanionRealmMigration : RealmMigration {
                 "configuration_tmp"
             )
 
-            addField(EdgeDeployment.FIELD_UPDATED_AT, Date::class.java)
-            addField(EdgeDeployment.FIELD_DELETED_AT, Date::class.java)
+            addField(Deployment.FIELD_UPDATED_AT, Date::class.java)
+            addField(Deployment.FIELD_DELETED_AT, Date::class.java)
         }
 
         val locate = realm.schema.get(Locate.TABLE_NAME)
@@ -141,7 +145,7 @@ class CompanionRealmMigration : RealmMigration {
 
         // Delete field first to avoid ref error
         // Remove fields that were not used in AudioMoth version
-        val edgeDeployment = realm.schema.get(EdgeDeployment.TABLE_NAME)
+        val edgeDeployment = realm.schema.get(Deployment.TABLE_NAME)
         edgeDeployment?.apply {
             val hasConfigField = this.hasField("configuration")
             val hasBatteryLevelField = this.hasField("batteryLevel")
@@ -169,10 +173,10 @@ class CompanionRealmMigration : RealmMigration {
     }
 
     private fun migrateToV5(realm: DynamicRealm) {
-        val edgeDeployment = realm.schema.get(EdgeDeployment.TABLE_NAME)
+        val edgeDeployment = realm.schema.get(Deployment.TABLE_NAME)
         edgeDeployment?.apply {
-            addRealmListField(EdgeDeployment.FIELD_PASSED_CHECKS, Int::class.java)
-                .setNullable(EdgeDeployment.FIELD_PASSED_CHECKS, true)
+            addRealmListField(Deployment.FIELD_PASSED_CHECKS, Int::class.java)
+                .setNullable(Deployment.FIELD_PASSED_CHECKS, true)
         }
     }
 
@@ -223,10 +227,10 @@ class CompanionRealmMigration : RealmMigration {
             addField(DeploymentLocation.FIELD_CORE_ID, String::class.java)
         }
 
-        val edgeDeployment = realm.schema.get(EdgeDeployment.TABLE_NAME)
+        val edgeDeployment = realm.schema.get(Deployment.TABLE_NAME)
         edgeDeployment?.apply {
-            renameField("location", EdgeDeployment.FIELD_STREAM)
-            renameField("deploymentId", EdgeDeployment.FIELD_DEPLOYMENT_KEY)
+            renameField("location", Deployment.FIELD_STREAM)
+            renameField("deploymentId", Deployment.FIELD_DEPLOYMENT_KEY)
         }
 
         val guardianDeployment = realm.schema.get(GuardianDeployment.TABLE_NAME)
@@ -236,7 +240,7 @@ class CompanionRealmMigration : RealmMigration {
     }
 
     private fun migrateToV10(realm: DynamicRealm) {
-        val edgeDeployment = realm.schema.get(EdgeDeployment.TABLE_NAME)
+        val edgeDeployment = realm.schema.get(Deployment.TABLE_NAME)
         edgeDeployment?.apply {
             addField("isActive", Boolean::class.java)
         }
@@ -328,6 +332,15 @@ class CompanionRealmMigration : RealmMigration {
         val locationGroups = realm.schema.get("LocationGroups")
         locationGroups?.apply {
             className = "Project"
+        }
+    }
+
+    private fun migrateToV16(realm: DynamicRealm) {
+        // Rename table EdgeDeployment to Deployment
+        val deployment = realm.schema.rename("EdgeDeployment", Deployment.TABLE_NAME)
+        deployment?.apply {
+            addField(Deployment.FIELD_DEPLOYMENT_TYPE, String::class.java)
+                .setNullable(Deployment.FIELD_DEPLOYMENT_TYPE, false)
         }
     }
 

@@ -7,12 +7,10 @@ import androidx.work.*
 import io.realm.Realm
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.localdb.DeploymentImageDb
-import org.rfcx.companion.localdb.EdgeDeploymentDb
-import org.rfcx.companion.localdb.TrackingFileDb
+import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.RealmHelper
-import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.util.getIdToken
 
 class DownloadImagesWorker(val context: Context, params: WorkerParameters) :
@@ -24,7 +22,7 @@ class DownloadImagesWorker(val context: Context, params: WorkerParameters) :
 
         Log.d(TAG, "doWork on DownloadAssets")
 
-        val edgeDeploymentDb = EdgeDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
+        val edgeDeploymentDb = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val edgeDeployment = edgeDeploymentDb.getDeploymentByServerId(deploymentServerId)
         val guardianDeploymentDb = GuardianDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val guardianDeployment = guardianDeploymentDb.getDeploymentByServerId(deploymentServerId)

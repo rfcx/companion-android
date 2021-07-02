@@ -34,11 +34,11 @@ import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.DeploymentImage
 import org.rfcx.companion.entity.Device
-import org.rfcx.companion.entity.EdgeDeployment
+import org.rfcx.companion.entity.Deployment
 import org.rfcx.companion.entity.Status
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.localdb.DeploymentImageDb
-import org.rfcx.companion.localdb.EdgeDeploymentDb
+import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.DownloadImagesWorker
@@ -50,7 +50,7 @@ import java.io.File
 
 class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (DeploymentImageView) -> Unit {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
+    private val edgeDeploymentDb by lazy { DeploymentDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
     private val locationGroupDb by lazy { ProjectDb(realm) }
@@ -60,7 +60,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
     private val analytics by lazy { Analytics(this) }
 
     // data
-    private var deployment: EdgeDeployment? = null
+    private var deployment: Deployment? = null
     private lateinit var deployImageLiveData: LiveData<List<DeploymentImage>>
     private var deploymentImages = listOf<DeploymentImage>()
     private val deploymentImageObserve = Observer<List<DeploymentImage>> {
@@ -254,7 +254,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         }
     }
 
-    private fun updateDeploymentDetailView(deployment: EdgeDeployment) {
+    private fun updateDeploymentDetailView(deployment: Deployment) {
         // setup deployment images view
         observeDeploymentImage(deployment.id)
         val location = deployment.stream
@@ -313,7 +313,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         scaleBarPlugin.create(ScaleBarOptions(this))
     }
 
-    private fun setLocationOnMap(deployment: EdgeDeployment) {
+    private fun setLocationOnMap(deployment: Deployment) {
         val location = deployment.stream
         location?.let { locate ->
             val latLng = LatLng(locate.latitude, locate.longitude)

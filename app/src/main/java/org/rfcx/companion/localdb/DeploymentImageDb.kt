@@ -9,7 +9,7 @@ import org.rfcx.companion.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_SERV
 import org.rfcx.companion.entity.DeploymentImage.Companion.FIELD_DEVICE
 import org.rfcx.companion.entity.DeploymentImage.Companion.FIELD_ID
 import org.rfcx.companion.entity.Device
-import org.rfcx.companion.entity.EdgeDeployment
+import org.rfcx.companion.entity.Deployment
 import org.rfcx.companion.entity.SyncState
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
@@ -106,7 +106,7 @@ class DeploymentImageDb(private val realm: Realm) {
     }
 
     fun insertImage(
-        deployment: EdgeDeployment? = null,
+        deployment: Deployment? = null,
         guardianDeployment: GuardianDeployment? = null,
         attachImages: List<String>
     ) {

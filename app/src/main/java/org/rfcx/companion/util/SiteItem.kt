@@ -3,9 +3,8 @@ package org.rfcx.companion.util
 import android.content.Context
 import android.location.Location
 import android.location.LocationManager
-import android.util.Log
 import org.rfcx.companion.R
-import org.rfcx.companion.entity.EdgeDeployment
+import org.rfcx.companion.entity.Deployment
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
@@ -33,13 +32,13 @@ private fun findNearLocations(
 
 fun getListSite(
     context: Context,
-    edgeDeployments: List<EdgeDeployment>,
+    deployments: List<Deployment>,
     guardianDeployments: List<GuardianDeployment>,
     projectName: String,
     currentUserLocation: Location,
     locations: List<Locate>
 ): ArrayList<SiteWithLastDeploymentItem> {
-    var showDeployments = edgeDeployments
+    var showDeployments = deployments
     var guardianShowDeployments = guardianDeployments
     if (projectName != context.getString(R.string.none)) {
         showDeployments =
@@ -72,7 +71,7 @@ fun getListSite(
 
 fun isHaveDeployment(
     guardians: List<GuardianDeployment>,
-    audioMoths: List<EdgeDeployment>,
+    audioMoths: List<Deployment>,
     locate: Locate
 ): Date? {
     val guardianDeployAt = guardians.find { dp -> dp.stream?.name == locate.name }?.deployedAt
@@ -85,12 +84,12 @@ fun isHaveDeployment(
 
 fun getListSiteWithOutCurrentLocation(
     context: Context,
-    edgeDeployments: List<EdgeDeployment>,
+    deployments: List<Deployment>,
     guardianDeployments: List<GuardianDeployment>,
     projectName: String,
     locations: List<Locate>
 ): ArrayList<SiteWithLastDeploymentItem> {
-    var showDeployments = edgeDeployments
+    var showDeployments = deployments
     var guardianShowDeployments = guardianDeployments
     if (projectName != context.getString(R.string.none)) {
         showDeployments =

@@ -12,7 +12,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
-import com.mapbox.mapboxsdk.geometry.LatLng
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
@@ -20,20 +19,20 @@ import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
 import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.entity.Locate
-import org.rfcx.companion.localdb.EdgeDeploymentDb
+import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.service.DeploymentCleanupWorker
-import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.EdgeDeploymentActivity
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
+import org.rfcx.companion.view.deployment.songmeter.SongMeterDeploymentActivity
 import org.rfcx.companion.view.map.MapFragment
 import org.rfcx.companion.view.profile.ProfileFragment
 import org.rfcx.companion.widget.BottomNavigationMenuItem
 
 class MainActivity : AppCompatActivity(), MainActivityListener {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
+    private val edgeDeploymentDb by lazy { DeploymentDb(realm) }
     private val projectDb by lazy { ProjectDb(realm) }
 
     private var currentFragment: Fragment? = null
@@ -93,12 +92,17 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
                     val addEdgeOrAudioMoth =
                         tip.findViewById<ConstraintLayout>(R.id.audioMothLayout)
                     val addGuardian = tip.findViewById<ConstraintLayout>(R.id.guardianLayout)
+                    val addSongMeter = tip.findViewById<ConstraintLayout>(R.id.songMeterLayout)
                     addEdgeOrAudioMoth?.setOnClickListener {
                         EdgeDeploymentActivity.startActivity(this)
                         tip.dismiss()
                     }
                     addGuardian?.setOnClickListener {
                         GuardianDeploymentActivity.startActivity(this)
+                        tip.dismiss()
+                    }
+                    addSongMeter?.setOnClickListener {
+                        SongMeterDeploymentActivity.startActivity(this)
                         tip.dismiss()
                     }
                     tip.show()
