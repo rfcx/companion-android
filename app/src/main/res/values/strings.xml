@@ -450,4 +450,7 @@
     <!-- ProjectSelectorActivity -->
     <string name="choose_project">Choose which project you are working with</string>
 
+    <!-- ConnectGuardianFragment -->
+    <string name="nearby_songmeter">Searching for Nearby\n SongMeter</string>
+
 </resources>

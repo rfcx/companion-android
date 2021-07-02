@@ -31,7 +31,7 @@ class SongMeterCheckListFragment : Fragment(), (Int, String) -> Unit {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_song_meter_check_list, container, false)
+        return inflater.inflate(R.layout.fragment_songmeter_check_list, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
