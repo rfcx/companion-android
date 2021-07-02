@@ -332,10 +332,8 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             setDeployment(it)
 
             val deploymentId = edgeDeploymentDb.insertOrUpdate(it, _deployLocation!!)
-            if (!useExistedLocation) {
-                this._locate?.let { loc ->
-                    locateDb.insertOrUpdateLocate(deploymentId, loc) // update locate - last deployment
-                }
+            this._locate?.let { loc ->
+                locateDb.insertOrUpdateLocate(deploymentId, loc) // update locate - last deployment
             }
 
             if (useExistedLocation) {
