@@ -147,7 +147,53 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
     }
 
     override fun backStep() {
-        TODO("Not yet implemented")
+        val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
+        when (container) {
+            is MapPickerFragment -> startFragment(
+                DetailDeploymentSiteFragment.newInstance(
+                    latitude,
+                    longitude,
+                    siteId,
+                    nameLocation
+                )
+            )
+            is SongMeterCheckListFragment -> {
+                _deployment?.let {
+                    it.passedChecks = passedChecks
+                    songMeterViewModel.updateDeployment(it)
+
+                    saveImages(it)
+                }
+                passedChecks.clear() // remove all passed
+                finish()
+            }
+            is DetailDeploymentSiteFragment -> {
+                if (_deployLocation == null) {
+                    startFragment(
+                        SetDeploymentSiteFragment.newInstance(
+                            currentLocation?.latitude ?: 0.0, currentLocation?.longitude ?: 0.0
+                        )
+                    )
+                } else {
+                    startCheckList()
+                }
+            }
+            else -> startCheckList()
+        }
+    }
+
+    override fun onBackPressed() {
+        backStep()
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        backStep()
+        return true
+    }
+
+    private fun saveImages(deployment: Deployment) {
+        songMeterViewModel.deleteImages(deployment)
+        songMeterViewModel.insertImage(deployment, null, _images)
     }
 
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
@@ -271,6 +317,14 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
         siteId: Int,
         name: String
     ) {
-        startFragment(DetailDeploymentSiteFragment.newInstance(latitude, longitude, siteId, name, true))
+        startFragment(
+            DetailDeploymentSiteFragment.newInstance(
+                latitude,
+                longitude,
+                siteId,
+                name,
+                true
+            )
+        )
     }
 }
