@@ -417,7 +417,7 @@
     <string name="notification_no">No</string>
 
     <!-- SongMeterCheckListFragment -->
-    <string name="song_meter_checklist">Song Meter Setup Checklist:</string>
+    <string name="song_meter_checklist">SongMeter Setup Checklist:</string>
     <string name="synchronize_with_song_meter">Synchronize with Song Meter</string>
 
     <!-- ConnectInstructionDiaglogFragment -->
@@ -453,5 +453,8 @@
     <string name="network_not_available">network not available</string>
     <string name="no_content_project">There is no accessible project in this account.\nPlease contact an administrator\nor create the project in Arbimon platform.</string>
     <string name="logout">logout</string>
+
+    <!-- SongMeterConnectFragment -->
+    <string name="nearby_songmeter">Searching for Nearby\n SongMeters</string>
 
 </resources>

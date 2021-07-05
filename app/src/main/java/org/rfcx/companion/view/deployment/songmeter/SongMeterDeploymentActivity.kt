@@ -21,11 +21,14 @@ import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.util.getLastLocation
 import org.rfcx.companion.util.getListSite
+import org.rfcx.companion.view.deployment.ChooseDeviceFragment
 import org.rfcx.companion.view.deployment.DeployFragment
+import org.rfcx.companion.view.deployment.EdgeCheckListFragment
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.deployment.location.DetailDeploymentSiteFragment
 import org.rfcx.companion.view.deployment.location.SetDeploymentSiteFragment
+import org.rfcx.companion.view.deployment.songmeter.connect.SongMeterConnectFragment
 import org.rfcx.companion.view.detail.MapPickerProtocol
 
 class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProtocol,
@@ -161,7 +164,6 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
                 _deployment?.let {
                     it.passedChecks = passedChecks
                     songMeterViewModel.updateDeployment(it)
-
                     saveImages(it)
                 }
                 passedChecks.clear() // remove all passed
@@ -260,7 +262,7 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
                 }
             }
             1 -> {
-                // TODO:: Sync process
+                startFragment(SongMeterConnectFragment.newInstance())
             }
             2 -> {
                 startFragment(DeployFragment.newInstance(Screen.SONG_METER_CHECK_LIST.id))
