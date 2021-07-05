@@ -417,7 +417,7 @@
     <string name="notification_no">No</string>
 
     <!-- SongMeterCheckListFragment -->
-    <string name="song_meter_checklist">Song Meter Setup Checklist:</string>
+    <string name="song_meter_checklist">SongMeter Setup Checklist:</string>
     <string name="synchronize_with_song_meter">Synchronize with Song Meter</string>
 
     <!-- ConnectInstructionDiaglogFragment -->
@@ -450,7 +450,7 @@
     <!-- ProjectSelectorActivity -->
     <string name="choose_project">Choose which project you are working with</string>
 
-    <!-- ConnectGuardianFragment -->
-    <string name="nearby_songmeter">Searching for Nearby\n SongMeter</string>
+    <!-- SongMeterConnectFragment -->
+    <string name="nearby_songmeter">Searching for Nearby\n SongMeters</string>
 
 </resources>

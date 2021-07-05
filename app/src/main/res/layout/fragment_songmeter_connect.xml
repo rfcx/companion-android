@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_padding_normal"
         android:textAlignment="center"
-        android:text="@string/connecting_up"
+        android:text="@string/nearby_songmeter"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>

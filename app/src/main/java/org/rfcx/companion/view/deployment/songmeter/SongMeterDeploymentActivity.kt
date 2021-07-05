@@ -21,11 +21,14 @@ import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.util.getLastLocation
 import org.rfcx.companion.util.getListSite
+import org.rfcx.companion.view.deployment.ChooseDeviceFragment
 import org.rfcx.companion.view.deployment.DeployFragment
+import org.rfcx.companion.view.deployment.EdgeCheckListFragment
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.deployment.location.DetailDeploymentSiteFragment
 import org.rfcx.companion.view.deployment.location.SetDeploymentSiteFragment
+import org.rfcx.companion.view.deployment.songmeter.connect.SongMeterConnectFragment
 import org.rfcx.companion.view.detail.MapPickerProtocol
 
 class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProtocol,
@@ -147,7 +150,36 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
     }
 
     override fun backStep() {
-        TODO("Not yet implemented")
+        val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
+        when (container) {
+            is MapPickerFragment -> startFragment(
+                DetailDeploymentSiteFragment.newInstance(
+                    latitude,
+                    longitude,
+                    siteId,
+                    nameLocation
+                )
+            )
+            is SongMeterCheckListFragment -> {
+                _deployment?.let {
+                    it.passedChecks = passedChecks
+                }
+                passedChecks.clear() // remove all passed
+                finish()
+            }
+            is DetailDeploymentSiteFragment -> {
+                if (_deployLocation == null) {
+                    startFragment(
+                        SetDeploymentSiteFragment.newInstance(
+                            currentLocation?.latitude ?: 0.0, currentLocation?.longitude ?: 0.0
+                        )
+                    )
+                } else {
+                    startCheckList()
+                }
+            }
+            else -> startCheckList()
+        }
     }
 
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
@@ -214,7 +246,7 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
                 }
             }
             1 -> {
-                // TODO:: Sync process
+                startFragment(SongMeterConnectFragment.newInstance())
             }
             2 -> {
                 startFragment(DeployFragment.newInstance(Screen.SONG_METER_CHECK_LIST.id))

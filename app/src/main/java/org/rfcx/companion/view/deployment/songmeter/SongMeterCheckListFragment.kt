@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.fragment_song_meter_check_list.*
+import kotlinx.android.synthetic.main.fragment_songmeter_check_list.*
 import org.rfcx.companion.R
 import org.rfcx.companion.adapter.CheckListItem
 import org.rfcx.companion.view.deployment.CheckListAdapter
