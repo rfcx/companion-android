@@ -456,5 +456,7 @@
 
     <!-- SongMeterConnectFragment -->
     <string name="nearby_songmeter">Searching for Nearby\n SongMeters</string>
+    <string name="detected_recorders">Detected recorders</string>
+    <string name="turn_recorder_on_to_detect">Turn recorder on to detect</string>
 
 </resources>

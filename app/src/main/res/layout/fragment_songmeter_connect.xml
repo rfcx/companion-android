@@ -4,17 +4,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
+    <com.google.android.material.progressindicator.ProgressIndicator
+        android:id="@+id/songMeterLoading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        app:indicatorType="linear"
+        android:visibility="invisible"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/nearbySongMeterTextView"
-        style="@style/AudioMothText.Headline"
+        android:id="@+id/songMeterSuggestTextView"
+        style="@style/AudioMothText.Subhead.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_padding_normal"
-        android:textAlignment="center"
-        android:text="@string/nearby_songmeter"
+        android:text="@string/turn_recorder_on_to_detect"
+        app:layout_constraintBottom_toTopOf="@id/connectSongMeterButton"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/songMeterRecyclerView"
@@ -24,8 +33,8 @@
         android:layout_marginTop="@dimen/margin_padding_normal"
         android:layout_marginEnd="@dimen/margin_padding_large"
         android:layout_marginBottom="@dimen/margin_padding_normal"
-        app:layout_constraintBottom_toTopOf="@id/connectSongMeterButton"
-        app:layout_constraintTop_toBottomOf="@id/nearbySongMeterTextView" />
+        app:layout_constraintBottom_toTopOf="@id/retryScanButton"
+        app:layout_constraintTop_toBottomOf="@id/songMeterLoading" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/connectSongMeterButton"
@@ -41,14 +50,13 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/retryScanButton"
-        style="@style/AudioMothButton.GreenButton"
+        style="@style/GuardianButton.GreenButton.Line"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginEnd="@dimen/margin_padding_large"
         android:layout_marginBottom="@dimen/margin_padding_normal"
         android:text="@string/retry"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toTopOf="@id/connectSongMeterButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
