@@ -4,11 +4,13 @@ import org.rfcx.companion.entity.Deployment
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.repo.api.DeviceApiHelper
+import org.rfcx.companion.repo.ble.BleHelper
 import org.rfcx.companion.repo.local.LocalDataHelper
 
 class SongMeterRepository(
     private val deviceApiHelper: DeviceApiHelper,
-    private val localDataHelper: LocalDataHelper
+    private val localDataHelper: LocalDataHelper,
+    private val bleHelper: BleHelper
 ) {
     fun getDeploymentFromLocal() = localDataHelper.getDeploymentLocalDb().getDeployments()
 
@@ -34,5 +36,15 @@ class SongMeterRepository(
         attachImages: List<String>
     ) = localDataHelper.getDeploymentImageLocalDb()
         .insertImage(deployment, guardianDeployment, attachImages)
+
+    fun scanBle(isEnabled: Boolean) {
+        bleHelper.scanBle(isEnabled)
+    }
+
+    fun stopBle() {
+        bleHelper.stopScanBle()
+    }
+
+    fun observeAdvertisement() = bleHelper.observeAdvertisement()
 
 }

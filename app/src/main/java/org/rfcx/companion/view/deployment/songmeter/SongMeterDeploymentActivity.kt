@@ -17,6 +17,8 @@ import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
+import org.rfcx.companion.repo.ble.BleDetectService
+import org.rfcx.companion.repo.ble.BleHelper
 import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.util.getLastLocation
@@ -78,7 +80,8 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
             ViewModelFactory(
                 application,
                 DeviceApiHelper(DeviceApiServiceImpl()),
-                LocalDataHelper()
+                LocalDataHelper(),
+                BleHelper(BleDetectService(this))
             )
         ).get(SongMeterViewModel::class.java)
     }

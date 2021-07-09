@@ -16,6 +16,8 @@ import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
+import org.rfcx.companion.repo.ble.BleDetectService
+import org.rfcx.companion.repo.ble.BleHelper
 import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DeploymentCleanupWorker
 import org.rfcx.companion.util.*
@@ -88,7 +90,8 @@ class ProjectSelectActivity : AppCompatActivity(), (Int) -> Unit,
             ViewModelFactory(
                 application,
                 DeviceApiHelper(DeviceApiServiceImpl()),
-                LocalDataHelper()
+                LocalDataHelper(),
+                BleHelper(BleDetectService(this))
             )
         ).get(ProjectSelectViewModel::class.java)
     }

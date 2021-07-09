@@ -1,4 +1,4 @@
-package org.rfcx.companion.service.songmeter
+package org.rfcx.companion.repo.ble
 
 import android.app.Service
 import android.bluetooth.*
@@ -6,14 +6,13 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
-import org.rfcx.companion.service.songmeter.BluetoothLeService
 import java.util.*
 
 /**
  * Service for managing connection and data communication with a GATT server hosted on a
  * given Bluetooth LE device.
  */
-class BluetoothLeService : Service() {
+class BleConnectService : Service() {
     private var mBluetoothManager: BluetoothManager? = null
     private var mBluetoothAdapter: BluetoothAdapter? = null
     private var mBluetoothDeviceAddress: String? = null
@@ -97,8 +96,8 @@ class BluetoothLeService : Service() {
     }
 
     inner class LocalBinder : Binder() {
-        val service: BluetoothLeService
-            get() = this@BluetoothLeService
+        val service: BleConnectService
+            get() = this@BleConnectService
     }
 
     override fun onBind(intent: Intent): IBinder? {
@@ -246,7 +245,7 @@ class BluetoothLeService : Service() {
         get() = if (mBluetoothGatt == null) null else mBluetoothGatt!!.services
 
     companion object {
-        private val TAG = BluetoothLeService::class.java.simpleName
+        private val TAG = BleConnectService::class.java.simpleName
         private const val STATE_DISCONNECTED = 0
         private const val STATE_CONNECTING = 1
         private const val STATE_CONNECTED = 2

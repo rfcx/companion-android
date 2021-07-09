@@ -2,15 +2,18 @@ package org.rfcx.companion.view.deployment.songmeter
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
 import org.rfcx.companion.entity.Deployment
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.songmeter.Advertisement
 
 class SongMeterViewModel(
     application: Application,
     private val songMeterRepository: SongMeterRepository
 ) : AndroidViewModel(application) {
+
     fun getDeploymentsFromLocal(): List<Deployment> {
         return songMeterRepository.getDeploymentFromLocal()
     }
@@ -46,4 +49,14 @@ class SongMeterViewModel(
     ) {
         songMeterRepository.insertImage(deployment, guardianDeployment, attachImages)
     }
+
+    fun scanBle(isEnabled: Boolean) {
+        songMeterRepository.scanBle(isEnabled)
+    }
+
+    fun stopBle() {
+        songMeterRepository.stopBle()
+    }
+
+    fun observeAdvertisement() = songMeterRepository.observeAdvertisement()
 }
