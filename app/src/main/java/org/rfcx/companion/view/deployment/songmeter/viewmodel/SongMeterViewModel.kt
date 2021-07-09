@@ -1,13 +1,12 @@
-package org.rfcx.companion.view.deployment.songmeter
+package org.rfcx.companion.view.deployment.songmeter.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
 import org.rfcx.companion.entity.Deployment
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.guardian.GuardianDeployment
-import org.rfcx.companion.entity.songmeter.Advertisement
+import org.rfcx.companion.view.deployment.songmeter.repository.SongMeterRepository
 
 class SongMeterViewModel(
     application: Application,

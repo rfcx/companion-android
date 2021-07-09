@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModelProvider
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.ble.BleHelper
 import org.rfcx.companion.repo.local.LocalDataHelper
-import org.rfcx.companion.view.deployment.songmeter.SongMeterRepository
-import org.rfcx.companion.view.deployment.songmeter.SongMeterViewModel
+import org.rfcx.companion.view.deployment.songmeter.repository.SongMeterRepository
+import org.rfcx.companion.view.deployment.songmeter.viewmodel.SongMeterViewModel
 import org.rfcx.companion.view.project.repository.ProjectSelectRepository
 import org.rfcx.companion.view.project.viewmodel.ProjectSelectViewModel
 

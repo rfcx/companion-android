@@ -15,6 +15,7 @@ import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
+import org.rfcx.companion.entity.songmeter.Advertisement
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.ble.BleDetectService
@@ -23,14 +24,14 @@ import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.util.getLastLocation
 import org.rfcx.companion.util.getListSite
-import org.rfcx.companion.view.deployment.ChooseDeviceFragment
 import org.rfcx.companion.view.deployment.DeployFragment
-import org.rfcx.companion.view.deployment.EdgeCheckListFragment
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.deployment.location.DetailDeploymentSiteFragment
 import org.rfcx.companion.view.deployment.location.SetDeploymentSiteFragment
 import org.rfcx.companion.view.deployment.songmeter.connect.SongMeterConnectFragment
+import org.rfcx.companion.view.deployment.songmeter.detect.SongMeterDetectFragment
+import org.rfcx.companion.view.deployment.songmeter.viewmodel.SongMeterViewModel
 import org.rfcx.companion.view.detail.MapPickerProtocol
 
 class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProtocol,
@@ -97,6 +98,10 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
         this._deployment = deployment
     }
 
+    override fun redirectToConnectSongmeter(advertisement: Advertisement) {
+        startFragment(SongMeterConnectFragment.newInstance(advertisement))
+    }
+
     override fun startMapPicker(latitude: Double, longitude: Double, siteId: Int, name: String) {
         setLatLng(latitude, longitude, siteId, name)
         startFragment(MapPickerFragment.newInstance(latitude, longitude, siteId, name))
@@ -153,8 +158,7 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
     }
 
     override fun backStep() {
-        val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
-        when (container) {
+        when (supportFragmentManager.findFragmentById(R.id.contentContainer)) {
             is MapPickerFragment -> startFragment(
                 DetailDeploymentSiteFragment.newInstance(
                     latitude,
@@ -265,7 +269,7 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
                 }
             }
             1 -> {
-                startFragment(SongMeterConnectFragment.newInstance())
+                startFragment(SongMeterDetectFragment.newInstance())
             }
             2 -> {
                 startFragment(DeployFragment.newInstance(Screen.SONG_METER_CHECK_LIST.id))

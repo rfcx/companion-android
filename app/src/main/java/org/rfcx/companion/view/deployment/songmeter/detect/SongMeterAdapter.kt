@@ -1,4 +1,4 @@
-package org.rfcx.companion.view.deployment.songmeter.connect
+package org.rfcx.companion.view.deployment.songmeter.detect
 
 import android.view.LayoutInflater
 import android.view.View

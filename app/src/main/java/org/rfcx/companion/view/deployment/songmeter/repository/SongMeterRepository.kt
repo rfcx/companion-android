@@ -1,4 +1,4 @@
-package org.rfcx.companion.view.deployment.songmeter
+package org.rfcx.companion.view.deployment.songmeter.repository
 
 import org.rfcx.companion.entity.Deployment
 import org.rfcx.companion.entity.Locate

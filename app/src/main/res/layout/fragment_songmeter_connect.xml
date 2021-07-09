@@ -4,40 +4,48 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
-    <com.google.android.material.progressindicator.ProgressIndicator
-        android:id="@+id/songMeterLoading"
-        android:layout_width="match_parent"
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/songMeterConnectTitle"
+        style="@style/AudioMothText.Headline"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:indeterminate="true"
-        app:indicatorType="linear"
-        android:visibility="invisible"
+        android:layout_margin="@dimen/margin_padding_normal"
+        android:text="@string/set_recorder_name"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/songMeterConnectDesc"
+        style="@style/AudioMothText.Subhead.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_padding_small"
+        android:text="Recorder name is RFCx site id"
+        app:layout_constraintStart_toStartOf="@id/songMeterConnectTitle"
+        app:layout_constraintTop_toBottomOf="@id/songMeterConnectTitle" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/songMeterSiteIdEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_padding_small"
+        app:layout_constraintEnd_toEndOf="@id/songMeterConnectDesc"
+        app:layout_constraintStart_toStartOf="@id/songMeterConnectDesc"
+        app:layout_constraintTop_toBottomOf="@id/songMeterConnectDesc" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/songMeterSuggestTextView"
         style="@style/AudioMothText.Subhead.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/turn_recorder_on_to_detect"
-        app:layout_constraintBottom_toTopOf="@id/connectSongMeterButton"
+        android:text="@string/hold_press_on_bluetooth_button_to_connect_this_device"
+        app:layout_constraintBottom_toTopOf="@id/finishSongMeterButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/songMeterRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginStart="@dimen/margin_padding_large"
-        android:layout_marginTop="@dimen/margin_padding_normal"
-        android:layout_marginEnd="@dimen/margin_padding_large"
-        android:layout_marginBottom="@dimen/margin_padding_normal"
-        app:layout_constraintBottom_toTopOf="@id/retryScanButton"
-        app:layout_constraintTop_toBottomOf="@id/songMeterLoading" />
-
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/connectSongMeterButton"
+        android:id="@+id/finishSongMeterButton"
         style="@style/AudioMothButton.GreenButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -45,18 +53,7 @@
         android:layout_marginEnd="@dimen/margin_padding_large"
         android:layout_marginBottom="@dimen/margin_padding_normal"
         android:enabled="false"
-        android:text="@string/connect"
+        android:text="@string/finish"
         app:layout_constraintBottom_toBottomOf="parent" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/retryScanButton"
-        style="@style/GuardianButton.GreenButton.Line"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_large"
-        android:layout_marginEnd="@dimen/margin_padding_large"
-        android:layout_marginBottom="@dimen/margin_padding_normal"
-        android:text="@string/retry"
-        app:layout_constraintBottom_toTopOf="@id/connectSongMeterButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
