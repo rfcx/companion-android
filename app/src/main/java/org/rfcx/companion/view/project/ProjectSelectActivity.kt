@@ -90,8 +90,7 @@ class ProjectSelectActivity : AppCompatActivity(), (Int) -> Unit,
             ViewModelFactory(
                 application,
                 DeviceApiHelper(DeviceApiServiceImpl()),
-                LocalDataHelper(),
-                BleHelper(BleDetectService(this))
+                LocalDataHelper()
             )
         ).get(ProjectSelectViewModel::class.java)
     }

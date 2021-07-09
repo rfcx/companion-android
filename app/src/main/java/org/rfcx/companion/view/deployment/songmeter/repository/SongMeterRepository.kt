@@ -47,4 +47,20 @@ class SongMeterRepository(
 
     fun observeAdvertisement() = bleHelper.observeAdvertisement()
 
+    fun registerGattReceiver() {
+        bleHelper.registerGattReceiver()
+    }
+
+    fun unRegisterGattReceiver() {
+        bleHelper.unRegisterGattReceiver()
+    }
+
+    fun bindConnectService(address: String) {
+        bleHelper.bindConnectService(address)
+    }
+
+    fun unBindConnectService() {
+        bleHelper.unBindConnectService()
+    }
+
 }

@@ -18,6 +18,7 @@ import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.songmeter.Advertisement
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
+import org.rfcx.companion.repo.ble.BleConnectDelegate
 import org.rfcx.companion.repo.ble.BleDetectService
 import org.rfcx.companion.repo.ble.BleHelper
 import org.rfcx.companion.repo.local.LocalDataHelper
@@ -82,7 +83,7 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
                 application,
                 DeviceApiHelper(DeviceApiServiceImpl()),
                 LocalDataHelper(),
-                BleHelper(BleDetectService(this))
+                BleHelper(BleDetectService(this), BleConnectDelegate(this))
             )
         ).get(SongMeterViewModel::class.java)
     }
@@ -98,7 +99,7 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
         this._deployment = deployment
     }
 
-    override fun redirectToConnectSongmeter(advertisement: Advertisement) {
+    override fun redirectToConnectSongMeter(advertisement: Advertisement) {
         startFragment(SongMeterConnectFragment.newInstance(advertisement))
     }
 

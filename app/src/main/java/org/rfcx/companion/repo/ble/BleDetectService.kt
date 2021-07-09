@@ -50,7 +50,7 @@ class BleDetectService(context: Context) {
 
     fun updateAdvertisement() {
         if (prefixes != null && serialNumber != null) {
-            advertisement.postValue(Resource.success(Advertisement(prefixes!!, "SMM${serialNumber!!}")))
+            advertisement.postValue(Resource.success(Advertisement(prefixes!!, "SMM${serialNumber!!}", address!!)))
         } else if (prefixes != null || serialNumber != null) {
             advertisement.postValue(Resource.loading(null))
         } else {

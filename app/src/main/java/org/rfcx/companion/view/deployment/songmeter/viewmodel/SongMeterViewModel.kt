@@ -58,4 +58,20 @@ class SongMeterViewModel(
     }
 
     fun observeAdvertisement() = songMeterRepository.observeAdvertisement()
+
+    fun registerGattReceiver() {
+        songMeterRepository.registerGattReceiver()
+    }
+
+    fun unRegisterGattReceiver() {
+        songMeterRepository.unRegisterGattReceiver()
+    }
+
+    fun bindConnectService(address: String) {
+        songMeterRepository.bindConnectService(address)
+    }
+
+    fun unBindConnectService() {
+        songMeterRepository.unBindConnectService()
+    }
 }

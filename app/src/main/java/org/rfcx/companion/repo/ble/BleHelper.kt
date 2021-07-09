@@ -1,6 +1,6 @@
 package org.rfcx.companion.repo.ble
 
-class BleHelper(private val detectService: BleDetectService) {
+class BleHelper(private val detectService: BleDetectService, private val connectService: BleConnectDelegate) {
     fun scanBle(isEnabled: Boolean) {
         detectService.scanBle(isEnabled)
     }
@@ -10,4 +10,20 @@ class BleHelper(private val detectService: BleDetectService) {
     }
 
     fun observeAdvertisement() = detectService.getAdvertisement()
+
+    fun registerGattReceiver() {
+        connectService.registerReceiver()
+    }
+
+    fun unRegisterGattReceiver() {
+        connectService.unRegisterReceiver()
+    }
+
+    fun bindConnectService(address: String) {
+        connectService.bindService(address)
+    }
+
+    fun unBindConnectService() {
+        connectService.unbindService()
+    }
 }
