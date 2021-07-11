@@ -47,6 +47,8 @@ class SongMeterRepository(
 
     fun observeAdvertisement() = bleHelper.observeAdvertisement()
 
+    fun observeGattConnection() = bleHelper.observeGattConnection()
+
     fun registerGattReceiver() {
         bleHelper.registerGattReceiver()
     }

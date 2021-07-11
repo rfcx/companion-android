@@ -11,6 +11,8 @@ class BleHelper(private val detectService: BleDetectService, private val connect
 
     fun observeAdvertisement() = detectService.getAdvertisement()
 
+    fun observeGattConnection() = connectService.observeGattConnection()
+
     fun registerGattReceiver() {
         connectService.registerReceiver()
     }
