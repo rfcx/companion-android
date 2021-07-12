@@ -458,7 +458,7 @@
     <string name="nearby_songmeter">Searching for Nearby\n SongMeters</string>
     <string name="detected_recorders">Detected recorders</string>
     <string name="turn_recorder_on_to_detect">Turn recorder on to detect</string>
-    <string name="hold_press_on_bluetooth_button_to_connect_this_device">Hold press on bluetooth button to connect this device</string>
+    <string name="hold_press_on_bluetooth_button_to_connect_this_device">Hold press on bluetooth button\nto connect this device</string>
     <string name="set_recorder_name">Set recorder name</string>
 
 </resources>

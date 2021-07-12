@@ -59,6 +59,8 @@ class SongMeterViewModel(
 
     fun observeAdvertisement() = songMeterRepository.observeAdvertisement()
 
+    fun observeGattConnection() = songMeterRepository.observeGattConnection()
+
     fun registerGattReceiver() {
         songMeterRepository.registerGattReceiver()
     }

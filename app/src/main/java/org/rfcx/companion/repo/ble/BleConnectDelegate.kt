@@ -8,6 +8,8 @@ import android.content.Context.BIND_AUTO_CREATE
 import android.os.IBinder
 import android.util.Log
 import org.rfcx.companion.entity.songmeter.SongMeterConstant
+import androidx.lifecycle.MutableLiveData
+import org.rfcx.companion.util.Resource
 
 class BleConnectDelegate(private val context: Context) {
 
@@ -22,6 +24,7 @@ class BleConnectDelegate(private val context: Context) {
     var configRtoA: BluetoothGattCharacteristic? = null
 
     var recorder: BluetoothGatt? = null
+    private var gattConnection = MutableLiveData<Resource<Boolean>>()
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -46,11 +49,11 @@ class BleConnectDelegate(private val context: Context) {
             when (intent.action) {
                 BleConnectService.ACTION_GATT_CONNECTED -> {
                     isConnected = true
-                    Log.d("BLE", "connect")
+                    gattConnection.postValue(Resource.success(isConnected))
                 }
                 BleConnectService.ACTION_GATT_DISCONNECTED -> {
                     isConnected = false
-                    Log.d("BLE", "disconnect")
+                    gattConnection.postValue(Resource.success(isConnected))
                 }
                 BleConnectService.ACTION_GATT_SERVICES_DISCOVERED -> {
                     setGattServices(bleConnectService?.supportedGattServices)
@@ -94,6 +97,8 @@ class BleConnectDelegate(private val context: Context) {
         return intentFilter
     }
 
+    fun observeGattConnection() = gattConnection
+
     fun registerReceiver() {
         context.registerReceiver(gattUpdateReceiver, makeGattUpdateIntentFilter())
         bleConnectService?.connect(deviceAddress)
@@ -105,8 +110,8 @@ class BleConnectDelegate(private val context: Context) {
 
     fun bindService(address: String) {
         val gattServiceIntent = Intent(context, BleConnectService::class.java)
-        context.bindService(gattServiceIntent, serviceConnection, BIND_AUTO_CREATE)
         deviceAddress = address
+        context.bindService(gattServiceIntent, serviceConnection, BIND_AUTO_CREATE)
     }
 
     fun unbindService() {

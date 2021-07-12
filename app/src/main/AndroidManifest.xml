@@ -112,6 +112,8 @@
             android:name=".service.LocationTrackerService"
             android:exported="false"
             android:foregroundServiceType="location" />
+
+        <service android:name=".repo.ble.BleConnectService" android:enabled="true"/>
     </application>
 
 </manifest>

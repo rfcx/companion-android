@@ -6,7 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.observe
+import kotlinx.android.synthetic.main.fragment_songmeter_connect.*
+import kotlinx.android.synthetic.main.fragment_songmeter_detect.*
+import kotlinx.android.synthetic.main.fragment_songmeter_detect.songMeterSuggestTextView
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.songmeter.Advertisement
@@ -16,6 +21,7 @@ import org.rfcx.companion.repo.ble.BleConnectDelegate
 import org.rfcx.companion.repo.ble.BleDetectService
 import org.rfcx.companion.repo.ble.BleHelper
 import org.rfcx.companion.repo.local.LocalDataHelper
+import org.rfcx.companion.util.Status
 import org.rfcx.companion.view.deployment.songmeter.SongMeterDeploymentProtocol
 import org.rfcx.companion.view.deployment.songmeter.viewmodel.SongMeterViewModel
 
@@ -58,9 +64,11 @@ class SongMeterConnectFragment : Fragment() {
         setViewModel()
         setupTopBar()
         getArgument()
+        observeGattConnection()
+        setupRecorderId()
 
-        songMeterViewModel.registerGattReceiver()
         songMeterViewModel.bindConnectService(advertisement!!.address)
+        songMeterViewModel.registerGattReceiver()
     }
 
     private fun getArgument() {
@@ -74,6 +82,50 @@ class SongMeterConnectFragment : Fragment() {
             it.showToolbar()
             it.setToolbarTitle()
         }
+    }
+
+    private fun observeGattConnection() {
+        songMeterViewModel.observeGattConnection().observe(viewLifecycleOwner, Observer {
+            when (it.status) {
+                Status.LOADING -> { }
+                Status.SUCCESS -> {
+                    if (it.data != null) {
+                        if (it.data == true) {
+                            hideSuggestMessage()
+                            showConfigUI()
+                        } else {
+                            hideConfigUI()
+                            showSuggestMessage()
+                        }
+                    }
+                }
+                Status.ERROR -> { }
+            }
+        })
+    }
+
+    private fun setupRecorderId() {
+        songMeterSiteIdEditText.setText(advertisement!!.prefixes)
+    }
+
+    private fun showConfigUI() {
+        songMeterConnectTitle.visibility = View.VISIBLE
+        songMeterConnectDesc.visibility = View.VISIBLE
+        songMeterSiteIdEditText.visibility = View.VISIBLE
+    }
+
+    private fun hideConfigUI() {
+        songMeterConnectTitle.visibility = View.GONE
+        songMeterConnectDesc.visibility = View.GONE
+        songMeterSiteIdEditText.visibility = View.GONE
+    }
+
+    private fun showSuggestMessage() {
+        songMeterSuggestTextView.visibility = View.VISIBLE
+    }
+
+    private fun hideSuggestMessage() {
+        songMeterSuggestTextView.visibility = View.GONE
     }
 
     override fun onPause() {
