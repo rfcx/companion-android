@@ -218,6 +218,14 @@ class BleConnectService : Service() {
         mBluetoothGatt!!.readCharacteristic(characteristic)
     }
 
+    fun writeCharacteristic(characteristic: BluetoothGattCharacteristic?) {
+        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
+            Log.w(TAG, "BluetoothAdapter not initialized")
+            return
+        }
+        mBluetoothGatt!!.writeCharacteristic(characteristic)
+    }
+
     /**
      * Enables or disables notification on a give characteristic.
      *

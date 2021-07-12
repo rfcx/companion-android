@@ -1,15 +1,27 @@
 package org.rfcx.companion.repo.ble
 
+import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothGattService
 import android.content.*
 import android.content.Context.BIND_AUTO_CREATE
 import android.os.IBinder
 import android.util.Log
+import org.rfcx.companion.entity.songmeter.SongMeterConstant
 
 class BleConnectDelegate(private val context: Context) {
 
     private var deviceAddress: String? = null
     private var isConnected = false
     private var bleConnectService: BleConnectService? = null
+
+    var configService: BluetoothGattService? = null
+    var configCharacteristics: List<BluetoothGattCharacteristic>? = null
+
+    var configAtoR: BluetoothGattCharacteristic? = null
+    var configRtoA: BluetoothGattCharacteristic? = null
+
+    var recorder: BluetoothGatt? = null
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -41,12 +53,35 @@ class BleConnectDelegate(private val context: Context) {
                     Log.d("BLE", "disconnect")
                 }
                 BleConnectService.ACTION_GATT_SERVICES_DISCOVERED -> {
-
+                    setGattServices(bleConnectService?.supportedGattServices)
                 }
                 BleConnectService.ACTION_DATA_AVAILABLE -> {
 
                 }
             }
+        }
+    }
+
+    private fun setGattServices(gattServices: List<BluetoothGattService>?) {
+        if (gattServices == null) return
+        gattServices.forEach { gattService ->
+            if (gattService.uuid.toString() == SongMeterConstant.kUUIDCommsService) {
+                configService = gattService
+                configCharacteristics = gattService.characteristics
+            }
+        }
+        configCharacteristics?.forEach { characteristic ->
+            when (characteristic.uuid.toString()) {
+                SongMeterConstant.kUUIDCharConfigAtoR -> configAtoR = characteristic
+                SongMeterConstant.kUUIDCharConfigRtoA -> configRtoA = characteristic
+            }
+            bleConnectService?.readCharacteristic(characteristic)
+        }
+    }
+
+    private fun setSiteId(id: String) {
+        configAtoR?.let {
+            val data = it.value
         }
     }
 
