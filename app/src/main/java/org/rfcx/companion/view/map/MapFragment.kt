@@ -23,6 +23,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.work.WorkInfo
@@ -63,7 +64,9 @@ import kotlinx.android.synthetic.main.layout_deployment_window_info.view.*
 import kotlinx.android.synthetic.main.layout_map_window_info.view.*
 import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.MainActivityListener
+import org.rfcx.companion.MainViewModel
 import org.rfcx.companion.R
+import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.guardian.toMark
@@ -72,6 +75,9 @@ import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
+import org.rfcx.companion.repo.api.DeviceApiHelper
+import org.rfcx.companion.repo.api.DeviceApiServiceImpl
+import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
@@ -82,6 +88,7 @@ import org.rfcx.companion.view.diagnostic.DiagnosticActivity
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupAdapter
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupListener
+import org.rfcx.companion.view.project.viewmodel.ProjectSelectViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -91,6 +98,8 @@ import kotlin.collections.ArrayList
 
 class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         (Locate, Boolean) -> Unit {
+
+    private lateinit var mainViewModel: MainViewModel
 
     // map
     private lateinit var mapView: MapView
@@ -239,6 +248,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         fetchData()
         showSearchBar(false)
         hideLabel()
+        setViewModel()
+
         context?.let { setTextTrackingButton(LocationTracking.isTrackingOn(it)) }
         projectNameTextView.text =
             if (listener?.getProjectName() != getString(R.string.none)) listener?.getProjectName() else getString(
@@ -304,6 +315,17 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             adapter = locationGroupAdapter
             locationGroupAdapter.screen = Screen.MAP.id
         }
+    }
+
+    private fun setViewModel() {
+        mainViewModel = ViewModelProvider(
+            this,
+            ViewModelFactory(
+                requireActivity().application,
+                DeviceApiHelper(DeviceApiServiceImpl()),
+                LocalDataHelper()
+            )
+        ).get(MainViewModel::class.java)
     }
 
     private fun setOnClickProjectName() {
