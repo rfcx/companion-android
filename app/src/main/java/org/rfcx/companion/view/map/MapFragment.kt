@@ -400,7 +400,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                             if (it > Date().time) {
                                 setLocationTrackingService(context, true)
                             } else {
-                                trackingDb.deleteTracking(1, context)
+                                mainViewModel.deleteTracking(1, context)
                                 setLocationTrackingService(context, true)
                             }
                         }

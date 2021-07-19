@@ -1,5 +1,6 @@
 package org.rfcx.companion
 
+import android.content.Context
 import io.realm.RealmResults
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.Project
@@ -71,5 +72,9 @@ class MainRepository(
 
     fun getFirstTracking(): Tracking? {
         return localDataHelper.getTrackingLocalDb().getFirstTracking()
+    }
+
+    fun deleteTracking(id: Int, context: Context) {
+        localDataHelper.getTrackingLocalDb().deleteTracking(id, context)
     }
 }

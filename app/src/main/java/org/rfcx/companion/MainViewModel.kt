@@ -2,6 +2,7 @@ package org.rfcx.companion
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -211,5 +212,9 @@ class MainViewModel(
 
     fun getFirstTracking(): Tracking? {
         return mainRepository.getFirstTracking()
+    }
+
+    fun deleteTracking(id: Int, context: Context) {
+        mainRepository.deleteTracking(id, context)
     }
 }
