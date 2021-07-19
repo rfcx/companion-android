@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.Project
+import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.service.DownloadStreamsWorker
@@ -187,5 +188,9 @@ class MainViewModel(
 
     fun getDeploymentUnsentCount(): Int {
         return mainRepository.getDeploymentUnsentCount()
+    }
+
+    fun getGuardianDeploymentById(id: Int): GuardianDeployment? {
+        return mainRepository.getGuardianDeploymentById(id)
     }
 }

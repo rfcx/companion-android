@@ -1,6 +1,7 @@
 package org.rfcx.companion
 
 import org.rfcx.companion.entity.Project
+import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.repo.api.DeviceApiHelper
@@ -46,5 +47,9 @@ class MainRepository(
 
     fun getDeploymentUnsentCount(): Int {
         return localDataHelper.getDeploymentLocalDb().unsentCount().toInt()
+    }
+
+    fun getGuardianDeploymentById(id: Int): GuardianDeployment? {
+        return localDataHelper.getGuardianDeploymentLocalDb().getDeploymentById(id)
     }
 }
