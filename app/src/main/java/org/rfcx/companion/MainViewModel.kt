@@ -5,15 +5,16 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import io.realm.Realm
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.ProjectResponse
-import org.rfcx.companion.localdb.TrackingFileDb
 import org.rfcx.companion.service.DownloadStreamsWorker
-import org.rfcx.companion.util.*
+import org.rfcx.companion.util.Preferences
+import org.rfcx.companion.util.Resource
 import org.rfcx.companion.util.geojson.GeoJsonUtils
+import org.rfcx.companion.util.getIdToken
+import org.rfcx.companion.util.isNetworkAvailable
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -120,8 +121,6 @@ class MainViewModel(
                     siteAssets?.forEach { item ->
                         if (item.mimeType.endsWith("geo+json")) {
                             fileCount += 1
-                            val trackingFileDb =
-                                TrackingFileDb(Realm.getInstance(RealmHelper.migrationConfig()))
                             GeoJsonUtils.downloadGeoJsonFile(
                                 context,
                                 "Bearer ${context.getIdToken()}",
@@ -131,7 +130,7 @@ class MainViewModel(
                                 object : GeoJsonUtils.DownloadTrackCallback {
                                     override fun onSuccess(filePath: String) {
                                         fileCreated += 1
-                                        trackingFileDb.insertOrUpdate(
+                                        mainRepository.saveTrackingToLocal(
                                             item,
                                             filePath,
                                             site.id
