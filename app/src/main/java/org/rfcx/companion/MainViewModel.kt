@@ -23,10 +23,6 @@ class MainViewModel(
     private val context = getApplication<Application>().applicationContext
     private val projects = MutableLiveData<Resource<List<Project>>>()
 
-    init {
-        fetchProjects()
-    }
-
     fun fetchProjects() {
         projects.postValue(Resource.loading(null))
         mainRepository.getProjectsFromRemote("Bearer ${context.getIdToken()}")
@@ -106,5 +102,9 @@ class MainViewModel(
 
     fun getProjectsFromRemote(): LiveData<Resource<List<Project>>> {
         return projects
+    }
+
+    fun getProjectsFromLocal(): List<Project> {
+        return mainRepository.getProjectsFromLocal()
     }
 }

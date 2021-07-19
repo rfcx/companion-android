@@ -127,7 +127,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
     private lateinit var guardianDeployLiveData: LiveData<List<GuardianDeployment>>
     private lateinit var edgeDeployLiveData: LiveData<List<EdgeDeployment>>
     private lateinit var locateLiveData: LiveData<List<Locate>>
-    private lateinit var locationGroupLiveData: LiveData<List<Project>>
     private lateinit var deploymentWorkInfoLiveData: LiveData<List<WorkInfo>>
     private lateinit var downloadStreamsWorkInfoLiveData: LiveData<List<WorkInfo>>
 
@@ -945,14 +944,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         combinedData()
     }
 
-    private val locationGroupObserve = Observer<List<Project>> {
-        this.locationGroups = it
-        combinedData()
-        locationGroupAdapter.items = listOf()
-        locationGroupAdapter.items = locationGroupDb.getProjects()
-        locationGroupAdapter.notifyDataSetChanged()
-    }
-
     private fun combinedData() {
         var showGuardianDeployments = this.guardianDeployments.filter { it.isCompleted() }
         val usedSitesOnGuardian = showGuardianDeployments.map { it.stream?.coreId }
@@ -1049,15 +1040,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                 it
             }
 
-        locationGroupLiveData =
-            Transformations.map(locationGroupDb.getAllResultsAsync().asLiveData()) {
-                it
-            }
-
         locateLiveData.observeForever(locateObserve)
         edgeDeployLiveData.observeForever(edgeDeploymentObserve)
         guardianDeployLiveData.observeForever(guardianDeploymentObserve)
-        locationGroupLiveData.observeForever(locationGroupObserve)
     }
 
     private fun setObserver() {
@@ -1066,6 +1051,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                 Status.LOADING -> {}
                 Status.SUCCESS -> {
                     projectSwipeRefreshView.isRefreshing = false
+
+                    this.locationGroups = mainViewModel.getProjectsFromLocal()
+                    locationGroupAdapter.items = listOf()
+                    locationGroupAdapter.items = this.locationGroups
+                    locationGroupAdapter.notifyDataSetChanged()
+
                     combinedData()
                 }
                 Status.ERROR -> {
@@ -1459,7 +1450,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         guardianDeployLiveData.removeObserver(guardianDeploymentObserve)
         edgeDeployLiveData.removeObserver(edgeDeploymentObserve)
         locateLiveData.removeObserver(locateObserve)
-        locationGroupLiveData.removeObserver(locationGroupObserve)
         locationEngine?.removeLocationUpdates(mapboxLocationChangeCallback)
         currentAnimator?.cancel()
         mapView.onDestroy()
