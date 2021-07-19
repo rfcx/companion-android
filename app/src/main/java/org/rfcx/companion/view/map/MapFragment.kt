@@ -583,7 +583,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         val markerId = feature.getProperty(
             PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID
         ).asString
-        val site = locateDb.getLocateByName(markerId.split(".")[0])
+        val site = mainViewModel.getLocateByName(markerId.split(".")[0])
 
         val windowInfoImages = hashMapOf<String, Bitmap>()
         val inflater = LayoutInflater.from(context)
@@ -785,7 +785,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                     val markerId = selectedFeature.getProperty(
                         PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID
                     ).asString
-                    val site = locateDb.getLocateByName(markerId.split(".")[0])
+                    val site = mainViewModel.getLocateByName(markerId.split(".")[0])
                     gettingTracksAndMoveToPin(site, markerId)
                     analytics?.trackClickPinEvent()
 
@@ -1440,7 +1440,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             setFeatureSelectState(selectingDeployment, true)
         }
 
-        val item = locateDb.getLocateByName(locate.name)
+        val item = mainViewModel.getLocateByName(locate.name)
         item?.let {
             val pointF = mapboxMap?.projection?.toScreenLocation(it.getLatLng()) ?: PointF()
             val clusterFeatures = mapboxMap?.queryRenderedFeatures(pointF, "$DEPLOYMENT_CLUSTER-0")

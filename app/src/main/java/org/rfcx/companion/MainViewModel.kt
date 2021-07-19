@@ -193,4 +193,8 @@ class MainViewModel(
     fun getGuardianDeploymentById(id: Int): GuardianDeployment? {
         return mainRepository.getGuardianDeploymentById(id)
     }
+
+    fun getLocateByName(name: String): Locate? {
+        return mainRepository.getLocateByName(name)
+    }
 }

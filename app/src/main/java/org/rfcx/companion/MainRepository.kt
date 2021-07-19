@@ -1,5 +1,6 @@
 package org.rfcx.companion
 
+import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
@@ -51,5 +52,9 @@ class MainRepository(
 
     fun getGuardianDeploymentById(id: Int): GuardianDeployment? {
         return localDataHelper.getGuardianDeploymentLocalDb().getDeploymentById(id)
+    }
+
+    fun getLocateByName(name: String): Locate? {
+        return localDataHelper.getLocateLocalDb().getLocateByName(name)
     }
 }
