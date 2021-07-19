@@ -25,7 +25,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.work.WorkInfo
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
@@ -57,6 +56,7 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.BitmapUtils
 import io.realm.Realm
+import kotlinx.android.synthetic.main.activity_project_select.*
 import kotlinx.android.synthetic.main.fragment_location_group.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.fragment_map.projectSwipeRefreshView
@@ -71,7 +71,6 @@ import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.guardian.toMark
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
-import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
@@ -81,6 +80,7 @@ import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
+import org.rfcx.companion.util.Status
 import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.detail.DeploymentDetailActivity
@@ -88,7 +88,6 @@ import org.rfcx.companion.view.diagnostic.DiagnosticActivity
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupAdapter
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupListener
-import org.rfcx.companion.view.project.viewmodel.ProjectSelectViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -244,11 +243,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         mapView = view.findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
+        setViewModel()
+        setObserver()
+
         fetchJobSyncing()
         fetchData()
         showSearchBar(false)
         hideLabel()
-        setViewModel()
 
         context?.let { setTextTrackingButton(LocationTracking.isTrackingOn(it)) }
         projectNameTextView.text =
@@ -287,7 +288,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
         projectSwipeRefreshView.apply {
             setOnRefreshListener {
-                retrieveProjects(requireContext())
+                mainViewModel.fetchProjects()
                 isRefreshing = true
             }
             setColorSchemeResources(R.color.colorPrimary)
@@ -511,8 +512,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
         context?.let {
             retrieveLocations(it)
-            retrieveProjects(it)
         }
+        mainViewModel.fetchProjects()
 
         mapboxMap.setStyle(Style.OUTDOORS) {
             checkThenAccquireLocation(it)
@@ -1059,63 +1060,29 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         locationGroupLiveData.observeForever(locationGroupObserve)
     }
 
+    private fun setObserver() {
+        mainViewModel.getProjectsFromRemote().observe(viewLifecycleOwner, Observer {
+            when (it.status) {
+                Status.LOADING -> {}
+                Status.SUCCESS -> {
+                    projectSwipeRefreshView.isRefreshing = false
+                    combinedData()
+                }
+                Status.ERROR -> {
+                    combinedData()
+                    projectSwipeRefreshView.isRefreshing = false
+                    showToast(it.message ?: getString(R.string.error_has_occurred))
+                }
+            }
+        })
+    }
+
     private fun retrieveLocations(context: Context) {
         val projectId = Preferences.getInstance(context).getInt(Preferences.SELECTED_PROJECT)
         val project = locationGroupDb.getProjectById(projectId)
         project?.serverId?.let {
             DownloadStreamsWorker.enqueue(context, it)
         }
-    }
-
-    private fun retrieveProjects(context: Context) {
-        val token = "Bearer ${context.getIdToken()}"
-        ApiManager.getInstance().getDeviceApi2().getProjects(token)
-            .enqueue(object : Callback<List<ProjectResponse>> {
-                override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
-                    combinedData()
-                    if (context.isNetworkAvailable()) {
-                        Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT)
-                            .show()
-                    }
-                    projectSwipeRefreshView.isRefreshing = false
-                }
-
-                override fun onResponse(
-                    call: Call<List<ProjectResponse>>,
-                    response: Response<List<ProjectResponse>>
-                ) {
-                    response.body()?.forEach { item ->
-                        locationGroupDb.insertOrUpdate(item)
-                    }
-                    deletedProjectsFromCore(context)
-                }
-            })
-    }
-
-    private fun deletedProjectsFromCore(context: Context) {
-        val token = "Bearer ${context.getIdToken()}"
-        ApiManager.getInstance().getDeviceApi2().getDeletedProjects(token)
-            .enqueue(object : Callback<List<ProjectResponse>> {
-                override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
-                    if (context.isNetworkAvailable()) {
-                        Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT)
-                            .show()
-                    }
-                }
-
-                override fun onResponse(
-                    call: Call<List<ProjectResponse>>,
-                    response: Response<List<ProjectResponse>>
-                ) {
-                    if (response.isSuccessful) {
-                        response.body()?.let { projectsRes ->
-                            locationGroupDb.deleteProjectsByCoreId(projectsRes.map { it.id!! }) // remove project with these coreIds
-                        }
-                        projectSwipeRefreshView.isRefreshing = false
-                        combinedData()
-                    }
-                }
-            })
     }
 
     private fun retrieveTracking(
@@ -1445,6 +1412,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         queueColor.clear()
         currentAnimator?.end()
         currentAnimator = null
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
     }
 
     fun showButtonOnMap() {
