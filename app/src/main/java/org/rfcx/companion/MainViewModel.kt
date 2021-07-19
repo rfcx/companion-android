@@ -7,6 +7,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.response.ProjectResponse
+import org.rfcx.companion.service.DownloadStreamsWorker
+import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.Resource
 import org.rfcx.companion.util.getIdToken
 import org.rfcx.companion.util.isNetworkAvailable
@@ -100,11 +102,22 @@ class MainViewModel(
             })
     }
 
+    fun retrieveLocations() {
+        val projectId = Preferences.getInstance(context).getInt(Preferences.SELECTED_PROJECT)
+        getProjectById(projectId)?.serverId?.let {
+            DownloadStreamsWorker.enqueue(context, it)
+        }
+    }
+
     fun getProjectsFromRemote(): LiveData<Resource<List<Project>>> {
         return projects
     }
 
     fun getProjectsFromLocal(): List<Project> {
         return mainRepository.getProjectsFromLocal()
+    }
+
+    fun getProjectById(id: Int): Project? {
+        return mainRepository.getProjectById(id)
     }
 }

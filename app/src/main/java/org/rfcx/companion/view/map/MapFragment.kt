@@ -295,7 +295,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
         siteSwipeRefreshView.apply {
             setOnRefreshListener {
-                retrieveLocations(requireContext())
+                mainViewModel.retrieveLocations()
                 isRefreshing = false
             }
             setColorSchemeResources(R.color.colorPrimary)
@@ -509,10 +509,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         mapboxMap.uiSettings.isLogoEnabled = false
         mapboxMap.uiSettings.isCompassEnabled = false
 
-        context?.let {
-            retrieveLocations(it)
-        }
         mainViewModel.fetchProjects()
+        mainViewModel.retrieveLocations()
 
         mapboxMap.setStyle(Style.OUTDOORS) {
             checkThenAccquireLocation(it)
@@ -1068,14 +1066,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         })
     }
 
-    private fun retrieveLocations(context: Context) {
-        val projectId = Preferences.getInstance(context).getInt(Preferences.SELECTED_PROJECT)
-        val project = locationGroupDb.getProjectById(projectId)
-        project?.serverId?.let {
-            DownloadStreamsWorker.enqueue(context, it)
-        }
-    }
-
     private fun retrieveTracking(
         context: Context,
         siteId: Int,
@@ -1550,7 +1540,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         context?.let { context ->
             Preferences.getInstance(context).putInt(Preferences.SELECTED_PROJECT, group.id)
             //reload site to get sites from selected project
-            retrieveLocations(context)
+            mainViewModel.retrieveLocations()
         }
         listener?.let { listener ->
             projectNameTextView.text =
