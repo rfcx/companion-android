@@ -27,7 +27,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.WorkInfo
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.snackbar.Snackbar
 import com.mapbox.android.core.location.*
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
@@ -70,10 +69,8 @@ import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.guardian.toMark
-import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
-import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
@@ -81,16 +78,12 @@ import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.Status
-import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.detail.DeploymentDetailActivity
 import org.rfcx.companion.view.diagnostic.DiagnosticActivity
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupAdapter
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupListener
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
@@ -1082,7 +1075,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
     }
 
     private fun setSnackbar(status: SyncInfo, isSites: Boolean) {
-        val deploymentUnsentCount = edgeDeploymentDb.unsentCount().toInt()
+        val deploymentUnsentCount = mainViewModel.getDeploymentUnsentCount()
         when (status) {
             SyncInfo.Starting, SyncInfo.Uploading -> {
                 val msg = if (isSites) {

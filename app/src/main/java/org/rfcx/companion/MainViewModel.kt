@@ -184,4 +184,8 @@ class MainViewModel(
     fun getProjectById(id: Int): Project? {
         return mainRepository.getProjectById(id)
     }
+
+    fun getDeploymentUnsentCount(): Int {
+        return mainRepository.getDeploymentUnsentCount()
+    }
 }
