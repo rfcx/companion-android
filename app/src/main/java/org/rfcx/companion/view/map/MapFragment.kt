@@ -107,7 +107,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
     private val locationGroupDb by lazy { ProjectDb(realm) }
-    private val trackingFileDb by lazy { TrackingFileDb(realm) }
     private val trackingDb by lazy { TrackingDb(realm) }
 
     // data
@@ -394,7 +393,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                 if (LocationTracking.isTrackingOn(context)) {
                     setLocationTrackingService(context, false)
                 } else {
-                    val tracking = trackingDb.getFirstTracking()
+                    val tracking = mainViewModel.getFirstTracking()
                     if (tracking != null) {
                         val time = tracking.stopAt?.time?.plus(WITHIN_TIME * 60000)
                         time?.let {

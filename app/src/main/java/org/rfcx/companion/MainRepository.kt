@@ -3,6 +3,7 @@ package org.rfcx.companion
 import io.realm.RealmResults
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.Project
+import org.rfcx.companion.entity.Tracking
 import org.rfcx.companion.entity.TrackingFile
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
@@ -66,5 +67,9 @@ class MainRepository(
 
     fun getTrackingFileBySiteId(id: Int): RealmResults<TrackingFile> {
         return localDataHelper.getTrackingFileLocalDb().getTrackingFileBySiteId(id)
+    }
+
+    fun getFirstTracking(): Tracking? {
+        return localDataHelper.getTrackingLocalDb().getFirstTracking()
     }
 }
