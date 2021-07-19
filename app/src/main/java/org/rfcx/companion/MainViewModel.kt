@@ -197,4 +197,8 @@ class MainViewModel(
     fun getLocateByName(name: String): Locate? {
         return mainRepository.getLocateByName(name)
     }
+
+    fun getLocateById(id: Int): Locate? {
+        return mainRepository.getLocateById(id)
+    }
 }

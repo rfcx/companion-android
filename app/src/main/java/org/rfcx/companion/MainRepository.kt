@@ -57,4 +57,8 @@ class MainRepository(
     fun getLocateByName(name: String): Locate? {
         return localDataHelper.getLocateLocalDb().getLocateByName(name)
     }
+
+    fun getLocateById(id: Int): Locate? {
+        return localDataHelper.getLocateLocalDb().getLocateById(id)
+    }
 }

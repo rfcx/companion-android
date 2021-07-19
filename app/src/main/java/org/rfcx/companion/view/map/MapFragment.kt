@@ -810,7 +810,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             features.forEachIndexed { index, feature ->
                 val markerId = selectedFeature.getProperty(PROPERTY_SITE_MARKER_ID)
                 if (markerId == feature.getProperty(PROPERTY_SITE_MARKER_ID)) {
-                    val site = locateDb.getLocateById(
+                    val site = mainViewModel.getLocateById(
                         selectedFeature.getProperty(PROPERTY_SITE_MARKER_SITE_ID).asInt
                     )
                     gettingTracksAndMoveToPin(site, markerId.asString)
