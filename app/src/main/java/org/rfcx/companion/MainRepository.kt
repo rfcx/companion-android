@@ -2,10 +2,7 @@ package org.rfcx.companion
 
 import android.content.Context
 import io.realm.RealmResults
-import org.rfcx.companion.entity.Locate
-import org.rfcx.companion.entity.Project
-import org.rfcx.companion.entity.Tracking
-import org.rfcx.companion.entity.TrackingFile
+import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.ProjectResponse
@@ -37,6 +34,18 @@ class MainRepository(
         deploymentId: Int?
     ) = localDataHelper.getTrackingFileLocalDb()
         .insertOrUpdate(deploymentAssetResponse, filePath, deploymentId)
+
+    fun getAllLocateResultsAsync(): RealmResults<Locate> {
+        return localDataHelper.getLocateLocalDb().getAllResultsAsync()
+    }
+
+    fun getAllDeploymentLocateResultsAsync(): RealmResults<EdgeDeployment> {
+        return localDataHelper.getDeploymentLocalDb().getAllResultsAsync()
+    }
+
+    fun getAllGuardianDeploymentLocateResultsAsync(): RealmResults<GuardianDeployment> {
+        return localDataHelper.getGuardianDeploymentLocalDb().getAllResultsAsync()
+    }
 
     fun saveProjectToLocal(projectResponse: ProjectResponse) {
         localDataHelper.getProjectLocalDb().insertOrUpdate(projectResponse)

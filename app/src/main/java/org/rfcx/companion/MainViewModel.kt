@@ -6,20 +6,16 @@ import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.Transformations
 import io.realm.RealmResults
-import org.rfcx.companion.entity.Locate
-import org.rfcx.companion.entity.Project
-import org.rfcx.companion.entity.Tracking
-import org.rfcx.companion.entity.TrackingFile
+import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.service.DownloadStreamsWorker
-import org.rfcx.companion.util.Preferences
-import org.rfcx.companion.util.Resource
+import org.rfcx.companion.util.*
 import org.rfcx.companion.util.geojson.GeoJsonUtils
-import org.rfcx.companion.util.getIdToken
-import org.rfcx.companion.util.isNetworkAvailable
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -34,6 +30,45 @@ class MainViewModel(
     private val context = getApplication<Application>().applicationContext
     private val projects = MutableLiveData<Resource<List<Project>>>()
     private val tracks = MutableLiveData<Resource<List<DeploymentAssetResponse>>>()
+
+    private var guardianDeployments = listOf<GuardianDeployment>()
+    private var deployments = listOf<EdgeDeployment>()
+    private var sites = listOf<Locate>()
+
+    private lateinit var deployLiveData: LiveData<List<EdgeDeployment>>
+    private val deploymentObserve = Observer<List<EdgeDeployment>> {
+        deployments = it
+    }
+
+    private lateinit var guardianDeploymentLiveData: LiveData<List<GuardianDeployment>>
+    private val guardianDeploymentObserve = Observer<List<GuardianDeployment>> {
+        guardianDeployments = it
+    }
+
+    private lateinit var siteLiveData: LiveData<List<Locate>>
+    private val siteObserve = Observer<List<Locate>> {
+        sites = it
+    }
+
+    init {
+        fetchLiveData()
+    }
+
+    private fun fetchLiveData() {
+        siteLiveData =
+            Transformations.map(mainRepository.getAllLocateResultsAsync().asLiveData()) { it }
+        siteLiveData.observeForever(siteObserve)
+
+        deployLiveData = Transformations.map(
+            mainRepository.getAllDeploymentLocateResultsAsync().asLiveData()
+        ) { it }
+        deployLiveData.observeForever(deploymentObserve)
+
+        guardianDeploymentLiveData = Transformations.map(
+            mainRepository.getAllGuardianDeploymentLocateResultsAsync().asLiveData()
+        ) { it }
+        guardianDeploymentLiveData.observeForever(guardianDeploymentObserve)
+    }
 
     fun fetchProjects() {
         projects.postValue(Resource.loading(null))
@@ -216,5 +251,11 @@ class MainViewModel(
 
     fun deleteTracking(id: Int, context: Context) {
         mainRepository.deleteTracking(id, context)
+    }
+
+    fun onDestroy() {
+        guardianDeploymentLiveData.removeObserver(guardianDeploymentObserve)
+        deployLiveData.removeObserver(deploymentObserve)
+        siteLiveData.removeObserver(siteObserve)
     }
 }

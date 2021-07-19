@@ -1366,6 +1366,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
     override fun onDestroy() {
         super.onDestroy()
+        mainViewModel.onDestroy()
+
         deploymentWorkInfoLiveData.removeObserver(deploymentWorkInfoObserve)
         downloadStreamsWorkInfoLiveData.removeObserver(downloadStreamsWorkInfoObserve)
         guardianDeployLiveData.removeObserver(guardianDeploymentObserve)
