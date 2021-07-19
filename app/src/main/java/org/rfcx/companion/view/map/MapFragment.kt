@@ -1287,7 +1287,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
     fun showTrackOnMap(id: Int, lat: Double, lng: Double, markerLocationId: String) {
         //remove the previous one
         hideTrackOnMap()
-        val tracks = trackingFileDb.getTrackingFileBySiteId(id)
+        val tracks = mainViewModel.getTrackingFileBySiteId(id)
         if (tracks.isNotEmpty()) {
             //get all track first
             if (currentMarkId == markerLocationId) {
