@@ -5,16 +5,19 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import io.realm.Realm
+import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.Project
+import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.ProjectResponse
+import org.rfcx.companion.localdb.TrackingFileDb
 import org.rfcx.companion.service.DownloadStreamsWorker
-import org.rfcx.companion.util.Preferences
-import org.rfcx.companion.util.Resource
-import org.rfcx.companion.util.getIdToken
-import org.rfcx.companion.util.isNetworkAvailable
+import org.rfcx.companion.util.*
+import org.rfcx.companion.util.geojson.GeoJsonUtils
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.*
 
 class MainViewModel(
     application: Application,
@@ -24,6 +27,7 @@ class MainViewModel(
     @SuppressLint("StaticFieldLeak")
     private val context = getApplication<Application>().applicationContext
     private val projects = MutableLiveData<Resource<List<Project>>>()
+    private val tracks = MutableLiveData<Resource<List<DeploymentAssetResponse>>>()
 
     fun fetchProjects() {
         projects.postValue(Resource.loading(null))
@@ -102,6 +106,63 @@ class MainViewModel(
             })
     }
 
+    fun getStreamAssets(site: Locate) {
+        tracks.postValue(Resource.loading(null))
+        mainRepository.getStreamAssets("Bearer ${context.getIdToken()}", site.serverId!!)
+            .enqueue(object : Callback<List<DeploymentAssetResponse>> {
+                override fun onResponse(
+                    call: Call<List<DeploymentAssetResponse>>,
+                    response: Response<List<DeploymentAssetResponse>>
+                ) {
+                    var fileCount = 0
+                    var fileCreated = 0
+                    val siteAssets = response.body()
+                    siteAssets?.forEach { item ->
+                        if (item.mimeType.endsWith("geo+json")) {
+                            fileCount += 1
+                            val trackingFileDb =
+                                TrackingFileDb(Realm.getInstance(RealmHelper.migrationConfig()))
+                            GeoJsonUtils.downloadGeoJsonFile(
+                                context,
+                                "Bearer ${context.getIdToken()}",
+                                item,
+                                site.serverId!!,
+                                Date(),
+                                object : GeoJsonUtils.DownloadTrackCallback {
+                                    override fun onSuccess(filePath: String) {
+                                        fileCreated += 1
+                                        trackingFileDb.insertOrUpdate(
+                                            item,
+                                            filePath,
+                                            site.id
+                                        )
+                                        if (fileCount == fileCreated) {
+                                            tracks.postValue(Resource.success(response.body()))
+                                        }
+                                    }
+
+                                    override fun onFailed(msg: String) {
+                                        tracks.postValue(
+                                            Resource.error(msg, null)
+                                        )
+                                    }
+                                }
+                            )
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<List<DeploymentAssetResponse>>, t: Throwable) {
+                    tracks.postValue(
+                        Resource.error(
+                            context.getString(R.string.something_went_wrong),
+                            null
+                        )
+                    )
+                }
+            })
+    }
+
     fun retrieveLocations() {
         val projectId = Preferences.getInstance(context).getInt(Preferences.SELECTED_PROJECT)
         getProjectById(projectId)?.serverId?.let {
@@ -111,6 +172,10 @@ class MainViewModel(
 
     fun getProjectsFromRemote(): LiveData<Resource<List<Project>>> {
         return projects
+    }
+
+    fun getTrackingFromRemote(): LiveData<Resource<List<DeploymentAssetResponse>>> {
+        return tracks
     }
 
     fun getProjectsFromLocal(): List<Project> {

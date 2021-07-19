@@ -878,29 +878,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         site?.let { obj ->
             showTrackOnMap(obj.id, obj.latitude, obj.longitude, markerId)
             if (site.serverId != null) {
-                retrieveTracking(
-                    requireContext(),
-                    site.id,
-                    site.serverId!!,
-                    object : ApiCallbackInjector {
-                        override fun onSuccess() {
-                            showTrackOnMap(
-                                obj.id,
-                                obj.latitude,
-                                obj.longitude,
-                                markerId
-                            )
-                        }
-
-                        override fun onFailed() {
-                            showTrackOnMap(
-                                obj.id,
-                                obj.latitude,
-                                obj.longitude,
-                                markerId
-                            )
-                        }
-                    })
+                mainViewModel.getStreamAssets(site)
+                setTrackObserver(obj, markerId)
             }
         }
     }
@@ -1066,64 +1045,24 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         })
     }
 
-    private fun retrieveTracking(
-        context: Context,
-        siteId: Int,
-        siteServerId: String,
-        callback: ApiCallbackInjector
-    ) {
-        val token = "Bearer ${context.getIdToken()}"
-        ApiManager.getInstance().getDeviceApi().getStreamAssets(token, siteServerId)
-            .enqueue(object : Callback<List<DeploymentAssetResponse>> {
-                override fun onFailure(call: Call<List<DeploymentAssetResponse>>, t: Throwable) {
-                    if (context.isNetworkAvailable()) {
-                        Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT)
-                            .show()
-                    }
-                    callback.onFailed()
+    private fun setTrackObserver(site: Locate, markerId: String){
+        mainViewModel.getTrackingFromRemote().observe(viewLifecycleOwner, Observer {
+            when (it.status) {
+                Status.LOADING -> {
                 }
-
-                override fun onResponse(
-                    call: Call<List<DeploymentAssetResponse>>,
-                    response: Response<List<DeploymentAssetResponse>>
-                ) {
-                    var fileCount = 0
-                    var fileCreated = 0
-                    val siteAssets = response.body()
-                    siteAssets?.forEach { item ->
-                        if (item.mimeType.endsWith("geo+json")) {
-                            fileCount += 1
-                            val trackingFileDb =
-                                TrackingFileDb(Realm.getInstance(RealmHelper.migrationConfig()))
-                            GeoJsonUtils.downloadGeoJsonFile(
-                                context,
-                                token,
-                                item,
-                                siteServerId,
-                                Date(),
-                                object : GeoJsonUtils.DownloadTrackCallback {
-                                    override fun onSuccess(filePath: String) {
-                                        fileCreated += 1
-                                        trackingFileDb.insertOrUpdate(
-                                            item,
-                                            filePath,
-                                            siteId
-                                        )
-                                        if (fileCount == fileCreated) {
-                                            callback.onSuccess()
-                                        }
-                                    }
-
-                                    override fun onFailed(msg: String) {
-                                        listener?.showSnackbar(msg, Snackbar.LENGTH_SHORT)
-                                    }
-
-                                }
-                            )
-                        }
-                    }
+                Status.SUCCESS -> {
+                    showTrackOnMap(
+                        site.id,
+                        site.latitude,
+                        site.longitude,
+                        markerId
+                    )
                 }
-            })
+                Status.ERROR -> {
+                    showToast(it.message ?: getString(R.string.error_has_occurred))
+                }
+            }
+        })
     }
 
     private fun fetchJobSyncing() {
