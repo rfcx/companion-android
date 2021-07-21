@@ -11,11 +11,13 @@ import androidx.lifecycle.Transformations
 import io.realm.RealmResults
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.guardian.toMark
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.geojson.GeoJsonUtils
+import org.rfcx.companion.view.map.MapMarker
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -30,6 +32,11 @@ class MainViewModel(
     private val context = getApplication<Application>().applicationContext
     private val projects = MutableLiveData<Resource<List<Project>>>()
     private val tracks = MutableLiveData<Resource<List<DeploymentAssetResponse>>>()
+    private val deploymentMarkers = MutableLiveData<Resource<List<MapMarker.DeploymentMarker>>>()
+    private val siteMarkers = MutableLiveData<Resource<List<MapMarker>>>()
+    private val siteList = MutableLiveData<Resource<List<Locate>>>()
+    private val showDeployments = MutableLiveData<Resource<List<EdgeDeployment>>>()
+    private val showGuardianDeployments = MutableLiveData<Resource<List<GuardianDeployment>>>()
 
     private var guardianDeployments = listOf<GuardianDeployment>()
     private var deployments = listOf<EdgeDeployment>()
@@ -38,16 +45,20 @@ class MainViewModel(
     private lateinit var deployLiveData: LiveData<List<EdgeDeployment>>
     private val deploymentObserve = Observer<List<EdgeDeployment>> {
         deployments = it
+        combinedData()
     }
 
     private lateinit var guardianDeploymentLiveData: LiveData<List<GuardianDeployment>>
     private val guardianDeploymentObserve = Observer<List<GuardianDeployment>> {
         guardianDeployments = it
+        combinedData()
     }
 
     private lateinit var siteLiveData: LiveData<List<Locate>>
     private val siteObserve = Observer<List<Locate>> {
         sites = it
+        siteList.postValue(Resource.success(it))
+        combinedData()
     }
 
     init {
@@ -202,6 +213,44 @@ class MainViewModel(
             })
     }
 
+    private fun combinedData() {
+        var guardianDeploymentsForShow = this.guardianDeployments.filter { it.isCompleted() }
+        val usedSitesOnGuardian = guardianDeploymentsForShow.map { it.stream?.coreId }
+
+        var deploymentsForShow = this.deployments.filter { it.isCompleted() }
+        val usedSitesOnEdge = deploymentsForShow.map { it.stream?.coreId }
+
+        val allUsedSites = usedSitesOnEdge + usedSitesOnGuardian
+        var filteredShowLocations =
+            sites.filter { loc -> !allUsedSites.contains(loc.serverId) || (loc.serverId == null && (loc.lastDeploymentId == 0 && loc.lastGuardianDeploymentId == 0)) }
+
+        val projectName = getProjectName()
+        if (projectName != context.getString(R.string.none)) {
+            filteredShowLocations =
+                filteredShowLocations.filter { it.locationGroup?.name == projectName }
+            deploymentsForShow =
+                deploymentsForShow.filter { it.stream?.project?.name == projectName }
+            guardianDeploymentsForShow =
+                guardianDeploymentsForShow.filter { it.stream?.project?.name == projectName }
+        }
+
+        val audiomothDeploymentMarkers =
+            deploymentsForShow.map { it.toMark(context, mainRepository.getProjectLocalDb()) }
+        val guardianDeploymentMarkers = guardianDeploymentsForShow.map { it.toMark(context) }
+
+        deploymentMarkers.postValue(Resource.success(audiomothDeploymentMarkers + guardianDeploymentMarkers))
+        siteMarkers.postValue(Resource.success(filteredShowLocations.map { it.toMark() }))
+        showDeployments.postValue(Resource.success(deploymentsForShow))
+        showGuardianDeployments.postValue(Resource.success(guardianDeploymentsForShow))
+    }
+
+    private fun getProjectName(): String {
+        val preferences = Preferences.getInstance(context)
+        val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
+        val project = mainRepository.getProjectById(projectId)
+        return project?.name ?: context.getString(R.string.none)
+    }
+
     fun retrieveLocations() {
         val projectId = Preferences.getInstance(context).getInt(Preferences.SELECTED_PROJECT)
         getProjectById(projectId)?.serverId?.let {
@@ -211,6 +260,26 @@ class MainViewModel(
 
     fun getProjectsFromRemote(): LiveData<Resource<List<Project>>> {
         return projects
+    }
+
+    fun getDeploymentMarkers(): LiveData<Resource<List<MapMarker.DeploymentMarker>>> {
+        return deploymentMarkers
+    }
+
+    fun getSiteMarkers(): LiveData<Resource<List<MapMarker>>> {
+        return siteMarkers
+    }
+
+    fun getSites(): LiveData<Resource<List<Locate>>> {
+        return siteList
+    }
+
+    fun getShowDeployments(): LiveData<Resource<List<EdgeDeployment>>> {
+        return showDeployments
+    }
+
+    fun getShowGuardianDeployments(): LiveData<Resource<List<GuardianDeployment>>> {
+        return showGuardianDeployments
     }
 
     fun getTrackingFromRemote(): LiveData<Resource<List<DeploymentAssetResponse>>> {

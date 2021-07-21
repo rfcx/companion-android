@@ -20,10 +20,8 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.*
 import androidx.lifecycle.Observer
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.WorkInfo
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -68,7 +66,6 @@ import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianDeployment
-import org.rfcx.companion.entity.guardian.toMark
 import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.api.DeviceApiHelper
@@ -103,22 +100,18 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
     // database manager
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
-    private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
-    private val locateDb by lazy { LocateDb(realm) }
-    private val locationGroupDb by lazy { ProjectDb(realm) }
     private val trackingDb by lazy { TrackingDb(realm) }
 
     // data
-    private var guardianDeployments = listOf<GuardianDeployment>()
-    private var edgeDeployments = listOf<EdgeDeployment>()
     private var locations = listOf<Locate>()
     private var locationGroups = listOf<Project>()
     private var lastSyncingInfo: SyncInfo? = null
 
-    private lateinit var guardianDeployLiveData: LiveData<List<GuardianDeployment>>
-    private lateinit var edgeDeployLiveData: LiveData<List<EdgeDeployment>>
-    private lateinit var locateLiveData: LiveData<List<Locate>>
+    private var deploymentMarkers = listOf<MapMarker.DeploymentMarker>()
+    private var siteMarkers = listOf<MapMarker>()
+    private var showDeployments = listOf<EdgeDeployment>()
+    private var showGuardianDeployments = listOf<GuardianDeployment>()
+
     private lateinit var deploymentWorkInfoLiveData: LiveData<List<WorkInfo>>
     private lateinit var downloadStreamsWorkInfoLiveData: LiveData<List<WorkInfo>>
 
@@ -238,7 +231,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         setObserver()
 
         fetchJobSyncing()
-        fetchData()
         showSearchBar(false)
         hideLabel()
 
@@ -898,50 +890,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         mapboxMap?.easeCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 230), 1300)
     }
 
-    private val guardianDeploymentObserve = Observer<List<GuardianDeployment>> {
-        this.guardianDeployments = it
-        combinedData()
-    }
-
-    private val edgeDeploymentObserve = Observer<List<EdgeDeployment>> {
-        this.edgeDeployments = it
-        combinedData()
-    }
-
-    private val locateObserve = Observer<List<Locate>> {
-        this.locations = it
-        combinedData()
-    }
-
     private fun combinedData() {
-        var showGuardianDeployments = this.guardianDeployments.filter { it.isCompleted() }
-        val usedSitesOnGuardian = showGuardianDeployments.map { it.stream?.coreId }
+        handleMarker(deploymentMarkers + siteMarkers)
 
-        var showDeployments = this.edgeDeployments.filter { it.isCompleted() }
-        val usedSitesOnEdge = showDeployments.map { it.stream?.coreId }
-
-        val allUsedSites = usedSitesOnEdge + usedSitesOnGuardian
-        var filteredShowLocations =
-            locations.filter { loc -> !allUsedSites.contains(loc.serverId) || (loc.serverId == null && (loc.lastDeploymentId == 0 && loc.lastGuardianDeploymentId == 0)) }
         val projectName = listener?.getProjectName() ?: getString(R.string.none)
-        if (projectName != getString(R.string.none)) {
-            filteredShowLocations =
-                filteredShowLocations.filter { it.locationGroup?.name == listener?.getProjectName() }
-            showDeployments =
-                showDeployments.filter { it.stream?.project?.name == listener?.getProjectName() }
-            showGuardianDeployments =
-                showGuardianDeployments.filter { it.stream?.project?.name == listener?.getProjectName() }
-        }
-
-        val edgeDeploymentMarkers =
-            showDeployments.map { it.toMark(requireContext(), locationGroupDb) }
-
-        val guardianDeploymentMarkers = showGuardianDeployments.map { it.toMark(requireContext()) }
-        val deploymentMarkers = edgeDeploymentMarkers + guardianDeploymentMarkers
-        val locationMarkers = filteredShowLocations.map { it.toMark() }
-        handleMarker(deploymentMarkers + locationMarkers)
-
         val state = listener?.getBottomSheetState() ?: 0
+
         if (deploymentMarkers.isNotEmpty() && state != BottomSheetBehavior.STATE_EXPANDED) {
             val lastReport = deploymentMarkers.sortedByDescending { it.updatedAt }.first()
             mapboxMap?.let {
@@ -994,26 +948,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         }
     }
 
-    private fun fetchData() {
-        locateLiveData = Transformations.map(locateDb.getAllResultsAsync().asLiveData()) {
-            it
-        }
-
-        edgeDeployLiveData =
-            Transformations.map(edgeDeploymentDb.getAllResultsAsync().asLiveData()) {
-                it
-            }
-
-        guardianDeployLiveData =
-            Transformations.map(guardianDeploymentDb.getAllResultsAsync().asLiveData()) {
-                it
-            }
-
-        locateLiveData.observeForever(locateObserve)
-        edgeDeployLiveData.observeForever(edgeDeploymentObserve)
-        guardianDeployLiveData.observeForever(guardianDeploymentObserve)
-    }
-
     private fun setObserver() {
         mainViewModel.getProjectsFromRemote().observe(viewLifecycleOwner, Observer {
             when (it.status) {
@@ -1033,6 +967,72 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                     projectSwipeRefreshView.isRefreshing = false
                     showToast(it.message ?: getString(R.string.error_has_occurred))
                 }
+            }
+        })
+
+        mainViewModel.getDeploymentMarkers().observe(viewLifecycleOwner, Observer {
+            when (it.status) {
+                Status.LOADING -> {}
+                Status.SUCCESS -> {
+                    deploymentMarkers = it.data ?: listOf()
+                    combinedData()
+                }
+                Status.ERROR -> { }
+            }
+        })
+
+        mainViewModel.getSiteMarkers().observe(viewLifecycleOwner, Observer {
+            when (it.status) {
+                Status.LOADING -> {}
+                Status.SUCCESS -> {
+                    siteMarkers = it.data ?: listOf()
+                    combinedData()
+                }
+                Status.ERROR -> { }
+            }
+        })
+
+        mainViewModel.getSiteMarkers().observe(viewLifecycleOwner, Observer {
+            when (it.status) {
+                Status.LOADING -> {}
+                Status.SUCCESS -> {
+                    siteMarkers = it.data ?: listOf()
+                    combinedData()
+                }
+                Status.ERROR -> { }
+            }
+        })
+
+        mainViewModel.getShowDeployments().observe(viewLifecycleOwner, Observer {
+            when (it.status) {
+                Status.LOADING -> {}
+                Status.SUCCESS -> {
+                    showDeployments = it.data ?: listOf()
+                    combinedData()
+                }
+                Status.ERROR -> { }
+            }
+        })
+
+        mainViewModel.getShowGuardianDeployments().observe(viewLifecycleOwner, Observer {
+            when (it.status) {
+                Status.LOADING -> {}
+                Status.SUCCESS -> {
+                    showGuardianDeployments = it.data ?: listOf()
+                    combinedData()
+                }
+                Status.ERROR -> { }
+            }
+        })
+
+        mainViewModel.getSites().observe(viewLifecycleOwner, Observer {
+            when (it.status) {
+                Status.LOADING -> {}
+                Status.SUCCESS -> {
+                    locations = it.data ?: listOf()
+                    combinedData()
+                }
+                Status.ERROR -> { }
             }
         })
     }
@@ -1370,9 +1370,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
         deploymentWorkInfoLiveData.removeObserver(deploymentWorkInfoObserve)
         downloadStreamsWorkInfoLiveData.removeObserver(downloadStreamsWorkInfoObserve)
-        guardianDeployLiveData.removeObserver(guardianDeploymentObserve)
-        edgeDeployLiveData.removeObserver(edgeDeploymentObserve)
-        locateLiveData.removeObserver(locateObserve)
         locationEngine?.removeLocationUpdates(mapboxLocationChangeCallback)
         currentAnimator?.cancel()
         mapView.onDestroy()

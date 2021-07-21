@@ -6,6 +6,8 @@ import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.ProjectResponse
+import org.rfcx.companion.localdb.LocateDb
+import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.local.LocalDataHelper
 
@@ -73,6 +75,10 @@ class MainRepository(
 
     fun getLocateById(id: Int): Locate? {
         return localDataHelper.getLocateLocalDb().getLocateById(id)
+    }
+
+    fun getProjectLocalDb(): ProjectDb {
+        return localDataHelper.getProjectLocalDb()
     }
 
     fun getTrackingFileBySiteId(id: Int): RealmResults<TrackingFile> {
