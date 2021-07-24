@@ -370,7 +370,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                         })
 
                         if (newList.isEmpty()) showLabel(true) else hideLabel()
-                        siteAdapter.setFilter(ArrayList(newList.sortedByDescending { it.date }))
+                        siteAdapter.setFilter(ArrayList(newList))
                     }
                 }
             }
