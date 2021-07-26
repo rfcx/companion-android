@@ -9,7 +9,8 @@ import org.rfcx.companion.entity.Project
 data class ProjectResponse(
     var id: String? = null,
     var name: String = "",
-    var color: String = ""
+    var color: String = "",
+    var permissions: String = ""
 )
 
 fun ProjectResponse.toLocationGroups(): Project {
