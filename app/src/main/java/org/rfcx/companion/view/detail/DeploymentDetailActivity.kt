@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.PersistableBundle
 import android.provider.MediaStore
 import android.util.TypedValue
+import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.lifecycle.LiveData
@@ -28,6 +29,7 @@ import com.zhihu.matisse.Matisse
 import com.zhihu.matisse.MimeType
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_deployment_detail.*
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.buttom_sheet_attach_image_layout.view.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.BuildConfig
@@ -54,6 +56,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
     private val locationGroupDb by lazy { ProjectDb(realm) }
+    private val projectDb by lazy { ProjectDb(realm) }
 
     private lateinit var mapView: MapView
     private lateinit var mapBoxMap: MapboxMap
@@ -77,6 +80,12 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         super.onCreate(savedInstanceState)
         Mapbox.getInstance(this, getString(R.string.mapbox_token))
         setContentView(R.layout.activity_deployment_detail)
+
+        val preferences = Preferences.getInstance(this)
+        val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
+        val project = projectDb.getProjectById(projectId)
+
+        setButtonEnabled(project?.permissions != "Guest")
 
         // Setup Mapbox
         mapView = findViewById(R.id.mapBoxView)
@@ -124,6 +133,11 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
                 }
             }
         }
+    }
+
+    private fun setButtonEnabled(enabled: Boolean) {
+        editButton.visibility = if(enabled) View.VISIBLE else View.GONE
+        deleteButton.visibility = if(enabled) View.VISIBLE else View.GONE
     }
 
     private fun confirmationDialog() {

@@ -34,7 +34,6 @@ import org.rfcx.companion.widget.BottomNavigationMenuItem
 
 class MainActivity : AppCompatActivity(), MainActivityListener {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
     private val projectDb by lazy { ProjectDb(realm) }
 
     private var currentFragment: Fragment? = null
