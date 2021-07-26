@@ -1,5 +1,6 @@
 package org.rfcx.companion.entity.response
 
+import com.google.gson.annotations.SerializedName
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import org.rfcx.companion.entity.guardian.GuardianDeployment
@@ -11,6 +12,7 @@ data class StreamResponse(
     var latitude: Double? = null,
     var longitude: Double? = null,
     var altitude: Double? = null,
+    @SerializedName("created_at")
     var createdAt: Date? = null,
     var updatedAt: Date? = null,
     var project: ProjectResponse? = null,
