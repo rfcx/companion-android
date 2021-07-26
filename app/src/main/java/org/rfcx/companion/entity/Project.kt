@@ -15,7 +15,8 @@ open class Project(
     var serverId: String? = null,
     @Expose(serialize = false)
     var syncState: Int = 0,
-    var deletedAt: Date? = null
+    var deletedAt: Date? = null,
+    var permissions: String = "Member"
 ) : RealmModel {
     companion object {
         const val TABLE_NAME = "LocationGroups"
@@ -25,6 +26,7 @@ open class Project(
         const val PROJECT_SERVER_ID = "serverId"
         const val PROJECT_SYNC_STATE = "syncState"
         const val PROJECT_DELETED_AT = "deletedAt"
+        const val PROJECT_PERMISSIONS = "permissions"
     }
 }
 

@@ -2,6 +2,7 @@ package org.rfcx.companion
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -75,6 +76,12 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val preferences = Preferences.getInstance(this)
+        val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
+        val project = projectDb.getProjectById(projectId)
+
+        toggleFabEnabled(project?.permissions != "Guest")
+
         createLocationButton.setOnClickListener {
             if (BuildConfig.ENABLE_GUARDIAN) {
                 addTooltip = SimpleTooltip.Builder(this)
@@ -135,6 +142,15 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
                 }
             }
         })
+    }
+
+    private fun toggleFabEnabled(enabled: Boolean){
+        createLocationButton.isEnabled = enabled
+        if (enabled){
+            createLocationButton.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.background_button_enable))
+        } else {
+            createLocationButton.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.background_fab_button_disable))
+        }
     }
 
     private fun setupSimpleTooltip() {
