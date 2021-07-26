@@ -34,9 +34,7 @@ import kotlinx.android.synthetic.main.buttom_sheet_attach_image_layout.view.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.R
-import org.rfcx.companion.entity.DeploymentImage
-import org.rfcx.companion.entity.Device
-import org.rfcx.companion.entity.EdgeDeployment
+import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.Status
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.localdb.DeploymentImageDb
@@ -64,6 +62,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
 
     // data
     private var deployment: EdgeDeployment? = null
+    private var project: Project? = null
     private lateinit var deployImageLiveData: LiveData<List<DeploymentImage>>
     private var deploymentImages = listOf<DeploymentImage>()
     private val deploymentImageObserve = Observer<List<DeploymentImage>> {
@@ -84,6 +83,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         val preferences = Preferences.getInstance(this)
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
         val project = projectDb.getProjectById(projectId)
+        this.project = project
 
         setButtonEnabled(project?.permissions != "Guest")
 
@@ -296,7 +296,10 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
 
     private fun updateDeploymentImages(deploymentImages: List<DeploymentImage>) {
         val items = deploymentImages.map { it.toDeploymentImageView() }
-        deploymentImageAdapter.setImages(items)
+        val isVisibility = items.isEmpty() && project?.permissions == "Guest"
+        photoLabel.visibility = if (isVisibility) View.GONE else View.VISIBLE
+        deploymentImageRecycler.visibility = if (isVisibility) View.GONE else View.VISIBLE
+        deploymentImageAdapter.setImages(items, project?.permissions != "Guest")
     }
 
     private fun setupImageRecycler() {
