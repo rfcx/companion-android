@@ -79,7 +79,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
         val project = projectDb.getProjectById(projectId)
 
-        toggleFabEnabled(project?.permissions != "Guest")
+        toggleFabEnabled(project?.permissions?.contains("C") ?: true) // Check permissions can create site or deployment
 
         createLocationButton.setOnClickListener {
             if (BuildConfig.ENABLE_GUARDIAN) {

@@ -1,6 +1,7 @@
 package org.rfcx.companion.entity
 
 import com.google.gson.annotations.Expose
+import io.realm.RealmList
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
@@ -16,7 +17,7 @@ open class Project(
     @Expose(serialize = false)
     var syncState: Int = 0,
     var deletedAt: Date? = null,
-    var permissions: String = "Member"
+    var permissions: RealmList<String> = RealmList()
 ) : RealmModel {
     companion object {
         const val TABLE_NAME = "LocationGroups"

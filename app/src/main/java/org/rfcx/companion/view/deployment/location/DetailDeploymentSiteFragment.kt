@@ -322,7 +322,6 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             locationGroupValueTextView.text = site?.locationGroup?.name ?: getString(R.string.none)
         }
         siteValueTextView.text = siteName
-        changeProjectTextView.visibility = if (isCreateNew) View.VISIBLE else View.GONE
     }
 
     private fun setLatLngLabel(location: LatLng, altitude: Double) {

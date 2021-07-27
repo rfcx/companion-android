@@ -10,7 +10,7 @@ data class ProjectResponse(
     var id: String? = null,
     var name: String = "",
     var color: String = "",
-    var permissions: String = ""
+    var permissions: List<String> = listOf()
 )
 
 fun ProjectResponse.toLocationGroups(): Project {

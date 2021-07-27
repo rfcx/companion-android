@@ -85,7 +85,8 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         val project = projectDb.getProjectById(projectId)
         this.project = project
 
-        setButtonEnabled(project?.permissions != "Guest")
+        editButton.visibility = if(project?.permissions?.contains("U") != false) View.VISIBLE else View.GONE
+        deleteButton.visibility = if(project?.permissions?.contains("D") != false) View.VISIBLE else View.GONE
 
         // Setup Mapbox
         mapView = findViewById(R.id.mapBoxView)
@@ -133,11 +134,6 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
                 }
             }
         }
-    }
-
-    private fun setButtonEnabled(enabled: Boolean) {
-        editButton.visibility = if(enabled) View.VISIBLE else View.GONE
-        deleteButton.visibility = if(enabled) View.VISIBLE else View.GONE
     }
 
     private fun confirmationDialog() {
@@ -296,10 +292,11 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
 
     private fun updateDeploymentImages(deploymentImages: List<DeploymentImage>) {
         val items = deploymentImages.map { it.toDeploymentImageView() }
-        val isVisibility = items.isEmpty() && project?.permissions == "Guest"
-        photoLabel.visibility = if (isVisibility) View.GONE else View.VISIBLE
-        deploymentImageRecycler.visibility = if (isVisibility) View.GONE else View.VISIBLE
-        deploymentImageAdapter.setImages(items, project?.permissions != "Guest")
+
+        val isVisibility = items.isNotEmpty() || project?.permissions?.contains("U") != false
+        photoLabel.visibility = if (isVisibility) View.VISIBLE else View.GONE
+        deploymentImageRecycler.visibility = if (isVisibility) View.VISIBLE else View.GONE
+        deploymentImageAdapter.setImages(items, project?.permissions?.contains("U") != false)
     }
 
     private fun setupImageRecycler() {
