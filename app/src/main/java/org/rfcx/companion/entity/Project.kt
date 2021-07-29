@@ -34,3 +34,6 @@ open class Project(
 fun Project.toLocationGroup(): LocationGroup {
     return LocationGroup(this.name, this.color, this.serverId)
 }
+fun Project.isGuest(): Boolean {
+    return this.permissions == Permissions.GUEST.value
+}

@@ -8,6 +8,7 @@ import kotlinx.android.synthetic.main.item_location_group.view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Permissions
 import org.rfcx.companion.entity.Project
+import org.rfcx.companion.entity.isGuest
 
 class ProjectSelectAdapter(private val projectSelectListener: (Int) -> Unit) :
     RecyclerView.Adapter<ProjectSelectAdapter.ProjectSelectViewHolder>() {
@@ -44,6 +45,18 @@ class ProjectSelectAdapter(private val projectSelectListener: (Int) -> Unit) :
         }
     }
 
+    fun setClickable(view: View?, clickable: Boolean) {
+        if (view != null) {
+            if (view is ViewGroup) {
+                val viewGroup = view
+                for (i in 0 until viewGroup.childCount) {
+                    setClickable(viewGroup.getChildAt(i), clickable)
+                }
+            }
+            view.isClickable = clickable
+        }
+    }
+
     override fun getItemCount(): Int = items.size
 
     inner class ProjectSelectViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -55,7 +68,8 @@ class ProjectSelectAdapter(private val projectSelectListener: (Int) -> Unit) :
             locationGroupTextView.text = project.name ?: itemView.context.getString(R.string.none)
             permissionsTextView.text = project.permissions
             lockImageView.visibility =
-                if (project.permissions == Permissions.GUEST.value) View.VISIBLE else View.GONE
+                if (project.isGuest()) View.VISIBLE else View.GONE
+            setClickable(itemView, project.isGuest())
         }
     }
 }

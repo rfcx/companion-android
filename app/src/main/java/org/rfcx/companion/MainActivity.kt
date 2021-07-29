@@ -20,6 +20,7 @@ import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
 import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.Permissions
+import org.rfcx.companion.entity.isGuest
 import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.service.DeploymentCleanupWorker
 import org.rfcx.companion.util.*
@@ -76,11 +77,12 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         val preferences = Preferences.getInstance(this)
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
         val project = projectDb.getProjectById(projectId)
-
-        if(project?.permissions == Permissions.GUEST.value) {
-            preferences.putInt(Preferences.SELECTED_PROJECT, -1)
-            ProjectSelectActivity.startActivity(this)
-            finish()
+        project?.let {
+            if(it.isGuest()) {
+                preferences.putInt(Preferences.SELECTED_PROJECT, -1)
+                ProjectSelectActivity.startActivity(this)
+                finish()
+            }
         }
 
         createLocationButton.setOnClickListener {
