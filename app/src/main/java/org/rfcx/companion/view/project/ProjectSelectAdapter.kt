@@ -32,7 +32,7 @@ class ProjectSelectAdapter(private val projectSelectListener: (Int) -> Unit) :
             holder.itemView.checkImageView.visibility = View.GONE
         }
 
-        holder.bind(items[position].name ?: holder.itemView.context.getString(R.string.none))
+        holder.bind(items[position])
 
         holder.itemView.setOnClickListener {
             selectedPosition = position
@@ -45,9 +45,11 @@ class ProjectSelectAdapter(private val projectSelectListener: (Int) -> Unit) :
 
     inner class ProjectSelectViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val locationGroupTextView = itemView.locationGroupTextView
+        private val permissionsTextView = itemView.permissionsTextView
 
-        fun bind(project: String) {
-            locationGroupTextView.text = project
+        fun bind(project: Project) {
+            locationGroupTextView.text = project.name ?: itemView.context.getString(R.string.none)
+            permissionsTextView.text = project.permissions
         }
     }
 }

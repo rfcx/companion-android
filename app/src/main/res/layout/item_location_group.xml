@@ -11,19 +11,29 @@
         style="@style/AudioMothText.Subhead"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="@dimen/margin_padding_normal"
         android:textColor="@color/text_primary"
         android:textSize="@dimen/text_small"
-        android:padding="@dimen/margin_padding_normal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Location Group 01" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/permissionsTextView"
+        style="@style/AudioMothText.Label.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/margin_padding_normal"
+        app:layout_constraintEnd_toStartOf="@id/checkImageView"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Guest" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/checkImageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_check_24dp"
         android:paddingEnd="@dimen/margin_padding_normal"
+        android:src="@drawable/ic_check_24dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
