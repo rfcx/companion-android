@@ -190,6 +190,11 @@ object SocketManager {
         sendMessage(data)
     }
 
+    fun sendInstructionMessage(type: InstructionType, command: InstructionCommand, meta: InstructionMeta) {
+        val data = gson.toJson(InstructionMessage(type, command, meta))
+        sendMessage(data)
+    }
+
     fun resetMicrophoneDefaultValue() {
         isTestingFirstTime = true
     }
