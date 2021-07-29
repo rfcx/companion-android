@@ -20,14 +20,11 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.*
 import androidx.lifecycle.Observer
-import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.work.WorkInfo
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.snackbar.Snackbar
 import com.mapbox.android.core.location.*
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
@@ -56,6 +53,7 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.BitmapUtils
 import io.realm.Realm
+import kotlinx.android.synthetic.main.activity_project_select.*
 import kotlinx.android.synthetic.main.fragment_location_group.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.fragment_map.projectSwipeRefreshView
@@ -63,34 +61,34 @@ import kotlinx.android.synthetic.main.layout_deployment_window_info.view.*
 import kotlinx.android.synthetic.main.layout_map_window_info.view.*
 import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.MainActivityListener
+import org.rfcx.companion.MainViewModel
 import org.rfcx.companion.R
+import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianDeployment
-import org.rfcx.companion.entity.guardian.toMark
-import org.rfcx.companion.entity.response.DeploymentAssetResponse
-import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
-import org.rfcx.companion.repo.ApiManager
+import org.rfcx.companion.repo.api.DeviceApiHelper
+import org.rfcx.companion.repo.api.DeviceApiServiceImpl
+import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
-import org.rfcx.companion.util.geojson.GeoJsonUtils
+import org.rfcx.companion.util.Status
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.detail.DeploymentDetailActivity
 import org.rfcx.companion.view.diagnostic.DiagnosticActivity
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupAdapter
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupListener
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
 class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         (Locate, Boolean) -> Unit {
+
+    private lateinit var mainViewModel: MainViewModel
 
     // map
     private lateinit var mapView: MapView
@@ -102,24 +100,18 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
     // database manager
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
-    private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
-    private val locateDb by lazy { LocateDb(realm) }
-    private val locationGroupDb by lazy { ProjectDb(realm) }
-    private val trackingFileDb by lazy { TrackingFileDb(realm) }
     private val trackingDb by lazy { TrackingDb(realm) }
 
     // data
-    private var guardianDeployments = listOf<GuardianDeployment>()
-    private var edgeDeployments = listOf<EdgeDeployment>()
     private var locations = listOf<Locate>()
     private var locationGroups = listOf<Project>()
     private var lastSyncingInfo: SyncInfo? = null
 
-    private lateinit var guardianDeployLiveData: LiveData<List<GuardianDeployment>>
-    private lateinit var edgeDeployLiveData: LiveData<List<EdgeDeployment>>
-    private lateinit var locateLiveData: LiveData<List<Locate>>
-    private lateinit var locationGroupLiveData: LiveData<List<Project>>
+    private var deploymentMarkers = listOf<MapMarker.DeploymentMarker>()
+    private var siteMarkers = listOf<MapMarker>()
+    private var showDeployments = listOf<EdgeDeployment>()
+    private var showGuardianDeployments = listOf<GuardianDeployment>()
+
     private lateinit var deploymentWorkInfoLiveData: LiveData<List<WorkInfo>>
     private lateinit var downloadStreamsWorkInfoLiveData: LiveData<List<WorkInfo>>
 
@@ -235,10 +227,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         mapView = view.findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
+        setViewModel()
+        setObserver()
+
         fetchJobSyncing()
-        fetchData()
         showSearchBar(false)
         hideLabel()
+
         context?.let { setTextTrackingButton(LocationTracking.isTrackingOn(it)) }
         projectNameTextView.text =
             if (listener?.getProjectName() != getString(R.string.none)) listener?.getProjectName() else getString(
@@ -276,7 +271,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
         projectSwipeRefreshView.apply {
             setOnRefreshListener {
-                retrieveProjects(requireContext())
+                mainViewModel.fetchProjects()
                 isRefreshing = true
             }
             setColorSchemeResources(R.color.colorPrimary)
@@ -284,7 +279,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
         siteSwipeRefreshView.apply {
             setOnRefreshListener {
-                retrieveLocations(requireContext())
+                mainViewModel.retrieveLocations()
                 isRefreshing = false
             }
             setColorSchemeResources(R.color.colorPrimary)
@@ -304,6 +299,17 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             adapter = locationGroupAdapter
             locationGroupAdapter.screen = Screen.MAP.id
         }
+    }
+
+    private fun setViewModel() {
+        mainViewModel = ViewModelProvider(
+            this,
+            ViewModelFactory(
+                requireActivity().application,
+                DeviceApiHelper(DeviceApiServiceImpl()),
+                LocalDataHelper()
+            )
+        ).get(MainViewModel::class.java)
     }
 
     private fun setOnClickProjectName() {
@@ -364,7 +370,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                         })
 
                         if (newList.isEmpty()) showLabel(true) else hideLabel()
-                        siteAdapter.setFilter(ArrayList(newList.sortedByDescending { it.date }))
+                        siteAdapter.setFilter(ArrayList(newList))
                     }
                 }
             }
@@ -379,14 +385,14 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                 if (LocationTracking.isTrackingOn(context)) {
                     setLocationTrackingService(context, false)
                 } else {
-                    val tracking = trackingDb.getFirstTracking()
+                    val tracking = mainViewModel.getFirstTracking()
                     if (tracking != null) {
                         val time = tracking.stopAt?.time?.plus(WITHIN_TIME * 60000)
                         time?.let {
                             if (it > Date().time) {
                                 setLocationTrackingService(context, true)
                             } else {
-                                trackingDb.deleteTracking(1, context)
+                                mainViewModel.deleteTracking(1, context)
                                 setLocationTrackingService(context, true)
                             }
                         }
@@ -487,10 +493,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         mapboxMap.uiSettings.isLogoEnabled = false
         mapboxMap.uiSettings.isCompassEnabled = false
 
-        context?.let {
-            retrieveLocations(it)
-            retrieveProjects(it)
-        }
+        mainViewModel.fetchProjects()
+        mainViewModel.retrieveLocations()
 
         mapboxMap.setStyle(Style.OUTDOORS) {
             checkThenAccquireLocation(it)
@@ -570,7 +574,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         val markerId = feature.getProperty(
             PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID
         ).asString
-        val site = locateDb.getLocateByName(markerId.split(".")[0])
+        val site = mainViewModel.getLocateByName(markerId.split(".")[0])
 
         val windowInfoImages = hashMapOf<String, Bitmap>()
         val inflater = LayoutInflater.from(context)
@@ -772,7 +776,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                     val markerId = selectedFeature.getProperty(
                         PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID
                     ).asString
-                    val site = locateDb.getLocateByName(markerId.split(".")[0])
+                    val site = mainViewModel.getLocateByName(markerId.split(".")[0])
                     gettingTracksAndMoveToPin(site, markerId)
                     analytics?.trackClickPinEvent()
 
@@ -797,7 +801,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             features.forEachIndexed { index, feature ->
                 val markerId = selectedFeature.getProperty(PROPERTY_SITE_MARKER_ID)
                 if (markerId == feature.getProperty(PROPERTY_SITE_MARKER_ID)) {
-                    val site = locateDb.getLocateById(
+                    val site = mainViewModel.getLocateById(
                         selectedFeature.getProperty(PROPERTY_SITE_MARKER_SITE_ID).asInt
                     )
                     gettingTracksAndMoveToPin(site, markerId.asString)
@@ -840,7 +844,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                 if (device == Device.AUDIOMOTH.value) {
                     DeploymentDetailActivity.startActivity(it, deploymentId.toInt())
                 } else {
-                    val deployment = guardianDeploymentDb.getDeploymentById(deploymentId.toInt())
+                    val deployment = mainViewModel.getGuardianDeploymentById(deploymentId.toInt())
                     deployment?.let { dp ->
                         DiagnosticActivity.startActivity(it, dp, false)
                     }
@@ -858,29 +862,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         site?.let { obj ->
             showTrackOnMap(obj.id, obj.latitude, obj.longitude, markerId)
             if (site.serverId != null) {
-                retrieveTracking(
-                    requireContext(),
-                    site.id,
-                    site.serverId!!,
-                    object : ApiCallbackInjector {
-                        override fun onSuccess() {
-                            showTrackOnMap(
-                                obj.id,
-                                obj.latitude,
-                                obj.longitude,
-                                markerId
-                            )
-                        }
-
-                        override fun onFailed() {
-                            showTrackOnMap(
-                                obj.id,
-                                obj.latitude,
-                                obj.longitude,
-                                markerId
-                            )
-                        }
-                    })
+                mainViewModel.getStreamAssets(site)
+                setTrackObserver(obj, markerId)
             }
         }
     }
@@ -907,58 +890,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         mapboxMap?.easeCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 230), 1300)
     }
 
-    private val guardianDeploymentObserve = Observer<List<GuardianDeployment>> {
-        this.guardianDeployments = it
-        combinedData()
-    }
-
-    private val edgeDeploymentObserve = Observer<List<EdgeDeployment>> {
-        this.edgeDeployments = it
-        combinedData()
-    }
-
-    private val locateObserve = Observer<List<Locate>> {
-        this.locations = it
-        combinedData()
-    }
-
-    private val locationGroupObserve = Observer<List<Project>> {
-        this.locationGroups = it
-        combinedData()
-        locationGroupAdapter.items = listOf()
-        locationGroupAdapter.items = locationGroupDb.getProjects()
-        locationGroupAdapter.notifyDataSetChanged()
-    }
-
     private fun combinedData() {
-        var showGuardianDeployments = this.guardianDeployments.filter { it.isCompleted() }
-        val usedSitesOnGuardian = showGuardianDeployments.map { it.stream?.coreId }
+        handleMarker(deploymentMarkers + siteMarkers)
 
-        var showDeployments = this.edgeDeployments.filter { it.isCompleted() }
-        val usedSitesOnEdge = showDeployments.map { it.stream?.coreId }
-
-        val allUsedSites = usedSitesOnEdge + usedSitesOnGuardian
-        var filteredShowLocations =
-            locations.filter { loc -> !allUsedSites.contains(loc.serverId) || (loc.serverId == null && (loc.lastDeploymentId == 0 && loc.lastGuardianDeploymentId == 0)) }
         val projectName = listener?.getProjectName() ?: getString(R.string.none)
-        if (projectName != getString(R.string.none)) {
-            filteredShowLocations =
-                filteredShowLocations.filter { it.locationGroup?.name == listener?.getProjectName() }
-            showDeployments =
-                showDeployments.filter { it.stream?.project?.name == listener?.getProjectName() }
-            showGuardianDeployments =
-                showGuardianDeployments.filter { it.stream?.project?.name == listener?.getProjectName() }
-        }
-
-        val edgeDeploymentMarkers =
-            showDeployments.map { it.toMark(requireContext(), locationGroupDb) }
-
-        val guardianDeploymentMarkers = showGuardianDeployments.map { it.toMark(requireContext()) }
-        val deploymentMarkers = edgeDeploymentMarkers + guardianDeploymentMarkers
-        val locationMarkers = filteredShowLocations.map { it.toMark() }
-        handleMarker(deploymentMarkers + locationMarkers)
-
         val state = listener?.getBottomSheetState() ?: 0
+
         if (deploymentMarkers.isNotEmpty() && state != BottomSheetBehavior.STATE_EXPANDED) {
             val lastReport = deploymentMarkers.sortedByDescending { it.updatedAt }.first()
             mapboxMap?.let {
@@ -1011,149 +948,113 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         }
     }
 
-    private fun fetchData() {
-        locateLiveData = Transformations.map(locateDb.getAllResultsAsync().asLiveData()) {
-            it
-        }
-
-        edgeDeployLiveData =
-            Transformations.map(edgeDeploymentDb.getAllResultsAsync().asLiveData()) {
-                it
-            }
-
-        guardianDeployLiveData =
-            Transformations.map(guardianDeploymentDb.getAllResultsAsync().asLiveData()) {
-                it
-            }
-
-        locationGroupLiveData =
-            Transformations.map(locationGroupDb.getAllResultsAsync().asLiveData()) {
-                it
-            }
-
-        locateLiveData.observeForever(locateObserve)
-        edgeDeployLiveData.observeForever(edgeDeploymentObserve)
-        guardianDeployLiveData.observeForever(guardianDeploymentObserve)
-        locationGroupLiveData.observeForever(locationGroupObserve)
-    }
-
-    private fun retrieveLocations(context: Context) {
-        val projectId = Preferences.getInstance(context).getInt(Preferences.SELECTED_PROJECT)
-        val project = locationGroupDb.getProjectById(projectId)
-        project?.serverId?.let {
-            DownloadStreamsWorker.enqueue(context, it)
-        }
-    }
-
-    private fun retrieveProjects(context: Context) {
-        val token = "Bearer ${context.getIdToken()}"
-        ApiManager.getInstance().getDeviceApi2().getProjects(token)
-            .enqueue(object : Callback<List<ProjectResponse>> {
-                override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
-                    combinedData()
-                    if (context.isNetworkAvailable()) {
-                        Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT)
-                            .show()
-                    }
+    private fun setObserver() {
+        mainViewModel.getProjectsFromRemote().observe(viewLifecycleOwner, Observer {
+            when (it.status) {
+                Status.LOADING -> {}
+                Status.SUCCESS -> {
                     projectSwipeRefreshView.isRefreshing = false
-                }
 
-                override fun onResponse(
-                    call: Call<List<ProjectResponse>>,
-                    response: Response<List<ProjectResponse>>
-                ) {
-                    response.body()?.forEach { item ->
-                        locationGroupDb.insertOrUpdate(item)
-                    }
-                    deletedProjectsFromCore(context)
+                    this.locationGroups = mainViewModel.getProjectsFromLocal()
+                    locationGroupAdapter.items = listOf()
+                    locationGroupAdapter.items = this.locationGroups
+                    locationGroupAdapter.notifyDataSetChanged()
+
+                    combinedData()
                 }
-            })
+                Status.ERROR -> {
+                    combinedData()
+                    projectSwipeRefreshView.isRefreshing = false
+                    showToast(it.message ?: getString(R.string.error_has_occurred))
+                }
+            }
+        })
+
+        mainViewModel.getDeploymentMarkers().observe(viewLifecycleOwner, Observer {
+            when (it.status) {
+                Status.LOADING -> {}
+                Status.SUCCESS -> {
+                    deploymentMarkers = it.data ?: listOf()
+                    combinedData()
+                }
+                Status.ERROR -> {}
+            }
+        })
+
+        mainViewModel.getSiteMarkers().observe(viewLifecycleOwner, Observer {
+            when (it.status) {
+                Status.LOADING -> {}
+                Status.SUCCESS -> {
+                    siteMarkers = it.data ?: listOf()
+                    combinedData()
+                }
+                Status.ERROR -> {}
+            }
+        })
+
+        mainViewModel.getSiteMarkers().observe(viewLifecycleOwner, Observer {
+            when (it.status) {
+                Status.LOADING -> {}
+                Status.SUCCESS -> {
+                    siteMarkers = it.data ?: listOf()
+                    combinedData()
+                }
+                Status.ERROR -> {}
+            }
+        })
+
+        mainViewModel.getShowDeployments().observe(viewLifecycleOwner, Observer {
+            when (it.status) {
+                Status.LOADING -> {}
+                Status.SUCCESS -> {
+                    showDeployments = it.data ?: listOf()
+                    combinedData()
+                }
+                Status.ERROR -> {}
+            }
+        })
+
+        mainViewModel.getShowGuardianDeployments().observe(viewLifecycleOwner, Observer {
+            when (it.status) {
+                Status.LOADING -> {}
+                Status.SUCCESS -> {
+                    showGuardianDeployments = it.data ?: listOf()
+                    combinedData()
+                }
+                Status.ERROR -> {}
+            }
+        })
+
+        mainViewModel.getSites().observe(viewLifecycleOwner, Observer {
+            when (it.status) {
+                Status.LOADING -> {}
+                Status.SUCCESS -> {
+                    locations = it.data ?: listOf()
+                    combinedData()
+                }
+                Status.ERROR -> {}
+            }
+        })
     }
 
-    private fun deletedProjectsFromCore(context: Context) {
-        val token = "Bearer ${context.getIdToken()}"
-        ApiManager.getInstance().getDeviceApi2().getDeletedProjects(token)
-            .enqueue(object : Callback<List<ProjectResponse>> {
-                override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
-                    if (context.isNetworkAvailable()) {
-                        Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT)
-                            .show()
-                    }
+    private fun setTrackObserver(site: Locate, markerId: String){
+        mainViewModel.getTrackingFromRemote().observe(viewLifecycleOwner, Observer {
+            when (it.status) {
+                Status.LOADING -> {
                 }
-
-                override fun onResponse(
-                    call: Call<List<ProjectResponse>>,
-                    response: Response<List<ProjectResponse>>
-                ) {
-                    if (response.isSuccessful) {
-                        response.body()?.let { projectsRes ->
-                            locationGroupDb.deleteProjectsByCoreId(projectsRes.map { it.id!! }) // remove project with these coreIds
-                        }
-                        projectSwipeRefreshView.isRefreshing = false
-                        combinedData()
-                    }
+                Status.SUCCESS -> {
+                    showTrackOnMap(
+                        site.id,
+                        site.latitude,
+                        site.longitude,
+                        markerId
+                    )
                 }
-            })
-    }
-
-    private fun retrieveTracking(
-        context: Context,
-        siteId: Int,
-        siteServerId: String,
-        callback: ApiCallbackInjector
-    ) {
-        val token = "Bearer ${context.getIdToken()}"
-        ApiManager.getInstance().getDeviceApi().getStreamAssets(token, siteServerId)
-            .enqueue(object : Callback<List<DeploymentAssetResponse>> {
-                override fun onFailure(call: Call<List<DeploymentAssetResponse>>, t: Throwable) {
-                    if (context.isNetworkAvailable()) {
-                        Toast.makeText(context, R.string.error_has_occurred, Toast.LENGTH_SHORT)
-                            .show()
-                    }
-                    callback.onFailed()
+                Status.ERROR -> {
+                    showToast(it.message ?: getString(R.string.error_has_occurred))
                 }
-
-                override fun onResponse(
-                    call: Call<List<DeploymentAssetResponse>>,
-                    response: Response<List<DeploymentAssetResponse>>
-                ) {
-                    var fileCount = 0
-                    var fileCreated = 0
-                    val siteAssets = response.body()
-                    siteAssets?.forEach { item ->
-                        if (item.mimeType.endsWith("geo+json")) {
-                            fileCount += 1
-                            val trackingFileDb =
-                                TrackingFileDb(Realm.getInstance(RealmHelper.migrationConfig()))
-                            GeoJsonUtils.downloadGeoJsonFile(
-                                context,
-                                token,
-                                item,
-                                siteServerId,
-                                Date(),
-                                object : GeoJsonUtils.DownloadTrackCallback {
-                                    override fun onSuccess(filePath: String) {
-                                        fileCreated += 1
-                                        trackingFileDb.insertOrUpdate(
-                                            item,
-                                            filePath,
-                                            siteId
-                                        )
-                                        if (fileCount == fileCreated) {
-                                            callback.onSuccess()
-                                        }
-                                    }
-
-                                    override fun onFailed(msg: String) {
-                                        listener?.showSnackbar(msg, Snackbar.LENGTH_SHORT)
-                                    }
-
-                                }
-                            )
-                        }
-                    }
-                }
-            })
+            }
+        })
     }
 
     private fun fetchJobSyncing() {
@@ -1173,7 +1074,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
     }
 
     private fun setSnackbar(status: SyncInfo, isSites: Boolean) {
-        val deploymentUnsentCount = edgeDeploymentDb.unsentCount().toInt()
+        val deploymentUnsentCount = mainViewModel.getDeploymentUnsentCount()
         when (status) {
             SyncInfo.Starting, SyncInfo.Uploading -> {
                 val msg = if (isSites) {
@@ -1385,7 +1286,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
     fun showTrackOnMap(id: Int, lat: Double, lng: Double, markerLocationId: String) {
         //remove the previous one
         hideTrackOnMap()
-        val tracks = trackingFileDb.getTrackingFileBySiteId(id)
+        val tracks = mainViewModel.getTrackingFileBySiteId(id)
         if (tracks.isNotEmpty()) {
             //get all track first
             if (currentMarkId == markerLocationId) {
@@ -1425,6 +1326,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         currentAnimator = null
     }
 
+    private fun showToast(message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+    }
+
     fun showButtonOnMap() {
         buttonOnMapGroup.visibility = View.VISIBLE
     }
@@ -1461,12 +1366,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
     override fun onDestroy() {
         super.onDestroy()
+        mainViewModel.onDestroy()
+
         deploymentWorkInfoLiveData.removeObserver(deploymentWorkInfoObserve)
         downloadStreamsWorkInfoLiveData.removeObserver(downloadStreamsWorkInfoObserve)
-        guardianDeployLiveData.removeObserver(guardianDeploymentObserve)
-        edgeDeployLiveData.removeObserver(edgeDeploymentObserve)
-        locateLiveData.removeObserver(locateObserve)
-        locationGroupLiveData.removeObserver(locationGroupObserve)
         locationEngine?.removeLocationUpdates(mapboxLocationChangeCallback)
         currentAnimator?.cancel()
         mapView.onDestroy()
@@ -1535,7 +1438,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             setFeatureSelectState(selectingDeployment, true)
         }
 
-        val item = locateDb.getLocateByName(locate.name)
+        val item = mainViewModel.getLocateByName(locate.name)
         item?.let {
             val pointF = mapboxMap?.projection?.toScreenLocation(it.getLatLng()) ?: PointF()
             val clusterFeatures = mapboxMap?.queryRenderedFeatures(pointF, "$DEPLOYMENT_CLUSTER-0")
@@ -1567,7 +1470,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         context?.let { context ->
             Preferences.getInstance(context).putInt(Preferences.SELECTED_PROJECT, group.id)
             //reload site to get sites from selected project
-            retrieveLocations(context)
+            mainViewModel.retrieveLocations()
         }
         listener?.let { listener ->
             projectNameTextView.text =
