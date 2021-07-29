@@ -17,7 +17,7 @@ open class Project(
     @Expose(serialize = false)
     var syncState: Int = 0,
     var deletedAt: Date? = null,
-    var permissions: RealmList<String> = RealmList()
+    var permissions: String = ""
 ) : RealmModel {
     companion object {
         const val TABLE_NAME = "LocationGroups"

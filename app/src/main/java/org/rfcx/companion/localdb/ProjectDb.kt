@@ -9,6 +9,7 @@ import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Project.Companion.PROJECT_DELETED_AT
 import org.rfcx.companion.entity.SyncState
 import org.rfcx.companion.entity.response.ProjectResponse
+import org.rfcx.companion.entity.response.permissionsLabel
 import org.rfcx.companion.entity.response.toLocationGroups
 import java.util.*
 
@@ -104,7 +105,7 @@ class ProjectDb(private val realm: Realm) {
                 project.serverId = groupsResponse.id
                 project.name = groupsResponse.name
                 project.color = groupsResponse.color
-                project.permissions.addAll(groupsResponse.permissions)
+                project.permissions = groupsResponse.permissionsLabel()
             }
         }
     }

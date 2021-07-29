@@ -338,7 +338,8 @@ class CompanionRealmMigration : RealmMigration {
     private fun migrateToV16(realm: DynamicRealm) {
         val locationGroups = realm.schema.get("Project")
         locationGroups?.apply {
-            addRealmListField(Project.PROJECT_PERMISSIONS, String::class.java)
+            addField(Project.PROJECT_PERMISSIONS, String::class.java)
+                .setRequired(Project.PROJECT_PERMISSIONS, true)
         }
     }
 

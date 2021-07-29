@@ -33,7 +33,7 @@ class DeploymentImageAdapter :
     fun getImageCount(): Int = if (imagesSource[imagesSource.count() - 1] is AddImageItem) imagesSource.count() - 1
     else imagesSource.count()
 
-    fun setImages(reportImages: List<DeploymentImageView>, isEnabledAdd: Boolean = true) {
+    fun setImages(reportImages: List<DeploymentImageView>) {
         imagesSource = arrayListOf()
         var index = 0
         reportImages.forEach {
@@ -50,7 +50,7 @@ class DeploymentImageAdapter :
             }
             index++
         }
-        if (imagesSource.count() < MAX_IMAGE_SIZE && isEnabledAdd) {
+        if (imagesSource.count() < MAX_IMAGE_SIZE) {
             imagesSource.add(AddImageItem())
         }
 

@@ -2,7 +2,6 @@ package org.rfcx.companion
 
 import android.content.Context
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -13,7 +12,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
-import com.mapbox.mapboxsdk.geometry.LatLng
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
@@ -21,15 +19,15 @@ import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
 import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.entity.Locate
-import org.rfcx.companion.localdb.EdgeDeploymentDb
+import org.rfcx.companion.entity.Permissions
 import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.service.DeploymentCleanupWorker
-import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.EdgeDeploymentActivity
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.companion.view.map.MapFragment
 import org.rfcx.companion.view.profile.ProfileFragment
+import org.rfcx.companion.view.project.ProjectSelectActivity
 import org.rfcx.companion.widget.BottomNavigationMenuItem
 
 class MainActivity : AppCompatActivity(), MainActivityListener {
@@ -79,7 +77,11 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
         val project = projectDb.getProjectById(projectId)
 
-        toggleFabEnabled(project?.permissions?.contains("C") ?: true) // Check permissions can create site or deployment
+        if(project?.permissions == Permissions.GUEST.value) {
+            preferences.putInt(Preferences.SELECTED_PROJECT, -1)
+            ProjectSelectActivity.startActivity(this)
+            finish()
+        }
 
         createLocationButton.setOnClickListener {
             if (BuildConfig.ENABLE_GUARDIAN) {
@@ -141,15 +143,6 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
                 }
             }
         })
-    }
-
-    private fun toggleFabEnabled(enabled: Boolean){
-        createLocationButton.isEnabled = enabled
-        if (enabled){
-            createLocationButton.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.background_button_enable))
-        } else {
-            createLocationButton.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.background_fab_button_disable))
-        }
     }
 
     private fun setupSimpleTooltip() {

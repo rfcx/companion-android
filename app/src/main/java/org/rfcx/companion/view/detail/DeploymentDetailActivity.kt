@@ -62,7 +62,6 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
 
     // data
     private var deployment: EdgeDeployment? = null
-    private var project: Project? = null
     private lateinit var deployImageLiveData: LiveData<List<DeploymentImage>>
     private var deploymentImages = listOf<DeploymentImage>()
     private val deploymentImageObserve = Observer<List<DeploymentImage>> {
@@ -83,10 +82,8 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         val preferences = Preferences.getInstance(this)
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
         val project = projectDb.getProjectById(projectId)
-        this.project = project
 
-        editButton.visibility = if(project?.permissions?.contains("U") != false) View.VISIBLE else View.GONE
-        deleteButton.visibility = if(project?.permissions?.contains("D") != false) View.VISIBLE else View.GONE
+        deleteButton.visibility = if(project?.permissions == Permissions.ADMIN.value) View.VISIBLE else View.GONE
 
         // Setup Mapbox
         mapView = findViewById(R.id.mapBoxView)
@@ -292,11 +289,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
 
     private fun updateDeploymentImages(deploymentImages: List<DeploymentImage>) {
         val items = deploymentImages.map { it.toDeploymentImageView() }
-
-        val isVisibility = items.isNotEmpty() || project?.permissions?.contains("U") != false
-        photoLabel.visibility = if (isVisibility) View.VISIBLE else View.GONE
-        deploymentImageRecycler.visibility = if (isVisibility) View.VISIBLE else View.GONE
-        deploymentImageAdapter.setImages(items, project?.permissions?.contains("U") != false)
+        deploymentImageAdapter.setImages(items)
     }
 
     private fun setupImageRecycler() {
