@@ -5,11 +5,15 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattService
 import android.content.*
 import android.content.Context.BIND_AUTO_CREATE
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.util.Log
-import org.rfcx.companion.entity.songmeter.SongMeterConstant
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
+import org.rfcx.companion.entity.songmeter.SongMeterConstant
 import org.rfcx.companion.util.Resource
+import java.util.*
 
 class BleConnectDelegate(private val context: Context) {
 
@@ -21,10 +25,26 @@ class BleConnectDelegate(private val context: Context) {
     var configCharacteristics: List<BluetoothGattCharacteristic>? = null
 
     var configAtoR: BluetoothGattCharacteristic? = null
+    var configAtoRData: ByteArray? = null
     var configRtoA: BluetoothGattCharacteristic? = null
+    var configRtoAData: ByteArray? = null
+    var schedAtoR: BluetoothGattCharacteristic? = null
+    var schedRtoA: BluetoothGattCharacteristic? = null
+    var bulkAckAtoR: BluetoothGattCharacteristic? = null
+    var bulkDataRtoA: BluetoothGattCharacteristic? = null
+    var response: BluetoothGattCharacteristic? = null
+    var status: BluetoothGattCharacteristic? = null
+
+    var needRead = false
+
+    var seqSend = 0
+
+    var count = 0
 
     var recorder: BluetoothGatt? = null
     private var gattConnection = MutableLiveData<Resource<Boolean>>()
+
+    private var handler = Handler(Looper.getMainLooper())
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -58,8 +78,60 @@ class BleConnectDelegate(private val context: Context) {
                 BleConnectService.ACTION_GATT_SERVICES_DISCOVERED -> {
                     setGattServices(bleConnectService?.supportedGattServices)
                 }
-                BleConnectService.ACTION_DATA_AVAILABLE -> {
-
+                BleConnectService.ACTION_CHA_WRITE -> {
+                    Log.d("OnChaWrite", "OnChaWrite")
+                    displayData(intent.getByteArrayExtra(BleConnectService.EXTRA_DATA))
+                    when {
+                        intent.getStringExtra(BleConnectService.CHARACTERISTICS)!!.toUpperCase() == SongMeterConstant.kUUIDCharConfigAtoR -> {
+                            handler.post {
+//                                bleConnectService?.readCharacteristic(configRtoA)
+                            }
+                        }
+                    }
+                }
+                BleConnectService.ACTION_CHA_READ -> {
+                    Log.d("OnChaRead", "OnChaRead")
+                    displayData(intent.getByteArrayExtra(BleConnectService.EXTRA_DATA))
+                    when {
+                        intent.getStringExtra(BleConnectService.CHARACTERISTICS)!!.toUpperCase() == SongMeterConstant.kUUIDCharConfigAtoR -> {
+                            seqSend++
+                            val configData = configAtoR!!.value
+                            Arrays.fill(configData, (0).toByte())
+                            configData[0] = (seqSend).toByte()
+                            configData[1] = (0).toByte()
+                            handler.post {
+                                configAtoR!!.value = configData
+                                bleConnectService?.writeCharacteristic(configAtoR)
+                            }
+                        }
+                        intent.getStringExtra(BleConnectService.CHARACTERISTICS)!!.toUpperCase() == SongMeterConstant.kUUIDCharConfigRtoA -> {
+                            configRtoAData = intent.getByteArrayExtra(BleConnectService.EXTRA_DATA)
+                            handler.post {
+//                                bleConnectService?.readCharacteristic(configAtoR)
+                            }
+                        }
+                    }
+                }
+                BleConnectService.ACTION_CHA_CHANGE -> {
+                    Log.d("OnChaChanged", "OnChaChanged")
+                    when {
+                        intent.getStringExtra(BleConnectService.CHARACTERISTICS)!!.toUpperCase() == SongMeterConstant.kUUIDCharConfigRtoA -> {
+                            configRtoAData = intent.getByteArrayExtra(BleConnectService.EXTRA_DATA)
+                            handler.post {
+//                                bleConnectService?.writeCharacteristic(configAtoR)
+                            }
+                        }
+                        intent.getStringExtra(BleConnectService.CHARACTERISTICS)!!.toUpperCase() == SongMeterConstant.kUUIDCharStatus -> {
+                            count++
+                            Toast.makeText(context, count.toString(), Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
+                BleConnectService.ACTION_DESCRIPTOR_WRITTEN -> {
+                    Log.d("OnDescWritten", "OnDescWritten")
+                    handler.post {
+                        bleConnectService?.readCharacteristic(configAtoR)
+                    }
                 }
             }
         }
@@ -68,18 +140,57 @@ class BleConnectDelegate(private val context: Context) {
     private fun setGattServices(gattServices: List<BluetoothGattService>?) {
         if (gattServices == null) return
         gattServices.forEach { gattService ->
-            if (gattService.uuid.toString() == SongMeterConstant.kUUIDCommsService) {
+            if (gattService.uuid.toString().toUpperCase() == SongMeterConstant.kUUIDCommsService) {
                 configService = gattService
                 configCharacteristics = gattService.characteristics
             }
         }
         configCharacteristics?.forEach { characteristic ->
-            when (characteristic.uuid.toString()) {
-                SongMeterConstant.kUUIDCharConfigAtoR -> configAtoR = characteristic
-                SongMeterConstant.kUUIDCharConfigRtoA -> configRtoA = characteristic
+            when (characteristic.uuid.toString().toUpperCase()) {
+                SongMeterConstant.kUUIDCharConfigAtoR -> {
+                    configAtoR = characteristic
+                    mapCharacteristic[SongMeterConstant.kUUIDCharConfigAtoR] = configAtoR!!
+                }
+                SongMeterConstant.kUUIDCharConfigRtoA -> {
+                    configRtoA = characteristic
+                    mapCharacteristic[SongMeterConstant.kUUIDCharConfigRtoA] = configRtoA!!
+                }
+                SongMeterConstant.kUUIDCharSchedAtoR -> {
+                    schedAtoR = characteristic
+                    mapCharacteristic[SongMeterConstant.kUUIDCharSchedAtoR] = schedAtoR!!
+                }
+                SongMeterConstant.kUUIDCharSchedRtoA -> {
+                    schedRtoA = characteristic
+                    mapCharacteristic[SongMeterConstant.kUUIDCharSchedRtoA] = schedRtoA!!
+                }
+                SongMeterConstant.kUUIDCharBulkAckAtoR -> {
+                    bulkAckAtoR = characteristic
+                    mapCharacteristic[SongMeterConstant.kUUIDCharBulkAckAtoR] = bulkAckAtoR!!
+                }
+                SongMeterConstant.kUUIDCharBulkDataRtoA -> {
+                    bulkDataRtoA = characteristic
+                    mapCharacteristic[SongMeterConstant.kUUIDCharBulkDataRtoA] = bulkDataRtoA!!
+                }
+                SongMeterConstant.kUUIDCharResponse -> {
+                    response = characteristic
+                    mapCharacteristic[SongMeterConstant.kUUIDCharResponse] = response!!
+                }
+                SongMeterConstant.kUUIDCharStatus -> {
+                    status = characteristic
+                    mapCharacteristic[SongMeterConstant.kUUIDCharStatus] = status!!
+                }
             }
-            bleConnectService?.readCharacteristic(characteristic)
         }
+
+        Log.d("BLE", "setting noti")
+        handler.post {
+            bleConnectService?.setCharacteristicNotification(configRtoA!!, true) // to notify if this got populate
+        }
+    }
+
+    private fun displayData(data: ByteArray?) {
+        if (data == null) return
+        Log.d("BLE", data.contentToString())
     }
 
     private fun setSiteId(id: String) {
@@ -93,7 +204,10 @@ class BleConnectDelegate(private val context: Context) {
         intentFilter.addAction(BleConnectService.ACTION_GATT_CONNECTED)
         intentFilter.addAction(BleConnectService.ACTION_GATT_DISCONNECTED)
         intentFilter.addAction(BleConnectService.ACTION_GATT_SERVICES_DISCOVERED)
-        intentFilter.addAction(BleConnectService.ACTION_DATA_AVAILABLE)
+        intentFilter.addAction(BleConnectService.ACTION_CHA_WRITE)
+        intentFilter.addAction(BleConnectService.ACTION_CHA_READ)
+        intentFilter.addAction(BleConnectService.ACTION_CHA_CHANGE)
+        intentFilter.addAction(BleConnectService.ACTION_DESCRIPTOR_WRITTEN)
         return intentFilter
     }
 
@@ -118,4 +232,7 @@ class BleConnectDelegate(private val context: Context) {
         context.unbindService(serviceConnection)
     }
 
+    companion object {
+        var mapCharacteristic: MutableMap<String, BluetoothGattCharacteristic> = mutableMapOf()
+    }
 }

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
+import org.rfcx.companion.entity.songmeter.SongMeterConstant
 import java.util.*
 
 /**
@@ -18,6 +19,18 @@ class BleConnectService : Service() {
     private var mBluetoothDeviceAddress: String? = null
     private var mBluetoothGatt: BluetoothGatt? = null
     private var mConnectionState = STATE_DISCONNECTED
+
+    var state = true
+
+    var notifyCharacteristics = listOf(
+        SongMeterConstant.kUUIDCharConfigRtoA,
+        SongMeterConstant.kUUIDCharSchedRtoA,
+        SongMeterConstant.kUUIDCharBulkAckAtoR,
+        SongMeterConstant.kUUIDCharBulkDataRtoA,
+        SongMeterConstant.kUUIDCharResponse,
+        SongMeterConstant.kUUIDCharStatus
+    )
+    var notifyCharacteristicsPosition = 0
 
     // Implements callback methods for GATT events that the app cares about.  For example,
     // connection change and services discovered.
@@ -56,7 +69,7 @@ class BleConnectService : Service() {
             status: Int
         ) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic)
+                broadcastUpdate(ACTION_CHA_READ, characteristic)
             }
         }
 
@@ -64,7 +77,36 @@ class BleConnectService : Service() {
             gatt: BluetoothGatt,
             characteristic: BluetoothGattCharacteristic
         ) {
-            broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic)
+            broadcastUpdate(ACTION_CHA_CHANGE, characteristic)
+        }
+
+        override fun onCharacteristicWrite(
+            gatt: BluetoothGatt?,
+            characteristic: BluetoothGattCharacteristic?,
+            status: Int
+        ) {
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                if (characteristic != null)
+                    broadcastUpdate(ACTION_CHA_WRITE, characteristic)
+            }
+        }
+
+        override fun onDescriptorWrite(
+            gatt: BluetoothGatt?,
+            descriptor: BluetoothGattDescriptor?,
+            status: Int
+        ) {
+            mBluetoothGatt!!.setCharacteristicNotification(descriptor!!.characteristic, true)
+            notifyCharacteristicsPosition++
+            if (notifyCharacteristicsPosition < notifyCharacteristics.size) {
+                val characteristic = BleConnectDelegate.mapCharacteristic[notifyCharacteristics[notifyCharacteristicsPosition]]
+                setCharacteristicNotification(characteristic!!, true)
+            } else {
+                notifyCharacteristicsPosition = 0
+                if (status == BluetoothGatt.GATT_SUCCESS) {
+                    broadcastUpdate(ACTION_DESCRIPTOR_WRITTEN, descriptor.characteristic)
+                }
+            }
         }
     }
 
@@ -79,18 +121,12 @@ class BleConnectService : Service() {
     ) {
         val intent = Intent(action)
 
-        // This is special handling for the Heart Rate Measurement profile.  Data parsing is
-        // carried out as per profile specifications:
-        // http://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml
-
-        // For all other profiles, writes the data formatted in HEX.
         val data = characteristic.value
         if (data != null && data.isNotEmpty()) {
-            val stringBuilder = StringBuilder(data.size)
-            for (byteChar in data) stringBuilder.append(String.format("%02X ", byteChar))
             intent.putExtra(
-                EXTRA_DATA, "${String(data)}$stringBuilder".trimIndent()
+                EXTRA_DATA, data
             )
+            intent.putExtra(CHARACTERISTICS, characteristic.uuid.toString())
         }
         sendBroadcast(intent)
     }
@@ -210,20 +246,20 @@ class BleConnectService : Service() {
      *
      * @param characteristic The characteristic to read from.
      */
-    fun readCharacteristic(characteristic: BluetoothGattCharacteristic?) {
+    fun readCharacteristic(characteristic: BluetoothGattCharacteristic?): Boolean {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w(TAG, "BluetoothAdapter not initialized")
-            return
+            return false
         }
-        mBluetoothGatt!!.readCharacteristic(characteristic)
+        return mBluetoothGatt!!.readCharacteristic(characteristic)
     }
 
-    fun writeCharacteristic(characteristic: BluetoothGattCharacteristic?) {
+    fun writeCharacteristic(characteristic: BluetoothGattCharacteristic?): Boolean {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w(TAG, "BluetoothAdapter not initialized")
-            return
+            return false
         }
-        mBluetoothGatt!!.writeCharacteristic(characteristic)
+        return mBluetoothGatt!!.writeCharacteristic(characteristic)
     }
 
     /**
@@ -240,7 +276,16 @@ class BleConnectService : Service() {
             Log.w(TAG, "BluetoothAdapter not initialized")
             return
         }
-        mBluetoothGatt!!.setCharacteristicNotification(characteristic, enabled)
+        characteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+        val descriptor =
+            characteristic.getDescriptor(UUID.fromString(SongMeterConstant.CLIENT_CHARACTERISTIC_CONFIG))
+        if (enabled) {
+            descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+        } else {
+            descriptor.value = BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE
+        }
+        mBluetoothGatt!!.writeDescriptor(descriptor)
+//        mBluetoothGatt!!.setCharacteristicNotification(characteristic, enabled)
     }
 
     /**
@@ -257,11 +302,15 @@ class BleConnectService : Service() {
         private const val STATE_DISCONNECTED = 0
         private const val STATE_CONNECTING = 1
         private const val STATE_CONNECTED = 2
-        const val ACTION_GATT_CONNECTED = "com.example.bluetooth.le.ACTION_GATT_CONNECTED"
-        const val ACTION_GATT_DISCONNECTED = "com.example.bluetooth.le.ACTION_GATT_DISCONNECTED"
+        const val ACTION_GATT_CONNECTED = "ACTION_GATT_CONNECTED"
+        const val ACTION_GATT_DISCONNECTED = "ACTION_GATT_DISCONNECTED"
         const val ACTION_GATT_SERVICES_DISCOVERED =
-            "com.example.bluetooth.le.ACTION_GATT_SERVICES_DISCOVERED"
-        const val ACTION_DATA_AVAILABLE = "com.example.bluetooth.le.ACTION_DATA_AVAILABLE"
-        const val EXTRA_DATA = "com.example.bluetooth.le.EXTRA_DATA"
+            "ACTION_GATT_SERVICES_DISCOVERED"
+        const val ACTION_CHA_WRITE = "ACTION_CHA_WRITE"
+        const val ACTION_CHA_READ = "ACTION_CHA_READ"
+        const val ACTION_CHA_CHANGE = "ACTION_CHA_CHANGE"
+        const val ACTION_DESCRIPTOR_WRITTEN = "ACTION_DESCRIPTOR_WRITTEN"
+        const val EXTRA_DATA = "EXTRA_DATA"
+        const val CHARACTERISTICS = "CHARACTERISTICS"
     }
 }
