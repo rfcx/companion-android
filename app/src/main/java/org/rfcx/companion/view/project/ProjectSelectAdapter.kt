@@ -3,6 +3,7 @@ package org.rfcx.companion.view.project
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_location_group.view.*
 import org.rfcx.companion.R
@@ -70,6 +71,14 @@ class ProjectSelectAdapter(private val projectSelectListener: (Int) -> Unit) :
             lockImageView.visibility =
                 if (project.isGuest()) View.VISIBLE else View.GONE
             setClickable(itemView, project.isGuest())
+
+            if (project.isGuest()) {
+                locationGroupTextView.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_secondary))
+                itemView.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.statusColor))
+            } else {
+                locationGroupTextView.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_black))
+                itemView.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.backgroundColor))
+            }
         }
     }
 }
