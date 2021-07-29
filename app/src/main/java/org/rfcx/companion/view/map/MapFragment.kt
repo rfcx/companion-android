@@ -977,7 +977,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                     deploymentMarkers = it.data ?: listOf()
                     combinedData()
                 }
-                Status.ERROR -> { }
+                Status.ERROR -> {}
             }
         })
 
@@ -988,7 +988,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                     siteMarkers = it.data ?: listOf()
                     combinedData()
                 }
-                Status.ERROR -> { }
+                Status.ERROR -> {}
             }
         })
 
@@ -999,7 +999,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                     siteMarkers = it.data ?: listOf()
                     combinedData()
                 }
-                Status.ERROR -> { }
+                Status.ERROR -> {}
             }
         })
 
@@ -1010,7 +1010,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                     showDeployments = it.data ?: listOf()
                     combinedData()
                 }
-                Status.ERROR -> { }
+                Status.ERROR -> {}
             }
         })
 
@@ -1021,7 +1021,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                     showGuardianDeployments = it.data ?: listOf()
                     combinedData()
                 }
-                Status.ERROR -> { }
+                Status.ERROR -> {}
             }
         })
 
@@ -1032,7 +1032,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                     locations = it.data ?: listOf()
                     combinedData()
                 }
-                Status.ERROR -> { }
+                Status.ERROR -> {}
             }
         })
     }
