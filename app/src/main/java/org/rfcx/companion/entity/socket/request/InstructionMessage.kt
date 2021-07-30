@@ -3,7 +3,7 @@ package org.rfcx.companion.entity.socket.request
 data class InstructionMessage(
     val type: InstructionType,
     val command: InstructionCommand,
-    val meta: InstructionMeta
+    val meta: String?
 )
 
 enum class InstructionType(val value: String) {
@@ -18,6 +18,3 @@ enum class InstructionCommand(val value: String) {
     PING("ping")
 }
 
-interface InstructionMeta {
-    val json: String
-}

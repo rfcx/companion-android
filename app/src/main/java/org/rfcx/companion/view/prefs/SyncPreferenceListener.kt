@@ -4,7 +4,7 @@ import android.content.SharedPreferences
 
 interface SyncPreferenceListener {
     fun setPrefsChanges(prefs: Map<String, String>)
-    fun getPrefsChanges(): List<String>
+    fun getPrefsChanges(): String
     fun showSyncButton()
     fun hideSyncButton()
     fun syncPrefs()

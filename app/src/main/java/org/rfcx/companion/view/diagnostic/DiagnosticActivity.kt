@@ -14,7 +14,9 @@ import androidx.lifecycle.Transformations
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
 import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_guardian_diagnostic.*
 import kotlinx.android.synthetic.main.toolbar_default.*
@@ -333,7 +335,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
         this.prefsChanges = prefs
     }
 
-    override fun getPrefsChanges(): List<String> { /* not used */ return listOf() }
+    override fun getPrefsChanges(): String { /* not used */ return "" }
 
     override fun showSyncButton() {
         syncButton.visibility = View.VISIBLE
@@ -345,12 +347,12 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
 
     override fun syncPrefs() {
         if (this.prefsChanges!!.isNotEmpty()) {
-            val listForGuardian = mutableListOf<String>()
+            val json = JsonObject()
             this.prefsChanges?.forEach {
-                listForGuardian.add("${it.key}|${it.value}")
+                json.addProperty(it.key, it.value)
             }
 
-            SocketManager.syncConfiguration(listForGuardian)
+            SocketManager.syncConfiguration(Gson().toJson(json))
             SocketManager.syncConfiguration.observe(this, Observer { syncConfiguration ->
                 if (syncConfiguration.sync.status == Status.SUCCESS.value) {
                     showSuccessResponse()

@@ -102,13 +102,8 @@ object SocketManager {
         sendMessage(data)
     }
 
-    fun syncConfiguration(config: List<String>) {
-        val jsonString = gson.toJson(
-            SyncConfigurationRequest(
-                SyncConfiguration(config)
-            )
-        )
-        sendMessage(jsonString)
+    fun syncConfiguration(config: String) {
+        sendInstructionMessage(InstructionType.SET, InstructionCommand.PREFS, config)
     }
 
     fun getSignalStrength() {
@@ -172,12 +167,7 @@ object SocketManager {
     }
 
     fun stopGuardianWiFi() {
-        val data = gson.toJson(
-            SocketRequest(
-                STOP_WIFI
-            )
-        )
-        sendMessage(data)
+        sendInstructionMessage(InstructionType.CTRL, InstructionCommand.WIFI)
     }
 
     fun getAllPrefs() {
@@ -190,7 +180,7 @@ object SocketManager {
         sendMessage(data)
     }
 
-    fun sendInstructionMessage(type: InstructionType, command: InstructionCommand, meta: InstructionMeta) {
+    private fun sendInstructionMessage(type: InstructionType, command: InstructionCommand, meta: String? = null) {
         val data = gson.toJson(InstructionMessage(type, command, meta))
         sendMessage(data)
     }
