@@ -3,6 +3,8 @@ package org.rfcx.companion.base
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import org.rfcx.companion.MainRepository
+import org.rfcx.companion.MainViewModel
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.view.project.repository.ProjectSelectRepository
@@ -12,6 +14,8 @@ class ViewModelFactory(private val application: Application, private val deviceA
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ProjectSelectViewModel::class.java)) {
             return ProjectSelectViewModel(application, ProjectSelectRepository(deviceApiHelper, localDataHelper)) as T
+        } else if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
+            return MainViewModel(application, MainRepository(deviceApiHelper, localDataHelper)) as T
         }
         throw IllegalArgumentException("Unknown class name")
     }

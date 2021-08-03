@@ -63,11 +63,7 @@ fun getListSite(
             )
         } ?: listOf()
 
-    val sortDate = locationsItems.filter { it.date != null }.sortedByDescending { it.date }
-    val notDeployment = locationsItems.filter { it.date == null }
-
-    val allItems = ArrayList(sortDate + notDeployment)
-    return allItems
+    return ArrayList(locationsItems)
 }
 
 fun isHaveDeployment(

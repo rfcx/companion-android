@@ -6,6 +6,8 @@ class DeviceApiHelper(private val deviceApiService: DeviceApiService) {
     fun getProjects(token: String, limit: Int = 100, offset: Int = 0) =
         deviceApiService.getProjects(token, limit, offset)
 
+    fun getProjectsById(token: String, id: String) = deviceApiService.getProjectsById(token, id)
+
     fun getDeletedProjects(
         token: String,
         limit: Int = 100,
@@ -13,5 +15,10 @@ class DeviceApiHelper(private val deviceApiService: DeviceApiService) {
         onlyDeleted: Boolean = true,
         fields: List<String> = listOf("id")
     ) = deviceApiService.getDeletedProjects(token, limit, offset, onlyDeleted, fields)
+
+    fun getStreamAssets(
+        token: String,
+        id: String
+    ) = deviceApiService.getStreamAssets(token, id)
 }
 

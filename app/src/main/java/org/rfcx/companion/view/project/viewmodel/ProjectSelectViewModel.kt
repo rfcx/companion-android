@@ -5,8 +5,10 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import org.rfcx.companion.R
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.response.ProjectResponse
+import org.rfcx.companion.entity.response.toLocationGroups
 import org.rfcx.companion.util.Resource
 import org.rfcx.companion.util.getIdToken
 import org.rfcx.companion.util.isNetworkAvailable
@@ -34,7 +36,7 @@ class ProjectSelectViewModel(
             .enqueue(object : Callback<List<ProjectResponse>> {
                 override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
                     if (context.isNetworkAvailable()) {
-                        projects.postValue(Resource.error("network not available", null))
+                        projects.postValue(Resource.error(context.getString(R.string.network_not_available), null))
                     }
                 }
 
@@ -44,13 +46,17 @@ class ProjectSelectViewModel(
                 ) {
                     if (response.isSuccessful) {
                         response.body()?.let { projectsRes ->
-                            projectsRes.forEach { item ->
-                                projectSelectRepository.saveProjectToLocal(item)
+                            if (!projectsRes.isNullOrEmpty()) {
+                                projectsRes.forEach { item ->
+                                    projectSelectRepository.saveProjectToLocal(item)
+                                }
+                                fetchDeletedProjects()
+                            } else {
+                                projects.postValue(Resource.success(listOf()))
                             }
-                            fetchDeletedProjects()
                         }
                     } else {
-                        projects.postValue(Resource.error("something went wrong", null))
+                        projects.postValue(Resource.error(context.getString(R.string.something_went_wrong), null))
                     }
                 }
             })
@@ -61,7 +67,7 @@ class ProjectSelectViewModel(
             .enqueue(object : Callback<List<ProjectResponse>> {
                 override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
                     if (context.isNetworkAvailable()) {
-                        projects.postValue(Resource.error("network not available", null))
+                        projects.postValue(Resource.error(context.getString(R.string.network_not_available), null))
                     }
                 }
 
@@ -75,7 +81,7 @@ class ProjectSelectViewModel(
                             projects.postValue(Resource.success(null)) // no need to send project data
                         }
                     } else {
-                        projects.postValue(Resource.error("something went wrong", null))
+                        projects.postValue(Resource.error(context.getString(R.string.something_went_wrong), null))
                     }
                 }
             })
