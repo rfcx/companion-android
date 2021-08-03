@@ -58,6 +58,10 @@ class CompanionRealmMigration : RealmMigration {
         if (oldVersion < 15L && newVersion >= 15L) {
             migrateToV15(realm)
         }
+
+        if (oldVersion < 16L && newVersion >= 16L) {
+            migrateToV16(realm)
+        }
     }
 
     private fun migrateToV2(realm: DynamicRealm) {
@@ -328,6 +332,15 @@ class CompanionRealmMigration : RealmMigration {
         val locationGroups = realm.schema.get("LocationGroups")
         locationGroups?.apply {
             className = "Project"
+        }
+    }
+
+    private fun migrateToV16(realm: DynamicRealm) {
+        val deployment = realm.schema.get(GuardianDeployment.TABLE_NAME)
+        deployment?.apply {
+            addField(GuardianDeployment.FIELD_DELETED_AT, Date::class.java)
+            addRealmListField(GuardianDeployment.FIELD_PASSED_CHECKS, Int::class.java)
+                .setNullable(GuardianDeployment.FIELD_PASSED_CHECKS, true)
         }
     }
 

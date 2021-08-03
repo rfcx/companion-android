@@ -2,6 +2,7 @@ package org.rfcx.companion.entity.guardian
 
 import android.content.Context
 import com.google.gson.annotations.Expose
+import io.realm.RealmList
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
@@ -32,7 +33,9 @@ open class GuardianDeployment(
     var updatedAt: Date? = null,
     var isActive: Boolean = false,
     @Expose(serialize = false)
-    var syncState: Int = 0
+    var syncState: Int = 0,
+    var deletedAt: Date? = null,
+    var passedChecks: RealmList<Int>? = null
 ) : RealmModel, Serializable {
 
     fun isCompleted(): Boolean {
@@ -47,6 +50,8 @@ open class GuardianDeployment(
         const val FIELD_SYNC_STATE = "syncState"
         const val FIELD_STREAM = "stream"
         const val FIELD_UPDATED_AT = "updatedAt"
+        const val FIELD_DELETED_AT = "deletedAt"
+        const val FIELD_PASSED_CHECKS = "passedChecks"
     }
 }
 
