@@ -8,7 +8,7 @@ import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
 import org.rfcx.companion.R
 import org.rfcx.companion.localdb.ProjectDb
-import org.rfcx.companion.util.Battery
+import org.rfcx.companion.util.Pin
 import org.rfcx.companion.util.randomDeploymentId
 import org.rfcx.companion.view.map.MapMarker
 import java.util.*
@@ -59,11 +59,11 @@ fun EdgeDeployment.toMark(context: Context, projectDb: ProjectDb): MapMarker.Dep
             if (color != null && color.isNotEmpty() && group != null && isGroupExisted) {
                 stream?.project?.color
             } else {
-                Battery.BATTERY_PIN_GREEN
+                Pin.PIN_GREEN
             }
         } else {
-            Battery.BATTERY_PIN_GREY
-        } ?: Battery.BATTERY_PIN_GREEN
+            Pin.PIN_GREY
+        } ?: Pin.PIN_GREEN
 
     val description = if (state >= DeploymentState.Edge.ReadyToUpload.key)
         context.getString(R.string.format_deployed)
