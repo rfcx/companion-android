@@ -6,10 +6,12 @@ import io.realm.RealmList
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
+import org.rfcx.companion.R
 import org.rfcx.companion.entity.DeploymentLocation
 import org.rfcx.companion.entity.DeploymentState
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.util.GuardianPin
+import org.rfcx.companion.util.Pin
 import org.rfcx.companion.util.WifiHotspotUtils
 import org.rfcx.companion.util.randomDeploymentId
 import org.rfcx.companion.view.map.MapMarker
@@ -57,27 +59,50 @@ open class GuardianDeployment(
 
 fun GuardianDeployment.toMark(context: Context): MapMarker.DeploymentMarker {
     val color = stream?.project?.color
-    val pinImage =
-        if (state == DeploymentState.Guardian.ReadyToUpload.key) {
-            if (WifiHotspotUtils.isConnectedWithGuardian(context, this.wifiName!!)) {
-                if (color != null && color.isNotEmpty()) {
-                    stream?.project?.color
+    val group = stream?.project?.name
+    var pinImage = ""
+    var description = "-"
+    when (device) {
+        Device.GUARDIAN.value -> {
+            pinImage = if (state == DeploymentState.Guardian.ReadyToUpload.key) {
+                if (WifiHotspotUtils.isConnectedWithGuardian(context, this.wifiName!!)) {
+                    if (color != null && color.isNotEmpty()) {
+                        stream?.project?.color
+                    } else {
+                        GuardianPin.CONNECTED_GUARDIAN
+                    }
                 } else {
                     GuardianPin.CONNECTED_GUARDIAN
                 }
             } else {
                 GuardianPin.CONNECTED_GUARDIAN
-            }
-        } else {
-            GuardianPin.CONNECTED_GUARDIAN
-        } ?: GuardianPin.CONNECTED_GUARDIAN
+            } ?: GuardianPin.CONNECTED_GUARDIAN
+        }
+        else -> {
+            pinImage = if (state == DeploymentState.Edge.ReadyToUpload.key) {
+                if (color != null && color.isNotEmpty() && group != null) {
+                    stream?.project?.color
+                } else {
+                    Pin.PIN_GREEN
+                }
+            } else {
+                Pin.PIN_GREY
+            } ?: Pin.PIN_GREEN
+
+            description = if (state >= DeploymentState.Edge.ReadyToUpload.key)
+                context.getString(R.string.format_deployed)
+            else
+                context.getString(R.string.format_in_progress_step)
+        }
+    }
+
     return MapMarker.DeploymentMarker(
         id,
         stream?.name ?: "",
         stream?.longitude ?: 0.0,
         stream?.latitude ?: 0.0,
         pinImage,
-        "-",
+        description,
         Device.GUARDIAN.value,
         stream?.project?.name ?: "",
         deploymentKey,
