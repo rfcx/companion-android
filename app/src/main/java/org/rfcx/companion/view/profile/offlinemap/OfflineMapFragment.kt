@@ -88,50 +88,22 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
         })
 
         projectOfflineMapViewModel.getStateOfflineMap().observe(viewLifecycleOwner, Observer {
-            when (it.status) {
-                Status.LOADING -> {
-                }
-                Status.SUCCESS -> {
-                    it.data?.let { str ->
-                        setStateOfflineMap(str)
-                    }
-                }
-                Status.ERROR -> {
-                }
-            }
+            setStateOfflineMap(it)
         })
 
-        projectOfflineMapViewModel.getPercentageDownloads().observe(viewLifecycleOwner, Observer {
-            when (it.status) {
-                Status.LOADING -> {
-                }
-                Status.SUCCESS -> {
-                    it.data?.let { percentage ->
-                        if (percentage >= 100) {
-                            projectOfflineMapViewModel.updateOfflineDownloadedState()
-                            setStateOfflineMap(OfflineMapState.DOWNLOADED_STATE.key)
-                            this.project?.let { it1 -> projectAdapter.setDownloading(it1) }
-                        } else {
-                            this.project?.let { it1 -> projectAdapter.setProgress(it1, percentage) }
-                            setStateOfflineMap(OfflineMapState.DOWNLOADING_STATE.key)
-                        }
-                    }
-                }
-                Status.ERROR -> {
-                }
+        projectOfflineMapViewModel.getPercentageDownloads().observe(viewLifecycleOwner, Observer { percentage ->
+            if (percentage >= 100) {
+                projectOfflineMapViewModel.updateOfflineDownloadedState()
+                setStateOfflineMap(OfflineMapState.DOWNLOADED_STATE.key)
+                this.project?.let { it1 -> projectAdapter.setDownloading(it1) }
+            } else {
+                this.project?.let { it1 -> projectAdapter.setProgress(it1, percentage) }
+                setStateOfflineMap(OfflineMapState.DOWNLOADING_STATE.key)
             }
         })
 
         projectOfflineMapViewModel.hideDownloadButton().observe(viewLifecycleOwner, Observer {
-            when (it.status) {
-                Status.LOADING -> {
-                }
-                Status.SUCCESS -> {
-                    projectAdapter.hideDownloadButton = true
-                }
-                Status.ERROR -> {
-                }
-            }
+            projectAdapter.hideDownloadButton = it
         })
     }
 
