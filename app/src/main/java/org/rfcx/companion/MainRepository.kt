@@ -19,7 +19,7 @@ class MainRepository(
     fun getProjectsFromRemote(token: String, limit: Int = 100, offset: Int = 0) =
         deviceApiHelper.getProjects(token, limit, offset)
 
-    fun getProjectsByIdFromApi(token: String, id: String) = deviceApiHelper.getProjectsById(token, id)
+    fun getProjectsByIdFromCore(token: String, id: String) = deviceApiHelper.getProjectsById(token, id)
 
     fun getDeletedProjectsFromRemote(
         token: String,
