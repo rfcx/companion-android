@@ -27,7 +27,7 @@ class ProjectOfflineMapViewModel(
     @SuppressLint("StaticFieldLeak")
     private val context = getApplication<Application>().applicationContext
 
-    private var projects = MutableLiveData<Resource<List<Project>>>()
+    private var projects = MutableLiveData<List<Project>>()
     private var stateOfflineMap = MutableLiveData<String>()
     private var percentageDownloads = MutableLiveData<Int>()
     private var hideDownloadButton = MutableLiveData<Boolean>()
@@ -35,7 +35,7 @@ class ProjectOfflineMapViewModel(
 
     private lateinit var projectsLiveData: LiveData<List<Project>>
     private val projectsObserve = Observer<List<Project>> {
-        projects.postValue(Resource.success(it))
+        projects.postValue(it)
     }
 
     companion object {
@@ -69,7 +69,7 @@ class ProjectOfflineMapViewModel(
         return hideDownloadButton
     }
 
-    fun getProjected(): LiveData<Resource<List<Project>>> {
+    fun getProjects(): LiveData<List<Project>> {
         return projects
     }
 

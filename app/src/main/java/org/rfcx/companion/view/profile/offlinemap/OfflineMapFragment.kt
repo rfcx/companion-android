@@ -23,7 +23,6 @@ import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.util.Preferences
-import org.rfcx.companion.util.Status
 
 class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
 
@@ -72,18 +71,10 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
     }
 
     private fun setObserver() {
-        projectOfflineMapViewModel.getProjected().observe(viewLifecycleOwner, Observer {
-            when (it.status) {
-                Status.LOADING -> {
-                }
-                Status.SUCCESS -> {
-                    if (projectOfflineMapViewModel.getOfflineDownloading() == null) {
-                        projectAdapter.hideDownloadButton =
-                            projectOfflineMapViewModel.getOfflineDownloading() != null
-                    }
-                }
-                Status.ERROR -> {
-                }
+        projectOfflineMapViewModel.getProjects().observe(viewLifecycleOwner, Observer {
+            if (projectOfflineMapViewModel.getOfflineDownloading() == null) {
+                projectAdapter.hideDownloadButton =
+                    projectOfflineMapViewModel.getOfflineDownloading() != null
             }
         })
 
@@ -91,16 +82,17 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
             setStateOfflineMap(it)
         })
 
-        projectOfflineMapViewModel.getPercentageDownloads().observe(viewLifecycleOwner, Observer { percentage ->
-            if (percentage >= 100) {
-                projectOfflineMapViewModel.updateOfflineDownloadedState()
-                setStateOfflineMap(OfflineMapState.DOWNLOADED_STATE.key)
-                this.project?.let { it1 -> projectAdapter.setDownloading(it1) }
-            } else {
-                this.project?.let { it1 -> projectAdapter.setProgress(it1, percentage) }
-                setStateOfflineMap(OfflineMapState.DOWNLOADING_STATE.key)
-            }
-        })
+        projectOfflineMapViewModel.getPercentageDownloads()
+            .observe(viewLifecycleOwner, Observer { percentage ->
+                if (percentage >= 100) {
+                    projectOfflineMapViewModel.updateOfflineDownloadedState()
+                    setStateOfflineMap(OfflineMapState.DOWNLOADED_STATE.key)
+                    this.project?.let { it1 -> projectAdapter.setDownloading(it1) }
+                } else {
+                    this.project?.let { it1 -> projectAdapter.setProgress(it1, percentage) }
+                    setStateOfflineMap(OfflineMapState.DOWNLOADING_STATE.key)
+                }
+            })
 
         projectOfflineMapViewModel.hideDownloadButton().observe(viewLifecycleOwner, Observer {
             projectAdapter.hideDownloadButton = it
