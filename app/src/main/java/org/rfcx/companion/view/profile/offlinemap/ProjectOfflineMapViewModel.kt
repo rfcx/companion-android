@@ -34,11 +34,6 @@ class ProjectOfflineMapViewModel(
         projects.postValue(it)
     }
 
-    companion object {
-        // JSON encoding/decoding
-        const val JSON_FIELD_REGION_NAME = "FIELD_REGION_NAME"
-    }
-
     init {
         fetchLiveData()
     }
@@ -114,7 +109,7 @@ class ProjectOfflineMapViewModel(
             val metadata: ByteArray? = try {
                 val jsonObject = JSONObject()
                 val charset = Charsets.UTF_8
-                jsonObject.put(JSON_FIELD_REGION_NAME, project.name)
+                jsonObject.put("regionName", project.name)
                 val json = jsonObject.toString()
                 json.toByteArray(charset)
             } catch (exception: java.lang.Exception) {
@@ -213,16 +208,11 @@ class ProjectOfflineMapViewModel(
         })
     }
 
-    private fun getRegionName(offlineRegion: OfflineRegion): String? {
-        // Get the region name from the offline region metadata
-        return try {
-            val metadata = offlineRegion.metadata
-            val json = String(metadata)
-            val jsonObject = JSONObject(json)
-            jsonObject.getString(JSON_FIELD_REGION_NAME)
-        } catch (exception: Exception) {
-            null
-        }
+    private fun getRegionName(offlineRegion: OfflineRegion): String {
+        val metadata = offlineRegion.metadata
+        val json = String(metadata)
+        val jsonObject = JSONObject(json)
+        return jsonObject.getString("regionName")
     }
 
     fun onDestroy() {

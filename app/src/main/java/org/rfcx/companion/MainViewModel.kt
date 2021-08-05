@@ -350,15 +350,11 @@ class MainViewModel(
         })
     }
 
-    private fun getRegionName(offlineRegion: OfflineRegion): String? {
-        return try {
-            val metadata = offlineRegion.metadata
-            val json = String(metadata)
-            val jsonObject = JSONObject(json)
-            jsonObject.getString("regionName")
-        } catch (exception: Exception) {
-            null
-        }
+    private fun getRegionName(offlineRegion: OfflineRegion): String {
+        val metadata = offlineRegion.metadata
+        val json = String(metadata)
+        val jsonObject = JSONObject(json)
+        return jsonObject.getString("regionName")
     }
 
     private fun getProjectName(): String {
