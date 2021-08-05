@@ -42,8 +42,7 @@ class LocationGroupAdapter(private val locationGroupListener: LocationGroupListe
     inner class LocationGroupAdapterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val locationGroupTextView = itemView.locationGroupTextView
         private val checkImageView = itemView.checkImageView
-        private val permissionsTextView = itemView.permissionsTextView
-        private val lockImageView = itemView.lockImageView
+        private val readOnlyLayout = itemView.readOnlyLayout
 
         fun bind(project: Project) {
             if (screen != Screen.PROFILE.id) {
@@ -53,8 +52,7 @@ class LocationGroupAdapter(private val locationGroupListener: LocationGroupListe
 
             locationGroupTextView.text = project.name ?: itemView.context.getString(R.string.none)
 
-            permissionsTextView.text = project.permissions
-            lockImageView.visibility =
+            readOnlyLayout.visibility =
                 if (project.isGuest()) View.VISIBLE else View.GONE
             setClickable(itemView, project.isGuest())
 

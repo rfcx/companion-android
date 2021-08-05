@@ -62,13 +62,11 @@ class ProjectSelectAdapter(private val projectSelectListener: (Int) -> Unit) :
 
     inner class ProjectSelectViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val locationGroupTextView = itemView.locationGroupTextView
-        private val permissionsTextView = itemView.permissionsTextView
-        private val lockImageView = itemView.lockImageView
+        private val readOnlyLayout = itemView.readOnlyLayout
 
         fun bind(project: Project) {
             locationGroupTextView.text = project.name ?: itemView.context.getString(R.string.none)
-            permissionsTextView.text = project.permissions
-            lockImageView.visibility =
+            readOnlyLayout.visibility =
                 if (project.isGuest()) View.VISIBLE else View.GONE
             setClickable(itemView, project.isGuest())
 
