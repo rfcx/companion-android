@@ -190,6 +190,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                 WorkInfo.State.RUNNING -> updateSyncInfo(SyncInfo.Uploading, true)
                 WorkInfo.State.SUCCEEDED -> {
                     updateSyncInfo(SyncInfo.Uploaded, true)
+                    mainViewModel.updateProjectBounds()
                     updateStatusOfflineMap()
                 }
                 else -> updateSyncInfo(isSites = true)
@@ -527,7 +528,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
     private fun updateStatusOfflineMap() {
         mainViewModel.getProjectsFromLocal().map { project ->
-            Log.d("getProjectsFromLocal","${project.name} ${project.offlineMapState}")
             if (context.isNetworkAvailable()) {
                 val offlineManager: OfflineManager? = context?.let { OfflineManager.getInstance(it) }
                 val definition: OfflineTilePyramidRegionDefinition
@@ -1040,6 +1040,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             when (it.status) {
                 Status.LOADING -> {}
                 Status.SUCCESS -> {
+                    mainViewModel.updateProjectBounds()
                     projectSwipeRefreshView.isRefreshing = false
 
                     this.locationGroups = mainViewModel.getProjectsFromLocal()
@@ -1047,10 +1048,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                     locationGroupAdapter.items = this.locationGroups
                     locationGroupAdapter.notifyDataSetChanged()
 
-                    mainViewModel.updateProjectBounds()
-                    updateStatusOfflineMap()
-
                     combinedData()
+                    updateStatusOfflineMap()
                 }
                 Status.ERROR -> {
                     combinedData()
