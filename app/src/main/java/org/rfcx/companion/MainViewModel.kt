@@ -3,7 +3,6 @@ package org.rfcx.companion
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
-import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -140,14 +139,7 @@ class MainViewModel(
             projectBounds.serverId?.let { serverId ->
                 mainRepository.getProjectsByIdFromCore(token, serverId)
                     .enqueue(object : Callback<ProjectByIdResponse> {
-                        override fun onFailure(call: Call<ProjectByIdResponse>, t: Throwable) {
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.something_went_wrong),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-
+                        override fun onFailure(call: Call<ProjectByIdResponse>, t: Throwable) {}
                         override fun onResponse(
                             call: Call<ProjectByIdResponse>,
                             response: Response<ProjectByIdResponse>
