@@ -11,9 +11,10 @@ class DeviceApiServiceImpl: DeviceApiService {
     override fun getProjects(
         authUser: String,
         limit: Int,
-        offset: Int
+        offset: Int,
+        fields: List<String>
     ): Call<List<ProjectResponse>> {
-        return ApiManager.getInstance().getDeviceApi2().getProjects(authUser, limit, offset)
+        return ApiManager.getInstance().getDeviceApi2().getProjects(authUser, limit, offset, fields)
     }
 
     override fun getDeletedProjects(
