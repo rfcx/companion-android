@@ -43,10 +43,6 @@ import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.mapboxsdk.offline.OfflineManager
-import com.mapbox.mapboxsdk.offline.OfflineRegion
-import com.mapbox.mapboxsdk.offline.OfflineRegionStatus
-import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition
 import com.mapbox.mapboxsdk.style.expressions.Expression.*
 import com.mapbox.mapboxsdk.style.layers.CircleLayer
 import com.mapbox.mapboxsdk.style.layers.LineLayer
@@ -64,14 +60,12 @@ import kotlinx.android.synthetic.main.fragment_map.projectSwipeRefreshView
 import kotlinx.android.synthetic.main.layout_deployment_window_info.view.*
 import kotlinx.android.synthetic.main.layout_map_window_info.view.*
 import kotlinx.android.synthetic.main.layout_search_view.*
-import org.json.JSONObject
 import org.rfcx.companion.MainActivityListener
 import org.rfcx.companion.MainViewModel
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianDeployment
-import org.rfcx.companion.entity.response.ProjectByIdResponse
 import org.rfcx.companion.localdb.*
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
@@ -191,7 +185,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                 WorkInfo.State.SUCCEEDED -> {
                     updateSyncInfo(SyncInfo.Uploaded, true)
                     mainViewModel.updateProjectBounds()
-                    updateStatusOfflineMap()
+                    mainViewModel.updateStatusOfflineMap()
                 }
                 else -> updateSyncInfo(isSites = true)
             }
@@ -523,84 +517,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                     handleClickIcon(symbolScreenPoint)
                 }
             }
-        }
-    }
-
-    private fun updateStatusOfflineMap() {
-        mainViewModel.getProjectsFromLocal().map { project ->
-            if (context.isNetworkAvailable()) {
-                val offlineManager: OfflineManager? = context?.let { OfflineManager.getInstance(it) }
-                val definition: OfflineTilePyramidRegionDefinition
-                offlineManager?.setOfflineMapboxTileCountLimit(10000)
-
-                val minLat = project.minLatitude
-                val maxLat = project.maxLatitude
-                val minLng = project.minLongitude
-                val maxLng = project.maxLongitude
-
-                if (minLat !== null && maxLat !== null && minLng !== null && maxLng !== null) {
-                    val regionName = "{\"regionName\":\"regionName.${project.name}\"}"
-                    val latLngBounds: LatLngBounds = LatLngBounds.from(
-                        maxLat.toDouble(),
-                        maxLng.toDouble(),
-                        minLat.toDouble(),
-                        minLng.toDouble()
-                    )
-                    definition = OfflineTilePyramidRegionDefinition(
-                        Style.OUTDOORS,
-                        latLngBounds,
-                        10.0,
-                        15.0,
-                        context?.resources?.displayMetrics?.density ?: 0.0F
-                    )
-
-                    offlineManager?.createOfflineRegion(definition, regionName.toByteArray(),
-                        object : OfflineManager.CreateOfflineRegionCallback {
-                            override fun onCreate(offlineRegion: OfflineRegion) {
-                                offlineRegion.getStatus(object : OfflineRegion.OfflineRegionStatusCallback {
-                                    override fun onStatus(status: OfflineRegionStatus?) {
-                                        if (status == null) return
-                                        if (status.requiredResourceCount > 10000) {
-                                            mainViewModel.updateOfflineState(OfflineMapState.UNAVAILABLE.key, project.serverId ?: "")
-                                        }
-                                        deleteOfflineRegion(project, offlineManager)
-                                    }
-                                    override fun onError(error: String?) {}
-                                })
-                            }
-                            override fun onError(error: String) {}
-                        })
-                }
-            }
-        }
-    }
-
-    private fun deleteOfflineRegion(project: Project, offlineManager: OfflineManager) {
-        offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
-            override fun onList(offlineRegions: Array<out OfflineRegion>?) {
-                if (!offlineRegions.isNullOrEmpty()) {
-                    offlineRegions.map {
-                        if (getRegionName(it) == "regionName.${project.name}") {
-                            it.delete(object : OfflineRegion.OfflineRegionDeleteCallback {
-                                override fun onDelete() {}
-                                override fun onError(error: String) {}
-                            })
-                        }
-                    }
-                }
-            }
-            override fun onError(error: String?) {}
-        })
-    }
-
-    private fun getRegionName(offlineRegion: OfflineRegion): String? {
-        return try {
-            val metadata = offlineRegion.metadata
-            val json = String(metadata)
-            val jsonObject = JSONObject(json)
-            jsonObject.getString("regionName")
-        } catch (exception: Exception) {
-            null
         }
     }
 
@@ -1049,7 +965,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                     locationGroupAdapter.notifyDataSetChanged()
 
                     combinedData()
-                    updateStatusOfflineMap()
+                    mainViewModel.updateStatusOfflineMap()
                 }
                 Status.ERROR -> {
                     combinedData()

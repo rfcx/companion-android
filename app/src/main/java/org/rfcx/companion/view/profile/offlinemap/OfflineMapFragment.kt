@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -23,6 +24,7 @@ import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.util.Preferences
+import org.rfcx.companion.util.isNetworkAvailable
 
 class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
 
@@ -118,8 +120,16 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
             projectOfflineMapViewModel.getOfflineDownloading() != null
 
         if (projectOfflineMapViewModel.getOfflineDownloading() != null) {
-            this.project = projectOfflineMapViewModel.getOfflineDownloading()!!
-            projectOfflineMapViewModel.offlineMapBox(projectOfflineMapViewModel.getOfflineDownloading()!!)
+            if (context.isNetworkAvailable()) {
+                this.project = projectOfflineMapViewModel.getOfflineDownloading()!!
+                projectOfflineMapViewModel.offlineMapBox(projectOfflineMapViewModel.getOfflineDownloading()!!)
+            } else {
+                Toast.makeText(
+                    context,
+                    context?.getString(R.string.no_internet_connection),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
@@ -129,24 +139,40 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
     }
 
     override fun onDownloadClicked(project: Project) {
-        val preferences = context?.let { Preferences.getInstance(it) }
-        preferences?.putString(Preferences.OFFLINE_MAP_SERVER_ID, project.serverId ?: "")
-        projectOfflineMapViewModel.updateOfflineState(
-            OfflineMapState.DOWNLOADING_STATE.key,
-            project.serverId ?: ""
-        )
-        this.project = project
-        projectOfflineMapViewModel.offlineMapBox(project)
+        if (context.isNetworkAvailable()) {
+            val preferences = context?.let { Preferences.getInstance(it) }
+            preferences?.putString(Preferences.OFFLINE_MAP_SERVER_ID, project.serverId ?: "")
+            projectOfflineMapViewModel.updateOfflineState(
+                OfflineMapState.DOWNLOADING_STATE.key,
+                project.serverId ?: ""
+            )
+            this.project = project
+            projectOfflineMapViewModel.offlineMapBox(project)
+        } else {
+            Toast.makeText(
+                context,
+                context?.getString(R.string.no_internet_connection),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     override fun onDeleteClicked(project: Project) {
-        val preferences = context?.let { Preferences.getInstance(it) }
-        preferences?.putString(Preferences.OFFLINE_MAP_SERVER_ID, project.serverId ?: "")
-        projectOfflineMapViewModel.updateOfflineState(
-            OfflineMapState.DELETING_STATE.key,
-            project.serverId ?: ""
-        )
-        projectOfflineMapViewModel.deleteOfflineRegion(project)
+        if (context.isNetworkAvailable()) {
+            val preferences = context?.let { Preferences.getInstance(it) }
+            preferences?.putString(Preferences.OFFLINE_MAP_SERVER_ID, project.serverId ?: "")
+            projectOfflineMapViewModel.updateOfflineState(
+                OfflineMapState.DELETING_STATE.key,
+                project.serverId ?: ""
+            )
+            projectOfflineMapViewModel.deleteOfflineRegion(project)
+        } else {
+            Toast.makeText(
+                context,
+                context?.getString(R.string.no_internet_connection),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     override fun onDestroy() {

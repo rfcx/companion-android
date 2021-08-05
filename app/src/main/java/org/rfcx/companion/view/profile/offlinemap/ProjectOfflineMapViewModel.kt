@@ -15,7 +15,6 @@ import org.json.JSONObject
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.OfflineMapState
 import org.rfcx.companion.entity.Project
-import org.rfcx.companion.util.Resource
 import org.rfcx.companion.util.asLiveData
 import org.rfcx.companion.util.isNetworkAvailable
 
@@ -90,68 +89,60 @@ class ProjectOfflineMapViewModel(
     }
 
     fun offlineMapBox(project: Project) {
-        if (context.isNetworkAvailable()) {
-            val offlineManager: OfflineManager? = context?.let { OfflineManager.getInstance(it) }
-            val minLat = project.minLatitude
-            val maxLat = project.maxLatitude
-            val minLng = project.minLongitude
-            val maxLng = project.maxLongitude
+        val offlineManager: OfflineManager? = context?.let { OfflineManager.getInstance(it) }
+        val minLat = project.minLatitude
+        val maxLat = project.maxLatitude
+        val minLng = project.minLongitude
+        val maxLng = project.maxLongitude
 
-            stateOfflineMap.postValue(OfflineMapState.DOWNLOADING_STATE.key)
+        stateOfflineMap.postValue(OfflineMapState.DOWNLOADING_STATE.key)
 
-            offlineManager?.setOfflineMapboxTileCountLimit(10000)
-            val style = Style.OUTDOORS
-            if (minLat !== null && maxLat !== null && minLng !== null && maxLng !== null) {
-                val latLngBounds: LatLngBounds = LatLngBounds.from(
-                    maxLat.toDouble(),
-                    maxLng.toDouble(),
-                    minLat.toDouble(),
-                    minLng.toDouble()
-                )
-                definition = OfflineTilePyramidRegionDefinition(
-                    style,
-                    latLngBounds,
-                    10.0,
-                    15.0,
-                    context?.resources?.displayMetrics?.density ?: 0.0F
-                )
+        offlineManager?.setOfflineMapboxTileCountLimit(10000)
+        val style = Style.OUTDOORS
+        if (minLat !== null && maxLat !== null && minLng !== null && maxLng !== null) {
+            val latLngBounds: LatLngBounds = LatLngBounds.from(
+                maxLat.toDouble(),
+                maxLng.toDouble(),
+                minLat.toDouble(),
+                minLng.toDouble()
+            )
+            definition = OfflineTilePyramidRegionDefinition(
+                style,
+                latLngBounds,
+                10.0,
+                15.0,
+                context?.resources?.displayMetrics?.density ?: 0.0F
+            )
 
-                val metadata: ByteArray? = try {
-                    val jsonObject = JSONObject()
-                    val charset = Charsets.UTF_8
-                    jsonObject.put(JSON_FIELD_REGION_NAME, project.name)
-                    val json = jsonObject.toString()
-                    json.toByteArray(charset)
-                } catch (exception: java.lang.Exception) {
-                    null
-                }
-
-                if (metadata != null) {
-                    offlineManager?.createOfflineRegion(definition, metadata,
-                        object : OfflineManager.CreateOfflineRegionCallback {
-                            override fun onCreate(offlineRegion: OfflineRegion) {
-                                hideDownloadButton.postValue(true)
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    createOfflineRegion(
-                                        offlineRegion,
-                                        project
-                                    )
-                                }
-                            }
-
-                            override fun onError(error: String) {
-                                stateOfflineMap.postValue(OfflineMapState.DOWNLOAD_STATE.key)
-                                Log.e(OfflineMapFragment.TAG, "Error: $error")
-                            }
-                        })
-                }
+            val metadata: ByteArray? = try {
+                val jsonObject = JSONObject()
+                val charset = Charsets.UTF_8
+                jsonObject.put(JSON_FIELD_REGION_NAME, project.name)
+                val json = jsonObject.toString()
+                json.toByteArray(charset)
+            } catch (exception: java.lang.Exception) {
+                null
             }
-        } else {
-            Toast.makeText(
-                context,
-                context?.getString(R.string.no_internet_connection),
-                Toast.LENGTH_SHORT
-            ).show()
+
+            if (metadata != null) {
+                offlineManager?.createOfflineRegion(definition, metadata,
+                    object : OfflineManager.CreateOfflineRegionCallback {
+                        override fun onCreate(offlineRegion: OfflineRegion) {
+                            hideDownloadButton.postValue(true)
+                            CoroutineScope(Dispatchers.IO).launch {
+                                createOfflineRegion(
+                                    offlineRegion,
+                                    project
+                                )
+                            }
+                        }
+
+                        override fun onError(error: String) {
+                            stateOfflineMap.postValue(OfflineMapState.DOWNLOAD_STATE.key)
+                            Log.e(OfflineMapFragment.TAG, "Error: $error")
+                        }
+                    })
+            }
         }
     }
 
