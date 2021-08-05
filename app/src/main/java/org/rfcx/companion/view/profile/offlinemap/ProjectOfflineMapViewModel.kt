@@ -3,7 +3,6 @@ package org.rfcx.companion.view.profile.offlinemap
 import android.annotation.SuppressLint
 import android.app.Application
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.*
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.maps.Style
@@ -12,11 +11,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONObject
-import org.rfcx.companion.R
 import org.rfcx.companion.entity.OfflineMapState
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.util.asLiveData
-import org.rfcx.companion.util.isNetworkAvailable
 
 class ProjectOfflineMapViewModel(
     application: Application,
@@ -180,34 +177,26 @@ class ProjectOfflineMapViewModel(
     }
 
     fun deleteOfflineRegion(project: Project) {
-        if (context.isNetworkAvailable()) {
-            stateOfflineMap.postValue(OfflineMapState.DELETING_STATE.key)
+        stateOfflineMap.postValue(OfflineMapState.DELETING_STATE.key)
 
-            val offlineManager: OfflineManager? = context?.let { OfflineManager.getInstance(it) }
-            offlineManager?.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
-                override fun onList(offlineRegions: Array<out OfflineRegion>?) {
-                    if (!offlineRegions.isNullOrEmpty()) {
-                        offlineRegions.map {
-                            if (getRegionName(it) == project.name) {
-                                hideDownloadButton.postValue(true)
-                                onDeleteOfflineRegion(it, project)
-                            }
+        val offlineManager: OfflineManager? = context?.let { OfflineManager.getInstance(it) }
+        offlineManager?.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
+            override fun onList(offlineRegions: Array<out OfflineRegion>?) {
+                if (!offlineRegions.isNullOrEmpty()) {
+                    offlineRegions.map {
+                        if (getRegionName(it) == project.name) {
+                            hideDownloadButton.postValue(true)
+                            onDeleteOfflineRegion(it, project)
                         }
                     }
                 }
+            }
 
-                override fun onError(error: String?) {
-                    stateOfflineMap.postValue(OfflineMapState.DOWNLOADED_STATE.key)
-                    updateOfflineState(OfflineMapState.DOWNLOADED_STATE.key, project.serverId ?: "")
-                }
-            })
-        } else {
-            Toast.makeText(
-                context,
-                context?.getString(R.string.no_internet_connection),
-                Toast.LENGTH_SHORT
-            ).show()
-        }
+            override fun onError(error: String?) {
+                stateOfflineMap.postValue(OfflineMapState.DOWNLOADED_STATE.key)
+                updateOfflineState(OfflineMapState.DOWNLOADED_STATE.key, project.serverId ?: "")
+            }
+        })
     }
 
     fun onDeleteOfflineRegion(offRegion: OfflineRegion, project: Project) {
