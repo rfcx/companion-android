@@ -1,6 +1,7 @@
 package org.rfcx.companion.view
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -11,11 +12,13 @@ import com.auth0.android.authentication.AuthenticationException
 import com.auth0.android.callback.BaseCallback
 import com.auth0.android.provider.WebAuthProvider
 import com.auth0.android.result.Credentials
+import com.google.firebase.auth.FirebaseAuth
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Err
 import org.rfcx.companion.entity.Ok
 import org.rfcx.companion.entity.UserAuthResponse
 import org.rfcx.companion.entity.UserTouchResponse
+import org.rfcx.companion.entity.response.FirebaseAuthResponse
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.CredentialVerifier
 import org.rfcx.companion.util.Resource
@@ -33,7 +36,10 @@ class LoginViewModel(
 
     private val loginWithEmailPassword = MutableLiveData<Resource<UserAuthResponse>>()
     private val userTouch = MutableLiveData<Resource<String>>()
+    private val firebaseAuth = MutableLiveData<Resource<String>>()
+    private val signInWithFirebaseToken = MutableLiveData<Resource<String>>()
 
+    private var auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val auth0 by lazy {
         val auth0 =
             Auth0(
@@ -114,11 +120,65 @@ class LoginViewModel(
             })
     }
 
+    fun getFirebaseAuth(authUser: String) {
+        ApiManager.getInstance().apiFirebaseAuth.firebaseAuth(authUser)
+            .enqueue(object : Callback<FirebaseAuthResponse> {
+                override fun onFailure(call: Call<FirebaseAuthResponse>, t: Throwable) {
+                    firebaseAuth.postValue(
+                        Resource.error(
+                            context.getString(R.string.an_error_occurred),
+                            null
+                        )
+                    )
+                }
+
+                override fun onResponse(
+                    call: Call<FirebaseAuthResponse>,
+                    response: Response<FirebaseAuthResponse>
+                ) {
+                    response.body()?.let {
+                        firebaseAuth.postValue(Resource.success(it.firebaseToken))
+
+                    }
+                }
+            })
+    }
+
+    fun signInWithFirebaseToken(activity: Activity, firebaseToken: String) {
+
+        auth.signInWithCustomToken(firebaseToken)
+            .addOnCompleteListener(activity) { task ->
+                if (task.isSuccessful) {
+                    val user = auth.currentUser
+
+                    user?.uid?.let { uid ->
+                        signInWithFirebaseToken.postValue(Resource.success(uid))
+
+                    }
+                } else {
+                    signInWithFirebaseToken.postValue(
+                        Resource.error(
+                            context.getString(R.string.an_error_occurred),
+                            null
+                        )
+                    )
+                }
+            }
+    }
+
     fun loginWithEmailPassword(): LiveData<Resource<UserAuthResponse>> {
         return loginWithEmailPassword
     }
 
     fun userTouchState(): LiveData<Resource<String>> {
         return userTouch
+    }
+
+    fun firebaseAuthState(): LiveData<Resource<String>> {
+        return firebaseAuth
+    }
+
+    fun signInWithFirebaseTokenState(): LiveData<Resource<String>> {
+        return firebaseAuth
     }
 }

@@ -16,13 +16,10 @@ import com.auth0.android.authentication.AuthenticationException
 import com.auth0.android.provider.AuthCallback
 import com.auth0.android.provider.WebAuthProvider
 import com.auth0.android.result.Credentials
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_login.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
-import org.rfcx.companion.entity.response.FirebaseAuthResponse
-import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
@@ -30,13 +27,9 @@ import org.rfcx.companion.util.*
 import org.rfcx.companion.util.Preferences.Companion.DISPLAY_THEME
 import org.rfcx.companion.util.Preferences.Companion.USER_FIREBASE_UID
 import org.rfcx.companion.view.project.ProjectSelectActivity
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class LoginActivity : AppCompatActivity() {
 
-    private lateinit var auth: FirebaseAuth
     private val analytics by lazy { Analytics(this) }
     private lateinit var loginViewModel: LoginViewModel
 
@@ -57,7 +50,6 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-        auth = FirebaseAuth.getInstance()
         setViewModel()
         setObserver()
         setupDisplayTheme()
@@ -136,7 +128,48 @@ class LoginActivity : AppCompatActivity() {
                 Status.LOADING -> {}
                 Status.SUCCESS -> {
                     it.data?.let { data ->
-                        userAuthResponse?.let { res -> getFirebaseAuth(data, res) }
+                        loginViewModel.getFirebaseAuth(data)
+                    }
+                }
+                Status.ERROR -> {
+                    loading(false)
+                    Toast.makeText(
+                        this@LoginActivity,
+                        it.message ?: getString(R.string.error_has_occurred),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        })
+
+        loginViewModel.firebaseAuthState().observe(this, Observer {
+            when (it.status) {
+                Status.LOADING -> {}
+                Status.SUCCESS -> {
+                    it.data?.let { token ->
+                        loginViewModel.signInWithFirebaseToken(this, token)
+                    }
+                }
+                Status.ERROR -> {
+                    loading(false)
+                    Toast.makeText(
+                        this@LoginActivity,
+                        it.message ?: getString(R.string.error_has_occurred),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        })
+
+        loginViewModel.signInWithFirebaseTokenState().observe(this, Observer {
+            when (it.status) {
+                Status.LOADING -> {}
+                Status.SUCCESS -> {
+                    it.data?.let { uid ->
+                        val preferences = Preferences.getInstance(this)
+                        preferences.putString(USER_FIREBASE_UID, uid)
+                        ProjectSelectActivity.startActivity(this@LoginActivity)
+                        finish()
                     }
                 }
                 Status.ERROR -> {
@@ -277,46 +310,6 @@ class LoginActivity : AppCompatActivity() {
                     }
                 }
             })
-    }
-
-    private fun getFirebaseAuth(authUser: String, result: UserAuthResponse) {
-        ApiManager.getInstance().apiFirebaseAuth.firebaseAuth(authUser)
-            .enqueue(object : Callback<FirebaseAuthResponse> {
-                override fun onFailure(call: Call<FirebaseAuthResponse>, t: Throwable) {
-                    loading(false)
-                    Toast.makeText(baseContext, R.string.an_error_occurred, Toast.LENGTH_SHORT)
-                        .show()
-                }
-
-                override fun onResponse(
-                    call: Call<FirebaseAuthResponse>,
-                    response: Response<FirebaseAuthResponse>
-                ) {
-                    response.body()?.let {
-                        signInWithFirebaseToken(it.firebaseToken, result)
-                    }
-                }
-            })
-    }
-
-    private fun signInWithFirebaseToken(firebaseToken: String, result: UserAuthResponse) {
-        val preferences = Preferences.getInstance(this)
-
-        auth.signInWithCustomToken(firebaseToken)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    val user = auth.currentUser
-                    user?.uid?.let {
-                        preferences.putString(USER_FIREBASE_UID, it)
-                        ProjectSelectActivity.startActivity(this@LoginActivity)
-                        finish()
-                    }
-                } else {
-                    loading(false)
-                    Toast.makeText(baseContext, R.string.an_error_occurred, Toast.LENGTH_SHORT)
-                        .show()
-                }
-            }
     }
 
     private fun loading(start: Boolean = true) {
