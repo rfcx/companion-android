@@ -3,6 +3,7 @@ package org.rfcx.companion.view
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Application
+import android.app.Dialog
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -10,6 +11,7 @@ import com.auth0.android.Auth0
 import com.auth0.android.authentication.AuthenticationAPIClient
 import com.auth0.android.authentication.AuthenticationException
 import com.auth0.android.callback.BaseCallback
+import com.auth0.android.provider.AuthCallback
 import com.auth0.android.provider.WebAuthProvider
 import com.auth0.android.result.Credentials
 import com.google.firebase.auth.FirebaseAuth
@@ -35,6 +37,7 @@ class LoginViewModel(
     private val context = getApplication<Application>().applicationContext
 
     private val loginWithEmailPassword = MutableLiveData<Resource<UserAuthResponse>>()
+    private val loginWithFacebook = MutableLiveData<Resource<UserAuthResponse>>()
     private val userTouch = MutableLiveData<Resource<String>>()
     private val firebaseAuth = MutableLiveData<Resource<String>>()
     private val signInWithFirebaseToken = MutableLiveData<Resource<String>>()
@@ -82,6 +85,45 @@ class LoginViewModel(
                             null
                         )
                     )
+                }
+            })
+    }
+
+    fun loginWithFacebook(activity: Activity) {
+        webAuthentication
+            .withConnection("facebook")
+            .withScope(context.getString(R.string.auth0_scopes))
+            .withScheme(context.getString(R.string.auth0_scheme))
+            .withAudience(context.getString(R.string.auth0_audience))
+            .start(activity, object : AuthCallback {
+                override fun onFailure(dialog: Dialog) {
+                    loginWithFacebook.postValue(
+                        Resource.error(
+                            context.getString(R.string.error_has_occurred),
+                            null
+                        )
+                    )
+                }
+
+                override fun onFailure(exception: AuthenticationException) {
+                    loginWithFacebook.postValue(
+                        Resource.error(
+                            context.getString(R.string.error_has_occurred),
+                            null
+                        )
+                    )
+                    exception.printStackTrace()
+                }
+
+                override fun onSuccess(credentials: Credentials) {
+                    when (val result = CredentialVerifier(context).verify(credentials)) {
+                        is Err -> {
+                            loginWithFacebook.postValue(Resource.error(result.error, null))
+                        }
+                        is Ok -> {
+                            loginWithFacebook.postValue(Resource.success(result.value))
+                        }
+                    }
                 }
             })
     }
@@ -168,6 +210,10 @@ class LoginViewModel(
 
     fun loginWithEmailPassword(): LiveData<Resource<UserAuthResponse>> {
         return loginWithEmailPassword
+    }
+
+    fun loginWithFacebookState(): LiveData<Resource<UserAuthResponse>> {
+        return loginWithFacebook
     }
 
     fun userTouchState(): LiveData<Resource<String>> {

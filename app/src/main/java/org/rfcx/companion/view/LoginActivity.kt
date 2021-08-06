@@ -72,7 +72,7 @@ class LoginActivity : AppCompatActivity() {
 
         facebookLoginButton.setOnClickListener {
             loading()
-            loginWithFacebook()
+            loginViewModel.loginWithFacebook(this)
         }
 
         googleLoginButton.setOnClickListener {
@@ -112,6 +112,31 @@ class LoginActivity : AppCompatActivity() {
                 }
                 Status.ERROR -> {
                     analytics.trackLoginEvent(LoginType.EMAIL.id, StatusEvent.FAILURE.id)
+                    loading(false)
+
+                    Toast.makeText(
+                        this@LoginActivity,
+                        it.message ?: getString(R.string.error_has_occurred),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        })
+
+        loginViewModel.loginWithFacebookState().observe(this, Observer {
+            when (it.status) {
+                Status.LOADING -> {}
+                Status.SUCCESS -> {
+                    analytics.trackLoginEvent(LoginType.FACEBOOK.id, StatusEvent.SUCCESS.id)
+                    it.data?.let { data ->
+                        runOnUiThread { loading() }
+                        this.userAuthResponse = data
+                        loginViewModel.userTouch(data)
+                        CredentialKeeper(this@LoginActivity).save(data)
+                    }
+                }
+                Status.ERROR -> {
+                    analytics.trackLoginEvent(LoginType.FACEBOOK.id, StatusEvent.FAILURE.id)
                     loading(false)
 
                     Toast.makeText(
@@ -199,42 +224,6 @@ class LoginActivity : AppCompatActivity() {
             }
         }
         AppCompatDelegate.setDefaultNightMode(theme)
-    }
-
-    private fun loginWithFacebook() {
-        webAuthentication
-            .withConnection("facebook")
-            .withScope(this.getString(R.string.auth0_scopes))
-            .withScheme(this.getString(R.string.auth0_scheme))
-            .withAudience(this.getString(R.string.auth0_audience))
-            .start(this, object : AuthCallback {
-                override fun onFailure(dialog: Dialog) {}
-
-                override fun onFailure(exception: AuthenticationException) {
-                    analytics.trackLoginEvent(LoginType.FACEBOOK.id, StatusEvent.FAILURE.id)
-
-                    exception.printStackTrace()
-                    loading(false)
-                }
-
-                override fun onSuccess(credentials: Credentials) {
-                    when (val result = CredentialVerifier(this@LoginActivity).verify(credentials)) {
-                        is Err -> {
-                            analytics.trackLoginEvent(LoginType.FACEBOOK.id, StatusEvent.FAILURE.id)
-
-                            Toast.makeText(this@LoginActivity, result.error, Toast.LENGTH_SHORT)
-                                .show()
-                            loading(false)
-                        }
-                        is Ok -> {
-                            analytics.trackLoginEvent(LoginType.FACEBOOK.id, StatusEvent.SUCCESS.id)
-                            runOnUiThread { loading() }
-                            loginViewModel.userTouch(result.value)
-                            CredentialKeeper(this@LoginActivity).save(result.value)
-                        }
-                    }
-                }
-            })
     }
 
     private fun loginWithGoogle() {
