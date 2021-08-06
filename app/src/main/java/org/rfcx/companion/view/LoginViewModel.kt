@@ -38,6 +38,8 @@ class LoginViewModel(
 
     private val loginWithEmailPassword = MutableLiveData<Resource<UserAuthResponse>>()
     private val loginWithFacebook = MutableLiveData<Resource<UserAuthResponse>>()
+    private val loginWithGoogle = MutableLiveData<Resource<UserAuthResponse>>()
+
     private val userTouch = MutableLiveData<Resource<String>>()
     private val firebaseAuth = MutableLiveData<Resource<String>>()
     private val signInWithFirebaseToken = MutableLiveData<Resource<String>>()
@@ -128,6 +130,45 @@ class LoginViewModel(
             })
     }
 
+    fun loginWithGoogle(activity: Activity) {
+        webAuthentication
+            .withConnection("google-oauth2")
+            .withScope(context.getString(R.string.auth0_scopes))
+            .withScheme(context.getString(R.string.auth0_scheme))
+            .withAudience(context.getString(R.string.auth0_audience))
+            .start(activity, object : AuthCallback {
+                override fun onFailure(dialog: Dialog) {
+                    loginWithGoogle.postValue(
+                        Resource.error(
+                            context.getString(R.string.error_has_occurred),
+                            null
+                        )
+                    )
+                }
+
+                override fun onFailure(exception: AuthenticationException) {
+                    loginWithGoogle.postValue(
+                        Resource.error(
+                            context.getString(R.string.error_has_occurred),
+                            null
+                        )
+                    )
+                    exception.printStackTrace()
+                }
+
+                override fun onSuccess(credentials: Credentials) {
+                    when (val result = CredentialVerifier(context).verify(credentials)) {
+                        is Err -> {
+                            loginWithGoogle.postValue(Resource.error(result.error, null))
+                        }
+                        is Ok -> {
+                            loginWithGoogle.postValue(Resource.success(result.value))
+                        }
+                    }
+                }
+            })
+    }
+
     fun userTouch(result: UserAuthResponse) {
         val authUser = "Bearer ${result.idToken}"
         loginRepository.userTouch(authUser)
@@ -187,15 +228,12 @@ class LoginViewModel(
     }
 
     fun signInWithFirebaseToken(activity: Activity, firebaseToken: String) {
-
         auth.signInWithCustomToken(firebaseToken)
             .addOnCompleteListener(activity) { task ->
                 if (task.isSuccessful) {
                     val user = auth.currentUser
-
                     user?.uid?.let { uid ->
                         signInWithFirebaseToken.postValue(Resource.success(uid))
-
                     }
                 } else {
                     signInWithFirebaseToken.postValue(
@@ -214,6 +252,10 @@ class LoginViewModel(
 
     fun loginWithFacebookState(): LiveData<Resource<UserAuthResponse>> {
         return loginWithFacebook
+    }
+
+    fun loginWithGoogleState(): LiveData<Resource<UserAuthResponse>> {
+        return loginWithGoogle
     }
 
     fun userTouchState(): LiveData<Resource<String>> {
