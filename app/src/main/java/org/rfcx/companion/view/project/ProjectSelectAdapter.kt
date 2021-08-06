@@ -62,20 +62,18 @@ class ProjectSelectAdapter(private val projectSelectListener: (Int) -> Unit) :
 
     inner class ProjectSelectViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val locationGroupTextView = itemView.locationGroupTextView
-        private val readOnlyLayout = itemView.readOnlyLayout
+        private val lockImageView = itemView.lockImageView
 
         fun bind(project: Project) {
             locationGroupTextView.text = project.name ?: itemView.context.getString(R.string.none)
-            readOnlyLayout.visibility =
+            lockImageView.visibility =
                 if (project.isGuest()) View.VISIBLE else View.GONE
             setClickable(itemView, project.isGuest())
 
             if (project.isGuest()) {
                 locationGroupTextView.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_secondary))
-                itemView.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.statusColor))
             } else {
                 locationGroupTextView.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_black))
-                itemView.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.backgroundColor))
             }
         }
     }

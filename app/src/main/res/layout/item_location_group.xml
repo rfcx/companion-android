@@ -17,41 +17,24 @@
         android:padding="@dimen/margin_padding_normal"
         android:textColor="@color/text_primary"
         android:textSize="@dimen/text_small"
-        app:layout_constraintEnd_toStartOf="@id/readOnlyLayout"
+        app:layout_constraintEnd_toStartOf="@id/lockImageView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Location Group 01" />
 
-    <LinearLayout
-        android:id="@+id/readOnlyLayout"
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/lockImageView"
         android:layout_width="wrap_content"
-        android:layout_height="30dp"
-        android:layout_marginEnd="@dimen/margin_padding_normal"
-        android:background="@drawable/bg_button_green_outline"
-        android:gravity="center"
-        android:orientation="horizontal"
+        android:layout_height="wrap_content"
         android:paddingStart="@dimen/margin_padding_normal"
         android:paddingEnd="@dimen/margin_padding_normal"
+        android:paddingTop="@dimen/margin_padding_small"
+        android:paddingBottom="@dimen/margin_padding_small"
+        android:src="@drawable/ic_lock"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/checkImageView"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/lockImageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/margin_padding_small"
-            android:src="@drawable/ic_lock" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            style="@style/AudioMothText.Label.Secondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/read_only"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </LinearLayout>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/checkImageView"
