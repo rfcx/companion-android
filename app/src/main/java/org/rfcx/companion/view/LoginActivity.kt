@@ -1,6 +1,5 @@
 package org.rfcx.companion.view
 
-import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -11,11 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.auth0.android.Auth0
-import com.auth0.android.authentication.AuthenticationException
-import com.auth0.android.provider.AuthCallback
-import com.auth0.android.provider.WebAuthProvider
-import com.auth0.android.result.Credentials
 import kotlinx.android.synthetic.main.activity_login.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
@@ -32,20 +26,7 @@ class LoginActivity : AppCompatActivity() {
 
     private val analytics by lazy { Analytics(this) }
     private lateinit var loginViewModel: LoginViewModel
-
     private var userAuthResponse: UserAuthResponse? = null
-
-    private val auth0 by lazy {
-        val auth0 =
-            Auth0(this.getString(R.string.auth0_client_id), this.getString(R.string.auth0_domain))
-        auth0.isOIDCConformant = true
-        auth0.isLoggingEnabled = true
-        auth0
-    }
-
-    private val webAuthentication by lazy {
-        WebAuthProvider.init(auth0)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,7 +63,7 @@ class LoginActivity : AppCompatActivity() {
 
         smsLoginButton.setOnClickListener {
             loading()
-            loginMagicLink()
+            loginViewModel.loginMagicLink(this)
         }
     }
 
@@ -173,6 +154,31 @@ class LoginActivity : AppCompatActivity() {
             }
         })
 
+        loginViewModel.loginWithPhoneNumberState().observe(this, Observer {
+            when (it.status) {
+                Status.LOADING -> {}
+                Status.SUCCESS -> {
+                    analytics.trackLoginEvent(LoginType.SMS.id, StatusEvent.SUCCESS.id)
+                    it.data?.let { data ->
+                        runOnUiThread { loading() }
+                        this.userAuthResponse = data
+                        loginViewModel.userTouch(data)
+                        CredentialKeeper(this@LoginActivity).save(data)
+                    }
+                }
+                Status.ERROR -> {
+                    analytics.trackLoginEvent(LoginType.SMS.id, StatusEvent.FAILURE.id)
+                    loading(false)
+
+                    Toast.makeText(
+                        this@LoginActivity,
+                        it.message ?: getString(R.string.error_has_occurred),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        })
+
         loginViewModel.userTouchState().observe(this, Observer {
             when (it.status) {
                 Status.LOADING -> {}
@@ -249,45 +255,6 @@ class LoginActivity : AppCompatActivity() {
             }
         }
         AppCompatDelegate.setDefaultNightMode(theme)
-    }
-
-    private fun loginMagicLink() {
-        webAuthentication
-            .withConnection("")
-            .withScope(this.getString(R.string.auth0_scopes))
-            .withScheme(this.getString(R.string.auth0_scheme))
-            .withAudience(this.getString(R.string.auth0_audience))
-            .start(this, object : AuthCallback {
-                override fun onFailure(dialog: Dialog) {
-                    analytics.trackLoginEvent(LoginType.SMS.id, StatusEvent.FAILURE.id)
-                }
-
-                override fun onFailure(exception: AuthenticationException) {
-                    analytics.trackLoginEvent(LoginType.SMS.id, StatusEvent.FAILURE.id)
-
-                    Toast.makeText(this@LoginActivity, exception.description, Toast.LENGTH_SHORT)
-                        .show()
-                    loading(false)
-                }
-
-                override fun onSuccess(credentials: Credentials) {
-                    when (val result = CredentialVerifier(this@LoginActivity).verify(credentials)) {
-                        is Err -> {
-                            analytics.trackLoginEvent(LoginType.SMS.id, StatusEvent.FAILURE.id)
-
-                            Toast.makeText(this@LoginActivity, result.error, Toast.LENGTH_SHORT)
-                                .show()
-                            loading(false)
-                        }
-                        is Ok -> {
-                            analytics.trackLoginEvent(LoginType.SMS.id, StatusEvent.SUCCESS.id)
-                            runOnUiThread { loading() }
-                            loginViewModel.userTouch(result.value)
-                            CredentialKeeper(this@LoginActivity).save(result.value)
-                        }
-                    }
-                }
-            })
     }
 
     private fun loading(start: Boolean = true) {

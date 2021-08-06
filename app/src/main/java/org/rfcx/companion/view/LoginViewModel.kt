@@ -39,6 +39,7 @@ class LoginViewModel(
     private val loginWithEmailPassword = MutableLiveData<Resource<UserAuthResponse>>()
     private val loginWithFacebook = MutableLiveData<Resource<UserAuthResponse>>()
     private val loginWithGoogle = MutableLiveData<Resource<UserAuthResponse>>()
+    private val loginWithPhoneNumber = MutableLiveData<Resource<UserAuthResponse>>()
 
     private val userTouch = MutableLiveData<Resource<String>>()
     private val firebaseAuth = MutableLiveData<Resource<String>>()
@@ -169,6 +170,44 @@ class LoginViewModel(
             })
     }
 
+    fun loginMagicLink(activity: Activity) {
+        webAuthentication
+            .withConnection("")
+            .withScope(context.getString(R.string.auth0_scopes))
+            .withScheme(context.getString(R.string.auth0_scheme))
+            .withAudience(context.getString(R.string.auth0_audience))
+            .start(activity, object : AuthCallback {
+                override fun onFailure(dialog: Dialog) {
+                    loginWithPhoneNumber.postValue(
+                        Resource.error(
+                            context.getString(R.string.error_has_occurred),
+                            null
+                        )
+                    )
+                }
+
+                override fun onFailure(exception: AuthenticationException) {
+                    loginWithPhoneNumber.postValue(
+                        Resource.error(
+                            context.getString(R.string.error_has_occurred),
+                            null
+                        )
+                    )
+                }
+
+                override fun onSuccess(credentials: Credentials) {
+                    when (val result = CredentialVerifier(context).verify(credentials)) {
+                        is Err -> {
+                            loginWithPhoneNumber.postValue(Resource.error(result.error, null))
+                        }
+                        is Ok -> {
+                            loginWithPhoneNumber.postValue(Resource.success(result.value))
+                        }
+                    }
+                }
+            })
+    }
+
     fun userTouch(result: UserAuthResponse) {
         val authUser = "Bearer ${result.idToken}"
         loginRepository.userTouch(authUser)
@@ -256,6 +295,10 @@ class LoginViewModel(
 
     fun loginWithGoogleState(): LiveData<Resource<UserAuthResponse>> {
         return loginWithGoogle
+    }
+
+    fun loginWithPhoneNumberState(): LiveData<Resource<UserAuthResponse>> {
+        return loginWithPhoneNumber
     }
 
     fun userTouchState(): LiveData<Resource<String>> {
