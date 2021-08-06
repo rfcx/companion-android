@@ -7,6 +7,8 @@ import org.rfcx.companion.MainRepository
 import org.rfcx.companion.MainViewModel
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.local.LocalDataHelper
+import org.rfcx.companion.view.LoginRepository
+import org.rfcx.companion.view.LoginViewModel
 import org.rfcx.companion.view.project.repository.ProjectSelectRepository
 import org.rfcx.companion.view.project.viewmodel.ProjectSelectViewModel
 
@@ -16,6 +18,8 @@ class ViewModelFactory(private val application: Application, private val deviceA
             return ProjectSelectViewModel(application, ProjectSelectRepository(deviceApiHelper, localDataHelper)) as T
         } else if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
             return MainViewModel(application, MainRepository(deviceApiHelper, localDataHelper)) as T
+        } else if (modelClass.isAssignableFrom(LoginViewModel::class.java)) {
+            return LoginViewModel(application, LoginRepository(deviceApiHelper, localDataHelper)) as T
         }
         throw IllegalArgumentException("Unknown class name")
     }
