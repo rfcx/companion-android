@@ -11,7 +11,6 @@
         style="@style/AudioMothText.Subhead"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/margin_padding_normal"
         android:ellipsize="end"
         android:maxLines="1"
         android:padding="@dimen/margin_padding_normal"

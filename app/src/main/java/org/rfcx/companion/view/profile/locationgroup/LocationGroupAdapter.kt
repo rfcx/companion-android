@@ -61,6 +61,10 @@ class LocationGroupAdapter(private val locationGroupListener: LocationGroupListe
             } else {
                 locationGroupTextView.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_black))
             }
+
+            lockImageView.setOnClickListener {
+                locationGroupListener.onLockImageClicked()
+            }
         }
     }
 
@@ -79,4 +83,5 @@ class LocationGroupAdapter(private val locationGroupListener: LocationGroupListe
 
 interface LocationGroupListener {
     fun onClicked(group: Project)
+    fun onLockImageClicked()
 }

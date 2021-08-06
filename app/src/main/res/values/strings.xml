@@ -245,6 +245,8 @@
     <string name="format_in_progress_step">Not yet deployed</string>
     <string name="format_deployed">deployed</string>
 
+    <string name="not_have_permission">You don’t have permission to deploy to this project. You can ask the project owner to change your user permissions.</string>
+
     <!-- ConnectGuardianFragment -->
     <string name="nearby_guardians">Nearby Guardian(s)</string>
     <string name="connecting_up">Searching for Nearby\n Guardians</string>

@@ -10,8 +10,9 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.Permissions
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.isGuest
+import org.rfcx.companion.view.profile.locationgroup.LocationGroupListener
 
-class ProjectSelectAdapter(private val projectSelectListener: (Int) -> Unit) :
+class ProjectSelectAdapter(private val projectSelectListener: LocationGroupListener) :
     RecyclerView.Adapter<ProjectSelectAdapter.ProjectSelectViewHolder>() {
 
     var selectedPosition = -1
@@ -41,7 +42,7 @@ class ProjectSelectAdapter(private val projectSelectListener: (Int) -> Unit) :
             if (items[position].permissions != Permissions.GUEST.value) {
                 selectedPosition = position
                 notifyDataSetChanged()
-                this.projectSelectListener(items[position].id)
+                projectSelectListener.onClicked(items[position])
             }
         }
     }
@@ -74,6 +75,10 @@ class ProjectSelectAdapter(private val projectSelectListener: (Int) -> Unit) :
                 locationGroupTextView.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_secondary))
             } else {
                 locationGroupTextView.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_black))
+            }
+
+            lockImageView.setOnClickListener {
+                projectSelectListener.onLockImageClicked()
             }
         }
     }

@@ -1514,6 +1514,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             listener?.showBottomAppBar()
         }
     }
+
+    override fun onLockImageClicked() {
+        Toast.makeText(context, R.string.not_have_permission, Toast.LENGTH_LONG).show()
+    }
 }
 
 interface ApiCallbackInjector {
