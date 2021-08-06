@@ -22,10 +22,16 @@ import org.rfcx.companion.repo.ble.BleConnectDelegate
 import org.rfcx.companion.repo.ble.BleDetectService
 import org.rfcx.companion.repo.ble.BleHelper
 import org.rfcx.companion.repo.local.LocalDataHelper
+import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.DownloadStreamState
+import org.rfcx.companion.service.DownloadStreamsWorker
+import org.rfcx.companion.util.Analytics
+import org.rfcx.companion.util.Preferences
+import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.util.getLastLocation
 import org.rfcx.companion.util.getListSite
 import org.rfcx.companion.view.deployment.DeployFragment
+import org.rfcx.companion.view.deployment.EdgeDeploymentActivity
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.deployment.location.DetailDeploymentSiteFragment
@@ -34,6 +40,11 @@ import org.rfcx.companion.view.deployment.songmeter.connect.SongMeterConnectFrag
 import org.rfcx.companion.view.deployment.songmeter.detect.SongMeterDetectFragment
 import org.rfcx.companion.view.deployment.songmeter.viewmodel.SongMeterViewModel
 import org.rfcx.companion.view.detail.MapPickerProtocol
+import org.rfcx.companion.view.dialog.CompleteFragment
+import org.rfcx.companion.view.dialog.LoadingDialogFragment
+import org.rfcx.companion.view.dialog.SiteLoadingDialogFragment
+import java.util.*
+import kotlin.collections.ArrayList
 
 class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProtocol,
     MapPickerProtocol {
@@ -57,8 +68,14 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
 
     private lateinit var songMeterViewModel: SongMeterViewModel
 
+    private val preferences = Preferences.getInstance(this)
+
+    private val analytics by lazy { Analytics(this) }
+
     companion object {
         const val TAG = "SongMeterDeploymentActivity"
+        const val loadingDialogTag = "LoadingDialog"
+        const val TAG_SITE_LOADING_DIALOG = "SiteLoadingDialogFragment"
 
         fun startActivity(context: Context) {
             val intent = Intent(context, SongMeterDeploymentActivity::class.java)
@@ -123,9 +140,7 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
         startFragment(DetailDeploymentSiteFragment.newInstance(id, name, isNewSite))
     }
 
-    override fun isOpenedFromUnfinishedDeployment(): Boolean {
-        TODO("Not yet implemented")
-    }
+    override fun isOpenedFromUnfinishedDeployment(): Boolean = false
 
     override fun nextStep() {
         if (passedChecks.contains(2) && _images.isNullOrEmpty()) {
@@ -218,9 +233,7 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
         return this._images
     }
 
-    override fun getCurrentLocation(): Location {
-        TODO("Not yet implemented")
-    }
+    override fun getCurrentLocation(): Location = currentLocation ?: Location(LocationManager.GPS_PROVIDER)
 
     override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
         val deployment = _deployment ?: Deployment()
@@ -246,11 +259,91 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
     }
 
     override fun setReadyToDeploy() {
-        TODO("Not yet implemented")
+        showLoading()
+        _deployment?.let {
+            it.deployedAt = Date()
+            it.updatedAt = Date()
+            it.isActive = true
+            it.state = DeploymentState.Edge.ReadyToUpload.key
+            setDeployment(it)
+
+            val deploymentId = songMeterViewModel.insertOrUpdateDeployment(it, _deployLocation!!)
+            this._locate?.let { loc ->
+                songMeterViewModel.insetOrUpdateStream(deploymentId, loc) // update locate - last deployment
+            }
+
+            if (useExistedLocation) {
+                this._locate?.let { locate ->
+                    //Todo: merge three deployment to 1
+//                    val deployments =
+//                        locate.serverId?.let { it1 -> songMeterViewModel.getDeploymentByStreamId(it1) }
+//                    val guardianDeployments = locate.serverId?.let { it1 ->
+//                        guardianDeploymentDb.getDeploymentsBySiteId(it1)
+//                    }
+//                    deployments?.forEach { deployment ->
+//                        edgeDeploymentDb.updateIsActive(deployment.id)
+//                    }
+//                    guardianDeployments?.forEach { deployment ->
+//                        guardianDeploymentDb.updateIsActive(deployment.id)
+//                    }
+                }
+            }
+            saveImages(it)
+
+            //track getting
+            if (preferences.getBoolean(Preferences.ENABLE_LOCATION_TRACKING)) {
+                val track = songMeterViewModel.getFirstTracking()
+                track?.let { t ->
+                    val point = t.points.toListDoubleArray()
+                    val trackingFile = TrackingFile(
+                        deploymentId = it.id,
+                        siteId = this._locate!!.id,
+                        localPath = GeoJsonUtils.generateGeoJson(
+                            this,
+                            GeoJsonUtils.generateFileName(it.deployedAt, it.deploymentKey!!),
+                            point
+                        ).absolutePath
+                    )
+                    songMeterViewModel.insertOrUpdateTrackingFile(trackingFile)
+                }
+            }
+
+            analytics.trackCreateAudiomothDeploymentEvent() // TODO: songmeter
+
+            DeploymentSyncWorker.enqueue(this)
+            hideLoading()
+            showComplete()
+        }
     }
 
+    private fun showLoading() {
+        val loadingDialog: LoadingDialogFragment =
+            supportFragmentManager.findFragmentByTag(loadingDialogTag) as LoadingDialogFragment?
+                ?: run {
+                    LoadingDialogFragment()
+                }
+        loadingDialog.show(supportFragmentManager, loadingDialogTag)
+    }
+
+    private fun hideLoading() {
+        val loadingDialog: LoadingDialogFragment? =
+            supportFragmentManager.findFragmentByTag(loadingDialogTag) as LoadingDialogFragment?
+        loadingDialog?.dismissDialog()
+    }
+
+    private fun showComplete() {
+        val completeFragment: CompleteFragment =
+            supportFragmentManager.findFragmentByTag(CompleteFragment.tag) as CompleteFragment?
+                ?: run {
+                    CompleteFragment()
+                }
+        completeFragment.isCancelable = false
+        completeFragment.show(supportFragmentManager, CompleteFragment.tag)
+    }
+
+
     override fun setCurrentLocation(location: Location) {
-        TODO("Not yet implemented")
+        this.currentLocation = location
     }
 
     override fun handleCheckClicked(number: Int) {
@@ -299,11 +392,23 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
     }
 
     override fun isSiteLoading(): DownloadStreamState {
-        TODO("Not yet implemented")
+        return DownloadStreamsWorker.isRunning()
     }
 
     override fun showSiteLoadingDialog(text: String) {
-        TODO("Not yet implemented")
+        var siteLoadingDialog: SiteLoadingDialogFragment =
+            supportFragmentManager.findFragmentByTag(TAG_SITE_LOADING_DIALOG) as SiteLoadingDialogFragment?
+                ?: run {
+                    SiteLoadingDialogFragment(text)
+                }
+        if (siteLoadingDialog.isAdded) {
+            siteLoadingDialog.dismiss()
+            siteLoadingDialog = SiteLoadingDialogFragment(text)
+        }
+        siteLoadingDialog.show(
+            supportFragmentManager,
+            TAG_SITE_LOADING_DIALOG
+        )
     }
 
     private fun startFragment(fragment: Fragment) {

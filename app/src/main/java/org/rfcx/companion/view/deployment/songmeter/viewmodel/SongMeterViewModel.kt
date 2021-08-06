@@ -2,9 +2,7 @@ package org.rfcx.companion.view.deployment.songmeter.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import org.rfcx.companion.entity.Deployment
-import org.rfcx.companion.entity.Locate
-import org.rfcx.companion.entity.Project
+import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.view.deployment.songmeter.repository.SongMeterRepository
 
@@ -76,4 +74,21 @@ class SongMeterViewModel(
     fun unBindConnectService() {
         songMeterRepository.unBindConnectService()
     }
+
+    fun insertOrUpdateDeployment(deployment: Deployment, deploymentLocation: DeploymentLocation): Int {
+        return 0
+    }
+
+    fun insetOrUpdateStream(deploymentId: Int, stream: Locate) {
+
+    }
+
+    fun getFirstTracking(): Tracking? {
+        return null
+    }
+
+    fun insertOrUpdateTrackingFile(file: TrackingFile) {
+
+    }
+
 }
