@@ -7,9 +7,8 @@ class DeviceApiHelper(private val deviceApiService: DeviceApiService) {
         token: String,
         limit: Int = 100,
         offset: Int = 0,
-        fields: List<String> = listOf("id", "name", "isPublic", "externalId", "permissions")
-    ) =
-        deviceApiService.getProjects(token, limit, offset, fields)
+        fields: List<String> = listOf("id", "name", "permissions")
+    ) = deviceApiService.getProjects(token, limit, offset, fields)
 
     fun getDeletedProjects(
         token: String,

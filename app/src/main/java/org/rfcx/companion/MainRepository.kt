@@ -18,7 +18,7 @@ class MainRepository(
         token: String,
         limit: Int = 100,
         offset: Int = 0,
-        fields: List<String> = listOf("id", "name", "isPublic", "externalId", "permissions")
+        fields: List<String> = listOf("id", "name", "permissions")
     ) =
         deviceApiHelper.getProjects(token, limit, offset, fields)
 

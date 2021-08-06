@@ -16,7 +16,7 @@ interface DeviceApiService {
         @Header("Authorization") authUser: String,
         @Query("limit") limit: Int = 100,
         @Query("offset") offset: Int = 0,
-        @Query("fields") fields: List<String> = listOf("id", "name", "isPublic", "externalId", "permissions")
+        @Query("fields") fields: List<String> = listOf("id", "name", "permissions")
     ): Call<List<ProjectResponse>>
 
     @GET("projects")
