@@ -62,6 +62,9 @@ class LocationGroupAdapter(private val locationGroupListener: LocationGroupListe
                 locationGroupTextView.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_black))
             }
 
+            lockImageView.setColorFilter(ContextCompat.getColor(itemView.context,
+                R.color.text_secondary))
+
             lockImageView.setOnClickListener {
                 locationGroupListener.onLockImageClicked()
             }
