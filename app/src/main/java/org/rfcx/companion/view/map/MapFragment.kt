@@ -1366,16 +1366,22 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
     override fun onDestroy() {
         super.onDestroy()
-        try {
+
+        if (::mainViewModel.isInitialized) {
             mainViewModel.onDestroy()
-            deploymentWorkInfoLiveData.removeObserver(deploymentWorkInfoObserve)
-            downloadStreamsWorkInfoLiveData.removeObserver(downloadStreamsWorkInfoObserve)
-            locationEngine?.removeLocationUpdates(mapboxLocationChangeCallback)
-            currentAnimator?.cancel()
-            mapView.onDestroy()
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
+        if (::deploymentWorkInfoLiveData.isInitialized) {
+            deploymentWorkInfoLiveData.removeObserver(deploymentWorkInfoObserve)
+        }
+        if (::downloadStreamsWorkInfoLiveData.isInitialized) {
+            downloadStreamsWorkInfoLiveData.removeObserver(downloadStreamsWorkInfoObserve)
+        }
+        if (::mapView.isInitialized) {
+            mapView.onDestroy()
+        }
+
+        locationEngine?.removeLocationUpdates(mapboxLocationChangeCallback)
+        currentAnimator?.cancel()
     }
 
     companion object {
