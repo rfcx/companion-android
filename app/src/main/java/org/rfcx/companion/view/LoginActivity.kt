@@ -40,6 +40,8 @@ class LoginActivity : AppCompatActivity() {
     private val analytics by lazy { Analytics(this) }
     private lateinit var loginViewModel: LoginViewModel
 
+    private var userAuthResponse: UserAuthResponse? = null
+
     private val auth0 by lazy {
         val auth0 =
             Auth0(this.getString(R.string.auth0_client_id), this.getString(R.string.auth0_domain))
@@ -106,16 +108,44 @@ class LoginActivity : AppCompatActivity() {
     private fun setObserver() {
         loginViewModel.loginWithEmailPassword().observe(this, Observer {
             when (it.status) {
-                Status.LOADING -> {
-                }
+                Status.LOADING -> {}
                 Status.SUCCESS -> {
                     analytics.trackLoginEvent(LoginType.EMAIL.id, StatusEvent.SUCCESS.id)
                     it.data?.let { data ->
-                        userTouch(data) // todo MVVM
+                        runOnUiThread { loading() }
+                        this.userAuthResponse = data
+                        loginViewModel.userTouch(data)
                         CredentialKeeper(this@LoginActivity).save(data)
                     }
                 }
                 Status.ERROR -> {
+                    analytics.trackLoginEvent(LoginType.EMAIL.id, StatusEvent.FAILURE.id)
+                    loading(false)
+
+                    Toast.makeText(
+                        this@LoginActivity,
+                        it.message ?: getString(R.string.error_has_occurred),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        })
+
+        loginViewModel.userTouchState().observe(this, Observer {
+            when (it.status) {
+                Status.LOADING -> {}
+                Status.SUCCESS -> {
+                    it.data?.let { data ->
+                        userAuthResponse?.let { res -> getFirebaseAuth(data, res) }
+                    }
+                }
+                Status.ERROR -> {
+                    loading(false)
+                    Toast.makeText(
+                        this@LoginActivity,
+                        it.message ?: getString(R.string.error_has_occurred),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         })
@@ -165,8 +195,8 @@ class LoginActivity : AppCompatActivity() {
                         }
                         is Ok -> {
                             analytics.trackLoginEvent(LoginType.FACEBOOK.id, StatusEvent.SUCCESS.id)
-
-                            userTouch(result.value)
+                            runOnUiThread { loading() }
+                            loginViewModel.userTouch(result.value)
                             CredentialKeeper(this@LoginActivity).save(result.value)
                         }
                     }
@@ -201,8 +231,8 @@ class LoginActivity : AppCompatActivity() {
                         }
                         is Ok -> {
                             analytics.trackLoginEvent(LoginType.GOOGLE.id, StatusEvent.SUCCESS.id)
-
-                            userTouch(result.value)
+                            runOnUiThread { loading() }
+                            loginViewModel.userTouch(result.value)
                             CredentialKeeper(this@LoginActivity).save(result.value)
                         }
                     }
@@ -240,35 +270,9 @@ class LoginActivity : AppCompatActivity() {
                         }
                         is Ok -> {
                             analytics.trackLoginEvent(LoginType.SMS.id, StatusEvent.SUCCESS.id)
-
-                            userTouch(result.value)
+                            runOnUiThread { loading() }
+                            loginViewModel.userTouch(result.value)
                             CredentialKeeper(this@LoginActivity).save(result.value)
-                        }
-                    }
-                }
-            })
-    }
-
-    private fun userTouch(result: UserAuthResponse) {
-        runOnUiThread { loading() }
-
-        val authUser = "Bearer ${result.idToken}"
-        ApiManager.getInstance().apiRest.userTouch(authUser)
-            .enqueue(object : Callback<UserTouchResponse> {
-                override fun onFailure(call: Call<UserTouchResponse>, t: Throwable) {
-                    Toast.makeText(this@LoginActivity, t.message, Toast.LENGTH_SHORT).show()
-                    loading(false)
-                }
-
-                override fun onResponse(
-                    call: Call<UserTouchResponse>,
-                    response: Response<UserTouchResponse>
-                ) {
-                    response.body()?.let {
-                        if (it.success) {
-                            getFirebaseAuth(authUser, result)
-                        } else {
-                            loading(false)
                         }
                     }
                 }

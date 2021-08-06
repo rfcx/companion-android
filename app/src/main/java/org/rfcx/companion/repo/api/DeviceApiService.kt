@@ -1,5 +1,6 @@
 package org.rfcx.companion.repo.api
 
+import org.rfcx.companion.entity.UserTouchResponse
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import retrofit2.Call
@@ -32,4 +33,7 @@ interface DeviceApiService {
         @Header("Authorization") authUser: String,
         @Path("id") id: String
     ): Call<List<DeploymentAssetResponse>>
+
+    @GET("v1/users/touchapi")
+    fun userTouch(@Header("Authorization") authUser: String): Call<UserTouchResponse>
 }
