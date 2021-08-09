@@ -42,7 +42,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     MapPickerProtocol {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
+//    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
     private val projectDb by lazy { ProjectDb(realm) }
@@ -79,13 +79,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     private val analytics by lazy { Analytics(this) }
 
     // Local LiveData
-    private lateinit var audioMothDeployLiveData: LiveData<List<EdgeDeployment>>
-    private var audioMothDeployments = listOf<EdgeDeployment>()
-    private val audioMothDeploymentObserve = Observer<List<EdgeDeployment>> {
-        this.audioMothDeployments = it.filter { deployment -> deployment.isCompleted() }
-        setSiteItems()
-    }
-
     private lateinit var guardianDeploymentLiveData: LiveData<List<GuardianDeployment>>
     private var guardianDeployments = listOf<GuardianDeployment>()
     private val guardianDeploymentObserve = Observer<List<GuardianDeployment>> {
@@ -139,12 +132,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         }
         siteLiveData.observeForever(siteObserve)
 
-        audioMothDeployLiveData =
-            Transformations.map(edgeDeploymentDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()) {
-                it
-            }
-        audioMothDeployLiveData.observeForever(audioMothDeploymentObserve)
-
         guardianDeploymentLiveData =
             Transformations.map(guardianDeploymentDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()) {
                 it
@@ -163,7 +150,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     private fun saveImages(deployment: EdgeDeployment) {
         deploymentImageDb.deleteImages(deployment.id)
-        deploymentImageDb.insertImage(deployment, null, _images)
+//        deploymentImageDb.insertImage(deployment, _images)
     }
 
     override fun openWithEdgeDevice() {
@@ -214,7 +201,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             is EdgeCheckListFragment -> {
                 _deployment?.let {
                     it.passedChecks = passedChecks
-                    edgeDeploymentDb.updateDeployment(it)
+//                    edgeDeploymentDb.updateDeployment(it)
 
                     saveImages(it)
                 }
@@ -330,21 +317,21 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             it.state = DeploymentState.Edge.ReadyToUpload.key
             setDeployment(it)
 
-            val deploymentId = edgeDeploymentDb.insertOrUpdate(it, _deployLocation!!)
-            this._locate?.let { loc ->
-                locateDb.insertOrUpdateLocate(deploymentId, loc) // update locate - last deployment
-            }
+//            val deploymentId = edgeDeploymentDb.insertOrUpdate(it, _deployLocation!!)
+//            this._locate?.let { loc ->
+//                locateDb.insertOrUpdateLocate(deploymentId, loc) // update locate - last deployment
+//            }
 
             if (useExistedLocation) {
                 this._locate?.let { locate ->
-                    val deployments =
-                        locate.serverId?.let { it1 -> edgeDeploymentDb.getDeploymentsBySiteId(it1) }
+//                    val deployments =
+//                        locate.serverId?.let { it1 -> edgeDeploymentDb.getDeploymentsBySiteId(it1) }
                     val guardianDeployments = locate.serverId?.let { it1 ->
                         guardianDeploymentDb.getDeploymentsBySiteId(it1)
                     }
-                    deployments?.forEach { deployment ->
-                        edgeDeploymentDb.updateIsActive(deployment.id)
-                    }
+//                    deployments?.forEach { deployment ->
+//                        edgeDeploymentDb.updateIsActive(deployment.id)
+//                    }
                     guardianDeployments?.forEach { deployment ->
                         guardianDeploymentDb.updateIsActive(deployment.id)
                     }
@@ -487,35 +474,35 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     }
 
     private fun handleDeploymentStep(deploymentId: Int) {
-        val deployment = edgeDeploymentDb.getDeploymentById(deploymentId)
-        if (deployment != null) {
-            setDeployment(deployment)
-
-            if (deployment.stream != null) {
-                _deployLocation = deployment.stream
-            }
-
-            if (deployment.passedChecks != null) {
-                val passedChecks = deployment.passedChecks
-                this.passedChecks = passedChecks ?: RealmList<Int>()
-            }
-
-            val images = deploymentImageDb.getImageByDeploymentId(deployment.id)
-            if (images.isNotEmpty()) {
-                val localPaths = arrayListOf<String>()
-                images.forEach {
-                    localPaths.add(it.localPath)
-                }
-                _images = localPaths
-            }
-
-            currentCheck = if (deployment.state == 1) {
-                deployment.state
-            } else {
-                deployment.state - 1
-            }
-            openWithEdgeDevice()
-        }
+//        val deployment = edgeDeploymentDb.getDeploymentById(deploymentId)
+//        if (deployment != null) {
+//            setDeployment(deployment)
+//
+//            if (deployment.stream != null) {
+//                _deployLocation = deployment.stream
+//            }
+//
+//            if (deployment.passedChecks != null) {
+//                val passedChecks = deployment.passedChecks
+//                this.passedChecks = passedChecks ?: RealmList<Int>()
+//            }
+//
+//            val images = deploymentImageDb.getImageByDeploymentId(deployment.id)
+//            if (images.isNotEmpty()) {
+//                val localPaths = arrayListOf<String>()
+//                images.forEach {
+//                    localPaths.add(it.localPath)
+//                }
+//                _images = localPaths
+//            }
+//
+//            currentCheck = if (deployment.state == 1) {
+//                deployment.state
+//            } else {
+//                deployment.state - 1
+//            }
+//            openWithEdgeDevice()
+//        }
     }
 
     private fun startFragment(fragment: Fragment) {
@@ -526,7 +513,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     private fun updateDeploymentState(state: DeploymentState.Edge) {
         this._deployment?.state = state.key
-        this._deployment?.let { edgeDeploymentDb.updateDeployment(it) }
+//        this._deployment?.let { edgeDeploymentDb.updateDeployment(it) }
     }
 
     private fun showLoading() {
@@ -597,13 +584,11 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         super.onDestroy()
         fromUnfinishedDeployment = false
         siteLiveData.removeObserver(siteObserve)
-        audioMothDeployLiveData.removeObserver(audioMothDeploymentObserve)
         guardianDeploymentLiveData.removeObserver(guardianDeploymentObserve)
     }
 
     companion object {
         const val loadingDialogTag = "LoadingDialog"
-        const val TAG_SYNC_INSTRUCTION_DIALOG = "SyncInstructionDialogFragment"
         const val TAG_SITE_LOADING_DIALOG = "SiteLoadingDialogFragment"
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
         const val TONE_DURATION = 10000

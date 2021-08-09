@@ -53,6 +53,7 @@ open class GuardianDeployment(
         const val FIELD_STREAM = "stream"
         const val FIELD_UPDATED_AT = "updatedAt"
         const val FIELD_DELETED_AT = "deletedAt"
+        const val FIELD_DEVICE = "device"
         const val FIELD_PASSED_CHECKS = "passedChecks"
     }
 }

@@ -6,7 +6,6 @@ import android.content.SharedPreferences
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -57,7 +56,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private val locateDb by lazy { LocateDb(realm) }
     private val projectDb by lazy { ProjectDb(realm) }
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
-    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val trackingDb by lazy { TrackingDb(realm) }
     private val trackingFileDb by lazy { TrackingFileDb(realm) }
@@ -77,7 +75,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     private var latitude = 0.0
     private var longitude = 0.0
-    private var altitude = 0.0
     private var nameLocation: String = ""
     private var siteId: Int = 0
 
@@ -98,13 +95,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private val preferences = Preferences.getInstance(this)
 
     // Local LiveData
-    private lateinit var audioMothDeployLiveData: LiveData<List<EdgeDeployment>>
-    private var audioMothDeployments = listOf<EdgeDeployment>()
-    private val audioMothDeploymentObserve = Observer<List<EdgeDeployment>> {
-        this.audioMothDeployments = it.filter { deployment -> deployment.isCompleted() }
-        setSiteItems()
-    }
-
     private lateinit var guardianDeploymentLiveData: LiveData<List<GuardianDeployment>>
     private var guardianDeployments = listOf<GuardianDeployment>()
     private val guardianDeploymentObserve = Observer<List<GuardianDeployment>> {
@@ -195,12 +185,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             it
         }
         siteLiveData.observeForever(siteObserve)
-
-        audioMothDeployLiveData =
-            Transformations.map(edgeDeploymentDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()) {
-                it
-            }
-        audioMothDeployLiveData.observeForever(audioMothDeploymentObserve)
 
         guardianDeploymentLiveData =
             Transformations.map(guardianDeploymentDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()) {
@@ -343,12 +327,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             if (useExistedLocation) {
                 this._locate?.let { locate ->
                     val deployments = locate.serverId?.let { it1 -> guardianDeploymentDb.getDeploymentsBySiteId(it1) }
-                    val edgeDeployments = locate.serverId?.let { it1 -> edgeDeploymentDb.getDeploymentsBySiteId(it1) }
                     deployments?.forEach { deployment ->
                         guardianDeploymentDb.updateIsActive(deployment.id)
-                    }
-                    edgeDeployments?.forEach { deployment ->
-                        edgeDeploymentDb.updateIsActive(deployment.id)
                     }
                 }
             }
@@ -379,7 +359,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     private fun saveImages(deployment: GuardianDeployment) {
         deploymentImageDb.deleteImages(deployment.id)
-        deploymentImageDb.insertImage(null, deployment, _images)
+        deploymentImageDb.insertImage(deployment, _images)
     }
 
     override fun setCurrentLocation(location: Location) {
@@ -583,7 +563,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         super.onDestroy()
         this.prefsEditor?.clear()?.apply()
         siteLiveData.removeObserver(siteObserve)
-        audioMothDeployLiveData.removeObserver(audioMothDeploymentObserve)
         guardianDeploymentLiveData.removeObserver(guardianDeploymentObserve)
         unregisterWifiConnectionLostListener()
     }

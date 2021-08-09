@@ -36,10 +36,11 @@ import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.Status
+import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.localdb.DeploymentImageDb
-import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.ProjectDb
+import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.service.DownloadImagesWorker
 import org.rfcx.companion.service.GuardianDeploymentSyncWorker
 import org.rfcx.companion.service.images.ImageSyncWorker
@@ -50,7 +51,7 @@ import java.io.File
 
 class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (DeploymentImageView) -> Unit {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
+    private val deploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
     private val locationGroupDb by lazy { ProjectDb(realm) }
@@ -61,7 +62,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
     private val analytics by lazy { Analytics(this) }
 
     // data
-    private var deployment: EdgeDeployment? = null
+    private var deployment: GuardianDeployment? = null
     private lateinit var deployImageLiveData: LiveData<List<DeploymentImage>>
     private var deploymentImages = listOf<DeploymentImage>()
     private val deploymentImageObserve = Observer<List<DeploymentImage>> {
@@ -92,7 +93,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
 
         deployment =
             intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
-                ?.let { edgeDeploymentDb.getDeploymentById(it) }
+                ?.let { deploymentDb.getDeploymentById(it) }
 
         setupToolbar()
         setupImageRecycler()
@@ -155,7 +156,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
     private fun onDeleteLocation() {
         showLoading()
         deployment?.let {
-            edgeDeploymentDb.deleteDeploymentLocation(it.id, object : DatabaseCallback {
+            deploymentDb.deleteDeploymentLocation(it.id, object : DatabaseCallback {
                 override fun onSuccess() {
                     GuardianDeploymentSyncWorker.enqueue(this@DeploymentDetailActivity)
                     hideLoading()
@@ -249,7 +250,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
 
     private fun forceUpdateDeployment() {
         if (this.deployment != null) {
-            this.deployment = edgeDeploymentDb.getDeploymentById(this.deployment!!.id)
+            this.deployment = deploymentDb.getDeploymentById(this.deployment!!.id)
             this.deployment?.let { it1 ->
                 updateDeploymentDetailView(it1)
                 setLocationOnMap(it1)
@@ -261,7 +262,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         }
     }
 
-    private fun updateDeploymentDetailView(deployment: EdgeDeployment) {
+    private fun updateDeploymentDetailView(deployment: GuardianDeployment) {
         // setup deployment images view
         observeDeploymentImage(deployment.id)
         val location = deployment.stream
@@ -320,7 +321,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         scaleBarPlugin.create(ScaleBarOptions(this))
     }
 
-    private fun setLocationOnMap(deployment: EdgeDeployment) {
+    private fun setLocationOnMap(deployment: GuardianDeployment) {
         val location = deployment.stream
         location?.let { locate ->
             val latLng = LatLng(locate.latitude, locate.longitude)
@@ -352,7 +353,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         deployImageLiveData.removeObserver(deploymentImageObserve)
         val newImages = deploymentImageAdapter.getNewAttachImage()
         if(newImages.isNotEmpty()) {
-            deploymentImageDb.insertImage(deployment, null, newImages)
+            deploymentImageDb.insertImage(deployment, newImages)
             ImageSyncWorker.enqueue(this)
         }
     }

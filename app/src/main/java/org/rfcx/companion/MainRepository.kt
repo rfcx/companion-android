@@ -48,10 +48,6 @@ class MainRepository(
         return localDataHelper.getLocateLocalDb().getAllResultsAsync()
     }
 
-    fun getAllDeploymentLocateResultsAsync(): RealmResults<EdgeDeployment> {
-        return localDataHelper.getDeploymentLocalDb().getAllResultsAsync()
-    }
-
     fun getAllGuardianDeploymentLocateResultsAsync(): RealmResults<GuardianDeployment> {
         return localDataHelper.getGuardianDeploymentLocalDb().getAllResultsAsync()
     }
@@ -69,7 +65,7 @@ class MainRepository(
     }
 
     fun getDeploymentUnsentCount(): Int {
-        return localDataHelper.getDeploymentLocalDb().unsentCount().toInt()
+        return localDataHelper.getGuardianDeploymentLocalDb().unsentCount().toInt()
     }
 
     fun getGuardianDeploymentById(id: Int): GuardianDeployment? {

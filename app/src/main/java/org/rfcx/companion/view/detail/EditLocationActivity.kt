@@ -15,7 +15,6 @@ import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.toLocationGroup
 import org.rfcx.companion.localdb.DatabaseCallback
-import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.service.GuardianDeploymentSyncWorker
@@ -30,7 +29,6 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
 
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
     private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locationGroupDb by lazy { ProjectDb(realm) }
 
@@ -129,24 +127,24 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
         showLoading()
         deploymentId?.let { id ->
             if (device == Device.AUDIOMOTH.value) {
-                edgeDeploymentDb.editLocation(
-                    id = id,
-                    locationName = name,
-                    latitude = latitude,
-                    longitude = longitude,
-                    altitude = altitude,
-                    callback = object : DatabaseCallback {
-                        override fun onSuccess() {
-                            hideLoading()
-                            GuardianDeploymentSyncWorker.enqueue(this@EditLocationActivity)
-                            finish()
-                        }
-
-                        override fun onFailure(errorMessage: String) {
-                            hideLoading()
-                            showCommonDialog(errorMessage)
-                        }
-                    })
+//                edgeDeploymentDb.editLocation(
+//                    id = id,
+//                    locationName = name,
+//                    latitude = latitude,
+//                    longitude = longitude,
+//                    altitude = altitude,
+//                    callback = object : DatabaseCallback {
+//                        override fun onSuccess() {
+//                            hideLoading()
+//                            GuardianDeploymentSyncWorker.enqueue(this@EditLocationActivity)
+//                            finish()
+//                        }
+//
+//                        override fun onFailure(errorMessage: String) {
+//                            hideLoading()
+//                            showCommonDialog(errorMessage)
+//                        }
+//                    })
             } else {
                 guardianDeploymentDb.editGuardianLocation(
                     id = id,
@@ -169,19 +167,19 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
             }
 
             if (device == Device.AUDIOMOTH.value) {
-                edgeDeploymentDb.editLocationGroup(id, getLocationGroup(group), object :
-                    DatabaseCallback {
-                    override fun onSuccess() {
-                        hideLoading()
-                        GuardianDeploymentSyncWorker.enqueue(this@EditLocationActivity)
-                        finish()
-                    }
-
-                    override fun onFailure(errorMessage: String) {
-                        hideLoading()
-                        showCommonDialog(errorMessage)
-                    }
-                })
+//                edgeDeploymentDb.editLocationGroup(id, getLocationGroup(group), object :
+//                    DatabaseCallback {
+//                    override fun onSuccess() {
+//                        hideLoading()
+//                        GuardianDeploymentSyncWorker.enqueue(this@EditLocationActivity)
+//                        finish()
+//                    }
+//
+//                    override fun onFailure(errorMessage: String) {
+//                        hideLoading()
+//                        showCommonDialog(errorMessage)
+//                    }
+//                })
             } else {
                 guardianDeploymentDb.editLocationGroup(id, getLocationGroup(group), object :
                     DatabaseCallback {

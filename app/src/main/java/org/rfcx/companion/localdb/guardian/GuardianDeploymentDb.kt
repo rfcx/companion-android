@@ -15,11 +15,23 @@ import java.util.*
 class GuardianDeploymentDb(private val realm: Realm) {
 
     fun unsentCount(): Long {
-        return realm.where(GuardianDeployment::class.java)
+        val audioMoths = realm.where(GuardianDeployment::class.java)
+            .equalTo(GuardianDeployment.FIELD_DEVICE, Device.AUDIOMOTH.value)
+            .and()
+            .equalTo(GuardianDeployment.FIELD_STATE, DeploymentState.Edge.ReadyToUpload.key)
+            .and()
+            .notEqualTo(GuardianDeployment.FIELD_SYNC_STATE, SyncState.Sent.key)
+            .count()
+
+        val guardians = realm.where(GuardianDeployment::class.java)
+            .equalTo(GuardianDeployment.FIELD_DEVICE, Device.GUARDIAN.value)
+            .and()
             .equalTo(GuardianDeployment.FIELD_STATE, DeploymentState.Guardian.ReadyToUpload.key)
             .and()
             .notEqualTo(GuardianDeployment.FIELD_SYNC_STATE, SyncState.Sent.key)
             .count()
+
+        return audioMoths + guardians
     }
 
     fun getAllResultsAsync(sort: Sort = Sort.DESCENDING): RealmResults<GuardianDeployment> {
@@ -318,5 +330,27 @@ class GuardianDeploymentDb(private val realm: Realm) {
                     .findFirst()
             deployment?.deleteFromRealm()
         }
+    }
+
+    fun deleteDeploymentLocation(id: Int, callback: DatabaseCallback) {
+        realm.executeTransactionAsync({ bgRealm ->
+            // do update and set delete deployment
+            val deployment =
+                bgRealm.where(EdgeDeployment::class.java).equalTo(GuardianDeployment.FIELD_ID, id)
+                    .findFirst()
+            if (deployment?.stream != null) {
+                deployment.deletedAt = Date()
+                deployment.updatedAt = Date()
+                deployment.syncState = SyncState.Unsent.key
+            }
+        }, {
+            // success
+            realm.close()
+            callback.onSuccess()
+        }, {
+            // failure
+            realm.close()
+            callback.onFailure(it.localizedMessage ?: "")
+        })
     }
 }
