@@ -14,13 +14,13 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
-import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
 import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.Locate
+import org.rfcx.companion.entity.isGuest
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
@@ -30,6 +30,7 @@ import org.rfcx.companion.view.deployment.EdgeDeploymentActivity
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.companion.view.map.MapFragment
 import org.rfcx.companion.view.profile.ProfileFragment
+import org.rfcx.companion.view.project.ProjectSelectActivity
 import org.rfcx.companion.widget.BottomNavigationMenuItem
 
 class MainActivity : AppCompatActivity(), MainActivityListener {
@@ -85,6 +86,17 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setViewModel()
+
+        val preferences = Preferences.getInstance(this)
+        val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
+        val project = mainViewModel.getProjectById(projectId)
+        project?.let {
+            if(it.isGuest()) {
+                preferences.putInt(Preferences.SELECTED_PROJECT, -1)
+                ProjectSelectActivity.startActivity(this)
+                finish()
+            }
+        }
 
         createLocationButton.setOnClickListener {
             if (BuildConfig.ENABLE_GUARDIAN) {

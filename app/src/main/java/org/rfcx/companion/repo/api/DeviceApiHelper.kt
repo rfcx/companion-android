@@ -3,8 +3,12 @@ package org.rfcx.companion.repo.api
 //TODO: Convert Old device api to MVVM pattern
 
 class DeviceApiHelper(private val deviceApiService: DeviceApiService) {
-    fun getProjects(token: String, limit: Int = 100, offset: Int = 0) =
-        deviceApiService.getProjects(token, limit, offset)
+    fun getProjects(
+        token: String,
+        limit: Int = 100,
+        offset: Int = 0,
+        fields: List<String> = listOf("id", "name", "permissions")
+    ) = deviceApiService.getProjects(token, limit, offset, fields)
 
     fun getProjectsById(token: String, id: String) = deviceApiService.getProjectsById(token, id)
 

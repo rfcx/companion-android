@@ -336,13 +336,15 @@ class CompanionRealmMigration : RealmMigration {
     }
 
     private fun migrateToV16(realm: DynamicRealm) {
-        val project = realm.schema.get(Project.TABLE_NAME)
+        val project = realm.schema.get("Project")
         project?.apply {
             addField(Project.PROJECT_MAX_LATITUDE, Double::class.java)
             addField(Project.PROJECT_MAX_LONGITUDE, Double::class.java)
             addField(Project.PROJECT_MIN_LATITUDE, Double::class.java)
             addField(Project.PROJECT_MIN_LONGITUDE, Double::class.java)
             addField(Project.PROJECT_OFFLINE_MAP_STATE, String::class.java)
+            addField(Project.PROJECT_PERMISSIONS, String::class.java)
+                .setRequired(Project.PROJECT_PERMISSIONS, true)
         }
     }
 

@@ -16,6 +16,7 @@ open class Project(
     @Expose(serialize = false)
     var syncState: Int = 0,
     var deletedAt: Date? = null,
+    var permissions: String = "",
     var minLatitude: Double? = null,
     var minLongitude: Double? = null,
     var maxLatitude: Double? = null,
@@ -30,6 +31,7 @@ open class Project(
         const val PROJECT_SERVER_ID = "serverId"
         const val PROJECT_SYNC_STATE = "syncState"
         const val PROJECT_DELETED_AT = "deletedAt"
+        const val PROJECT_PERMISSIONS = "permissions"
         const val PROJECT_MIN_LATITUDE = "minLatitude"
         const val PROJECT_MIN_LONGITUDE = "minLongitude"
         const val PROJECT_MAX_LATITUDE = "maxLatitude"
@@ -40,4 +42,8 @@ open class Project(
 
 fun Project.toLocationGroup(): LocationGroup {
     return LocationGroup(this.name, this.color, this.serverId)
+}
+
+fun Project.isGuest(): Boolean {
+    return this.permissions == Permissions.GUEST.value
 }

@@ -1,6 +1,7 @@
 package org.rfcx.companion.localdb
 
 import io.realm.Realm
+import io.realm.RealmList
 import io.realm.RealmResults
 import io.realm.Sort
 import io.realm.kotlin.deleteFromRealm
@@ -10,6 +11,7 @@ import org.rfcx.companion.entity.Project.Companion.PROJECT_DELETED_AT
 import org.rfcx.companion.entity.SyncState
 import org.rfcx.companion.entity.response.ProjectByIdResponse
 import org.rfcx.companion.entity.response.ProjectResponse
+import org.rfcx.companion.entity.response.permissionsLabel
 import org.rfcx.companion.entity.response.toLocationGroups
 import java.util.*
 
@@ -153,6 +155,7 @@ class ProjectDb(private val realm: Realm) {
                 project.serverId = groupsResponse.id
                 project.name = groupsResponse.name
                 project.color = groupsResponse.color
+                project.permissions = groupsResponse.permissionsLabel()
             }
         }
     }

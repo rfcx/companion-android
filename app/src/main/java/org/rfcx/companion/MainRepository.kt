@@ -7,7 +7,6 @@ import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.ProjectByIdResponse
 import org.rfcx.companion.entity.response.ProjectResponse
-import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.local.LocalDataHelper
@@ -16,8 +15,13 @@ class MainRepository(
     private val deviceApiHelper: DeviceApiHelper,
     private val localDataHelper: LocalDataHelper
 ) {
-    fun getProjectsFromRemote(token: String, limit: Int = 100, offset: Int = 0) =
-        deviceApiHelper.getProjects(token, limit, offset)
+    fun getProjectsFromRemote(
+        token: String,
+        limit: Int = 100,
+        offset: Int = 0,
+        fields: List<String> = listOf("id", "name", "permissions")
+    ) =
+        deviceApiHelper.getProjects(token, limit, offset, fields)
 
     fun getProjectsByIdFromCore(token: String, id: String) = deviceApiHelper.getProjectsById(token, id)
 

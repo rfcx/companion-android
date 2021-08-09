@@ -9,21 +9,38 @@
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/locationGroupTextView"
         style="@style/AudioMothText.Subhead"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:padding="@dimen/margin_padding_normal"
         android:textColor="@color/text_primary"
         android:textSize="@dimen/text_small"
-        android:padding="@dimen/margin_padding_normal"
+        app:layout_constraintEnd_toStartOf="@id/lockImageView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Location Group 01" />
 
     <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/lockImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/margin_padding_normal"
+        android:paddingEnd="@dimen/margin_padding_normal"
+        android:paddingTop="@dimen/margin_padding_small"
+        android:paddingBottom="@dimen/margin_padding_small"
+        android:src="@drawable/ic_lock"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/checkImageView"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/checkImageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/margin_padding_normal"
         android:src="@drawable/ic_check_24dp"
-        android:paddingEnd="@dimen/margin_padding_normal"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
