@@ -244,7 +244,7 @@ class MainViewModel(
             })
     }
 
-    private fun combinedData() {
+    fun combinedData() {
         var guardianDeploymentsForShow = this.guardianDeployments.filter { it.isCompleted() }
         val usedSitesOnGuardian = guardianDeploymentsForShow.map { it.stream?.coreId }
 

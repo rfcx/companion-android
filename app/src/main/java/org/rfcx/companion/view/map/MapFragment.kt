@@ -1491,6 +1491,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                 if (listener.getProjectName() != getString(R.string.none)) listener.getProjectName() else getString(
                     R.string.projects
                 )
+            mainViewModel.combinedData()
             combinedData()
             val projects =
                 adapterOfSearchSite?.map { LatLng(it.locate.latitude, it.locate.longitude) }
