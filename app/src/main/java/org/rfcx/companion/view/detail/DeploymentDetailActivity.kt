@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.PersistableBundle
 import android.provider.MediaStore
 import android.util.TypedValue
+import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.lifecycle.LiveData
@@ -28,13 +29,12 @@ import com.zhihu.matisse.Matisse
 import com.zhihu.matisse.MimeType
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_deployment_detail.*
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.buttom_sheet_attach_image_layout.view.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.R
-import org.rfcx.companion.entity.DeploymentImage
-import org.rfcx.companion.entity.Device
-import org.rfcx.companion.entity.EdgeDeployment
+import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.Status
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.localdb.DeploymentImageDb
@@ -54,6 +54,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
     private val locationGroupDb by lazy { ProjectDb(realm) }
+    private val projectDb by lazy { ProjectDb(realm) }
 
     private lateinit var mapView: MapView
     private lateinit var mapBoxMap: MapboxMap
@@ -77,6 +78,12 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         super.onCreate(savedInstanceState)
         Mapbox.getInstance(this, getString(R.string.mapbox_token))
         setContentView(R.layout.activity_deployment_detail)
+
+        val preferences = Preferences.getInstance(this)
+        val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
+        val project = projectDb.getProjectById(projectId)
+
+        deleteButton.visibility = if(project?.permissions == Permissions.ADMIN.value) View.VISIBLE else View.GONE
 
         // Setup Mapbox
         mapView = findViewById(R.id.mapBoxView)

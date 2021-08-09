@@ -342,6 +342,17 @@ class CompanionRealmMigration : RealmMigration {
             addRealmListField(GuardianDeployment.FIELD_PASSED_CHECKS, Int::class.java)
                 .setNullable(GuardianDeployment.FIELD_PASSED_CHECKS, true)
         }
+
+        val project = realm.schema.get("Project")
+        project?.apply {
+            addField(Project.PROJECT_MAX_LATITUDE, Double::class.java)
+            addField(Project.PROJECT_MAX_LONGITUDE, Double::class.java)
+            addField(Project.PROJECT_MIN_LATITUDE, Double::class.java)
+            addField(Project.PROJECT_MIN_LONGITUDE, Double::class.java)
+            addField(Project.PROJECT_OFFLINE_MAP_STATE, String::class.java)
+            addField(Project.PROJECT_PERMISSIONS, String::class.java)
+                .setRequired(Project.PROJECT_PERMISSIONS, true)
+        }
     }
 
     override fun hashCode(): Int {

@@ -182,7 +182,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         if (currentWorkStatus != null) {
             when (currentWorkStatus.state) {
                 WorkInfo.State.RUNNING -> updateSyncInfo(SyncInfo.Uploading, true)
-                WorkInfo.State.SUCCEEDED -> updateSyncInfo(SyncInfo.Uploaded, true)
+                WorkInfo.State.SUCCEEDED -> {
+                    updateSyncInfo(SyncInfo.Uploaded, true)
+                    mainViewModel.updateProjectBounds()
+                    mainViewModel.updateStatusOfflineMap()
+                }
                 else -> updateSyncInfo(isSites = true)
             }
         }
@@ -952,6 +956,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             when (it.status) {
                 Status.LOADING -> {}
                 Status.SUCCESS -> {
+                    mainViewModel.updateProjectBounds()
                     projectSwipeRefreshView.isRefreshing = false
 
                     this.locationGroups = mainViewModel.getProjectsFromLocal()
@@ -960,6 +965,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                     locationGroupAdapter.notifyDataSetChanged()
 
                     combinedData()
+                    mainViewModel.updateStatusOfflineMap()
                 }
                 Status.ERROR -> {
                     combinedData()
@@ -1365,13 +1371,22 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
     override fun onDestroy() {
         super.onDestroy()
-        mainViewModel.onDestroy()
 
-        deploymentWorkInfoLiveData.removeObserver(deploymentWorkInfoObserve)
-        downloadStreamsWorkInfoLiveData.removeObserver(downloadStreamsWorkInfoObserve)
+        if (::mainViewModel.isInitialized) {
+            mainViewModel.onDestroy()
+        }
+        if (::deploymentWorkInfoLiveData.isInitialized) {
+            deploymentWorkInfoLiveData.removeObserver(deploymentWorkInfoObserve)
+        }
+        if (::downloadStreamsWorkInfoLiveData.isInitialized) {
+            downloadStreamsWorkInfoLiveData.removeObserver(downloadStreamsWorkInfoObserve)
+        }
+        if (::mapView.isInitialized) {
+            mapView.onDestroy()
+        }
+
         locationEngine?.removeLocationUpdates(mapboxLocationChangeCallback)
         currentAnimator?.cancel()
-        mapView.onDestroy()
     }
 
     companion object {
@@ -1476,6 +1491,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                 if (listener.getProjectName() != getString(R.string.none)) listener.getProjectName() else getString(
                     R.string.projects
                 )
+            mainViewModel.combinedData()
             combinedData()
             val projects =
                 adapterOfSearchSite?.map { LatLng(it.locate.latitude, it.locate.longitude) }
@@ -1509,6 +1525,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             showButtonOnMap()
             listener?.showBottomAppBar()
         }
+    }
+
+    override fun onLockImageClicked() {
+        Toast.makeText(context, R.string.not_have_permission, Toast.LENGTH_LONG).show()
     }
 }
 

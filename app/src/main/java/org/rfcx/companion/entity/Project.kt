@@ -15,7 +15,13 @@ open class Project(
     var serverId: String? = null,
     @Expose(serialize = false)
     var syncState: Int = 0,
-    var deletedAt: Date? = null
+    var deletedAt: Date? = null,
+    var permissions: String = "",
+    var minLatitude: Double? = null,
+    var minLongitude: Double? = null,
+    var maxLatitude: Double? = null,
+    var maxLongitude: Double? = null,
+    var offlineMapState: String = OfflineMapState.DOWNLOAD_STATE.key
 ) : RealmModel {
     companion object {
         const val TABLE_NAME = "LocationGroups"
@@ -25,9 +31,19 @@ open class Project(
         const val PROJECT_SERVER_ID = "serverId"
         const val PROJECT_SYNC_STATE = "syncState"
         const val PROJECT_DELETED_AT = "deletedAt"
+        const val PROJECT_PERMISSIONS = "permissions"
+        const val PROJECT_MIN_LATITUDE = "minLatitude"
+        const val PROJECT_MIN_LONGITUDE = "minLongitude"
+        const val PROJECT_MAX_LATITUDE = "maxLatitude"
+        const val PROJECT_MAX_LONGITUDE = "maxLongitude"
+        const val PROJECT_OFFLINE_MAP_STATE = "offlineMapState"
     }
 }
 
 fun Project.toLocationGroup(): LocationGroup {
     return LocationGroup(this.name, this.color, this.serverId)
+}
+
+fun Project.isGuest(): Boolean {
+    return this.permissions == Permissions.GUEST.value
 }
