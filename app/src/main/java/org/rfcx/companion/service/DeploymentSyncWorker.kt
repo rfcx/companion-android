@@ -7,7 +7,6 @@ import androidx.work.*
 import io.realm.Realm
 import org.rfcx.companion.entity.request.EditDeploymentRequest
 import org.rfcx.companion.entity.request.toRequestBody
-import org.rfcx.companion.entity.response.toEdgeDeployment
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.repo.ApiManager
@@ -94,7 +93,6 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
         val updatedDp = ApiManager.getInstance().getDeviceApi()
             .getDeployment(token, id).execute().body()
         updatedDp?.let { dp ->
-            db.updateDeploymentByServerId(updatedDp.toEdgeDeployment())
             locateDb.updateSiteServerId(deploymentId, dp.stream!!.id!!)
         }
 

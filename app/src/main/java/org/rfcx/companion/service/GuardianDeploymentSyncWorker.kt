@@ -7,6 +7,7 @@ import androidx.work.*
 import io.realm.Realm
 import org.rfcx.companion.entity.request.EditDeploymentRequest
 import org.rfcx.companion.entity.request.toRequestBody
+import org.rfcx.companion.entity.response.isGuardian
 import org.rfcx.companion.entity.response.toGuardianDeployment
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
@@ -55,13 +56,21 @@ class GuardianDeploymentSyncWorker(val context: Context, params: WorkerParameter
                 }
             } else {
                 val deploymentLocation = it.stream
+                val serverId = it.serverId ?: ""
                 deploymentLocation?.let { location ->
-                    val req = EditDeploymentRequest(location.toRequestBody())
-                    val serverId = it.serverId ?: ""
-                    val result = ApiManager.getInstance().getDeviceApi()
-                        .editDeployments(token, serverId, req).execute()
-                    if (result.isSuccessful) {
-                        db.markSent(it.serverId!!, it.id)
+                    if (it.deletedAt != null) {
+                        val result = ApiManager.getInstance().getDeviceApi()
+                            .deleteDeployments(token, serverId).execute()
+                        if (result.isSuccessful) {
+                            db.deleteDeployment(it.id)
+                        }
+                    } else {
+                        val req = EditDeploymentRequest(location.toRequestBody())
+                        val result = ApiManager.getInstance().getDeviceApi()
+                            .editDeployments(token, serverId, req).execute()
+                        if (result.isSuccessful) {
+                            db.markSent(it.serverId!!, it.id)
+                        }
                     }
                 }
             }
@@ -86,7 +95,7 @@ class GuardianDeploymentSyncWorker(val context: Context, params: WorkerParameter
             .getDeployment(token, id).execute().body()
         updatedDp?.let { dp ->
             db.updateDeploymentByServerId(updatedDp.toGuardianDeployment())
-            locateDb.updateSiteServerId(deploymentId, dp.stream!!.id!!, true)
+            locateDb.updateSiteServerId(deploymentId, dp.stream!!.id!!, updatedDp.isGuardian())
         }
 
         //send tracking if there is

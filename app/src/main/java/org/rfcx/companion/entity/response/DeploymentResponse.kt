@@ -27,6 +27,7 @@ fun DeploymentResponse.isGuardian(): Boolean {
 fun DeploymentResponse.toGuardianDeployment(): GuardianDeployment {
     return GuardianDeployment(
         serverId = this.id,
+        deploymentKey = this.id ?: "",
         deployedAt = this.deployedAt ?: Date(),
         state = if (this.isGuardian()) DeploymentState.Guardian.ReadyToUpload.key else DeploymentState.Edge.ReadyToUpload.key,
         device = this.deploymentType,
@@ -40,19 +41,3 @@ fun DeploymentResponse.toGuardianDeployment(): GuardianDeployment {
         isActive = true
     )
 }
-
-// Todo:: delete
-fun DeploymentResponse.toEdgeDeployment(): EdgeDeployment {
-    return EdgeDeployment(
-        deploymentKey = this.id,
-        serverId = this.id,
-        deployedAt = this.deployedAt ?: Date(),
-        state = DeploymentState.Edge.ReadyToUpload.key,
-        stream = this.stream?.toDeploymentLocation(),
-        createdAt = this.createdAt ?: Date(),
-        syncState = SyncState.Sent.key,
-        updatedAt = this.updatedAt,
-        deletedAt = this.deletedAt
-    )
-}
-

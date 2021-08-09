@@ -3,6 +3,7 @@ package org.rfcx.companion.localdb.guardian
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
+import io.realm.kotlin.deleteFromRealm
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.response.DeploymentResponse
@@ -308,5 +309,14 @@ class GuardianDeploymentDb(private val realm: Realm) {
             it?.let { it1 -> arrayOfId.add(it1) }
         }
         return arrayOfId
+    }
+
+    fun deleteDeployment(id: Int) {
+        realm.executeTransaction {
+            val deployment =
+                it.where(GuardianDeployment::class.java).equalTo(GuardianDeployment.FIELD_ID, id)
+                    .findFirst()
+            deployment?.deleteFromRealm()
+        }
     }
 }
