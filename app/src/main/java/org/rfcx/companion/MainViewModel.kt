@@ -147,6 +147,7 @@ class MainViewModel(
                             if (response.body() != null && response.body()?.id != null && response.body()?.maxLatitude != null) {
                                 val res = response.body() as ProjectByIdResponse
                                 updateProjectBounds(res)
+                                updateStatusOfflineMap()
                             }
                         }
                     })
