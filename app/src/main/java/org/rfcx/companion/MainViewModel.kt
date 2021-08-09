@@ -238,7 +238,6 @@ class MainViewModel(
         val usedSitesOnGuardian = deploymentsForShow.map { it.stream?.coreId }
         var filteredShowLocations =
             sites.filter { loc -> !usedSitesOnGuardian.contains(loc.serverId) || (loc.serverId == null && (loc.lastDeploymentId == 0 && loc.lastGuardianDeploymentId == 0)) }
-
         val projectName = getProjectName()
         if (projectName != context.getString(R.string.none)) {
             filteredShowLocations =
@@ -246,8 +245,8 @@ class MainViewModel(
             deploymentsForShow =
                 deploymentsForShow.filter { it.stream?.project?.name == projectName }
         }
-        val guardianDeploymentMarkers = deploymentsForShow.map { it.toMark(context) }
-        deploymentMarkers.postValue(Resource.success(guardianDeploymentMarkers))
+        val deploymentMarkersList = deploymentsForShow.map { it.toMark(context) }
+        deploymentMarkers.postValue(Resource.success(deploymentMarkersList))
         siteMarkers.postValue(Resource.success(filteredShowLocations.map { it.toMark() }))
         showGuardianDeployments.postValue(Resource.success(deploymentsForShow))
     }
