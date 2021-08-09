@@ -6,6 +6,7 @@ import io.realm.Sort
 import io.realm.kotlin.deleteFromRealm
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.guardian.isGuardian
 import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.toDeploymentLocation
 import org.rfcx.companion.entity.response.toGuardianDeployment
@@ -158,17 +159,28 @@ class GuardianDeploymentDb(private val realm: Realm) {
     fun lockUnsent(): List<GuardianDeployment> {
         var unsentCopied: List<GuardianDeployment> = listOf()
         realm.executeTransaction {
-            val unsent = it.where(GuardianDeployment::class.java)
+            val unsentGuardian = it.where(GuardianDeployment::class.java)
+                .equalTo(GuardianDeployment.FIELD_DEVICE, Device.GUARDIAN.value)
+                .and()
                 .equalTo(GuardianDeployment.FIELD_STATE, DeploymentState.Guardian.ReadyToUpload.key)
                 .and()
                 .equalTo(GuardianDeployment.FIELD_SYNC_STATE, SyncState.Unsent.key).findAll()
                 .createSnapshot()
-            unsentCopied = unsent.toList()
-            unsent.forEach { deployment ->
+
+            val unsentAudioMoth = it.where(GuardianDeployment::class.java)
+                .equalTo(GuardianDeployment.FIELD_DEVICE, Device.AUDIOMOTH.value)
+                .and()
+                .equalTo(GuardianDeployment.FIELD_STATE, DeploymentState.Edge.ReadyToUpload.key)
+                .and()
+                .equalTo(GuardianDeployment.FIELD_SYNC_STATE, SyncState.Unsent.key).findAll()
+                .createSnapshot()
+
+            unsentCopied = (unsentGuardian + unsentAudioMoth)
+            unsentCopied.forEach { deployment ->
                 deployment.syncState = SyncState.Sending.key
             }
         }
-        return unsentCopied
+        return unsentCopied.toList()
     }
 
     fun unlockSending() {
@@ -199,7 +211,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
     /**
      * Update Deployment Location and Locate
      * */
-    fun editGuardianLocation(
+    fun editLocation(
         id: Int,
         locationName: String,
         latitude: Double,
@@ -209,26 +221,40 @@ class GuardianDeploymentDb(private val realm: Realm) {
     ) {
         realm.executeTransactionAsync({ bgRealm ->
             // do update deployment location
-            val guardianDeployment =
+            val deployment =
                 bgRealm.where(GuardianDeployment::class.java).equalTo(GuardianDeployment.FIELD_ID, id)
                     .findFirst()
-            if (guardianDeployment?.stream != null) {
-                guardianDeployment.stream?.name = locationName
-                guardianDeployment.stream?.latitude = latitude
-                guardianDeployment.stream?.longitude = longitude
-                guardianDeployment.stream?.altitude = altitude
-                guardianDeployment.updatedAt = Date()
-                guardianDeployment.syncState = SyncState.Unsent.key
+            if (deployment?.stream != null) {
+                deployment.stream?.name = locationName
+                deployment.stream?.latitude = latitude
+                deployment.stream?.longitude = longitude
+                deployment.stream?.altitude = altitude
+                deployment.updatedAt = Date()
+                deployment.syncState = SyncState.Unsent.key
             }
 
             // do update location
-            val location = if (guardianDeployment?.serverId != null) {
-                bgRealm.where(Locate::class.java)
-                    .equalTo(Locate.FIELD_LAST_GUARDIAN_DEPLOYMENT_SERVER_ID, guardianDeployment.serverId)
-                    .findFirst()
+            val location = if (deployment?.serverId != null) {
+                if (deployment.isGuardian()) {
+                    bgRealm.where(Locate::class.java)
+                        .equalTo(Locate.FIELD_LAST_GUARDIAN_DEPLOYMENT_SERVER_ID, deployment.serverId)
+                        .findFirst()
+                } else {
+                    bgRealm.where(Locate::class.java)
+                    .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_SERVER_ID, deployment.serverId)
+                        .findFirst()
+                        ?: bgRealm.where(Locate::class.java)
+                            .equalTo(Locate.FIELD_SERVER_ID, deployment.stream?.coreId)
+                            .findFirst()
+                }
             } else {
-                bgRealm.where(Locate::class.java)
-                    .equalTo(Locate.FIELD_LAST_GUARDIAN_DEPLOYMENT_ID, id).findFirst()
+                if (deployment?.isGuardian() == true) {
+                    bgRealm.where(Locate::class.java)
+                        .equalTo(Locate.FIELD_LAST_GUARDIAN_DEPLOYMENT_ID, id).findFirst()
+                } else {
+                    bgRealm.where(Locate::class.java)
+                        .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_ID, id).findFirst()
+                }
             }
 
             if (location != null) {

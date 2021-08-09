@@ -58,6 +58,10 @@ open class GuardianDeployment(
     }
 }
 
+fun GuardianDeployment.isGuardian(): Boolean {
+    return this.device == Device.GUARDIAN.value
+}
+
 fun GuardianDeployment.toMark(context: Context): MapMarker.DeploymentMarker {
     val color = stream?.project?.color
     val group = stream?.project?.name

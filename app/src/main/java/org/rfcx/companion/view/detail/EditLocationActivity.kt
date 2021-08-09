@@ -10,7 +10,6 @@ import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_edit_location.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
-import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.toLocationGroup
@@ -29,7 +28,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
 
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
+    private val deploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locationGroupDb by lazy { ProjectDb(realm) }
 
     private var latitude: Double = 0.0
@@ -48,15 +47,23 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
         initIntent()
         setupToolbar()
         toolbarLayout.visibility = View.VISIBLE
-        startFragment(MapPickerFragment.newInstance(latitude, longitude, altitude, nameLocation ?: ""))
+        startFragment(
+            MapPickerFragment.newInstance(
+                latitude,
+                longitude,
+                altitude,
+                nameLocation ?: ""
+            )
+        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == DEPLOYMENT_REQUEST_CODE) {
-            when(resultCode) {
+            when (resultCode) {
                 LocationGroupActivity.RESULT_OK -> {
-                    locationGroup = data?.getSerializableExtra(EXTRA_LOCATION_GROUP) as LocationGroup
+                    locationGroup =
+                        data?.getSerializableExtra(EXTRA_LOCATION_GROUP) as LocationGroup
                     locationGroup?.let {
                         val isGroupExisted = locationGroupDb.isExisted(locationGroup?.name)
                         groupName = if (isGroupExisted) {
@@ -116,7 +123,12 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
         startFragment(EditLocationFragment.newInstance(latitude, longitude, altitude, name))
     }
 
-    override fun startMapPickerPage(latitude: Double, longitude: Double, altitude: Double, name: String) {
+    override fun startMapPickerPage(
+        latitude: Double,
+        longitude: Double,
+        altitude: Double,
+        name: String
+    ) {
         toolbarLayout.visibility = View.VISIBLE
         setLatLng(latitude, longitude, altitude)
         startFragment(MapPickerFragment.newInstance(latitude, longitude, altitude, name))
@@ -126,63 +138,13 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
         val group = groupName ?: ""
         showLoading()
         deploymentId?.let { id ->
-            if (device == Device.AUDIOMOTH.value) {
-//                edgeDeploymentDb.editLocation(
-//                    id = id,
-//                    locationName = name,
-//                    latitude = latitude,
-//                    longitude = longitude,
-//                    altitude = altitude,
-//                    callback = object : DatabaseCallback {
-//                        override fun onSuccess() {
-//                            hideLoading()
-//                            GuardianDeploymentSyncWorker.enqueue(this@EditLocationActivity)
-//                            finish()
-//                        }
-//
-//                        override fun onFailure(errorMessage: String) {
-//                            hideLoading()
-//                            showCommonDialog(errorMessage)
-//                        }
-//                    })
-            } else {
-                guardianDeploymentDb.editGuardianLocation(
-                    id = id,
-                    locationName = name,
-                    latitude = latitude,
-                    longitude = longitude,
-                    altitude = altitude,
-                    callback = object : DatabaseCallback {
-                        override fun onSuccess() {
-                            hideLoading()
-                            GuardianDeploymentSyncWorker.enqueue(this@EditLocationActivity)
-                            finish()
-                        }
-
-                        override fun onFailure(errorMessage: String) {
-                            hideLoading()
-                            showCommonDialog(errorMessage)
-                        }
-                    })
-            }
-
-            if (device == Device.AUDIOMOTH.value) {
-//                edgeDeploymentDb.editLocationGroup(id, getLocationGroup(group), object :
-//                    DatabaseCallback {
-//                    override fun onSuccess() {
-//                        hideLoading()
-//                        GuardianDeploymentSyncWorker.enqueue(this@EditLocationActivity)
-//                        finish()
-//                    }
-//
-//                    override fun onFailure(errorMessage: String) {
-//                        hideLoading()
-//                        showCommonDialog(errorMessage)
-//                    }
-//                })
-            } else {
-                guardianDeploymentDb.editLocationGroup(id, getLocationGroup(group), object :
-                    DatabaseCallback {
+            deploymentDb.editLocation(
+                id = id,
+                locationName = name,
+                latitude = latitude,
+                longitude = longitude,
+                altitude = altitude,
+                callback = object : DatabaseCallback {
                     override fun onSuccess() {
                         hideLoading()
                         GuardianDeploymentSyncWorker.enqueue(this@EditLocationActivity)
@@ -194,7 +156,20 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
                         showCommonDialog(errorMessage)
                     }
                 })
-            }
+
+            deploymentDb.editLocationGroup(id, getLocationGroup(group), object :
+                DatabaseCallback {
+                override fun onSuccess() {
+                    hideLoading()
+                    GuardianDeploymentSyncWorker.enqueue(this@EditLocationActivity)
+                    finish()
+                }
+
+                override fun onFailure(errorMessage: String) {
+                    hideLoading()
+                    showCommonDialog(errorMessage)
+                }
+            })
         }
     }
 
