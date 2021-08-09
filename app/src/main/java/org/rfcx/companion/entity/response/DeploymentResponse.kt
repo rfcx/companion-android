@@ -1,6 +1,7 @@
 package org.rfcx.companion.entity.response
 
 import org.rfcx.companion.entity.DeploymentState
+import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.EdgeDeployment
 import org.rfcx.companion.entity.SyncState
 import org.rfcx.companion.entity.guardian.GuardianConfiguration
@@ -19,11 +20,15 @@ data class DeploymentResponse(
     var deletedAt: Date? = null
 )
 
+fun DeploymentResponse.isGuardian(): Boolean {
+    return this.deploymentType == Device.GUARDIAN.value
+}
+
 fun DeploymentResponse.toGuardianDeployment(): GuardianDeployment {
     return GuardianDeployment(
         serverId = this.id,
         deployedAt = this.deployedAt ?: Date(),
-        state = DeploymentState.Guardian.ReadyToUpload.key,
+        state = if (this.isGuardian()) DeploymentState.Guardian.ReadyToUpload.key else DeploymentState.Edge.ReadyToUpload.key,
         device = this.deploymentType,
         wifiName = this.wifi ?: "",
         configuration = this.configuration ?: GuardianConfiguration(),
@@ -31,11 +36,12 @@ fun DeploymentResponse.toGuardianDeployment(): GuardianDeployment {
         createdAt = this.createdAt ?: Date(),
         syncState = SyncState.Sent.key,
         updatedAt = this.updatedAt,
+        deletedAt = this.deletedAt,
         isActive = true
     )
 }
 
-
+// Todo:: delete
 fun DeploymentResponse.toEdgeDeployment(): EdgeDeployment {
     return EdgeDeployment(
         deploymentKey = this.id,

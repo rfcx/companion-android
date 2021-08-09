@@ -7,7 +7,6 @@ import io.realm.kotlin.deleteFromRealm
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.toDeploymentLocation
-import org.rfcx.companion.entity.response.toEdgeDeployment
 import java.util.*
 
 /**
@@ -79,66 +78,6 @@ class EdgeDeploymentDb(private val realm: Realm) {
             it.insertOrUpdate(deployment)
         }
         return id
-    }
-
-    fun insertOrUpdate(deploymentResponse: DeploymentResponse) {
-        realm.executeTransaction {
-            val deployment =
-                it.where(EdgeDeployment::class.java)
-                    .equalTo(EdgeDeployment.FIELD_SERVER_ID, deploymentResponse.id)
-                    .findFirst()
-
-            if (deployment == null) {
-                val deploymentObj = deploymentResponse.toEdgeDeployment()
-                val id = (it.where(EdgeDeployment::class.java).max(EdgeDeployment.FIELD_ID)
-                    ?.toInt() ?: 0) + 1
-                deploymentObj.id = id
-                it.insert(deploymentObj)
-            } else if (deployment.syncState == SyncState.Sent.key) {
-                deployment.deploymentKey = deploymentResponse.id
-                deployment.serverId = deploymentResponse.id
-                deployment.deployedAt = deploymentResponse.deployedAt ?: deployment.deployedAt
-
-                val newLocation = deploymentResponse.stream
-                if (newLocation != null) {
-                    deployment.stream = it.copyToRealm(newLocation.toDeploymentLocation())
-                }
-
-                deployment.createdAt =
-                    deploymentResponse.createdAt ?: deployment.createdAt
-            }
-        }
-    }
-
-    fun insertOrUpdate(deploymentResponses: List<DeploymentResponse>) {
-        realm.executeTransaction {
-            deploymentResponses.forEach { deploymentResponse ->
-                val deployment =
-                    it.where(EdgeDeployment::class.java)
-                        .equalTo(EdgeDeployment.FIELD_SERVER_ID, deploymentResponse.id)
-                        .findFirst()
-
-                if (deployment == null) {
-                    val deploymentObj = deploymentResponse.toEdgeDeployment()
-                    val id = (it.where(EdgeDeployment::class.java).max(EdgeDeployment.FIELD_ID)
-                        ?.toInt() ?: 0) + 1
-                    deploymentObj.id = id
-                    it.insert(deploymentObj)
-                } else if (deployment.syncState == SyncState.Sent.key) {
-                    deployment.deploymentKey = deploymentResponse.id
-                    deployment.serverId = deploymentResponse.id
-                    deployment.deployedAt = deploymentResponse.deployedAt ?: deployment.deployedAt
-
-                    val newLocation = deploymentResponse.stream
-                    if (newLocation != null) {
-                        deployment.stream = it.copyToRealm(newLocation.toDeploymentLocation())
-                    }
-
-                    deployment.createdAt =
-                        deploymentResponse.createdAt ?: deployment.createdAt
-                }
-            }
-        }
     }
 
     fun markUnsent(id: Int) {

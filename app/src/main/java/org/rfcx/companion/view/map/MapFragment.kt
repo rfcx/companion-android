@@ -917,7 +917,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         if (currentLocation != null) {
             adapterOfSearchSite = getListSite(
                 requireContext(),
-                showDeployments,
                 showGuardianDeployments,
                 projectName,
                 currentLocation,

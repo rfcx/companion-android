@@ -216,7 +216,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
         _siteItems = getListSite(
             this,
-            audioMothDeployments,
             guardianDeployments,
             getString(R.string.none),
             currentLocation ?: loc,

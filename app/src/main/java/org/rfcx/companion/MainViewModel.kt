@@ -46,19 +46,12 @@ class MainViewModel(
     private val showDeployments = MutableLiveData<Resource<List<EdgeDeployment>>>()
     private val showGuardianDeployments = MutableLiveData<Resource<List<GuardianDeployment>>>()
 
-    private var guardianDeployments = listOf<GuardianDeployment>()
-    private var deployments = listOf<EdgeDeployment>()
+    private var deployments = listOf<GuardianDeployment>()
     private var sites = listOf<Locate>()
 
-    private lateinit var deployLiveData: LiveData<List<EdgeDeployment>>
-    private val deploymentObserve = Observer<List<EdgeDeployment>> {
+    private lateinit var deploymentLiveData: LiveData<List<GuardianDeployment>>
+    private val deploymentObserve = Observer<List<GuardianDeployment>> {
         deployments = it
-        combinedData()
-    }
-
-    private lateinit var guardianDeploymentLiveData: LiveData<List<GuardianDeployment>>
-    private val guardianDeploymentObserve = Observer<List<GuardianDeployment>> {
-        guardianDeployments = it
         combinedData()
     }
 
@@ -78,15 +71,10 @@ class MainViewModel(
             Transformations.map(mainRepository.getAllLocateResultsAsync().asLiveData()) { it }
         siteLiveData.observeForever(siteObserve)
 
-        deployLiveData = Transformations.map(
-            mainRepository.getAllDeploymentLocateResultsAsync().asLiveData()
-        ) { it }
-        deployLiveData.observeForever(deploymentObserve)
-
-        guardianDeploymentLiveData = Transformations.map(
+        deploymentLiveData = Transformations.map(
             mainRepository.getAllGuardianDeploymentLocateResultsAsync().asLiveData()
         ) { it }
-        guardianDeploymentLiveData.observeForever(guardianDeploymentObserve)
+        deploymentLiveData.observeForever(deploymentObserve)
     }
 
     fun fetchProjects() {
@@ -246,15 +234,10 @@ class MainViewModel(
     }
 
     fun combinedData() {
-        var guardianDeploymentsForShow = this.guardianDeployments.filter { it.isCompleted() }
-        val usedSitesOnGuardian = guardianDeploymentsForShow.map { it.stream?.coreId }
-
         var deploymentsForShow = this.deployments.filter { it.isCompleted() }
-        val usedSitesOnEdge = deploymentsForShow.map { it.stream?.coreId }
-
-        val allUsedSites = usedSitesOnEdge + usedSitesOnGuardian
+        val usedSitesOnGuardian = deploymentsForShow.map { it.stream?.coreId }
         var filteredShowLocations =
-            sites.filter { loc -> !allUsedSites.contains(loc.serverId) || (loc.serverId == null && (loc.lastDeploymentId == 0 && loc.lastGuardianDeploymentId == 0)) }
+            sites.filter { loc -> !usedSitesOnGuardian.contains(loc.serverId) || (loc.serverId == null && (loc.lastDeploymentId == 0 && loc.lastGuardianDeploymentId == 0)) }
 
         val projectName = getProjectName()
         if (projectName != context.getString(R.string.none)) {
@@ -262,24 +245,18 @@ class MainViewModel(
                 filteredShowLocations.filter { it.locationGroup?.name == projectName }
             deploymentsForShow =
                 deploymentsForShow.filter { it.stream?.project?.name == projectName }
-            guardianDeploymentsForShow =
-                guardianDeploymentsForShow.filter { it.stream?.project?.name == projectName }
         }
-
-        val audiomothDeploymentMarkers =
-            deploymentsForShow.map { it.toMark(context, mainRepository.getProjectLocalDb()) }
-        val guardianDeploymentMarkers = guardianDeploymentsForShow.map { it.toMark(context) }
-
-        deploymentMarkers.postValue(Resource.success(audiomothDeploymentMarkers + guardianDeploymentMarkers))
+        val guardianDeploymentMarkers = deploymentsForShow.map { it.toMark(context) }
+        deploymentMarkers.postValue(Resource.success(guardianDeploymentMarkers))
         siteMarkers.postValue(Resource.success(filteredShowLocations.map { it.toMark() }))
-        showDeployments.postValue(Resource.success(deploymentsForShow))
-        showGuardianDeployments.postValue(Resource.success(guardianDeploymentsForShow))
+        showGuardianDeployments.postValue(Resource.success(deploymentsForShow))
     }
 
     fun updateStatusOfflineMap() {
         getProjectsFromLocal().map { project ->
             if (context.isNetworkAvailable()) {
-                val offlineManager: OfflineManager? = context?.let { OfflineManager.getInstance(it) }
+                val offlineManager: OfflineManager? =
+                    context?.let { OfflineManager.getInstance(it) }
                 val definition: OfflineTilePyramidRegionDefinition
                 offlineManager?.setOfflineMapboxTileCountLimit(10000)
 
@@ -307,17 +284,23 @@ class MainViewModel(
                     offlineManager?.createOfflineRegion(definition, regionName.toByteArray(),
                         object : OfflineManager.CreateOfflineRegionCallback {
                             override fun onCreate(offlineRegion: OfflineRegion) {
-                                offlineRegion.getStatus(object : OfflineRegion.OfflineRegionStatusCallback {
+                                offlineRegion.getStatus(object :
+                                    OfflineRegion.OfflineRegionStatusCallback {
                                     override fun onStatus(status: OfflineRegionStatus?) {
                                         if (status == null) return
                                         if (status.requiredResourceCount > 10000) {
-                                            mainRepository.updateOfflineState(OfflineMapState.UNAVAILABLE.key, project.serverId ?: "")
+                                            mainRepository.updateOfflineState(
+                                                OfflineMapState.UNAVAILABLE.key,
+                                                project.serverId ?: ""
+                                            )
                                         }
                                         deleteOfflineRegion(project, offlineManager)
                                     }
+
                                     override fun onError(error: String?) {}
                                 })
                             }
+
                             override fun onError(error: String) {}
                         })
                 }
@@ -339,6 +322,7 @@ class MainViewModel(
                     }
                 }
             }
+
             override fun onError(error: String?) {}
         })
     }
@@ -433,8 +417,7 @@ class MainViewModel(
     }
 
     fun onDestroy() {
-        guardianDeploymentLiveData.removeObserver(guardianDeploymentObserve)
-        deployLiveData.removeObserver(deploymentObserve)
+        deploymentLiveData.removeObserver(deploymentObserve)
         siteLiveData.removeObserver(siteObserve)
     }
 }

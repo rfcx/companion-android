@@ -67,40 +67,6 @@ class GuardianDeploymentDb(private val realm: Realm) {
         return id
     }
 
-    fun insertOrUpdate(deploymentResponse: DeploymentResponse) {
-        realm.executeTransaction {
-            val deployment =
-                it.where(GuardianDeployment::class.java)
-                    .equalTo(GuardianDeployment.FIELD_SERVER_ID, deploymentResponse.id)
-                    .findFirst()
-
-            if (deployment != null) {
-                deployment.serverId = deploymentResponse.id
-                deployment.deployedAt = deploymentResponse.deployedAt ?: deployment.deployedAt
-                deployment.wifiName = deploymentResponse.wifi ?: ""
-
-                val newConfig = deploymentResponse.configuration
-                if (newConfig != null) {
-                    deployment.configuration = it.copyToRealm(newConfig)
-                }
-
-                val newLocation = deploymentResponse.stream
-                if (newLocation != null) {
-                    deployment.stream = it.copyToRealm(newLocation.toDeploymentLocation())
-                }
-
-                deployment.createdAt = deploymentResponse.createdAt ?: deployment.createdAt
-            } else {
-                val deploymentObj = deploymentResponse.toGuardianDeployment()
-                val id = (it.where(GuardianDeployment::class.java).max(GuardianDeployment.FIELD_ID)
-                    ?.toInt() ?: 0) + 1
-                deploymentObj.id = id
-                deploymentObj.isActive = true
-                it.insert(deploymentObj)
-            }
-        }
-    }
-
     fun insertOrUpdate(deploymentResponses: List<DeploymentResponse>) {
         realm.executeTransaction {
             deploymentResponses.forEach { deploymentResponse ->

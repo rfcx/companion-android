@@ -123,7 +123,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
         _siteItems = getListSite(
             this,
-            audioMothDeployments,
             guardianDeployments,
             getString(R.string.none),
             currentLocation ?: loc,

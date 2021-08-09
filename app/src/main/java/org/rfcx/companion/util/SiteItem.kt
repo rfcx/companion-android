@@ -3,7 +3,6 @@ package org.rfcx.companion.util
 import android.content.Context
 import android.location.Location
 import android.location.LocationManager
-import android.util.Log
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.EdgeDeployment
 import org.rfcx.companion.entity.Locate
@@ -33,19 +32,15 @@ private fun findNearLocations(
 
 fun getListSite(
     context: Context,
-    edgeDeployments: List<EdgeDeployment>,
-    guardianDeployments: List<GuardianDeployment>,
+    deploymentList: List<GuardianDeployment>,
     projectName: String,
     currentUserLocation: Location,
     locations: List<Locate>
 ): ArrayList<SiteWithLastDeploymentItem> {
-    var showDeployments = edgeDeployments
-    var guardianShowDeployments = guardianDeployments
+    var deployments = deploymentList
     if (projectName != context.getString(R.string.none)) {
-        showDeployments =
-            showDeployments.filter { it.stream?.project?.name == projectName }
-        guardianShowDeployments =
-            guardianDeployments.filter { it.stream?.project?.name == projectName }
+        deployments =
+            deploymentList.filter { it.stream?.project?.name == projectName }
     }
     val nearLocations =
         findNearLocations(ArrayList(locations.filter { loc ->
@@ -58,7 +53,7 @@ fun getListSite(
         nearLocations?.map {
             SiteWithLastDeploymentItem(
                 it.first,
-                isHaveDeployment(guardianShowDeployments, showDeployments, it.first),
+                deployments.find { dp -> dp.stream?.name == it.first.name }?.deployedAt,
                 it.second
             )
         } ?: listOf()
