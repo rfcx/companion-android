@@ -18,7 +18,6 @@ import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
-import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.GuardianDeploymentSyncWorker
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.showCommonDialog
@@ -139,7 +138,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
                     callback = object : DatabaseCallback {
                         override fun onSuccess() {
                             hideLoading()
-                            DeploymentSyncWorker.enqueue(this@EditLocationActivity)
+                            GuardianDeploymentSyncWorker.enqueue(this@EditLocationActivity)
                             finish()
                         }
 
@@ -174,7 +173,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
                     DatabaseCallback {
                     override fun onSuccess() {
                         hideLoading()
-                        DeploymentSyncWorker.enqueue(this@EditLocationActivity)
+                        GuardianDeploymentSyncWorker.enqueue(this@EditLocationActivity)
                         finish()
                     }
 

@@ -22,9 +22,9 @@ import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
-import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
+import org.rfcx.companion.service.GuardianDeploymentSyncWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.Preferences.Companion.ENABLE_LOCATION_TRACKING
 import org.rfcx.companion.util.geojson.GeoJsonUtils
@@ -372,7 +372,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
             analytics.trackCreateAudiomothDeploymentEvent()
 
-            DeploymentSyncWorker.enqueue(this@EdgeDeploymentActivity)
+            GuardianDeploymentSyncWorker.enqueue(this@EdgeDeploymentActivity)
             hideLoading()
             showComplete()
         }

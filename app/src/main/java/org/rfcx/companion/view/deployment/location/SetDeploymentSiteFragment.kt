@@ -23,7 +23,6 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.ProjectDb
-import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol

@@ -24,6 +24,7 @@ class GuardianDeploymentSyncWorker(val context: Context, params: WorkerParameter
 
     override suspend fun doWork(): Result {
         Log.d(TAG, "doWork")
+        isRunning = DeploymentSyncState.RUNNING
 
         val db = GuardianDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val locateDb = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
@@ -75,7 +76,7 @@ class GuardianDeploymentSyncWorker(val context: Context, params: WorkerParameter
                 }
             }
         }
-
+        isRunning = DeploymentSyncState.FINISH
         ImageSyncWorker.enqueue(context)
 
         return if (someFailed) Result.retry() else Result.success()
@@ -105,6 +106,7 @@ class GuardianDeploymentSyncWorker(val context: Context, params: WorkerParameter
     companion object {
         private const val TAG = "GDeploymentSyncWorker"
         private const val UNIQUE_WORK_KEY = "GDeploymentSyncWorkerUniqueKey"
+        private var isRunning = DeploymentSyncState.NOT_RUNNING
 
         fun enqueue(context: Context) {
             val constraints =
@@ -116,9 +118,13 @@ class GuardianDeploymentSyncWorker(val context: Context, params: WorkerParameter
                 .enqueueUniqueWork(UNIQUE_WORK_KEY, ExistingWorkPolicy.REPLACE, workRequest)
         }
 
+        fun isRunning() = isRunning
+
         fun workInfos(context: Context): LiveData<List<WorkInfo>> {
             return WorkManager.getInstance(context)
                 .getWorkInfosForUniqueWorkLiveData(UNIQUE_WORK_KEY)
         }
     }
 }
+
+enum class DeploymentSyncState { NOT_RUNNING, RUNNING, FINISH }

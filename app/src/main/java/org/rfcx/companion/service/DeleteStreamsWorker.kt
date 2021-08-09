@@ -7,7 +7,6 @@ import androidx.work.*
 import io.realm.Realm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.rfcx.companion.entity.EdgeDeployment
 import org.rfcx.companion.entity.response.StreamResponse
 import org.rfcx.companion.entity.response.toLocate
 import org.rfcx.companion.localdb.EdgeDeploymentDb
@@ -50,7 +49,7 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
                     streamDb.deleteLocate(it.id)
                 }
                 // force delete deployment on device-api
-                DeploymentSyncWorker.enqueue(context)
+                GuardianDeploymentSyncWorker.enqueue(context)
             }
         } else {
             someFailed = true
