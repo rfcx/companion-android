@@ -5,6 +5,7 @@ import io.realm.RealmResults
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
+import org.rfcx.companion.entity.response.ProjectByIdResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.repo.api.DeviceApiHelper
@@ -21,6 +22,8 @@ class MainRepository(
         fields: List<String> = listOf("id", "name", "permissions")
     ) =
         deviceApiHelper.getProjects(token, limit, offset, fields)
+
+    fun getProjectsByIdFromCore(token: String, id: String) = deviceApiHelper.getProjectsById(token, id)
 
     fun getDeletedProjectsFromRemote(
         token: String,
@@ -79,6 +82,14 @@ class MainRepository(
 
     fun getLocateById(id: Int): Locate? {
         return localDataHelper.getLocateLocalDb().getLocateById(id)
+    }
+
+    fun updateOfflineState(state: String, id: String) {
+        localDataHelper.getProjectLocalDb().updateOfflineState(state, id)
+    }
+
+    fun updateProjectBounds(response: ProjectByIdResponse) {
+        localDataHelper.getProjectLocalDb().updateProjectBounds(response)
     }
 
     fun getProjectLocalDb(): ProjectDb {

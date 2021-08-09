@@ -10,6 +10,8 @@ class DeviceApiHelper(private val deviceApiService: DeviceApiService) {
         fields: List<String> = listOf("id", "name", "permissions")
     ) = deviceApiService.getProjects(token, limit, offset, fields)
 
+    fun getProjectsById(token: String, id: String) = deviceApiService.getProjectsById(token, id)
+
     fun getDeletedProjects(
         token: String,
         limit: Int = 100,

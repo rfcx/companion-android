@@ -8,11 +8,19 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
+import com.mapbox.mapboxsdk.geometry.LatLngBounds
+import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.mapboxsdk.offline.OfflineManager
+import com.mapbox.mapboxsdk.offline.OfflineRegion
+import com.mapbox.mapboxsdk.offline.OfflineRegionStatus
+import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition
 import io.realm.RealmResults
+import org.json.JSONObject
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.guardian.toMark
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
+import org.rfcx.companion.entity.response.ProjectByIdResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
@@ -121,6 +129,29 @@ class MainViewModel(
                     }
                 }
             })
+    }
+
+    fun updateProjectBounds() {
+        val updateProjectBounds =
+            getProjectsFromLocal().filter { project -> project.serverId != null && project.maxLatitude == null }
+        updateProjectBounds.map { projectBounds ->
+            val token = "Bearer ${context?.getIdToken()}"
+            projectBounds.serverId?.let { serverId ->
+                mainRepository.getProjectsByIdFromCore(token, serverId)
+                    .enqueue(object : Callback<ProjectByIdResponse> {
+                        override fun onFailure(call: Call<ProjectByIdResponse>, t: Throwable) {}
+                        override fun onResponse(
+                            call: Call<ProjectByIdResponse>,
+                            response: Response<ProjectByIdResponse>
+                        ) {
+                            if (response.body() != null && response.body()?.id != null && response.body()?.maxLatitude != null) {
+                                val res = response.body() as ProjectByIdResponse
+                                updateProjectBounds(res)
+                            }
+                        }
+                    })
+            }
+        }
     }
 
     private fun fetchDeletedProjects() {
@@ -244,6 +275,80 @@ class MainViewModel(
         showGuardianDeployments.postValue(Resource.success(guardianDeploymentsForShow))
     }
 
+    fun updateStatusOfflineMap() {
+        getProjectsFromLocal().map { project ->
+            if (context.isNetworkAvailable()) {
+                val offlineManager: OfflineManager? = context?.let { OfflineManager.getInstance(it) }
+                val definition: OfflineTilePyramidRegionDefinition
+                offlineManager?.setOfflineMapboxTileCountLimit(10000)
+
+                val minLat = project.minLatitude
+                val maxLat = project.maxLatitude
+                val minLng = project.minLongitude
+                val maxLng = project.maxLongitude
+
+                if (minLat !== null && maxLat !== null && minLng !== null && maxLng !== null) {
+                    val regionName = "{\"regionName\":\"regionName.${project.name}\"}"
+                    val latLngBounds: LatLngBounds = LatLngBounds.from(
+                        maxLat.toDouble(),
+                        maxLng.toDouble(),
+                        minLat.toDouble(),
+                        minLng.toDouble()
+                    )
+                    definition = OfflineTilePyramidRegionDefinition(
+                        Style.OUTDOORS,
+                        latLngBounds,
+                        10.0,
+                        15.0,
+                        context?.resources?.displayMetrics?.density ?: 0.0F
+                    )
+
+                    offlineManager?.createOfflineRegion(definition, regionName.toByteArray(),
+                        object : OfflineManager.CreateOfflineRegionCallback {
+                            override fun onCreate(offlineRegion: OfflineRegion) {
+                                offlineRegion.getStatus(object : OfflineRegion.OfflineRegionStatusCallback {
+                                    override fun onStatus(status: OfflineRegionStatus?) {
+                                        if (status == null) return
+                                        if (status.requiredResourceCount > 10000) {
+                                            mainRepository.updateOfflineState(OfflineMapState.UNAVAILABLE.key, project.serverId ?: "")
+                                        }
+                                        deleteOfflineRegion(project, offlineManager)
+                                    }
+                                    override fun onError(error: String?) {}
+                                })
+                            }
+                            override fun onError(error: String) {}
+                        })
+                }
+            }
+        }
+    }
+
+    private fun deleteOfflineRegion(project: Project, offlineManager: OfflineManager) {
+        offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
+            override fun onList(offlineRegions: Array<out OfflineRegion>?) {
+                if (!offlineRegions.isNullOrEmpty()) {
+                    offlineRegions.map {
+                        if (getRegionName(it) == "regionName.${project.name}") {
+                            it.delete(object : OfflineRegion.OfflineRegionDeleteCallback {
+                                override fun onDelete() {}
+                                override fun onError(error: String) {}
+                            })
+                        }
+                    }
+                }
+            }
+            override fun onError(error: String?) {}
+        })
+    }
+
+    private fun getRegionName(offlineRegion: OfflineRegion): String {
+        val metadata = offlineRegion.metadata
+        val json = String(metadata)
+        val jsonObject = JSONObject(json)
+        return jsonObject.getString("regionName")
+    }
+
     private fun getProjectName(): String {
         val preferences = Preferences.getInstance(context)
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
@@ -320,6 +425,10 @@ class MainViewModel(
 
     fun deleteTracking(id: Int, context: Context) {
         mainRepository.deleteTracking(id, context)
+    }
+
+    fun updateProjectBounds(response: ProjectByIdResponse) {
+        mainRepository.updateProjectBounds(response)
     }
 
     fun onDestroy() {

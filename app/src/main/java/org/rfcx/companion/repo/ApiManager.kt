@@ -17,7 +17,6 @@ class ApiManager {
     companion object {
         @Volatile
         private var INSTANCE: ApiManager? = null
-        const val DEPLOY_DOMAIN = "https://api.rfcx.org/"
 
         fun getInstance(): ApiManager =
             INSTANCE ?: synchronized(this) {
@@ -26,7 +25,7 @@ class ApiManager {
     }
 
     init {
-        apiRest = setRetrofitBaseUrl(DEPLOY_DOMAIN).create(ApiRestInterface::class.java)
+        apiRest = setRetrofitBaseUrl(BuildConfig.DEPLOY_DOMAIN).create(ApiRestInterface::class.java)
         apiFirebaseAuth =
             setRetrofitBaseUrl(BuildConfig.FIREBASE_AUTH_DOMAIN).create(FirebaseAuthInterface::class.java)
         deviceApi =
@@ -37,6 +36,7 @@ class ApiManager {
 
     fun getDeviceApi(): DeviceApiInterface = deviceApi
 
+    fun getRestApi(): ApiRestInterface = apiRest
     fun getDeviceApi2(): DeviceApiService = deviceApi2
 
     private fun setRetrofitBaseUrl(baseUrl: String): Retrofit {
