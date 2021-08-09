@@ -67,7 +67,6 @@ import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.localdb.*
-import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
@@ -183,7 +182,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         if (currentWorkStatus != null) {
             when (currentWorkStatus.state) {
                 WorkInfo.State.RUNNING -> updateSyncInfo(SyncInfo.Uploading, true)
-                WorkInfo.State.SUCCEEDED -> updateSyncInfo(SyncInfo.Uploaded, true)
+                WorkInfo.State.SUCCEEDED -> {
+                    updateSyncInfo(SyncInfo.Uploaded, true)
+                    mainViewModel.updateProjectBounds()
+                    mainViewModel.updateStatusOfflineMap()
+                }
                 else -> updateSyncInfo(isSites = true)
             }
         }
@@ -953,6 +956,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             when (it.status) {
                 Status.LOADING -> {}
                 Status.SUCCESS -> {
+                    mainViewModel.updateProjectBounds()
                     projectSwipeRefreshView.isRefreshing = false
 
                     this.locationGroups = mainViewModel.getProjectsFromLocal()
@@ -961,6 +965,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                     locationGroupAdapter.notifyDataSetChanged()
 
                     combinedData()
+                    mainViewModel.updateStatusOfflineMap()
                 }
                 Status.ERROR -> {
                     combinedData()

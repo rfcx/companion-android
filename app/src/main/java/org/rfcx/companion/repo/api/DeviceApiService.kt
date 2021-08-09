@@ -1,6 +1,7 @@
 package org.rfcx.companion.repo.api
 
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
+import org.rfcx.companion.entity.response.ProjectByIdResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import retrofit2.Call
 import retrofit2.http.GET
@@ -32,4 +33,10 @@ interface DeviceApiService {
         @Header("Authorization") authUser: String,
         @Path("id") id: String
     ): Call<List<DeploymentAssetResponse>>
+
+    @GET("projects/{id}")
+    fun getProjectsById(
+        @Header("Authorization") authUser: String,
+        @Path("id") id: String
+    ): Call<ProjectByIdResponse>
 }

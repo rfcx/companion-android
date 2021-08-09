@@ -1,6 +1,7 @@
 package org.rfcx.companion.repo.api
 
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
+import org.rfcx.companion.entity.response.ProjectByIdResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.repo.ApiManager
 import retrofit2.Call
@@ -31,5 +32,9 @@ class DeviceApiServiceImpl: DeviceApiService {
         id: String
     ): Call<List<DeploymentAssetResponse>> {
         return ApiManager.getInstance().getDeviceApi2().getStreamAssets(authUser, id)
+    }
+
+    override fun getProjectsById(authUser: String, id: String): Call<ProjectByIdResponse> {
+        return ApiManager.getInstance().getRestApi().getProjectsById(authUser, id)
     }
 }

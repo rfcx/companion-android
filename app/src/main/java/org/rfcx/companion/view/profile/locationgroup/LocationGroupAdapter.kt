@@ -6,8 +6,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_location_group.view.*
 import org.rfcx.companion.R
+import org.rfcx.companion.entity.OfflineMapState
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Screen
+import org.rfcx.companion.util.Preferences
 
 class LocationGroupAdapter(private val locationGroupListener: LocationGroupListener) :
     RecyclerView.Adapter<LocationGroupAdapter.LocationGroupAdapterViewHolder>() {
@@ -31,7 +33,7 @@ class LocationGroupAdapter(private val locationGroupListener: LocationGroupListe
     override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: LocationGroupAdapterViewHolder, position: Int) {
-        holder.bind(items[position].name ?: holder.itemView.context.getString(R.string.none))
+        holder.bind(items[position])
         holder.itemView.setOnClickListener {
             locationGroupListener.onClicked(items[position])
         }
@@ -41,13 +43,12 @@ class LocationGroupAdapter(private val locationGroupListener: LocationGroupListe
         private val locationGroupTextView = itemView.locationGroupTextView
         private val checkImageView = itemView.checkImageView
 
-        fun bind(locationGroup: String) {
+        fun bind(project: Project) {
             if (screen != Screen.PROFILE.id) {
                 checkImageView.visibility =
-                    if (locationGroup == selectedGroup) View.VISIBLE else View.GONE
+                    if (project.name == selectedGroup) View.VISIBLE else View.GONE
             }
-
-            locationGroupTextView.text = locationGroup
+            locationGroupTextView.text = project.name
         }
     }
 }

@@ -29,6 +29,75 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/downloadButton"
+        style="@style/OfflineMapButton"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_gravity="center"
+        android:layout_marginEnd="@dimen/margin_padding_normal"
+        android:text="@string/download"
+        android:visibility="gone"
+        android:enabled="false"
+        android:textSize="@dimen/text_xxsmall"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/deleteButton"
+        style="@style/OfflineMapButton.Delete"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_gravity="center"
+        android:layout_marginEnd="@dimen/margin_padding_normal"
+        android:text="@string/delete"
+        android:visibility="gone"
+        android:textSize="@dimen/text_xxsmall"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+        android:id="@+id/downloadedTextView"
+        style="@style/AudioMothText.Body.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginEnd="@dimen/margin_padding_normal"
+        android:text="50%"
+        android:textSize="@dimen/text_xsmall"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/offlineMapProgress"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="50%" />
+
+    <TextView
+        android:id="@+id/unavailableTextView"
+        style="@style/AudioMothText.Body.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginEnd="@dimen/margin_padding_normal"
+        android:gravity="center"
+        android:text="@string/unavailable"
+        android:textSize="@dimen/text_xsmall"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/offlineMapProgress"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/offlineMapProgress"
+        android:layout_width="@dimen/mini_progress_loading"
+        android:layout_height="@dimen/mini_progress_loading"
+        android:layout_marginEnd="@dimen/margin_padding_normal"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
