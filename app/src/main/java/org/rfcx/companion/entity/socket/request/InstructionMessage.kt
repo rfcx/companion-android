@@ -13,7 +13,7 @@ data class InstructionMessage(
         ): InstructionMessage {
             val instruction = Instruction(
                 type = type.value,
-                command = cmd.value,
+                cmd = cmd.value,
                 meta = meta
             )
             return InstructionMessage(listOf(instruction))
@@ -24,7 +24,7 @@ data class InstructionMessage(
 data class Instruction(
     val id: Int = Random.nextInt(1, 100),
     val type: String,
-    val command: String,
+    val cmd: String,
     val at: String = "",
     val meta: String = "{}"
 )

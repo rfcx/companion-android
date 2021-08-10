@@ -1,6 +1,7 @@
 package org.rfcx.companion.connection.socket
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import org.json.JSONObject
@@ -254,6 +255,8 @@ object SocketManager {
 
                         val receiveJson = JSONObject(dataInput)
                         val jsonIterator = receiveJson.keys()
+
+                        Log.d("SocketComm", dataInput)
 
                         val keys = jsonIterator.asSequence().toList()
                         when (keys[0].toString()) {

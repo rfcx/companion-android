@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.JsonObject
 import com.mapbox.mapboxsdk.geometry.LatLng
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import io.realm.Realm
@@ -19,7 +20,10 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
 import kotlinx.android.synthetic.main.layout_search_view.*
+import org.rfcx.companion.connection.socket.SocketManager
 import org.rfcx.companion.entity.Locate
+import org.rfcx.companion.entity.socket.request.InstructionCommand
+import org.rfcx.companion.entity.socket.request.InstructionType
 import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.service.DeploymentCleanupWorker
@@ -74,6 +78,11 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val meta = JsonObject().also {
+            it.addProperty("enable_audio_vault", "true")
+        }
+        SocketManager.sendInstructionMessage(InstructionType.SET, InstructionCommand.PREFS, meta.toString())
 
         createLocationButton.setOnClickListener {
             if (BuildConfig.ENABLE_GUARDIAN) {
