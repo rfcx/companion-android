@@ -198,7 +198,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol,
                     nameLocation
                 )
             )
-            is EdgeCheckListFragment -> {
+            is AudioMothCheckListFragment -> {
                 _deployment?.let {
                     it.passedChecks = passedChecks
 //                    edgeDeploymentDb.updateDeployment(it)
@@ -225,7 +225,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol,
     }
 
     override fun startCheckList() {
-        startFragment(EdgeCheckListFragment.newInstance())
+        startFragment(AudioMothCheckListFragment.newInstance())
     }
 
     override fun startDetailDeploymentSite(id: Int, name: String?, isNewSite: Boolean) {
