@@ -24,7 +24,7 @@ import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
-import org.rfcx.companion.service.GuardianDeploymentSyncWorker
+import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.Preferences.Companion.ENABLE_LOCATION_TRACKING
 import org.rfcx.companion.util.geojson.GeoJsonUtils
@@ -354,7 +354,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
 
             analytics.trackCreateAudiomothDeploymentEvent()
 
-            GuardianDeploymentSyncWorker.enqueue(this@AudioMothDeploymentActivity)
+            DeploymentSyncWorker.enqueue(this@AudioMothDeploymentActivity)
             hideLoading()
             showComplete()
         }

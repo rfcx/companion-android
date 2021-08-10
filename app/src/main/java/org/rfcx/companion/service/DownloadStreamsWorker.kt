@@ -27,7 +27,7 @@ class DownloadStreamsWorker(val context: Context, params: WorkerParameters) :
         currentStreamsLoading = 0
         someFailed = false
 
-        if(GuardianDeploymentSyncWorker.isRunning() != DeploymentSyncState.RUNNING) {
+        if(DeploymentSyncWorker.isRunning() != DeploymentSyncState.RUNNING) {
             Log.d(TAG, "doWork on DownloadStreams")
 
             val token = "Bearer ${context.getIdToken()}"

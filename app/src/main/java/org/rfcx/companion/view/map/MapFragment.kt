@@ -71,7 +71,7 @@ import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DownloadStreamsWorker
-import org.rfcx.companion.service.GuardianDeploymentSyncWorker
+import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.Status
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
@@ -1052,7 +1052,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         context ?: return
         downloadStreamsWorkInfoLiveData = DownloadStreamsWorker.workInfos(requireContext())
         downloadStreamsWorkInfoLiveData.observeForever(downloadStreamsWorkInfoObserve)
-        deploymentWorkInfoLiveData = GuardianDeploymentSyncWorker.workInfos(requireContext())
+        deploymentWorkInfoLiveData = DeploymentSyncWorker.workInfos(requireContext())
         deploymentWorkInfoLiveData.observeForever(deploymentWorkInfoObserve)
     }
 

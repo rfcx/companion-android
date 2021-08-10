@@ -19,7 +19,7 @@ import org.rfcx.companion.util.getIdToken
 /**
  * For syncing data to server. Ref from Ranger Android App
  */
-class GuardianDeploymentSyncWorker(val context: Context, params: WorkerParameters) :
+class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
@@ -112,7 +112,7 @@ class GuardianDeploymentSyncWorker(val context: Context, params: WorkerParameter
             val constraints =
                 Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
             val workRequest =
-                OneTimeWorkRequestBuilder<GuardianDeploymentSyncWorker>().setConstraints(constraints)
+                OneTimeWorkRequestBuilder<DeploymentSyncWorker>().setConstraints(constraints)
                     .build()
             WorkManager.getInstance(context)
                 .enqueueUniqueWork(UNIQUE_WORK_KEY, ExistingWorkPolicy.REPLACE, workRequest)

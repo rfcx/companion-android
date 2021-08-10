@@ -42,7 +42,7 @@ import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.service.DownloadImagesWorker
-import org.rfcx.companion.service.GuardianDeploymentSyncWorker
+import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.BaseActivity
@@ -158,7 +158,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         deployment?.let {
             deploymentDb.deleteDeploymentLocation(it.id, object : DatabaseCallback {
                 override fun onSuccess() {
-                    GuardianDeploymentSyncWorker.enqueue(this@DeploymentDetailActivity)
+                    DeploymentSyncWorker.enqueue(this@DeploymentDetailActivity)
                     hideLoading()
                     finish()
                 }

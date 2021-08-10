@@ -45,7 +45,7 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
                     streamDb.deleteLocate(it.id)
                 }
                 // force delete deployment on device-api
-                GuardianDeploymentSyncWorker.enqueue(context)
+                DeploymentSyncWorker.enqueue(context)
             }
         } else {
             someFailed = true

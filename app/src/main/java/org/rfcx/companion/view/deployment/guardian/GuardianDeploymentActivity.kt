@@ -27,7 +27,7 @@ import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
-import org.rfcx.companion.service.GuardianDeploymentSyncWorker
+import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.view.deployment.AudioMothDeploymentActivity
@@ -352,7 +352,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             analytics.trackCreateGuardianDeploymentEvent()
 
             SocketManager.getCheckInTest(CheckinCommand.STOP) // to stop getting checkin test
-            GuardianDeploymentSyncWorker.enqueue(this@GuardianDeploymentActivity)
+            DeploymentSyncWorker.enqueue(this@GuardianDeploymentActivity)
             showComplete()
         }
     }

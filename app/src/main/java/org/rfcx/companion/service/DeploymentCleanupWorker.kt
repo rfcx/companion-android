@@ -28,7 +28,7 @@ class DeploymentCleanupWorker(val context: Context, params: WorkerParameters) :
         val guardianDeploymentUnsent = guardianDeploymentDb.unsentCount()
         guardianDeploymentDb.unlockSending()
         if (guardianDeploymentUnsent > 0) {
-            GuardianDeploymentSyncWorker.enqueue(context)
+            DeploymentSyncWorker.enqueue(context)
         }
 
         val imageDb = DeploymentImageDb(realm)
@@ -45,7 +45,7 @@ class DeploymentCleanupWorker(val context: Context, params: WorkerParameters) :
             TrackingSyncWorker.enqueue(context)
         }
 
-        if (GuardianDeploymentSyncWorker.isRunning() == DeploymentSyncState.FINISH) {
+        if (DeploymentSyncWorker.isRunning() == DeploymentSyncState.FINISH) {
             DeleteStreamsWorker.enqueue(context)
         }
     }
