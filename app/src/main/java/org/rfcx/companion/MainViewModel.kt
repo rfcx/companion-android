@@ -43,7 +43,6 @@ class MainViewModel(
     private val deploymentMarkers = MutableLiveData<Resource<List<MapMarker.DeploymentMarker>>>()
     private val siteMarkers = MutableLiveData<Resource<List<MapMarker>>>()
     private val siteList = MutableLiveData<Resource<List<Locate>>>()
-    private val showDeployments = MutableLiveData<Resource<List<EdgeDeployment>>>()
     private val showGuardianDeployments = MutableLiveData<Resource<List<GuardianDeployment>>>()
 
     private var deployments = listOf<GuardianDeployment>()
@@ -361,10 +360,6 @@ class MainViewModel(
 
     fun getSites(): LiveData<Resource<List<Locate>>> {
         return siteList
-    }
-
-    fun getShowDeployments(): LiveData<Resource<List<EdgeDeployment>>> {
-        return showDeployments
     }
 
     fun getShowGuardianDeployments(): LiveData<Resource<List<GuardianDeployment>>> {
