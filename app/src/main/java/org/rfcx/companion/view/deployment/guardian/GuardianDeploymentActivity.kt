@@ -30,7 +30,7 @@ import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.service.GuardianDeploymentSyncWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.geojson.GeoJsonUtils
-import org.rfcx.companion.view.deployment.EdgeDeploymentActivity
+import org.rfcx.companion.view.deployment.AudioMothDeploymentActivity
 import org.rfcx.companion.view.deployment.guardian.advanced.GuardianAdvancedFragment
 import org.rfcx.companion.view.deployment.guardian.checkin.GuardianCheckInTestFragment
 import org.rfcx.companion.view.deployment.guardian.configure.GuardianConfigureFragment
@@ -450,7 +450,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun showSiteLoadingDialog(text: String) {
         var siteLoadingDialog: SiteLoadingDialogFragment =
-            supportFragmentManager.findFragmentByTag(EdgeDeploymentActivity.TAG_SITE_LOADING_DIALOG) as SiteLoadingDialogFragment?
+            supportFragmentManager.findFragmentByTag(AudioMothDeploymentActivity.TAG_SITE_LOADING_DIALOG) as SiteLoadingDialogFragment?
                 ?: run {
                     SiteLoadingDialogFragment(text)
                 }
@@ -459,7 +459,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             siteLoadingDialog = SiteLoadingDialogFragment(text)
         }
         siteLoadingDialog.show(supportFragmentManager,
-            EdgeDeploymentActivity.TAG_SITE_LOADING_DIALOG
+            AudioMothDeploymentActivity.TAG_SITE_LOADING_DIALOG
         )
     }
 

@@ -46,7 +46,7 @@ import org.rfcx.companion.service.GuardianDeploymentSyncWorker
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.BaseActivity
-import org.rfcx.companion.view.deployment.EdgeDeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
+import org.rfcx.companion.view.deployment.AudioMothDeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
 import java.io.File
 
 class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (DeploymentImageView) -> Unit {

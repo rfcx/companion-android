@@ -38,7 +38,7 @@ import org.rfcx.companion.view.detail.MapPickerProtocol
 import org.rfcx.companion.view.dialog.*
 import java.util.*
 
-class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, CompleteListener,
+class AudioMothDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, CompleteListener,
     MapPickerProtocol {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
@@ -359,7 +359,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
             analytics.trackCreateAudiomothDeploymentEvent()
 
-            GuardianDeploymentSyncWorker.enqueue(this@EdgeDeploymentActivity)
+            GuardianDeploymentSyncWorker.enqueue(this@AudioMothDeploymentActivity)
             hideLoading()
             showComplete()
         }
@@ -435,7 +435,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 calendar,
                 deploymentIdArrayInt
             )
-            this@EdgeDeploymentActivity.runOnUiThread {
+            this@AudioMothDeploymentActivity.runOnUiThread {
                 val fragment = supportFragmentManager.findFragmentById(R.id.contentContainer) as NewSyncFragment
                 fragment.showRepeatSync()
             }
@@ -596,18 +596,18 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         private var fromUnfinishedDeployment = false
 
         fun startActivity(context: Context) {
-            val intent = Intent(context, EdgeDeploymentActivity::class.java)
+            val intent = Intent(context, AudioMothDeploymentActivity::class.java)
             context.startActivity(intent)
         }
 
         fun startActivity(context: Context, deploymentId: Int) {
-            val intent = Intent(context, EdgeDeploymentActivity::class.java)
+            val intent = Intent(context, AudioMothDeploymentActivity::class.java)
             intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
             context.startActivity(intent)
         }
 
         fun startActivity(context: Context, deploymentId: Int, requestCode: Int) {
-            val intent = Intent(context, EdgeDeploymentActivity::class.java)
+            val intent = Intent(context, AudioMothDeploymentActivity::class.java)
             intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
             fromUnfinishedDeployment = true
             (context as Activity).startActivityForResult(intent, requestCode)
