@@ -38,7 +38,7 @@ import org.rfcx.companion.view.detail.MapPickerProtocol
 import org.rfcx.companion.view.dialog.*
 import java.util.*
 
-class AudioMothDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, CompleteListener,
+class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProtocol, CompleteListener,
     MapPickerProtocol {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
