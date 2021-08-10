@@ -41,7 +41,12 @@ open class GuardianDeployment(
 ) : RealmModel, Serializable {
 
     fun isCompleted(): Boolean {
-        return isActive && (state == DeploymentState.Guardian.ReadyToUpload.key || state == DeploymentState.Edge.ReadyToUpload.key)
+        val stateOfDeployment = if (device == Device.GUARDIAN.value) {
+            state == DeploymentState.Guardian.ReadyToUpload.key
+        } else {
+            state == DeploymentState.Edge.ReadyToUpload.key
+        }
+        return isActive && stateOfDeployment
     }
 
     companion object {
