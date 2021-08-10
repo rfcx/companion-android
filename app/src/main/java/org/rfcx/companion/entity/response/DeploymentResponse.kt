@@ -28,7 +28,7 @@ fun DeploymentResponse.toGuardianDeployment(): GuardianDeployment {
         serverId = this.id,
         deploymentKey = this.id ?: "",
         deployedAt = this.deployedAt ?: Date(),
-        state = if (this.isGuardian()) DeploymentState.Guardian.ReadyToUpload.key else DeploymentState.Edge.ReadyToUpload.key,
+        state = if (this.isGuardian()) DeploymentState.Guardian.ReadyToUpload.key else DeploymentState.AudioMoth.ReadyToUpload.key,
         device = this.deploymentType,
         wifiName = this.wifi ?: "",
         configuration = this.configuration ?: GuardianConfiguration(),

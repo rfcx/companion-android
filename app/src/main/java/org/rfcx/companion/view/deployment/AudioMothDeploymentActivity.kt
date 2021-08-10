@@ -278,7 +278,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
         val deployment = _deployment ?: GuardianDeployment()
         deployment.device = Device.AUDIOMOTH.value
         deployment.isActive = locate.serverId == null
-        deployment.state = DeploymentState.Edge.Locate.key // state
+        deployment.state = DeploymentState.AudioMoth.Locate.key // state
 
         this._deployLocation = locate.asDeploymentLocation()
         this._locate = locate
@@ -315,7 +315,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
             it.deployedAt = Date()
             it.updatedAt = Date()
             it.isActive = true
-            it.state = DeploymentState.Edge.ReadyToUpload.key
+            it.state = DeploymentState.AudioMoth.ReadyToUpload.key
             setDeployment(it)
 
             val deploymentId = deploymentDb.insertOrUpdateDeployment(it, _deployLocation!!)
@@ -365,7 +365,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
         currentCheck = number
         when (number) {
             0 -> {
-                updateDeploymentState(DeploymentState.Edge.Locate)
+                updateDeploymentState(DeploymentState.AudioMoth.Locate)
                 val site = this._locate
                 if (site == null) {
                     startFragment(
@@ -378,11 +378,11 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
                 }
             }
             1 -> {
-                updateDeploymentState(DeploymentState.Edge.Sync)
+                updateDeploymentState(DeploymentState.AudioMoth.Sync)
                 startFragment(NewSyncFragment.newInstance())
             }
             2 -> {
-                updateDeploymentState(DeploymentState.Edge.Deploy)
+                updateDeploymentState(DeploymentState.AudioMoth.Deploy)
                 startFragment(DeployFragment.newInstance())
             }
         }
@@ -506,7 +506,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
             .commit()
     }
 
-    private fun updateDeploymentState(state: DeploymentState.Edge) {
+    private fun updateDeploymentState(state: DeploymentState.AudioMoth) {
         this._deployment?.state = state.key
         this._deployment?.let { deploymentDb.updateDeployment(it) }
     }

@@ -44,7 +44,7 @@ open class GuardianDeployment(
         val stateOfDeployment = if (device == Device.GUARDIAN.value) {
             state == DeploymentState.Guardian.ReadyToUpload.key
         } else {
-            state == DeploymentState.Edge.ReadyToUpload.key
+            state == DeploymentState.AudioMoth.ReadyToUpload.key
         }
         return isActive && stateOfDeployment
     }
@@ -89,7 +89,7 @@ fun GuardianDeployment.toMark(context: Context): MapMarker.DeploymentMarker {
             } ?: GuardianPin.CONNECTED_GUARDIAN
         }
         else -> {
-            pinImage = if (state == DeploymentState.Edge.ReadyToUpload.key) {
+            pinImage = if (state == DeploymentState.AudioMoth.ReadyToUpload.key) {
                 if (color != null && color.isNotEmpty() && group != null) {
                     stream?.project?.color
                 } else {
@@ -99,7 +99,7 @@ fun GuardianDeployment.toMark(context: Context): MapMarker.DeploymentMarker {
                 Pin.PIN_GREY
             } ?: Pin.PIN_GREEN
 
-            description = if (state >= DeploymentState.Edge.ReadyToUpload.key)
+            description = if (state >= DeploymentState.AudioMoth.ReadyToUpload.key)
                 context.getString(R.string.format_deployed)
             else
                 context.getString(R.string.format_in_progress_step)
