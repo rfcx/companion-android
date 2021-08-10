@@ -1,6 +1,7 @@
 package org.rfcx.companion.view.deployment
 
 import org.rfcx.companion.entity.*
+import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.service.DownloadStreamState
 
 interface AudioMothDeploymentProtocol : BaseDeploymentProtocol {
@@ -9,9 +10,9 @@ interface AudioMothDeploymentProtocol : BaseDeploymentProtocol {
 
     fun startSyncing(status: String)
 
-    fun getDeployment(): EdgeDeployment?
+    fun getDeployment(): GuardianDeployment?
 
-    fun setDeployment(deployment: EdgeDeployment)
+    fun setDeployment(deployment: GuardianDeployment)
 
     fun playSyncSound()
 

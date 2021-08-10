@@ -42,15 +42,14 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
     MapPickerProtocol {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-//    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
-    private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
+    private val deploymentDb by lazy { GuardianDeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
     private val projectDb by lazy { ProjectDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val trackingDb by lazy { TrackingDb(realm) }
     private val trackingFileDb by lazy { TrackingFileDb(realm) }
 
-    private var _deployment: EdgeDeployment? = null
+    private var _deployment: GuardianDeployment? = null
     private var _deployLocation: DeploymentLocation? = null
     private var _images: List<String> = listOf()
     private var _siteItems = arrayListOf<SiteWithLastDeploymentItem>()
@@ -64,7 +63,6 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
 
     private var latitude = 0.0
     private var longitude = 0.0
-    private var altitude = 0.0
     private var nameLocation: String = ""
     private var siteId: Int = 0
 
@@ -133,7 +131,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
         siteLiveData.observeForever(siteObserve)
 
         guardianDeploymentLiveData =
-            Transformations.map(guardianDeploymentDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()) {
+            Transformations.map(deploymentDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()) {
                 it
             }
         guardianDeploymentLiveData.observeForever(guardianDeploymentObserve)
@@ -148,9 +146,9 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
         }
     }
 
-    private fun saveImages(deployment: EdgeDeployment) {
+    private fun saveImages(deployment: GuardianDeployment) {
         deploymentImageDb.deleteImages(deployment.id)
-//        deploymentImageDb.insertImage(deployment, _images)
+        deploymentImageDb.insertImage(deployment, _images)
     }
 
     override fun openWithEdgeDevice() {
@@ -201,7 +199,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
             is AudioMothCheckListFragment -> {
                 _deployment?.let {
                     it.passedChecks = passedChecks
-//                    edgeDeploymentDb.updateDeployment(it)
+                    deploymentDb.updateDeployment(it)
 
                     saveImages(it)
                 }
@@ -232,9 +230,11 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
         startFragment(DetailDeploymentSiteFragment.newInstance(id, name, isNewSite))
     }
 
-    override fun getDeployment(): EdgeDeployment? {
+    override fun getDeployment(): GuardianDeployment? {
         if (this._deployment == null) {
-            this._deployment = EdgeDeployment()
+            val dp = GuardianDeployment()
+            dp.device = Device.AUDIOMOTH.value
+            this._deployment = dp
         }
         return this._deployment
     }
@@ -246,7 +246,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
         return projectDb.getProjectByName(name)
     }
 
-    override fun setDeployment(deployment: EdgeDeployment) {
+    override fun setDeployment(deployment: GuardianDeployment) {
         this._deployment = deployment
     }
 
@@ -275,7 +275,8 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
     override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
 
     override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
-        val deployment = _deployment ?: EdgeDeployment()
+        val deployment = _deployment ?: GuardianDeployment()
+        deployment.device = Device.AUDIOMOTH.value
         deployment.isActive = locate.serverId == null
         deployment.state = DeploymentState.Edge.Locate.key // state
 
@@ -317,23 +318,17 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
             it.state = DeploymentState.Edge.ReadyToUpload.key
             setDeployment(it)
 
-//            val deploymentId = edgeDeploymentDb.insertOrUpdate(it, _deployLocation!!)
-//            this._locate?.let { loc ->
-//                locateDb.insertOrUpdateLocate(deploymentId, loc) // update locate - last deployment
-//            }
+            val deploymentId = deploymentDb.insertOrUpdateDeployment(it, _deployLocation!!)
+            this._locate?.let { loc ->
+                locateDb.insertOrUpdateLocate(deploymentId, loc) // update locate - last deployment
+            }
 
             if (useExistedLocation) {
                 this._locate?.let { locate ->
-//                    val deployments =
-//                        locate.serverId?.let { it1 -> edgeDeploymentDb.getDeploymentsBySiteId(it1) }
-                    val guardianDeployments = locate.serverId?.let { it1 ->
-                        guardianDeploymentDb.getDeploymentsBySiteId(it1)
-                    }
-//                    deployments?.forEach { deployment ->
-//                        edgeDeploymentDb.updateIsActive(deployment.id)
-//                    }
-                    guardianDeployments?.forEach { deployment ->
-                        guardianDeploymentDb.updateIsActive(deployment.id)
+                    val deployments =
+                        locate.serverId?.let { it1 -> deploymentDb.getDeploymentsBySiteId(it1) }
+                    deployments?.forEach { deployment ->
+                        deploymentDb.updateIsActive(deployment.id)
                     }
                 }
             }
@@ -474,35 +469,35 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
     }
 
     private fun handleDeploymentStep(deploymentId: Int) {
-//        val deployment = edgeDeploymentDb.getDeploymentById(deploymentId)
-//        if (deployment != null) {
-//            setDeployment(deployment)
-//
-//            if (deployment.stream != null) {
-//                _deployLocation = deployment.stream
-//            }
-//
-//            if (deployment.passedChecks != null) {
-//                val passedChecks = deployment.passedChecks
-//                this.passedChecks = passedChecks ?: RealmList<Int>()
-//            }
-//
-//            val images = deploymentImageDb.getImageByDeploymentId(deployment.id)
-//            if (images.isNotEmpty()) {
-//                val localPaths = arrayListOf<String>()
-//                images.forEach {
-//                    localPaths.add(it.localPath)
-//                }
-//                _images = localPaths
-//            }
-//
-//            currentCheck = if (deployment.state == 1) {
-//                deployment.state
-//            } else {
-//                deployment.state - 1
-//            }
-//            openWithEdgeDevice()
-//        }
+        val deployment = deploymentDb.getDeploymentById(deploymentId)
+        if (deployment != null) {
+            setDeployment(deployment)
+
+            if (deployment.stream != null) {
+                _deployLocation = deployment.stream
+            }
+
+            if (deployment.passedChecks != null) {
+                val passedChecks = deployment.passedChecks
+                this.passedChecks = passedChecks ?: RealmList<Int>()
+            }
+
+            val images = deploymentImageDb.getImageByDeploymentId(deployment.id)
+            if (images.isNotEmpty()) {
+                val localPaths = arrayListOf<String>()
+                images.forEach {
+                    localPaths.add(it.localPath)
+                }
+                _images = localPaths
+            }
+
+            currentCheck = if (deployment.state == 1) {
+                deployment.state
+            } else {
+                deployment.state - 1
+            }
+            openWithEdgeDevice()
+        }
     }
 
     private fun startFragment(fragment: Fragment) {
@@ -513,7 +508,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
 
     private fun updateDeploymentState(state: DeploymentState.Edge) {
         this._deployment?.state = state.key
-//        this._deployment?.let { edgeDeploymentDb.updateDeployment(it) }
+        this._deployment?.let { deploymentDb.updateDeployment(it) }
     }
 
     private fun showLoading() {
