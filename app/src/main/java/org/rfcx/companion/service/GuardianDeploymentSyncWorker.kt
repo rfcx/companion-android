@@ -39,7 +39,7 @@ class GuardianDeploymentSyncWorker(val context: Context, params: WorkerParameter
 
             if (it.serverId == null) {
                 val result = ApiManager.getInstance().getDeviceApi()
-                    .createGuardianDeployment(token, it.toRequestBody()).execute()
+                    .createDeployment(token, it.toRequestBody()).execute()
 
                 when {
                     result.isSuccessful -> {

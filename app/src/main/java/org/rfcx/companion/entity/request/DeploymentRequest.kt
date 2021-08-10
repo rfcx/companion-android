@@ -4,11 +4,10 @@ import com.google.gson.annotations.SerializedName
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.guardian.toRequestBody
-import org.rfcx.companion.util.randomDeploymentId
 import org.rfcx.companion.util.toISO8601Format
 import java.util.*
 
-data class GuardianDeploymentRequest(
+data class DeploymentRequest(
     var deploymentKey: String,
     var deploymentType: String,
     var deployedAt: String = Date().toISO8601Format(),
@@ -26,8 +25,8 @@ data class GuardianConfigurationRequest(
     var duration: Int = 90
 )
 
-fun GuardianDeployment.toRequestBody(): GuardianDeploymentRequest {
-    return GuardianDeploymentRequest(
+fun GuardianDeployment.toRequestBody(): DeploymentRequest {
+    return DeploymentRequest(
         deploymentKey = this.deploymentKey,
         deploymentType = Device.GUARDIAN.value,
         deployedAt = this.deployedAt.toISO8601Format(),
