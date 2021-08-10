@@ -65,7 +65,7 @@ import org.rfcx.companion.MainViewModel
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
-import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.localdb.*
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
@@ -108,7 +108,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
     private var deploymentMarkers = listOf<MapMarker.DeploymentMarker>()
     private var siteMarkers = listOf<MapMarker>()
-    private var showDeployments = listOf<GuardianDeployment>()
+    private var showDeployments = listOf<Deployment>()
 
     private lateinit var deploymentWorkInfoLiveData: LiveData<List<WorkInfo>>
     private lateinit var downloadStreamsWorkInfoLiveData: LiveData<List<WorkInfo>>

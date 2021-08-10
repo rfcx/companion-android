@@ -19,7 +19,7 @@ import java.io.Serializable
 import java.util.*
 
 @RealmClass
-open class GuardianDeployment(
+open class Deployment(
     @PrimaryKey
     var id: Int = 0,
     var serverId: String? = null,
@@ -63,11 +63,11 @@ open class GuardianDeployment(
     }
 }
 
-fun GuardianDeployment.isGuardian(): Boolean {
+fun Deployment.isGuardian(): Boolean {
     return this.device == Device.GUARDIAN.value
 }
 
-fun GuardianDeployment.toMark(context: Context): MapMarker.DeploymentMarker {
+fun Deployment.toMark(context: Context): MapMarker.DeploymentMarker {
     val color = stream?.project?.color
     val group = stream?.project?.name
     var pinImage = ""

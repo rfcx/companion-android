@@ -1,8 +1,6 @@
 package org.rfcx.companion.view.deployment
 
-import org.rfcx.companion.entity.*
-import org.rfcx.companion.entity.guardian.GuardianDeployment
-import org.rfcx.companion.service.DownloadStreamState
+import org.rfcx.companion.entity.guardian.Deployment
 
 interface AudioMothDeploymentProtocol : BaseDeploymentProtocol {
     fun openWithEdgeDevice()
@@ -10,9 +8,9 @@ interface AudioMothDeploymentProtocol : BaseDeploymentProtocol {
 
     fun startSyncing(status: String)
 
-    fun getDeployment(): GuardianDeployment?
+    fun getDeployment(): Deployment?
 
-    fun setDeployment(deployment: GuardianDeployment)
+    fun setDeployment(deployment: Deployment)
 
     fun playSyncSound()
 

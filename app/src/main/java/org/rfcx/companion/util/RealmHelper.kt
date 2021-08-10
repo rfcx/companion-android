@@ -5,7 +5,7 @@ import org.rfcx.companion.CompanionRealmMigration
 
 class RealmHelper {
     companion object {
-        private const val schemaVersion = 16L
+        private const val schemaVersion = 17L
 
         fun migrationConfig(): RealmConfiguration {
             return RealmConfiguration.Builder().apply {

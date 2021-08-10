@@ -4,7 +4,7 @@ import org.rfcx.companion.entity.DeploymentState
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.SyncState
 import org.rfcx.companion.entity.guardian.GuardianConfiguration
-import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.guardian.Deployment
 import java.util.*
 
 data class DeploymentResponse(
@@ -23,8 +23,8 @@ fun DeploymentResponse.isGuardian(): Boolean {
     return this.deploymentType == Device.GUARDIAN.value
 }
 
-fun DeploymentResponse.toGuardianDeployment(): GuardianDeployment {
-    return GuardianDeployment(
+fun DeploymentResponse.toGuardianDeployment(): Deployment {
+    return Deployment(
         serverId = this.id,
         deploymentKey = this.id ?: "",
         deployedAt = this.deployedAt ?: Date(),

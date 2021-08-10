@@ -19,7 +19,7 @@ import kotlinx.android.synthetic.main.activity_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
-import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.service.DownloadStreamState
@@ -49,7 +49,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
     private val trackingDb by lazy { TrackingDb(realm) }
     private val trackingFileDb by lazy { TrackingFileDb(realm) }
 
-    private var _deployment: GuardianDeployment? = null
+    private var _deployment: Deployment? = null
     private var _deployLocation: DeploymentLocation? = null
     private var _images: List<String> = listOf()
     private var _siteItems = arrayListOf<SiteWithLastDeploymentItem>()
@@ -77,10 +77,10 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
     private val analytics by lazy { Analytics(this) }
 
     // Local LiveData
-    private lateinit var guardianDeploymentLiveData: LiveData<List<GuardianDeployment>>
-    private var guardianDeployments = listOf<GuardianDeployment>()
-    private val guardianDeploymentObserve = Observer<List<GuardianDeployment>> {
-        this.guardianDeployments = it.filter { deployment -> deployment.isCompleted() }
+    private lateinit var deploymentLiveData: LiveData<List<Deployment>>
+    private var deployments = listOf<Deployment>()
+    private val deploymentObserve = Observer<List<Deployment>> {
+        this.deployments = it.filter { deployment -> deployment.isCompleted() }
         setSiteItems()
     }
 
@@ -114,7 +114,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
 
         _siteItems = getListSite(
             this,
-            guardianDeployments,
+            deployments,
             getString(R.string.none),
             currentLocation ?: loc,
             sites
@@ -130,11 +130,11 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
         }
         siteLiveData.observeForever(siteObserve)
 
-        guardianDeploymentLiveData =
+        deploymentLiveData =
             Transformations.map(deploymentDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()) {
                 it
             }
-        guardianDeploymentLiveData.observeForever(guardianDeploymentObserve)
+        deploymentLiveData.observeForever(deploymentObserve)
     }
 
     private fun setupToolbar() {
@@ -146,7 +146,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
         }
     }
 
-    private fun saveImages(deployment: GuardianDeployment) {
+    private fun saveImages(deployment: Deployment) {
         deploymentImageDb.deleteImages(deployment.id)
         deploymentImageDb.insertImage(deployment, _images)
     }
@@ -230,9 +230,9 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
         startFragment(DetailDeploymentSiteFragment.newInstance(id, name, isNewSite))
     }
 
-    override fun getDeployment(): GuardianDeployment? {
+    override fun getDeployment(): Deployment? {
         if (this._deployment == null) {
-            val dp = GuardianDeployment()
+            val dp = Deployment()
             dp.device = Device.AUDIOMOTH.value
             this._deployment = dp
         }
@@ -246,7 +246,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
         return projectDb.getProjectByName(name)
     }
 
-    override fun setDeployment(deployment: GuardianDeployment) {
+    override fun setDeployment(deployment: Deployment) {
         this._deployment = deployment
     }
 
@@ -275,7 +275,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
     override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
 
     override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
-        val deployment = _deployment ?: GuardianDeployment()
+        val deployment = _deployment ?: Deployment()
         deployment.device = Device.AUDIOMOTH.value
         deployment.isActive = locate.serverId == null
         deployment.state = DeploymentState.AudioMoth.Locate.key // state
@@ -579,7 +579,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
         super.onDestroy()
         fromUnfinishedDeployment = false
         siteLiveData.removeObserver(siteObserve)
-        guardianDeploymentLiveData.removeObserver(guardianDeploymentObserve)
+        deploymentLiveData.removeObserver(deploymentObserve)
     }
 
     companion object {

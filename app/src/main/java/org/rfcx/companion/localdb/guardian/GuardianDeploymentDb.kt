@@ -5,7 +5,7 @@ import io.realm.RealmResults
 import io.realm.Sort
 import io.realm.kotlin.deleteFromRealm
 import org.rfcx.companion.entity.*
-import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.guardian.isGuardian
 import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.toDeploymentLocation
@@ -16,42 +16,42 @@ import java.util.*
 class GuardianDeploymentDb(private val realm: Realm) {
 
     fun unsentCount(): Long {
-        val audioMoths = realm.where(GuardianDeployment::class.java)
-            .equalTo(GuardianDeployment.FIELD_DEVICE, Device.AUDIOMOTH.value)
+        val audioMoths = realm.where(Deployment::class.java)
+            .equalTo(Deployment.FIELD_DEVICE, Device.AUDIOMOTH.value)
             .and()
-            .equalTo(GuardianDeployment.FIELD_STATE, DeploymentState.AudioMoth.ReadyToUpload.key)
+            .equalTo(Deployment.FIELD_STATE, DeploymentState.AudioMoth.ReadyToUpload.key)
             .and()
-            .notEqualTo(GuardianDeployment.FIELD_SYNC_STATE, SyncState.Sent.key)
+            .notEqualTo(Deployment.FIELD_SYNC_STATE, SyncState.Sent.key)
             .count()
 
-        val guardians = realm.where(GuardianDeployment::class.java)
-            .equalTo(GuardianDeployment.FIELD_DEVICE, Device.GUARDIAN.value)
+        val guardians = realm.where(Deployment::class.java)
+            .equalTo(Deployment.FIELD_DEVICE, Device.GUARDIAN.value)
             .and()
-            .equalTo(GuardianDeployment.FIELD_STATE, DeploymentState.Guardian.ReadyToUpload.key)
+            .equalTo(Deployment.FIELD_STATE, DeploymentState.Guardian.ReadyToUpload.key)
             .and()
-            .notEqualTo(GuardianDeployment.FIELD_SYNC_STATE, SyncState.Sent.key)
+            .notEqualTo(Deployment.FIELD_SYNC_STATE, SyncState.Sent.key)
             .count()
 
         return audioMoths + guardians
     }
 
-    fun getAllResultsAsync(sort: Sort = Sort.DESCENDING): RealmResults<GuardianDeployment> {
-        return realm.where(GuardianDeployment::class.java)
-            .sort(GuardianDeployment.FIELD_ID, sort)
+    fun getAllResultsAsync(sort: Sort = Sort.DESCENDING): RealmResults<Deployment> {
+        return realm.where(Deployment::class.java)
+            .sort(Deployment.FIELD_ID, sort)
             .findAllAsync()
     }
 
-    fun getAllResultsAsyncWithinProject(sort: Sort = Sort.DESCENDING, project: String): RealmResults<GuardianDeployment> {
-        return realm.where(GuardianDeployment::class.java)
+    fun getAllResultsAsyncWithinProject(sort: Sort = Sort.DESCENDING, project: String): RealmResults<Deployment> {
+        return realm.where(Deployment::class.java)
             .equalTo("stream.project.name", project)
-            .sort(GuardianDeployment.FIELD_ID, sort)
+            .sort(Deployment.FIELD_ID, sort)
             .findAllAsync()
     }
 
     fun deleteDeploymentByStreamId(id: String) {
         realm.executeTransaction {
             val deployments =
-                it.where(GuardianDeployment::class.java).equalTo("stream.coreId", id)
+                it.where(Deployment::class.java).equalTo("stream.coreId", id)
                     .findAll()
             deployments.forEach { dp ->
                 dp.isActive = false
@@ -60,11 +60,11 @@ class GuardianDeploymentDb(private val realm: Realm) {
         }
     }
 
-    fun insertOrUpdateDeployment(deployment: GuardianDeployment, location: DeploymentLocation): Int {
+    fun insertOrUpdateDeployment(deployment: Deployment, location: DeploymentLocation): Int {
         var id = deployment.id
         realm.executeTransaction {
             if (deployment.id == 0) {
-                id = (it.where(GuardianDeployment::class.java).max(GuardianDeployment.FIELD_ID)
+                id = (it.where(Deployment::class.java).max(Deployment.FIELD_ID)
                     ?.toInt() ?: 0) + 1
                 deployment.id = id
             }
@@ -78,8 +78,8 @@ class GuardianDeploymentDb(private val realm: Realm) {
         realm.executeTransaction {
             deploymentResponses.forEach { deploymentResponse ->
                 val deployment =
-                    it.where(GuardianDeployment::class.java)
-                        .equalTo(GuardianDeployment.FIELD_SERVER_ID, deploymentResponse.id)
+                    it.where(Deployment::class.java)
+                        .equalTo(Deployment.FIELD_SERVER_ID, deploymentResponse.id)
                         .findFirst()
 
                 if (deployment != null) {
@@ -100,7 +100,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
                     deployment.createdAt = deploymentResponse.createdAt ?: deployment.createdAt
                 } else {
                     val deploymentObj = deploymentResponse.toGuardianDeployment()
-                    val id = (it.where(GuardianDeployment::class.java).max(GuardianDeployment.FIELD_ID)
+                    val id = (it.where(Deployment::class.java).max(Deployment.FIELD_ID)
                         ?.toInt() ?: 0) + 1
                     deploymentObj.id = id
                     it.insert(deploymentObj)
@@ -121,7 +121,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
     private fun mark(id: Int, serverId: String? = null, syncState: Int) {
         realm.executeTransaction {
             val deployment =
-                it.where(GuardianDeployment::class.java).equalTo(GuardianDeployment.FIELD_ID, id)
+                it.where(Deployment::class.java).equalTo(Deployment.FIELD_ID, id)
                     .findFirst()
             if (deployment != null) {
                 deployment.serverId = serverId
@@ -130,15 +130,15 @@ class GuardianDeploymentDb(private val realm: Realm) {
         }
     }
 
-    fun updateDeployment(deployment: GuardianDeployment) {
+    fun updateDeployment(deployment: Deployment) {
         realm.executeTransaction {
             it.insertOrUpdate(deployment)
         }
     }
 
-    fun getDeploymentById(id: Int): GuardianDeployment? {
+    fun getDeploymentById(id: Int): Deployment? {
         val deployment =
-            realm.where(GuardianDeployment::class.java).equalTo(GuardianDeployment.FIELD_ID, id)
+            realm.where(Deployment::class.java).equalTo(Deployment.FIELD_ID, id)
                 .findFirst()
         if (deployment != null) {
             return realm.copyFromRealm(deployment)
@@ -146,33 +146,33 @@ class GuardianDeploymentDb(private val realm: Realm) {
         return null
     }
 
-    fun getDeploymentByServerId(serverId: String): GuardianDeployment? {
+    fun getDeploymentByServerId(serverId: String): Deployment? {
         val deployment =
-            realm.where(GuardianDeployment::class.java)
-                .equalTo(GuardianDeployment.FIELD_SERVER_ID, serverId).findFirst()
+            realm.where(Deployment::class.java)
+                .equalTo(Deployment.FIELD_SERVER_ID, serverId).findFirst()
         if (deployment != null) {
             return realm.copyFromRealm(deployment)
         }
         return null
     }
 
-    fun lockUnsent(): List<GuardianDeployment> {
-        var unsentCopied: List<GuardianDeployment> = listOf()
+    fun lockUnsent(): List<Deployment> {
+        var unsentCopied: List<Deployment> = listOf()
         realm.executeTransaction {
-            val unsentGuardian = it.where(GuardianDeployment::class.java)
-                .equalTo(GuardianDeployment.FIELD_DEVICE, Device.GUARDIAN.value)
+            val unsentGuardian = it.where(Deployment::class.java)
+                .equalTo(Deployment.FIELD_DEVICE, Device.GUARDIAN.value)
                 .and()
-                .equalTo(GuardianDeployment.FIELD_STATE, DeploymentState.Guardian.ReadyToUpload.key)
+                .equalTo(Deployment.FIELD_STATE, DeploymentState.Guardian.ReadyToUpload.key)
                 .and()
-                .equalTo(GuardianDeployment.FIELD_SYNC_STATE, SyncState.Unsent.key).findAll()
+                .equalTo(Deployment.FIELD_SYNC_STATE, SyncState.Unsent.key).findAll()
                 .createSnapshot()
 
-            val unsentAudioMoth = it.where(GuardianDeployment::class.java)
-                .equalTo(GuardianDeployment.FIELD_DEVICE, Device.AUDIOMOTH.value)
+            val unsentAudioMoth = it.where(Deployment::class.java)
+                .equalTo(Deployment.FIELD_DEVICE, Device.AUDIOMOTH.value)
                 .and()
-                .equalTo(GuardianDeployment.FIELD_STATE, DeploymentState.AudioMoth.ReadyToUpload.key)
+                .equalTo(Deployment.FIELD_STATE, DeploymentState.AudioMoth.ReadyToUpload.key)
                 .and()
-                .equalTo(GuardianDeployment.FIELD_SYNC_STATE, SyncState.Unsent.key).findAll()
+                .equalTo(Deployment.FIELD_SYNC_STATE, SyncState.Unsent.key).findAll()
                 .createSnapshot()
 
             unsentCopied = (unsentGuardian + unsentAudioMoth)
@@ -185,8 +185,8 @@ class GuardianDeploymentDb(private val realm: Realm) {
 
     fun unlockSending() {
         realm.executeTransaction {
-            val snapshot = it.where(GuardianDeployment::class.java)
-                .equalTo(GuardianDeployment.FIELD_SYNC_STATE, SyncState.Sending.key).findAll()
+            val snapshot = it.where(Deployment::class.java)
+                .equalTo(Deployment.FIELD_SYNC_STATE, SyncState.Sending.key).findAll()
                 .createSnapshot()
             snapshot.forEach { deployment ->
                 deployment.syncState = SyncState.Unsent.key
@@ -222,7 +222,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
         realm.executeTransactionAsync({ bgRealm ->
             // do update deployment location
             val deployment =
-                bgRealm.where(GuardianDeployment::class.java).equalTo(GuardianDeployment.FIELD_ID, id)
+                bgRealm.where(Deployment::class.java).equalTo(Deployment.FIELD_ID, id)
                     .findFirst()
             if (deployment?.stream != null) {
                 deployment.stream?.name = locationName
@@ -279,7 +279,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
         realm.executeTransactionAsync({ bgRealm ->
             // do update deployment location
             val guardianDeployment =
-                bgRealm.where(GuardianDeployment::class.java).equalTo(GuardianDeployment.FIELD_ID, id)
+                bgRealm.where(Deployment::class.java).equalTo(Deployment.FIELD_ID, id)
                     .findFirst()
             if (guardianDeployment?.stream != null) {
                 guardianDeployment.updatedAt = Date()
@@ -313,10 +313,10 @@ class GuardianDeploymentDb(private val realm: Realm) {
         })
     }
 
-    fun updateDeploymentByServerId(deployment: GuardianDeployment) {
+    fun updateDeploymentByServerId(deployment: Deployment) {
         realm.executeTransaction {
-            it.where(GuardianDeployment::class.java)
-                .equalTo(GuardianDeployment.FIELD_SERVER_ID, deployment.serverId)
+            it.where(Deployment::class.java)
+                .equalTo(Deployment.FIELD_SERVER_ID, deployment.serverId)
                 .findFirst()?.apply {
                     stream?.coreId = deployment.stream?.coreId
                 }
@@ -326,7 +326,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
     fun updateIsActive(id: Int) {
         realm.executeTransaction {
             val deployment =
-                it.where(GuardianDeployment::class.java).equalTo(GuardianDeployment.FIELD_ID, id)
+                it.where(Deployment::class.java).equalTo(Deployment.FIELD_ID, id)
                     .findFirst()
             if (deployment != null) {
                 deployment.isActive = false
@@ -334,15 +334,15 @@ class GuardianDeploymentDb(private val realm: Realm) {
         }
     }
 
-    fun getDeploymentsBySiteId(streamId: String): ArrayList<GuardianDeployment> {
-        val deployments = realm.where(GuardianDeployment::class.java)
-            .equalTo(GuardianDeployment.FIELD_STATE, DeploymentState.Guardian.ReadyToUpload.key)
+    fun getDeploymentsBySiteId(streamId: String): ArrayList<Deployment> {
+        val deployments = realm.where(Deployment::class.java)
+            .equalTo(Deployment.FIELD_STATE, DeploymentState.Guardian.ReadyToUpload.key)
             .and()
-            .equalTo(GuardianDeployment.FIELD_SYNC_STATE, SyncState.Sent.key)
+            .equalTo(Deployment.FIELD_SYNC_STATE, SyncState.Sent.key)
             .and()
             .equalTo("stream.coreId", streamId)
             .findAllAsync()
-        val arrayOfId = arrayListOf<GuardianDeployment>()
+        val arrayOfId = arrayListOf<Deployment>()
         deployments.forEach {
             it?.let { it1 -> arrayOfId.add(it1) }
         }
@@ -352,7 +352,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
     fun deleteDeployment(id: Int) {
         realm.executeTransaction {
             val deployment =
-                it.where(GuardianDeployment::class.java).equalTo(GuardianDeployment.FIELD_ID, id)
+                it.where(Deployment::class.java).equalTo(Deployment.FIELD_ID, id)
                     .findFirst()
             deployment?.deleteFromRealm()
         }
@@ -362,7 +362,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
         realm.executeTransactionAsync({ bgRealm ->
             // do update and set delete deployment
             val deployment =
-                bgRealm.where(GuardianDeployment::class.java).equalTo(GuardianDeployment.FIELD_ID, id)
+                bgRealm.where(Deployment::class.java).equalTo(Deployment.FIELD_ID, id)
                     .findFirst()
             if (deployment?.stream != null) {
                 deployment.deletedAt = Date()

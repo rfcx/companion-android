@@ -17,7 +17,7 @@ import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition
 import io.realm.RealmResults
 import org.json.JSONObject
 import org.rfcx.companion.entity.*
-import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.guardian.toMark
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.ProjectByIdResponse
@@ -43,13 +43,13 @@ class MainViewModel(
     private val deploymentMarkers = MutableLiveData<Resource<List<MapMarker.DeploymentMarker>>>()
     private val siteMarkers = MutableLiveData<Resource<List<MapMarker>>>()
     private val siteList = MutableLiveData<Resource<List<Locate>>>()
-    private val showGuardianDeployments = MutableLiveData<Resource<List<GuardianDeployment>>>()
+    private val showGuardianDeployments = MutableLiveData<Resource<List<Deployment>>>()
 
-    private var deployments = listOf<GuardianDeployment>()
+    private var deployments = listOf<Deployment>()
     private var sites = listOf<Locate>()
 
-    private lateinit var deploymentLiveData: LiveData<List<GuardianDeployment>>
-    private val deploymentObserve = Observer<List<GuardianDeployment>> {
+    private lateinit var deploymentLiveData: LiveData<List<Deployment>>
+    private val deploymentObserve = Observer<List<Deployment>> {
         deployments = it
         combinedData()
     }
@@ -362,7 +362,7 @@ class MainViewModel(
         return siteList
     }
 
-    fun getShowGuardianDeployments(): LiveData<Resource<List<GuardianDeployment>>> {
+    fun getShowGuardianDeployments(): LiveData<Resource<List<Deployment>>> {
         return showGuardianDeployments
     }
 
@@ -382,7 +382,7 @@ class MainViewModel(
         return mainRepository.getDeploymentUnsentCount()
     }
 
-    fun getGuardianDeploymentById(id: Int): GuardianDeployment? {
+    fun getGuardianDeploymentById(id: Int): Deployment? {
         return mainRepository.getGuardianDeploymentById(id)
     }
 

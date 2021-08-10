@@ -21,7 +21,7 @@ import org.rfcx.companion.connection.wifi.WifiHotspotManager
 import org.rfcx.companion.connection.wifi.WifiLostListener
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianConfiguration
-import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.socket.request.CheckinCommand
 import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
@@ -60,7 +60,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private val trackingDb by lazy { TrackingDb(realm) }
     private val trackingFileDb by lazy { TrackingFileDb(realm) }
 
-    private var _deployment: GuardianDeployment? = null
+    private var _deployment: Deployment? = null
     private var _deployLocation: DeploymentLocation? = null
     private var _configuration: GuardianConfiguration? = null
     private var _images: List<String> = listOf()
@@ -95,9 +95,9 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private val preferences = Preferences.getInstance(this)
 
     // Local LiveData
-    private lateinit var guardianDeploymentLiveData: LiveData<List<GuardianDeployment>>
-    private var guardianDeployments = listOf<GuardianDeployment>()
-    private val guardianDeploymentObserve = Observer<List<GuardianDeployment>> {
+    private lateinit var deploymentLiveData: LiveData<List<Deployment>>
+    private var guardianDeployments = listOf<Deployment>()
+    private val guardianDeploymentObserve = Observer<List<Deployment>> {
         this.guardianDeployments = it.filter { deployment -> deployment.isCompleted() }
         setSiteItems()
     }
@@ -186,11 +186,11 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         }
         siteLiveData.observeForever(siteObserve)
 
-        guardianDeploymentLiveData =
+        deploymentLiveData =
             Transformations.map(guardianDeploymentDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()) {
                 it
             }
-        guardianDeploymentLiveData.observeForever(guardianDeploymentObserve)
+        deploymentLiveData.observeForever(guardianDeploymentObserve)
     }
 
     private fun setSiteItems() {
@@ -217,14 +217,14 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun isOpenedFromUnfinishedDeployment(): Boolean = false // guardian not have this feature so return false
 
-    override fun getDeployment(): GuardianDeployment? = this._deployment ?: GuardianDeployment()
+    override fun getDeployment(): Deployment? = this._deployment ?: Deployment()
 
-    override fun setDeployment(deployment: GuardianDeployment) {
+    override fun setDeployment(deployment: Deployment) {
         this._deployment = deployment
     }
 
     override fun setDeploymentWifiName(name: String) {
-        val deployment = _deployment ?: GuardianDeployment()
+        val deployment = _deployment ?: Deployment()
         deployment.wifiName = name
         setDeployment(deployment)
     }
@@ -292,7 +292,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     override fun getCurrentLocation(): Location = currentLocation ?: Location(LocationManager.GPS_PROVIDER)
 
     override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
-        val deployment = _deployment ?: GuardianDeployment()
+        val deployment = _deployment ?: Deployment()
         deployment.isActive = locate.serverId == null
         deployment.state = DeploymentState.Guardian.Locate.key // state
 
@@ -357,7 +357,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         }
     }
 
-    private fun saveImages(deployment: GuardianDeployment) {
+    private fun saveImages(deployment: Deployment) {
         deploymentImageDb.deleteImages(deployment.id)
         deploymentImageDb.insertImage(deployment, _images)
     }
@@ -563,7 +563,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         super.onDestroy()
         this.prefsEditor?.clear()?.apply()
         siteLiveData.removeObserver(siteObserve)
-        guardianDeploymentLiveData.removeObserver(guardianDeploymentObserve)
+        deploymentLiveData.removeObserver(guardianDeploymentObserve)
         unregisterWifiConnectionLostListener()
     }
 

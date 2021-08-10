@@ -25,7 +25,7 @@ import org.rfcx.companion.entity.DeploymentImage
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.guardian.GuardianConfiguration
-import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.guardian.getRecordTime
 import org.rfcx.companion.entity.guardian.toReadableFormat
 import org.rfcx.companion.entity.socket.response.Status
@@ -64,7 +64,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
     private var altitude: Double? = null
     private var locationName: String? = null
     private var isConnected: Boolean? = null
-    private var deployment: GuardianDeployment? = null
+    private var deployment: Deployment? = null
     private var deploymentServerId: String? = null
     private var configuration: GuardianConfiguration? = null
     private val analytics by lazy { Analytics(this) }
@@ -101,7 +101,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
 
     private fun getIntentExtra() {
         isConnected = intent.extras?.getBoolean(IS_CONNECTED)
-        deployment = intent.extras?.getSerializable(DEPLOYMENT) as GuardianDeployment
+        deployment = intent.extras?.getSerializable(DEPLOYMENT) as Deployment
         lat = deployment?.stream?.latitude ?: 0.0
         long = deployment?.stream?.longitude ?: 0.0
         altitude = deployment?.stream?.altitude ?: 0.0
@@ -289,7 +289,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
         }
     }
 
-    private fun updateDeploymentDetailView(deployment: GuardianDeployment) {
+    private fun updateDeploymentDetailView(deployment: Deployment) {
         val location = deployment.stream
         location?.let { locate ->
             latitudeValue.text = locate.latitude.latitudeCoordinates(this)
@@ -404,7 +404,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
             context.startActivity(intent)
         }
 
-        fun startActivity(context: Context, deployment: GuardianDeployment, isConnected: Boolean) {
+        fun startActivity(context: Context, deployment: Deployment, isConnected: Boolean) {
             val intent = Intent(context, DiagnosticActivity::class.java)
             intent.putExtra(IS_CONNECTED, isConnected)
             intent.putExtra(DEPLOYMENT, deployment)

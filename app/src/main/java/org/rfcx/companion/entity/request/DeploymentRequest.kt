@@ -1,8 +1,7 @@
 package org.rfcx.companion.entity.request
 
 import com.google.gson.annotations.SerializedName
-import org.rfcx.companion.entity.Device
-import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.guardian.toRequestBody
 import org.rfcx.companion.util.toISO8601Format
 import java.util.*
@@ -25,10 +24,10 @@ data class GuardianConfigurationRequest(
     var duration: Int = 90
 )
 
-fun GuardianDeployment.toRequestBody(): DeploymentRequest {
+fun Deployment.toRequestBody(): DeploymentRequest {
     return DeploymentRequest(
         deploymentKey = this.deploymentKey,
-        deploymentType = Device.GUARDIAN.value,
+        deploymentType = this.device ?: "",
         deployedAt = this.deployedAt.toISO8601Format(),
         wifi = this.wifiName,
         configuration = this.configuration?.toRequestBody(),

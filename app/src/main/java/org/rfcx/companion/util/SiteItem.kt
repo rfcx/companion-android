@@ -5,7 +5,7 @@ import android.location.Location
 import android.location.LocationManager
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Locate
-import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import java.util.*
 import kotlin.collections.ArrayList
@@ -31,7 +31,7 @@ private fun findNearLocations(
 
 fun getListSite(
     context: Context,
-    deploymentList: List<GuardianDeployment>,
+    deploymentList: List<Deployment>,
     projectName: String,
     currentUserLocation: Location,
     locations: List<Locate>
@@ -61,7 +61,7 @@ fun getListSite(
 }
 
 fun isHaveDeployment(
-    deployments: List<GuardianDeployment>,
+    deployments: List<Deployment>,
     locate: Locate
 ): Date? {
     return deployments.find { dp -> dp.stream?.name == locate.name }?.deployedAt
@@ -69,7 +69,7 @@ fun isHaveDeployment(
 
 fun getListSiteWithOutCurrentLocation(
     context: Context,
-    deployments: List<GuardianDeployment>,
+    deployments: List<Deployment>,
     projectName: String,
     locations: List<Locate>
 ): ArrayList<SiteWithLastDeploymentItem> {
