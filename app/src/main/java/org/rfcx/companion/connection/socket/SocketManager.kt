@@ -3,14 +3,14 @@ package org.rfcx.companion.connection.socket
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
-import java.io.DataInputStream
-import java.io.DataOutputStream
-import java.net.Socket
 import org.json.JSONObject
 import org.rfcx.companion.entity.socket.request.*
 import org.rfcx.companion.entity.socket.response.*
 import org.rfcx.companion.util.MicrophoneTestUtils
 import org.rfcx.companion.util.Preferences
+import java.io.DataInputStream
+import java.io.DataOutputStream
+import java.net.Socket
 
 object SocketManager {
 
@@ -180,8 +180,8 @@ object SocketManager {
         sendMessage(data)
     }
 
-    private fun sendInstructionMessage(type: InstructionType, command: InstructionCommand, meta: String? = null) {
-        val data = gson.toJson(InstructionMessage(type, command, meta))
+    fun sendInstructionMessage(type: InstructionType, command: InstructionCommand, meta: String = "{}") {
+        val data = gson.toJson(InstructionMessage.toMessage(type, command, meta))
         sendMessage(data)
     }
 

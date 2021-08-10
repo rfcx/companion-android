@@ -1,9 +1,32 @@
 package org.rfcx.companion.entity.socket.request
 
+import kotlin.random.Random
+
 data class InstructionMessage(
-    val type: InstructionType,
-    val command: InstructionCommand,
-    val meta: String?
+    val instructions: List<Instruction>
+) {
+    companion object {
+        fun toMessage(
+            type: InstructionType,
+            cmd: InstructionCommand,
+            meta: String
+        ): InstructionMessage {
+            val instruction = Instruction(
+                type = type.value,
+                command = cmd.value,
+                meta = meta
+            )
+            return InstructionMessage(listOf(instruction))
+        }
+    }
+}
+
+data class Instruction(
+    val id: Int = Random.nextInt(1, 100),
+    val type: String,
+    val command: String,
+    val at: String = "",
+    val meta: String = "{}"
 )
 
 enum class InstructionType(val value: String) {
@@ -15,6 +38,7 @@ enum class InstructionType(val value: String) {
 enum class InstructionCommand(val value: String) {
     PREFS("prefs"),
     WIFI("wifi"),
-    PING("ping")
+    PING("ping"),
+    IDENTITY("identity")
 }
 

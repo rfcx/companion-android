@@ -352,7 +352,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
                 json.addProperty(it.key, it.value)
             }
 
-            SocketManager.syncConfiguration(Gson().toJson(json))
+            SocketManager.syncConfiguration(json.toString())
             SocketManager.syncConfiguration.observe(this, Observer { syncConfiguration ->
                 if (syncConfiguration.sync.status == Status.SUCCESS.value) {
                     showSuccessResponse()

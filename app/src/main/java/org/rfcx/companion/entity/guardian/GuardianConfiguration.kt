@@ -26,7 +26,7 @@ fun GuardianConfiguration.toListForGuardian(): String {
         addProperty("audio_encode_codec", fileFormat)
         addProperty("audio_cycle_duration", duration)
     }
-    return Gson().toJson(json)
+    return json.toString()
 }
 
 fun GuardianConfiguration.toReadableFormat(): GuardianConfiguration {

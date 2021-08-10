@@ -620,7 +620,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                 json.addProperty(it.key, it.value)
             }
         }
-        return Gson().toJson(json)
+        return json.toString()
     }
 
     override fun showSyncButton() { /* not used */
