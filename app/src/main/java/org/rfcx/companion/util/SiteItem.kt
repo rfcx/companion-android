@@ -4,7 +4,6 @@ import android.content.Context
 import android.location.Location
 import android.location.LocationManager
 import org.rfcx.companion.R
-import org.rfcx.companion.entity.EdgeDeployment
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
@@ -53,7 +52,7 @@ fun getListSite(
         nearLocations?.map {
             SiteWithLastDeploymentItem(
                 it.first,
-                deployments.find { dp -> dp.stream?.name == it.first.name }?.deployedAt,
+                isHaveDeployment(deployments, it.first),
                 it.second
             )
         } ?: listOf()
@@ -62,32 +61,22 @@ fun getListSite(
 }
 
 fun isHaveDeployment(
-    guardians: List<GuardianDeployment>,
-    audioMoths: List<EdgeDeployment>,
+    deployments: List<GuardianDeployment>,
     locate: Locate
 ): Date? {
-    val guardianDeployAt = guardians.find { dp -> dp.stream?.name == locate.name }?.deployedAt
-    val audioMothDeployAt = audioMoths.find { dp -> dp.stream?.name == locate.name }?.deployedAt
-
-    return if (audioMothDeployAt != null && guardianDeployAt != null) {
-        if (audioMothDeployAt.time > guardianDeployAt.time) audioMothDeployAt else guardianDeployAt
-    } else audioMothDeployAt ?: guardianDeployAt
+    return deployments.find { dp -> dp.stream?.name == locate.name }?.deployedAt
 }
 
 fun getListSiteWithOutCurrentLocation(
     context: Context,
-    edgeDeployments: List<EdgeDeployment>,
-    guardianDeployments: List<GuardianDeployment>,
+    deployments: List<GuardianDeployment>,
     projectName: String,
     locations: List<Locate>
 ): ArrayList<SiteWithLastDeploymentItem> {
-    var showDeployments = edgeDeployments
-    var guardianShowDeployments = guardianDeployments
+    var showDeployments = deployments
     if (projectName != context.getString(R.string.none)) {
         showDeployments =
-            showDeployments.filter { it.stream?.project?.name == projectName }
-        guardianShowDeployments =
-            guardianDeployments.filter { it.stream?.project?.name == projectName }
+            deployments.filter { it.stream?.project?.name == projectName }
     }
 
     val filterLocations = ArrayList(locations.filter { loc ->
@@ -100,7 +89,7 @@ fun getListSiteWithOutCurrentLocation(
         filterLocations.map {
             SiteWithLastDeploymentItem(
                 it,
-                isHaveDeployment(guardianShowDeployments, showDeployments, it),
+                isHaveDeployment(showDeployments, it),
                 null
             )
         }

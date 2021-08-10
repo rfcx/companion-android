@@ -362,7 +362,7 @@ class GuardianDeploymentDb(private val realm: Realm) {
         realm.executeTransactionAsync({ bgRealm ->
             // do update and set delete deployment
             val deployment =
-                bgRealm.where(EdgeDeployment::class.java).equalTo(GuardianDeployment.FIELD_ID, id)
+                bgRealm.where(GuardianDeployment::class.java).equalTo(GuardianDeployment.FIELD_ID, id)
                     .findFirst()
             if (deployment?.stream != null) {
                 deployment.deletedAt = Date()

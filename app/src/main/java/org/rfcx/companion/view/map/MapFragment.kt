@@ -108,8 +108,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
     private var deploymentMarkers = listOf<MapMarker.DeploymentMarker>()
     private var siteMarkers = listOf<MapMarker>()
-    private var showDeployments = listOf<EdgeDeployment>()
-    private var showGuardianDeployments = listOf<GuardianDeployment>()
+    private var showDeployments = listOf<GuardianDeployment>()
 
     private lateinit var deploymentWorkInfoLiveData: LiveData<List<WorkInfo>>
     private lateinit var downloadStreamsWorkInfoLiveData: LiveData<List<WorkInfo>>
@@ -917,7 +916,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         if (currentLocation != null) {
             adapterOfSearchSite = getListSite(
                 requireContext(),
-                showGuardianDeployments,
+                showDeployments,
                 projectName,
                 currentLocation,
                 locations
@@ -927,7 +926,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             adapterOfSearchSite = getListSiteWithOutCurrentLocation(
                 requireContext(),
                 showDeployments,
-                showGuardianDeployments,
                 projectName,
                 locations
             )
@@ -1007,22 +1005,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             }
         })
 
-        mainViewModel.getShowDeployments().observe(viewLifecycleOwner, Observer {
-            when (it.status) {
-                Status.LOADING -> {}
-                Status.SUCCESS -> {
-                    showDeployments = it.data ?: listOf()
-                    combinedData()
-                }
-                Status.ERROR -> {}
-            }
-        })
-
         mainViewModel.getShowGuardianDeployments().observe(viewLifecycleOwner, Observer {
             when (it.status) {
                 Status.LOADING -> {}
                 Status.SUCCESS -> {
-                    showGuardianDeployments = it.data ?: listOf()
+                    showDeployments = it.data ?: listOf()
                     combinedData()
                 }
                 Status.ERROR -> {}
