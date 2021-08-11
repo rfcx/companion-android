@@ -18,7 +18,6 @@ import io.realm.Realm
 import io.realm.RealmList
 import kotlinx.android.synthetic.main.activity_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
-import org.rfcx.companion.MainViewModel
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
@@ -28,9 +27,9 @@ import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
+import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
-import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.Preferences.Companion.ENABLE_LOCATION_TRACKING
 import org.rfcx.companion.util.geojson.GeoJsonUtils
@@ -44,14 +43,14 @@ import org.rfcx.companion.view.detail.MapPickerProtocol
 import org.rfcx.companion.view.dialog.*
 import java.util.*
 
-class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProtocol, CompleteListener,
+class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProtocol,
+    CompleteListener,
     MapPickerProtocol {
     private lateinit var audioMothDeploymentViewModel: AudioMothDeploymentViewModel
 
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val deploymentDb by lazy { GuardianDeploymentDb(realm) }
-    private val locateDb by lazy { LocateDb(realm) }
     private val projectDb by lazy { ProjectDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val trackingDb by lazy { TrackingDb(realm) }
@@ -145,13 +144,17 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
         val project = projectDb.getProjectById(projectId)
         val projectName = project?.name ?: getString(R.string.none)
-        siteLiveData = Transformations.map(locateDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()) {
+        siteLiveData = Transformations.map(
+            audioMothDeploymentViewModel.getAllResultsAsyncWithinProject(projectName).asLiveData()
+        ) {
             it
         }
         siteLiveData.observeForever(siteObserve)
 
         deploymentLiveData =
-            Transformations.map(deploymentDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()) {
+            Transformations.map(
+                deploymentDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()
+            ) {
                 it
             }
         deploymentLiveData.observeForever(deploymentObserve)
@@ -304,7 +307,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
         this._locate = locate
         useExistedLocation = isExisted
         if (!useExistedLocation) {
-            locateDb.insertOrUpdate(locate)
+            audioMothDeploymentViewModel.insertOrUpdate(locate)
         }
 
         setDeployment(deployment)
@@ -340,7 +343,10 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
 
             val deploymentId = deploymentDb.insertOrUpdateDeployment(it, _deployLocation!!)
             this._locate?.let { loc ->
-                locateDb.insertOrUpdateLocate(deploymentId, loc) // update locate - last deployment
+                audioMothDeploymentViewModel.insertOrUpdateLocate(
+                    deploymentId,
+                    loc
+                ) // update locate - last deployment
             }
 
             if (useExistedLocation) {
@@ -438,12 +444,21 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
         siteId: Int,
         name: String
     ) {
-        startFragment(DetailDeploymentSiteFragment.newInstance(latitude, longitude, siteId, name, true))
+        startFragment(
+            DetailDeploymentSiteFragment.newInstance(
+                latitude,
+                longitude,
+                siteId,
+                name,
+                true
+            )
+        )
     }
 
     override fun playSyncSound() {
         val deploymentId = getDeployment()?.deploymentKey
-        val deploymentIdArrayInt = deploymentId?.chunked(2)?.map { it.toInt(radix = 16) }?.toTypedArray() ?: arrayOf()
+        val deploymentIdArrayInt =
+            deploymentId?.chunked(2)?.map { it.toInt(radix = 16) }?.toTypedArray() ?: arrayOf()
         val calendar = Calendar.getInstance()
         Thread {
             audioMothConnector.playTimeAndDeploymentID(
@@ -451,7 +466,8 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
                 deploymentIdArrayInt
             )
             this@AudioMothDeploymentActivity.runOnUiThread {
-                val fragment = supportFragmentManager.findFragmentById(R.id.contentContainer) as NewSyncFragment
+                val fragment =
+                    supportFragmentManager.findFragmentById(R.id.contentContainer) as NewSyncFragment
                 fragment.showRepeatSync()
             }
         }.start()
