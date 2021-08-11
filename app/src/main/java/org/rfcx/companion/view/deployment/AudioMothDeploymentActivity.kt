@@ -13,15 +13,21 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
+import androidx.lifecycle.ViewModelProvider
 import io.realm.Realm
 import io.realm.RealmList
 import kotlinx.android.synthetic.main.activity_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
+import org.rfcx.companion.MainViewModel
 import org.rfcx.companion.R
+import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
+import org.rfcx.companion.repo.api.DeviceApiHelper
+import org.rfcx.companion.repo.api.DeviceApiServiceImpl
+import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.service.DeploymentSyncWorker
@@ -40,6 +46,8 @@ import java.util.*
 
 class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProtocol, CompleteListener,
     MapPickerProtocol {
+    private lateinit var audioMothDeploymentViewModel: AudioMothDeploymentViewModel
+
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val deploymentDb by lazy { GuardianDeploymentDb(realm) }
@@ -96,6 +104,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
         setContentView(R.layout.activity_deployment)
 
         setupToolbar()
+        setViewModel()
         setLiveData()
         preferences.clearSelectedProject()
         this.currentLocation = this.getLastLocation()
@@ -105,6 +114,17 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
         } else {
             openWithEdgeDevice()
         }
+    }
+
+    private fun setViewModel() {
+        audioMothDeploymentViewModel = ViewModelProvider(
+            this,
+            ViewModelFactory(
+                application,
+                DeviceApiHelper(DeviceApiServiceImpl()),
+                LocalDataHelper()
+            )
+        ).get(AudioMothDeploymentViewModel::class.java)
     }
 
     private fun setSiteItems() {
