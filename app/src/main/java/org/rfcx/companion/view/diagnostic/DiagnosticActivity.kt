@@ -11,11 +11,9 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
-import androidx.preference.PreferenceManager
+import androidx.preference.Preference
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
-import com.google.gson.Gson
-import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_guardian_diagnostic.*
@@ -360,6 +358,10 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
 
     override fun setEditor(editor: SharedPreferences.Editor) {
         this.prefsEditor = editor
+    }
+
+    override fun getPrefs(): List<Preference>? {
+        TODO("Not yet implemented")
     }
 
     override fun onBackPressed() {

@@ -60,13 +60,7 @@ class GuardianAdvancedFragment : Fragment() {
     private fun syncConfig() {
         val prefs = syncPreferenceListener?.getPrefsChanges() ?: ""
         SocketManager.syncConfiguration(prefs)
-        SocketManager.syncConfiguration.observe(viewLifecycleOwner, Observer {
-            requireActivity().runOnUiThread {
-                if (it.sync.status == Status.SUCCESS.value) {
-                    deploymentProtocol?.nextStep()
-                }
-            }
-        })
+        deploymentProtocol?.nextStep()
     }
 
     override fun onDetach() {

@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
+import com.google.gson.JsonObject
 import org.json.JSONObject
 import org.rfcx.companion.entity.socket.request.*
 import org.rfcx.companion.entity.socket.response.*
@@ -59,6 +60,8 @@ object SocketManager {
     val register = MutableLiveData<RegisterResponse>()
     val isRegistered = MutableLiveData<CheckGuardianRegistered>()
     val recorderState = MutableLiveData<RecorderStateResponse>()
+
+    val pingBlob = MutableLiveData<Ping>()
 
     init {
         connection.postValue(ConnectionResponse())
@@ -255,6 +258,9 @@ object SocketManager {
 
                         val receiveJson = JSONObject(dataInput)
                         val jsonIterator = receiveJson.keys()
+
+                        val ping = gson.fromJson(dataInput, Ping::class.java)
+                        pingBlob.postValue(ping)
 
                         Log.d("SocketComm", dataInput)
 

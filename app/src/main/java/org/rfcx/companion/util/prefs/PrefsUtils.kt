@@ -7,7 +7,10 @@ import com.google.gson.JsonParser
 
 object PrefsUtils {
 
-    fun stringToPrefs(context: Context, str: String): List<Preference> {
+    fun stringToPrefs(context: Context, str: String?): List<Preference> {
+        if (str == null) {
+            return listOf()
+        }
         val prefs = arrayListOf<Preference>()
         val json = JsonParser.parseString(str).asJsonObject
         val keys = json.keySet()
