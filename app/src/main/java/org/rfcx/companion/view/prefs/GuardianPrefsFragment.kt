@@ -3,9 +3,13 @@ package org.rfcx.companion.view.prefs
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import androidx.preference.Preference
+import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
+import com.google.gson.JsonObject
 import org.rfcx.companion.R
+import org.rfcx.companion.util.prefs.PrefsUtils
 
 class GuardianPrefsFragment : PreferenceFragmentCompat(),
     SharedPreferences.OnSharedPreferenceChangeListener {
@@ -27,8 +31,20 @@ class GuardianPrefsFragment : PreferenceFragmentCompat(),
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        addPreferencesFromResource(R.xml.prefs)
+        val preferenceCategory = PreferenceCategory(preferenceScreen.context)
+        preferenceCategory.title = "Guardian Prefs"
+        preferenceScreen.addPreference(preferenceCategory)
+
+        val json = JsonObject().also {
+            it.addProperty("pref1", "1")
+            it.addProperty("pref2", "2")
+            it.addProperty("pref3", "3")
+            it.addProperty("pref4", "4")
+        }
+        prefs = PrefsUtils.stringToPrefs(preferenceScreen.context, json.toString())
         prefs.forEach {
-            preferenceScreen.addPreference(it)
+            preferenceCategory.addPreference(it)
         }
         syncPreferenceListener?.setEditor(preferenceScreen.sharedPreferences.edit())
     }
