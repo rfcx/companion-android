@@ -1,9 +1,11 @@
 package org.rfcx.companion.view.deployment
 
 import io.realm.RealmResults
-import org.rfcx.companion.entity.Locate
+import org.rfcx.companion.entity.*
+import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.local.LocalDataHelper
+import java.util.*
 
 class AudioMothDeploymentRepository(
     private val deviceApiHelper: DeviceApiHelper,
@@ -21,6 +23,63 @@ class AudioMothDeploymentRepository(
 
     fun insertOrUpdateLocate(deploymentId: Int, locate: Locate) {
         localDataHelper.getLocateLocalDb().insertOrUpdateLocate(deploymentId, locate)
+    }
+
+    fun getProjectById(id: Int): Project? {
+        return localDataHelper.getProjectLocalDb().getProjectById(id)
+    }
+
+    fun getProjectByName(name: String): Project? {
+        return localDataHelper.getProjectLocalDb().getProjectByName(name)
+    }
+
+    fun deleteImages(id: Int) {
+        localDataHelper.getDeploymentImageLocalDb().deleteImages(id)
+    }
+
+    fun getImageByDeploymentId(id: Int): List<DeploymentImage> {
+        return localDataHelper.getDeploymentImageLocalDb().getImageByDeploymentId(id)
+    }
+
+    fun insertImage(
+        deployment: Deployment? = null,
+        attachImages: List<String>
+    ) {
+        localDataHelper.getDeploymentImageLocalDb().insertImage(deployment, attachImages)
+    }
+
+    fun getFirstTracking(): Tracking? {
+        return localDataHelper.getTrackingLocalDb().getFirstTracking()
+    }
+
+    fun insertOrUpdateTrackingFile(file: TrackingFile) {
+        localDataHelper.getTrackingFileLocalDb().insertOrUpdate(file)
+    }
+
+    fun getAllDeploymentResultsAsyncWithinProject(projectName: String): RealmResults<Deployment> {
+        return localDataHelper.getGuardianDeploymentLocalDb()
+            .getAllResultsAsyncWithinProject(project = projectName)
+    }
+
+    fun updateDeployment(deployment: Deployment) {
+        localDataHelper.getGuardianDeploymentLocalDb().updateDeployment(deployment)
+    }
+
+    fun insertOrUpdateDeployment(deployment: Deployment, location: DeploymentLocation): Int {
+        return localDataHelper.getGuardianDeploymentLocalDb()
+            .insertOrUpdateDeployment(deployment, location)
+    }
+
+    fun getDeploymentsBySiteId(streamId: String): ArrayList<Deployment> {
+        return localDataHelper.getGuardianDeploymentLocalDb().getDeploymentsBySiteId(streamId)
+    }
+
+    fun updateIsActive(id: Int) {
+        localDataHelper.getGuardianDeploymentLocalDb().updateIsActive(id)
+    }
+
+    fun getDeploymentById(id: Int): Deployment? {
+        return localDataHelper.getGuardianDeploymentLocalDb().getDeploymentById(id)
     }
 
 }

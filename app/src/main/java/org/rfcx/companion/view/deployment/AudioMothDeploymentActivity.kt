@@ -14,7 +14,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProvider
-import io.realm.Realm
 import io.realm.RealmList
 import kotlinx.android.synthetic.main.activity_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
@@ -23,7 +22,6 @@ import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.localdb.*
-import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
@@ -47,14 +45,6 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
     CompleteListener,
     MapPickerProtocol {
     private lateinit var audioMothDeploymentViewModel: AudioMothDeploymentViewModel
-
-    // manager database
-    private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val deploymentDb by lazy { GuardianDeploymentDb(realm) }
-    private val projectDb by lazy { ProjectDb(realm) }
-    private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
-    private val trackingDb by lazy { TrackingDb(realm) }
-    private val trackingFileDb by lazy { TrackingFileDb(realm) }
 
     private var _deployment: Deployment? = null
     private var _deployLocation: DeploymentLocation? = null
@@ -142,7 +132,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
 
     private fun setLiveData() {
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
-        val project = projectDb.getProjectById(projectId)
+        val project = audioMothDeploymentViewModel.getProjectById(projectId)
         val projectName = project?.name ?: getString(R.string.none)
         siteLiveData = Transformations.map(
             audioMothDeploymentViewModel.getAllResultsAsyncWithinProject(projectName).asLiveData()
@@ -153,7 +143,8 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
 
         deploymentLiveData =
             Transformations.map(
-                deploymentDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()
+                audioMothDeploymentViewModel.getAllDeploymentResultsAsyncWithinProject(projectName)
+                    .asLiveData()
             ) {
                 it
             }
@@ -170,8 +161,8 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
     }
 
     private fun saveImages(deployment: Deployment) {
-        deploymentImageDb.deleteImages(deployment.id)
-        deploymentImageDb.insertImage(deployment, _images)
+        audioMothDeploymentViewModel.deleteImages(deployment.id)
+        audioMothDeploymentViewModel.insertImage(deployment, _images)
     }
 
     override fun openWithEdgeDevice() {
@@ -222,7 +213,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
             is AudioMothCheckListFragment -> {
                 _deployment?.let {
                     it.passedChecks = passedChecks
-                    deploymentDb.updateDeployment(it)
+                    audioMothDeploymentViewModel.updateDeployment(it)
 
                     saveImages(it)
                 }
@@ -266,7 +257,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
         currentLocation ?: Location(LocationManager.GPS_PROVIDER)
 
     override fun getLocationGroup(name: String): Project? {
-        return projectDb.getProjectByName(name)
+        return audioMothDeploymentViewModel.getProjectByName(name)
     }
 
     override fun setDeployment(deployment: Deployment) {
@@ -341,7 +332,8 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
             it.state = DeploymentState.AudioMoth.ReadyToUpload.key
             setDeployment(it)
 
-            val deploymentId = deploymentDb.insertOrUpdateDeployment(it, _deployLocation!!)
+            val deploymentId =
+                audioMothDeploymentViewModel.insertOrUpdateDeployment(it, _deployLocation!!)
             this._locate?.let { loc ->
                 audioMothDeploymentViewModel.insertOrUpdateLocate(
                     deploymentId,
@@ -352,9 +344,13 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
             if (useExistedLocation) {
                 this._locate?.let { locate ->
                     val deployments =
-                        locate.serverId?.let { it1 -> deploymentDb.getDeploymentsBySiteId(it1) }
+                        locate.serverId?.let { it1 ->
+                            audioMothDeploymentViewModel.getDeploymentsBySiteId(
+                                it1
+                            )
+                        }
                     deployments?.forEach { deployment ->
-                        deploymentDb.updateIsActive(deployment.id)
+                        audioMothDeploymentViewModel.updateIsActive(deployment.id)
                     }
                 }
             }
@@ -362,7 +358,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
 
             //track getting
             if (preferences.getBoolean(ENABLE_LOCATION_TRACKING)) {
-                val track = trackingDb.getFirstTracking()
+                val track = audioMothDeploymentViewModel.getFirstTracking()
                 track?.let { t ->
                     val point = t.points.toListDoubleArray()
                     val trackingFile = TrackingFile(
@@ -374,7 +370,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
                             point
                         ).absolutePath
                     )
-                    trackingFileDb.insertOrUpdate(trackingFile)
+                    audioMothDeploymentViewModel.insertOrUpdateTrackingFile(trackingFile)
                 }
             }
 
@@ -505,7 +501,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
     }
 
     private fun handleDeploymentStep(deploymentId: Int) {
-        val deployment = deploymentDb.getDeploymentById(deploymentId)
+        val deployment = audioMothDeploymentViewModel.getDeploymentById(deploymentId)
         if (deployment != null) {
             setDeployment(deployment)
 
@@ -518,7 +514,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
                 this.passedChecks = passedChecks ?: RealmList<Int>()
             }
 
-            val images = deploymentImageDb.getImageByDeploymentId(deployment.id)
+            val images = audioMothDeploymentViewModel.getImageByDeploymentId(deployment.id)
             if (images.isNotEmpty()) {
                 val localPaths = arrayListOf<String>()
                 images.forEach {
@@ -544,7 +540,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
 
     private fun updateDeploymentState(state: DeploymentState.AudioMoth) {
         this._deployment?.state = state.key
-        this._deployment?.let { deploymentDb.updateDeployment(it) }
+        this._deployment?.let { audioMothDeploymentViewModel.updateDeployment(it) }
     }
 
     private fun showLoading() {
