@@ -5,15 +5,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_guardian_register.*
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.SocketManager
 import org.rfcx.companion.entity.Screen
+import org.rfcx.companion.entity.response.GuardianRegisterResponse
 import org.rfcx.companion.entity.socket.response.Status
+import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.Analytics
+import org.rfcx.companion.util.getIdToken
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.net.Socket
 
 class GuardianRegisterFragment : Fragment() {
@@ -62,19 +69,47 @@ class GuardianRegisterFragment : Fragment() {
         registerResultTextView.text = requireContext().getString(R.string.registering)
     }
 
+//    private fun registerGuardian() {
+//        SocketManager.sendGuardianRegistration(requireContext(), getRadioValueForRegistration())
+//        SocketManager.register.observe(viewLifecycleOwner, Observer {
+//            if (it.register.status == Status.SUCCESS.value) {
+//                registerFinishButton.visibility = View.VISIBLE
+//                registerGuardianButton.visibility = View.GONE
+//                registerResultTextView.text = requireContext().getString(R.string.register_success)
+//            } else {
+//                registerGuardianButton.isEnabled = true
+//                registerResultTextView.text = requireContext().getString(R.string.register_failed)
+//            }
+//        })
+//        setUIWaitingRegisterResponse()
+//    }
+
     private fun registerGuardian() {
-        SocketManager.sendGuardianRegistration(requireContext(), getRadioValueForRegistration())
-        SocketManager.register.observe(viewLifecycleOwner, Observer {
-            if (it.register.status == Status.SUCCESS.value) {
-                registerFinishButton.visibility = View.VISIBLE
-                registerGuardianButton.visibility = View.GONE
-                registerResultTextView.text = requireContext().getString(R.string.register_success)
-            } else {
-                registerGuardianButton.isEnabled = true
-                registerResultTextView.text = requireContext().getString(R.string.register_failed)
-            }
-        })
-        setUIWaitingRegisterResponse()
+        val guid = deploymentProtocol?.getGuid()
+        val userToken = requireContext().getIdToken()
+        if (guid != null && userToken != null) {
+            ApiManager.getInstance().getRestApi().registerGuardian(userToken, guid).enqueue(
+                object: Callback<GuardianRegisterResponse> {
+                    override fun onResponse(
+                        call: Call<GuardianRegisterResponse>,
+                        response: Response<GuardianRegisterResponse>
+                    ) {
+                        val regResponse = response.body()
+                        if (regResponse != null) {
+                            SocketManager.sendGuardianRegistration(regResponse)
+                        } else {
+                            Toast.makeText(requireContext(), "Register failed: empty response", Toast.LENGTH_LONG).show()
+                        }
+                    }
+
+                    override fun onFailure(call: Call<GuardianRegisterResponse>, t: Throwable) {
+                        Toast.makeText(requireContext(), "Register failed: ${t.message}", Toast.LENGTH_LONG).show()
+                    }
+                }
+            )
+        } else {
+            Toast.makeText(requireContext(), "Register failed: guid or token is null", Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun isGuardianRegistered() {

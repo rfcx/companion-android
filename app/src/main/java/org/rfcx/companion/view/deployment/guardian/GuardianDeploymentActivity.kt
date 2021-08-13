@@ -309,6 +309,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     override fun getWifiName(): String = _deployment?.wifiName ?: ""
 
     override fun getLastCheckInTime(): Long? = lastCheckInTime
+    override fun getGuid(): String? = PingUtils.getGuidFromPing(pingBlob)
 
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 

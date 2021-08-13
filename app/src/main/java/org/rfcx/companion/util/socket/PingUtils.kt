@@ -20,4 +20,9 @@ object PingUtils {
         Log.d("ConvertPing", sha1.toString())
         return sha1.asString
     }
+
+    fun getGuidFromPing(ping: Ping?): String? {
+        val guid = ping?.device?.get("guid") ?: return null
+        return guid.asString
+    }
 }

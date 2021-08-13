@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import org.json.JSONObject
+import org.rfcx.companion.entity.response.GuardianRegisterResponse
 import org.rfcx.companion.entity.socket.request.*
 import org.rfcx.companion.entity.socket.response.*
 import org.rfcx.companion.util.MicrophoneTestUtils
@@ -149,16 +150,8 @@ object SocketManager {
         sendMessage(data)
     }
 
-    fun sendGuardianRegistration(context: Context, isProduction: Boolean) {
-        val preferences = Preferences.getInstance(context)
-        val jsonString = gson.toJson(
-            RegisterRequest(
-                Register(
-                    RegisterInfo(preferences.getString(Preferences.ID_TOKEN, ""), isProduction)
-                )
-            )
-        )
-        sendMessage(jsonString)
+    fun sendGuardianRegistration(response: GuardianRegisterResponse) {
+        sendInstructionMessage(InstructionType.SET, InstructionCommand.IDENTITY, gson.toJson(response))
     }
 
     fun isGuardianRegistered() {
