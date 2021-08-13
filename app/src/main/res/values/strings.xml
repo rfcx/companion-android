@@ -162,6 +162,7 @@
     <string name="profile_sign_out_label">Sign out</string>
     <string name="version_app">%s (%s)</string>
     <string name="profile_feedback_label">Feedback</string>
+    <string name="profile_offline_map_label">Offline map</string>
     <string name="coordinates">Coordinates</string>
     <string name="location">Site</string>
     <string name="display">Display</string>
@@ -185,6 +186,11 @@
     <string name="dms_coordinates_format">0°0\'0.0\"N 0°0\'0.0\"E</string>
 
     <string name="delete_location_group_title">Do you want to delete this project?</string>
+    <string name="read_only">Read Only</string>
+
+    <string name="download">Download</string>
+    <string name="no_internet_connection">No internet, Please try again.</string>
+    <string name="unavailable">Unavailable \n(area too large)</string>
 
     <!--  FeedbackActivity  -->
     <string name="app_feedback_share_ideas">Leave app feedback or share your ideas</string>
@@ -243,6 +249,8 @@
     <string name="error_has_occurred">An error occurred. Please try again.</string>
     <string name="format_in_progress_step">Not yet deployed</string>
     <string name="format_deployed">deployed</string>
+
+    <string name="not_have_permission">You don’t have permission to deploy to this project. You can ask the project owner to change your user permissions.</string>
 
     <!-- ConnectGuardianFragment -->
     <string name="nearby_guardians">Nearby Guardian(s)</string>

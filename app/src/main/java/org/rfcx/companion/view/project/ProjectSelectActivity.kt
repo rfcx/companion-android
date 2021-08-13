@@ -10,18 +10,22 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.activity_guardian_diagnostic.*
 import kotlinx.android.synthetic.main.activity_project_select.*
 import org.rfcx.companion.MainActivity
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
+import org.rfcx.companion.entity.Project
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DeploymentCleanupWorker
 import org.rfcx.companion.util.*
+import org.rfcx.companion.view.profile.locationgroup.LocationGroupListener
 import org.rfcx.companion.view.project.viewmodel.ProjectSelectViewModel
 
-class ProjectSelectActivity : AppCompatActivity(), (Int) -> Unit,
+class ProjectSelectActivity : AppCompatActivity(), LocationGroupListener,
     SwipeRefreshLayout.OnRefreshListener {
 
     private lateinit var projectSelectViewModel: ProjectSelectViewModel
@@ -135,11 +139,6 @@ class ProjectSelectActivity : AppCompatActivity(), (Int) -> Unit,
         projectSwipeRefreshView.isRefreshing = false
     }
 
-    override fun invoke(id: Int) {
-        selectedProject = id
-        selectProjectButton.isEnabled = true
-    }
-
     override fun onRefresh() {
         projectSelectViewModel.refreshProjects()
     }
@@ -149,5 +148,14 @@ class ProjectSelectActivity : AppCompatActivity(), (Int) -> Unit,
             val intent = Intent(context, ProjectSelectActivity::class.java)
             context.startActivity(intent)
         }
+    }
+
+    override fun onClicked(group: Project) {
+        selectedProject = group.id
+        selectProjectButton.isEnabled = true
+    }
+
+    override fun onLockImageClicked() {
+        Toast.makeText(this, R.string.not_have_permission, Toast.LENGTH_LONG).show()
     }
 }

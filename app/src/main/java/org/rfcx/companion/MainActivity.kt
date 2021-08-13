@@ -10,35 +10,35 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonObject
-import com.mapbox.mapboxsdk.geometry.LatLng
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
-import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
 import kotlinx.android.synthetic.main.layout_search_view.*
+import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.connection.socket.SocketManager
 import org.rfcx.companion.entity.Locate
+import org.rfcx.companion.entity.isGuest
 import org.rfcx.companion.entity.socket.request.InstructionCommand
 import org.rfcx.companion.entity.socket.request.InstructionType
-import org.rfcx.companion.localdb.EdgeDeploymentDb
-import org.rfcx.companion.localdb.ProjectDb
+import org.rfcx.companion.repo.api.DeviceApiHelper
+import org.rfcx.companion.repo.api.DeviceApiServiceImpl
+import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DeploymentCleanupWorker
-import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.EdgeDeploymentActivity
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.companion.view.map.MapFragment
 import org.rfcx.companion.view.profile.ProfileFragment
+import org.rfcx.companion.view.project.ProjectSelectActivity
 import org.rfcx.companion.widget.BottomNavigationMenuItem
 
 class MainActivity : AppCompatActivity(), MainActivityListener {
-    private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
-    private val projectDb by lazy { ProjectDb(realm) }
+    private lateinit var mainViewModel: MainViewModel
 
     private var currentFragment: Fragment? = null
     private val locationPermissions by lazy { LocationPermissions(this) }
@@ -60,6 +60,17 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         }
     }
 
+    private fun setViewModel() {
+        mainViewModel = ViewModelProvider(
+            this,
+            ViewModelFactory(
+                application,
+                DeviceApiHelper(DeviceApiServiceImpl()),
+                LocalDataHelper()
+            )
+        ).get(MainViewModel::class.java)
+    }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
@@ -78,6 +89,18 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        setViewModel()
+
+        val preferences = Preferences.getInstance(this)
+        val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
+        val project = mainViewModel.getProjectById(projectId)
+        project?.let {
+            if(it.isGuest()) {
+                preferences.putInt(Preferences.SELECTED_PROJECT, -1)
+                ProjectSelectActivity.startActivity(this)
+                finish()
+            }
+        }
 
         val meta = JsonObject().also {
             it.addProperty("enable_audio_vault", "true")
@@ -275,7 +298,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
     override fun getProjectName(): String {
         val preferences = Preferences.getInstance(this)
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
-        val project = projectDb.getProjectById(projectId)
+        val project = mainViewModel.getProjectById(projectId)
         return project?.name ?: getString(R.string.none)
     }
 

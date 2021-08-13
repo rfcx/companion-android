@@ -3,12 +3,16 @@ package org.rfcx.companion.view.project
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_location_group.view.*
 import org.rfcx.companion.R
+import org.rfcx.companion.entity.Permissions
 import org.rfcx.companion.entity.Project
+import org.rfcx.companion.entity.isGuest
+import org.rfcx.companion.view.profile.locationgroup.LocationGroupListener
 
-class ProjectSelectAdapter(private val projectSelectListener: (Int) -> Unit) :
+class ProjectSelectAdapter(private val projectSelectListener: LocationGroupListener) :
     RecyclerView.Adapter<ProjectSelectAdapter.ProjectSelectViewHolder>() {
 
     var selectedPosition = -1
@@ -32,12 +36,26 @@ class ProjectSelectAdapter(private val projectSelectListener: (Int) -> Unit) :
             holder.itemView.checkImageView.visibility = View.GONE
         }
 
-        holder.bind(items[position].name ?: holder.itemView.context.getString(R.string.none))
+        holder.bind(items[position])
 
         holder.itemView.setOnClickListener {
-            selectedPosition = position
-            notifyDataSetChanged()
-            this.projectSelectListener(items[position].id)
+            if (items[position].permissions != Permissions.GUEST.value) {
+                selectedPosition = position
+                notifyDataSetChanged()
+                projectSelectListener.onClicked(items[position])
+            }
+        }
+    }
+
+    fun setClickable(view: View?, clickable: Boolean) {
+        if (view != null) {
+            if (view is ViewGroup) {
+                val viewGroup = view
+                for (i in 0 until viewGroup.childCount) {
+                    setClickable(viewGroup.getChildAt(i), clickable)
+                }
+            }
+            view.isClickable = clickable
         }
     }
 
@@ -45,9 +63,26 @@ class ProjectSelectAdapter(private val projectSelectListener: (Int) -> Unit) :
 
     inner class ProjectSelectViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val locationGroupTextView = itemView.locationGroupTextView
+        private val lockImageView = itemView.lockImageView
 
-        fun bind(project: String) {
-            locationGroupTextView.text = project
+        fun bind(project: Project) {
+            locationGroupTextView.text = project.name ?: itemView.context.getString(R.string.none)
+            lockImageView.visibility =
+                if (project.isGuest()) View.VISIBLE else View.GONE
+            setClickable(itemView, project.isGuest())
+
+            if (project.isGuest()) {
+                locationGroupTextView.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_secondary))
+            } else {
+                locationGroupTextView.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_black))
+            }
+
+            lockImageView.setColorFilter(ContextCompat.getColor(itemView.context,
+                R.color.text_secondary))
+
+            lockImageView.setOnClickListener {
+                projectSelectListener.onLockImageClicked()
+            }
         }
     }
 }
