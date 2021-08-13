@@ -1,4 +1,4 @@
-package org.rfcx.companion.localdb.guardian
+package org.rfcx.companion.localdb
 
 import io.realm.Realm
 import io.realm.RealmResults
@@ -10,10 +10,9 @@ import org.rfcx.companion.entity.guardian.isGuardian
 import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.toDeploymentLocation
 import org.rfcx.companion.entity.response.toGuardianDeployment
-import org.rfcx.companion.localdb.DatabaseCallback
 import java.util.*
 
-class GuardianDeploymentDb(private val realm: Realm) {
+class DeploymentDb(private val realm: Realm) {
 
     fun unsentCount(): Long {
         val audioMoths = realm.where(Deployment::class.java)

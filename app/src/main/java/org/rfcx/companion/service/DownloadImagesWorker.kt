@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.work.*
 import io.realm.Realm
 import org.rfcx.companion.localdb.DeploymentImageDb
-import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
+import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.getIdToken
@@ -18,8 +18,8 @@ class DownloadImagesWorker(val context: Context, params: WorkerParameters) :
 
     override suspend fun doWork(): Result {
         Log.d(TAG, "doWork on DownloadAssets")
-        val guardianDeploymentDb = GuardianDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
-        val deployments = guardianDeploymentDb.getDeploymentByServerId(deploymentServerId)
+        val deploymentDb = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
+        val deployments = deploymentDb.getDeploymentByServerId(deploymentServerId)
 
         val deployment = when {
             deployments != null -> Triple(deployments.id, deployments.serverId, deployments.device ?: "") // TODO: change to not can be null

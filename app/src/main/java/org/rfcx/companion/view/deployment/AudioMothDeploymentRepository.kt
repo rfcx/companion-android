@@ -57,29 +57,29 @@ class AudioMothDeploymentRepository(
     }
 
     fun getAllDeploymentResultsAsyncWithinProject(projectName: String): RealmResults<Deployment> {
-        return localDataHelper.getGuardianDeploymentLocalDb()
+        return localDataHelper.getDeploymentLocalDb()
             .getAllResultsAsyncWithinProject(project = projectName)
     }
 
     fun updateDeployment(deployment: Deployment) {
-        localDataHelper.getGuardianDeploymentLocalDb().updateDeployment(deployment)
+        localDataHelper.getDeploymentLocalDb().updateDeployment(deployment)
     }
 
     fun insertOrUpdateDeployment(deployment: Deployment, location: DeploymentLocation): Int {
-        return localDataHelper.getGuardianDeploymentLocalDb()
+        return localDataHelper.getDeploymentLocalDb()
             .insertOrUpdateDeployment(deployment, location)
     }
 
     fun getDeploymentsBySiteId(streamId: String): ArrayList<Deployment> {
-        return localDataHelper.getGuardianDeploymentLocalDb().getDeploymentsBySiteId(streamId)
+        return localDataHelper.getDeploymentLocalDb().getDeploymentsBySiteId(streamId)
     }
 
     fun updateIsActive(id: Int) {
-        localDataHelper.getGuardianDeploymentLocalDb().updateIsActive(id)
+        localDataHelper.getDeploymentLocalDb().updateIsActive(id)
     }
 
     fun getDeploymentById(id: Int): Deployment? {
-        return localDataHelper.getGuardianDeploymentLocalDb().getDeploymentById(id)
+        return localDataHelper.getDeploymentLocalDb().getDeploymentById(id)
     }
 
 }

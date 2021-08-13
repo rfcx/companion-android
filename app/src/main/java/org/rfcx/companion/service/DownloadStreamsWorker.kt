@@ -9,7 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.rfcx.companion.entity.response.convertToDeploymentResponse
 import org.rfcx.companion.localdb.LocateDb
-import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
+import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.getIdToken
@@ -52,7 +52,7 @@ class DownloadStreamsWorker(val context: Context, params: WorkerParameters) :
             val resultBody = result.body()
             resultBody?.let {
                 val streamDb = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
-                val deploymentDb = GuardianDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
+                val deploymentDb = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
                 count += resultBody.size
                 streamDb.insertOrUpdate(resultBody)
 

@@ -10,7 +10,7 @@ import kotlinx.coroutines.withContext
 import org.rfcx.companion.entity.response.StreamResponse
 import org.rfcx.companion.entity.response.toLocate
 import org.rfcx.companion.localdb.LocateDb
-import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
+import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.getIdToken
@@ -34,14 +34,14 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
         val result = getStreams(token, currentStreamsLoading)
         if (result) {
             val streamDb = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
-            val guardianDeploymentDb = GuardianDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
+            val deploymentDb = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
             val savedStreams = streamDb.getLocations().filter { it.serverId != null }
             val downloadedStreams = streams.map { it.toLocate().serverId }
             val filteredStreams = savedStreams.filter { stream -> !downloadedStreams.contains(stream.serverId) }
             if (filteredStreams.isNotEmpty()) {
                 filteredStreams.forEach {
                     Log.d(TAG, "remove stream: ${it.id}")
-                    guardianDeploymentDb.deleteDeploymentByStreamId(it.serverId!!)
+                    deploymentDb.deleteDeploymentByStreamId(it.serverId!!)
                     streamDb.deleteLocate(it.id)
                 }
                 // force delete deployment on device-api

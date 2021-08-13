@@ -6,7 +6,7 @@ import androidx.work.*
 import io.realm.Realm
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.TrackingFileDb
-import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
+import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.RealmHelper
 import java.util.concurrent.TimeUnit
@@ -24,10 +24,10 @@ class DeploymentCleanupWorker(val context: Context, params: WorkerParameters) :
 
     private fun resendIfRequired() {
         val realm = Realm.getInstance(RealmHelper.migrationConfig())
-        val guardianDeploymentDb = GuardianDeploymentDb(realm)
-        val guardianDeploymentUnsent = guardianDeploymentDb.unsentCount()
-        guardianDeploymentDb.unlockSending()
-        if (guardianDeploymentUnsent > 0) {
+        val deploymentDb = DeploymentDb(realm)
+        val deploymentUnsent = deploymentDb.unsentCount()
+        deploymentDb.unlockSending()
+        if (deploymentUnsent > 0) {
             DeploymentSyncWorker.enqueue(context)
         }
 
