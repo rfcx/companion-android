@@ -13,6 +13,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_guardian_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
@@ -611,14 +613,14 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         this.prefsChanges = prefs
     }
 
-    override fun getPrefsChanges(): List<String> {
-        val listForGuardian = mutableListOf<String>()
+    override fun getPrefsChanges(): String {
+        val json = JsonObject()
         if (this.prefsChanges.isNotEmpty()) {
             this.prefsChanges.forEach {
-                listForGuardian.add("${it.key}|${it.value}")
+                json.addProperty(it.key, it.value)
             }
         }
-        return listForGuardian
+        return json.toString()
     }
 
     override fun showSyncButton() { /* not used */

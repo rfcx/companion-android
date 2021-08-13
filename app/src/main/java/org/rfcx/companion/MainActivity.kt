@@ -13,14 +13,18 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.JsonObject
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
 import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.base.ViewModelFactory
+import org.rfcx.companion.connection.socket.SocketManager
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.isGuest
+import org.rfcx.companion.entity.socket.request.InstructionCommand
+import org.rfcx.companion.entity.socket.request.InstructionType
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
@@ -97,6 +101,11 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
                 finish()
             }
         }
+
+        val meta = JsonObject().also {
+            it.addProperty("enable_audio_vault", "true")
+        }
+        SocketManager.sendInstructionMessage(InstructionType.SET, InstructionCommand.PREFS, meta.toString())
 
         createLocationButton.setOnClickListener {
             if (BuildConfig.ENABLE_GUARDIAN) {

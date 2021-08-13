@@ -88,7 +88,7 @@ class GuardianAdvancedFragment : Fragment() {
     }
 
     private fun syncConfig() {
-        val prefs = syncPreferenceListener?.getPrefsChanges() ?: listOf()
+        val prefs = syncPreferenceListener?.getPrefsChanges() ?: ""
         SocketManager.syncConfiguration(prefs)
         SocketManager.syncConfiguration.observe(viewLifecycleOwner, Observer {
             requireActivity().runOnUiThread {

@@ -1,16 +1,17 @@
 package org.rfcx.companion.connection.socket
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
-import java.io.DataInputStream
-import java.io.DataOutputStream
-import java.net.Socket
 import org.json.JSONObject
 import org.rfcx.companion.entity.socket.request.*
 import org.rfcx.companion.entity.socket.response.*
 import org.rfcx.companion.util.MicrophoneTestUtils
 import org.rfcx.companion.util.Preferences
+import java.io.DataInputStream
+import java.io.DataOutputStream
+import java.net.Socket
 
 object SocketManager {
 
@@ -102,13 +103,8 @@ object SocketManager {
         sendMessage(data)
     }
 
-    fun syncConfiguration(config: List<String>) {
-        val jsonString = gson.toJson(
-            SyncConfigurationRequest(
-                SyncConfiguration(config)
-            )
-        )
-        sendMessage(jsonString)
+    fun syncConfiguration(config: String) {
+        sendInstructionMessage(InstructionType.SET, InstructionCommand.PREFS, config)
     }
 
     fun getSignalStrength() {
@@ -172,12 +168,7 @@ object SocketManager {
     }
 
     fun stopGuardianWiFi() {
-        val data = gson.toJson(
-            SocketRequest(
-                STOP_WIFI
-            )
-        )
-        sendMessage(data)
+        sendInstructionMessage(InstructionType.CTRL, InstructionCommand.WIFI)
     }
 
     fun getAllPrefs() {
@@ -187,6 +178,11 @@ object SocketManager {
 
     fun getRecorderState() {
         val data = gson.toJson(SocketRequest(IS_RECORDING))
+        sendMessage(data)
+    }
+
+    fun sendInstructionMessage(type: InstructionType, command: InstructionCommand, meta: String = "{}") {
+        val data = gson.toJson(InstructionMessage.toMessage(type, command, meta))
         sendMessage(data)
     }
 
@@ -259,6 +255,8 @@ object SocketManager {
 
                         val receiveJson = JSONObject(dataInput)
                         val jsonIterator = receiveJson.keys()
+
+                        Log.d("SocketComm", dataInput)
 
                         val keys = jsonIterator.asSequence().toList()
                         when (keys[0].toString()) {

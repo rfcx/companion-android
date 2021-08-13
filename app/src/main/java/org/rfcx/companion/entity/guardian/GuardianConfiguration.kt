@@ -1,5 +1,8 @@
 package org.rfcx.companion.entity.guardian
 
+import com.google.gson.Gson
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 import io.realm.RealmModel
 import io.realm.annotations.RealmClass
@@ -16,13 +19,14 @@ open class GuardianConfiguration(
     var duration: Int = 90
 ) : RealmModel, Serializable
 
-fun GuardianConfiguration.toListForGuardian(): List<String> {
-    return listOf(
-        "audio_sample_rate|$sampleRate",
-        "audio_encode_bitrate|$bitrate",
-        "audio_encode_codec|$fileFormat",
-        "audio_cycle_duration|$duration"
-    )
+fun GuardianConfiguration.toListForGuardian(): String {
+    val json = JsonObject().apply {
+        addProperty("audio_sample_rate", sampleRate)
+        addProperty("audio_encode_bitrate", bitrate)
+        addProperty("audio_encode_codec", fileFormat)
+        addProperty("audio_cycle_duration", duration)
+    }
+    return json.toString()
 }
 
 fun GuardianConfiguration.toReadableFormat(): GuardianConfiguration {
