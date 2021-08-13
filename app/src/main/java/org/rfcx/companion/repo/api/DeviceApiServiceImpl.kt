@@ -1,5 +1,6 @@
 package org.rfcx.companion.repo.api
 
+import org.rfcx.companion.entity.UserTouchResponse
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.ProjectByIdResponse
 import org.rfcx.companion.entity.response.ProjectResponse
@@ -33,6 +34,10 @@ class DeviceApiServiceImpl: DeviceApiService {
         id: String
     ): Call<List<DeploymentAssetResponse>> {
         return ApiManager.getInstance().getDeviceApi2().getStreamAssets(authUser, id)
+    }
+
+    override fun userTouch(authUser: String): Call<UserTouchResponse> {
+        return ApiManager.getInstance().getCoreApi().userTouch(authUser)
     }
 
     override fun getProjectsById(authUser: String, id: String): Call<ProjectByIdResponse> {

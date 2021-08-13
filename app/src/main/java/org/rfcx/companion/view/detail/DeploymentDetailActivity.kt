@@ -34,8 +34,11 @@ import kotlinx.android.synthetic.main.buttom_sheet_attach_image_layout.view.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.R
+import org.rfcx.companion.entity.DeploymentImage
+import org.rfcx.companion.entity.Device
+import org.rfcx.companion.entity.EdgeDeployment
+import org.rfcx.companion.entity.StatusEvent
 import org.rfcx.companion.entity.*
-import org.rfcx.companion.entity.Status
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.EdgeDeploymentDb
@@ -140,7 +143,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
 
         builder.setPositiveButton(getString(R.string.delete)) { _, _ ->
             onDeleteLocation()
-            analytics.trackDeleteDeploymentEvent(Status.SUCCESS.id)
+            analytics.trackDeleteDeploymentEvent(StatusEvent.SUCCESS.id)
         }
         builder.setNegativeButton(getString(R.string.cancel)) { _, _ -> }
 
