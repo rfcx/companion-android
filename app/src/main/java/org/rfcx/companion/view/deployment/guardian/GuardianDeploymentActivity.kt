@@ -79,6 +79,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     private var pingBlob: Ping? = null
     private var prefsSha1: String? = null
+    private var isGuardianRegistered: Boolean? = null
 
     private var _sampleRate = 12000
 
@@ -222,6 +223,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                 Log.d("SocketComm", "Setting ping blob")
                 pingBlob = it
             }
+            isGuardianRegistered = PingUtils.isRegisteredFromPing(it)
         }
     }
 
@@ -310,6 +312,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun getLastCheckInTime(): Long? = lastCheckInTime
     override fun getGuid(): String? = PingUtils.getGuidFromPing(pingBlob)
+    override fun isGuardianRegistered(): Boolean? = isGuardianRegistered
 
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 

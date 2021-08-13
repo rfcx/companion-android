@@ -25,4 +25,9 @@ object PingUtils {
         val guid = ping?.device?.get("guid") ?: return null
         return guid.asString
     }
+
+    fun isRegisteredFromPing(ping: Ping?): Boolean? {
+        val isRegistered = ping?.device?.get("is_registered") ?: return null
+        return isRegistered.asBoolean
+    }
 }

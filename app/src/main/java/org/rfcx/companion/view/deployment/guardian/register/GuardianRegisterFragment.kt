@@ -113,9 +113,9 @@ class GuardianRegisterFragment : Fragment() {
     }
 
     private fun isGuardianRegistered() {
-        SocketManager.isGuardianRegistered()
-        SocketManager.isRegistered.observe(viewLifecycleOwner, Observer {
-            if (it.isRegistered) {
+        SocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
+            val isRegistered = deploymentProtocol?.isGuardianRegistered()
+            if (isRegistered != null && isRegistered) {
                 productionRadioButton.isEnabled = false
                 stagingRadioButton.isEnabled = false
                 registerGuardianButton.visibility = View.GONE
