@@ -11,11 +11,9 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
-import androidx.preference.PreferenceManager
+import androidx.preference.Preference
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
-import com.google.gson.Gson
-import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_guardian_diagnostic.*
@@ -58,8 +56,6 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
     private var collapseAdvanced = false
     private var prefsChanges: Map<String, String>? = null
     private var prefsEditor: SharedPreferences.Editor? = null
-
-    private var switchPrefs = listOf<String>()
 
     private var lat: Double? = null
     private var long: Double? = null
@@ -201,7 +197,6 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
                         getString(R.string.detail_secs, configurationData.duration)
 
                     setupAdvancedSetting()
-                    setupCurrentPrefs(prefsData)
                     hideLoading()
                 }
             })
@@ -220,21 +215,6 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
             getString(R.string.detail_kbs, configurationInfo?.bitrate)
         configDurationValue.text =
             getString(R.string.detail_secs, configurationInfo?.duration)
-    }
-
-    private fun setupCurrentPrefs(prefs: JsonArray) {
-        switchPrefs = this.resources.getStringArray(R.array.switch_prefs).toList()
-        val prefsEditor = PreferenceManager.getDefaultSharedPreferences(this).edit()
-        prefs.forEach {
-            val pref = it.asJsonObject
-            val key = ArrayList<String>(pref.keySet())[0]
-            val value = pref.get(key).asString.replace("\"", "")
-            if (switchPrefs.contains(key)) {
-                prefsEditor.putBoolean(key, value.toBoolean()).apply()
-            } else {
-                prefsEditor.putString(key, value).apply()
-            }
-        }
     }
 
     private fun setupEditLocationButton() {
@@ -378,6 +358,10 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
 
     override fun setEditor(editor: SharedPreferences.Editor) {
         this.prefsEditor = editor
+    }
+
+    override fun getPrefs(): List<Preference>? {
+        TODO("Not yet implemented")
     }
 
     override fun onBackPressed() {

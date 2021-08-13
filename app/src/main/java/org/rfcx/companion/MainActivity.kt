@@ -102,11 +102,6 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
             }
         }
 
-        val meta = JsonObject().also {
-            it.addProperty("enable_audio_vault", "true")
-        }
-        SocketManager.sendInstructionMessage(InstructionType.SET, InstructionCommand.PREFS, meta.toString())
-
         createLocationButton.setOnClickListener {
             if (BuildConfig.ENABLE_GUARDIAN) {
                 addTooltip = SimpleTooltip.Builder(this)

@@ -13,7 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
-import com.google.gson.Gson
+import androidx.preference.Preference
 import com.google.gson.JsonObject
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_guardian_deployment.*
@@ -26,6 +26,7 @@ import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.socket.request.CheckinCommand
+import org.rfcx.companion.entity.socket.response.Ping
 import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.service.DownloadStreamState
@@ -33,6 +34,7 @@ import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.service.GuardianDeploymentSyncWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.geojson.GeoJsonUtils
+import org.rfcx.companion.util.socket.PingUtils
 import org.rfcx.companion.view.deployment.EdgeDeploymentActivity
 import org.rfcx.companion.view.deployment.guardian.advanced.GuardianAdvancedFragment
 import org.rfcx.companion.view.deployment.guardian.checkin.GuardianCheckInTestFragment
@@ -74,6 +76,9 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private var useExistedLocation: Boolean = false
 
     private var currentLocation: Location? = null
+
+    private var pingBlob: Ping? = null
+    private var prefsSha1: String? = null
 
     private var _sampleRate = 12000
 
@@ -209,6 +214,15 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                 it
             }
         guardianDeploymentLiveData.observeForever(guardianDeploymentObserve)
+
+        SocketManager.pingBlob.observeForever {
+            Log.d("SocketComm", "Getting ping blob")
+            val sha1 = PingUtils.getPrefsSha1FromPing(it)
+            if (prefsSha1 != sha1) {
+                Log.d("SocketComm", "Setting ping blob")
+                pingBlob = it
+            }
+        }
     }
 
     private fun setSiteItems() {
@@ -641,4 +655,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     override fun setEditor(editor: SharedPreferences.Editor) {
         this.prefsEditor = editor
     }
+
+    override fun getPrefs(): List<Preference> = PingUtils.getPrefsFromPing(this, pingBlob)
 }

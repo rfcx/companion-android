@@ -1,6 +1,7 @@
 package org.rfcx.companion.view.prefs
 
 import android.content.SharedPreferences
+import androidx.preference.Preference
 
 interface SyncPreferenceListener {
     fun setPrefsChanges(prefs: Map<String, String>)
@@ -11,4 +12,6 @@ interface SyncPreferenceListener {
     fun showSuccessResponse()
     fun showFailedResponse()
     fun setEditor(editor: SharedPreferences.Editor)
+
+    fun getPrefs(): List<Preference>?
 }
