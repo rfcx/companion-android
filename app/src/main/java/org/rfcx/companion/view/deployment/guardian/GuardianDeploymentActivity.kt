@@ -24,7 +24,7 @@ import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.socket.request.CheckinCommand
 import org.rfcx.companion.localdb.*
-import org.rfcx.companion.localdb.GuardianDeploymentDb
+import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.service.DeploymentSyncWorker
@@ -55,7 +55,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val locateDb by lazy { LocateDb(realm) }
     private val projectDb by lazy { ProjectDb(realm) }
-    private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
+    private val deploymentDb by lazy { DeploymentDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val trackingDb by lazy { TrackingDb(realm) }
     private val trackingFileDb by lazy { TrackingFileDb(realm) }
@@ -118,7 +118,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
         val deploymentId = intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
         if (deploymentId != null) {
-            val deployment = guardianDeploymentDb.getDeploymentById(deploymentId)
+            val deployment = deploymentDb.getDeploymentById(deploymentId)
             if (deployment != null) {
                 setDeployment(deployment)
 
@@ -187,7 +187,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         siteLiveData.observeForever(siteObserve)
 
         deploymentLiveData =
-            Transformations.map(guardianDeploymentDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()) {
+            Transformations.map(deploymentDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()) {
                 it
             }
         deploymentLiveData.observeForever(guardianDeploymentObserve)
@@ -266,7 +266,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         this._deployment?.configuration = _configuration
 
         // update deployment
-        this._deployment?.let { guardianDeploymentDb.updateDeployment(it) }
+        this._deployment?.let { deploymentDb.updateDeployment(it) }
     }
 
     override fun getConfiguration(): GuardianConfiguration? = _configuration
@@ -319,16 +319,16 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             it.state = DeploymentState.Guardian.ReadyToUpload.key
             setDeployment(it)
 
-            val deploymentId = guardianDeploymentDb.insertOrUpdateDeployment(it, _deployLocation!!)
+            val deploymentId = deploymentDb.insertOrUpdateDeployment(it, _deployLocation!!)
             this._locate?.let { loc ->
                 locateDb.insertOrUpdateLocate(deploymentId, loc, true) // update locate - last deployment
             }
 
             if (useExistedLocation) {
                 this._locate?.let { locate ->
-                    val deployments = locate.serverId?.let { it1 -> guardianDeploymentDb.getDeploymentsBySiteId(it1) }
+                    val deployments = locate.serverId?.let { it1 -> deploymentDb.getDeploymentsBySiteId(it1) }
                     deployments?.forEach { deployment ->
-                        guardianDeploymentDb.updateIsActive(deployment.id)
+                        deploymentDb.updateIsActive(deployment.id)
                     }
                 }
             }
@@ -436,7 +436,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     private fun updateDeploymentState(state: DeploymentState.Guardian) {
         this._deployment?.state = state.key
-        this._deployment?.let { guardianDeploymentDb.updateDeployment(it) }
+        this._deployment?.let { deploymentDb.updateDeployment(it) }
     }
 
     override fun showConnectInstruction() {

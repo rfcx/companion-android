@@ -31,7 +31,7 @@ import org.rfcx.companion.entity.guardian.toReadableFormat
 import org.rfcx.companion.entity.socket.response.Status
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.ProjectDb
-import org.rfcx.companion.localdb.GuardianDeploymentDb
+import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.detail.*
 import org.rfcx.companion.view.dialog.LoadingDialogFragment
@@ -42,7 +42,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
 
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val locationGroupDb by lazy { ProjectDb(realm) }
-    private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
+    private val deploymentDb by lazy { DeploymentDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
 
@@ -278,7 +278,7 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
 
     private fun forceUpdateDeployment() {
         if (this.deployment != null) {
-            this.deployment = guardianDeploymentDb.getDeploymentById(this.deployment!!.id)
+            this.deployment = deploymentDb.getDeploymentById(this.deployment!!.id)
             this.deployment?.let { it1 ->
                 updateDeploymentDetailView(it1)
             }

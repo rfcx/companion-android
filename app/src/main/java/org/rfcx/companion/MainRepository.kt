@@ -49,7 +49,7 @@ class MainRepository(
     }
 
     fun getAllGuardianDeploymentLocateResultsAsync(): RealmResults<Deployment> {
-        return localDataHelper.getGuardianDeploymentLocalDb().getAllResultsAsync()
+        return localDataHelper.getDeploymentLocalDb().getAllResultsAsync()
     }
 
     fun saveProjectToLocal(projectResponse: ProjectResponse) {
@@ -65,11 +65,11 @@ class MainRepository(
     }
 
     fun getDeploymentUnsentCount(): Int {
-        return localDataHelper.getGuardianDeploymentLocalDb().unsentCount().toInt()
+        return localDataHelper.getDeploymentLocalDb().unsentCount().toInt()
     }
 
     fun getGuardianDeploymentById(id: Int): Deployment? {
-        return localDataHelper.getGuardianDeploymentLocalDb().getDeploymentById(id)
+        return localDataHelper.getDeploymentLocalDb().getDeploymentById(id)
     }
 
     fun getLocateByName(name: String): Locate? {

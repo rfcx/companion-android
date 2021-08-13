@@ -12,7 +12,7 @@ import org.rfcx.companion.entity.response.toDeploymentLocation
 import org.rfcx.companion.entity.response.toGuardianDeployment
 import java.util.*
 
-class GuardianDeploymentDb(private val realm: Realm) {
+class DeploymentDb(private val realm: Realm) {
 
     fun unsentCount(): Long {
         val audioMoths = realm.where(Deployment::class.java)

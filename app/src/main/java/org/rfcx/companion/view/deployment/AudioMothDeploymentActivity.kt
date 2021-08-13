@@ -21,7 +21,7 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.localdb.*
-import org.rfcx.companion.localdb.GuardianDeploymentDb
+import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.service.DeploymentSyncWorker
@@ -42,7 +42,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
     MapPickerProtocol {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val deploymentDb by lazy { GuardianDeploymentDb(realm) }
+    private val deploymentDb by lazy { DeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
     private val projectDb by lazy { ProjectDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
