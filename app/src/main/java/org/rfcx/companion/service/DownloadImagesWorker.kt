@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.work.*
 import io.realm.Realm
 import org.rfcx.companion.localdb.DeploymentImageDb
-import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
+import org.rfcx.companion.localdb.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.getIdToken

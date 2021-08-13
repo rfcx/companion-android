@@ -6,7 +6,7 @@ import androidx.work.*
 import io.realm.Realm
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.TrackingFileDb
-import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
+import org.rfcx.companion.localdb.GuardianDeploymentDb
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.RealmHelper
 import java.util.concurrent.TimeUnit

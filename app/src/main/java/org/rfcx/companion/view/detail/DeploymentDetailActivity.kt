@@ -40,7 +40,7 @@ import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.ProjectDb
-import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
+import org.rfcx.companion.localdb.GuardianDeploymentDb
 import org.rfcx.companion.service.DownloadImagesWorker
 import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.images.ImageSyncWorker

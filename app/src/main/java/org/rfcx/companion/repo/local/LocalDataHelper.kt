@@ -2,7 +2,7 @@ package org.rfcx.companion.repo.local
 
 import io.realm.Realm
 import org.rfcx.companion.localdb.*
-import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
+import org.rfcx.companion.localdb.GuardianDeploymentDb
 import org.rfcx.companion.util.RealmHelper
 
 class LocalDataHelper {

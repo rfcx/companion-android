@@ -31,7 +31,7 @@ import org.rfcx.companion.entity.guardian.toReadableFormat
 import org.rfcx.companion.entity.socket.response.Status
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.ProjectDb
-import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
+import org.rfcx.companion.localdb.GuardianDeploymentDb
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.detail.*
 import org.rfcx.companion.view.dialog.LoadingDialogFragment

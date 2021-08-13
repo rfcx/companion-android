@@ -21,7 +21,7 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.localdb.*
-import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
+import org.rfcx.companion.localdb.GuardianDeploymentDb
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.service.DeploymentSyncWorker

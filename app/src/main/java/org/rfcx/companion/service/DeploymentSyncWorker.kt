@@ -10,7 +10,7 @@ import org.rfcx.companion.entity.request.toRequestBody
 import org.rfcx.companion.entity.response.isGuardian
 import org.rfcx.companion.entity.response.toGuardianDeployment
 import org.rfcx.companion.localdb.LocateDb
-import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
+import org.rfcx.companion.localdb.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.RealmHelper
