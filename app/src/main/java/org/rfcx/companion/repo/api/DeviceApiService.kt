@@ -2,6 +2,7 @@ package org.rfcx.companion.repo.api
 
 import org.rfcx.companion.entity.UserTouchResponse
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
+import org.rfcx.companion.entity.response.ProjectByIdResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import retrofit2.Call
 import retrofit2.http.GET
@@ -16,7 +17,8 @@ interface DeviceApiService {
     fun getProjects(
         @Header("Authorization") authUser: String,
         @Query("limit") limit: Int = 100,
-        @Query("offset") offset: Int = 0
+        @Query("offset") offset: Int = 0,
+        @Query("fields") fields: List<String> = listOf("id", "name", "permissions")
     ): Call<List<ProjectResponse>>
 
     @GET("projects")
@@ -36,4 +38,10 @@ interface DeviceApiService {
 
     @GET("v1/users/touchapi")
     fun userTouch(@Header("Authorization") authUser: String): Call<UserTouchResponse>
+
+    @GET("projects/{id}")
+    fun getProjectsById(
+        @Header("Authorization") authUser: String,
+        @Path("id") id: String
+    ): Call<ProjectByIdResponse>
 }

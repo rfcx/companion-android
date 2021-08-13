@@ -152,6 +152,10 @@ class LocationGroupFragment : Fragment(), LocationGroupListener,
         locationGroupProtocol?.onLocationGroupClick(group)
     }
 
+    override fun onLockImageClicked() {
+        Toast.makeText(context, R.string.not_have_permission, Toast.LENGTH_SHORT).show()
+    }
+
     override fun onRefresh() {
         retrieveProjects(requireContext())
         projectSwipeRefreshView.isRefreshing = true
