@@ -53,19 +53,6 @@ class ApiManager {
     }
     fun getDeviceApi2(): DeviceApiService = deviceApi2
 
-    private fun getCoreUrl(isProduction: Boolean): String {
-        val url = BuildConfig.DEPLOY_DOMAIN
-        if (url.contains("staging", ignoreCase = true)) {
-
-        }
-
-        if (isProduction) {
-
-        } else {
-
-        }
-    }
-
     private fun setRetrofitBaseUrl(baseUrl: String): Retrofit {
         return Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())

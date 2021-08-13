@@ -69,22 +69,8 @@ class GuardianRegisterFragment : Fragment() {
         registerResultTextView.text = requireContext().getString(R.string.registering)
     }
 
-//    private fun registerGuardian() {
-//        SocketManager.sendGuardianRegistration(requireContext(), getRadioValueForRegistration())
-//        SocketManager.register.observe(viewLifecycleOwner, Observer {
-//            if (it.register.status == Status.SUCCESS.value) {
-//                registerFinishButton.visibility = View.VISIBLE
-//                registerGuardianButton.visibility = View.GONE
-//                registerResultTextView.text = requireContext().getString(R.string.register_success)
-//            } else {
-//                registerGuardianButton.isEnabled = true
-//                registerResultTextView.text = requireContext().getString(R.string.register_failed)
-//            }
-//        })
-//        setUIWaitingRegisterResponse()
-//    }
-
     private fun registerGuardian() {
+        setUIWaitingRegisterResponse()
         val guid = deploymentProtocol?.getGuid()
         val userToken = requireContext().getIdToken()
         if (guid != null && userToken != null) {
