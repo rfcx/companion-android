@@ -1,10 +1,17 @@
 package org.rfcx.companion.view.deployment
 
+import android.annotation.SuppressLint
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import io.realm.RealmResults
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.Transformations
+import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
+import org.rfcx.companion.util.Preferences
+import org.rfcx.companion.util.asLiveData
 import java.util.*
 
 class AudioMothDeploymentViewModel(
@@ -12,8 +19,51 @@ class AudioMothDeploymentViewModel(
     private val audioMothDeploymentRepository: AudioMothDeploymentRepository
 ) : AndroidViewModel(application) {
 
-    fun getAllResultsAsyncWithinProject(projectName: String): RealmResults<Locate> {
-        return audioMothDeploymentRepository.getAllResultsAsyncWithinProject(projectName)
+    @SuppressLint("StaticFieldLeak")
+    private val context = getApplication<Application>().applicationContext
+
+    private var deployments = MutableLiveData<List<Deployment>>()
+    private var sites = MutableLiveData<List<Locate>>()
+
+    private lateinit var deploymentLiveData: LiveData<List<Deployment>>
+    private val deploymentObserve = Observer<List<Deployment>> {
+        deployments.postValue(it)
+    }
+
+    private lateinit var siteLiveData: LiveData<List<Locate>>
+    private val siteObserve = Observer<List<Locate>> {
+        sites.postValue(it)
+    }
+
+    init {
+        fetchLiveData()
+    }
+
+    private fun fetchLiveData() {
+        val preferences = Preferences.getInstance(context)
+        val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
+        val project = getProjectById(projectId)
+        val projectName = project?.name ?: context.getString(R.string.none)
+        siteLiveData =
+            Transformations.map(
+                audioMothDeploymentRepository.getAllResultsAsyncWithinProject(projectName)
+                    .asLiveData()
+            ) { it }
+        siteLiveData.observeForever(siteObserve)
+
+        deploymentLiveData = Transformations.map(
+            audioMothDeploymentRepository.getAllDeploymentResultsAsyncWithinProject(projectName)
+                .asLiveData()
+        ) { it }
+        deploymentLiveData.observeForever(deploymentObserve)
+    }
+
+    fun getDeployments(): LiveData<List<Deployment>> {
+        return deployments
+    }
+
+    fun getSites(): LiveData<List<Locate>> {
+        return sites
     }
 
     fun insertOrUpdate(locate: Locate) {
@@ -55,10 +105,6 @@ class AudioMothDeploymentViewModel(
         audioMothDeploymentRepository.insertOrUpdateTrackingFile(file)
     }
 
-    fun getAllDeploymentResultsAsyncWithinProject(projectName: String): RealmResults<Deployment> {
-        return audioMothDeploymentRepository.getAllDeploymentResultsAsyncWithinProject(projectName)
-    }
-
     fun updateDeployment(deployment: Deployment) {
         audioMothDeploymentRepository.updateDeployment(deployment)
     }
@@ -77,5 +123,10 @@ class AudioMothDeploymentViewModel(
 
     fun getDeploymentById(id: Int): Deployment? {
         return audioMothDeploymentRepository.getDeploymentById(id)
+    }
+
+    fun onDestroy() {
+        deploymentLiveData.removeObserver(deploymentObserve)
+        siteLiveData.removeObserver(siteObserve)
     }
 }

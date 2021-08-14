@@ -10,9 +10,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProvider
 import io.realm.RealmList
 import kotlinx.android.synthetic.main.activity_deployment.*
@@ -73,20 +71,8 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
 
     private val analytics by lazy { Analytics(this) }
 
-    // Local LiveData
-    private lateinit var deploymentLiveData: LiveData<List<Deployment>>
     private var deployments = listOf<Deployment>()
-    private val deploymentObserve = Observer<List<Deployment>> {
-        this.deployments = it.filter { deployment -> deployment.isCompleted() }
-        setSiteItems()
-    }
-
-    private lateinit var siteLiveData: LiveData<List<Locate>>
     private var sites = listOf<Locate>()
-    private val siteObserve = Observer<List<Locate>> {
-        this.sites = it
-        setSiteItems()
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,7 +80,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
 
         setupToolbar()
         setViewModel()
-        setLiveData()
+        setObserver()
         preferences.clearSelectedProject()
         this.currentLocation = this.getLastLocation()
         val deploymentId = intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
@@ -116,6 +102,18 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
         ).get(AudioMothDeploymentViewModel::class.java)
     }
 
+    private fun setObserver() {
+        audioMothDeploymentViewModel.getDeployments().observe(this, Observer {
+            this.deployments = it.filter { deployment -> deployment.isCompleted() }
+            setSiteItems()
+        })
+
+        audioMothDeploymentViewModel.getSites().observe(this, Observer {
+            this.sites = it
+            setSiteItems()
+        })
+    }
+
     private fun setSiteItems() {
         val loc = Location(LocationManager.GPS_PROVIDER)
         loc.latitude = 0.0
@@ -128,27 +126,6 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
             currentLocation ?: loc,
             sites
         )
-    }
-
-    private fun setLiveData() {
-        val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
-        val project = audioMothDeploymentViewModel.getProjectById(projectId)
-        val projectName = project?.name ?: getString(R.string.none)
-        siteLiveData = Transformations.map(
-            audioMothDeploymentViewModel.getAllResultsAsyncWithinProject(projectName).asLiveData()
-        ) {
-            it
-        }
-        siteLiveData.observeForever(siteObserve)
-
-        deploymentLiveData =
-            Transformations.map(
-                audioMothDeploymentViewModel.getAllDeploymentResultsAsyncWithinProject(projectName)
-                    .asLiveData()
-            ) {
-                it
-            }
-        deploymentLiveData.observeForever(deploymentObserve)
     }
 
     private fun setupToolbar() {
@@ -610,8 +587,10 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
     override fun onDestroy() {
         super.onDestroy()
         fromUnfinishedDeployment = false
-        siteLiveData.removeObserver(siteObserve)
-        deploymentLiveData.removeObserver(deploymentObserve)
+
+        if (::audioMothDeploymentViewModel.isInitialized) {
+            audioMothDeploymentViewModel.onDestroy()
+        }
     }
 
     companion object {
