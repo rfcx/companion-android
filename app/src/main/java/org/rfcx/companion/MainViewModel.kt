@@ -382,8 +382,8 @@ class MainViewModel(
         return mainRepository.getDeploymentUnsentCount()
     }
 
-    fun getGuardianDeploymentById(id: Int): Deployment? {
-        return mainRepository.getGuardianDeploymentById(id)
+    fun getDeploymentById(id: Int): Deployment? {
+        return mainRepository.getDeploymentById(id)
     }
 
     fun getLocateByName(name: String): Locate? {

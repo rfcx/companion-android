@@ -68,7 +68,7 @@ class MainRepository(
         return localDataHelper.getDeploymentLocalDb().unsentCount().toInt()
     }
 
-    fun getGuardianDeploymentById(id: Int): Deployment? {
+    fun getDeploymentById(id: Int): Deployment? {
         return localDataHelper.getDeploymentLocalDb().getDeploymentById(id)
     }
 
