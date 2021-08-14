@@ -429,21 +429,12 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
     }
 
     override fun playSyncSound() {
-        val deploymentId = getDeployment()?.deploymentKey
-        val deploymentIdArrayInt =
-            deploymentId?.chunked(2)?.map { it.toInt(radix = 16) }?.toTypedArray() ?: arrayOf()
-        val calendar = Calendar.getInstance()
-        Thread {
-            audioMothConnector.playTimeAndDeploymentID(
-                calendar,
-                deploymentIdArrayInt
-            )
-            this@AudioMothDeploymentActivity.runOnUiThread {
-                val fragment =
-                    supportFragmentManager.findFragmentById(R.id.contentContainer) as NewSyncFragment
-                fragment.showRepeatSync()
-            }
-        }.start()
+        audioMothDeploymentViewModel.playSyncSound(getDeployment()?.deploymentKey)
+        this@AudioMothDeploymentActivity.runOnUiThread {
+            val fragment =
+                supportFragmentManager.findFragmentById(R.id.contentContainer) as NewSyncFragment
+            fragment.showRepeatSync()
+        }
     }
 
     override fun playTone(duration: Int) {

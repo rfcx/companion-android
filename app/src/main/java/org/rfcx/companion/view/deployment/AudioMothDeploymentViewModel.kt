@@ -10,6 +10,7 @@ import androidx.lifecycle.Transformations
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
+import org.rfcx.companion.util.AudioMothChimeConnector
 import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.asLiveData
 import java.util.*
@@ -21,6 +22,7 @@ class AudioMothDeploymentViewModel(
 
     @SuppressLint("StaticFieldLeak")
     private val context = getApplication<Application>().applicationContext
+    private var audioMothConnector = AudioMothChimeConnector()
 
     private var deployments = MutableLiveData<List<Deployment>>()
     private var sites = MutableLiveData<List<Locate>>()
@@ -123,6 +125,18 @@ class AudioMothDeploymentViewModel(
 
     fun getDeploymentById(id: Int): Deployment? {
         return audioMothDeploymentRepository.getDeploymentById(id)
+    }
+
+    fun playSyncSound(deploymentId: String?) {
+        val deploymentIdArrayInt =
+            deploymentId?.chunked(2)?.map { it.toInt(radix = 16) }?.toTypedArray() ?: arrayOf()
+        val calendar = Calendar.getInstance()
+        Thread {
+            audioMothConnector.playTimeAndDeploymentID(
+                calendar,
+                deploymentIdArrayInt
+            )
+        }.start()
     }
 
     fun onDestroy() {
