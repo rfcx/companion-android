@@ -4,7 +4,10 @@ import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
 import io.realm.kotlin.deleteFromRealm
-import org.rfcx.companion.entity.*
+import org.rfcx.companion.entity.Locate
+import org.rfcx.companion.entity.LocationGroup
+import org.rfcx.companion.entity.SyncState
+import org.rfcx.companion.entity.TrackingFile
 import org.rfcx.companion.entity.response.StreamResponse
 import org.rfcx.companion.entity.response.toLocate
 import org.rfcx.companion.util.toISO8601Format
@@ -17,7 +20,10 @@ class LocateDb(private val realm: Realm) {
             .findAllAsync()
     }
 
-    fun getAllResultsAsyncWithinProject(sort: Sort = Sort.DESCENDING, project: String): RealmResults<Locate> {
+    fun getAllResultsAsyncWithinProject(
+        sort: Sort = Sort.DESCENDING,
+        project: String
+    ): RealmResults<Locate> {
         return realm.where(Locate::class.java)
             .equalTo("locationGroup.name", project)
             .sort(Locate.FIELD_ID, sort)
@@ -52,51 +58,18 @@ class LocateDb(private val realm: Realm) {
                     ?.toInt() ?: 0) + 1
                 locate.id = id
             }
-            // new last deployment?
-            if (!isGuardian) {
-                locate.lastDeploymentId = deploymentId
-                locate.lastGuardianDeploymentId = 0
-                locate.lastGuardianDeploymentServerId = null
-            } else {
-                locate.lastGuardianDeploymentId = deploymentId
-                locate.lastDeploymentId = 0
-                locate.lastDeploymentServerId = null
-            }
             it.insertOrUpdate(locate)
         }
     }
 
-    fun updateSiteServerId(deploymentId: Int, serverId: String, fromGuardian: Boolean = false) {
+    fun updateSiteServerId(deploymentId: Int, serverId: String) {
         realm.executeTransaction {
-            if (!fromGuardian) {
-                //update server id in site
-                it.where(Locate::class.java)
-                    .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_ID, deploymentId)
-                    .findFirst()?.apply {
-                        this.serverId = serverId
-                    }
-
-                //update server id in track
-                it.where(TrackingFile::class.java)
-                    .equalTo(TrackingFile.FIELD_DEPLOYMENT_ID, deploymentId)
-                    .findFirst()?.apply {
-                        this.siteServerId = serverId
-                    }
-            } else {
-                //update server id in site
-                it.where(Locate::class.java)
-                    .equalTo(Locate.FIELD_LAST_GUARDIAN_DEPLOYMENT_ID, deploymentId)
-                    .findFirst()?.apply {
-                        this.serverId = serverId
-                    }
-
-                //update server id in track
-                it.where(TrackingFile::class.java)
-                    .equalTo(TrackingFile.FIELD_DEPLOYMENT_ID, deploymentId)
-                    .findFirst()?.apply {
-                        this.siteServerId = serverId
-                    }
-            }
+            //update server id in track
+            it.where(TrackingFile::class.java)
+                .equalTo(TrackingFile.FIELD_DEPLOYMENT_ID, deploymentId)
+                .findFirst()?.apply {
+                    this.siteServerId = serverId
+                }
         }
     }
 

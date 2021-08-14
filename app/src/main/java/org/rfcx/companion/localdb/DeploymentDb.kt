@@ -9,7 +9,7 @@ import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.guardian.isGuardian
 import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.toDeploymentLocation
-import org.rfcx.companion.entity.response.toGuardianDeployment
+import org.rfcx.companion.entity.response.toDeployment
 import java.util.*
 
 class DeploymentDb(private val realm: Realm) {
@@ -98,7 +98,7 @@ class DeploymentDb(private val realm: Realm) {
 
                     deployment.createdAt = deploymentResponse.createdAt ?: deployment.createdAt
                 } else {
-                    val deploymentObj = deploymentResponse.toGuardianDeployment()
+                    val deploymentObj = deploymentResponse.toDeployment()
                     val id = (it.where(Deployment::class.java).max(Deployment.FIELD_ID)
                         ?.toInt() ?: 0) + 1
                     deploymentObj.id = id
@@ -230,38 +230,6 @@ class DeploymentDb(private val realm: Realm) {
                 deployment.stream?.altitude = altitude
                 deployment.updatedAt = Date()
                 deployment.syncState = SyncState.Unsent.key
-            }
-
-            // do update location
-            val location = if (deployment?.serverId != null) {
-                if (deployment.isGuardian()) {
-                    bgRealm.where(Locate::class.java)
-                        .equalTo(Locate.FIELD_LAST_GUARDIAN_DEPLOYMENT_SERVER_ID, deployment.serverId)
-                        .findFirst()
-                } else {
-                    bgRealm.where(Locate::class.java)
-                    .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_SERVER_ID, deployment.serverId)
-                        .findFirst()
-                        ?: bgRealm.where(Locate::class.java)
-                            .equalTo(Locate.FIELD_SERVER_ID, deployment.stream?.coreId)
-                            .findFirst()
-                }
-            } else {
-                if (deployment?.isGuardian() == true) {
-                    bgRealm.where(Locate::class.java)
-                        .equalTo(Locate.FIELD_LAST_GUARDIAN_DEPLOYMENT_ID, id).findFirst()
-                } else {
-                    bgRealm.where(Locate::class.java)
-                        .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_ID, id).findFirst()
-                }
-            }
-
-            if (location != null) {
-                location.latitude = latitude
-                location.longitude = longitude
-                location.altitude = altitude
-                location.name = locationName
-                location.syncState = SyncState.Unsent.key
             }
         }, {
             // success

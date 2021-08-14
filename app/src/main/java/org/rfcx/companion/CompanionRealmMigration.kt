@@ -66,6 +66,10 @@ class CompanionRealmMigration : RealmMigration {
         if (oldVersion < 17L && newVersion >= 17L) {
             migrateToV17(realm)
         }
+
+        if (oldVersion < 18L && newVersion >= 18L) {
+            migrateToV18(realm)
+        }
     }
 
     private fun migrateToV2(realm: DynamicRealm) {
@@ -80,8 +84,8 @@ class CompanionRealmMigration : RealmMigration {
         // Rename table Configuration to EdgeConfiguration
         val edgeConfiguration = realm.schema.rename("Configuration", "EdgeConfiguration")
 
-        // Rename table Deployment to EdgeDeployment
-        val edgeDeployment = realm.schema.rename("Deployment", EdgeDeployment.TABLE_NAME)
+        // Rename table Deployment to EdgeDeploymentEdgeDeployment
+        val edgeDeployment = realm.schema.rename("Deployment", "EdgeDeployment")
 
         // Add field updatedAt and deletedAt to EdgeDeployment
         edgeDeployment?.apply {
@@ -97,8 +101,8 @@ class CompanionRealmMigration : RealmMigration {
                 "configuration_tmp"
             )
 
-            addField(EdgeDeployment.FIELD_UPDATED_AT, Date::class.java)
-            addField(EdgeDeployment.FIELD_DELETED_AT, Date::class.java)
+            addField("updatedAt", Date::class.java)
+            addField("deletedAt", Date::class.java)
         }
 
         val locate = realm.schema.get(Locate.TABLE_NAME)
@@ -149,7 +153,7 @@ class CompanionRealmMigration : RealmMigration {
 
         // Delete field first to avoid ref error
         // Remove fields that were not used in AudioMoth version
-        val edgeDeployment = realm.schema.get(EdgeDeployment.TABLE_NAME)
+        val edgeDeployment = realm.schema.get("EdgeDeployment")
         edgeDeployment?.apply {
             val hasConfigField = this.hasField("configuration")
             val hasBatteryLevelField = this.hasField("batteryLevel")
@@ -177,16 +181,16 @@ class CompanionRealmMigration : RealmMigration {
     }
 
     private fun migrateToV5(realm: DynamicRealm) {
-        val edgeDeployment = realm.schema.get(EdgeDeployment.TABLE_NAME)
+        val edgeDeployment = realm.schema.get("EdgeDeployment")
         edgeDeployment?.apply {
-            addRealmListField(EdgeDeployment.FIELD_PASSED_CHECKS, Int::class.java)
-                .setNullable(EdgeDeployment.FIELD_PASSED_CHECKS, true)
+            addRealmListField("passedChecks", Int::class.java)
+                .setNullable("passedChecks", true)
         }
     }
 
     private fun migrateToV6(realm: DynamicRealm) {
-        val guardianDeployment = realm.schema.get(Deployment.TABLE_NAME)
-        guardianDeployment?.apply {
+        val deployment = realm.schema.get("GuardianDeployment")
+        deployment?.apply {
             addField(Deployment.FIELD_UPDATED_AT, Date::class.java)
         }
     }
@@ -231,20 +235,20 @@ class CompanionRealmMigration : RealmMigration {
             addField(DeploymentLocation.FIELD_CORE_ID, String::class.java)
         }
 
-        val edgeDeployment = realm.schema.get(EdgeDeployment.TABLE_NAME)
+        val edgeDeployment = realm.schema.get("EdgeDeployment")
         edgeDeployment?.apply {
-            renameField("location", EdgeDeployment.FIELD_STREAM)
-            renameField("deploymentId", EdgeDeployment.FIELD_DEPLOYMENT_KEY)
+            renameField("location", "stream")
+            renameField("deploymentId", "deploymentKey")
         }
 
-        val guardianDeployment = realm.schema.get(Deployment.TABLE_NAME)
+        val guardianDeployment = realm.schema.get("GuardianDeployment")
         guardianDeployment?.apply {
             renameField("location", Deployment.FIELD_STREAM)
         }
     }
 
     private fun migrateToV10(realm: DynamicRealm) {
-        val edgeDeployment = realm.schema.get(EdgeDeployment.TABLE_NAME)
+        val edgeDeployment = realm.schema.get("EdgeDeployment")
         edgeDeployment?.apply {
             addField("isActive", Boolean::class.java)
         }
@@ -315,7 +319,7 @@ class CompanionRealmMigration : RealmMigration {
             removeField(TrackingFile.FIELD_DEVICE)
         }
 
-        val guardianDp = realm.schema.get(Deployment.TABLE_NAME)
+        val guardianDp = realm.schema.get("GuardianDeployment")
         guardianDp?.apply {
             addField("deploymentKey", String::class.java)
                 .setRequired("deploymentKey", true)
@@ -340,7 +344,7 @@ class CompanionRealmMigration : RealmMigration {
     }
 
     private fun migrateToV16(realm: DynamicRealm) {
-        val deployment = realm.schema.get(Deployment.TABLE_NAME)
+        val deployment = realm.schema.get("GuardianDeployment")
         deployment?.apply {
             addField(Deployment.FIELD_DELETED_AT, Date::class.java)
             addRealmListField(Deployment.FIELD_PASSED_CHECKS, Int::class.java)
@@ -362,7 +366,29 @@ class CompanionRealmMigration : RealmMigration {
     private fun migrateToV17(realm: DynamicRealm) {
         val deployment = realm.schema.get("GuardianDeployment")
         deployment?.apply {
-            className = "Deployment"
+            className = Deployment.TABLE_NAME
+        }
+    }
+
+    private fun migrateToV18(realm: DynamicRealm) {
+        val locate = realm.schema.get(Locate.TABLE_NAME)
+        locate?.apply {
+            val lastDeploymentId = this.hasField("lastDeploymentId")
+            if (lastDeploymentId) {
+                removeField("lastDeploymentId")
+            }
+            val lastDeploymentServerId = this.hasField("lastDeploymentServerId")
+            if (lastDeploymentServerId) {
+                removeField("lastDeploymentServerId")
+            }
+            val lastGuardianDeploymentId = this.hasField("lastGuardianDeploymentId")
+            if (lastGuardianDeploymentId) {
+                removeField("lastGuardianDeploymentId")
+            }
+            val lastGuardianDeploymentServerId = this.hasField("lastGuardianDeploymentServerId")
+            if (lastGuardianDeploymentServerId) {
+                removeField("lastGuardianDeploymentServerId")
+            }
         }
     }
 

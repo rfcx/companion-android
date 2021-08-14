@@ -234,10 +234,6 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 altitude,
                 it.createdAt,
                 it.updatedAt,
-                it.lastDeploymentId,
-                it.lastDeploymentServerId,
-                it.lastGuardianDeploymentId,
-                it.lastGuardianDeploymentServerId,
                 it.syncState
             )
             createSiteSymbol(locate.getLatLng())
@@ -275,10 +271,6 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 currentUserLocation?.altitude ?: it.altitude,
                 it.createdAt,
                 it.updatedAt,
-                it.lastDeploymentId,
-                it.lastDeploymentServerId,
-                it.lastGuardianDeploymentId,
-                it.lastGuardianDeploymentServerId,
                 it.syncState
             )
             deploymentProtocol?.setDeployLocation(locate, true)
