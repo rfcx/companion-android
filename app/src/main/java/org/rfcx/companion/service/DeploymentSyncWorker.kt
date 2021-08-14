@@ -104,8 +104,8 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
     }
 
     companion object {
-        private const val TAG = "GDeploymentSyncWorker"
-        private const val UNIQUE_WORK_KEY = "GDeploymentSyncWorkerUniqueKey"
+        private const val TAG = "DeploymentSyncWorker"
+        private const val UNIQUE_WORK_KEY = "DeploymentSyncWorkerUniqueKey"
         private var isRunning = DeploymentSyncState.NOT_RUNNING
 
         fun enqueue(context: Context) {
