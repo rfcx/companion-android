@@ -48,7 +48,7 @@ class MainRepository(
         return localDataHelper.getLocateLocalDb().getAllResultsAsync()
     }
 
-    fun getAllGuardianDeploymentLocateResultsAsync(): RealmResults<Deployment> {
+    fun getAllDeploymentLocateResultsAsync(): RealmResults<Deployment> {
         return localDataHelper.getDeploymentLocalDb().getAllResultsAsync()
     }
 

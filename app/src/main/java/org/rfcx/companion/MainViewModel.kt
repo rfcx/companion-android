@@ -71,7 +71,7 @@ class MainViewModel(
         siteLiveData.observeForever(siteObserve)
 
         deploymentLiveData = Transformations.map(
-            mainRepository.getAllGuardianDeploymentLocateResultsAsync().asLiveData()
+            mainRepository.getAllDeploymentLocateResultsAsync().asLiveData()
         ) { it }
         deploymentLiveData.observeForever(deploymentObserve)
     }
