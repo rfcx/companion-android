@@ -96,7 +96,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
             .getDeployment(token, id).execute().body()
         updatedDp?.let { dp ->
             db.updateDeploymentByServerId(updatedDp.toDeployment())
-            locateDb.updateSiteServerId(deploymentId, dp.stream!!.id!!, updatedDp.isGuardian())
+            locateDb.updateSiteServerId(deploymentId, dp.stream!!.id!!)
         }
 
         //send tracking if there is

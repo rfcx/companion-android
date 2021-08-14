@@ -236,7 +236,7 @@ class MainViewModel(
         var deploymentsForShow = this.deployments.filter { it.isCompleted() }
         val usedSites = deploymentsForShow.map { it.stream?.coreId }
         var filteredShowLocations =
-            sites.filter { loc -> !usedSites.contains(loc.serverId) || (loc.serverId == null && (loc.lastDeploymentId == 0 && loc.lastGuardianDeploymentId == 0)) }
+            sites.filter { loc -> !usedSites.contains(loc.serverId) || loc.serverId == null }
         val projectName = getProjectName()
         if (projectName != context.getString(R.string.none)) {
             filteredShowLocations =

@@ -21,10 +21,6 @@ open class Locate(
     var altitude: Double = 0.0,
     var createdAt: Date = Date(),
     var updatedAt: Date? = null,
-    var lastDeploymentId: Int = 0,
-    var lastDeploymentServerId: String? = null,
-    var lastGuardianDeploymentId: Int = 0,
-    var lastGuardianDeploymentServerId: String? = null,
     @Expose(serialize = false)
     var syncState: Int = 0
 ) : RealmModel {
@@ -49,10 +45,6 @@ open class Locate(
         const val FIELD_UPDATED_AT = "updatedAt"
         const val FIELD_LOCATION_GROUP = "locationGroup"
         const val FIELD_DELETED_AT = "deletedAt"
-        const val FIELD_LAST_EDGE_DEPLOYMENT_SERVER_ID = "lastDeploymentServerId"
-        const val FIELD_LAST_EDGE_DEPLOYMENT_ID = "lastDeploymentId"
-        const val FIELD_LAST_GUARDIAN_DEPLOYMENT_SERVER_ID = "lastGuardianDeploymentServerId"
-        const val FIELD_LAST_GUARDIAN_DEPLOYMENT_ID = "lastGuardianDeploymentId"
         const val FIELD_ALTITUDE = "altitude"
         const val FIELD_NAME = "name"
     }

@@ -66,6 +66,10 @@ class CompanionRealmMigration : RealmMigration {
         if (oldVersion < 17L && newVersion >= 17L) {
             migrateToV17(realm)
         }
+
+        if (oldVersion < 18L && newVersion >= 18L) {
+            migrateToV18(realm)
+        }
     }
 
     private fun migrateToV2(realm: DynamicRealm) {
@@ -363,6 +367,28 @@ class CompanionRealmMigration : RealmMigration {
         val deployment = realm.schema.get("GuardianDeployment")
         deployment?.apply {
             className = Deployment.TABLE_NAME
+        }
+    }
+
+    private fun migrateToV18(realm: DynamicRealm) {
+        val locate = realm.schema.get(Locate.TABLE_NAME)
+        locate?.apply {
+            val lastDeploymentId = this.hasField("lastDeploymentId")
+            if (lastDeploymentId) {
+                removeField("lastDeploymentId")
+            }
+            val lastDeploymentServerId = this.hasField("lastDeploymentServerId")
+            if (lastDeploymentServerId) {
+                removeField("lastDeploymentServerId")
+            }
+            val lastGuardianDeploymentId = this.hasField("lastGuardianDeploymentId")
+            if (lastGuardianDeploymentId) {
+                removeField("lastGuardianDeploymentId")
+            }
+            val lastGuardianDeploymentServerId = this.hasField("lastGuardianDeploymentServerId")
+            if (lastGuardianDeploymentServerId) {
+                removeField("lastGuardianDeploymentServerId")
+            }
         }
     }
 

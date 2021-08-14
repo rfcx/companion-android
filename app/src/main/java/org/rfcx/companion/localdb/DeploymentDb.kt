@@ -231,38 +231,6 @@ class DeploymentDb(private val realm: Realm) {
                 deployment.updatedAt = Date()
                 deployment.syncState = SyncState.Unsent.key
             }
-
-            // do update location
-            val location = if (deployment?.serverId != null) {
-                if (deployment.isGuardian()) {
-                    bgRealm.where(Locate::class.java)
-                        .equalTo(Locate.FIELD_LAST_GUARDIAN_DEPLOYMENT_SERVER_ID, deployment.serverId)
-                        .findFirst()
-                } else {
-                    bgRealm.where(Locate::class.java)
-                    .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_SERVER_ID, deployment.serverId)
-                        .findFirst()
-                        ?: bgRealm.where(Locate::class.java)
-                            .equalTo(Locate.FIELD_SERVER_ID, deployment.stream?.coreId)
-                            .findFirst()
-                }
-            } else {
-                if (deployment?.isGuardian() == true) {
-                    bgRealm.where(Locate::class.java)
-                        .equalTo(Locate.FIELD_LAST_GUARDIAN_DEPLOYMENT_ID, id).findFirst()
-                } else {
-                    bgRealm.where(Locate::class.java)
-                        .equalTo(Locate.FIELD_LAST_EDGE_DEPLOYMENT_ID, id).findFirst()
-                }
-            }
-
-            if (location != null) {
-                location.latitude = latitude
-                location.longitude = longitude
-                location.altitude = altitude
-                location.name = locationName
-                location.syncState = SyncState.Unsent.key
-            }
         }, {
             // success
             realm.close()
