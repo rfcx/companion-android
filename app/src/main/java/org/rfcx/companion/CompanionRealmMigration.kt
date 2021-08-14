@@ -185,8 +185,8 @@ class CompanionRealmMigration : RealmMigration {
     }
 
     private fun migrateToV6(realm: DynamicRealm) {
-        val guardianDeployment = realm.schema.get(Deployment.TABLE_NAME)
-        guardianDeployment?.apply {
+        val deployment = realm.schema.get("GuardianDeployment")
+        deployment?.apply {
             addField(Deployment.FIELD_UPDATED_AT, Date::class.java)
         }
     }
@@ -237,7 +237,7 @@ class CompanionRealmMigration : RealmMigration {
             renameField("deploymentId", EdgeDeployment.FIELD_DEPLOYMENT_KEY)
         }
 
-        val guardianDeployment = realm.schema.get(Deployment.TABLE_NAME)
+        val guardianDeployment = realm.schema.get("GuardianDeployment")
         guardianDeployment?.apply {
             renameField("location", Deployment.FIELD_STREAM)
         }
@@ -315,7 +315,7 @@ class CompanionRealmMigration : RealmMigration {
             removeField(TrackingFile.FIELD_DEVICE)
         }
 
-        val guardianDp = realm.schema.get(Deployment.TABLE_NAME)
+        val guardianDp = realm.schema.get("GuardianDeployment")
         guardianDp?.apply {
             addField("deploymentKey", String::class.java)
                 .setRequired("deploymentKey", true)
@@ -340,7 +340,7 @@ class CompanionRealmMigration : RealmMigration {
     }
 
     private fun migrateToV16(realm: DynamicRealm) {
-        val deployment = realm.schema.get(Deployment.TABLE_NAME)
+        val deployment = realm.schema.get("GuardianDeployment")
         deployment?.apply {
             addField(Deployment.FIELD_DELETED_AT, Date::class.java)
             addRealmListField(Deployment.FIELD_PASSED_CHECKS, Int::class.java)
@@ -362,7 +362,7 @@ class CompanionRealmMigration : RealmMigration {
     private fun migrateToV17(realm: DynamicRealm) {
         val deployment = realm.schema.get("GuardianDeployment")
         deployment?.apply {
-            className = "Deployment"
+            className = Deployment.TABLE_NAME
         }
     }
 

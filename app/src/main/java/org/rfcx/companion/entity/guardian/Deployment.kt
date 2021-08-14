@@ -50,7 +50,7 @@ open class Deployment(
     }
 
     companion object {
-        const val TABLE_NAME = "GuardianDeployment"
+        const val TABLE_NAME = "Deployment"
         const val FIELD_ID = "id"
         const val FIELD_SERVER_ID = "serverId"
         const val FIELD_STATE = "state"
