@@ -8,7 +8,7 @@ import io.realm.Realm
 import org.rfcx.companion.entity.request.EditDeploymentRequest
 import org.rfcx.companion.entity.request.toRequestBody
 import org.rfcx.companion.entity.response.isGuardian
-import org.rfcx.companion.entity.response.toGuardianDeployment
+import org.rfcx.companion.entity.response.toDeployment
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.repo.ApiManager
@@ -95,7 +95,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
         val updatedDp = ApiManager.getInstance().getDeviceApi()
             .getDeployment(token, id).execute().body()
         updatedDp?.let { dp ->
-            db.updateDeploymentByServerId(updatedDp.toGuardianDeployment())
+            db.updateDeploymentByServerId(updatedDp.toDeployment())
             locateDb.updateSiteServerId(deploymentId, dp.stream!!.id!!, updatedDp.isGuardian())
         }
 

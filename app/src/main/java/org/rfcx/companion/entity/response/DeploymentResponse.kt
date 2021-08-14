@@ -23,7 +23,7 @@ fun DeploymentResponse.isGuardian(): Boolean {
     return this.deploymentType == Device.GUARDIAN.value
 }
 
-fun DeploymentResponse.toGuardianDeployment(): Deployment {
+fun DeploymentResponse.toDeployment(): Deployment {
     return Deployment(
         serverId = this.id,
         deploymentKey = this.id ?: "",

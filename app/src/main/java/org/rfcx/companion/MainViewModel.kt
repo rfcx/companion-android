@@ -43,7 +43,7 @@ class MainViewModel(
     private val deploymentMarkers = MutableLiveData<Resource<List<MapMarker.DeploymentMarker>>>()
     private val siteMarkers = MutableLiveData<Resource<List<MapMarker>>>()
     private val siteList = MutableLiveData<Resource<List<Locate>>>()
-    private val showGuardianDeployments = MutableLiveData<Resource<List<Deployment>>>()
+    private val showDeployments = MutableLiveData<Resource<List<Deployment>>>()
 
     private var deployments = listOf<Deployment>()
     private var sites = listOf<Locate>()
@@ -234,9 +234,9 @@ class MainViewModel(
 
     fun combinedData() {
         var deploymentsForShow = this.deployments.filter { it.isCompleted() }
-        val usedSitesOnGuardian = deploymentsForShow.map { it.stream?.coreId }
+        val usedSites = deploymentsForShow.map { it.stream?.coreId }
         var filteredShowLocations =
-            sites.filter { loc -> !usedSitesOnGuardian.contains(loc.serverId) || (loc.serverId == null && (loc.lastDeploymentId == 0 && loc.lastGuardianDeploymentId == 0)) }
+            sites.filter { loc -> !usedSites.contains(loc.serverId) || (loc.serverId == null && (loc.lastDeploymentId == 0 && loc.lastGuardianDeploymentId == 0)) }
         val projectName = getProjectName()
         if (projectName != context.getString(R.string.none)) {
             filteredShowLocations =
@@ -247,7 +247,7 @@ class MainViewModel(
         val deploymentMarkersList = deploymentsForShow.map { it.toMark(context) }
         deploymentMarkers.postValue(Resource.success(deploymentMarkersList))
         siteMarkers.postValue(Resource.success(filteredShowLocations.map { it.toMark() }))
-        showGuardianDeployments.postValue(Resource.success(deploymentsForShow))
+        showDeployments.postValue(Resource.success(deploymentsForShow))
     }
 
     fun updateStatusOfflineMap() {
@@ -362,8 +362,8 @@ class MainViewModel(
         return siteList
     }
 
-    fun getShowGuardianDeployments(): LiveData<Resource<List<Deployment>>> {
-        return showGuardianDeployments
+    fun getShowDeployments(): LiveData<Resource<List<Deployment>>> {
+        return showDeployments
     }
 
     fun getTrackingFromRemote(): LiveData<Resource<List<DeploymentAssetResponse>>> {

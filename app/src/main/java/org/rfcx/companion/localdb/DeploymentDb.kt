@@ -9,7 +9,7 @@ import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.guardian.isGuardian
 import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.toDeploymentLocation
-import org.rfcx.companion.entity.response.toGuardianDeployment
+import org.rfcx.companion.entity.response.toDeployment
 import java.util.*
 
 class DeploymentDb(private val realm: Realm) {
@@ -98,7 +98,7 @@ class DeploymentDb(private val realm: Realm) {
 
                     deployment.createdAt = deploymentResponse.createdAt ?: deployment.createdAt
                 } else {
-                    val deploymentObj = deploymentResponse.toGuardianDeployment()
+                    val deploymentObj = deploymentResponse.toDeployment()
                     val id = (it.where(Deployment::class.java).max(Deployment.FIELD_ID)
                         ?.toInt() ?: 0) + 1
                     deploymentObj.id = id

@@ -1005,7 +1005,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             }
         })
 
-        mainViewModel.getShowGuardianDeployments().observe(viewLifecycleOwner, Observer {
+        mainViewModel.getShowDeployments().observe(viewLifecycleOwner, Observer {
             when (it.status) {
                 Status.LOADING -> {}
                 Status.SUCCESS -> {
