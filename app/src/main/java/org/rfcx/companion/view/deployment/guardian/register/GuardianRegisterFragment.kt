@@ -12,6 +12,7 @@ import kotlinx.android.synthetic.main.fragment_guardian_register.*
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.SocketManager
 import org.rfcx.companion.entity.Screen
+import org.rfcx.companion.entity.request.GuardianRegisterRequest
 import org.rfcx.companion.entity.response.GuardianRegisterResponse
 import org.rfcx.companion.entity.socket.response.Status
 import org.rfcx.companion.repo.ApiManager
@@ -74,7 +75,7 @@ class GuardianRegisterFragment : Fragment() {
         val guid = deploymentProtocol?.getGuid()
         val userToken = requireContext().getIdToken()
         if (guid != null && userToken != null) {
-            ApiManager.getInstance().getRestApi(getRadioValueForRegistration()).registerGuardian(userToken, guid).enqueue(
+            ApiManager.getInstance().getRestApi(getRadioValueForRegistration()).registerGuardian("Bearer $userToken", GuardianRegisterRequest(guid)).enqueue(
                 object: Callback<GuardianRegisterResponse> {
                     override fun onResponse(
                         call: Call<GuardianRegisterResponse>,

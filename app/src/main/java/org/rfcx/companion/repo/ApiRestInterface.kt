@@ -1,6 +1,7 @@
 package org.rfcx.companion.repo
 
 import org.rfcx.companion.entity.UserTouchResponse
+import org.rfcx.companion.entity.request.GuardianRegisterRequest
 import org.rfcx.companion.entity.response.ProjectByIdResponse
 import org.rfcx.companion.entity.response.GuardianRegisterResponse
 import retrofit2.Call
@@ -19,6 +20,6 @@ interface ApiRestInterface {
     @POST("v2/guardians/register")
     fun registerGuardian(
         @Header("Authorization") authUser: String,
-        @Body guid: String
+        @Body guid: GuardianRegisterRequest
     ): Call<GuardianRegisterResponse>
 }

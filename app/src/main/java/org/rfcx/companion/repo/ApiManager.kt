@@ -4,6 +4,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.repo.api.DeviceApiService
+import org.rfcx.companion.util.insert
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
@@ -40,13 +41,13 @@ class ApiManager {
         return if (isProduction == null) {
             apiRest
         } else {
-            val staging = "staging"
-            val url = BuildConfig.DEPLOY_DOMAIN
+            val staging = "staging-"
+            var url = BuildConfig.DEPLOY_DOMAIN
             if (url.contains(staging, ignoreCase = true)) {
-                url.replace(staging, "")
+                url = url.replace(staging, "")
             }
             if (!isProduction) {
-                url.insert(8, staging)
+                url = url.insert(8, staging)
             }
             setRetrofitBaseUrl(url).create(ApiRestInterface::class.java)
         }
