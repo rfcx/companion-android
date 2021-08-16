@@ -26,7 +26,7 @@ import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DeploymentCleanupWorker
 import org.rfcx.companion.util.*
-import org.rfcx.companion.view.deployment.EdgeDeploymentActivity
+import org.rfcx.companion.view.deployment.AudioMothDeploymentActivity
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.companion.view.map.MapFragment
 import org.rfcx.companion.view.profile.ProfileFragment
@@ -117,7 +117,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
                         tip.findViewById<ConstraintLayout>(R.id.audioMothLayout)
                     val addGuardian = tip.findViewById<ConstraintLayout>(R.id.guardianLayout)
                     addEdgeOrAudioMoth?.setOnClickListener {
-                        EdgeDeploymentActivity.startActivity(this)
+                        AudioMothDeploymentActivity.startActivity(this)
                         tip.dismiss()
                     }
                     addGuardian?.setOnClickListener {
@@ -127,7 +127,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
                     tip.show()
                 }
             } else {
-                EdgeDeploymentActivity.startActivity(this)
+                AudioMothDeploymentActivity.startActivity(this)
             }
         }
 

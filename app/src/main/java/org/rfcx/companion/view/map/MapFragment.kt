@@ -65,13 +65,13 @@ import org.rfcx.companion.MainViewModel
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
-import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.localdb.*
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
-import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.DownloadStreamsWorker
+import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.Status
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
@@ -108,8 +108,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
     private var deploymentMarkers = listOf<MapMarker.DeploymentMarker>()
     private var siteMarkers = listOf<MapMarker>()
-    private var showDeployments = listOf<EdgeDeployment>()
-    private var showGuardianDeployments = listOf<GuardianDeployment>()
+    private var showDeployments = listOf<Deployment>()
 
     private lateinit var deploymentWorkInfoLiveData: LiveData<List<WorkInfo>>
     private lateinit var downloadStreamsWorkInfoLiveData: LiveData<List<WorkInfo>>
@@ -536,7 +535,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                             any(
                                 eq(
                                     get(PROPERTY_DEPLOYMENT_MARKER_IMAGE),
-                                    Battery.BATTERY_PIN_GREEN
+                                    Pin.PIN_GREEN
                                 ),
                                 eq(
                                     get(PROPERTY_DEPLOYMENT_MARKER_IMAGE),
@@ -669,14 +668,14 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map, null)
         val mBitmapPinMapGreen = BitmapUtils.getBitmapFromDrawable(drawablePinMapGreen)
         if (mBitmapPinMapGreen != null) {
-            style.addImage(Battery.BATTERY_PIN_GREEN, mBitmapPinMapGreen)
+            style.addImage(Pin.PIN_GREEN, mBitmapPinMapGreen)
         }
 
         val drawablePinMapGrey =
             ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map_grey, null)
         val mBitmapPinMapGrey = BitmapUtils.getBitmapFromDrawable(drawablePinMapGrey)
         if (mBitmapPinMapGrey != null) {
-            style.addImage(Battery.BATTERY_PIN_GREY, mBitmapPinMapGrey)
+            style.addImage(Pin.PIN_GREY, mBitmapPinMapGrey)
         }
     }
 
@@ -847,7 +846,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                 if (device == Device.AUDIOMOTH.value) {
                     DeploymentDetailActivity.startActivity(it, deploymentId.toInt())
                 } else {
-                    val deployment = mainViewModel.getGuardianDeploymentById(deploymentId.toInt())
+                    val deployment = mainViewModel.getDeploymentById(deploymentId.toInt())
                     deployment?.let { dp ->
                         DiagnosticActivity.startActivity(it, dp, false)
                     }
@@ -918,7 +917,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             adapterOfSearchSite = getListSite(
                 requireContext(),
                 showDeployments,
-                showGuardianDeployments,
                 projectName,
                 currentLocation,
                 locations
@@ -928,7 +926,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             adapterOfSearchSite = getListSiteWithOutCurrentLocation(
                 requireContext(),
                 showDeployments,
-                showGuardianDeployments,
                 projectName,
                 locations
             )
@@ -1013,17 +1010,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                 Status.LOADING -> {}
                 Status.SUCCESS -> {
                     showDeployments = it.data ?: listOf()
-                    combinedData()
-                }
-                Status.ERROR -> {}
-            }
-        })
-
-        mainViewModel.getShowGuardianDeployments().observe(viewLifecycleOwner, Observer {
-            when (it.status) {
-                Status.LOADING -> {}
-                Status.SUCCESS -> {
-                    showGuardianDeployments = it.data ?: listOf()
                     combinedData()
                 }
                 Status.ERROR -> {}

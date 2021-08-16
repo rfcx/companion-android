@@ -19,12 +19,12 @@ import kotlinx.android.synthetic.main.activity_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
-import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.localdb.*
-import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
-import org.rfcx.companion.service.DeploymentSyncWorker
+import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
+import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.Preferences.Companion.ENABLE_LOCATION_TRACKING
 import org.rfcx.companion.util.geojson.GeoJsonUtils
@@ -38,19 +38,18 @@ import org.rfcx.companion.view.detail.MapPickerProtocol
 import org.rfcx.companion.view.dialog.*
 import java.util.*
 
-class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, CompleteListener,
+class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProtocol, CompleteListener,
     MapPickerProtocol {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val edgeDeploymentDb by lazy { EdgeDeploymentDb(realm) }
-    private val guardianDeploymentDb by lazy { GuardianDeploymentDb(realm) }
+    private val deploymentDb by lazy { DeploymentDb(realm) }
     private val locateDb by lazy { LocateDb(realm) }
     private val projectDb by lazy { ProjectDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val trackingDb by lazy { TrackingDb(realm) }
     private val trackingFileDb by lazy { TrackingFileDb(realm) }
 
-    private var _deployment: EdgeDeployment? = null
+    private var _deployment: Deployment? = null
     private var _deployLocation: DeploymentLocation? = null
     private var _images: List<String> = listOf()
     private var _siteItems = arrayListOf<SiteWithLastDeploymentItem>()
@@ -64,7 +63,6 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
     private var latitude = 0.0
     private var longitude = 0.0
-    private var altitude = 0.0
     private var nameLocation: String = ""
     private var siteId: Int = 0
 
@@ -79,17 +77,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     private val analytics by lazy { Analytics(this) }
 
     // Local LiveData
-    private lateinit var audioMothDeployLiveData: LiveData<List<EdgeDeployment>>
-    private var audioMothDeployments = listOf<EdgeDeployment>()
-    private val audioMothDeploymentObserve = Observer<List<EdgeDeployment>> {
-        this.audioMothDeployments = it.filter { deployment -> deployment.isCompleted() }
-        setSiteItems()
-    }
-
-    private lateinit var guardianDeploymentLiveData: LiveData<List<GuardianDeployment>>
-    private var guardianDeployments = listOf<GuardianDeployment>()
-    private val guardianDeploymentObserve = Observer<List<GuardianDeployment>> {
-        this.guardianDeployments = it.filter { deployment -> deployment.isCompleted() }
+    private lateinit var deploymentLiveData: LiveData<List<Deployment>>
+    private var deployments = listOf<Deployment>()
+    private val deploymentObserve = Observer<List<Deployment>> {
+        this.deployments = it.filter { deployment -> deployment.isCompleted() }
         setSiteItems()
     }
 
@@ -123,8 +114,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
         _siteItems = getListSite(
             this,
-            audioMothDeployments,
-            guardianDeployments,
+            deployments,
             getString(R.string.none),
             currentLocation ?: loc,
             sites
@@ -140,17 +130,11 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         }
         siteLiveData.observeForever(siteObserve)
 
-        audioMothDeployLiveData =
-            Transformations.map(edgeDeploymentDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()) {
+        deploymentLiveData =
+            Transformations.map(deploymentDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()) {
                 it
             }
-        audioMothDeployLiveData.observeForever(audioMothDeploymentObserve)
-
-        guardianDeploymentLiveData =
-            Transformations.map(guardianDeploymentDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()) {
-                it
-            }
-        guardianDeploymentLiveData.observeForever(guardianDeploymentObserve)
+        deploymentLiveData.observeForever(deploymentObserve)
     }
 
     private fun setupToolbar() {
@@ -162,9 +146,9 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         }
     }
 
-    private fun saveImages(deployment: EdgeDeployment) {
+    private fun saveImages(deployment: Deployment) {
         deploymentImageDb.deleteImages(deployment.id)
-        deploymentImageDb.insertImage(deployment, null, _images)
+        deploymentImageDb.insertImage(deployment, _images)
     }
 
     override fun openWithEdgeDevice() {
@@ -212,10 +196,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                     nameLocation
                 )
             )
-            is EdgeCheckListFragment -> {
+            is AudioMothCheckListFragment -> {
                 _deployment?.let {
                     it.passedChecks = passedChecks
-                    edgeDeploymentDb.updateDeployment(it)
+                    deploymentDb.updateDeployment(it)
 
                     saveImages(it)
                 }
@@ -239,16 +223,18 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     }
 
     override fun startCheckList() {
-        startFragment(EdgeCheckListFragment.newInstance())
+        startFragment(AudioMothCheckListFragment.newInstance())
     }
 
     override fun startDetailDeploymentSite(id: Int, name: String?, isNewSite: Boolean) {
         startFragment(DetailDeploymentSiteFragment.newInstance(id, name, isNewSite))
     }
 
-    override fun getDeployment(): EdgeDeployment? {
+    override fun getDeployment(): Deployment? {
         if (this._deployment == null) {
-            this._deployment = EdgeDeployment()
+            val dp = Deployment()
+            dp.device = Device.AUDIOMOTH.value
+            this._deployment = dp
         }
         return this._deployment
     }
@@ -260,7 +246,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         return projectDb.getProjectByName(name)
     }
 
-    override fun setDeployment(deployment: EdgeDeployment) {
+    override fun setDeployment(deployment: Deployment) {
         this._deployment = deployment
     }
 
@@ -289,9 +275,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
 
     override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
-        val deployment = _deployment ?: EdgeDeployment()
+        val deployment = _deployment ?: Deployment()
+        deployment.device = Device.AUDIOMOTH.value
         deployment.isActive = locate.serverId == null
-        deployment.state = DeploymentState.Edge.Locate.key // state
+        deployment.state = DeploymentState.AudioMoth.Locate.key // state
 
         this._deployLocation = locate.asDeploymentLocation()
         this._locate = locate
@@ -328,10 +315,10 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             it.deployedAt = Date()
             it.updatedAt = Date()
             it.isActive = true
-            it.state = DeploymentState.Edge.ReadyToUpload.key
+            it.state = DeploymentState.AudioMoth.ReadyToUpload.key
             setDeployment(it)
 
-            val deploymentId = edgeDeploymentDb.insertOrUpdate(it, _deployLocation!!)
+            val deploymentId = deploymentDb.insertOrUpdateDeployment(it, _deployLocation!!)
             this._locate?.let { loc ->
                 locateDb.insertOrUpdateLocate(deploymentId, loc) // update locate - last deployment
             }
@@ -339,15 +326,9 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             if (useExistedLocation) {
                 this._locate?.let { locate ->
                     val deployments =
-                        locate.serverId?.let { it1 -> edgeDeploymentDb.getDeploymentsBySiteId(it1) }
-                    val guardianDeployments = locate.serverId?.let { it1 ->
-                        guardianDeploymentDb.getDeploymentsBySiteId(it1)
-                    }
+                        locate.serverId?.let { it1 -> deploymentDb.getDeploymentsBySiteId(it1) }
                     deployments?.forEach { deployment ->
-                        edgeDeploymentDb.updateIsActive(deployment.id)
-                    }
-                    guardianDeployments?.forEach { deployment ->
-                        guardianDeploymentDb.updateIsActive(deployment.id)
+                        deploymentDb.updateIsActive(deployment.id)
                     }
                 }
             }
@@ -373,7 +354,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
 
             analytics.trackCreateAudiomothDeploymentEvent()
 
-            DeploymentSyncWorker.enqueue(this@EdgeDeploymentActivity)
+            DeploymentSyncWorker.enqueue(this@AudioMothDeploymentActivity)
             hideLoading()
             showComplete()
         }
@@ -384,7 +365,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         currentCheck = number
         when (number) {
             0 -> {
-                updateDeploymentState(DeploymentState.Edge.Locate)
+                updateDeploymentState(DeploymentState.AudioMoth.Locate)
                 val site = this._locate
                 if (site == null) {
                     startFragment(
@@ -397,11 +378,11 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 }
             }
             1 -> {
-                updateDeploymentState(DeploymentState.Edge.Sync)
+                updateDeploymentState(DeploymentState.AudioMoth.Sync)
                 startFragment(NewSyncFragment.newInstance())
             }
             2 -> {
-                updateDeploymentState(DeploymentState.Edge.Deploy)
+                updateDeploymentState(DeploymentState.AudioMoth.Deploy)
                 startFragment(DeployFragment.newInstance())
             }
         }
@@ -449,7 +430,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
                 calendar,
                 deploymentIdArrayInt
             )
-            this@EdgeDeploymentActivity.runOnUiThread {
+            this@AudioMothDeploymentActivity.runOnUiThread {
                 val fragment = supportFragmentManager.findFragmentById(R.id.contentContainer) as NewSyncFragment
                 fragment.showRepeatSync()
             }
@@ -488,7 +469,7 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
     }
 
     private fun handleDeploymentStep(deploymentId: Int) {
-        val deployment = edgeDeploymentDb.getDeploymentById(deploymentId)
+        val deployment = deploymentDb.getDeploymentById(deploymentId)
         if (deployment != null) {
             setDeployment(deployment)
 
@@ -525,9 +506,9 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
             .commit()
     }
 
-    private fun updateDeploymentState(state: DeploymentState.Edge) {
+    private fun updateDeploymentState(state: DeploymentState.AudioMoth) {
         this._deployment?.state = state.key
-        this._deployment?.let { edgeDeploymentDb.updateDeployment(it) }
+        this._deployment?.let { deploymentDb.updateDeployment(it) }
     }
 
     private fun showLoading() {
@@ -598,13 +579,11 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         super.onDestroy()
         fromUnfinishedDeployment = false
         siteLiveData.removeObserver(siteObserve)
-        audioMothDeployLiveData.removeObserver(audioMothDeploymentObserve)
-        guardianDeploymentLiveData.removeObserver(guardianDeploymentObserve)
+        deploymentLiveData.removeObserver(deploymentObserve)
     }
 
     companion object {
         const val loadingDialogTag = "LoadingDialog"
-        const val TAG_SYNC_INSTRUCTION_DIALOG = "SyncInstructionDialogFragment"
         const val TAG_SITE_LOADING_DIALOG = "SiteLoadingDialogFragment"
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
         const val TONE_DURATION = 10000
@@ -612,18 +591,18 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         private var fromUnfinishedDeployment = false
 
         fun startActivity(context: Context) {
-            val intent = Intent(context, EdgeDeploymentActivity::class.java)
+            val intent = Intent(context, AudioMothDeploymentActivity::class.java)
             context.startActivity(intent)
         }
 
         fun startActivity(context: Context, deploymentId: Int) {
-            val intent = Intent(context, EdgeDeploymentActivity::class.java)
+            val intent = Intent(context, AudioMothDeploymentActivity::class.java)
             intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
             context.startActivity(intent)
         }
 
         fun startActivity(context: Context, deploymentId: Int, requestCode: Int) {
-            val intent = Intent(context, EdgeDeploymentActivity::class.java)
+            val intent = Intent(context, AudioMothDeploymentActivity::class.java)
             intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
             fromUnfinishedDeployment = true
             (context as Activity).startActivityForResult(intent, requestCode)

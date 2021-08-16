@@ -15,12 +15,12 @@ import org.rfcx.companion.util.Analytics
 
 class DeployFragment : BaseImageFragment() {
 
-    private var edgeDeploymentProtocol: EdgeDeploymentProtocol? = null
+    private var audioMothDeploymentProtocol: AudioMothDeploymentProtocol? = null
     private val analytics by lazy { context?.let { Analytics(it) } }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        edgeDeploymentProtocol = (context as EdgeDeploymentProtocol)
+        audioMothDeploymentProtocol = (context as AudioMothDeploymentProtocol)
     }
 
     override fun onCreateView(
@@ -34,7 +34,7 @@ class DeployFragment : BaseImageFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        edgeDeploymentProtocol?.let {
+        audioMothDeploymentProtocol?.let {
             it.showToolbar()
             it.setCurrentPage(requireContext().resources.getStringArray(R.array.edge_optional_checks)[0])
             it.setToolbarTitle()
@@ -55,11 +55,11 @@ class DeployFragment : BaseImageFragment() {
             if(images.isNotEmpty()) {
                 analytics?.trackAddDeploymentImageEvent(Device.AUDIOMOTH.value)
             }
-            edgeDeploymentProtocol?.setImages(images)
-            edgeDeploymentProtocol?.nextStep()
+            audioMothDeploymentProtocol?.setImages(images)
+            audioMothDeploymentProtocol?.nextStep()
         }
 
-        val deployment = edgeDeploymentProtocol?.getImages()
+        val deployment = audioMothDeploymentProtocol?.getImages()
         if (deployment != null && deployment.isNotEmpty()) {
             val pathList = mutableListOf<String>()
             deployment.forEach {
