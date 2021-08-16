@@ -12,7 +12,7 @@ import androidx.lifecycle.Observer
 import java.util.*
 import kotlinx.android.synthetic.main.fragment_guardian_microphone.*
 import org.rfcx.companion.R
-import org.rfcx.companion.connection.socket.SocketManager
+import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.MicrophoneTestUtils
@@ -68,11 +68,11 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         setupSpectrogramColorMenu()
         setupAudioPlaybackMenu()
         setUiByState(MicTestingState.READY)
-        SocketManager.resetMicrophoneDefaultValue()
+        GuardianSocketManager.resetMicrophoneDefaultValue()
 
-        SocketManager.resetRecorderState()
+        GuardianSocketManager.resetRecorderState()
         retrieveRecorderState()
-        SocketManager.recorderState.observe(viewLifecycleOwner, Observer {
+        GuardianSocketManager.recorderState.observe(viewLifecycleOwner, Observer {
             if (it.isRecording) {
                 listenAudioButton.isEnabled = true
                 listenAgainAudioButton.isEnabled = true
@@ -241,7 +241,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         recorderTimer = Timer()
         recorderTimer?.schedule(object : TimerTask() {
             override fun run() {
-                SocketManager.getRecorderState()
+                GuardianSocketManager.getRecorderState()
             }
         }, DELAY, RECORDER_CHECK_PERIOD)
     }
@@ -254,7 +254,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
             override fun run() {
                 if (!isTimerPause && isMicTesting) {
                     isTimerPause = true
-                    SocketManager.getLiveAudioBuffer(microphoneTestUtils)
+                    GuardianSocketManager.getLiveAudioBuffer(microphoneTestUtils)
                 }
             }
         }, DELAY, MILLI_PERIOD)
@@ -271,7 +271,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
                 } else {
                     nullStackThreshold++
                     if (nullStackThreshold >= 50) {
-                        SocketManager.getLiveAudioBuffer(microphoneTestUtils)
+                        GuardianSocketManager.getLiveAudioBuffer(microphoneTestUtils)
                         isTimerPause = true
                         nullStackThreshold = 0
                     }
@@ -279,11 +279,11 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
             }
         }, DELAY, STACK_PERIOD)
 
-        SocketManager.liveAudio.observe(viewLifecycleOwner, Observer {
+        GuardianSocketManager.liveAudio.observe(viewLifecycleOwner, Observer {
             isTimerPause = false
         })
 
-        SocketManager.spectrogram.observe(viewLifecycleOwner, Observer {
+        GuardianSocketManager.spectrogram.observe(viewLifecycleOwner, Observer {
             if (isMicTesting) {
                 if (it.size > 2) {
                     AudioSpectrogramUtils.setupSpectrogram(it.size)

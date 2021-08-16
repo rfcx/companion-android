@@ -6,12 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_guardian_advanced.*
 import org.rfcx.companion.R
-import org.rfcx.companion.connection.socket.SocketManager
+import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.entity.Screen
-import org.rfcx.companion.entity.socket.response.Status
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 import org.rfcx.companion.view.prefs.GuardianPrefsFragment
@@ -59,13 +57,13 @@ class GuardianAdvancedFragment : Fragment() {
 
     private fun syncConfig() {
         val prefs = syncPreferenceListener?.getPrefsChanges() ?: ""
-        SocketManager.syncConfiguration(prefs)
+        GuardianSocketManager.syncConfiguration(prefs)
         deploymentProtocol?.nextStep()
     }
 
     override fun onDetach() {
         super.onDetach()
-        SocketManager.resetPrefsValue()
+        GuardianSocketManager.resetPrefsValue()
     }
 
     companion object {

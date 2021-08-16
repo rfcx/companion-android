@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
-import com.google.gson.JsonObject
 import org.json.JSONObject
 import org.rfcx.companion.entity.socket.request.*
 import org.rfcx.companion.entity.socket.response.*
@@ -14,7 +13,7 @@ import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.Socket
 
-object SocketManager {
+object GuardianSocketManager {
 
     private var socket: Socket? = null
     private var outputStream: DataOutputStream? = null
@@ -61,7 +60,7 @@ object SocketManager {
     val isRegistered = MutableLiveData<CheckGuardianRegistered>()
     val recorderState = MutableLiveData<RecorderStateResponse>()
 
-    val pingBlob = MutableLiveData<Ping>()
+    val pingBlob = MutableLiveData<GuardianPing>()
 
     init {
         connection.postValue(ConnectionResponse())
@@ -233,7 +232,7 @@ object SocketManager {
     }
 
     private fun sendMessage(message: String) {
-        clientThread = Thread(Runnable {
+        clientThread = Thread {
             try {
                 socket = Socket("192.168.43.1", 9999)
                 socket?.keepAlive = true
@@ -244,12 +243,12 @@ object SocketManager {
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-        })
+        }
         clientThread?.start()
     }
 
     private fun startInComingMessageThread() {
-        inComingMessageThread = Thread(Runnable {
+        inComingMessageThread = Thread {
             try {
                 while (true) {
                     inputStream = DataInputStream(socket!!.getInputStream())
@@ -259,7 +258,7 @@ object SocketManager {
                         val receiveJson = JSONObject(dataInput)
                         val jsonIterator = receiveJson.keys()
 
-                        val ping = gson.fromJson(dataInput, Ping::class.java)
+                        val ping = gson.fromJson(dataInput, GuardianPing::class.java)
                         pingBlob.postValue(ping)
 
                         Log.d("SocketComm", dataInput)
@@ -336,7 +335,7 @@ object SocketManager {
                             CHECKIN -> {
                                 val response =
                                     gson.fromJson(dataInput, CheckInTestResponse::class.java)
-                                    this.checkInTest.postValue(response)
+                                this.checkInTest.postValue(response)
                             }
                             SENTINEL -> {
                                 val response =
@@ -364,7 +363,7 @@ object SocketManager {
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-        })
+        }
         inComingMessageThread.start()
     }
 

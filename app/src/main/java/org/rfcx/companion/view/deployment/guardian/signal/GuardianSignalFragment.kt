@@ -12,8 +12,10 @@ import androidx.lifecycle.Observer
 import java.util.*
 import kotlinx.android.synthetic.main.fragment_guardian_signal.*
 import org.rfcx.companion.R
-import org.rfcx.companion.connection.socket.SocketManager
+import org.rfcx.companion.connection.socket.AdminSocketManager
+import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.entity.Screen
+import org.rfcx.companion.entity.socket.response.AdminPing
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 
@@ -21,10 +23,6 @@ class GuardianSignalFragment : Fragment() {
     private val listOfSignal by lazy {
         listOf(signalStrength1, signalStrength2, signalStrength3, signalStrength4)
     }
-
-    private var timer: Timer? = null
-
-    private var isSignalTesting = false
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
 
@@ -60,22 +58,58 @@ class GuardianSignalFragment : Fragment() {
         }
     }
 
-    private fun retrieveGuardianSignal() {
-        isSignalTesting = true
-
-        timer = Timer()
-        timer?.schedule(object : TimerTask() {
-            override fun run() {
-                SocketManager.getSignalStrength()
-            }
-        }, DELAY, MILLI_PERIOD)
-
-        SocketManager.signal.observe(viewLifecycleOwner, Observer { signal ->
+//    private fun retrieveGuardianSignal() {
+//        AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer { signal ->
+//            deploymentProtocol?.hideLoading()
+//            val strength = signal.signalInfo.signal
+//            val simCard = signal.signalInfo.simCard
+//            requireActivity().runOnUiThread {
+//                if (simCard) {
+//                    hideSimError()
+//                    showSignalInfo()
+//                    when {
+//                        strength > -70 -> {
+//                            showSignalStrength(SignalState.MAX)
+//                            signalDescText.text = getString(R.string.signal_text_4)
+//                        }
+//                        strength > -90 -> {
+//                            showSignalStrength(SignalState.HIGH)
+//                            signalDescText.text = getString(R.string.signal_text_3)
+//                        }
+//                        strength > -110 -> {
+//                            showSignalStrength(SignalState.NORMAL)
+//                            signalDescText.text = getString(R.string.signal_text_2)
+//                        }
+//                        strength > -130 -> {
+//                            showSignalStrength(SignalState.LOW)
+//                            signalDescText.text = getString(R.string.signal_text_1)
+//                        }
+//                        else -> {
+//                            showSignalStrength(SignalState.NONE)
+//                            signalDescText.text = getString(R.string.signal_text_0)
+//                        }
+//                    }
+//                    signalValue.text = getString(R.string.signal_value, strength)
+//                } else {
+//                    hideSignalInfo()
+//                    showSimError()
+//                    showSignalStrength(SignalState.NONE)
+//                    if (strength == -999) {
+//                        signalErrorText.text = getText(R.string.signal_lost)
+//                    } else {
+//                        signalErrorText.text = getText(R.string.signal_sim_card)
+//                    }
+//                }
+//            }
+//        })
+//    }
+        private fun retrieveGuardianSignal() {
+        AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer { it ->
             deploymentProtocol?.hideLoading()
-            val strength = signal.signalInfo.signal
-            val simCard = signal.signalInfo.simCard
+            val strength = deploymentProtocol?.getNetwork() ?: -130
             requireActivity().runOnUiThread {
-                if (simCard) {
+                //TODO: get sim card info
+                if (true) {
                     hideSimError()
                     showSignalInfo()
                     when {
@@ -146,22 +180,12 @@ class GuardianSignalFragment : Fragment() {
         signalErrorText.visibility = View.GONE
     }
 
-    override fun onDetach() {
-        super.onDetach()
-        if (isSignalTesting) {
-            timer?.cancel()
-            timer = null
-        }
-    }
-
     override fun onResume() {
         super.onResume()
         analytics?.trackScreen(Screen.GUARDIAN_SIGNAL)
     }
 
     companion object {
-        private const val DELAY = 0L
-        private const val MILLI_PERIOD = 1000L
 
         private enum class SignalState(val value: Int) {
             NONE(0), LOW(1), NORMAL(2), HIGH(3), MAX(4)

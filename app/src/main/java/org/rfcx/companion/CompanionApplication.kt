@@ -3,7 +3,8 @@ package org.rfcx.companion
 import android.app.Application
 import io.realm.Realm
 import io.realm.exceptions.RealmMigrationNeededException
-import org.rfcx.companion.connection.socket.SocketManager
+import org.rfcx.companion.connection.socket.AdminSocketManager
+import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.service.DeploymentCleanupWorker
 import org.rfcx.companion.util.LocationTracking
 import org.rfcx.companion.util.Preferences
@@ -46,6 +47,7 @@ class CompanionApplication : Application() {
 
     override fun onTerminate() {
         super.onTerminate()
-        SocketManager.stopConnection()
+        GuardianSocketManager.stopConnection()
+        AdminSocketManager.stopConnection()
     }
 }

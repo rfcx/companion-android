@@ -9,15 +9,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_guardian_checkin_test.*
 import org.rfcx.companion.R
-import org.rfcx.companion.connection.socket.SocketManager
+import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.socket.response.CheckIn
 import org.rfcx.companion.entity.socket.response.CheckInTestResponse
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.TimeAgo
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
-import java.net.Socket
-import java.util.*
 
 class GuardianCheckInTestFragment : Fragment() {
 
@@ -57,7 +55,7 @@ class GuardianCheckInTestFragment : Fragment() {
     }
 
     private fun setCheckInTestView() {
-        SocketManager.checkInTest.observe(viewLifecycleOwner, Observer { res ->
+        GuardianSocketManager.checkInTest.observe(viewLifecycleOwner, Observer { res ->
             checkInUrlValueTextView.text = res.checkin.apiUrl
             checkInStatusValueTextView.text = res.checkin.state
             checkInDeliveryTimeValueTextView.text = res.checkin.deliveryTime
@@ -88,7 +86,7 @@ class GuardianCheckInTestFragment : Fragment() {
     override fun onDetach() {
         super.onDetach()
         if (state == CHECKIN_SUCCESS) {
-            SocketManager.checkInTest.value = CheckInTestResponse(CheckIn(apiUrl = apiUrl, state = "not published"))
+            GuardianSocketManager.checkInTest.value = CheckInTestResponse(CheckIn(apiUrl = apiUrl, state = "not published"))
         }
     }
 

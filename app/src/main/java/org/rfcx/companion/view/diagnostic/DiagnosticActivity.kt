@@ -20,7 +20,7 @@ import kotlinx.android.synthetic.main.activity_guardian_diagnostic.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.R
-import org.rfcx.companion.connection.socket.SocketManager
+import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.entity.DeploymentImage
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Screen
@@ -169,8 +169,8 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
     private fun retrieveDiagnosticInfo() {
         if (isConnected == true) {
             showLoading()
-            SocketManager.getDiagnosticData()
-            SocketManager.diagnostic.observe(this, Observer { diagnosticInfo ->
+            GuardianSocketManager.getDiagnosticData()
+            GuardianSocketManager.diagnostic.observe(this, Observer { diagnosticInfo ->
                 val diagnosticData = diagnosticInfo.diagnostic
                 val configurationData = diagnosticInfo.configure.toReadableFormat()
                 val prefsData = diagnosticInfo.prefs
@@ -332,8 +332,8 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
                 json.addProperty(it.key, it.value)
             }
 
-            SocketManager.syncConfiguration(json.toString())
-            SocketManager.syncConfiguration.observe(this, Observer { syncConfiguration ->
+            GuardianSocketManager.syncConfiguration(json.toString())
+            GuardianSocketManager.syncConfiguration.observe(this, Observer { syncConfiguration ->
                 if (syncConfiguration.sync.status == Status.SUCCESS.value) {
                     showSuccessResponse()
                 } else {

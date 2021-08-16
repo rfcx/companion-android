@@ -18,7 +18,8 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import java.util.*
 import kotlinx.android.synthetic.main.fragment_guardian_solar_panel.*
 import org.rfcx.companion.R
-import org.rfcx.companion.connection.socket.SocketManager
+import org.rfcx.companion.connection.socket.AdminSocketManager
+import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.socket.response.SentinelInput
 import org.rfcx.companion.util.Analytics
@@ -27,10 +28,6 @@ import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 class GuardianSolarPanelFragment : Fragment() {
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
-
-    private var timer: Timer = Timer()
-
-    private var isGettingSentinel = false
 
     private lateinit var voltageLineDataSet: LineDataSet
     private lateinit var powerLineDataSet: LineDataSet
@@ -68,40 +65,62 @@ class GuardianSolarPanelFragment : Fragment() {
         getSentinelValue()
     }
 
+//    private fun getSentinelValue() {
+//        GuardianSocketManager.sentinel.observe(viewLifecycleOwner, Observer { sentinelResponse ->
+//            val input = sentinelResponse.sentinel.convertToInfo().input
+//            if (isSentinelConnected(input)) {
+//                hideAssembleWarn()
+//
+//                val voltage = input.voltage.toFloat() / 1000
+//                val current = input.current.toFloat() / 1000
+//                val power = input.power.toFloat() / 1000
+//
+//                // set 3 top value
+//                setVoltageValue(voltage)
+//                setCurrentValue(current)
+//                setPowerValue(power)
+//
+//                // update power and voltage to chart
+//                updateData(voltage, power)
+//
+//                // expand xAxis line
+//                expandXAxisLine()
+//
+//                solarFinishButton.isEnabled = true
+//            } else {
+//                showAssembleWarn()
+//            }
+//        })
+//    }
+
     private fun getSentinelValue() {
-        isGettingSentinel = true
+        AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
+            val sentinelResponse = deploymentProtocol?.getSentinelPower()
+            sentinelResponse?.let {
+                //TODO: change to sentinel info
+                val input = SentinelInput()
+                if (isSentinelConnected(input)) {
+                    hideAssembleWarn()
 
-        // getting sentinel values every second
-        timer = Timer()
-        timer.schedule(object : TimerTask() {
-            override fun run() {
-                SocketManager.getSentinelBoardValue()
-            }
-        }, DELAY, MILLI_PERIOD)
+                    val voltage = input.voltage.toFloat() / 1000
+                    val current = input.current.toFloat() / 1000
+                    val power = input.power.toFloat() / 1000
 
-        SocketManager.sentinel.observe(viewLifecycleOwner, Observer { sentinelResponse ->
-            val input = sentinelResponse.sentinel.convertToInfo().input
-            if (isSentinelConnected(input)) {
-                hideAssembleWarn()
+                    // set 3 top value
+                    setVoltageValue(voltage)
+                    setCurrentValue(current)
+                    setPowerValue(power)
 
-                val voltage = input.voltage.toFloat() / 1000
-                val current = input.current.toFloat() / 1000
-                val power = input.power.toFloat() / 1000
+                    // update power and voltage to chart
+                    updateData(voltage, power)
 
-                // set 3 top value
-                setVoltageValue(voltage)
-                setCurrentValue(current)
-                setPowerValue(power)
+                    // expand xAxis line
+                    expandXAxisLine()
 
-                // update power and voltage to chart
-                updateData(voltage, power)
-
-                // expand xAxis line
-                expandXAxisLine()
-
-                solarFinishButton.isEnabled = true
-            } else {
-                showAssembleWarn()
+                    solarFinishButton.isEnabled = true
+                } else {
+                    showAssembleWarn()
+                }
             }
         })
     }
@@ -237,22 +256,12 @@ class GuardianSolarPanelFragment : Fragment() {
         solarWarnTextView.visibility = View.INVISIBLE
     }
 
-    override fun onDetach() {
-        super.onDetach()
-        if (isGettingSentinel) {
-            timer.cancel()
-        }
-    }
-
     override fun onResume() {
         super.onResume()
         analytics?.trackScreen(Screen.GUARDIAN_SOLAR_PANEL)
     }
 
     companion object {
-        private const val DELAY = 0L
-        private const val MILLI_PERIOD = 1000L
-
         private const val X_AXIS_MAXIMUM = 100f
         private const val LEFT_AXIS_MAXIMUM = 30f
         private const val RIGHT_AXIS_MAXIMUM = 30f

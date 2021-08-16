@@ -12,7 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_guardian_checklist.*
 import org.rfcx.companion.R
 import org.rfcx.companion.adapter.CheckListItem
-import org.rfcx.companion.connection.socket.SocketManager
+import org.rfcx.companion.connection.socket.AdminSocketManager
+import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.view.deployment.CheckListAdapter
 
 class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
@@ -67,8 +68,8 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
     }
 
     private fun checkIfRegistered() {
-        SocketManager.isGuardianRegistered()
-        SocketManager.isRegistered.observe(viewLifecycleOwner, Observer {
+        GuardianSocketManager.isGuardianRegistered()
+        GuardianSocketManager.isRegistered.observe(viewLifecycleOwner, Observer {
             if (it.isRegistered) {
                 checkListRecyclerView.setCheckPassed(1)
                 deploymentProtocol?.addRegisteredToPassedCheck()
@@ -118,7 +119,7 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
             setTitle(getString(R.string.wifi_notification_title))
             setPositiveButton(getString(R.string.notification_yes)) { dialog, _ ->
                 deploymentProtocol?.setOnDeployClicked()
-                SocketManager.stopGuardianWiFi()
+                GuardianSocketManager.stopGuardianWiFi()
                 deploy()
                 dialog.dismiss()
             }
@@ -132,7 +133,8 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
 
     private fun deploy() {
         deploymentProtocol?.setReadyToDeploy()
-        SocketManager.stopConnection()
+        GuardianSocketManager.stopConnection()
+        AdminSocketManager.stopConnection()
     }
 
     companion object {

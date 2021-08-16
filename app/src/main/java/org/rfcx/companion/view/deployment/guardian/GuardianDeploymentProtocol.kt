@@ -16,6 +16,9 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getWifiName(): String
     fun getLastCheckInTime(): Long?
 
+    fun getNetwork(): Int?
+    fun getSentinelPower(): String?
+
     fun setDeploymentConfigure(config: GuardianConfiguration)
     fun setDeployment(deployment: GuardianDeployment)
     fun setDeploymentWifiName(name: String)

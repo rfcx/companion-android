@@ -1,11 +1,7 @@
 package org.rfcx.companion.view.deployment.guardian.configure
 
 import android.app.AlertDialog
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
-import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,7 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_guardian_configure.*
 import org.rfcx.companion.R
-import org.rfcx.companion.connection.socket.SocketManager
+import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import org.rfcx.companion.entity.guardian.toListForGuardian
@@ -94,8 +90,8 @@ class GuardianConfigureFragment : Fragment() {
     }
 
     private fun syncConfig() {
-        SocketManager.syncConfiguration(getConfiguration().toListForGuardian())
-        SocketManager.syncConfiguration.observe(viewLifecycleOwner, Observer {
+        GuardianSocketManager.syncConfiguration(getConfiguration().toListForGuardian())
+        GuardianSocketManager.syncConfiguration.observe(viewLifecycleOwner, Observer {
             requireActivity().runOnUiThread {
                 if (it.sync.status == Status.SUCCESS.value) {
                     deploymentProtocol?.nextStep()
@@ -109,8 +105,8 @@ class GuardianConfigureFragment : Fragment() {
     }
 
     private fun retrieveCurrentConfigure() {
-        SocketManager.getCurrentConfiguration()
-        SocketManager.currentConfiguration.observe(viewLifecycleOwner, Observer { curConfig ->
+        GuardianSocketManager.getCurrentConfiguration()
+        GuardianSocketManager.currentConfiguration.observe(viewLifecycleOwner, Observer { curConfig ->
             bitrate = curConfig.configure.bitrate
             sampleRate = curConfig.configure.sampleRate
             duration = curConfig.configure.duration

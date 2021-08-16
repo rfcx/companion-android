@@ -9,12 +9,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_guardian_register.*
 import org.rfcx.companion.R
-import org.rfcx.companion.connection.socket.SocketManager
+import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.socket.response.Status
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
-import java.net.Socket
 
 class GuardianRegisterFragment : Fragment() {
 
@@ -43,7 +42,7 @@ class GuardianRegisterFragment : Fragment() {
             it.setToolbarTitle()
         }
 
-        SocketManager.resetRegisterResult()
+        GuardianSocketManager.resetRegisterResult()
         isGuardianRegistered()
 
         registerGuardianButton.setOnClickListener {
@@ -63,8 +62,8 @@ class GuardianRegisterFragment : Fragment() {
     }
 
     private fun registerGuardian() {
-        SocketManager.sendGuardianRegistration(requireContext(), getRadioValueForRegistration())
-        SocketManager.register.observe(viewLifecycleOwner, Observer {
+        GuardianSocketManager.sendGuardianRegistration(requireContext(), getRadioValueForRegistration())
+        GuardianSocketManager.register.observe(viewLifecycleOwner, Observer {
             if (it.register.status == Status.SUCCESS.value) {
                 registerFinishButton.visibility = View.VISIBLE
                 registerGuardianButton.visibility = View.GONE
@@ -78,8 +77,8 @@ class GuardianRegisterFragment : Fragment() {
     }
 
     private fun isGuardianRegistered() {
-        SocketManager.isGuardianRegistered()
-        SocketManager.isRegistered.observe(viewLifecycleOwner, Observer {
+        GuardianSocketManager.isGuardianRegistered()
+        GuardianSocketManager.isRegistered.observe(viewLifecycleOwner, Observer {
             if (it.isRegistered) {
                 productionRadioButton.isEnabled = false
                 stagingRadioButton.isEnabled = false

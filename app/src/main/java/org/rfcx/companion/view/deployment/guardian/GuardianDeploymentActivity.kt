@@ -19,14 +19,15 @@ import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_guardian_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
-import org.rfcx.companion.connection.socket.SocketManager
+import org.rfcx.companion.connection.socket.AdminSocketManager
+import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.connection.wifi.WifiHotspotManager
 import org.rfcx.companion.connection.wifi.WifiLostListener
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import org.rfcx.companion.entity.guardian.GuardianDeployment
 import org.rfcx.companion.entity.socket.request.CheckinCommand
-import org.rfcx.companion.entity.socket.response.Ping
+import org.rfcx.companion.entity.socket.response.GuardianPing
 import org.rfcx.companion.localdb.*
 import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.service.DownloadStreamState
@@ -77,8 +78,10 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     private var currentLocation: Location? = null
 
-    private var pingBlob: Ping? = null
+    private var guardianPingBlob: GuardianPing? = null
     private var prefsSha1: String? = null
+    private var network: Int? = null
+    private var sentinelPower: String? = null
 
     private var _sampleRate = 12000
 
@@ -177,9 +180,9 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         when (container) {
             is MapPickerFragment -> startFragment(DetailDeploymentSiteFragment.newInstance(latitude, longitude, siteId, nameLocation))
             is GuardianCheckListFragment -> {
-                SocketManager.resetAllValuesToDefault()
+                GuardianSocketManager.resetAllValuesToDefault()
                 setLastCheckInTime(null)
-                SocketManager.getCheckInTest(CheckinCommand.STOP) // to stop getting checkin test
+                GuardianSocketManager.getCheckInTest(CheckinCommand.STOP) // to stop getting checkin test
                 passedChecks.clear() // remove all passed
                 unregisterWifiConnectionLostListener()
                 startFragment(ConnectGuardianFragment.newInstance())
@@ -215,13 +218,18 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             }
         guardianDeploymentLiveData.observeForever(guardianDeploymentObserve)
 
-        SocketManager.pingBlob.observeForever {
-            Log.d("SocketComm", "Getting ping blob")
+        GuardianSocketManager.pingBlob.observeForever {
+            Log.d("SocketComm", "Getting Guardian ping blob")
             val sha1 = PingUtils.getPrefsSha1FromPing(it)
             if (prefsSha1 != sha1) {
                 Log.d("SocketComm", "Setting ping blob")
-                pingBlob = it
+                guardianPingBlob = it
             }
+        }
+        AdminSocketManager.pingBlob.observeForever {
+            Log.d("SocketComm", "Getting Admin ping blob")
+            network = PingUtils.getNetworkFromPing(it)
+            sentinelPower = PingUtils.getSentinelPowerFromPing(it)
         }
     }
 
@@ -309,6 +317,9 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     override fun getWifiName(): String = _deployment?.wifiName ?: ""
 
     override fun getLastCheckInTime(): Long? = lastCheckInTime
+    override fun getNetwork(): Int? = network
+
+    override fun getSentinelPower(): String? = sentinelPower
 
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
@@ -388,7 +399,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
             analytics.trackCreateGuardianDeploymentEvent()
 
-            SocketManager.getCheckInTest(CheckinCommand.STOP) // to stop getting checkin test
+            GuardianSocketManager.getCheckInTest(CheckinCommand.STOP) // to stop getting checkin test
             GuardianDeploymentSyncWorker.enqueue(this@GuardianDeploymentActivity)
             showComplete()
         }
@@ -656,5 +667,5 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         this.prefsEditor = editor
     }
 
-    override fun getPrefs(): List<Preference> = PingUtils.getPrefsFromPing(this, pingBlob)
+    override fun getPrefs(): List<Preference> = PingUtils.getPrefsFromPing(this, guardianPingBlob)
 }
