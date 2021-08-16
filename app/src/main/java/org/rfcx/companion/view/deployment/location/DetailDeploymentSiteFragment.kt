@@ -29,7 +29,6 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
-import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_detail_deployment_site.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
@@ -104,7 +103,6 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         context?.let { Mapbox.getInstance(it, getString(R.string.mapbox_token)) }
         initIntent()
-        setViewModel()
     }
 
     private fun setViewModel() {
@@ -145,6 +143,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupTopBar()
+        setViewModel()
 
         mapView = view.findViewById(R.id.mapBoxView)
         mapView.onCreate(savedInstanceState)
