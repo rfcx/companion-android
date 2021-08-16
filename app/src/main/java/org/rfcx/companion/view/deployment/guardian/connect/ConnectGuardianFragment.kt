@@ -115,19 +115,15 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
     }
 
     private fun checkConnection() {
-        GuardianSocketManager.getConnection()
         GlobalScope.launch(Dispatchers.Main) {
-            GuardianSocketManager.connection.observe(viewLifecycleOwner, Observer { response ->
+            GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
                 requireActivity().runOnUiThread {
+                    hideLoading()
+                    deploymentProtocol?.setDeploymentWifiName(guardianHotspot!!.SSID)
                     deploymentProtocol?.startCheckList()
-                    if (response.connection.status == Status.SUCCESS.value) {
-                        hideLoading()
-                        deploymentProtocol?.setDeploymentWifiName(guardianHotspot!!.SSID)
-                        deploymentProtocol?.startCheckList()
-                        deploymentProtocol?.setWifiManager(wifiHotspotManager)
-                        deploymentProtocol?.registerWifiConnectionLostListener()
-                        GuardianSocketManager.getCheckInTest(CheckinCommand.START)
-                    }
+                    deploymentProtocol?.setWifiManager(wifiHotspotManager)
+                    deploymentProtocol?.registerWifiConnectionLostListener()
+                    GuardianSocketManager.getCheckInTest(CheckinCommand.START)
                 }
             })
         }
