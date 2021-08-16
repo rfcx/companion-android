@@ -54,8 +54,6 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
 
     private var currentLocation: Location? = null
 
-    private var audioMothConnector = AudioMothChimeConnector()
-
     private var latitude = 0.0
     private var longitude = 0.0
     private var nameLocation: String = ""
@@ -429,12 +427,17 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
     }
 
     override fun playSyncSound() {
-        audioMothDeploymentViewModel.playSyncSound(getDeployment()?.deploymentKey)
-        this@AudioMothDeploymentActivity.runOnUiThread {
-            val fragment =
-                supportFragmentManager.findFragmentById(R.id.contentContainer) as NewSyncFragment
-            fragment.showRepeatSync()
-        }
+        val deploymentIdArrayInt =
+            getDeployment()?.deploymentKey?.chunked(2)?.map { it.toInt(radix = 16) }?.toTypedArray()
+                ?: arrayOf()
+        Thread {
+            audioMothDeploymentViewModel.playSyncSound(Calendar.getInstance(), deploymentIdArrayInt)
+            this@AudioMothDeploymentActivity.runOnUiThread {
+                val fragment =
+                    supportFragmentManager.findFragmentById(R.id.contentContainer) as NewSyncFragment
+                fragment.showRepeatSync()
+            }
+        }.start()
     }
 
     override fun playTone(duration: Int) {
@@ -444,10 +447,10 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
             val durationFrac = duration % TONE_DURATION
             do {
                 durationCount += if (durationCount + durationFrac == duration) {
-                    audioMothConnector.playTone(durationFrac)
+                    audioMothDeploymentViewModel.playTone(durationFrac)
                     durationFrac
                 } else {
-                    audioMothConnector.playTone(TONE_DURATION)
+                    audioMothDeploymentViewModel.playTone(TONE_DURATION)
                     TONE_DURATION
                 }
             } while (durationCount < duration && duration >= TONE_DURATION && needTone)
@@ -456,7 +459,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
 
     override fun stopPlaySound() {
         needTone = false
-        audioMothConnector.stopPlay()
+        audioMothDeploymentViewModel.stopPlaySound()
     }
 
     override fun isSiteLoading(): DownloadStreamState {

@@ -127,16 +127,19 @@ class AudioMothDeploymentViewModel(
         return audioMothDeploymentRepository.getDeploymentById(id)
     }
 
-    fun playSyncSound(deploymentId: String?) {
-        val deploymentIdArrayInt =
-            deploymentId?.chunked(2)?.map { it.toInt(radix = 16) }?.toTypedArray() ?: arrayOf()
-        val calendar = Calendar.getInstance()
-        Thread {
-            audioMothConnector.playTimeAndDeploymentID(
-                calendar,
-                deploymentIdArrayInt
-            )
-        }.start()
+    fun playSyncSound(calendar: Calendar, deploymentID: Array<Int>) {
+        audioMothConnector.playTimeAndDeploymentID(
+            calendar,
+            deploymentID
+        )
+    }
+
+    fun playTone(duration: Int) {
+        audioMothConnector.playTone(duration)
+    }
+
+    fun stopPlaySound() {
+        audioMothConnector.stopPlay()
     }
 
     fun onDestroy() {
