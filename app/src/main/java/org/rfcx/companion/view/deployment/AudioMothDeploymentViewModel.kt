@@ -7,12 +7,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
+import androidx.work.WorkInfo
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
+import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.AudioMothChimeConnector
 import org.rfcx.companion.util.Preferences
+import org.rfcx.companion.util.Resource
 import org.rfcx.companion.util.asLiveData
+import org.rfcx.companion.view.map.SyncInfo
 import java.util.*
 
 class AudioMothDeploymentViewModel(
@@ -26,6 +30,7 @@ class AudioMothDeploymentViewModel(
 
     private var deployments = MutableLiveData<List<Deployment>>()
     private var sites = MutableLiveData<List<Locate>>()
+    private var downloadStreamsWork = MutableLiveData<Resource<SyncInfo>>()
 
     private lateinit var deploymentLiveData: LiveData<List<Deployment>>
     private val deploymentObserve = Observer<List<Deployment>> {
@@ -35,6 +40,24 @@ class AudioMothDeploymentViewModel(
     private lateinit var siteLiveData: LiveData<List<Locate>>
     private val siteObserve = Observer<List<Locate>> {
         sites.postValue(it)
+    }
+
+    private lateinit var downloadStreamsWorkInfoLiveData: LiveData<List<WorkInfo>>
+    private val downloadStreamsWorkInfoObserve = Observer<List<WorkInfo>> {
+        val currentWorkStatus = it?.getOrNull(0)
+        if (currentWorkStatus != null) {
+            when (currentWorkStatus.state) {
+                WorkInfo.State.RUNNING -> downloadStreamsWork.postValue(Resource.loading(SyncInfo.Uploading))
+                WorkInfo.State.SUCCEEDED -> downloadStreamsWork.postValue(Resource.success(SyncInfo.Uploaded))
+                else -> downloadStreamsWork.postValue(
+                    Resource.error(
+                        context.getString(R.string.error_has_occurred),
+                        null
+                    )
+                )
+
+            }
+        }
     }
 
     init {
@@ -58,6 +81,14 @@ class AudioMothDeploymentViewModel(
                 .asLiveData()
         ) { it }
         deploymentLiveData.observeForever(deploymentObserve)
+
+        downloadStreamsWorkInfoLiveData = DownloadStreamsWorker.workInfos(context)
+        downloadStreamsWorkInfoLiveData.observeForever(downloadStreamsWorkInfoObserve)
+
+    }
+
+    fun downloadStreamsWork(): LiveData<Resource<SyncInfo>> {
+        return downloadStreamsWork
     }
 
     fun getDeployments(): LiveData<List<Deployment>> {
@@ -149,5 +180,6 @@ class AudioMothDeploymentViewModel(
     fun onDestroy() {
         deploymentLiveData.removeObserver(deploymentObserve)
         siteLiveData.removeObserver(siteObserve)
+        downloadStreamsWorkInfoLiveData.removeObserver(downloadStreamsWorkInfoObserve)
     }
 }

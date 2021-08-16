@@ -9,13 +9,10 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.work.WorkInfo
 import kotlinx.android.synthetic.main.fragment_set_deployment_site.*
-import kotlinx.android.synthetic.main.fragment_set_deployment_site.siteSwipeRefreshView
 import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
@@ -45,18 +42,6 @@ class SetDeploymentSiteFragment : Fragment(),
     private val preferences by lazy { Preferences.getInstance(requireContext()) }
 
     private var lastSyncingInfo: SyncInfo? = null
-    private lateinit var downloadStreamsWorkInfoLiveData: LiveData<List<WorkInfo>>
-    private val downloadStreamsWorkInfoObserve = Observer<List<WorkInfo>> {
-        val currentWorkStatus = it?.getOrNull(0)
-        if (currentWorkStatus != null) {
-            when (currentWorkStatus.state) {
-                WorkInfo.State.RUNNING -> updateSyncInfo(SyncInfo.Uploading, true)
-                WorkInfo.State.SUCCEEDED -> updateSyncInfo(SyncInfo.Uploaded, true)
-                else -> updateSyncInfo(isSites = true)
-            }
-        }
-    }
-
     private var searchItem: MenuItem? = null
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
@@ -104,7 +89,6 @@ class SetDeploymentSiteFragment : Fragment(),
         setObserver()
         setupAdapter()
         setupTopBar()
-        fetchJobSyncing()
         setEditText()
         setSwipeSite()
     }
@@ -125,12 +109,6 @@ class SetDeploymentSiteFragment : Fragment(),
                 statusSiteView.onShowWithDelayed(getString(R.string.format_deploy_waiting_network))
             }
         }
-    }
-
-    private fun fetchJobSyncing() {
-        context ?: return
-        downloadStreamsWorkInfoLiveData = DownloadStreamsWorker.workInfos(requireContext())
-        downloadStreamsWorkInfoLiveData.observeForever(downloadStreamsWorkInfoObserve)
     }
 
     private fun setEditText() {
@@ -214,6 +192,14 @@ class SetDeploymentSiteFragment : Fragment(),
         audioMothDeploymentViewModel.getSites().observe(viewLifecycleOwner, Observer {
             setupView()
         })
+
+        audioMothDeploymentViewModel.downloadStreamsWork().observe(viewLifecycleOwner, Observer {
+            when (it.status) {
+                Status.LOADING -> updateSyncInfo(SyncInfo.Uploading, true)
+                Status.SUCCESS -> updateSyncInfo(SyncInfo.Uploaded, true)
+                Status.ERROR -> updateSyncInfo(isSites = true)
+            }
+        })
     }
 
     private fun setSwipeSite() {
@@ -237,7 +223,7 @@ class SetDeploymentSiteFragment : Fragment(),
 
     override fun onDestroy() {
         super.onDestroy()
-        downloadStreamsWorkInfoLiveData.removeObserver(downloadStreamsWorkInfoObserve)
+        audioMothDeploymentViewModel.onDestroy()
     }
 
     companion object {
