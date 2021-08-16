@@ -15,6 +15,8 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getSampleRate(): Int
     fun getWifiName(): String
     fun getLastCheckInTime(): Long?
+    fun getGuid(): String?
+    fun isGuardianRegistered(): Boolean?
 
     fun setDeploymentConfigure(config: GuardianConfiguration)
     fun setDeployment(deployment: GuardianDeployment)

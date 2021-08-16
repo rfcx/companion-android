@@ -20,4 +20,15 @@ object PingUtils {
         Log.d("ConvertPing", sha1.toString())
         return sha1.asString
     }
+
+    fun getGuidFromPing(ping: Ping?): String? {
+        val guid = ping?.companion?.get("guid") ?: return null
+        return guid.asString
+    }
+
+    fun isRegisteredFromPing(ping: Ping?): Boolean? {
+        val isRegistered = ping?.companion?.get("is_registered") ?: return null
+        Log.d("ConvertPing", isRegistered.asBoolean.toString())
+        return isRegistered.asBoolean
+    }
 }
