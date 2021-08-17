@@ -94,12 +94,13 @@ class LoginActivity : AppCompatActivity() {
                 Status.ERROR -> {
                     analytics.trackLoginEvent(LoginType.EMAIL.id, StatusEvent.FAILURE.id)
                     loading(false)
-
-                    Toast.makeText(
-                        this@LoginActivity,
-                        it.message ?: getString(R.string.error_has_occurred),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@LoginActivity,
+                            it.message ?: getString(R.string.error_has_occurred),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
         })
@@ -119,12 +120,13 @@ class LoginActivity : AppCompatActivity() {
                 Status.ERROR -> {
                     analytics.trackLoginEvent(LoginType.FACEBOOK.id, StatusEvent.FAILURE.id)
                     loading(false)
-
-                    Toast.makeText(
-                        this@LoginActivity,
-                        it.message ?: getString(R.string.error_has_occurred),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@LoginActivity,
+                            it.message ?: getString(R.string.error_has_occurred),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
         })
@@ -144,12 +146,13 @@ class LoginActivity : AppCompatActivity() {
                 Status.ERROR -> {
                     analytics.trackLoginEvent(LoginType.GOOGLE.id, StatusEvent.FAILURE.id)
                     loading(false)
-
-                    Toast.makeText(
-                        this@LoginActivity,
-                        it.message ?: getString(R.string.error_has_occurred),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@LoginActivity,
+                            it.message ?: getString(R.string.error_has_occurred),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
         })
@@ -169,12 +172,13 @@ class LoginActivity : AppCompatActivity() {
                 Status.ERROR -> {
                     analytics.trackLoginEvent(LoginType.SMS.id, StatusEvent.FAILURE.id)
                     loading(false)
-
-                    Toast.makeText(
-                        this@LoginActivity,
-                        it.message ?: getString(R.string.error_has_occurred),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@LoginActivity,
+                            it.message ?: getString(R.string.error_has_occurred),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
         })
@@ -189,11 +193,13 @@ class LoginActivity : AppCompatActivity() {
                 }
                 Status.ERROR -> {
                     loading(false)
-                    Toast.makeText(
-                        this@LoginActivity,
-                        it.message ?: getString(R.string.error_has_occurred),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@LoginActivity,
+                            it.message ?: getString(R.string.error_has_occurred),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
         })
@@ -208,11 +214,13 @@ class LoginActivity : AppCompatActivity() {
                 }
                 Status.ERROR -> {
                     loading(false)
-                    Toast.makeText(
-                        this@LoginActivity,
-                        it.message ?: getString(R.string.error_has_occurred),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@LoginActivity,
+                            it.message ?: getString(R.string.error_has_occurred),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
         })
@@ -230,11 +238,13 @@ class LoginActivity : AppCompatActivity() {
                 }
                 Status.ERROR -> {
                     loading(false)
-                    Toast.makeText(
-                        this@LoginActivity,
-                        it.message ?: getString(R.string.error_has_occurred),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@LoginActivity,
+                            it.message ?: getString(R.string.error_has_occurred),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
         })
