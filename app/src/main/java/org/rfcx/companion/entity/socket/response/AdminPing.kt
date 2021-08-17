@@ -4,11 +4,11 @@ import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 
 data class AdminPing(
-    val network: JsonObject? = null,
+    val network: String? = null,
     @SerializedName("sentinel_power")
-    val sentinelPower: JsonObject? = null,
+    val sentinelPower: String? = null,
     @SerializedName("sentinel_sensor")
-    val sentinelSensor: JsonObject? = null,
-    val cpu: JsonObject? = null,
-    val storage: JsonObject? = null
+    val sentinelSensor: String? = null,
+    val cpu: String? = null,
+    val storage: String? = null
 )

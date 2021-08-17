@@ -228,6 +228,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         }
         AdminSocketManager.pingBlob.observeForever {
             Log.d("SocketComm", "Getting Admin ping blob")
+            Log.d("SocketComm", PingUtils.getNetworkFromPing(it).toString())
             network = PingUtils.getNetworkFromPing(it)
             sentinelPower = PingUtils.getSentinelPowerFromPing(it)
         }

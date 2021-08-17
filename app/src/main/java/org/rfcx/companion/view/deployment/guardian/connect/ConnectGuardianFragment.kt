@@ -16,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.rfcx.companion.R
+import org.rfcx.companion.connection.socket.AdminSocketManager
 import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.connection.wifi.OnWifiListener
 import org.rfcx.companion.connection.wifi.WifiHotspotManager
@@ -115,6 +116,8 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
     }
 
     private fun checkConnection() {
+        GuardianSocketManager.getConnection()
+        AdminSocketManager.connect()
         GlobalScope.launch(Dispatchers.Main) {
             GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
                 requireActivity().runOnUiThread {
