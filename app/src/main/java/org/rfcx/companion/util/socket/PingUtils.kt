@@ -42,12 +42,12 @@ object PingUtils {
         return power
     }
 
-    fun getGuidFromPing(ping: Ping?): String? {
+    fun getGuidFromPing(ping: GuardianPing?): String? {
         val guid = ping?.companion?.get("guid") ?: return null
         return guid.asString
     }
 
-    fun isRegisteredFromPing(ping: Ping?): Boolean? {
+    fun isRegisteredFromPing(ping: GuardianPing?): Boolean? {
         val isRegistered = ping?.companion?.get("is_registered") ?: return null
         Log.d("ConvertPing", isRegistered.asBoolean.toString())
         return isRegistered.asBoolean
