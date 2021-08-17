@@ -11,12 +11,14 @@ class LocalDataHelper {
     private val projectDb by lazy { ProjectDb(realm) }
     private val trackingDb by lazy { TrackingDb(realm) }
     private val trackingFileDb by lazy { TrackingFileDb(realm) }
+    private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val deploymentDb by lazy { DeploymentDb(realm) }
 
     fun getLocateLocalDb() = locateDb
     fun getProjectLocalDb() = projectDb
     fun getTrackingLocalDb() = trackingDb
     fun getTrackingFileLocalDb() = trackingFileDb
+    fun getDeploymentImageLocalDb() = deploymentImageDb
     fun getDeploymentLocalDb() = deploymentDb
 
 }

@@ -7,6 +7,8 @@ import org.rfcx.companion.MainRepository
 import org.rfcx.companion.MainViewModel
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.local.LocalDataHelper
+import org.rfcx.companion.view.deployment.AudioMothDeploymentRepository
+import org.rfcx.companion.view.deployment.AudioMothDeploymentViewModel
 import org.rfcx.companion.view.LoginRepository
 import org.rfcx.companion.view.LoginViewModel
 import org.rfcx.companion.view.profile.offlinemap.ProjectOfflineMapRepository
@@ -24,6 +26,8 @@ class ViewModelFactory(private val application: Application, private val deviceA
             return LoginViewModel(application, LoginRepository(deviceApiHelper, localDataHelper)) as T
         } else if (modelClass.isAssignableFrom(ProjectOfflineMapViewModel::class.java)) {
             return ProjectOfflineMapViewModel(application, ProjectOfflineMapRepository(deviceApiHelper, localDataHelper)) as T
+        } else if (modelClass.isAssignableFrom(AudioMothDeploymentViewModel::class.java)) {
+            return AudioMothDeploymentViewModel(application, AudioMothDeploymentRepository(deviceApiHelper, localDataHelper)) as T
         }
         throw IllegalArgumentException("Unknown class name")
     }
