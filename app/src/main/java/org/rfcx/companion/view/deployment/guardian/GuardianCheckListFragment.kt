@@ -68,9 +68,9 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
     }
 
     private fun checkIfRegistered() {
-        GuardianSocketManager.isGuardianRegistered()
-        GuardianSocketManager.isRegistered.observe(viewLifecycleOwner, Observer {
-            if (it.isRegistered) {
+        GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
+            val isRegistered = deploymentProtocol?.isGuardianRegistered()
+            if (isRegistered != null && isRegistered) {
                 checkListRecyclerView.setCheckPassed(1)
                 deploymentProtocol?.addRegisteredToPassedCheck()
             } else {

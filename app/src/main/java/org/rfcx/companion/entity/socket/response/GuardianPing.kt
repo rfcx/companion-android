@@ -6,5 +6,6 @@ data class GuardianPing(
     val prefs: Any? = null,
     val device: JsonObject? = null,
     val software: String? = null,
-    val instructions: JsonObject? = null
+    val instructions: JsonObject? = null,
+    val companion: JsonObject? = null
 )

@@ -82,6 +82,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private var prefsSha1: String? = null
     private var network: Int? = null
     private var sentinelPower: String? = null
+    private var isGuardianRegistered: Boolean? = null
 
     private var _sampleRate = 12000
 
@@ -225,6 +226,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                 Log.d("SocketComm", "Setting ping blob")
                 guardianPingBlob = it
             }
+            isGuardianRegistered = PingUtils.isRegisteredFromPing(it)
         }
         AdminSocketManager.pingBlob.observeForever {
             Log.d("SocketComm", "Getting Admin ping blob")
@@ -318,9 +320,14 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     override fun getWifiName(): String = _deployment?.wifiName ?: ""
 
     override fun getLastCheckInTime(): Long? = lastCheckInTime
+
     override fun getNetwork(): Int? = network
 
     override fun getSentinelPower(): String? = sentinelPower
+
+    override fun getGuid(): String? = PingUtils.getGuidFromPing(guardianPingBlob)
+
+    override fun isGuardianRegistered(): Boolean? = isGuardianRegistered
 
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
