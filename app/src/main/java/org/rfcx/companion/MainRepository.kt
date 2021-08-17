@@ -64,6 +64,10 @@ class MainRepository(
         return localDataHelper.getProjectLocalDb().getProjectById(id)
     }
 
+    fun getProjectByServerId(id: String): Project? {
+        return localDataHelper.getProjectLocalDb().getProjectByServerId(id)
+    }
+
     fun getDeploymentUnsentCount(): Int {
         return localDataHelper.getDeploymentLocalDb().unsentCount().toInt()
     }

@@ -120,7 +120,7 @@ class MainViewModel(
 
     fun updateProjectBounds() {
         val updateProjectBounds =
-            getProjectsFromLocal().filter { project -> project.serverId != null && project.maxLatitude == null }
+            getProjectsFromLocal().filter { project -> project.serverId != null }
         updateProjectBounds.map { projectBounds ->
             val token = "Bearer ${context?.getIdToken()}"
             projectBounds.serverId?.let { serverId ->
@@ -133,8 +133,13 @@ class MainViewModel(
                         ) {
                             if (response.body() != null && response.body()?.id != null && response.body()?.maxLatitude != null) {
                                 val res = response.body() as ProjectByIdResponse
-                                updateProjectBounds(res)
-                                updateStatusOfflineMap()
+                                val project =
+                                    res.id?.let { mainRepository.getProjectByServerId(it) }
+                                        ?: Project()
+                                if (project.minLatitude != res.minLatitude || project.maxLatitude != res.maxLatitude || project.minLongitude != res.minLongitude || project.maxLongitude != res.maxLongitude) {
+                                    updateProjectBounds(res)
+                                    updateStatusOfflineMap()
+                                }
                             }
                         }
                     })
@@ -289,6 +294,11 @@ class MainViewModel(
                                         if (status.requiredResourceCount > 10000) {
                                             mainRepository.updateOfflineState(
                                                 OfflineMapState.UNAVAILABLE.key,
+                                                project.serverId ?: ""
+                                            )
+                                        } else {
+                                            mainRepository.updateOfflineState(
+                                                OfflineMapState.DOWNLOAD_STATE.key,
                                                 project.serverId ?: ""
                                             )
                                         }

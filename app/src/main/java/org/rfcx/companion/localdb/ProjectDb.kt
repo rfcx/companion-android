@@ -137,6 +137,11 @@ class ProjectDb(private val realm: Realm) {
             .equalTo(Project.PROJECT_ID, id).findFirst()
     }
 
+    fun getProjectByServerId(serverId: String): Project? {
+        return realm.where(Project::class.java)
+            .equalTo(Project.PROJECT_SERVER_ID, serverId).findFirst()
+    }
+
     fun insertOrUpdate(groupsResponse: ProjectResponse) {
         realm.executeTransaction {
             val project =
