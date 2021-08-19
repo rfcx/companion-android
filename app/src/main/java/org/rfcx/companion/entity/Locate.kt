@@ -21,6 +21,7 @@ open class Locate(
     var altitude: Double = 0.0,
     var createdAt: Date = Date(),
     var updatedAt: Date? = null,
+    var lastDeploymentId: Int = 0,
     @Expose(serialize = false)
     var syncState: Int = 0
 ) : RealmModel {
@@ -47,6 +48,7 @@ open class Locate(
         const val FIELD_DELETED_AT = "deletedAt"
         const val FIELD_ALTITUDE = "altitude"
         const val FIELD_NAME = "name"
+        const val FIELD_LAST_DEPLOYMENT_ID = "lastDeploymentId"
     }
 }
 

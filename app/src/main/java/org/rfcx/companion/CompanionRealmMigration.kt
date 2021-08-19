@@ -373,10 +373,6 @@ class CompanionRealmMigration : RealmMigration {
     private fun migrateToV18(realm: DynamicRealm) {
         val locate = realm.schema.get(Locate.TABLE_NAME)
         locate?.apply {
-            val lastDeploymentId = this.hasField("lastDeploymentId")
-            if (lastDeploymentId) {
-                removeField("lastDeploymentId")
-            }
             val lastDeploymentServerId = this.hasField("lastDeploymentServerId")
             if (lastDeploymentServerId) {
                 removeField("lastDeploymentServerId")

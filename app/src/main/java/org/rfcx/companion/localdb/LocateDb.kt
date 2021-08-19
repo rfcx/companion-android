@@ -51,13 +51,14 @@ class LocateDb(private val realm: Realm) {
         }
     }
 
-    fun insertOrUpdateLocate(deploymentId: Int, locate: Locate, isGuardian: Boolean = false) {
+    fun insertOrUpdateLocate(deploymentId: Int, locate: Locate) {
         realm.executeTransaction {
             if (locate.id == 0) {
                 val id = (realm.where(Locate::class.java).max(Locate.FIELD_ID)
                     ?.toInt() ?: 0) + 1
                 locate.id = id
             }
+            locate.lastDeploymentId = deploymentId
             it.insertOrUpdate(locate)
         }
     }
@@ -69,6 +70,13 @@ class LocateDb(private val realm: Realm) {
                 .equalTo(TrackingFile.FIELD_DEPLOYMENT_ID, deploymentId)
                 .findFirst()?.apply {
                     this.siteServerId = serverId
+                }
+
+            //update server id in site
+            it.where(Locate::class.java)
+                .equalTo(Locate.FIELD_LAST_DEPLOYMENT_ID, deploymentId)
+                .findFirst()?.apply {
+                    this.serverId = serverId
                 }
         }
     }

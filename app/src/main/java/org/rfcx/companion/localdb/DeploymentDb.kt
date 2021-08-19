@@ -231,6 +231,16 @@ class DeploymentDb(private val realm: Realm) {
                 deployment.updatedAt = Date()
                 deployment.syncState = SyncState.Unsent.key
             }
+            val location = bgRealm.where(Locate::class.java)
+                .equalTo(Locate.FIELD_LAST_DEPLOYMENT_ID, id).findFirst()
+
+            if (location != null) {
+                location.latitude = latitude
+                location.longitude = longitude
+                location.altitude = altitude
+                location.name = locationName
+                location.syncState = SyncState.Unsent.key
+            }
         }, {
             // success
             realm.close()
