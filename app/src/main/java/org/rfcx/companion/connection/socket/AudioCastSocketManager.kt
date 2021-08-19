@@ -3,9 +3,7 @@ package org.rfcx.companion.connection.socket
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
-import org.rfcx.companion.entity.socket.response.AdminPing
 import org.rfcx.companion.entity.socket.response.AudioCastPing
-import org.rfcx.companion.entity.socket.response.MicrophoneTestResponse
 import org.rfcx.companion.util.MicrophoneTestUtils
 import java.io.DataInputStream
 import java.io.DataOutputStream
@@ -29,6 +27,11 @@ object AudioCastSocketManager {
 
     val pingBlob = MutableLiveData<AudioCastPing>()
     val spectrogram = MutableLiveData<ByteArray>()
+
+    fun resetAllValuesToDefault() {
+        pingBlob.value = AudioCastPing()
+        spectrogram.value = ByteArray(2)
+    }
 
     //just to connect to server
     fun connect(micTestUtils: MicrophoneTestUtils) {

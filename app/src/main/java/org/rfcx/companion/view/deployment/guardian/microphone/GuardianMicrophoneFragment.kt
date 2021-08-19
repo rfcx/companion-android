@@ -280,6 +280,8 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
             timer = null
             isMicTesting = false
         }
+        AudioCastSocketManager.resetAllValuesToDefault()
+        AudioCastSocketManager.stopConnection()
     }
 
     override fun onResume() {
