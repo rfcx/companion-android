@@ -103,6 +103,10 @@ class AudioMothDeploymentViewModel(
         audioMothDeploymentRepository.insertOrUpdate(locate)
     }
 
+    fun insertOrUpdateLocate(deploymentId: Int, locate: Locate) {
+        audioMothDeploymentRepository.insertOrUpdateLocate(deploymentId, locate)
+    }
+
     fun getLocateById(id: Int): Locate? {
         return audioMothDeploymentRepository.getLocateById(id)
     }

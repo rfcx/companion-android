@@ -51,6 +51,17 @@ class LocateDb(private val realm: Realm) {
         }
     }
 
+    fun insertOrUpdateLocate(deploymentId: Int, locate: Locate, isGuardian: Boolean = false) {
+        realm.executeTransaction {
+            if (locate.id == 0) {
+                val id = (realm.where(Locate::class.java).max(Locate.FIELD_ID)
+                    ?.toInt() ?: 0) + 1
+                locate.id = id
+            }
+            it.insertOrUpdate(locate)
+        }
+    }
+
     fun updateSiteServerId(deploymentId: Int, serverId: String) {
         realm.executeTransaction {
             //update server id in track
