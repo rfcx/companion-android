@@ -6,7 +6,6 @@ import io.realm.Sort
 import io.realm.kotlin.deleteFromRealm
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
-import org.rfcx.companion.entity.guardian.isGuardian
 import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.toDeploymentLocation
 import org.rfcx.companion.entity.response.toDeployment

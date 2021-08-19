@@ -21,10 +21,6 @@ class AudioMothDeploymentRepository(
         localDataHelper.getLocateLocalDb().insertOrUpdate(locate)
     }
 
-    fun insertOrUpdateLocate(deploymentId: Int, locate: Locate) {
-        localDataHelper.getLocateLocalDb().insertOrUpdateLocate(deploymentId, locate)
-    }
-
     fun getLocateById(id: Int): Locate? {
         return localDataHelper.getLocateLocalDb().getLocateById(id)
     }

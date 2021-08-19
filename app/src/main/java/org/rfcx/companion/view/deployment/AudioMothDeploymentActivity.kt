@@ -306,15 +306,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
             it.isActive = true
             it.state = DeploymentState.AudioMoth.ReadyToUpload.key
             setDeployment(it)
-
-            val deploymentId =
-                audioMothDeploymentViewModel.insertOrUpdateDeployment(it, _deployLocation!!)
-            this._locate?.let { loc ->
-                audioMothDeploymentViewModel.insertOrUpdateLocate(
-                    deploymentId,
-                    loc
-                ) // update locate - last deployment
-            }
+            audioMothDeploymentViewModel.insertOrUpdateDeployment(it, _deployLocation!!)
 
             if (useExistedLocation) {
                 this._locate?.let { locate ->
