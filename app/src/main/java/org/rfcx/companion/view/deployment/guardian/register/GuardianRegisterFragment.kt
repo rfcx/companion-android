@@ -14,7 +14,6 @@ import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.request.GuardianRegisterRequest
 import org.rfcx.companion.entity.response.GuardianRegisterResponse
-import org.rfcx.companion.entity.socket.response.Status
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.getIdToken
@@ -60,7 +59,7 @@ class GuardianRegisterFragment : Fragment() {
 
         registerFinishButton.setOnClickListener {
             analytics?.trackClickNextEvent(Screen.GUARDIAN_REGISTER.id)
-            deploymentProtocol?.nextStep()
+            deploymentProtocol?.startCheckList()
         }
     }
 

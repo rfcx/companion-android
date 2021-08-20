@@ -426,6 +426,11 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         startFragment(GuardianConfigureFragment.newInstance())
     }
 
+    override fun startGuardianRegister() {
+//        updateDeploymentState(DeploymentState.Guardian.Register) // TODO:: Not sure where should be @Frongs
+        startFragment(GuardianRegisterFragment.newInstance())
+    }
+
     override fun backToConfigure() {
         startFragment(GuardianConfigureFragment.newInstance())
     }
@@ -439,22 +444,18 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                 startFragment(GuardianSolarPanelFragment.newInstance())
             }
             1 -> {
-                updateDeploymentState(DeploymentState.Guardian.Register)
-                startFragment(GuardianRegisterFragment.newInstance())
-            }
-            2 -> {
                 updateDeploymentState(DeploymentState.Guardian.Signal)
                 startFragment(GuardianSignalFragment.newInstance())
             }
-            3 -> {
+            2 -> {
                 updateDeploymentState(DeploymentState.Guardian.Microphone)
                 startFragment(GuardianMicrophoneFragment.newInstance())
             }
-            4 -> {
+            3 -> {
                 updateDeploymentState(DeploymentState.Guardian.Config)
                 startFragment(GuardianConfigureFragment.newInstance())
             }
-            5 -> {
+            4 -> {
                 updateDeploymentState(DeploymentState.Guardian.Locate)
                 val site = this._locate
                 if (site == null) {
@@ -467,15 +468,15 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                     startDetailDeploymentSite(site.id, site.name, false)
                 }
             }
-            6 -> {
+            5 -> {
                 updateDeploymentState(DeploymentState.Guardian.Checkin)
                 startFragment(GuardianCheckInTestFragment.newInstance())
             }
-            7 -> {
+            6 -> {
                 updateDeploymentState(DeploymentState.Guardian.Deploy)
                 startFragment(GuardianDeployFragment.newInstance())
             }
-            8 -> {
+            7 -> {
                 updateDeploymentState(DeploymentState.Guardian.Advanced)
                 startFragment(GuardianAdvancedFragment.newInstance())
             }
