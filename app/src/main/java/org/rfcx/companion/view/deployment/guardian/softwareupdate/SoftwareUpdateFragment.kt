@@ -43,6 +43,10 @@ class SoftwareUpdateFragment : Fragment(), (String) -> Unit {
             adapter = guardianApkAdapter
         }
 
+        updateButton.setOnClickListener {
+            deploymentProtocol?.nextStep()
+        }
+
         guardianApkAdapter.items = listOf(
             "Guardian v0.8.2-fix",
             "Guardian v0.8.2",
