@@ -30,7 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="@dimen/margin_padding_small"
-            android:text="0.8.0"
+            android:text="v0.8.0"
             tools:text="0.8.0" />
     </LinearLayout>
 
@@ -38,8 +38,8 @@
         android:id="@+id/guardianApkRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="@dimen/margin_padding_xlarge"
-        android:layout_marginBottom="@dimen/margin_padding_xlarge"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:layout_marginBottom="@dimen/margin_padding_normal"
         app:layout_constraintTop_toBottomOf="@id/guardianVersionLayout"
         app:layout_constraintBottom_toTopOf="@id/updateButton"/>
 

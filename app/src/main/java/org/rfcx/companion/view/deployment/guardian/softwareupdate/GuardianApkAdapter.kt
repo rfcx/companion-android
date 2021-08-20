@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_location_group.view.*
+import kotlinx.android.synthetic.main.item_text_and_checkmark.view.*
 import org.rfcx.companion.R
 
 class GuardianApkAdapter(private val onClickListener: (String) -> Unit) :
@@ -21,7 +21,7 @@ class GuardianApkAdapter(private val onClickListener: (String) -> Unit) :
         viewType: Int
     ): GuardianApkAdapter.GuardianApkViewHolder {
         val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.item_location_group, parent, false)
+            LayoutInflater.from(parent.context).inflate(R.layout.item_text_and_checkmark, parent, false)
         return GuardianApkViewHolder(view)
     }
 
@@ -44,7 +44,7 @@ class GuardianApkAdapter(private val onClickListener: (String) -> Unit) :
     override fun getItemCount(): Int = items.size
 
     inner class GuardianApkViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val versionApkTextView = itemView.locationGroupTextView
+        private val versionApkTextView = itemView.nameTextView
         fun bind(versionApk: String) {
             versionApkTextView.text = versionApk
         }
