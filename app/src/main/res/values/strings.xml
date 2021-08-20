@@ -457,4 +457,8 @@
     <string name="no_content_project">There is no accessible project in this account.\nPlease contact an administrator\nor create the project in Arbimon platform.</string>
     <string name="logout">logout</string>
 
+    <!-- SoftwareUpdateFragment -->
+    <string name="guardian_version">Guardian version</string>
+    <string name="update">Update</string>
+
 </resources>

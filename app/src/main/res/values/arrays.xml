@@ -55,6 +55,7 @@
         <item>Audio Parameter Config</item>
         <item>Guardian Installation Location</item>
         <item>Confirm CheckIn Status</item>
+        <item>Software Update</item>
     </string-array>
 
     <string-array name="guardian_optional_checks">

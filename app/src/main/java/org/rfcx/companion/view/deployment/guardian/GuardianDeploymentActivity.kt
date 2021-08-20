@@ -45,6 +45,7 @@ import org.rfcx.companion.view.deployment.guardian.deploy.GuardianDeployFragment
 import org.rfcx.companion.view.deployment.guardian.microphone.GuardianMicrophoneFragment
 import org.rfcx.companion.view.deployment.guardian.register.GuardianRegisterFragment
 import org.rfcx.companion.view.deployment.guardian.signal.GuardianSignalFragment
+import org.rfcx.companion.view.deployment.guardian.softwareupdate.SoftwareUpdateFragment
 import org.rfcx.companion.view.deployment.guardian.solarpanel.GuardianSolarPanelFragment
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
@@ -472,10 +473,13 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                 startFragment(GuardianCheckInTestFragment.newInstance())
             }
             7 -> {
+                startFragment(SoftwareUpdateFragment.newInstance())
+            }
+            8 -> {
                 updateDeploymentState(DeploymentState.Guardian.Deploy)
                 startFragment(GuardianDeployFragment.newInstance())
             }
-            8 -> {
+            9 -> {
                 updateDeploymentState(DeploymentState.Guardian.Advanced)
                 startFragment(GuardianAdvancedFragment.newInstance())
             }
