@@ -32,10 +32,10 @@ class SoftwareUpdateFragment : Fragment(), CountryClickedListener {
         return inflater.inflate(R.layout.fragment_software_update, container, false)
     }
 
-    private fun populateAdapterWithInfo(expandableCountryStateList: MutableList<ExpandableCountryModel>) {
+    private fun populateAdapterWithInfo(expandableSoftwareUpdateStateList: MutableList<ExpandableSoftwareUpdateModel>) {
         softwareUpdateAdapter = SoftwareUpdateAdapter(
             this,
-            expandableCountryStateList
+            expandableSoftwareUpdateStateList
         )
         softwareUpdateAdapter?.let {
             val layoutManager = LinearLayoutManager(context)
@@ -59,11 +59,6 @@ class SoftwareUpdateFragment : Fragment(), CountryClickedListener {
             it.setToolbarTitle()
         }
 
-//        guardianApkRecyclerView.apply {
-//            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-//            adapter = softwareUpdateAdapter
-//        }
-
         updateButton.setOnClickListener {
             deploymentProtocol?.nextStep()
         }
@@ -84,54 +79,54 @@ class SoftwareUpdateFragment : Fragment(), CountryClickedListener {
             "Guardian v0.5.31"
         )
 
-        val app1 = listOf(
-            StateCapital.Country.State("Guardian v0.8.2-fix", "v0.8.2-fix"),
-            StateCapital.Country.State("Guardian v0.8.2", "v0.8.2"),
-            StateCapital.Country.State("Guardian v0.8.1", "v0.8.1")
+        val guardianMockData = listOf(
+            StateSoftwareUpdate.Software.ApkVersion("", "Guardian v0.8.2-fix"),
+            StateSoftwareUpdate.Software.ApkVersion("", "Guardian v0.8.2"),
+            StateSoftwareUpdate.Software.ApkVersion("", "Guardian v0.8.1")
         )
         val app2 = listOf(
-            StateCapital.Country.State("admin  v0.8.2-fix", "v0.8.2-fix"),
-            StateCapital.Country.State("admin  v0.8.2", "v0.8.2"),
-            StateCapital.Country.State("admin  v0.8.1", "v0.8.1")
+            StateSoftwareUpdate.Software.ApkVersion("", "Admin v0.8.2-fix"),
+            StateSoftwareUpdate.Software.ApkVersion("", "Admin v0.8.2"),
+            StateSoftwareUpdate.Software.ApkVersion("", "Admin v0.8.1")
         )
         val app3 = listOf(
-            StateCapital.Country.State("classify  v0.8.2-fix", "v0.8.2-fix"),
-            StateCapital.Country.State("classify  v0.8.2", "v0.8.2"),
-            StateCapital.Country.State("classify  v0.8.1", "v0.8.1")
+            StateSoftwareUpdate.Software.ApkVersion("", "Classify v0.8.2-fix"),
+            StateSoftwareUpdate.Software.ApkVersion("", "Classify v0.8.2"),
+            StateSoftwareUpdate.Software.ApkVersion("", "Classify v0.8.1")
         )
         val app4 = listOf(
-            StateCapital.Country.State("updater v0.8.2-fix", "v0.8.2-fix"),
-            StateCapital.Country.State("updater v0.8.2", "v0.8.2"),
-            StateCapital.Country.State("updater v0.8.1", "v0.8.1")
+            StateSoftwareUpdate.Software.ApkVersion("", "Updater v0.8.2-fix"),
+            StateSoftwareUpdate.Software.ApkVersion("", "Updater v0.8.2"),
+            StateSoftwareUpdate.Software.ApkVersion("", "Updater v0.8.1")
         )
 
-        val datas = mutableListOf<ExpandableCountryModel>()
+        val mockData = mutableListOf<ExpandableSoftwareUpdateModel>()
 
-        datas.add(
-            ExpandableCountryModel(
+        mockData.add(
+            ExpandableSoftwareUpdateModel(
                 1,
-                StateCapital.Country("Guardian", app1)
+                StateSoftwareUpdate.Software("Guardian App", guardianMockData)
             )
         )
-        datas.add(
-            ExpandableCountryModel(
+        mockData.add(
+            ExpandableSoftwareUpdateModel(
                 1,
-                StateCapital.Country("admin", app2)
+                StateSoftwareUpdate.Software("Admin App", app2)
             )
         )
-        datas.add(
-            ExpandableCountryModel(
+        mockData.add(
+            ExpandableSoftwareUpdateModel(
                 1,
-                StateCapital.Country("classify", app3)
+                StateSoftwareUpdate.Software("Classify App", app3)
             )
         )
-        datas.add(
-            ExpandableCountryModel(
+        mockData.add(
+            ExpandableSoftwareUpdateModel(
                 1,
-                StateCapital.Country("updater", app4)
+                StateSoftwareUpdate.Software("Updater App", app4)
             )
         )
-        populateAdapterWithInfo(datas)
+        populateAdapterWithInfo(mockData)
     }
 
     companion object {
@@ -139,7 +134,7 @@ class SoftwareUpdateFragment : Fragment(), CountryClickedListener {
         fun newInstance() = SoftwareUpdateFragment()
     }
 
-    override fun onItemClick(countryName: String, countryChild: StateCapital.Country.State) {
-        Toast.makeText(context,"Clicked on $countryName with info ${countryChild.name} and ${countryChild.capital}",Toast.LENGTH_LONG).show()
+    override fun onItemClick(appName: String, softwareChild: StateSoftwareUpdate.Software.ApkVersion) {
+        Toast.makeText(context,"Clicked on $appName with info ${softwareChild.name} and ${softwareChild.capital}",Toast.LENGTH_LONG).show()
     }
 }

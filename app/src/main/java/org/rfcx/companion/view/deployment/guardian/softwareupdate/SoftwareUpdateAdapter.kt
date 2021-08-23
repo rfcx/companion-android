@@ -12,23 +12,23 @@ import org.rfcx.companion.R
 
 class SoftwareUpdateAdapter(
     var countryClickedListener: CountryClickedListener,
-    var countryStateModelList: MutableList<ExpandableCountryModel>
+    var softwareUpdateStateModelList: MutableList<ExpandableSoftwareUpdateModel>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var isFirstItemExpanded: Boolean = true
     private var actionLock = false
     lateinit var countryName: String
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            ExpandableCountryModel.PARENT -> {
-                CountryStateParentViewHolder(
+            ExpandableSoftwareUpdateModel.PARENT -> {
+                SoftwareStateParentViewHolder(
                     LayoutInflater.from(parent.context).inflate(
                         R.layout.expandable_parent_item, parent, false
                     )
                 )
             }
 
-            ExpandableCountryModel.CHILD -> {
-                CountryStateChildViewHolder(
+            ExpandableSoftwareUpdateModel.CHILD -> {
+                SoftwareStateChildViewHolder(
                     LayoutInflater.from(parent.context).inflate(
                         R.layout.expandable_child_item, parent, false
                     )
@@ -36,7 +36,7 @@ class SoftwareUpdateAdapter(
             }
 
             else -> {
-                CountryStateParentViewHolder(
+                SoftwareStateParentViewHolder(
                     LayoutInflater.from(parent.context).inflate(
                         R.layout.expandable_parent_item, parent, false
                     )
@@ -45,20 +45,18 @@ class SoftwareUpdateAdapter(
         }
     }
 
-    override fun getItemCount(): Int = countryStateModelList.size
+    override fun getItemCount(): Int = softwareUpdateStateModelList.size
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val row = countryStateModelList[position]
+        val row = softwareUpdateStateModelList[position]
         when (row.type) {
-            ExpandableCountryModel.PARENT -> {
-                (holder as CountryStateParentViewHolder).countryName.text = row.countryParent.country
+            ExpandableSoftwareUpdateModel.PARENT -> {
+                (holder as SoftwareStateParentViewHolder).countryName.text = row.softwareParent.appName
                 holder.closeImage.setOnClickListener {
                     if (row.isExpanded) {
                         row.isExpanded = false
                         collapseRow(position)
                         holder.layout.setBackgroundColor(Color.WHITE)
-
-
                     }else{
                         holder.layout.setBackgroundColor(Color.GRAY)
                         row.isExpanded = true
@@ -79,129 +77,120 @@ class SoftwareUpdateAdapter(
                 }
             }
 
-            ExpandableCountryModel.CHILD -> {
-                (holder as CountryStateChildViewHolder).stateName.text = row.countryChild.name
-                holder.capitalImage.text = row.countryChild.capital
+            ExpandableSoftwareUpdateModel.CHILD -> {
+                (holder as SoftwareStateChildViewHolder).stateName.text = row.softwareChild.name
+                holder.capitalImage.text = row.softwareChild.capital
+
+                holder.layout.setOnClickListener {
+                    val softwareInfo =   holder.stateName.tag
+                    countryClickedListener.onItemClick(holder.layout.tag.toString(),
+                        softwareInfo as StateSoftwareUpdate.Software.ApkVersion
+                    )
+                }
             }
         }
 
     }
 
-    override fun getItemViewType(position: Int): Int = countryStateModelList[position].type
+    override fun getItemViewType(position: Int): Int = softwareUpdateStateModelList[position].type
 
     private fun expandRow(position: Int){
-        val row = countryStateModelList[position]
+        val row = softwareUpdateStateModelList[position]
         var nextPosition = position
         when (row.type) {
-            ExpandableCountryModel.PARENT -> {
-                for(child in row.countryParent.states){
-                    countryStateModelList.add(++nextPosition, ExpandableCountryModel(ExpandableCountryModel.CHILD, child))
+            ExpandableSoftwareUpdateModel.PARENT -> {
+                for(child in row.softwareParent.apkVersions){
+                    softwareUpdateStateModelList.add(++nextPosition, ExpandableSoftwareUpdateModel(ExpandableSoftwareUpdateModel.CHILD, child))
                 }
                 notifyDataSetChanged()
             }
-            ExpandableCountryModel.CHILD -> {
+            ExpandableSoftwareUpdateModel.CHILD -> {
                 notifyDataSetChanged()
             }
         }
     }
 
     private fun collapseRow(position: Int){
-        val row = countryStateModelList[position]
-        var nextPosition = position + 1
+        val row = softwareUpdateStateModelList[position]
+        val nextPosition = position + 1
         when (row.type) {
-            ExpandableCountryModel.PARENT -> {
+            ExpandableSoftwareUpdateModel.PARENT -> {
                 outerloop@ while (true) {
-                    //  println("Next Position during Collapse $nextPosition size is ${shelfModelList.size} and parent is ${shelfModelList[nextPosition].type}")
-
-                    if (nextPosition == countryStateModelList.size || countryStateModelList[nextPosition].type == ExpandableCountryModel.PARENT) {
-                        /* println("Inside break $nextPosition and size is ${closedShelfModelList.size}")
-                         closedShelfModelList[closedShelfModelList.size-1].isExpanded = false
-                         println("Modified closedShelfModelList ${closedShelfModelList.size}")*/
+                    if (nextPosition == softwareUpdateStateModelList.size || softwareUpdateStateModelList[nextPosition].type == ExpandableSoftwareUpdateModel.PARENT) {
                         break@outerloop
                     }
-
-                    countryStateModelList.removeAt(nextPosition)
+                    softwareUpdateStateModelList.removeAt(nextPosition)
                 }
-
                 notifyDataSetChanged()
             }
         }
     }
 
-    class CountryStateParentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class SoftwareStateParentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal var layout = itemView.country_item_parent_container
         internal var countryName: TextView = itemView.country_name
         internal var closeImage = itemView.close_arrow
         internal var upArrowImg = itemView.up_arrow
-
     }
 
-    class CountryStateChildViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class SoftwareStateChildViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal var layout = itemView.country_item_child_container
         internal var stateName: TextView = itemView.state_name
         internal var capitalImage = itemView.capital_name
-
     }
 }
 
-data class StateCapital(
-    val countries: List<Country>
+data class StateSoftwareUpdate(
+    val softwares: List<Software>
 ) {
-    data class Country(
-        val country: String, // India
-        val states: List<State>
+    data class Software(
+        val appName: String,
+        val apkVersions: List<ApkVersion>
     ) {
-        data class State(
-            val capital: String, // Hyderabad
-            val name: String // Telangana
+        data class ApkVersion(
+            val capital: String,
+            val name: String
         )
     }
 }
 
-
-class ExpandableCountryModel {
+class ExpandableSoftwareUpdateModel {
     companion object {
         const val PARENT = 1
         const val CHILD = 2
-
     }
 
-    lateinit var countryParent: StateCapital.Country
+    lateinit var softwareParent: StateSoftwareUpdate.Software
     var type: Int
-    lateinit var countryChild: StateCapital.Country.State
+    lateinit var softwareChild: StateSoftwareUpdate.Software.ApkVersion
     var isExpanded: Boolean
     private var isCloseShown: Boolean
 
-
     constructor(
         type: Int,
-        countryParent: StateCapital.Country,
+        softwareParent: StateSoftwareUpdate.Software,
         isExpanded: Boolean = false,
         isCloseShown: Boolean = false
     ) {
         this.type = type
-        this.countryParent = countryParent
+        this.softwareParent = softwareParent
         this.isExpanded = isExpanded
         this.isCloseShown = isCloseShown
-
     }
 
-
     constructor(
         type: Int,
-        countryChild: StateCapital.Country.State,
+        softwareChild: StateSoftwareUpdate.Software.ApkVersion,
         isExpanded: Boolean = false,
         isCloseShown: Boolean = false
     ) {
         this.type = type
-        this.countryChild = countryChild
+        this.softwareChild = softwareChild
         this.isExpanded = isExpanded
         this.isCloseShown = isCloseShown
-
-
     }
 }
 
 interface CountryClickedListener {
-    fun onItemClick(countryName: String, countryChild: StateCapital.Country.State)
+    fun onItemClick(appName: String, softwareChild: StateSoftwareUpdate.Software.ApkVersion)
 }
