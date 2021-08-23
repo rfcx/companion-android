@@ -129,10 +129,12 @@ class GuardianSoftwareActivity : AppCompatActivity() {
 
     private fun showLoading() {
         softwareLoading.visibility = View.VISIBLE
+        roleLayout.visibility = View.GONE
     }
 
     private fun hideLoading() {
         softwareLoading.visibility = View.GONE
+        roleLayout.visibility = View.VISIBLE
     }
 
     private fun showToast(message: String) {

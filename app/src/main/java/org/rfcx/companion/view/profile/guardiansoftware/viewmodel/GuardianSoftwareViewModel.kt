@@ -35,6 +35,7 @@ class GuardianSoftwareViewModel(
     fun getSoftwareVersion() = software
 
     private fun checkSoftwareVersion(userToken: String) {
+        software.postValue(Resource.loading(null))
         guardianSoftwareRepository.checkSoftwareVersion(userToken)
             .enqueue(object : Callback<List<GuardianSoftwareResponse>> {
                 override fun onResponse(
