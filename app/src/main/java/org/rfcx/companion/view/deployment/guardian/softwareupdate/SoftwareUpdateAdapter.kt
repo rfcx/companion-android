@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.expandable_child_item.view.*
 import kotlinx.android.synthetic.main.expandable_parent_item.view.*
@@ -53,23 +52,11 @@ class SoftwareUpdateAdapter(
                     if (row.isExpanded) {
                         row.isExpanded = false
                         collapseRow(position)
-                        holder.appName.setTextColor(
-                            ContextCompat.getColor(
-                                holder.itemView.context,
-                                R.color.text_primary
-                            )
-                        )
                         holder.itemView.close_arrow.rotation = 0F
 
                     } else {
                         row.isExpanded = true
                         expandRow(position)
-                        holder.appName.setTextColor(
-                            ContextCompat.getColor(
-                                holder.itemView.context,
-                                R.color.colorPrimary
-                            )
-                        )
                         holder.itemView.close_arrow.rotation = 180F
                     }
                 }
@@ -79,11 +66,7 @@ class SoftwareUpdateAdapter(
                 (holder as SoftwareStateChildViewHolder).apkVersion.text = row.softwareChild.name
 
                 holder.layout.setOnClickListener {
-//                    val softwareInfo = holder.apkVersion.tag
-//                    countryClickedListener.onItemClick(
-//                        holder.layout.tag.toString(),
-//                        softwareInfo as StateSoftwareUpdate.Software.ApkVersion
-//                    )
+                    countryClickedListener.onItemClick(row.softwareChild.name)
                 }
             }
         }
@@ -189,5 +172,5 @@ class ExpandableSoftwareUpdateModel {
 }
 
 interface CountryClickedListener {
-    fun onItemClick(appName: String, softwareChild: StateSoftwareUpdate.Software.ApkVersion)
+    fun onItemClick(apkVersion: String)
 }

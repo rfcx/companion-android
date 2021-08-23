@@ -118,7 +118,7 @@ class SoftwareUpdateFragment : Fragment(), CountryClickedListener {
         fun newInstance() = SoftwareUpdateFragment()
     }
 
-    override fun onItemClick(appName: String, softwareChild: StateSoftwareUpdate.Software.ApkVersion) {
-        Toast.makeText(context,"Clicked on $appName with info ${softwareChild.name}",Toast.LENGTH_LONG).show()
+    override fun onItemClick(apkVersion: String) {
+        Toast.makeText(context,"Clicked on $apkVersion",Toast.LENGTH_LONG).show()
     }
 }

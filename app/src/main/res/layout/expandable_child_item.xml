@@ -5,18 +5,28 @@
     android:id="@+id/country_item_child_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingStart="@dimen/margin_padding_large"
+    android:paddingStart="@dimen/margin_padding_xlarge"
     android:paddingTop="@dimen/margin_padding_normal"
     android:paddingEnd="@dimen/margin_padding_large"
     android:paddingBottom="@dimen/margin_padding_normal">
 
     <TextView
         android:id="@+id/apkVersionTextView"
-        style="@style/AudioMothText.Body.Small"
+        style="@style/AudioMothText.Label.Secondary"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="TextView" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/checkImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_check_24dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
