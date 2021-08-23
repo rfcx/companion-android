@@ -6,13 +6,16 @@ import java.io.File
 object APKUtils {
 
     fun getAllDownloadedSoftwares(context: Context): Array<File>? {
-        return context.filesDir.listFiles()
+        return File(context.filesDir, "guardian-software").listFiles()
     }
 
     fun getAllDownloadedSoftwaresVersion(context: Context): Map<String, String> {
         val downloadedAPKs = getAllDownloadedSoftwares(context)
         val roleMappedVersion = mutableMapOf<String, String>()
-        downloadedAPKs?.forEach {
+        if (downloadedAPKs.isNullOrEmpty()) {
+            return roleMappedVersion
+        }
+        downloadedAPKs.forEach {
             val splitName = it.name.split("-")
             val role = splitName[0]
             val version = it.name.split("-")[1]
