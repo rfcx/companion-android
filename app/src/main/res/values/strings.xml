@@ -462,5 +462,6 @@
     <string name="classify_role">classify role</string>
     <string name="guardian_role">guardian role</string>
     <string name="updater_role">updater role</string>
+    <string name="up_to_date">up to date</string>
 
 </resources>

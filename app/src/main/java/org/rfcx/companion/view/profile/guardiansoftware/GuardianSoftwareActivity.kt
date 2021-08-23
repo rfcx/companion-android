@@ -91,28 +91,28 @@ class GuardianSoftwareActivity : AppCompatActivity() {
                                         if (it.value != APKUtils.APKStatus.UP_TO_DATE) {
                                             adminDownloadButton.visibility = View.VISIBLE
                                         } else {
-                                            adminDownloadButton.visibility = View.GONE
+                                            adminStatus.visibility = View.VISIBLE
                                         }
                                     }
                                     CLASSIFY -> {
                                         if (it.value != APKUtils.APKStatus.UP_TO_DATE) {
                                             classifyDownloadButton.visibility = View.VISIBLE
                                         } else {
-                                            classifyDownloadButton.visibility = View.GONE
+                                            classifyStatus.visibility = View.VISIBLE
                                         }
                                     }
                                     GUARDIAN -> {
                                         if (it.value != APKUtils.APKStatus.UP_TO_DATE) {
                                             guardianDownloadButton.visibility = View.VISIBLE
                                         } else {
-                                            guardianDownloadButton.visibility = View.GONE
+                                            guardianStatus.visibility = View.VISIBLE
                                         }
                                     }
                                     UPDATER -> {
                                         if (it.value != APKUtils.APKStatus.UP_TO_DATE) {
                                             updaterDownloadButton.visibility = View.VISIBLE
                                         } else {
-                                            updaterDownloadButton.visibility = View.GONE
+                                            updaterStatus.visibility = View.VISIBLE
                                         }
                                     }
                                 }
@@ -138,11 +138,24 @@ class GuardianSoftwareActivity : AppCompatActivity() {
                     downloadStatus.data?.let { role ->
                         hideDownloadingLoading(role)
                         when(role) {
-                            ADMIN -> adminDownloadButton.visibility = View.GONE
-                            CLASSIFY -> classifyDownloadButton.visibility = View.GONE
-                            GUARDIAN -> guardianDownloadButton.visibility = View.GONE
-                            UPDATER -> updaterDownloadButton.visibility = View.GONE
+                            ADMIN -> {
+                                adminDownloadButton.visibility = View.GONE
+                                adminStatus.visibility = View.VISIBLE
+                            }
+                            CLASSIFY -> {
+                                classifyDownloadButton.visibility = View.GONE
+                                classifyStatus.visibility = View.VISIBLE
+                            }
+                            GUARDIAN -> {
+                                guardianDownloadButton.visibility = View.GONE
+                                guardianStatus.visibility = View.VISIBLE
+                            }
+                            UPDATER -> {
+                                updaterDownloadButton.visibility = View.GONE
+                                updaterStatus.visibility = View.VISIBLE
+                            }
                         }
+                        setView()
                     }
                 }
                 Status.ERROR -> {

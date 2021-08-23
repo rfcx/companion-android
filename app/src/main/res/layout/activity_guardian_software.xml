@@ -45,7 +45,6 @@
             android:background="?attr/selectableItemBackground"
             android:padding="@dimen/margin_padding_normal"
             android:text="@string/not_found_software"
-            android:textStyle="italic"
             app:layout_constraintBottom_toBottomOf="@id/adminRole"
             app:layout_constraintStart_toEndOf="@id/guidelineVertical"
             app:layout_constraintTop_toTopOf="@id/adminRole" />
@@ -65,11 +64,24 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/adminRole" />
 
+        <TextView
+            android:id="@+id/adminStatus"
+            style="@style/AudioMothText.Body.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:padding="@dimen/margin_padding_normal"
+            android:text="@string/up_to_date"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/adminRole"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/adminRole" />
+
         <ProgressBar
             android:id="@+id/adminLoading"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_marginEnd="@dimen/margin_padding_normal"
+            android:layout_marginEnd="@dimen/margin_padding_xlarge"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/adminRole"
             app:layout_constraintEnd_toEndOf="parent"
@@ -96,7 +108,6 @@
             android:background="?attr/selectableItemBackground"
             android:padding="@dimen/margin_padding_normal"
             android:text="@string/not_found_software"
-            android:textStyle="italic"
             app:layout_constraintBottom_toBottomOf="@id/classifyRole"
             app:layout_constraintStart_toEndOf="@id/guidelineVertical"
             app:layout_constraintTop_toTopOf="@id/classifyRole" />
@@ -116,11 +127,24 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/classifyRole" />
 
+        <TextView
+            android:id="@+id/classifyStatus"
+            style="@style/AudioMothText.Body.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:padding="@dimen/margin_padding_normal"
+            android:text="@string/up_to_date"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/classifyRole"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/classifyRole" />
+
         <ProgressBar
             android:id="@+id/classifyLoading"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_marginEnd="@dimen/margin_padding_normal"
+            android:layout_marginEnd="@dimen/margin_padding_xlarge"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/classifyRole"
             app:layout_constraintEnd_toEndOf="parent"
@@ -147,7 +171,6 @@
             android:background="?attr/selectableItemBackground"
             android:padding="@dimen/margin_padding_normal"
             android:text="@string/not_found_software"
-            android:textStyle="italic"
             app:layout_constraintBottom_toBottomOf="@id/guardianRole"
             app:layout_constraintStart_toEndOf="@id/guidelineVertical"
             app:layout_constraintTop_toTopOf="@id/guardianRole" />
@@ -167,11 +190,24 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/guardianRole" />
 
+        <TextView
+            android:id="@+id/guardianStatus"
+            style="@style/AudioMothText.Body.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:padding="@dimen/margin_padding_normal"
+            android:text="@string/up_to_date"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/guardianRole"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/guardianRole" />
+
         <ProgressBar
             android:id="@+id/guardianLoading"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_marginEnd="@dimen/margin_padding_normal"
+            android:layout_marginEnd="@dimen/margin_padding_xlarge"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/guardianRole"
             app:layout_constraintEnd_toEndOf="parent"
@@ -198,7 +234,6 @@
             android:background="?attr/selectableItemBackground"
             android:padding="@dimen/margin_padding_normal"
             android:text="@string/not_found_software"
-            android:textStyle="italic"
             app:layout_constraintBottom_toBottomOf="@id/updaterRole"
             app:layout_constraintStart_toEndOf="@id/guidelineVertical"
             app:layout_constraintTop_toTopOf="@id/updaterRole" />
@@ -218,11 +253,24 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/updaterRole" />
 
+        <TextView
+            android:id="@+id/updaterStatus"
+            style="@style/AudioMothText.Body.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:padding="@dimen/margin_padding_normal"
+            android:text="@string/up_to_date"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/updaterRole"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/updaterRole" />
+
         <ProgressBar
             android:id="@+id/updaterLoading"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_marginEnd="@dimen/margin_padding_normal"
+            android:layout_marginEnd="@dimen/margin_padding_xlarge"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/updaterRole"
             app:layout_constraintEnd_toEndOf="parent"
