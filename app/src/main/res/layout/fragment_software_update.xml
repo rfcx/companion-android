@@ -6,42 +6,13 @@
     android:layout_height="match_parent"
     tools:context=".view.deployment.guardian.softwareupdate.SoftwareUpdateFragment">
 
-    <LinearLayout
-        android:id="@+id/guardianVersionLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_large"
-        android:layout_marginTop="@dimen/margin_padding_normal"
-        android:layout_marginEnd="@dimen/margin_padding_large"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/guardianVersionTextView"
-            style="@style/AudioMothText.Subhead"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/guardian_version" />
-
-        <TextView
-            android:id="@+id/guardianVersionValueTextView"
-            style="@style/AudioMothText.Body.Secondary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/margin_padding_small"
-            android:text="v0.8.0"
-            tools:text="0.8.0" />
-    </LinearLayout>
-
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/guardianApkRecyclerView"
+        android:id="@+id/apkRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="@dimen/margin_padding_normal"
         android:layout_marginBottom="@dimen/margin_padding_normal"
-        app:layout_constraintTop_toBottomOf="@id/guardianVersionLayout"
-        app:layout_constraintBottom_toTopOf="@id/updateButton"/>
+        app:layout_constraintBottom_toTopOf="@id/updateButton"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/updateButton"

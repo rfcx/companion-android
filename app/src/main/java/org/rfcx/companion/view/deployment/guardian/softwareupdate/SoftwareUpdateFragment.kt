@@ -39,9 +39,9 @@ class SoftwareUpdateFragment : Fragment(), CountryClickedListener {
         )
         softwareUpdateAdapter?.let {
             val layoutManager = LinearLayoutManager(context)
-            guardianApkRecyclerView.layoutManager = layoutManager
-            guardianApkRecyclerView.adapter = it
-            guardianApkRecyclerView.addItemDecoration(
+            apkRecyclerView.layoutManager = layoutManager
+            apkRecyclerView.adapter = it
+            apkRecyclerView.addItemDecoration(
                 DividerItemDecoration(
                     this.context,
                     DividerItemDecoration.VERTICAL
@@ -69,19 +69,19 @@ class SoftwareUpdateFragment : Fragment(), CountryClickedListener {
             StateSoftwareUpdate.Software.ApkVersion("Guardian v0.8.1")
         )
         val app2 = listOf(
-            StateSoftwareUpdate.Software.ApkVersion("Admin v0.6.83"),
-            StateSoftwareUpdate.Software.ApkVersion("Admin v0.6.16"),
+            StateSoftwareUpdate.Software.ApkVersion("Admin v2.6.8"),
+            StateSoftwareUpdate.Software.ApkVersion("Admin v1.7.1"),
             StateSoftwareUpdate.Software.ApkVersion("Admin v0.6.8")
         )
         val app3 = listOf(
-            StateSoftwareUpdate.Software.ApkVersion("Classify v0.8.2"),
-            StateSoftwareUpdate.Software.ApkVersion("Classify v0.6.2"),
-            StateSoftwareUpdate.Software.ApkVersion("Classify v0.6.0")
+            StateSoftwareUpdate.Software.ApkVersion("Classify v2.8.2"),
+            StateSoftwareUpdate.Software.ApkVersion("Classify v2.6.2"),
+            StateSoftwareUpdate.Software.ApkVersion("Classify v1.6.0")
         )
         val app4 = listOf(
-            StateSoftwareUpdate.Software.ApkVersion("Updater v0.6.8"),
-            StateSoftwareUpdate.Software.ApkVersion("Updater v0.6.2"),
-            StateSoftwareUpdate.Software.ApkVersion("Updater v0.6.0")
+            StateSoftwareUpdate.Software.ApkVersion("Updater v3.6.8"),
+            StateSoftwareUpdate.Software.ApkVersion("Updater v3.6.2"),
+            StateSoftwareUpdate.Software.ApkVersion("Updater v3.6.0")
         )
 
         val mockData = mutableListOf<ExpandableSoftwareUpdateModel>()
@@ -89,25 +89,25 @@ class SoftwareUpdateFragment : Fragment(), CountryClickedListener {
         mockData.add(
             ExpandableSoftwareUpdateModel(
                 1,
-                StateSoftwareUpdate.Software("Guardian App", guardianMockData)
+                StateSoftwareUpdate.Software("Guardian App (current: v0.8.3)", guardianMockData)
             )
         )
         mockData.add(
             ExpandableSoftwareUpdateModel(
                 1,
-                StateSoftwareUpdate.Software("Admin App", app2)
+                StateSoftwareUpdate.Software("Admin App (current: v1.7.0)", app2)
             )
         )
         mockData.add(
             ExpandableSoftwareUpdateModel(
                 1,
-                StateSoftwareUpdate.Software("Classify App", app3)
+                StateSoftwareUpdate.Software("Classify App (current: v2.1.2)", app3)
             )
         )
         mockData.add(
             ExpandableSoftwareUpdateModel(
                 1,
-                StateSoftwareUpdate.Software("Updater App", app4)
+                StateSoftwareUpdate.Software("Updater App (current: v3.5.0)", app4)
             )
         )
         populateAdapterWithInfo(mockData)
