@@ -46,9 +46,9 @@
             android:padding="@dimen/margin_padding_normal"
             android:text="@string/not_found_software"
             android:textStyle="italic"
-            app:layout_constraintTop_toTopOf="@id/adminRole"
             app:layout_constraintBottom_toBottomOf="@id/adminRole"
-            app:layout_constraintStart_toEndOf="@id/guidelineVertical"/>
+            app:layout_constraintStart_toEndOf="@id/guidelineVertical"
+            app:layout_constraintTop_toTopOf="@id/adminRole" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/adminDownloadButton"
@@ -57,12 +57,12 @@
             android:layout_height="30dp"
             android:layout_gravity="center"
             android:layout_marginEnd="@dimen/margin_padding_normal"
-            android:text="@string/download"
             android:enabled="false"
+            android:text="@string/download"
             android:textSize="@dimen/text_xxsmall"
-            app:layout_constraintTop_toTopOf="@id/adminRole"
+            app:layout_constraintBottom_toBottomOf="@id/adminRole"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="@id/adminRole" />
+            app:layout_constraintTop_toTopOf="@id/adminRole" />
 
         <TextView
             android:id="@+id/classifyRole"
@@ -86,9 +86,9 @@
             android:padding="@dimen/margin_padding_normal"
             android:text="@string/not_found_software"
             android:textStyle="italic"
-            app:layout_constraintTop_toTopOf="@id/classifyRole"
             app:layout_constraintBottom_toBottomOf="@id/classifyRole"
-            app:layout_constraintStart_toEndOf="@id/guidelineVertical"/>
+            app:layout_constraintStart_toEndOf="@id/guidelineVertical"
+            app:layout_constraintTop_toTopOf="@id/classifyRole" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/classifyDownloadButton"
@@ -97,12 +97,12 @@
             android:layout_height="30dp"
             android:layout_gravity="center"
             android:layout_marginEnd="@dimen/margin_padding_normal"
-            android:text="@string/download"
             android:enabled="false"
+            android:text="@string/download"
             android:textSize="@dimen/text_xxsmall"
-            app:layout_constraintTop_toTopOf="@id/classifyRole"
+            app:layout_constraintBottom_toBottomOf="@id/classifyRole"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="@id/classifyRole" />
+            app:layout_constraintTop_toTopOf="@id/classifyRole" />
 
         <TextView
             android:id="@+id/guardianRole"
@@ -126,9 +126,9 @@
             android:padding="@dimen/margin_padding_normal"
             android:text="@string/not_found_software"
             android:textStyle="italic"
-            app:layout_constraintTop_toTopOf="@id/guardianRole"
             app:layout_constraintBottom_toBottomOf="@id/guardianRole"
-            app:layout_constraintStart_toEndOf="@id/guidelineVertical"/>
+            app:layout_constraintStart_toEndOf="@id/guidelineVertical"
+            app:layout_constraintTop_toTopOf="@id/guardianRole" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/guardianDownloadButton"
@@ -137,12 +137,12 @@
             android:layout_height="30dp"
             android:layout_gravity="center"
             android:layout_marginEnd="@dimen/margin_padding_normal"
-            android:text="@string/download"
             android:enabled="false"
+            android:text="@string/download"
             android:textSize="@dimen/text_xxsmall"
-            app:layout_constraintTop_toTopOf="@id/guardianRole"
+            app:layout_constraintBottom_toBottomOf="@id/guardianRole"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="@id/guardianRole" />
+            app:layout_constraintTop_toTopOf="@id/guardianRole" />
 
         <TextView
             android:id="@+id/updaterRole"
@@ -166,9 +166,9 @@
             android:padding="@dimen/margin_padding_normal"
             android:text="@string/not_found_software"
             android:textStyle="italic"
-            app:layout_constraintTop_toTopOf="@id/updaterRole"
             app:layout_constraintBottom_toBottomOf="@id/updaterRole"
-            app:layout_constraintStart_toEndOf="@id/guidelineVertical"/>
+            app:layout_constraintStart_toEndOf="@id/guidelineVertical"
+            app:layout_constraintTop_toTopOf="@id/updaterRole" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/updaterDownloadButton"
@@ -177,13 +177,23 @@
             android:layout_height="30dp"
             android:layout_gravity="center"
             android:layout_marginEnd="@dimen/margin_padding_normal"
-            android:text="@string/download"
             android:enabled="false"
+            android:text="@string/download"
             android:textSize="@dimen/text_xxsmall"
-            app:layout_constraintTop_toTopOf="@id/updaterRole"
+            app:layout_constraintBottom_toBottomOf="@id/updaterRole"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="@id/updaterRole" />
+            app:layout_constraintTop_toTopOf="@id/updaterRole" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ProgressBar
+        android:id="@+id/softwareLoading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbarLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

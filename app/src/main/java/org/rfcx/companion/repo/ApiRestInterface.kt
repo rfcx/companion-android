@@ -23,9 +23,4 @@ interface ApiRestInterface {
         @Header("Authorization") authUser: String,
         @Body guid: GuardianRegisterRequest
     ): Call<GuardianRegisterResponse>
-
-    @GET("v2/guardians/u60oxzgwk6vf/software/all")
-    fun checkSoftwareVersion(
-        @Header("Authorization") authUser: String
-    ): Call<List<GuardianSoftwareResponse>>
 }
