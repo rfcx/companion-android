@@ -4,11 +4,13 @@ import android.annotation.SuppressLint
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import okhttp3.ResponseBody
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.response.GuardianSoftwareResponse
 import org.rfcx.companion.util.Resource
 import org.rfcx.companion.util.file.APKUtils
 import org.rfcx.companion.util.getIdToken
+import org.rfcx.companion.util.insert
 import org.rfcx.companion.util.isNetworkAvailable
 import org.rfcx.companion.view.profile.guardiansoftware.repository.GuardianSoftwareRepository
 import retrofit2.Call
@@ -22,7 +24,10 @@ class GuardianSoftwareViewModel(
 
     @SuppressLint("StaticFieldLeak")
     private val context = getApplication<Application>().applicationContext
-    private val software = MutableLiveData<Resource<Map<String, APKUtils.APKStatus>>>()
+    private val availableAPKs = MutableLiveData<Resource<Map<String, APKUtils.APKStatus>>>()
+    private val downloadAPKs = MutableLiveData<Resource<String>>()
+    private var softwareDownloadUrl: Map<String, String>? = null
+    private var softwareVersion: Map<String, String>? = null
 
     init {
         checkSoftwareVersion("Bearer ${context.getIdToken()}")
@@ -32,10 +37,11 @@ class GuardianSoftwareViewModel(
         return APKUtils.getAllDownloadedSoftwaresVersion(context)
     }
 
-    fun getSoftwareVersion() = software
+    fun getSoftwareVersion() = availableAPKs
+    fun getSoftwareFileDownload() = downloadAPKs
 
     private fun checkSoftwareVersion(userToken: String) {
-        software.postValue(Resource.loading(null))
+        availableAPKs.postValue(Resource.loading(null))
         guardianSoftwareRepository.checkSoftwareVersion(userToken)
             .enqueue(object : Callback<List<GuardianSoftwareResponse>> {
                 override fun onResponse(
@@ -47,11 +53,11 @@ class GuardianSoftwareViewModel(
                             if (!softwares.isNullOrEmpty()) {
                                 compareToDownloadedAPKs(softwares)
                             } else {
-                                software.postValue(Resource.success(mapOf()))
+                                availableAPKs.postValue(Resource.success(mapOf()))
                             }
                         }
                     } else {
-                        software.postValue(
+                        availableAPKs.postValue(
                             Resource.error(
                                 context.getString(R.string.something_went_wrong),
                                 null
@@ -62,7 +68,7 @@ class GuardianSoftwareViewModel(
 
                 override fun onFailure(call: Call<List<GuardianSoftwareResponse>>, t: Throwable) {
                     if (context.isNetworkAvailable()) {
-                        software.postValue(
+                        availableAPKs.postValue(
                             Resource.error(
                                 context.getString(R.string.network_not_available),
                                 null
@@ -74,10 +80,12 @@ class GuardianSoftwareViewModel(
     }
 
     private fun compareToDownloadedAPKs(softwares: List<GuardianSoftwareResponse>) {
+        extractDownloadUrl(softwares)
+        extractVersion(softwares)
         val roleMappedVersion = APKUtils.getAllDownloadedSoftwaresVersion(context)
         val roleStatus = mutableMapOf<String, APKUtils.APKStatus>()
         softwares.forEach {
-            if (roleMappedVersion.keys.contains(it.version)) {
+            if (roleMappedVersion.values.contains(it.version)) {
                 val isUpToDate = it.version == roleMappedVersion[it.role]
                 if (isUpToDate) {
                     roleStatus[it.role] = APKUtils.APKStatus.UP_TO_DATE
@@ -96,11 +104,78 @@ class GuardianSoftwareViewModel(
                 roleStatus[it.role] = APKUtils.APKStatus.NOT_INSTALLED
             }
         }
-        software.postValue(Resource.success(roleStatus))
+        availableAPKs.postValue(Resource.success(roleStatus))
     }
 
-    fun downloadSoftware(url: String) {
+    private fun extractDownloadUrl(softwares: List<GuardianSoftwareResponse>) {
+        val roleMapToUrl = mutableMapOf<String, String>()
+        softwares.forEach {
+            roleMapToUrl[it.role] = it.url
+        }
+        softwareDownloadUrl = roleMapToUrl
+    }
 
+    private fun extractVersion(softwares: List<GuardianSoftwareResponse>) {
+        val roleMapToVersion = mutableMapOf<String, String>()
+        softwares.forEach {
+            roleMapToVersion[it.role] = it.version
+        }
+        softwareVersion = roleMapToVersion
+    }
+
+    fun downloadSoftware(role: String) {
+        downloadAPKs.postValue(Resource.loading(role))
+        softwareDownloadUrl?.let {
+            guardianSoftwareRepository.downloadAPK(it[role]!!.insert(4, "s"))
+                .enqueue(object : Callback<ResponseBody> {
+                    override fun onResponse(
+                        call: Call<ResponseBody>,
+                        response: Response<ResponseBody>
+                    ) {
+                        if (response.isSuccessful) {
+                            response.body()?.let { bytes ->
+                                softwareVersion?.let { version ->
+                                    val result = APKUtils.apkResponseToDisk(
+                                        context,
+                                        bytes,
+                                        role,
+                                        version[role]!!
+                                    )
+                                    if (result) {
+                                        downloadAPKs.postValue(Resource.success(role))
+                                    } else {
+                                        downloadAPKs.postValue(
+                                            Resource.error(
+                                                "Cannot build file: $role-${it[role]}.apk.gz",
+                                                null
+                                            )
+                                        )
+                                    }
+                                }
+                            }
+                        } else {
+                            downloadAPKs.postValue(
+                                Resource.error(
+                                    context.getString(R.string.something_went_wrong),
+                                    null
+                                )
+                            )
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                        if (context.isNetworkAvailable()) {
+                            downloadAPKs.postValue(
+                                Resource.error(
+                                    context.getString(R.string.network_not_available),
+                                    null
+                                )
+                            )
+                        }
+                    }
+
+                })
+        }
     }
 
 }

@@ -5,7 +5,7 @@ import org.rfcx.companion.repo.api.CoreApiHelper
 class GuardianSoftwareRepository(
     private val coreApiHelper: CoreApiHelper
 ) {
-
     fun checkSoftwareVersion(authUser: String) = coreApiHelper.checkSoftwareVersion(authUser)
+    fun downloadAPK(url: String) = coreApiHelper.downloadAPK(url)
 
 }

@@ -65,6 +65,16 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/adminRole" />
 
+        <ProgressBar
+            android:id="@+id/adminLoading"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginEnd="@dimen/margin_padding_normal"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/adminRole"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/adminRole" />
+
         <TextView
             android:id="@+id/classifyRole"
             style="@style/AudioMothText.SubTitle"
@@ -101,6 +111,16 @@
             android:enabled="true"
             android:text="@string/download"
             android:textSize="@dimen/text_xxsmall"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/classifyRole"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/classifyRole" />
+
+        <ProgressBar
+            android:id="@+id/classifyLoading"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginEnd="@dimen/margin_padding_normal"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/classifyRole"
             app:layout_constraintEnd_toEndOf="parent"
@@ -147,6 +167,16 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/guardianRole" />
 
+        <ProgressBar
+            android:id="@+id/guardianLoading"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginEnd="@dimen/margin_padding_normal"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/guardianRole"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/guardianRole" />
+
         <TextView
             android:id="@+id/updaterRole"
             style="@style/AudioMothText.SubTitle"
@@ -183,6 +213,16 @@
             android:enabled="true"
             android:text="@string/download"
             android:textSize="@dimen/text_xxsmall"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/updaterRole"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/updaterRole" />
+
+        <ProgressBar
+            android:id="@+id/updaterLoading"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginEnd="@dimen/margin_padding_normal"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/updaterRole"
             app:layout_constraintEnd_toEndOf="parent"

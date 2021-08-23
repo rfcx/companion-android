@@ -1,7 +1,9 @@
 package org.rfcx.companion.util.file
 
 import android.content.Context
-import java.io.File
+import android.util.Log
+import okhttp3.ResponseBody
+import java.io.*
 
 object APKUtils {
 
@@ -21,6 +23,7 @@ object APKUtils {
             val version = it.name.split("-")[1]
             roleMappedVersion[role] = version
         }
+        Log.d("SSSS", downloadedAPKs.contentToString())
         return roleMappedVersion
     }
 
@@ -37,6 +40,39 @@ object APKUtils {
             }
         }
         return false
+    }
+
+    fun apkResponseToDisk(context: Context, body: ResponseBody, role: String, version: String): Boolean {
+        return try {
+            val dir = File(context.filesDir, "guardian-software")
+            if (!dir.exists()) {
+                dir.mkdir()
+            }
+            val file = File(dir, "$role-$version-release.apk.gz")
+            var inputStream: InputStream? = null
+            var outputStream: OutputStream? = null
+            try {
+                val fileReader = ByteArray(4096)
+                inputStream = body.byteStream()
+                outputStream = FileOutputStream(file)
+                while (true) {
+                    val read: Int = inputStream.read(fileReader)
+                    if (read == -1) {
+                        break
+                    }
+                    outputStream.write(fileReader, 0, read)
+                }
+                outputStream.flush()
+                true
+            } catch (e: IOException) {
+                false
+            } finally {
+                inputStream?.close()
+                outputStream?.close()
+            }
+        } catch (e: IOException) {
+            false
+        }
     }
 
     enum class APKStatus { NOT_INSTALLED, UP_TO_DATE, NEED_UPDATE }

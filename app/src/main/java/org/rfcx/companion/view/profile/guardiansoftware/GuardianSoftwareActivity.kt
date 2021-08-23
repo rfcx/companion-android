@@ -39,6 +39,19 @@ class GuardianSoftwareActivity : AppCompatActivity() {
         }
 
         setView()
+
+        adminDownloadButton.setOnClickListener {
+            guardianSoftwareViewModel.downloadSoftware(ADMIN)
+        }
+        classifyDownloadButton.setOnClickListener {
+            guardianSoftwareViewModel.downloadSoftware(CLASSIFY)
+        }
+        guardianDownloadButton.setOnClickListener {
+            guardianSoftwareViewModel.downloadSoftware(GUARDIAN)
+        }
+        updaterDownloadButton.setOnClickListener {
+            guardianSoftwareViewModel.downloadSoftware(UPDATER)
+        }
     }
 
     private fun setViewModel() {
@@ -74,28 +87,28 @@ class GuardianSoftwareActivity : AppCompatActivity() {
                         if (roleStatus.isNotEmpty()) {
                             roleStatus.forEach {
                                 when (it.key) {
-                                    "admin" -> {
+                                    ADMIN -> {
                                         if (it.value != APKUtils.APKStatus.UP_TO_DATE) {
                                             adminDownloadButton.visibility = View.VISIBLE
                                         } else {
                                             adminDownloadButton.visibility = View.GONE
                                         }
                                     }
-                                    "classify" -> {
+                                    CLASSIFY -> {
                                         if (it.value != APKUtils.APKStatus.UP_TO_DATE) {
                                             classifyDownloadButton.visibility = View.VISIBLE
                                         } else {
                                             classifyDownloadButton.visibility = View.GONE
                                         }
                                     }
-                                    "guardian" -> {
+                                    GUARDIAN -> {
                                         if (it.value != APKUtils.APKStatus.UP_TO_DATE) {
                                             guardianDownloadButton.visibility = View.VISIBLE
                                         } else {
                                             guardianDownloadButton.visibility = View.GONE
                                         }
                                     }
-                                    "updater" -> {
+                                    UPDATER -> {
                                         if (it.value != APKUtils.APKStatus.UP_TO_DATE) {
                                             updaterDownloadButton.visibility = View.VISIBLE
                                         } else {
@@ -113,16 +126,41 @@ class GuardianSoftwareActivity : AppCompatActivity() {
                 }
             }
         })
+
+        guardianSoftwareViewModel.getSoftwareFileDownload().observe(this, Observer { downloadStatus ->
+            when (downloadStatus.status) {
+                Status.LOADING -> {
+                    downloadStatus.data?.let { role ->
+                        showDownloadingLoading(role)
+                    }
+                }
+                Status.SUCCESS -> {
+                    downloadStatus.data?.let { role ->
+                        hideDownloadingLoading(role)
+                        when(role) {
+                            ADMIN -> adminDownloadButton.visibility = View.GONE
+                            CLASSIFY -> classifyDownloadButton.visibility = View.GONE
+                            GUARDIAN -> guardianDownloadButton.visibility = View.GONE
+                            UPDATER -> updaterDownloadButton.visibility = View.GONE
+                        }
+                    }
+                }
+                Status.ERROR -> {
+                    hideLoading()
+                    showToast(downloadStatus.message ?: getString(R.string.error_has_occurred))
+                }
+            }
+        })
     }
 
     private fun setView() {
         val versions = guardianSoftwareViewModel.getCurrentDownloadedAPKsVersions()
         versions.forEach {
             when(it.key) {
-                "admin" -> adminRoleVersion.text = it.value
-                "classify" -> classifyRoleVersion.text = it.value
-                "guardian" -> guardianRoleVersion.text = it.value
-                "updater" -> updaterRoleVersion.text = it.value
+                ADMIN -> adminRoleVersion.text = it.value
+                CLASSIFY -> classifyRoleVersion.text = it.value
+                GUARDIAN -> guardianRoleVersion.text = it.value
+                UPDATER -> updaterRoleVersion.text = it.value
             }
         }
     }
@@ -137,11 +175,59 @@ class GuardianSoftwareActivity : AppCompatActivity() {
         roleLayout.visibility = View.VISIBLE
     }
 
+    private fun showDownloadingLoading(role: String) {
+        when(role) {
+            ADMIN -> {
+                adminLoading.visibility = View.VISIBLE
+                adminDownloadButton.visibility = View.GONE
+            }
+            CLASSIFY -> {
+                classifyLoading.visibility = View.VISIBLE
+                classifyDownloadButton.visibility = View.GONE
+            }
+            GUARDIAN -> {
+                guardianLoading.visibility = View.VISIBLE
+                guardianDownloadButton.visibility = View.GONE
+            }
+            UPDATER -> {
+                updaterLoading.visibility = View.VISIBLE
+                updaterDownloadButton.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun hideDownloadingLoading(role: String) {
+        when(role) {
+            ADMIN -> {
+                adminLoading.visibility = View.GONE
+                adminDownloadButton.visibility = View.VISIBLE
+            }
+            CLASSIFY -> {
+                classifyLoading.visibility = View.GONE
+                classifyDownloadButton.visibility = View.VISIBLE
+            }
+            GUARDIAN -> {
+                guardianLoading.visibility = View.GONE
+                guardianDownloadButton.visibility = View.VISIBLE
+            }
+            UPDATER -> {
+                updaterLoading.visibility = View.GONE
+                updaterDownloadButton.visibility = View.VISIBLE
+            }
+        }
+    }
+
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
     companion object {
+
+        private const val ADMIN = "admin"
+        private const val CLASSIFY = "classify"
+        private const val GUARDIAN = "guardian"
+        private const val UPDATER = "updater"
+
         fun startActivity(context: Context) {
             val intent = Intent(context, GuardianSoftwareActivity::class.java)
             context.startActivity(intent)
