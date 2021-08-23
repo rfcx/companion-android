@@ -457,5 +457,10 @@
     <string name="no_content_project">There is no accessible project in this account.\nPlease contact an administrator\nor create the project in Arbimon platform.</string>
     <string name="logout">logout</string>
     <string name="guardian_softwares">Guardian softwares</string>
+    <string name="admin_role">admin role</string>
+    <string name="not_found_software">not found</string>
+    <string name="classify_role">classify role</string>
+    <string name="guardian_role">guardian role</string>
+    <string name="updater_role">updater role</string>
 
 </resources>
