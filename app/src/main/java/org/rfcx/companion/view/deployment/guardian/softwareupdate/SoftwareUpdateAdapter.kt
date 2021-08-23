@@ -1,10 +1,10 @@
 package org.rfcx.companion.view.deployment.guardian.softwareupdate
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.expandable_child_item.view.*
 import kotlinx.android.synthetic.main.expandable_parent_item.view.*
@@ -14,9 +14,6 @@ class SoftwareUpdateAdapter(
     var countryClickedListener: CountryClickedListener,
     var softwareUpdateStateModelList: MutableList<ExpandableSoftwareUpdateModel>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private var isFirstItemExpanded: Boolean = true
-    private var actionLock = false
-    lateinit var countryName: String
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             ExpandableSoftwareUpdateModel.PARENT -> {
@@ -51,41 +48,42 @@ class SoftwareUpdateAdapter(
         val row = softwareUpdateStateModelList[position]
         when (row.type) {
             ExpandableSoftwareUpdateModel.PARENT -> {
-                (holder as SoftwareStateParentViewHolder).countryName.text = row.softwareParent.appName
-                holder.closeImage.setOnClickListener {
+                (holder as SoftwareStateParentViewHolder).appName.text = row.softwareParent.appName
+                holder.itemView.setOnClickListener {
                     if (row.isExpanded) {
                         row.isExpanded = false
                         collapseRow(position)
-                        holder.layout.setBackgroundColor(Color.WHITE)
-                    }else{
-                        holder.layout.setBackgroundColor(Color.GRAY)
-                        row.isExpanded = true
-                        holder.upArrowImg.visibility = View.VISIBLE
-                        holder.closeImage.visibility = View.GONE
-                        expandRow(position)
-                    }
-                }
-                holder.upArrowImg.setOnClickListener{
-                    if(row.isExpanded){
-                        row.isExpanded = false
-                        collapseRow(position)
-                        holder.layout.setBackgroundColor(Color.WHITE)
-                        holder.upArrowImg.visibility = View.GONE
-                        holder.closeImage.visibility = View.VISIBLE
+                        holder.appName.setTextColor(
+                            ContextCompat.getColor(
+                                holder.itemView.context,
+                                R.color.text_primary
+                            )
+                        )
+                        holder.itemView.close_arrow.rotation = 0F
 
+                    } else {
+                        row.isExpanded = true
+                        expandRow(position)
+                        holder.appName.setTextColor(
+                            ContextCompat.getColor(
+                                holder.itemView.context,
+                                R.color.colorPrimary
+                            )
+                        )
+                        holder.itemView.close_arrow.rotation = 180F
                     }
                 }
             }
 
             ExpandableSoftwareUpdateModel.CHILD -> {
-                (holder as SoftwareStateChildViewHolder).stateName.text = row.softwareChild.name
-                holder.capitalImage.text = row.softwareChild.capital
+                (holder as SoftwareStateChildViewHolder).apkVersion.text = row.softwareChild.name
 
                 holder.layout.setOnClickListener {
-                    val softwareInfo =   holder.stateName.tag
-                    countryClickedListener.onItemClick(holder.layout.tag.toString(),
-                        softwareInfo as StateSoftwareUpdate.Software.ApkVersion
-                    )
+//                    val softwareInfo = holder.apkVersion.tag
+//                    countryClickedListener.onItemClick(
+//                        holder.layout.tag.toString(),
+//                        softwareInfo as StateSoftwareUpdate.Software.ApkVersion
+//                    )
                 }
             }
         }
@@ -94,13 +92,16 @@ class SoftwareUpdateAdapter(
 
     override fun getItemViewType(position: Int): Int = softwareUpdateStateModelList[position].type
 
-    private fun expandRow(position: Int){
+    private fun expandRow(position: Int) {
         val row = softwareUpdateStateModelList[position]
         var nextPosition = position
         when (row.type) {
             ExpandableSoftwareUpdateModel.PARENT -> {
-                for(child in row.softwareParent.apkVersions){
-                    softwareUpdateStateModelList.add(++nextPosition, ExpandableSoftwareUpdateModel(ExpandableSoftwareUpdateModel.CHILD, child))
+                for (child in row.softwareParent.apkVersions) {
+                    softwareUpdateStateModelList.add(
+                        ++nextPosition,
+                        ExpandableSoftwareUpdateModel(ExpandableSoftwareUpdateModel.CHILD, child)
+                    )
                 }
                 notifyDataSetChanged()
             }
@@ -110,7 +111,7 @@ class SoftwareUpdateAdapter(
         }
     }
 
-    private fun collapseRow(position: Int){
+    private fun collapseRow(position: Int) {
         val row = softwareUpdateStateModelList[position]
         val nextPosition = position + 1
         when (row.type) {
@@ -128,15 +129,12 @@ class SoftwareUpdateAdapter(
 
     class SoftwareStateParentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal var layout = itemView.country_item_parent_container
-        internal var countryName: TextView = itemView.country_name
-        internal var closeImage = itemView.close_arrow
-        internal var upArrowImg = itemView.up_arrow
+        internal var appName: TextView = itemView.appNameTextView
     }
 
     class SoftwareStateChildViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal var layout = itemView.country_item_child_container
-        internal var stateName: TextView = itemView.state_name
-        internal var capitalImage = itemView.capital_name
+        internal var apkVersion: TextView = itemView.apkVersionTextView
     }
 }
 
@@ -148,7 +146,6 @@ data class StateSoftwareUpdate(
         val apkVersions: List<ApkVersion>
     ) {
         data class ApkVersion(
-            val capital: String,
             val name: String
         )
     }
