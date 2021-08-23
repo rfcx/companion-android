@@ -4,6 +4,7 @@ import org.rfcx.companion.entity.UserTouchResponse
 import org.rfcx.companion.entity.request.GuardianRegisterRequest
 import org.rfcx.companion.entity.response.ProjectByIdResponse
 import org.rfcx.companion.entity.response.GuardianRegisterResponse
+import org.rfcx.companion.entity.response.GuardianSoftwareResponse
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -22,4 +23,9 @@ interface ApiRestInterface {
         @Header("Authorization") authUser: String,
         @Body guid: GuardianRegisterRequest
     ): Call<GuardianRegisterResponse>
+
+    @GET("v2/guardians/u60oxzgwk6vf/software/all")
+    fun checkSoftwareVersion(
+        @Header("Authorization") authUser: String
+    ): Call<List<GuardianSoftwareResponse>>
 }

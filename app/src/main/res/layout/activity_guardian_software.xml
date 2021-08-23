@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/backgroundColor"
+    android:fitsSystemWindows="true">
+
+    <include
+        android:id="@+id/toolbarLayout"
+        layout="@layout/toolbar_default" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/roleLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/toolbarLayout">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineVertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="114dp"
+            app:layout_constraintStart_toEndOf="@id/guardianRole" />
+
+        <TextView
+            android:id="@+id/adminRole"
+            style="@style/AudioMothText.SubTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:padding="@dimen/margin_padding_normal"
+            android:text="admin role"
+            android:textColor="@color/text_primary"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/adminRoleVersion"
+            style="@style/AudioMothText.Body.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:padding="@dimen/margin_padding_normal"
+            android:text="not found"
+            android:textStyle="italic"
+            app:layout_constraintTop_toTopOf="@id/adminRole"
+            app:layout_constraintBottom_toBottomOf="@id/adminRole"
+            app:layout_constraintStart_toEndOf="@id/guidelineVertical"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/adminDownloadButton"
+            style="@style/OfflineMapButton"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="@dimen/margin_padding_normal"
+            android:text="@string/download"
+            android:enabled="false"
+            android:textSize="@dimen/text_xxsmall"
+            app:layout_constraintTop_toTopOf="@id/adminRole"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/adminRole" />
+
+        <TextView
+            android:id="@+id/classifyRole"
+            style="@style/AudioMothText.SubTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:padding="@dimen/margin_padding_normal"
+            android:text="classify role"
+            android:textColor="@color/text_primary"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/adminRole" />
+
+        <TextView
+            android:id="@+id/classifyRoleVersion"
+            style="@style/AudioMothText.Body.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:padding="@dimen/margin_padding_normal"
+            android:text=" not found"
+            android:textStyle="italic"
+            app:layout_constraintTop_toTopOf="@id/classifyRole"
+            app:layout_constraintBottom_toBottomOf="@id/classifyRole"
+            app:layout_constraintStart_toEndOf="@id/guidelineVertical"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/classifyDownloadButton"
+            style="@style/OfflineMapButton"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="@dimen/margin_padding_normal"
+            android:text="@string/download"
+            android:enabled="false"
+            android:textSize="@dimen/text_xxsmall"
+            app:layout_constraintTop_toTopOf="@id/classifyRole"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/classifyRole" />
+
+        <TextView
+            android:id="@+id/guardianRole"
+            style="@style/AudioMothText.SubTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:padding="@dimen/margin_padding_normal"
+            android:text="guardian role"
+            android:textColor="@color/text_primary"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/classifyRole" />
+
+        <TextView
+            android:id="@+id/guardianRoleVersion"
+            style="@style/AudioMothText.Body.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:padding="@dimen/margin_padding_normal"
+            android:text=" not found"
+            android:textStyle="italic"
+            app:layout_constraintTop_toTopOf="@id/guardianRole"
+            app:layout_constraintBottom_toBottomOf="@id/guardianRole"
+            app:layout_constraintStart_toEndOf="@id/guidelineVertical"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/guardianDownloadButton"
+            style="@style/OfflineMapButton"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="@dimen/margin_padding_normal"
+            android:text="@string/download"
+            android:enabled="false"
+            android:textSize="@dimen/text_xxsmall"
+            app:layout_constraintTop_toTopOf="@id/guardianRole"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/guardianRole" />
+
+        <TextView
+            android:id="@+id/updaterRole"
+            style="@style/AudioMothText.SubTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:padding="@dimen/margin_padding_normal"
+            android:text="updater role"
+            android:textColor="@color/text_primary"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/guardianRole" />
+
+        <TextView
+            android:id="@+id/updaterRoleVersion"
+            style="@style/AudioMothText.Body.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:padding="@dimen/margin_padding_normal"
+            android:text=" not found"
+            android:textStyle="italic"
+            app:layout_constraintTop_toTopOf="@id/updaterRole"
+            app:layout_constraintBottom_toBottomOf="@id/updaterRole"
+            app:layout_constraintStart_toEndOf="@id/guidelineVertical"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/updaterDownloadButton"
+            style="@style/OfflineMapButton"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="@dimen/margin_padding_normal"
+            android:text="@string/download"
+            android:enabled="false"
+            android:textSize="@dimen/text_xxsmall"
+            app:layout_constraintTop_toTopOf="@id/updaterRole"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/updaterRole" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
