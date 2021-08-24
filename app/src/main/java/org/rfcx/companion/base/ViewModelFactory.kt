@@ -5,23 +5,44 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import org.rfcx.companion.MainRepository
 import org.rfcx.companion.MainViewModel
+import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.local.LocalDataHelper
+import org.rfcx.companion.view.profile.guardiansoftware.repository.GuardianSoftwareRepository
+import org.rfcx.companion.view.profile.guardiansoftware.viewmodel.GuardianSoftwareViewModel
 import org.rfcx.companion.view.profile.offlinemap.OfflineMapActivity
 import org.rfcx.companion.view.profile.offlinemap.ProjectOfflineMapRepository
 import org.rfcx.companion.view.profile.offlinemap.ProjectOfflineMapViewModel
 import org.rfcx.companion.view.project.repository.ProjectSelectRepository
 import org.rfcx.companion.view.project.viewmodel.ProjectSelectViewModel
 
-class ViewModelFactory(private val application: Application, private val deviceApiHelper: DeviceApiHelper, private val localDataHelper: LocalDataHelper): ViewModelProvider.Factory {
+class ViewModelFactory(
+    private val application: Application,
+    private val deviceApiHelper: DeviceApiHelper,
+    private val coreApiHelper: CoreApiHelper,
+    private val localDataHelper: LocalDataHelper
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(ProjectSelectViewModel::class.java)) {
-            return ProjectSelectViewModel(application, ProjectSelectRepository(deviceApiHelper, localDataHelper)) as T
-        } else if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
-            return MainViewModel(application, MainRepository(deviceApiHelper, localDataHelper)) as T
-        } else if (modelClass.isAssignableFrom(ProjectOfflineMapViewModel::class.java)) {
-            return ProjectOfflineMapViewModel(application, ProjectOfflineMapRepository(deviceApiHelper, localDataHelper)) as T
+        when {
+            modelClass.isAssignableFrom(ProjectSelectViewModel::class.java) -> {
+                return ProjectSelectViewModel(
+                    application,
+                    ProjectSelectRepository(deviceApiHelper, localDataHelper)
+                ) as T
+            }
+            modelClass.isAssignableFrom(MainViewModel::class.java) -> {
+                return MainViewModel(application, MainRepository(deviceApiHelper, localDataHelper)) as T
+            }
+            modelClass.isAssignableFrom(ProjectOfflineMapViewModel::class.java) -> {
+                return ProjectOfflineMapViewModel(
+                    application,
+                    ProjectOfflineMapRepository(deviceApiHelper, localDataHelper)
+                ) as T
+            }
+            modelClass.isAssignableFrom(GuardianSoftwareViewModel::class.java) -> {
+                return GuardianSoftwareViewModel(application, GuardianSoftwareRepository(coreApiHelper)) as T
+            }
+            else -> throw IllegalArgumentException("Unknown class name")
         }
-        throw IllegalArgumentException("Unknown class name")
     }
 }
