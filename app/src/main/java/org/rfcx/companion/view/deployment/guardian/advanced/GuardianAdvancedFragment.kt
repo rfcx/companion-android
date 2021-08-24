@@ -15,13 +15,14 @@ import org.rfcx.companion.connection.socket.SocketManager
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.socket.response.Status
 import org.rfcx.companion.util.Analytics
+import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 import org.rfcx.companion.view.prefs.GuardianPrefsFragment
 import org.rfcx.companion.view.prefs.SyncPreferenceListener
 
 class GuardianAdvancedFragment : Fragment() {
 
-    private var deploymentProtocol: GuardianDeploymentProtocol? = null
+    private var deploymentProtocol: BaseDeploymentProtocol? = null
     private var syncPreferenceListener: SyncPreferenceListener? = null
 
     private var switchPrefs: List<String>? = null
@@ -29,7 +30,7 @@ class GuardianAdvancedFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        deploymentProtocol = context as GuardianDeploymentProtocol
+        deploymentProtocol = context as BaseDeploymentProtocol
         syncPreferenceListener = context as SyncPreferenceListener
         setPredefinedConfiguration(context)
     }

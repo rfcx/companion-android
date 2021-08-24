@@ -11,17 +11,18 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
+import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.deployment.BaseImageFragment
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianDeployFragment : BaseImageFragment() {
 
-    private var deploymentProtocol: GuardianDeploymentProtocol? = null
+    private var deploymentProtocol: BaseDeploymentProtocol? = null
     private val analytics by lazy { context?.let { Analytics(it) } }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        deploymentProtocol = (context as GuardianDeploymentProtocol)
+        deploymentProtocol = (context as BaseDeploymentProtocol)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

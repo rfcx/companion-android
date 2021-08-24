@@ -15,6 +15,7 @@ import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.SocketManager
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
+import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianSignalFragment : Fragment() {
@@ -27,12 +28,14 @@ class GuardianSignalFragment : Fragment() {
     private var isSignalTesting = false
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
+    private var baseDeploymentProtocol: BaseDeploymentProtocol? = null
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         deploymentProtocol = (context as GuardianDeploymentProtocol)
+        baseDeploymentProtocol = (context as BaseDeploymentProtocol)
     }
 
     override fun onCreateView(
@@ -46,7 +49,7 @@ class GuardianSignalFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        deploymentProtocol?.let {
+        baseDeploymentProtocol?.let {
             it.showToolbar()
             it.setToolbarTitle()
         }
@@ -56,7 +59,7 @@ class GuardianSignalFragment : Fragment() {
 
         finishButton.setOnClickListener {
             analytics?.trackClickNextEvent(Screen.GUARDIAN_SIGNAL.id)
-            deploymentProtocol?.nextStep()
+            baseDeploymentProtocol?.nextStep()
         }
     }
 

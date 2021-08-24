@@ -5,7 +5,7 @@ import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 
-interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
+interface GuardianDeploymentProtocol {
     fun startSetupConfigure()
 
     fun backToConfigure()

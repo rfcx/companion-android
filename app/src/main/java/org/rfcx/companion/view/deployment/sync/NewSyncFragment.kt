@@ -19,11 +19,13 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.view.deployment.AudioMothDeploymentProtocol
+import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.dialog.CompleteFragment
 import java.util.*
 
 class NewSyncFragment : Fragment() {
     private var audioMothDeploymentProtocol: AudioMothDeploymentProtocol? = null
+    private var baseDeploymentProtocol: BaseDeploymentProtocol? = null
     private lateinit var switchAnimation: AnimationDrawable
     private lateinit var flashingRedAnimation: AnimationDrawable
     private val analytics by lazy { context?.let { Analytics(it) } }
@@ -32,6 +34,7 @@ class NewSyncFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         audioMothDeploymentProtocol = (context as AudioMothDeploymentProtocol)
+        baseDeploymentProtocol = (context as BaseDeploymentProtocol)
     }
 
     override fun onCreateView(
@@ -55,7 +58,7 @@ class NewSyncFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        audioMothDeploymentProtocol?.let {
+        baseDeploymentProtocol?.let {
             it.showToolbar()
             it.setCurrentPage(requireContext().resources.getStringArray(R.array.edge_setup_checks)[1])
             it.setToolbarTitle()

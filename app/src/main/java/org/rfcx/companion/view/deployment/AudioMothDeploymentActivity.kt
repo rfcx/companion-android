@@ -6,9 +6,6 @@ import android.content.Intent
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
-import android.view.View
-import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -24,45 +21,23 @@ import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DeploymentSyncWorker
-import org.rfcx.companion.service.DownloadStreamState
-import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.Preferences.Companion.ENABLE_LOCATION_TRACKING
 import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
-import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.deployment.location.DetailDeploymentSiteFragment
 import org.rfcx.companion.view.deployment.location.SetDeploymentSiteFragment
 import org.rfcx.companion.view.deployment.sync.NewSyncFragment
-import org.rfcx.companion.view.detail.MapPickerProtocol
 import org.rfcx.companion.view.dialog.*
 import java.util.*
 
-class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProtocol,
-    CompleteListener,
-    MapPickerProtocol {
+class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymentProtocol {
     private lateinit var audioMothDeploymentViewModel: AudioMothDeploymentViewModel
-
-    private var _deployment: Deployment? = null
-    private var _deployLocation: DeploymentLocation? = null
-    private var _images: List<String> = listOf()
-    private var _siteItems = arrayListOf<SiteWithLastDeploymentItem>()
-    private var _locate: Locate? = null
-
     private var useExistedLocation: Boolean = false
 
-    private var currentLocation: Location? = null
-
-    private var latitude = 0.0
-    private var longitude = 0.0
-    private var nameLocation: String = ""
-    private var siteId: Int = 0
-
     private var currentCheck = 0
-    private var currentCheckName = ""
     private var passedChecks = RealmList<Int>()
-
     private var needTone = true
 
     private val preferences = Preferences.getInstance(this)
@@ -80,7 +55,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
         setViewModel()
         setObserver()
         preferences.clearSelectedProject()
-        this.currentLocation = this.getLastLocation()
+        this.currentLocate = this.getLastLocation()
         val deploymentId = intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
         if (deploymentId != null) {
             handleDeploymentStep(deploymentId)
@@ -121,7 +96,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
             this,
             deployments,
             getString(R.string.none),
-            currentLocation ?: loc,
+            currentLocate ?: loc,
             sites
         )
     }
@@ -199,7 +174,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
                 if (_deployLocation == null) {
                     startFragment(
                         SetDeploymentSiteFragment.newInstance(
-                            currentLocation?.latitude ?: 0.0, currentLocation?.longitude ?: 0.0
+                            currentLocate?.latitude ?: 0.0, currentLocate?.longitude ?: 0.0
                         )
                     )
                 } else {
@@ -215,10 +190,6 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
         startFragment(AudioMothCheckListFragment.newInstance())
     }
 
-    override fun startDetailDeploymentSite(id: Int, name: String?, isNewSite: Boolean) {
-        startFragment(DetailDeploymentSiteFragment.newInstance(id, name, isNewSite))
-    }
-
     override fun getDeployment(): Deployment? {
         if (this._deployment == null) {
             val dp = Deployment()
@@ -228,9 +199,6 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
         return this._deployment
     }
 
-    override fun getCurrentLocation(): Location =
-        currentLocation ?: Location(LocationManager.GPS_PROVIDER)
-
     override fun getLocationGroup(name: String): Project? {
         return audioMothDeploymentViewModel.getProjectByName(name)
     }
@@ -238,30 +206,6 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
     override fun setDeployment(deployment: Deployment) {
         this._deployment = deployment
     }
-
-    override fun setCurrentLocation(location: Location) {
-        this.currentLocation = location
-    }
-
-    override fun showSiteLoadingDialog(text: String) {
-        var siteLoadingDialog: SiteLoadingDialogFragment =
-            supportFragmentManager.findFragmentByTag(TAG_SITE_LOADING_DIALOG) as SiteLoadingDialogFragment?
-                ?: run {
-                    SiteLoadingDialogFragment(text)
-                }
-        if (siteLoadingDialog.isAdded) {
-            siteLoadingDialog.dismiss()
-            siteLoadingDialog = SiteLoadingDialogFragment(text)
-        }
-        siteLoadingDialog.show(
-            supportFragmentManager,
-            TAG_SITE_LOADING_DIALOG
-        )
-    }
-
-    override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
-
-    override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
 
     override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
         val deployment = _deployment ?: Deployment()
@@ -277,25 +221,6 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
         }
 
         setDeployment(deployment)
-    }
-
-    override fun setSiteItem(items: ArrayList<SiteWithLastDeploymentItem>) {
-        this._siteItems = items
-    }
-
-    override fun setImages(images: List<String>) {
-        this._images = images
-    }
-
-    override fun getImages(): List<String> {
-        return this._images
-    }
-
-    private fun setLatLng(latitude: Double, longitude: Double, siteId: Int, name: String) {
-        this.latitude = latitude
-        this.longitude = longitude
-        this.siteId = siteId
-        this.nameLocation = name
     }
 
     override fun setReadyToDeploy() {
@@ -367,7 +292,7 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
                 if (site == null) {
                     startFragment(
                         SetDeploymentSiteFragment.newInstance(
-                            currentLocation?.latitude ?: 0.0, currentLocation?.longitude ?: 0.0
+                            currentLocate?.latitude ?: 0.0, currentLocate?.longitude ?: 0.0
                         )
                     )
                 } else {
@@ -387,43 +312,8 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
 
     override fun getPassedChecks(): List<Int> = passedChecks
 
-    override fun setCurrentPage(name: String) {
-        currentCheckName = name
-    }
-
-    override fun showToolbar() {
-        toolbar.visibility = View.VISIBLE
-    }
-
-    override fun hideToolbar() {
-        toolbar.visibility = View.GONE
-    }
-
-    override fun setToolbarTitle() {
-        supportActionBar?.apply {
-            title = currentCheckName
-        }
-    }
-
     override fun startSyncing(status: String) {
         startFragment(NewSyncFragment.newInstance())
-    }
-
-    override fun onSelectedLocation(
-        latitude: Double,
-        longitude: Double,
-        siteId: Int,
-        name: String
-    ) {
-        startFragment(
-            DetailDeploymentSiteFragment.newInstance(
-                latitude,
-                longitude,
-                siteId,
-                name,
-                true
-            )
-        )
     }
 
     override fun playSyncSound() {
@@ -462,15 +352,6 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
         audioMothDeploymentViewModel.stopPlaySound()
     }
 
-    override fun isSiteLoading(): DownloadStreamState {
-        return DownloadStreamsWorker.isRunning()
-    }
-
-    override fun startMapPicker(latitude: Double, longitude: Double, siteId: Int, name: String) {
-        setLatLng(latitude, longitude, siteId, name)
-        startFragment(MapPickerFragment.newInstance(latitude, longitude, siteId, name))
-    }
-
     private fun handleDeploymentStep(deploymentId: Int) {
         val deployment = audioMothDeploymentViewModel.getDeploymentById(deploymentId)
         if (deployment != null) {
@@ -503,12 +384,6 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
         }
     }
 
-    private fun startFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(contentContainer.id, fragment)
-            .commit()
-    }
-
     private fun updateDeploymentState(state: DeploymentState.AudioMoth) {
         this._deployment?.state = state.key
         this._deployment?.let { audioMothDeploymentViewModel.updateDeployment(it) }
@@ -537,14 +412,6 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
         val loadingDialog: LoadingDialogFragment? =
             supportFragmentManager.findFragmentByTag(loadingDialogTag) as LoadingDialogFragment?
         loadingDialog?.dismissDialog()
-    }
-
-    override fun onAnimationEnd() {
-        if (supportFragmentManager.fragments.last() is NewSyncFragment) {
-            nextStep()
-        } else {
-            finish()
-        }
     }
 
     override fun onBackPressed() {
@@ -589,7 +456,6 @@ class AudioMothDeploymentActivity : AppCompatActivity(), AudioMothDeploymentProt
 
     companion object {
         const val loadingDialogTag = "LoadingDialog"
-        const val TAG_SITE_LOADING_DIALOG = "SiteLoadingDialogFragment"
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
         const val TONE_DURATION = 10000
 

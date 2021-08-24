@@ -13,17 +13,20 @@ import kotlinx.android.synthetic.main.fragment_guardian_checklist.*
 import org.rfcx.companion.R
 import org.rfcx.companion.adapter.CheckListItem
 import org.rfcx.companion.connection.socket.SocketManager
+import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.deployment.CheckListAdapter
 
 class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
+    private var baseDeploymentProtocol: BaseDeploymentProtocol? = null
 
     private val checkListRecyclerView by lazy { CheckListAdapter(this) }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         deploymentProtocol = (context as GuardianDeploymentProtocol)
+        baseDeploymentProtocol = (context as BaseDeploymentProtocol)
     }
 
     override fun onCreateView(
@@ -37,7 +40,7 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        deploymentProtocol?.hideToolbar()
+        baseDeploymentProtocol?.hideToolbar()
 
         setGuardianName()
 
@@ -48,7 +51,7 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
 
         checkListRecyclerView.setCheckList(getAllChecks())
         // set passed checks
-        deploymentProtocol?.getPassedChecks()?.forEach { number ->
+        baseDeploymentProtocol?.getPassedChecks()?.forEach { number ->
             checkListRecyclerView.setCheckPassed(number)
         }
 
@@ -80,8 +83,8 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
     }
 
     override fun invoke(number: Int, name: String) {
-        deploymentProtocol?.handleCheckClicked(number)
-        deploymentProtocol?.setCurrentPage(name)
+        baseDeploymentProtocol?.handleCheckClicked(number)
+        baseDeploymentProtocol?.setCurrentPage(name)
     }
 
     private fun getAllChecks(): List<CheckListItem> {
@@ -131,7 +134,7 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
     }
 
     private fun deploy() {
-        deploymentProtocol?.setReadyToDeploy()
+        baseDeploymentProtocol?.setReadyToDeploy()
         SocketManager.stopConnection()
     }
 

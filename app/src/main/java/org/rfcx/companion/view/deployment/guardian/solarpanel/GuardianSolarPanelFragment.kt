@@ -22,11 +22,12 @@ import org.rfcx.companion.connection.socket.SocketManager
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.socket.response.SentinelInput
 import org.rfcx.companion.util.Analytics
+import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianSolarPanelFragment : Fragment() {
 
-    private var deploymentProtocol: GuardianDeploymentProtocol? = null
+    private var deploymentProtocol: BaseDeploymentProtocol? = null
 
     private var timer: Timer = Timer()
 
@@ -39,7 +40,7 @@ class GuardianSolarPanelFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        deploymentProtocol = (context as GuardianDeploymentProtocol)
+        deploymentProtocol = (context as BaseDeploymentProtocol)
     }
 
     override fun onCreateView(

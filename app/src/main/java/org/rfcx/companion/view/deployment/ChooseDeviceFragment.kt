@@ -13,17 +13,19 @@ import org.rfcx.companion.util.Analytics
 
 class ChooseDeviceFragment : Fragment() {
     private var audioMothDeploymentProtocol: AudioMothDeploymentProtocol? = null
+    private var baseDeploymentProtocol: BaseDeploymentProtocol? = null
     private val analytics by lazy { context?.let { Analytics(it) } }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         audioMothDeploymentProtocol = (context as AudioMothDeploymentProtocol)
+        baseDeploymentProtocol = (context as BaseDeploymentProtocol)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        audioMothDeploymentProtocol?.hideToolbar()
+        baseDeploymentProtocol?.hideToolbar()
 
         edgeImageView.setOnClickListener {
             audioMothDeploymentProtocol?.openWithEdgeDevice()

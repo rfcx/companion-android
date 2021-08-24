@@ -24,11 +24,13 @@ import org.rfcx.companion.entity.socket.request.CheckinCommand
 import org.rfcx.companion.entity.socket.response.Status
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.WifiHotspotUtils
+import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 
 class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit {
     private val guardianHotspotAdapter by lazy { GuardianHotspotAdapter(this) }
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
+    private var baseDeploymentProtocol: BaseDeploymentProtocol? = null
     private lateinit var wifiHotspotManager: WifiHotspotManager
 
     private var guardianHotspot: ScanResult? = null
@@ -42,6 +44,7 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
     override fun onAttach(context: Context) {
         super.onAttach(context)
         deploymentProtocol = (context as GuardianDeploymentProtocol)
+        baseDeploymentProtocol = (context as BaseDeploymentProtocol)
     }
 
     override fun onCreateView(
@@ -55,7 +58,7 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        deploymentProtocol?.hideToolbar()
+        baseDeploymentProtocol?.hideToolbar()
 
         showLoading()
         retryCountdown(SCAN)
@@ -119,11 +122,11 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
         GlobalScope.launch(Dispatchers.Main) {
             SocketManager.connection.observe(viewLifecycleOwner, Observer { response ->
                 requireActivity().runOnUiThread {
-                    deploymentProtocol?.startCheckList()
+                    baseDeploymentProtocol?.startCheckList()
                     if (response.connection.status == Status.SUCCESS.value) {
                         hideLoading()
                         deploymentProtocol?.setDeploymentWifiName(guardianHotspot!!.SSID)
-                        deploymentProtocol?.startCheckList()
+                        baseDeploymentProtocol?.startCheckList()
                         deploymentProtocol?.setWifiManager(wifiHotspotManager)
                         deploymentProtocol?.registerWifiConnectionLostListener()
                         SocketManager.getCheckInTest(CheckinCommand.START)

@@ -20,6 +20,7 @@ import org.rfcx.companion.util.spectrogram.AudioSpectrogramUtils
 import org.rfcx.companion.util.spectrogram.SpectrogramListener
 import org.rfcx.companion.util.spectrogram.toShortArray
 import org.rfcx.companion.util.spectrogram.toSmallChunk
+import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
@@ -32,6 +33,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     private var isTimerPause = false
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
+    private var baseDeploymentProtocol: BaseDeploymentProtocol? = null
     private val microphoneTestUtils by lazy {
         MicrophoneTestUtils()
     }
@@ -43,6 +45,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         deploymentProtocol = (context as GuardianDeploymentProtocol)
+        baseDeploymentProtocol = (context as BaseDeploymentProtocol)
     }
 
     override fun onCreateView(
@@ -56,7 +59,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        deploymentProtocol?.let {
+        baseDeploymentProtocol?.let {
             it.showToolbar()
             it.setToolbarTitle()
         }
@@ -107,7 +110,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
 
         finishButton.setOnClickListener {
             analytics?.trackClickNextEvent(Screen.GUARDIAN_MICROPHONE.id)
-            deploymentProtocol?.nextStep()
+            baseDeploymentProtocol?.nextStep()
         }
     }
 
