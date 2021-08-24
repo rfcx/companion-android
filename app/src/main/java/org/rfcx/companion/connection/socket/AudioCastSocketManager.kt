@@ -1,6 +1,5 @@
 package org.rfcx.companion.connection.socket
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import org.rfcx.companion.entity.socket.response.AudioCastPing
@@ -64,8 +63,6 @@ object AudioCastSocketManager {
                     if (!dataInput.isNullOrBlank()) {
 
                         val ping = gson.fromJson(dataInput, AudioCastPing::class.java)
-
-                        Log.d("SocketComm", dataInput)
 
                         audioChunks.add(ping.buffer)
                         if (ping.amount == ping.number) {

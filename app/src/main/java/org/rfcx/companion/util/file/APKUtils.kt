@@ -1,7 +1,6 @@
 package org.rfcx.companion.util.file
 
 import android.content.Context
-import android.util.Log
 import okhttp3.ResponseBody
 import java.io.*
 
@@ -23,7 +22,6 @@ object APKUtils {
             val version = it.name.split("-")[1]
             roleMappedVersion[role] = version
         }
-        Log.d("SSSS", downloadedAPKs.contentToString())
         return roleMappedVersion
     }
 
