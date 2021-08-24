@@ -9,10 +9,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import java.util.*
 import kotlinx.android.synthetic.main.fragment_guardian_microphone.*
 import org.rfcx.companion.R
-import org.rfcx.companion.connection.socket.GuardianSocketManager
+import org.rfcx.companion.connection.socket.AudioCastSocketManager
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.MicrophoneTestUtils
@@ -21,6 +20,7 @@ import org.rfcx.companion.util.spectrogram.SpectrogramListener
 import org.rfcx.companion.util.spectrogram.toShortArray
 import org.rfcx.companion.util.spectrogram.toSmallChunk
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
+import java.util.*
 
 class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
 
@@ -68,21 +68,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         setupSpectrogramColorMenu()
         setupAudioPlaybackMenu()
         setUiByState(MicTestingState.READY)
-        GuardianSocketManager.resetMicrophoneDefaultValue()
-
-        GuardianSocketManager.resetRecorderState()
-        retrieveRecorderState()
-        GuardianSocketManager.recorderState.observe(viewLifecycleOwner, Observer {
-            if (it.isRecording) {
-                listenAudioButton.isEnabled = true
-                listenAgainAudioButton.isEnabled = true
-                micWarningText.visibility = View.INVISIBLE
-            } else {
-                listenAudioButton.isEnabled = false
-                listenAgainAudioButton.isEnabled = false
-                micWarningText.visibility = View.VISIBLE
-            }
-        })
+        AudioCastSocketManager.resetMicrophoneDefaultValue()
 
         listenAudioButton.setOnClickListener {
             isMicTesting = true
@@ -237,27 +223,11 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         }
     }
 
-    private fun retrieveRecorderState() {
-        recorderTimer = Timer()
-        recorderTimer?.schedule(object : TimerTask() {
-            override fun run() {
-                GuardianSocketManager.getRecorderState()
-            }
-        }, DELAY, RECORDER_CHECK_PERIOD)
-    }
-
     private fun retrieveLiveAudioBuffer() {
         timer = Timer()
         spectrogramTimer = Timer()
 
-        timer?.schedule(object : TimerTask() {
-            override fun run() {
-                if (!isTimerPause && isMicTesting) {
-                    isTimerPause = true
-                    GuardianSocketManager.getLiveAudioBuffer(microphoneTestUtils)
-                }
-            }
-        }, DELAY, MILLI_PERIOD)
+        AudioCastSocketManager.connect(microphoneTestUtils)
 
         spectrogramTimer?.schedule(object : TimerTask() {
             override fun run() {
@@ -271,19 +241,13 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
                 } else {
                     nullStackThreshold++
                     if (nullStackThreshold >= 50) {
-                        GuardianSocketManager.getLiveAudioBuffer(microphoneTestUtils)
-                        isTimerPause = true
                         nullStackThreshold = 0
                     }
                 }
             }
         }, DELAY, STACK_PERIOD)
 
-        GuardianSocketManager.liveAudio.observe(viewLifecycleOwner, Observer {
-            isTimerPause = false
-        })
-
-        GuardianSocketManager.spectrogram.observe(viewLifecycleOwner, Observer {
+        AudioCastSocketManager.spectrogram.observe(viewLifecycleOwner, Observer {
             if (isMicTesting) {
                 if (it.size > 2) {
                     AudioSpectrogramUtils.setupSpectrogram(it.size)
@@ -316,6 +280,8 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
             timer = null
             isMicTesting = false
         }
+        AudioCastSocketManager.resetAllValuesToDefault()
+        AudioCastSocketManager.stopConnection()
     }
 
     override fun onResume() {
@@ -331,11 +297,8 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         private val playback = arrayOf("On", "Off")
 
         private const val DELAY = 0L
-        private const val MILLI_PERIOD = 333L
 
         private const val STACK_PERIOD = 20L
-
-        private const val RECORDER_CHECK_PERIOD = 1000L
 
         private const val DEF_SAMPLERATE = 12000
 
