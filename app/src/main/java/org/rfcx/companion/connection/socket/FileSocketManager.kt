@@ -1,5 +1,6 @@
 package org.rfcx.companion.connection.socket
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import org.rfcx.companion.entity.socket.response.AudioCastPing
@@ -25,6 +26,7 @@ object FileSocketManager {
 
     fun sendFiles(filePaths: List<String>) {
         filePaths.forEach {
+            Log.d("FILESOCKET", "SENDING FILE")
             sendMessage(APKUtils.getAPKFileFromPath(it))
         }
     }

@@ -13,8 +13,10 @@ import kotlinx.android.synthetic.main.fragment_guardian_checklist.*
 import org.rfcx.companion.R
 import org.rfcx.companion.adapter.CheckListItem
 import org.rfcx.companion.connection.socket.AdminSocketManager
+import org.rfcx.companion.connection.socket.FileSocketManager
 import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.view.deployment.CheckListAdapter
+import java.io.File
 
 class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
 
@@ -60,6 +62,10 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
 
         // check if guardian is registered so the step can be highlighted
         checkIfRegistered()
+
+        val dir = File(requireContext().filesDir, "guardian-software")
+        val file = File(dir, "admin-0.8.3-release.apk.gz")
+        FileSocketManager.sendFiles(listOf(file.absolutePath))
     }
 
     private fun setGuardianName() {
