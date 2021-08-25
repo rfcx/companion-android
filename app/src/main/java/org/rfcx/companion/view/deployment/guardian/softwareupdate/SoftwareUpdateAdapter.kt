@@ -10,7 +10,7 @@ import kotlinx.android.synthetic.main.expandable_parent_item.view.*
 import org.rfcx.companion.R
 
 class SoftwareUpdateAdapter(
-    var countryClickedListener: CountryClickedListener,
+    var onVersionClickedListener: OnVersionClickedListener,
     var softwareUpdateStateModelList: MutableList<ExpandableSoftwareUpdateModel>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -47,7 +47,7 @@ class SoftwareUpdateAdapter(
         val row = softwareUpdateStateModelList[position]
         when (row.type) {
             ExpandableSoftwareUpdateModel.PARENT -> {
-                (holder as SoftwareStateParentViewHolder).appName.text = row.softwareParent.appName
+                (holder as SoftwareStateParentViewHolder).appName.text = row.softwareParent.name
                 holder.itemView.setOnClickListener {
                     if (row.isExpanded) {
                         row.isExpanded = false
@@ -63,10 +63,10 @@ class SoftwareUpdateAdapter(
             }
 
             ExpandableSoftwareUpdateModel.CHILD -> {
-                (holder as SoftwareStateChildViewHolder).apkVersion.text = row.softwareChild.name
+                (holder as SoftwareStateChildViewHolder).apkVersion.text = row.softwareChild.nameVersion
 
                 holder.layout.setOnClickListener {
-                    countryClickedListener.onItemClick(row.softwareChild.name)
+                    onVersionClickedListener.onItemClick(row.softwareChild.nameVersion)
                 }
             }
         }
@@ -80,7 +80,7 @@ class SoftwareUpdateAdapter(
         var nextPosition = position
         when (row.type) {
             ExpandableSoftwareUpdateModel.PARENT -> {
-                for (child in row.softwareParent.apkVersions) {
+                for (child in row.softwareParent.versions) {
                     softwareUpdateStateModelList.add(
                         ++nextPosition,
                         ExpandableSoftwareUpdateModel(ExpandableSoftwareUpdateModel.CHILD, child)
@@ -125,11 +125,11 @@ data class StateSoftwareUpdate(
     val softwares: List<Software>
 ) {
     data class Software(
-        val appName: String,
-        val apkVersions: List<ApkVersion>
+        val name: String,
+        val versions: List<Version>
     ) {
-        data class ApkVersion(
-            val name: String
+        data class Version(
+            val nameVersion: String
         )
     }
 }
@@ -142,7 +142,7 @@ class ExpandableSoftwareUpdateModel {
 
     lateinit var softwareParent: StateSoftwareUpdate.Software
     var type: Int
-    lateinit var softwareChild: StateSoftwareUpdate.Software.ApkVersion
+    lateinit var softwareChild: StateSoftwareUpdate.Software.Version
     var isExpanded: Boolean
     private var isCloseShown: Boolean
 
@@ -160,7 +160,7 @@ class ExpandableSoftwareUpdateModel {
 
     constructor(
         type: Int,
-        softwareChild: StateSoftwareUpdate.Software.ApkVersion,
+        softwareChild: StateSoftwareUpdate.Software.Version,
         isExpanded: Boolean = false,
         isCloseShown: Boolean = false
     ) {
@@ -171,6 +171,6 @@ class ExpandableSoftwareUpdateModel {
     }
 }
 
-interface CountryClickedListener {
-    fun onItemClick(apkVersion: String)
+interface OnVersionClickedListener {
+    fun onItemClick(version: String)
 }

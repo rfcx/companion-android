@@ -12,12 +12,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_classifier.*
 import org.rfcx.companion.R
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
-import org.rfcx.companion.view.deployment.guardian.softwareupdate.CountryClickedListener
+import org.rfcx.companion.view.deployment.guardian.softwareupdate.OnVersionClickedListener
 import org.rfcx.companion.view.deployment.guardian.softwareupdate.ExpandableSoftwareUpdateModel
 import org.rfcx.companion.view.deployment.guardian.softwareupdate.SoftwareUpdateAdapter
 import org.rfcx.companion.view.deployment.guardian.softwareupdate.StateSoftwareUpdate
 
-class ClassifierFragment : Fragment(), CountryClickedListener {
+class ClassifierFragment : Fragment(), OnVersionClickedListener {
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
     var softwareUpdateAdapter: SoftwareUpdateAdapter? = null
 
@@ -51,52 +51,52 @@ class ClassifierFragment : Fragment(), CountryClickedListener {
 
     private fun mockData() {
         val d1 = listOf(
-            StateSoftwareUpdate.Software.ApkVersion("chainsaw v5"),
-            StateSoftwareUpdate.Software.ApkVersion("chainsaw v4"),
-            StateSoftwareUpdate.Software.ApkVersion("chainsaw v3"),
-            StateSoftwareUpdate.Software.ApkVersion("chainsaw v2"),
-            StateSoftwareUpdate.Software.ApkVersion("chainsaw v1"),
-            StateSoftwareUpdate.Software.ApkVersion("chainsaw rfcx v1"),
-            StateSoftwareUpdate.Software.ApkVersion("chainsaw hua v5"),
-            StateSoftwareUpdate.Software.ApkVersion("chainsaw hua v4")
+            StateSoftwareUpdate.Software.Version("chainsaw v5"),
+            StateSoftwareUpdate.Software.Version("chainsaw v4"),
+            StateSoftwareUpdate.Software.Version("chainsaw v3"),
+            StateSoftwareUpdate.Software.Version("chainsaw v2"),
+            StateSoftwareUpdate.Software.Version("chainsaw v1"),
+            StateSoftwareUpdate.Software.Version("chainsaw rfcx v1"),
+            StateSoftwareUpdate.Software.Version("chainsaw hua v5"),
+            StateSoftwareUpdate.Software.Version("chainsaw hua v4")
         )
         val d2 = listOf(
-            StateSoftwareUpdate.Software.ApkVersion("vehicle v5"),
-            StateSoftwareUpdate.Software.ApkVersion("vehicle v4"),
-            StateSoftwareUpdate.Software.ApkVersion("vehicle v3"),
-            StateSoftwareUpdate.Software.ApkVersion("vehicle v2"),
-            StateSoftwareUpdate.Software.ApkVersion("vehicle v1"),
-            StateSoftwareUpdate.Software.ApkVersion("vehicle rfcx v1")
+            StateSoftwareUpdate.Software.Version("vehicle v5"),
+            StateSoftwareUpdate.Software.Version("vehicle v4"),
+            StateSoftwareUpdate.Software.Version("vehicle v3"),
+            StateSoftwareUpdate.Software.Version("vehicle v2"),
+            StateSoftwareUpdate.Software.Version("vehicle v1"),
+            StateSoftwareUpdate.Software.Version("vehicle rfcx v1")
         )
         val d3 = listOf(
-            StateSoftwareUpdate.Software.ApkVersion("gunshot v14"),
-            StateSoftwareUpdate.Software.ApkVersion("gunshot v13"),
-            StateSoftwareUpdate.Software.ApkVersion("gunshot v12"),
-            StateSoftwareUpdate.Software.ApkVersion("gunshot v7"),
-            StateSoftwareUpdate.Software.ApkVersion("gunshot v4"),
-            StateSoftwareUpdate.Software.ApkVersion("gunshot v3"),
-            StateSoftwareUpdate.Software.ApkVersion("gunshot v1")
+            StateSoftwareUpdate.Software.Version("gunshot v14"),
+            StateSoftwareUpdate.Software.Version("gunshot v13"),
+            StateSoftwareUpdate.Software.Version("gunshot v12"),
+            StateSoftwareUpdate.Software.Version("gunshot v7"),
+            StateSoftwareUpdate.Software.Version("gunshot v4"),
+            StateSoftwareUpdate.Software.Version("gunshot v3"),
+            StateSoftwareUpdate.Software.Version("gunshot v1")
         )
         val d4 = listOf(
-            StateSoftwareUpdate.Software.ApkVersion("whale orca v1"),
-            StateSoftwareUpdate.Software.ApkVersion("whale v1")
+            StateSoftwareUpdate.Software.Version("whale orca v1"),
+            StateSoftwareUpdate.Software.Version("whale v1")
         )
 
         val d5 = listOf(
-            StateSoftwareUpdate.Software.ApkVersion("dog bark v12 "),
-            StateSoftwareUpdate.Software.ApkVersion("dog bark v10 "),
-            StateSoftwareUpdate.Software.ApkVersion("dog bark v9 "),
-            StateSoftwareUpdate.Software.ApkVersion("dog bark v8 "),
-            StateSoftwareUpdate.Software.ApkVersion("dog bark v7 "),
-            StateSoftwareUpdate.Software.ApkVersion("dog bark v6 "),
-            StateSoftwareUpdate.Software.ApkVersion("dog bark v4 "),
+            StateSoftwareUpdate.Software.Version("dog bark v12 "),
+            StateSoftwareUpdate.Software.Version("dog bark v10 "),
+            StateSoftwareUpdate.Software.Version("dog bark v9 "),
+            StateSoftwareUpdate.Software.Version("dog bark v8 "),
+            StateSoftwareUpdate.Software.Version("dog bark v7 "),
+            StateSoftwareUpdate.Software.Version("dog bark v6 "),
+            StateSoftwareUpdate.Software.Version("dog bark v4 "),
         )
         val d6 = listOf(
-            StateSoftwareUpdate.Software.ApkVersion("voice v5"),
-            StateSoftwareUpdate.Software.ApkVersion("voice v4"),
-            StateSoftwareUpdate.Software.ApkVersion("voice v3"),
-            StateSoftwareUpdate.Software.ApkVersion("voice v2"),
-            StateSoftwareUpdate.Software.ApkVersion("voice v1")
+            StateSoftwareUpdate.Software.Version("voice v5"),
+            StateSoftwareUpdate.Software.Version("voice v4"),
+            StateSoftwareUpdate.Software.Version("voice v3"),
+            StateSoftwareUpdate.Software.Version("voice v2"),
+            StateSoftwareUpdate.Software.Version("voice v1")
         )
 
         val mockData = mutableListOf<ExpandableSoftwareUpdateModel>()
@@ -164,7 +164,7 @@ class ClassifierFragment : Fragment(), CountryClickedListener {
         fun newInstance() = ClassifierFragment()
     }
 
-    override fun onItemClick(apkVersion: String) {
-        Toast.makeText(context,"Clicked on $apkVersion", Toast.LENGTH_LONG).show()
+    override fun onItemClick(version: String) {
+        Toast.makeText(context,"Clicked on $version", Toast.LENGTH_LONG).show()
     }
 }

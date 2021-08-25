@@ -13,7 +13,7 @@ import kotlinx.android.synthetic.main.fragment_software_update.*
 import org.rfcx.companion.R
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 
-class SoftwareUpdateFragment : Fragment(), CountryClickedListener {
+class SoftwareUpdateFragment : Fragment(), OnVersionClickedListener {
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
     var softwareUpdateAdapter: SoftwareUpdateAdapter? = null
 
@@ -62,24 +62,24 @@ class SoftwareUpdateFragment : Fragment(), CountryClickedListener {
         }
 
         val guardianMockData = listOf(
-            StateSoftwareUpdate.Software.ApkVersion("Guardian v0.8.2-fix"),
-            StateSoftwareUpdate.Software.ApkVersion("Guardian v0.8.2"),
-            StateSoftwareUpdate.Software.ApkVersion("Guardian v0.8.1")
+            StateSoftwareUpdate.Software.Version("Guardian v0.8.2-fix"),
+            StateSoftwareUpdate.Software.Version("Guardian v0.8.2"),
+            StateSoftwareUpdate.Software.Version("Guardian v0.8.1")
         )
         val app2 = listOf(
-            StateSoftwareUpdate.Software.ApkVersion("Admin v2.6.8"),
-            StateSoftwareUpdate.Software.ApkVersion("Admin v1.7.1"),
-            StateSoftwareUpdate.Software.ApkVersion("Admin v0.6.8")
+            StateSoftwareUpdate.Software.Version("Admin v2.6.8"),
+            StateSoftwareUpdate.Software.Version("Admin v1.7.1"),
+            StateSoftwareUpdate.Software.Version("Admin v0.6.8")
         )
         val app3 = listOf(
-            StateSoftwareUpdate.Software.ApkVersion("Classify v2.8.2"),
-            StateSoftwareUpdate.Software.ApkVersion("Classify v2.6.2"),
-            StateSoftwareUpdate.Software.ApkVersion("Classify v1.6.0")
+            StateSoftwareUpdate.Software.Version("Classify v2.8.2"),
+            StateSoftwareUpdate.Software.Version("Classify v2.6.2"),
+            StateSoftwareUpdate.Software.Version("Classify v1.6.0")
         )
         val app4 = listOf(
-            StateSoftwareUpdate.Software.ApkVersion("Updater v3.6.8"),
-            StateSoftwareUpdate.Software.ApkVersion("Updater v3.6.2"),
-            StateSoftwareUpdate.Software.ApkVersion("Updater v3.6.0")
+            StateSoftwareUpdate.Software.Version("Updater v3.6.8"),
+            StateSoftwareUpdate.Software.Version("Updater v3.6.2"),
+            StateSoftwareUpdate.Software.Version("Updater v3.6.0")
         )
 
         val mockData = mutableListOf<ExpandableSoftwareUpdateModel>()
@@ -116,7 +116,7 @@ class SoftwareUpdateFragment : Fragment(), CountryClickedListener {
         fun newInstance() = SoftwareUpdateFragment()
     }
 
-    override fun onItemClick(apkVersion: String) {
-        Toast.makeText(context,"Clicked on $apkVersion",Toast.LENGTH_LONG).show()
+    override fun onItemClick(version: String) {
+        Toast.makeText(context,"Clicked on $version",Toast.LENGTH_LONG).show()
     }
 }
