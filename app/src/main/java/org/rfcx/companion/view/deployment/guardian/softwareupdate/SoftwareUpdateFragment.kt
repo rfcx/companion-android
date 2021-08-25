@@ -15,9 +15,7 @@ import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 
 class SoftwareUpdateFragment : Fragment(), CountryClickedListener {
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
-
     var softwareUpdateAdapter: SoftwareUpdateAdapter? = null
-    private var selectedApk = ""
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

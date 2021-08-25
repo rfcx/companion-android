@@ -49,12 +49,13 @@
     </string-array>
 
     <string-array name="guardian_setup_checks">
+        <item>Software Update</item>
         <item>Network Signal Test</item>
         <item>Microphone Capture Test</item>
         <item>Audio Parameter Config</item>
         <item>Guardian Installation Location</item>
         <item>Confirm CheckIn Status</item>
-        <item>Software Update</item>
+        <item>Classifier Setup</item>
     </string-array>
 
     <string-array name="guardian_optional_checks">

@@ -39,6 +39,7 @@ import org.rfcx.companion.util.socket.PingUtils
 import org.rfcx.companion.view.deployment.EdgeDeploymentActivity
 import org.rfcx.companion.view.deployment.guardian.advanced.GuardianAdvancedFragment
 import org.rfcx.companion.view.deployment.guardian.checkin.GuardianCheckInTestFragment
+import org.rfcx.companion.view.deployment.guardian.classifier.ClassifierFragment
 import org.rfcx.companion.view.deployment.guardian.configure.GuardianConfigureFragment
 import org.rfcx.companion.view.deployment.guardian.connect.ConnectGuardianFragment
 import org.rfcx.companion.view.deployment.guardian.deploy.GuardianDeployFragment
@@ -445,18 +446,21 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                 startFragment(GuardianSolarPanelFragment.newInstance())
             }
             1 -> {
+                startFragment(SoftwareUpdateFragment.newInstance())
+            }
+            2 -> {
                 updateDeploymentState(DeploymentState.Guardian.Signal)
                 startFragment(GuardianSignalFragment.newInstance())
             }
-            2 -> {
+            3 -> {
                 updateDeploymentState(DeploymentState.Guardian.Microphone)
                 startFragment(GuardianMicrophoneFragment.newInstance())
             }
-            3 -> {
+            4 -> {
                 updateDeploymentState(DeploymentState.Guardian.Config)
                 startFragment(GuardianConfigureFragment.newInstance())
             }
-            4 -> {
+            5 -> {
                 updateDeploymentState(DeploymentState.Guardian.Locate)
                 val site = this._locate
                 if (site == null) {
@@ -469,18 +473,18 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                     startDetailDeploymentSite(site.id, site.name, false)
                 }
             }
-            5 -> {
+            6 -> {
                 updateDeploymentState(DeploymentState.Guardian.Checkin)
                 startFragment(GuardianCheckInTestFragment.newInstance())
             }
-            6 -> {
-                startFragment(SoftwareUpdateFragment.newInstance())
-            }
             7 -> {
+                startFragment(ClassifierFragment.newInstance())
+            }
+            8 -> {
                 updateDeploymentState(DeploymentState.Guardian.Deploy)
                 startFragment(GuardianDeployFragment.newInstance())
             }
-            8 -> {
+            9 -> {
                 updateDeploymentState(DeploymentState.Guardian.Advanced)
                 startFragment(GuardianAdvancedFragment.newInstance())
             }
