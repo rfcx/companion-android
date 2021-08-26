@@ -66,6 +66,7 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
         val dir = File(requireContext().filesDir, "guardian-software")
         val file = File(dir, "admin-0.8.3-release.apk.gz")
         FileSocketManager.sendFiles(listOf(file.absolutePath))
+        deploymentProtocol?.sendSiteIdToGuardian("test-site-id")
     }
 
     private fun setGuardianName() {
