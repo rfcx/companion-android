@@ -89,7 +89,7 @@ class ClassifierFragment : Fragment(), OnVersionClickedListener {
             StateSoftwareUpdate.Software.Version("dog bark v8 "),
             StateSoftwareUpdate.Software.Version("dog bark v7 "),
             StateSoftwareUpdate.Software.Version("dog bark v6 "),
-            StateSoftwareUpdate.Software.Version("dog bark v4 "),
+            StateSoftwareUpdate.Software.Version("dog bark v4 ")
         )
         val d6 = listOf(
             StateSoftwareUpdate.Software.Version("voice v5"),

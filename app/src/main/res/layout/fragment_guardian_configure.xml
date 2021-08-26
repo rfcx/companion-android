@@ -15,19 +15,16 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_padding_large"
-            android:layout_marginEnd="@dimen/margin_padding_large">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:id="@+id/configureLayout"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:clickable="true"
                 android:focusable="true"
                 android:orientation="vertical"
-                android:paddingTop="@dimen/margin_padding_normal"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
@@ -36,6 +33,9 @@
                     style="@style/AudioMothText.Subhead.Bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_padding_large"
+                    android:layout_marginEnd="@dimen/margin_padding_large"
+                    android:paddingTop="@dimen/margin_padding_normal"
                     android:text="File format" />
 
                 <TextView
@@ -43,20 +43,24 @@
                     style="@style/AudioMothText.Body.Secondary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="@dimen/margin_padding_small"
+                    android:layout_marginStart="@dimen/margin_padding_large"
+                    android:layout_marginEnd="@dimen/margin_padding_large"
+                    android:paddingBottom="@dimen/margin_padding_normal"
                     tools:text="OPUS" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginBottom="@dimen/margin_padding_small"
-                    android:background="@color/gray_30" />
+                    android:background="@color/separateLine" />
 
                 <TextView
                     android:id="@+id/sampleRateTextView"
                     style="@style/AudioMothText.Subhead.Bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_padding_large"
+                    android:layout_marginEnd="@dimen/margin_padding_large"
+                    android:paddingTop="@dimen/margin_padding_normal"
                     android:text="@string/sample_rate" />
 
                 <TextView
@@ -64,20 +68,24 @@
                     style="@style/AudioMothText.Body.Secondary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="@dimen/margin_padding_small"
+                    android:layout_marginStart="@dimen/margin_padding_large"
+                    android:layout_marginEnd="@dimen/margin_padding_large"
+                    android:paddingBottom="@dimen/margin_padding_normal"
                     tools:text="14kHz" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginBottom="@dimen/margin_padding_small"
-                    android:background="@color/gray_30" />
+                    android:background="@color/separateLine" />
 
                 <TextView
                     android:id="@+id/bitrateTextView"
                     style="@style/AudioMothText.Subhead.Bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_padding_large"
+                    android:layout_marginEnd="@dimen/margin_padding_large"
+                    android:paddingTop="@dimen/margin_padding_normal"
                     android:text="@string/bitrate" />
 
                 <TextView
@@ -85,20 +93,24 @@
                     style="@style/AudioMothText.Body.Secondary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="@dimen/margin_padding_small"
+                    android:layout_marginStart="@dimen/margin_padding_large"
+                    android:layout_marginEnd="@dimen/margin_padding_large"
+                    android:paddingBottom="@dimen/margin_padding_normal"
                     tools:text="14kbs" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginBottom="@dimen/margin_padding_small"
-                    android:background="@color/gray_30" />
+                    android:background="@color/separateLine" />
 
                 <TextView
                     android:id="@+id/durationTextView"
                     style="@style/AudioMothText.Subhead.Bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_padding_large"
+                    android:layout_marginEnd="@dimen/margin_padding_large"
+                    android:paddingTop="@dimen/margin_padding_normal"
                     android:text="@string/duration" />
 
                 <TextView
@@ -106,14 +118,15 @@
                     style="@style/AudioMothText.Body.Secondary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="@dimen/margin_padding_small"
+                    android:layout_marginStart="@dimen/margin_padding_large"
+                    android:layout_marginEnd="@dimen/margin_padding_large"
+                    android:paddingBottom="@dimen/margin_padding_normal"
                     tools:text="90 secs" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginBottom="@dimen/margin_padding_small"
-                    android:background="@color/gray_30" />
+                    android:background="@color/separateLine" />
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
