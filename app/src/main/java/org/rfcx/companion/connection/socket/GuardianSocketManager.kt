@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
+import com.google.gson.JsonObject
 import org.json.JSONObject
 import org.rfcx.companion.entity.response.GuardianRegisterResponse
 import org.rfcx.companion.entity.socket.request.*
@@ -151,6 +152,11 @@ object GuardianSocketManager {
 
     fun sendGuardianRegistration(response: GuardianRegisterResponse) {
         sendInstructionMessage(InstructionType.SET, InstructionCommand.IDENTITY, gson.toJson(response))
+    }
+
+    fun sendSiteId(siteId: String) {
+        val siteIdJson = JsonObject().addProperty("site_id", siteId)
+        sendInstructionMessage(InstructionType.SET, InstructionCommand.SITE, gson.toJson(siteIdJson))
     }
 
     fun isGuardianRegistered() {

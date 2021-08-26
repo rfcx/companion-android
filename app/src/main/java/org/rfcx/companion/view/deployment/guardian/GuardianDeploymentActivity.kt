@@ -20,7 +20,6 @@ import kotlinx.android.synthetic.main.activity_guardian_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.AdminSocketManager
-import org.rfcx.companion.connection.socket.FileSocketManager
 import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.connection.wifi.WifiHotspotManager
 import org.rfcx.companion.connection.wifi.WifiLostListener
@@ -54,7 +53,6 @@ import org.rfcx.companion.view.deployment.location.SetDeploymentSiteFragment
 import org.rfcx.companion.view.detail.MapPickerProtocol
 import org.rfcx.companion.view.dialog.*
 import org.rfcx.companion.view.prefs.SyncPreferenceListener
-import java.io.File
 import java.util.*
 
 class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtocol,
@@ -285,6 +283,10 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun setLastCheckInTime(time: Long?) {
         this.lastCheckInTime = time
+    }
+
+    override fun sendSiteIdToGuardian(siteId: String) {
+        GuardianSocketManager.sendSiteId(siteId)
     }
 
     override fun addRegisteredToPassedCheck() {

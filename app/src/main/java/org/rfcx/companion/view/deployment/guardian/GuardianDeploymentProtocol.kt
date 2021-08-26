@@ -28,6 +28,8 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun setOnDeployClicked()
     fun setLastCheckInTime(time: Long?)
 
+    fun sendSiteIdToGuardian(siteId: String)
+
     fun addRegisteredToPassedCheck()
     fun removeRegisteredOnPassedCheck()
 
