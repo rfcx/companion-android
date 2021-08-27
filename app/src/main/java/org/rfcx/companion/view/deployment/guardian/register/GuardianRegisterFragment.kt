@@ -45,6 +45,8 @@ class GuardianRegisterFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         deploymentProtocol?.let {
+            context?.getString(R.string.register_guardian)?.let { it1 -> it.setCurrentPage(it1) }
+            it.setMenuToolbar(true)
             it.showToolbar()
             it.setToolbarTitle()
         }

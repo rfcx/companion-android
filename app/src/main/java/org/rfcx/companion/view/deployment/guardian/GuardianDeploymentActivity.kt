@@ -153,7 +153,9 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     }
 
     private fun onClickMoreView() {
-        Log.d("onClickMoreView", "onClickMoreView")
+        setCurrentPage(getString(R.string.advanced_config))
+        setToolbarTitle()
+        startFragment(GuardianAdvancedFragment.newInstance(), "GuardianAdvancedFragment")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -205,6 +207,13 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     override fun backStep() {
         val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
         when (container) {
+            is GuardianAdvancedFragment -> {
+                if (supportFragmentManager.backStackEntryCount > 0) {
+                    supportFragmentManager.popBackStack()
+                } else {
+                    super.onBackPressed()
+                }
+            }
             is MapPickerFragment -> startFragment(
                 DetailDeploymentSiteFragment.newInstance(
                     latitude,
@@ -544,10 +553,17 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun getPassedChecks(): List<Int> = passedChecks
 
-    private fun startFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(contentContainer.id, fragment)
-            .commit()
+    private fun startFragment(fragment: Fragment, tag: String = "") {
+        if (tag.isBlank()) {
+            supportFragmentManager.beginTransaction()
+                .replace(contentContainer.id, fragment)
+                .commit()
+        } else {
+            supportFragmentManager.beginTransaction()
+                .replace(contentContainer.id, fragment, tag)
+                .addToBackStack(tag)
+                .commit()
+        }
     }
 
     private fun updateDeploymentState(state: DeploymentState.Guardian) {
