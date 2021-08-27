@@ -545,10 +545,6 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                 updateDeploymentState(DeploymentState.Guardian.Deploy)
                 startFragment(GuardianDeployFragment.newInstance())
             }
-            9 -> {
-                updateDeploymentState(DeploymentState.Guardian.Advanced)
-                startFragment(GuardianAdvancedFragment.newInstance())
-            }
         }
     }
 

@@ -60,7 +60,6 @@
 
     <string-array name="guardian_optional_checks">
         <item>Add Photo(s)</item>
-        <item>Advanced Configuration</item>
     </string-array>
 
     <string-array name="guardian_can_skip_steps">
