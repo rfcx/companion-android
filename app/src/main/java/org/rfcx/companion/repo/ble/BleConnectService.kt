@@ -4,8 +4,10 @@ import android.app.Service
 import android.bluetooth.*
 import android.content.Intent
 import android.os.Binder
+import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import androidx.annotation.RequiresApi
 import org.rfcx.companion.entity.songmeter.SongMeterConstant
 import java.util.*
 
@@ -107,6 +109,10 @@ class BleConnectService : Service() {
                     broadcastUpdate(ACTION_DESCRIPTOR_WRITTEN, descriptor.characteristic)
                 }
             }
+        }
+
+        override fun onMtuChanged(gatt: BluetoothGatt?, mtu: Int, status: Int) {
+            setCharacteristicNotification(BleConnectDelegate.mapCharacteristic[SongMeterConstant.kUUIDCharConfigRtoA]!!, true) // to notify if this got populate
         }
     }
 
@@ -286,6 +292,11 @@ class BleConnectService : Service() {
         }
         mBluetoothGatt!!.writeDescriptor(descriptor)
 //        mBluetoothGatt!!.setCharacteristicNotification(characteristic, enabled)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    fun requestMTU() {
+        mBluetoothGatt!!.requestMtu(512)
     }
 
     /**

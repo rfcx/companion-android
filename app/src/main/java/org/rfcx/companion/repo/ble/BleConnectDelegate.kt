@@ -5,11 +5,13 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattService
 import android.content.*
 import android.content.Context.BIND_AUTO_CREATE
+import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.MutableLiveData
 import org.rfcx.companion.entity.songmeter.SongMeterConstant
 import org.rfcx.companion.util.Resource
@@ -113,7 +115,7 @@ class BleConnectDelegate(private val context: Context) {
                     }
                 }
                 BleConnectService.ACTION_CHA_CHANGE -> {
-                    Log.d("OnChaChanged", "OnChaChanged")
+                    displayData(intent.getByteArrayExtra(BleConnectService.EXTRA_DATA))
                     when {
                         intent.getStringExtra(BleConnectService.CHARACTERISTICS)!!.toUpperCase() == SongMeterConstant.kUUIDCharConfigRtoA -> {
                             configRtoAData = intent.getByteArrayExtra(BleConnectService.EXTRA_DATA)
@@ -137,6 +139,7 @@ class BleConnectDelegate(private val context: Context) {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private fun setGattServices(gattServices: List<BluetoothGattService>?) {
         if (gattServices == null) return
         gattServices.forEach { gattService ->
@@ -184,7 +187,7 @@ class BleConnectDelegate(private val context: Context) {
 
         Log.d("BLE", "setting noti")
         handler.post {
-            bleConnectService?.setCharacteristicNotification(configRtoA!!, true) // to notify if this got populate
+            bleConnectService?.requestMTU()
         }
     }
 
