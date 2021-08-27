@@ -134,6 +134,7 @@ class GuardianSolarPanelFragment : Fragment() {
     private fun setFeedbackChart() {
         // setup simple line chart
         feedbackChart.apply {
+            legend.textColor = ContextCompat.getColor(requireContext(), R.color.text_primary)
             setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.backgroundColor))
             description.isEnabled = false /* description inside chart */
             setTouchEnabled(false)
