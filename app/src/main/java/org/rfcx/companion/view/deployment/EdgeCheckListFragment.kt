@@ -33,7 +33,11 @@ class EdgeCheckListFragment : Fragment(), (Int, String) -> Unit {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        deploymentProtocol?.hideToolbar()
+        deploymentProtocol?.let {
+            it.showToolbar()
+            it.setCurrentPage(getString(R.string.setting_up_edge_checklist))
+            it.setToolbarTitle()
+        }
 
         edgeCheckListRecyclerView.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
