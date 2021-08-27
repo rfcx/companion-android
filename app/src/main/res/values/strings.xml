@@ -415,6 +415,7 @@
     <string name="registering">Registration Request Sent. Awaiting Response.</string>
     <string name="check_registered">Verifying Guardian Registration Status</string>
     <string name="not_registered">Your Guardian is Not Registered</string>
+    <string name="register_guardian">Register Guardian with RFCx</string>
 
     <!-- GuardianCheckListFragment -->
     <string name="setting_up_checklist">Guardian Setup Checklist:</string>

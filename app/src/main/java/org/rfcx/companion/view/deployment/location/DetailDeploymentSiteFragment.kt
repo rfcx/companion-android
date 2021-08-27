@@ -198,6 +198,8 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
 
     private fun setupTopBar() {
         deploymentProtocol?.let {
+            it.setToolbarSubtitle()
+            it.setMenuToolbar(false)
             it.showToolbar()
             it.setToolbarTitle()
         }

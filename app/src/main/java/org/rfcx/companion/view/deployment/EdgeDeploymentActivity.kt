@@ -421,9 +421,17 @@ class EdgeDeploymentActivity : AppCompatActivity(), EdgeDeploymentProtocol, Comp
         toolbar.visibility = View.GONE
     }
 
+    override fun setMenuToolbar(isVisibility: Boolean) {}
+
     override fun setToolbarTitle() {
         supportActionBar?.apply {
             title = currentCheckName
+        }
+    }
+
+    override fun setToolbarSubtitle(sub: String) {
+        supportActionBar?.apply {
+            subtitle = sub
         }
     }
 

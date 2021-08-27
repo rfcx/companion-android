@@ -1,5 +1,6 @@
 package org.rfcx.companion.view.deployment.guardian
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -7,6 +8,8 @@ import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -104,6 +107,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private var passedChecks = arrayListOf<Int>()
 
     private var onDeployClicked = false
+    private var menuAll: Menu? = null
 
     private lateinit var wifiHotspotManager: WifiHotspotManager
     private val analytics by lazy { Analytics(this) }
@@ -130,6 +134,26 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     private val siteObserve = Observer<List<Locate>> {
         this.sites = it
         setSiteItems()
+    }
+
+    @SuppressLint("ResourceAsColor")
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuAll = menu
+        val inflater = menuInflater
+        inflater.inflate(R.menu.preference_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> finish()
+            R.id.MoreView -> onClickMoreView()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun onClickMoreView() {
+        Log.d("onClickMoreView", "onClickMoreView")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -181,7 +205,14 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
     override fun backStep() {
         val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
         when (container) {
-            is MapPickerFragment -> startFragment(DetailDeploymentSiteFragment.newInstance(latitude, longitude, siteId, nameLocation))
+            is MapPickerFragment -> startFragment(
+                DetailDeploymentSiteFragment.newInstance(
+                    latitude,
+                    longitude,
+                    siteId,
+                    nameLocation
+                )
+            )
             is GuardianCheckListFragment -> {
                 GuardianSocketManager.resetAllValuesToDefault()
                 setLastCheckInTime(null)
@@ -204,19 +235,26 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
         val project = projectDb.getProjectById(projectId)
         val projectName = project?.name ?: getString(R.string.none)
-        siteLiveData = Transformations.map(locateDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()) {
+        siteLiveData = Transformations.map(
+            locateDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()
+        ) {
             it
         }
         siteLiveData.observeForever(siteObserve)
 
         audioMothDeployLiveData =
-            Transformations.map(edgeDeploymentDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()) {
+            Transformations.map(
+                edgeDeploymentDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()
+            ) {
                 it
             }
         audioMothDeployLiveData.observeForever(audioMothDeploymentObserve)
 
         guardianDeploymentLiveData =
-            Transformations.map(guardianDeploymentDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()) {
+            Transformations.map(
+                guardianDeploymentDb.getAllResultsAsyncWithinProject(project = projectName)
+                    .asLiveData()
+            ) {
                 it
             }
         guardianDeploymentLiveData.observeForever(guardianDeploymentObserve)
@@ -257,11 +295,12 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         startFragment(GuardianCheckListFragment.newInstance())
     }
 
-    override fun startDetailDeploymentSite(id: Int, name: String? , isNewSite: Boolean) {
+    override fun startDetailDeploymentSite(id: Int, name: String?, isNewSite: Boolean) {
         startFragment(DetailDeploymentSiteFragment.newInstance(id, name, isNewSite))
     }
 
-    override fun isOpenedFromUnfinishedDeployment(): Boolean = false // guardian not have this feature so return false
+    override fun isOpenedFromUnfinishedDeployment(): Boolean =
+        false // guardian not have this feature so return false
 
     override fun getDeployment(): GuardianDeployment? = this._deployment ?: GuardianDeployment()
 
@@ -343,7 +382,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         return this._images
     }
 
-    override fun getCurrentLocation(): Location = currentLocation ?: Location(LocationManager.GPS_PROVIDER)
+    override fun getCurrentLocation(): Location =
+        currentLocation ?: Location(LocationManager.GPS_PROVIDER)
 
     override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
         val deployment = _deployment ?: GuardianDeployment()
@@ -375,13 +415,20 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
             val deploymentId = guardianDeploymentDb.insertOrUpdateDeployment(it, _deployLocation!!)
             this._locate?.let { loc ->
-                locateDb.insertOrUpdateLocate(deploymentId, loc, true) // update locate - last deployment
+                locateDb.insertOrUpdateLocate(
+                    deploymentId,
+                    loc,
+                    true
+                ) // update locate - last deployment
             }
 
             if (useExistedLocation) {
                 this._locate?.let { locate ->
-                    val deployments = locate.serverId?.let { it1 -> guardianDeploymentDb.getDeploymentsBySiteId(it1) }
-                    val edgeDeployments = locate.serverId?.let { it1 -> edgeDeploymentDb.getDeploymentsBySiteId(it1) }
+                    val deployments = locate.serverId?.let { it1 ->
+                        guardianDeploymentDb.getDeploymentsBySiteId(it1)
+                    }
+                    val edgeDeployments =
+                        locate.serverId?.let { it1 -> edgeDeploymentDb.getDeploymentsBySiteId(it1) }
                     deployments?.forEach { deployment ->
                         guardianDeploymentDb.updateIsActive(deployment.id)
                     }
@@ -401,7 +448,11 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                     val trackingFile = TrackingFile(
                         deploymentId = it.id,
                         siteId = this._locate!!.id,
-                        localPath = GeoJsonUtils.generateGeoJson(this, GeoJsonUtils.generateFileName(it.deployedAt, it.wifiName!!), point).absolutePath
+                        localPath = GeoJsonUtils.generateGeoJson(
+                            this,
+                            GeoJsonUtils.generateFileName(it.deployedAt, it.wifiName!!),
+                            point
+                        ).absolutePath
                     )
                     trackingFileDb.insertOrUpdate(trackingFile)
                 }
@@ -523,7 +574,8 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
             siteLoadingDialog.dismiss()
             siteLoadingDialog = SiteLoadingDialogFragment(text)
         }
-        siteLoadingDialog.show(supportFragmentManager,
+        siteLoadingDialog.show(
+            supportFragmentManager,
             EdgeDeploymentActivity.TAG_SITE_LOADING_DIALOG
         )
     }
@@ -585,9 +637,19 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         toolbar.visibility = View.GONE
     }
 
+    override fun setMenuToolbar(isVisibility: Boolean) {
+        menuAll?.findItem(R.id.MoreView)?.isVisible = isVisibility
+    }
+
     override fun setToolbarTitle() {
         supportActionBar?.apply {
             title = currentCheckName
+        }
+    }
+
+    override fun setToolbarSubtitle(sub: String) {
+        supportActionBar?.apply {
+            subtitle = sub
         }
     }
 
@@ -613,7 +675,15 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
         siteId: Int,
         name: String
     ) {
-        startFragment(DetailDeploymentSiteFragment.newInstance(latitude, longitude, siteId, name, true))
+        startFragment(
+            DetailDeploymentSiteFragment.newInstance(
+                latitude,
+                longitude,
+                siteId,
+                name,
+                true
+            )
+        )
     }
 
     override fun onBackPressed() {
