@@ -146,7 +146,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            android.R.id.home -> finish()
+            android.R.id.home -> backStep()
             R.id.MoreView -> onClickMoreView()
         }
         return super.onOptionsItemSelected(item)
@@ -214,6 +214,7 @@ class GuardianDeploymentActivity : AppCompatActivity(), GuardianDeploymentProtoc
                     super.onBackPressed()
                 }
             }
+            is GuardianRegisterFragment -> setupView()
             is MapPickerFragment -> startFragment(
                 DetailDeploymentSiteFragment.newInstance(
                     latitude,
