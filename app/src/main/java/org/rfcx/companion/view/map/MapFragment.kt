@@ -493,7 +493,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         this.mapboxMap = mapboxMap
         mapboxMap.uiSettings.isAttributionEnabled = false
         mapboxMap.uiSettings.isLogoEnabled = false
-        mapboxMap.uiSettings.isCompassEnabled = false
+        mapboxMap.uiSettings.setCompassMargins(0,1350,900,0)
 
         mainViewModel.fetchProjects()
         mainViewModel.retrieveLocations()
