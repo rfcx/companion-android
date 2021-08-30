@@ -11,7 +11,6 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
-import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.deployment.BaseImageFragment
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 

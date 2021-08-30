@@ -19,7 +19,6 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.view.deployment.AudioMothDeploymentProtocol
-import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.dialog.CompleteFragment
 import java.util.*
 

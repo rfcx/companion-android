@@ -15,7 +15,6 @@ import org.rfcx.companion.connection.socket.SocketManager
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.socket.response.Status
 import org.rfcx.companion.util.Analytics
-import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 import org.rfcx.companion.view.prefs.GuardianPrefsFragment
 import org.rfcx.companion.view.prefs.SyncPreferenceListener

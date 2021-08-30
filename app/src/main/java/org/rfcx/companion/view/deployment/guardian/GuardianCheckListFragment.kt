@@ -13,7 +13,6 @@ import kotlinx.android.synthetic.main.fragment_guardian_checklist.*
 import org.rfcx.companion.R
 import org.rfcx.companion.adapter.CheckListItem
 import org.rfcx.companion.connection.socket.SocketManager
-import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.deployment.CheckListAdapter
 
 class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {

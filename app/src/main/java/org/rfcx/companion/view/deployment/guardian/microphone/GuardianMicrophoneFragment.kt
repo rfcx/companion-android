@@ -20,7 +20,6 @@ import org.rfcx.companion.util.spectrogram.AudioSpectrogramUtils
 import org.rfcx.companion.util.spectrogram.SpectrogramListener
 import org.rfcx.companion.util.spectrogram.toShortArray
 import org.rfcx.companion.util.spectrogram.toSmallChunk
-import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
