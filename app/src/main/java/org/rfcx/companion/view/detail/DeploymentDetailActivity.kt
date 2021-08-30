@@ -14,6 +14,7 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.mapbox.mapboxsdk.Mapbox
@@ -34,15 +35,19 @@ import kotlinx.android.synthetic.main.buttom_sheet_attach_image_layout.view.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.R
+import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.DeploymentImage
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.StatusEvent
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.localdb.DatabaseCallback
+import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.ProjectDb
-import org.rfcx.companion.localdb.DeploymentDb
+import org.rfcx.companion.repo.api.DeviceApiHelper
+import org.rfcx.companion.repo.api.DeviceApiServiceImpl
+import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DownloadImagesWorker
 import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.images.ImageSyncWorker
@@ -53,11 +58,12 @@ import java.io.File
 
 class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (DeploymentImageView) -> Unit {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val deploymentDb by lazy { DeploymentDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
     private val locationGroupDb by lazy { ProjectDb(realm) }
     private val projectDb by lazy { ProjectDb(realm) }
+
+    private lateinit var viewModel: DeploymentDetailViewModel
 
     private lateinit var mapView: MapView
     private lateinit var mapBoxMap: MapboxMap
@@ -81,6 +87,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         super.onCreate(savedInstanceState)
         Mapbox.getInstance(this, getString(R.string.mapbox_token))
         setContentView(R.layout.activity_deployment_detail)
+        setViewModel()
 
         val preferences = Preferences.getInstance(this)
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
@@ -95,7 +102,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
 
         deployment =
             intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
-                ?.let { deploymentDb.getDeploymentById(it) }
+                ?.let { viewModel.getDeploymentById(it) }
 
         setupToolbar()
         setupImageRecycler()
@@ -136,6 +143,17 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         }
     }
 
+    private fun setViewModel() {
+        viewModel = ViewModelProvider(
+            this,
+            ViewModelFactory(
+                application,
+                DeviceApiHelper(DeviceApiServiceImpl()),
+                LocalDataHelper()
+            )
+        ).get(DeploymentDetailViewModel::class.java)
+    }
+
     private fun confirmationDialog() {
         val builder = AlertDialog.Builder(this, R.style.DialogCustom)
         builder.setTitle(getString(R.string.delete_location))
@@ -158,7 +176,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
     private fun onDeleteLocation() {
         showLoading()
         deployment?.let {
-            deploymentDb.deleteDeploymentLocation(it.id, object : DatabaseCallback {
+            viewModel.deleteDeploymentLocation(it.id, object : DatabaseCallback {
                 override fun onSuccess() {
                     DeploymentSyncWorker.enqueue(this@DeploymentDetailActivity)
                     hideLoading()
@@ -252,7 +270,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
 
     private fun forceUpdateDeployment() {
         if (this.deployment != null) {
-            this.deployment = deploymentDb.getDeploymentById(this.deployment!!.id)
+            this.deployment = viewModel.getDeploymentById(this.deployment!!.id)
             this.deployment?.let { it1 ->
                 updateDeploymentDetailView(it1)
                 setLocationOnMap(it1)
