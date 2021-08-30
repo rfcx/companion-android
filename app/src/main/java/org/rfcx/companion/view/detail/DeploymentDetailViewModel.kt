@@ -2,6 +2,8 @@ package org.rfcx.companion.view.detail
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import io.realm.RealmResults
+import org.rfcx.companion.entity.DeploymentImage
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.localdb.DatabaseCallback
 
@@ -16,6 +18,17 @@ class DeploymentDetailViewModel(
 
     fun deleteDeploymentLocation(id: Int, callback: DatabaseCallback) {
         return deploymentDetailRepository.deleteDeploymentLocation(id, callback)
+    }
+
+    fun getAllResultsAsync(deploymentId: Int): RealmResults<DeploymentImage> {
+        return deploymentDetailRepository.getAllResultsAsync(deploymentId)
+    }
+
+    fun insertImage(
+        deployment: Deployment? = null,
+        attachImages: List<String>
+    ) {
+        return deploymentDetailRepository.insertImage(deployment, attachImages)
     }
 
 }

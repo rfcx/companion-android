@@ -42,8 +42,6 @@ import org.rfcx.companion.entity.StatusEvent
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.localdb.DatabaseCallback
-import org.rfcx.companion.localdb.DeploymentDb
-import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
@@ -58,7 +56,6 @@ import java.io.File
 
 class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (DeploymentImageView) -> Unit {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
     private val locationGroupDb by lazy { ProjectDb(realm) }
     private val projectDb by lazy { ProjectDb(realm) }
@@ -302,7 +299,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
 
     private fun observeDeploymentImage(deploymentId: Int) {
         deployImageLiveData =
-            Transformations.map(deploymentImageDb.getAllResultsAsync(deploymentId).asLiveData()) {
+            Transformations.map(viewModel.getAllResultsAsync(deploymentId).asLiveData()) {
                 it
             }
         deployImageLiveData.observeForever(deploymentImageObserve)
@@ -373,7 +370,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         deployImageLiveData.removeObserver(deploymentImageObserve)
         val newImages = deploymentImageAdapter.getNewAttachImage()
         if(newImages.isNotEmpty()) {
-            deploymentImageDb.insertImage(deployment, newImages)
+            viewModel.insertImage(deployment, newImages)
             ImageSyncWorker.enqueue(this)
         }
     }

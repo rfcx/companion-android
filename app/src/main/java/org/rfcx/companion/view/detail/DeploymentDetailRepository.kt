@@ -1,5 +1,7 @@
 package org.rfcx.companion.view.detail
 
+import io.realm.RealmResults
+import org.rfcx.companion.entity.DeploymentImage
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.repo.api.DeviceApiHelper
@@ -15,5 +17,16 @@ class DeploymentDetailRepository(
 
     fun deleteDeploymentLocation(id: Int, callback: DatabaseCallback) {
         return localDataHelper.getDeploymentLocalDb().deleteDeploymentLocation(id, callback)
+    }
+
+    fun getAllResultsAsync(deploymentId: Int): RealmResults<DeploymentImage> {
+        return localDataHelper.getDeploymentImageLocalDb().getAllResultsAsync(deploymentId)
+    }
+
+    fun insertImage(
+        deployment: Deployment? = null,
+        attachImages: List<String>
+    ) {
+        return localDataHelper.getDeploymentImageLocalDb().insertImage(deployment, attachImages)
     }
 }
