@@ -2,6 +2,7 @@ package org.rfcx.companion.view.detail
 
 import io.realm.RealmResults
 import org.rfcx.companion.entity.DeploymentImage
+import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.repo.api.DeviceApiHelper
@@ -27,6 +28,14 @@ class DeploymentDetailRepository(
         deployment: Deployment? = null,
         attachImages: List<String>
     ) {
-        return localDataHelper.getDeploymentImageLocalDb().insertImage(deployment, attachImages)
+        localDataHelper.getDeploymentImageLocalDb().insertImage(deployment, attachImages)
+    }
+
+    fun isExisted(name: String?): Boolean {
+        return localDataHelper.getProjectLocalDb().isExisted(name)
+    }
+
+    fun getProjectById(id: Int): Project? {
+        return localDataHelper.getProjectLocalDb().getProjectById(id)
     }
 }

@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import io.realm.RealmResults
 import org.rfcx.companion.entity.DeploymentImage
+import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.localdb.DatabaseCallback
 
@@ -28,7 +29,14 @@ class DeploymentDetailViewModel(
         deployment: Deployment? = null,
         attachImages: List<String>
     ) {
-        return deploymentDetailRepository.insertImage(deployment, attachImages)
+        deploymentDetailRepository.insertImage(deployment, attachImages)
     }
 
+    fun isExisted(name: String?): Boolean {
+        return deploymentDetailRepository.isExisted(name)
+    }
+
+    fun getProjectById(id: Int): Project? {
+        return deploymentDetailRepository.getProjectById(id)
+    }
 }
