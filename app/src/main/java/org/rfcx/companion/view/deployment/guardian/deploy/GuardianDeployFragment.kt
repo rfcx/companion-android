@@ -17,12 +17,12 @@ import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianDeployFragment : BaseImageFragment() {
 
-    private var deploymentProtocol: BaseDeploymentProtocol? = null
+    private var deploymentProtocol: GuardianDeploymentProtocol? = null
     private val analytics by lazy { context?.let { Analytics(it) } }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        deploymentProtocol = (context as BaseDeploymentProtocol)
+        deploymentProtocol = (context as GuardianDeploymentProtocol)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

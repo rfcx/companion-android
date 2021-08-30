@@ -19,14 +19,12 @@ import org.rfcx.companion.view.deployment.CheckListAdapter
 class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
-    private var baseDeploymentProtocol: BaseDeploymentProtocol? = null
 
     private val checkListRecyclerView by lazy { CheckListAdapter(this) }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         deploymentProtocol = (context as GuardianDeploymentProtocol)
-        baseDeploymentProtocol = (context as BaseDeploymentProtocol)
     }
 
     override fun onCreateView(
@@ -40,7 +38,7 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        baseDeploymentProtocol?.hideToolbar()
+        deploymentProtocol?.hideToolbar()
 
         setGuardianName()
 
@@ -51,7 +49,7 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
 
         checkListRecyclerView.setCheckList(getAllChecks())
         // set passed checks
-        baseDeploymentProtocol?.getPassedChecks()?.forEach { number ->
+        deploymentProtocol?.getPassedChecks()?.forEach { number ->
             checkListRecyclerView.setCheckPassed(number)
         }
 
@@ -83,8 +81,8 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
     }
 
     override fun invoke(number: Int, name: String) {
-        baseDeploymentProtocol?.handleCheckClicked(number)
-        baseDeploymentProtocol?.setCurrentPage(name)
+        deploymentProtocol?.handleCheckClicked(number)
+        deploymentProtocol?.setCurrentPage(name)
     }
 
     private fun getAllChecks(): List<CheckListItem> {
@@ -134,7 +132,7 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
     }
 
     private fun deploy() {
-        baseDeploymentProtocol?.setReadyToDeploy()
+        deploymentProtocol?.setReadyToDeploy()
         SocketManager.stopConnection()
     }
 

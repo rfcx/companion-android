@@ -13,13 +13,13 @@ import org.rfcx.companion.adapter.CheckListItem
 
 class AudioMothCheckListFragment : Fragment(), (Int, String) -> Unit {
 
-    private var deploymentProtocol: BaseDeploymentProtocol? = null
+    private var deploymentProtocol: AudioMothDeploymentProtocol? = null
 
     private val checkListRecyclerView by lazy { CheckListAdapter(this) }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        deploymentProtocol = (context as BaseDeploymentProtocol)
+        deploymentProtocol = (context as AudioMothDeploymentProtocol)
     }
 
     override fun onCreateView(

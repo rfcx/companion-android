@@ -33,7 +33,6 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     private var isTimerPause = false
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
-    private var baseDeploymentProtocol: BaseDeploymentProtocol? = null
     private val microphoneTestUtils by lazy {
         MicrophoneTestUtils()
     }
@@ -45,7 +44,6 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         deploymentProtocol = (context as GuardianDeploymentProtocol)
-        baseDeploymentProtocol = (context as BaseDeploymentProtocol)
     }
 
     override fun onCreateView(
@@ -59,7 +57,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        baseDeploymentProtocol?.let {
+        deploymentProtocol?.let {
             it.showToolbar()
             it.setToolbarTitle()
         }
@@ -110,7 +108,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
 
         finishButton.setOnClickListener {
             analytics?.trackClickNextEvent(Screen.GUARDIAN_MICROPHONE.id)
-            baseDeploymentProtocol?.nextStep()
+            deploymentProtocol?.nextStep()
         }
     }
 

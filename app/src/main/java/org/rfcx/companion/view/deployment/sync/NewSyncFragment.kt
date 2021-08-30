@@ -25,7 +25,6 @@ import java.util.*
 
 class NewSyncFragment : Fragment() {
     private var audioMothDeploymentProtocol: AudioMothDeploymentProtocol? = null
-    private var baseDeploymentProtocol: BaseDeploymentProtocol? = null
     private lateinit var switchAnimation: AnimationDrawable
     private lateinit var flashingRedAnimation: AnimationDrawable
     private val analytics by lazy { context?.let { Analytics(it) } }
@@ -34,7 +33,6 @@ class NewSyncFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         audioMothDeploymentProtocol = (context as AudioMothDeploymentProtocol)
-        baseDeploymentProtocol = (context as BaseDeploymentProtocol)
     }
 
     override fun onCreateView(
@@ -58,7 +56,7 @@ class NewSyncFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        baseDeploymentProtocol?.let {
+        audioMothDeploymentProtocol?.let {
             it.showToolbar()
             it.setCurrentPage(requireContext().resources.getStringArray(R.array.edge_setup_checks)[1])
             it.setToolbarTitle()

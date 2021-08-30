@@ -22,7 +22,7 @@ import org.rfcx.companion.view.prefs.SyncPreferenceListener
 
 class GuardianAdvancedFragment : Fragment() {
 
-    private var deploymentProtocol: BaseDeploymentProtocol? = null
+    private var deploymentProtocol: GuardianDeploymentProtocol? = null
     private var syncPreferenceListener: SyncPreferenceListener? = null
 
     private var switchPrefs: List<String>? = null
@@ -30,7 +30,7 @@ class GuardianAdvancedFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        deploymentProtocol = context as BaseDeploymentProtocol
+        deploymentProtocol = context as GuardianDeploymentProtocol
         syncPreferenceListener = context as SyncPreferenceListener
         setPredefinedConfiguration(context)
     }

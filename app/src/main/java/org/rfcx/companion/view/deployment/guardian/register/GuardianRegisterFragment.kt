@@ -19,13 +19,13 @@ import java.net.Socket
 
 class GuardianRegisterFragment : Fragment() {
 
-    private var deploymentProtocol: BaseDeploymentProtocol? = null
+    private var deploymentProtocol: GuardianDeploymentProtocol? = null
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        deploymentProtocol = (context as BaseDeploymentProtocol)
+        deploymentProtocol = (context as GuardianDeploymentProtocol)
     }
 
     override fun onCreateView(

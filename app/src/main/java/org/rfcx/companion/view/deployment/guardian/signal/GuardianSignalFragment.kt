@@ -28,14 +28,12 @@ class GuardianSignalFragment : Fragment() {
     private var isSignalTesting = false
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
-    private var baseDeploymentProtocol: BaseDeploymentProtocol? = null
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         deploymentProtocol = (context as GuardianDeploymentProtocol)
-        baseDeploymentProtocol = (context as BaseDeploymentProtocol)
     }
 
     override fun onCreateView(
@@ -49,7 +47,7 @@ class GuardianSignalFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        baseDeploymentProtocol?.let {
+        deploymentProtocol?.let {
             it.showToolbar()
             it.setToolbarTitle()
         }
@@ -59,7 +57,7 @@ class GuardianSignalFragment : Fragment() {
 
         finishButton.setOnClickListener {
             analytics?.trackClickNextEvent(Screen.GUARDIAN_SIGNAL.id)
-            baseDeploymentProtocol?.nextStep()
+            deploymentProtocol?.nextStep()
         }
     }
 

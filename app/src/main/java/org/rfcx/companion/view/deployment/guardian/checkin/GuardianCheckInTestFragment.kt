@@ -15,15 +15,11 @@ import org.rfcx.companion.entity.socket.response.CheckIn
 import org.rfcx.companion.entity.socket.response.CheckInTestResponse
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.TimeAgo
-import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
-import java.net.Socket
-import java.util.*
 
 class GuardianCheckInTestFragment : Fragment() {
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
-    private var baseDeploymentProtocol: BaseDeploymentProtocol? = null
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
@@ -33,7 +29,6 @@ class GuardianCheckInTestFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         deploymentProtocol = (context as GuardianDeploymentProtocol)
-        baseDeploymentProtocol = (context as BaseDeploymentProtocol)
     }
 
     override fun onCreateView(
@@ -47,7 +42,7 @@ class GuardianCheckInTestFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        baseDeploymentProtocol?.let {
+        deploymentProtocol?.let {
             it.showToolbar()
             it.setToolbarTitle()
         }
@@ -56,7 +51,7 @@ class GuardianCheckInTestFragment : Fragment() {
 
         checkInFinishButton.setOnClickListener {
             analytics?.trackClickNextEvent(Screen.GUARDIAN_CHECKIN_TEST.id)
-            baseDeploymentProtocol?.nextStep()
+            deploymentProtocol?.nextStep()
         }
     }
 

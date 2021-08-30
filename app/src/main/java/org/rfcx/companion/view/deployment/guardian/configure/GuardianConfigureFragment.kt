@@ -26,7 +26,6 @@ import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 class GuardianConfigureFragment : Fragment() {
     private val analytics by lazy { context?.let { Analytics(it) } }
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
-    private var baseDeploymentProtocol: BaseDeploymentProtocol? = null
 
     // Predefined configuration values
     private var sampleRateEntries: Array<String>? = null
@@ -46,7 +45,6 @@ class GuardianConfigureFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         deploymentProtocol = context as GuardianDeploymentProtocol
-        baseDeploymentProtocol = (context as BaseDeploymentProtocol)
         setPredefinedConfiguration(context)
     }
 
@@ -61,7 +59,7 @@ class GuardianConfigureFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        baseDeploymentProtocol?.let {
+        deploymentProtocol?.let {
             it.showToolbar()
             it.setToolbarTitle()
         }
@@ -101,7 +99,7 @@ class GuardianConfigureFragment : Fragment() {
         SocketManager.syncConfiguration.observe(viewLifecycleOwner, Observer {
             requireActivity().runOnUiThread {
                 if (it.sync.status == Status.SUCCESS.value) {
-                    baseDeploymentProtocol?.nextStep()
+                    deploymentProtocol?.nextStep()
                 }
             }
         })
