@@ -16,12 +16,11 @@ import org.rfcx.companion.entity.socket.response.CheckInTestResponse
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.TimeAgo
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
-import java.net.Socket
-import java.util.*
 
 class GuardianCheckInTestFragment : Fragment() {
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
+
     private val analytics by lazy { context?.let { Analytics(it) } }
 
     private var state = ""

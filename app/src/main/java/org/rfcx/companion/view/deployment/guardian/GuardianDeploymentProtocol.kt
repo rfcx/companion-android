@@ -1,8 +1,8 @@
 package org.rfcx.companion.view.deployment.guardian
 
 import org.rfcx.companion.connection.wifi.WifiHotspotManager
-import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import org.rfcx.companion.entity.guardian.Deployment
+import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 
 interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
