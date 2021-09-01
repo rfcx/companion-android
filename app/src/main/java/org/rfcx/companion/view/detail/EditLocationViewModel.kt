@@ -3,6 +3,7 @@ package org.rfcx.companion.view.detail
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import org.rfcx.companion.entity.LocationGroup
+import org.rfcx.companion.entity.Project
 import org.rfcx.companion.localdb.DatabaseCallback
 
 class EditLocationViewModel(
@@ -30,5 +31,13 @@ class EditLocationViewModel(
 
     fun editProject(id: Int, locationGroup: LocationGroup, callback: DatabaseCallback) {
         return editLocationRepository.editProject(id, locationGroup, callback)
+    }
+
+    fun isExisted(name: String?): Boolean {
+        return editLocationRepository.isExisted(name)
+    }
+
+    fun getProjectByName(name: String): Project? {
+        return editLocationRepository.getProjectByName(name)
     }
 }

@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_edit_location.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
@@ -16,12 +15,10 @@ import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.toLocationGroup
 import org.rfcx.companion.localdb.DatabaseCallback
-import org.rfcx.companion.localdb.ProjectDb
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DeploymentSyncWorker
-import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.showCommonDialog
 import org.rfcx.companion.view.BaseActivity
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
@@ -30,10 +27,6 @@ import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 
 class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActivityListener {
     private lateinit var viewModel: EditLocationViewModel
-
-    // manager database
-    private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val locationGroupDb by lazy { ProjectDb(realm) }
 
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
@@ -81,7 +74,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
                     locationGroup =
                         data?.getSerializableExtra(EXTRA_LOCATION_GROUP) as LocationGroup
                     locationGroup?.let {
-                        val isGroupExisted = locationGroupDb.isExisted(locationGroup?.name)
+                        val isGroupExisted = viewModel.isExisted(locationGroup?.name)
                         groupName = if (isGroupExisted) {
                             it.name
                         } else {
@@ -91,7 +84,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
                 }
                 LocationGroupActivity.RESULT_DELETE -> {
                     val group = data?.getStringExtra(LocationGroupActivity.EXTRA_GROUP)
-                    val isGroupExisted = locationGroupDb.isExisted(group)
+                    val isGroupExisted = viewModel.isExisted(group)
                     groupName = if (isGroupExisted) {
                         group
                     } else {
@@ -192,7 +185,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
     override fun getLocationGroupName(): String = groupName ?: getString(R.string.none)
 
     override fun getLocationGroup(name: String): LocationGroup {
-        return locationGroupDb.getProjectByName(name)?.toLocationGroup() ?: LocationGroup()
+        return viewModel.getProjectByName(name)?.toLocationGroup() ?: LocationGroup()
     }
 
     override fun startLocationGroupPage() {

@@ -1,6 +1,7 @@
 package org.rfcx.companion.view.detail
 
 import org.rfcx.companion.entity.LocationGroup
+import org.rfcx.companion.entity.Project
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.local.LocalDataHelper
@@ -24,5 +25,13 @@ class EditLocationRepository(
 
     fun editProject(id: Int, locationGroup: LocationGroup, callback: DatabaseCallback) {
         return localDataHelper.getDeploymentLocalDb().editProject(id, locationGroup, callback)
+    }
+
+    fun isExisted(name: String?): Boolean {
+        return localDataHelper.getProjectLocalDb().isExisted(name)
+    }
+
+    fun getProjectByName(name: String): Project? {
+        return localDataHelper.getProjectLocalDb().getProjectByName(name)
     }
 }
