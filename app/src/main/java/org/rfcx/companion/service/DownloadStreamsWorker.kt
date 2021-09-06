@@ -7,11 +7,9 @@ import androidx.work.*
 import io.realm.Realm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.response.convertToDeploymentResponse
-import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.LocateDb
-import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
+import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.getIdToken
@@ -54,16 +52,13 @@ class DownloadStreamsWorker(val context: Context, params: WorkerParameters) :
             val resultBody = result.body()
             resultBody?.let {
                 val streamDb = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
-                val edgeDeploymentDb = EdgeDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
-                val guardianDeploymentDb = GuardianDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
+                val deploymentDb = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
                 count += resultBody.size
                 streamDb.insertOrUpdate(resultBody)
 
                 //insert deployments
-                val edgeDeploymentStreams = resultBody.filter { st -> st.deployment != null && st.deployment?.deploymentType == Device.AUDIOMOTH.value }
-                val guardianDeploymentStreams = resultBody.filter { st -> st.deployment != null && st.deployment?.deploymentType == Device.GUARDIAN.value }
-                edgeDeploymentDb.insertOrUpdate(edgeDeploymentStreams.map { st -> st.convertToDeploymentResponse() })
-                guardianDeploymentDb.insertOrUpdate(guardianDeploymentStreams.map { st -> st.convertToDeploymentResponse() })
+                val deploymentStreams = resultBody.filter { st -> st.deployment != null}
+                deploymentDb.insertOrUpdate(deploymentStreams.map { st -> st.convertToDeploymentResponse() })
 
                 if (it.size == SITES_LIMIT_GETTING) {
                     if (streamDb.getMaxUpdatedAt() == maxUpdatedAt) {

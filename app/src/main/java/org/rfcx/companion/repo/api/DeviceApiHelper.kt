@@ -24,5 +24,7 @@ class DeviceApiHelper(private val deviceApiService: DeviceApiService) {
         token: String,
         id: String
     ) = deviceApiService.getStreamAssets(token, id)
+
+    fun userTouch(token: String) = deviceApiService.userTouch(token)
 }
 

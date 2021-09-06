@@ -10,7 +10,10 @@ import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.view.profile.guardiansoftware.repository.GuardianSoftwareRepository
 import org.rfcx.companion.view.profile.guardiansoftware.viewmodel.GuardianSoftwareViewModel
-import org.rfcx.companion.view.profile.offlinemap.OfflineMapActivity
+import org.rfcx.companion.view.deployment.AudioMothDeploymentRepository
+import org.rfcx.companion.view.deployment.AudioMothDeploymentViewModel
+import org.rfcx.companion.view.LoginRepository
+import org.rfcx.companion.view.LoginViewModel
 import org.rfcx.companion.view.profile.offlinemap.ProjectOfflineMapRepository
 import org.rfcx.companion.view.profile.offlinemap.ProjectOfflineMapViewModel
 import org.rfcx.companion.view.project.repository.ProjectSelectRepository
@@ -41,6 +44,12 @@ class ViewModelFactory(
             }
             modelClass.isAssignableFrom(GuardianSoftwareViewModel::class.java) -> {
                 return GuardianSoftwareViewModel(application, GuardianSoftwareRepository(coreApiHelper)) as T
+            }
+            modelClass.isAssignableFrom(LoginViewModel::class.java) -> {
+                return LoginViewModel(application, LoginRepository(deviceApiHelper, localDataHelper)) as T
+            }
+            modelClass.isAssignableFrom(AudioMothDeploymentViewModel::class.java) -> {
+                return AudioMothDeploymentViewModel(application, AudioMothDeploymentRepository(deviceApiHelper, localDataHelper)) as T
             }
             else -> throw IllegalArgumentException("Unknown class name")
         }

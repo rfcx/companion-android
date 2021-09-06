@@ -9,23 +9,20 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.work.WorkInfo
-import io.realm.Realm
-import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.fragment_set_deployment_site.*
-import kotlinx.android.synthetic.main.fragment_set_deployment_site.siteSwipeRefreshView
 import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.R
+import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.Locate
-import org.rfcx.companion.localdb.LocateDb
-import org.rfcx.companion.localdb.ProjectDb
-import org.rfcx.companion.service.DeploymentSyncWorker
+import org.rfcx.companion.repo.api.DeviceApiHelper
+import org.rfcx.companion.repo.api.DeviceApiServiceImpl
+import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
+import org.rfcx.companion.view.deployment.AudioMothDeploymentViewModel
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.map.SiteAdapter
@@ -33,6 +30,7 @@ import org.rfcx.companion.view.map.SyncInfo
 
 class SetDeploymentSiteFragment : Fragment(),
         (Locate, Boolean) -> Unit {
+    private lateinit var audioMothDeploymentViewModel: AudioMothDeploymentViewModel
 
     // Protocol
     private var deploymentProtocol: BaseDeploymentProtocol? = null
@@ -41,32 +39,9 @@ class SetDeploymentSiteFragment : Fragment(),
     private val existedSiteAdapter by lazy { SiteAdapter(this) }
     private var sitesAdapter = arrayListOf<SiteWithLastDeploymentItem>()
 
-    // Local database
-    val realm: Realm = Realm.getInstance(RealmHelper.migrationConfig())
-    private val locateDb by lazy { LocateDb(realm) }
-    private val projectDb by lazy { ProjectDb(realm) }
-
     private val preferences by lazy { Preferences.getInstance(requireContext()) }
 
-    // Local LiveData
-    private lateinit var siteLiveData: LiveData<List<Locate>>
-    private val siteObserve = Observer<List<Locate>> {
-        setupView()
-    }
-
     private var lastSyncingInfo: SyncInfo? = null
-    private lateinit var downloadStreamsWorkInfoLiveData: LiveData<List<WorkInfo>>
-    private val downloadStreamsWorkInfoObserve = Observer<List<WorkInfo>> {
-        val currentWorkStatus = it?.getOrNull(0)
-        if (currentWorkStatus != null) {
-            when (currentWorkStatus.state) {
-                WorkInfo.State.RUNNING -> updateSyncInfo(SyncInfo.Uploading, true)
-                WorkInfo.State.SUCCEEDED -> updateSyncInfo(SyncInfo.Uploaded, true)
-                else -> updateSyncInfo(isSites = true)
-            }
-        }
-    }
-
     private var searchItem: MenuItem? = null
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
@@ -80,6 +55,18 @@ class SetDeploymentSiteFragment : Fragment(),
         super.onCreate(savedInstanceState)
         initIntent()
     }
+
+    private fun setViewModel() {
+        audioMothDeploymentViewModel = ViewModelProvider(
+            this,
+            ViewModelFactory(
+                requireActivity().application,
+                DeviceApiHelper(DeviceApiServiceImpl()),
+                LocalDataHelper()
+            )
+        ).get(AudioMothDeploymentViewModel::class.java)
+    }
+
 
     private fun initIntent() {
         arguments?.let {
@@ -98,10 +85,10 @@ class SetDeploymentSiteFragment : Fragment(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setViewModel()
+        setObserver()
         setupAdapter()
         setupTopBar()
-        fetchJobSyncing()
-        setLiveData()
         setEditText()
         setSwipeSite()
     }
@@ -122,12 +109,6 @@ class SetDeploymentSiteFragment : Fragment(),
                 statusSiteView.onShowWithDelayed(getString(R.string.format_deploy_waiting_network))
             }
         }
-    }
-
-    private fun fetchJobSyncing() {
-        context ?: return
-        downloadStreamsWorkInfoLiveData = DownloadStreamsWorker.workInfos(requireContext())
-        downloadStreamsWorkInfoLiveData.observeForever(downloadStreamsWorkInfoObserve)
     }
 
     private fun setEditText() {
@@ -207,23 +188,25 @@ class SetDeploymentSiteFragment : Fragment(),
         }
     }
 
-    private fun setLiveData() {
-        val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
-        val project = projectDb.getProjectById(projectId)
-        val projectName = project?.name ?: getString(R.string.none)
-        siteLiveData = Transformations.map(
-            locateDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()
-        ) {
-            it
-        }
-        siteLiveData.observeForever(siteObserve)
+    private fun setObserver() {
+        audioMothDeploymentViewModel.getSites().observe(viewLifecycleOwner, Observer {
+            setupView()
+        })
+
+        audioMothDeploymentViewModel.downloadStreamsWork().observe(viewLifecycleOwner, Observer {
+            when (it.status) {
+                Status.LOADING -> updateSyncInfo(SyncInfo.Uploading, true)
+                Status.SUCCESS -> updateSyncInfo(SyncInfo.Uploaded, true)
+                Status.ERROR -> updateSyncInfo(isSites = true)
+            }
+        })
     }
 
     private fun setSwipeSite() {
         siteSwipeRefreshView.apply {
             setOnRefreshListener {
                 val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
-                val project = projectDb.getProjectById(projectId)
+                val project = audioMothDeploymentViewModel.getProjectById(projectId)
                 project?.serverId?.let {
                     DownloadStreamsWorker.enqueue(context, it)
                 }
@@ -240,8 +223,7 @@ class SetDeploymentSiteFragment : Fragment(),
 
     override fun onDestroy() {
         super.onDestroy()
-        siteLiveData.removeObserver(siteObserve)
-        downloadStreamsWorkInfoLiveData.removeObserver(downloadStreamsWorkInfoObserve)
+        audioMothDeploymentViewModel.onDestroy()
     }
 
     companion object {

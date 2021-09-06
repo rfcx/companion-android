@@ -20,6 +20,7 @@ import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 class GuardianCheckInTestFragment : Fragment() {
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
+
     private val analytics by lazy { context?.let { Analytics(it) } }
 
     private var state = ""

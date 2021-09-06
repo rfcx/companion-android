@@ -18,12 +18,12 @@ import kotlinx.android.synthetic.main.fragment_new_sync.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
-import org.rfcx.companion.view.deployment.EdgeDeploymentProtocol
+import org.rfcx.companion.view.deployment.AudioMothDeploymentProtocol
 import org.rfcx.companion.view.dialog.CompleteFragment
 import java.util.*
 
 class NewSyncFragment : Fragment() {
-    private var edgeDeploymentProtocol: EdgeDeploymentProtocol? = null
+    private var audioMothDeploymentProtocol: AudioMothDeploymentProtocol? = null
     private lateinit var switchAnimation: AnimationDrawable
     private lateinit var flashingRedAnimation: AnimationDrawable
     private val analytics by lazy { context?.let { Analytics(it) } }
@@ -31,7 +31,7 @@ class NewSyncFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        edgeDeploymentProtocol = (context as EdgeDeploymentProtocol)
+        audioMothDeploymentProtocol = (context as AudioMothDeploymentProtocol)
     }
 
     override fun onCreateView(
@@ -44,7 +44,7 @@ class NewSyncFragment : Fragment() {
 
     override fun onDetach() {
         super.onDetach()
-        edgeDeploymentProtocol?.stopPlaySound()
+        audioMothDeploymentProtocol?.stopPlaySound()
     }
 
     override fun onResume() {
@@ -55,7 +55,7 @@ class NewSyncFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        edgeDeploymentProtocol?.let {
+        audioMothDeploymentProtocol?.let {
             it.showToolbar()
             it.setCurrentPage(requireContext().resources.getStringArray(R.array.edge_setup_checks)[1])
             it.setToolbarTitle()
@@ -84,12 +84,12 @@ class NewSyncFragment : Fragment() {
 
         beginSyncButton.setOnClickListener {
             analytics?.trackPlayToneEvent()
-            edgeDeploymentProtocol?.playTone(100000)
+            audioMothDeploymentProtocol?.playTone(100000)
             setStep(2)
         }
         notHearButton.setOnClickListener {
             analytics?.trackRetryPlayToneEvent()
-            edgeDeploymentProtocol?.stopPlaySound()
+            audioMothDeploymentProtocol?.stopPlaySound()
             setStep(1)
         }
         hearButton.setOnClickListener {
@@ -97,7 +97,7 @@ class NewSyncFragment : Fragment() {
         }
         notSwitchButton.setOnClickListener {
             analytics?.trackRetryPlayToneEvent()
-            edgeDeploymentProtocol?.stopPlaySound()
+            audioMothDeploymentProtocol?.stopPlaySound()
             setStep(1)
         }
         switchButton.setOnClickListener {
@@ -105,12 +105,12 @@ class NewSyncFragment : Fragment() {
         }
         notSeeLightsAudiomothButton.setOnClickListener {
             analytics?.trackRetryPlayToneEvent()
-            edgeDeploymentProtocol?.stopPlaySound()
+            audioMothDeploymentProtocol?.stopPlaySound()
             setStep(1)
         }
         seeLightsAudiomothButton.setOnClickListener {
             analytics?.trackPlayToneCompletedEvent()
-            edgeDeploymentProtocol?.stopPlaySound()
+            audioMothDeploymentProtocol?.stopPlaySound()
             setStep(5)
         }
         syncAudioMothButton.setOnClickListener {
@@ -119,19 +119,19 @@ class NewSyncFragment : Fragment() {
             syncAudioMothButton.text = getString(R.string.sync_in_progress)
             syncAudioMothFinishButton.visibility = View.GONE
             analytics?.trackPlaySyncToneEvent()
-            edgeDeploymentProtocol?.playSyncSound()
+            audioMothDeploymentProtocol?.playSyncSound()
         }
         syncAudioMothFinishButton.setOnClickListener {
             setStep(6)
         }
         notConfirmLightButton.setOnClickListener {
             analytics?.trackRetryPlayToneEvent()
-            edgeDeploymentProtocol?.stopPlaySound()
+            audioMothDeploymentProtocol?.stopPlaySound()
             setStep(1)
         }
         confirmLightButton.setOnClickListener {
             analytics?.trackPlaySyncToneCompletedEvent()
-            edgeDeploymentProtocol?.stopPlaySound()
+            audioMothDeploymentProtocol?.stopPlaySound()
             showComplete()
         }
     }
