@@ -273,7 +273,7 @@
         android:textColor="@color/text_secondary"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/view1" />
+        app:layout_constraintTop_toBottomOf="@id/softwareTextView" />
 
     <TextView
         android:id="@+id/feedbackTextView"

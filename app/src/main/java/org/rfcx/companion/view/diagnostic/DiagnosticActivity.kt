@@ -99,13 +99,18 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
 
     private fun getIntentExtra() {
         isConnected = intent.extras?.getBoolean(IS_CONNECTED)
-        deployment = intent.extras?.getSerializable(DEPLOYMENT) as Deployment
-        lat = deployment?.stream?.latitude ?: 0.0
-        long = deployment?.stream?.longitude ?: 0.0
-        altitude = deployment?.stream?.altitude ?: 0.0
-        locationName = deployment?.stream?.name ?: ""
-        deploymentServerId = deployment?.serverId ?: ""
-        configuration = deployment?.configuration ?: GuardianConfiguration()
+        val deploymentId = intent.extras?.getInt(DEPLOYMENT)
+        deploymentId?.let { id ->
+            deploymentDb.getDeploymentById(id)?.let { dp ->
+                deployment = dp
+                lat = dp.stream?.latitude ?: 0.0
+                long = dp.stream?.longitude ?: 0.0
+                altitude = dp.stream?.altitude ?: 0.0
+                locationName = dp.stream?.name ?: ""
+                deploymentServerId = dp.serverId ?: ""
+                configuration = dp.configuration ?: GuardianConfiguration()
+            }
+        }
     }
 
     private fun setupAdvancedSetting() {
@@ -390,10 +395,10 @@ class DiagnosticActivity : AppCompatActivity(), SyncPreferenceListener, (Deploym
             context.startActivity(intent)
         }
 
-        fun startActivity(context: Context, deployment: Deployment, isConnected: Boolean) {
+        fun startActivity(context: Context, deploymentID: Int, isConnected: Boolean) {
             val intent = Intent(context, DiagnosticActivity::class.java)
             intent.putExtra(IS_CONNECTED, isConnected)
-            intent.putExtra(DEPLOYMENT, deployment)
+            intent.putExtra(DEPLOYMENT, deploymentID)
             context.startActivity(intent)
         }
     }

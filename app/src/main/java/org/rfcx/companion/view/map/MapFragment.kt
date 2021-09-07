@@ -849,10 +849,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                 if (device == Device.AUDIOMOTH.value) {
                     DeploymentDetailActivity.startActivity(it, deploymentId.toInt())
                 } else {
-                    val deployment = mainViewModel.getDeploymentById(deploymentId.toInt())
-                    deployment?.let { dp ->
-                        DiagnosticActivity.startActivity(it, dp, false)
-                    }
+                    DiagnosticActivity.startActivity(it, deploymentId.toInt(), false)
                 }
                 analytics?.trackSeeDetailEvent()
             }
