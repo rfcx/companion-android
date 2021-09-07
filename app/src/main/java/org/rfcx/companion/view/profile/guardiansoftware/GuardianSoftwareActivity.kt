@@ -234,6 +234,15 @@ class GuardianSoftwareActivity : AppCompatActivity() {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
+    }
+
+    override fun onBackPressed() {
+        finish()
+    }
+
     companion object {
 
         private const val ADMIN = "admin"
