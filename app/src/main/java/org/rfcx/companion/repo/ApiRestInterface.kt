@@ -4,6 +4,7 @@ import org.rfcx.companion.entity.UserTouchResponse
 import org.rfcx.companion.entity.request.GuardianRegisterRequest
 import org.rfcx.companion.entity.response.ProjectByIdResponse
 import org.rfcx.companion.entity.response.GuardianRegisterResponse
+import org.rfcx.companion.entity.response.GuardianSoftwareResponse
 import retrofit2.Call
 import retrofit2.http.*
 

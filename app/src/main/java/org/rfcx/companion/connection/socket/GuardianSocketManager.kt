@@ -43,9 +43,9 @@ object GuardianSocketManager {
 
     private var audioChunks = arrayListOf<String>()
     private var microphoneTestUtils: MicrophoneTestUtils? = null
+    private var tempAudio = ByteArray(0)
     private var isTestingFirstTime = true
 
-    private var tempAudio = ByteArray(0)
 
     val connection = MutableLiveData<ConnectionResponse>()
     val diagnostic = MutableLiveData<DiagnosticResponse>()

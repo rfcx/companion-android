@@ -3,6 +3,7 @@ package org.rfcx.companion.repo
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.rfcx.companion.BuildConfig
+import org.rfcx.companion.repo.api.CoreApiService
 import org.rfcx.companion.repo.api.DeviceApiService
 import org.rfcx.companion.util.insert
 import retrofit2.Retrofit
@@ -11,6 +12,7 @@ import java.util.concurrent.TimeUnit
 
 class ApiManager {
     var apiRest: ApiRestInterface
+    var coreApi: CoreApiService
     var apiFirebaseAuth: FirebaseAuthInterface
     private var deviceApi: DeviceApiInterface
     private var deviceApi2: DeviceApiService
@@ -27,6 +29,7 @@ class ApiManager {
 
     init {
         apiRest = setRetrofitBaseUrl(BuildConfig.DEPLOY_DOMAIN).create(ApiRestInterface::class.java)
+        coreApi = setRetrofitBaseUrl(BuildConfig.DEPLOY_DOMAIN).create(CoreApiService::class.java)
         apiFirebaseAuth =
             setRetrofitBaseUrl(BuildConfig.FIREBASE_AUTH_DOMAIN).create(FirebaseAuthInterface::class.java)
         deviceApi =
@@ -34,6 +37,8 @@ class ApiManager {
         deviceApi2 =
             setRetrofitBaseUrl(BuildConfig.DEVICE_API_DOMAIN).create(DeviceApiService::class.java)
     }
+
+    fun getCoreApi(): ApiRestInterface = apiRest
 
     fun getDeviceApi(): DeviceApiInterface = deviceApi
 
@@ -52,6 +57,7 @@ class ApiManager {
             setRetrofitBaseUrl(url).create(ApiRestInterface::class.java)
         }
     }
+
     fun getDeviceApi2(): DeviceApiService = deviceApi2
 
     private fun setRetrofitBaseUrl(baseUrl: String): Retrofit {

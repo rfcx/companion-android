@@ -3,7 +3,7 @@ package org.rfcx.companion
 import android.content.Context
 import io.realm.RealmResults
 import org.rfcx.companion.entity.*
-import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.ProjectByIdResponse
 import org.rfcx.companion.entity.response.ProjectResponse
@@ -48,12 +48,8 @@ class MainRepository(
         return localDataHelper.getLocateLocalDb().getAllResultsAsync()
     }
 
-    fun getAllDeploymentLocateResultsAsync(): RealmResults<EdgeDeployment> {
+    fun getAllDeploymentLocateResultsAsync(): RealmResults<Deployment> {
         return localDataHelper.getDeploymentLocalDb().getAllResultsAsync()
-    }
-
-    fun getAllGuardianDeploymentLocateResultsAsync(): RealmResults<GuardianDeployment> {
-        return localDataHelper.getGuardianDeploymentLocalDb().getAllResultsAsync()
     }
 
     fun saveProjectToLocal(projectResponse: ProjectResponse) {
@@ -68,12 +64,16 @@ class MainRepository(
         return localDataHelper.getProjectLocalDb().getProjectById(id)
     }
 
+    fun getProjectByServerId(id: String): Project? {
+        return localDataHelper.getProjectLocalDb().getProjectByServerId(id)
+    }
+
     fun getDeploymentUnsentCount(): Int {
         return localDataHelper.getDeploymentLocalDb().unsentCount().toInt()
     }
 
-    fun getGuardianDeploymentById(id: Int): GuardianDeployment? {
-        return localDataHelper.getGuardianDeploymentLocalDb().getDeploymentById(id)
+    fun getDeploymentById(id: Int): Deployment? {
+        return localDataHelper.getDeploymentLocalDb().getDeploymentById(id)
     }
 
     fun getLocateByName(name: String): Locate? {

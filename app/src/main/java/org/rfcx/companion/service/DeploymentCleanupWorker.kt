@@ -5,9 +5,8 @@ import android.util.Log
 import androidx.work.*
 import io.realm.Realm
 import org.rfcx.companion.localdb.DeploymentImageDb
-import org.rfcx.companion.localdb.EdgeDeploymentDb
 import org.rfcx.companion.localdb.TrackingFileDb
-import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
+import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.RealmHelper
 import java.util.concurrent.TimeUnit
@@ -25,23 +24,11 @@ class DeploymentCleanupWorker(val context: Context, params: WorkerParameters) :
 
     private fun resendIfRequired() {
         val realm = Realm.getInstance(RealmHelper.migrationConfig())
-        val edgeDeploymentDb = EdgeDeploymentDb(realm)
-        val unsent = edgeDeploymentDb.unsentCount()
-        Log.d(TAG, "resendIfRequired: found $unsent unsent")
-
-        // In case any failed sending, we can resend (same ranger app)
-        edgeDeploymentDb.unlockSending()
-        if (unsent > 0) {
-            if (DeploymentSyncWorker.isRunning() == DeploymentSyncState.FINISH) {
-                DeploymentSyncWorker.enqueue(context)
-            }
-        }
-
-        val guardianDeploymentDb = GuardianDeploymentDb(realm)
-        val guardianDeploymentUnsent = guardianDeploymentDb.unsentCount()
-        guardianDeploymentDb.unlockSending()
-        if (guardianDeploymentUnsent > 0) {
-            GuardianDeploymentSyncWorker.enqueue(context)
+        val deploymentDb = DeploymentDb(realm)
+        val deploymentUnsent = deploymentDb.unsentCount()
+        deploymentDb.unlockSending()
+        if (deploymentUnsent > 0) {
+            DeploymentSyncWorker.enqueue(context)
         }
 
         val imageDb = DeploymentImageDb(realm)

@@ -11,15 +11,15 @@ import kotlinx.android.synthetic.main.fragment_edge_checklist.*
 import org.rfcx.companion.R
 import org.rfcx.companion.adapter.CheckListItem
 
-class EdgeCheckListFragment : Fragment(), (Int, String) -> Unit {
+class AudioMothCheckListFragment : Fragment(), (Int, String) -> Unit {
 
-    private var deploymentProtocol: EdgeDeploymentProtocol? = null
+    private var deploymentProtocol: AudioMothDeploymentProtocol? = null
 
     private val checkListRecyclerView by lazy { CheckListAdapter(this) }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        deploymentProtocol = (context as EdgeDeploymentProtocol)
+        deploymentProtocol = (context as AudioMothDeploymentProtocol)
     }
 
     override fun onCreateView(
@@ -79,8 +79,8 @@ class EdgeCheckListFragment : Fragment(), (Int, String) -> Unit {
     }
 
     companion object {
-        fun newInstance(): EdgeCheckListFragment {
-            return EdgeCheckListFragment()
+        fun newInstance(): AudioMothCheckListFragment {
+            return AudioMothCheckListFragment()
         }
     }
 }

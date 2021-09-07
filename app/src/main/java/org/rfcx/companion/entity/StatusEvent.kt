@@ -1,6 +1,6 @@
 package org.rfcx.companion.entity
 
-enum class Status(val id: String) {
+enum class StatusEvent(val id: String) {
     SUCCESS("success"),
     FAILURE("failure")
 }

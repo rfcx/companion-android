@@ -9,9 +9,8 @@ import org.rfcx.companion.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_SERV
 import org.rfcx.companion.entity.DeploymentImage.Companion.FIELD_DEVICE
 import org.rfcx.companion.entity.DeploymentImage.Companion.FIELD_ID
 import org.rfcx.companion.entity.Device
-import org.rfcx.companion.entity.EdgeDeployment
 import org.rfcx.companion.entity.SyncState
-import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 
 class DeploymentImageDb(private val realm: Realm) {
@@ -106,12 +105,11 @@ class DeploymentImageDb(private val realm: Realm) {
     }
 
     fun insertImage(
-        deployment: EdgeDeployment? = null,
-        guardianDeployment: GuardianDeployment? = null,
+        deployment: Deployment? = null,
         attachImages: List<String>
     ) {
-        if (deployment != null) {
-            val imageCreateAt = deployment.deployedAt
+        deployment?.let { dp ->
+            val imageCreateAt = dp.deployedAt
             realm.executeTransaction {
                 // save attached image to be Deployment Image
                 attachImages.forEach { attachImage ->
@@ -119,33 +117,13 @@ class DeploymentImageDb(private val realm: Realm) {
                         (it.where(DeploymentImage::class.java).max(FIELD_ID)?.toInt() ?: 0) + 1
                     val deploymentImage = DeploymentImage(
                         id = imageId,
-                        deploymentId = deployment.id,
+                        deploymentId = dp.id,
                         localPath = attachImage,
                         createdAt = imageCreateAt,
-                        device = Device.AUDIOMOTH.value,
-                        deploymentServerId = deployment.serverId
+                        device = dp.device ?: "",
+                        deploymentServerId = dp.serverId
                     )
                     it.insertOrUpdate(deploymentImage)
-                }
-            }
-        } else {
-            if (guardianDeployment != null) {
-                val imageCreateAt = guardianDeployment.deployedAt
-                realm.executeTransaction {
-                    // save attached image to be Deployment Image
-                    attachImages.forEach { attachImage ->
-                        val imageId =
-                            (it.where(DeploymentImage::class.java).max(FIELD_ID)?.toInt() ?: 0) + 1
-                        val deploymentImage = DeploymentImage(
-                            id = imageId,
-                            deploymentId = guardianDeployment.id,
-                            localPath = attachImage,
-                            createdAt = imageCreateAt,
-                            device = Device.GUARDIAN.value,
-                            deploymentServerId = guardianDeployment.serverId
-                        )
-                        it.insertOrUpdate(deploymentImage)
-                    }
                 }
             }
         }
