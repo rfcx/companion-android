@@ -36,6 +36,8 @@ import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Screen
+import org.rfcx.companion.repo.api.CoreApiHelper
+import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
@@ -111,6 +113,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             ViewModelFactory(
                 requireActivity().application,
                 DeviceApiHelper(DeviceApiServiceImpl()),
+                CoreApiHelper(CoreApiServiceImpl()),
                 LocalDataHelper()
             )
         ).get(AudioMothDeploymentViewModel::class.java)

@@ -17,6 +17,8 @@ import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.localdb.*
+import org.rfcx.companion.repo.api.CoreApiHelper
+import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
@@ -70,6 +72,7 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
             ViewModelFactory(
                 application,
                 DeviceApiHelper(DeviceApiServiceImpl()),
+                CoreApiHelper(CoreApiServiceImpl()),
                 LocalDataHelper()
             )
         ).get(AudioMothDeploymentViewModel::class.java)
