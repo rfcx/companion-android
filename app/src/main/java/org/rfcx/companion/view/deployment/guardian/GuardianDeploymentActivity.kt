@@ -12,6 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.preference.Preference
 import com.google.gson.JsonObject
+import com.mapbox.api.directions.v5.models.Admin
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_guardian_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
@@ -514,6 +515,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         siteLiveData.removeObserver(siteObserve)
         deploymentLiveData.removeObserver(guardianDeploymentObserve)
         unregisterWifiConnectionLostListener()
+        GuardianSocketManager.stopConnection()
+        AdminSocketManager.stopConnection()
     }
 
     companion object {

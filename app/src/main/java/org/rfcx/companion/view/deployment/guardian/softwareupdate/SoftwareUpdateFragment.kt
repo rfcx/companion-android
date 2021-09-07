@@ -2,6 +2,7 @@ package org.rfcx.companion.view.deployment.guardian.softwareupdate
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +16,7 @@ import org.rfcx.companion.entity.Software
 import org.rfcx.companion.util.file.APKUtils
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 
-class SoftwareUpdateFragment : Fragment(), CountryClickedListener {
+class SoftwareUpdateFragment : Fragment(), ChildrenClickedListener {
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
 
     var softwareUpdateAdapter: SoftwareUpdateAdapter? = null
@@ -74,7 +75,7 @@ class SoftwareUpdateFragment : Fragment(), CountryClickedListener {
         fun newInstance() = SoftwareUpdateFragment()
     }
 
-    override fun onItemClick(apkVersion: String) {
-        Toast.makeText(context,"Clicked on $apkVersion",Toast.LENGTH_LONG).show()
+    override fun onItemClick(selectedSoftwares: Map<String, String>) {
+        updateButton.isEnabled = selectedSoftwares.isNotEmpty()
     }
 }

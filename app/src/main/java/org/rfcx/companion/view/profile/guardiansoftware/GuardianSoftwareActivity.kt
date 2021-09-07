@@ -168,12 +168,12 @@ class GuardianSoftwareActivity : AppCompatActivity() {
 
     private fun setView() {
         val versions = guardianSoftwareViewModel.getCurrentDownloadedAPKsVersions()
-        versions.forEach {
+        versions?.forEach {
             when(it.key) {
-                ADMIN -> adminRoleVersion.text = it.value
-                CLASSIFY -> classifyRoleVersion.text = it.value
-                GUARDIAN -> guardianRoleVersion.text = it.value
-                UPDATER -> updaterRoleVersion.text = it.value
+                ADMIN -> adminRoleVersion.text = it.value.first
+                CLASSIFY -> classifyRoleVersion.text = it.value.first
+                GUARDIAN -> guardianRoleVersion.text = it.value.first
+                UPDATER -> updaterRoleVersion.text = it.value.first
             }
         }
     }

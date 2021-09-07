@@ -1,8 +1,9 @@
 package org.rfcx.companion.entity
 
 data class Software(
-    val appName: GuardianSoftware,
-    val apkVersion: String
+    val name: GuardianSoftware,
+    val version: String,
+    val path: String
 )
 
 enum class GuardianSoftware(val value: String) {

@@ -17,18 +17,34 @@ object APKUtils {
         val files = getAllDownloadedSoftwaresVersion(context)
         files.forEach {
             when (it.key) {
-                GuardianSoftware.ADMIN.value -> softwares.add(Software(GuardianSoftware.ADMIN, it.value))
-                GuardianSoftware.CLASSIFY.value -> softwares.add(Software(GuardianSoftware.CLASSIFY, it.value))
-                GuardianSoftware.GUARDIAN.value -> softwares.add(Software(GuardianSoftware.GUARDIAN, it.value))
-                GuardianSoftware.UPDATER.value -> softwares.add(Software(GuardianSoftware.UPDATER, it.value))
+                GuardianSoftware.ADMIN.value -> softwares.add(Software(
+                    GuardianSoftware.ADMIN,
+                    it.value.first,
+                    it.value.second
+                ))
+                GuardianSoftware.CLASSIFY.value -> softwares.add(Software(
+                    GuardianSoftware.CLASSIFY,
+                    it.value.first,
+                    it.value.second
+                ))
+                GuardianSoftware.GUARDIAN.value -> softwares.add(Software(
+                    GuardianSoftware.GUARDIAN,
+                    it.value.first,
+                    it.value.second
+                ))
+                GuardianSoftware.UPDATER.value -> softwares.add(Software(
+                    GuardianSoftware.UPDATER,
+                    it.value.first,
+                    it.value.second
+                ))
             }
         }
         return softwares
     }
 
-    fun getAllDownloadedSoftwaresVersion(context: Context): Map<String, String> {
+    fun getAllDownloadedSoftwaresVersion(context: Context): Map<String, Pair<String, String>> {
         val downloadedAPKs = getAllDownloadedSoftwares(context)
-        val roleMappedVersion = mutableMapOf<String, String>()
+        val roleMappedVersion = mutableMapOf<String, Pair<String, String>>()
         if (downloadedAPKs.isNullOrEmpty()) {
             return roleMappedVersion
         }
@@ -36,12 +52,15 @@ object APKUtils {
             val splitName = it.name.split("-")
             val role = splitName[0]
             val version = it.name.split("-")[1]
-            roleMappedVersion[role] = version
+            roleMappedVersion[role] = Pair(version, it.absolutePath)
         }
         return roleMappedVersion
     }
 
-    fun compareVersionsIfNeedToUpdate(version1: String, version2: String): Boolean {
+    fun compareVersionsIfNeedToUpdate(version1: String, version2: String?): Boolean {
+        if (version2 == null) {
+            return true
+        }
         val levels1 = version1.split("\\.")
         val levels2 = version2.split("\\.")
         val length = levels1.size.coerceAtLeast(levels2.size)

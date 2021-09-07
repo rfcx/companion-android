@@ -1,24 +1,45 @@
 package org.rfcx.companion.view.deployment.guardian.softwareupdate
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.expandable_child_item.view.*
 import kotlinx.android.synthetic.main.expandable_parent_item.view.*
+import kotlinx.android.synthetic.main.item_guardian_hotspot.view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Software
 
 class SoftwareUpdateAdapter(
-    private var countryClickedListener: CountryClickedListener,
+    private var childrenClickedListener: ChildrenClickedListener,
     softwares: List<Software>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var softwareUpdateStateModelList = mutableListOf<ExpandableSoftwareUpdateModel>()
+    private val selectedSoftwares = mutableMapOf<String, String>()
 
     init {
-        softwares.
+        val softwaresGrouped = softwares.sortedBy { it.name.value }.groupBy { it.name }
+        softwaresGrouped.forEach { software ->
+            softwareUpdateStateModelList.add(
+                ExpandableSoftwareUpdateModel(
+                    1,
+                    StateSoftwareUpdate(
+                        software.key.value,
+                        software.value.map {
+                            StateSoftwareUpdate.SoftwareChildren(
+                                software.key.value,
+                                it.version,
+                                it.path
+                            )
+                        })
+                )
+            )
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -53,9 +74,10 @@ class SoftwareUpdateAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val row = softwareUpdateStateModelList[position]
+
         when (row.type) {
             ExpandableSoftwareUpdateModel.PARENT -> {
-                (holder as SoftwareStateParentViewHolder).appName.text = row.softwareParent.appName
+                (holder as SoftwareStateParentViewHolder).appName.text = row.softwareParent.name
                 holder.itemView.setOnClickListener {
                     if (row.isExpanded) {
                         row.isExpanded = false
@@ -71,10 +93,37 @@ class SoftwareUpdateAdapter(
             }
 
             ExpandableSoftwareUpdateModel.CHILD -> {
-                (holder as SoftwareStateChildViewHolder).apkVersion.text = row.softwareChild.name
+                (holder as SoftwareStateChildViewHolder).apkVersion.text = row.softwareChild.version
+                holder.apkVersion.apply {
+                    if (selectedSoftwares[row.softwareChild.parent] == row.softwareChild.path) {
+                        setTextColor(ContextCompat.getColor(this.context, R.color.colorPrimary))
+                        setCompoundDrawablesWithIntrinsicBounds(
+                            0,
+                            0,
+                            R.drawable.ic_hotspot_selected,
+                            0
+                        )
+
+                    } else {
+                        setTextColor(ContextCompat.getColor(this.context, R.color.text_secondary))
+                        setCompoundDrawablesWithIntrinsicBounds(
+                            0,
+                            0,
+                            0,
+                            0
+                        )
+
+                    }
+                }
 
                 holder.layout.setOnClickListener {
-                    countryClickedListener.onItemClick(row.softwareChild.name)
+                    if (row.softwareChild.path == selectedSoftwares[row.softwareChild.parent]) {
+                        selectedSoftwares[row.softwareChild.parent] = "" // To make it empty
+                    } else {
+                        selectedSoftwares[row.softwareChild.parent] = row.softwareChild.path
+                    }
+                    notifyDataSetChanged()
+                    childrenClickedListener.onItemClick(selectedSoftwares.filter { it.value != "" })
                 }
             }
         }
@@ -88,7 +137,7 @@ class SoftwareUpdateAdapter(
         var nextPosition = position
         when (row.type) {
             ExpandableSoftwareUpdateModel.PARENT -> {
-                for (child in row.softwareParent.apkVersions) {
+                for (child in row.softwareParent.members) {
                     softwareUpdateStateModelList.add(
                         ++nextPosition,
                         ExpandableSoftwareUpdateModel(ExpandableSoftwareUpdateModel.CHILD, child)
@@ -130,11 +179,13 @@ class SoftwareUpdateAdapter(
 }
 
 data class StateSoftwareUpdate(
-    val appName: String,
-    val apkVersions: List<ApkVersion>
+    val name: String,
+    val members: List<SoftwareChildren>
 ) {
-    data class ApkVersion(
-        val name: String
+    data class SoftwareChildren(
+        val parent: String,
+        val version: String,
+        val path: String
     )
 }
 
@@ -146,7 +197,7 @@ class ExpandableSoftwareUpdateModel {
 
     lateinit var softwareParent: StateSoftwareUpdate
     var type: Int
-    lateinit var softwareChild: StateSoftwareUpdate.ApkVersion
+    lateinit var softwareChild: StateSoftwareUpdate.SoftwareChildren
     var isExpanded: Boolean
     private var isCloseShown: Boolean
 
@@ -164,7 +215,7 @@ class ExpandableSoftwareUpdateModel {
 
     constructor(
         type: Int,
-        softwareChild: StateSoftwareUpdate.ApkVersion,
+        softwareChild: StateSoftwareUpdate.SoftwareChildren,
         isExpanded: Boolean = false,
         isCloseShown: Boolean = false
     ) {
@@ -175,6 +226,6 @@ class ExpandableSoftwareUpdateModel {
     }
 }
 
-interface CountryClickedListener {
-    fun onItemClick(apkVersion: String)
+interface ChildrenClickedListener {
+    fun onItemClick(selectedSoftwares: Map<String, String>)
 }
