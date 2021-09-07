@@ -1,6 +1,8 @@
 package org.rfcx.companion.util.file
 
 import android.content.Context
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import okhttp3.ResponseBody
 import org.rfcx.companion.entity.GuardianSoftware
 import org.rfcx.companion.entity.Software
@@ -106,6 +108,10 @@ object APKUtils {
         } catch (e: IOException) {
             false
         }
+    }
+
+    fun getAPKFileFromPath(filePath: String): File {
+        return File(filePath)
     }
 
     enum class APKStatus { NOT_INSTALLED, UP_TO_DATE, NEED_UPDATE }
