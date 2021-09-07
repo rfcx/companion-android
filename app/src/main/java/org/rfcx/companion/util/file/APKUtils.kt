@@ -2,12 +2,28 @@ package org.rfcx.companion.util.file
 
 import android.content.Context
 import okhttp3.ResponseBody
+import org.rfcx.companion.entity.GuardianSoftware
+import org.rfcx.companion.entity.Software
 import java.io.*
 
 object APKUtils {
 
-    fun getAllDownloadedSoftwares(context: Context): Array<File>? {
+    private fun getAllDownloadedSoftwares(context: Context): Array<File>? {
         return File(context.filesDir, "guardian-software").listFiles()
+    }
+
+    fun getAllDownloadedSoftwaresWithType(context: Context): List<Software> {
+        val softwares = mutableListOf<Software>()
+        val files = getAllDownloadedSoftwaresVersion(context)
+        files.forEach {
+            when (it.key) {
+                GuardianSoftware.ADMIN.value -> softwares.add(Software(GuardianSoftware.ADMIN, it.value))
+                GuardianSoftware.CLASSIFY.value -> softwares.add(Software(GuardianSoftware.CLASSIFY, it.value))
+                GuardianSoftware.GUARDIAN.value -> softwares.add(Software(GuardianSoftware.GUARDIAN, it.value))
+                GuardianSoftware.UPDATER.value -> softwares.add(Software(GuardianSoftware.UPDATER, it.value))
+            }
+        }
+        return softwares
     }
 
     fun getAllDownloadedSoftwaresVersion(context: Context): Map<String, String> {

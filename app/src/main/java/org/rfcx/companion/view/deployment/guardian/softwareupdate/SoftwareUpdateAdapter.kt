@@ -8,11 +8,19 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.expandable_child_item.view.*
 import kotlinx.android.synthetic.main.expandable_parent_item.view.*
 import org.rfcx.companion.R
+import org.rfcx.companion.entity.Software
 
 class SoftwareUpdateAdapter(
-    var countryClickedListener: CountryClickedListener,
-    var softwareUpdateStateModelList: MutableList<ExpandableSoftwareUpdateModel>
+    private var countryClickedListener: CountryClickedListener,
+    softwares: List<Software>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    private var softwareUpdateStateModelList = mutableListOf<ExpandableSoftwareUpdateModel>()
+
+    init {
+        softwares.
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             ExpandableSoftwareUpdateModel.PARENT -> {
@@ -122,16 +130,12 @@ class SoftwareUpdateAdapter(
 }
 
 data class StateSoftwareUpdate(
-    val softwares: List<Software>
+    val appName: String,
+    val apkVersions: List<ApkVersion>
 ) {
-    data class Software(
-        val appName: String,
-        val apkVersions: List<ApkVersion>
-    ) {
-        data class ApkVersion(
-            val name: String
-        )
-    }
+    data class ApkVersion(
+        val name: String
+    )
 }
 
 class ExpandableSoftwareUpdateModel {
@@ -140,15 +144,15 @@ class ExpandableSoftwareUpdateModel {
         const val CHILD = 2
     }
 
-    lateinit var softwareParent: StateSoftwareUpdate.Software
+    lateinit var softwareParent: StateSoftwareUpdate
     var type: Int
-    lateinit var softwareChild: StateSoftwareUpdate.Software.ApkVersion
+    lateinit var softwareChild: StateSoftwareUpdate.ApkVersion
     var isExpanded: Boolean
     private var isCloseShown: Boolean
 
     constructor(
         type: Int,
-        softwareParent: StateSoftwareUpdate.Software,
+        softwareParent: StateSoftwareUpdate,
         isExpanded: Boolean = false,
         isCloseShown: Boolean = false
     ) {
@@ -160,7 +164,7 @@ class ExpandableSoftwareUpdateModel {
 
     constructor(
         type: Int,
-        softwareChild: StateSoftwareUpdate.Software.ApkVersion,
+        softwareChild: StateSoftwareUpdate.ApkVersion,
         isExpanded: Boolean = false,
         isCloseShown: Boolean = false
     ) {
