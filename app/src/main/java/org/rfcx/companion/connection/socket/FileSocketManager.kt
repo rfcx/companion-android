@@ -1,5 +1,8 @@
 package org.rfcx.companion.connection.socket
 
+import android.os.Handler
+import android.os.Looper
+import android.os.SystemClock
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
@@ -26,7 +29,6 @@ object FileSocketManager {
 
     fun sendFiles(filePaths: List<String>) {
         filePaths.forEach {
-            Log.d("FILESOCKET", "SENDING FILE")
             sendMessage(APKUtils.getAPKFileFromPath(it))
         }
     }
@@ -38,10 +40,28 @@ object FileSocketManager {
                 socket?.keepAlive = true
                 startInComingMessageThread()
                 outputStream = DataOutputStream(socket?.getOutputStream())
+                val buffer = ByteArray(8192)
+                var sum = 0
+                var count = 0
+                val inp = file.inputStream()
                 outputStream?.write(file.name.toByteArray())
                 outputStream?.write("|".toByteArray())
-                outputStream?.write(file.readBytes())
+                while (true) {
+                    count = inp.read(buffer)
+                    sum += count
+                    if (count < 0) {
+                        break
+                    }
+                    outputStream?.write(buffer, 0, count)
+                }
+
                 outputStream?.flush()
+
+                SystemClock.sleep(10000)
+
+                outputStream?.write("*".toByteArray())
+                outputStream?.flush()
+
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -55,9 +75,10 @@ object FileSocketManager {
                 while (true) {
                     inputStream = DataInputStream(socket!!.getInputStream())
                     val dataInput = inputStream?.readUTF()
+                    Log.d("APK", dataInput.toString())
                     if (!dataInput.isNullOrBlank()) {
 
-                        val sendResult = gson.fromJson(dataInput, FileSendingResult::class.java)
+//                        val sendResult = gson.fromJson(dataInput, FileSendingResult::class.java)
 
                     }
                 }
@@ -77,7 +98,6 @@ object FileSocketManager {
         // stop server thread
         clientThread?.interrupt()
 
-        outputStream?.flush()
         outputStream?.close()
 
         inputStream?.close()

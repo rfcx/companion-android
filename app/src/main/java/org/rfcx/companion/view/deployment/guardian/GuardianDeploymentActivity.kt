@@ -18,6 +18,7 @@ import kotlinx.android.synthetic.main.activity_guardian_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.AdminSocketManager
+import org.rfcx.companion.connection.socket.AudioCastSocketManager
 import org.rfcx.companion.connection.socket.FileSocketManager
 import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.connection.wifi.WifiHotspotManager
@@ -198,17 +199,13 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
             }
 
         GuardianSocketManager.pingBlob.observeForever {
-            Log.d("SocketComm", "Getting Guardian ping blob")
             val sha1 = PingUtils.getPrefsSha1FromPing(it)
             if (prefsSha1 != sha1) {
-                Log.d("SocketComm", "Setting ping blob")
                 guardianPingBlob = it
             }
             isGuardianRegistered = PingUtils.isRegisteredFromPing(it)
         }
         AdminSocketManager.pingBlob.observeForever {
-            Log.d("SocketComm", "Getting Admin ping blob")
-            Log.d("SocketComm", PingUtils.getNetworkFromPing(it).toString())
             network = PingUtils.getNetworkFromPing(it)
             sentinelPower = PingUtils.getSentinelPowerFromPing(it)
         }
@@ -519,6 +516,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         unregisterWifiConnectionLostListener()
         GuardianSocketManager.stopConnection()
         AdminSocketManager.stopConnection()
+        AudioCastSocketManager.stopConnection()
+        FileSocketManager.stopConnection()
     }
 
     companion object {

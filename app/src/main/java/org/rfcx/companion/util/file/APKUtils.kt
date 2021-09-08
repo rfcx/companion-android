@@ -1,6 +1,7 @@
 package org.rfcx.companion.util.file
 
 import android.content.Context
+import android.util.Log
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import okhttp3.ResponseBody

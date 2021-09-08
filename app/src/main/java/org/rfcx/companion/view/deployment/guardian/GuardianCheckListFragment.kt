@@ -63,9 +63,6 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
         // check if guardian is registered so the step can be highlighted
         checkIfRegistered()
 
-        val dir = File(requireContext().filesDir, "guardian-software")
-        val file = File(dir, "admin-0.8.3-release.apk.gz")
-        FileSocketManager.sendFiles(listOf(file.absolutePath))
     }
 
     private fun setGuardianName() {

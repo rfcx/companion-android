@@ -62,7 +62,6 @@ object AdminSocketManager {
                         val ping = gson.fromJson(dataInput, AdminPing::class.java)
                         pingBlob.postValue(ping)
 
-                        Log.d("SocketComm", dataInput)
                     }
                 }
             } catch (e: Exception) {

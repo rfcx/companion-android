@@ -14,7 +14,6 @@ object PingUtils {
     fun getPrefsFromPing(context: Context, guardianPing: GuardianPing?): List<Preference> {
         if (guardianPing?.prefs is JsonObject) {
             val prefs = guardianPing.prefs.get("vals") ?: return listOf()
-            Log.d("ConvertPing", prefs.toString())
             return PrefsUtils.stringToPrefs(context, Gson().toJson(prefs))
         }
         return listOf()
@@ -23,7 +22,6 @@ object PingUtils {
     fun getPrefsSha1FromPing(guardianPing: GuardianPing?): String? {
         if (guardianPing?.prefs is JsonObject) {
             val sha1 = guardianPing.prefs.get("sha1") ?: return null
-            Log.d("ConvertPing", sha1.toString())
             return sha1.asString
         }
         return null
@@ -49,7 +47,6 @@ object PingUtils {
 
     fun isRegisteredFromPing(ping: GuardianPing?): Boolean? {
         val isRegistered = ping?.companion?.get("is_registered") ?: return null
-        Log.d("ConvertPing", isRegistered.asBoolean.toString())
         return isRegistered.asBoolean
     }
 }

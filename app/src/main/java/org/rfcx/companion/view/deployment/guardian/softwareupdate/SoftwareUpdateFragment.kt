@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_software_update.*
 import org.rfcx.companion.R
+import org.rfcx.companion.connection.socket.FileSocketManager
 import org.rfcx.companion.entity.Software
 import org.rfcx.companion.util.file.APKUtils
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
@@ -20,7 +21,7 @@ class SoftwareUpdateFragment : Fragment(), ChildrenClickedListener {
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
 
     var softwareUpdateAdapter: SoftwareUpdateAdapter? = null
-    private var selectedApk = ""
+    private var selectedFiles = listOf<String>()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -63,7 +64,7 @@ class SoftwareUpdateFragment : Fragment(), ChildrenClickedListener {
         }
 
         updateButton.setOnClickListener {
-            deploymentProtocol?.nextStep()
+            FileSocketManager.sendFiles(selectedFiles)
         }
 
         val softwares = APKUtils.getAllDownloadedSoftwaresWithType(requireContext())
@@ -77,5 +78,6 @@ class SoftwareUpdateFragment : Fragment(), ChildrenClickedListener {
 
     override fun onItemClick(selectedSoftwares: Map<String, String>) {
         updateButton.isEnabled = selectedSoftwares.isNotEmpty()
+        selectedFiles = selectedSoftwares.values.toList()
     }
 }
