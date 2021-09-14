@@ -10,6 +10,7 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.DeploymentLocation
 import org.rfcx.companion.entity.DeploymentState
 import org.rfcx.companion.entity.Device
+import org.rfcx.companion.entity.DeviceParameter
 import org.rfcx.companion.util.GuardianPin
 import org.rfcx.companion.util.Pin
 import org.rfcx.companion.util.WifiHotspotUtils
@@ -37,7 +38,8 @@ open class Deployment(
     @Expose(serialize = false)
     var syncState: Int = 0,
     var deletedAt: Date? = null,
-    var passedChecks: RealmList<Int>? = null
+    var passedChecks: RealmList<Int>? = null,
+    var deviceParameters: String? = null
 ) : RealmModel, Serializable {
 
     fun isCompleted(): Boolean {
