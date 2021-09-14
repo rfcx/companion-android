@@ -1,19 +1,12 @@
 package org.rfcx.companion.connection.socket
 
-import android.os.Handler
-import android.os.Looper
 import android.os.SystemClock
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
-import org.rfcx.companion.entity.socket.response.AudioCastPing
-import org.rfcx.companion.entity.socket.response.FileSendingResult
-import org.rfcx.companion.util.MicrophoneTestUtils
 import org.rfcx.companion.util.file.APKUtils
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.File
-import java.io.InputStream
 import java.net.Socket
 
 object FileSocketManager {
@@ -24,8 +17,6 @@ object FileSocketManager {
     private var clientThread: Thread? = null // Thread for socket communication
 
     private lateinit var inComingMessageThread: Thread
-
-    private val gson = Gson()
 
     fun sendFiles(filePaths: List<String>) {
         filePaths.forEach {
@@ -41,14 +32,12 @@ object FileSocketManager {
                 startInComingMessageThread()
                 outputStream = DataOutputStream(socket?.getOutputStream())
                 val buffer = ByteArray(8192)
-                var sum = 0
                 var count = 0
                 val inp = file.inputStream()
                 outputStream?.write(file.name.toByteArray())
                 outputStream?.write("|".toByteArray())
                 while (true) {
                     count = inp.read(buffer)
-                    sum += count
                     if (count < 0) {
                         break
                     }
