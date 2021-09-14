@@ -2,10 +2,9 @@ package org.rfcx.companion.entity.response
 
 import org.rfcx.companion.entity.DeploymentState
 import org.rfcx.companion.entity.Device
-import org.rfcx.companion.entity.DeviceParameter
 import org.rfcx.companion.entity.SyncState
-import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import org.rfcx.companion.entity.guardian.Deployment
+import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import java.util.*
 
 data class DeploymentResponse(

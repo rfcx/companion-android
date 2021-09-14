@@ -10,7 +10,6 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.DeploymentLocation
 import org.rfcx.companion.entity.DeploymentState
 import org.rfcx.companion.entity.Device
-import org.rfcx.companion.entity.DeviceParameter
 import org.rfcx.companion.util.GuardianPin
 import org.rfcx.companion.util.Pin
 import org.rfcx.companion.util.WifiHotspotUtils
@@ -62,6 +61,7 @@ open class Deployment(
         const val FIELD_DELETED_AT = "deletedAt"
         const val FIELD_DEVICE = "device"
         const val FIELD_PASSED_CHECKS = "passedChecks"
+        const val FIELD_DEVICE_PARAMETERS = "deviceParameters"
     }
 }
 
