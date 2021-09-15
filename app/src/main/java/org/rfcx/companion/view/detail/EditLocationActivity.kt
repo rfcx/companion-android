@@ -6,18 +6,19 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
-import io.realm.Realm
+import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.activity_edit_location.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
+import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.toLocationGroup
 import org.rfcx.companion.localdb.DatabaseCallback
-import org.rfcx.companion.localdb.ProjectDb
-import org.rfcx.companion.localdb.DeploymentDb
+import org.rfcx.companion.repo.api.DeviceApiHelper
+import org.rfcx.companion.repo.api.DeviceApiServiceImpl
+import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DeploymentSyncWorker
-import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.showCommonDialog
 import org.rfcx.companion.view.BaseActivity
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
@@ -25,11 +26,7 @@ import org.rfcx.companion.view.detail.DeploymentDetailActivity.Companion.DEPLOYM
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 
 class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActivityListener {
-
-    // manager database
-    private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val deploymentDb by lazy { DeploymentDb(realm) }
-    private val locationGroupDb by lazy { ProjectDb(realm) }
+    private lateinit var viewModel: EditLocationViewModel
 
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
@@ -45,6 +42,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
         setContentView(R.layout.activity_edit_location)
 
         initIntent()
+        setViewModel()
         setupToolbar()
         toolbarLayout.visibility = View.VISIBLE
         startFragment(
@@ -57,6 +55,17 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
         )
     }
 
+    private fun setViewModel() {
+        viewModel = ViewModelProvider(
+            this,
+            ViewModelFactory(
+                application,
+                DeviceApiHelper(DeviceApiServiceImpl()),
+                LocalDataHelper()
+            )
+        ).get(EditLocationViewModel::class.java)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == DEPLOYMENT_REQUEST_CODE) {
@@ -65,7 +74,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
                     locationGroup =
                         data?.getSerializableExtra(EXTRA_LOCATION_GROUP) as LocationGroup
                     locationGroup?.let {
-                        val isGroupExisted = locationGroupDb.isExisted(locationGroup?.name)
+                        val isGroupExisted = viewModel.isExisted(locationGroup?.name)
                         groupName = if (isGroupExisted) {
                             it.name
                         } else {
@@ -75,7 +84,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
                 }
                 LocationGroupActivity.RESULT_DELETE -> {
                     val group = data?.getStringExtra(LocationGroupActivity.EXTRA_GROUP)
-                    val isGroupExisted = locationGroupDb.isExisted(group)
+                    val isGroupExisted = viewModel.isExisted(group)
                     groupName = if (isGroupExisted) {
                         group
                     } else {
@@ -138,7 +147,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
         val group = groupName ?: ""
         showLoading()
         deploymentId?.let { id ->
-            deploymentDb.editLocation(
+            viewModel.editStream(
                 id = id,
                 locationName = name,
                 latitude = latitude,
@@ -157,7 +166,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
                     }
                 })
 
-            deploymentDb.editLocationGroup(id, getLocationGroup(group), object :
+            viewModel.editProject(id, getLocationGroup(group), object :
                 DatabaseCallback {
                 override fun onSuccess() {
                     hideLoading()
@@ -176,7 +185,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
     override fun getLocationGroupName(): String = groupName ?: getString(R.string.none)
 
     override fun getLocationGroup(name: String): LocationGroup {
-        return locationGroupDb.getProjectByName(name)?.toLocationGroup() ?: LocationGroup()
+        return viewModel.getProjectByName(name)?.toLocationGroup() ?: LocationGroup()
     }
 
     override fun startLocationGroupPage() {

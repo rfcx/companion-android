@@ -210,7 +210,7 @@ class DeploymentDb(private val realm: Realm) {
     /**
      * Update Deployment Location and Locate
      * */
-    fun editLocation(
+    fun editStream(
         id: Int,
         locationName: String,
         latitude: Double,
@@ -252,7 +252,7 @@ class DeploymentDb(private val realm: Realm) {
         })
     }
 
-    fun editLocationGroup(id: Int, locationGroup: LocationGroup, callback: DatabaseCallback) {
+    fun editProject(id: Int, locationGroup: LocationGroup, callback: DatabaseCallback) {
         realm.executeTransactionAsync({ bgRealm ->
             // do update deployment location
             val guardianDeployment =

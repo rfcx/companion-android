@@ -11,6 +11,8 @@ import org.rfcx.companion.view.deployment.AudioMothDeploymentRepository
 import org.rfcx.companion.view.deployment.AudioMothDeploymentViewModel
 import org.rfcx.companion.view.LoginRepository
 import org.rfcx.companion.view.LoginViewModel
+import org.rfcx.companion.view.detail.EditLocationRepository
+import org.rfcx.companion.view.detail.EditLocationViewModel
 import org.rfcx.companion.view.detail.DeploymentDetailRepository
 import org.rfcx.companion.view.detail.DeploymentDetailViewModel
 import org.rfcx.companion.view.profile.offlinemap.ProjectOfflineMapRepository
@@ -30,6 +32,8 @@ class ViewModelFactory(private val application: Application, private val deviceA
             return ProjectOfflineMapViewModel(application, ProjectOfflineMapRepository(deviceApiHelper, localDataHelper)) as T
         } else if (modelClass.isAssignableFrom(AudioMothDeploymentViewModel::class.java)) {
             return AudioMothDeploymentViewModel(application, AudioMothDeploymentRepository(deviceApiHelper, localDataHelper)) as T
+        } else if (modelClass.isAssignableFrom(EditLocationViewModel::class.java)) {
+            return EditLocationViewModel(application, EditLocationRepository(deviceApiHelper, localDataHelper)) as T
         } else if (modelClass.isAssignableFrom(DeploymentDetailViewModel::class.java)) {
             return DeploymentDetailViewModel(application, DeploymentDetailRepository(deviceApiHelper, localDataHelper)) as T
         }
