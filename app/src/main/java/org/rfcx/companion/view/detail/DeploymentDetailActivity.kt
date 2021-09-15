@@ -14,6 +14,7 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.mapbox.mapboxsdk.Mapbox
@@ -27,24 +28,21 @@ import com.mapbox.pluginscalebar.ScaleBarOptions
 import com.mapbox.pluginscalebar.ScaleBarPlugin
 import com.zhihu.matisse.Matisse
 import com.zhihu.matisse.MimeType
-import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_deployment_detail.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.buttom_sheet_attach_image_layout.view.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.R
-import org.rfcx.companion.entity.DeploymentImage
-import org.rfcx.companion.entity.Device
-import org.rfcx.companion.entity.StatusEvent
+import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.localdb.DatabaseCallback
-import org.rfcx.companion.localdb.DeploymentImageDb
-import org.rfcx.companion.localdb.ProjectDb
-import org.rfcx.companion.localdb.DeploymentDb
-import org.rfcx.companion.service.DownloadImagesWorker
+import org.rfcx.companion.repo.api.DeviceApiHelper
+import org.rfcx.companion.repo.api.DeviceApiServiceImpl
+import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DeploymentSyncWorker
+import org.rfcx.companion.service.DownloadImagesWorker
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.BaseActivity
@@ -52,12 +50,8 @@ import org.rfcx.companion.view.deployment.AudioMothDeploymentActivity.Companion.
 import java.io.File
 
 class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (DeploymentImageView) -> Unit {
-    private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val deploymentDb by lazy { DeploymentDb(realm) }
-    private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
-    private val locationGroupDb by lazy { ProjectDb(realm) }
-    private val projectDb by lazy { ProjectDb(realm) }
+    private lateinit var viewModel: DeploymentDetailViewModel
 
     private lateinit var mapView: MapView
     private lateinit var mapBoxMap: MapboxMap
@@ -81,12 +75,14 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         super.onCreate(savedInstanceState)
         Mapbox.getInstance(this, getString(R.string.mapbox_token))
         setContentView(R.layout.activity_deployment_detail)
+        setViewModel()
 
         val preferences = Preferences.getInstance(this)
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
-        val project = projectDb.getProjectById(projectId)
+        val project = viewModel.getProjectById(projectId)
 
-        deleteButton.visibility = if(project?.permissions == Permissions.ADMIN.value) View.VISIBLE else View.GONE
+        deleteButton.visibility =
+            if (project?.permissions == Permissions.ADMIN.value) View.VISIBLE else View.GONE
 
         // Setup Mapbox
         mapView = findViewById(R.id.mapBoxView)
@@ -95,7 +91,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
 
         deployment =
             intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
-                ?.let { deploymentDb.getDeploymentById(it) }
+                ?.let { viewModel.getDeploymentById(it) }
 
         setupToolbar()
         setupImageRecycler()
@@ -116,7 +112,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
                 val location = deployment?.stream
                 location?.let { locate ->
                     val group = locate.project?.name ?: getString(R.string.none)
-                    val isGroupExisted = locationGroupDb.isExisted(locate.project?.name)
+                    val isGroupExisted = viewModel.isExisted(locate.project?.name)
                     intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)?.let { deploymentId ->
                         analytics.trackEditLocationEvent()
                         EditLocationActivity.startActivity(
@@ -134,6 +130,17 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
                 }
             }
         }
+    }
+
+    private fun setViewModel() {
+        viewModel = ViewModelProvider(
+            this,
+            ViewModelFactory(
+                application,
+                DeviceApiHelper(DeviceApiServiceImpl()),
+                LocalDataHelper()
+            )
+        ).get(DeploymentDetailViewModel::class.java)
     }
 
     private fun confirmationDialog() {
@@ -158,7 +165,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
     private fun onDeleteLocation() {
         showLoading()
         deployment?.let {
-            deploymentDb.deleteDeploymentLocation(it.id, object : DatabaseCallback {
+            viewModel.deleteDeploymentLocation(it.id, object : DatabaseCallback {
                 override fun onSuccess() {
                     DeploymentSyncWorker.enqueue(this@DeploymentDetailActivity)
                     hideLoading()
@@ -184,9 +191,14 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
                     if (it.remotePath != null) BuildConfig.DEVICE_API_DOMAIN + it.remotePath else "file://${it.localPath}"
                 } as ArrayList
 
-                val index = list.indexOf(deploymentImageView.remotePath ?: "file://${deploymentImageView.localPath}")
+                val index = list.indexOf(
+                    deploymentImageView.remotePath ?: "file://${deploymentImageView.localPath}"
+                )
                 list.removeAt(index)
-                list.add(0, deploymentImageView.remotePath ?: "file://${deploymentImageView.localPath}")
+                list.add(
+                    0,
+                    deploymentImageView.remotePath ?: "file://${deploymentImageView.localPath}"
+                )
 
                 DisplayImageActivity.startActivity(this@DeploymentDetailActivity, list)
             }
@@ -252,7 +264,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
 
     private fun forceUpdateDeployment() {
         if (this.deployment != null) {
-            this.deployment = deploymentDb.getDeploymentById(this.deployment!!.id)
+            this.deployment = viewModel.getDeploymentById(this.deployment!!.id)
             this.deployment?.let { it1 ->
                 updateDeploymentDetailView(it1)
                 setLocationOnMap(it1)
@@ -284,7 +296,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
 
     private fun observeDeploymentImage(deploymentId: Int) {
         deployImageLiveData =
-            Transformations.map(deploymentImageDb.getAllResultsAsync(deploymentId).asLiveData()) {
+            Transformations.map(viewModel.getAllResultsAsync(deploymentId).asLiveData()) {
                 it
             }
         deployImageLiveData.observeForever(deploymentImageObserve)
@@ -354,8 +366,8 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         // remove observer
         deployImageLiveData.removeObserver(deploymentImageObserve)
         val newImages = deploymentImageAdapter.getNewAttachImage()
-        if(newImages.isNotEmpty()) {
-            deploymentImageDb.insertImage(deployment, newImages)
+        if (newImages.isNotEmpty()) {
+            viewModel.insertImage(deployment, newImages)
             ImageSyncWorker.enqueue(this)
         }
     }
@@ -391,7 +403,8 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
     }
 
     private fun setupAttachImageDialog() {
-        val bottomSheetView = layoutInflater.inflate(R.layout.buttom_sheet_attach_image_layout, null)
+        val bottomSheetView =
+            layoutInflater.inflate(R.layout.buttom_sheet_attach_image_layout, null)
 
         bottomSheetView.menuGallery.setOnClickListener {
             openGallery()
@@ -418,7 +431,8 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         imageFile = ImageUtils.createImageFile()
         if (imageFile != null) {
-            val photoURI = FileProvider.getUriForFile(this, ImageUtils.FILE_CONTENT_PROVIDER, imageFile!!)
+            val photoURI =
+                FileProvider.getUriForFile(this, ImageUtils.FILE_CONTENT_PROVIDER, imageFile!!)
             takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
             startActivityForResult(takePictureIntent, ImageUtils.REQUEST_TAKE_PHOTO)
         }
@@ -434,7 +448,8 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
     }
 
     private fun startOpenGallery() {
-        val remainingImage = DeploymentImageAdapter.MAX_IMAGE_SIZE - deploymentImageAdapter.getImageCount()
+        val remainingImage =
+            DeploymentImageAdapter.MAX_IMAGE_SIZE - deploymentImageAdapter.getImageCount()
         Matisse.from(this)
             .choose(MimeType.ofImage())
             .countable(true)
@@ -461,8 +476,9 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         val list = deploymentImages.map {
             if (it.remotePath != null) BuildConfig.DEVICE_API_DOMAIN + it.remotePath else "file://${it.localPath}"
         } as ArrayList
-        
-        val index = list.indexOf(deploymentImage.remotePath ?: "file://${deploymentImage.localPath}")
+
+        val index =
+            list.indexOf(deploymentImage.remotePath ?: "file://${deploymentImage.localPath}")
         list.removeAt(index)
         list.add(0, deploymentImage.remotePath ?: "file://${deploymentImage.localPath}")
 
