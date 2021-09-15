@@ -526,7 +526,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                 FeatureCollection.fromFeatures(listOf()),
                 GeoJsonOptions()
                     .withCluster(true)
-                    .withClusterMaxZoom(20)
+                    .withClusterMaxZoom(25)
                     .withClusterRadius(30)
                     .withClusterProperty(
                         PROPERTY_CLUSTER_TYPE,
