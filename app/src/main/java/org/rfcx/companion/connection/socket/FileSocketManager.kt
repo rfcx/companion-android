@@ -51,7 +51,7 @@ object FileSocketManager {
 
                 SystemClock.sleep(10000)
 
-                outputStream?.write("*".toByteArray())
+                outputStream?.write("****".toByteArray())
                 outputStream?.flush()
 
             } catch (e: Exception) {
@@ -67,7 +67,6 @@ object FileSocketManager {
                 while (true) {
                     inputStream = DataInputStream(socket!!.getInputStream())
                     val dataInput = inputStream?.readUTF()
-                    Log.d("APK", dataInput.toString())
                     if (!dataInput.isNullOrBlank()) {
                         val ping = Gson().fromJson(dataInput, JsonObject::class.java)
                         pingBlob.postValue(ping)
