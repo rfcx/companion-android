@@ -41,7 +41,7 @@ object PingUtils {
     }
 
     fun getGuidFromPing(ping: GuardianPing?): String? {
-        val guid = ping?.companion?.get("guid") ?: return null
+        val guid = ping?.companion?.get("guardian")?.asJsonObject?.get("guid") ?: return null
         return guid.asString
     }
 

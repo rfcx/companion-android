@@ -199,10 +199,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
             }
 
         GuardianSocketManager.pingBlob.observeForever {
-            val sha1 = PingUtils.getPrefsSha1FromPing(it)
-            if (prefsSha1 != sha1) {
-                guardianPingBlob = it
-            }
+            guardianPingBlob = it
             isGuardianRegistered = PingUtils.isRegisteredFromPing(it)
         }
         AdminSocketManager.pingBlob.observeForever {

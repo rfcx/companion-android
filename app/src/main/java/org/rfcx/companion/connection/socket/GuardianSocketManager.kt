@@ -192,6 +192,7 @@ object GuardianSocketManager {
                         val receiveJson = JSONObject(dataInput)
                         val jsonIterator = receiveJson.keys()
 
+                        Log.d("LOG", dataInput)
                         val ping = gson.fromJson(dataInput, GuardianPing::class.java)
                         pingBlob.postValue(ping)
 

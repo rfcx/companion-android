@@ -54,7 +54,7 @@ object APKUtils {
         downloadedAPKs.forEach {
             val splitName = it.name.split("-")
             val role = splitName[0]
-            val version = it.name.split("-")[1]
+            val version = splitName[1].removeSuffix(".apk.gz")
             roleMappedVersion[role] = Pair(version, it.absolutePath)
         }
         return roleMappedVersion
@@ -84,7 +84,7 @@ object APKUtils {
             if (!dir.exists()) {
                 dir.mkdir()
             }
-            val file = File(dir, "$role-$version-release.apk.gz")
+            val file = File(dir, "$role-$version.apk.gz")
             var inputStream: InputStream? = null
             var outputStream: OutputStream? = null
             try {

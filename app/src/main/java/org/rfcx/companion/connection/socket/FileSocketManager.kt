@@ -2,7 +2,10 @@ package org.rfcx.companion.connection.socket
 
 import android.os.SystemClock
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
+import com.google.gson.JsonObject
+import org.rfcx.companion.entity.socket.response.GuardianPing
 import org.rfcx.companion.util.file.APKUtils
 import java.io.DataInputStream
 import java.io.DataOutputStream
@@ -18,10 +21,10 @@ object FileSocketManager {
 
     private lateinit var inComingMessageThread: Thread
 
-    fun sendFiles(filePaths: List<String>) {
-        filePaths.forEach {
-            sendMessage(APKUtils.getAPKFileFromPath(it))
-        }
+    val pingBlob = MutableLiveData<JsonObject>()
+
+    fun sendFile(filePath: String) {
+        sendMessage(APKUtils.getAPKFileFromPath(filePath))
     }
 
     private fun sendMessage(file: File) {
@@ -32,7 +35,7 @@ object FileSocketManager {
                 startInComingMessageThread()
                 outputStream = DataOutputStream(socket?.getOutputStream())
                 val buffer = ByteArray(8192)
-                var count = 0
+                var count: Int
                 val inp = file.inputStream()
                 outputStream?.write(file.name.toByteArray())
                 outputStream?.write("|".toByteArray())
@@ -66,9 +69,8 @@ object FileSocketManager {
                     val dataInput = inputStream?.readUTF()
                     Log.d("APK", dataInput.toString())
                     if (!dataInput.isNullOrBlank()) {
-
-//                        val sendResult = gson.fromJson(dataInput, FileSendingResult::class.java)
-
+                        val ping = Gson().fromJson(dataInput, JsonObject::class.java)
+                        pingBlob.postValue(ping)
                     }
                 }
             } catch (e: Exception) {
