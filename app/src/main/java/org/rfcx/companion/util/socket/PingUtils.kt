@@ -49,4 +49,16 @@ object PingUtils {
         val isRegistered = ping?.companion?.get("is_registered") ?: return null
         return isRegistered.asBoolean
     }
+
+    fun getSoftwareVersionFromPing(ping: GuardianPing?): Map<String, String>? {
+        val software = ping?.software ?: return null
+        val softwareList = software.split("|")
+        val mapSoftwareVersion = mutableMapOf<String, String>()
+        softwareList.forEach {
+            val role = it.split("*")[0]
+            val version = it.split("*")[1]
+            mapSoftwareVersion[role] = version
+        }
+        return mapSoftwareVersion
+    }
 }

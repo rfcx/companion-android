@@ -1,18 +1,18 @@
 package org.rfcx.companion.view.deployment.guardian.softwareupdate
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.appcompat.widget.AppCompatImageView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.expandable_child_item.view.*
 import kotlinx.android.synthetic.main.expandable_parent_item.view.*
 import kotlinx.android.synthetic.main.item_guardian_hotspot.view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Software
+import org.rfcx.companion.util.file.APKUtils.calculateVersionValue
 
 class SoftwareUpdateAdapter(
     private var childrenClickedListener: ChildrenClickedListener,
@@ -20,7 +20,10 @@ class SoftwareUpdateAdapter(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var softwareUpdateStateModelList = mutableListOf<ExpandableSoftwareUpdateModel>()
-    private val selectedSoftwares = mutableMapOf<String, String>()
+
+    var guardianSoftwareVersion = mapOf<String, String>()
+
+    private var needLoading = false
 
     init {
         val softwaresGrouped = softwares.sortedBy { it.name.value }.groupBy { it.name }
@@ -95,40 +98,44 @@ class SoftwareUpdateAdapter(
             ExpandableSoftwareUpdateModel.CHILD -> {
                 (holder as SoftwareStateChildViewHolder).apkVersion.text = row.softwareChild.version
                 holder.apkVersion.apply {
-                    if (selectedSoftwares[row.softwareChild.parent] == row.softwareChild.path) {
-                        setTextColor(ContextCompat.getColor(this.context, R.color.colorPrimary))
-                        setCompoundDrawablesWithIntrinsicBounds(
-                            0,
-                            0,
-                            R.drawable.ic_hotspot_selected,
-                            0
-                        )
-
-                    } else {
-                        setTextColor(ContextCompat.getColor(this.context, R.color.text_secondary))
-                        setCompoundDrawablesWithIntrinsicBounds(
-                            0,
-                            0,
-                            0,
-                            0
-                        )
-
+                    val installedVersion = guardianSoftwareVersion[row.softwareChild.parent]
+                    if (!needLoading) {
+                        if (installedVersion != null && calculateVersionValue(installedVersion) >= calculateVersionValue(row.softwareChild.version)) {
+                            holder.apkSendButton.visibility = View.GONE
+                            holder.apkUpToDateText.visibility = View.VISIBLE
+                        } else {
+                            holder.apkSendButton.visibility = View.VISIBLE
+                            holder.apkUpToDateText.visibility = View.GONE
+                        }
                     }
                 }
 
-                holder.layout.setOnClickListener {
-                    if (row.softwareChild.path == selectedSoftwares[row.softwareChild.parent]) {
-                        selectedSoftwares[row.softwareChild.parent] = "" // To make it empty
-                    } else {
-                        selectedSoftwares[row.softwareChild.parent] = row.softwareChild.path
-                    }
-                    notifyDataSetChanged()
-                    childrenClickedListener.onItemClick(selectedSoftwares.filter { it.value != "" })
+                holder.apkSendButton.isEnabled = !needLoading
+                if (!needLoading && holder.apkLoading.visibility == View.VISIBLE) {
+                    holder.apkLoading.visibility = View.GONE
+                }
+                holder.apkSendButton.setOnClickListener {
+                    showLoading()
+                    it.visibility = View.GONE
+                    holder.apkLoading.visibility = View.VISIBLE
+                    childrenClickedListener.onItemClick(row.softwareChild)
                 }
             }
         }
 
     }
+
+    fun showLoading() {
+        needLoading = true
+        notifyDataSetChanged()
+    }
+
+    fun hideLoading() {
+        needLoading = false
+        notifyDataSetChanged()
+    }
+
+    fun getLoading(): Boolean = needLoading
 
     override fun getItemViewType(position: Int): Int = softwareUpdateStateModelList[position].type
 
@@ -175,6 +182,9 @@ class SoftwareUpdateAdapter(
     class SoftwareStateChildViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal var layout = itemView.country_item_child_container
         internal var apkVersion: TextView = itemView.apkVersionTextView
+        internal var apkSendButton: Button = itemView.apkSendButton
+        internal var apkUpToDateText: TextView = itemView.apkUpToDateTextView
+        internal var apkLoading: ProgressBar = itemView.apkLoading
     }
 }
 
@@ -227,5 +237,5 @@ class ExpandableSoftwareUpdateModel {
 }
 
 interface ChildrenClickedListener {
-    fun onItemClick(selectedSoftwares: Map<String, String>)
+    fun onItemClick(selectedSoftware: StateSoftwareUpdate.SoftwareChildren)
 }

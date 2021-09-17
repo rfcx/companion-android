@@ -2,11 +2,10 @@ package org.rfcx.companion.view.deployment.guardian.softwareupdate
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
+import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -16,15 +15,17 @@ import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.FileSocketManager
 import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.entity.Software
-import org.rfcx.companion.entity.socket.request.CheckinCommand
 import org.rfcx.companion.util.file.APKUtils
+import org.rfcx.companion.util.file.APKUtils.calculateVersionValue
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
+import java.util.*
 
 class SoftwareUpdateFragment : Fragment(), ChildrenClickedListener {
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
 
     var softwareUpdateAdapter: SoftwareUpdateAdapter? = null
-    private var selectedFiles = mutableMapOf<String, String>()
+    private var selectedFile: StateSoftwareUpdate.SoftwareChildren? = null
+    private var loadingTimer: CountDownTimer? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -66,32 +67,53 @@ class SoftwareUpdateFragment : Fragment(), ChildrenClickedListener {
             it.setToolbarTitle()
         }
 
-        updateButton.setOnClickListener {
-            var start = 0
-            val keys = selectedFiles.keys.toList()
-            sendFile(keys[start])
-            FileSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
-                requireActivity().runOnUiThread {
-                    if (it.has(keys[start]) && it.get(keys[start]).asBoolean) {
-                        selectedFiles.remove(keys[start])
-                        if (selectedFiles.isNotEmpty()) {
-                            start++
-                            sendFile(keys[start])
-                        } else {
+        GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
+            requireActivity().runOnUiThread {
+                deploymentProtocol?.getSoftwareVersion()?.let {
+                    softwareUpdateAdapter?.guardianSoftwareVersion = it
+                    softwareUpdateAdapter?.notifyDataSetChanged()
+
+                    selectedFile?.let { selected ->
+                        val selectedVersion = selected.version
+                        val installedVersion = it[selected.parent]
+                        if (installedVersion != null && calculateVersionValue(installedVersion) == calculateVersionValue(selectedVersion)) {
+                            softwareUpdateAdapter?.hideLoading()
+                            nextButton.isEnabled = true
+
+                            stopTimer()
                         }
                     }
                 }
-            })
+            }
+        })
+
+        nextButton.setOnClickListener {
+            deploymentProtocol?.nextStep()
         }
 
         val softwares = APKUtils.getAllDownloadedSoftwaresWithType(requireContext())
         populateAdapterWithInfo(softwares)
     }
 
-    private fun sendFile(name: String) {
-        selectedFiles[name]?.also {
-            FileSocketManager.sendFile(it)
+    private fun startTimer() {
+        loadingTimer = object: CountDownTimer(60000, 1000) {
+            override fun onTick(millisUntilFinished: Long) { }
+
+            override fun onFinish() {
+                softwareUpdateAdapter?.let {
+                    if (it.getLoading()) {
+                        it.hideLoading()
+                    }
+                }
+                stopTimer()
+            }
         }
+        loadingTimer?.start()
+    }
+
+    private fun stopTimer() {
+        loadingTimer?.cancel()
+        loadingTimer = null
     }
 
     companion object {
@@ -99,9 +121,10 @@ class SoftwareUpdateFragment : Fragment(), ChildrenClickedListener {
         fun newInstance() = SoftwareUpdateFragment()
     }
 
-    override fun onItemClick(selectedSoftwares: Map<String, String>) {
-        updateButton.isEnabled = selectedSoftwares.isNotEmpty()
-        selectedFiles.clear()
-        selectedFiles.putAll(selectedSoftwares)
+    override fun onItemClick(selectedSoftware: StateSoftwareUpdate.SoftwareChildren) {
+        selectedFile = selectedSoftware
+        FileSocketManager.sendFile(selectedSoftware.path)
+        nextButton.isEnabled = false
+        startTimer()
     }
 }

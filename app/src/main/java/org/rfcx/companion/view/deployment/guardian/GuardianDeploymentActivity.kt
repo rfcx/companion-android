@@ -290,6 +290,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
 
     override fun isGuardianRegistered(): Boolean? = isGuardianRegistered
 
+    override fun getSoftwareVersion(): Map<String, String>? = PingUtils.getSoftwareVersionFromPing(guardianPingBlob)
+
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
     override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems

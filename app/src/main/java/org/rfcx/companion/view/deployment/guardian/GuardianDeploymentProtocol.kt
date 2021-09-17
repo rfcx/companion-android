@@ -17,6 +17,7 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getLastCheckInTime(): Long?
     fun getGuid(): String?
     fun isGuardianRegistered(): Boolean?
+    fun getSoftwareVersion(): Map<String, String>?
 
     fun getNetwork(): Int?
     fun getSentinelPower(): String?
