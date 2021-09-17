@@ -1,7 +1,9 @@
 package org.rfcx.companion.repo.api
 
 import org.rfcx.companion.entity.UserTouchResponse
+import org.rfcx.companion.entity.request.GuardianRegisterRequest
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
+import org.rfcx.companion.entity.response.GuardianRegisterResponse
 import org.rfcx.companion.entity.response.ProjectByIdResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.repo.ApiManager
@@ -37,10 +39,17 @@ class DeviceApiServiceImpl: DeviceApiService {
     }
 
     override fun userTouch(authUser: String): Call<UserTouchResponse> {
-        return ApiManager.getInstance().getCoreApi().userTouch(authUser)
+        return ApiManager.getInstance().getDeviceApi2().userTouch(authUser)
     }
 
     override fun getProjectsById(authUser: String, id: String): Call<ProjectByIdResponse> {
-        return ApiManager.getInstance().getRestApi().getProjectsById(authUser, id)
+        return ApiManager.getInstance().getDeviceApi2().getProjectsById(authUser, id)
+    }
+
+    override fun registerGuardian(
+        authUser: String,
+        guid: GuardianRegisterRequest
+    ): Call<GuardianRegisterResponse> {
+        return ApiManager.getInstance().getDeviceApi2().registerGuardian(authUser, guid)
     }
 }

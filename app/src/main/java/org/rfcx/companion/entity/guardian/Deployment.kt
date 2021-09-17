@@ -37,7 +37,8 @@ open class Deployment(
     @Expose(serialize = false)
     var syncState: Int = 0,
     var deletedAt: Date? = null,
-    var passedChecks: RealmList<Int>? = null
+    var passedChecks: RealmList<Int>? = null,
+    var deviceParameters: String? = null
 ) : RealmModel, Serializable {
 
     fun isCompleted(): Boolean {
@@ -60,6 +61,7 @@ open class Deployment(
         const val FIELD_DELETED_AT = "deletedAt"
         const val FIELD_DEVICE = "device"
         const val FIELD_PASSED_CHECKS = "passedChecks"
+        const val FIELD_DEVICE_PARAMETERS = "deviceParameters"
     }
 }
 

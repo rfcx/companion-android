@@ -74,7 +74,7 @@ class GuardianRegisterFragment : Fragment() {
         val guid = deploymentProtocol?.getGuid()
         val userToken = requireContext().getIdToken()
         if (guid != null && userToken != null) {
-            ApiManager.getInstance().getRestApi(getRadioValueForRegistration()).registerGuardian("Bearer $userToken", GuardianRegisterRequest(guid)).enqueue(
+            ApiManager.getInstance().getDeviceApi2(getRadioValueForRegistration()).registerGuardian("Bearer $userToken", GuardianRegisterRequest(guid)).enqueue(
                 object: Callback<GuardianRegisterResponse> {
                     override fun onResponse(
                         call: Call<GuardianRegisterResponse>,
