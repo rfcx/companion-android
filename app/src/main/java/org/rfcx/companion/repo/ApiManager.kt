@@ -11,7 +11,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 class ApiManager {
-    var apiRest: ApiRestInterface
     var coreApi: CoreApiService
     var apiFirebaseAuth: FirebaseAuthInterface
     private var deviceApi: DeviceApiInterface
@@ -28,7 +27,6 @@ class ApiManager {
     }
 
     init {
-        apiRest = setRetrofitBaseUrl(BuildConfig.DEPLOY_DOMAIN).create(ApiRestInterface::class.java)
         coreApi = setRetrofitBaseUrl(BuildConfig.DEPLOY_DOMAIN).create(CoreApiService::class.java)
         apiFirebaseAuth =
             setRetrofitBaseUrl(BuildConfig.FIREBASE_AUTH_DOMAIN).create(FirebaseAuthInterface::class.java)
@@ -38,27 +36,26 @@ class ApiManager {
             setRetrofitBaseUrl(BuildConfig.DEVICE_API_DOMAIN).create(DeviceApiService::class.java)
     }
 
-    fun getCoreApi(): ApiRestInterface = apiRest
 
     fun getDeviceApi(): DeviceApiInterface = deviceApi
 
-    fun getRestApi(isProduction: Boolean? = null): ApiRestInterface {
+    fun getDeviceApi2(): DeviceApiService = deviceApi2
+
+    fun getDeviceApi2(isProduction: Boolean? = null): DeviceApiService {
         return if (isProduction == null) {
-            apiRest
+            deviceApi2
         } else {
             val staging = "staging-"
-            var url = BuildConfig.DEPLOY_DOMAIN
+            var url = BuildConfig.DEVICE_API_DOMAIN
             if (url.contains(staging, ignoreCase = true)) {
                 url = url.replace(staging, "")
             }
             if (!isProduction) {
                 url = url.insert(8, staging)
             }
-            setRetrofitBaseUrl(url).create(ApiRestInterface::class.java)
+            setRetrofitBaseUrl(url).create(DeviceApiService::class.java)
         }
     }
-
-    fun getDeviceApi2(): DeviceApiService = deviceApi2
 
     private fun setRetrofitBaseUrl(baseUrl: String): Retrofit {
         return Retrofit.Builder()

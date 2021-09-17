@@ -13,6 +13,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.preference.Preference
+import com.google.gson.Gson
 import com.google.gson.JsonObject
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_guardian_deployment.*
@@ -355,6 +356,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
             it.updatedAt = Date()
             it.isActive = true
             it.state = DeploymentState.Guardian.ReadyToUpload.key
+            it.deviceParameters = Gson().toJson(GuardianDeviceParameters(getGuid()))
             setDeployment(it)
 
             val deploymentId = deploymentDb.insertOrUpdateDeployment(it, _deployLocation!!)
