@@ -40,9 +40,14 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        deploymentProtocol?.hideToolbar()
-
-        setGuardianName()
+        val wifi = deploymentProtocol?.getWifiName() ?: ""
+        deploymentProtocol?.let {
+            context?.getString(R.string.setting_up_checklist)?.let { it1 -> it.setCurrentPage(it1) }
+            it.setToolbarSubtitle(wifi)
+            it.setMenuToolbar(true)
+            it.showToolbar()
+            it.setToolbarTitle()
+        }
 
         guardianCheckListRecyclerView.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
@@ -63,11 +68,6 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
         // check if guardian is registered so the step can be highlighted
         checkIfRegistered()
 
-    }
-
-    private fun setGuardianName() {
-        val wifi = deploymentProtocol?.getWifiName()
-        guardianIdTextView.text = wifi
     }
 
     private fun checkIfRegistered() {

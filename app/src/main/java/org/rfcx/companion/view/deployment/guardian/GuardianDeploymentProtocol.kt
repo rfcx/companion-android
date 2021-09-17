@@ -7,7 +7,7 @@ import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 
 interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun startSetupConfigure()
-
+    fun startGuardianRegister()
     fun backToConfigure()
 
     fun getDeployment(): Deployment?

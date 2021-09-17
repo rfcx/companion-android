@@ -1,18 +1,19 @@
 package org.rfcx.companion.view.deployment.guardian
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
-import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.preference.Preference
 import com.google.gson.JsonObject
-import com.mapbox.api.directions.v5.models.Admin
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_guardian_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
@@ -36,6 +37,7 @@ import org.rfcx.companion.util.socket.PingUtils
 import org.rfcx.companion.view.deployment.BaseDeploymentActivity
 import org.rfcx.companion.view.deployment.guardian.advanced.GuardianAdvancedFragment
 import org.rfcx.companion.view.deployment.guardian.checkin.GuardianCheckInTestFragment
+import org.rfcx.companion.view.deployment.guardian.classifier.ClassifierFragment
 import org.rfcx.companion.view.deployment.guardian.configure.GuardianConfigureFragment
 import org.rfcx.companion.view.deployment.guardian.connect.ConnectGuardianFragment
 import org.rfcx.companion.view.deployment.guardian.deploy.GuardianDeployFragment
@@ -50,7 +52,6 @@ import org.rfcx.companion.view.deployment.location.DetailDeploymentSiteFragment
 import org.rfcx.companion.view.deployment.location.SetDeploymentSiteFragment
 import org.rfcx.companion.view.dialog.*
 import org.rfcx.companion.view.prefs.SyncPreferenceListener
-import java.io.File
 import java.util.*
 
 class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentProtocol,
@@ -84,6 +85,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     private var passedChecks = arrayListOf<Int>()
 
     private var onDeployClicked = false
+    private var menuAll: Menu? = null
 
     private lateinit var wifiHotspotManager: WifiHotspotManager
     private val analytics by lazy { Analytics(this) }
@@ -103,6 +105,28 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     private val siteObserve = Observer<List<Locate>> {
         this.sites = it
         setSiteItems()
+    }
+
+    @SuppressLint("ResourceAsColor")
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuAll = menu
+        val inflater = menuInflater
+        inflater.inflate(R.menu.preference_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> backStep()
+            R.id.MoreView -> onClickMoreView()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun onClickMoreView() {
+        setCurrentPage(getString(R.string.advanced_config))
+        setToolbarTitle()
+        startFragment(GuardianAdvancedFragment.newInstance(), "GuardianAdvancedFragment")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -154,6 +178,14 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     override fun backStep() {
         val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
         when (container) {
+            is GuardianAdvancedFragment -> {
+                if (supportFragmentManager.backStackEntryCount > 0) {
+                    supportFragmentManager.popBackStack()
+                } else {
+                    super.onBackPressed()
+                }
+            }
+            is GuardianRegisterFragment -> setupView()
             is MapPickerFragment -> startFragment(
                 DetailDeploymentSiteFragment.newInstance(
                     latitude,
@@ -300,7 +332,6 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         return projectDb.getProjectByName(name)
     }
 
-
     override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
         val deployment = _deployment ?: Deployment()
         deployment.isActive = locate.serverId == null
@@ -379,6 +410,11 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         startFragment(GuardianConfigureFragment.newInstance())
     }
 
+    override fun startGuardianRegister() {
+//        updateDeploymentState(DeploymentState.Guardian.Register) // TODO:: Not sure where should be @Frongs
+        startFragment(GuardianRegisterFragment.newInstance())
+    }
+
     override fun backToConfigure() {
         startFragment(GuardianConfigureFragment.newInstance())
     }
@@ -392,8 +428,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
                 startFragment(GuardianSolarPanelFragment.newInstance())
             }
             1 -> {
-                updateDeploymentState(DeploymentState.Guardian.Register)
-                startFragment(GuardianRegisterFragment.newInstance())
+                startFragment(SoftwareUpdateFragment.newInstance())
             }
             2 -> {
                 updateDeploymentState(DeploymentState.Guardian.Signal)
@@ -425,15 +460,11 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
                 startFragment(GuardianCheckInTestFragment.newInstance())
             }
             7 -> {
-                startFragment(SoftwareUpdateFragment.newInstance())
+                startFragment(ClassifierFragment.newInstance())
             }
             8 -> {
                 updateDeploymentState(DeploymentState.Guardian.Deploy)
                 startFragment(GuardianDeployFragment.newInstance())
-            }
-            9 -> {
-                updateDeploymentState(DeploymentState.Guardian.Advanced)
-                startFragment(GuardianAdvancedFragment.newInstance())
             }
         }
     }
@@ -500,6 +531,16 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     override fun unregisterWifiConnectionLostListener() {
         if (::wifiHotspotManager.isInitialized) {
             wifiHotspotManager.unregisterWifiConnectionLost()
+        }
+    }
+
+    override fun setMenuToolbar(isVisibility: Boolean) {
+        menuAll?.findItem(R.id.MoreView)?.isVisible = isVisibility
+    }
+
+    override fun setToolbarSubtitle(sub: String) {
+        supportActionBar?.apply {
+            subtitle = sub
         }
     }
 

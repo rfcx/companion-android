@@ -22,7 +22,6 @@ import java.util.*
 
 class SoftwareUpdateFragment : Fragment(), ChildrenClickedListener {
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
-
     var softwareUpdateAdapter: SoftwareUpdateAdapter? = null
     private var selectedFile: StateSoftwareUpdate.SoftwareChildren? = null
     private var loadingTimer: CountDownTimer? = null
@@ -63,6 +62,8 @@ class SoftwareUpdateFragment : Fragment(), ChildrenClickedListener {
         super.onViewCreated(view, savedInstanceState)
 
         deploymentProtocol?.let {
+            it.setToolbarSubtitle()
+            it.setMenuToolbar(false)
             it.showToolbar()
             it.setToolbarTitle()
         }
