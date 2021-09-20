@@ -65,22 +65,6 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
             showNotificationBeforeDeploy()
         }
 
-        // check if guardian is registered so the step can be highlighted
-        checkIfRegistered()
-
-    }
-
-    private fun checkIfRegistered() {
-        GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
-            val isRegistered = deploymentProtocol?.isGuardianRegistered()
-            if (isRegistered != null && isRegistered) {
-                checkListRecyclerView.setCheckPassed(1)
-                deploymentProtocol?.addRegisteredToPassedCheck()
-            } else {
-                checkListRecyclerView.setCheckUnPassed(1)
-                deploymentProtocol?.removeRegisteredOnPassedCheck()
-            }
-        })
     }
 
     override fun invoke(number: Int, name: String) {

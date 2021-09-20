@@ -61,4 +61,13 @@ object PingUtils {
         }
         return mapSoftwareVersion
     }
+
+    fun getAudioConfigureFromPing(ping: GuardianPing?): JsonObject? {
+        val prefs = ping?.prefs ?: return null
+        if (prefs is JsonObject) {
+            val prefsJson = Gson().fromJson(prefs.get("vals"), JsonObject::class.java) ?: return JsonObject()
+            return prefsJson
+        }
+        return JsonObject()
+    }
 }

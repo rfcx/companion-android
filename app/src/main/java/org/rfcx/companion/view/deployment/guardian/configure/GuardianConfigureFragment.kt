@@ -85,6 +85,7 @@ class GuardianConfigureFragment : Fragment() {
         nextButton.setOnClickListener {
             analytics?.trackClickNextEvent(Screen.GUARDIAN_CONFIGURE.id)
             setNextButton(false)
+            deploymentProtocol?.nextStep()
             syncConfig()
             deploymentProtocol?.setDeploymentConfigure(getConfiguration())
             deploymentProtocol?.setSampleRate(sampleRate)
@@ -108,11 +109,11 @@ class GuardianConfigureFragment : Fragment() {
 
     private fun retrieveCurrentConfigure() {
         GuardianSocketManager.getCurrentConfiguration()
-        GuardianSocketManager.currentConfiguration.observe(viewLifecycleOwner, Observer { curConfig ->
-            bitrate = curConfig.configure.bitrate
-            sampleRate = curConfig.configure.sampleRate
-            duration = curConfig.configure.duration
-            fileFormat = if (curConfig.configure.fileFormat.toIntOrNull() == null) curConfig.configure.fileFormat else "opus"
+        GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer { curConfig ->
+//            bitrate = curConfig.configure.bitrate
+//            sampleRate = curConfig.configure.sampleRate
+//            duration = curConfig.configure.duration
+//            fileFormat = if (curConfig.configure.fileFormat.toIntOrNull() == null) curConfig.configure.fileFormat else "opus"
             deploymentProtocol?.hideLoading()
 
             setFileFormatLayout()

@@ -38,7 +38,6 @@ import org.rfcx.companion.util.socket.PingUtils
 import org.rfcx.companion.view.deployment.BaseDeploymentActivity
 import org.rfcx.companion.view.deployment.guardian.advanced.GuardianAdvancedFragment
 import org.rfcx.companion.view.deployment.guardian.checkin.GuardianCheckInTestFragment
-import org.rfcx.companion.view.deployment.guardian.classifier.ClassifierFragment
 import org.rfcx.companion.view.deployment.guardian.configure.GuardianConfigureFragment
 import org.rfcx.companion.view.deployment.guardian.connect.ConnectGuardianFragment
 import org.rfcx.companion.view.deployment.guardian.deploy.GuardianDeployFragment
@@ -127,7 +126,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     private fun onClickMoreView() {
         setCurrentPage(getString(R.string.advanced_config))
         setToolbarTitle()
-        startFragment(GuardianAdvancedFragment.newInstance(), "GuardianAdvancedFragment")
+        startFragment(GuardianAdvancedFragment.newInstance())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -136,6 +135,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
 
         setupToolbar()
         setLiveData()
+
+        this.currentLocate = this.getLastLocation()
 
         val deploymentId = intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
         if (deploymentId != null) {
@@ -180,11 +181,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
         when (container) {
             is GuardianAdvancedFragment -> {
-                if (supportFragmentManager.backStackEntryCount > 0) {
-                    supportFragmentManager.popBackStack()
-                } else {
-                    super.onBackPressed()
-                }
+                startCheckList()
             }
             is GuardianRegisterFragment -> setupView()
             is MapPickerFragment -> startFragment(
@@ -325,6 +322,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
 
     override fun getSoftwareVersion(): Map<String, String>? = PingUtils.getSoftwareVersionFromPing(guardianPingBlob)
 
+    override fun getAudioConfiguration(): JsonObject? = JsonObject()
+
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
     override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
@@ -462,9 +461,6 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
                 startFragment(GuardianCheckInTestFragment.newInstance())
             }
             7 -> {
-                startFragment(ClassifierFragment.newInstance())
-            }
-            8 -> {
                 updateDeploymentState(DeploymentState.Guardian.Deploy)
                 startFragment(GuardianDeployFragment.newInstance())
             }
