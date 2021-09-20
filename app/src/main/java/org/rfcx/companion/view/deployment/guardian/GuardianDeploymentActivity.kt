@@ -27,7 +27,6 @@ import org.rfcx.companion.connection.wifi.WifiHotspotManager
 import org.rfcx.companion.connection.wifi.WifiLostListener
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
-import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import org.rfcx.companion.entity.socket.request.CheckinCommand
 import org.rfcx.companion.entity.socket.response.GuardianPing
 import org.rfcx.companion.localdb.*
@@ -65,11 +64,9 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     private val trackingDb by lazy { TrackingDb(realm) }
     private val trackingFileDb by lazy { TrackingFileDb(realm) }
 
-    private var _configuration: GuardianConfiguration? = null
     private var useExistedLocation: Boolean = false
 
     private var guardianPingBlob: GuardianPing? = null
-    private var prefsSha1: String? = null
     private var network: Int? = null
     private var sentinelPower: String? = null
     private var isGuardianRegistered: Boolean? = null
@@ -143,13 +140,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
             val deployment = deploymentDb.getDeploymentById(deploymentId)
             if (deployment != null) {
                 setDeployment(deployment)
-
                 if (deployment.stream != null) {
                     _deployLocation = deployment.stream
-                }
-
-                if (deployment.configuration != null) {
-                    _configuration = deployment.configuration
                 }
             }
         } else {
@@ -296,16 +288,6 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         }
     }
 
-    override fun setDeploymentConfigure(config: GuardianConfiguration) {
-        this._configuration = config
-        this._deployment?.configuration = _configuration
-
-        // update deployment
-        this._deployment?.let { deploymentDb.updateDeployment(it) }
-    }
-
-    override fun getConfiguration(): GuardianConfiguration? = _configuration
-
     override fun getSampleRate(): Int = _sampleRate
 
     override fun getWifiName(): String = _deployment?.wifiName ?: ""
@@ -322,7 +304,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
 
     override fun getSoftwareVersion(): Map<String, String>? = PingUtils.getSoftwareVersionFromPing(guardianPingBlob)
 
-    override fun getAudioConfiguration(): JsonObject? = JsonObject()
+    override fun getAudioConfiguration(): JsonObject? = PingUtils.getAudioConfigureFromPing(guardianPingBlob)
 
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
@@ -385,7 +367,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
                         siteId = this._locate!!.id,
                         localPath = GeoJsonUtils.generateGeoJson(
                             this,
-                            GeoJsonUtils.generateFileName(it.deployedAt, it.wifiName!!),
+                            GeoJsonUtils.generateFileName(it.deployedAt, getGuid()!!),
                             point
                         ).absolutePath
                     )

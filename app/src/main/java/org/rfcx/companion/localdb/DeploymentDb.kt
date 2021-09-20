@@ -6,10 +6,9 @@ import io.realm.Sort
 import io.realm.kotlin.deleteFromRealm
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
-import org.rfcx.companion.entity.guardian.isGuardian
 import org.rfcx.companion.entity.response.DeploymentResponse
-import org.rfcx.companion.entity.response.toDeploymentLocation
 import org.rfcx.companion.entity.response.toDeployment
+import org.rfcx.companion.entity.response.toDeploymentLocation
 import java.util.*
 
 class DeploymentDb(private val realm: Realm) {
@@ -84,12 +83,6 @@ class DeploymentDb(private val realm: Realm) {
                 if (deployment != null) {
                     deployment.serverId = deploymentResponse.id
                     deployment.deployedAt = deploymentResponse.deployedAt ?: deployment.deployedAt
-                    deployment.wifiName = deploymentResponse.wifi ?: ""
-
-                    val newConfig = deploymentResponse.configuration
-                    if (newConfig != null) {
-                        deployment.configuration = it.copyToRealm(newConfig)
-                    }
 
                     val newLocation = deploymentResponse.stream
                     if (newLocation != null) {

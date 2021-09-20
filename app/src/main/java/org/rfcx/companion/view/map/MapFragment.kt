@@ -72,13 +72,11 @@ import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
-import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.service.DeploymentSyncWorker
+import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
-import org.rfcx.companion.util.Status
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.detail.DeploymentDetailActivity
-import org.rfcx.companion.view.diagnostic.DiagnosticActivity
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupAdapter
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupListener
@@ -845,12 +843,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         val deploymentId = feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID)
         if (deploymentId != null) {
             context?.let {
-                val device = feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEVICE)
-                if (device == Device.AUDIOMOTH.value) {
-                    DeploymentDetailActivity.startActivity(it, deploymentId.toInt())
-                } else {
-                    DiagnosticActivity.startActivity(it, deploymentId.toInt(), false)
-                }
+                DeploymentDetailActivity.startActivity(it, deploymentId.toInt())
                 analytics?.trackSeeDetailEvent()
             }
         } else {

@@ -16,6 +16,7 @@ import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import org.rfcx.companion.entity.guardian.toListForGuardian
 import org.rfcx.companion.entity.socket.response.Status
 import org.rfcx.companion.util.Analytics
+import org.rfcx.companion.util.prefs.PrefsUtils
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianConfigureFragment : Fragment() {
@@ -62,7 +63,6 @@ class GuardianConfigureFragment : Fragment() {
         }
 
         setNextButton(true)
-        deploymentProtocol?.showLoading()
         retrieveCurrentConfigure()
     }
 
@@ -87,7 +87,6 @@ class GuardianConfigureFragment : Fragment() {
             setNextButton(false)
             deploymentProtocol?.nextStep()
             syncConfig()
-            deploymentProtocol?.setDeploymentConfigure(getConfiguration())
             deploymentProtocol?.setSampleRate(sampleRate)
         }
     }
@@ -108,20 +107,17 @@ class GuardianConfigureFragment : Fragment() {
     }
 
     private fun retrieveCurrentConfigure() {
-        GuardianSocketManager.getCurrentConfiguration()
-        GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer { curConfig ->
-//            bitrate = curConfig.configure.bitrate
-//            sampleRate = curConfig.configure.sampleRate
-//            duration = curConfig.configure.duration
-//            fileFormat = if (curConfig.configure.fileFormat.toIntOrNull() == null) curConfig.configure.fileFormat else "opus"
-            deploymentProtocol?.hideLoading()
-
-            setFileFormatLayout()
-            setSampleRateLayout()
-            setBitrateLayout()
-            setDuration()
-            setNextOnClick()
-        })
+        deploymentProtocol?.getAudioConfiguration()?.let {
+            bitrate = it.get(PrefsUtils.audioBitrate).asInt
+            sampleRate = it.get(PrefsUtils.audioSampleRate).asInt
+            duration = it.get(PrefsUtils.audioDuration).asInt
+            fileFormat = it.get(PrefsUtils.audioCodec).asString
+        }
+        setFileFormatLayout()
+        setSampleRateLayout()
+        setBitrateLayout()
+        setDuration()
+        setNextOnClick()
     }
 
     private fun setBitrateLayout() {

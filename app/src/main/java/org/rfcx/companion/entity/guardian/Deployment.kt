@@ -28,8 +28,6 @@ open class Deployment(
     @Expose(serialize = false)
     var state: Int = 0, // 1 = Locate, 2 = Config, 3 = Sync, 4 = Verify, 5 = Deploy, 6 = Ready To Upload
     var device: String? = Device.GUARDIAN.value,
-    var wifiName: String? = "",
-    var configuration: GuardianConfiguration? = null,
     var stream: DeploymentLocation? = null,
     var createdAt: Date = Date(),
     var updatedAt: Date? = null,
@@ -65,48 +63,23 @@ open class Deployment(
     }
 }
 
-fun Deployment.isGuardian(): Boolean {
-    return this.device == Device.GUARDIAN.value
-}
-
 fun Deployment.toMark(context: Context): MapMarker.DeploymentMarker {
     val color = stream?.project?.color
     val group = stream?.project?.name
-    var pinImage = ""
-    var description = "-"
-    when (device) {
-        Device.GUARDIAN.value -> {
-            pinImage = if (state == DeploymentState.Guardian.ReadyToUpload.key) {
-                if (WifiHotspotUtils.isConnectedWithGuardian(context, this.wifiName!!)) {
-                    if (color != null && color.isNotEmpty()) {
-                        stream?.project?.color
-                    } else {
-                        GuardianPin.CONNECTED_GUARDIAN
-                    }
-                } else {
-                    GuardianPin.CONNECTED_GUARDIAN
-                }
-            } else {
-                GuardianPin.CONNECTED_GUARDIAN
-            } ?: GuardianPin.CONNECTED_GUARDIAN
+    val pinImage = if (state == DeploymentState.AudioMoth.ReadyToUpload.key) {
+        if (color != null && color.isNotEmpty() && group != null) {
+            stream?.project?.color
+        } else {
+            Pin.PIN_GREEN
         }
-        else -> {
-            pinImage = if (state == DeploymentState.AudioMoth.ReadyToUpload.key) {
-                if (color != null && color.isNotEmpty() && group != null) {
-                    stream?.project?.color
-                } else {
-                    Pin.PIN_GREEN
-                }
-            } else {
-                Pin.PIN_GREY
-            } ?: Pin.PIN_GREEN
+    } else {
+        Pin.PIN_GREY
+    } ?: Pin.PIN_GREEN
 
-            description = if (state >= DeploymentState.AudioMoth.ReadyToUpload.key)
-                context.getString(R.string.format_deployed)
-            else
-                context.getString(R.string.format_in_progress_step)
-        }
-    }
+    val description = if (state >= DeploymentState.AudioMoth.ReadyToUpload.key)
+        context.getString(R.string.format_deployed)
+    else
+        context.getString(R.string.format_in_progress_step)
 
     return MapMarker.DeploymentMarker(
         id,
