@@ -64,17 +64,17 @@ open class Deployment(
 }
 
 fun Deployment.toMark(context: Context): MapMarker.DeploymentMarker {
-    val color = stream?.project?.color
-    val group = stream?.project?.name
-    val pinImage = if (state == DeploymentState.AudioMoth.ReadyToUpload.key) {
-        if (color != null && color.isNotEmpty() && group != null) {
-            stream?.project?.color
-        } else {
+    val pinImage = when (state) {
+        DeploymentState.AudioMoth.ReadyToUpload.key -> {
             Pin.PIN_GREEN
         }
-    } else {
-        Pin.PIN_GREY
-    } ?: Pin.PIN_GREEN
+        DeploymentState.Guardian.ReadyToUpload.key -> {
+            Pin.PIN_GREEN
+        }
+        else -> {
+            Pin.PIN_GREY
+        }
+    }
 
     val description = if (state >= DeploymentState.AudioMoth.ReadyToUpload.key)
         context.getString(R.string.format_deployed)
