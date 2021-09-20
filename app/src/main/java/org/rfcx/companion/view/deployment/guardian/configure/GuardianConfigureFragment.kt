@@ -88,7 +88,6 @@ class GuardianConfigureFragment : Fragment() {
         nextButton.setOnClickListener {
             analytics?.trackClickNextEvent(Screen.GUARDIAN_CONFIGURE.id)
             setNextButton(false)
-            deploymentProtocol?.nextStep()
             syncConfig()
             deploymentProtocol?.setSampleRate(sampleRate)
         }
@@ -96,7 +95,7 @@ class GuardianConfigureFragment : Fragment() {
 
     private fun syncConfig() {
         GuardianSocketManager.syncConfiguration(getConfiguration().toListForGuardian())
-        GuardianSocketManager.syncConfiguration.observe(viewLifecycleOwner, Observer {
+        GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
             requireActivity().runOnUiThread {
                 if (!needCheckSha1) {
                     deploymentProtocol?.nextStep()

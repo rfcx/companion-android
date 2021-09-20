@@ -49,6 +49,7 @@ class GuardianAdvancedFragment : Fragment() {
             it.setMenuToolbar(false)
             it.showToolbar()
             it.setToolbarTitle()
+            currentPrefsSha1 = it.getPrefsSha1()
         }
 
         //start guardian prefs fragment once view created
@@ -58,6 +59,7 @@ class GuardianAdvancedFragment : Fragment() {
 
         advancedFinishButton.setOnClickListener {
             analytics?.trackClickNextEvent(Screen.GUARDIAN_ADVANCED.id)
+            it.isEnabled = false
             syncConfig()
         }
     }
@@ -66,7 +68,7 @@ class GuardianAdvancedFragment : Fragment() {
         val prefs = syncPreferenceListener?.getPrefsChanges() ?: JsonObject()
         needCheckSha1 = prefs.size() > 0
         GuardianSocketManager.syncConfiguration(prefs.toString())
-        GuardianSocketManager.syncConfiguration.observe(viewLifecycleOwner, Observer {
+        GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
             requireActivity().runOnUiThread {
                 if (!needCheckSha1) {
                     deploymentProtocol?.nextStep()
