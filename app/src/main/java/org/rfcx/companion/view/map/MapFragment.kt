@@ -537,14 +537,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                                 eq(
                                     get(PROPERTY_DEPLOYMENT_MARKER_IMAGE),
                                     Pin.PIN_GREEN
-                                ),
-                                eq(
-                                    get(PROPERTY_DEPLOYMENT_MARKER_IMAGE),
-                                    GuardianPin.CONNECTED_GUARDIAN
-                                ),
-                                eq(
-                                    get(PROPERTY_DEPLOYMENT_MARKER_IMAGE),
-                                    GuardianPin.NOT_CONNECTED_GUARDIAN
                                 )
                             ),
                             literal(1),
@@ -647,22 +639,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         val mBitmapPinSite = BitmapUtils.getBitmapFromDrawable(drawablePinSite)
         if (mBitmapPinSite != null) {
             style.addImage(SITE_MARKER, mBitmapPinSite)
-        }
-
-        val drawablePinConnectedGuardian =
-            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map, null)
-        val mBitmapPinConnectedGuardian =
-            BitmapUtils.getBitmapFromDrawable(drawablePinConnectedGuardian)
-        if (mBitmapPinConnectedGuardian != null) {
-            style.addImage(GuardianPin.CONNECTED_GUARDIAN, mBitmapPinConnectedGuardian)
-        }
-
-        val drawablePinNotConnectedGuardian =
-            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map_grey, null)
-        val mBitmapPinNotConnectedGuardian =
-            BitmapUtils.getBitmapFromDrawable(drawablePinNotConnectedGuardian)
-        if (mBitmapPinNotConnectedGuardian != null) {
-            style.addImage(GuardianPin.NOT_CONNECTED_GUARDIAN, mBitmapPinNotConnectedGuardian)
         }
 
         val drawablePinMapGreen =

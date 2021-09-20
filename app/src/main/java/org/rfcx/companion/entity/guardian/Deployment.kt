@@ -10,9 +10,7 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.DeploymentLocation
 import org.rfcx.companion.entity.DeploymentState
 import org.rfcx.companion.entity.Device
-import org.rfcx.companion.util.GuardianPin
 import org.rfcx.companion.util.Pin
-import org.rfcx.companion.util.WifiHotspotUtils
 import org.rfcx.companion.util.randomDeploymentId
 import org.rfcx.companion.view.map.MapMarker
 import java.io.Serializable
