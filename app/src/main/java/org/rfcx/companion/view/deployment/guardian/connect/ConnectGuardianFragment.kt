@@ -121,7 +121,6 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
             GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
                 requireActivity().runOnUiThread {
                     hideLoading()
-                    deploymentProtocol?.setDeploymentWifiName(guardianHotspot!!.SSID)
                     deploymentProtocol?.startGuardianRegister()
                     deploymentProtocol?.setWifiManager(wifiHotspotManager)
                     deploymentProtocol?.registerWifiConnectionLostListener()

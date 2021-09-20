@@ -12,7 +12,6 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
 
     fun getDeployment(): Deployment?
     fun getSampleRate(): Int
-    fun getWifiName(): String
     fun getLastCheckInTime(): Long?
     fun getGuid(): String?
     fun isGuardianRegistered(): Boolean?
@@ -23,7 +22,6 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getSentinelPower(): String?
 
     fun setDeployment(deployment: Deployment)
-    fun setDeploymentWifiName(name: String)
     fun setSampleRate(sampleRate: Int)
     fun setOnDeployClicked()
     fun setLastCheckInTime(time: Long?)

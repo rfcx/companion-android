@@ -258,12 +258,6 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         this._deployment = deployment
     }
 
-    override fun setDeploymentWifiName(name: String) {
-        val deployment = _deployment ?: Deployment()
-        deployment.wifiName = name
-        setDeployment(deployment)
-    }
-
     override fun setSampleRate(sampleRate: Int) {
         this._sampleRate = sampleRate
     }
@@ -289,8 +283,6 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     }
 
     override fun getSampleRate(): Int = _sampleRate
-
-    override fun getWifiName(): String = _deployment?.wifiName ?: ""
 
     override fun getLastCheckInTime(): Long? = lastCheckInTime
 

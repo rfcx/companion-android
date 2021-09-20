@@ -40,10 +40,9 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val wifi = deploymentProtocol?.getWifiName() ?: ""
         deploymentProtocol?.let {
             context?.getString(R.string.setting_up_checklist)?.let { it1 -> it.setCurrentPage(it1) }
-            it.setToolbarSubtitle(wifi)
+            it.setToolbarSubtitle(it.getGuid() ?: "Guardian")
             it.setMenuToolbar(true)
             it.showToolbar()
             it.setToolbarTitle()
