@@ -298,6 +298,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
 
     override fun getAudioConfiguration(): JsonObject? = PingUtils.getAudioConfigureFromPing(guardianPingBlob)
 
+    override fun getPrefsSha1(): String? = PingUtils.getPrefsSha1FromPing(guardianPingBlob)
+
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
     override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
@@ -554,14 +556,14 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         this.prefsChanges = prefs
     }
 
-    override fun getPrefsChanges(): String {
+    override fun getPrefsChanges(): JsonObject {
         val json = JsonObject()
         if (this.prefsChanges.isNotEmpty()) {
             this.prefsChanges.forEach {
                 json.addProperty(it.key, it.value)
             }
         }
-        return json.toString()
+        return json
     }
 
     override fun showSyncButton() { /* not used */
