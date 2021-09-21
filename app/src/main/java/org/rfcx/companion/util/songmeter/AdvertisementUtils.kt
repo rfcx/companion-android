@@ -55,7 +55,7 @@ class AdvertisementUtils {
      *    "-"    = 37
      */
     private fun binaryToPrefixes(prefixesBinary: String): String {
-        return PrefixesMapper.toPrefixes(
+        return PrefixesMapper.toPrefixesString(
             prefixesBinary.substring(0, prefixesBinary.length - 4).chunked(6)
                 .map { Integer.parseInt(it, 2) })
     }

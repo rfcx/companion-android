@@ -42,7 +42,7 @@ private val characterTable = mapOf(
     )
 
 object PrefixesMapper {
-    fun toPrefixes(binaries: List<Int>): String {
+    fun toPrefixesString(binaries: List<Int>): String {
         return binaries.mapNotNull { characterTable[it] }.joinToString("")
     }
 }
