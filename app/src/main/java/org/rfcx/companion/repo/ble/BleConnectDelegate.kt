@@ -125,6 +125,8 @@ class BleConnectDelegate(private val context: Context) {
                     }
                 }
                 expectedPrefixes = null
+                // Disconnect gatt
+                unbindService()
             }
         }
     }
