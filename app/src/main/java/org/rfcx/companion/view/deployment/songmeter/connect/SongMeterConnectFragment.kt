@@ -66,6 +66,12 @@ class SongMeterConnectFragment : Fragment() {
         getArgument()
         observeGattConnection()
         setupRecorderId()
+        observeSetSite()
+        observeGetConfig()
+
+        finishSongMeterButton.setOnClickListener {
+            songMeterViewModel.setPrefixes(songMeterSiteIdEditText.text.toString())
+        }
 
         songMeterViewModel.bindConnectService(advertisement!!.address)
         songMeterViewModel.registerGattReceiver()
@@ -82,6 +88,48 @@ class SongMeterConnectFragment : Fragment() {
             it.showToolbar()
             it.setToolbarTitle()
         }
+    }
+
+    private fun observeSetSite() {
+        songMeterViewModel.getSetSiteLiveData().observe(viewLifecycleOwner, Observer {
+            when (it.status) {
+                Status.LOADING -> {
+                    disableUI()
+                }
+                Status.SUCCESS -> {
+                    it.data?.let { result ->
+                        if (result) {
+                            deploymentProtocol?.nextStep()
+                        } else {
+                            enableUI()
+                        }
+                    }
+                }
+            }
+        })
+    }
+
+    private fun observeGetConfig() {
+        songMeterViewModel.getRequestConfigLiveData().observe(viewLifecycleOwner, Observer {
+            when (it.status) {
+                Status.LOADING -> {
+                    disableUI()
+                }
+                Status.SUCCESS -> {
+                    enableUI()
+                }
+            }
+        })
+    }
+
+    private fun disableUI() {
+        finishSongMeterButton.isEnabled = false
+        songMeterSiteIdEditText.isEnabled = false
+    }
+
+    private fun enableUI() {
+        finishSongMeterButton.isEnabled = true
+        songMeterSiteIdEditText.isEnabled = true
     }
 
     private fun observeGattConnection() {
@@ -133,8 +181,8 @@ class SongMeterConnectFragment : Fragment() {
         songMeterViewModel.unRegisterGattReceiver()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDetach() {
+        super.onDetach()
         songMeterViewModel.unBindConnectService()
     }
 

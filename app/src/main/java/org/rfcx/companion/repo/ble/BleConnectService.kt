@@ -23,6 +23,7 @@ class BleConnectService : Service() {
     private var mConnectionState = STATE_DISCONNECTED
 
     var state = true
+    var commandChar: BluetoothGattCharacteristic? = null
 
     var notifyCharacteristics = listOf(
         SongMeterConstant.kUUIDCharConfigRtoA,
@@ -53,6 +54,7 @@ class BleConnectService : Service() {
                 intentAction = ACTION_GATT_DISCONNECTED
                 mConnectionState = STATE_DISCONNECTED
                 Log.i(TAG, "Disconnected from GATT server.")
+                close()
                 broadcastUpdate(intentAction)
             }
         }
@@ -98,15 +100,27 @@ class BleConnectService : Service() {
             descriptor: BluetoothGattDescriptor?,
             status: Int
         ) {
-            mBluetoothGatt!!.setCharacteristicNotification(descriptor!!.characteristic, true)
+            val enabled = descriptor!!.value!!.contentEquals(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
+            mBluetoothGatt!!.setCharacteristicNotification(descriptor.characteristic, enabled)
             notifyCharacteristicsPosition++
             if (notifyCharacteristicsPosition < notifyCharacteristics.size) {
                 val characteristic = BleConnectDelegate.mapCharacteristic[notifyCharacteristics[notifyCharacteristicsPosition]]
-                setCharacteristicNotification(characteristic!!, true)
+                setCharacteristicNotification(characteristic!!, enabled)
             } else {
                 notifyCharacteristicsPosition = 0
                 if (status == BluetoothGatt.GATT_SUCCESS) {
                     broadcastUpdate(ACTION_DESCRIPTOR_WRITTEN, descriptor.characteristic)
+                }
+                //close gatt after set chars notification to false
+                if (!enabled) {
+                    val data = ByteArray(3)
+                    data[0] = (1).toByte()
+                    data[1] = 0xA // Disconnect the Bluetooth connection.
+                    data[2] = 0x00.toByte()
+                    commandChar?.value = data
+                    writeCharacteristic(commandChar)
+                    close()
+                    broadcastUpdate(ACTION_GATT_DISCONNECTED)
                 }
             }
         }
@@ -210,6 +224,7 @@ class BleConnectService : Service() {
             Log.w(TAG, "Device not found.  Unable to connect.")
             return false
         }
+        mBluetoothAdapter?.cancelDiscovery()
         // We want to directly connect to the device, so we are setting the autoConnect
         // parameter to false.
         mBluetoothGatt = device.connectGatt(this, false, mGattCallback)
@@ -291,7 +306,6 @@ class BleConnectService : Service() {
             descriptor.value = BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE
         }
         mBluetoothGatt!!.writeDescriptor(descriptor)
-//        mBluetoothGatt!!.setCharacteristicNotification(characteristic, enabled)
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)

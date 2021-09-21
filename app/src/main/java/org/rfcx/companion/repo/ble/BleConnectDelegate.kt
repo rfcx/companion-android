@@ -1,6 +1,5 @@
 package org.rfcx.companion.repo.ble
 
-import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattService
 import android.content.*
@@ -9,7 +8,6 @@ import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.MutableLiveData
 import org.rfcx.companion.entity.songmeter.SongMeterConstant
@@ -19,7 +17,6 @@ import java.util.*
 class BleConnectDelegate(private val context: Context) {
 
     private var deviceAddress: String? = null
-    private var isConnected = false
     private var bleConnectService: BleConnectService? = null
 
     var configService: BluetoothGattService? = null
@@ -36,23 +33,24 @@ class BleConnectDelegate(private val context: Context) {
     var bulkDataRtoA: BluetoothGattCharacteristic? = null
     var response: BluetoothGattCharacteristic? = null
     var status: BluetoothGattCharacteristic? = null
+    var command: BluetoothGattCharacteristic? = null
 
     var needCheck = false
 
+    val setSiteLiveData = MutableLiveData<Resource<Boolean>>()
+    val getConfigLiveData = MutableLiveData<Resource<Boolean>>()
+
     var requestConfigVersion = 0
-    var seqAtoRSendVersion = 0
-    var seqAtoRRecvVersion = 0
+    var expectedPrefixes: ByteArray? = null
 
     var count = 0
 
-    var recorder: BluetoothGatt? = null
     private var gattConnection = MutableLiveData<Resource<Boolean>>()
 
     private var handler = Handler(Looper.getMainLooper())
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            Log.d("BLE", "connected")
             bleConnectService = (service as BleConnectService.LocalBinder).service
             bleConnectService?.let {
                 if (!it.initialize()) {
@@ -63,7 +61,6 @@ class BleConnectDelegate(private val context: Context) {
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
-            Log.d("BLE", "disconnected")
             bleConnectService = null
         }
     }
@@ -73,47 +70,29 @@ class BleConnectDelegate(private val context: Context) {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
                 BleConnectService.ACTION_GATT_CONNECTED -> {
-                    isConnected = true
-                    gattConnection.postValue(Resource.success(isConnected))
+                    gattConnection.postValue(Resource.success(true))
                 }
                 BleConnectService.ACTION_GATT_DISCONNECTED -> {
-                    isConnected = false
-                    gattConnection.postValue(Resource.success(isConnected))
+                    gattConnection.postValue(Resource.success(false))
+                    // Send after close connection
+                    if (needCheck) {
+                        setSiteLiveData.postValue(Resource.success(true))
+                        needCheck = false
+                    }
                 }
                 BleConnectService.ACTION_GATT_SERVICES_DISCOVERED -> {
                     setGattServices(bleConnectService?.supportedGattServices)
                 }
-                BleConnectService.ACTION_CHA_WRITE -> {
-                    when {
-                        intent.getStringExtra(BleConnectService.CHARACTERISTICS)!!.toUpperCase() == SongMeterConstant.kUUIDCharConfigAtoR -> {
-                            handler.post {
-//                                bleConnectService?.readCharacteristic(configRtoA)
-                            }
-                        }
-                    }
-                }
-                BleConnectService.ACTION_CHA_READ -> {
-                    displayData(intent.getByteArrayExtra(BleConnectService.EXTRA_DATA))
-                    when {
-                        intent.getStringExtra(BleConnectService.CHARACTERISTICS)!!.toUpperCase() == SongMeterConstant.kUUIDCharConfigAtoR -> {
-
-                        }
-                        intent.getStringExtra(BleConnectService.CHARACTERISTICS)!!.toUpperCase() == SongMeterConstant.kUUIDCharConfigRtoA -> {
-                            configRtoAData = intent.getByteArrayExtra(BleConnectService.EXTRA_DATA)
-                            handler.post {
-//                                bleConnectService?.readCharacteristic(configAtoR)
-                            }
-                        }
-                    }
-                }
                 BleConnectService.ACTION_CHA_CHANGE -> {
                     when {
-                        intent.getStringExtra(BleConnectService.CHARACTERISTICS)!!.toUpperCase() == SongMeterConstant.kUUIDCharConfigRtoA -> {
+                        intent.getStringExtra(BleConnectService.CHARACTERISTICS)!!
+                            .toUpperCase() == SongMeterConstant.kUUIDCharConfigRtoA -> {
                             intent.getByteArrayExtra(BleConnectService.EXTRA_DATA)?.let {
                                 manageRtoAChanges(it)
                             }
                         }
-                        intent.getStringExtra(BleConnectService.CHARACTERISTICS)!!.toUpperCase() == SongMeterConstant.kUUIDCharStatus -> {
+                        intent.getStringExtra(BleConnectService.CHARACTERISTICS)!!
+                            .toUpperCase() == SongMeterConstant.kUUIDCharStatus -> {
                             requestCurrentConfig()
                         }
                     }
@@ -128,38 +107,57 @@ class BleConnectDelegate(private val context: Context) {
     }
 
     private fun manageRtoAChanges(changes: ByteArray) {
+        firstTime = false
+        getConfigLiveData.postValue(Resource.success(null))
         configRtoAData = changes
         configAtoRData = changes.also {
             it[0] = requestConfigVersion.toByte()
             it[1] = (0).toByte()
         }
         if (needCheck) {
-            needCheck = false
+            if (expectedPrefixes != null) {
+                val actualPrefixes = changes.copyOfRange(6, 18)
+                actualPrefixes.forEachIndexed { index, byte ->
+                    if (byte != expectedPrefixes!![index]) {
+                        // If not match then fail
+                        setSiteLiveData.postValue(Resource.success(false))
+                        needCheck = false
+                    }
+                }
+                expectedPrefixes = null
+            }
         }
     }
 
     fun requestChangePrefixes(prefixes: String) {
         configAtoRData?.also {
-            val prefixesConverted = prefixes.toByteArray()
+            setSiteLiveData.postValue(Resource.loading(null))
+            expectedPrefixes = prefixes.toByteArray()
             requestConfigVersion++
             it[0] = requestConfigVersion.toByte()
+            for (index in 0..11) {
+                it[index + 6] = expectedPrefixes?.getOrNull(index) ?: (0).toByte()
+            }
             writeCharacteristic(configAtoR, it)
         }
     }
 
     private fun requestCurrentConfig() {
         if (firstTime) {
+            getConfigLiveData.postValue(Resource.loading(null))
             requestConfigVersion++
             val configData = ByteArray(128)
             Arrays.fill(configData, (0).toByte())
             configData[0] = requestConfigVersion.toByte()
             configData[1] = (0).toByte()
             writeCharacteristic(configAtoR, configData)
-            firstTime = false
         }
     }
 
-    private fun writeCharacteristic(characteristic: BluetoothGattCharacteristic?, data: ByteArray?) {
+    private fun writeCharacteristic(
+        characteristic: BluetoothGattCharacteristic?,
+        data: ByteArray?
+    ) {
         if (characteristic == null || data == null) {
             return
         }
@@ -213,23 +211,16 @@ class BleConnectDelegate(private val context: Context) {
                     status = characteristic
                     mapCharacteristic[SongMeterConstant.kUUIDCharStatus] = status!!
                 }
+                SongMeterConstant.kUUIDCharCommand -> {
+                    command = characteristic
+                    mapCharacteristic[SongMeterConstant.kUUIDCharCommand] = command!!
+                    bleConnectService?.commandChar = command
+                }
             }
         }
 
-        Log.d("BLE", "setting noti")
         handler.post {
             bleConnectService?.requestMTU()
-        }
-    }
-
-    private fun displayData(data: ByteArray?) {
-        if (data == null) return
-        Log.d("BLE", data.contentToString())
-    }
-
-    private fun setSiteId(id: String) {
-        configAtoR?.let {
-            val data = it.value
         }
     }
 
@@ -263,7 +254,9 @@ class BleConnectDelegate(private val context: Context) {
     }
 
     fun unbindService() {
-        context.unbindService(serviceConnection)
+        if (configRtoA != null) {
+            bleConnectService?.setCharacteristicNotification(configRtoA!!, false)
+        }
     }
 
     companion object {

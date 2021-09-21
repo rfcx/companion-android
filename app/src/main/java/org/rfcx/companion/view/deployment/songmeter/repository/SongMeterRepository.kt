@@ -65,4 +65,12 @@ class SongMeterRepository(
         bleHelper.unBindConnectService()
     }
 
+    fun getSetSiteLiveData() = bleHelper.getSetSiteLiveData()
+
+    fun getRequestConfigLiveData() = bleHelper.getRequestConfigLiveData()
+
+    fun setPrefixes(prefixes: String) {
+        bleHelper.setPrefixes(prefixes)
+    }
+
 }

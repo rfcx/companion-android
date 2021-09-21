@@ -75,6 +75,14 @@ class SongMeterViewModel(
         songMeterRepository.unBindConnectService()
     }
 
+    fun getSetSiteLiveData() = songMeterRepository.getSetSiteLiveData()
+
+    fun getRequestConfigLiveData() = songMeterRepository.getRequestConfigLiveData()
+
+    fun setPrefixes(prefixes: String) {
+        songMeterRepository.setPrefixes(prefixes)
+    }
+
     fun insertOrUpdateDeployment(deployment: Deployment, deploymentLocation: DeploymentLocation): Int {
         return 0
     }

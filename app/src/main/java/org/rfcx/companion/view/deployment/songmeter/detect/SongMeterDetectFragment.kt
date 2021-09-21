@@ -77,6 +77,7 @@ class SongMeterDetectFragment: Fragment(), (Advertisement) -> Unit {
 
         connectSongMeterButton.setOnClickListener {
             deploymentProtocol?.redirectToConnectSongMeter(advertisement!!)
+            songMeterViewModel.stopBle()
         }
     }
 

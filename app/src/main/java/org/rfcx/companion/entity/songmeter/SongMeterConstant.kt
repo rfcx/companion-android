@@ -15,7 +15,7 @@ object SongMeterConstant {
     const val kUUIDCharBulkDataRtoA = "80D7D05E-4C28-401E-BE5D-EA8C603C47A6" //Notificaton enabled
 //    const val kUUIDCharBulkAckRtoA = "410C206C-22D0-4EF0-AE8E-06AFF9F65CB0"
 
-//    const val kUUIDCharCommand = "C5785D8D-B346-49B6-BC76-FC0221A17425"
+    const val kUUIDCharCommand = "C5785D8D-B346-49B6-BC76-FC0221A17425"
     const val kUUIDCharResponse = "46201889-AE14-4DF2-B289-64BCF836AB4A" //Notificaton enabled
 
     const val kUUIDCharStatus = "5CC2E5F9-ED39-417B-8C28-420B7610ED85" //Notificaton enabled

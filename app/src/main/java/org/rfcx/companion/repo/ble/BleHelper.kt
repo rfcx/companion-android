@@ -1,5 +1,7 @@
 package org.rfcx.companion.repo.ble
 
+import androidx.lifecycle.LiveData
+
 class BleHelper(private val detectService: BleDetectService, private val connectService: BleConnectDelegate) {
     fun scanBle(isEnabled: Boolean) {
         detectService.scanBle(isEnabled)
@@ -27,5 +29,13 @@ class BleHelper(private val detectService: BleDetectService, private val connect
 
     fun unBindConnectService() {
         connectService.unbindService()
+    }
+
+    fun getSetSiteLiveData() = connectService.setSiteLiveData
+
+    fun getRequestConfigLiveData() = connectService.getConfigLiveData
+
+    fun setPrefixes(prefixes: String) {
+        connectService.requestChangePrefixes(prefixes)
     }
 }
