@@ -49,18 +49,16 @@
     </string-array>
 
     <string-array name="guardian_setup_checks">
-        <item>Register Guardian with RFCx</item>
+        <item>Software Update</item>
         <item>Network Signal Test</item>
         <item>Microphone Capture Test</item>
         <item>Audio Parameter Config</item>
         <item>Guardian Installation Location</item>
-        <item>Confirm CheckIn Status</item>
-        <item>Software Update</item>
     </string-array>
 
     <string-array name="guardian_optional_checks">
+        <item>API Connection Test</item>
         <item>Add Photo(s)</item>
-        <item>Advanced Configuration</item>
     </string-array>
 
     <string-array name="guardian_can_skip_steps">

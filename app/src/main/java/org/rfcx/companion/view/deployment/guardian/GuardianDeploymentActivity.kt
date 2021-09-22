@@ -1,18 +1,20 @@
 package org.rfcx.companion.view.deployment.guardian
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
-import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.preference.Preference
+import com.google.gson.Gson
 import com.google.gson.JsonObject
-import com.mapbox.api.directions.v5.models.Admin
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_guardian_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
@@ -25,7 +27,6 @@ import org.rfcx.companion.connection.wifi.WifiHotspotManager
 import org.rfcx.companion.connection.wifi.WifiLostListener
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
-import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import org.rfcx.companion.entity.socket.request.CheckinCommand
 import org.rfcx.companion.entity.socket.response.GuardianPing
 import org.rfcx.companion.localdb.*
@@ -50,7 +51,6 @@ import org.rfcx.companion.view.deployment.location.DetailDeploymentSiteFragment
 import org.rfcx.companion.view.deployment.location.SetDeploymentSiteFragment
 import org.rfcx.companion.view.dialog.*
 import org.rfcx.companion.view.prefs.SyncPreferenceListener
-import java.io.File
 import java.util.*
 
 class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentProtocol,
@@ -64,11 +64,9 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     private val trackingDb by lazy { TrackingDb(realm) }
     private val trackingFileDb by lazy { TrackingFileDb(realm) }
 
-    private var _configuration: GuardianConfiguration? = null
     private var useExistedLocation: Boolean = false
 
     private var guardianPingBlob: GuardianPing? = null
-    private var prefsSha1: String? = null
     private var network: Int? = null
     private var sentinelPower: String? = null
     private var isGuardianRegistered: Boolean? = null
@@ -84,6 +82,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     private var passedChecks = arrayListOf<Int>()
 
     private var onDeployClicked = false
+    private var menuAll: Menu? = null
 
     private lateinit var wifiHotspotManager: WifiHotspotManager
     private val analytics by lazy { Analytics(this) }
@@ -105,6 +104,28 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         setSiteItems()
     }
 
+    @SuppressLint("ResourceAsColor")
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuAll = menu
+        val inflater = menuInflater
+        inflater.inflate(R.menu.preference_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> backStep()
+            R.id.MoreView -> onClickMoreView()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun onClickMoreView() {
+        setCurrentPage(getString(R.string.advanced_config))
+        setToolbarTitle()
+        startFragment(GuardianAdvancedFragment.newInstance())
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_guardian_deployment)
@@ -112,18 +133,15 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         setupToolbar()
         setLiveData()
 
+        this.currentLocate = this.getLastLocation()
+
         val deploymentId = intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
         if (deploymentId != null) {
             val deployment = deploymentDb.getDeploymentById(deploymentId)
             if (deployment != null) {
                 setDeployment(deployment)
-
                 if (deployment.stream != null) {
                     _deployLocation = deployment.stream
-                }
-
-                if (deployment.configuration != null) {
-                    _configuration = deployment.configuration
                 }
             }
         } else {
@@ -154,6 +172,10 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     override fun backStep() {
         val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
         when (container) {
+            is GuardianAdvancedFragment -> {
+                startCheckList()
+            }
+            is GuardianRegisterFragment -> setupView()
             is MapPickerFragment -> startFragment(
                 DetailDeploymentSiteFragment.newInstance(
                     latitude,
@@ -236,12 +258,6 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         this._deployment = deployment
     }
 
-    override fun setDeploymentWifiName(name: String) {
-        val deployment = _deployment ?: Deployment()
-        deployment.wifiName = name
-        setDeployment(deployment)
-    }
-
     override fun setSampleRate(sampleRate: Int) {
         this._sampleRate = sampleRate
     }
@@ -266,19 +282,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         }
     }
 
-    override fun setDeploymentConfigure(config: GuardianConfiguration) {
-        this._configuration = config
-        this._deployment?.configuration = _configuration
-
-        // update deployment
-        this._deployment?.let { deploymentDb.updateDeployment(it) }
-    }
-
-    override fun getConfiguration(): GuardianConfiguration? = _configuration
-
     override fun getSampleRate(): Int = _sampleRate
-
-    override fun getWifiName(): String = _deployment?.wifiName ?: ""
 
     override fun getLastCheckInTime(): Long? = lastCheckInTime
 
@@ -292,6 +296,10 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
 
     override fun getSoftwareVersion(): Map<String, String>? = PingUtils.getSoftwareVersionFromPing(guardianPingBlob)
 
+    override fun getAudioConfiguration(): JsonObject? = PingUtils.getAudioConfigureFromPing(guardianPingBlob)
+
+    override fun getPrefsSha1(): String? = PingUtils.getPrefsSha1FromPing(guardianPingBlob)
+
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
     override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
@@ -299,7 +307,6 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     override fun getLocationGroup(name: String): Project? {
         return projectDb.getProjectByName(name)
     }
-
 
     override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
         val deployment = _deployment ?: Deployment()
@@ -324,6 +331,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
             it.updatedAt = Date()
             it.isActive = true
             it.state = DeploymentState.Guardian.ReadyToUpload.key
+            it.deviceParameters = Gson().toJson(GuardianDeviceParameters(getGuid()))
             setDeployment(it)
 
             val deploymentId = deploymentDb.insertOrUpdateDeployment(it, _deployLocation!!)
@@ -353,7 +361,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
                         siteId = this._locate!!.id,
                         localPath = GeoJsonUtils.generateGeoJson(
                             this,
-                            GeoJsonUtils.generateFileName(it.deployedAt, it.wifiName!!),
+                            GeoJsonUtils.generateFileName(it.deployedAt, getGuid()!!),
                             point
                         ).absolutePath
                     )
@@ -379,6 +387,11 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         startFragment(GuardianConfigureFragment.newInstance())
     }
 
+    override fun startGuardianRegister() {
+//        updateDeploymentState(DeploymentState.Guardian.Register) // TODO:: Not sure where should be @Frongs
+        startFragment(GuardianRegisterFragment.newInstance())
+    }
+
     override fun backToConfigure() {
         startFragment(GuardianConfigureFragment.newInstance())
     }
@@ -392,8 +405,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
                 startFragment(GuardianSolarPanelFragment.newInstance())
             }
             1 -> {
-                updateDeploymentState(DeploymentState.Guardian.Register)
-                startFragment(GuardianRegisterFragment.newInstance())
+                startFragment(SoftwareUpdateFragment.newInstance())
             }
             2 -> {
                 updateDeploymentState(DeploymentState.Guardian.Signal)
@@ -425,15 +437,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
                 startFragment(GuardianCheckInTestFragment.newInstance())
             }
             7 -> {
-                startFragment(SoftwareUpdateFragment.newInstance())
-            }
-            8 -> {
                 updateDeploymentState(DeploymentState.Guardian.Deploy)
                 startFragment(GuardianDeployFragment.newInstance())
-            }
-            9 -> {
-                updateDeploymentState(DeploymentState.Guardian.Advanced)
-                startFragment(GuardianAdvancedFragment.newInstance())
             }
         }
     }
@@ -503,6 +508,16 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         }
     }
 
+    override fun setMenuToolbar(isVisibility: Boolean) {
+        menuAll?.findItem(R.id.MoreView)?.isVisible = isVisibility
+    }
+
+    override fun setToolbarSubtitle(sub: String) {
+        supportActionBar?.apply {
+            subtitle = sub
+        }
+    }
+
     override fun onBackPressed() {
         backStep()
     }
@@ -541,14 +556,14 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         this.prefsChanges = prefs
     }
 
-    override fun getPrefsChanges(): String {
+    override fun getPrefsChanges(): JsonObject {
         val json = JsonObject()
         if (this.prefsChanges.isNotEmpty()) {
             this.prefsChanges.forEach {
                 json.addProperty(it.key, it.value)
             }
         }
-        return json.toString()
+        return json
     }
 
     override fun showSyncButton() { /* not used */

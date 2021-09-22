@@ -1,7 +1,6 @@
 package org.rfcx.companion.util.socket
 
 import android.content.Context
-import android.util.Log
 import androidx.preference.Preference
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -60,5 +59,13 @@ object PingUtils {
             mapSoftwareVersion[role] = version
         }
         return mapSoftwareVersion
+    }
+
+    fun getAudioConfigureFromPing(ping: GuardianPing?): JsonObject? {
+        if (ping?.prefs is JsonObject) {
+            val prefs = ping.prefs.get("vals") ?: return null
+            return PrefsUtils.stringToAudioPrefs(Gson().toJson(prefs))
+        }
+        return null
     }
 }

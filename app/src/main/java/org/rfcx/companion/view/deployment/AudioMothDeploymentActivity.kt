@@ -315,6 +315,14 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
 
     override fun getPassedChecks(): List<Int> = passedChecks
 
+    override fun setMenuToolbar(isVisibility: Boolean) {}
+
+    override fun setToolbarSubtitle(sub: String) {
+        supportActionBar?.apply {
+            subtitle = sub
+        }
+    }
+
     override fun startSyncing(status: String) {
         startFragment(NewSyncFragment.newInstance())
     }

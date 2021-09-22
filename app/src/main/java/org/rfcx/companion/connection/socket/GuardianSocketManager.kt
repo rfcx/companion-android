@@ -48,8 +48,6 @@ object GuardianSocketManager {
 
 
     val connection = MutableLiveData<ConnectionResponse>()
-    val diagnostic = MutableLiveData<DiagnosticResponse>()
-    val currentConfiguration = MutableLiveData<ConfigurationResponse>()
     val syncConfiguration = MutableLiveData<SyncConfigurationResponse>()
     val prefs = MutableLiveData<PrefsResponse>()
     val signal = MutableLiveData<SignalResponse>()
@@ -65,8 +63,6 @@ object GuardianSocketManager {
 
     init {
         connection.postValue(ConnectionResponse())
-        diagnostic.postValue(DiagnosticResponse())
-        currentConfiguration.postValue(ConfigurationResponse())
         syncConfiguration.postValue(SyncConfigurationResponse())
         prefs.postValue(PrefsResponse())
         signal.postValue(SignalResponse())
@@ -145,10 +141,6 @@ object GuardianSocketManager {
     fun resetAllValuesToDefault() {
         connection.value =
             ConnectionResponse()
-        diagnostic.value =
-            DiagnosticResponse()
-        currentConfiguration.value =
-            ConfigurationResponse()
         syncConfiguration.value =
             SyncConfigurationResponse()
         prefs.value = PrefsResponse()
@@ -198,16 +190,6 @@ object GuardianSocketManager {
 
                         val keys = jsonIterator.asSequence().toList()
                         when (keys[0].toString()) {
-                            CONFIGURE -> {
-                                val response =
-                                    gson.fromJson(dataInput, ConfigurationResponse::class.java)
-                                this.currentConfiguration.postValue(response)
-                            }
-                            DIAGNOSTIC -> {
-                                val response =
-                                    gson.fromJson(dataInput, DiagnosticResponse::class.java)
-                                this.diagnostic.postValue(response)
-                            }
                             CONNECTION -> {
                                 val response =
                                     gson.fromJson(dataInput, ConnectionResponse::class.java)
