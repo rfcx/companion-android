@@ -87,7 +87,7 @@
     <string name="recharging">Batteries need recharging!</string>
 
     <!-- EdgeCheckListFragment -->
-    <string name="setting_up_edge_checklist">AudioMoth Setup Checklist:</string>
+    <string name="setting_up_edge_checklist">AudioMoth Setup Checklist</string>
     <string name="setup">Setup</string>
     <string name="optional">Optional</string>
     <string name="set_deployment_site">Set deployment site</string>
@@ -269,7 +269,7 @@
     <string name="choose_bitrate">Choose Bitrate (kbs)</string>
     <string name="choose_file_format">Choose Audio Format</string>
     <string name="choose_duration_cycle">Choose Recording Duration Cycle (secs)</string>
-    <string name="advanced_config">Advanced Configuration</string>
+    <string name="advanced_config">Guardian Preferences</string>
 
     <!-- GuardianPreferences -->
     <bool name="prefs_value_default_show_ui">true</bool>
@@ -415,9 +415,10 @@
     <string name="registering">Registration Request Sent. Awaiting Response.</string>
     <string name="check_registered">Verifying Guardian Registration Status</string>
     <string name="not_registered">Your Guardian is Not Registered</string>
+    <string name="register_guardian">Register Guardian with RFCx</string>
 
     <!-- GuardianCheckListFragment -->
-    <string name="setting_up_checklist">Guardian Setup Checklist:</string>
+    <string name="setting_up_checklist">Guardian Setup Checklist</string>
     <string name="deploy">Deploy</string>
     <string name="wifi_notification_title">Do you want to disable Guardian\'s WiFi after deployed?</string>
     <string name="notification_yes">Yes</string>
@@ -463,5 +464,12 @@
     <string name="guardian_role">guardian role</string>
     <string name="updater_role">updater role</string>
     <string name="up_to_date">up to date</string>
+
+    <!-- SoftwareUpdateFragment -->
+    <string name="guardian_version">Guardian version</string>
+    <string name="admin_version">Admin version</string>
+    <string name="classify_version">Classify version</string>
+    <string name="updater_version">Updater version</string>
+    <string name="update">Update</string>
 
 </resources>

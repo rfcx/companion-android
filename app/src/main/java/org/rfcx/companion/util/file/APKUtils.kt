@@ -1,31 +1,70 @@
 package org.rfcx.companion.util.file
 
 import android.content.Context
+import android.util.Log
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import okhttp3.ResponseBody
+import org.rfcx.companion.entity.GuardianSoftware
+import org.rfcx.companion.entity.Software
 import java.io.*
+import java.lang.Exception
 
 object APKUtils {
 
-    fun getAllDownloadedSoftwares(context: Context): Array<File>? {
+    private fun getAllDownloadedSoftwares(context: Context): Array<File>? {
         return File(context.filesDir, "guardian-software").listFiles()
     }
 
-    fun getAllDownloadedSoftwaresVersion(context: Context): Map<String, String> {
+    fun getAllDownloadedSoftwaresWithType(context: Context): List<Software> {
+        val softwares = mutableListOf<Software>()
+        val files = getAllDownloadedSoftwaresVersion(context)
+        files.forEach {
+            when (it.key) {
+                GuardianSoftware.ADMIN.value -> softwares.add(Software(
+                    GuardianSoftware.ADMIN,
+                    it.value.first,
+                    it.value.second
+                ))
+                GuardianSoftware.CLASSIFY.value -> softwares.add(Software(
+                    GuardianSoftware.CLASSIFY,
+                    it.value.first,
+                    it.value.second
+                ))
+                GuardianSoftware.GUARDIAN.value -> softwares.add(Software(
+                    GuardianSoftware.GUARDIAN,
+                    it.value.first,
+                    it.value.second
+                ))
+                GuardianSoftware.UPDATER.value -> softwares.add(Software(
+                    GuardianSoftware.UPDATER,
+                    it.value.first,
+                    it.value.second
+                ))
+            }
+        }
+        return softwares
+    }
+
+    fun getAllDownloadedSoftwaresVersion(context: Context): Map<String, Pair<String, String>> {
         val downloadedAPKs = getAllDownloadedSoftwares(context)
-        val roleMappedVersion = mutableMapOf<String, String>()
+        val roleMappedVersion = mutableMapOf<String, Pair<String, String>>()
         if (downloadedAPKs.isNullOrEmpty()) {
             return roleMappedVersion
         }
         downloadedAPKs.forEach {
             val splitName = it.name.split("-")
             val role = splitName[0]
-            val version = it.name.split("-")[1]
-            roleMappedVersion[role] = version
+            val version = splitName[1].removeSuffix(".apk.gz")
+            roleMappedVersion[role] = Pair(version, it.absolutePath)
         }
         return roleMappedVersion
     }
 
-    fun compareVersionsIfNeedToUpdate(version1: String, version2: String): Boolean {
+    fun compareVersionsIfNeedToUpdate(version1: String, version2: String?): Boolean {
+        if (version2 == null) {
+            return true
+        }
         val levels1 = version1.split("\\.")
         val levels2 = version2.split("\\.")
         val length = levels1.size.coerceAtLeast(levels2.size)
@@ -46,7 +85,7 @@ object APKUtils {
             if (!dir.exists()) {
                 dir.mkdir()
             }
-            val file = File(dir, "$role-$version-release.apk.gz")
+            val file = File(dir, "$role-$version.apk.gz")
             var inputStream: InputStream? = null
             var outputStream: OutputStream? = null
             try {
@@ -70,6 +109,23 @@ object APKUtils {
             }
         } catch (e: IOException) {
             false
+        }
+    }
+
+    fun getAPKFileFromPath(filePath: String): File {
+        return File(filePath)
+    }
+
+    fun calculateVersionValue(versionName: String): Int {
+        return try {
+            val majorVersion = versionName.substring(0, versionName.indexOf(".")).toInt()
+            val subVersion =
+                versionName.substring(1 + versionName.indexOf("."), versionName.lastIndexOf("."))
+                    .toInt()
+            val updateVersion = versionName.substring(1 + versionName.lastIndexOf(".")).toInt()
+            10000 * majorVersion + 100 * subVersion + updateVersion
+        } catch (e: Exception) {
+            0
         }
     }
 

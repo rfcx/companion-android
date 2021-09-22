@@ -1,15 +1,18 @@
 package org.rfcx.companion.connection.socket
 
+import android.os.SystemClock
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
-import org.json.JSONObject
-import org.rfcx.companion.entity.socket.response.AdminPing
+import com.google.gson.JsonObject
+import org.rfcx.companion.entity.socket.response.GuardianPing
+import org.rfcx.companion.util.file.APKUtils
 import java.io.DataInputStream
 import java.io.DataOutputStream
+import java.io.File
 import java.net.Socket
 
-object AdminSocketManager {
+object FileSocketManager {
 
     private var socket: Socket? = null
     private var outputStream: DataOutputStream? = null
@@ -18,32 +21,39 @@ object AdminSocketManager {
 
     private lateinit var inComingMessageThread: Thread
 
-    private val gson = Gson()
+    val pingBlob = MutableLiveData<JsonObject>()
 
-    val pingBlob = MutableLiveData<AdminPing>()
-
-    init {
-
+    fun sendFile(filePath: String) {
+        sendMessage(APKUtils.getAPKFileFromPath(filePath))
     }
 
-    fun resetAllValuesToDefault() {
-
-    }
-
-    //just to connect to server
-    fun connect() {
-        sendMessage("")
-    }
-
-    private fun sendMessage(message: String) {
+    private fun sendMessage(file: File) {
         clientThread = Thread {
             try {
-                socket = Socket("192.168.43.1", 9997)
+                socket = Socket("192.168.43.1", 9996)
                 socket?.keepAlive = true
                 startInComingMessageThread()
                 outputStream = DataOutputStream(socket?.getOutputStream())
-                outputStream?.writeUTF(message)
+                val buffer = ByteArray(8192)
+                var count: Int
+                val inp = file.inputStream()
+                outputStream?.write(file.name.toByteArray())
+                outputStream?.write("|".toByteArray())
+                while (true) {
+                    count = inp.read(buffer)
+                    if (count < 0) {
+                        break
+                    }
+                    outputStream?.write(buffer, 0, count)
+                }
+
                 outputStream?.flush()
+
+                SystemClock.sleep(10000)
+
+                outputStream?.write("****".toByteArray())
+                outputStream?.flush()
+
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -58,10 +68,8 @@ object AdminSocketManager {
                     inputStream = DataInputStream(socket!!.getInputStream())
                     val dataInput = inputStream?.readUTF()
                     if (!dataInput.isNullOrBlank()) {
-
-                        val ping = gson.fromJson(dataInput, AdminPing::class.java)
+                        val ping = Gson().fromJson(dataInput, JsonObject::class.java)
                         pingBlob.postValue(ping)
-
                     }
                 }
             } catch (e: Exception) {
@@ -80,7 +88,6 @@ object AdminSocketManager {
         // stop server thread
         clientThread?.interrupt()
 
-        outputStream?.flush()
         outputStream?.close()
 
         inputStream?.close()

@@ -1,7 +1,6 @@
 package org.rfcx.companion.util.socket
 
 import android.content.Context
-import android.util.Log
 import androidx.preference.Preference
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -14,7 +13,6 @@ object PingUtils {
     fun getPrefsFromPing(context: Context, guardianPing: GuardianPing?): List<Preference> {
         if (guardianPing?.prefs is JsonObject) {
             val prefs = guardianPing.prefs.get("vals") ?: return listOf()
-            Log.d("ConvertPing", prefs.toString())
             return PrefsUtils.stringToPrefs(context, Gson().toJson(prefs))
         }
         return listOf()
@@ -23,7 +21,6 @@ object PingUtils {
     fun getPrefsSha1FromPing(guardianPing: GuardianPing?): String? {
         if (guardianPing?.prefs is JsonObject) {
             val sha1 = guardianPing.prefs.get("sha1") ?: return null
-            Log.d("ConvertPing", sha1.toString())
             return sha1.asString
         }
         return null
@@ -43,13 +40,32 @@ object PingUtils {
     }
 
     fun getGuidFromPing(ping: GuardianPing?): String? {
-        val guid = ping?.companion?.get("guid") ?: return null
+        val guid = ping?.companion?.get("guardian")?.asJsonObject?.get("guid") ?: return null
         return guid.asString
     }
 
     fun isRegisteredFromPing(ping: GuardianPing?): Boolean? {
         val isRegistered = ping?.companion?.get("is_registered") ?: return null
-        Log.d("ConvertPing", isRegistered.asBoolean.toString())
         return isRegistered.asBoolean
+    }
+
+    fun getSoftwareVersionFromPing(ping: GuardianPing?): Map<String, String>? {
+        val software = ping?.software ?: return null
+        val softwareList = software.split("|")
+        val mapSoftwareVersion = mutableMapOf<String, String>()
+        softwareList.forEach {
+            val role = it.split("*")[0]
+            val version = it.split("*")[1]
+            mapSoftwareVersion[role] = version
+        }
+        return mapSoftwareVersion
+    }
+
+    fun getAudioConfigureFromPing(ping: GuardianPing?): JsonObject? {
+        if (ping?.prefs is JsonObject) {
+            val prefs = ping.prefs.get("vals") ?: return null
+            return PrefsUtils.stringToAudioPrefs(Gson().toJson(prefs))
+        }
+        return null
     }
 }

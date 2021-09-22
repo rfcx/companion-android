@@ -45,6 +45,8 @@ class GuardianSignalFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         deploymentProtocol?.let {
+            it.setToolbarSubtitle()
+            it.setMenuToolbar(false)
             it.showToolbar()
             it.setToolbarTitle()
         }

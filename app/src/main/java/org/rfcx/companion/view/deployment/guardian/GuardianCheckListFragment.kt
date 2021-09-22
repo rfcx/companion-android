@@ -13,8 +13,10 @@ import kotlinx.android.synthetic.main.fragment_guardian_checklist.*
 import org.rfcx.companion.R
 import org.rfcx.companion.adapter.CheckListItem
 import org.rfcx.companion.connection.socket.AdminSocketManager
+import org.rfcx.companion.connection.socket.FileSocketManager
 import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.view.deployment.CheckListAdapter
+import java.io.File
 
 class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
 
@@ -38,9 +40,13 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        deploymentProtocol?.hideToolbar()
-
-        setGuardianName()
+        deploymentProtocol?.let {
+            context?.getString(R.string.setting_up_checklist)?.let { it1 -> it.setCurrentPage(it1) }
+            it.setToolbarSubtitle(it.getGuid() ?: "Guardian")
+            it.setMenuToolbar(true)
+            it.showToolbar()
+            it.setToolbarTitle()
+        }
 
         guardianCheckListRecyclerView.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
@@ -58,26 +64,6 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
             showNotificationBeforeDeploy()
         }
 
-        // check if guardian is registered so the step can be highlighted
-        checkIfRegistered()
-    }
-
-    private fun setGuardianName() {
-        val wifi = deploymentProtocol?.getWifiName()
-        guardianIdTextView.text = wifi
-    }
-
-    private fun checkIfRegistered() {
-        GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
-            val isRegistered = deploymentProtocol?.isGuardianRegistered()
-            if (isRegistered != null && isRegistered) {
-                checkListRecyclerView.setCheckPassed(1)
-                deploymentProtocol?.addRegisteredToPassedCheck()
-            } else {
-                checkListRecyclerView.setCheckUnPassed(1)
-                deploymentProtocol?.removeRegisteredOnPassedCheck()
-            }
-        })
     }
 
     override fun invoke(number: Int, name: String) {

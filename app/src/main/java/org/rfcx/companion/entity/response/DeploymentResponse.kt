@@ -4,7 +4,6 @@ import org.rfcx.companion.entity.DeploymentState
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.SyncState
 import org.rfcx.companion.entity.guardian.Deployment
-import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import java.util.*
 
 data class DeploymentResponse(
@@ -14,8 +13,6 @@ data class DeploymentResponse(
     var stream: StreamResponse? = null,
     var createdAt: Date? = null,
     var updatedAt: Date? = null,
-    var wifi: String? = null,
-    var configuration: GuardianConfiguration? = null,
     var deletedAt: Date? = null,
     var deviceParameters: String? = null
 )
@@ -31,8 +28,6 @@ fun DeploymentResponse.toDeployment(): Deployment {
         deployedAt = this.deployedAt ?: Date(),
         state = if (this.isGuardian()) DeploymentState.Guardian.ReadyToUpload.key else DeploymentState.AudioMoth.ReadyToUpload.key,
         device = this.deploymentType,
-        wifiName = this.wifi ?: "",
-        configuration = this.configuration ?: GuardianConfiguration(),
         stream = this.stream?.toDeploymentLocation(),
         createdAt = this.createdAt ?: Date(),
         syncState = SyncState.Sent.key,

@@ -22,7 +22,6 @@ import org.rfcx.companion.connection.wifi.OnWifiListener
 import org.rfcx.companion.connection.wifi.WifiHotspotManager
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.socket.request.CheckinCommand
-import org.rfcx.companion.entity.socket.response.Status
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.WifiHotspotUtils
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
@@ -122,8 +121,7 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
             GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
                 requireActivity().runOnUiThread {
                     hideLoading()
-                    deploymentProtocol?.setDeploymentWifiName(guardianHotspot!!.SSID)
-                    deploymentProtocol?.startCheckList()
+                    deploymentProtocol?.startGuardianRegister()
                     deploymentProtocol?.setWifiManager(wifiHotspotManager)
                     deploymentProtocol?.registerWifiConnectionLostListener()
                     GuardianSocketManager.getCheckInTest(CheckinCommand.START)

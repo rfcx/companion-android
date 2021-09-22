@@ -48,8 +48,6 @@ object GuardianSocketManager {
 
 
     val connection = MutableLiveData<ConnectionResponse>()
-    val diagnostic = MutableLiveData<DiagnosticResponse>()
-    val currentConfiguration = MutableLiveData<ConfigurationResponse>()
     val syncConfiguration = MutableLiveData<SyncConfigurationResponse>()
     val prefs = MutableLiveData<PrefsResponse>()
     val signal = MutableLiveData<SignalResponse>()
@@ -65,8 +63,6 @@ object GuardianSocketManager {
 
     init {
         connection.postValue(ConnectionResponse())
-        diagnostic.postValue(DiagnosticResponse())
-        currentConfiguration.postValue(ConfigurationResponse())
         syncConfiguration.postValue(SyncConfigurationResponse())
         prefs.postValue(PrefsResponse())
         signal.postValue(SignalResponse())
@@ -110,25 +106,6 @@ object GuardianSocketManager {
         sendInstructionMessage(InstructionType.SET, InstructionCommand.PREFS, config)
     }
 
-    fun getSignalStrength() {
-        val data = gson.toJson(
-            SocketRequest(
-                SIGNAL
-            )
-        )
-        sendMessage(data)
-    }
-
-    fun getLiveAudioBuffer(micTestUtils: MicrophoneTestUtils) {
-        this.microphoneTestUtils = micTestUtils
-        val data = gson.toJson(
-            SocketRequest(
-                MICROPHONE_TEST
-            )
-        )
-        sendMessage(data)
-    }
-
     fun getCheckInTest(command: CheckinCommand) {
         val jsonString = gson.toJson(
             CheckinRequest(
@@ -140,53 +117,17 @@ object GuardianSocketManager {
         sendMessage(jsonString)
     }
 
-    fun getSentinelBoardValue() {
-        val data = gson.toJson(
-            SocketRequest(
-                SENTINEL
-            )
-        )
-        sendMessage(data)
-    }
-
     fun sendGuardianRegistration(response: GuardianRegisterResponse) {
         sendInstructionMessage(InstructionType.SET, InstructionCommand.IDENTITY, gson.toJson(response))
-    }
-
-    fun isGuardianRegistered() {
-        val data = gson.toJson(
-            SocketRequest(
-                IS_REGISTERED
-            )
-        )
-        sendMessage(data)
     }
 
     fun stopGuardianWiFi() {
         sendInstructionMessage(InstructionType.CTRL, InstructionCommand.WIFI)
     }
 
-    fun getAllPrefs() {
-        val data = gson.toJson(SocketRequest(PREFS))
-        sendMessage(data)
-    }
-
-    fun getRecorderState() {
-        val data = gson.toJson(SocketRequest(IS_RECORDING))
-        sendMessage(data)
-    }
-
     fun sendInstructionMessage(type: InstructionType, command: InstructionCommand, meta: String = "{}") {
         val data = gson.toJson(InstructionMessage.toMessage(type, command, meta))
         sendMessage(data)
-    }
-
-    fun resetMicrophoneDefaultValue() {
-        isTestingFirstTime = true
-    }
-
-    fun resetCheckInValue() {
-        this.checkInTest.value = CheckInTestResponse()
     }
 
     fun resetPrefsValue() {
@@ -197,17 +138,9 @@ object GuardianSocketManager {
         this.register.value = RegisterResponse()
     }
 
-    fun resetRecorderState() {
-        this.recorderState.value = RecorderStateResponse()
-    }
-
     fun resetAllValuesToDefault() {
         connection.value =
             ConnectionResponse()
-        diagnostic.value =
-            DiagnosticResponse()
-        currentConfiguration.value =
-            ConfigurationResponse()
         syncConfiguration.value =
             SyncConfigurationResponse()
         prefs.value = PrefsResponse()
@@ -251,23 +184,12 @@ object GuardianSocketManager {
                         val receiveJson = JSONObject(dataInput)
                         val jsonIterator = receiveJson.keys()
 
-                        Log.d("SocketComm", dataInput)
-
+                        Log.d("LOG", dataInput)
                         val ping = gson.fromJson(dataInput, GuardianPing::class.java)
                         pingBlob.postValue(ping)
 
                         val keys = jsonIterator.asSequence().toList()
                         when (keys[0].toString()) {
-                            CONFIGURE -> {
-                                val response =
-                                    gson.fromJson(dataInput, ConfigurationResponse::class.java)
-                                this.currentConfiguration.postValue(response)
-                            }
-                            DIAGNOSTIC -> {
-                                val response =
-                                    gson.fromJson(dataInput, DiagnosticResponse::class.java)
-                                this.diagnostic.postValue(response)
-                            }
                             CONNECTION -> {
                                 val response =
                                     gson.fromJson(dataInput, ConnectionResponse::class.java)

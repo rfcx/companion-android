@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.fragment_guardian_advanced.*
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.GuardianSocketManager
@@ -19,6 +21,9 @@ class GuardianAdvancedFragment : Fragment() {
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
     private var syncPreferenceListener: SyncPreferenceListener? = null
+
+    private var needCheckSha1 = false
+    private var currentPrefsSha1: String? = null
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
@@ -40,8 +45,11 @@ class GuardianAdvancedFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         deploymentProtocol?.let {
+            it.setToolbarSubtitle()
+            it.setMenuToolbar(false)
             it.showToolbar()
             it.setToolbarTitle()
+            currentPrefsSha1 = it.getPrefsSha1()
         }
 
         //start guardian prefs fragment once view created
@@ -51,14 +59,25 @@ class GuardianAdvancedFragment : Fragment() {
 
         advancedFinishButton.setOnClickListener {
             analytics?.trackClickNextEvent(Screen.GUARDIAN_ADVANCED.id)
+            it.isEnabled = false
             syncConfig()
         }
     }
 
     private fun syncConfig() {
-        val prefs = syncPreferenceListener?.getPrefsChanges() ?: ""
-        GuardianSocketManager.syncConfiguration(prefs)
-        deploymentProtocol?.nextStep()
+        val prefs = syncPreferenceListener?.getPrefsChanges() ?: JsonObject()
+        needCheckSha1 = prefs.size() > 0
+        GuardianSocketManager.syncConfiguration(prefs.toString())
+        GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
+            requireActivity().runOnUiThread {
+                if (!needCheckSha1) {
+                    deploymentProtocol?.nextStep()
+                }
+                if (currentPrefsSha1 != deploymentProtocol?.getPrefsSha1()) {
+                    deploymentProtocol?.nextStep()
+                }
+            }
+        })
     }
 
     override fun onDetach() {
