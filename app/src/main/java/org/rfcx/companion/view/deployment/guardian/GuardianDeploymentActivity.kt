@@ -402,10 +402,10 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         when (number) {
             0 -> {
                 updateDeploymentState(DeploymentState.Guardian.SolarPanel)
-                startFragment(GuardianSolarPanelFragment.newInstance())
+                startFragment(SoftwareUpdateFragment.newInstance())
             }
             1 -> {
-                startFragment(SoftwareUpdateFragment.newInstance())
+                startFragment(GuardianSolarPanelFragment.newInstance())
             }
             2 -> {
                 updateDeploymentState(DeploymentState.Guardian.Signal)

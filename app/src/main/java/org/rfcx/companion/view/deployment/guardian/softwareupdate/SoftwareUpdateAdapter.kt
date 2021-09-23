@@ -94,6 +94,7 @@ class SoftwareUpdateAdapter(
                             holder.apkUpToDateText.visibility = View.VISIBLE
                         } else {
                             holder.apkSendButton.visibility = View.VISIBLE
+                            holder.apkSendButton.text = "${holder.apkSendButton.text} ${row.softwareChild.version}"
                             holder.apkUpToDateText.visibility = View.GONE
                         }
                     }
