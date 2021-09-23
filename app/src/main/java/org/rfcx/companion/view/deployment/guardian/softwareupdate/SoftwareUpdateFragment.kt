@@ -23,7 +23,7 @@ import java.util.*
 class SoftwareUpdateFragment : Fragment(), ChildrenClickedListener {
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
     var softwareUpdateAdapter: SoftwareUpdateAdapter? = null
-    private var selectedFile: StateSoftwareUpdate.SoftwareChildren? = null
+    private var selectedFile: SoftwareItem.SoftwareVersion? = null
     private var loadingTimer: CountDownTimer? = null
 
     override fun onAttach(context: Context) {
@@ -122,7 +122,7 @@ class SoftwareUpdateFragment : Fragment(), ChildrenClickedListener {
         fun newInstance() = SoftwareUpdateFragment()
     }
 
-    override fun onItemClick(selectedSoftware: StateSoftwareUpdate.SoftwareChildren) {
+    override fun onItemClick(selectedSoftware: SoftwareItem.SoftwareVersion) {
         selectedFile = selectedSoftware
         FileSocketManager.sendFile(selectedSoftware.path)
         nextButton.isEnabled = false
