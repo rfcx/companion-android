@@ -81,18 +81,7 @@ class SoftwareUpdateAdapter(
         when (row.type) {
             ExpandableSoftwareUpdateModel.PARENT -> {
                 (holder as SoftwareStateParentViewHolder).appName.text = row.softwareParent.name
-                holder.itemView.setOnClickListener {
-                    if (row.isExpanded) {
-                        row.isExpanded = false
-                        collapseRow(position)
-                        holder.itemView.close_arrow.rotation = 0F
-
-                    } else {
-                        row.isExpanded = true
-                        expandRow(position)
-                        holder.itemView.close_arrow.rotation = 180F
-                    }
-                }
+                expandRow(position)
             }
 
             ExpandableSoftwareUpdateModel.CHILD -> {
@@ -127,12 +116,10 @@ class SoftwareUpdateAdapter(
 
     fun showLoading() {
         needLoading = true
-        notifyDataSetChanged()
     }
 
     fun hideLoading() {
         needLoading = false
-        notifyDataSetChanged()
     }
 
     fun getLoading(): Boolean = needLoading
@@ -150,26 +137,6 @@ class SoftwareUpdateAdapter(
                         ExpandableSoftwareUpdateModel(ExpandableSoftwareUpdateModel.CHILD, child)
                     )
                 }
-                notifyDataSetChanged()
-            }
-            ExpandableSoftwareUpdateModel.CHILD -> {
-                notifyDataSetChanged()
-            }
-        }
-    }
-
-    private fun collapseRow(position: Int) {
-        val row = softwareUpdateStateModelList[position]
-        val nextPosition = position + 1
-        when (row.type) {
-            ExpandableSoftwareUpdateModel.PARENT -> {
-                outerloop@ while (true) {
-                    if (nextPosition == softwareUpdateStateModelList.size || softwareUpdateStateModelList[nextPosition].type == ExpandableSoftwareUpdateModel.PARENT) {
-                        break@outerloop
-                    }
-                    softwareUpdateStateModelList.removeAt(nextPosition)
-                }
-                notifyDataSetChanged()
             }
         }
     }
