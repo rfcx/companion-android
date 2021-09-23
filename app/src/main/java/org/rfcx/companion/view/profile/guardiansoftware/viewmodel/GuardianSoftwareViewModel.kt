@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import okhttp3.ResponseBody
 import org.rfcx.companion.R
+import org.rfcx.companion.entity.APK
 import org.rfcx.companion.entity.response.GuardianSoftwareResponse
 import org.rfcx.companion.util.Resource
 import org.rfcx.companion.util.file.APKUtils
@@ -25,7 +26,7 @@ class GuardianSoftwareViewModel(
 
     @SuppressLint("StaticFieldLeak")
     private val context = getApplication<Application>().applicationContext
-    private val availableAPKs = MutableLiveData<Resource<Map<String, APKUtils.APKStatus>>>()
+    private val availableAPKs = MutableLiveData<Resource<Map<String, APK>>>()
     private val downloadAPKs = MutableLiveData<Resource<String>>()
     private var softwareDownloadUrl: Map<String, String>? = null
     private var softwareVersion: Map<String, String>? = null
@@ -84,25 +85,25 @@ class GuardianSoftwareViewModel(
         extractDownloadUrl(softwares)
         extractVersion(softwares)
         val roleMappedVersion = APKUtils.getAllDownloadedSoftwaresVersion(context)
-        val roleStatus = mutableMapOf<String, APKUtils.APKStatus>()
+        val roleStatus = mutableMapOf<String, APK>()
         softwares.forEach { res ->
             if (roleMappedVersion.values.map { it.first }.contains(res.version)) {
                 val isUpToDate = res.version == roleMappedVersion[res.role]?.first
                 if (isUpToDate) {
-                    roleStatus[res.role] = APKUtils.APKStatus.UP_TO_DATE
+                    roleStatus[res.role] = APK(res.role, res.version, APKUtils.APKStatus.UP_TO_DATE)
                 } else {
                     if (APKUtils.compareVersionsIfNeedToUpdate(
                             res.version,
                             roleMappedVersion[res.version]?.first
                         )
                     ) {
-                        roleStatus[res.role] = APKUtils.APKStatus.NEED_UPDATE
+                        roleStatus[res.role] = APK(res.role, res.version, APKUtils.APKStatus.NEED_UPDATE)
                     } else {
-                        roleStatus[res.role] = APKUtils.APKStatus.UP_TO_DATE
+                        roleStatus[res.role] = APK(res.role, res.version, APKUtils.APKStatus.UP_TO_DATE)
                     }
                 }
             } else {
-                roleStatus[res.role] = APKUtils.APKStatus.NOT_INSTALLED
+                roleStatus[res.role] = APK(res.role, res.version, APKUtils.APKStatus.NOT_INSTALLED)
             }
         }
         availableAPKs.postValue(Resource.success(roleStatus))
