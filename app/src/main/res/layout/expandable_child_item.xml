@@ -27,7 +27,7 @@
         android:layout_gravity="center"
         android:layout_marginEnd="@dimen/margin_padding_normal"
         android:enabled="true"
-        android:text="send"
+        android:text="@string/update_to"
         android:textSize="@dimen/text_xxsmall"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/apkVersionTextView"

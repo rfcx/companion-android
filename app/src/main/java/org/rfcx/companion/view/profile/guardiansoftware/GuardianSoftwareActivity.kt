@@ -88,29 +88,33 @@ class GuardianSoftwareActivity : AppCompatActivity() {
                             roleStatus.forEach {
                                 when (it.key) {
                                     ADMIN -> {
-                                        if (it.value != APKUtils.APKStatus.UP_TO_DATE) {
+                                        if (it.value.status != APKUtils.APKStatus.UP_TO_DATE) {
                                             adminDownloadButton.visibility = View.VISIBLE
+                                            adminDownloadButton.text = "${adminDownloadButton.text} ${it.value.version}"
                                         } else {
                                             adminStatus.visibility = View.VISIBLE
                                         }
                                     }
                                     CLASSIFY -> {
-                                        if (it.value != APKUtils.APKStatus.UP_TO_DATE) {
+                                        if (it.value.status != APKUtils.APKStatus.UP_TO_DATE) {
                                             classifyDownloadButton.visibility = View.VISIBLE
+                                            classifyDownloadButton.text = "${classifyDownloadButton.text} ${it.value.version}"
                                         } else {
                                             classifyStatus.visibility = View.VISIBLE
                                         }
                                     }
                                     GUARDIAN -> {
-                                        if (it.value != APKUtils.APKStatus.UP_TO_DATE) {
+                                        if (it.value.status != APKUtils.APKStatus.UP_TO_DATE) {
                                             guardianDownloadButton.visibility = View.VISIBLE
+                                            guardianDownloadButton.text = "${guardianDownloadButton.text} ${it.value.version}"
                                         } else {
                                             guardianStatus.visibility = View.VISIBLE
                                         }
                                     }
                                     UPDATER -> {
-                                        if (it.value != APKUtils.APKStatus.UP_TO_DATE) {
+                                        if (it.value.status != APKUtils.APKStatus.UP_TO_DATE) {
                                             updaterDownloadButton.visibility = View.VISIBLE
+                                            updaterDownloadButton.text = "${updaterDownloadButton.text} ${it.value.version}"
                                         } else {
                                             updaterStatus.visibility = View.VISIBLE
                                         }
@@ -170,10 +174,10 @@ class GuardianSoftwareActivity : AppCompatActivity() {
         val versions = guardianSoftwareViewModel.getCurrentDownloadedAPKsVersions()
         versions?.forEach {
             when(it.key) {
-                ADMIN -> adminRoleVersion.text = it.value.first
-                CLASSIFY -> classifyRoleVersion.text = it.value.first
-                GUARDIAN -> guardianRoleVersion.text = it.value.first
-                UPDATER -> updaterRoleVersion.text = it.value.first
+                ADMIN -> adminRoleVersion.text = "${it.value.first} (local)"
+                CLASSIFY -> classifyRoleVersion.text = "${it.value.first} (local)"
+                GUARDIAN -> guardianRoleVersion.text = "${it.value.first} (local)"
+                UPDATER -> updaterRoleVersion.text = "${it.value.first} (local)"
             }
         }
     }

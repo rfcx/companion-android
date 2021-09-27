@@ -1,5 +1,9 @@
 package org.rfcx.companion.entity.response
 
+import com.google.gson.Gson
+import com.google.gson.JsonElement
+import com.google.gson.JsonNull
+import com.google.gson.JsonObject
 import org.rfcx.companion.entity.DeploymentState
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.SyncState
@@ -14,7 +18,7 @@ data class DeploymentResponse(
     var createdAt: Date? = null,
     var updatedAt: Date? = null,
     var deletedAt: Date? = null,
-    var deviceParameters: String? = null
+    var deviceParameters: JsonElement? = null
 )
 
 fun DeploymentResponse.isGuardian(): Boolean {
@@ -34,6 +38,6 @@ fun DeploymentResponse.toDeployment(): Deployment {
         updatedAt = this.updatedAt,
         deletedAt = this.deletedAt,
         isActive = true,
-        deviceParameters = this.deviceParameters
+        deviceParameters = if (this.deviceParameters is JsonNull) null else Gson().toJson(this.deviceParameters)
     )
 }

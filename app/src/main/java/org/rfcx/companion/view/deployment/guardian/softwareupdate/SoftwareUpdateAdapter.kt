@@ -9,7 +9,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.expandable_child_item.view.*
 import kotlinx.android.synthetic.main.expandable_parent_item.view.*
-import kotlinx.android.synthetic.main.item_guardian_hotspot.view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Software
 import org.rfcx.companion.util.file.APKUtils.calculateVersionValue
@@ -19,7 +18,12 @@ class SoftwareUpdateAdapter(
     softwares: List<Software>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private var softwareUpdateStateModelList = mutableListOf<ExpandableSoftwareUpdateModel>()
+    companion object {
+        const val VERSION_ITEM = 1
+        const val HEADER_ITEM = 2
+    }
+
+    private var softwareUpdateStateModelList = mutableListOf<SoftwareItem>()
 
     var guardianSoftwareVersion = mapOf<String, String>()
 
@@ -28,35 +32,17 @@ class SoftwareUpdateAdapter(
     init {
         val softwaresGrouped = softwares.sortedBy { it.name.value }.groupBy { it.name }
         softwaresGrouped.forEach { software ->
-            softwareUpdateStateModelList.add(
-                ExpandableSoftwareUpdateModel(
-                    1,
-                    StateSoftwareUpdate(
-                        software.key.value,
-                        software.value.map {
-                            StateSoftwareUpdate.SoftwareChildren(
-                                software.key.value,
-                                it.version,
-                                it.path
-                            )
-                        })
-                )
-            )
+            softwareUpdateStateModelList.add(SoftwareItem.SoftwareHeader(software.key.value))
+            software.value.forEach {
+                softwareUpdateStateModelList.add(SoftwareItem.SoftwareVersion(software.key.value, it.version, it.path))
+            }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            ExpandableSoftwareUpdateModel.PARENT -> {
-                SoftwareStateParentViewHolder(
-                    LayoutInflater.from(parent.context).inflate(
-                        R.layout.expandable_parent_item, parent, false
-                    )
-                )
-            }
-
-            ExpandableSoftwareUpdateModel.CHILD -> {
-                SoftwareStateChildViewHolder(
+            VERSION_ITEM -> {
+                SoftwareVersionViewHolder(
                     LayoutInflater.from(parent.context).inflate(
                         R.layout.expandable_child_item, parent, false
                     )
@@ -64,7 +50,7 @@ class SoftwareUpdateAdapter(
             }
 
             else -> {
-                SoftwareStateParentViewHolder(
+                SoftwareHeaderViewHolder(
                     LayoutInflater.from(parent.context).inflate(
                         R.layout.expandable_parent_item, parent, false
                     )
@@ -76,35 +62,19 @@ class SoftwareUpdateAdapter(
     override fun getItemCount(): Int = softwareUpdateStateModelList.size
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val row = softwareUpdateStateModelList[position]
-
-        when (row.type) {
-            ExpandableSoftwareUpdateModel.PARENT -> {
-                (holder as SoftwareStateParentViewHolder).appName.text = row.softwareParent.name
-                holder.itemView.setOnClickListener {
-                    if (row.isExpanded) {
-                        row.isExpanded = false
-                        collapseRow(position)
-                        holder.itemView.close_arrow.rotation = 0F
-
-                    } else {
-                        row.isExpanded = true
-                        expandRow(position)
-                        holder.itemView.close_arrow.rotation = 180F
-                    }
-                }
-            }
-
-            ExpandableSoftwareUpdateModel.CHILD -> {
-                (holder as SoftwareStateChildViewHolder).apkVersion.text = row.softwareChild.version
+        when (holder.itemViewType) {
+            VERSION_ITEM -> {
+                val versionItem = (softwareUpdateStateModelList[position] as SoftwareItem.SoftwareVersion)
+                (holder as SoftwareVersionViewHolder).apkVersion.text = versionItem.version
                 holder.apkVersion.apply {
-                    val installedVersion = guardianSoftwareVersion[row.softwareChild.parent]
+                    val installedVersion = guardianSoftwareVersion[versionItem.parent]
                     if (!needLoading) {
-                        if (installedVersion != null && calculateVersionValue(installedVersion) >= calculateVersionValue(row.softwareChild.version)) {
+                        if (installedVersion != null && calculateVersionValue(installedVersion) >= calculateVersionValue(versionItem.version)) {
                             holder.apkSendButton.visibility = View.GONE
                             holder.apkUpToDateText.visibility = View.VISIBLE
                         } else {
                             holder.apkSendButton.visibility = View.VISIBLE
+                            holder.apkSendButton.text = "${holder.apkSendButton.text} ${versionItem.version}"
                             holder.apkUpToDateText.visibility = View.GONE
                         }
                     }
@@ -118,11 +88,14 @@ class SoftwareUpdateAdapter(
                     showLoading()
                     it.visibility = View.GONE
                     holder.apkLoading.visibility = View.VISIBLE
-                    childrenClickedListener.onItemClick(row.softwareChild)
+                    childrenClickedListener.onItemClick(versionItem)
                 }
             }
+            else -> {
+                val headerItem = (softwareUpdateStateModelList[position] as SoftwareItem.SoftwareHeader)
+                (holder as SoftwareHeaderViewHolder).appName.text = headerItem.name
+            }
         }
-
     }
 
     fun showLoading() {
@@ -137,49 +110,19 @@ class SoftwareUpdateAdapter(
 
     fun getLoading(): Boolean = needLoading
 
-    override fun getItemViewType(position: Int): Int = softwareUpdateStateModelList[position].type
-
-    private fun expandRow(position: Int) {
-        val row = softwareUpdateStateModelList[position]
-        var nextPosition = position
-        when (row.type) {
-            ExpandableSoftwareUpdateModel.PARENT -> {
-                for (child in row.softwareParent.members) {
-                    softwareUpdateStateModelList.add(
-                        ++nextPosition,
-                        ExpandableSoftwareUpdateModel(ExpandableSoftwareUpdateModel.CHILD, child)
-                    )
-                }
-                notifyDataSetChanged()
-            }
-            ExpandableSoftwareUpdateModel.CHILD -> {
-                notifyDataSetChanged()
-            }
+    override fun getItemViewType(position: Int): Int {
+        return when(softwareUpdateStateModelList[position]) {
+            is SoftwareItem.SoftwareVersion -> VERSION_ITEM
+            else -> HEADER_ITEM
         }
     }
 
-    private fun collapseRow(position: Int) {
-        val row = softwareUpdateStateModelList[position]
-        val nextPosition = position + 1
-        when (row.type) {
-            ExpandableSoftwareUpdateModel.PARENT -> {
-                outerloop@ while (true) {
-                    if (nextPosition == softwareUpdateStateModelList.size || softwareUpdateStateModelList[nextPosition].type == ExpandableSoftwareUpdateModel.PARENT) {
-                        break@outerloop
-                    }
-                    softwareUpdateStateModelList.removeAt(nextPosition)
-                }
-                notifyDataSetChanged()
-            }
-        }
-    }
-
-    class SoftwareStateParentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class SoftwareHeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal var layout = itemView.country_item_parent_container
         internal var appName: TextView = itemView.appNameTextView
     }
 
-    class SoftwareStateChildViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class SoftwareVersionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal var layout = itemView.country_item_child_container
         internal var apkVersion: TextView = itemView.apkVersionTextView
         internal var apkSendButton: Button = itemView.apkSendButton
@@ -188,54 +131,11 @@ class SoftwareUpdateAdapter(
     }
 }
 
-data class StateSoftwareUpdate(
-    val name: String,
-    val members: List<SoftwareChildren>
-) {
-    data class SoftwareChildren(
-        val parent: String,
-        val version: String,
-        val path: String
-    )
-}
-
-class ExpandableSoftwareUpdateModel {
-    companion object {
-        const val PARENT = 1
-        const val CHILD = 2
-    }
-
-    lateinit var softwareParent: StateSoftwareUpdate
-    var type: Int
-    lateinit var softwareChild: StateSoftwareUpdate.SoftwareChildren
-    var isExpanded: Boolean
-    private var isCloseShown: Boolean
-
-    constructor(
-        type: Int,
-        softwareParent: StateSoftwareUpdate,
-        isExpanded: Boolean = false,
-        isCloseShown: Boolean = false
-    ) {
-        this.type = type
-        this.softwareParent = softwareParent
-        this.isExpanded = isExpanded
-        this.isCloseShown = isCloseShown
-    }
-
-    constructor(
-        type: Int,
-        softwareChild: StateSoftwareUpdate.SoftwareChildren,
-        isExpanded: Boolean = false,
-        isCloseShown: Boolean = false
-    ) {
-        this.type = type
-        this.softwareChild = softwareChild
-        this.isExpanded = isExpanded
-        this.isCloseShown = isCloseShown
-    }
+sealed class SoftwareItem {
+    data class SoftwareHeader(val name: String) : SoftwareItem()
+    data class SoftwareVersion(val parent: String, val version: String, val path: String): SoftwareItem()
 }
 
 interface ChildrenClickedListener {
-    fun onItemClick(selectedSoftware: StateSoftwareUpdate.SoftwareChildren)
+    fun onItemClick(selectedSoftware: SoftwareItem.SoftwareVersion)
 }
