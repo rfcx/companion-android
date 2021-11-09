@@ -12,6 +12,8 @@ import org.rfcx.companion.view.deployment.AudioMothDeploymentRepository
 import org.rfcx.companion.view.deployment.AudioMothDeploymentViewModel
 import org.rfcx.companion.view.LoginRepository
 import org.rfcx.companion.view.LoginViewModel
+import org.rfcx.companion.view.deployment.songmeter.repository.SongMeterRepository
+import org.rfcx.companion.view.deployment.songmeter.viewmodel.SongMeterViewModel
 import org.rfcx.companion.view.detail.EditLocationRepository
 import org.rfcx.companion.view.detail.EditLocationViewModel
 import org.rfcx.companion.view.detail.DeploymentDetailRepository
@@ -42,6 +44,8 @@ class ViewModelFactory(
             return EditLocationViewModel(application, EditLocationRepository(deviceApiHelper, localDataHelper)) as T
         } else if (modelClass.isAssignableFrom(DeploymentDetailViewModel::class.java)) {
             return DeploymentDetailViewModel(application, DeploymentDetailRepository(deviceApiHelper, localDataHelper)) as T
+        } else if (modelClass.isAssignableFrom(SongMeterViewModel::class.java)) {
+            return SongMeterViewModel(application, SongMeterRepository(deviceApiHelper, localDataHelper, bleHelper!!)) as T
         }
         throw IllegalArgumentException("Unknown class name")
     }

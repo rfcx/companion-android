@@ -1,6 +1,6 @@
 package org.rfcx.companion.view.deployment.songmeter
 
-import org.rfcx.companion.entity.Deployment
+import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.songmeter.Advertisement
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 

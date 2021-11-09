@@ -24,8 +24,10 @@ class DeployFragment : BaseImageFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        audioMothDeploymentProtocol = (context as AudioMothDeploymentProtocol)
-        songMeterDeploymentProtocol = (context as SongMeterDeploymentProtocol)
+        when(context) {
+            is AudioMothDeploymentProtocol -> audioMothDeploymentProtocol = context
+            is SongMeterDeploymentProtocol -> songMeterDeploymentProtocol = context
+        }
     }
 
     override fun onCreateView(
