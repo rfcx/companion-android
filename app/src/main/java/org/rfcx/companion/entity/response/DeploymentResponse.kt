@@ -1,10 +1,10 @@
 package org.rfcx.companion.entity.response
 
 import org.rfcx.companion.entity.DeploymentState
-import org.rfcx.companion.entity.Deployment
+import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.SyncState
 import org.rfcx.companion.entity.guardian.GuardianConfiguration
-import org.rfcx.companion.entity.guardian.GuardianDeployment
+import org.rfcx.companion.entity.guardian.Deployment
 import java.util.*
 
 data class DeploymentResponse(
@@ -19,11 +19,16 @@ data class DeploymentResponse(
     var deletedAt: Date? = null
 )
 
-fun DeploymentResponse.toGuardianDeployment(): GuardianDeployment {
-    return GuardianDeployment(
+fun DeploymentResponse.isGuardian(): Boolean {
+    return this.deploymentType == Device.GUARDIAN.value
+}
+
+fun DeploymentResponse.toDeployment(): Deployment {
+    return Deployment(
         serverId = this.id,
+        deploymentKey = this.id ?: "",
         deployedAt = this.deployedAt ?: Date(),
-        state = DeploymentState.Guardian.ReadyToUpload.key,
+        state = if (this.isGuardian()) DeploymentState.Guardian.ReadyToUpload.key else DeploymentState.AudioMoth.ReadyToUpload.key,
         device = this.deploymentType,
         wifiName = this.wifi ?: "",
         configuration = this.configuration ?: GuardianConfiguration(),
@@ -31,22 +36,7 @@ fun DeploymentResponse.toGuardianDeployment(): GuardianDeployment {
         createdAt = this.createdAt ?: Date(),
         syncState = SyncState.Sent.key,
         updatedAt = this.updatedAt,
+        deletedAt = this.deletedAt,
         isActive = true
     )
 }
-
-
-fun DeploymentResponse.toEdgeDeployment(): Deployment {
-    return Deployment(
-        deploymentKey = this.id,
-        serverId = this.id,
-        deployedAt = this.deployedAt ?: Date(),
-        state = DeploymentState.Edge.ReadyToUpload.key,
-        stream = this.stream?.toDeploymentLocation(),
-        createdAt = this.createdAt ?: Date(),
-        syncState = SyncState.Sent.key,
-        updatedAt = this.updatedAt,
-        deletedAt = this.deletedAt
-    )
-}
-

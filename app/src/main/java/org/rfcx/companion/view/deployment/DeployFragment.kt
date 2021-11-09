@@ -17,24 +17,15 @@ import org.rfcx.companion.view.deployment.songmeter.SongMeterDeploymentProtocol
 
 class DeployFragment : BaseImageFragment() {
 
-    private var edgeDeploymentProtocol: EdgeDeploymentProtocol? = null
+    private var audioMothDeploymentProtocol: AudioMothDeploymentProtocol? = null
     private var songMeterDeploymentProtocol: SongMeterDeploymentProtocol? = null
     private val analytics by lazy { context?.let { Analytics(it) } }
     private var screen: String? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        try {
-            edgeDeploymentProtocol = (context as EdgeDeploymentProtocol)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        try {
-            songMeterDeploymentProtocol = (context as SongMeterDeploymentProtocol)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        audioMothDeploymentProtocol = (context as AudioMothDeploymentProtocol)
+        songMeterDeploymentProtocol = (context as SongMeterDeploymentProtocol)
     }
 
     override fun onCreateView(
@@ -59,7 +50,7 @@ class DeployFragment : BaseImageFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        edgeDeploymentProtocol?.let {
+        audioMothDeploymentProtocol?.let {
             it.showToolbar()
             it.setCurrentPage(requireContext().resources.getStringArray(R.array.edge_optional_checks)[0])
             it.setToolbarTitle()
@@ -88,9 +79,9 @@ class DeployFragment : BaseImageFragment() {
                 if(images.isNotEmpty()) {
                     analytics?.trackAddDeploymentImageEvent(Device.AUDIOMOTH.value)
                 }
-                edgeDeploymentProtocol?.setImages(images)
-                edgeDeploymentProtocol?.nextStep()
-            } else {
+                audioMothDeploymentProtocol?.setImages(images)
+                audioMothDeploymentProtocol?.nextStep()
+            } else if (screen == Screen.SONG_METER_CHECK_LIST.id) {
                 if(images.isNotEmpty()) {
                     analytics?.trackAddDeploymentImageEvent(Device.SONGMETER.value)
                 }
@@ -99,25 +90,11 @@ class DeployFragment : BaseImageFragment() {
             }
         }
 
-        if (screen == Screen.AUDIO_MOTH_CHECK_LIST.id) {
-            val deployment = edgeDeploymentProtocol?.getImages()
-            if (deployment != null && deployment.isNotEmpty()) {
-                val pathList = mutableListOf<String>()
-                deployment.forEach {
-                    pathList.add(it)
-                }
-                getImageAdapter().addImages(pathList)
-                didAddImages(pathList)
-            }
-        } else {
-            val deployment = songMeterDeploymentProtocol?.getImages()
-            if (deployment != null && deployment.isNotEmpty()) {
-                val pathList = mutableListOf<String>()
-                deployment.forEach {
-                    pathList.add(it)
-                }
-                getImageAdapter().addImages(pathList)
-                didAddImages(pathList)
+        val deployment = audioMothDeploymentProtocol?.getImages()
+        if (deployment != null && deployment.isNotEmpty()) {
+            val pathList = mutableListOf<String>()
+            deployment.forEach {
+                pathList.add(it)
             }
         }
     }

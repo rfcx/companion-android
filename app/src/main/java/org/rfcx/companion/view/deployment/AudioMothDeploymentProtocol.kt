@@ -1,8 +1,8 @@
 package org.rfcx.companion.view.deployment
 
-import org.rfcx.companion.entity.*
+import org.rfcx.companion.entity.guardian.Deployment
 
-interface EdgeDeploymentProtocol : BaseDeploymentProtocol {
+interface AudioMothDeploymentProtocol : BaseDeploymentProtocol {
     fun openWithEdgeDevice()
     fun openWithGuardianDevice()
 

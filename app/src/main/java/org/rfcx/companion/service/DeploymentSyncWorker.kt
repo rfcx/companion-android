@@ -7,9 +7,10 @@ import androidx.work.*
 import io.realm.Realm
 import org.rfcx.companion.entity.request.EditDeploymentRequest
 import org.rfcx.companion.entity.request.toRequestBody
-import org.rfcx.companion.entity.response.toEdgeDeployment
-import org.rfcx.companion.localdb.DeploymentDb
+import org.rfcx.companion.entity.response.isGuardian
+import org.rfcx.companion.entity.response.toDeployment
 import org.rfcx.companion.localdb.LocateDb
+import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.RealmHelper
@@ -47,7 +48,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                         markSentDeployment(id, db, locateDb, it.id, token)
                     }
                     result.errorBody()?.string()?.contains("id must be unique") ?: false -> {
-                        markSentDeployment(it.deploymentKey ?: "", db, locateDb, it.id, token)
+                        markSentDeployment(it.deploymentKey, db, locateDb, it.id, token)
                     }
                     else -> {
                         db.markUnsent(it.id)
@@ -94,7 +95,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
         val updatedDp = ApiManager.getInstance().getDeviceApi()
             .getDeployment(token, id).execute().body()
         updatedDp?.let { dp ->
-            db.updateDeploymentByServerId(updatedDp.toEdgeDeployment())
+            db.updateDeploymentByServerId(updatedDp.toDeployment())
             locateDb.updateSiteServerId(deploymentId, dp.stream!!.id!!)
         }
 

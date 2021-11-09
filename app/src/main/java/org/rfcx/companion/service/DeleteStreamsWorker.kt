@@ -11,7 +11,6 @@ import org.rfcx.companion.entity.response.StreamResponse
 import org.rfcx.companion.entity.response.toLocate
 import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.localdb.LocateDb
-import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.getIdToken
@@ -36,16 +35,14 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
         if (result) {
             val streamDb = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
             val deploymentDb = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
-            val guardianDeploymentDb = GuardianDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
             val savedStreams = streamDb.getLocations().filter { it.serverId != null }
             val downloadedStreams = streams.map { it.toLocate().serverId }
-            val filteredStreams = savedStreams.filter { stream -> !downloadedStreams.contains(stream.serverId) }
+            val filteredStreams =
+                savedStreams.filter { stream -> !downloadedStreams.contains(stream.serverId) }
             if (filteredStreams.isNotEmpty()) {
                 filteredStreams.forEach {
                     Log.d(TAG, "remove stream: ${it.id}")
-                    // delete deployment that has this stream
                     deploymentDb.deleteDeploymentByStreamId(it.serverId!!)
-                    guardianDeploymentDb.deleteDeploymentByStreamId(it.serverId!!)
                     streamDb.deleteLocate(it.id)
                 }
                 // force delete deployment on device-api
@@ -54,33 +51,49 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
         } else {
             someFailed = true
         }
+        PROJECT_ID = null
         return if (someFailed) Result.retry() else Result.success()
     }
 
-    private suspend fun getStreams(token: String, offset: Int): Boolean = withContext(Dispatchers.IO) {
-        val result = ApiManager.getInstance().getDeviceApi()
-            .getStreams(token, SITES_LIMIT_GETTING, offset).execute()
-        if (result.isSuccessful) {
-            val resultBody = result.body()
-            resultBody?.let {
-                streams = streams + it
-                if (it.size == SITES_LIMIT_GETTING) {
-                    currentStreamsLoading += SITES_LIMIT_GETTING
-                    return@withContext getStreams(token, currentStreamsLoading)
+    private suspend fun getStreams(token: String, offset: Int): Boolean =
+        withContext(Dispatchers.IO) {
+            val projectId = PROJECT_ID?.let { listOf(it) }
+            val result = ApiManager.getInstance().getDeviceApi()
+                .getStreams(token, SITES_LIMIT_GETTING, offset, null, null, projectId)
+                .execute()
+            if (result.isSuccessful) {
+                val resultBody = result.body()
+                resultBody?.let {
+                    streams = streams + it
+                    if (it.size == SITES_LIMIT_GETTING) {
+                        currentStreamsLoading += SITES_LIMIT_GETTING
+                        return@withContext getStreams(token, currentStreamsLoading)
+                    }
                 }
+            } else {
+                return@withContext false
             }
-        } else {
-            return@withContext false
+            return@withContext true
         }
-        return@withContext true
-    }
 
     companion object {
         private const val TAG = "DeleteStreamsWorker"
         private const val UNIQUE_WORK_KEY = "DeleteStreamsWorkerUniqueKey"
         private const val SITES_LIMIT_GETTING = 100
+        private var PROJECT_ID: String? = null
 
         fun enqueue(context: Context) {
+            val constraints =
+                Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+            val workRequest =
+                OneTimeWorkRequestBuilder<DeleteStreamsWorker>().setConstraints(constraints)
+                    .build()
+            WorkManager.getInstance(context)
+                .enqueueUniqueWork(UNIQUE_WORK_KEY, ExistingWorkPolicy.REPLACE, workRequest)
+        }
+
+        fun enqueue(context: Context, projectId: String?) {
+            PROJECT_ID = projectId ?: return enqueue(context)
             val constraints =
                 Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
             val workRequest =

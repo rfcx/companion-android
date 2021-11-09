@@ -71,4 +71,6 @@
     <!-- Sync -->
     <dimen name="height_audiomoth_near_phone">180dp</dimen>
 
+    <dimen name="mini_progress_loading">24dp</dimen>
+
 </resources>

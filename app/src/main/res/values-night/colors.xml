@@ -30,11 +30,12 @@
     <color name="text_white">#000000</color>
     <color name="text_black">#ffffff</color>
     <color name="text_button_enable">#ffffff</color>
+    <color name="text_red_button_disable">#bf5050</color>
     <color name="text_button_disable">#3dbf63</color>
     <color name="text_button_outline_enable">#ffffff</color>
     <color name="text_button_outline_disable">#505050</color>
 
-    <color name="divider">#D6D6D6</color>
+    <color name="divider">#a81313</color>
     <color name="background_button_enable">@color/colorPrimaryDark</color>
     <color name="background_button_disable">@color/colorPrimaryDark</color>
     <color name="background_outline_button_enable">#45485d</color>

@@ -184,6 +184,44 @@
         android:background="@color/separateLine"
         app:layout_constraintTop_toBottomOf="@id/darkThemeLinearLayout" />
 
+    <TextView
+        android:id="@+id/projectTextView"
+        style="@style/AudioMothText.Title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/margin_padding_normal"
+        android:paddingTop="@dimen/margin_padding_small"
+        android:paddingEnd="@dimen/margin_padding_normal"
+        android:paddingBottom="@dimen/margin_padding_small"
+        android:text="@string/location_group"
+        android:textAllCaps="false"
+        android:textColor="@color/text_secondary"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/view1" />
+
+    <TextView
+        android:id="@+id/offlineMapTextView"
+        style="@style/AudioMothText.SubTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:padding="@dimen/margin_padding_normal"
+        android:text="@string/profile_offline_map_label"
+        android:textColor="@color/text_primary"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/projectTextView" />
+
+    <View
+        android:id="@+id/viewProject"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/separate_line_size"
+        android:background="@color/separateLine"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/offlineMapTextView" />
 
     <TextView
 

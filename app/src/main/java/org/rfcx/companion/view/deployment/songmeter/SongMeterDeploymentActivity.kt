@@ -6,15 +6,14 @@ import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.Observer
 import io.realm.RealmList
-import kotlinx.android.synthetic.main.activity_song_meter_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
+import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.songmeter.Advertisement
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
@@ -30,8 +29,8 @@ import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.util.getLastLocation
 import org.rfcx.companion.util.getListSite
+import org.rfcx.companion.view.deployment.BaseDeploymentActivity
 import org.rfcx.companion.view.deployment.DeployFragment
-import org.rfcx.companion.view.deployment.EdgeDeploymentActivity
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.deployment.location.DetailDeploymentSiteFragment
@@ -39,34 +38,22 @@ import org.rfcx.companion.view.deployment.location.SetDeploymentSiteFragment
 import org.rfcx.companion.view.deployment.songmeter.connect.SongMeterConnectFragment
 import org.rfcx.companion.view.deployment.songmeter.detect.SongMeterDetectFragment
 import org.rfcx.companion.view.deployment.songmeter.viewmodel.SongMeterViewModel
-import org.rfcx.companion.view.detail.MapPickerProtocol
 import org.rfcx.companion.view.dialog.CompleteFragment
 import org.rfcx.companion.view.dialog.LoadingDialogFragment
 import org.rfcx.companion.view.dialog.SiteLoadingDialogFragment
 import java.util.*
-import kotlin.collections.ArrayList
 
-class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProtocol,
-    MapPickerProtocol {
-
-    private var _deployment: Deployment? = null
-    private var _deployLocation: DeploymentLocation? = null
-    private var _images: List<String> = listOf()
-    private var _siteItems = arrayListOf<SiteWithLastDeploymentItem>()
-    private var _locate: Locate? = null
+class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymentProtocol{
 
     private var currentCheck = 0
-    private var currentCheckName = ""
     private var passedChecks = RealmList<Int>()
     private var currentLocation: Location? = null
     private var useExistedLocation: Boolean = false
 
-    private var latitude = 0.0
-    private var longitude = 0.0
-    private var siteId: Int = 0
-    private var nameLocation: String = ""
-
     private lateinit var songMeterViewModel: SongMeterViewModel
+
+    private var deployments = listOf<Deployment>()
+    private var sites = listOf<Locate>()
 
     private val preferences = Preferences.getInstance(this)
 
@@ -86,11 +73,13 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_song_meter_deployment)
-        this.currentLocation = this.getLastLocation()
+
         setupToolbar()
         startCheckList()
         setViewModel()
-        setSiteItems()
+        setObserver()
+        this.currentLocation = this.getLastLocation()
+        preferences.clearSelectedProject()
     }
 
     private fun setViewModel() {
@@ -105,9 +94,23 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
         ).get(SongMeterViewModel::class.java)
     }
 
+    private fun setObserver() {
+        songMeterViewModel.getDeployments().observe(this, Observer {
+            this.deployments = it.filter { deployment -> deployment.isCompleted() }
+            setSiteItems()
+        })
+
+        songMeterViewModel.getSites().observe(this, Observer {
+            this.sites = it
+            setSiteItems()
+        })
+    }
+
     override fun getDeployment(): Deployment? {
         if (this._deployment == null) {
-            this._deployment = Deployment()
+            val dp = Deployment()
+            dp.device = Device.SONGMETER.value
+            this._deployment = dp
         }
         return this._deployment
     }
@@ -165,11 +168,10 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
 
         _siteItems = getListSite(
             this,
-            songMeterViewModel.getDeploymentsFromLocal(),
-            songMeterViewModel.getGuardianDeploymentsFromLocal(),
+            deployments,
             getString(R.string.none),
             currentLocation ?: loc,
-            songMeterViewModel.getLocatesFromLocal()
+            sites
         )
     }
 
@@ -218,7 +220,7 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
 
     private fun saveImages(deployment: Deployment) {
         songMeterViewModel.deleteImages(deployment)
-        songMeterViewModel.insertImage(deployment, null, _images)
+        songMeterViewModel.insertImage(deployment, _images)
     }
 
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
@@ -237,8 +239,9 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
 
     override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
         val deployment = _deployment ?: Deployment()
+        deployment.device = Device.SONGMETER.value
         deployment.isActive = locate.serverId == null
-        deployment.state = DeploymentState.Edge.Locate.key // state
+        deployment.state = DeploymentState.SongMeter.Locate.key // state
 
         this._deployLocation = locate.asDeploymentLocation()
         this._locate = locate
@@ -264,7 +267,7 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
             it.deployedAt = Date()
             it.updatedAt = Date()
             it.isActive = true
-            it.state = DeploymentState.Edge.ReadyToUpload.key
+            it.state = DeploymentState.SongMeter.ReadyToUpload.key
             setDeployment(it)
 
             val deploymentId = songMeterViewModel.insertOrUpdateDeployment(it, _deployLocation!!)
@@ -274,18 +277,15 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
 
             if (useExistedLocation) {
                 this._locate?.let { locate ->
-                    //Todo: merge three deployment to 1
-//                    val deployments =
-//                        locate.serverId?.let { it1 -> songMeterViewModel.getDeploymentByStreamId(it1) }
-//                    val guardianDeployments = locate.serverId?.let { it1 ->
-//                        guardianDeploymentDb.getDeploymentsBySiteId(it1)
-//                    }
-//                    deployments?.forEach { deployment ->
-//                        edgeDeploymentDb.updateIsActive(deployment.id)
-//                    }
-//                    guardianDeployments?.forEach { deployment ->
-//                        guardianDeploymentDb.updateIsActive(deployment.id)
-//                    }
+                    val deployments =
+                        locate.serverId?.let { it1 ->
+                            songMeterViewModel.getDeploymentsBySiteId(
+                                it1
+                            )
+                        }
+                    deployments?.forEach { deployment ->
+                        songMeterViewModel.updateIsActive(deployment.id)
+                    }
                 }
             }
             saveImages(it)
@@ -300,7 +300,7 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
                         siteId = this._locate!!.id,
                         localPath = GeoJsonUtils.generateGeoJson(
                             this,
-                            GeoJsonUtils.generateFileName(it.deployedAt, it.deploymentKey!!),
+                            GeoJsonUtils.generateFileName(it.deployedAt, it.deploymentKey),
                             point
                         ).absolutePath
                     )
@@ -308,7 +308,7 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
                 }
             }
 
-            analytics.trackCreateAudiomothDeploymentEvent() // TODO: songmeter
+            analytics.trackCreateSongMeterDeploymentEvent()
 
             DeploymentSyncWorker.enqueue(this)
             hideLoading()
@@ -409,12 +409,6 @@ class SongMeterDeploymentActivity : AppCompatActivity(), SongMeterDeploymentProt
             supportFragmentManager,
             TAG_SITE_LOADING_DIALOG
         )
-    }
-
-    private fun startFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(contentContainer.id, fragment)
-            .commit()
     }
 
     private fun setupToolbar() {

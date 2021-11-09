@@ -5,10 +5,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import io.realm.Realm
-import org.rfcx.companion.entity.Device
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.DeploymentDb
-import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.getIdToken
@@ -19,17 +17,12 @@ class DownloadImagesWorker(val context: Context, params: WorkerParameters) :
     private var someFailed = false
 
     override suspend fun doWork(): Result {
-
         Log.d(TAG, "doWork on DownloadAssets")
-
-        val edgeDeploymentDb = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
-        val edgeDeployment = edgeDeploymentDb.getDeploymentByServerId(deploymentServerId)
-        val guardianDeploymentDb = GuardianDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
-        val guardianDeployment = guardianDeploymentDb.getDeploymentByServerId(deploymentServerId)
+        val deploymentDb = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
+        val deployments = deploymentDb.getDeploymentByServerId(deploymentServerId)
 
         val deployment = when {
-            edgeDeployment != null -> Triple(edgeDeployment.id, edgeDeployment.serverId, Device.AUDIOMOTH.value)
-            guardianDeployment != null -> Triple(guardianDeployment.id, guardianDeployment.serverId, Device.GUARDIAN.value)
+            deployments != null -> Triple(deployments.id, deployments.serverId, deployments.device ?: "") // TODO: change to not can be null
             else -> null
         }
 

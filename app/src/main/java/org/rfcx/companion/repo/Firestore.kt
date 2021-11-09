@@ -3,8 +3,6 @@ package org.rfcx.companion.repo
 import android.content.Context
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.tasks.await
-import org.rfcx.companion.entity.request.EdgeGroupRequest
 import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.Storage
 import org.rfcx.companion.util.getEmailUser
@@ -19,18 +17,6 @@ class Firestore(val context: Context) {
         Preferences.getInstance(context)
     private val uid = preferences.getString(Preferences.USER_FIREBASE_UID, "")
     private val feedbackDocument = db.collection(COLLECTION_FEEDBACK)
-
-
-    suspend fun sendGroup(group: EdgeGroupRequest, docId: String) {
-        val userDocument = db.collection(COLLECTION_USERS).document(uid)
-        userDocument.collection(COLLECTION_GROUPS).document(docId).set(group).await()
-    }
-
-    suspend fun updateGroup(groupServerId: String, group: EdgeGroupRequest) {
-        val userDocument = db.collection(COLLECTION_USERS).document(uid)
-        userDocument.collection(COLLECTION_GROUPS).document(groupServerId)
-            .set(group).await()
-    }
 
     fun saveFeedback(
         text: String,
@@ -65,7 +51,6 @@ class Firestore(val context: Context) {
         const val TAG = "Firestore"
 
         // Firestore Collection
-        const val COLLECTION_USERS = "users"
         const val COLLECTION_FEEDBACK = "feedback"
         const val COLLECTION_GROUPS = "groups"
     }

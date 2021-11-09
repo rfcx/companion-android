@@ -12,33 +12,33 @@ import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
 
 class ChooseDeviceFragment : Fragment() {
-    private var edgeDeploymentProtocol: EdgeDeploymentProtocol? = null
+    private var audioMothDeploymentProtocol: AudioMothDeploymentProtocol? = null
     private val analytics by lazy { context?.let { Analytics(it) } }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        edgeDeploymentProtocol = (context as EdgeDeploymentProtocol)
+        audioMothDeploymentProtocol = (context as AudioMothDeploymentProtocol)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        edgeDeploymentProtocol?.hideToolbar()
+        audioMothDeploymentProtocol?.hideToolbar()
 
         edgeImageView.setOnClickListener {
-            edgeDeploymentProtocol?.openWithEdgeDevice()
+            audioMothDeploymentProtocol?.openWithEdgeDevice()
         }
 
         edgeTextView.setOnClickListener {
-            edgeDeploymentProtocol?.openWithEdgeDevice()
+            audioMothDeploymentProtocol?.openWithEdgeDevice()
         }
 
         guardianImageView.setOnClickListener {
-            edgeDeploymentProtocol?.openWithGuardianDevice()
+            audioMothDeploymentProtocol?.openWithGuardianDevice()
         }
 
         guardianTextview.setOnClickListener {
-            edgeDeploymentProtocol?.openWithGuardianDevice()
+            audioMothDeploymentProtocol?.openWithGuardianDevice()
         }
     }
 

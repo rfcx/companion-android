@@ -7,11 +7,9 @@ import androidx.work.*
 import io.realm.Realm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.response.convertToDeploymentResponse
-import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.localdb.LocateDb
-import org.rfcx.companion.localdb.guardian.GuardianDeploymentDb
+import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.getIdToken
@@ -37,33 +35,34 @@ class DownloadStreamsWorker(val context: Context, params: WorkerParameters) :
             if (result) {
                 Log.d(TAG, "downloaded $count sites")
                 isRunning = DownloadStreamState.FINISH
+                // Trigger delete streams after download streams successfully
+                DeleteStreamsWorker.enqueue(context, PROJECT_ID)
             } else {
                 isRunning = DownloadStreamState.NOT_RUNNING
                 someFailed = true
             }
             return if (someFailed) Result.retry() else Result.success()
         }
+        PROJECT_ID = null
         return Result.retry()
     }
 
     private suspend fun getStreams(token: String, offset: Int, maxUpdatedAt: String? = null): Boolean = withContext(Dispatchers.IO) {
         isRunning = DownloadStreamState.RUNNING
+        val projectId = PROJECT_ID?.let { listOf(it) }
         val result = ApiManager.getInstance().getDeviceApi()
-            .getStreams(token, SITES_LIMIT_GETTING, offset, maxUpdatedAt, "updated_at,name", PROJECT_ID).execute()
+            .getStreams(token, SITES_LIMIT_GETTING, offset, maxUpdatedAt, "updated_at,name", projectId).execute()
         if (result.isSuccessful) {
             val resultBody = result.body()
             resultBody?.let {
                 val streamDb = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
-                val edgeDeploymentDb = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
-                val guardianDeploymentDb = GuardianDeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
+                val deploymentDb = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
                 count += resultBody.size
                 streamDb.insertOrUpdate(resultBody)
 
                 //insert deployments
-                val edgeDeploymentStreams = resultBody.filter { st -> st.deployment != null && st.deployment?.deploymentType == Device.AUDIOMOTH.value }
-                val guardianDeploymentStreams = resultBody.filter { st -> st.deployment != null && st.deployment?.deploymentType == Device.GUARDIAN.value }
-                edgeDeploymentDb.insertOrUpdate(edgeDeploymentStreams.map { st -> st.convertToDeploymentResponse() })
-                guardianDeploymentDb.insertOrUpdate(guardianDeploymentStreams.map { st -> st.convertToDeploymentResponse() })
+                val deploymentStreams = resultBody.filter { st -> st.deployment != null}
+                deploymentDb.insertOrUpdate(deploymentStreams.map { st -> st.convertToDeploymentResponse() })
 
                 if (it.size == SITES_LIMIT_GETTING) {
                     if (streamDb.getMaxUpdatedAt() == maxUpdatedAt) {
@@ -87,7 +86,7 @@ class DownloadStreamsWorker(val context: Context, params: WorkerParameters) :
         private const val UNIQUE_WORK_KEY = "DownloadStreamsWorkerUniqueKey"
         private const val SITES_LIMIT_GETTING = 100
         private var isRunning = DownloadStreamState.NOT_RUNNING
-        private var PROJECT_ID: List<String>? = null
+        private var PROJECT_ID: String? = null
 
         fun enqueue(context: Context) {
             val constraints =
@@ -100,7 +99,7 @@ class DownloadStreamsWorker(val context: Context, params: WorkerParameters) :
         }
 
         fun enqueue(context: Context, projectId: String) {
-            PROJECT_ID = listOf(projectId)
+            PROJECT_ID = projectId
             val constraints =
                 Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
             val workRequest =

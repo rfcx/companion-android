@@ -7,39 +7,11 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import java.io.File
-import kotlinx.coroutines.tasks.await
 import me.echodev.resizer.Resizer
 
 class Storage(val context: Context) {
     private val storage = FirebaseStorage.getInstance()
     private val storageRef = storage.reference
-    private val preferences = Preferences.getInstance(context)
-    private val guid = preferences.getString(Preferences.USER_GUID, "images")
-
-    suspend fun sendImage(uri: String): String? {
-        val imageFile = File(uri)
-        val compressedFile = compressFile(context, imageFile)
-
-        val file = Uri.fromFile(compressedFile)
-        val ref = file.lastPathSegment?.let { storageRef.child("$guid/${file.lastPathSegment}") }
-        val uploadTask = ref?.putFile(file)
-        var uriDownload: String? = null
-        uploadTask?.continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
-            if (!task.isSuccessful) {
-                task.exception?.let {
-                    throw it
-                }
-            }
-            return@Continuation ref.downloadUrl
-        })?.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val downloadUri = task.result
-                uriDownload = downloadUri.toString()
-            }
-        }?.await()
-
-        return uriDownload
-    }
 
     fun uploadImagesOfFeedback(
         uris: List<String>,

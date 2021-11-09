@@ -1,8 +1,6 @@
 package org.rfcx.companion.entity.response
 
 import org.rfcx.companion.entity.*
-import org.rfcx.companion.entity.guardian.GuardianConfiguration
-import org.rfcx.companion.entity.guardian.GuardianDeployment
 import java.util.*
 
 data class StreamResponse(

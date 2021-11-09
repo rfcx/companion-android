@@ -165,6 +165,11 @@ class Analytics(context: Context) {
         trackEvent(Event.CREATE_AUDIOMOTH_DEPLOYMENT.id, bundle)
     }
 
+    fun trackCreateSongMeterDeploymentEvent() {
+        val bundle = Bundle()
+        trackEvent(Event.CREATE_SONGMETER_DEPLOYMENT.id, bundle)
+    }
+
     fun trackSelectGuardianHotspotEvent() {
         val bundle = Bundle()
         trackEvent(Event.SELECT_GUARDIAN_HOTSPOT.id, bundle)

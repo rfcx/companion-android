@@ -16,6 +16,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.mapbox.android.core.location.*
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -28,16 +29,18 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
-import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_detail_deployment_site.*
 import org.rfcx.companion.R
+import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Screen
-import org.rfcx.companion.localdb.LocateDb
-import org.rfcx.companion.localdb.ProjectDb
+import org.rfcx.companion.repo.api.DeviceApiHelper
+import org.rfcx.companion.repo.api.DeviceApiServiceImpl
+import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.util.*
+import org.rfcx.companion.view.deployment.AudioMothDeploymentViewModel
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.map.MapboxCameraUtils
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
@@ -46,6 +49,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     private val analytics by lazy { context?.let { Analytics(it) } }
     private val preferences by lazy { context?.let { Preferences.getInstance(it) } }
     private var deploymentProtocol: BaseDeploymentProtocol? = null
+    private lateinit var audioMothDeploymentViewModel: AudioMothDeploymentViewModel
 
     // Mapbox
     private var mapboxMap: MapboxMap? = null
@@ -59,11 +63,6 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     var isUseCurrentLocate: Boolean = false
     var site: Locate? = null
     var fromMapPicker: Boolean = false
-
-    // Local database
-    val realm: Realm = Realm.getInstance(RealmHelper.migrationConfig())
-    private val siteDb by lazy { LocateDb(realm) }
-    private val projectDb by lazy { ProjectDb(realm) }
 
     // Location
     private var group: String? = null
@@ -106,6 +105,17 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         initIntent()
     }
 
+    private fun setViewModel() {
+        audioMothDeploymentViewModel = ViewModelProvider(
+            this,
+            ViewModelFactory(
+                requireActivity().application,
+                DeviceApiHelper(DeviceApiServiceImpl()),
+                LocalDataHelper()
+            )
+        ).get(AudioMothDeploymentViewModel::class.java)
+    }
+
     private fun initIntent() {
         arguments?.let {
             siteId = it.getInt(ARG_SITE_ID)
@@ -133,6 +143,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupTopBar()
+        setViewModel()
 
         mapView = view.findViewById(R.id.mapBoxView)
         mapView.onCreate(savedInstanceState)
@@ -235,9 +246,6 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 it.createdAt,
                 it.updatedAt,
                 it.lastDeploymentId,
-                it.lastDeploymentServerId,
-                it.lastGuardianDeploymentId,
-                it.lastGuardianDeploymentServerId,
                 it.syncState
             )
             createSiteSymbol(locate.getLatLng())
@@ -276,9 +284,6 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 it.createdAt,
                 it.updatedAt,
                 it.lastDeploymentId,
-                it.lastDeploymentServerId,
-                it.lastGuardianDeploymentId,
-                it.lastGuardianDeploymentServerId,
                 it.syncState
             )
             deploymentProtocol?.setDeployLocation(locate, true)
@@ -311,7 +316,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     }
 
     fun updateView() {
-        if (!isCreateNew) site = site ?: siteDb.getLocateById(siteId)
+        if (!isCreateNew) site = site ?: audioMothDeploymentViewModel.getLocateById(siteId)
         if (latitude != 0.0 && longitude != 0.0) {
             val alt = if (isCreateNew) currentUserLocation?.altitude else site?.altitude
             setLatLngLabel(LatLng(latitude, longitude), alt ?: 0.0)
@@ -356,7 +361,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             createSiteSymbol(latLng)
             setCheckboxForResumeDeployment(curLoc, latLng)
         } else if (!isCreateNew) {
-            site = siteDb.getLocateById(siteId)
+            site = audioMothDeploymentViewModel.getLocateById(siteId)
             site?.let { locate ->
                 val latLng = locate.getLatLng()
                 moveCamera(curLoc, latLng, DefaultSetupMap.DEFAULT_ZOOM)
@@ -524,7 +529,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         mapView.onResume()
 
         val projectId = preferences?.getInt(Preferences.SELECTED_PROJECT) ?: -1
-        val selectedProject = projectDb.getProjectById(projectId)
+        val selectedProject = audioMothDeploymentViewModel.getProjectById(projectId)
         val selectedGroup = preferences?.getString(Preferences.GROUP)
 
         group = selectedGroup ?: (selectedProject?.name ?: getString(R.string.none))
