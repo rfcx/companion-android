@@ -5,6 +5,7 @@ import android.content.Intent
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.Observer
@@ -273,6 +274,7 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
             val deploymentId = songMeterViewModel.insertOrUpdateDeployment(it, _deployLocation!!)
             this._locate?.let { loc ->
                 songMeterViewModel.insetOrUpdateStream(deploymentId, loc) // update locate - last deployment
+                Log.d("SONGMETER", "success deploy save")
             }
 
             if (useExistedLocation) {

@@ -179,7 +179,15 @@ class DeploymentDb(private val realm: Realm) {
                 .equalTo(Deployment.FIELD_SYNC_STATE, SyncState.Unsent.key).findAll()
                 .createSnapshot()
 
-            unsentCopied = (unsentGuardian + unsentAudioMoth)
+            val unsentSongMeter = it.where(Deployment::class.java)
+                .equalTo(Deployment.FIELD_DEVICE, Device.SONGMETER.value)
+                .and()
+                .equalTo(Deployment.FIELD_STATE, DeploymentState.AudioMoth.ReadyToUpload.key)
+                .and()
+                .equalTo(Deployment.FIELD_SYNC_STATE, SyncState.Unsent.key).findAll()
+                .createSnapshot()
+
+            unsentCopied = (unsentGuardian + unsentAudioMoth + unsentSongMeter)
             unsentCopied.forEach { deployment ->
                 deployment.syncState = SyncState.Sending.key
             }
