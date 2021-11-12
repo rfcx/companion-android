@@ -9,7 +9,6 @@ import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
-import com.google.gson.Gson
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_guardian_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
@@ -94,8 +93,6 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
 
         setupToolbar()
         setLiveData()
-
-        this.currentLocate = this.getLastLocation()
 
         val deploymentId = intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
         if (deploymentId != null) {
@@ -257,7 +254,6 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     override fun getWifiName(): String = _deployment?.wifiName ?: ""
 
     override fun getLastCheckInTime(): Long? = lastCheckInTime
-    override fun getGuid(): String = getWifiName().substring(4)
 
     override fun getLocationGroup(name: String): Project? {
         return projectDb.getProjectByName(name)
@@ -287,7 +283,6 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
             it.updatedAt = Date()
             it.isActive = true
             it.state = DeploymentState.Guardian.ReadyToUpload.key
-            it.deviceParameters = Gson().toJson(GuardianDeviceParameters(getGuid()))
             setDeployment(it)
 
             val deploymentId = deploymentDb.insertOrUpdateDeployment(it, _deployLocation!!)

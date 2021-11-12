@@ -3,8 +3,8 @@ package org.rfcx.companion.entity.response
 import org.rfcx.companion.entity.DeploymentState
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.SyncState
-import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.guardian.GuardianConfiguration
+import org.rfcx.companion.entity.guardian.Deployment
 import java.util.*
 
 data class DeploymentResponse(
@@ -16,8 +16,7 @@ data class DeploymentResponse(
     var updatedAt: Date? = null,
     var wifi: String? = null,
     var configuration: GuardianConfiguration? = null,
-    var deletedAt: Date? = null,
-    var deviceParameters: String? = null
+    var deletedAt: Date? = null
 )
 
 fun DeploymentResponse.isGuardian(): Boolean {
@@ -38,7 +37,6 @@ fun DeploymentResponse.toDeployment(): Deployment {
         syncState = SyncState.Sent.key,
         updatedAt = this.updatedAt,
         deletedAt = this.deletedAt,
-        isActive = true,
-        deviceParameters = this.deviceParameters
+        isActive = true
     )
 }

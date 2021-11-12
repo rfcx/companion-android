@@ -70,10 +70,6 @@ class CompanionRealmMigration : RealmMigration {
         if (oldVersion < 18L && newVersion >= 18L) {
             migrateToV18(realm)
         }
-
-        if (oldVersion < 19L && newVersion >= 19L) {
-            migrateToV19(realm)
-        }
     }
 
     private fun migrateToV2(realm: DynamicRealm) {
@@ -389,13 +385,6 @@ class CompanionRealmMigration : RealmMigration {
             if (lastGuardianDeploymentServerId) {
                 removeField("lastGuardianDeploymentServerId")
             }
-        }
-    }
-
-    private fun migrateToV19(realm: DynamicRealm) {
-        val deployment = realm.schema.get(Deployment.TABLE_NAME)
-        deployment?.apply {
-            addField(Deployment.FIELD_DEVICE_PARAMETERS, String::class.java)
         }
     }
 

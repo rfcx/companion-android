@@ -1,7 +1,5 @@
 package org.rfcx.companion.entity.request
 
-import com.google.gson.Gson
-import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.guardian.toRequestBody
@@ -14,8 +12,7 @@ data class DeploymentRequest(
     var deployedAt: String = Date().toISO8601Format(),
     var wifi: String? = null,
     var configuration: GuardianConfigurationRequest? = null,
-    var stream: StreamRequest? = null,
-    var deviceParameters: JsonObject? = null
+    var stream: StreamRequest? = null
 )
 
 data class GuardianConfigurationRequest(
@@ -34,7 +31,6 @@ fun Deployment.toRequestBody(): DeploymentRequest {
         deployedAt = this.deployedAt.toISO8601Format(),
         wifi = this.wifiName,
         configuration = this.configuration?.toRequestBody(),
-        stream = if (this.stream?.name == null) null else this.stream?.toRequestBody(),
-        deviceParameters = Gson().fromJson(this.deviceParameters, JsonObject::class.java)
+        stream = if (this.stream?.name == null) null else this.stream?.toRequestBody()
     )
 }
