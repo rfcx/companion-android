@@ -21,8 +21,8 @@ class DeploymentDetailViewModel(
         return deploymentDetailRepository.deleteDeploymentLocation(id, callback)
     }
 
-    fun getAllResultsAsync(deploymentId: Int): RealmResults<DeploymentImage> {
-        return deploymentDetailRepository.getAllResultsAsync(deploymentId)
+    fun getAllResultsAsync(deploymentId: Int, device: String): RealmResults<DeploymentImage> {
+        return deploymentDetailRepository.getAllResultsAsync(deploymentId, device)
     }
 
     fun insertImage(

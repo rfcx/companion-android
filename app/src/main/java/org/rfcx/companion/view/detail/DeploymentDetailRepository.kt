@@ -20,8 +20,8 @@ class DeploymentDetailRepository(
         return localDataHelper.getDeploymentLocalDb().deleteDeploymentLocation(id, callback)
     }
 
-    fun getAllResultsAsync(deploymentId: Int): RealmResults<DeploymentImage> {
-        return localDataHelper.getDeploymentImageLocalDb().getAllResultsAsync(deploymentId)
+    fun getAllResultsAsync(deploymentId: Int, device: String): RealmResults<DeploymentImage> {
+        return localDataHelper.getDeploymentImageLocalDb().getAllResultsAsync(deploymentId, device)
     }
 
     fun insertImage(

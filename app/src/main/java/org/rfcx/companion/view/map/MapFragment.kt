@@ -842,15 +842,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         val deploymentId = feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID)
         if (deploymentId != null) {
             context?.let {
-                val device = feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEVICE)
-                if (device == Device.AUDIOMOTH.value) {
-                    DeploymentDetailActivity.startActivity(it, deploymentId.toInt())
-                } else {
-                    val deployment = mainViewModel.getDeploymentById(deploymentId.toInt())
-                    deployment?.let { dp ->
-                        DiagnosticActivity.startActivity(it, dp, false)
-                    }
-                }
+                DeploymentDetailActivity.startActivity(it, deploymentId.toInt())
                 analytics?.trackSeeDetailEvent()
             }
         } else {

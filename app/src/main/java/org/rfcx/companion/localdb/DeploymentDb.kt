@@ -6,10 +6,9 @@ import io.realm.Sort
 import io.realm.kotlin.deleteFromRealm
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
-import org.rfcx.companion.entity.guardian.isGuardian
 import org.rfcx.companion.entity.response.DeploymentResponse
-import org.rfcx.companion.entity.response.toDeploymentLocation
 import org.rfcx.companion.entity.response.toDeployment
+import org.rfcx.companion.entity.response.toDeploymentLocation
 import java.util.*
 
 class DeploymentDb(private val realm: Realm) {
@@ -311,9 +310,9 @@ class DeploymentDb(private val realm: Realm) {
         }
     }
 
-    fun getDeploymentsBySiteId(streamId: String): ArrayList<Deployment> {
+    fun getDeploymentsBySiteId(streamId: String, device: String): ArrayList<Deployment> {
         val deployments = realm.where(Deployment::class.java)
-            .equalTo(Deployment.FIELD_STATE, DeploymentState.Guardian.ReadyToUpload.key)
+            .equalTo(Deployment.FIELD_STATE, if (device == Device.GUARDIAN.value) DeploymentState.Guardian.ReadyToUpload.key else DeploymentState.AudioMoth.ReadyToUpload.key)
             .and()
             .equalTo(Deployment.FIELD_SYNC_STATE, SyncState.Sent.key)
             .and()
