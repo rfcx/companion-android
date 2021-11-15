@@ -344,13 +344,6 @@ class CompanionRealmMigration : RealmMigration {
     }
 
     private fun migrateToV16(realm: DynamicRealm) {
-        val deployment = realm.schema.get("GuardianDeployment")
-        deployment?.apply {
-            addField(Deployment.FIELD_DELETED_AT, Date::class.java)
-            addRealmListField(Deployment.FIELD_PASSED_CHECKS, Int::class.java)
-                .setNullable(Deployment.FIELD_PASSED_CHECKS, true)
-        }
-
         val project = realm.schema.get("Project")
         project?.apply {
             addField(Project.PROJECT_MAX_LATITUDE, Double::class.java)
@@ -367,7 +360,11 @@ class CompanionRealmMigration : RealmMigration {
         val deployment = realm.schema.get("GuardianDeployment")
         deployment?.apply {
             className = Deployment.TABLE_NAME
+            addField(Deployment.FIELD_DELETED_AT, Date::class.java)
+            addRealmListField(Deployment.FIELD_PASSED_CHECKS, Int::class.java)
+                .setNullable(Deployment.FIELD_PASSED_CHECKS, true)
         }
+
     }
 
     private fun migrateToV18(realm: DynamicRealm) {
