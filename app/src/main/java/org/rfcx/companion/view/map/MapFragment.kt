@@ -322,12 +322,21 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             listener?.hideBottomSheet()
         }
 
-        projectRecyclerView.visibility = View.VISIBLE
-        projectSwipeRefreshView.visibility = View.VISIBLE
-        searchButton.visibility = View.GONE
-        trackingLayout.visibility = View.GONE
-        hideButtonOnMap()
-        listener?.hideBottomAppBar()
+        if (projectRecyclerView.visibility == View.VISIBLE) {
+            projectRecyclerView.visibility = View.GONE
+            projectSwipeRefreshView.visibility = View.GONE
+            searchButton.visibility = View.VISIBLE
+            trackingLayout.visibility = View.VISIBLE
+            showButtonOnMap()
+            listener?.showBottomAppBar()
+        } else {
+            projectRecyclerView.visibility = View.VISIBLE
+            projectSwipeRefreshView.visibility = View.VISIBLE
+            searchButton.visibility = View.GONE
+            trackingLayout.visibility = View.GONE
+            hideButtonOnMap()
+            listener?.hideBottomAppBar()
+        }
 
         if (siteRecyclerView.visibility == View.VISIBLE) {
             searchLayout.visibility = View.GONE
