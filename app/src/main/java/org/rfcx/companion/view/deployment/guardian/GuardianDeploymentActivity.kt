@@ -94,6 +94,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         setupToolbar()
         setLiveData()
 
+        this.currentLocate = this.getLastLocation()
+
         val deploymentId = intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
         if (deploymentId != null) {
             val deployment = deploymentDb.getDeploymentById(deploymentId)
@@ -293,7 +295,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
             if (useExistedLocation) {
                 this._locate?.let { locate ->
                     val deployments =
-                        locate.serverId?.let { it1 -> deploymentDb.getDeploymentsBySiteId(it1) }
+                        locate.serverId?.let { it1 -> deploymentDb.getDeploymentsBySiteId(it1, Device.GUARDIAN.value) }
                     deployments?.forEach { deployment ->
                         deploymentDb.updateIsActive(deployment.id)
                     }
@@ -359,14 +361,9 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
                 startFragment(GuardianSignalFragment.newInstance())
             }
             3 -> {
-                updateDeploymentState(DeploymentState.Guardian.Microphone)
-                startFragment(GuardianMicrophoneFragment.newInstance())
-            }
-            4 -> {
-                updateDeploymentState(DeploymentState.Guardian.Config)
                 startFragment(GuardianConfigureFragment.newInstance())
             }
-            5 -> {
+            4 -> {
                 updateDeploymentState(DeploymentState.Guardian.Locate)
                 val site = this._locate
                 if (site == null) {
@@ -378,6 +375,10 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
                 } else {
                     startDetailDeploymentSite(site.id, site.name, false)
                 }
+            }
+            5 -> {
+                updateDeploymentState(DeploymentState.Guardian.Microphone)
+                startFragment(GuardianMicrophoneFragment.newInstance())
             }
             6 -> {
                 updateDeploymentState(DeploymentState.Guardian.Checkin)

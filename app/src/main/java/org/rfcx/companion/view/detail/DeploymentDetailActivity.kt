@@ -278,7 +278,7 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
 
     private fun updateDeploymentDetailView(deployment: Deployment) {
         // setup deployment images view
-        observeDeploymentImage(deployment.id)
+        observeDeploymentImage(deployment.id, deployment.device ?: Device.GUARDIAN.value)
         val location = deployment.stream
         location?.let { locate ->
             latitudeValue.text = locate.latitude.latitudeCoordinates(this)
@@ -294,9 +294,9 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
         }
     }
 
-    private fun observeDeploymentImage(deploymentId: Int) {
+    private fun observeDeploymentImage(deploymentId: Int, device: String) {
         deployImageLiveData =
-            Transformations.map(viewModel.getAllResultsAsync(deploymentId).asLiveData()) {
+            Transformations.map(viewModel.getAllResultsAsync(deploymentId, device).asLiveData()) {
                 it
             }
         deployImageLiveData.observeForever(deploymentImageObserve)
