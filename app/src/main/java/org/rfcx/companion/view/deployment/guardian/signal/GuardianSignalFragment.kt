@@ -63,12 +63,18 @@ class GuardianSignalFragment : Fragment() {
     private fun retrieveGuardianSignal() {
         AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
             deploymentProtocol?.hideLoading()
-            val strength = deploymentProtocol?.getNetwork() ?: -130
-            val swmStrenth = deploymentProtocol?.getSwmNetwork() ?: 92
+            val strength = deploymentProtocol?.getNetwork()
+            val swmStrength = deploymentProtocol?.getSwmNetwork()
             requireActivity().runOnUiThread {
                 hideSimError()
                 showSignalInfo()
                 if (signalCell.isChecked) {
+                    if (strength == null) {
+                        showSignalStrength(SignalState.NONE)
+                        signalDescText.text = getString(R.string.signal_text_0)
+                        signalValue.text = "failed to retrieve cell signal"
+                        return@runOnUiThread
+                    }
                     when {
                         strength > -70 -> {
                             showSignalStrength(SignalState.MAX)
@@ -93,20 +99,26 @@ class GuardianSignalFragment : Fragment() {
                     }
                     signalValue.text = getString(R.string.signal_value, strength)
                 } else {
+                    if (swmStrength == null) {
+                        showSignalStrength(SignalState.NONE)
+                        signalDescText.text = getString(R.string.signal_text_0)
+                        signalValue.text = "failed to retrieve swarm background signal"
+                        return@runOnUiThread
+                    }
                     when {
-                        swmStrenth < -104 -> {
+                        swmStrength < -104 -> {
                             showSignalStrength(SignalState.MAX)
                             signalDescText.text = getString(R.string.signal_text_4)
                         }
-                        swmStrenth < -100 -> {
+                        swmStrength < -100 -> {
                             showSignalStrength(SignalState.HIGH)
                             signalDescText.text = getString(R.string.signal_text_3)
                         }
-                        swmStrenth < -97 -> {
+                        swmStrength < -97 -> {
                             showSignalStrength(SignalState.NORMAL)
                             signalDescText.text = getString(R.string.signal_text_2)
                         }
-                        swmStrenth < -93 -> {
+                        swmStrength < -93 -> {
                             showSignalStrength(SignalState.LOW)
                             signalDescText.text = getString(R.string.signal_text_1)
                         }
@@ -115,7 +127,7 @@ class GuardianSignalFragment : Fragment() {
                             signalDescText.text = getString(R.string.signal_text_0)
                         }
                     }
-                    signalValue.text = getString(R.string.signal_value, strength)
+                    signalValue.text = getString(R.string.signal_value, swmStrength)
                 }
             }
         })
