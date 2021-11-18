@@ -472,5 +472,7 @@
     <string name="updater_version">Updater version</string>
     <string name="update">Update</string>
     <string name="update_to">Update to</string>
+    <string name="cell">cell</string>
+    <string name="swarm">swarm</string>
 
 </resources>
