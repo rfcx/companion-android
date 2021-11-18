@@ -28,6 +28,8 @@ class GuardianRegisterFragment : Fragment() {
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
+    private var isWaitingRegistration = false
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         deploymentProtocol = (context as GuardianDeploymentProtocol)
@@ -71,6 +73,7 @@ class GuardianRegisterFragment : Fragment() {
     }
 
     private fun registerGuardian() {
+        isWaitingRegistration = true
         setUIWaitingRegisterResponse()
         val guid = deploymentProtocol?.getGuid()
         val userToken = requireContext().getIdToken()
@@ -86,16 +89,19 @@ class GuardianRegisterFragment : Fragment() {
                             GuardianSocketManager.sendGuardianRegistration(regResponse)
                         } else {
                             Toast.makeText(requireContext(), "Register failed: empty response", Toast.LENGTH_LONG).show()
+                            resetUI()
                         }
                     }
 
                     override fun onFailure(call: Call<GuardianRegisterResponse>, t: Throwable) {
                         Toast.makeText(requireContext(), "Register failed: ${t.message}", Toast.LENGTH_LONG).show()
+                        resetUI()
                     }
                 }
             )
         } else {
             Toast.makeText(requireContext(), "Register failed: guid or token is null", Toast.LENGTH_LONG).show()
+            resetUI()
         }
     }
 
@@ -111,12 +117,18 @@ class GuardianRegisterFragment : Fragment() {
                     requireContext().getString(R.string.already_registered)
                 registerFinishButton.visibility = View.VISIBLE
             } else {
-                registerResultTextView.text = requireContext().getString(R.string.not_registered)
-                registerGuardianButton.isEnabled = true
+                if (!isWaitingRegistration) {
+                    resetUI()
+                }
             }
         })
         registerResultTextView.text = requireContext().getString(R.string.check_registered)
         registerGuardianButton.isEnabled = false
+    }
+
+    private fun resetUI() {
+        registerResultTextView.text = requireContext().getString(R.string.not_registered)
+        registerGuardianButton.isEnabled = true
     }
 
     private fun getRadioValueForRegistration(): Boolean {
