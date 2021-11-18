@@ -300,6 +300,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
 
     override fun getPrefsSha1(): String? = PingUtils.getPrefsSha1FromPing(guardianPingBlob)
 
+    override fun getLatestCheckIn(): JsonObject? = PingUtils.getLatestCheckInFromPing(guardianPingBlob)
+
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
     override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems

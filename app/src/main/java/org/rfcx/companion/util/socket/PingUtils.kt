@@ -68,4 +68,12 @@ object PingUtils {
         }
         return null
     }
+
+    fun getLatestCheckInFromPing(ping: GuardianPing?): JsonObject? {
+        if (ping?.prefs is JsonObject) {
+            val checkIn = ping.companion?.get("checkin") ?: return null
+            return checkIn.asJsonObject
+        }
+        return null
+    }
 }

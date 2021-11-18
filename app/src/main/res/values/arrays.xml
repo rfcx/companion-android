@@ -57,7 +57,7 @@
     </string-array>
 
     <string-array name="guardian_optional_checks">
-        <item>API Connection Test</item>
+        <item>Latest CheckIn Check</item>
         <item>Add Photo(s)</item>
     </string-array>
 
