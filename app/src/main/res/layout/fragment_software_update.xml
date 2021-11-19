@@ -12,7 +12,7 @@
         android:layout_height="0dp"
         android:layout_marginBottom="@dimen/margin_padding_normal"
         app:layout_constraintBottom_toTopOf="@id/nextButton"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/nextButton"
@@ -26,5 +26,17 @@
         android:enabled="true"
         android:text="@string/next"
         app:layout_constraintBottom_toBottomOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/noSoftwareText"
+        style="@style/AudioMothText.Body.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/download_softwares_from_guardian_softwares_page_first"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/nextButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

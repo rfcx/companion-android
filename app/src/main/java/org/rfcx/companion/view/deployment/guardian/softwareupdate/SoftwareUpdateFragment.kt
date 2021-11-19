@@ -93,7 +93,11 @@ class SoftwareUpdateFragment : Fragment(), ChildrenClickedListener {
         }
 
         val softwares = APKUtils.getAllDownloadedSoftwaresWithType(requireContext())
-        populateAdapterWithInfo(softwares)
+        if (softwares.isNullOrEmpty()) {
+            noSoftwareText.visibility = View.VISIBLE
+        } else {
+            populateAdapterWithInfo(softwares)
+        }
     }
 
     private fun startTimer() {
