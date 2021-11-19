@@ -51,13 +51,14 @@
 
     <string-array name="guardian_setup_checks">
         <item>Network Signal Test</item>
-        <item>Microphone Capture Test</item>
         <item>Audio Parameter Config</item>
         <item>Guardian Installation Location</item>
     </string-array>
 
     <string-array name="guardian_optional_checks">
         <item>Latest CheckIn Check</item>
+        <item>Microphone Capture Test</item>
+        <item>Confirm CheckIn Status</item>
         <item>Add Photo(s)</item>
     </string-array>
 

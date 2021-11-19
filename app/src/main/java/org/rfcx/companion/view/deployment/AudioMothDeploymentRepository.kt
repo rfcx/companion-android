@@ -75,7 +75,7 @@ class AudioMothDeploymentRepository(
     }
 
     fun getDeploymentsBySiteId(streamId: String): ArrayList<Deployment> {
-        return localDataHelper.getDeploymentLocalDb().getDeploymentsBySiteId(streamId)
+        return localDataHelper.getDeploymentLocalDb().getDeploymentsBySiteId(streamId, Device.AUDIOMOTH.value)
     }
 
     fun updateIsActive(id: Int) {

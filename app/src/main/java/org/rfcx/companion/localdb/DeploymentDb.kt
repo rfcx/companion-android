@@ -203,7 +203,7 @@ class DeploymentDb(private val realm: Realm) {
     /**
      * Update Deployment Location and Locate
      * */
-    fun editLocation(
+    fun editStream(
         id: Int,
         locationName: String,
         latitude: Double,
@@ -245,7 +245,7 @@ class DeploymentDb(private val realm: Realm) {
         })
     }
 
-    fun editLocationGroup(id: Int, locationGroup: LocationGroup, callback: DatabaseCallback) {
+    fun editProject(id: Int, locationGroup: LocationGroup, callback: DatabaseCallback) {
         realm.executeTransactionAsync({ bgRealm ->
             // do update deployment location
             val guardianDeployment =
@@ -304,9 +304,9 @@ class DeploymentDb(private val realm: Realm) {
         }
     }
 
-    fun getDeploymentsBySiteId(streamId: String): ArrayList<Deployment> {
+    fun getDeploymentsBySiteId(streamId: String, device: String): ArrayList<Deployment> {
         val deployments = realm.where(Deployment::class.java)
-            .equalTo(Deployment.FIELD_STATE, DeploymentState.Guardian.ReadyToUpload.key)
+            .equalTo(Deployment.FIELD_STATE, if (device == Device.GUARDIAN.value) DeploymentState.Guardian.ReadyToUpload.key else DeploymentState.AudioMoth.ReadyToUpload.key)
             .and()
             .equalTo(Deployment.FIELD_SYNC_STATE, SyncState.Sent.key)
             .and()

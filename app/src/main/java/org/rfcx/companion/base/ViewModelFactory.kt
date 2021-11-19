@@ -14,6 +14,10 @@ import org.rfcx.companion.view.deployment.AudioMothDeploymentRepository
 import org.rfcx.companion.view.deployment.AudioMothDeploymentViewModel
 import org.rfcx.companion.view.LoginRepository
 import org.rfcx.companion.view.LoginViewModel
+import org.rfcx.companion.view.detail.EditLocationRepository
+import org.rfcx.companion.view.detail.EditLocationViewModel
+import org.rfcx.companion.view.detail.DeploymentDetailRepository
+import org.rfcx.companion.view.detail.DeploymentDetailViewModel
 import org.rfcx.companion.view.profile.offlinemap.ProjectOfflineMapRepository
 import org.rfcx.companion.view.profile.offlinemap.ProjectOfflineMapViewModel
 import org.rfcx.companion.view.project.repository.ProjectSelectRepository
