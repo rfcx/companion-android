@@ -99,8 +99,7 @@ class GuardianSolarPanelFragment : Fragment() {
         AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
             val sentinelResponse = deploymentProtocol?.getSentinelPower()
             sentinelResponse?.let {
-                //TODO: change to sentinel info
-                val input = SentinelInput()
+                val input = sentinelResponse.input
                 if (isSentinelConnected(input)) {
                     hideAssembleWarn()
 

@@ -3,6 +3,7 @@ package org.rfcx.companion.view.deployment.guardian
 import com.google.gson.JsonObject
 import org.rfcx.companion.connection.wifi.WifiHotspotManager
 import org.rfcx.companion.entity.guardian.Deployment
+import org.rfcx.companion.entity.socket.response.SentinelInfo
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 
 interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
@@ -22,7 +23,7 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
 
     fun getNetwork(): Int?
     fun getSwmNetwork(): Int?
-    fun getSentinelPower(): String?
+    fun getSentinelPower(): SentinelInfo?
 
     fun setDeployment(deployment: Deployment)
     fun setSampleRate(sampleRate: Int)

@@ -4,8 +4,7 @@ import android.content.Context
 import androidx.preference.Preference
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import org.rfcx.companion.entity.socket.response.AdminPing
-import org.rfcx.companion.entity.socket.response.GuardianPing
+import org.rfcx.companion.entity.socket.response.*
 import org.rfcx.companion.util.prefs.PrefsUtils
 
 object PingUtils {
@@ -36,12 +35,21 @@ object PingUtils {
         return network.split("*")[1].toInt()
     }
 
-    fun getSentinelPowerFromPing(adminPing: AdminPing?): String? {
+    fun getSentinelPowerFromPing(adminPing: AdminPing?): SentinelInfo? {
         val sentinelPower = adminPing?.sentinelPower ?: return null
-        val power = sentinelPower
-        val input = sentinelPower
-        val batt = sentinelPower
-        return power
+        val splitSentinelPower = sentinelPower.split("|")
+        var system = SentinelSystem()
+        var input = SentinelInput()
+        var batt = SentinelBattery()
+        splitSentinelPower.forEach {
+            val splittedItem = it.split("*")
+            when(splittedItem[0]) {
+                "system" -> system = SentinelSystem(splittedItem[2].toInt(), splittedItem[3].toInt(), splittedItem[4].toInt(), splittedItem[5].toInt())
+                "input" -> input = SentinelInput(splittedItem[2].toInt(), splittedItem[3].toInt(), splittedItem[4].toInt(), splittedItem[5].toInt())
+                "battery" -> batt = SentinelBattery(splittedItem[2].toInt(), splittedItem[3].toInt(), splittedItem[4].toDouble(), splittedItem[5].toInt())
+            }
+        }
+        return SentinelInfo(input, system, batt)
     }
 
     fun getGuidFromPing(ping: GuardianPing?): String? {

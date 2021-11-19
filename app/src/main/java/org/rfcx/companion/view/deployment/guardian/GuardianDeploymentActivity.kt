@@ -29,6 +29,7 @@ import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.socket.request.CheckinCommand
 import org.rfcx.companion.entity.socket.response.GuardianPing
+import org.rfcx.companion.entity.socket.response.SentinelInfo
 import org.rfcx.companion.localdb.*
 import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.util.*
@@ -69,7 +70,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     private var guardianPingBlob: GuardianPing? = null
     private var network: Int? = null
     private var swmNetwork: Int? = null
-    private var sentinelPower: String? = null
+    private var sentinelPower: SentinelInfo? = null
     private var isGuardianRegistered: Boolean? = null
 
     private var _sampleRate = 12000
@@ -292,7 +293,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
 
     override fun getSwmNetwork(): Int? = swmNetwork
 
-    override fun getSentinelPower(): String? = sentinelPower
+    override fun getSentinelPower(): SentinelInfo? = sentinelPower
 
     override fun getGuid(): String? = PingUtils.getGuidFromPing(guardianPingBlob)
 
