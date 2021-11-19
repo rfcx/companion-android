@@ -21,6 +21,7 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getLatestCheckIn(): JsonObject?
 
     fun getNetwork(): Int?
+    fun getSwmNetwork(): Int?
     fun getSentinelPower(): String?
 
     fun setDeployment(deployment: Deployment)
