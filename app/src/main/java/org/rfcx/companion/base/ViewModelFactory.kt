@@ -55,6 +55,9 @@ class ViewModelFactory(
             modelClass.isAssignableFrom(AudioMothDeploymentViewModel::class.java) -> {
                 return AudioMothDeploymentViewModel(application, AudioMothDeploymentRepository(deviceApiHelper, localDataHelper)) as T
             }
+            modelClass.isAssignableFrom(DeploymentDetailViewModel::class.java) -> {
+                return DeploymentDetailViewModel(application, DeploymentDetailRepository(deviceApiHelper, localDataHelper)) as T
+            }
             else -> throw IllegalArgumentException("Unknown class name")
         }
     }

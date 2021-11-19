@@ -123,7 +123,6 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
                     hideLoading()
                     deploymentProtocol?.startGuardianRegister()
                     deploymentProtocol?.setWifiManager(wifiHotspotManager)
-                    deploymentProtocol?.registerWifiConnectionLostListener()
                     GuardianSocketManager.getCheckInTest(CheckinCommand.START)
                 }
             })
