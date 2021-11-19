@@ -68,6 +68,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
 
     private var guardianPingBlob: GuardianPing? = null
     private var network: Int? = null
+    private var swmNetwork: Int? = null
     private var sentinelPower: String? = null
     private var isGuardianRegistered: Boolean? = null
 
@@ -226,6 +227,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         }
         AdminSocketManager.pingBlob.observeForever {
             network = PingUtils.getNetworkFromPing(it)
+            swmNetwork = PingUtils.getSwarmNetworkFromPing(it)
             sentinelPower = PingUtils.getSentinelPowerFromPing(it)
         }
         deploymentLiveData.observeForever(guardianDeploymentObserve)
@@ -287,6 +289,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     override fun getLastCheckInTime(): Long? = lastCheckInTime
 
     override fun getNetwork(): Int? = network
+
+    override fun getSwmNetwork(): Int? = swmNetwork
 
     override fun getSentinelPower(): String? = sentinelPower
 

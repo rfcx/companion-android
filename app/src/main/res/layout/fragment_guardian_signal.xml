@@ -30,6 +30,31 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/verifyTitle" />
 
+    <RadioGroup
+        android:id="@+id/signalTypeGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/signalStrengthTitle">
+
+        <RadioButton
+            android:id="@+id/signalCell"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin_padding_xlarge"
+            android:text="@string/cell"
+            android:checked="true"/>
+
+        <RadioButton
+            android:id="@+id/signalSwarm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/swarm"/>
+
+    </RadioGroup>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/signalStrengthLayout"
         android:layout_width="wrap_content"
@@ -38,7 +63,7 @@
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/signalStrengthTitle">
+        app:layout_constraintTop_toBottomOf="@id/signalTypeGroup">
 
         <View
             android:id="@+id/signalStrength1"

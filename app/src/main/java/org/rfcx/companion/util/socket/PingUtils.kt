@@ -31,6 +31,11 @@ object PingUtils {
         return network.split("*")[1].toInt()
     }
 
+    fun getSwarmNetworkFromPing(adminPing: AdminPing?): Int? {
+        val network = adminPing?.swmNetwork ?: return null
+        return network.split("*")[1].toInt()
+    }
+
     fun getSentinelPowerFromPing(adminPing: AdminPing?): String? {
         val sentinelPower = adminPing?.sentinelPower ?: return null
         val power = sentinelPower

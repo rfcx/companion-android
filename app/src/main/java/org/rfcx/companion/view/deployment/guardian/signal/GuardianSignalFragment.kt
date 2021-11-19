@@ -60,60 +60,21 @@ class GuardianSignalFragment : Fragment() {
         }
     }
 
-//    private fun retrieveGuardianSignal() {
-//        AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer { signal ->
-//            deploymentProtocol?.hideLoading()
-//            val strength = signal.signalInfo.signal
-//            val simCard = signal.signalInfo.simCard
-//            requireActivity().runOnUiThread {
-//                if (simCard) {
-//                    hideSimError()
-//                    showSignalInfo()
-//                    when {
-//                        strength > -70 -> {
-//                            showSignalStrength(SignalState.MAX)
-//                            signalDescText.text = getString(R.string.signal_text_4)
-//                        }
-//                        strength > -90 -> {
-//                            showSignalStrength(SignalState.HIGH)
-//                            signalDescText.text = getString(R.string.signal_text_3)
-//                        }
-//                        strength > -110 -> {
-//                            showSignalStrength(SignalState.NORMAL)
-//                            signalDescText.text = getString(R.string.signal_text_2)
-//                        }
-//                        strength > -130 -> {
-//                            showSignalStrength(SignalState.LOW)
-//                            signalDescText.text = getString(R.string.signal_text_1)
-//                        }
-//                        else -> {
-//                            showSignalStrength(SignalState.NONE)
-//                            signalDescText.text = getString(R.string.signal_text_0)
-//                        }
-//                    }
-//                    signalValue.text = getString(R.string.signal_value, strength)
-//                } else {
-//                    hideSignalInfo()
-//                    showSimError()
-//                    showSignalStrength(SignalState.NONE)
-//                    if (strength == -999) {
-//                        signalErrorText.text = getText(R.string.signal_lost)
-//                    } else {
-//                        signalErrorText.text = getText(R.string.signal_sim_card)
-//                    }
-//                }
-//            }
-//        })
-//    }
-        private fun retrieveGuardianSignal() {
-        AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer { it ->
+    private fun retrieveGuardianSignal() {
+        AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
             deploymentProtocol?.hideLoading()
-            val strength = deploymentProtocol?.getNetwork() ?: -130
+            val strength = deploymentProtocol?.getNetwork()
+            val swmStrength = deploymentProtocol?.getSwmNetwork()
             requireActivity().runOnUiThread {
-                //TODO: get sim card info
-                if (true) {
-                    hideSimError()
-                    showSignalInfo()
+                hideSimError()
+                showSignalInfo()
+                if (signalCell.isChecked) {
+                    if (strength == null) {
+                        showSignalStrength(SignalState.NONE)
+                        signalDescText.text = getString(R.string.signal_text_0)
+                        signalValue.text = "failed to retrieve cell signal"
+                        return@runOnUiThread
+                    }
                     when {
                         strength > -70 -> {
                             showSignalStrength(SignalState.MAX)
@@ -138,14 +99,35 @@ class GuardianSignalFragment : Fragment() {
                     }
                     signalValue.text = getString(R.string.signal_value, strength)
                 } else {
-                    hideSignalInfo()
-                    showSimError()
-                    showSignalStrength(SignalState.NONE)
-                    if (strength == -999) {
-                        signalErrorText.text = getText(R.string.signal_lost)
-                    } else {
-                        signalErrorText.text = getText(R.string.signal_sim_card)
+                    if (swmStrength == null) {
+                        showSignalStrength(SignalState.NONE)
+                        signalDescText.text = getString(R.string.signal_text_0)
+                        signalValue.text = "failed to retrieve swarm background signal"
+                        return@runOnUiThread
                     }
+                    when {
+                        swmStrength < -104 -> {
+                            showSignalStrength(SignalState.MAX)
+                            signalDescText.text = getString(R.string.signal_text_4)
+                        }
+                        swmStrength < -100 -> {
+                            showSignalStrength(SignalState.HIGH)
+                            signalDescText.text = getString(R.string.signal_text_3)
+                        }
+                        swmStrength < -97 -> {
+                            showSignalStrength(SignalState.NORMAL)
+                            signalDescText.text = getString(R.string.signal_text_2)
+                        }
+                        swmStrength < -93 -> {
+                            showSignalStrength(SignalState.LOW)
+                            signalDescText.text = getString(R.string.signal_text_1)
+                        }
+                        else -> {
+                            showSignalStrength(SignalState.NONE)
+                            signalDescText.text = getString(R.string.signal_text_0)
+                        }
+                    }
+                    signalValue.text = getString(R.string.signal_value, swmStrength)
                 }
             }
         })

@@ -20,6 +20,7 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getPrefsSha1(): String?
 
     fun getNetwork(): Int?
+    fun getSwmNetwork(): Int?
     fun getSentinelPower(): String?
 
     fun setDeployment(deployment: Deployment)
