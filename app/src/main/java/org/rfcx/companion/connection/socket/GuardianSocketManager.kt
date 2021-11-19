@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
+import com.google.gson.JsonObject
 import org.json.JSONObject
 import org.rfcx.companion.entity.response.GuardianRegisterResponse
 import org.rfcx.companion.entity.socket.request.*
@@ -118,7 +119,14 @@ object GuardianSocketManager {
     }
 
     fun sendGuardianRegistration(response: GuardianRegisterResponse) {
-        sendInstructionMessage(InstructionType.SET, InstructionCommand.IDENTITY, gson.toJson(response))
+        val renamedJson = JsonObject()
+        renamedJson.addProperty("guid", response.guid)
+        renamedJson.addProperty("token", response.token)
+        renamedJson.addProperty("keystore_passphrase", response.keystorePassphrase)
+        renamedJson.addProperty("pin_code", response.pinCode)
+        renamedJson.addProperty("api_mqtt_host", response.apiMqttHost)
+        renamedJson.addProperty("api_sms_address", response.apiSmsAddress)
+        sendInstructionMessage(InstructionType.SET, InstructionCommand.IDENTITY, gson.toJson(renamedJson))
     }
 
     fun stopGuardianWiFi() {

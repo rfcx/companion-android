@@ -389,7 +389,7 @@
     <string name="mic_recorder_warn">Recorder service is not started yet.\nPlease try again later.</string>
 
     <!-- GuardianCheckinTestFragment -->
-    <string name="testing_guardian_checkin">Guardian CheckIn Test</string>
+    <string name="testing_guardian_checkin">Guardian CheckIn Check</string>
     <string name="checkin_url">CheckIn URL</string>
     <string name="status">Status</string>
     <string name="delivery_time">Delivery Time</string>
@@ -472,6 +472,7 @@
     <string name="updater_version">Updater version</string>
     <string name="update">Update</string>
     <string name="update_to">Update to</string>
+    <string name="protocol">Protocol</string>
     <string name="cell">cell</string>
     <string name="swarm">swarm</string>
 

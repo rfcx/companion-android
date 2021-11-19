@@ -18,6 +18,7 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getSoftwareVersion(): Map<String, String>?
     fun getAudioConfiguration(): JsonObject?
     fun getPrefsSha1(): String?
+    fun getLatestCheckIn(): JsonObject?
 
     fun getNetwork(): Int?
     fun getSwmNetwork(): Int?
