@@ -15,6 +15,8 @@ import kotlinx.android.synthetic.main.fragment_songmeter_detect.songMeterSuggest
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.songmeter.Advertisement
+import org.rfcx.companion.repo.api.CoreApiHelper
+import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.ble.BleConnectDelegate
@@ -39,6 +41,7 @@ class SongMeterConnectFragment : Fragment() {
             ViewModelFactory(
                 requireActivity().application,
                 DeviceApiHelper(DeviceApiServiceImpl()),
+                CoreApiHelper(CoreApiServiceImpl()),
                 LocalDataHelper(),
                 BleHelper(BleDetectService(requireContext()), BleConnectDelegate(requireContext()))
             )

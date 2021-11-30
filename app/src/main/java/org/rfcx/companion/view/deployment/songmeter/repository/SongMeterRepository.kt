@@ -91,7 +91,7 @@ class SongMeterRepository(
     }
 
     fun getDeploymentsBySiteId(streamId: String): ArrayList<Deployment> {
-        return localDataHelper.getDeploymentLocalDb().getDeploymentsBySiteId(streamId)
+        return localDataHelper.getDeploymentLocalDb().getDeploymentsBySiteId(streamId, Device.SONGMETER.value)
     }
 
     fun updateIsActive(id: Int) {

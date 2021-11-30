@@ -6,6 +6,7 @@ import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.Observer
@@ -16,6 +17,8 @@ import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.songmeter.Advertisement
+import org.rfcx.companion.repo.api.CoreApiHelper
+import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.ble.BleConnectDelegate
@@ -60,6 +63,8 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
 
     private val analytics by lazy { Analytics(this) }
 
+    private var menuAll: Menu? = null
+
     companion object {
         const val TAG = "SongMeterDeploymentActivity"
         const val loadingDialogTag = "LoadingDialog"
@@ -89,6 +94,7 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
             ViewModelFactory(
                 application,
                 DeviceApiHelper(DeviceApiServiceImpl()),
+                CoreApiHelper(CoreApiServiceImpl()),
                 LocalDataHelper(),
                 BleHelper(BleDetectService(this), BleConnectDelegate(this))
             )
@@ -387,9 +393,19 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
         toolbar.visibility = View.GONE
     }
 
+    override fun setMenuToolbar(isVisibility: Boolean) {
+        menuAll?.findItem(R.id.MoreView)?.isVisible = isVisibility
+    }
+
     override fun setToolbarTitle() {
         supportActionBar?.apply {
             title = currentCheckName
+        }
+    }
+
+    override fun setToolbarSubtitle(sub: String) {
+        supportActionBar?.apply {
+            subtitle = sub
         }
     }
 
