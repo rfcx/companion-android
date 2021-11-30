@@ -16,12 +16,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.rfcx.companion.R
-import org.rfcx.companion.connection.socket.SocketManager
+import org.rfcx.companion.connection.socket.AdminSocketManager
+import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.connection.wifi.OnWifiListener
 import org.rfcx.companion.connection.wifi.WifiHotspotManager
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.socket.request.CheckinCommand
-import org.rfcx.companion.entity.socket.response.Status
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.WifiHotspotUtils
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
@@ -115,19 +115,15 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
     }
 
     private fun checkConnection() {
-        SocketManager.getConnection()
+        GuardianSocketManager.getConnection()
+        AdminSocketManager.connect()
         GlobalScope.launch(Dispatchers.Main) {
-            SocketManager.connection.observe(viewLifecycleOwner, Observer { response ->
+            GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
                 requireActivity().runOnUiThread {
-                    deploymentProtocol?.startCheckList()
-                    if (response.connection.status == Status.SUCCESS.value) {
-                        hideLoading()
-                        deploymentProtocol?.setDeploymentWifiName(guardianHotspot!!.SSID)
-                        deploymentProtocol?.startCheckList()
-                        deploymentProtocol?.setWifiManager(wifiHotspotManager)
-                        deploymentProtocol?.registerWifiConnectionLostListener()
-                        SocketManager.getCheckInTest(CheckinCommand.START)
-                    }
+                    hideLoading()
+                    deploymentProtocol?.startGuardianRegister()
+                    deploymentProtocol?.setWifiManager(wifiHotspotManager)
+                    GuardianSocketManager.getCheckInTest(CheckinCommand.START)
                 }
             })
         }

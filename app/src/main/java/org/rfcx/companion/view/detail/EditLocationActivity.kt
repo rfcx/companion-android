@@ -15,6 +15,8 @@ import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.toLocationGroup
 import org.rfcx.companion.localdb.DatabaseCallback
+import org.rfcx.companion.repo.api.CoreApiHelper
+import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
@@ -61,6 +63,7 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
             ViewModelFactory(
                 application,
                 DeviceApiHelper(DeviceApiServiceImpl()),
+                CoreApiHelper(CoreApiServiceImpl()),
                 LocalDataHelper()
             )
         ).get(EditLocationViewModel::class.java)

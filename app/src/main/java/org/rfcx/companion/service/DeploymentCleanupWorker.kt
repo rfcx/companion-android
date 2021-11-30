@@ -44,10 +44,6 @@ class DeploymentCleanupWorker(val context: Context, params: WorkerParameters) :
         if (trackingFileUnsent > 0) {
             TrackingSyncWorker.enqueue(context)
         }
-
-        if (DeploymentSyncWorker.isRunning() == DeploymentSyncState.FINISH) {
-            DeleteStreamsWorker.enqueue(context)
-        }
     }
 
     companion object {

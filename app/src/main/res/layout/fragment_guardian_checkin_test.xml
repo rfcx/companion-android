@@ -32,61 +32,25 @@
         app:layout_constraintTop_toBottomOf="@id/checkInTestTitle">
 
         <TextView
-            android:id="@+id/checkInUrlTextView"
+            android:id="@+id/checkInProtocolTextView"
             style="@style/AudioMothText.Subhead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/checkin_url"
+            android:text="@string/protocol"
             android:textColor="@color/text_primary"
             android:textSize="@dimen/text_small" />
 
         <TextView
-            android:id="@+id/checkInUrlValueTextView"
+            android:id="@+id/checkInProtocolValueTextView"
             style="@style/AudioMothText.Body.Secondary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="@dimen/margin_padding_small"
             android:text="@string/dash"
-            tools:text="ssl://checkin.rfcx.org" />
+            tools:text="mqtt" />
 
         <TextView
-            android:id="@+id/checkInStatusTextView"
-            style="@style/AudioMothText.Subhead"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/status"
-            android:textColor="@color/text_primary"
-            android:textSize="@dimen/text_small" />
-
-        <TextView
-            android:id="@+id/checkInStatusValueTextView"
-            style="@style/AudioMothText.Body.Secondary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/margin_padding_small"
-            android:text="@string/dash"
-            tools:text="publish" />
-
-        <TextView
-            android:id="@+id/checkInDeliveryTimeTextView"
-            style="@style/AudioMothText.Subhead"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/delivery_time"
-            android:textColor="@color/text_primary"
-            android:textSize="@dimen/text_small" />
-
-        <TextView
-            android:id="@+id/checkInDeliveryTimeValueTextView"
-            style="@style/AudioMothText.Body.Secondary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/margin_padding_small"
-            android:text="@string/dash"
-            tools:text="12 seconds" />
-
-        <TextView
-            android:id="@+id/checkInLastTextView"
+            android:id="@+id/checkInTimeTextView"
             style="@style/AudioMothText.Subhead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -95,7 +59,7 @@
             android:textSize="@dimen/text_small" />
 
         <TextView
-            android:id="@+id/checkInLastValueTextView"
+            android:id="@+id/checkInTimeValueTextView"
             style="@style/AudioMothText.Body.Secondary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

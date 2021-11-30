@@ -1,18 +1,18 @@
 package org.rfcx.companion.connection.socket
 
-import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
-import java.io.DataInputStream
-import java.io.DataOutputStream
-import java.net.Socket
+import com.google.gson.JsonObject
 import org.json.JSONObject
+import org.rfcx.companion.entity.response.GuardianRegisterResponse
 import org.rfcx.companion.entity.socket.request.*
 import org.rfcx.companion.entity.socket.response.*
 import org.rfcx.companion.util.MicrophoneTestUtils
-import org.rfcx.companion.util.Preferences
+import java.io.DataInputStream
+import java.io.DataOutputStream
+import java.net.Socket
 
-object SocketManager {
+object GuardianSocketManager {
 
     private var socket: Socket? = null
     private var outputStream: DataOutputStream? = null
@@ -29,25 +29,21 @@ object SocketManager {
     private const val CONFIGURE = "configure"
     private const val SYNC = "sync"
     private const val PREFS = "prefs"
-    private const val SIGNAL = "signal"
     private const val SIGNAL_INFO = "signal_info"
     private const val MICROPHONE_TEST = "microphone_test"
     private const val CHECKIN = "checkin"
     private const val SENTINEL = "sentinel"
     private const val REGISTER = "register"
     private const val IS_REGISTERED = "is_registered"
-    private const val STOP_WIFI = "stop_wifi"
     private const val IS_RECORDING = "is_recording"
 
     private var audioChunks = arrayListOf<String>()
     private var microphoneTestUtils: MicrophoneTestUtils? = null
+    private var tempAudio = ByteArray(0)
     private var isTestingFirstTime = true
 
-    private var tempAudio = ByteArray(0)
 
     val connection = MutableLiveData<ConnectionResponse>()
-    val diagnostic = MutableLiveData<DiagnosticResponse>()
-    val currentConfiguration = MutableLiveData<ConfigurationResponse>()
     val syncConfiguration = MutableLiveData<SyncConfigurationResponse>()
     val prefs = MutableLiveData<PrefsResponse>()
     val signal = MutableLiveData<SignalResponse>()
@@ -59,10 +55,10 @@ object SocketManager {
     val isRegistered = MutableLiveData<CheckGuardianRegistered>()
     val recorderState = MutableLiveData<RecorderStateResponse>()
 
+    val pingBlob = MutableLiveData<GuardianPing>()
+
     init {
         connection.postValue(ConnectionResponse())
-        diagnostic.postValue(DiagnosticResponse())
-        currentConfiguration.postValue(ConfigurationResponse())
         syncConfiguration.postValue(SyncConfigurationResponse())
         prefs.postValue(PrefsResponse())
         signal.postValue(SignalResponse())
@@ -102,32 +98,8 @@ object SocketManager {
         sendMessage(data)
     }
 
-    fun syncConfiguration(config: List<String>) {
-        val jsonString = gson.toJson(
-            SyncConfigurationRequest(
-                SyncConfiguration(config)
-            )
-        )
-        sendMessage(jsonString)
-    }
-
-    fun getSignalStrength() {
-        val data = gson.toJson(
-            SocketRequest(
-                SIGNAL
-            )
-        )
-        sendMessage(data)
-    }
-
-    fun getLiveAudioBuffer(micTestUtils: MicrophoneTestUtils) {
-        this.microphoneTestUtils = micTestUtils
-        val data = gson.toJson(
-            SocketRequest(
-                MICROPHONE_TEST
-            )
-        )
-        sendMessage(data)
+    fun syncConfiguration(config: String) {
+        sendInstructionMessage(InstructionType.SET, InstructionCommand.PREFS, config)
     }
 
     fun getCheckInTest(command: CheckinCommand) {
@@ -141,61 +113,24 @@ object SocketManager {
         sendMessage(jsonString)
     }
 
-    fun getSentinelBoardValue() {
-        val data = gson.toJson(
-            SocketRequest(
-                SENTINEL
-            )
-        )
-        sendMessage(data)
-    }
-
-    fun sendGuardianRegistration(context: Context, isProduction: Boolean) {
-        val preferences = Preferences.getInstance(context)
-        val jsonString = gson.toJson(
-            RegisterRequest(
-                Register(
-                    RegisterInfo(preferences.getString(Preferences.ID_TOKEN, ""), isProduction)
-                )
-            )
-        )
-        sendMessage(jsonString)
-    }
-
-    fun isGuardianRegistered() {
-        val data = gson.toJson(
-            SocketRequest(
-                IS_REGISTERED
-            )
-        )
-        sendMessage(data)
+    fun sendGuardianRegistration(response: GuardianRegisterResponse) {
+        val renamedJson = JsonObject()
+        renamedJson.addProperty("guid", response.guid)
+        renamedJson.addProperty("token", response.token)
+        renamedJson.addProperty("keystore_passphrase", response.keystorePassphrase)
+        renamedJson.addProperty("pin_code", response.pinCode)
+        renamedJson.addProperty("api_mqtt_host", response.apiMqttHost)
+        renamedJson.addProperty("api_sms_address", response.apiSmsAddress)
+        sendInstructionMessage(InstructionType.SET, InstructionCommand.IDENTITY, gson.toJson(renamedJson))
     }
 
     fun stopGuardianWiFi() {
-        val data = gson.toJson(
-            SocketRequest(
-                STOP_WIFI
-            )
-        )
+        sendInstructionMessage(InstructionType.CTRL, InstructionCommand.WIFI)
+    }
+
+    fun sendInstructionMessage(type: InstructionType, command: InstructionCommand, meta: String = "{}") {
+        val data = gson.toJson(InstructionMessage.toMessage(type, command, meta))
         sendMessage(data)
-    }
-
-    fun getAllPrefs() {
-        val data = gson.toJson(SocketRequest(PREFS))
-        sendMessage(data)
-    }
-
-    fun getRecorderState() {
-        val data = gson.toJson(SocketRequest(IS_RECORDING))
-        sendMessage(data)
-    }
-
-    fun resetMicrophoneDefaultValue() {
-        isTestingFirstTime = true
-    }
-
-    fun resetCheckInValue() {
-        this.checkInTest.value = CheckInTestResponse()
     }
 
     fun resetPrefsValue() {
@@ -206,17 +141,9 @@ object SocketManager {
         this.register.value = RegisterResponse()
     }
 
-    fun resetRecorderState() {
-        this.recorderState.value = RecorderStateResponse()
-    }
-
     fun resetAllValuesToDefault() {
         connection.value =
             ConnectionResponse()
-        diagnostic.value =
-            DiagnosticResponse()
-        currentConfiguration.value =
-            ConfigurationResponse()
         syncConfiguration.value =
             SyncConfigurationResponse()
         prefs.value = PrefsResponse()
@@ -234,7 +161,7 @@ object SocketManager {
     }
 
     private fun sendMessage(message: String) {
-        clientThread = Thread(Runnable {
+        clientThread = Thread {
             try {
                 socket = Socket("192.168.43.1", 9999)
                 socket?.keepAlive = true
@@ -245,12 +172,12 @@ object SocketManager {
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-        })
+        }
         clientThread?.start()
     }
 
     private fun startInComingMessageThread() {
-        inComingMessageThread = Thread(Runnable {
+        inComingMessageThread = Thread {
             try {
                 while (true) {
                     inputStream = DataInputStream(socket!!.getInputStream())
@@ -260,18 +187,11 @@ object SocketManager {
                         val receiveJson = JSONObject(dataInput)
                         val jsonIterator = receiveJson.keys()
 
+                        val ping = gson.fromJson(dataInput, GuardianPing::class.java)
+                        pingBlob.postValue(ping)
+
                         val keys = jsonIterator.asSequence().toList()
                         when (keys[0].toString()) {
-                            CONFIGURE -> {
-                                val response =
-                                    gson.fromJson(dataInput, ConfigurationResponse::class.java)
-                                this.currentConfiguration.postValue(response)
-                            }
-                            DIAGNOSTIC -> {
-                                val response =
-                                    gson.fromJson(dataInput, DiagnosticResponse::class.java)
-                                this.diagnostic.postValue(response)
-                            }
                             CONNECTION -> {
                                 val response =
                                     gson.fromJson(dataInput, ConnectionResponse::class.java)
@@ -332,7 +252,7 @@ object SocketManager {
                             CHECKIN -> {
                                 val response =
                                     gson.fromJson(dataInput, CheckInTestResponse::class.java)
-                                    this.checkInTest.postValue(response)
+                                this.checkInTest.postValue(response)
                             }
                             SENTINEL -> {
                                 val response =
@@ -360,7 +280,7 @@ object SocketManager {
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-        })
+        }
         inComingMessageThread.start()
     }
 

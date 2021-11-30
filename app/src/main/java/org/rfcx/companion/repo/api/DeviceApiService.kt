@@ -1,14 +1,13 @@
 package org.rfcx.companion.repo.api
 
 import org.rfcx.companion.entity.UserTouchResponse
+import org.rfcx.companion.entity.request.GuardianRegisterRequest
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
+import org.rfcx.companion.entity.response.GuardianRegisterResponse
 import org.rfcx.companion.entity.response.ProjectByIdResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import retrofit2.Call
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.Path
-import retrofit2.http.Query
+import retrofit2.http.*
 
 //TODO: Convert Old device api to MVVM pattern
 
@@ -36,7 +35,7 @@ interface DeviceApiService {
         @Path("id") id: String
     ): Call<List<DeploymentAssetResponse>>
 
-    @GET("v1/users/touchapi")
+    @GET("usertouch")
     fun userTouch(@Header("Authorization") authUser: String): Call<UserTouchResponse>
 
     @GET("projects/{id}")
@@ -44,4 +43,10 @@ interface DeviceApiService {
         @Header("Authorization") authUser: String,
         @Path("id") id: String
     ): Call<ProjectByIdResponse>
+
+    @POST("guardians")
+    fun registerGuardian(
+        @Header("Authorization") authUser: String,
+        @Body guid: GuardianRegisterRequest
+    ): Call<GuardianRegisterResponse>
 }

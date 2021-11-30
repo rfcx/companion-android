@@ -68,16 +68,16 @@ import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.localdb.*
+import org.rfcx.companion.repo.api.CoreApiHelper
+import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
-import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.service.DeploymentSyncWorker
+import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
-import org.rfcx.companion.util.Status
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.detail.DeploymentDetailActivity
-import org.rfcx.companion.view.diagnostic.DiagnosticActivity
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupAdapter
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupListener
@@ -310,6 +310,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             ViewModelFactory(
                 requireActivity().application,
                 DeviceApiHelper(DeviceApiServiceImpl()),
+                CoreApiHelper(CoreApiServiceImpl()),
                 LocalDataHelper()
             )
         ).get(MainViewModel::class.java)
@@ -546,14 +547,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                                 eq(
                                     get(PROPERTY_DEPLOYMENT_MARKER_IMAGE),
                                     Pin.PIN_GREEN
-                                ),
-                                eq(
-                                    get(PROPERTY_DEPLOYMENT_MARKER_IMAGE),
-                                    GuardianPin.CONNECTED_GUARDIAN
-                                ),
-                                eq(
-                                    get(PROPERTY_DEPLOYMENT_MARKER_IMAGE),
-                                    GuardianPin.NOT_CONNECTED_GUARDIAN
                                 )
                             ),
                             literal(1),
@@ -656,22 +649,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         val mBitmapPinSite = BitmapUtils.getBitmapFromDrawable(drawablePinSite)
         if (mBitmapPinSite != null) {
             style.addImage(SITE_MARKER, mBitmapPinSite)
-        }
-
-        val drawablePinConnectedGuardian =
-            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map, null)
-        val mBitmapPinConnectedGuardian =
-            BitmapUtils.getBitmapFromDrawable(drawablePinConnectedGuardian)
-        if (mBitmapPinConnectedGuardian != null) {
-            style.addImage(GuardianPin.CONNECTED_GUARDIAN, mBitmapPinConnectedGuardian)
-        }
-
-        val drawablePinNotConnectedGuardian =
-            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map_grey, null)
-        val mBitmapPinNotConnectedGuardian =
-            BitmapUtils.getBitmapFromDrawable(drawablePinNotConnectedGuardian)
-        if (mBitmapPinNotConnectedGuardian != null) {
-            style.addImage(GuardianPin.NOT_CONNECTED_GUARDIAN, mBitmapPinNotConnectedGuardian)
         }
 
         val drawablePinMapGreen =
