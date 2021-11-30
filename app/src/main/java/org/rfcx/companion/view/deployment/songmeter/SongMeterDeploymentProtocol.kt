@@ -5,6 +5,8 @@ import org.rfcx.companion.entity.songmeter.Advertisement
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 
 interface SongMeterDeploymentProtocol : BaseDeploymentProtocol {
+    fun setSongMeterId(id: String)
+
     fun getDeployment(): Deployment?
     fun setDeployment(deployment: Deployment)
 

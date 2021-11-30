@@ -10,6 +10,7 @@ import android.view.Menu
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.Observer
+import com.google.gson.Gson
 import io.realm.RealmList
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
@@ -58,6 +59,8 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
 
     private var deployments = listOf<Deployment>()
     private var sites = listOf<Locate>()
+
+    private var songMeterId: String? = null
 
     private val preferences = Preferences.getInstance(this)
 
@@ -111,6 +114,10 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
             this.sites = it
             setSiteItems()
         })
+    }
+
+    override fun setSongMeterId(id: String) {
+        songMeterId = id
     }
 
     override fun getDeployment(): Deployment? {
@@ -275,6 +282,7 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
             it.updatedAt = Date()
             it.isActive = true
             it.state = DeploymentState.SongMeter.ReadyToUpload.key
+            it.deviceParameters = Gson().toJson(SongMeterParameters(songMeterId))
             setDeployment(it)
 
             val deploymentId = songMeterViewModel.insertOrUpdateDeployment(it, _deployLocation!!)

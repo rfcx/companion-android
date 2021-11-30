@@ -74,6 +74,7 @@ class SongMeterConnectFragment : Fragment() {
 
         finishSongMeterButton.setOnClickListener {
             songMeterViewModel.setPrefixes(songMeterSiteIdEditText.text.toString())
+            deploymentProtocol?.setSongMeterId(songMeterSiteIdEditText.text.toString())
         }
 
         songMeterViewModel.bindConnectService(advertisement!!.address)
