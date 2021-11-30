@@ -2,6 +2,8 @@ package org.rfcx.companion.view.deployment.songmeter.connect
 
 import android.content.Context
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,7 +29,7 @@ import org.rfcx.companion.util.Status
 import org.rfcx.companion.view.deployment.songmeter.SongMeterDeploymentProtocol
 import org.rfcx.companion.view.deployment.songmeter.viewmodel.SongMeterViewModel
 
-class SongMeterConnectFragment : Fragment() {
+class SongMeterConnectFragment : Fragment(), TextWatcher {
 
     private var advertisement: Advertisement? = null
 
@@ -79,6 +81,8 @@ class SongMeterConnectFragment : Fragment() {
 
         songMeterViewModel.bindConnectService(advertisement!!.address)
         songMeterViewModel.registerGattReceiver()
+
+        songMeterSiteIdEditText.addTextChangedListener(this)
     }
 
     private fun getArgument() {
@@ -200,5 +204,26 @@ class SongMeterConnectFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+        // nothing to do here
+    }
+
+    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+        finishSongMeterButton.isEnabled = isIdPassTheRequirement(songMeterSiteIdEditText.text.toString())
+    }
+
+    override fun afterTextChanged(s: Editable?) {
+        // nothing to do here
+    }
+
+    private val upperCase = "(.*[A-Z].*)"
+    private val symbol = "(.*[:?!@#$%^&*()].*)"
+    private fun isIdPassTheRequirement(id: String?): Boolean {
+        if (id.isNullOrBlank()) return false
+        if (id.matches(Regex(upperCase))) return false
+        if (id.matches(Regex(symbol))) return false
+        return true
     }
 }
