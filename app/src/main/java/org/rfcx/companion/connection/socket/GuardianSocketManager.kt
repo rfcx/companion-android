@@ -1,7 +1,5 @@
 package org.rfcx.companion.connection.socket
 
-import android.content.Context
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -10,7 +8,6 @@ import org.rfcx.companion.entity.response.GuardianRegisterResponse
 import org.rfcx.companion.entity.socket.request.*
 import org.rfcx.companion.entity.socket.response.*
 import org.rfcx.companion.util.MicrophoneTestUtils
-import org.rfcx.companion.util.Preferences
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.Socket
@@ -32,14 +29,12 @@ object GuardianSocketManager {
     private const val CONFIGURE = "configure"
     private const val SYNC = "sync"
     private const val PREFS = "prefs"
-    private const val SIGNAL = "signal"
     private const val SIGNAL_INFO = "signal_info"
     private const val MICROPHONE_TEST = "microphone_test"
     private const val CHECKIN = "checkin"
     private const val SENTINEL = "sentinel"
     private const val REGISTER = "register"
     private const val IS_REGISTERED = "is_registered"
-    private const val STOP_WIFI = "stop_wifi"
     private const val IS_RECORDING = "is_recording"
 
     private var audioChunks = arrayListOf<String>()
@@ -192,7 +187,6 @@ object GuardianSocketManager {
                         val receiveJson = JSONObject(dataInput)
                         val jsonIterator = receiveJson.keys()
 
-                        Log.d("LOG", dataInput)
                         val ping = gson.fromJson(dataInput, GuardianPing::class.java)
                         pingBlob.postValue(ping)
 

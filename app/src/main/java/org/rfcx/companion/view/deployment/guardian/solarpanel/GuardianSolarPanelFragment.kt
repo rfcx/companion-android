@@ -67,34 +67,6 @@ class GuardianSolarPanelFragment : Fragment() {
         getSentinelValue()
     }
 
-//    private fun getSentinelValue() {
-//        GuardianSocketManager.sentinel.observe(viewLifecycleOwner, Observer { sentinelResponse ->
-//            val input = sentinelResponse.sentinel.convertToInfo().input
-//            if (isSentinelConnected(input)) {
-//                hideAssembleWarn()
-//
-//                val voltage = input.voltage.toFloat() / 1000
-//                val current = input.current.toFloat() / 1000
-//                val power = input.power.toFloat() / 1000
-//
-//                // set 3 top value
-//                setVoltageValue(voltage)
-//                setCurrentValue(current)
-//                setPowerValue(power)
-//
-//                // update power and voltage to chart
-//                updateData(voltage, power)
-//
-//                // expand xAxis line
-//                expandXAxisLine()
-//
-//                solarFinishButton.isEnabled = true
-//            } else {
-//                showAssembleWarn()
-//            }
-//        })
-//    }
-
     private fun getSentinelValue() {
         AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
             val sentinelResponse = deploymentProtocol?.getSentinelPower()

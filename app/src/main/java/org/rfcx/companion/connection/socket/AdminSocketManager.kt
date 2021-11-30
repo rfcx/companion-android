@@ -1,9 +1,7 @@
 package org.rfcx.companion.connection.socket
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
-import org.json.JSONObject
 import org.rfcx.companion.entity.socket.response.AdminPing
 import java.io.DataInputStream
 import java.io.DataOutputStream
@@ -21,14 +19,6 @@ object AdminSocketManager {
     private val gson = Gson()
 
     val pingBlob = MutableLiveData<AdminPing>()
-
-    init {
-
-    }
-
-    fun resetAllValuesToDefault() {
-
-    }
 
     //just to connect to server
     fun connect() {

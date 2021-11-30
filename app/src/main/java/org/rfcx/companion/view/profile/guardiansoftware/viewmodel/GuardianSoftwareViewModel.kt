@@ -2,7 +2,6 @@ package org.rfcx.companion.view.profile.guardiansoftware.viewmodel
 
 import android.annotation.SuppressLint
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import okhttp3.ResponseBody

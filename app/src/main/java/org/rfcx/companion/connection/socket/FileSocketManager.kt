@@ -1,11 +1,9 @@
 package org.rfcx.companion.connection.socket
 
 import android.os.SystemClock
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import org.rfcx.companion.entity.socket.response.GuardianPing
 import org.rfcx.companion.util.file.APKUtils
 import java.io.DataInputStream
 import java.io.DataOutputStream
