@@ -17,6 +17,8 @@ import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.localdb.*
+import org.rfcx.companion.repo.api.CoreApiHelper
+import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
@@ -70,6 +72,7 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
             ViewModelFactory(
                 application,
                 DeviceApiHelper(DeviceApiServiceImpl()),
+                CoreApiHelper(CoreApiServiceImpl()),
                 LocalDataHelper()
             )
         ).get(AudioMothDeploymentViewModel::class.java)
@@ -311,6 +314,14 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
     }
 
     override fun getPassedChecks(): List<Int> = passedChecks
+
+    override fun setMenuToolbar(isVisibility: Boolean) {}
+
+    override fun setToolbarSubtitle(sub: String) {
+        supportActionBar?.apply {
+            subtitle = sub
+        }
+    }
 
     override fun startSyncing(status: String) {
         startFragment(NewSyncFragment.newInstance())

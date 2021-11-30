@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_guardian_checkin_test.*
 import org.rfcx.companion.R
-import org.rfcx.companion.connection.socket.SocketManager
+import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.socket.response.CheckIn
 import org.rfcx.companion.entity.socket.response.CheckInTestResponse
@@ -43,6 +43,8 @@ class GuardianCheckInTestFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         deploymentProtocol?.let {
+            it.setToolbarSubtitle()
+            it.setMenuToolbar(false)
             it.showToolbar()
             it.setToolbarTitle()
         }
@@ -56,23 +58,29 @@ class GuardianCheckInTestFragment : Fragment() {
     }
 
     private fun setCheckInTestView() {
-        SocketManager.checkInTest.observe(viewLifecycleOwner, Observer { res ->
-            checkInUrlValueTextView.text = res.checkin.apiUrl
-            checkInStatusValueTextView.text = res.checkin.state
-            checkInDeliveryTimeValueTextView.text = res.checkin.deliveryTime
-
-            state = res.checkin.state
-            apiUrl = res.checkin.apiUrl
-            if (state == CHECKIN_SUCCESS) {
-                deploymentProtocol?.setLastCheckInTime(System.currentTimeMillis())
+        GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
+            val latestCheckin = deploymentProtocol?.getLatestCheckIn()
+            latestCheckin?.let {
+                if (it.has("mqtt")) {
+                    val mqtt = it.get("mqtt").asJsonObject
+                    checkInProtocolValueTextView.text = "mqtt"
+                    checkInTimeValueTextView.text = mqtt.get("created_at").asString
+                    checkInFinishButton.isEnabled = true
+                }
+                if (it.has("sbd")) {
+                    val mqtt = it.get("sbd").asJsonObject
+                    checkInProtocolValueTextView.text = "sbd"
+                    checkInTimeValueTextView.text = mqtt.get("created_at").asString
+                    checkInFinishButton.isEnabled = true
+                }
+                if (it.has("swm")) {
+                    val mqtt = it.get("swm").asJsonObject
+                    checkInProtocolValueTextView.text = "swm"
+                    checkInTimeValueTextView.text = mqtt.get("created_at").asString
+                    checkInFinishButton.isEnabled = true
+                }
             }
-            val lastCheckInTime = deploymentProtocol?.getLastCheckInTime()
-            if (lastCheckInTime != null) {
-                checkInFinishButton.isEnabled = true
-            }
-            checkInLastValueTextView.text = getLastCheckInRelativeTime()
         })
-        checkInLastValueTextView.text = getLastCheckInRelativeTime()
     }
 
     private fun getLastCheckInRelativeTime(): String {
@@ -87,7 +95,7 @@ class GuardianCheckInTestFragment : Fragment() {
     override fun onDetach() {
         super.onDetach()
         if (state == CHECKIN_SUCCESS) {
-            SocketManager.checkInTest.value = CheckInTestResponse(CheckIn(apiUrl = apiUrl, state = "not published"))
+            GuardianSocketManager.checkInTest.value = CheckInTestResponse(CheckIn(apiUrl = apiUrl, state = "not published"))
         }
     }
 

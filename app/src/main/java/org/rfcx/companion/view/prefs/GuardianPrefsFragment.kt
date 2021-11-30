@@ -3,17 +3,20 @@ package org.rfcx.companion.view.prefs
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import androidx.preference.Preference
+import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import org.rfcx.companion.R
+import org.rfcx.companion.util.socket.PingUtils
 
-class GuardianPrefsFragment() : PreferenceFragmentCompat(),
+class GuardianPrefsFragment : PreferenceFragmentCompat(),
     SharedPreferences.OnSharedPreferenceChangeListener {
 
     private val prefsChanges = mutableMapOf<String, String>()
 
     private var syncPreferenceListener: SyncPreferenceListener? = null
 
-    private var switchPrefs: List<String> = listOf()
+    private var prefs: List<Preference> = listOf()
 
     override fun onResume() {
         super.onResume()
@@ -23,20 +26,23 @@ class GuardianPrefsFragment() : PreferenceFragmentCompat(),
     override fun onAttach(context: Context) {
         super.onAttach(context)
         syncPreferenceListener = context as SyncPreferenceListener
-        switchPrefs = context.resources.getStringArray(R.array.switch_prefs).toList()
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.prefs)
+        val preferenceCategory = PreferenceCategory(preferenceScreen.context)
+        preferenceCategory.title = ""
+        preferenceScreen.addPreference(preferenceCategory)
+
+        prefs = syncPreferenceListener?.getPrefs() ?: listOf()
+        prefs.forEach {
+            preferenceCategory.addPreference(it)
+        }
         syncPreferenceListener?.setEditor(preferenceScreen.sharedPreferences.edit())
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        val value = if (switchPrefs.contains(key)) {
-            sharedPreferences?.getBoolean(key, false).toString()
-        } else {
-            sharedPreferences?.getString(key, "") ?: ""
-        }
+        val value = sharedPreferences?.getString(key, "") ?: ""
 
         prefsChanges[key!!] = value
 

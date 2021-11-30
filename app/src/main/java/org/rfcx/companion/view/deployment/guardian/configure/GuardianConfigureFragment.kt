@@ -1,11 +1,7 @@
 package org.rfcx.companion.view.deployment.guardian.configure
 
 import android.app.AlertDialog
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
-import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,12 +10,12 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_guardian_configure.*
 import org.rfcx.companion.R
-import org.rfcx.companion.connection.socket.SocketManager
+import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import org.rfcx.companion.entity.guardian.toListForGuardian
-import org.rfcx.companion.entity.socket.response.Status
 import org.rfcx.companion.util.Analytics
+import org.rfcx.companion.util.prefs.PrefsUtils
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianConfigureFragment : Fragment() {
@@ -40,6 +36,9 @@ class GuardianConfigureFragment : Fragment() {
     private var fileFormat = "opus" // default guardian file format is opus
     private var duration = 90 // default guardian duration is 90
 
+    private var needCheckSha1 = false
+    private var currentPrefsSha1: String? = null
+
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -59,12 +58,14 @@ class GuardianConfigureFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         deploymentProtocol?.let {
+            it.setToolbarSubtitle()
+            it.setMenuToolbar(false)
             it.showToolbar()
             it.setToolbarTitle()
+            currentPrefsSha1 = it.getPrefsSha1()
         }
 
         setNextButton(true)
-        deploymentProtocol?.showLoading()
         retrieveCurrentConfigure()
     }
 
@@ -88,16 +89,18 @@ class GuardianConfigureFragment : Fragment() {
             analytics?.trackClickNextEvent(Screen.GUARDIAN_CONFIGURE.id)
             setNextButton(false)
             syncConfig()
-            deploymentProtocol?.setDeploymentConfigure(getConfiguration())
             deploymentProtocol?.setSampleRate(sampleRate)
         }
     }
 
     private fun syncConfig() {
-        SocketManager.syncConfiguration(getConfiguration().toListForGuardian())
-        SocketManager.syncConfiguration.observe(viewLifecycleOwner, Observer {
+        GuardianSocketManager.syncConfiguration(getConfiguration().toListForGuardian())
+        GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
             requireActivity().runOnUiThread {
-                if (it.sync.status == Status.SUCCESS.value) {
+                if (!needCheckSha1) {
+                    deploymentProtocol?.nextStep()
+                }
+                if (currentPrefsSha1 != deploymentProtocol?.getPrefsSha1()) {
                     deploymentProtocol?.nextStep()
                 }
             }
@@ -109,20 +112,17 @@ class GuardianConfigureFragment : Fragment() {
     }
 
     private fun retrieveCurrentConfigure() {
-        SocketManager.getCurrentConfiguration()
-        SocketManager.currentConfiguration.observe(viewLifecycleOwner, Observer { curConfig ->
-            bitrate = curConfig.configure.bitrate
-            sampleRate = curConfig.configure.sampleRate
-            duration = curConfig.configure.duration
-            fileFormat = if (curConfig.configure.fileFormat.toIntOrNull() == null) curConfig.configure.fileFormat else "opus"
-            deploymentProtocol?.hideLoading()
-
-            setFileFormatLayout()
-            setSampleRateLayout()
-            setBitrateLayout()
-            setDuration()
-            setNextOnClick()
-        })
+        deploymentProtocol?.getAudioConfiguration()?.let {
+            bitrate = it.get(PrefsUtils.audioBitrate).asInt
+            sampleRate = it.get(PrefsUtils.audioSampleRate).asInt
+            duration = it.get(PrefsUtils.audioDuration).asInt
+            fileFormat = it.get(PrefsUtils.audioCodec).asString
+        }
+        setFileFormatLayout()
+        setSampleRateLayout()
+        setBitrateLayout()
+        setDuration()
+        setNextOnClick()
     }
 
     private fun setBitrateLayout() {
@@ -136,8 +136,13 @@ class GuardianConfigureFragment : Fragment() {
                 builder.setTitle(R.string.choose_bitrate)
                     ?.setItems(bitrateEntries) { dialog, i ->
                         try {
-                            bitrateValueTextView.text = bitrateEntries!![i]
-                            bitrate = bitrateValues!![i].toInt()
+                            if (bitrateValues!![i].toInt() == bitrate) {
+                                needCheckSha1 = false
+                            } else {
+                                bitrateValueTextView.text = bitrateEntries!![i]
+                                bitrate = bitrateValues!![i].toInt()
+                                needCheckSha1 = true
+                            }
                         } catch (e: IllegalArgumentException) {
                             dialog.dismiss()
                         }
@@ -158,8 +163,13 @@ class GuardianConfigureFragment : Fragment() {
                 builder.setTitle(R.string.choose_file_format)
                     ?.setItems(fileFormatList) { dialog, i ->
                         try {
-                            fileFormatValueTextView.text = fileFormatList!![i]
-                            fileFormat = fileFormatList!![i]
+                            if (fileFormatList!![i] == fileFormat) {
+                                needCheckSha1 = false
+                            } else {
+                                fileFormatValueTextView.text = fileFormatList!![i]
+                                fileFormat = fileFormatList!![i]
+                                needCheckSha1 = true
+                            }
                         } catch (e: IllegalArgumentException) {
                             dialog.dismiss()
                         }
@@ -181,8 +191,13 @@ class GuardianConfigureFragment : Fragment() {
                 builder.setTitle(R.string.choose_sample_rate)
                     ?.setItems(sampleRateEntries) { dialog, i ->
                         try {
-                            sampleRateValueTextView.text = sampleRateEntries!![i]
-                            sampleRate = sampleRateValues!![i].toInt()
+                            if (sampleRateValues!![i].toInt() == sampleRate) {
+                                needCheckSha1 = false
+                            } else {
+                                sampleRateValueTextView.text = sampleRateEntries!![i]
+                                sampleRate = sampleRateValues!![i].toInt()
+                                needCheckSha1 = true
+                            }
                         } catch (e: IllegalArgumentException) {
                             dialog.dismiss()
                         }
@@ -208,8 +223,13 @@ class GuardianConfigureFragment : Fragment() {
                 builder.setTitle(R.string.choose_duration_cycle)
                     ?.setItems(durationEntries) { dialog, i ->
                         try {
-                            durationValueTextView.text = durationEntries!![i]
-                            duration = durationValues!![i].toInt()
+                            if (durationValues!![i].toInt() == duration) {
+                                needCheckSha1 = false
+                            } else {
+                                durationValueTextView.text = durationEntries!![i]
+                                duration = durationValues!![i].toInt()
+                                needCheckSha1 = true
+                            }
                         } catch (e: IllegalArgumentException) {
                             dialog.dismiss()
                         }

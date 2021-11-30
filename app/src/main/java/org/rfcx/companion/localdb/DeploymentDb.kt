@@ -89,12 +89,6 @@ class DeploymentDb(private val realm: Realm) {
                 if (deployment != null) {
                     deployment.serverId = deploymentResponse.id
                     deployment.deployedAt = deploymentResponse.deployedAt ?: deployment.deployedAt
-                    deployment.wifiName = deploymentResponse.wifi ?: ""
-
-                    val newConfig = deploymentResponse.configuration
-                    if (newConfig != null) {
-                        deployment.configuration = it.copyToRealm(newConfig)
-                    }
 
                     val newLocation = deploymentResponse.stream
                     if (newLocation != null) {

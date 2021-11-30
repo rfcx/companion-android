@@ -35,7 +35,7 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
         if (result) {
             val streamDb = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
             val deploymentDb = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
-            val savedStreams = streamDb.getLocations().filter { it.serverId != null }
+            val savedStreams = streamDb.getLocations().filter { it.serverId != null && it.locationGroup?.coreId == PROJECT_ID }
             val downloadedStreams = streams.map { it.toLocate().serverId }
             val filteredStreams =
                 savedStreams.filter { stream -> !downloadedStreams.contains(stream.serverId) }

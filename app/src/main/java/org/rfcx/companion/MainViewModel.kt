@@ -245,7 +245,7 @@ class MainViewModel(
         val projectName = getProjectName()
         if (projectName != context.getString(R.string.none)) {
             filteredShowLocations =
-                filteredShowLocations.filter { it.locationGroup?.name == projectName }
+                filteredShowLocations.filter { it.locationGroup?.name == projectName && it.lastDeploymentId == 0 }
             deploymentsForShow =
                 deploymentsForShow.filter { it.stream?.project?.name == projectName }
         }

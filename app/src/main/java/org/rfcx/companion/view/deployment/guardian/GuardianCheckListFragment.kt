@@ -12,8 +12,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_guardian_checklist.*
 import org.rfcx.companion.R
 import org.rfcx.companion.adapter.CheckListItem
-import org.rfcx.companion.connection.socket.SocketManager
+import org.rfcx.companion.connection.socket.AdminSocketManager
+import org.rfcx.companion.connection.socket.FileSocketManager
+import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.view.deployment.CheckListAdapter
+import java.io.File
 
 class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
 
@@ -37,9 +40,13 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        deploymentProtocol?.hideToolbar()
-
-        setGuardianName()
+        deploymentProtocol?.let {
+            context?.getString(R.string.setting_up_checklist)?.let { it1 -> it.setCurrentPage(it1) }
+            it.setToolbarSubtitle(it.getGuid() ?: "Guardian")
+            it.setMenuToolbar(true)
+            it.showToolbar()
+            it.setToolbarTitle()
+        }
 
         guardianCheckListRecyclerView.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
@@ -57,26 +64,6 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
             showNotificationBeforeDeploy()
         }
 
-        // check if guardian is registered so the step can be highlighted
-        checkIfRegistered()
-    }
-
-    private fun setGuardianName() {
-        val wifi = deploymentProtocol?.getWifiName()
-        guardianIdTextView.text = wifi
-    }
-
-    private fun checkIfRegistered() {
-        SocketManager.isGuardianRegistered()
-        SocketManager.isRegistered.observe(viewLifecycleOwner, Observer {
-            if (it.isRegistered) {
-                checkListRecyclerView.setCheckPassed(1)
-                deploymentProtocol?.addRegisteredToPassedCheck()
-            } else {
-                checkListRecyclerView.setCheckUnPassed(1)
-                deploymentProtocol?.removeRegisteredOnPassedCheck()
-            }
-        })
     }
 
     override fun invoke(number: Int, name: String) {
@@ -118,7 +105,7 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
             setTitle(getString(R.string.wifi_notification_title))
             setPositiveButton(getString(R.string.notification_yes)) { dialog, _ ->
                 deploymentProtocol?.setOnDeployClicked()
-                SocketManager.stopGuardianWiFi()
+                GuardianSocketManager.stopGuardianWiFi()
                 deploy()
                 dialog.dismiss()
             }
@@ -132,7 +119,8 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
 
     private fun deploy() {
         deploymentProtocol?.setReadyToDeploy()
-        SocketManager.stopConnection()
+        GuardianSocketManager.stopConnection()
+        AdminSocketManager.stopConnection()
     }
 
     companion object {

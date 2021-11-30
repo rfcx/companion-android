@@ -21,6 +21,8 @@ import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.Locate
 import org.rfcx.companion.entity.isGuest
+import org.rfcx.companion.repo.api.CoreApiHelper
+import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
@@ -63,6 +65,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
             ViewModelFactory(
                 application,
                 DeviceApiHelper(DeviceApiServiceImpl()),
+                CoreApiHelper(CoreApiServiceImpl()),
                 LocalDataHelper()
             )
         ).get(MainViewModel::class.java)
