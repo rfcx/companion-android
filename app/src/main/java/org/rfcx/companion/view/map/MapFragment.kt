@@ -25,6 +25,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.WorkInfo
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.gson.JsonSyntaxException
 import com.mapbox.android.core.location.*
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
@@ -321,12 +322,21 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             listener?.hideBottomSheet()
         }
 
-        projectRecyclerView.visibility = View.VISIBLE
-        projectSwipeRefreshView.visibility = View.VISIBLE
-        searchButton.visibility = View.GONE
-        trackingLayout.visibility = View.GONE
-        hideButtonOnMap()
-        listener?.hideBottomAppBar()
+        if (projectRecyclerView.visibility == View.VISIBLE) {
+            projectRecyclerView.visibility = View.GONE
+            projectSwipeRefreshView.visibility = View.GONE
+            searchButton.visibility = View.VISIBLE
+            trackingLayout.visibility = View.VISIBLE
+            showButtonOnMap()
+            listener?.showBottomAppBar()
+        } else {
+            projectRecyclerView.visibility = View.VISIBLE
+            projectSwipeRefreshView.visibility = View.VISIBLE
+            searchButton.visibility = View.GONE
+            trackingLayout.visibility = View.GONE
+            hideButtonOnMap()
+            listener?.hideBottomAppBar()
+        }
 
         if (siteRecyclerView.visibility == View.VISIBLE) {
             searchLayout.visibility = View.GONE
@@ -842,20 +852,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         val deploymentId = feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID)
         if (deploymentId != null) {
             context?.let {
-                when (feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEVICE)) {
-                    Device.AUDIOMOTH.value -> {
-                        DeploymentDetailActivity.startActivity(it, deploymentId.toInt())
-                    }
-                    Device.SONGMETER.value -> {
-                        DeploymentDetailActivity.startActivity(it, deploymentId.toInt())
-                    }
-                    else -> {
-                        val deployment = mainViewModel.getDeploymentById(deploymentId.toInt())
-                        deployment?.let { dp ->
-                            DiagnosticActivity.startActivity(it, dp, false)
-                        }
-                    }
-                }
+                DeploymentDetailActivity.startActivity(it, deploymentId.toInt())
                 analytics?.trackSeeDetailEvent()
             }
         } else {
@@ -1283,28 +1280,32 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         //remove the previous one
         hideTrackOnMap()
         val tracks = mainViewModel.getTrackingFileBySiteId(id)
-        if (tracks.isNotEmpty()) {
-            //get all track first
-            if (currentMarkId == markerLocationId) {
-                val tempTrack = arrayListOf<Feature>()
-                tracks.forEach { track ->
-                    val json = File(track.localPath).readText()
-                    val featureCollection = FeatureCollection.fromJson(json)
-                    val feature = featureCollection.features()?.get(0)
-                    feature?.let {
-                        tempTrack.add(it)
+        try {
+            if (tracks.isNotEmpty()) {
+                //get all track first
+                if (currentMarkId == markerLocationId) {
+                    val tempTrack = arrayListOf<Feature>()
+                    tracks.forEach { track ->
+                        val json = File(track.localPath).readText()
+                        val featureCollection = FeatureCollection.fromJson(json)
+                        val feature = featureCollection.features()?.get(0)
+                        feature?.let {
+                            tempTrack.add(it)
+                        }
+                        //track always has 1 item so using get(0) is okay - also it can only be LineString
+                        val lineString = feature?.geometry() as LineString
+                        queue.add(lineString.coordinates().toList())
                     }
-                    //track always has 1 item so using get(0) is okay - also it can only be LineString
-                    val lineString = feature?.geometry() as LineString
-                    queue.add(lineString.coordinates().toList())
-                }
-                lineSource?.setGeoJson(FeatureCollection.fromFeatures(tempTrack))
+                    lineSource?.setGeoJson(FeatureCollection.fromFeatures(tempTrack))
 
-                //move camera to pin
+                    //move camera to pin
+                    moveToDeploymentMarker(lat, lng)
+                }
+
+            } else {
                 moveToDeploymentMarker(lat, lng)
             }
-
-        } else {
+        } catch (e: JsonSyntaxException) {
             moveToDeploymentMarker(lat, lng)
         }
     }

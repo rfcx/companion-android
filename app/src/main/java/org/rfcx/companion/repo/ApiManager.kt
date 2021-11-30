@@ -59,6 +59,10 @@ class ApiManager {
                 readTimeout(60, TimeUnit.SECONDS)
                 writeTimeout(60, TimeUnit.SECONDS)
             }
+            .addInterceptor { chain ->
+                val request = chain.request().newBuilder().addHeader("User-Agent", "Companion/${BuildConfig.VERSION_NAME}/${BuildConfig.VERSION_CODE}").build()
+                chain.proceed(request)
+            }
             .addInterceptor(httpLoggingInterceptor)
             .build()
     }

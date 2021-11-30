@@ -47,7 +47,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                         val id = fullId?.substring(fullId.lastIndexOf("/") + 1, fullId.length) ?: ""
                         markSentDeployment(id, db, locateDb, it.id, token)
                     }
-                    result.errorBody()?.string()?.contains("id must be unique") ?: false -> {
+                    result.errorBody()?.string()?.contains("this deploymentKey is already existed") ?: false -> {
                         markSentDeployment(it.deploymentKey, db, locateDb, it.id, token)
                     }
                     else -> {
