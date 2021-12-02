@@ -191,7 +191,6 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
                 setLastCheckInTime(null)
                 GuardianSocketManager.getCheckInTest(CheckinCommand.STOP) // to stop getting checkin test
                 passedChecks.clear() // remove all passed
-                unregisterWifiConnectionLostListener()
                 startFragment(ConnectGuardianFragment.newInstance())
             }
             is ConnectGuardianFragment -> finish()
@@ -491,27 +490,6 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
 
     override fun setWifiManager(wifiManager: WifiHotspotManager) {
         wifiHotspotManager = wifiManager
-    }
-
-    override fun registerWifiConnectionLostListener() {
-        wifiHotspotManager.registerWifiConnectionLost(object : WifiLostListener {
-            override fun onLost() {
-                if (!onDeployClicked) {
-                    val wifiLostDialog: WifiLostDialogFragment =
-                        supportFragmentManager.findFragmentByTag(TAG_WIFI_LOST_DIALOG) as WifiLostDialogFragment?
-                            ?: run {
-                                WifiLostDialogFragment()
-                            }
-                    wifiLostDialog.show(supportFragmentManager, TAG_WIFI_LOST_DIALOG)
-                }
-            }
-        })
-    }
-
-    override fun unregisterWifiConnectionLostListener() {
-        if (::wifiHotspotManager.isInitialized) {
-            wifiHotspotManager.unregisterWifiConnectionLost()
-        }
     }
 
     override fun setMenuToolbar(isVisibility: Boolean) {

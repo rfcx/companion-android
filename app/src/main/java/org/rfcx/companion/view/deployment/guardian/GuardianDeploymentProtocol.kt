@@ -39,6 +39,4 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun hideLoading()
 
     fun setWifiManager(wifiManager: WifiHotspotManager)
-    fun registerWifiConnectionLostListener()
-    fun unregisterWifiConnectionLostListener()
 }
