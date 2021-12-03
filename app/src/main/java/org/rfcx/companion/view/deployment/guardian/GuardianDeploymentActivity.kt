@@ -86,7 +86,6 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     private var onDeployClicked = false
     private var menuAll: Menu? = null
 
-    private lateinit var wifiHotspotManager: WifiHotspotManager
     private val analytics by lazy { Analytics(this) }
 
     private val preferences = Preferences.getInstance(this)
@@ -486,10 +485,6 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         val loadingDialog: LoadingDialogFragment? =
             supportFragmentManager.findFragmentByTag(TAG_LOADING_DIALOG) as LoadingDialogFragment?
         loadingDialog?.dismissDialog()
-    }
-
-    override fun setWifiManager(wifiManager: WifiHotspotManager) {
-        wifiHotspotManager = wifiManager
     }
 
     override fun setMenuToolbar(isVisibility: Boolean) {

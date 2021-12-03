@@ -37,6 +37,4 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
 
     fun showLoading()
     fun hideLoading()
-
-    fun setWifiManager(wifiManager: WifiHotspotManager)
 }

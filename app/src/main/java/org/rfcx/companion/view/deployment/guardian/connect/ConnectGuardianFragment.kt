@@ -117,16 +117,11 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
     private fun checkConnection() {
         GuardianSocketManager.getConnection()
         AdminSocketManager.connect()
-        GlobalScope.launch(Dispatchers.Main) {
-            GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
-                requireActivity().runOnUiThread {
-                    hideLoading()
-                    deploymentProtocol?.startGuardianRegister()
-                    deploymentProtocol?.setWifiManager(wifiHotspotManager)
-                    GuardianSocketManager.getCheckInTest(CheckinCommand.START)
-                }
-            })
-        }
+        GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
+            requireActivity().runOnUiThread {
+                deploymentProtocol?.startGuardianRegister()
+            }
+        })
     }
 
     private fun showLoading() {
