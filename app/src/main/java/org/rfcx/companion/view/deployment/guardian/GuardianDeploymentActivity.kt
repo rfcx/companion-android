@@ -404,6 +404,9 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     override fun handleCheckClicked(number: Int) {
         // setup fragment for current step
         currentCheck = number
+        // always checking for connection in case disconnected
+        GuardianSocketManager.getConnection()
+        AdminSocketManager.connect()
         when (number) {
             0 -> {
                 updateDeploymentState(DeploymentState.Guardian.SolarPanel)
