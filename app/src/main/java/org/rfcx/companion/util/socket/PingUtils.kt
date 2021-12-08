@@ -2,6 +2,7 @@ package org.rfcx.companion.util.socket
 
 import android.content.Context
 import androidx.preference.Preference
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import org.rfcx.companion.entity.socket.response.*
@@ -41,13 +42,17 @@ object PingUtils {
         var system = SentinelSystem()
         var input = SentinelInput()
         var batt = SentinelBattery()
-        splitSentinelPower.forEach {
-            val splittedItem = it.split("*")
-            when(splittedItem[0]) {
-                "system" -> system = SentinelSystem(splittedItem[2].toInt(), splittedItem[3].toInt(), splittedItem[4].toInt(), splittedItem[5].toInt())
-                "input" -> input = SentinelInput(splittedItem[2].toInt(), splittedItem[3].toInt(), splittedItem[4].toInt(), splittedItem[5].toInt())
-                "battery" -> batt = SentinelBattery(splittedItem[2].toInt(), splittedItem[3].toInt(), splittedItem[4].toDouble(), splittedItem[5].toInt())
+        try {
+            splitSentinelPower.forEach {
+                val splittedItem = it.split("*")
+                when(splittedItem[0]) {
+                    "system" -> system = SentinelSystem(splittedItem[2].toInt(), splittedItem[3].toInt(), splittedItem[4].toInt(), splittedItem[5].toInt())
+                    "input" -> input = SentinelInput(splittedItem[2].toInt(), splittedItem[3].toInt(), splittedItem[4].toInt(), splittedItem[5].toInt())
+                    "battery" -> batt = SentinelBattery(splittedItem[2].toInt(), splittedItem[3].toInt(), splittedItem[4].toDouble(), splittedItem[5].toInt())
+                }
             }
+        } catch (e: NumberFormatException) {
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
         return SentinelInfo(input, system, batt)
     }
