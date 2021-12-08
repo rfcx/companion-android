@@ -475,6 +475,6 @@
     <string name="protocol">Protocol</string>
     <string name="cell">cell</string>
     <string name="swarm">swarm</string>
-    <string name="download_softwares_from_guardian_softwares_page_first">Download softwares from Guardian softwares page first</string>
+    <string name="download_softwares_from_guardian_softwares_page_first">Download softwares from Guardian softwares page first\nProfile -> Guardian software -> Download APKs you needed</string>
 
 </resources>
