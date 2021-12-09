@@ -38,6 +38,7 @@ import org.rfcx.companion.util.socket.PingUtils
 import org.rfcx.companion.view.deployment.BaseDeploymentActivity
 import org.rfcx.companion.view.deployment.guardian.advanced.GuardianAdvancedFragment
 import org.rfcx.companion.view.deployment.guardian.checkin.GuardianCheckInTestFragment
+import org.rfcx.companion.view.deployment.guardian.classifierloader.ClassifierLoaderFragment
 import org.rfcx.companion.view.deployment.guardian.configure.GuardianConfigureFragment
 import org.rfcx.companion.view.deployment.guardian.connect.ConnectGuardianFragment
 import org.rfcx.companion.view.deployment.guardian.deploy.GuardianDeployFragment
@@ -409,7 +410,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         AdminSocketManager.connect()
         when (number) {
             0 -> startFragment(SoftwareUpdateFragment.newInstance())
-            1 -> startFragment(SoftwareUpdateFragment.newInstance())
+            1 -> startFragment(ClassifierLoaderFragment.newInstance())
             2 -> startFragment(GuardianSolarPanelFragment.newInstance())
             3 -> startFragment(GuardianSignalFragment.newInstance())
             4 -> startFragment(GuardianConfigureFragment.newInstance())
