@@ -27,6 +27,8 @@ class ClassifierAdapter(
             notifyDataSetChanged()
         }
 
+    fun getLoading() = needLoading
+
     fun showLoading() {
         needLoading = true
         notifyDataSetChanged()
@@ -51,7 +53,7 @@ class ClassifierAdapter(
             showLoading()
             it.visibility = View.GONE
             holder.classifierLoading.visibility = View.VISIBLE
-            classifierLoadListener.onLoadClicked()
+            classifierLoadListener.onLoadClicked(items[position].path)
         }
     }
 
@@ -69,5 +71,5 @@ class ClassifierAdapter(
 }
 
 interface ClassifierLoadListener {
-    fun onLoadClicked()
+    fun onLoadClicked(path: String)
 }

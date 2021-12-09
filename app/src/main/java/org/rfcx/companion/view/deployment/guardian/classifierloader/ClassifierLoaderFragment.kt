@@ -7,16 +7,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_software_update.*
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.FileSocketManager
+import org.rfcx.companion.entity.Software
+import org.rfcx.companion.entity.socket.Classifier
 import org.rfcx.companion.util.file.ClassifierUtils
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
+import org.rfcx.companion.view.deployment.guardian.softwareupdate.SoftwareUpdateAdapter
 import java.util.*
 
-class ClassifierLoaderFragment : Fragment() {
+class ClassifierLoaderFragment : Fragment(), ClassifierLoadListener {
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
     private var loadingTimer: CountDownTimer? = null
+    private var classifierAdapter: ClassifierAdapter? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -45,11 +51,28 @@ class ClassifierLoaderFragment : Fragment() {
             deploymentProtocol?.nextStep()
         }
 
-        val softwares = ClassifierUtils.getAllDownloadedClassifiers(requireContext())
-        if (softwares.isNullOrEmpty()) {
+        val classifiers = ClassifierUtils.getAllDownloadedClassifiers(requireContext())
+        if (classifiers.isNullOrEmpty()) {
             noSoftwareText.visibility = View.VISIBLE
         } else {
-//            populateAdapterWithInfo(softwares)
+            populateAdapterWithInfo(classifiers)
+        }
+    }
+
+    private fun populateAdapterWithInfo(classifiers: List<Classifier>) {
+        classifierAdapter = ClassifierAdapter(this)
+        classifierAdapter?.let {
+            val layoutManager = LinearLayoutManager(context)
+            apkRecyclerView.layoutManager = layoutManager
+            apkRecyclerView.adapter = it
+            apkRecyclerView.addItemDecoration(
+                DividerItemDecoration(
+                    this.context,
+                    DividerItemDecoration.VERTICAL
+                )
+            )
+            it.items = classifiers
+            it.notifyDataSetChanged()
         }
     }
 
@@ -58,11 +81,11 @@ class ClassifierLoaderFragment : Fragment() {
             override fun onTick(millisUntilFinished: Long) { }
 
             override fun onFinish() {
-//                softwareUpdateAdapter?.let {
-//                    if (it.getLoading()) {
-//                        it.hideLoading()
-//                    }
-//                }
+                classifierAdapter?.let {
+                    if (it.getLoading()) {
+                        it.hideLoading()
+                    }
+                }
                 stopTimer()
             }
         }
@@ -79,10 +102,9 @@ class ClassifierLoaderFragment : Fragment() {
         fun newInstance() = ClassifierLoaderFragment()
     }
 
-//    override fun onItemClick(selectedSoftware: SoftwareItem.SoftwareVersion) {
-//        selectedFile = selectedSoftware
-//        FileSocketManager.sendFile(selectedSoftware.path)
-//        nextButton.isEnabled = false
-//        startTimer()
-//    }
+    override fun onLoadClicked(path: String) {
+        FileSocketManager.sendFile(path)
+        nextButton.isEnabled = false
+        startTimer()
+    }
 }
