@@ -408,22 +408,12 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         GuardianSocketManager.getConnection()
         AdminSocketManager.connect()
         when (number) {
-            0 -> {
-                updateDeploymentState(DeploymentState.Guardian.SolarPanel)
-                startFragment(SoftwareUpdateFragment.newInstance())
-            }
-            1 -> {
-                startFragment(GuardianSolarPanelFragment.newInstance())
-            }
-            2 -> {
-                updateDeploymentState(DeploymentState.Guardian.Signal)
-                startFragment(GuardianSignalFragment.newInstance())
-            }
-            3 -> {
-                startFragment(GuardianConfigureFragment.newInstance())
-            }
-            4 -> {
-                updateDeploymentState(DeploymentState.Guardian.Locate)
+            0 -> startFragment(SoftwareUpdateFragment.newInstance())
+            1 -> startFragment(SoftwareUpdateFragment.newInstance())
+            2 -> startFragment(GuardianSolarPanelFragment.newInstance())
+            3 -> startFragment(GuardianSignalFragment.newInstance())
+            4 -> startFragment(GuardianConfigureFragment.newInstance())
+            5 -> {
                 val site = this._locate
                 if (site == null) {
                     startFragment(
@@ -435,18 +425,9 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
                     startDetailDeploymentSite(site.id, site.name, false)
                 }
             }
-            5 -> {
-                updateDeploymentState(DeploymentState.Guardian.Microphone)
-                startFragment(GuardianMicrophoneFragment.newInstance())
-            }
-            6 -> {
-                updateDeploymentState(DeploymentState.Guardian.Checkin)
-                startFragment(GuardianCheckInTestFragment.newInstance())
-            }
-            7 -> {
-                updateDeploymentState(DeploymentState.Guardian.Deploy)
-                startFragment(GuardianDeployFragment.newInstance())
-            }
+            6 -> startFragment(GuardianMicrophoneFragment.newInstance())
+            7 -> startFragment(GuardianCheckInTestFragment.newInstance())
+            8 -> startFragment(GuardianDeployFragment.newInstance())
         }
     }
 

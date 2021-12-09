@@ -45,7 +45,8 @@
     </string-array>
 
     <string-array name="guardian_assembly_checks">
-        <item>Software Update</item>
+        <item>Software Loader</item>
+        <item>Classifier Loader</item>
         <item>Solar Panel Exposure Test</item>
     </string-array>
 
