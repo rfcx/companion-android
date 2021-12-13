@@ -1,4 +1,4 @@
-package org.rfcx.companion.view.deployment.guardian.classifierloader
+package org.rfcx.companion.view.profile.guardianclassifier
 
 import android.view.LayoutInflater
 import android.view.View
@@ -11,10 +11,10 @@ import kotlinx.android.synthetic.main.item_classifier.view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.socket.Classifier
 
-class ClassifierAdapter(
-    private var classifierLoadListener: ClassifierLoadListener
+class GuardianClassifierAdapter(
+    private var classifierLoadListener: ClassifierDownloadListener
 ) :
-    RecyclerView.Adapter<ClassifierAdapter.ClassifierViewHolder>() {
+    RecyclerView.Adapter<GuardianClassifierAdapter.GuardianClassifierViewHolder>() {
 
     private var needLoading = false
 
@@ -36,13 +36,13 @@ class ClassifierAdapter(
         notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ClassifierViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GuardianClassifierViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.item_classifier, parent, false)
-        return ClassifierViewHolder(view)
+        return GuardianClassifierViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ClassifierViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: GuardianClassifierViewHolder, position: Int) {
         holder.setText(items[position].name)
 
         holder.classifierTextView.isEnabled = !needLoading
@@ -50,13 +50,13 @@ class ClassifierAdapter(
             showLoading()
             it.visibility = View.GONE
             holder.classifierLoading.visibility = View.VISIBLE
-            classifierLoadListener.onLoadClicked(items[position].path)
+            classifierLoadListener.onDownloadClicked(items[position].path)
         }
     }
 
     override fun getItemCount(): Int = items.size
 
-    inner class ClassifierViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class GuardianClassifierViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val classifierTextView: TextView = itemView.classifierTextView
         val classifierLoadButton: AppCompatButton = itemView.classifierLoadButton
         val classifierLoading: ProgressBar = itemView.classifierLoading
@@ -67,6 +67,6 @@ class ClassifierAdapter(
     }
 }
 
-interface ClassifierLoadListener {
-    fun onLoadClicked(path: String)
+interface ClassifierDownloadListener {
+    fun onDownloadClicked(path: String)
 }

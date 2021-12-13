@@ -106,6 +106,9 @@
             android:name=".view.profile.guardiansoftware.GuardianSoftwareActivity"
             android:screenOrientation="portrait"/>
 
+        <activity android:name=".view.profile.guardianclassifier.GuardianClassifierActivity"
+            android:screenOrientation="portrait"/>
+
         <service
             android:name=".service.LocationTrackerService"
             android:exported="false"
