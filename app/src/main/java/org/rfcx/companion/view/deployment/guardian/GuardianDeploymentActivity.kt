@@ -352,18 +352,18 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
                 updateDeploymentState(DeploymentState.Guardian.SolarPanel)
                 startFragment(GuardianSolarPanelFragment.newInstance())
             }
-            1 -> {
+            2 -> {
                 updateDeploymentState(DeploymentState.Guardian.Register)
                 startFragment(GuardianRegisterFragment.newInstance())
             }
-            2 -> {
+            3 -> {
                 updateDeploymentState(DeploymentState.Guardian.Signal)
                 startFragment(GuardianSignalFragment.newInstance())
             }
-            3 -> {
+            4 -> {
                 startFragment(GuardianConfigureFragment.newInstance())
             }
-            4 -> {
+            1 -> {
                 updateDeploymentState(DeploymentState.Guardian.Locate)
                 val site = this._locate
                 if (site == null) {
