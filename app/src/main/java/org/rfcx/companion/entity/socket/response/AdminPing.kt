@@ -9,7 +9,5 @@ data class AdminPing(
     @SerializedName("sentinel_sensor")
     val sentinelSensor: String? = null,
     val cpu: String? = null,
-    val storage: String? = null,
-    @SerializedName("swm_network")
-    val swmNetwork: String? = null
+    val storage: String? = null
 )

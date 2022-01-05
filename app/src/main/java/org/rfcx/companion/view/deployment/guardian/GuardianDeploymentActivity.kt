@@ -223,10 +223,10 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         GuardianSocketManager.pingBlob.observeForever {
             guardianPingBlob = it
             isGuardianRegistered = PingUtils.isRegisteredFromPing(it)
+            swmNetwork = PingUtils.getSwarmNetworkFromPing(it)
         }
         AdminSocketManager.pingBlob.observeForever {
             network = PingUtils.getNetworkFromPing(it)
-            swmNetwork = PingUtils.getSwarmNetworkFromPing(it)
             sentinelPower = PingUtils.getSentinelPowerFromPing(it)
         }
         deploymentLiveData.observeForever(guardianDeploymentObserve)
