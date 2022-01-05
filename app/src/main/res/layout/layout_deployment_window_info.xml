@@ -40,14 +40,26 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textStyle="bold"
+                android:layout_weight="0"
                 tools:text="MA19" />
+
+            <TextView
+                android:id="@+id/deploymentTypeName"
+                style="@style/AudioMothText.Body.Secondary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_normal"
+                android:gravity="start"
+                android:textStyle="bold"
+                android:layout_weight="0.8"
+                tools:text="AudioMoth" />
 
             <TextView
                 android:id="@+id/projectName"
                 style="@style/AudioMothText.Body.Secondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_weight="1.5"
                 android:gravity="end"
                 tools:text="Puerto Rico" />
         </LinearLayout>

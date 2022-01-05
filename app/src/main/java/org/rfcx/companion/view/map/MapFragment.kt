@@ -588,6 +588,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             inflater.inflate(R.layout.layout_deployment_window_info, null) as BubbleLayout
         val id = feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID) ?: ""
         val title = feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_TITLE)
+        val deploymentId = feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID)
+        deploymentId?.let {
+            val type = mainViewModel.getDeploymentById(it.toInt())?.device ?: Device.AUDIOMOTH.value
+            layout.deploymentTypeName.text = type
+        }
+        layout.deploymentTypeName.text = deploymentId
         layout.deploymentSiteTitle.text = title
         val projectName = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_PROJECT_NAME)
         layout.projectName.text = projectName
