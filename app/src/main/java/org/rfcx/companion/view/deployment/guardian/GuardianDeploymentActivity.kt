@@ -295,6 +295,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
 
     override fun getGuid(): String? = PingUtils.getGuidFromPing(guardianPingBlob)
 
+    override fun getGuardianPurpose(): String? = PingUtils.getPurposeFromPrefs(guardianPingBlob)
+
     override fun isGuardianRegistered(): Boolean? = isGuardianRegistered
 
     override fun getSoftwareVersion(): Map<String, String>? = PingUtils.getSoftwareVersionFromPing(guardianPingBlob)

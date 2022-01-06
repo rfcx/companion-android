@@ -63,6 +63,14 @@ object PingUtils {
         return guid.asString
     }
 
+    fun getPurposeFromPrefs(guardianPing: GuardianPing?): String? {
+        if (guardianPing?.prefs is JsonObject) {
+            val prefs = guardianPing.prefs.get("vals") ?: return null
+            return PrefsUtils.getPurposeGuardiansFromPrefs(Gson().toJson(prefs))
+        }
+        return null
+    }
+
     fun isRegisteredFromPing(ping: GuardianPing?): Boolean? {
         val isRegistered = ping?.companion?.get("is_registered") ?: return null
         return isRegistered.asBoolean

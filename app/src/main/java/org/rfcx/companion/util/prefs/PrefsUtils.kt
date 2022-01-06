@@ -31,6 +31,16 @@ object PrefsUtils {
         return prefs
     }
 
+    fun getPurposeGuardiansFromPrefs(str: String?): String? {
+        if (str == null) {
+            return null
+        }
+        val json = JsonParser.parseString(str).asJsonObject
+        val protocol = json.get("api_satellite_protocol").asString
+        if (protocol == "off") return "cell"
+        return protocol
+    }
+
     fun stringToAudioPrefs(str: String?): JsonObject? {
         if (str == null) {
             return null
