@@ -592,14 +592,14 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         deploymentId?.let {
             val deployment = mainViewModel.getDeploymentById(it.toInt())
             val type = deployment?.device ?: Device.AUDIOMOTH.value
-            layout.deploymentTypeName.text = type
+            layout.deploymentTypeName.text = "type: ${type.toUpperCase()}"
 
             val streamId = deployment?.stream?.coreId
             if (streamId != null) {
-                layout.deploymentStreamId.text = streamId
+                layout.deploymentStreamId.visibility = View.VISIBLE
+                layout.deploymentStreamId.text = "id: $streamId"
             }
         }
-        layout.deploymentTypeName.text = deploymentId
         layout.deploymentSiteTitle.text = title
         val projectName = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_PROJECT_NAME)
         layout.projectName.text = projectName

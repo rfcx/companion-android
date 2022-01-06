@@ -47,6 +47,7 @@
                 style="@style/AudioMothText.Body.Secondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_normal"
                 android:gravity="end"
                 tools:text="Puerto Rico" />
         </LinearLayout>
@@ -54,7 +55,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_padding_normal"
+            android:layout_marginTop="@dimen/margin_padding_small"
             android:orientation="horizontal">
 
             <TextView
@@ -62,8 +63,7 @@
                 style="@style/AudioMothText.Body.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_normal"
-                android:textStyle="bold"
+                android:layout_marginEnd="@dimen/margin_padding_normal"
                 android:visibility="gone"
                 tools:text="asbcdsgthrtew" />
 
@@ -72,8 +72,6 @@
                 style="@style/AudioMothText.Body.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_normal"
-                android:textStyle="bold"
                 tools:text="AudioMoth" />
 
         </LinearLayout>
@@ -81,7 +79,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_padding_small"
+            android:layout_marginTop="@dimen/margin_padding_normal"
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatImageView
