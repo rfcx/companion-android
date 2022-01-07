@@ -10,18 +10,18 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_connect_guardian.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.AdminSocketManager
 import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.connection.wifi.OnWifiListener
 import org.rfcx.companion.connection.wifi.WifiHotspotManager
 import org.rfcx.companion.entity.Screen
-import org.rfcx.companion.entity.socket.request.CheckinCommand
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.WifiHotspotUtils
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
@@ -117,11 +117,15 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
     private fun checkConnection() {
         GuardianSocketManager.getConnection()
         AdminSocketManager.connect()
-        GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
-            requireActivity().runOnUiThread {
-                deploymentProtocol?.startGuardianRegister()
+        lifecycleScope.launch {
+            withContext(Dispatchers.Main) {
+                GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
+                    requireActivity().runOnUiThread {
+                        deploymentProtocol?.startGuardianRegister()
+                    }
+                })
             }
-        })
+        }
     }
 
     private fun showLoading() {
