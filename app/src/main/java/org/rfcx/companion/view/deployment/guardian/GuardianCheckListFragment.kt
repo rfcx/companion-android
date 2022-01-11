@@ -42,7 +42,7 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
 
         deploymentProtocol?.let {
             context?.getString(R.string.setting_up_checklist)?.let { it1 -> it.setCurrentPage(it1) }
-            it.setToolbarSubtitle(it.getGuid() ?: "Guardian")
+            it.setToolbarSubtitle("${it.getGuid()} (${it.getGuardianPurpose()})")
             it.setMenuToolbar(true)
             it.showToolbar()
             it.setToolbarTitle()
@@ -121,6 +121,13 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
         deploymentProtocol?.setReadyToDeploy()
         GuardianSocketManager.stopConnection()
         AdminSocketManager.stopConnection()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        deploymentProtocol?.let {
+            it.setToolbarSubtitle("${it.getGuid()} (${it.getGuardianPurpose()})")
+        }
     }
 
     companion object {

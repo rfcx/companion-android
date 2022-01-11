@@ -223,10 +223,10 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         GuardianSocketManager.pingBlob.observeForever {
             guardianPingBlob = it
             isGuardianRegistered = PingUtils.isRegisteredFromPing(it)
+            swmNetwork = PingUtils.getSwarmNetworkFromPing(it)
         }
         AdminSocketManager.pingBlob.observeForever {
             network = PingUtils.getNetworkFromPing(it)
-            swmNetwork = PingUtils.getSwarmNetworkFromPing(it)
             sentinelPower = PingUtils.getSentinelPowerFromPing(it)
         }
         deploymentLiveData.observeForever(guardianDeploymentObserve)
@@ -294,6 +294,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     override fun getSentinelPower(): SentinelInfo? = sentinelPower
 
     override fun getGuid(): String? = PingUtils.getGuidFromPing(guardianPingBlob)
+
+    override fun getGuardianPurpose(): String? = PingUtils.getPurposeFromPrefs(guardianPingBlob)
 
     override fun isGuardianRegistered(): Boolean? = isGuardianRegistered
 

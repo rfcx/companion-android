@@ -31,9 +31,10 @@ object PingUtils {
         return network.split("*")[1].toInt()
     }
 
-    fun getSwarmNetworkFromPing(adminPing: AdminPing?): Int? {
-        val network = adminPing?.swmNetwork ?: return null
-        return network.split("*")[1].toInt()
+    fun getSwarmNetworkFromPing(guardianPing: GuardianPing?): Int? {
+        val network = guardianPing?.swm ?: return null
+        val splitNetworks = network.split("|").map { it.split("*") }
+        return splitNetworks.last()[1].toInt()
     }
 
     fun getSentinelPowerFromPing(adminPing: AdminPing?): SentinelInfo? {
@@ -60,6 +61,14 @@ object PingUtils {
     fun getGuidFromPing(ping: GuardianPing?): String? {
         val guid = ping?.companion?.get("guardian")?.asJsonObject?.get("guid") ?: return null
         return guid.asString
+    }
+
+    fun getPurposeFromPrefs(guardianPing: GuardianPing?): String? {
+        if (guardianPing?.prefs is JsonObject) {
+            val prefs = guardianPing.prefs.get("vals") ?: return null
+            return PrefsUtils.getPurposeGuardiansFromPrefs(Gson().toJson(prefs))
+        }
+        return null
     }
 
     fun isRegisteredFromPing(ping: GuardianPing?): Boolean? {
