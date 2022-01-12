@@ -34,7 +34,14 @@ object PingUtils {
     fun getSwarmNetworkFromPing(guardianPing: GuardianPing?): Int? {
         val network = guardianPing?.swm ?: return null
         val splitNetworks = network.split("|").map { it.split("*") }
-        return splitNetworks.last()[1].toInt()
+        return splitNetworks.last()[1].toIntOrNull()
+    }
+
+    fun getSwarmUnsetMessagesFromPing(guardianPing: GuardianPing?): Int? {
+        val network = guardianPing?.swm ?: return null
+        val splitNetworks = network.split("|").map { it.split("*") }
+        val lastSwmObj = splitNetworks.last()
+        return lastSwmObj[lastSwmObj.size - 1].toIntOrNull()
     }
 
     fun getSentinelPowerFromPing(adminPing: AdminPing?): SentinelInfo? {

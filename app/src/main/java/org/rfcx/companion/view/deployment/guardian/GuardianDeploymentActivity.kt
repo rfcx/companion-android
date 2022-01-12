@@ -70,6 +70,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     private var guardianPingBlob: GuardianPing? = null
     private var network: Int? = null
     private var swmNetwork: Int? = null
+    private var swmUnsentMsgs: Int? = null
     private var sentinelPower: SentinelInfo? = null
     private var isGuardianRegistered: Boolean? = null
 
@@ -174,18 +175,23 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
         when (container) {
             is GuardianAdvancedFragment -> {
+                reTriggerConnection()
                 startCheckList()
             }
             is GuardianRegisterFragment -> setupView()
-            is MapPickerFragment -> startFragment(
-                DetailDeploymentSiteFragment.newInstance(
-                    latitude,
-                    longitude,
-                    siteId,
-                    nameLocation
+            is MapPickerFragment -> {
+                reTriggerConnection()
+                startFragment(
+                    DetailDeploymentSiteFragment.newInstance(
+                        latitude,
+                        longitude,
+                        siteId,
+                        nameLocation
+                    )
                 )
-            )
+            }
             is GuardianCheckListFragment -> {
+                reTriggerConnection()
                 GuardianSocketManager.resetAllValuesToDefault()
                 setLastCheckInTime(null)
                 GuardianSocketManager.getCheckInTest(CheckinCommand.STOP) // to stop getting checkin test
@@ -193,7 +199,10 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
                 startFragment(ConnectGuardianFragment.newInstance())
             }
             is ConnectGuardianFragment -> finish()
-            else -> startCheckList()
+            else -> {
+                reTriggerConnection()
+                startCheckList()
+            }
         }
     }
 
@@ -224,6 +233,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
             guardianPingBlob = it
             isGuardianRegistered = PingUtils.isRegisteredFromPing(it)
             swmNetwork = PingUtils.getSwarmNetworkFromPing(it)
+            swmUnsentMsgs = PingUtils.getSwarmUnsetMessagesFromPing(it)
         }
         AdminSocketManager.pingBlob.observeForever {
             network = PingUtils.getNetworkFromPing(it)
@@ -291,6 +301,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
 
     override fun getSwmNetwork(): Int? = swmNetwork
 
+    override fun getSwmUnsentMessages(): Int? = swmUnsentMsgs
+
     override fun getSentinelPower(): SentinelInfo? = sentinelPower
 
     override fun getGuid(): String? = PingUtils.getGuidFromPing(guardianPingBlob)
@@ -306,6 +318,11 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     override fun getPrefsSha1(): String? = PingUtils.getPrefsSha1FromPing(guardianPingBlob)
 
     override fun getLatestCheckIn(): JsonObject? = PingUtils.getLatestCheckInFromPing(guardianPingBlob)
+
+    override fun reTriggerConnection() {
+        GuardianSocketManager.getConnection()
+        AdminSocketManager.connect()
+    }
 
     override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
 
@@ -406,9 +423,6 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     override fun handleCheckClicked(number: Int) {
         // setup fragment for current step
         currentCheck = number
-        // always checking for connection in case disconnected
-        GuardianSocketManager.getConnection()
-        AdminSocketManager.connect()
         when (number) {
             0 -> {
                 updateDeploymentState(DeploymentState.Guardian.SolarPanel)

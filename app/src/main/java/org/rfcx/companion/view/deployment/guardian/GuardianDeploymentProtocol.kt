@@ -21,9 +21,11 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getAudioConfiguration(): JsonObject?
     fun getPrefsSha1(): String?
     fun getLatestCheckIn(): JsonObject?
+    fun reTriggerConnection()
 
     fun getNetwork(): Int?
     fun getSwmNetwork(): Int?
+    fun getSwmUnsentMessages(): Int?
     fun getSentinelPower(): SentinelInfo?
 
     fun setDeployment(deployment: Deployment)
