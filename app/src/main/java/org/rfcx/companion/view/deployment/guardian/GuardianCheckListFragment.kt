@@ -13,6 +13,7 @@ import kotlinx.android.synthetic.main.fragment_guardian_checklist.*
 import org.rfcx.companion.R
 import org.rfcx.companion.adapter.CheckListItem
 import org.rfcx.companion.connection.socket.AdminSocketManager
+import org.rfcx.companion.connection.socket.AudioCastSocketManager
 import org.rfcx.companion.connection.socket.FileSocketManager
 import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.view.deployment.CheckListAdapter
@@ -121,6 +122,8 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
         deploymentProtocol?.setReadyToDeploy()
         GuardianSocketManager.stopConnection()
         AdminSocketManager.stopConnection()
+        AudioCastSocketManager.stopConnection()
+        FileSocketManager.stopConnection()
     }
 
     override fun onResume() {
@@ -128,6 +131,14 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
         deploymentProtocol?.let {
             it.setToolbarSubtitle("${it.getGuid()} (${it.getGuardianPurpose()})")
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        GuardianSocketManager.stopConnection()
+        AdminSocketManager.stopConnection()
+        AudioCastSocketManager.stopConnection()
+        FileSocketManager.stopConnection()
     }
 
     companion object {
