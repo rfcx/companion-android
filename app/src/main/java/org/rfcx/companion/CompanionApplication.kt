@@ -31,10 +31,7 @@ class CompanionApplication : Application() {
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
             defaultHandler?.uncaughtException(thread, throwable)
 
-            GuardianSocketManager.stopConnection()
-            AdminSocketManager.stopConnection()
-            AudioCastSocketManager.stopConnection()
-            FileSocketManager.stopConnection()
+            SocketUtils.stopAllConnections()
         }
     }
 
