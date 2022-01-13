@@ -16,6 +16,7 @@ import org.rfcx.companion.connection.socket.AdminSocketManager
 import org.rfcx.companion.connection.socket.AudioCastSocketManager
 import org.rfcx.companion.connection.socket.FileSocketManager
 import org.rfcx.companion.connection.socket.GuardianSocketManager
+import org.rfcx.companion.util.SocketUtils
 import org.rfcx.companion.view.deployment.CheckListAdapter
 import java.io.File
 
@@ -120,10 +121,7 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
 
     private fun deploy() {
         deploymentProtocol?.setReadyToDeploy()
-        GuardianSocketManager.stopConnection()
-        AdminSocketManager.stopConnection()
-        AudioCastSocketManager.stopConnection()
-        FileSocketManager.stopConnection()
+        SocketUtils.stopAllConnections()
     }
 
     override fun onResume() {
@@ -135,10 +133,7 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
 
     override fun onDestroy() {
         super.onDestroy()
-        GuardianSocketManager.stopConnection()
-        AdminSocketManager.stopConnection()
-        AudioCastSocketManager.stopConnection()
-        FileSocketManager.stopConnection()
+        SocketUtils.stopAllConnections()
     }
 
     companion object {

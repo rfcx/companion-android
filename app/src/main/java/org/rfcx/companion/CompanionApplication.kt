@@ -11,6 +11,7 @@ import org.rfcx.companion.service.DeploymentCleanupWorker
 import org.rfcx.companion.util.LocationTracking
 import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.RealmHelper
+import org.rfcx.companion.util.SocketUtils
 
 class CompanionApplication : Application() {
     override fun onCreate() {
@@ -59,9 +60,6 @@ class CompanionApplication : Application() {
 
     override fun onTerminate() {
         super.onTerminate()
-        GuardianSocketManager.stopConnection()
-        AdminSocketManager.stopConnection()
-        AudioCastSocketManager.stopConnection()
-        FileSocketManager.stopConnection()
+        SocketUtils.stopAllConnections()
     }
 }
