@@ -399,9 +399,9 @@
 
     <!-- GuardianSolarPanelFragment -->
     <string name="solar_panel_feedback">Solar Panel Input Values</string>
-    <string name="voltage_v">Voltage(V)</string>
-    <string name="current_a">Current(A)</string>
-    <string name="power_w">Power(W)</string>
+    <string name="voltage_v">Voltage</string>
+    <string name="current_a">Current</string>
+    <string name="power_w">Power</string>
     <string name="please_assemble_solar_panel_to_get_feedback">Please Begin Attaching the Solar Panels to Observe Feedback</string>
 
     <!-- GuardianRegisterFragment -->
@@ -476,7 +476,8 @@
     <string name="cell">cell</string>
     <string name="swarm">swarm</string>
     <string name="download_softwares_from_guardian_softwares_page_first">Download softwares from Guardian softwares page first\nProfile -> Guardian software -> Download APKs you needed</string>
-    <string name="battery_p">Battery(%)</string>
+    <string name="ibattery_p">Internal Battery</string>
+    <string name="mbattery_p">Main Battery</string>
     <string name="in_queue">In queue</string>
 
 </resources>

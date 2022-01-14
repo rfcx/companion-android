@@ -46,7 +46,7 @@
 
     <string-array name="guardian_assembly_checks">
         <item>Software Update</item>
-        <item>Solar Panel Exposure Test</item>
+        <item>Power Diagnostics</item>
     </string-array>
 
     <string-array name="guardian_setup_checks">
