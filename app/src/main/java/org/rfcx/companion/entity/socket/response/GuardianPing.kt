@@ -8,5 +8,6 @@ data class GuardianPing(
     val software: String? = null,
     val instructions: JsonObject? = null,
     val companion: JsonObject? = null,
-    val swm: String? = null
+    val swm: String? = null,
+    val battery: String? = null
 )

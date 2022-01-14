@@ -72,6 +72,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     private var swmNetwork: Int? = null
     private var swmUnsentMsgs: Int? = null
     private var sentinelPower: SentinelInfo? = null
+    private var internalBattery: Int? = null
     private var isGuardianRegistered: Boolean? = null
 
     private var _sampleRate = 12000
@@ -234,6 +235,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
             isGuardianRegistered = PingUtils.isRegisteredFromPing(it)
             swmNetwork = PingUtils.getSwarmNetworkFromPing(it)
             swmUnsentMsgs = PingUtils.getSwarmUnsetMessagesFromPing(it)
+            internalBattery = PingUtils.getInternalBatteryFromPing(it)
         }
         AdminSocketManager.pingBlob.observeForever {
             network = PingUtils.getNetworkFromPing(it)
@@ -304,6 +306,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     override fun getSwmUnsentMessages(): Int? = swmUnsentMsgs
 
     override fun getSentinelPower(): SentinelInfo? = sentinelPower
+
+    override fun getInternalBattery(): Int? = internalBattery
 
     override fun getGuid(): String? = PingUtils.getGuidFromPing(guardianPingBlob)
 

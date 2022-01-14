@@ -27,6 +27,7 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getSwmNetwork(): Int?
     fun getSwmUnsentMessages(): Int?
     fun getSentinelPower(): SentinelInfo?
+    fun getInternalBattery(): Int?
 
     fun setDeployment(deployment: Deployment)
     fun setSampleRate(sampleRate: Int)

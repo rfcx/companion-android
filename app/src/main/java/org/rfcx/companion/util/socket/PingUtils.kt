@@ -44,6 +44,11 @@ object PingUtils {
         return lastSwmObj[lastSwmObj.size - 1].toIntOrNull()
     }
 
+    fun getInternalBatteryFromPing(guardianPing: GuardianPing?): Int? {
+        val battery = guardianPing?.battery ?: return null
+        return battery.split("*")[1].toInt()
+    }
+
     fun getSentinelPowerFromPing(adminPing: AdminPing?): SentinelInfo? {
         val sentinelPower = adminPing?.sentinelPower ?: return null
         val splitSentinelPower = sentinelPower.split("|")
