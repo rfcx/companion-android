@@ -479,5 +479,6 @@
     <string name="ibattery_p">Internal Battery</string>
     <string name="mbattery_p">Main Battery</string>
     <string name="in_queue">In queue</string>
+    <string name="sentinel_module_detect">Sentinel module detect</string>
 
 </resources>

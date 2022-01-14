@@ -62,7 +62,24 @@ class GuardianSolarPanelFragment : Fragment() {
 
         setFeedbackChart()
         setChartDataSetting()
+        getI2CAccessibility()
         getSentinelValue()
+    }
+
+    private fun getI2CAccessibility() {
+        AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
+            val i2CAccessibility = deploymentProtocol?.getI2cAccessibility()
+            i2CAccessibility?.let {
+                if (it.isAccessible) {
+                    i2cCheckbox.isChecked = true
+                    i2cFailMessage.visibility = View.GONE
+                } else {
+                    i2cCheckbox.isChecked = false
+                    i2cFailMessage.text = it.message
+                    i2cFailMessage.visibility = View.VISIBLE
+                }
+            }
+        })
     }
 
     private fun getSentinelValue() {
@@ -213,7 +230,7 @@ class GuardianSolarPanelFragment : Fragment() {
 
     companion object {
         private const val X_AXIS_MAXIMUM = 100f
-        private const val LEFT_AXIS_MAXIMUM = 5000f
+        private const val LEFT_AXIS_MAXIMUM = 10000f
         private const val AXIS_MINIMUM = 0f
         private const val AXIS_LINE_WIDTH = 2f
 

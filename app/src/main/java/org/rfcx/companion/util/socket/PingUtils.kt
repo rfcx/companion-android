@@ -44,6 +44,11 @@ object PingUtils {
         return lastSwmObj[lastSwmObj.size - 1].toIntOrNull()
     }
 
+    fun getI2cAccessibilityFromPing(adminPing: AdminPing?): I2CAccessibility? {
+        val i2c = adminPing?.companion?.get("i2c")?.asJsonObject ?: return null
+        return Gson().fromJson(i2c, I2CAccessibility::class.java)
+    }
+
     fun getInternalBatteryFromPing(guardianPing: GuardianPing?): Int? {
         val battery = guardianPing?.battery ?: return null
         return battery.split("*")[1].toInt()

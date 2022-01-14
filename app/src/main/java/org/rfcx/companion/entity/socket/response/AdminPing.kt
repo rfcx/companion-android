@@ -1,5 +1,6 @@
 package org.rfcx.companion.entity.socket.response
 
+import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 
 data class AdminPing(
@@ -9,5 +10,6 @@ data class AdminPing(
     @SerializedName("sentinel_sensor")
     val sentinelSensor: String? = null,
     val cpu: String? = null,
-    val storage: String? = null
+    val storage: String? = null,
+    val companion: JsonObject? = null
 )
