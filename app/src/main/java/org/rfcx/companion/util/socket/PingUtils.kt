@@ -120,4 +120,16 @@ object PingUtils {
         }
         return null
     }
+
+    fun getSimDetectedFromPing(adminPing: AdminPing?): Boolean? {
+        return adminPing?.companion?.get("sim_detected")?.asBoolean ?: return null
+    }
+
+    fun getPhoneNumberFromPing(adminPing: AdminPing?): String? {
+        return adminPing?.companion?.get("phone_number")?.asString ?: return null
+    }
+
+    fun getSwarmIdFromPing(adminPing: AdminPing?): String? {
+        return adminPing?.companion?.get("swarm_id")?.asString ?: return null
+    }
 }

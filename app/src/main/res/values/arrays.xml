@@ -46,6 +46,7 @@
 
     <string-array name="guardian_assembly_checks">
         <item>Software Update</item>
+        <item>Communication Configuration</item>
         <item>Power Diagnostics</item>
     </string-array>
 

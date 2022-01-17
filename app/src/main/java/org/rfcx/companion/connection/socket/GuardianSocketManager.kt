@@ -98,6 +98,33 @@ object GuardianSocketManager {
         sendMessage(data)
     }
 
+    fun sendCellOnlyPrefs() {
+        val prefs = JsonObject()
+        prefs.addProperty("", "")
+        prefs.addProperty("", "")
+        prefs.addProperty("", "")
+        prefs.addProperty("", "")
+        syncConfiguration(prefs.toString())
+    }
+
+    fun sendCellSMSPrefs() {
+        val prefs = JsonObject()
+        prefs.addProperty("", "")
+        prefs.addProperty("", "")
+        prefs.addProperty("", "")
+        prefs.addProperty("", "")
+        syncConfiguration(prefs.toString())
+    }
+
+    fun sendSatOnlyPrefs() {
+        val prefs = JsonObject()
+        prefs.addProperty("", "")
+        prefs.addProperty("", "")
+        prefs.addProperty("", "")
+        prefs.addProperty("", "")
+        syncConfiguration(prefs.toString())
+    }
+
     fun syncConfiguration(config: String) {
         sendInstructionMessage(InstructionType.SET, InstructionCommand.PREFS, config)
     }

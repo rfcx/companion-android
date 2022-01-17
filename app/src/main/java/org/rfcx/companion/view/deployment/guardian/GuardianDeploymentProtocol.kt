@@ -30,6 +30,9 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getSentinelPower(): SentinelInfo?
     fun getInternalBattery(): Int?
     fun getI2cAccessibility(): I2CAccessibility?
+    fun getSimDetected(): Boolean?
+    fun getSatId(): String?
+    fun getPhoneNumber(): String?
 
     fun setDeployment(deployment: Deployment)
     fun setSampleRate(sampleRate: Int)

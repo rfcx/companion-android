@@ -39,6 +39,7 @@ import org.rfcx.companion.util.socket.PingUtils
 import org.rfcx.companion.view.deployment.BaseDeploymentActivity
 import org.rfcx.companion.view.deployment.guardian.advanced.GuardianAdvancedFragment
 import org.rfcx.companion.view.deployment.guardian.checkin.GuardianCheckInTestFragment
+import org.rfcx.companion.view.deployment.guardian.communication.GuardianCommunicationFragment
 import org.rfcx.companion.view.deployment.guardian.configure.GuardianConfigureFragment
 import org.rfcx.companion.view.deployment.guardian.connect.ConnectGuardianFragment
 import org.rfcx.companion.view.deployment.guardian.deploy.GuardianDeployFragment
@@ -76,6 +77,9 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     private var internalBattery: Int? = null
     private var i2cAccessibility: I2CAccessibility? = null
     private var isGuardianRegistered: Boolean? = null
+    private var isSimDetected: Boolean? = null
+    private var satId: String? = null
+    private var phoneNumber: String? = null
 
     private var _sampleRate = 12000
 
@@ -84,7 +88,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     private var prefsChanges = mapOf<String, String>()
     private var prefsEditor: SharedPreferences.Editor? = null
 
-    private var currentCheck = 0
+    private var currentCheck = -1
     private var passedChecks = arrayListOf<Int>()
 
     private var onDeployClicked = false
@@ -171,10 +175,12 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         if (currentCheck !in passedChecks) {
             passedChecks.add(currentCheck)
         }
+        currentCheck = -1 //reset check
         startCheckList()
     }
 
     override fun backStep() {
+        currentCheck = -1 //reset check
         val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
         when (container) {
             is GuardianAdvancedFragment -> {
@@ -243,6 +249,9 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
             network = PingUtils.getNetworkFromPing(it)
             sentinelPower = PingUtils.getSentinelPowerFromPing(it)
             i2cAccessibility = PingUtils.getI2cAccessibilityFromPing(it)
+            satId = PingUtils.getSwarmIdFromPing(it)
+            isSimDetected = PingUtils.getSimDetectedFromPing(it)
+            phoneNumber = PingUtils.getPhoneNumberFromPing(it)
         }
         deploymentLiveData.observeForever(guardianDeploymentObserve)
     }
@@ -313,6 +322,12 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     override fun getInternalBattery(): Int? = internalBattery
 
     override fun getI2cAccessibility(): I2CAccessibility? = i2cAccessibility
+
+    override fun getSimDetected(): Boolean? = isSimDetected
+
+    override fun getSatId(): String? = satId
+
+    override fun getPhoneNumber(): String? = phoneNumber
 
     override fun getGuid(): String? = PingUtils.getGuidFromPing(guardianPingBlob)
 
@@ -438,16 +453,19 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
                 startFragment(SoftwareUpdateFragment.newInstance())
             }
             1 -> {
-                startFragment(GuardianSolarPanelFragment.newInstance())
+                startFragment(GuardianCommunicationFragment.newInstance())
             }
             2 -> {
+                startFragment(GuardianSolarPanelFragment.newInstance())
+            }
+            3 -> {
                 updateDeploymentState(DeploymentState.Guardian.Signal)
                 startFragment(GuardianSignalFragment.newInstance())
             }
-            3 -> {
+            4 -> {
                 startFragment(GuardianConfigureFragment.newInstance())
             }
-            4 -> {
+            5 -> {
                 updateDeploymentState(DeploymentState.Guardian.Locate)
                 val site = this._locate
                 if (site == null) {
@@ -460,15 +478,15 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
                     startDetailDeploymentSite(site.id, site.name, false)
                 }
             }
-            5 -> {
+            6 -> {
                 updateDeploymentState(DeploymentState.Guardian.Microphone)
                 startFragment(GuardianMicrophoneFragment.newInstance())
             }
-            6 -> {
+            7 -> {
                 updateDeploymentState(DeploymentState.Guardian.Checkin)
                 startFragment(GuardianCheckInTestFragment.newInstance())
             }
-            7 -> {
+            8 -> {
                 updateDeploymentState(DeploymentState.Guardian.Deploy)
                 startFragment(GuardianDeployFragment.newInstance())
             }
