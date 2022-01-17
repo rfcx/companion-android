@@ -19,7 +19,7 @@
 
     <CheckBox
         android:id="@+id/i2cCheckbox"
-        style="@style/i2cCheckBox"
+        style="@style/AudioMothCheckBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"

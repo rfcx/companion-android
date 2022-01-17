@@ -264,7 +264,14 @@
     </style>
 
     <!-- Checkbox -->
-    <style name="i2cCheckBox" parent="@android:style/Widget.CompoundButton.CheckBox">
+    <style name="AudioMothCheckBox" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">@dimen/text_small</item>
+        <item name="android:fontFamily">@font/lato_regular</item>
+    </style>
+
+    <!-- RadioButton -->
+    <style name="AudioMothRadioButton" parent="@android:style/Widget.CompoundButton.RadioButton">
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">@dimen/text_small</item>
         <item name="android:fontFamily">@font/lato_regular</item>

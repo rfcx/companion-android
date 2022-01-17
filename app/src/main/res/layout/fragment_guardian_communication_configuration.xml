@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <CheckBox
+        android:id="@+id/simDetectionCheckbox"
+        style="@style/AudioMothCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="0dp"
+        android:minWidth="0dp"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:clickable="false"
+        android:enabled="false"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/simDetectionTextView"
+        style="@style/AudioMothText.Subhead.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sim detected"
+        app:layout_constraintStart_toEndOf="@+id/simDetectionCheckbox"
+        app:layout_constraintTop_toTopOf="@id/simDetectionCheckbox"
+        app:layout_constraintBottom_toBottomOf="@id/simDetectionCheckbox"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/phoneNumberTextView"
+        style="@style/AudioMothText.Subhead.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="phone number:"
+        android:paddingTop="@dimen/margin_padding_small"
+        app:layout_constraintStart_toStartOf="@+id/simDetectionTextView"
+        app:layout_constraintTop_toBottomOf="@id/simDetectionTextView"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/phoneNumberValueTextView"
+        style="@style/AudioMothText.Subhead.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/margin_padding_small"
+        android:paddingTop="@dimen/margin_padding_small"
+        app:layout_constraintStart_toEndOf="@+id/phoneNumberTextView"
+        app:layout_constraintTop_toBottomOf="@id/simDetectionTextView"
+        tools:text="01111111"/>
+
+    <CheckBox
+        android:id="@+id/satDetectionCheckbox"
+        style="@style/AudioMothCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="0dp"
+        android:minWidth="0dp"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:clickable="false"
+        android:enabled="false"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/phoneNumberTextView"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/satDetectionTextView"
+        style="@style/AudioMothText.Subhead.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Satellite module detected"
+        app:layout_constraintStart_toEndOf="@+id/satDetectionCheckbox"
+        app:layout_constraintTop_toTopOf="@id/satDetectionCheckbox"
+        app:layout_constraintBottom_toBottomOf="@id/satDetectionCheckbox"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/swarmIdTextView"
+        style="@style/AudioMothText.Subhead.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="swarm id:"
+        android:paddingTop="@dimen/margin_padding_small"
+        app:layout_constraintStart_toStartOf="@+id/satDetectionTextView"
+        app:layout_constraintTop_toBottomOf="@id/satDetectionTextView"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/swarmValueTextView"
+        style="@style/AudioMothText.Subhead.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/margin_padding_small"
+        android:paddingTop="@dimen/margin_padding_small"
+        app:layout_constraintStart_toEndOf="@+id/swarmIdTextView"
+        app:layout_constraintTop_toBottomOf="@id/satDetectionTextView"
+        tools:text="01111111"/>
+
+    <RadioGroup
+        android:id="@+id/guardianPlanGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/margin_padding_large"
+        app:layout_constraintTop_toBottomOf="@id/swarmIdTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <RadioButton
+            android:id="@+id/cellOnlyRadioButton"
+            style="@style/AudioMothRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cell data only"/>
+
+        <RadioButton
+            android:id="@+id/cellSmsRadioButton"
+            style="@style/AudioMothRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cell data + SMS fallback (experimental)"/>
+
+        <RadioButton
+            android:id="@+id/satOnlyRadioButton"
+            style="@style/AudioMothRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Satellite only"/>
+    </RadioGroup>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/passTimesTextView"
+        style="@style/AudioMothText.Body.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/guardianPlanGroup"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="Pass times (local time)"/>
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/passTimeEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/passTimesTextView"
+        app:layout_constraintStart_toStartOf="@id/passTimesTextView"
+        app:layout_constraintEnd_toEndOf="@id/passTimesTextView"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
