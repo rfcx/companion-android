@@ -26,6 +26,7 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
     private var tempStartHourOff: String? = null
     private var tempEndHourOff: String? = null
     private var isAddFirstSetOfChips = false
+    private var isSetFirstGuardianPlan = false
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -103,21 +104,24 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
     private fun setPlanRadioGroup() {
         AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
             val guardianPlan = deploymentProtocol?.getGuardianPlan()
-            when(guardianPlan) {
-                GuardianPlan.CELL_ONLY -> {
-                    cellOnlyRadioButton.isChecked = true
+            if (guardianPlan != null && !isSetFirstGuardianPlan) {
+                when(guardianPlan) {
+                    GuardianPlan.CELL_ONLY -> {
+                        cellOnlyRadioButton.isChecked = true
+                    }
+                    GuardianPlan.CELL_SMS -> {
+                        cellSmsRadioButton.isChecked = true
+                    }
+                    GuardianPlan.SAT_ONLY -> {
+                        satOnlyRadioButton.isChecked = true
+                    }
+                    null -> {
+                        cellOnlyRadioButton.isChecked = false
+                        cellSmsRadioButton.isChecked = false
+                        satOnlyRadioButton.isChecked = false
+                    }
                 }
-                GuardianPlan.CELL_SMS -> {
-                    cellSmsRadioButton.isChecked = true
-                }
-                GuardianPlan.SAT_ONLY -> {
-                    satOnlyRadioButton.isChecked = true
-                }
-                null -> {
-                    cellOnlyRadioButton.isChecked = false
-                    cellSmsRadioButton.isChecked = false
-                    satOnlyRadioButton.isChecked = false
-                }
+                isSetFirstGuardianPlan = true
             }
 
             val satTimeOff = deploymentProtocol?.getSatTimeOff()
