@@ -35,6 +35,7 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getSatId(): String?
     fun getPhoneNumber(): String?
     fun getGuardianPlan(): GuardianPlan?
+    fun getSatTimeOff(): List<String>?
 
     fun setDeployment(deployment: Deployment)
     fun setSampleRate(sampleRate: Int)

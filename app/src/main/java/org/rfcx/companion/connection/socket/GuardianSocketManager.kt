@@ -107,6 +107,7 @@ object GuardianSocketManager {
         prefs.addProperty("enable_audio_cast", "true")
         prefs.addProperty("enable_file_socket", "true")
         prefs.addProperty("api_protocol_escalation_order", "mqtt,rest")
+        prefs.addProperty("api_satellite_off_hours", "23:55-23:56,23:57-23:59")
         syncConfiguration(prefs.toString())
     }
 
@@ -119,10 +120,11 @@ object GuardianSocketManager {
         prefs.addProperty("enable_audio_cast", "true")
         prefs.addProperty("enable_file_socket", "true")
         prefs.addProperty("api_protocol_escalation_order", "mqtt,rest,sms")
+        prefs.addProperty("api_satellite_off_hours", "23:55-23:56,23:57-23:59")
         syncConfiguration(prefs.toString())
     }
 
-    fun sendSatOnlyPrefs() {
+    fun sendSatOnlyPrefs(timeOff: String) {
         val prefs = JsonObject()
         prefs.addProperty("api_satellite_protocol", "swm")
         prefs.addProperty("enable_audio_classify", "true")
@@ -131,6 +133,7 @@ object GuardianSocketManager {
         prefs.addProperty("enable_audio_cast", "true")
         prefs.addProperty("enable_file_socket", "true")
         prefs.addProperty("api_protocol_escalation_order", "sat")
+        prefs.addProperty("api_satellite_off_hours", timeOff)
         syncConfiguration(prefs.toString())
     }
 

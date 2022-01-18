@@ -53,6 +53,13 @@ object PrefsUtils {
         }
     }
 
+    fun getSatTimeOffFromPrefs(str: String?): List<String>? {
+        if (str == null) return null
+        val json = JsonParser.parseString(str).asJsonObject
+        val timeOff = json.get("api_satellite_off_hours").asString
+        return timeOff.split(",")
+    }
+
     fun stringToAudioPrefs(str: String?): JsonObject? {
         if (str == null) {
             return null

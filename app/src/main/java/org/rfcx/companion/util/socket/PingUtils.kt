@@ -97,6 +97,14 @@ object PingUtils {
         return null
     }
 
+    fun getSatTimeOffFromPrefs(guardianPing: GuardianPing?): List<String>? {
+        if (guardianPing?.prefs is JsonObject) {
+            val prefs = guardianPing.prefs.get("vals") ?: return null
+            return PrefsUtils.getSatTimeOffFromPrefs(Gson().toJson(prefs))
+        }
+        return null
+    }
+
     fun isRegisteredFromPing(ping: GuardianPing?): Boolean? {
         val isRegistered = ping?.companion?.get("is_registered") ?: return null
         return isRegistered.asBoolean

@@ -82,6 +82,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     private var satId: String? = null
     private var phoneNumber: String? = null
     private var guardianPlan: GuardianPlan? = null
+    private var satTimeOff: List<String>? = null
 
     private var _sampleRate = 12000
 
@@ -247,6 +248,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
             swmUnsentMsgs = PingUtils.getSwarmUnsetMessagesFromPing(it)
             internalBattery = PingUtils.getInternalBatteryFromPing(it)
             guardianPlan = PingUtils.getGuardianPlanFromPrefs(it)
+            satTimeOff = PingUtils.getSatTimeOffFromPrefs(it)
         }
         AdminSocketManager.pingBlob.observeForever {
             network = PingUtils.getNetworkFromPing(it)
@@ -333,6 +335,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     override fun getPhoneNumber(): String? = phoneNumber
 
     override fun getGuardianPlan(): GuardianPlan? = guardianPlan
+
+    override fun getSatTimeOff(): List<String>? = satTimeOff
 
     override fun getGuid(): String? = PingUtils.getGuidFromPing(guardianPingBlob)
 
