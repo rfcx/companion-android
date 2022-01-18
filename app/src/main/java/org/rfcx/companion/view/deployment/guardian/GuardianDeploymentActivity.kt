@@ -29,6 +29,7 @@ import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.socket.request.CheckinCommand
 import org.rfcx.companion.entity.socket.response.GuardianPing
+import org.rfcx.companion.entity.socket.response.I2CAccessibility
 import org.rfcx.companion.entity.socket.response.SentinelInfo
 import org.rfcx.companion.localdb.*
 import org.rfcx.companion.service.DeploymentSyncWorker
@@ -72,6 +73,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     private var swmNetwork: Int? = null
     private var swmUnsentMsgs: Int? = null
     private var sentinelPower: SentinelInfo? = null
+    private var internalBattery: Int? = null
+    private var i2cAccessibility: I2CAccessibility? = null
     private var isGuardianRegistered: Boolean? = null
 
     private var _sampleRate = 12000
@@ -234,10 +237,12 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
             isGuardianRegistered = PingUtils.isRegisteredFromPing(it)
             swmNetwork = PingUtils.getSwarmNetworkFromPing(it)
             swmUnsentMsgs = PingUtils.getSwarmUnsetMessagesFromPing(it)
+            internalBattery = PingUtils.getInternalBatteryFromPing(it)
         }
         AdminSocketManager.pingBlob.observeForever {
             network = PingUtils.getNetworkFromPing(it)
             sentinelPower = PingUtils.getSentinelPowerFromPing(it)
+            i2cAccessibility = PingUtils.getI2cAccessibilityFromPing(it)
         }
         deploymentLiveData.observeForever(guardianDeploymentObserve)
     }
@@ -304,6 +309,10 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     override fun getSwmUnsentMessages(): Int? = swmUnsentMsgs
 
     override fun getSentinelPower(): SentinelInfo? = sentinelPower
+
+    override fun getInternalBattery(): Int? = internalBattery
+
+    override fun getI2cAccessibility(): I2CAccessibility? = i2cAccessibility
 
     override fun getGuid(): String? = PingUtils.getGuidFromPing(guardianPingBlob)
 
