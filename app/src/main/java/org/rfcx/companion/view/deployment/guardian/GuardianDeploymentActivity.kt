@@ -35,6 +35,7 @@ import org.rfcx.companion.localdb.*
 import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.geojson.GeoJsonUtils
+import org.rfcx.companion.util.prefs.GuardianPlan
 import org.rfcx.companion.util.socket.PingUtils
 import org.rfcx.companion.view.deployment.BaseDeploymentActivity
 import org.rfcx.companion.view.deployment.guardian.advanced.GuardianAdvancedFragment
@@ -80,6 +81,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     private var isSimDetected: Boolean? = null
     private var satId: String? = null
     private var phoneNumber: String? = null
+    private var guardianPlan: GuardianPlan? = null
 
     private var _sampleRate = 12000
 
@@ -244,6 +246,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
             swmNetwork = PingUtils.getSwarmNetworkFromPing(it)
             swmUnsentMsgs = PingUtils.getSwarmUnsetMessagesFromPing(it)
             internalBattery = PingUtils.getInternalBatteryFromPing(it)
+            guardianPlan = PingUtils.getGuardianPlanFromPrefs(it)
         }
         AdminSocketManager.pingBlob.observeForever {
             network = PingUtils.getNetworkFromPing(it)
@@ -328,6 +331,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     override fun getSatId(): String? = satId
 
     override fun getPhoneNumber(): String? = phoneNumber
+
+    override fun getGuardianPlan(): GuardianPlan? = guardianPlan
 
     override fun getGuid(): String? = PingUtils.getGuidFromPing(guardianPingBlob)
 

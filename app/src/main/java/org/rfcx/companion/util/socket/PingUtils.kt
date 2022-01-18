@@ -6,6 +6,7 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import org.rfcx.companion.entity.socket.response.*
+import org.rfcx.companion.util.prefs.GuardianPlan
 import org.rfcx.companion.util.prefs.PrefsUtils
 
 object PingUtils {
@@ -84,6 +85,14 @@ object PingUtils {
         if (guardianPing?.prefs is JsonObject) {
             val prefs = guardianPing.prefs.get("vals") ?: return null
             return PrefsUtils.getPurposeGuardiansFromPrefs(Gson().toJson(prefs))
+        }
+        return null
+    }
+
+    fun getGuardianPlanFromPrefs(guardianPing: GuardianPing?): GuardianPlan? {
+        if (guardianPing?.prefs is JsonObject) {
+            val prefs = guardianPing.prefs.get("vals") ?: return null
+            return PrefsUtils.getGuardianPlanFromPrefs(Gson().toJson(prefs))
         }
         return null
     }

@@ -100,28 +100,37 @@ object GuardianSocketManager {
 
     fun sendCellOnlyPrefs() {
         val prefs = JsonObject()
-        prefs.addProperty("", "")
-        prefs.addProperty("", "")
-        prefs.addProperty("", "")
-        prefs.addProperty("", "")
+        prefs.addProperty("api_satellite_protocol", "off")
+        prefs.addProperty("enable_audio_classify", "false")
+        prefs.addProperty("enable_checkin_publish", "true")
+        prefs.addProperty("api_ping_cycle_fields", "checkins,instructions,prefs,sms,meta,detections,purged")
+        prefs.addProperty("enable_audio_cast", "true")
+        prefs.addProperty("enable_file_socket", "true")
+        prefs.addProperty("api_protocol_escalation_order", "mqtt,rest")
         syncConfiguration(prefs.toString())
     }
 
     fun sendCellSMSPrefs() {
         val prefs = JsonObject()
-        prefs.addProperty("", "")
-        prefs.addProperty("", "")
-        prefs.addProperty("", "")
-        prefs.addProperty("", "")
+        prefs.addProperty("api_satellite_protocol", "off")
+        prefs.addProperty("enable_audio_classify", "false")
+        prefs.addProperty("enable_checkin_publish", "true")
+        prefs.addProperty("api_ping_cycle_fields", "checkins,instructions,prefs,sms,meta,detections,purged")
+        prefs.addProperty("enable_audio_cast", "true")
+        prefs.addProperty("enable_file_socket", "true")
+        prefs.addProperty("api_protocol_escalation_order", "mqtt,rest,sms")
         syncConfiguration(prefs.toString())
     }
 
     fun sendSatOnlyPrefs() {
         val prefs = JsonObject()
-        prefs.addProperty("", "")
-        prefs.addProperty("", "")
-        prefs.addProperty("", "")
-        prefs.addProperty("", "")
+        prefs.addProperty("api_satellite_protocol", "swm")
+        prefs.addProperty("enable_audio_classify", "true")
+        prefs.addProperty("enable_checkin_publish", "false")
+        prefs.addProperty("api_ping_cycle_fields", "battery,sentinel_power,software,swm,detections")
+        prefs.addProperty("enable_audio_cast", "true")
+        prefs.addProperty("enable_file_socket", "true")
+        prefs.addProperty("api_protocol_escalation_order", "sat")
         syncConfiguration(prefs.toString())
     }
 

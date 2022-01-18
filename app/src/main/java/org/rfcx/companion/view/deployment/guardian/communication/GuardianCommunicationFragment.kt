@@ -11,6 +11,7 @@ import kotlinx.android.synthetic.main.fragment_guardian_communication_configurat
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.AdminSocketManager
 import org.rfcx.companion.connection.socket.GuardianSocketManager
+import org.rfcx.companion.util.prefs.GuardianPlan
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianCommunicationFragment : Fragment() {
@@ -65,6 +66,11 @@ class GuardianCommunicationFragment : Fragment() {
             val phoneNumber = deploymentProtocol?.getPhoneNumber()
             if (phoneNumber != null) {
                 phoneNumberValueTextView.text = phoneNumber
+                phoneNumberTextView.visibility = View.VISIBLE
+                phoneNumberValueTextView.visibility = View.VISIBLE
+            } else {
+                phoneNumberTextView.visibility = View.GONE
+                phoneNumberValueTextView.visibility = View.GONE
             }
         })
     }
@@ -72,18 +78,34 @@ class GuardianCommunicationFragment : Fragment() {
     private fun setSatDetected() {
         AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
             val satId = deploymentProtocol?.getSatId()
-            if (satId == null) {
-                satDetectionCheckbox.isChecked = false
-                swarmValueTextView.visibility = View.GONE
-            } else {
+            if (satId != null) {
                 satDetectionCheckbox.isChecked = true
+                swarmIdTextView.visibility = View.VISIBLE
                 swarmValueTextView.visibility = View.VISIBLE
                 swarmValueTextView.text = satId
+            } else {
+                satDetectionCheckbox.isChecked = false
+                swarmIdTextView.visibility = View.GONE
+                swarmValueTextView.visibility = View.GONE
             }
         })
     }
 
     private fun setPlanRadioGroup() {
+        AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
+            val guardianPlan = deploymentProtocol?.getGuardianPlan()
+            when(guardianPlan) {
+                GuardianPlan.CELL_ONLY -> cellOnlyRadioButton.isChecked = true
+                GuardianPlan.CELL_SMS -> cellSmsRadioButton.isChecked = true
+                GuardianPlan.SAT_ONLY -> satOnlyRadioButton.isChecked = true
+                null -> {
+                    cellOnlyRadioButton.isChecked = false
+                    cellSmsRadioButton.isChecked = false
+                    satOnlyRadioButton.isChecked = false
+                }
+            }
+        })
+
         guardianPlanGroup.setOnCheckedChangeListener { group, checkedId ->
             if (checkedId == R.id.satOnlyRadioButton) {
                 passTimeEditText.isEnabled = true
