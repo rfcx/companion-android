@@ -15,6 +15,7 @@ import org.rfcx.companion.entity.socket.response.CheckIn
 import org.rfcx.companion.entity.socket.response.CheckInTestResponse
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.TimeAgo
+import org.rfcx.companion.util.timestampToDateString
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianCheckInTestFragment : Fragment() {
@@ -64,19 +65,23 @@ class GuardianCheckInTestFragment : Fragment() {
                 if (it.has("mqtt")) {
                     val mqtt = it.get("mqtt").asJsonObject
                     checkInProtocolValueTextView.text = "mqtt"
-                    checkInTimeValueTextView.text = mqtt.get("created_at").asString
+                    checkInTimeValueTextView.text = timestampToDateString((mqtt.get("created_at").asString).toLongOrNull())
                     checkInFinishButton.isEnabled = true
                 }
                 if (it.has("sbd")) {
-                    val mqtt = it.get("sbd").asJsonObject
+                    val sbd = it.get("sbd").asJsonObject
                     checkInProtocolValueTextView.text = "sbd"
-                    checkInTimeValueTextView.text = mqtt.get("created_at").asString
+                    checkInTimeValueTextView.text = timestampToDateString((sbd.get("created_at").asString).toLongOrNull())
                     checkInFinishButton.isEnabled = true
                 }
                 if (it.has("swm")) {
-                    val mqtt = it.get("swm").asJsonObject
+                    val swm = it.get("swm").asJsonObject
+                    val unsent = deploymentProtocol?.getSwmUnsentMessages() ?: -1
                     checkInProtocolValueTextView.text = "swm"
-                    checkInTimeValueTextView.text = mqtt.get("created_at").asString
+                    checkInTimeValueTextView.text = timestampToDateString((swm.get("created_at").asString).toLongOrNull())
+                    checkInQueueTextView.visibility = View.VISIBLE
+                    checkInQueueValueTextView.visibility = View.VISIBLE
+                    checkInQueueValueTextView.text = if(unsent != -1) "$unsent messages" else "unable to retrieve unsent message"
                     checkInFinishButton.isEnabled = true
                 }
             }
