@@ -212,6 +212,7 @@
             android:layout_marginStart="@dimen/margin_padding_small"
             android:minWidth="70dp"
             android:minHeight="20dp"
+            android:textStyle="normal"
             app:layout_constraintBottom_toBottomOf="@id/satSignalValues"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/satSignalValues"

@@ -7,15 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import java.util.*
 import kotlinx.android.synthetic.main.fragment_guardian_signal.*
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.AdminSocketManager
-import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.entity.Screen
-import org.rfcx.companion.entity.socket.response.AdminPing
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 
@@ -76,15 +74,15 @@ class GuardianSignalFragment : Fragment() {
 
             val cellStrength = deploymentProtocol?.getNetwork()
             if (cellStrength == null) {
-                showSignalStrength(SignalState.NONE)
+                showCellSignalStrength(SignalState.NONE)
                 signalValue.text = "failed to retrieve"
             } else {
                 when {
-                    cellStrength > -70 -> showSignalStrength(SignalState.MAX)
-                    cellStrength > -90 -> showSignalStrength(SignalState.HIGH)
-                    cellStrength > -110 -> showSignalStrength(SignalState.NORMAL)
-                    cellStrength > -130 -> showSignalStrength(SignalState.LOW)
-                    else -> showSignalStrength(SignalState.NONE)
+                    cellStrength > -70 -> showCellSignalStrength(SignalState.MAX)
+                    cellStrength > -90 -> showCellSignalStrength(SignalState.HIGH)
+                    cellStrength > -110 -> showCellSignalStrength(SignalState.NORMAL)
+                    cellStrength > -130 -> showCellSignalStrength(SignalState.LOW)
+                    else -> showCellSignalStrength(SignalState.NONE)
                 }
                 signalValue.text = getString(R.string.signal_value, cellStrength)
             }
@@ -103,31 +101,36 @@ class GuardianSignalFragment : Fragment() {
 
         val swmStrength = deploymentProtocol?.getSwmNetwork()
         if (swmStrength == null) {
-            showSignalStrength(SignalState.NONE)
+            showCellSignalStrength(SignalState.NONE)
             signalValue.text = "failed to retrieve"
         } else {
             when {
                 swmStrength < -104 -> {
-                    showSignalStrength(SignalState.MAX)
+                    satSignalQuality.visibility = View.VISIBLE
+                    showSatSignalTagStrength(SignalState.MAX)
                 }
                 swmStrength < -100 -> {
-                    showSignalStrength(SignalState.HIGH)
+                    satSignalQuality.visibility = View.VISIBLE
+                    showSatSignalTagStrength(SignalState.HIGH)
                 }
                 swmStrength < -97 -> {
-                    showSignalStrength(SignalState.NORMAL)
+                    satSignalQuality.visibility = View.VISIBLE
+                    showSatSignalTagStrength(SignalState.NORMAL)
                 }
                 swmStrength < -93 -> {
-                    showSignalStrength(SignalState.LOW)
+                    satSignalQuality.visibility = View.VISIBLE
+                    showSatSignalTagStrength(SignalState.LOW)
                 }
                 else -> {
-                    showSignalStrength(SignalState.NONE)
+                    satSignalQuality.visibility = View.VISIBLE
+                    showSatSignalTagStrength(SignalState.NONE)
                 }
             }
             signalValue.text = getString(R.string.signal_value, swmStrength)
         }
     }
 
-    private fun showSignalStrength(state: SignalState) {
+    private fun showCellSignalStrength(state: SignalState) {
         listOfSignal.forEachIndexed { index, view ->
             if (index < state.value) {
                 (view.background as GradientDrawable).setBackground(
@@ -136,6 +139,31 @@ class GuardianSignalFragment : Fragment() {
                 )
             } else {
                 (view.background as GradientDrawable).setBackground(requireContext(), R.color.white)
+            }
+        }
+    }
+
+    private fun showSatSignalTagStrength(state: SignalState) {
+        when(state) {
+            SignalState.MAX -> {
+                TextViewCompat.setTextAppearance(satSignalQuality, R.style.GuardianButton_GreenButton_Line_Small)
+                satSignalQuality.text = "Perfect"
+            }
+            SignalState.HIGH -> {
+                TextViewCompat.setTextAppearance(satSignalQuality, R.style.GuardianButton_YellowButton_Line_Small)
+                satSignalQuality.text = "Good"
+            }
+            SignalState.NORMAL -> {
+                TextViewCompat.setTextAppearance(satSignalQuality, R.style.GuardianButton_OrangeButton_Line_Small)
+                satSignalQuality.text = "OK"
+            }
+            SignalState.LOW -> {
+                TextViewCompat.setTextAppearance(satSignalQuality, R.style.GuardianButton_RedButton_Line_Small)
+                satSignalQuality.text = "Bad"
+            }
+            SignalState.NONE -> {
+                TextViewCompat.setTextAppearance(satSignalQuality, R.style.GuardianButton_RedButton_Line_Small)
+                satSignalQuality.text = "Worst"
             }
         }
     }
