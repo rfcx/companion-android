@@ -205,19 +205,68 @@
             tools:text="-105 dB" />
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/satSignalQuality"
+            android:id="@+id/satPerfectSignalQuality"
             style="@style/GuardianButton.GreenButton.Line.Small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_padding_small"
             android:minWidth="70dp"
             android:minHeight="20dp"
+            android:text="Perfect"
             android:textStyle="normal"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/satSignalValues"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/satSignalValues"
-            app:layout_constraintTop_toTopOf="@id/satSignalValues"
-            tools:text="Perfect" />
+            app:layout_constraintTop_toTopOf="@id/satSignalValues" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/satGoodSignalQuality"
+            style="@style/GuardianButton.YellowButton.Line.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_padding_small"
+            android:minWidth="70dp"
+            android:minHeight="20dp"
+            android:text="Good"
+            android:textStyle="normal"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/satSignalValues"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/satSignalValues"
+            app:layout_constraintTop_toTopOf="@id/satSignalValues" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/satOKSignalQuality"
+            style="@style/GuardianButton.OrangeButton.Line.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_padding_small"
+            android:minWidth="70dp"
+            android:minHeight="20dp"
+            android:text="OK"
+            android:textStyle="normal"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/satSignalValues"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/satSignalValues"
+            app:layout_constraintTop_toTopOf="@id/satSignalValues" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/satBadSignalQuality"
+            style="@style/GuardianButton.RedButton.Line.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_padding_small"
+            android:minWidth="70dp"
+            android:minHeight="20dp"
+            android:text="Bad"
+            android:textStyle="normal"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/satSignalValues"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/satSignalValues"
+            app:layout_constraintTop_toTopOf="@id/satSignalValues" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/satSignalBadText"
@@ -225,7 +274,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_padding_normal"
-            android:text="< -93 Bad"
+            android:text="&lt; -93 Bad"
             android:textColor="@color/red"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/satSignalValues" />
@@ -236,7 +285,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_padding_xsmall"
-            android:text="< -97 OK"
+            android:text="&lt; -97 OK"
             android:textColor="@color/orange"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/satSignalBadText" />
@@ -247,7 +296,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_padding_xsmall"
-            android:text="< -100 OK"
+            android:text="&lt; -100 OK"
             android:textColor="@color/yellow"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/satSignalOkText" />
@@ -258,7 +307,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_padding_xsmall"
-            android:text="< -104 OK"
+            android:text="&lt; -104 OK"
             android:textColor="@color/colorPrimary"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/satSignalGoodText" />

@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_guardian_signal.*
@@ -20,6 +19,15 @@ import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 class GuardianSignalFragment : Fragment() {
     private val listOfSignal by lazy {
         listOf(signalStrength1, signalStrength2, signalStrength3, signalStrength4)
+    }
+
+    private val listOfTag by lazy {
+        listOf(
+            satBadSignalQuality,
+            satOKSignalQuality,
+            satGoodSignalQuality,
+            satPerfectSignalQuality
+        )
     }
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
@@ -49,7 +57,6 @@ class GuardianSignalFragment : Fragment() {
             it.setToolbarTitle()
         }
 
-        deploymentProtocol?.showLoading()
         retrieveSimModule()
         retrieveSatModule()
 
@@ -105,28 +112,13 @@ class GuardianSignalFragment : Fragment() {
             signalValue.text = "failed to retrieve"
         } else {
             when {
-                swmStrength < -104 -> {
-                    satSignalQuality.visibility = View.VISIBLE
-                    showSatSignalTagStrength(SignalState.MAX)
-                }
-                swmStrength < -100 -> {
-                    satSignalQuality.visibility = View.VISIBLE
-                    showSatSignalTagStrength(SignalState.HIGH)
-                }
-                swmStrength < -97 -> {
-                    satSignalQuality.visibility = View.VISIBLE
-                    showSatSignalTagStrength(SignalState.NORMAL)
-                }
-                swmStrength < -93 -> {
-                    satSignalQuality.visibility = View.VISIBLE
-                    showSatSignalTagStrength(SignalState.LOW)
-                }
-                else -> {
-                    satSignalQuality.visibility = View.VISIBLE
-                    showSatSignalTagStrength(SignalState.NONE)
-                }
+                swmStrength < -104 -> showSatSignalTagStrength(SignalState.MAX)
+                swmStrength < -100 -> showSatSignalTagStrength(SignalState.HIGH)
+                swmStrength < -97 -> showSatSignalTagStrength(SignalState.NORMAL)
+                swmStrength < -93 -> showSatSignalTagStrength(SignalState.LOW)
+                else -> showSatSignalTagStrength(SignalState.LOW)
             }
-            signalValue.text = getString(R.string.signal_value, swmStrength)
+            satSignalValues.text = getString(R.string.signal_value, swmStrength)
         }
     }
 
@@ -144,26 +136,11 @@ class GuardianSignalFragment : Fragment() {
     }
 
     private fun showSatSignalTagStrength(state: SignalState) {
-        when(state) {
-            SignalState.MAX -> {
-                TextViewCompat.setTextAppearance(satSignalQuality, R.style.GuardianButton_GreenButton_Line_Small)
-                satSignalQuality.text = "Perfect"
-            }
-            SignalState.HIGH -> {
-                TextViewCompat.setTextAppearance(satSignalQuality, R.style.GuardianButton_YellowButton_Line_Small)
-                satSignalQuality.text = "Good"
-            }
-            SignalState.NORMAL -> {
-                TextViewCompat.setTextAppearance(satSignalQuality, R.style.GuardianButton_OrangeButton_Line_Small)
-                satSignalQuality.text = "OK"
-            }
-            SignalState.LOW -> {
-                TextViewCompat.setTextAppearance(satSignalQuality, R.style.GuardianButton_RedButton_Line_Small)
-                satSignalQuality.text = "Bad"
-            }
-            SignalState.NONE -> {
-                TextViewCompat.setTextAppearance(satSignalQuality, R.style.GuardianButton_RedButton_Line_Small)
-                satSignalQuality.text = "Worst"
+        listOfTag.forEachIndexed { index, view ->
+            if ((index + 1) == state.value) {
+                view.visibility = View.VISIBLE
+            } else {
+                view.visibility = View.GONE
             }
         }
     }

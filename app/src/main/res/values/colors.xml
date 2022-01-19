@@ -49,6 +49,7 @@
     <color name="red">#e41a1a</color>
     <color name="orange">#FF9800</color>
     <color name="yellow">#FFEB3B</color>
+    <color name="dark_gray">#5A6978</color>
 
     <color name="button_facebook_login">#37509f</color>
     <color name="transparent">@android:color/transparent</color>
