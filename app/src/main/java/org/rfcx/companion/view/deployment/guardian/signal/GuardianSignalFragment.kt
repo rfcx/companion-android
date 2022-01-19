@@ -52,7 +52,8 @@ class GuardianSignalFragment : Fragment() {
         }
 
         deploymentProtocol?.showLoading()
-        retrieveGuardianSignal()
+        retrieveSimModule()
+        retrieveSatModule()
 
         finishButton.setOnClickListener {
             analytics?.trackClickNextEvent(Screen.GUARDIAN_SIGNAL.id)
@@ -60,77 +61,70 @@ class GuardianSignalFragment : Fragment() {
         }
     }
 
-    private fun retrieveGuardianSignal() {
+    private fun retrieveSimModule() {
         AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
-            deploymentProtocol?.hideLoading()
-            val strength = deploymentProtocol?.getNetwork()
-            val swmStrength = deploymentProtocol?.getSwmNetwork()
-            requireActivity().runOnUiThread {
-                hideSimError()
-                showSignalInfo()
-                if (signalCell.isChecked) {
-                    if (strength == null) {
-                        showSignalStrength(SignalState.NONE)
-                        signalDescText.text = getString(R.string.signal_text_0)
-                        signalValue.text = "failed to retrieve cell signal"
-                        return@runOnUiThread
-                    }
-                    when {
-                        strength > -70 -> {
-                            showSignalStrength(SignalState.MAX)
-                            signalDescText.text = getString(R.string.signal_text_4)
-                        }
-                        strength > -90 -> {
-                            showSignalStrength(SignalState.HIGH)
-                            signalDescText.text = getString(R.string.signal_text_3)
-                        }
-                        strength > -110 -> {
-                            showSignalStrength(SignalState.NORMAL)
-                            signalDescText.text = getString(R.string.signal_text_2)
-                        }
-                        strength > -130 -> {
-                            showSignalStrength(SignalState.LOW)
-                            signalDescText.text = getString(R.string.signal_text_1)
-                        }
-                        else -> {
-                            showSignalStrength(SignalState.NONE)
-                            signalDescText.text = getString(R.string.signal_text_0)
-                        }
-                    }
-                    signalValue.text = getString(R.string.signal_value, strength)
-                } else {
-                    if (swmStrength == null) {
-                        showSignalStrength(SignalState.NONE)
-                        signalDescText.text = getString(R.string.signal_text_0)
-                        signalValue.text = "failed to retrieve swarm background signal"
-                        return@runOnUiThread
-                    }
-                    when {
-                        swmStrength < -104 -> {
-                            showSignalStrength(SignalState.MAX)
-                            signalDescText.text = getString(R.string.signal_text_4)
-                        }
-                        swmStrength < -100 -> {
-                            showSignalStrength(SignalState.HIGH)
-                            signalDescText.text = getString(R.string.signal_text_3)
-                        }
-                        swmStrength < -97 -> {
-                            showSignalStrength(SignalState.NORMAL)
-                            signalDescText.text = getString(R.string.signal_text_2)
-                        }
-                        swmStrength < -93 -> {
-                            showSignalStrength(SignalState.LOW)
-                            signalDescText.text = getString(R.string.signal_text_1)
-                        }
-                        else -> {
-                            showSignalStrength(SignalState.NONE)
-                            signalDescText.text = getString(R.string.signal_text_0)
-                        }
-                    }
-                    signalValue.text = getString(R.string.signal_value, swmStrength)
+            val hasSim = deploymentProtocol?.getSimDetected()
+            if (hasSim != null && hasSim) {
+                simDetectionCheckbox.isChecked = true
+                cellSignalLayout.visibility = View.VISIBLE
+                cellDataTransferLayout.visibility = View.VISIBLE
+            } else {
+                simDetectionCheckbox.isChecked = false
+                cellSignalLayout.visibility = View.GONE
+                cellDataTransferLayout.visibility = View.GONE
+            }
+
+            val cellStrength = deploymentProtocol?.getNetwork()
+            if (cellStrength == null) {
+                showSignalStrength(SignalState.NONE)
+                signalValue.text = "failed to retrieve"
+            } else {
+                when {
+                    cellStrength > -70 -> showSignalStrength(SignalState.MAX)
+                    cellStrength > -90 -> showSignalStrength(SignalState.HIGH)
+                    cellStrength > -110 -> showSignalStrength(SignalState.NORMAL)
+                    cellStrength > -130 -> showSignalStrength(SignalState.LOW)
+                    else -> showSignalStrength(SignalState.NONE)
                 }
+                signalValue.text = getString(R.string.signal_value, cellStrength)
             }
         })
+    }
+
+    private fun retrieveSatModule() {
+        val hasSatModule = deploymentProtocol?.getSatId()
+        if (hasSatModule != null) {
+            satDetectionCheckbox.isChecked = true
+            satSignalLayout.visibility = View.VISIBLE
+        } else {
+            satDetectionCheckbox.isChecked = false
+            satSignalLayout.visibility = View.GONE
+        }
+
+        val swmStrength = deploymentProtocol?.getSwmNetwork()
+        if (swmStrength == null) {
+            showSignalStrength(SignalState.NONE)
+            signalValue.text = "failed to retrieve"
+        } else {
+            when {
+                swmStrength < -104 -> {
+                    showSignalStrength(SignalState.MAX)
+                }
+                swmStrength < -100 -> {
+                    showSignalStrength(SignalState.HIGH)
+                }
+                swmStrength < -97 -> {
+                    showSignalStrength(SignalState.NORMAL)
+                }
+                swmStrength < -93 -> {
+                    showSignalStrength(SignalState.LOW)
+                }
+                else -> {
+                    showSignalStrength(SignalState.NONE)
+                }
+            }
+            signalValue.text = getString(R.string.signal_value, swmStrength)
+        }
     }
 
     private fun showSignalStrength(state: SignalState) {
@@ -144,24 +138,6 @@ class GuardianSignalFragment : Fragment() {
                 (view.background as GradientDrawable).setBackground(requireContext(), R.color.white)
             }
         }
-    }
-
-    private fun showSignalInfo() {
-        signalDescText.visibility = View.VISIBLE
-        signalValue.visibility = View.VISIBLE
-    }
-
-    private fun hideSignalInfo() {
-        signalDescText.visibility = View.GONE
-        signalValue.visibility = View.GONE
-    }
-
-    private fun showSimError() {
-        signalErrorText.visibility = View.VISIBLE
-    }
-
-    private fun hideSimError() {
-        signalErrorText.visibility = View.GONE
     }
 
     override fun onResume() {
