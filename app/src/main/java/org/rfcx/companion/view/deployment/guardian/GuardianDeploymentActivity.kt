@@ -534,10 +534,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         this.prefsEditor?.clear()?.apply()
         siteLiveData.removeObserver(siteObserve)
         deploymentLiveData.removeObserver(guardianDeploymentObserve)
-        GuardianSocketManager.stopConnection()
-        AdminSocketManager.stopConnection()
-        AudioCastSocketManager.stopConnection()
-        FileSocketManager.stopConnection()
+        SocketUtils.stopAllConnections()
     }
 
     companion object {
