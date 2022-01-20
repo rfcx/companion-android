@@ -167,6 +167,10 @@ object GuardianSocketManager {
         sendInstructionMessage(InstructionType.CTRL, InstructionCommand.WIFI)
     }
 
+    fun runSpeedTest() {
+        sendInstructionMessage(InstructionType.CTRL, InstructionCommand.SPEED_TEST)
+    }
+
     fun sendInstructionMessage(type: InstructionType, command: InstructionCommand, meta: String = "{}") {
         val data = gson.toJson(InstructionMessage.toMessage(type, command, meta))
         sendMessage(data)

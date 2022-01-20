@@ -9,9 +9,12 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import kotlinx.android.synthetic.main.fragment_guardian_microphone.*
 import kotlinx.android.synthetic.main.fragment_guardian_signal.*
+import kotlinx.android.synthetic.main.fragment_guardian_signal.finishButton
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.AdminSocketManager
+import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
@@ -93,7 +96,20 @@ class GuardianSignalFragment : Fragment() {
                 }
                 signalValue.text = getString(R.string.signal_value, cellStrength)
             }
+
+            val speedTest = deploymentProtocol?.getSpeedTest()
+            if (speedTest == null) {
+                cellDownloadDataTransferValues.text = "failed to retrieve"
+                cellUploadDataTransferValues.text = "failed to retrieve"
+            } else {
+                cellDownloadDataTransferValues.text = "${speedTest.downloadSpeed} kb/s download"
+                cellUploadDataTransferValues.text = "${speedTest.uploadSpeed} kb/s download"
+            }
         })
+
+        cellDataTransferButton.setOnClickListener {
+            GuardianSocketManager.runSpeedTest()
+        }
     }
 
     private fun retrieveSatModule() {

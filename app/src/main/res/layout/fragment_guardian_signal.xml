@@ -126,7 +126,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/cellDataTransferValues"
+            android:id="@+id/cellDownloadDataTransferValues"
             style="@style/AudioMothText.Subhead.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -134,10 +134,21 @@
             android:layout_marginEnd="@dimen/margin_padding_large"
             app:layout_constraintStart_toStartOf="@+id/cellDataTransferTitle"
             app:layout_constraintTop_toBottomOf="@+id/cellDataTransferTitle"
-            tools:text="20 kb/s" />
+            tools:text="20 kb/s download" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/cellUploadDataTransferValues"
+            style="@style/AudioMothText.Subhead.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_padding_small"
+            android:layout_marginEnd="@dimen/margin_padding_large"
+            app:layout_constraintStart_toStartOf="@+id/cellDownloadDataTransferValues"
+            app:layout_constraintTop_toBottomOf="@+id/cellDownloadDataTransferValues"
+            tools:text="20 kb/s upload" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/cellFataTransferButton"
+            android:id="@+id/cellDataTransferButton"
             style="@style/AudioMothButton.GreenButton.TextSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -145,9 +156,9 @@
             android:minWidth="70dp"
             android:minHeight="20dp"
             android:text="Retest"
-            app:layout_constraintBottom_toBottomOf="@+id/cellDataTransferValues"
+            app:layout_constraintBottom_toBottomOf="@+id/cellDownloadDataTransferValues"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/cellDataTransferValues" />
+            app:layout_constraintStart_toEndOf="@id/cellDownloadDataTransferValues" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
