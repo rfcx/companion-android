@@ -9,9 +9,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import kotlinx.android.synthetic.main.fragment_guardian_microphone.*
 import kotlinx.android.synthetic.main.fragment_guardian_signal.*
-import kotlinx.android.synthetic.main.fragment_guardian_signal.finishButton
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.AdminSocketManager
 import org.rfcx.companion.connection.socket.GuardianSocketManager
@@ -102,8 +100,8 @@ class GuardianSignalFragment : Fragment() {
                 cellDownloadDataTransferValues.text = "failed to retrieve"
                 cellUploadDataTransferValues.text = "failed to retrieve"
             } else {
-                cellDownloadDataTransferValues.text = "${speedTest.downloadSpeed} kb/s download"
-                cellUploadDataTransferValues.text = "${speedTest.uploadSpeed} kb/s download"
+                cellDownloadDataTransferValues.text = "${String.format("%.2f", speedTest.downloadSpeed)} kb/s download"
+                cellUploadDataTransferValues.text = "${String.format("%.2f", speedTest.uploadSpeed)} kb/s upload"
             }
         })
 
