@@ -126,6 +126,16 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/noCellConnectionText"
+            style="@style/AudioMothText.Subhead.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No internet connection"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="@+id/cellDataTransferTitle"
+            app:layout_constraintTop_toBottomOf="@+id/cellDataTransferTitle" />
+
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/cellDownloadDataTransferValues"
             style="@style/AudioMothText.Subhead.Secondary"
             android:layout_width="wrap_content"

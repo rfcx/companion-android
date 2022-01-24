@@ -31,6 +31,10 @@ class GuardianSignalFragment : Fragment() {
         )
     }
 
+    private var isWaitingSpeedTest = false
+    private var downloadSpeed: Double? = null
+    private var uploadSpeed: Double? = null
+
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
 
     private val analytics by lazy { context?.let { Analytics(it) } }
@@ -96,18 +100,85 @@ class GuardianSignalFragment : Fragment() {
             }
 
             val speedTest = deploymentProtocol?.getSpeedTest()
-            if (speedTest == null) {
-                cellDownloadDataTransferValues.text = "failed to retrieve"
-                cellUploadDataTransferValues.text = "failed to retrieve"
+            val tempDownload = speedTest?.downloadSpeed
+            val tempUpload = speedTest?.uploadSpeed
+            val hasConnection = speedTest?.hasConnection
+            val isFailed = speedTest?.isFailed
+
+            if (hasConnection != null && hasConnection) {
+                showSpeedTest()
             } else {
-                cellDownloadDataTransferValues.text = "${String.format("%.2f", speedTest.downloadSpeed)} kb/s download"
-                cellUploadDataTransferValues.text = "${String.format("%.2f", speedTest.uploadSpeed)} kb/s upload"
+                hideHideSpeedTest()
+            }
+
+            if (isWaitingSpeedTest && isSpeedTestChanged(
+                    downloadSpeed,
+                    uploadSpeed,
+                    tempDownload,
+                    tempUpload
+                )
+            ) {
+                isWaitingSpeedTest = false
+
+            }
+
+            when {
+                isFailed != null && isFailed -> {
+                    cellDownloadDataTransferValues.text = "failed to retrieve"
+                    cellUploadDataTransferValues.text = "failed to retrieve"
+                }
+                isWaitingSpeedTest -> {
+                    cellDownloadDataTransferValues.text = "waiting for testing"
+                    cellUploadDataTransferValues.text = "waiting for testing"
+                }
+                !isWaitingSpeedTest -> {
+                    if (downloadSpeed == null) {
+                        cellDownloadDataTransferValues.text = "run the test"
+                    } else {
+                        cellDownloadDataTransferValues.text =
+                            "${String.format("%.2f", downloadSpeed)} kb/s download"
+                    }
+                    if (uploadSpeed == null) {
+                        cellUploadDataTransferValues.text = "run the test"
+                    } else {
+                        cellUploadDataTransferValues.text =
+                            "${String.format("%.2f", uploadSpeed)} kb/s upload"
+                    }
+                }
             }
         })
 
         cellDataTransferButton.setOnClickListener {
             GuardianSocketManager.runSpeedTest()
+            isWaitingSpeedTest = true
         }
+    }
+
+    private fun isSpeedTestChanged(
+        currentDownload: Double?,
+        currentUpload: Double?,
+        newDownload: Double?,
+        newUpload: Double?
+    ): Boolean {
+        if (currentDownload == newDownload || newDownload == null || newDownload == -1.0) return false
+        downloadSpeed = newDownload
+        if (currentUpload == newUpload || newUpload == null || newUpload == -1.0) return false
+        uploadSpeed = newUpload
+        return true
+    }
+
+    private fun showSpeedTest() {
+        noCellConnectionText.visibility = View.GONE
+        cellDownloadDataTransferValues.visibility = View.VISIBLE
+        cellUploadDataTransferValues.visibility = View.VISIBLE
+        cellDataTransferButton.visibility = View.VISIBLE
+    }
+
+    private fun hideHideSpeedTest() {
+        noCellConnectionText.visibility = View.VISIBLE
+        cellDownloadDataTransferValues.visibility = View.GONE
+        cellUploadDataTransferValues.visibility = View.GONE
+        cellDataTransferButton.visibility = View.GONE
     }
 
     private fun retrieveSatModule() {
