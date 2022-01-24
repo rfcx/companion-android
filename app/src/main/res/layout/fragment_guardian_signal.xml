@@ -5,110 +5,58 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <CheckBox
-        android:id="@+id/simDetectionCheckbox"
-        style="@style/AudioMothCheckBox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_large"
-        android:layout_marginTop="@dimen/margin_padding_normal"
-        android:clickable="false"
-        android:enabled="false"
-        android:minWidth="0dp"
-        android:minHeight="0dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/simDetectionTextView"
-        style="@style/AudioMothText.Subhead.Small"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Sim detected"
-        app:layout_constraintBottom_toBottomOf="@id/simDetectionCheckbox"
-        app:layout_constraintStart_toEndOf="@+id/simDetectionCheckbox"
-        app:layout_constraintTop_toTopOf="@id/simDetectionCheckbox" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cellSignalLayout"
+        android:id="@+id/verifyTitle"
+        style="@style/AudioMothText.Subhead.Bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginTop="@dimen/margin_padding_normal"
         android:layout_marginEnd="@dimen/margin_padding_large"
-        app:layout_constraintStart_toStartOf="@+id/simDetectionTextView"
-        app:layout_constraintTop_toBottomOf="@+id/simDetectionTextView">
+        android:text="@string/position_the_device"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/signalStrengthTitle"
-            style="@style/AudioMothText.Subhead.Bold"
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/signalStrengthTitle"
+        style="@style/AudioMothText.Subhead.Bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:layout_marginEnd="@dimen/margin_padding_large"
+        android:text="@string/network_strength_signal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/verifyTitle" />
+
+    <RadioGroup
+        android:id="@+id/signalTypeGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/signalStrengthTitle">
+
+        <RadioButton
+            android:id="@+id/signalCell"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Cell signal strength"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_marginEnd="@dimen/margin_padding_xlarge"
+            android:text="@string/cell"
+            android:checked="true"/>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/signalStrengthLayout"
+        <RadioButton
+            android:id="@+id/signalSwarm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_padding_small"
-            android:orientation="horizontal"
-            app:layout_constraintStart_toStartOf="@+id/signalStrengthTitle"
-            app:layout_constraintTop_toBottomOf="@id/signalStrengthTitle">
+            android:text="@string/swarm"/>
 
-            <View
-                android:id="@+id/signalStrength1"
-                android:layout_width="15dp"
-                android:layout_height="20dp"
-                android:background="@drawable/signal_strength"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <View
-                android:id="@+id/signalStrength2"
-                android:layout_width="15dp"
-                android:layout_height="30dp"
-                android:layout_marginStart="@dimen/margin_padding_small"
-                android:background="@drawable/signal_strength"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/signalStrength1" />
-
-            <View
-                android:id="@+id/signalStrength3"
-                android:layout_width="15dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="@dimen/margin_padding_small"
-                android:background="@drawable/signal_strength"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/signalStrength2" />
-
-            <View
-                android:id="@+id/signalStrength4"
-                android:layout_width="15dp"
-                android:layout_height="50dp"
-                android:layout_marginStart="@dimen/margin_padding_small"
-                android:background="@drawable/signal_strength"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/signalStrength3" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <TextView
-            android:id="@+id/signalValue"
-            style="@style/AudioMothText.Body.Headline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_padding_small"
-            android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="@id/signalStrengthLayout"
-            app:layout_constraintStart_toEndOf="@id/signalStrengthLayout"
-            tools:text="20 db" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </RadioGroup>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cellDataTransferLayout"
+        android:id="@+id/signalStrengthLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_padding_large"
@@ -172,32 +120,35 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <CheckBox
-        android:id="@+id/satDetectionCheckbox"
-        style="@style/AudioMothCheckBox"
+    <TextView
+        android:id="@+id/signalDescText"
+        style="@style/AudioMothText.Body.Headline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_large"
-        android:layout_marginTop="@dimen/margin_padding_normal"
-        android:clickable="false"
-        android:enabled="false"
-        android:minWidth="0dp"
-        android:minHeight="0dp"
+        android:layout_marginTop="@dimen/margin_padding_xlarge"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cellDataTransferLayout" />
+        app:layout_constraintTop_toBottomOf="@id/signalStrengthLayout"
+        tools:text="The signal is good" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/satDetectionTextView"
-        style="@style/AudioMothText.Subhead.Small"
+    <TextView
+        android:id="@+id/signalErrorText"
+        style="@style/AudioMothText.Body.Headline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Satellite module detected"
-        app:layout_constraintBottom_toBottomOf="@id/satDetectionCheckbox"
-        app:layout_constraintStart_toEndOf="@+id/satDetectionCheckbox"
-        app:layout_constraintTop_toTopOf="@id/satDetectionCheckbox" />
+        android:layout_marginTop="@dimen/margin_padding_xlarge"
+        android:textSize="14sp"
+        android:textColor="@color/text_error"
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/signalStrengthLayout"
+        tools:text="The signal is good" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/satSignalLayout"
+    <TextView
+        android:id="@+id/signalValue"
+        style="@style/AudioMothText.Body.Headline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"
