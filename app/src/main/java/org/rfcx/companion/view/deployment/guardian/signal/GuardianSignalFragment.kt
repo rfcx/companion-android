@@ -124,25 +124,25 @@ class GuardianSignalFragment : Fragment() {
 
             when {
                 isFailed != null && isFailed -> {
-                    cellDownloadDataTransferValues.text = "failed to retrieve"
-                    cellUploadDataTransferValues.text = "failed to retrieve"
+                    cellDownloadDataTransferValues.text = getString(R.string.speed_test_failed)
+                    cellUploadDataTransferValues.text = getString(R.string.speed_test_failed)
                 }
                 isWaitingSpeedTest -> {
-                    cellDownloadDataTransferValues.text = "waiting for testing"
-                    cellUploadDataTransferValues.text = "waiting for testing"
+                    cellDownloadDataTransferValues.text = getString(R.string.speed_test_wait)
+                    cellUploadDataTransferValues.text = getString(R.string.speed_test_wait)
                 }
                 !isWaitingSpeedTest -> {
                     if (downloadSpeed == null) {
-                        cellDownloadDataTransferValues.text = "run the test"
+                        cellDownloadDataTransferValues.text = getString(R.string.speed_test_run)
                     } else {
                         cellDownloadDataTransferValues.text =
-                            "${String.format("%.2f", downloadSpeed)} kb/s download"
+                            getString(R.string.speed_test_kbps, downloadSpeed)
                     }
                     if (uploadSpeed == null) {
-                        cellUploadDataTransferValues.text = "run the test"
+                        cellUploadDataTransferValues.text = getString(R.string.speed_test_run)
                     } else {
                         cellUploadDataTransferValues.text =
-                            "${String.format("%.2f", uploadSpeed)} kb/s upload"
+                            getString(R.string.speed_test_kbps, uploadSpeed)
                     }
                 }
             }
