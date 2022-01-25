@@ -6,6 +6,7 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import org.rfcx.companion.entity.socket.response.*
+import org.rfcx.companion.util.prefs.GuardianPlan
 import org.rfcx.companion.util.prefs.PrefsUtils
 
 object PingUtils {
@@ -88,6 +89,22 @@ object PingUtils {
         return null
     }
 
+    fun getGuardianPlanFromPrefs(guardianPing: GuardianPing?): GuardianPlan? {
+        if (guardianPing?.prefs is JsonObject) {
+            val prefs = guardianPing.prefs.get("vals") ?: return null
+            return PrefsUtils.getGuardianPlanFromPrefs(Gson().toJson(prefs))
+        }
+        return null
+    }
+
+    fun getSatTimeOffFromPrefs(guardianPing: GuardianPing?): List<String>? {
+        if (guardianPing?.prefs is JsonObject) {
+            val prefs = guardianPing.prefs.get("vals") ?: return null
+            return PrefsUtils.getSatTimeOffFromPrefs(Gson().toJson(prefs))
+        }
+        return null
+    }
+
     fun isRegisteredFromPing(ping: GuardianPing?): Boolean? {
         val isRegistered = ping?.companion?.get("is_registered") ?: return null
         return isRegistered.asBoolean
@@ -119,5 +136,26 @@ object PingUtils {
             return checkIn.asJsonObject
         }
         return null
+    }
+
+    fun getSpeedTest(ping: AdminPing?): SpeedTest? {
+        val speedTest = ping?.companion?.get("speed_test")?.asJsonObject ?: return null
+        val downloadSpeed = speedTest.get("download_speed").asDouble
+        val uploadSpeed = speedTest.get("upload_speed").asDouble
+        val isFailed = speedTest.get("is_failed").asBoolean
+        val hasConnection = speedTest.get("connection_available").asBoolean
+        return SpeedTest(downloadSpeed, uploadSpeed, isFailed, hasConnection)
+    }
+
+    fun getSimDetectedFromPing(adminPing: AdminPing?): Boolean? {
+        return adminPing?.companion?.get("sim_info")?.asJsonObject?.get("has_sim")?.asBoolean ?: return null
+    }
+
+    fun getPhoneNumberFromPing(adminPing: AdminPing?): String? {
+        return adminPing?.companion?.get("sim_info")?.asJsonObject?.get("phone_number")?.asString ?: return null
+    }
+
+    fun getSwarmIdFromPing(adminPing: AdminPing?): String? {
+        return adminPing?.companion?.get("sat_info")?.asJsonObject?.get("sat_id")?.asString ?: return null
     }
 }

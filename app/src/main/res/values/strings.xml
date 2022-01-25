@@ -347,6 +347,10 @@
     <string name="signal_value">%d dBm</string>
     <string name="signal_sim_card">The Guardian does not have a SIM card inserted.\nPlease insert a SIM card.</string>
     <string name="signal_lost">WiFi hotspot connection lost.\nPlease try again.</string>
+    <string name="speed_test_failed">failed to retrieve</string>
+    <string name="speed_test_wait">waiting for testing</string>
+    <string name="speed_test_run">run a test</string>
+    <string name="speed_test_kbps">%.2f kb/s download</string>
 
     <!-- LocationTrackerService -->
     <string name="track">Track</string>
@@ -480,5 +484,29 @@
     <string name="mbattery_p">Main Battery</string>
     <string name="in_queue">In queue</string>
     <string name="sentinel_module_detect">Sentinel module detect</string>
+    <string name="sim_detected">Sim detected</string>
+    <string name="cell_signal_strength">Cell signal strength</string>
+    <string name="cell_data_transfer">Cell data transfer</string>
+    <string name="cell_no_internet_connection">No internet connection</string>
+    <string name="retest">Retest</string>
+    <string name="satellite_module_detected">Satellite module detected</string>
+    <string name="background_noise">Background noise</string>
+    <string name="perfect">Perfect</string>
+    <string name="good">Good</string>
+    <string name="bad">Bad</string>
+    <string name="lt_93_bad"><![CDATA[< -93 Bad]]></string>
+    <string name="lt_97_ok"><![CDATA[< -97 OK]]></string>
+    <string name="lt_100_ok"><![CDATA[< -100 Good]]></string>
+    <string name="lt_104_perfect"><![CDATA[< -104 Perfect]]></string>
+    <string name="phone_number">phone number:</string>
+    <string name="swarm_id">swarm id:</string>
+    <string name="cell_data_only">Cell data only</string>
+    <string name="cell_data_sms_fallback_experimental">Cell data + SMS fallback (experimental)</string>
+    <string name="satellite_only">Satellite only</string>
+    <string name="pass_times_local_time">Pass times (local time)</string>
+    <string name="plus">+</string>
+
+    <string name="sat_start_time">Select Satellite start time off</string>
+    <string name="sat_end_time">Select Satellite end time off</string>
 
 </resources>

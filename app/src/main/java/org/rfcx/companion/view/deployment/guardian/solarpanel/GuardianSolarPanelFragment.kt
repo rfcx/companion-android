@@ -230,7 +230,7 @@ class GuardianSolarPanelFragment : Fragment() {
 
     companion object {
         private const val X_AXIS_MAXIMUM = 100f
-        private const val LEFT_AXIS_MAXIMUM = 10000f
+        private const val LEFT_AXIS_MAXIMUM = 15000f
         private const val AXIS_MINIMUM = 0f
         private const val AXIS_LINE_WIDTH = 2f
 

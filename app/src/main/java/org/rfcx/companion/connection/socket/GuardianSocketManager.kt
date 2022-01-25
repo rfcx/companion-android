@@ -98,6 +98,45 @@ object GuardianSocketManager {
         sendMessage(data)
     }
 
+    fun sendCellOnlyPrefs() {
+        val prefs = JsonObject()
+        prefs.addProperty("api_satellite_protocol", "off")
+        prefs.addProperty("enable_audio_classify", "false")
+        prefs.addProperty("enable_checkin_publish", "true")
+        prefs.addProperty("api_ping_cycle_fields", "checkins,instructions,prefs,sms,meta,detections,purged")
+        prefs.addProperty("enable_audio_cast", "true")
+        prefs.addProperty("enable_file_socket", "true")
+        prefs.addProperty("api_protocol_escalation_order", "mqtt,rest")
+        prefs.addProperty("api_satellite_off_hours", "23:55-23:56,23:57-23:59")
+        syncConfiguration(prefs.toString())
+    }
+
+    fun sendCellSMSPrefs() {
+        val prefs = JsonObject()
+        prefs.addProperty("api_satellite_protocol", "off")
+        prefs.addProperty("enable_audio_classify", "false")
+        prefs.addProperty("enable_checkin_publish", "true")
+        prefs.addProperty("api_ping_cycle_fields", "checkins,instructions,prefs,sms,meta,detections,purged")
+        prefs.addProperty("enable_audio_cast", "true")
+        prefs.addProperty("enable_file_socket", "true")
+        prefs.addProperty("api_protocol_escalation_order", "mqtt,rest,sms")
+        prefs.addProperty("api_satellite_off_hours", "23:55-23:56,23:57-23:59")
+        syncConfiguration(prefs.toString())
+    }
+
+    fun sendSatOnlyPrefs(timeOff: String) {
+        val prefs = JsonObject()
+        prefs.addProperty("api_satellite_protocol", "swm")
+        prefs.addProperty("enable_audio_classify", "true")
+        prefs.addProperty("enable_checkin_publish", "false")
+        prefs.addProperty("api_ping_cycle_fields", "battery,sentinel_power,software,swm,detections")
+        prefs.addProperty("enable_audio_cast", "true")
+        prefs.addProperty("enable_file_socket", "true")
+        prefs.addProperty("api_protocol_escalation_order", "sat")
+        prefs.addProperty("api_satellite_off_hours", timeOff)
+        syncConfiguration(prefs.toString())
+    }
+
     fun syncConfiguration(config: String) {
         sendInstructionMessage(InstructionType.SET, InstructionCommand.PREFS, config)
     }
@@ -126,6 +165,10 @@ object GuardianSocketManager {
 
     fun stopGuardianWiFi() {
         sendInstructionMessage(InstructionType.CTRL, InstructionCommand.WIFI)
+    }
+
+    fun runSpeedTest() {
+        sendInstructionMessage(InstructionType.CTRL, InstructionCommand.SPEED_TEST)
     }
 
     fun sendInstructionMessage(type: InstructionType, command: InstructionCommand, meta: String = "{}") {

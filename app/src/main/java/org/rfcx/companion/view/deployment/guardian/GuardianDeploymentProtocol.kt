@@ -5,6 +5,8 @@ import org.rfcx.companion.connection.wifi.WifiHotspotManager
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.socket.response.I2CAccessibility
 import org.rfcx.companion.entity.socket.response.SentinelInfo
+import org.rfcx.companion.entity.socket.response.SpeedTest
+import org.rfcx.companion.util.prefs.GuardianPlan
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 
 interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
@@ -30,6 +32,12 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getSentinelPower(): SentinelInfo?
     fun getInternalBattery(): Int?
     fun getI2cAccessibility(): I2CAccessibility?
+    fun getSimDetected(): Boolean?
+    fun getSatId(): String?
+    fun getPhoneNumber(): String?
+    fun getGuardianPlan(): GuardianPlan?
+    fun getSatTimeOff(): List<String>?
+    fun getSpeedTest(): SpeedTest?
 
     fun setDeployment(deployment: Deployment)
     fun setSampleRate(sampleRate: Int)
