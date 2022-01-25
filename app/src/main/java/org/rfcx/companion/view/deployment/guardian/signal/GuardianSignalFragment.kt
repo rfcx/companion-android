@@ -87,7 +87,7 @@ class GuardianSignalFragment : Fragment() {
             val cellStrength = deploymentProtocol?.getNetwork()
             if (cellStrength == null) {
                 showCellSignalStrength(SignalState.NONE)
-                signalValue.text = "failed to retrieve"
+                signalValue.text = getString(R.string.speed_test_failed)
             } else {
                 when {
                     cellStrength > -70 -> showCellSignalStrength(SignalState.MAX)
@@ -194,7 +194,7 @@ class GuardianSignalFragment : Fragment() {
         val swmStrength = deploymentProtocol?.getSwmNetwork()
         if (swmStrength == null) {
             showCellSignalStrength(SignalState.NONE)
-            signalValue.text = "failed to retrieve"
+            signalValue.text = getString(R.string.speed_test_failed)
         } else {
             when {
                 swmStrength < -104 -> showSatSignalTagStrength(SignalState.MAX)

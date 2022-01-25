@@ -493,7 +493,6 @@
     <string name="background_noise">Background noise</string>
     <string name="perfect">Perfect</string>
     <string name="good">Good</string>
-    <string name="ok">OK</string>
     <string name="bad">Bad</string>
     <string name="lt_93_bad"><![CDATA[< -93 Bad]]></string>
     <string name="lt_97_ok"><![CDATA[< -97 OK]]></string>
