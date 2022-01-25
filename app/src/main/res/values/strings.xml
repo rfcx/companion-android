@@ -498,5 +498,12 @@
     <string name="lt_97_ok"><![CDATA[< -97 OK]]></string>
     <string name="lt_100_ok"><![CDATA[< -100 Good]]></string>
     <string name="lt_104_perfect"><![CDATA[< -104 Perfect]]></string>
+    <string name="phone_number">phone number:</string>
+    <string name="swarm_id">swarm id:</string>
+    <string name="cell_data_only">Cell data only</string>
+    <string name="cell_data_sms_fallback_experimental">Cell data + SMS fallback (experimental)</string>
+    <string name="satellite_only">Satellite only</string>
+    <string name="pass_times_local_time">Pass times (local time)</string>
+    <string name="plus">+</string>
 
 </resources>

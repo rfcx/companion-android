@@ -34,7 +34,7 @@
                 style="@style/AudioMothText.Subhead.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sim detected"
+                android:text="@string/sim_detected"
                 app:layout_constraintBottom_toBottomOf="@id/simDetectionCheckbox"
                 app:layout_constraintStart_toEndOf="@+id/simDetectionCheckbox"
                 app:layout_constraintTop_toTopOf="@id/simDetectionCheckbox" />
@@ -45,7 +45,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="@dimen/margin_padding_small"
-                android:text="phone number:"
+                android:text="@string/phone_number"
                 app:layout_constraintStart_toStartOf="@+id/simDetectionTextView"
                 app:layout_constraintTop_toBottomOf="@id/simDetectionTextView" />
 
@@ -79,7 +79,7 @@
                 style="@style/AudioMothText.Subhead.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Satellite module detected"
+                android:text="@string/satellite_module_detected"
                 app:layout_constraintBottom_toBottomOf="@id/satDetectionCheckbox"
                 app:layout_constraintStart_toEndOf="@+id/satDetectionCheckbox"
                 app:layout_constraintTop_toTopOf="@id/satDetectionCheckbox" />
@@ -90,7 +90,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="@dimen/margin_padding_small"
-                android:text="swarm id:"
+                android:text="@string/swarm_id"
                 app:layout_constraintStart_toStartOf="@+id/satDetectionTextView"
                 app:layout_constraintTop_toBottomOf="@id/satDetectionTextView" />
 
@@ -119,21 +119,21 @@
                     style="@style/AudioMothRadioButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Cell data only" />
+                    android:text="@string/cell_data_only" />
 
                 <RadioButton
                     android:id="@+id/cellSmsRadioButton"
                     style="@style/AudioMothRadioButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Cell data + SMS fallback (experimental)" />
+                    android:text="@string/cell_data_sms_fallback_experimental" />
 
                 <RadioButton
                     android:id="@+id/satOnlyRadioButton"
                     style="@style/AudioMothRadioButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Satellite only" />
+                    android:text="@string/satellite_only" />
             </RadioGroup>
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -141,7 +141,7 @@
                 style="@style/AudioMothText.Body.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Pass times (local time)"
+                android:text="@string/pass_times_local_time"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/guardianPlanGroup" />
@@ -158,7 +158,7 @@
                     android:id="@+id/passTimeAddChip"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="+" />
+                    android:text="@string/plus" />
             </com.google.android.material.chip.ChipGroup>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
