@@ -347,10 +347,6 @@
     <string name="signal_value">%d dBm</string>
     <string name="signal_sim_card">The Guardian does not have a SIM card inserted.\nPlease insert a SIM card.</string>
     <string name="signal_lost">WiFi hotspot connection lost.\nPlease try again.</string>
-    <string name="speed_test_failed">failed to retrieve</string>
-    <string name="speed_test_wait">waiting for testing</string>
-    <string name="speed_test_run">run a test</string>
-    <string name="speed_test_kbps">%.2f kb/s download</string>
 
     <!-- LocationTrackerService -->
     <string name="track">Track</string>
