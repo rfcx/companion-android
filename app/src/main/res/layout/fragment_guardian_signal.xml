@@ -24,7 +24,7 @@
         style="@style/AudioMothText.Subhead.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Sim detected"
+        android:text="@string/sim_detected"
         app:layout_constraintBottom_toBottomOf="@id/simDetectionCheckbox"
         app:layout_constraintStart_toEndOf="@+id/simDetectionCheckbox"
         app:layout_constraintTop_toTopOf="@id/simDetectionCheckbox" />
@@ -44,7 +44,7 @@
             style="@style/AudioMothText.Subhead.Bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Cell signal strength"
+            android:text="@string/cell_signal_strength"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -121,7 +121,7 @@
             style="@style/AudioMothText.Subhead.Bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Cell data transfer"
+            android:text="@string/cell_data_transfer"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -130,7 +130,7 @@
             style="@style/AudioMothText.Subhead.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="No internet connection"
+            android:text="@string/cell_no_internet_connection"
             android:visibility="gone"
             app:layout_constraintStart_toStartOf="@+id/cellDataTransferTitle"
             app:layout_constraintTop_toBottomOf="@+id/cellDataTransferTitle" />
@@ -165,7 +165,7 @@
             android:layout_marginStart="@dimen/margin_padding_small"
             android:minWidth="70dp"
             android:minHeight="20dp"
-            android:text="Retest"
+            android:text="@string/retest"
             app:layout_constraintBottom_toBottomOf="@+id/cellDownloadDataTransferValues"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/cellDownloadDataTransferValues" />
@@ -191,7 +191,7 @@
         style="@style/AudioMothText.Subhead.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Satellite module detected"
+        android:text="@string/satellite_module_detected"
         app:layout_constraintBottom_toBottomOf="@id/satDetectionCheckbox"
         app:layout_constraintStart_toEndOf="@+id/satDetectionCheckbox"
         app:layout_constraintTop_toTopOf="@id/satDetectionCheckbox" />
@@ -211,7 +211,7 @@
             style="@style/AudioMothText.Subhead.Bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Backgroud noise"
+            android:text="@string/background_noise"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -233,7 +233,7 @@
             android:layout_marginStart="@dimen/margin_padding_small"
             android:minWidth="70dp"
             android:minHeight="20dp"
-            android:text="Perfect"
+            android:text="@string/perfect"
             android:textStyle="normal"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/satSignalValues"
@@ -249,7 +249,7 @@
             android:layout_marginStart="@dimen/margin_padding_small"
             android:minWidth="70dp"
             android:minHeight="20dp"
-            android:text="Good"
+            android:text="@string/good"
             android:textStyle="normal"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/satSignalValues"
@@ -265,7 +265,7 @@
             android:layout_marginStart="@dimen/margin_padding_small"
             android:minWidth="70dp"
             android:minHeight="20dp"
-            android:text="OK"
+            android:text="@string/ok"
             android:textStyle="normal"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/satSignalValues"
@@ -281,7 +281,7 @@
             android:layout_marginStart="@dimen/margin_padding_small"
             android:minWidth="70dp"
             android:minHeight="20dp"
-            android:text="Bad"
+            android:text="@string/bad"
             android:textStyle="normal"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/satSignalValues"
@@ -295,7 +295,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_padding_normal"
-            android:text="&lt; -93 Bad"
+            android:text="@string/lt_93_bad"
             android:textColor="@color/red"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/satSignalValues" />
@@ -306,7 +306,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_padding_xsmall"
-            android:text="&lt; -97 OK"
+            android:text="@string/lt_97_ok"
             android:textColor="@color/orange"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/satSignalBadText" />
@@ -317,7 +317,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_padding_xsmall"
-            android:text="&lt; -100 OK"
+            android:text="@string/lt_100_ok"
             android:textColor="@color/yellow"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/satSignalOkText" />
@@ -328,7 +328,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_padding_xsmall"
-            android:text="&lt; -104 OK"
+            android:text="@string/lt_104_perfect"
             android:textColor="@color/colorPrimary"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/satSignalGoodText" />
