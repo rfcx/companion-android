@@ -506,4 +506,7 @@
     <string name="pass_times_local_time">Pass times (local time)</string>
     <string name="plus">+</string>
 
+    <string name="sat_start_time">Select Satellite start time off</string>
+    <string name="sat_end_time">Select Satellite end time off</string>
+
 </resources>

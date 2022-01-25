@@ -160,14 +160,14 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
             .setTimeFormat(TimeFormat.CLOCK_24H)
             .setHour(12)
             .setMinute(0)
-            .setTitleText("Select Satellite start time off")
+            .setTitleText(getString(R.string.sat_start_time))
             .build()
 
         val endPicker = MaterialTimePicker.Builder()
             .setTimeFormat(TimeFormat.CLOCK_24H)
             .setHour(12)
             .setMinute(0)
-            .setTitleText("Select Satellite end time off")
+            .setTitleText(R.string.sat_end_time)
             .build()
 
         startPicker.addOnPositiveButtonClickListener {
