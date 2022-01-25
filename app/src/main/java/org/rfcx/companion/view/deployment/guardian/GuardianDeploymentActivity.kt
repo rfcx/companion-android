@@ -31,6 +31,7 @@ import org.rfcx.companion.entity.socket.request.CheckinCommand
 import org.rfcx.companion.entity.socket.response.GuardianPing
 import org.rfcx.companion.entity.socket.response.I2CAccessibility
 import org.rfcx.companion.entity.socket.response.SentinelInfo
+import org.rfcx.companion.entity.socket.response.SpeedTest
 import org.rfcx.companion.localdb.*
 import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.util.*
@@ -83,6 +84,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     private var phoneNumber: String? = null
     private var guardianPlan: GuardianPlan? = null
     private var satTimeOff: List<String>? = null
+    private var speedTest: SpeedTest? = null
 
     private var _sampleRate = 12000
 
@@ -257,6 +259,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
             satId = PingUtils.getSwarmIdFromPing(it)
             isSimDetected = PingUtils.getSimDetectedFromPing(it)
             phoneNumber = PingUtils.getPhoneNumberFromPing(it)
+            speedTest = PingUtils.getSpeedTest(it)
         }
         deploymentLiveData.observeForever(guardianDeploymentObserve)
     }
@@ -337,6 +340,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     override fun getGuardianPlan(): GuardianPlan? = guardianPlan
 
     override fun getSatTimeOff(): List<String>? = satTimeOff
+
+    override fun getSpeedTest(): SpeedTest? = speedTest
 
     override fun getGuid(): String? = PingUtils.getGuidFromPing(guardianPingBlob)
 

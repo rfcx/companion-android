@@ -138,6 +138,15 @@ object PingUtils {
         return null
     }
 
+    fun getSpeedTest(ping: AdminPing?): SpeedTest? {
+        val speedTest = ping?.companion?.get("speed_test")?.asJsonObject ?: return null
+        val downloadSpeed = speedTest.get("download_speed").asDouble
+        val uploadSpeed = speedTest.get("upload_speed").asDouble
+        val isFailed = speedTest.get("is_failed").asBoolean
+        val hasConnection = speedTest.get("connection_available").asBoolean
+        return SpeedTest(downloadSpeed, uploadSpeed, isFailed, hasConnection)
+    }
+
     fun getSimDetectedFromPing(adminPing: AdminPing?): Boolean? {
         return adminPing?.companion?.get("sim_info")?.asJsonObject?.get("has_sim")?.asBoolean ?: return null
     }
