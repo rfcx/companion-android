@@ -16,7 +16,9 @@ import org.rfcx.companion.entity.request.GuardianRegisterRequest
 import org.rfcx.companion.entity.response.GuardianRegisterResponse
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.Analytics
+import org.rfcx.companion.util.generateSecureRandomHash
 import org.rfcx.companion.util.getIdToken
+import org.rfcx.companion.util.isNetworkAvailable
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 import retrofit2.Call
 import retrofit2.Callback
@@ -58,7 +60,11 @@ class GuardianRegisterFragment : Fragment() {
 
         registerGuardianButton.setOnClickListener {
             analytics?.trackRegisterGuardianEvent()
-            registerGuardian()
+            if (requireContext().isNetworkAvailable()) {
+                registerGuardianWithInternet()
+            } else {
+                registerGuardianWithoutInternet()
+            }
         }
 
         registerFinishButton.setOnClickListener {
@@ -72,7 +78,7 @@ class GuardianRegisterFragment : Fragment() {
         registerResultTextView.text = requireContext().getString(R.string.registering)
     }
 
-    private fun registerGuardian() {
+    private fun registerGuardianWithInternet() {
         isWaitingRegistration = true
         setUIWaitingRegisterResponse()
         val guid = deploymentProtocol?.getGuid()
@@ -102,6 +108,28 @@ class GuardianRegisterFragment : Fragment() {
         } else {
             Toast.makeText(requireContext(), "Register failed: guid or token is null", Toast.LENGTH_LONG).show()
             resetUI()
+        }
+    }
+
+    private fun registerGuardianWithoutInternet() {
+        val guid = deploymentProtocol?.getGuid()
+        val token = generateSecureRandomHash(40)
+        val pinCode = generateSecureRandomHash(4)
+        val apiMqttHost = ""
+        val apiSmsAddress = ""
+        val keystorePassphrase = ""
+        if (guid != null) {
+            val request = GuardianRegisterResponse(
+                guid = guid,
+                token = token,
+                pinCode = pinCode,
+                apiMqttHost = apiMqttHost,
+                apiSmsAddress = apiSmsAddress,
+                keystorePassphrase = keystorePassphrase
+            )
+            GuardianSocketManager.sendGuardianRegistration(request)
+        } else {
+            Toast.makeText(requireContext(), "Register failed: guid is null", Toast.LENGTH_LONG).show()
         }
     }
 

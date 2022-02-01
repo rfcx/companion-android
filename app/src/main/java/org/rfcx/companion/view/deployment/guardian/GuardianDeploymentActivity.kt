@@ -27,6 +27,8 @@ import org.rfcx.companion.connection.wifi.WifiHotspotManager
 import org.rfcx.companion.connection.wifi.WifiLostListener
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
+import org.rfcx.companion.entity.request.GuardianDeploymentParameters
+import org.rfcx.companion.entity.response.GuardianRegisterResponse
 import org.rfcx.companion.entity.socket.request.CheckinCommand
 import org.rfcx.companion.entity.socket.response.GuardianPing
 import org.rfcx.companion.entity.socket.response.I2CAccessibility
@@ -70,6 +72,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     private val trackingFileDb by lazy { TrackingFileDb(realm) }
 
     private var useExistedLocation: Boolean = false
+
+    private var guardianRegister: GuardianRegisterResponse? = null
 
     private var guardianPingBlob: GuardianPing? = null
     private var network: Int? = null
@@ -303,6 +307,10 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         this.lastCheckInTime = time
     }
 
+    override fun setGuardianRegisterBody(body: GuardianRegisterResponse) {
+        this.guardianRegister = body
+    }
+
     override fun addRegisteredToPassedCheck() {
         if (1 !in passedChecks) {
             passedChecks.add(1)
@@ -393,7 +401,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
             it.updatedAt = Date()
             it.isActive = true
             it.state = DeploymentState.Guardian.ReadyToUpload.key
-            it.deviceParameters = Gson().toJson(GuardianDeviceParameters(getGuid()))
+            it.deviceParameters = getGuardianDeploymentParameter()
             setDeployment(it)
 
             val deploymentId = deploymentDb.insertOrUpdateDeployment(it, _deployLocation!!)
@@ -437,6 +445,20 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
             DeploymentSyncWorker.enqueue(this@GuardianDeploymentActivity)
             showComplete()
         }
+    }
+
+    private fun getGuardianDeploymentParameter(): String {
+        val guid = getGuid()
+        val register = guardianRegister
+        val guardianDeploymentParameters = GuardianDeploymentParameters(
+            guid = guid,
+            token = register?.token,
+            keystorePassphrase = register?.keystorePassphrase,
+            pinCode = register?.pinCode,
+            apiMqttHost = register?.apiMqttHost,
+            apiSmsAddress = register?.apiSmsAddress
+        )
+        return Gson().toJson(guardianDeploymentParameters)
     }
 
     private fun saveImages(deployment: Deployment) {

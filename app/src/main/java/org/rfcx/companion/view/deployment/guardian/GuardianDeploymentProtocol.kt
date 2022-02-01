@@ -3,6 +3,7 @@ package org.rfcx.companion.view.deployment.guardian
 import com.google.gson.JsonObject
 import org.rfcx.companion.connection.wifi.WifiHotspotManager
 import org.rfcx.companion.entity.guardian.Deployment
+import org.rfcx.companion.entity.response.GuardianRegisterResponse
 import org.rfcx.companion.entity.socket.response.I2CAccessibility
 import org.rfcx.companion.entity.socket.response.SentinelInfo
 import org.rfcx.companion.entity.socket.response.SpeedTest
@@ -43,6 +44,7 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun setSampleRate(sampleRate: Int)
     fun setOnDeployClicked()
     fun setLastCheckInTime(time: Long?)
+    fun setGuardianRegisterBody(body: GuardianRegisterResponse)
 
     fun addRegisteredToPassedCheck()
     fun removeRegisteredOnPassedCheck()
