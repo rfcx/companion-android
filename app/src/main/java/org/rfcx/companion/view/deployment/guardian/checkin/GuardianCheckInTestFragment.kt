@@ -65,7 +65,7 @@ class GuardianCheckInTestFragment : Fragment() {
                 if (it.has("mqtt")) {
                     val mqtt = it.get("mqtt").asJsonObject
                     checkInProtocolValueTextView.text = "mqtt"
-                    checkInTimeValueTextView.text = timestampToDateString((mqtt.get("created_at").asString).toLongOrNull())
+                    checkInTimeValueTextView.text = mqtt.get("created_at").asString
                     checkInFinishButton.isEnabled = true
                 }
                 if (it.has("sbd")) {
