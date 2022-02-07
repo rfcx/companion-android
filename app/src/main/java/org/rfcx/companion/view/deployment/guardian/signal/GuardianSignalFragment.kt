@@ -182,29 +182,31 @@ class GuardianSignalFragment : Fragment() {
     }
 
     private fun retrieveSatModule() {
-        val hasSatModule = deploymentProtocol?.getSatId()
-        if (hasSatModule != null) {
-            satDetectionCheckbox.isChecked = true
-            satSignalLayout.visibility = View.VISIBLE
-        } else {
-            satDetectionCheckbox.isChecked = false
-            satSignalLayout.visibility = View.GONE
-        }
-
-        val swmStrength = deploymentProtocol?.getSwmNetwork()
-        if (swmStrength == null) {
-            showCellSignalStrength(SignalState.NONE)
-            signalValue.text = getString(R.string.speed_test_failed)
-        } else {
-            when {
-                swmStrength < -104 -> showSatSignalTagStrength(SignalState.MAX)
-                swmStrength < -100 -> showSatSignalTagStrength(SignalState.HIGH)
-                swmStrength < -97 -> showSatSignalTagStrength(SignalState.NORMAL)
-                swmStrength < -93 -> showSatSignalTagStrength(SignalState.LOW)
-                else -> showSatSignalTagStrength(SignalState.LOW)
+        AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
+            val hasSatModule = deploymentProtocol?.getSatId()
+            if (hasSatModule != null) {
+                satDetectionCheckbox.isChecked = true
+                satSignalLayout.visibility = View.VISIBLE
+            } else {
+                satDetectionCheckbox.isChecked = false
+                satSignalLayout.visibility = View.GONE
             }
-            satSignalValues.text = getString(R.string.signal_value, swmStrength)
-        }
+
+            val swmStrength = deploymentProtocol?.getSwmNetwork()
+            if (swmStrength == null) {
+                showCellSignalStrength(SignalState.NONE)
+                signalValue.text = getString(R.string.speed_test_failed)
+            } else {
+                when {
+                    swmStrength < -104 -> showSatSignalTagStrength(SignalState.MAX)
+                    swmStrength < -100 -> showSatSignalTagStrength(SignalState.HIGH)
+                    swmStrength < -97 -> showSatSignalTagStrength(SignalState.NORMAL)
+                    swmStrength < -93 -> showSatSignalTagStrength(SignalState.LOW)
+                    else -> showSatSignalTagStrength(SignalState.LOW)
+                }
+                satSignalValues.text = getString(R.string.signal_value, swmStrength)
+            }
+        })
     }
 
     private fun showCellSignalStrength(state: SignalState) {
