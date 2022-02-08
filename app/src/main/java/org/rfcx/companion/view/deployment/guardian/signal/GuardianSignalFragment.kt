@@ -75,11 +75,11 @@ class GuardianSignalFragment : Fragment() {
         AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
             val hasSim = deploymentProtocol?.getSimDetected()
             if (hasSim != null && hasSim) {
-                simDetectionCheckbox.isChecked = true
+                simDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
                 cellSignalLayout.visibility = View.VISIBLE
                 cellDataTransferLayout.visibility = View.VISIBLE
             } else {
-                simDetectionCheckbox.isChecked = false
+                simDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_error, 0, 0, 0)
                 cellSignalLayout.visibility = View.GONE
                 cellDataTransferLayout.visibility = View.GONE
             }
@@ -184,10 +184,10 @@ class GuardianSignalFragment : Fragment() {
     private fun retrieveSatModule() {
         val hasSatModule = deploymentProtocol?.getSatId()
         if (hasSatModule != null) {
-            satDetectionCheckbox.isChecked = true
+            satDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
             satSignalLayout.visibility = View.VISIBLE
         } else {
-            satDetectionCheckbox.isChecked = false
+            satDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_error, 0, 0, 0)
             satSignalLayout.visibility = View.GONE
         }
 
