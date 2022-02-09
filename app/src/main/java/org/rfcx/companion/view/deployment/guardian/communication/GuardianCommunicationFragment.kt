@@ -67,7 +67,12 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
         AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
             val isSimDetected = deploymentProtocol?.getSimDetected()
 
-            simDetectionCheckbox.isChecked = !(isSimDetected == null || isSimDetected == false)
+            if ((isSimDetected == null || isSimDetected == false)) {
+                simDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist, 0, 0, 0)
+
+            } else {
+                simDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
+            }
         })
     }
 
@@ -89,14 +94,18 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
         AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
             val satId = deploymentProtocol?.getSatId()
             if (satId != null) {
-                satDetectionCheckbox.isChecked = true
+                satDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
                 swarmIdTextView.visibility = View.VISIBLE
                 swarmValueTextView.visibility = View.VISIBLE
                 swarmValueTextView.text = satId
+                satOnlyRadioButton.isEnabled = true
+                satOnlyRadioButton.setTextColor(resources.getColor(R.color.text_primary))
             } else {
-                satDetectionCheckbox.isChecked = false
+                satDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_error, 0, 0, 0)
                 swarmIdTextView.visibility = View.GONE
                 swarmValueTextView.visibility = View.GONE
+                satOnlyRadioButton.isEnabled = false
+                satOnlyRadioButton.setTextColor(resources.getColor(R.color.text_secondary))
             }
         })
     }
@@ -136,8 +145,10 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
 
         guardianPlanGroup.setOnCheckedChangeListener { group, checkedId ->
             if (checkedId == R.id.satOnlyRadioButton) {
+                passTimesTextView.visibility = View.VISIBLE
                 passTimeChipGroup.visibility = View.VISIBLE
             } else {
+                passTimesTextView.visibility = View.GONE
                 passTimeChipGroup.visibility = View.GONE
             }
         }
