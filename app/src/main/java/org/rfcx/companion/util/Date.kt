@@ -49,7 +49,8 @@ private val isoSdf by lazy {
 }
 
 fun Date.toDateTimeString(): String {
-    return outputStandardDateSdf.format(this)
+    val sdf = SimpleDateFormat(standardDateFormat, Locale.ENGLISH)
+    return sdf.format(this)
 }
 
 fun Date.toDateString(): String {

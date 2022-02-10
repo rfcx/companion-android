@@ -138,6 +138,11 @@ object PingUtils {
         return null
     }
 
+    fun getGuardianLocalTime(ping: GuardianPing?): Long? {
+        val isRegistered = ping?.companion?.get("local_time") ?: return null
+        return isRegistered.asLong
+    }
+
     fun getSpeedTest(ping: AdminPing?): SpeedTest? {
         val speedTest = ping?.companion?.get("speed_test")?.asJsonObject ?: return null
         val downloadSpeed = speedTest.get("download_speed").asDouble
