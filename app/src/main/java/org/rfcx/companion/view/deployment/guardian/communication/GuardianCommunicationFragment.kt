@@ -16,7 +16,9 @@ import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.AdminSocketManager
 import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.util.prefs.GuardianPlan
+import org.rfcx.companion.util.toDateTimeString
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
+import java.util.*
 
 class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
 
@@ -54,6 +56,7 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
         setSimDetected()
         setPhoneNumber()
         setSatDetected()
+        setGuardianLocalTime()
         setPlanRadioGroup()
         setPassTime()
 
@@ -106,6 +109,17 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
                 swarmValueTextView.visibility = View.GONE
                 satOnlyRadioButton.isEnabled = false
                 satOnlyRadioButton.setTextColor(resources.getColor(R.color.text_secondary))
+            }
+        })
+    }
+
+    private fun setGuardianLocalTime() {
+        GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
+            val time = deploymentProtocol?.getGuardianLocalTime()
+            if (time != null) {
+                guardianTimeValuesTextView.text = Date(time).toDateTimeString()
+            } else {
+                guardianTimeValuesTextView.text = getString(R.string.guardian_local_time_null)
             }
         })
     }
