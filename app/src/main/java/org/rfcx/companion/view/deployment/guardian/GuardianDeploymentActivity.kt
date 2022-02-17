@@ -85,7 +85,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     private var guardianPlan: GuardianPlan? = null
     private var satTimeOff: List<String>? = null
     private var speedTest: SpeedTest? = null
-    private var guardianLocalTIme: Long? = null
+    private var guardianLocalTime: Long? = null
 
     private var _sampleRate = 12000
 
@@ -252,7 +252,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
             internalBattery = PingUtils.getInternalBatteryFromPing(it)
             guardianPlan = PingUtils.getGuardianPlanFromPrefs(it)
             satTimeOff = PingUtils.getSatTimeOffFromPrefs(it)
-            guardianLocalTIme = PingUtils.getGuardianLocalTime(it)
+            guardianLocalTime = PingUtils.getGuardianLocalTime(it)
         }
         AdminSocketManager.pingBlob.observeForever {
             network = PingUtils.getNetworkFromPing(it)
