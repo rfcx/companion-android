@@ -71,10 +71,12 @@ class GuardianSolarPanelFragment : Fragment() {
             val i2CAccessibility = deploymentProtocol?.getI2cAccessibility()
             i2CAccessibility?.let {
                 if (it.isAccessible) {
-                    i2cCheckbox.isChecked = true
+                    i2cCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
+                    i2cCheckTextView.text = getString(R.string.sentinel_module_detect)
                     i2cFailMessage.visibility = View.GONE
                 } else {
-                    i2cCheckbox.isChecked = false
+                    i2cCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_error, 0, 0, 0)
+                    i2cCheckTextView.text = getString(R.string.sentinel_module_not_detect)
                     i2cFailMessage.text = it.message
                     i2cFailMessage.visibility = View.VISIBLE
                 }

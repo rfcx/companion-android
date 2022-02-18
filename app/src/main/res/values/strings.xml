@@ -483,7 +483,8 @@
     <string name="ibattery_p">Internal Battery</string>
     <string name="mbattery_p">Main Battery</string>
     <string name="in_queue">In queue</string>
-    <string name="sentinel_module_detect">Sentinel module detect</string>
+    <string name="sentinel_module_detect">Sentinel module detected</string>
+    <string name="sentinel_module_not_detect">Sentinel module not detected</string>
     <string name="sim_detected">SIM Card detected</string>
     <string name="sim_not_detected">SIM Card not detected</string>
     <string name="cell_signal_strength">Cell signal strength</string>

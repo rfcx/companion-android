@@ -17,18 +17,26 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <CheckBox
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/i2cCheckbox"
-        style="@style/AudioMothCheckBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginTop="@dimen/margin_padding_normal"
-        android:text="@string/sentinel_module_detect"
-        android:clickable="false"
-        android:enabled="false"
+        android:drawableStart="@drawable/ic_red_error"
+        android:drawablePadding="@dimen/margin_padding_normal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/solarPanelTitle" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/i2cCheckTextView"
+        style="@style/AudioMothText.Subhead.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sentinel_module_detect"
+        app:layout_constraintStart_toEndOf="@id/i2cCheckbox"
+        app:layout_constraintTop_toTopOf="@id/i2cCheckbox"
+        app:layout_constraintBottom_toBottomOf="@id/i2cCheckbox" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/i2cFailMessage"
@@ -38,7 +46,7 @@
         android:layout_marginStart="@dimen/margin_padding_small"
         android:textColor="@color/text_error"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/i2cCheckbox"
+        app:layout_constraintTop_toBottomOf="@id/i2cCheckTextView"
         app:layout_constraintStart_toStartOf="parent"
         tools:text="i2c not..."/>
 
