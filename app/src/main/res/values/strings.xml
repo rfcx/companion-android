@@ -484,12 +484,14 @@
     <string name="mbattery_p">Main Battery</string>
     <string name="in_queue">In queue</string>
     <string name="sentinel_module_detect">Sentinel module detect</string>
-    <string name="sim_detected">Sim detected</string>
+    <string name="sim_detected">SIM Card detected</string>
+    <string name="sim_not_detected">SIM Card not detected</string>
     <string name="cell_signal_strength">Cell signal strength</string>
     <string name="cell_data_transfer">Cell data transfer</string>
     <string name="cell_no_internet_connection">No internet connection</string>
     <string name="retest">Retest</string>
     <string name="satellite_module_detected">Satellite module detected</string>
+    <string name="satellite_module_not_detected">Satellite module not detected</string>
     <string name="background_noise">Background noise</string>
     <string name="perfect">Perfect</string>
     <string name="good">Good</string>
