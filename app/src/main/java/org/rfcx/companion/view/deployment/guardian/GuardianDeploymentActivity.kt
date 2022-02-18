@@ -20,14 +20,9 @@ import kotlinx.android.synthetic.main.activity_guardian_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.AdminSocketManager
-import org.rfcx.companion.connection.socket.AudioCastSocketManager
-import org.rfcx.companion.connection.socket.FileSocketManager
 import org.rfcx.companion.connection.socket.GuardianSocketManager
-import org.rfcx.companion.connection.wifi.WifiHotspotManager
-import org.rfcx.companion.connection.wifi.WifiLostListener
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
-import org.rfcx.companion.entity.socket.request.CheckinCommand
 import org.rfcx.companion.entity.socket.response.GuardianPing
 import org.rfcx.companion.entity.socket.response.I2CAccessibility
 import org.rfcx.companion.entity.socket.response.SentinelInfo
@@ -208,10 +203,9 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
                 )
             }
             is GuardianCheckListFragment -> {
-                reTriggerConnection()
                 GuardianSocketManager.resetAllValuesToDefault()
                 setLastCheckInTime(null)
-                GuardianSocketManager.getCheckInTest(CheckinCommand.STOP) // to stop getting checkin test
+                SocketUtils.stopAllConnections()
                 passedChecks.clear() // remove all passed
                 startFragment(ConnectGuardianFragment.newInstance())
             }
@@ -442,7 +436,6 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
 
             analytics.trackCreateGuardianDeploymentEvent()
 
-            GuardianSocketManager.getCheckInTest(CheckinCommand.STOP) // to stop getting checkin test
             DeploymentSyncWorker.enqueue(this@GuardianDeploymentActivity)
             showComplete()
         }
@@ -482,7 +475,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
             }
             3 -> {
                 updateDeploymentState(DeploymentState.Guardian.Register)
-                startGuardianRegister()
+                startFragment(GuardianRegisterFragment.newInstance())
             }
             4 -> {
                 updateDeploymentState(DeploymentState.Guardian.Signal)

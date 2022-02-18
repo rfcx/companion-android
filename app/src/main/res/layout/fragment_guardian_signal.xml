@@ -158,14 +158,13 @@
             android:id="@+id/cellDataTransferButton"
             style="@style/AudioMothButton.GreenButton.TextSmall"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_padding_small"
-            android:minWidth="70dp"
-            android:minHeight="20dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/margin_padding_normal"
             android:text="@string/retest"
-            app:layout_constraintBottom_toBottomOf="@+id/cellDownloadDataTransferValues"
+            app:layout_constraintTop_toTopOf="@id/cellDownloadDataTransferValues"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/cellDownloadDataTransferValues" />
+            app:layout_constraintStart_toEndOf="@id/cellDownloadDataTransferValues"
+            app:layout_constraintBottom_toBottomOf="@id/cellUploadDataTransferValues" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

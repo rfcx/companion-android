@@ -63,7 +63,7 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
 
         checklistDeployButton.isEnabled = checkListRecyclerView.isEveryCheckListPassed()
         checklistDeployButton.setOnClickListener {
-            showNotificationBeforeDeploy()
+            deploy()
         }
 
     }
@@ -102,24 +102,6 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
         return checkList
     }
 
-    private fun showNotificationBeforeDeploy() {
-        val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
-        builder?.apply {
-            setTitle(getString(R.string.wifi_notification_title))
-            setPositiveButton(getString(R.string.notification_yes)) { dialog, _ ->
-                deploymentProtocol?.setOnDeployClicked()
-                GuardianSocketManager.stopGuardianWiFi()
-                deploy()
-                dialog.dismiss()
-            }
-            setNegativeButton(getString(R.string.notification_no)) { dialog, _ ->
-                deploy()
-                dialog.dismiss()
-            }
-        }
-        builder?.show()
-    }
-
     private fun deploy() {
         deploymentProtocol?.setReadyToDeploy()
         SocketUtils.stopAllConnections()
@@ -130,11 +112,6 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
         deploymentProtocol?.let {
             it.setToolbarSubtitle("${it.getGuid()}")
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        SocketUtils.stopAllConnections()
     }
 
     companion object {

@@ -351,6 +351,7 @@
     <string name="speed_test_wait">waiting for testing</string>
     <string name="speed_test_run">run a test</string>
     <string name="speed_test_kbps">%.2f kb/s download</string>
+    <string name="speed_test_kbps_upload">%.2f kb/s upload</string>
 
     <!-- LocationTrackerService -->
     <string name="track">Track</string>
