@@ -406,7 +406,7 @@
     <string name="voltage_v">Voltage</string>
     <string name="current_a">Current</string>
     <string name="power_w">Power</string>
-    <string name="please_assemble_solar_panel_to_get_feedback">Please Begin Attaching the Solar Panels to Observe Feedback</string>
+    <string name="please_assemble_solar_panel_to_get_feedback">Please Begin Attaching the Solar Panels\nto Observe Feedback</string>
 
     <!-- GuardianRegisterFragment -->
     <string name="let_s_register_your_guardian">Let\'s Register your Guardian</string>
