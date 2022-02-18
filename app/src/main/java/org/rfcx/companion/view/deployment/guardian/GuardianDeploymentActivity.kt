@@ -178,10 +178,13 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     }
 
     override fun nextStep() {
-        if (currentCheck !in passedChecks) {
-            passedChecks.add(currentCheck)
+        val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
+        if (container !is GuardianAdvancedFragment) {
+            if (currentCheck !in passedChecks) {
+                passedChecks.add(currentCheck)
+            }
+            currentCheck = -1 //reset check
         }
-        currentCheck = -1 //reset check
         startCheckList()
     }
 
@@ -193,7 +196,6 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
                 reTriggerConnection()
                 startCheckList()
             }
-            is GuardianRegisterFragment -> setupView()
             is MapPickerFragment -> {
                 reTriggerConnection()
                 startFragment(
@@ -247,6 +249,9 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         GuardianSocketManager.pingBlob.observeForever {
             guardianPingBlob = it
             isGuardianRegistered = PingUtils.isRegisteredFromPing(it)
+            if (isGuardianRegistered == true) {
+                addRegisteredToPassedCheck()
+            }
             swmNetwork = PingUtils.getSwarmNetworkFromPing(it)
             swmUnsentMsgs = PingUtils.getSwarmUnsetMessagesFromPing(it)
             internalBattery = PingUtils.getInternalBatteryFromPing(it)
@@ -306,8 +311,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     }
 
     override fun addRegisteredToPassedCheck() {
-        if (1 !in passedChecks) {
-            passedChecks.add(1)
+        if (3 !in passedChecks) {
+            passedChecks.add(3)
         }
     }
 
@@ -345,7 +350,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
 
     override fun getSpeedTest(): SpeedTest? = speedTest
 
-    override fun getGuardianLocalTime(): Long? = guardianLocalTIme
+    override fun getGuardianLocalTime(): Long? = guardianLocalTime
 
     override fun getGuid(): String? = PingUtils.getGuidFromPing(guardianPingBlob)
 
@@ -454,7 +459,6 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     }
 
     override fun startGuardianRegister() {
-//        updateDeploymentState(DeploymentState.Guardian.Register) // TODO:: Not sure where should be @Frongs
         startFragment(GuardianRegisterFragment.newInstance())
     }
 
@@ -477,13 +481,17 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
                 startFragment(GuardianSolarPanelFragment.newInstance())
             }
             3 -> {
+                updateDeploymentState(DeploymentState.Guardian.Register)
+                startGuardianRegister()
+            }
+            4 -> {
                 updateDeploymentState(DeploymentState.Guardian.Signal)
                 startFragment(GuardianSignalFragment.newInstance())
             }
-            4 -> {
+            5 -> {
                 startFragment(GuardianConfigureFragment.newInstance())
             }
-            5 -> {
+            6 -> {
                 updateDeploymentState(DeploymentState.Guardian.Locate)
                 val site = this._locate
                 if (site == null) {
@@ -496,15 +504,15 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
                     startDetailDeploymentSite(site.id, site.name, false)
                 }
             }
-            6 -> {
+            7 -> {
                 updateDeploymentState(DeploymentState.Guardian.Microphone)
                 startFragment(GuardianMicrophoneFragment.newInstance())
             }
-            7 -> {
+            8 -> {
                 updateDeploymentState(DeploymentState.Guardian.Checkin)
                 startFragment(GuardianCheckInTestFragment.newInstance())
             }
-            8 -> {
+            9 -> {
                 updateDeploymentState(DeploymentState.Guardian.Deploy)
                 startFragment(GuardianDeployFragment.newInstance())
             }
