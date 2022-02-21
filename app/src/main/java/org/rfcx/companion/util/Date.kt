@@ -48,8 +48,12 @@ private val isoSdf by lazy {
     sdf
 }
 
-fun Date.toDateTimeString(): String {
-    return outputStandardDateSdf.format(this)
+fun Date.toDateTimeString(timeZone: String? = null): String {
+    val sdf = SimpleDateFormat(standardDateFormat, Locale.ENGLISH)
+    if (timeZone != null) {
+        sdf.timeZone = TimeZone.getTimeZone(timeZone)
+    }
+    return sdf.format(this)
 }
 
 fun Date.toDateString(): String {

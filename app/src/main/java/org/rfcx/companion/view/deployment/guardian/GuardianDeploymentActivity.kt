@@ -20,16 +20,11 @@ import kotlinx.android.synthetic.main.activity_guardian_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.AdminSocketManager
-import org.rfcx.companion.connection.socket.AudioCastSocketManager
-import org.rfcx.companion.connection.socket.FileSocketManager
 import org.rfcx.companion.connection.socket.GuardianSocketManager
-import org.rfcx.companion.connection.wifi.WifiHotspotManager
-import org.rfcx.companion.connection.wifi.WifiLostListener
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.request.GuardianDeploymentParameters
 import org.rfcx.companion.entity.response.GuardianRegisterResponse
-import org.rfcx.companion.entity.socket.request.CheckinCommand
 import org.rfcx.companion.entity.socket.response.GuardianPing
 import org.rfcx.companion.entity.socket.response.I2CAccessibility
 import org.rfcx.companion.entity.socket.response.SentinelInfo
@@ -89,6 +84,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     private var guardianPlan: GuardianPlan? = null
     private var satTimeOff: List<String>? = null
     private var speedTest: SpeedTest? = null
+    private var guardianLocalTime: Long? = null
+    private var guardianTimezone: String? = null
 
     private var _sampleRate = 12000
 
@@ -181,10 +178,13 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     }
 
     override fun nextStep() {
-        if (currentCheck !in passedChecks) {
-            passedChecks.add(currentCheck)
+        val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
+        if (container !is GuardianAdvancedFragment) {
+            if (currentCheck !in passedChecks) {
+                passedChecks.add(currentCheck)
+            }
+            currentCheck = -1 //reset check
         }
-        currentCheck = -1 //reset check
         startCheckList()
     }
 
@@ -196,7 +196,6 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
                 reTriggerConnection()
                 startCheckList()
             }
-            is GuardianRegisterFragment -> setupView()
             is MapPickerFragment -> {
                 reTriggerConnection()
                 startFragment(
@@ -209,10 +208,9 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
                 )
             }
             is GuardianCheckListFragment -> {
-                reTriggerConnection()
                 GuardianSocketManager.resetAllValuesToDefault()
                 setLastCheckInTime(null)
-                GuardianSocketManager.getCheckInTest(CheckinCommand.STOP) // to stop getting checkin test
+                SocketUtils.stopAllConnections()
                 passedChecks.clear() // remove all passed
                 startFragment(ConnectGuardianFragment.newInstance())
             }
@@ -250,11 +248,16 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         GuardianSocketManager.pingBlob.observeForever {
             guardianPingBlob = it
             isGuardianRegistered = PingUtils.isRegisteredFromPing(it)
+            if (isGuardianRegistered == true) {
+                addRegisteredToPassedCheck()
+            }
             swmNetwork = PingUtils.getSwarmNetworkFromPing(it)
             swmUnsentMsgs = PingUtils.getSwarmUnsetMessagesFromPing(it)
             internalBattery = PingUtils.getInternalBatteryFromPing(it)
             guardianPlan = PingUtils.getGuardianPlanFromPrefs(it)
             satTimeOff = PingUtils.getSatTimeOffFromPrefs(it)
+            guardianLocalTime = PingUtils.getGuardianLocalTime(it)
+            guardianTimezone = PingUtils.getGuardianTimezone(it)
         }
         AdminSocketManager.pingBlob.observeForever {
             network = PingUtils.getNetworkFromPing(it)
@@ -312,8 +315,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     }
 
     override fun addRegisteredToPassedCheck() {
-        if (1 !in passedChecks) {
-            passedChecks.add(1)
+        if (3 !in passedChecks) {
+            passedChecks.add(3)
         }
     }
 
@@ -350,6 +353,16 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     override fun getSatTimeOff(): List<String>? = satTimeOff
 
     override fun getSpeedTest(): SpeedTest? = speedTest
+
+    override fun getGuardianLocalTime(): Long? = guardianLocalTime
+
+    override fun getGuardianTimezone(): String? = guardianTimezone
+
+    override fun getCurrentProjectId(): String? {
+        val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
+        val project = projectDb.getProjectById(projectId)
+        return project?.serverId
+    }
 
     override fun getGuid(): String? = PingUtils.getGuidFromPing(guardianPingBlob)
 
@@ -441,7 +454,6 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
 
             analytics.trackCreateGuardianDeploymentEvent()
 
-            GuardianSocketManager.getCheckInTest(CheckinCommand.STOP) // to stop getting checkin test
             DeploymentSyncWorker.enqueue(this@GuardianDeploymentActivity)
             showComplete()
         }
@@ -472,7 +484,6 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     }
 
     override fun startGuardianRegister() {
-//        updateDeploymentState(DeploymentState.Guardian.Register) // TODO:: Not sure where should be @Frongs
         startFragment(GuardianRegisterFragment.newInstance())
     }
 
@@ -495,13 +506,17 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
                 startFragment(GuardianSolarPanelFragment.newInstance())
             }
             3 -> {
+                updateDeploymentState(DeploymentState.Guardian.Register)
+                startFragment(GuardianRegisterFragment.newInstance())
+            }
+            4 -> {
                 updateDeploymentState(DeploymentState.Guardian.Signal)
                 startFragment(GuardianSignalFragment.newInstance())
             }
-            4 -> {
+            5 -> {
                 startFragment(GuardianConfigureFragment.newInstance())
             }
-            5 -> {
+            6 -> {
                 updateDeploymentState(DeploymentState.Guardian.Locate)
                 val site = this._locate
                 if (site == null) {
@@ -514,15 +529,15 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
                     startDetailDeploymentSite(site.id, site.name, false)
                 }
             }
-            6 -> {
+            7 -> {
                 updateDeploymentState(DeploymentState.Guardian.Microphone)
                 startFragment(GuardianMicrophoneFragment.newInstance())
             }
-            7 -> {
+            8 -> {
                 updateDeploymentState(DeploymentState.Guardian.Checkin)
                 startFragment(GuardianCheckInTestFragment.newInstance())
             }
-            8 -> {
+            9 -> {
                 updateDeploymentState(DeploymentState.Guardian.Deploy)
                 startFragment(GuardianDeployFragment.newInstance())
             }

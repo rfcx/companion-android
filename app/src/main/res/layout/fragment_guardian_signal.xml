@@ -5,17 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <CheckBox
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/simDetectionCheckbox"
-        style="@style/AudioMothCheckBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginTop="@dimen/margin_padding_normal"
-        android:clickable="false"
-        android:enabled="false"
-        android:minWidth="0dp"
-        android:minHeight="0dp"
+        android:drawableStart="@drawable/ic_red_error"
+        android:drawablePadding="@dimen/margin_padding_normal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -161,28 +158,24 @@
             android:id="@+id/cellDataTransferButton"
             style="@style/AudioMothButton.GreenButton.TextSmall"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_padding_small"
-            android:minWidth="70dp"
-            android:minHeight="20dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/margin_padding_normal"
             android:text="@string/retest"
-            app:layout_constraintBottom_toBottomOf="@+id/cellDownloadDataTransferValues"
+            app:layout_constraintTop_toTopOf="@id/cellDownloadDataTransferValues"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/cellDownloadDataTransferValues" />
+            app:layout_constraintStart_toEndOf="@id/cellDownloadDataTransferValues"
+            app:layout_constraintBottom_toBottomOf="@id/cellUploadDataTransferValues" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <CheckBox
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/satDetectionCheckbox"
-        style="@style/AudioMothCheckBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginTop="@dimen/margin_padding_normal"
-        android:clickable="false"
-        android:enabled="false"
-        android:minWidth="0dp"
-        android:minHeight="0dp"
+        android:drawableStart="@drawable/ic_red_error"
+        android:drawablePadding="@dimen/margin_padding_normal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cellDataTransferLayout" />
 

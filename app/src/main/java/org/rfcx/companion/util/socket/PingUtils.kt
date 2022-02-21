@@ -138,13 +138,24 @@ object PingUtils {
         return null
     }
 
+    fun getGuardianLocalTime(ping: GuardianPing?): Long? {
+        val localtime = ping?.companion?.get("system_time_utc") ?: return null
+        return localtime.asLong
+    }
+
+    fun getGuardianTimezone(ping: GuardianPing?): String? {
+        val timezone = ping?.companion?.get("system_timezone") ?: return null
+        return timezone.asString
+    }
+
     fun getSpeedTest(ping: AdminPing?): SpeedTest? {
         val speedTest = ping?.companion?.get("speed_test")?.asJsonObject ?: return null
         val downloadSpeed = speedTest.get("download_speed").asDouble
         val uploadSpeed = speedTest.get("upload_speed").asDouble
         val isFailed = speedTest.get("is_failed").asBoolean
+        val isTesting = if (speedTest.has("is_testing")) speedTest.get("is_testing").asBoolean else false
         val hasConnection = speedTest.get("connection_available").asBoolean
-        return SpeedTest(downloadSpeed, uploadSpeed, isFailed, hasConnection)
+        return SpeedTest(downloadSpeed, uploadSpeed, isFailed, isTesting, hasConnection)
     }
 
     fun getSimDetectedFromPing(adminPing: AdminPing?): Boolean? {

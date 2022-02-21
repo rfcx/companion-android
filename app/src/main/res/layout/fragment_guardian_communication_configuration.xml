@@ -15,17 +15,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <CheckBox
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/simDetectionCheckbox"
-                style="@style/AudioMothCheckBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_large"
                 android:layout_marginTop="@dimen/margin_padding_normal"
-                android:clickable="false"
-                android:enabled="false"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
+                android:drawableStart="@drawable/ic_red_error"
+                android:drawablePadding="@dimen/margin_padding_normal"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -60,17 +57,14 @@
                 app:layout_constraintTop_toBottomOf="@id/simDetectionTextView"
                 tools:text="01111111" />
 
-            <CheckBox
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/satDetectionCheckbox"
-                style="@style/AudioMothCheckBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_large"
                 android:layout_marginTop="@dimen/margin_padding_normal"
-                android:clickable="false"
-                android:enabled="false"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
+                android:drawableStart="@drawable/ic_red_error"
+                android:drawablePadding="@dimen/margin_padding_normal"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/phoneNumberTextView" />
 
@@ -105,14 +99,66 @@
                 app:layout_constraintTop_toBottomOf="@id/satDetectionTextView"
                 tools:text="01111111" />
 
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/guardianTimeTextView"
+                style="@style/AudioMothText.Subhead.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:text="@string/guardian_local_time"
+                app:layout_constraintStart_toStartOf="@id/swarmIdTextView"
+                app:layout_constraintTop_toBottomOf="@id/swarmIdTextView"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/guardianTimeValuesTextView"
+                style="@style/AudioMothText.Subhead.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_small"
+                app:layout_constraintStart_toEndOf="@id/guardianTimeTextView"
+                app:layout_constraintTop_toTopOf="@id/guardianTimeTextView"
+                app:layout_constraintBottom_toBottomOf="@id/guardianTimeTextView"
+                tools:text="19:00"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/timezoneTextView"
+                style="@style/AudioMothText.Subhead.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:text="@string/guardian_timezone"
+                app:layout_constraintStart_toStartOf="@id/guardianTimeTextView"
+                app:layout_constraintTop_toBottomOf="@id/guardianTimeTextView"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/timezoneValuesTextView"
+                style="@style/AudioMothText.Subhead.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_small"
+                app:layout_constraintStart_toEndOf="@id/timezoneTextView"
+                app:layout_constraintTop_toTopOf="@id/timezoneTextView"
+                app:layout_constraintBottom_toBottomOf="@id/timezoneTextView"
+                tools:text="Asia/Bangkok"/>
+
+            <View
+                android:id="@+id/sectionDivide"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_large"
+                android:layout_marginEnd="@dimen/margin_padding_large"
+                android:background="@color/colorPrimary"
+                app:layout_constraintTop_toBottomOf="@id/timezoneValuesTextView" />
+
             <RadioGroup
                 android:id="@+id/guardianPlanGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingTop="@dimen/margin_padding_large"
+                android:paddingTop="@dimen/margin_padding_normal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/swarmIdTextView">
+                app:layout_constraintTop_toBottomOf="@id/sectionDivide">
 
                 <RadioButton
                     android:id="@+id/cellOnlyRadioButton"

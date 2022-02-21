@@ -16,7 +16,9 @@ import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.AdminSocketManager
 import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.util.prefs.GuardianPlan
+import org.rfcx.companion.util.toDateTimeString
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
+import java.util.*
 
 class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
 
@@ -54,6 +56,7 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
         setSimDetected()
         setPhoneNumber()
         setSatDetected()
+        setGuardianLocalTime()
         setPlanRadioGroup()
         setPassTime()
 
@@ -67,7 +70,13 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
         AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
             val isSimDetected = deploymentProtocol?.getSimDetected()
 
-            simDetectionCheckbox.isChecked = !(isSimDetected == null || isSimDetected == false)
+            if ((isSimDetected == null || isSimDetected == false)) {
+                simDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_error, 0, 0, 0)
+                simDetectionTextView.text = getString(R.string.sim_not_detected)
+            } else {
+                simDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
+                simDetectionTextView.text = getString(R.string.sim_detected)
+            }
         })
     }
 
@@ -89,14 +98,45 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
         AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
             val satId = deploymentProtocol?.getSatId()
             if (satId != null) {
-                satDetectionCheckbox.isChecked = true
+                satDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
+                satDetectionTextView.text = getString(R.string.satellite_module_detected)
                 swarmIdTextView.visibility = View.VISIBLE
                 swarmValueTextView.visibility = View.VISIBLE
                 swarmValueTextView.text = satId
+                satOnlyRadioButton.isEnabled = true
+                satOnlyRadioButton.setTextColor(resources.getColor(R.color.text_primary))
             } else {
-                satDetectionCheckbox.isChecked = false
+                satDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_error, 0, 0, 0)
+                satDetectionTextView.text = getString(R.string.satellite_module_not_detected)
                 swarmIdTextView.visibility = View.GONE
                 swarmValueTextView.visibility = View.GONE
+                val isSimDetected = deploymentProtocol?.getSimDetected()
+                if (isSimDetected == true) {
+                    satOnlyRadioButton.isEnabled = false
+                    satOnlyRadioButton.setTextColor(resources.getColor(R.color.text_primary))
+                } else {
+                    satOnlyRadioButton.isEnabled = true
+                    satOnlyRadioButton.setTextColor(resources.getColor(R.color.text_secondary))
+                }
+            }
+        })
+    }
+
+    private fun setGuardianLocalTime() {
+        GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
+            val time = deploymentProtocol?.getGuardianLocalTime()
+            if (time != null) {
+                guardianTimeValuesTextView.text = Date(time).toDateTimeString()
+            } else {
+                guardianTimeValuesTextView.text = getString(R.string.guardian_local_time_null)
+            }
+
+            val timezone = deploymentProtocol?.getGuardianTimezone()
+            if (timezone != null && time != null) {
+                timezoneValuesTextView.text = timezone
+                guardianTimeValuesTextView.text = Date(time).toDateTimeString(timezone)
+            } else {
+                timezoneValuesTextView.text = getString(R.string.guardian_local_timezone_null)
             }
         })
     }
@@ -126,9 +166,16 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
 
             val satTimeOff = deploymentProtocol?.getSatTimeOff()
             if (satTimeOff != null && !isAddFirstSetOfChips) {
-                satTimeOff.forEach { name ->
-                    timeOff.add(name)
-                    addChip(name)
+                if (deploymentProtocol?.getCurrentProjectId() == "agk3cpurb5wm") {
+                    listOf("00:00-01:20", "03:10-08:40", "11:30-13:15", "15:05-20:45", "23:30-23:59").forEach { name ->
+                        timeOff.add(name)
+                        addChip(name)
+                    }
+                } else {
+                    satTimeOff.forEach { name ->
+                        timeOff.add(name)
+                        addChip(name)
+                    }
                 }
                 isAddFirstSetOfChips = true
             }
@@ -136,8 +183,10 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
 
         guardianPlanGroup.setOnCheckedChangeListener { group, checkedId ->
             if (checkedId == R.id.satOnlyRadioButton) {
+                passTimesTextView.visibility = View.VISIBLE
                 passTimeChipGroup.visibility = View.VISIBLE
             } else {
+                passTimesTextView.visibility = View.GONE
                 passTimeChipGroup.visibility = View.GONE
             }
         }

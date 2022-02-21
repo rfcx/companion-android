@@ -11,6 +11,7 @@ import org.rfcx.companion.util.MicrophoneTestUtils
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.Socket
+import java.util.*
 
 object GuardianSocketManager {
 
@@ -108,6 +109,7 @@ object GuardianSocketManager {
         prefs.addProperty("enable_file_socket", "true")
         prefs.addProperty("api_protocol_escalation_order", "mqtt,rest")
         prefs.addProperty("api_satellite_off_hours", "23:55-23:56,23:57-23:59")
+        prefs.addProperty("admin_system_timezone", TimeZone.getDefault().id)
         syncConfiguration(prefs.toString())
     }
 
@@ -121,6 +123,7 @@ object GuardianSocketManager {
         prefs.addProperty("enable_file_socket", "true")
         prefs.addProperty("api_protocol_escalation_order", "mqtt,rest,sms")
         prefs.addProperty("api_satellite_off_hours", "23:55-23:56,23:57-23:59")
+        prefs.addProperty("admin_system_timezone", TimeZone.getDefault().id)
         syncConfiguration(prefs.toString())
     }
 
@@ -134,6 +137,7 @@ object GuardianSocketManager {
         prefs.addProperty("enable_file_socket", "true")
         prefs.addProperty("api_protocol_escalation_order", "sat")
         prefs.addProperty("api_satellite_off_hours", timeOff)
+        prefs.addProperty("admin_system_timezone", TimeZone.getDefault().id)
         syncConfiguration(prefs.toString())
     }
 

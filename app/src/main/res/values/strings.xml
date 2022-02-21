@@ -351,6 +351,7 @@
     <string name="speed_test_wait">waiting for testing</string>
     <string name="speed_test_run">run a test</string>
     <string name="speed_test_kbps">%.2f kb/s download</string>
+    <string name="speed_test_kbps_upload">%.2f kb/s upload</string>
 
     <!-- LocationTrackerService -->
     <string name="track">Track</string>
@@ -406,7 +407,7 @@
     <string name="voltage_v">Voltage</string>
     <string name="current_a">Current</string>
     <string name="power_w">Power</string>
-    <string name="please_assemble_solar_panel_to_get_feedback">Please Begin Attaching the Solar Panels to Observe Feedback</string>
+    <string name="please_assemble_solar_panel_to_get_feedback">Please Begin Attaching the Solar Panels\nto Observe Feedback</string>
 
     <!-- GuardianRegisterFragment -->
     <string name="let_s_register_your_guardian">Let\'s Register your Guardian</string>
@@ -483,13 +484,16 @@
     <string name="ibattery_p">Internal Battery</string>
     <string name="mbattery_p">Main Battery</string>
     <string name="in_queue">In queue</string>
-    <string name="sentinel_module_detect">Sentinel module detect</string>
-    <string name="sim_detected">Sim detected</string>
+    <string name="sentinel_module_detect">Sentinel module detected</string>
+    <string name="sentinel_module_not_detect">Sentinel module not detected</string>
+    <string name="sim_detected">SIM Card detected</string>
+    <string name="sim_not_detected">SIM Card not detected</string>
     <string name="cell_signal_strength">Cell signal strength</string>
     <string name="cell_data_transfer">Cell data transfer</string>
     <string name="cell_no_internet_connection">No internet connection</string>
     <string name="retest">Retest</string>
     <string name="satellite_module_detected">Satellite module detected</string>
+    <string name="satellite_module_not_detected">Satellite module not detected</string>
     <string name="background_noise">Background noise</string>
     <string name="perfect">Perfect</string>
     <string name="good">Good</string>
@@ -503,10 +507,14 @@
     <string name="cell_data_only">Cell data only</string>
     <string name="cell_data_sms_fallback_experimental">Cell data + SMS fallback (experimental)</string>
     <string name="satellite_only">Satellite only</string>
-    <string name="pass_times_local_time">Pass times (local time)</string>
+    <string name="pass_times_local_time">Off times (local time)</string>
     <string name="plus">+</string>
 
     <string name="sat_start_time">Select Satellite start time off</string>
     <string name="sat_end_time">Select Satellite end time off</string>
+    <string name="guardian_local_time">Guardian local time:</string>
+    <string name="guardian_local_time_null">cannot retrieve local time</string>
+    <string name="guardian_local_timezone_null">cannot retrieve timezone</string>
+    <string name="guardian_timezone">Guardian timezone:</string>
 
 </resources>

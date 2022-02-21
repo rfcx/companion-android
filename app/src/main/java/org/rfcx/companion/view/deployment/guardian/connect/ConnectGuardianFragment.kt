@@ -121,7 +121,7 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
             withContext(Dispatchers.Main) {
                 GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
                     requireActivity().runOnUiThread {
-                        deploymentProtocol?.startGuardianRegister()
+                        deploymentProtocol?.startCheckList()
                     }
                 })
             }
