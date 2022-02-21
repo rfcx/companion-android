@@ -110,8 +110,14 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
                 satDetectionTextView.text = getString(R.string.satellite_module_not_detected)
                 swarmIdTextView.visibility = View.GONE
                 swarmValueTextView.visibility = View.GONE
-                satOnlyRadioButton.isEnabled = false
-                satOnlyRadioButton.setTextColor(resources.getColor(R.color.text_secondary))
+                val isSimDetected = deploymentProtocol?.getSimDetected()
+                if (isSimDetected == true) {
+                    satOnlyRadioButton.isEnabled = false
+                    satOnlyRadioButton.setTextColor(resources.getColor(R.color.text_primary))
+                } else {
+                    satOnlyRadioButton.isEnabled = true
+                    satOnlyRadioButton.setTextColor(resources.getColor(R.color.text_secondary))
+                }
             }
         })
     }
