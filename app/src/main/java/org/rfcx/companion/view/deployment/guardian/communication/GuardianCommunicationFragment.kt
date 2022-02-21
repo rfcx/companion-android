@@ -124,6 +124,13 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
             } else {
                 guardianTimeValuesTextView.text = getString(R.string.guardian_local_time_null)
             }
+
+            val timezone = deploymentProtocol?.getGuardianTimezone()
+            if (timezone != null) {
+                timezoneValuesTextView.text = timezone
+            } else {
+                timezoneValuesTextView.text = getString(R.string.guardian_local_timezone_null)
+            }
         })
     }
 

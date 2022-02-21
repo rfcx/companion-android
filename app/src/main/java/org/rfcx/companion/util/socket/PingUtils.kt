@@ -139,8 +139,13 @@ object PingUtils {
     }
 
     fun getGuardianLocalTime(ping: GuardianPing?): Long? {
-        val isRegistered = ping?.companion?.get("local_time") ?: return null
-        return isRegistered.asLong
+        val localtime = ping?.companion?.get("local_time") ?: return null
+        return localtime.asLong
+    }
+
+    fun getGuardianTimezone(ping: GuardianPing?): String? {
+        val timezone = ping?.companion?.get("timezone") ?: return null
+        return timezone.asString
     }
 
     fun getSpeedTest(ping: AdminPing?): SpeedTest? {

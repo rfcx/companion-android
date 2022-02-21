@@ -39,6 +39,7 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getSatTimeOff(): List<String>?
     fun getSpeedTest(): SpeedTest?
     fun getGuardianLocalTime(): Long?
+    fun getGuardianTimezone(): String?
 
     fun setDeployment(deployment: Deployment)
     fun setSampleRate(sampleRate: Int)

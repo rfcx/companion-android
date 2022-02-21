@@ -514,5 +514,7 @@
     <string name="sat_end_time">Select Satellite end time off</string>
     <string name="guardian_local_time">Guardian local time:</string>
     <string name="guardian_local_time_null">cannot retrieve local time</string>
+    <string name="guardian_local_timezone_null">cannot retrieve timezone</string>
+    <string name="guardian_timezone">Guardian timezone:</string>
 
 </resources>

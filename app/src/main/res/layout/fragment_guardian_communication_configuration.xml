@@ -120,6 +120,27 @@
                 app:layout_constraintBottom_toBottomOf="@id/guardianTimeTextView"
                 tools:text="19:00"/>
 
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/timezoneTextView"
+                style="@style/AudioMothText.Subhead.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:text="@string/guardian_timezone"
+                app:layout_constraintStart_toStartOf="@id/guardianTimeTextView"
+                app:layout_constraintTop_toBottomOf="@id/guardianTimeTextView"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/timezoneValuesTextView"
+                style="@style/AudioMothText.Subhead.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_small"
+                app:layout_constraintStart_toEndOf="@id/timezoneTextView"
+                app:layout_constraintTop_toTopOf="@id/timezoneTextView"
+                app:layout_constraintBottom_toBottomOf="@id/timezoneTextView"
+                tools:text="Asia/Bangkok"/>
+
             <View
                 android:id="@+id/sectionDivide"
                 android:layout_width="match_parent"
@@ -128,7 +149,7 @@
                 android:layout_marginTop="@dimen/margin_padding_large"
                 android:layout_marginEnd="@dimen/margin_padding_large"
                 android:background="@color/colorPrimary"
-                app:layout_constraintTop_toBottomOf="@id/guardianTimeTextView" />
+                app:layout_constraintTop_toBottomOf="@id/timezoneValuesTextView" />
 
             <RadioGroup
                 android:id="@+id/guardianPlanGroup"
