@@ -8,7 +8,7 @@ import retrofit2.http.Header
 import retrofit2.http.Url
 
 interface CoreApiService {
-    @GET("v2/guardians/u60oxzgwk6vf/software/all")
+    @GET("v2/guardians/software/all")
     fun checkSoftwareVersion(
         @Header("Authorization") authUser: String
     ): Call<List<GuardianSoftwareResponse>>

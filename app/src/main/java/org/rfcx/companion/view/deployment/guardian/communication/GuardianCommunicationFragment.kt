@@ -71,10 +71,11 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
             val isSimDetected = deploymentProtocol?.getSimDetected()
 
             if ((isSimDetected == null || isSimDetected == false)) {
-                simDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist, 0, 0, 0)
-
+                simDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_error, 0, 0, 0)
+                simDetectionTextView.text = getString(R.string.sim_not_detected)
             } else {
                 simDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
+                simDetectionTextView.text = getString(R.string.sim_detected)
             }
         })
     }
@@ -98,6 +99,7 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
             val satId = deploymentProtocol?.getSatId()
             if (satId != null) {
                 satDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
+                satDetectionTextView.text = getString(R.string.satellite_module_detected)
                 swarmIdTextView.visibility = View.VISIBLE
                 swarmValueTextView.visibility = View.VISIBLE
                 swarmValueTextView.text = satId
@@ -105,10 +107,17 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
                 satOnlyRadioButton.setTextColor(resources.getColor(R.color.text_primary))
             } else {
                 satDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_error, 0, 0, 0)
+                satDetectionTextView.text = getString(R.string.satellite_module_not_detected)
                 swarmIdTextView.visibility = View.GONE
                 swarmValueTextView.visibility = View.GONE
-                satOnlyRadioButton.isEnabled = false
-                satOnlyRadioButton.setTextColor(resources.getColor(R.color.text_secondary))
+                val isSimDetected = deploymentProtocol?.getSimDetected()
+                if (isSimDetected == true) {
+                    satOnlyRadioButton.isEnabled = false
+                    satOnlyRadioButton.setTextColor(resources.getColor(R.color.text_primary))
+                } else {
+                    satOnlyRadioButton.isEnabled = true
+                    satOnlyRadioButton.setTextColor(resources.getColor(R.color.text_secondary))
+                }
             }
         })
     }
@@ -120,6 +129,13 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
                 guardianTimeValuesTextView.text = Date(time).toDateTimeString()
             } else {
                 guardianTimeValuesTextView.text = getString(R.string.guardian_local_time_null)
+            }
+
+            val timezone = deploymentProtocol?.getGuardianTimezone()
+            if (timezone != null) {
+                timezoneValuesTextView.text = timezone
+            } else {
+                timezoneValuesTextView.text = getString(R.string.guardian_local_timezone_null)
             }
         })
     }

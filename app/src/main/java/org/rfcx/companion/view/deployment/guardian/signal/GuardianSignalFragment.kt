@@ -31,10 +31,6 @@ class GuardianSignalFragment : Fragment() {
         )
     }
 
-    private var isWaitingSpeedTest = false
-    private var downloadSpeed: Double? = null
-    private var uploadSpeed: Double? = null
-
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
 
     private val analytics by lazy { context?.let { Analytics(it) } }
@@ -104,6 +100,7 @@ class GuardianSignalFragment : Fragment() {
             val tempUpload = speedTest?.uploadSpeed
             val hasConnection = speedTest?.hasConnection
             val isFailed = speedTest?.isFailed
+            val isWaitingSpeedTest = speedTest?.isTesting
 
             if (hasConnection != null && hasConnection) {
                 showSpeedTest()
@@ -111,38 +108,27 @@ class GuardianSignalFragment : Fragment() {
                 hideHideSpeedTest()
             }
 
-            if (isWaitingSpeedTest && isSpeedTestChanged(
-                    downloadSpeed,
-                    uploadSpeed,
-                    tempDownload,
-                    tempUpload
-                )
-            ) {
-                isWaitingSpeedTest = false
-
-            }
-
             when {
                 isFailed != null && isFailed -> {
                     cellDownloadDataTransferValues.text = getString(R.string.speed_test_failed)
                     cellUploadDataTransferValues.text = getString(R.string.speed_test_failed)
                 }
-                isWaitingSpeedTest -> {
+                isWaitingSpeedTest == true -> {
                     cellDownloadDataTransferValues.text = getString(R.string.speed_test_wait)
                     cellUploadDataTransferValues.text = getString(R.string.speed_test_wait)
                 }
-                !isWaitingSpeedTest -> {
-                    if (downloadSpeed == null) {
+                isWaitingSpeedTest == false -> {
+                    if (tempDownload == null || tempDownload == -1.0) {
                         cellDownloadDataTransferValues.text = getString(R.string.speed_test_run)
                     } else {
                         cellDownloadDataTransferValues.text =
-                            getString(R.string.speed_test_kbps, downloadSpeed)
+                            getString(R.string.speed_test_kbps, tempDownload)
                     }
-                    if (uploadSpeed == null) {
+                    if (tempUpload == null || tempUpload == -1.0) {
                         cellUploadDataTransferValues.text = getString(R.string.speed_test_run)
                     } else {
                         cellUploadDataTransferValues.text =
-                            getString(R.string.speed_test_kbps, uploadSpeed)
+                            getString(R.string.speed_test_kbps_upload, tempUpload)
                     }
                 }
             }
@@ -150,21 +136,7 @@ class GuardianSignalFragment : Fragment() {
 
         cellDataTransferButton.setOnClickListener {
             GuardianSocketManager.runSpeedTest()
-            isWaitingSpeedTest = true
         }
-    }
-
-    private fun isSpeedTestChanged(
-        currentDownload: Double?,
-        currentUpload: Double?,
-        newDownload: Double?,
-        newUpload: Double?
-    ): Boolean {
-        if (currentDownload == newDownload || newDownload == null || newDownload == -1.0) return false
-        downloadSpeed = newDownload
-        if (currentUpload == newUpload || newUpload == null || newUpload == -1.0) return false
-        uploadSpeed = newUpload
-        return true
     }
 
     private fun showSpeedTest() {
@@ -182,30 +154,31 @@ class GuardianSignalFragment : Fragment() {
     }
 
     private fun retrieveSatModule() {
-        val hasSatModule = deploymentProtocol?.getSatId()
-        if (hasSatModule != null) {
-            satDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
-            satSignalLayout.visibility = View.VISIBLE
-        } else {
-            satDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_error, 0, 0, 0)
-            satSignalLayout.visibility = View.GONE
-        }
-
-        val swmStrength = deploymentProtocol?.getSwmNetwork()
-        if (swmStrength == null) {
-            showCellSignalStrength(SignalState.NONE)
-            signalValue.text = getString(R.string.speed_test_failed)
-        } else {
-            when {
-                swmStrength < -104 -> showSatSignalTagStrength(SignalState.MAX)
-                swmStrength < -100 -> showSatSignalTagStrength(SignalState.HIGH)
-                swmStrength < -97 -> showSatSignalTagStrength(SignalState.NORMAL)
-                swmStrength < -93 -> showSatSignalTagStrength(SignalState.LOW)
-                else -> showSatSignalTagStrength(SignalState.LOW)
+        AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
+            val hasSatModule = deploymentProtocol?.getSatId()
+            if (hasSatModule != null) {
+                satDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
+                satSignalLayout.visibility = View.VISIBLE
+            } else {
+                satDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_error, 0, 0, 0)
+                satSignalLayout.visibility = View.GONE
             }
-            satSignalValues.text = getString(R.string.signal_value, swmStrength)
-        }
 
+            val swmStrength = deploymentProtocol?.getSwmNetwork()
+            if (swmStrength == null) {
+                showSatSignalTagStrength(SignalState.NONE)
+                satSignalValues.text = getString(R.string.speed_test_failed)
+            } else {
+                when {
+                    swmStrength < -104 -> showSatSignalTagStrength(SignalState.MAX)
+                    swmStrength < -100 -> showSatSignalTagStrength(SignalState.HIGH)
+                    swmStrength < -97 -> showSatSignalTagStrength(SignalState.NORMAL)
+                    swmStrength < -93 -> showSatSignalTagStrength(SignalState.LOW)
+                    else -> showSatSignalTagStrength(SignalState.LOW)
+                }
+                satSignalValues.text = getString(R.string.signal_value, swmStrength)
+            }
+        })
     }
 
     private fun showCellSignalStrength(state: SignalState) {
