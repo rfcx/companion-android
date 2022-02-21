@@ -166,8 +166,8 @@ class GuardianSignalFragment : Fragment() {
 
             val swmStrength = deploymentProtocol?.getSwmNetwork()
             if (swmStrength == null) {
-                showCellSignalStrength(SignalState.NONE)
-                signalValue.text = getString(R.string.speed_test_failed)
+                showSatSignalTagStrength(SignalState.NONE)
+                satSignalValues.text = getString(R.string.speed_test_failed)
             } else {
                 when {
                     swmStrength < -104 -> showSatSignalTagStrength(SignalState.MAX)
