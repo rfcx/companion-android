@@ -30,6 +30,7 @@ class GuardianPrefsFragment : PreferenceFragmentCompat(),
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.prefs)
+        preferenceScreen.removeAll()
         val preferenceCategory = PreferenceCategory(preferenceScreen.context)
         preferenceCategory.title = ""
         preferenceScreen.addPreference(preferenceCategory)
@@ -53,5 +54,12 @@ class GuardianPrefsFragment : PreferenceFragmentCompat(),
     override fun onPause() {
         super.onPause()
         preferenceScreen.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        prefs.forEach {
+            preferenceScreen.sharedPreferences.edit().remove(it.key).apply()
+        }
     }
 }

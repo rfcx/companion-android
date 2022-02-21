@@ -166,9 +166,16 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
 
             val satTimeOff = deploymentProtocol?.getSatTimeOff()
             if (satTimeOff != null && !isAddFirstSetOfChips) {
-                satTimeOff.forEach { name ->
-                    timeOff.add(name)
-                    addChip(name)
+                if (deploymentProtocol?.getCurrentProjectId() == "agk3cpurb5wm") {
+                    listOf("00:00-01:20", "03:10-08:40", "11:30-13:15", "15:05-20:45", "23:30-23:59").forEach { name ->
+                        timeOff.add(name)
+                        addChip(name)
+                    }
+                } else {
+                    satTimeOff.forEach { name ->
+                        timeOff.add(name)
+                        addChip(name)
+                    }
                 }
                 isAddFirstSetOfChips = true
             }

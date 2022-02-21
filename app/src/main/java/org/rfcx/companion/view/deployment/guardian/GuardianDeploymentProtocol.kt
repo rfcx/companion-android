@@ -41,6 +41,8 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getGuardianLocalTime(): Long?
     fun getGuardianTimezone(): String?
 
+    fun getCurrentProjectId(): String?
+
     fun setDeployment(deployment: Deployment)
     fun setSampleRate(sampleRate: Int)
     fun setOnDeployClicked()

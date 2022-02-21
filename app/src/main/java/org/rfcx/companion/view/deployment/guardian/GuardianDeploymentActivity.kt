@@ -350,6 +350,12 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
 
     override fun getGuardianTimezone(): String? = guardianTimezone
 
+    override fun getCurrentProjectId(): String? {
+        val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
+        val project = projectDb.getProjectById(projectId)
+        return project?.serverId
+    }
+
     override fun getGuid(): String? = PingUtils.getGuidFromPing(guardianPingBlob)
 
     override fun getGuardianPurpose(): String? = PingUtils.getPurposeFromPrefs(guardianPingBlob)
