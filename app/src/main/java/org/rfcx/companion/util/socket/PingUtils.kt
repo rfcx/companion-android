@@ -139,12 +139,12 @@ object PingUtils {
     }
 
     fun getGuardianLocalTime(ping: GuardianPing?): Long? {
-        val localtime = ping?.companion?.get("local_time") ?: return null
+        val localtime = ping?.companion?.get("system_time_utc") ?: return null
         return localtime.asLong
     }
 
     fun getGuardianTimezone(ping: GuardianPing?): String? {
-        val timezone = ping?.companion?.get("timezone") ?: return null
+        val timezone = ping?.companion?.get("system_timezone") ?: return null
         return timezone.asString
     }
 
