@@ -310,7 +310,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         this.lastCheckInTime = time
     }
 
-    override fun setGuardianRegisterBody(body: GuardianRegisterResponse) {
+    override fun setGuardianRegisterBody(body: GuardianRegisterResponse?) {
         this.guardianRegister = body
     }
 
@@ -466,7 +466,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
             guid = guid,
             token = register?.token,
             keystorePassphrase = register?.keystorePassphrase,
-            pinCode = register?.pinCode,
+            pin_code = register?.pinCode,
             apiMqttHost = register?.apiMqttHost,
             apiSmsAddress = register?.apiSmsAddress
         )

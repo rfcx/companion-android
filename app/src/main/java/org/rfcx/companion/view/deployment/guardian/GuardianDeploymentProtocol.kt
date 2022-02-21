@@ -48,7 +48,7 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun setSampleRate(sampleRate: Int)
     fun setOnDeployClicked()
     fun setLastCheckInTime(time: Long?)
-    fun setGuardianRegisterBody(body: GuardianRegisterResponse)
+    fun setGuardianRegisterBody(body: GuardianRegisterResponse?)
 
     fun addRegisteredToPassedCheck()
     fun removeRegisteredOnPassedCheck()

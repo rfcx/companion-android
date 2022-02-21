@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_guardian_register.*
+import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.entity.Screen
@@ -29,6 +30,8 @@ class GuardianRegisterFragment : Fragment() {
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
 
     private val analytics by lazy { context?.let { Analytics(it) } }
+
+    private var request: GuardianRegisterResponse? = null
 
     private var isWaitingRegistration = false
 
@@ -115,11 +118,11 @@ class GuardianRegisterFragment : Fragment() {
         val guid = deploymentProtocol?.getGuid()
         val token = generateSecureRandomHash(40)
         val pinCode = generateSecureRandomHash(4)
-        val apiMqttHost = ""
-        val apiSmsAddress = ""
-        val keystorePassphrase = ""
+        val apiMqttHost = if (BuildConfig.FLAVOR != "internal") "staging-api-mqtt.rfcx.org" else "api-mqtt.rfcx.org"
+        val apiSmsAddress = if (BuildConfig.FLAVOR != "internal") "+14154803657" else "+13467870964"
+        val keystorePassphrase = if (BuildConfig.FLAVOR != "internal") "L2Cevkmc9W5fFCKn" else "x3bJwhSQ83A5ddkh"
         if (guid != null) {
-            val request = GuardianRegisterResponse(
+            request = GuardianRegisterResponse(
                 guid = guid,
                 token = token,
                 pinCode = pinCode,
@@ -127,7 +130,7 @@ class GuardianRegisterFragment : Fragment() {
                 apiSmsAddress = apiSmsAddress,
                 keystorePassphrase = keystorePassphrase
             )
-            GuardianSocketManager.sendGuardianRegistration(request)
+            GuardianSocketManager.sendGuardianRegistration(request!!)
         } else {
             Toast.makeText(requireContext(), "Register failed: guid is null", Toast.LENGTH_LONG).show()
         }
@@ -143,6 +146,7 @@ class GuardianRegisterFragment : Fragment() {
                 registerResultTextView.text =
                     requireContext().getString(R.string.already_registered)
                 registerFinishButton.visibility = View.VISIBLE
+                deploymentProtocol?.setGuardianRegisterBody(request)
             } else {
                 if (!isWaitingRegistration) {
                     resetUI()
