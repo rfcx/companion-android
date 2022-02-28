@@ -163,7 +163,7 @@ object PingUtils {
     }
 
     fun getGPSDetectedFromPing(adminPing: AdminPing?): Boolean? {
-        return adminPing?.companion?.get("sat_info")?.asJsonObject?.get("is_gps_detected")?.asBoolean ?: return null
+        return adminPing?.companion?.get("sat_info")?.asJsonObject?.get("is_gps_connected")?.asBoolean ?: return null
     }
 
     fun getPhoneNumberFromPing(adminPing: AdminPing?): String? {
