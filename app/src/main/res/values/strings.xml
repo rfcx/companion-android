@@ -516,5 +516,7 @@
     <string name="guardian_local_time_null">cannot retrieve local time</string>
     <string name="guardian_local_timezone_null">cannot retrieve timezone</string>
     <string name="guardian_timezone">Guardian timezone:</string>
+    <string name="manual">manual</string>
+    <string name="auto">auto</string>
 
 </resources>

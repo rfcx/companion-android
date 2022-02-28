@@ -27,7 +27,6 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
     private var timeOff = arrayListOf<String>()
     private var tempStartHourOff: String? = null
     private var tempEndHourOff: String? = null
-    private var isAddFirstSetOfChips = false
     private var isSetFirstGuardianPlan = false
 
     override fun onAttach(context: Context) {
@@ -40,7 +39,11 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_guardian_communication_configuration, container, false)
+        return inflater.inflate(
+            R.layout.fragment_guardian_communication_configuration,
+            container,
+            false
+        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -71,10 +74,20 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
             val isSimDetected = deploymentProtocol?.getSimDetected()
 
             if ((isSimDetected == null || isSimDetected == false)) {
-                simDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_error, 0, 0, 0)
+                simDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(
+                    R.drawable.ic_red_error,
+                    0,
+                    0,
+                    0
+                )
                 simDetectionTextView.text = getString(R.string.sim_not_detected)
             } else {
-                simDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
+                simDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(
+                    R.drawable.ic_checklist_passed,
+                    0,
+                    0,
+                    0
+                )
                 simDetectionTextView.text = getString(R.string.sim_detected)
             }
         })
@@ -98,7 +111,12 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
         AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
             val satId = deploymentProtocol?.getSatId()
             if (satId != null) {
-                satDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
+                satDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(
+                    R.drawable.ic_checklist_passed,
+                    0,
+                    0,
+                    0
+                )
                 satDetectionTextView.text = getString(R.string.satellite_module_detected)
                 swarmIdTextView.visibility = View.VISIBLE
                 swarmValueTextView.visibility = View.VISIBLE
@@ -106,7 +124,12 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
                 satOnlyRadioButton.isEnabled = true
                 satOnlyRadioButton.setTextColor(resources.getColor(R.color.text_primary))
             } else {
-                satDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_error, 0, 0, 0)
+                satDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(
+                    R.drawable.ic_red_error,
+                    0,
+                    0,
+                    0
+                )
                 satDetectionTextView.text = getString(R.string.satellite_module_not_detected)
                 swarmIdTextView.visibility = View.GONE
                 swarmValueTextView.visibility = View.GONE
@@ -145,7 +168,7 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
         AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
             val guardianPlan = deploymentProtocol?.getGuardianPlan()
             if (guardianPlan != null && !isSetFirstGuardianPlan) {
-                when(guardianPlan) {
+                when (guardianPlan) {
                     GuardianPlan.CELL_ONLY -> {
                         cellOnlyRadioButton.isChecked = true
                     }
@@ -162,22 +185,6 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
                     }
                 }
                 isSetFirstGuardianPlan = true
-            }
-
-            val satTimeOff = deploymentProtocol?.getSatTimeOff()
-            if (satTimeOff != null && !isAddFirstSetOfChips) {
-                if (deploymentProtocol?.getCurrentProjectId() == "agk3cpurb5wm") {
-                    listOf("00:00-01:20", "03:10-08:40", "11:30-13:15", "15:05-20:45", "23:30-23:59").forEach { name ->
-                        timeOff.add(name)
-                        addChip(name)
-                    }
-                } else {
-                    satTimeOff.forEach { name ->
-                        timeOff.add(name)
-                        addChip(name)
-                    }
-                }
-                isAddFirstSetOfChips = true
             }
         })
 
@@ -205,6 +212,31 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
     }
 
     private fun setPassTime() {
+        GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
+            timeOffRadioGroup.setOnCheckedChangeListener { group, checkedId ->
+                timeOff = arrayListOf()
+                if (checkedId == R.id.manualRadioButton) {
+                    deploymentProtocol?.getSatTimeOff()?.forEach { time ->
+                        addTimeOff(time)
+                        addChip(time)
+                    }
+                } else {
+                    if (deploymentProtocol?.getCurrentProjectId() == "agk3cpurb5wm") {
+                        listOf(
+                            "00:00-01:20",
+                            "03:10-08:40",
+                            "11:30-13:15",
+                            "15:05-20:45",
+                            "23:30-23:59"
+                        ).forEach { time ->
+                            addTimeOff(time)
+                            addChip(time)
+                        }
+                    }
+                }
+            }
+        })
+
         val startPicker = MaterialTimePicker.Builder()
             .setTimeFormat(TimeFormat.CLOCK_24H)
             .setHour(12)
@@ -220,18 +252,22 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
             .build()
 
         startPicker.addOnPositiveButtonClickListener {
-            val hour = if (startPicker.hour.toString().length == 1) "0${startPicker.hour}" else startPicker.hour.toString()
-            val minute = if (startPicker.minute.toString().length == 1) "0${startPicker.minute}" else startPicker.minute.toString()
+            val hour =
+                if (startPicker.hour.toString().length == 1) "0${startPicker.hour}" else startPicker.hour.toString()
+            val minute =
+                if (startPicker.minute.toString().length == 1) "0${startPicker.minute}" else startPicker.minute.toString()
             tempStartHourOff = "$hour:$minute"
             endPicker.show(requireFragmentManager(), "EndTimeOffPicker")
         }
 
         endPicker.addOnPositiveButtonClickListener {
-            val hour = if (endPicker.hour.toString().length == 1) "0${endPicker.hour}" else endPicker.hour.toString()
-            val minute = if (endPicker.minute.toString().length == 1) "0${endPicker.minute}" else endPicker.minute.toString()
+            val hour =
+                if (endPicker.hour.toString().length == 1) "0${endPicker.hour}" else endPicker.hour.toString()
+            val minute =
+                if (endPicker.minute.toString().length == 1) "0${endPicker.minute}" else endPicker.minute.toString()
             tempEndHourOff = "$hour:$minute"
             val fullTime = "$tempStartHourOff-$tempEndHourOff"
-            timeOff.add(fullTime)
+            addTimeOff(fullTime)
             addChip(fullTime)
         }
 
@@ -249,6 +285,11 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
         passTimeChipGroup.addView(chip)
     }
 
+    private fun addTimeOff(name: String) {
+        timeOff.add(name)
+        nextButton.isEnabled = true
+    }
+
     companion object {
         fun newInstance(): GuardianCommunicationFragment = GuardianCommunicationFragment()
     }
@@ -258,6 +299,9 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
             val time = v.text
             timeOff.remove(time)
             passTimeChipGroup.removeView(v)
+            if (timeOff.isEmpty()) {
+                nextButton.isEnabled = false
+            }
         }
     }
 }
