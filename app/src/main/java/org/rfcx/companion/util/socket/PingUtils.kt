@@ -162,6 +162,10 @@ object PingUtils {
         return adminPing?.companion?.get("sim_info")?.asJsonObject?.get("has_sim")?.asBoolean ?: return null
     }
 
+    fun getGPSDetectedFromPing(adminPing: AdminPing?): Boolean? {
+        return adminPing?.companion?.get("sat_info")?.asJsonObject?.get("is_gps_detected")?.asBoolean ?: return null
+    }
+
     fun getPhoneNumberFromPing(adminPing: AdminPing?): String? {
         return adminPing?.companion?.get("sim_info")?.asJsonObject?.get("phone_number")?.asString ?: return null
     }
