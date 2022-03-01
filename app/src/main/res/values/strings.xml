@@ -518,5 +518,6 @@
     <string name="guardian_timezone">Guardian timezone:</string>
     <string name="manual">manual</string>
     <string name="auto">auto</string>
+    <string name="there_is_no_off_time_in_this_project">There is no off time in this project</string>
 
 </resources>

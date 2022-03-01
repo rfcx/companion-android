@@ -24,10 +24,18 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
 
-    private var timeOff = arrayListOf<String>()
+    private var manualTimeOff = arrayListOf<String>()
+    private var autoTimeOff = listOf(
+        "00:00-01:20",
+        "03:10-08:40",
+        "11:30-13:15",
+        "15:05-20:45",
+        "23:30-23:59"
+    )
     private var tempStartHourOff: String? = null
     private var tempEndHourOff: String? = null
     private var isSetFirstGuardianPlan = false
+    private var didEditOffTime = false
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -61,7 +69,8 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
         setSatDetected()
         setGuardianLocalTime()
         setPlanRadioGroup()
-        setPassTime()
+        observeOffTime()
+        setOffTime()
 
         nextButton.setOnClickListener {
             handlePlanSelection()
@@ -190,11 +199,11 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
 
         guardianPlanGroup.setOnCheckedChangeListener { group, checkedId ->
             if (checkedId == R.id.satOnlyRadioButton) {
-                passTimesTextView.visibility = View.VISIBLE
-                passTimeChipGroup.visibility = View.VISIBLE
+                showChips(true)
             } else {
                 passTimesTextView.visibility = View.GONE
-                passTimeChipGroup.visibility = View.GONE
+                hideChips(false)
+                hideChips(true)
             }
         }
     }
@@ -207,35 +216,43 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
             GuardianSocketManager.sendCellSMSPrefs()
         }
         if (satOnlyRadioButton.isChecked) {
-            GuardianSocketManager.sendSatOnlyPrefs(timeOff.joinToString(","))
+            if (manualRadioButton.isChecked) {
+                GuardianSocketManager.sendSatOnlyPrefs(manualTimeOff.joinToString(","))
+            } else {
+                GuardianSocketManager.sendSatOnlyPrefs(autoTimeOff.joinToString(","))
+            }
         }
     }
 
-    private fun setPassTime() {
+    private fun observeOffTime() {
+        //TODO: For preset project off time
+        if (deploymentProtocol?.getCurrentProjectId() == "3dvrocmagfiw") {
+            autoTimeOff.forEach { time ->
+                addChip(time, false)
+            }
+        }
+
         GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
-            timeOffRadioGroup.setOnCheckedChangeListener { group, checkedId ->
-                timeOff = arrayListOf()
-                if (checkedId == R.id.manualRadioButton) {
-                    deploymentProtocol?.getSatTimeOff()?.forEach { time ->
-                        addTimeOff(time)
-                        addChip(time)
-                    }
-                } else {
-                    if (deploymentProtocol?.getCurrentProjectId() == "agk3cpurb5wm") {
-                        listOf(
-                            "00:00-01:20",
-                            "03:10-08:40",
-                            "11:30-13:15",
-                            "15:05-20:45",
-                            "23:30-23:59"
-                        ).forEach { time ->
-                            addTimeOff(time)
-                            addChip(time)
-                        }
-                    }
-                }
+            deploymentProtocol?.getSatTimeOff()?.forEach { time ->
+                if (!didEditOffTime) addTimeOff(time)
             }
         })
+    }
+
+    private fun setOffTime() {
+        timeOffRadioGroup.setOnCheckedChangeListener { group, checkedId ->
+            if (checkedId == R.id.manualRadioButton) {
+                hideChips(false)
+                showChips(true)
+                handleNextButtonOnManual()
+                hideEmptyOffTimeText()
+            } else {
+                hideChips(true)
+                showChips(false)
+                handleNextButtonOnAuto()
+                showEmptyOffTimeText()
+            }
+        }
 
         val startPicker = MaterialTimePicker.Builder()
             .setTimeFormat(TimeFormat.CLOCK_24H)
@@ -268,7 +285,6 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
             tempEndHourOff = "$hour:$minute"
             val fullTime = "$tempStartHourOff-$tempEndHourOff"
             addTimeOff(fullTime)
-            addChip(fullTime)
         }
 
         passTimeAddChip.setOnClickListener {
@@ -276,18 +292,57 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    private fun addChip(name: String) {
+    private fun addChip(name: String, isManual: Boolean = true) {
         val chip = Chip(requireContext())
         chip.text = name
-        chip.isCloseIconVisible = true
         chip.id = ViewCompat.generateViewId()
-        chip.setOnCloseIconClickListener(this)
-        passTimeChipGroup.addView(chip)
+        if (isManual) {
+            chip.isCloseIconVisible = true
+            chip.setOnCloseIconClickListener(this)
+            manualOffTimeChipGroup.addView(chip)
+        } else {
+            chip.isCloseIconVisible = false
+            autoOffTimeChipGroup.addView(chip)
+        }
     }
 
-    private fun addTimeOff(name: String) {
-        timeOff.add(name)
-        nextButton.isEnabled = true
+    private fun hideChips(isManual: Boolean) {
+        if (isManual) {
+            manualOffTimeChipGroup.visibility = View.GONE
+        } else {
+            autoOffTimeChipGroup.visibility = View.GONE
+        }
+    }
+
+    private fun showChips(isManual: Boolean) {
+        if (isManual) {
+            manualOffTimeChipGroup.visibility = View.VISIBLE
+        } else {
+            autoOffTimeChipGroup.visibility = View.VISIBLE
+        }
+    }
+
+    private fun addTimeOff(time: String) {
+        if (manualTimeOff.contains(time)) return
+        manualTimeOff.add(time)
+        addChip(time)
+        handleNextButtonOnManual()
+    }
+
+    private fun showEmptyOffTimeText() {
+        if (deploymentProtocol?.getCurrentProjectId() != "3dvrocmagfiw") emptyOffTimeTextView.visibility = View.VISIBLE
+    }
+
+    private fun hideEmptyOffTimeText() {
+        emptyOffTimeTextView.visibility = View.GONE
+    }
+
+    private fun handleNextButtonOnManual() {
+        nextButton.isEnabled = manualTimeOff.isNotEmpty()
+    }
+
+    private fun handleNextButtonOnAuto() {
+        nextButton.isEnabled = deploymentProtocol?.getCurrentProjectId() == "3dvrocmagfiw"
     }
 
     companion object {
@@ -296,12 +351,11 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         if (v is Chip) {
+            didEditOffTime = true
             val time = v.text
-            timeOff.remove(time)
-            passTimeChipGroup.removeView(v)
-            if (timeOff.isEmpty()) {
-                nextButton.isEnabled = false
-            }
+            manualTimeOff.remove(time)
+            manualOffTimeChipGroup.removeView(v)
+            handleNextButtonOnManual()
         }
     }
 }
