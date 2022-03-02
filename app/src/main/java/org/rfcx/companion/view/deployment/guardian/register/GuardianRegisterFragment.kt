@@ -53,7 +53,6 @@ class GuardianRegisterFragment : Fragment() {
             it.setToolbarTitle()
         }
 
-        GuardianSocketManager.resetRegisterResult()
         isGuardianRegistered()
 
         registerGuardianButton.setOnClickListener {

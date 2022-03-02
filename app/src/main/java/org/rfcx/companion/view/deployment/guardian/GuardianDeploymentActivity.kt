@@ -204,7 +204,6 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
                 )
             }
             is GuardianCheckListFragment -> {
-                GuardianSocketManager.resetAllValuesToDefault()
                 setLastCheckInTime(null)
                 SocketUtils.stopAllConnections()
                 passedChecks.clear() // remove all passed
