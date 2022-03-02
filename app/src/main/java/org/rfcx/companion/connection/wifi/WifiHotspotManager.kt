@@ -4,16 +4,14 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkCapabilities
-import android.net.NetworkRequest
+import android.net.*
 import android.net.wifi.ScanResult
 import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
 import android.net.wifi.WifiNetworkSpecifier
 import android.os.Build
 import android.os.PatternMatcher
+import android.util.Log
 import androidx.annotation.RequiresApi
 import org.rfcx.companion.util.WifiHotspotUtils
 
@@ -25,7 +23,7 @@ class WifiHotspotManager(private val context: Context) {
     private lateinit var wifiScanReceiver: WifiScanReceiver
     private lateinit var wifiConnectionReceiver: WifiConnectionReceiver
     private var isConnected = false
-    private var isRegisterCallback = false
+    private var isRegisteredCallback = false
 
     private var wifiName = ""
 
@@ -112,6 +110,10 @@ class WifiHotspotManager(private val context: Context) {
         }
     }
 
+    fun unRegisterWifiLost() {
+        unregisterWifiConnectionLost()
+    }
+
     private inner class WifiScanReceiver(private val onWifiListener: OnWifiListener) :
         BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -153,31 +155,24 @@ class WifiHotspotManager(private val context: Context) {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.Q)
-    fun registerWifiConnectionLost(wifiName: String, wifiLostListener: WifiLostListener) {
+    fun registerWifiConnectionLost(wifiLostListener: WifiLostListener) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             connectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             val networkRequest = NetworkRequest.Builder().also {
                 it.addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-                it.setNetworkSpecifier(WifiNetworkSpecifier.Builder().also { spec ->
-                    spec.setSsid(wifiName)
-                }.build())
             }.build()
             networkCallback = WifiLostCallback(wifiLostListener)
-            if (!isRegisterCallback) {
-                isRegisterCallback = true
-                connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
-            }
+            connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
+            isRegisteredCallback = true
         }
     }
 
-    fun unregisterWifiConnectionLost() {
+    private fun unregisterWifiConnectionLost() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (::connectivityManager.isInitialized)
-                if (isRegisterCallback) {
-                    isRegisterCallback = false
-                    connectivityManager.unregisterNetworkCallback(networkCallback)
-                }
+            if (isRegisteredCallback) {
+                connectivityManager.unregisterNetworkCallback(networkCallback)
+                isRegisteredCallback = false
+            }
         }
     }
 }

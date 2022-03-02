@@ -3,11 +3,12 @@ package org.rfcx.companion.connection.socket
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import org.json.JSONObject
 import org.rfcx.companion.entity.response.GuardianRegisterResponse
-import org.rfcx.companion.entity.socket.request.*
-import org.rfcx.companion.entity.socket.response.*
-import org.rfcx.companion.util.MicrophoneTestUtils
+import org.rfcx.companion.entity.socket.request.InstructionCommand
+import org.rfcx.companion.entity.socket.request.InstructionMessage
+import org.rfcx.companion.entity.socket.request.InstructionType
+import org.rfcx.companion.entity.socket.request.SocketRequest
+import org.rfcx.companion.entity.socket.response.GuardianPing
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.Socket
@@ -134,13 +135,17 @@ object GuardianSocketManager {
                         pingBlob.postValue(ping)
                     }
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
             } catch (e: SocketTimeoutException) {
                 throwReceiver.postValue(true)
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
         inComingMessageThread.start()
+    }
+
+    fun clearValue() {
+        pingBlob.value = GuardianPing()
     }
 
     fun stopConnection() {

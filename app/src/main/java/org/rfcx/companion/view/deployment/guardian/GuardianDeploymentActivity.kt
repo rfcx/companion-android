@@ -9,7 +9,6 @@ import android.location.LocationManager
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
@@ -23,6 +22,8 @@ import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.AdminSocketManager
 import org.rfcx.companion.connection.socket.GuardianSocketManager
+import org.rfcx.companion.connection.wifi.WifiHotspotManager
+import org.rfcx.companion.connection.wifi.WifiLostListener
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.socket.response.GuardianPing
@@ -51,12 +52,14 @@ import org.rfcx.companion.view.deployment.locate.MapPickerFragment
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.deployment.location.DetailDeploymentSiteFragment
 import org.rfcx.companion.view.deployment.location.SetDeploymentSiteFragment
-import org.rfcx.companion.view.dialog.*
+import org.rfcx.companion.view.dialog.CompleteFragment
+import org.rfcx.companion.view.dialog.ConnectInstructionDialogFragment
+import org.rfcx.companion.view.dialog.LoadingDialogFragment
 import org.rfcx.companion.view.prefs.SyncPreferenceListener
 import java.util.*
 
 class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentProtocol,
-    SyncPreferenceListener {
+    SyncPreferenceListener, WifiLostListener {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val locateDb by lazy { LocateDb(realm) }
@@ -116,6 +119,9 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         this.sites = it
         setSiteItems()
     }
+
+    private val wifiHotspotManager by lazy { WifiHotspotManager(this) }
+    private var timer = Timer()
 
     @SuppressLint("ResourceAsColor")
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -209,6 +215,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
             is GuardianCheckListFragment -> {
                 setLastCheckInTime(null)
                 SocketUtils.stopAllConnections()
+                SocketUtils.clearAllBlobs()
+                timer.cancel()
                 passedChecks.clear() // remove all passed
                 startFragment(ConnectGuardianFragment.newInstance())
             }
@@ -274,10 +282,31 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
             if (it) {
                 Snackbar.make(guardianRootView, "Guardian Socket lost connection", Snackbar.LENGTH_LONG)
                     .setAction("Reconnect"
-                    ) { GuardianSocketManager.getConnection() }
+                    ) { reTriggerConnection() }
                     .show()
+                GuardianSocketManager.throwReceiver.value = false
             }
         }
+
+        AdminSocketManager.throwReceiver.observeForever {
+            if (it) {
+                Snackbar.make(guardianRootView, "Admin Socket lost connection", Snackbar.LENGTH_LONG)
+                    .setAction("Reconnect"
+                    ) { reTriggerConnection() }
+                    .show()
+                AdminSocketManager.throwReceiver.value = false
+            }
+        }
+    }
+
+    override fun onLost() {
+        unregisterWifiLost()
+        Snackbar.make(guardianRootView, "Guardian WiFi lost connection", Snackbar.LENGTH_LONG)
+            .setAction("Go back"
+            ) {
+                startConnectGuardian()
+            }
+            .show()
     }
 
     private fun setSiteItems() {
@@ -295,6 +324,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     }
 
     override fun startCheckList() {
+        registerWifiLost()
+        periodicSocketHeartBreath()
         startFragment(GuardianCheckListFragment.newInstance())
     }
 
@@ -469,6 +500,10 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         deploymentImageDb.insertImage(deployment, _images)
     }
 
+    override fun startConnectGuardian() {
+        startFragment(ConnectGuardianFragment.newInstance())
+    }
+
 
     override fun startSetupConfigure() {
         startFragment(GuardianConfigureFragment.newInstance())
@@ -480,6 +515,14 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
 
     override fun backToConfigure() {
         startFragment(GuardianConfigureFragment.newInstance())
+    }
+
+    override fun registerWifiLost() {
+        wifiHotspotManager.registerWifiConnectionLost(this)
+    }
+
+    override fun unregisterWifiLost() {
+        wifiHotspotManager.unRegisterWifiLost()
     }
 
     override fun handleCheckClicked(number: Int) {
@@ -595,6 +638,16 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         siteLiveData.removeObserver(siteObserve)
         deploymentLiveData.removeObserver(guardianDeploymentObserve)
         SocketUtils.stopAllConnections()
+        timer.cancel()
+    }
+
+    private fun periodicSocketHeartBreath() {
+        timer = Timer()
+        timer.schedule(object : TimerTask() {
+            override fun run() {
+                reTriggerConnection()
+            }
+        }, 0, 5000)
     }
 
     companion object {

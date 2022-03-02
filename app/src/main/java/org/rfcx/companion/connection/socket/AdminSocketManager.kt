@@ -6,6 +6,7 @@ import org.rfcx.companion.entity.socket.response.AdminPing
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.Socket
+import java.net.SocketTimeoutException
 
 object AdminSocketManager {
 
@@ -19,6 +20,7 @@ object AdminSocketManager {
     private val gson = Gson()
 
     val pingBlob = MutableLiveData<AdminPing>()
+    val throwReceiver = MutableLiveData<Boolean>()
 
     //just to connect to server
     fun connect() {
@@ -30,6 +32,7 @@ object AdminSocketManager {
             try {
                 socket = Socket("192.168.43.1", 9997)
                 socket?.keepAlive = true
+                socket?.soTimeout = 10000
                 startInComingMessageThread()
                 outputStream = DataOutputStream(socket?.getOutputStream())
                 outputStream?.writeUTF(message)
@@ -54,11 +57,17 @@ object AdminSocketManager {
 
                     }
                 }
+            } catch (e: SocketTimeoutException) {
+                throwReceiver.postValue(true)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
         inComingMessageThread.start()
+    }
+
+    fun clearValue() {
+        pingBlob.value = AdminPing()
     }
 
     fun stopConnection() {
