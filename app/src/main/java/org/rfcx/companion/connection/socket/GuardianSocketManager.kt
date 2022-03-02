@@ -29,6 +29,7 @@ object GuardianSocketManager {
     private const val CONNECTION = "connection"
 
     val pingBlob = MutableLiveData<GuardianPing>()
+    val throwReceiver = MutableLiveData<Boolean>()
 
     fun getConnection() {
         val data = gson.toJson(
@@ -136,7 +137,7 @@ object GuardianSocketManager {
             } catch (e: Exception) {
                 e.printStackTrace()
             } catch (e: SocketTimeoutException) {
-
+                throwReceiver.postValue(true)
             }
         }
         inComingMessageThread.start()

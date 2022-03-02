@@ -9,10 +9,12 @@ import android.location.LocationManager
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.preference.Preference
+import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import io.realm.Realm
@@ -143,6 +145,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
 
         setupToolbar()
         setLiveData()
+        setSocketTimeOutReceiver()
 
         this.currentLocate = this.getLastLocation()
 
@@ -264,6 +267,17 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
             speedTest = PingUtils.getSpeedTest(it)
         }
         deploymentLiveData.observeForever(guardianDeploymentObserve)
+    }
+
+    private fun setSocketTimeOutReceiver() {
+        GuardianSocketManager.throwReceiver.observeForever {
+            if (it) {
+                Snackbar.make(guardianRootView, "Guardian Socket lost connection", Snackbar.LENGTH_LONG)
+                    .setAction("Reconnect"
+                    ) { GuardianSocketManager.getConnection() }
+                    .show()
+            }
+        }
     }
 
     private fun setSiteItems() {

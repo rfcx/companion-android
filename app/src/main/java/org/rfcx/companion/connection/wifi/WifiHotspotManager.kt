@@ -153,11 +153,15 @@ class WifiHotspotManager(private val context: Context) {
         }
     }
 
-    fun registerWifiConnectionLost(wifiLostListener: WifiLostListener) {
+    @RequiresApi(Build.VERSION_CODES.Q)
+    fun registerWifiConnectionLost(wifiName: String, wifiLostListener: WifiLostListener) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             connectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             val networkRequest = NetworkRequest.Builder().also {
                 it.addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                it.setNetworkSpecifier(WifiNetworkSpecifier.Builder().also { spec ->
+                    spec.setSsid(wifiName)
+                }.build())
             }.build()
             networkCallback = WifiLostCallback(wifiLostListener)
             if (!isRegisterCallback) {
