@@ -151,7 +151,6 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
 
         setupToolbar()
         setLiveData()
-        setSocketTimeOutReceiver()
 
         this.currentLocate = this.getLastLocation()
 
@@ -275,28 +274,6 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
             speedTest = PingUtils.getSpeedTest(it)
         }
         deploymentLiveData.observeForever(guardianDeploymentObserve)
-    }
-
-    private fun setSocketTimeOutReceiver() {
-        GuardianSocketManager.throwReceiver.observeForever {
-            if (it) {
-                Snackbar.make(guardianRootView, "Guardian Socket lost connection", Snackbar.LENGTH_LONG)
-                    .setAction("Reconnect"
-                    ) { reTriggerConnection() }
-                    .show()
-                GuardianSocketManager.throwReceiver.value = false
-            }
-        }
-
-        AdminSocketManager.throwReceiver.observeForever {
-            if (it) {
-                Snackbar.make(guardianRootView, "Admin Socket lost connection", Snackbar.LENGTH_LONG)
-                    .setAction("Reconnect"
-                    ) { reTriggerConnection() }
-                    .show()
-                AdminSocketManager.throwReceiver.value = false
-            }
-        }
     }
 
     override fun onLost() {

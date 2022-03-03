@@ -20,7 +20,6 @@ object AdminSocketManager {
     private val gson = Gson()
 
     val pingBlob = MutableLiveData<AdminPing>()
-    val throwReceiver = MutableLiveData<Boolean>()
 
     //just to connect to server
     fun connect() {
@@ -57,8 +56,6 @@ object AdminSocketManager {
 
                     }
                 }
-            } catch (e: SocketTimeoutException) {
-                throwReceiver.postValue(true)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
