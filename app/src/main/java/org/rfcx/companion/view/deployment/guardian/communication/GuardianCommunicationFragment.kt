@@ -25,13 +25,7 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
 
     private var manualTimeOff = arrayListOf<String>()
-    private var autoTimeOff = listOf(
-        "00:00-01:20",
-        "03:10-08:40",
-        "11:30-13:15",
-        "15:05-20:45",
-        "23:30-23:59"
-    )
+    private var autoTimeOff = listOf("00:00-01:20", "03:10-08:40", "11:30-13:15", "15:05-20:45", "23:30-23:59")
     private var tempStartHourOff: String? = null
     private var tempEndHourOff: String? = null
     private var isSetFirstGuardianPlan = false
@@ -226,7 +220,7 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
 
     private fun observeOffTime() {
         //TODO: For preset project off time
-        if (deploymentProtocol?.getCurrentProjectId() == "3dvrocmagfiw") {
+        if (deploymentProtocol?.getCurrentProjectId() == "agk3cpurb5wm") {
             autoTimeOff.forEach { time ->
                 addChip(time, false)
             }
