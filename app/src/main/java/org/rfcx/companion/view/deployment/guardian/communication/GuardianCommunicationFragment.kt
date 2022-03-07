@@ -139,10 +139,10 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
                 val isSimDetected = deploymentProtocol?.getSimDetected()
                 if (isSimDetected == true) {
                     satOnlyRadioButton.isEnabled = false
-                    satOnlyRadioButton.setTextColor(resources.getColor(R.color.text_primary))
+                    satOnlyRadioButton.setTextColor(resources.getColor(R.color.text_secondary))
                 } else {
                     satOnlyRadioButton.isEnabled = true
-                    satOnlyRadioButton.setTextColor(resources.getColor(R.color.text_secondary))
+                    satOnlyRadioButton.setTextColor(resources.getColor(R.color.text_primary))
                 }
             }
         })
@@ -193,6 +193,7 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
 
         guardianPlanGroup.setOnCheckedChangeListener { group, checkedId ->
             if (checkedId == R.id.satOnlyRadioButton) {
+                passTimesTextView.visibility = View.VISIBLE
                 showChips(true)
             } else {
                 passTimesTextView.visibility = View.GONE
@@ -301,6 +302,7 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
     }
 
     private fun hideChips(isManual: Boolean) {
+        timeOffRadioGroup.visibility = View.GONE
         if (isManual) {
             manualOffTimeChipGroup.visibility = View.GONE
         } else {
@@ -309,6 +311,7 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
     }
 
     private fun showChips(isManual: Boolean) {
+        timeOffRadioGroup.visibility = View.VISIBLE
         if (isManual) {
             manualOffTimeChipGroup.visibility = View.VISIBLE
         } else {

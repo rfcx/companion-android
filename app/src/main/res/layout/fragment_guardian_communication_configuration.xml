@@ -188,6 +188,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/pass_times_local_time"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/guardianPlanGroup" />
@@ -200,6 +201,7 @@
                 android:paddingStart="@dimen/margin_padding_large"
                 android:paddingTop="@dimen/margin_padding_small"
                 android:paddingEnd="@dimen/margin_padding_large"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/passTimesTextView">
@@ -228,6 +230,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_normal"
                 android:layout_marginEnd="@dimen/margin_padding_normal"
+                android:visibility="gone"
                 app:layout_constraintTop_toBottomOf="@id/timeOffRadioGroup">
 
                 <com.google.android.material.chip.Chip
@@ -251,9 +254,9 @@
                 style="@style/AudioMothText.Subhead.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
                 android:layout_marginTop="@dimen/margin_padding_small"
                 android:text="@string/there_is_no_off_time_in_this_project"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/timeOffRadioGroup" />
