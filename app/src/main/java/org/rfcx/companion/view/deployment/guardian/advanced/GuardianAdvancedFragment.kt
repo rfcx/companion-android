@@ -80,11 +80,6 @@ class GuardianAdvancedFragment : Fragment() {
         })
     }
 
-    override fun onDetach() {
-        super.onDetach()
-        GuardianSocketManager.resetPrefsValue()
-    }
-
     companion object {
         fun newInstance(): GuardianAdvancedFragment {
             return GuardianAdvancedFragment()
