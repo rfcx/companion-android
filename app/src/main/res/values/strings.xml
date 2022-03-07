@@ -516,5 +516,8 @@
     <string name="guardian_local_time_null">cannot retrieve local time</string>
     <string name="guardian_local_timezone_null">cannot retrieve timezone</string>
     <string name="guardian_timezone">Guardian timezone:</string>
+    <string name="manual">manual</string>
+    <string name="auto">auto</string>
+    <string name="there_is_no_off_time_in_this_project">There is no off time in this project</string>
 
 </resources>
