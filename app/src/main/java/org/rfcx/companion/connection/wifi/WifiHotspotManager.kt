@@ -10,8 +10,6 @@ import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
 import android.net.wifi.WifiNetworkSpecifier
 import android.os.Build
-import android.os.PatternMatcher
-import android.util.Log
 import androidx.annotation.RequiresApi
 import org.rfcx.companion.util.WifiHotspotUtils
 
