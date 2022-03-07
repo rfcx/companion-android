@@ -76,6 +76,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     private var isGuardianRegistered: Boolean? = null
     private var isSimDetected: Boolean? = null
     private var satId: String? = null
+    private var isGPSDetected: Boolean? = null
     private var phoneNumber: String? = null
     private var guardianPlan: GuardianPlan? = null
     private var satTimeOff: List<String>? = null
@@ -261,6 +262,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
             i2cAccessibility = PingUtils.getI2cAccessibilityFromPing(it)
             satId = PingUtils.getSwarmIdFromPing(it)
             isSimDetected = PingUtils.getSimDetectedFromPing(it)
+            isGPSDetected = PingUtils.getGPSDetectedFromPing(it)
             phoneNumber = PingUtils.getPhoneNumberFromPing(it)
             speedTest = PingUtils.getSpeedTest(it)
         }
@@ -337,6 +339,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     override fun getSimDetected(): Boolean? = isSimDetected
 
     override fun getSatId(): String? = satId
+
+    override fun getGPSDetected(): Boolean? = isGPSDetected
 
     override fun getPhoneNumber(): String? = phoneNumber
 

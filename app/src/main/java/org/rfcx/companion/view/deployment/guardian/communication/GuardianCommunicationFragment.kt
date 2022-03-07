@@ -61,6 +61,7 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
         setSimDetected()
         setPhoneNumber()
         setSatDetected()
+        setGPSDetected()
         setGuardianLocalTime()
         setPlanRadioGroup()
         observeOffTime()
@@ -144,6 +145,19 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
                     satOnlyRadioButton.isEnabled = true
                     satOnlyRadioButton.setTextColor(resources.getColor(R.color.text_primary))
                 }
+            }
+        })
+    }
+
+    private fun setGPSDetected() {
+        AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
+            val isGPSDetected = deploymentProtocol?.getGPSDetected()
+            if ((isGPSDetected == null || isGPSDetected == false)) {
+                gpsDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_error, 0, 0, 0)
+                gpsDetectionTextView.text = getString(R.string.satellite_gps_not_detected)
+            } else {
+                gpsDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
+                gpsDetectionTextView.text = getString(R.string.satellite_gps_detected)
             }
         })
     }
