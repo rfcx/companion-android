@@ -341,7 +341,7 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
     }
 
     private fun showEmptyOffTimeText() {
-        if (deploymentProtocol?.getCurrentProjectId() != "3dvrocmagfiw") emptyOffTimeTextView.visibility = View.VISIBLE
+        if (deploymentProtocol?.getCurrentProjectId() != "agk3cpurb5wm") emptyOffTimeTextView.visibility = View.VISIBLE
     }
 
     private fun hideEmptyOffTimeText() {
@@ -353,7 +353,7 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
     }
 
     private fun handleNextButtonOnAuto() {
-        nextButton.isEnabled = deploymentProtocol?.getCurrentProjectId() == "3dvrocmagfiw"
+        nextButton.isEnabled = deploymentProtocol?.getCurrentProjectId() == "agk3cpurb5wm"
     }
 
     companion object {
