@@ -13,4 +13,9 @@ object SocketUtils {
         AudioCastSocketManager.stopConnection()
         FileSocketManager.stopConnection()
     }
+
+    fun clearAllBlobs() {
+        GuardianSocketManager.clearValue()
+        AdminSocketManager.clearValue()
+    }
 }

@@ -97,13 +97,6 @@ class GuardianCheckInTestFragment : Fragment() {
         return getString(R.string.dash)
     }
 
-    override fun onDetach() {
-        super.onDetach()
-        if (state == CHECKIN_SUCCESS) {
-            GuardianSocketManager.checkInTest.value = CheckInTestResponse(CheckIn(apiUrl = apiUrl, state = "not published"))
-        }
-    }
-
     override fun onResume() {
         super.onResume()
         analytics?.trackScreen(Screen.GUARDIAN_CHECKIN_TEST)

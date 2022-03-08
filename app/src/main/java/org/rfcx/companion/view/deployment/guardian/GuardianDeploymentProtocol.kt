@@ -10,9 +10,13 @@ import org.rfcx.companion.util.prefs.GuardianPlan
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 
 interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
+    fun startConnectGuardian()
     fun startSetupConfigure()
     fun startGuardianRegister()
     fun backToConfigure()
+
+    fun registerWifiLost()
+    fun unregisterWifiLost()
 
     fun getDeployment(): Deployment?
     fun getSampleRate(): Int

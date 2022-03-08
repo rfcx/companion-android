@@ -6,6 +6,7 @@ import org.rfcx.companion.entity.socket.response.AdminPing
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.Socket
+import java.net.SocketTimeoutException
 
 object AdminSocketManager {
 
@@ -30,6 +31,7 @@ object AdminSocketManager {
             try {
                 socket = Socket("192.168.43.1", 9997)
                 socket?.keepAlive = true
+                socket?.soTimeout = 10000
                 startInComingMessageThread()
                 outputStream = DataOutputStream(socket?.getOutputStream())
                 outputStream?.writeUTF(message)
@@ -59,6 +61,10 @@ object AdminSocketManager {
             }
         }
         inComingMessageThread.start()
+    }
+
+    fun clearValue() {
+        pingBlob.value = AdminPing()
     }
 
     fun stopConnection() {
