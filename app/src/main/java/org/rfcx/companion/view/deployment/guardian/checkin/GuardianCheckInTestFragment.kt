@@ -9,12 +9,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_guardian_checkin_test.*
 import org.rfcx.companion.R
-import org.rfcx.companion.connection.socket.SocketManager
+import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.socket.response.CheckIn
 import org.rfcx.companion.entity.socket.response.CheckInTestResponse
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.TimeAgo
+import org.rfcx.companion.util.timestampToDateString
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianCheckInTestFragment : Fragment() {
@@ -43,6 +44,8 @@ class GuardianCheckInTestFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         deploymentProtocol?.let {
+            it.setToolbarSubtitle()
+            it.setMenuToolbar(false)
             it.showToolbar()
             it.setToolbarTitle()
         }
@@ -56,23 +59,33 @@ class GuardianCheckInTestFragment : Fragment() {
     }
 
     private fun setCheckInTestView() {
-        SocketManager.checkInTest.observe(viewLifecycleOwner, Observer { res ->
-            checkInUrlValueTextView.text = res.checkin.apiUrl
-            checkInStatusValueTextView.text = res.checkin.state
-            checkInDeliveryTimeValueTextView.text = res.checkin.deliveryTime
-
-            state = res.checkin.state
-            apiUrl = res.checkin.apiUrl
-            if (state == CHECKIN_SUCCESS) {
-                deploymentProtocol?.setLastCheckInTime(System.currentTimeMillis())
+        GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
+            val latestCheckin = deploymentProtocol?.getLatestCheckIn()
+            latestCheckin?.let {
+                if (it.has("mqtt")) {
+                    val mqtt = it.get("mqtt").asJsonObject
+                    checkInProtocolValueTextView.text = "mqtt"
+                    checkInTimeValueTextView.text = timestampToDateString((mqtt.get("created_at").asString).toLongOrNull())
+                    checkInFinishButton.isEnabled = true
+                }
+                if (it.has("sbd")) {
+                    val sbd = it.get("sbd").asJsonObject
+                    checkInProtocolValueTextView.text = "sbd"
+                    checkInTimeValueTextView.text = timestampToDateString((sbd.get("created_at").asString).toLongOrNull())
+                    checkInFinishButton.isEnabled = true
+                }
+                if (it.has("swm")) {
+                    val swm = it.get("swm").asJsonObject
+                    val unsent = deploymentProtocol?.getSwmUnsentMessages() ?: -1
+                    checkInProtocolValueTextView.text = "swm"
+                    checkInTimeValueTextView.text = timestampToDateString((swm.get("created_at").asString).toLongOrNull())
+                    checkInQueueTextView.visibility = View.VISIBLE
+                    checkInQueueValueTextView.visibility = View.VISIBLE
+                    checkInQueueValueTextView.text = if(unsent != -1) "$unsent messages" else "unable to retrieve unsent message"
+                    checkInFinishButton.isEnabled = true
+                }
             }
-            val lastCheckInTime = deploymentProtocol?.getLastCheckInTime()
-            if (lastCheckInTime != null) {
-                checkInFinishButton.isEnabled = true
-            }
-            checkInLastValueTextView.text = getLastCheckInRelativeTime()
         })
-        checkInLastValueTextView.text = getLastCheckInRelativeTime()
     }
 
     private fun getLastCheckInRelativeTime(): String {
@@ -82,13 +95,6 @@ class GuardianCheckInTestFragment : Fragment() {
             return TimeAgo.toDuration(timeDiff) ?: getString(R.string.dash)
         }
         return getString(R.string.dash)
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        if (state == CHECKIN_SUCCESS) {
-            SocketManager.checkInTest.value = CheckInTestResponse(CheckIn(apiUrl = apiUrl, state = "not published"))
-        }
     }
 
     override fun onResume() {

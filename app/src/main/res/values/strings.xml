@@ -87,7 +87,7 @@
     <string name="recharging">Batteries need recharging!</string>
 
     <!-- EdgeCheckListFragment -->
-    <string name="setting_up_edge_checklist">AudioMoth Setup Checklist:</string>
+    <string name="setting_up_edge_checklist">AudioMoth Setup Checklist</string>
     <string name="setup">Setup</string>
     <string name="optional">Optional</string>
     <string name="set_deployment_site">Set deployment site</string>
@@ -269,7 +269,7 @@
     <string name="choose_bitrate">Choose Bitrate (kbs)</string>
     <string name="choose_file_format">Choose Audio Format</string>
     <string name="choose_duration_cycle">Choose Recording Duration Cycle (secs)</string>
-    <string name="advanced_config">Advanced Configuration</string>
+    <string name="advanced_config">Guardian Preferences</string>
 
     <!-- GuardianPreferences -->
     <bool name="prefs_value_default_show_ui">true</bool>
@@ -347,6 +347,11 @@
     <string name="signal_value">%d dBm</string>
     <string name="signal_sim_card">The Guardian does not have a SIM card inserted.\nPlease insert a SIM card.</string>
     <string name="signal_lost">WiFi hotspot connection lost.\nPlease try again.</string>
+    <string name="speed_test_failed">failed to retrieve</string>
+    <string name="speed_test_wait">waiting for testing</string>
+    <string name="speed_test_run">run a test</string>
+    <string name="speed_test_kbps">%.2f kb/s download</string>
+    <string name="speed_test_kbps_upload">%.2f kb/s upload</string>
 
     <!-- LocationTrackerService -->
     <string name="track">Track</string>
@@ -389,7 +394,7 @@
     <string name="mic_recorder_warn">Recorder service is not started yet.\nPlease try again later.</string>
 
     <!-- GuardianCheckinTestFragment -->
-    <string name="testing_guardian_checkin">Guardian CheckIn Test</string>
+    <string name="testing_guardian_checkin">Guardian CheckIn Check</string>
     <string name="checkin_url">CheckIn URL</string>
     <string name="status">Status</string>
     <string name="delivery_time">Delivery Time</string>
@@ -398,11 +403,11 @@
     <string name="last_checkin">Last checkin</string>
 
     <!-- GuardianSolarPanelFragment -->
-    <string name="solar_panel_feedback">Solar Panel Info</string>
-    <string name="voltage_v">Voltage(V)</string>
-    <string name="current_a">Current(A)</string>
-    <string name="power_w">Power(W)</string>
-    <string name="please_assemble_solar_panel_to_get_feedback">Please Begin Attaching the Solar Panels to Observe Feedback</string>
+    <string name="solar_panel_feedback">Solar Panel Input Values</string>
+    <string name="voltage_v">Voltage</string>
+    <string name="current_a">Current</string>
+    <string name="power_w">Power</string>
+    <string name="please_assemble_solar_panel_to_get_feedback">Please Begin Attaching the Solar Panels\nto Observe Feedback</string>
 
     <!-- GuardianRegisterFragment -->
     <string name="let_s_register_your_guardian">Let\'s Register your Guardian</string>
@@ -415,9 +420,10 @@
     <string name="registering">Registration Request Sent. Awaiting Response.</string>
     <string name="check_registered">Verifying Guardian Registration Status</string>
     <string name="not_registered">Your Guardian is Not Registered</string>
+    <string name="register_guardian">Register Guardian with RFCx</string>
 
     <!-- GuardianCheckListFragment -->
-    <string name="setting_up_checklist">Guardian Setup Checklist:</string>
+    <string name="setting_up_checklist">Guardian Setup Checklist</string>
     <string name="deploy">Deploy</string>
     <string name="wifi_notification_title">Do you want to disable Guardian\'s WiFi after deployed?</string>
     <string name="notification_yes">Yes</string>
@@ -456,5 +462,66 @@
     <string name="network_not_available">network not available</string>
     <string name="no_content_project">There is no accessible project in this account.\nPlease contact an administrator\nor create the project in Arbimon platform.</string>
     <string name="logout">logout</string>
+    <string name="guardian_softwares">Guardian software</string>
+    <string name="admin_role">admin</string>
+    <string name="not_found_software">not found in local</string>
+    <string name="classify_role">classify</string>
+    <string name="guardian_role">guardian</string>
+    <string name="updater_role">updater</string>
+    <string name="up_to_date">up to date</string>
+
+    <!-- SoftwareUpdateFragment -->
+    <string name="guardian_version">Guardian version</string>
+    <string name="admin_version">Admin version</string>
+    <string name="classify_version">Classify version</string>
+    <string name="updater_version">Updater version</string>
+    <string name="update">Update</string>
+    <string name="update_to">Update to</string>
+    <string name="protocol">Protocol</string>
+    <string name="cell">cell</string>
+    <string name="swarm">swarm</string>
+    <string name="download_softwares_from_guardian_softwares_page_first">Download softwares from Guardian softwares page first\nProfile -> Guardian software -> Download APKs you needed</string>
+    <string name="ibattery_p">Internal Battery</string>
+    <string name="mbattery_p">Main Battery</string>
+    <string name="in_queue">In queue</string>
+    <string name="sentinel_module_detect">Sentinel module detected</string>
+    <string name="sentinel_module_not_detect">Sentinel module not detected</string>
+    <string name="sim_detected">SIM Card detected</string>
+    <string name="sim_not_detected">SIM Card not detected</string>
+    <string name="cell_signal_strength">Cell signal strength</string>
+    <string name="cell_data_transfer">Cell data transfer</string>
+    <string name="cell_no_internet_connection">No internet connection</string>
+    <string name="retest">Retest</string>
+    <string name="satellite_module_detected">Satellite module detected</string>
+    <string name="satellite_module_not_detected">Satellite module not detected</string>
+    <string name="background_noise">Background noise</string>
+    <string name="perfect">Perfect</string>
+    <string name="good">Good</string>
+    <string name="bad">Bad</string>
+    <string name="lt_93_bad"><![CDATA[< -93 Bad]]></string>
+    <string name="lt_97_ok"><![CDATA[< -97 OK]]></string>
+    <string name="lt_100_ok"><![CDATA[< -100 Good]]></string>
+    <string name="lt_104_perfect"><![CDATA[< -104 Perfect]]></string>
+    <string name="phone_number">phone number:</string>
+    <string name="swarm_id">swarm id:</string>
+    <string name="cell_data_only">Cell data only</string>
+    <string name="cell_data_sms_fallback_experimental">Cell data + SMS fallback (experimental)</string>
+    <string name="satellite_only">Satellite only</string>
+    <string name="pass_times_local_time">Off times (local time)</string>
+    <string name="plus">+</string>
+
+    <string name="sat_start_time">Select Satellite start time off</string>
+    <string name="sat_end_time">Select Satellite end time off</string>
+    <string name="guardian_local_time">Guardian local time:</string>
+    <string name="guardian_local_time_null">cannot retrieve local time</string>
+    <string name="guardian_local_timezone_null">cannot retrieve timezone</string>
+    <string name="guardian_timezone">Guardian timezone:</string>
+    <string name="guardian_lost_wifi">Guardian WiFi lost connection</string>
+    <string name="guardian_go_back_wifi">Go Back</string>
+    <string name="satellite_gps_detected">Satellite GPS detected</string>
+    <string name="satellite_gps_not_detected">Satellite GPS not detected</string>
+    <string name="manual">manual</string>
+    <string name="auto">auto</string>
+    <string name="there_is_no_off_time_in_this_project">There is no off time in this project</string>
 
 </resources>

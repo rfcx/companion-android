@@ -33,6 +33,9 @@ build/
 captures/
 .navigation/
 
+# Google service file
+google-services.json
+
 # Intellij IDEA
 .idea/*
 !.idea/codeStyles

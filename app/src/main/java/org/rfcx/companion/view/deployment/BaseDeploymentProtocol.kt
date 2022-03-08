@@ -34,7 +34,9 @@ interface BaseDeploymentProtocol {
 
     fun showToolbar()
     fun hideToolbar()
+    fun setMenuToolbar(isVisibility: Boolean)
     fun setToolbarTitle()
+    fun setToolbarSubtitle(sub: String = "")
 
     fun isSiteLoading(): DownloadStreamState
     fun showSiteLoadingDialog(text: String)

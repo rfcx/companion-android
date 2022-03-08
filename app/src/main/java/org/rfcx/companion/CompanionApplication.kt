@@ -3,11 +3,15 @@ package org.rfcx.companion
 import android.app.Application
 import io.realm.Realm
 import io.realm.exceptions.RealmMigrationNeededException
-import org.rfcx.companion.connection.socket.SocketManager
+import org.rfcx.companion.connection.socket.AdminSocketManager
+import org.rfcx.companion.connection.socket.AudioCastSocketManager
+import org.rfcx.companion.connection.socket.FileSocketManager
+import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.service.DeploymentCleanupWorker
 import org.rfcx.companion.util.LocationTracking
 import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.RealmHelper
+import org.rfcx.companion.util.SocketUtils
 
 class CompanionApplication : Application() {
     override fun onCreate() {
@@ -21,6 +25,13 @@ class CompanionApplication : Application() {
         val state = preferences.getBoolean(Preferences.ENABLE_LOCATION_TRACKING, false)
         if (state) {
             LocationTracking.set(this, true)
+        }
+
+        val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+            defaultHandler?.uncaughtException(thread, throwable)
+
+            SocketUtils.stopAllConnections()
         }
     }
 
@@ -46,6 +57,6 @@ class CompanionApplication : Application() {
 
     override fun onTerminate() {
         super.onTerminate()
-        SocketManager.stopConnection()
+        SocketUtils.stopAllConnections()
     }
 }

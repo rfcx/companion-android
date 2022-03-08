@@ -9,10 +9,10 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import java.util.*
 import kotlinx.android.synthetic.main.fragment_guardian_signal.*
 import org.rfcx.companion.R
-import org.rfcx.companion.connection.socket.SocketManager
+import org.rfcx.companion.connection.socket.AdminSocketManager
+import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
@@ -22,9 +22,14 @@ class GuardianSignalFragment : Fragment() {
         listOf(signalStrength1, signalStrength2, signalStrength3, signalStrength4)
     }
 
-    private var timer: Timer? = null
-
-    private var isSignalTesting = false
+    private val listOfTag by lazy {
+        listOf(
+            satBadSignalQuality,
+            satOKSignalQuality,
+            satGoodSignalQuality,
+            satPerfectSignalQuality
+        )
+    }
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
 
@@ -47,12 +52,14 @@ class GuardianSignalFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         deploymentProtocol?.let {
+            it.setToolbarSubtitle()
+            it.setMenuToolbar(false)
             it.showToolbar()
             it.setToolbarTitle()
         }
 
-        deploymentProtocol?.showLoading()
-        retrieveGuardianSignal()
+        retrieveSimModule()
+        retrieveSatModule()
 
         finishButton.setOnClickListener {
             analytics?.trackClickNextEvent(Screen.GUARDIAN_SIGNAL.id)
@@ -60,62 +67,121 @@ class GuardianSignalFragment : Fragment() {
         }
     }
 
-    private fun retrieveGuardianSignal() {
-        isSignalTesting = true
-
-        timer = Timer()
-        timer?.schedule(object : TimerTask() {
-            override fun run() {
-                SocketManager.getSignalStrength()
+    private fun retrieveSimModule() {
+        AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
+            val hasSim = deploymentProtocol?.getSimDetected()
+            if (hasSim != null && hasSim) {
+                simDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
+                cellSignalLayout.visibility = View.VISIBLE
+                cellDataTransferLayout.visibility = View.VISIBLE
+            } else {
+                simDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_error, 0, 0, 0)
+                cellSignalLayout.visibility = View.GONE
+                cellDataTransferLayout.visibility = View.GONE
             }
-        }, DELAY, MILLI_PERIOD)
 
-        SocketManager.signal.observe(viewLifecycleOwner, Observer { signal ->
-            deploymentProtocol?.hideLoading()
-            val strength = signal.signalInfo.signal
-            val simCard = signal.signalInfo.simCard
-            requireActivity().runOnUiThread {
-                if (simCard) {
-                    hideSimError()
-                    showSignalInfo()
-                    when {
-                        strength > -70 -> {
-                            showSignalStrength(SignalState.MAX)
-                            signalDescText.text = getString(R.string.signal_text_4)
-                        }
-                        strength > -90 -> {
-                            showSignalStrength(SignalState.HIGH)
-                            signalDescText.text = getString(R.string.signal_text_3)
-                        }
-                        strength > -110 -> {
-                            showSignalStrength(SignalState.NORMAL)
-                            signalDescText.text = getString(R.string.signal_text_2)
-                        }
-                        strength > -130 -> {
-                            showSignalStrength(SignalState.LOW)
-                            signalDescText.text = getString(R.string.signal_text_1)
-                        }
-                        else -> {
-                            showSignalStrength(SignalState.NONE)
-                            signalDescText.text = getString(R.string.signal_text_0)
-                        }
-                    }
-                    signalValue.text = getString(R.string.signal_value, strength)
-                } else {
-                    hideSignalInfo()
-                    showSimError()
-                    showSignalStrength(SignalState.NONE)
-                    if (strength == -999) {
-                        signalErrorText.text = getText(R.string.signal_lost)
+            val cellStrength = deploymentProtocol?.getNetwork()
+            if (cellStrength == null) {
+                showCellSignalStrength(SignalState.NONE)
+                signalValue.text = getString(R.string.speed_test_failed)
+            } else {
+                when {
+                    cellStrength > -70 -> showCellSignalStrength(SignalState.MAX)
+                    cellStrength > -90 -> showCellSignalStrength(SignalState.HIGH)
+                    cellStrength > -110 -> showCellSignalStrength(SignalState.NORMAL)
+                    cellStrength > -130 -> showCellSignalStrength(SignalState.LOW)
+                    else -> showCellSignalStrength(SignalState.NONE)
+                }
+                signalValue.text = getString(R.string.signal_value, cellStrength)
+            }
+
+            val speedTest = deploymentProtocol?.getSpeedTest()
+            val tempDownload = speedTest?.downloadSpeed
+            val tempUpload = speedTest?.uploadSpeed
+            val hasConnection = speedTest?.hasConnection
+            val isFailed = speedTest?.isFailed
+            val isWaitingSpeedTest = speedTest?.isTesting
+
+            if (hasConnection != null && hasConnection) {
+                showSpeedTest()
+            } else {
+                hideHideSpeedTest()
+            }
+
+            when {
+                isFailed != null && isFailed -> {
+                    cellDownloadDataTransferValues.text = getString(R.string.speed_test_failed)
+                    cellUploadDataTransferValues.text = getString(R.string.speed_test_failed)
+                }
+                isWaitingSpeedTest == true -> {
+                    cellDownloadDataTransferValues.text = getString(R.string.speed_test_wait)
+                    cellUploadDataTransferValues.text = getString(R.string.speed_test_wait)
+                }
+                isWaitingSpeedTest == false -> {
+                    if (tempDownload == null || tempDownload == -1.0) {
+                        cellDownloadDataTransferValues.text = getString(R.string.speed_test_run)
                     } else {
-                        signalErrorText.text = getText(R.string.signal_sim_card)
+                        cellDownloadDataTransferValues.text =
+                            getString(R.string.speed_test_kbps, tempDownload)
+                    }
+                    if (tempUpload == null || tempUpload == -1.0) {
+                        cellUploadDataTransferValues.text = getString(R.string.speed_test_run)
+                    } else {
+                        cellUploadDataTransferValues.text =
+                            getString(R.string.speed_test_kbps_upload, tempUpload)
                     }
                 }
             }
         })
+
+        cellDataTransferButton.setOnClickListener {
+            GuardianSocketManager.runSpeedTest()
+        }
     }
 
-    private fun showSignalStrength(state: SignalState) {
+    private fun showSpeedTest() {
+        noCellConnectionText.visibility = View.GONE
+        cellDownloadDataTransferValues.visibility = View.VISIBLE
+        cellUploadDataTransferValues.visibility = View.VISIBLE
+        cellDataTransferButton.visibility = View.VISIBLE
+    }
+
+    private fun hideHideSpeedTest() {
+        noCellConnectionText.visibility = View.VISIBLE
+        cellDownloadDataTransferValues.visibility = View.GONE
+        cellUploadDataTransferValues.visibility = View.GONE
+        cellDataTransferButton.visibility = View.GONE
+    }
+
+    private fun retrieveSatModule() {
+        AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
+            val hasSatModule = deploymentProtocol?.getSatId()
+            if (hasSatModule != null) {
+                satDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
+                satSignalLayout.visibility = View.VISIBLE
+            } else {
+                satDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_error, 0, 0, 0)
+                satSignalLayout.visibility = View.GONE
+            }
+
+            val swmStrength = deploymentProtocol?.getSwmNetwork()
+            if (swmStrength == null) {
+                showSatSignalTagStrength(SignalState.NONE)
+                satSignalValues.text = getString(R.string.speed_test_failed)
+            } else {
+                when {
+                    swmStrength < -104 -> showSatSignalTagStrength(SignalState.MAX)
+                    swmStrength < -100 -> showSatSignalTagStrength(SignalState.HIGH)
+                    swmStrength < -97 -> showSatSignalTagStrength(SignalState.NORMAL)
+                    swmStrength < -93 -> showSatSignalTagStrength(SignalState.LOW)
+                    else -> showSatSignalTagStrength(SignalState.LOW)
+                }
+                satSignalValues.text = getString(R.string.signal_value, swmStrength)
+            }
+        })
+    }
+
+    private fun showCellSignalStrength(state: SignalState) {
         listOfSignal.forEachIndexed { index, view ->
             if (index < state.value) {
                 (view.background as GradientDrawable).setBackground(
@@ -128,29 +194,13 @@ class GuardianSignalFragment : Fragment() {
         }
     }
 
-    private fun showSignalInfo() {
-        signalDescText.visibility = View.VISIBLE
-        signalValue.visibility = View.VISIBLE
-    }
-
-    private fun hideSignalInfo() {
-        signalDescText.visibility = View.GONE
-        signalValue.visibility = View.GONE
-    }
-
-    private fun showSimError() {
-        signalErrorText.visibility = View.VISIBLE
-    }
-
-    private fun hideSimError() {
-        signalErrorText.visibility = View.GONE
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        if (isSignalTesting) {
-            timer?.cancel()
-            timer = null
+    private fun showSatSignalTagStrength(state: SignalState) {
+        listOfTag.forEachIndexed { index, view ->
+            if ((index + 1) == state.value) {
+                view.visibility = View.VISIBLE
+            } else {
+                view.visibility = View.GONE
+            }
         }
     }
 
@@ -160,8 +210,6 @@ class GuardianSignalFragment : Fragment() {
     }
 
     companion object {
-        private const val DELAY = 0L
-        private const val MILLI_PERIOD = 1000L
 
         private enum class SignalState(val value: Int) {
             NONE(0), LOW(1), NORMAL(2), HIGH(3), MAX(4)
