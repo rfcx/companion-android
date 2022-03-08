@@ -516,5 +516,7 @@
     <string name="guardian_local_time_null">cannot retrieve local time</string>
     <string name="guardian_local_timezone_null">cannot retrieve timezone</string>
     <string name="guardian_timezone">Guardian timezone:</string>
+    <string name="guardian_lost_wifi">Guardian WiFi lost connection</string>
+    <string name="guardian_go_back_wifi">Go Back</string>
 
 </resources>

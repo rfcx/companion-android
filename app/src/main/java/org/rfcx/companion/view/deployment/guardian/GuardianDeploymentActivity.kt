@@ -278,8 +278,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
 
     override fun onLost() {
         unregisterWifiLost()
-        Snackbar.make(guardianRootView, "Guardian WiFi lost connection", Snackbar.LENGTH_LONG)
-            .setAction("Go back"
+        Snackbar.make(guardianRootView, getString(R.string.guardian_lost_wifi), Snackbar.LENGTH_LONG)
+            .setAction(getString(R.string.guardian_go_back_wifi)
             ) {
                 startConnectGuardian()
             }
