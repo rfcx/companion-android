@@ -38,6 +38,7 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getI2cAccessibility(): I2CAccessibility?
     fun getSimDetected(): Boolean?
     fun getSatId(): String?
+    fun getGPSDetected(): Boolean?
     fun getPhoneNumber(): String?
     fun getGuardianPlan(): GuardianPlan?
     fun getSatTimeOff(): List<String>?
