@@ -21,22 +21,8 @@ jobs:
       - name: 'Build: Assemble Staging APK'
         run: ./gradlew assembleInternalDevelopDebug
         
-      - run: cd app/
-        
-      - run: cd app/build/
-        
-      - run: cd app/build/outputs/
-      
-      - run: cd app/build/outputs/apk/
-      
-      - run: cd app/build/outputs/apk/internalDevelop/
-      
-      - run: cd app/build/outputs/apk/internalDevelop/debug/
-      
-      - run: ls app/build/outputs/apk/internalDevelop/debug/
-        
       - name: 'Upload a Build APK'
         uses: actions/upload-artifact@v3.0.0
         with:
-          name: my-artifact
+          name: companion-staging
           path: app/build/outputs/apk/internalDevelop/debug/app-internalDevelop-debug.apk
