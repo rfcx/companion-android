@@ -19,7 +19,7 @@ jobs:
           java-version: 11
           
       - name: 'Build: Assemble Staging APK'
-        run: ./gradlew assembleStagingDebug
+        run: ./gradlew assembleInternalDevelopDebug
         
       - name: 'Upload a Build APK'
         uses: actions/upload-artifact@v3.0.0
