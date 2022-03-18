@@ -73,7 +73,8 @@ class WifiHotspotManager(private val context: Context) {
                         super.onUnavailable()
                         println("unavailable")
                     }
-                })
+                }
+            )
         } else {
             wifiConnectionReceiver = WifiConnectionReceiver(onWifiListener)
             context.registerReceiver(

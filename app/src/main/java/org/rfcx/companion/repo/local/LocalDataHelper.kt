@@ -20,5 +20,4 @@ class LocalDataHelper {
     fun getTrackingFileLocalDb() = trackingFileDb
     fun getDeploymentImageLocalDb() = deploymentImageDb
     fun getDeploymentLocalDb() = deploymentDb
-
 }

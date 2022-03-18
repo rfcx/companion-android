@@ -64,14 +64,14 @@ object PingUtils {
         try {
             splitSentinelPower.forEach {
                 val splittedItem = it.split("*")
-                when(splittedItem[0]) {
+                when (splittedItem[0]) {
                     "system" -> system = SentinelSystem(splittedItem[2].toInt(), splittedItem[3].toInt(), splittedItem[4].toInt(), splittedItem[5].toInt())
                     "input" -> input = SentinelInput(splittedItem[2].toInt(), splittedItem[3].toInt(), splittedItem[4].toInt(), splittedItem[5].toInt())
                     "battery" -> batt = SentinelBattery(splittedItem[2].toInt(), splittedItem[3].toInt(), splittedItem[4].toDouble(), splittedItem[5].toInt())
                 }
             }
         } catch (e: NumberFormatException) {
-            FirebaseCrashlytics.getInstance().recordException(e);
+            FirebaseCrashlytics.getInstance().recordException(e)
         }
         return SentinelInfo(input, system, batt)
     }

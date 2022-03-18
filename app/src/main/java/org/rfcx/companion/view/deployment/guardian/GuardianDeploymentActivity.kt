@@ -58,8 +58,11 @@ import org.rfcx.companion.view.dialog.LoadingDialogFragment
 import org.rfcx.companion.view.prefs.SyncPreferenceListener
 import java.util.*
 
-class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentProtocol,
-    SyncPreferenceListener, WifiLostListener {
+class GuardianDeploymentActivity :
+    BaseDeploymentActivity(),
+    GuardianDeploymentProtocol,
+    SyncPreferenceListener,
+    WifiLostListener {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val locateDb by lazy { LocateDb(realm) }
@@ -188,13 +191,13 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
             if (currentCheck !in passedChecks) {
                 passedChecks.add(currentCheck)
             }
-            currentCheck = -1 //reset check
+            currentCheck = -1 // reset check
         }
         startCheckList()
     }
 
     override fun backStep() {
-        currentCheck = -1 //reset check
+        currentCheck = -1 // reset check
         val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
         when (container) {
             is GuardianAdvancedFragment -> {
@@ -281,7 +284,8 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     override fun onLost() {
         unregisterWifiLost()
         Snackbar.make(guardianRootView, getString(R.string.guardian_lost_wifi), Snackbar.LENGTH_LONG)
-            .setAction(getString(R.string.guardian_go_back_wifi)
+            .setAction(
+                getString(R.string.guardian_go_back_wifi)
             ) {
                 startConnectGuardian()
             }
@@ -423,7 +427,6 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
         setDeployment(deployment)
     }
 
-
     override fun setReadyToDeploy() {
         showLoading()
         this._deployment?.let {
@@ -431,7 +434,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
             it.updatedAt = Date()
             it.isActive = true
             it.state = DeploymentState.Guardian.ReadyToUpload.key
-            it.deviceParameters = Gson().toJson(GuardianDeviceParameters(getGuid()))
+            it.deviceParameters = Gson().toJson(DeviceParameter(getGuid()))
             setDeployment(it)
 
             val deploymentId = deploymentDb.insertOrUpdateDeployment(it, _deployLocation!!)
@@ -451,7 +454,7 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
 
             saveImages(it)
 
-            //track getting
+            // track getting
             if (preferences.getBoolean(Preferences.ENABLE_LOCATION_TRACKING)) {
                 val track = trackingDb.getFirstTracking()
                 track?.let { t ->
@@ -484,7 +487,6 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
     override fun startConnectGuardian() {
         startFragment(ConnectGuardianFragment.newInstance())
     }
-
 
     override fun startSetupConfigure() {
         startFragment(GuardianConfigureFragment.newInstance())
@@ -624,11 +626,14 @@ class GuardianDeploymentActivity : BaseDeploymentActivity(), GuardianDeploymentP
 
     private fun periodicSocketHeartBreath() {
         timer = Timer()
-        timer.schedule(object : TimerTask() {
-            override fun run() {
-                reTriggerConnection()
-            }
-        }, 0, 5000)
+        timer.schedule(
+            object : TimerTask() {
+                override fun run() {
+                    reTriggerConnection()
+                }
+            },
+            0, 5000
+        )
     }
 
     companion object {

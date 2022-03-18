@@ -21,11 +21,11 @@ fun Context.getIntColor(res: Int): Int {
 }
 
 fun Double.setFormatLabel(): String {
-    return if (this >= 1000) "${String.format("%.1f", this/1000)}km" else "${String.format("%.2f", this)}m"
+    return if (this >= 1000) "${String.format("%.1f", this / 1000)}km" else "${String.format("%.2f", this)}m"
 }
 
 fun Float.setFormatLabel(): String {
-    return if (this >= 1000) "${String.format("%.1f", this/1000)}km" else "${String.format("%.0f", this)}m"
+    return if (this >= 1000) "${String.format("%.1f", this / 1000)}km" else "${String.format("%.0f", this)}m"
 }
 
 fun View.hideKeyboard() = this.let {

@@ -39,7 +39,6 @@ class GuardianConfigureFragment : Fragment() {
     private var needCheckSha1 = false
     private var currentPrefsSha1: String? = null
 
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
         deploymentProtocol = context as GuardianDeploymentProtocol
@@ -95,16 +94,19 @@ class GuardianConfigureFragment : Fragment() {
 
     private fun syncConfig() {
         GuardianSocketManager.syncConfiguration(getConfiguration().toListForGuardian())
-        GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
-            requireActivity().runOnUiThread {
-                if (!needCheckSha1) {
-                    deploymentProtocol?.nextStep()
-                }
-                if (currentPrefsSha1 != deploymentProtocol?.getPrefsSha1()) {
-                    deploymentProtocol?.nextStep()
+        GuardianSocketManager.pingBlob.observe(
+            viewLifecycleOwner,
+            Observer {
+                requireActivity().runOnUiThread {
+                    if (!needCheckSha1) {
+                        deploymentProtocol?.nextStep()
+                    }
+                    if (currentPrefsSha1 != deploymentProtocol?.getPrefsSha1()) {
+                        deploymentProtocol?.nextStep()
+                    }
                 }
             }
-        })
+        )
     }
 
     private fun getConfiguration(): GuardianConfiguration {

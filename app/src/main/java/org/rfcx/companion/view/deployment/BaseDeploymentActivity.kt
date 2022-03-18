@@ -21,8 +21,11 @@ import org.rfcx.companion.view.dialog.CompleteListener
 import org.rfcx.companion.view.dialog.SiteLoadingDialogFragment
 import java.util.*
 
-abstract class BaseDeploymentActivity : AppCompatActivity(), CompleteListener,
-    BaseDeploymentProtocol, MapPickerProtocol {
+abstract class BaseDeploymentActivity :
+    AppCompatActivity(),
+    CompleteListener,
+    BaseDeploymentProtocol,
+    MapPickerProtocol {
 
     var _deployment: Deployment? = null
     var _deployLocation: DeploymentLocation? = null

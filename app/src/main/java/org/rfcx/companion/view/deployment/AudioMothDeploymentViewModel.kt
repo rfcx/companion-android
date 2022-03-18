@@ -55,7 +55,6 @@ class AudioMothDeploymentViewModel(
                         null
                     )
                 )
-
             }
         }
     }
@@ -84,7 +83,6 @@ class AudioMothDeploymentViewModel(
 
         downloadStreamsWorkInfoLiveData = DownloadStreamsWorker.workInfos(context)
         downloadStreamsWorkInfoLiveData.observeForever(downloadStreamsWorkInfoObserve)
-
     }
 
     fun downloadStreamsWork(): LiveData<Resource<SyncInfo>> {

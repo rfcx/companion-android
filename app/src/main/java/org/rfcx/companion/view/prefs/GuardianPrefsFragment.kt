@@ -7,9 +7,9 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import org.rfcx.companion.R
-import org.rfcx.companion.util.socket.PingUtils
 
-class GuardianPrefsFragment : PreferenceFragmentCompat(),
+class GuardianPrefsFragment :
+    PreferenceFragmentCompat(),
     SharedPreferences.OnSharedPreferenceChangeListener {
 
     private val prefsChanges = mutableMapOf<String, String>()

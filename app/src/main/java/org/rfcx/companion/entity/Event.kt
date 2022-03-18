@@ -26,12 +26,12 @@ enum class Event(val id: String) {
     PLAY_SYNC_TONE_COMPLETED("play_sync_tone_completed"),
     ADD_DEPLOYMENT_IMAGE("add_deployment_image"),
     CREATE_AUDIOMOTH_DEPLOYMENT("create_audiomoth_deployment"),
-    SELECT_GUARDIAN_HOTSPOT ("select_guardian_hotspot"),
+    SELECT_GUARDIAN_HOTSPOT("select_guardian_hotspot"),
     CONNECT_GUARDIAN_HOTSPOT("connect_guardian_hotspot"),
     RETRY_GUARDIAN_HOTSPOT("retry_guardian_hotspot"),
     CLICK_NEXT("click_next"),
-    REGISTER_GUARDIAN ("register_guardian"),
-    SELECT_GUARDIAN_PROFILE ("select_guardian_profile"),
+    REGISTER_GUARDIAN("register_guardian"),
+    SELECT_GUARDIAN_PROFILE("select_guardian_profile"),
     CREATE_NEW_GUARDIAN_PROFILE("create_new_guardian_profile"),
-    CREATE_GUARDIAN_DEPLOYMENT ("create_guardian_deployment")
+    CREATE_GUARDIAN_DEPLOYMENT("create_guardian_deployment")
 }

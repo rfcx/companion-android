@@ -368,7 +368,6 @@ class CompanionRealmMigration : RealmMigration {
             addRealmListField(Deployment.FIELD_PASSED_CHECKS, Int::class.java)
                 .setNullable(Deployment.FIELD_PASSED_CHECKS, true)
         }
-
     }
 
     private fun migrateToV18(realm: DynamicRealm) {

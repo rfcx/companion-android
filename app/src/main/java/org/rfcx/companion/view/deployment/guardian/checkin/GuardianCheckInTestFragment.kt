@@ -11,8 +11,6 @@ import kotlinx.android.synthetic.main.fragment_guardian_checkin_test.*
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.entity.Screen
-import org.rfcx.companion.entity.socket.response.CheckIn
-import org.rfcx.companion.entity.socket.response.CheckInTestResponse
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.TimeAgo
 import org.rfcx.companion.util.timestampToDateString
@@ -59,33 +57,36 @@ class GuardianCheckInTestFragment : Fragment() {
     }
 
     private fun setCheckInTestView() {
-        GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
-            val latestCheckin = deploymentProtocol?.getLatestCheckIn()
-            latestCheckin?.let {
-                if (it.has("mqtt")) {
-                    val mqtt = it.get("mqtt").asJsonObject
-                    checkInProtocolValueTextView.text = "mqtt"
-                    checkInTimeValueTextView.text = timestampToDateString((mqtt.get("created_at").asString).toLongOrNull())
-                    checkInFinishButton.isEnabled = true
-                }
-                if (it.has("sbd")) {
-                    val sbd = it.get("sbd").asJsonObject
-                    checkInProtocolValueTextView.text = "sbd"
-                    checkInTimeValueTextView.text = timestampToDateString((sbd.get("created_at").asString).toLongOrNull())
-                    checkInFinishButton.isEnabled = true
-                }
-                if (it.has("swm")) {
-                    val swm = it.get("swm").asJsonObject
-                    val unsent = deploymentProtocol?.getSwmUnsentMessages() ?: -1
-                    checkInProtocolValueTextView.text = "swm"
-                    checkInTimeValueTextView.text = timestampToDateString((swm.get("created_at").asString).toLongOrNull())
-                    checkInQueueTextView.visibility = View.VISIBLE
-                    checkInQueueValueTextView.visibility = View.VISIBLE
-                    checkInQueueValueTextView.text = if(unsent != -1) "$unsent messages" else "unable to retrieve unsent message"
-                    checkInFinishButton.isEnabled = true
+        GuardianSocketManager.pingBlob.observe(
+            viewLifecycleOwner,
+            Observer {
+                val latestCheckin = deploymentProtocol?.getLatestCheckIn()
+                latestCheckin?.let {
+                    if (it.has("mqtt")) {
+                        val mqtt = it.get("mqtt").asJsonObject
+                        checkInProtocolValueTextView.text = "mqtt"
+                        checkInTimeValueTextView.text = timestampToDateString((mqtt.get("created_at").asString).toLongOrNull())
+                        checkInFinishButton.isEnabled = true
+                    }
+                    if (it.has("sbd")) {
+                        val sbd = it.get("sbd").asJsonObject
+                        checkInProtocolValueTextView.text = "sbd"
+                        checkInTimeValueTextView.text = timestampToDateString((sbd.get("created_at").asString).toLongOrNull())
+                        checkInFinishButton.isEnabled = true
+                    }
+                    if (it.has("swm")) {
+                        val swm = it.get("swm").asJsonObject
+                        val unsent = deploymentProtocol?.getSwmUnsentMessages() ?: -1
+                        checkInProtocolValueTextView.text = "swm"
+                        checkInTimeValueTextView.text = timestampToDateString((swm.get("created_at").asString).toLongOrNull())
+                        checkInQueueTextView.visibility = View.VISIBLE
+                        checkInQueueValueTextView.visibility = View.VISIBLE
+                        checkInQueueValueTextView.text = if (unsent != -1) "$unsent messages" else "unable to retrieve unsent message"
+                        checkInFinishButton.isEnabled = true
+                    }
                 }
             }
-        })
+        )
     }
 
     private fun getLastCheckInRelativeTime(): String {

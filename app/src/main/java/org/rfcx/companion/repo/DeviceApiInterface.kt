@@ -2,8 +2,8 @@ package org.rfcx.companion.repo
 
 import okhttp3.MultipartBody
 import okhttp3.ResponseBody
-import org.rfcx.companion.entity.request.EditDeploymentRequest
 import org.rfcx.companion.entity.request.DeploymentRequest
+import org.rfcx.companion.entity.request.EditDeploymentRequest
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.StreamResponse
@@ -11,7 +11,7 @@ import retrofit2.Call
 import retrofit2.http.*
 
 interface DeviceApiInterface {
-    //deployment
+    // deployment
     @POST("deployments")
     fun createDeployment(
         @Header("Authorization") authUser: String,
@@ -72,10 +72,12 @@ interface DeviceApiInterface {
     ): Call<ResponseBody>
 
     @GET("streams")
-    fun getStreams(@Header("Authorization") authUser: String,
-                   @Query("limit") limit: Int = 100,
-                   @Query("offset") offset: Int = 0,
-                   @Query("updated_after", encoded = true) updatedAfter: String? = null,
-                   @Query("sort", encoded = true) sort: String? = null,
-                   @Query("projects") projects: List<String>? = null): Call<List<StreamResponse>>
+    fun getStreams(
+        @Header("Authorization") authUser: String,
+        @Query("limit") limit: Int = 100,
+        @Query("offset") offset: Int = 0,
+        @Query("updated_after", encoded = true) updatedAfter: String? = null,
+        @Query("sort", encoded = true) sort: String? = null,
+        @Query("projects") projects: List<String>? = null
+    ): Call<List<StreamResponse>>
 }

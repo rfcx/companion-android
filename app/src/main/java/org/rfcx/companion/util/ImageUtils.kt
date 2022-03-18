@@ -1,9 +1,9 @@
 package org.rfcx.companion.util
 
 import android.os.Environment
+import org.rfcx.companion.BuildConfig
 import java.io.File
 import java.util.*
-import org.rfcx.companion.BuildConfig
 
 object ImageUtils {
 
@@ -18,7 +18,8 @@ object ImageUtils {
         val directory = File(
             Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES
-            ).absolutePath, directoryName
+            ).absolutePath,
+            directoryName
         )
 
         if (!directory.exists()) {

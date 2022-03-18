@@ -12,7 +12,6 @@ import org.rfcx.companion.entity.socket.response.GuardianPing
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.Socket
-import java.net.SocketTimeoutException
 import java.util.*
 
 object GuardianSocketManager {

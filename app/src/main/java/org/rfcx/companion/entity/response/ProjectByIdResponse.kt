@@ -2,7 +2,7 @@ package org.rfcx.companion.entity.response
 
 import com.google.gson.annotations.SerializedName
 
-class ProjectByIdResponse (
+class ProjectByIdResponse(
     var id: String? = null,
 
     var name: String? = null,

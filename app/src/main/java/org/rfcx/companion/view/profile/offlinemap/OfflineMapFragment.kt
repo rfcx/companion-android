@@ -43,7 +43,8 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
     private var project: Project? = null
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
@@ -76,32 +77,44 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
     }
 
     private fun setObserver() {
-        projectOfflineMapViewModel.getProjects().observe(viewLifecycleOwner, Observer {
-            if (projectOfflineMapViewModel.getOfflineDownloading() == null) {
-                projectAdapter.hideDownloadButton =
-                    projectOfflineMapViewModel.getOfflineDownloading() != null
+        projectOfflineMapViewModel.getProjects().observe(
+            viewLifecycleOwner,
+            Observer {
+                if (projectOfflineMapViewModel.getOfflineDownloading() == null) {
+                    projectAdapter.hideDownloadButton =
+                        projectOfflineMapViewModel.getOfflineDownloading() != null
+                }
             }
-        })
+        )
 
-        projectOfflineMapViewModel.getStateOfflineMap().observe(viewLifecycleOwner, Observer {
-            setStateOfflineMap(it)
-        })
+        projectOfflineMapViewModel.getStateOfflineMap().observe(
+            viewLifecycleOwner,
+            Observer {
+                setStateOfflineMap(it)
+            }
+        )
 
         projectOfflineMapViewModel.getPercentageDownloads()
-            .observe(viewLifecycleOwner, Observer { percentage ->
-                if (percentage >= 100) {
-                    projectOfflineMapViewModel.updateOfflineDownloadedState()
-                    setStateOfflineMap(OfflineMapState.DOWNLOADED_STATE.key)
-                    this.project?.let { it1 -> projectAdapter.setDownloading(it1) }
-                } else {
-                    this.project?.let { it1 -> projectAdapter.setProgress(it1, percentage) }
-                    setStateOfflineMap(OfflineMapState.DOWNLOADING_STATE.key)
+            .observe(
+                viewLifecycleOwner,
+                Observer { percentage ->
+                    if (percentage >= 100) {
+                        projectOfflineMapViewModel.updateOfflineDownloadedState()
+                        setStateOfflineMap(OfflineMapState.DOWNLOADED_STATE.key)
+                        this.project?.let { it1 -> projectAdapter.setDownloading(it1) }
+                    } else {
+                        this.project?.let { it1 -> projectAdapter.setProgress(it1, percentage) }
+                        setStateOfflineMap(OfflineMapState.DOWNLOADING_STATE.key)
+                    }
                 }
-            })
+            )
 
-        projectOfflineMapViewModel.hideDownloadButton().observe(viewLifecycleOwner, Observer {
-            projectAdapter.hideDownloadButton = it
-        })
+        projectOfflineMapViewModel.hideDownloadButton().observe(
+            viewLifecycleOwner,
+            Observer {
+                projectAdapter.hideDownloadButton = it
+            }
+        )
     }
 
     private fun setupAdapter() {

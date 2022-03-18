@@ -42,11 +42,16 @@ fun getListSite(
             deploymentList.filter { it.stream?.project?.name == projectName }
     }
     val nearLocations =
-        findNearLocations(ArrayList(locations.filter { loc ->
-            loc.locationGroup?.name == projectName || projectName == context.getString(
-                R.string.none
-            )
-        }), currentUserLocation)?.sortedBy { it.second }
+        findNearLocations(
+            ArrayList(
+                locations.filter { loc ->
+                    loc.locationGroup?.name == projectName || projectName == context.getString(
+                        R.string.none
+                    )
+                }
+            ),
+            currentUserLocation
+        )?.sortedBy { it.second }
 
     val locationsItems: List<SiteWithLastDeploymentItem> =
         nearLocations?.map {
@@ -79,11 +84,13 @@ fun getListSiteWithOutCurrentLocation(
             deployments.filter { it.stream?.project?.name == projectName }
     }
 
-    val filterLocations = ArrayList(locations.filter { loc ->
-        loc.locationGroup?.name == projectName || projectName == context.getString(
-            R.string.none
-        )
-    })
+    val filterLocations = ArrayList(
+        locations.filter { loc ->
+            loc.locationGroup?.name == projectName || projectName == context.getString(
+                R.string.none
+            )
+        }
+    )
 
     val locationsItems: List<SiteWithLastDeploymentItem> =
         filterLocations.map {
@@ -98,4 +105,3 @@ fun getListSiteWithOutCurrentLocation(
     val notDeployment = locationsItems.filter { it.date == null }
     return ArrayList(sortDate + notDeployment)
 }
-

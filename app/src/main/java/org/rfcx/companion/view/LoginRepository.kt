@@ -9,5 +9,4 @@ class LoginRepository(
 ) {
 
     fun userTouch(token: String) = deviceApiHelper.userTouch(token)
-
 }

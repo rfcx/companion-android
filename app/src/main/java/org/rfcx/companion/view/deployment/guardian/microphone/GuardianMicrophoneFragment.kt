@@ -231,35 +231,41 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
 
         AudioCastSocketManager.connect(microphoneTestUtils)
 
-        spectrogramTimer?.schedule(object : TimerTask() {
-            override fun run() {
-                if (!spectrogramStack.isNullOrEmpty()) {
-                    nullStackThreshold = 0
-                    try {
-                        spectrogramView.setMagnitudes(spectrogramStack[0] ?: FloatArray(0))
-                        spectrogramView.invalidate()
-                        spectrogramStack.removeAt(0)
-                    } catch (e: Exception) { /* nothing now */ }
-                } else {
-                    nullStackThreshold++
-                    if (nullStackThreshold >= 50) {
+        spectrogramTimer?.schedule(
+            object : TimerTask() {
+                override fun run() {
+                    if (!spectrogramStack.isNullOrEmpty()) {
                         nullStackThreshold = 0
+                        try {
+                            spectrogramView.setMagnitudes(spectrogramStack[0] ?: FloatArray(0))
+                            spectrogramView.invalidate()
+                            spectrogramStack.removeAt(0)
+                        } catch (e: Exception) { /* nothing now */ }
+                    } else {
+                        nullStackThreshold++
+                        if (nullStackThreshold >= 50) {
+                            nullStackThreshold = 0
+                        }
                     }
                 }
-            }
-        }, DELAY, STACK_PERIOD)
+            },
+            DELAY, STACK_PERIOD
+        )
 
-        AudioCastSocketManager.spectrogram.observe(viewLifecycleOwner, Observer {
-            if (isMicTesting) {
-                if (it.size > 2) {
-                    AudioSpectrogramUtils.setupSpectrogram(it.size)
-                    val audioChunks = it.toShortArray().toSmallChunk(1)
-                    for (chunk in audioChunks) {
-                        AudioSpectrogramUtils.getTrunks(chunk, this)
+        AudioCastSocketManager.spectrogram.observe(
+            viewLifecycleOwner,
+            Observer {
+                if (isMicTesting) {
+                    if (it.size > 2) {
+                        AudioSpectrogramUtils.setupSpectrogram(it.size)
+                        val audioChunks = it.toShortArray().toSmallChunk(1)
+                        for (chunk in audioChunks) {
+                            AudioSpectrogramUtils.getTrunks(chunk, this)
+                        }
                     }
                 }
             }
-        })
+        )
     }
 
     override fun onProcessed(mag: FloatArray) {

@@ -1,7 +1,6 @@
 package org.rfcx.companion.util.geojson
 
 import android.content.Context
-import android.graphics.Color
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.JsonArray
@@ -28,10 +27,10 @@ object GeoJsonUtils {
     fun generateGeoJson(context: Context, fileName: String, points: List<DoubleArray>): File {
         val gson = Gson()
         val json = JsonObject()
-        //add Type
+        // add Type
         json.addProperty("type", "FeatureCollection")
 
-        //create features
+        // create features
         val featureArray = JsonArray()
 
         val featureItem = JsonObject()
@@ -41,19 +40,19 @@ object GeoJsonUtils {
         propertyItem.addProperty("color", randomColor())
         featureItem.add("properties", propertyItem)
 
-        //create Geometry type
+        // create Geometry type
         val geometry = JsonObject()
         geometry.addProperty("type", "LineString")
-        //create Geometry coordinate
+        // create Geometry coordinate
         geometry.add("coordinates", points.toJsonArray())
         featureItem.add("geometry", geometry)
 
         featureArray.add(featureItem)
 
-        //combine all data
+        // combine all data
         json.add("features", gson.toJsonTree(featureArray).asJsonArray)
 
-        //write to file
+        // write to file
         return createFile(context, fileName, json)
     }
 
@@ -67,7 +66,7 @@ object GeoJsonUtils {
         val writer = FileWriter(file)
         gson.toJson(json, writer)
 
-        //close writer
+        // close writer
         writer.close()
         return file
     }
@@ -120,7 +119,6 @@ object GeoJsonUtils {
                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                     callback.onFailed(t.message ?: "error occur")
                 }
-
             })
     }
 

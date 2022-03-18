@@ -85,5 +85,4 @@ class AudioMothDeploymentRepository(
     fun getDeploymentById(id: Int): Deployment? {
         return localDataHelper.getDeploymentLocalDb().getDeploymentById(id)
     }
-
 }

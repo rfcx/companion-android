@@ -22,7 +22,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.zhihu.matisse.Matisse
 import com.zhihu.matisse.MimeType
-import java.io.File
 import kotlinx.android.synthetic.main.activity_feedback.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
@@ -31,6 +30,7 @@ import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.StatusEvent
 import org.rfcx.companion.repo.Firestore
 import org.rfcx.companion.util.*
+import java.io.File
 
 class FeedbackActivity : AppCompatActivity() {
     private var imageFile: File? = null
@@ -228,28 +228,28 @@ class FeedbackActivity : AppCompatActivity() {
 
         Firestore(this)
             .saveFeedback(feedbackInput, pathListArray) { success ->
-            if (success) {
-                val intent = Intent()
-                setResult(ProfileFragment.RESULT_CODE, intent)
-                analytics.trackSendFeedbackEvent(StatusEvent.SUCCESS.id)
+                if (success) {
+                    val intent = Intent()
+                    setResult(ProfileFragment.RESULT_CODE, intent)
+                    analytics.trackSendFeedbackEvent(StatusEvent.SUCCESS.id)
 
-                if(pathListArray != null){
-                    analytics.trackAddFeedbackImagesEvent()
+                    if (pathListArray != null) {
+                        analytics.trackAddFeedbackImagesEvent()
+                    }
+
+                    finish()
+                } else {
+                    feedbackGroupView.visibility = View.VISIBLE
+                    feedbackProgressBar.visibility = View.GONE
+                    analytics.trackSendFeedbackEvent(StatusEvent.FAILURE.id)
+
+                    Snackbar.make(
+                        contextView,
+                        R.string.feedback_submission_failed,
+                        Snackbar.LENGTH_LONG
+                    ).setAction(R.string.snackbar_retry) { sendFeedback() }.show()
                 }
-
-                finish()
-            } else {
-                feedbackGroupView.visibility = View.VISIBLE
-                feedbackProgressBar.visibility = View.GONE
-                analytics.trackSendFeedbackEvent(StatusEvent.FAILURE.id)
-
-                Snackbar.make(
-                    contextView,
-                    R.string.feedback_submission_failed,
-                    Snackbar.LENGTH_LONG
-                ).setAction(R.string.snackbar_retry) { sendFeedback() }.show()
             }
-        }
     }
 
     private fun View.hideKeyboard() = this.let {

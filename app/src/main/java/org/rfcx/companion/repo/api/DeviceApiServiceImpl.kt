@@ -9,9 +9,9 @@ import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.repo.ApiManager
 import retrofit2.Call
 
-//TODO: Convert Old device api to MVVM pattern
+// TODO: Convert Old device api to MVVM pattern
 
-class DeviceApiServiceImpl: DeviceApiService {
+class DeviceApiServiceImpl : DeviceApiService {
     override fun getProjects(
         authUser: String,
         limit: Int,

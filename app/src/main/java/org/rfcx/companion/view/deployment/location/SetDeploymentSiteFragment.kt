@@ -30,8 +30,9 @@ import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.map.SiteAdapter
 import org.rfcx.companion.view.map.SyncInfo
 
-class SetDeploymentSiteFragment : Fragment(),
-        (Locate, Boolean) -> Unit {
+class SetDeploymentSiteFragment :
+    Fragment(),
+    (Locate, Boolean) -> Unit {
     private lateinit var audioMothDeploymentViewModel: AudioMothDeploymentViewModel
 
     // Protocol
@@ -70,7 +71,6 @@ class SetDeploymentSiteFragment : Fragment(),
         ).get(AudioMothDeploymentViewModel::class.java)
     }
 
-
     private fun initIntent() {
         arguments?.let {
             latitude = it.getDouble(ARG_LATITUDE)
@@ -79,7 +79,8 @@ class SetDeploymentSiteFragment : Fragment(),
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
@@ -137,9 +138,11 @@ class SetDeploymentSiteFragment : Fragment(),
                 } else {
                     val text = s.toString().toLowerCase()
                     val newList: ArrayList<SiteWithLastDeploymentItem> = ArrayList()
-                    newList.addAll(sitesAdapter.filter {
-                        it.locate.name.toLowerCase().contains(text)
-                    })
+                    newList.addAll(
+                        sitesAdapter.filter {
+                            it.locate.name.toLowerCase().contains(text)
+                        }
+                    )
                     noResultFound.visibility = View.GONE
                     val createNew = arrayListOf(
                         SiteWithLastDeploymentItem(
@@ -194,17 +197,23 @@ class SetDeploymentSiteFragment : Fragment(),
     }
 
     private fun setObserver() {
-        audioMothDeploymentViewModel.getSites().observe(viewLifecycleOwner, Observer {
-            setupView()
-        })
-
-        audioMothDeploymentViewModel.downloadStreamsWork().observe(viewLifecycleOwner, Observer {
-            when (it.status) {
-                Status.LOADING -> updateSyncInfo(SyncInfo.Uploading, true)
-                Status.SUCCESS -> updateSyncInfo(SyncInfo.Uploaded, true)
-                Status.ERROR -> updateSyncInfo(isSites = true)
+        audioMothDeploymentViewModel.getSites().observe(
+            viewLifecycleOwner,
+            Observer {
+                setupView()
             }
-        })
+        )
+
+        audioMothDeploymentViewModel.downloadStreamsWork().observe(
+            viewLifecycleOwner,
+            Observer {
+                when (it.status) {
+                    Status.LOADING -> updateSyncInfo(SyncInfo.Uploading, true)
+                    Status.SUCCESS -> updateSyncInfo(SyncInfo.Uploaded, true)
+                    Status.ERROR -> updateSyncInfo(isSites = true)
+                }
+            }
+        )
     }
 
     private fun setSwipeSite() {

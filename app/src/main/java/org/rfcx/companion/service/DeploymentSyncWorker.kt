@@ -7,10 +7,9 @@ import androidx.work.*
 import io.realm.Realm
 import org.rfcx.companion.entity.request.EditDeploymentRequest
 import org.rfcx.companion.entity.request.toRequestBody
-import org.rfcx.companion.entity.response.isGuardian
 import org.rfcx.companion.entity.response.toDeployment
-import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.DeploymentDb
+import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.RealmHelper
@@ -91,7 +90,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
     ) {
         db.markSent(id, deploymentId)
 
-        //update core siteId when deployment created
+        // update core siteId when deployment created
         val updatedDp = ApiManager.getInstance().getDeviceApi()
             .getDeployment(token, id).execute().body()
         updatedDp?.let { dp ->
@@ -99,7 +98,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
             locateDb.updateSiteServerId(deploymentId, dp.stream!!.id!!)
         }
 
-        //send tracking if there is
+        // send tracking if there is
         TrackingSyncWorker.enqueue(context)
     }
 

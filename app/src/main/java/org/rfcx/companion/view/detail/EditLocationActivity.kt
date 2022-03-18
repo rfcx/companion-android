@@ -167,21 +167,25 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
                         hideLoading()
                         showCommonDialog(errorMessage)
                     }
-                })
-
-            viewModel.editProject(id, getLocationGroup(group), object :
-                DatabaseCallback {
-                override fun onSuccess() {
-                    hideLoading()
-                    DeploymentSyncWorker.enqueue(this@EditLocationActivity)
-                    finish()
                 }
+            )
 
-                override fun onFailure(errorMessage: String) {
-                    hideLoading()
-                    showCommonDialog(errorMessage)
+            viewModel.editProject(
+                id, getLocationGroup(group),
+                object :
+                    DatabaseCallback {
+                    override fun onSuccess() {
+                        hideLoading()
+                        DeploymentSyncWorker.enqueue(this@EditLocationActivity)
+                        finish()
+                    }
+
+                    override fun onFailure(errorMessage: String) {
+                        hideLoading()
+                        showCommonDialog(errorMessage)
+                    }
                 }
-            })
+            )
         }
     }
 

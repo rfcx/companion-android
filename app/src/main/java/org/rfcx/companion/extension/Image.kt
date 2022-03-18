@@ -36,7 +36,7 @@ fun ImageView.setDeploymentImage(url: String, blur: Boolean, fromServer: Boolean
 
         Glide.with(this)
             .load(glideUrl)
-            .listener(object : RequestListener<Drawable>{
+            .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(
                     e: GlideException?,
                     model: Any?,
@@ -61,7 +61,6 @@ fun ImageView.setDeploymentImage(url: String, blur: Boolean, fromServer: Boolean
             .placeholder(placeholder)
             .error(placeholder)
             .into(this)
-
     } else {
         if (blur) {
             Glide.with(this)

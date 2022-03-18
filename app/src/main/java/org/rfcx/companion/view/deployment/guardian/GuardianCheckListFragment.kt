@@ -5,20 +5,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_guardian_checklist.*
 import org.rfcx.companion.R
 import org.rfcx.companion.adapter.CheckListItem
-import org.rfcx.companion.connection.socket.AdminSocketManager
-import org.rfcx.companion.connection.socket.AudioCastSocketManager
-import org.rfcx.companion.connection.socket.FileSocketManager
-import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.util.SocketUtils
 import org.rfcx.companion.view.deployment.CheckListAdapter
-import java.io.File
 
 class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
 
@@ -65,7 +58,6 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
         checklistDeployButton.setOnClickListener {
             deploy()
         }
-
     }
 
     override fun invoke(number: Int, name: String) {

@@ -223,7 +223,6 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-
     private fun moveCamera(latLng: LatLng, zoom: Double) {
         mapboxMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom))
     }

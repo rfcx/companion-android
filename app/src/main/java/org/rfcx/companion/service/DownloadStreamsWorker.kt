@@ -8,8 +8,8 @@ import io.realm.Realm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.rfcx.companion.entity.response.convertToDeploymentResponse
-import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.localdb.DeploymentDb
+import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.getIdToken
@@ -22,12 +22,12 @@ class DownloadStreamsWorker(val context: Context, params: WorkerParameters) :
     private var someFailed = false
 
     override suspend fun doWork(): Result {
-        //reset to default
+        // reset to default
         count = 0
         currentStreamsLoading = 0
         someFailed = false
 
-        if(DeploymentSyncWorker.isRunning() != DeploymentSyncState.RUNNING) {
+        if (DeploymentSyncWorker.isRunning() != DeploymentSyncState.RUNNING) {
             Log.d(TAG, "doWork on DownloadStreams")
 
             val token = "Bearer ${context.getIdToken()}"
@@ -60,8 +60,8 @@ class DownloadStreamsWorker(val context: Context, params: WorkerParameters) :
                 count += resultBody.size
                 streamDb.insertOrUpdate(resultBody)
 
-                //insert deployments
-                val deploymentStreams = resultBody.filter { st -> st.deployment != null}
+                // insert deployments
+                val deploymentStreams = resultBody.filter { st -> st.deployment != null }
                 deploymentDb.insertOrUpdate(deploymentStreams.map { st -> st.convertToDeploymentResponse() })
 
                 if (it.size == SITES_LIMIT_GETTING) {

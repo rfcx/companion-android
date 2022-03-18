@@ -32,9 +32,9 @@ fun ProjectResponse.toLocationGroup(): LocationGroup {
 }
 
 fun ProjectResponse.permissionsLabel(): String {
-    return if(this.permissions.contains("C") && this.permissions.contains("R") && this.permissions.contains("U") && this.permissions.contains("D")) {
+    return if (this.permissions.contains("C") && this.permissions.contains("R") && this.permissions.contains("U") && this.permissions.contains("D")) {
         Permissions.ADMIN.value
-    } else if(this.permissions.contains("C") && this.permissions.contains("R") && this.permissions.contains("U")) {
+    } else if (this.permissions.contains("C") && this.permissions.contains("R") && this.permissions.contains("U")) {
         Permissions.MEMBER.value
     } else {
         Permissions.GUEST.value

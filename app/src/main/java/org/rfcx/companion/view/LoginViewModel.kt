@@ -98,37 +98,40 @@ class LoginViewModel(
             .withScope(context.getString(R.string.auth0_scopes))
             .withScheme(context.getString(R.string.auth0_scheme))
             .withAudience(context.getString(R.string.auth0_audience))
-            .start(activity, object : AuthCallback {
-                override fun onFailure(dialog: Dialog) {
-                    loginWithGoogle.postValue(
-                        Resource.error(
-                            context.getString(R.string.error_has_occurred),
-                            null
+            .start(
+                activity,
+                object : AuthCallback {
+                    override fun onFailure(dialog: Dialog) {
+                        loginWithGoogle.postValue(
+                            Resource.error(
+                                context.getString(R.string.error_has_occurred),
+                                null
+                            )
                         )
-                    )
-                }
+                    }
 
-                override fun onFailure(exception: AuthenticationException) {
-                    loginWithGoogle.postValue(
-                        Resource.error(
-                            context.getString(R.string.error_has_occurred),
-                            null
+                    override fun onFailure(exception: AuthenticationException) {
+                        loginWithGoogle.postValue(
+                            Resource.error(
+                                context.getString(R.string.error_has_occurred),
+                                null
+                            )
                         )
-                    )
-                    exception.printStackTrace()
-                }
+                        exception.printStackTrace()
+                    }
 
-                override fun onSuccess(credentials: Credentials) {
-                    when (val result = CredentialVerifier(context).verify(credentials)) {
-                        is Err -> {
-                            loginWithGoogle.postValue(Resource.error(result.error, null))
-                        }
-                        is Ok -> {
-                            loginWithGoogle.postValue(Resource.success(result.value))
+                    override fun onSuccess(credentials: Credentials) {
+                        when (val result = CredentialVerifier(context).verify(credentials)) {
+                            is Err -> {
+                                loginWithGoogle.postValue(Resource.error(result.error, null))
+                            }
+                            is Ok -> {
+                                loginWithGoogle.postValue(Resource.success(result.value))
+                            }
                         }
                     }
                 }
-            })
+            )
     }
 
     fun userTouch(result: UserAuthResponse) {
@@ -183,7 +186,6 @@ class LoginViewModel(
                 ) {
                     response.body()?.let {
                         firebaseAuth.postValue(Resource.success(it.firebaseToken))
-
                     }
                 }
             })

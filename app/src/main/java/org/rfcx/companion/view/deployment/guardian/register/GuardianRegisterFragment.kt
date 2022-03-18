@@ -78,7 +78,7 @@ class GuardianRegisterFragment : Fragment() {
         val userToken = requireContext().getIdToken()
         if (guid != null && userToken != null) {
             ApiManager.getInstance().getDeviceApi2(getRadioValueForRegistration()).registerGuardian("Bearer $userToken", GuardianRegisterRequest(guid)).enqueue(
-                object: Callback<GuardianRegisterResponse> {
+                object : Callback<GuardianRegisterResponse> {
                     override fun onResponse(
                         call: Call<GuardianRegisterResponse>,
                         response: Response<GuardianRegisterResponse>
@@ -105,21 +105,24 @@ class GuardianRegisterFragment : Fragment() {
     }
 
     private fun isGuardianRegistered() {
-        GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
-            val isRegistered = deploymentProtocol?.isGuardianRegistered()
-            if (isRegistered != null && isRegistered) {
-                productionRadioButton.isEnabled = false
-                stagingRadioButton.isEnabled = false
-                registerGuardianButton.visibility = View.GONE
-                registerResultTextView.text =
-                    requireContext().getString(R.string.already_registered)
-                registerFinishButton.visibility = View.VISIBLE
-            } else {
-                if (!isWaitingRegistration) {
-                    resetUI()
+        GuardianSocketManager.pingBlob.observe(
+            viewLifecycleOwner,
+            Observer {
+                val isRegistered = deploymentProtocol?.isGuardianRegistered()
+                if (isRegistered != null && isRegistered) {
+                    productionRadioButton.isEnabled = false
+                    stagingRadioButton.isEnabled = false
+                    registerGuardianButton.visibility = View.GONE
+                    registerResultTextView.text =
+                        requireContext().getString(R.string.already_registered)
+                    registerFinishButton.visibility = View.VISIBLE
+                } else {
+                    if (!isWaitingRegistration) {
+                        resetUI()
+                    }
                 }
             }
-        })
+        )
         registerResultTextView.text = requireContext().getString(R.string.check_registered)
         registerGuardianButton.isEnabled = false
     }

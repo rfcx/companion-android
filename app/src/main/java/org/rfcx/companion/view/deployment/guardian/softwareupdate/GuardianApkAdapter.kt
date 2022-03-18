@@ -37,7 +37,6 @@ class GuardianApkAdapter(private val onClickListener: (String) -> Unit) :
             selectedPosition = position
             notifyDataSetChanged()
             onClickListener(items[position])
-
         }
     }
 

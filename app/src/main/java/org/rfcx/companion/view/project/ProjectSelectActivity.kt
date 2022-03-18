@@ -10,7 +10,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_guardian_diagnostic.*
 import kotlinx.android.synthetic.main.activity_project_select.*
 import org.rfcx.companion.MainActivity
@@ -27,7 +26,9 @@ import org.rfcx.companion.util.*
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupListener
 import org.rfcx.companion.view.project.viewmodel.ProjectSelectViewModel
 
-class ProjectSelectActivity : AppCompatActivity(), LocationGroupListener,
+class ProjectSelectActivity :
+    AppCompatActivity(),
+    LocationGroupListener,
     SwipeRefreshLayout.OnRefreshListener {
 
     private lateinit var projectSelectViewModel: ProjectSelectViewModel
@@ -85,7 +86,6 @@ class ProjectSelectActivity : AppCompatActivity(), LocationGroupListener,
             analytics.trackLogoutEvent()
             finish()
         }
-
     }
 
     private fun setViewModel() {
@@ -101,29 +101,32 @@ class ProjectSelectActivity : AppCompatActivity(), LocationGroupListener,
     }
 
     private fun setObserver() {
-        projectSelectViewModel.getProjectsFromRemote().observe(this, Observer {
-            when (it.status) {
-                Status.LOADING -> {
-                    showLoading()
-                }
-                Status.SUCCESS -> {
-                    hideLoading()
-                    it.data?.let { projects ->
-                        if (projects.isEmpty()) {
-                            noContentTextView.visibility = View.VISIBLE
-                        } else {
-                            noContentTextView.visibility = View.GONE
-                        }
+        projectSelectViewModel.getProjectsFromRemote().observe(
+            this,
+            Observer {
+                when (it.status) {
+                    Status.LOADING -> {
+                        showLoading()
                     }
-                    addProjectsToAdapter()
-                }
-                Status.ERROR -> {
-                    hideLoading()
-                    addProjectsToAdapter()
-                    showToast(it.message ?: getString(R.string.error_has_occurred))
+                    Status.SUCCESS -> {
+                        hideLoading()
+                        it.data?.let { projects ->
+                            if (projects.isEmpty()) {
+                                noContentTextView.visibility = View.VISIBLE
+                            } else {
+                                noContentTextView.visibility = View.GONE
+                            }
+                        }
+                        addProjectsToAdapter()
+                    }
+                    Status.ERROR -> {
+                        hideLoading()
+                        addProjectsToAdapter()
+                        showToast(it.message ?: getString(R.string.error_has_occurred))
+                    }
                 }
             }
-        })
+        )
     }
 
     private fun showToast(message: String) {

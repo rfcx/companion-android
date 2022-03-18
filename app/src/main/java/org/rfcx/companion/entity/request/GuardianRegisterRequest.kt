@@ -1,5 +1,5 @@
 package org.rfcx.companion.entity.request
 
-data class GuardianRegisterRequest (
+data class GuardianRegisterRequest(
     val guid: String
-        )
+)

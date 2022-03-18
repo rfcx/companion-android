@@ -95,7 +95,8 @@ class ProfileFragment : Fragment() {
             if (builder != null) {
                 builder.setTitle(getString(R.string.theme))
 
-                builder.setSingleChoiceItems(themeOption, selectedRadioItem,
+                builder.setSingleChoiceItems(
+                    themeOption, selectedRadioItem,
                     DialogInterface.OnClickListener { dialog, which ->
                         when (themeOption[which]) {
                             themeOption[0] -> {

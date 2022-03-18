@@ -4,9 +4,9 @@ import android.content.Context
 import android.util.Log
 import androidx.work.*
 import io.realm.Realm
+import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.localdb.TrackingFileDb
-import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.RealmHelper
 import java.util.concurrent.TimeUnit

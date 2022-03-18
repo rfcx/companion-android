@@ -68,71 +68,74 @@ class GuardianSignalFragment : Fragment() {
     }
 
     private fun retrieveSimModule() {
-        AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
-            val hasSim = deploymentProtocol?.getSimDetected()
-            if (hasSim != null && hasSim) {
-                simDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
-                cellSignalLayout.visibility = View.VISIBLE
-                cellDataTransferLayout.visibility = View.VISIBLE
-            } else {
-                simDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_error, 0, 0, 0)
-                cellSignalLayout.visibility = View.GONE
-                cellDataTransferLayout.visibility = View.GONE
-            }
+        AdminSocketManager.pingBlob.observe(
+            viewLifecycleOwner,
+            Observer {
+                val hasSim = deploymentProtocol?.getSimDetected()
+                if (hasSim != null && hasSim) {
+                    simDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
+                    cellSignalLayout.visibility = View.VISIBLE
+                    cellDataTransferLayout.visibility = View.VISIBLE
+                } else {
+                    simDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_error, 0, 0, 0)
+                    cellSignalLayout.visibility = View.GONE
+                    cellDataTransferLayout.visibility = View.GONE
+                }
 
-            val cellStrength = deploymentProtocol?.getNetwork()
-            if (cellStrength == null) {
-                showCellSignalStrength(SignalState.NONE)
-                signalValue.text = getString(R.string.speed_test_failed)
-            } else {
+                val cellStrength = deploymentProtocol?.getNetwork()
+                if (cellStrength == null) {
+                    showCellSignalStrength(SignalState.NONE)
+                    signalValue.text = getString(R.string.speed_test_failed)
+                } else {
+                    when {
+                        cellStrength > -70 -> showCellSignalStrength(SignalState.MAX)
+                        cellStrength > -90 -> showCellSignalStrength(SignalState.HIGH)
+                        cellStrength > -110 -> showCellSignalStrength(SignalState.NORMAL)
+                        cellStrength > -130 -> showCellSignalStrength(SignalState.LOW)
+                        else -> showCellSignalStrength(SignalState.NONE)
+                    }
+                    signalValue.text = getString(R.string.signal_value, cellStrength)
+                }
+
+                val speedTest = deploymentProtocol?.getSpeedTest()
+                val tempDownload = speedTest?.downloadSpeed
+                val tempUpload = speedTest?.uploadSpeed
+                val hasConnection = speedTest?.hasConnection
+                val isFailed = speedTest?.isFailed
+                val isWaitingSpeedTest = speedTest?.isTesting
+
+                if (hasConnection != null && hasConnection) {
+                    showSpeedTest()
+                } else {
+                    hideHideSpeedTest()
+                }
+
                 when {
-                    cellStrength > -70 -> showCellSignalStrength(SignalState.MAX)
-                    cellStrength > -90 -> showCellSignalStrength(SignalState.HIGH)
-                    cellStrength > -110 -> showCellSignalStrength(SignalState.NORMAL)
-                    cellStrength > -130 -> showCellSignalStrength(SignalState.LOW)
-                    else -> showCellSignalStrength(SignalState.NONE)
-                }
-                signalValue.text = getString(R.string.signal_value, cellStrength)
-            }
-
-            val speedTest = deploymentProtocol?.getSpeedTest()
-            val tempDownload = speedTest?.downloadSpeed
-            val tempUpload = speedTest?.uploadSpeed
-            val hasConnection = speedTest?.hasConnection
-            val isFailed = speedTest?.isFailed
-            val isWaitingSpeedTest = speedTest?.isTesting
-
-            if (hasConnection != null && hasConnection) {
-                showSpeedTest()
-            } else {
-                hideHideSpeedTest()
-            }
-
-            when {
-                isFailed != null && isFailed -> {
-                    cellDownloadDataTransferValues.text = getString(R.string.speed_test_failed)
-                    cellUploadDataTransferValues.text = getString(R.string.speed_test_failed)
-                }
-                isWaitingSpeedTest == true -> {
-                    cellDownloadDataTransferValues.text = getString(R.string.speed_test_wait)
-                    cellUploadDataTransferValues.text = getString(R.string.speed_test_wait)
-                }
-                isWaitingSpeedTest == false -> {
-                    if (tempDownload == null || tempDownload == -1.0) {
-                        cellDownloadDataTransferValues.text = getString(R.string.speed_test_run)
-                    } else {
-                        cellDownloadDataTransferValues.text =
-                            getString(R.string.speed_test_kbps, tempDownload)
+                    isFailed != null && isFailed -> {
+                        cellDownloadDataTransferValues.text = getString(R.string.speed_test_failed)
+                        cellUploadDataTransferValues.text = getString(R.string.speed_test_failed)
                     }
-                    if (tempUpload == null || tempUpload == -1.0) {
-                        cellUploadDataTransferValues.text = getString(R.string.speed_test_run)
-                    } else {
-                        cellUploadDataTransferValues.text =
-                            getString(R.string.speed_test_kbps_upload, tempUpload)
+                    isWaitingSpeedTest == true -> {
+                        cellDownloadDataTransferValues.text = getString(R.string.speed_test_wait)
+                        cellUploadDataTransferValues.text = getString(R.string.speed_test_wait)
+                    }
+                    isWaitingSpeedTest == false -> {
+                        if (tempDownload == null || tempDownload == -1.0) {
+                            cellDownloadDataTransferValues.text = getString(R.string.speed_test_run)
+                        } else {
+                            cellDownloadDataTransferValues.text =
+                                getString(R.string.speed_test_kbps, tempDownload)
+                        }
+                        if (tempUpload == null || tempUpload == -1.0) {
+                            cellUploadDataTransferValues.text = getString(R.string.speed_test_run)
+                        } else {
+                            cellUploadDataTransferValues.text =
+                                getString(R.string.speed_test_kbps_upload, tempUpload)
+                        }
                     }
                 }
             }
-        })
+        )
 
         cellDataTransferButton.setOnClickListener {
             GuardianSocketManager.runSpeedTest()
@@ -154,31 +157,34 @@ class GuardianSignalFragment : Fragment() {
     }
 
     private fun retrieveSatModule() {
-        AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
-            val hasSatModule = deploymentProtocol?.getSatId()
-            if (hasSatModule != null) {
-                satDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
-                satSignalLayout.visibility = View.VISIBLE
-            } else {
-                satDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_error, 0, 0, 0)
-                satSignalLayout.visibility = View.GONE
-            }
-
-            val swmStrength = deploymentProtocol?.getSwmNetwork()
-            if (swmStrength == null) {
-                showSatSignalTagStrength(SignalState.NONE)
-                satSignalValues.text = getString(R.string.speed_test_failed)
-            } else {
-                when {
-                    swmStrength < -104 -> showSatSignalTagStrength(SignalState.MAX)
-                    swmStrength < -100 -> showSatSignalTagStrength(SignalState.HIGH)
-                    swmStrength < -97 -> showSatSignalTagStrength(SignalState.NORMAL)
-                    swmStrength < -93 -> showSatSignalTagStrength(SignalState.LOW)
-                    else -> showSatSignalTagStrength(SignalState.LOW)
+        AdminSocketManager.pingBlob.observe(
+            viewLifecycleOwner,
+            Observer {
+                val hasSatModule = deploymentProtocol?.getSatId()
+                if (hasSatModule != null) {
+                    satDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
+                    satSignalLayout.visibility = View.VISIBLE
+                } else {
+                    satDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_error, 0, 0, 0)
+                    satSignalLayout.visibility = View.GONE
                 }
-                satSignalValues.text = getString(R.string.signal_value, swmStrength)
+
+                val swmStrength = deploymentProtocol?.getSwmNetwork()
+                if (swmStrength == null) {
+                    showSatSignalTagStrength(SignalState.NONE)
+                    satSignalValues.text = getString(R.string.speed_test_failed)
+                } else {
+                    when {
+                        swmStrength < -104 -> showSatSignalTagStrength(SignalState.MAX)
+                        swmStrength < -100 -> showSatSignalTagStrength(SignalState.HIGH)
+                        swmStrength < -97 -> showSatSignalTagStrength(SignalState.NORMAL)
+                        swmStrength < -93 -> showSatSignalTagStrength(SignalState.LOW)
+                        else -> showSatSignalTagStrength(SignalState.LOW)
+                    }
+                    satSignalValues.text = getString(R.string.signal_value, swmStrength)
+                }
             }
-        })
+        )
     }
 
     private fun showCellSignalStrength(state: SignalState) {

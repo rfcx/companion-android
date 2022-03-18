@@ -21,7 +21,7 @@ open class DeploymentImage(
     @Expose(serialize = false)
     var syncState: Int = 0,
     @Expose(serialize = false)
-    var syncToFireStoreState: Int = 0 //TODO: no need anymore
+    var syncToFireStoreState: Int = 0 // TODO: no need anymore
 ) : RealmModel {
     companion object {
         const val TABLE_NAME = "DeploymentImage"

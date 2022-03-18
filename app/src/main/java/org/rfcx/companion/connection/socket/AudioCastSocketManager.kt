@@ -32,7 +32,7 @@ object AudioCastSocketManager {
         spectrogram.value = ByteArray(2)
     }
 
-    //just to connect to server
+    // just to connect to server
     fun connect(micTestUtils: MicrophoneTestUtils) {
         this.microphoneTestUtils = micTestUtils
         sendMessage("")

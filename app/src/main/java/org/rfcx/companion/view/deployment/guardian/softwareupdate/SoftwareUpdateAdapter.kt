@@ -111,7 +111,7 @@ class SoftwareUpdateAdapter(
     fun getLoading(): Boolean = needLoading
 
     override fun getItemViewType(position: Int): Int {
-        return when(softwareUpdateStateModelList[position]) {
+        return when (softwareUpdateStateModelList[position]) {
             is SoftwareItem.SoftwareVersion -> VERSION_ITEM
             else -> HEADER_ITEM
         }
@@ -133,7 +133,7 @@ class SoftwareUpdateAdapter(
 
 sealed class SoftwareItem {
     data class SoftwareHeader(val name: String) : SoftwareItem()
-    data class SoftwareVersion(val parent: String, val version: String, val path: String): SoftwareItem()
+    data class SoftwareVersion(val parent: String, val version: String, val path: String) : SoftwareItem()
 }
 
 interface ChildrenClickedListener {

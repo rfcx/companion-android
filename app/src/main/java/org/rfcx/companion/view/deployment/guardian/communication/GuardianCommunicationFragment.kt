@@ -74,136 +74,154 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
     }
 
     private fun setSimDetected() {
-        AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
-            val isSimDetected = deploymentProtocol?.getSimDetected()
+        AdminSocketManager.pingBlob.observe(
+            viewLifecycleOwner,
+            Observer {
+                val isSimDetected = deploymentProtocol?.getSimDetected()
 
-            if ((isSimDetected == null || isSimDetected == false)) {
-                simDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(
-                    R.drawable.ic_red_error,
-                    0,
-                    0,
-                    0
-                )
-                simDetectionTextView.text = getString(R.string.sim_not_detected)
-            } else {
-                simDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(
-                    R.drawable.ic_checklist_passed,
-                    0,
-                    0,
-                    0
-                )
-                simDetectionTextView.text = getString(R.string.sim_detected)
+                if ((isSimDetected == null || isSimDetected == false)) {
+                    simDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(
+                        R.drawable.ic_red_error,
+                        0,
+                        0,
+                        0
+                    )
+                    simDetectionTextView.text = getString(R.string.sim_not_detected)
+                } else {
+                    simDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(
+                        R.drawable.ic_checklist_passed,
+                        0,
+                        0,
+                        0
+                    )
+                    simDetectionTextView.text = getString(R.string.sim_detected)
+                }
             }
-        })
+        )
     }
 
     private fun setPhoneNumber() {
-        AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
-            val phoneNumber = deploymentProtocol?.getPhoneNumber()
-            if (phoneNumber != null) {
-                phoneNumberValueTextView.text = phoneNumber
-                phoneNumberTextView.visibility = View.VISIBLE
-                phoneNumberValueTextView.visibility = View.VISIBLE
-            } else {
-                phoneNumberTextView.visibility = View.GONE
-                phoneNumberValueTextView.visibility = View.GONE
+        AdminSocketManager.pingBlob.observe(
+            viewLifecycleOwner,
+            Observer {
+                val phoneNumber = deploymentProtocol?.getPhoneNumber()
+                if (phoneNumber != null) {
+                    phoneNumberValueTextView.text = phoneNumber
+                    phoneNumberTextView.visibility = View.VISIBLE
+                    phoneNumberValueTextView.visibility = View.VISIBLE
+                } else {
+                    phoneNumberTextView.visibility = View.GONE
+                    phoneNumberValueTextView.visibility = View.GONE
+                }
             }
-        })
+        )
     }
 
     private fun setSatDetected() {
-        AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
-            val satId = deploymentProtocol?.getSatId()
-            if (satId != null) {
-                satDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(
-                    R.drawable.ic_checklist_passed,
-                    0,
-                    0,
-                    0
-                )
-                satDetectionTextView.text = getString(R.string.satellite_module_detected)
-                swarmIdTextView.visibility = View.VISIBLE
-                swarmValueTextView.visibility = View.VISIBLE
-                swarmValueTextView.text = satId
-                satOnlyRadioButton.isEnabled = true
-                satOnlyRadioButton.setTextColor(resources.getColor(R.color.text_primary))
-            } else {
-                satDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(
-                    R.drawable.ic_red_error,
-                    0,
-                    0,
-                    0
-                )
-                satDetectionTextView.text = getString(R.string.satellite_module_not_detected)
-                swarmIdTextView.visibility = View.GONE
-                swarmValueTextView.visibility = View.GONE
-                val isSimDetected = deploymentProtocol?.getSimDetected()
-                if (isSimDetected == true) {
-                    satOnlyRadioButton.isEnabled = false
-                    satOnlyRadioButton.setTextColor(resources.getColor(R.color.text_secondary))
-                } else {
+        AdminSocketManager.pingBlob.observe(
+            viewLifecycleOwner,
+            Observer {
+                val satId = deploymentProtocol?.getSatId()
+                if (satId != null) {
+                    satDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(
+                        R.drawable.ic_checklist_passed,
+                        0,
+                        0,
+                        0
+                    )
+                    satDetectionTextView.text = getString(R.string.satellite_module_detected)
+                    swarmIdTextView.visibility = View.VISIBLE
+                    swarmValueTextView.visibility = View.VISIBLE
+                    swarmValueTextView.text = satId
                     satOnlyRadioButton.isEnabled = true
                     satOnlyRadioButton.setTextColor(resources.getColor(R.color.text_primary))
+                } else {
+                    satDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(
+                        R.drawable.ic_red_error,
+                        0,
+                        0,
+                        0
+                    )
+                    satDetectionTextView.text = getString(R.string.satellite_module_not_detected)
+                    swarmIdTextView.visibility = View.GONE
+                    swarmValueTextView.visibility = View.GONE
+                    val isSimDetected = deploymentProtocol?.getSimDetected()
+                    if (isSimDetected == true) {
+                        satOnlyRadioButton.isEnabled = false
+                        satOnlyRadioButton.setTextColor(resources.getColor(R.color.text_secondary))
+                    } else {
+                        satOnlyRadioButton.isEnabled = true
+                        satOnlyRadioButton.setTextColor(resources.getColor(R.color.text_primary))
+                    }
                 }
             }
-        })
+        )
     }
 
     private fun setGPSDetected() {
-        AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
-            val isGPSDetected = deploymentProtocol?.getGPSDetected()
-            if ((isGPSDetected == null || isGPSDetected == false)) {
-                gpsDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_error, 0, 0, 0)
-                gpsDetectionTextView.text = getString(R.string.satellite_gps_not_detected)
-            } else {
-                gpsDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
-                gpsDetectionTextView.text = getString(R.string.satellite_gps_detected)
+        AdminSocketManager.pingBlob.observe(
+            viewLifecycleOwner,
+            Observer {
+                val isGPSDetected = deploymentProtocol?.getGPSDetected()
+                if ((isGPSDetected == null || isGPSDetected == false)) {
+                    gpsDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_error, 0, 0, 0)
+                    gpsDetectionTextView.text = getString(R.string.satellite_gps_not_detected)
+                } else {
+                    gpsDetectionCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
+                    gpsDetectionTextView.text = getString(R.string.satellite_gps_detected)
+                }
             }
-        })
+        )
     }
 
     private fun setGuardianLocalTime() {
-        GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
-            val time = deploymentProtocol?.getGuardianLocalTime()
-            if (time != null) {
-                guardianTimeValuesTextView.text = Date(time).toDateTimeString()
-            } else {
-                guardianTimeValuesTextView.text = getString(R.string.guardian_local_time_null)
-            }
+        GuardianSocketManager.pingBlob.observe(
+            viewLifecycleOwner,
+            Observer {
+                val time = deploymentProtocol?.getGuardianLocalTime()
+                if (time != null) {
+                    guardianTimeValuesTextView.text = Date(time).toDateTimeString()
+                } else {
+                    guardianTimeValuesTextView.text = getString(R.string.guardian_local_time_null)
+                }
 
-            val timezone = deploymentProtocol?.getGuardianTimezone()
-            if (timezone != null && time != null) {
-                timezoneValuesTextView.text = timezone
-                guardianTimeValuesTextView.text = Date(time).toDateTimeString(timezone)
-            } else {
-                timezoneValuesTextView.text = getString(R.string.guardian_local_timezone_null)
+                val timezone = deploymentProtocol?.getGuardianTimezone()
+                if (timezone != null && time != null) {
+                    timezoneValuesTextView.text = timezone
+                    guardianTimeValuesTextView.text = Date(time).toDateTimeString(timezone)
+                } else {
+                    timezoneValuesTextView.text = getString(R.string.guardian_local_timezone_null)
+                }
             }
-        })
+        )
     }
 
     private fun setPlanRadioGroup() {
-        AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
-            val guardianPlan = deploymentProtocol?.getGuardianPlan()
-            if (guardianPlan != null && !isSetFirstGuardianPlan) {
-                when (guardianPlan) {
-                    GuardianPlan.CELL_ONLY -> {
-                        cellOnlyRadioButton.isChecked = true
+        AdminSocketManager.pingBlob.observe(
+            viewLifecycleOwner,
+            Observer {
+                val guardianPlan = deploymentProtocol?.getGuardianPlan()
+                if (guardianPlan != null && !isSetFirstGuardianPlan) {
+                    when (guardianPlan) {
+                        GuardianPlan.CELL_ONLY -> {
+                            cellOnlyRadioButton.isChecked = true
+                        }
+                        GuardianPlan.CELL_SMS -> {
+                            cellSmsRadioButton.isChecked = true
+                        }
+                        GuardianPlan.SAT_ONLY -> {
+                            satOnlyRadioButton.isChecked = true
+                        }
+                        null -> {
+                            cellOnlyRadioButton.isChecked = false
+                            cellSmsRadioButton.isChecked = false
+                            satOnlyRadioButton.isChecked = false
+                        }
                     }
-                    GuardianPlan.CELL_SMS -> {
-                        cellSmsRadioButton.isChecked = true
-                    }
-                    GuardianPlan.SAT_ONLY -> {
-                        satOnlyRadioButton.isChecked = true
-                    }
-                    null -> {
-                        cellOnlyRadioButton.isChecked = false
-                        cellSmsRadioButton.isChecked = false
-                        satOnlyRadioButton.isChecked = false
-                    }
+                    isSetFirstGuardianPlan = true
                 }
-                isSetFirstGuardianPlan = true
             }
-        })
+        )
 
         guardianPlanGroup.setOnCheckedChangeListener { group, checkedId ->
             if (checkedId == R.id.satOnlyRadioButton) {
@@ -234,18 +252,21 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
     }
 
     private fun observeOffTime() {
-        //TODO: For preset project off time
+        // TODO: For preset project off time
         if (deploymentProtocol?.getCurrentProjectId() == "agk3cpurb5wm") {
             autoTimeOff.forEach { time ->
                 addChip(time, false)
             }
         }
 
-        GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
-            deploymentProtocol?.getSatTimeOff()?.forEach { time ->
-                if (!didEditOffTime) addTimeOff(time)
+        GuardianSocketManager.pingBlob.observe(
+            viewLifecycleOwner,
+            Observer {
+                deploymentProtocol?.getSatTimeOff()?.forEach { time ->
+                    if (!didEditOffTime) addTimeOff(time)
+                }
             }
-        })
+        )
     }
 
     private fun setOffTime() {

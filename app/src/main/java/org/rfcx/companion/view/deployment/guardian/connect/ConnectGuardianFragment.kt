@@ -119,11 +119,14 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
         AdminSocketManager.connect()
         lifecycleScope.launch {
             withContext(Dispatchers.Main) {
-                GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
-                    requireActivity().runOnUiThread {
-                        deploymentProtocol?.startCheckList()
+                GuardianSocketManager.pingBlob.observe(
+                    viewLifecycleOwner,
+                    Observer {
+                        requireActivity().runOnUiThread {
+                            deploymentProtocol?.startCheckList()
+                        }
                     }
-                })
+                )
             }
         }
     }

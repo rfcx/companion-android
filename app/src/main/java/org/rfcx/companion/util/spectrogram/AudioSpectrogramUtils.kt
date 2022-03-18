@@ -1,11 +1,11 @@
 package org.rfcx.companion.util.spectrogram
 
+import org.jtransforms.fft.FloatFFT_1D
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
 import kotlin.math.min
 import kotlin.math.sqrt
-import org.jtransforms.fft.FloatFFT_1D
 
 object AudioSpectrogramUtils {
 

@@ -27,7 +27,6 @@ interface BaseDeploymentProtocol {
     fun setReadyToDeploy()
     fun setCurrentLocation(location: Location)
 
-
     fun handleCheckClicked(number: Int)
     fun getPassedChecks(): List<Int>
     fun setCurrentPage(name: String)

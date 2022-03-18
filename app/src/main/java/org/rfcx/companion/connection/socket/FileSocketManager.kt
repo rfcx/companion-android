@@ -51,7 +51,6 @@ object FileSocketManager {
 
                 outputStream?.write("****".toByteArray())
                 outputStream?.flush()
-
             } catch (e: Exception) {
                 e.printStackTrace()
             }

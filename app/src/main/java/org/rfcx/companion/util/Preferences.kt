@@ -41,8 +41,8 @@ class Preferences(context: Context) {
         const val LASTEST_GET_LOCATION_TIME = "${PREFIX}LASTEST_GET_LOCATION_TIME"
         const val LAST_LATITUDE = "${PREFIX}LAST_LATITUDE"
         const val LAST_LONGITUDE = "${PREFIX}LAST_LONGITUDE"
-        const val OFFLINE_MAP_STATE  = "${PREFIX}OFFLINE_MAP_STATE"
-        const val OFFLINE_MAP_SERVER_ID  = "${PREFIX}OFFLINE_MAP_SERVER_ID"
+        const val OFFLINE_MAP_STATE = "${PREFIX}OFFLINE_MAP_STATE"
+        const val OFFLINE_MAP_SERVER_ID = "${PREFIX}OFFLINE_MAP_SERVER_ID"
     }
 
     init {

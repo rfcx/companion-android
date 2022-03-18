@@ -23,7 +23,7 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
     private var someFailed = false
 
     override suspend fun doWork(): Result {
-        //reset to default
+        // reset to default
         streams = listOf()
         currentStreamsLoading = 0
         someFailed = false

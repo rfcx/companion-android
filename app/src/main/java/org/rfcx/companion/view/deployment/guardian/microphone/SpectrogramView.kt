@@ -25,13 +25,13 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
+import org.rfcx.companion.util.spectrogram.AudioSpectrogramUtils
 import kotlin.math.log10
 import kotlin.math.max
 import kotlin.math.pow
 import kotlin.math.roundToInt
-import org.rfcx.companion.util.spectrogram.AudioSpectrogramUtils
 
-class FrequencyView : View {
+class SpectrogramView : View {
 
     companion object {
         private val colorRainbow =

@@ -59,7 +59,7 @@ object PrefsUtils {
         if (str == null) return null
         val json = JsonParser.parseString(str).asJsonObject
         val order = json.get("api_protocol_escalation_order").asString
-        return when(order) {
+        return when (order) {
             "mqtt,rest" -> GuardianPlan.CELL_ONLY
             "mqtt,rest,sms" -> GuardianPlan.CELL_SMS
             "sat" -> GuardianPlan.SAT_ONLY
@@ -90,6 +90,6 @@ object PrefsUtils {
     }
 }
 
-enum class GuardianPlan{
+enum class GuardianPlan {
     CELL_ONLY, CELL_SMS, SAT_ONLY
 }

@@ -1,7 +1,6 @@
 package org.rfcx.companion.localdb
 
 import io.realm.Realm
-import io.realm.RealmList
 import io.realm.RealmResults
 import io.realm.Sort
 import io.realm.kotlin.deleteFromRealm
@@ -20,8 +19,10 @@ class ProjectDb(private val realm: Realm) {
         realm.executeTransaction {
             if (group.id == 0) {
                 val id =
-                    (realm.where(Project::class.java).max(Project.PROJECT_ID)
-                        ?.toInt() ?: 0) + 1
+                    (
+                        realm.where(Project::class.java).max(Project.PROJECT_ID)
+                            ?.toInt() ?: 0
+                        ) + 1
                 group.id = id
             }
             it.insertOrUpdate(group)
@@ -103,8 +104,10 @@ class ProjectDb(private val realm: Realm) {
 
     fun getOfflineDownloading(): Project? {
         return realm.where(Project::class.java)
-            .equalTo(Project.PROJECT_OFFLINE_MAP_STATE,
-                OfflineMapState.DOWNLOADING_STATE.key).findFirst()
+            .equalTo(
+                Project.PROJECT_OFFLINE_MAP_STATE,
+                OfflineMapState.DOWNLOADING_STATE.key
+            ).findFirst()
     }
 
     fun markUnsent(id: Int) {
@@ -152,8 +155,10 @@ class ProjectDb(private val realm: Realm) {
             if (project == null) {
                 val projectObject = groupsResponse.toLocationGroups()
                 val id =
-                    (it.where(Project::class.java).max(Project.PROJECT_ID)
-                        ?.toInt() ?: 0) + 1
+                    (
+                        it.where(Project::class.java).max(Project.PROJECT_ID)
+                            ?.toInt() ?: 0
+                        ) + 1
                 projectObject.id = id
                 it.insert(projectObject)
             } else if (project.syncState == SyncState.Sent.key) {

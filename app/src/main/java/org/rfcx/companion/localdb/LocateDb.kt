@@ -54,8 +54,10 @@ class LocateDb(private val realm: Realm) {
     fun insertOrUpdateLocate(deploymentId: Int, locate: Locate) {
         realm.executeTransaction {
             if (locate.id == 0) {
-                val id = (realm.where(Locate::class.java).max(Locate.FIELD_ID)
-                    ?.toInt() ?: 0) + 1
+                val id = (
+                    realm.where(Locate::class.java).max(Locate.FIELD_ID)
+                        ?.toInt() ?: 0
+                    ) + 1
                 locate.id = id
             }
             locate.lastDeploymentId = deploymentId
@@ -65,14 +67,14 @@ class LocateDb(private val realm: Realm) {
 
     fun updateSiteServerId(deploymentId: Int, serverId: String) {
         realm.executeTransaction {
-            //update server id in track
+            // update server id in track
             it.where(TrackingFile::class.java)
                 .equalTo(TrackingFile.FIELD_DEPLOYMENT_ID, deploymentId)
                 .findFirst()?.apply {
                     this.siteServerId = serverId
                 }
 
-            //update server id in site
+            // update server id in site
             it.where(Locate::class.java)
                 .equalTo(Locate.FIELD_LAST_DEPLOYMENT_ID, deploymentId)
                 .findFirst()?.apply {
@@ -84,8 +86,10 @@ class LocateDb(private val realm: Realm) {
     fun insertOrUpdate(stream: Locate) {
         realm.executeTransaction {
             if (stream.id == 0) {
-                val id = (realm.where(Locate::class.java).max(Locate.FIELD_ID)
-                    ?.toInt() ?: 0) + 1
+                val id = (
+                    realm.where(Locate::class.java).max(Locate.FIELD_ID)
+                        ?.toInt() ?: 0
+                    ) + 1
                 stream.id = id
             }
             it.insertOrUpdate(stream)
@@ -102,8 +106,10 @@ class LocateDb(private val realm: Realm) {
 
                 if (location == null) {
                     val locate = streamResponse.toLocate()
-                    val id = (it.where(Locate::class.java).max(Locate.FIELD_ID)
-                        ?.toInt() ?: 0) + 1
+                    val id = (
+                        it.where(Locate::class.java).max(Locate.FIELD_ID)
+                            ?.toInt() ?: 0
+                        ) + 1
                     locate.id = id
                     it.insert(locate)
                 } else if (location.syncState == SyncState.Sent.key) {

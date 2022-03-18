@@ -4,7 +4,6 @@ import android.webkit.MimeTypeMap
 import java.io.File
 import java.util.*
 
-
 object FileUtils {
 
     // default for json file

@@ -3,10 +3,6 @@ package org.rfcx.companion
 import android.app.Application
 import io.realm.Realm
 import io.realm.exceptions.RealmMigrationNeededException
-import org.rfcx.companion.connection.socket.AdminSocketManager
-import org.rfcx.companion.connection.socket.AudioCastSocketManager
-import org.rfcx.companion.connection.socket.FileSocketManager
-import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.service.DeploymentCleanupWorker
 import org.rfcx.companion.util.LocationTracking
 import org.rfcx.companion.util.Preferences

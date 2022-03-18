@@ -168,18 +168,21 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
     private fun onDeleteLocation() {
         showLoading()
         deployment?.let {
-            viewModel.deleteDeploymentLocation(it.id, object : DatabaseCallback {
-                override fun onSuccess() {
-                    DeploymentSyncWorker.enqueue(this@DeploymentDetailActivity)
-                    hideLoading()
-                    finish()
-                }
+            viewModel.deleteDeploymentLocation(
+                it.id,
+                object : DatabaseCallback {
+                    override fun onSuccess() {
+                        DeploymentSyncWorker.enqueue(this@DeploymentDetailActivity)
+                        hideLoading()
+                        finish()
+                    }
 
-                override fun onFailure(errorMessage: String) {
-                    hideLoading()
-                    showCommonDialog(errorMessage)
+                    override fun onFailure(errorMessage: String) {
+                        hideLoading()
+                        showCommonDialog(errorMessage)
+                    }
                 }
-            })
+            )
         }
     }
 
@@ -236,7 +239,6 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
                 deploymentImageAdapter.addImages(pathList)
             }
             dismissImagePickerOptionsDialog()
-
         } else {
             // remove file image
             imageFile?.let {

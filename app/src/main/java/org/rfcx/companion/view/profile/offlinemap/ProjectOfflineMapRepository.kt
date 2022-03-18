@@ -29,5 +29,4 @@ class ProjectOfflineMapRepository(
     fun updateOfflineState(state: String, id: String) {
         localDataHelper.getProjectLocalDb().updateOfflineState(state, id)
     }
-
 }

@@ -59,7 +59,6 @@ class LocationTracking {
                 val onDutyMinute = ((stopTime - lastOpen) / MILLI_SECS_PER_MINUTE).toInt()
                 adjustOnDuty(context, onDutyMinute)
             }
-
         }
 
         private fun adjustOnDuty(context: Context, minutes: Int) {

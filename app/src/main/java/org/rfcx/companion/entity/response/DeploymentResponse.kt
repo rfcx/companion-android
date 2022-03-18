@@ -3,7 +3,6 @@ package org.rfcx.companion.entity.response
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonNull
-import com.google.gson.JsonObject
 import org.rfcx.companion.entity.DeploymentState
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.SyncState

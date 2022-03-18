@@ -24,8 +24,7 @@ class DisplayImageAdapter(private val imageList: List<String>, private val conte
 
     override fun getItemCount(): Int = imageList.size
 
-
-    inner class DisplayImageViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+    inner class DisplayImageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val imageView = itemView.displayImage
         private val progressBar = itemView.progressBarOfImageView
 
@@ -41,5 +40,4 @@ class DisplayImageAdapter(private val imageList: List<String>, private val conte
             )
         }
     }
-
 }

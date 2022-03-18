@@ -15,7 +15,6 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
-import java.util.*
 import kotlinx.android.synthetic.main.fragment_guardian_solar_panel.*
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.AdminSocketManager
@@ -23,6 +22,7 @@ import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.socket.response.SentinelInput
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
+import java.util.*
 
 class GuardianSolarPanelFragment : Fragment() {
 
@@ -67,56 +67,62 @@ class GuardianSolarPanelFragment : Fragment() {
     }
 
     private fun getI2CAccessibility() {
-        AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
-            val i2CAccessibility = deploymentProtocol?.getI2cAccessibility()
-            i2CAccessibility?.let {
-                if (it.isAccessible) {
-                    i2cCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
-                    i2cCheckTextView.text = getString(R.string.sentinel_module_detect)
-                    i2cFailMessage.visibility = View.GONE
-                } else {
-                    i2cCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_error, 0, 0, 0)
-                    i2cCheckTextView.text = getString(R.string.sentinel_module_not_detect)
-                    i2cFailMessage.text = it.message
-                    i2cFailMessage.visibility = View.VISIBLE
+        AdminSocketManager.pingBlob.observe(
+            viewLifecycleOwner,
+            Observer {
+                val i2CAccessibility = deploymentProtocol?.getI2cAccessibility()
+                i2CAccessibility?.let {
+                    if (it.isAccessible) {
+                        i2cCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
+                        i2cCheckTextView.text = getString(R.string.sentinel_module_detect)
+                        i2cFailMessage.visibility = View.GONE
+                    } else {
+                        i2cCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_error, 0, 0, 0)
+                        i2cCheckTextView.text = getString(R.string.sentinel_module_not_detect)
+                        i2cFailMessage.text = it.message
+                        i2cFailMessage.visibility = View.VISIBLE
+                    }
                 }
             }
-        })
+        )
     }
 
     private fun getSentinelValue() {
-        AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
-            val sentinelResponse = deploymentProtocol?.getSentinelPower()
-            sentinelResponse?.let {
-                val input = sentinelResponse.input
-                if (isSentinelConnected(input)) {
-                    hideAssembleWarn()
+        AdminSocketManager.pingBlob.observe(
+            viewLifecycleOwner,
+            Observer {
+                val sentinelResponse = deploymentProtocol?.getSentinelPower()
+                sentinelResponse?.let {
+                    val input = sentinelResponse.input
+                    if (isSentinelConnected(input)) {
+                        hideAssembleWarn()
 
-                    val voltage = input.voltage.toFloat()
-                    val current = input.current.toFloat()
-                    val power = input.power.toFloat()
-                    val mainBattery = sentinelResponse.battery.percentage
-                    val internalBattery = deploymentProtocol?.getInternalBattery() ?: -1
+                        val voltage = input.voltage.toFloat()
+                        val current = input.current.toFloat()
+                        val power = input.power.toFloat()
+                        val mainBattery = sentinelResponse.battery.percentage
+                        val internalBattery = deploymentProtocol?.getInternalBattery() ?: -1
 
-                    // set 4 top value
-                    setVoltageValue(voltage)
-                    setCurrentValue(current)
-                    setPowerValue(power)
-                    setMainBatteryPercentage(mainBattery)
-                    setInternalBatteryPercentage(internalBattery)
+                        // set 4 top value
+                        setVoltageValue(voltage)
+                        setCurrentValue(current)
+                        setPowerValue(power)
+                        setMainBatteryPercentage(mainBattery)
+                        setInternalBatteryPercentage(internalBattery)
 
-                    // update power and voltage to chart
-                    updateData(power)
+                        // update power and voltage to chart
+                        updateData(power)
 
-                    // expand xAxis line
-                    expandXAxisLine()
+                        // expand xAxis line
+                        expandXAxisLine()
 
-                    solarFinishButton.isEnabled = true
-                } else {
-                    showAssembleWarn()
+                        solarFinishButton.isEnabled = true
+                    } else {
+                        showAssembleWarn()
+                    }
                 }
             }
-        })
+        )
     }
 
     private fun isSentinelConnected(input: SentinelInput): Boolean {
@@ -136,11 +142,11 @@ class GuardianSolarPanelFragment : Fragment() {
     }
 
     private fun setMainBatteryPercentage(value: Double) {
-        mainBatteryValueTextView.text = "${value}%"
+        mainBatteryValueTextView.text = "$value%"
     }
 
     private fun setInternalBatteryPercentage(value: Int) {
-        internalBatteryValueTextView.text = "${value}%"
+        internalBatteryValueTextView.text = "$value%"
     }
 
     private fun convertPowerToEntry(power: Float): Entry {

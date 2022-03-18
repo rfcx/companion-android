@@ -85,8 +85,11 @@ import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
-class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
-        (Locate, Boolean) -> Unit {
+class MapFragment :
+    Fragment(),
+    OnMapReadyCallback,
+    LocationGroupListener,
+    (Locate, Boolean) -> Unit {
 
     private lateinit var mainViewModel: MainViewModel
 
@@ -124,7 +127,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
     private val handler: Handler = Handler()
 
-    //for animate line string
+    // for animate line string
     private var routeCoordinateList = listOf<Point>()
     private var routeIndex = 0
     private var markerLinePointList = arrayListOf<ArrayList<Point>>()
@@ -378,9 +381,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                     val text = s.toString().toLowerCase()
                     val newList: ArrayList<SiteWithLastDeploymentItem> = arrayListOf()
                     adapterOfSearchSite?.let {
-                        newList.addAll(it.filter { site ->
-                            site.locate.name.toLowerCase().contains(text)
-                        })
+                        newList.addAll(
+                            it.filter { site ->
+                                site.locate.name.toLowerCase().contains(text)
+                            }
+                        )
 
                         if (newList.isEmpty()) showLabel(true) else hideLabel()
                         siteAdapter.setFilter(ArrayList(newList))
@@ -409,7 +414,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                                 setLocationTrackingService(context, true)
                             }
                         }
-
                     } else {
                         setLocationTrackingService(context, true)
                     }
@@ -504,7 +508,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         this.mapboxMap = mapboxMap
         mapboxMap.uiSettings.isAttributionEnabled = false
         mapboxMap.uiSettings.isLogoEnabled = false
-        mapboxMap.uiSettings.setCompassMargins(0,1350,900,0)
+        mapboxMap.uiSettings.setCompassMargins(0, 1350, 900, 0)
 
         mainViewModel.fetchProjects()
         mainViewModel.retrieveLocations()
@@ -705,7 +709,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                             get(
                                 PROPERTY_DEPLOYMENT_SELECTED
                             )
-                        ), literal(0.8f), stop("true", 1.0f)
+                        ),
+                        literal(0.8f), stop("true", 1.0f)
                     )
                 ),
                 iconAllowOverlap(true)
@@ -897,7 +902,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                         LatLng(
                             lastReport.latitude,
                             lastReport.longitude
-                        ), it.cameraPosition.zoom
+                        ),
+                        it.cameraPosition.zoom
                     )
                 )
             }
@@ -940,103 +946,124 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
     }
 
     private fun setObserver() {
-        mainViewModel.getProjectsFromRemote().observe(viewLifecycleOwner, Observer {
-            when (it.status) {
-                Status.LOADING -> {}
-                Status.SUCCESS -> {
-                    mainViewModel.updateProjectBounds()
-                    projectSwipeRefreshView.isRefreshing = false
+        mainViewModel.getProjectsFromRemote().observe(
+            viewLifecycleOwner,
+            Observer {
+                when (it.status) {
+                    Status.LOADING -> {}
+                    Status.SUCCESS -> {
+                        mainViewModel.updateProjectBounds()
+                        projectSwipeRefreshView.isRefreshing = false
 
-                    this.locationGroups = mainViewModel.getProjectsFromLocal()
-                    locationGroupAdapter.items = listOf()
-                    locationGroupAdapter.items = this.locationGroups
-                    locationGroupAdapter.notifyDataSetChanged()
+                        this.locationGroups = mainViewModel.getProjectsFromLocal()
+                        locationGroupAdapter.items = listOf()
+                        locationGroupAdapter.items = this.locationGroups
+                        locationGroupAdapter.notifyDataSetChanged()
 
-                    combinedData()
-                    mainViewModel.updateStatusOfflineMap()
-                }
-                Status.ERROR -> {
-                    combinedData()
-                    projectSwipeRefreshView.isRefreshing = false
-                    showToast(it.message ?: getString(R.string.error_has_occurred))
+                        combinedData()
+                        mainViewModel.updateStatusOfflineMap()
+                    }
+                    Status.ERROR -> {
+                        combinedData()
+                        projectSwipeRefreshView.isRefreshing = false
+                        showToast(it.message ?: getString(R.string.error_has_occurred))
+                    }
                 }
             }
-        })
+        )
 
-        mainViewModel.getDeploymentMarkers().observe(viewLifecycleOwner, Observer {
-            when (it.status) {
-                Status.LOADING -> {}
-                Status.SUCCESS -> {
-                    deploymentMarkers = it.data ?: listOf()
-                    combinedData()
+        mainViewModel.getDeploymentMarkers().observe(
+            viewLifecycleOwner,
+            Observer {
+                when (it.status) {
+                    Status.LOADING -> {}
+                    Status.SUCCESS -> {
+                        deploymentMarkers = it.data ?: listOf()
+                        combinedData()
+                    }
+                    Status.ERROR -> {}
                 }
-                Status.ERROR -> {}
             }
-        })
+        )
 
-        mainViewModel.getSiteMarkers().observe(viewLifecycleOwner, Observer {
-            when (it.status) {
-                Status.LOADING -> {}
-                Status.SUCCESS -> {
-                    siteMarkers = it.data ?: listOf()
-                    combinedData()
+        mainViewModel.getSiteMarkers().observe(
+            viewLifecycleOwner,
+            Observer {
+                when (it.status) {
+                    Status.LOADING -> {}
+                    Status.SUCCESS -> {
+                        siteMarkers = it.data ?: listOf()
+                        combinedData()
+                    }
+                    Status.ERROR -> {}
                 }
-                Status.ERROR -> {}
             }
-        })
+        )
 
-        mainViewModel.getSiteMarkers().observe(viewLifecycleOwner, Observer {
-            when (it.status) {
-                Status.LOADING -> {}
-                Status.SUCCESS -> {
-                    siteMarkers = it.data ?: listOf()
-                    combinedData()
+        mainViewModel.getSiteMarkers().observe(
+            viewLifecycleOwner,
+            Observer {
+                when (it.status) {
+                    Status.LOADING -> {}
+                    Status.SUCCESS -> {
+                        siteMarkers = it.data ?: listOf()
+                        combinedData()
+                    }
+                    Status.ERROR -> {}
                 }
-                Status.ERROR -> {}
             }
-        })
+        )
 
-        mainViewModel.getShowDeployments().observe(viewLifecycleOwner, Observer {
-            when (it.status) {
-                Status.LOADING -> {}
-                Status.SUCCESS -> {
-                    showDeployments = it.data ?: listOf()
-                    combinedData()
+        mainViewModel.getShowDeployments().observe(
+            viewLifecycleOwner,
+            Observer {
+                when (it.status) {
+                    Status.LOADING -> {}
+                    Status.SUCCESS -> {
+                        showDeployments = it.data ?: listOf()
+                        combinedData()
+                    }
+                    Status.ERROR -> {}
                 }
-                Status.ERROR -> {}
             }
-        })
+        )
 
-        mainViewModel.getSites().observe(viewLifecycleOwner, Observer {
-            when (it.status) {
-                Status.LOADING -> {}
-                Status.SUCCESS -> {
-                    locations = it.data ?: listOf()
-                    combinedData()
+        mainViewModel.getSites().observe(
+            viewLifecycleOwner,
+            Observer {
+                when (it.status) {
+                    Status.LOADING -> {}
+                    Status.SUCCESS -> {
+                        locations = it.data ?: listOf()
+                        combinedData()
+                    }
+                    Status.ERROR -> {}
                 }
-                Status.ERROR -> {}
             }
-        })
+        )
     }
 
-    private fun setTrackObserver(site: Locate, markerId: String){
-        mainViewModel.getTrackingFromRemote().observe(viewLifecycleOwner, Observer {
-            when (it.status) {
-                Status.LOADING -> {
-                }
-                Status.SUCCESS -> {
-                    showTrackOnMap(
-                        site.id,
-                        site.latitude,
-                        site.longitude,
-                        markerId
-                    )
-                }
-                Status.ERROR -> {
-                    showToast(it.message ?: getString(R.string.error_has_occurred))
+    private fun setTrackObserver(site: Locate, markerId: String) {
+        mainViewModel.getTrackingFromRemote().observe(
+            viewLifecycleOwner,
+            Observer {
+                when (it.status) {
+                    Status.LOADING -> {
+                    }
+                    Status.SUCCESS -> {
+                        showTrackOnMap(
+                            site.id,
+                            site.latitude,
+                            site.longitude,
+                            markerId
+                        )
+                    }
+                    Status.ERROR -> {
+                        showToast(it.message ?: getString(R.string.error_has_occurred))
+                    }
                 }
             }
-        })
+        )
     }
 
     private fun fetchJobSyncing() {
@@ -1114,8 +1141,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                         Pair(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID, it.id.toString()),
                         Pair(PROPERTY_DEPLOYMENT_MARKER_DEVICE, it.device),
                         Pair(PROPERTY_SITE_MARKER_SITE_PROJECT_NAME, it.projectName ?: ""),
-                        Pair(PROPERTY_SITE_MARKER_SITE_CREATED_AT,
-                            context?.let { context -> it.deploymentAt.toTimeAgo(context) } ?: ""),
+                        Pair(
+                            PROPERTY_SITE_MARKER_SITE_CREATED_AT,
+                            context?.let { context -> it.deploymentAt.toTimeAgo(context) } ?: ""
+                        ),
                         Pair(PROPERTY_DEPLOYMENT_SELECTED, isSelecting.toString())
                     )
                     Feature.fromGeometry(
@@ -1132,8 +1161,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                         Pair(PROPERTY_SITE_MARKER_SITE_LATITUDE, "${it.latitude}"),
                         Pair(PROPERTY_SITE_MARKER_SITE_LONGITUDE, "${it.longitude}"),
                         Pair(PROPERTY_SITE_MARKER_SITE_PROJECT_NAME, it.projectName ?: ""),
-                        Pair(PROPERTY_SITE_MARKER_SITE_CREATED_AT,
-                            context?.let { context -> it.createdAt.toTimeAgo(context) } ?: "")
+                        Pair(
+                            PROPERTY_SITE_MARKER_SITE_CREATED_AT,
+                            context?.let { context -> it.createdAt.toTimeAgo(context) } ?: ""
+                        )
                     )
 
                     Feature.fromGeometry(
@@ -1151,15 +1182,17 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
     }
 
     private fun setupWindowInfo(it: Style) {
-        it.addLayer(SymbolLayer(WINDOW_MARKER_ID, SOURCE_DEPLOYMENT).apply {
-            withProperties(
-                iconImage("{$PROPERTY_WINDOW_INFO_ID}"),
-                iconAnchor(ICON_ANCHOR_BOTTOM),
-                iconOffset(arrayOf(-2f, -20f)),
-                iconAllowOverlap(true)
-            )
-            withFilter(eq(get(PROPERTY_DEPLOYMENT_SELECTED), literal(true)))
-        })
+        it.addLayer(
+            SymbolLayer(WINDOW_MARKER_ID, SOURCE_DEPLOYMENT).apply {
+                withProperties(
+                    iconImage("{$PROPERTY_WINDOW_INFO_ID}"),
+                    iconAnchor(ICON_ANCHOR_BOTTOM),
+                    iconOffset(arrayOf(-2f, -20f)),
+                    iconAllowOverlap(true)
+                )
+                withFilter(eq(get(PROPERTY_DEPLOYMENT_SELECTED), literal(true)))
+            }
+        )
     }
 
     private fun refreshSource() {
@@ -1260,18 +1293,18 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
     fun moveToDeploymentMarker(lat: Double, lng: Double) {
         mapboxMap?.let {
             it.moveCamera(
-                CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), mapboxMap?.cameraPosition?.zoom?: DefaultSetupMap.DEFAULT_ZOOM)
+                CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), mapboxMap?.cameraPosition?.zoom ?: DefaultSetupMap.DEFAULT_ZOOM)
             )
         }
     }
 
     fun showTrackOnMap(id: Int, lat: Double, lng: Double, markerLocationId: String) {
-        //remove the previous one
+        // remove the previous one
         hideTrackOnMap()
         val tracks = mainViewModel.getTrackingFileBySiteId(id)
         try {
             if (tracks.isNotEmpty()) {
-                //get all track first
+                // get all track first
                 if (currentMarkId == markerLocationId) {
                     val tempTrack = arrayListOf<Feature>()
                     tracks.forEach { track ->
@@ -1281,16 +1314,15 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                         feature?.let {
                             tempTrack.add(it)
                         }
-                        //track always has 1 item so using get(0) is okay - also it can only be LineString
+                        // track always has 1 item so using get(0) is okay - also it can only be LineString
                         val lineString = feature?.geometry() as LineString
                         queue.add(lineString.coordinates().toList())
                     }
                     lineSource?.setGeoJson(FeatureCollection.fromFeatures(tempTrack))
 
-                    //move camera to pin
+                    // move camera to pin
                     moveToDeploymentMarker(lat, lng)
                 }
-
             } else {
                 moveToDeploymentMarker(lat, lng)
             }
@@ -1300,7 +1332,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
     }
 
     private fun hideTrackOnMap() {
-        //reset source
+        // reset source
         lineSource?.setGeoJson(FeatureCollection.fromFeatures(listOf()))
         routeCoordinateList = listOf()
         routeIndex = 0
@@ -1403,7 +1435,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         private const val DEPLOYMENT_CLUSTER = "deployment.cluster"
         private const val POINT_COUNT = "point_count"
         private const val DEPLOYMENT_COUNT = "deployment.count"
-        private const val WITHIN_TIME = (60 * 3)     // 3 hr
+        private const val WITHIN_TIME = (60 * 3) // 3 hr
 
         private const val DURATION = 700
 
@@ -1427,7 +1459,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
             if (selectingSite == null) return
             setSiteDetail(selectingSite)
             setFeatureSelectState(selectingSite, true)
-
         } else {
             setDeploymentDetail(selectingDeployment)
             setFeatureSelectState(selectingDeployment, true)
@@ -1437,8 +1468,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         item?.let {
             val pointF = mapboxMap?.projection?.toScreenLocation(it.getLatLng()) ?: PointF()
             val clusterFeatures = mapboxMap?.queryRenderedFeatures(pointF, "$DEPLOYMENT_CLUSTER-0")
-            var zoom = mapboxMap?.cameraPosition?.zoom?: DefaultSetupMap.DEFAULT_ZOOM
-            zoom = if ( zoom > DefaultSetupMap.DEFAULT_ZOOM) zoom else DefaultSetupMap.DEFAULT_ZOOM
+            var zoom = mapboxMap?.cameraPosition?.zoom ?: DefaultSetupMap.DEFAULT_ZOOM
+            zoom = if (zoom > DefaultSetupMap.DEFAULT_ZOOM) zoom else DefaultSetupMap.DEFAULT_ZOOM
 
             if (!clusterFeatures.isNullOrEmpty()) {
                 val pinCount =
@@ -1464,7 +1495,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
 
         context?.let { context ->
             Preferences.getInstance(context).putInt(Preferences.SELECTED_PROJECT, group.id)
-            //reload site to get sites from selected project
+            // reload site to get sites from selected project
             mainViewModel.retrieveLocations()
         }
         listener?.let { listener ->
@@ -1492,7 +1523,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
                         LatLng(
                             current.latitude,
                             current.longitude
-                        ), null, DefaultSetupMap.DEFAULT_ZOOM
+                        ),
+                        null, DefaultSetupMap.DEFAULT_ZOOM
                     )
                 }
             }

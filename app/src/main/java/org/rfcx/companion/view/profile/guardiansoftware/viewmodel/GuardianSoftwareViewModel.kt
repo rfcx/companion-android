@@ -174,9 +174,7 @@ class GuardianSoftwareViewModel(
                             )
                         }
                     }
-
                 })
         }
     }
-
 }

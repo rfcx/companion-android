@@ -19,7 +19,6 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.toColorInt
 import androidx.fragment.app.Fragment
 import com.mapbox.android.core.location.*
 import com.mapbox.mapboxsdk.Mapbox
@@ -34,8 +33,6 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.pluginscalebar.ScaleBarOptions
 import com.mapbox.pluginscalebar.ScaleBarPlugin
-import java.util.*
-import kotlin.concurrent.schedule
 import kotlinx.android.synthetic.main.fragment_map_picker.*
 import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.R
@@ -46,8 +43,12 @@ import org.rfcx.companion.util.latitudeCoordinates
 import org.rfcx.companion.util.longitudeCoordinates
 import org.rfcx.companion.view.detail.EditLocationActivityListener
 import org.rfcx.companion.view.detail.MapPickerProtocol
+import java.util.*
+import kotlin.concurrent.schedule
 
-class MapPickerFragment : Fragment(), OnMapReadyCallback,
+class MapPickerFragment :
+    Fragment(),
+    OnMapReadyCallback,
     SearchResultFragment.OnSearchResultListener {
     private var mapboxMap: MapboxMap? = null
     private lateinit var mapView: MapView

@@ -131,7 +131,8 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
@@ -493,7 +494,6 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     private fun moveCamera(latLng: LatLng, zoom: Double) {
         mapboxMap?.moveCamera(MapboxCameraUtils.calculateLatLngForZoom(latLng, null, zoom))
     }
-
 
     private fun setCheckboxForResumeDeployment(curLoc: LatLng, target: LatLng) {
         val distance = curLoc.distanceTo(target)

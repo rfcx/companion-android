@@ -42,4 +42,3 @@ enum class InstructionCommand(val value: String) {
     IDENTITY("identity"),
     SPEED_TEST("speed_test")
 }
-

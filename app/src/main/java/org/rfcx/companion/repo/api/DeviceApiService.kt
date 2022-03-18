@@ -9,7 +9,7 @@ import org.rfcx.companion.entity.response.ProjectResponse
 import retrofit2.Call
 import retrofit2.http.*
 
-//TODO: Convert Old device api to MVVM pattern
+// TODO: Convert Old device api to MVVM pattern
 
 interface DeviceApiService {
     @GET("projects")

@@ -72,175 +72,196 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun setObserver() {
-        loginViewModel.loginWithEmailPassword().observe(this, Observer {
-            when (it.status) {
-                Status.LOADING -> {}
-                Status.SUCCESS -> {
-                    analytics.trackLoginEvent(LoginType.EMAIL.id, StatusEvent.SUCCESS.id)
-                    it.data?.let { data ->
-                        runOnUiThread { loading() }
-                        this.userAuthResponse = data
-                        loginViewModel.userTouch(data)
-                        CredentialKeeper(this@LoginActivity).save(data)
+        loginViewModel.loginWithEmailPassword().observe(
+            this,
+            Observer {
+                when (it.status) {
+                    Status.LOADING -> {}
+                    Status.SUCCESS -> {
+                        analytics.trackLoginEvent(LoginType.EMAIL.id, StatusEvent.SUCCESS.id)
+                        it.data?.let { data ->
+                            runOnUiThread { loading() }
+                            this.userAuthResponse = data
+                            loginViewModel.userTouch(data)
+                            CredentialKeeper(this@LoginActivity).save(data)
+                        }
                     }
-                }
-                Status.ERROR -> {
-                    analytics.trackLoginEvent(LoginType.EMAIL.id, StatusEvent.FAILURE.id)
-                    loading(false)
-                    runOnUiThread {
-                        Toast.makeText(
-                            this@LoginActivity,
-                            it.message ?: getString(R.string.error_has_occurred),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                    Status.ERROR -> {
+                        analytics.trackLoginEvent(LoginType.EMAIL.id, StatusEvent.FAILURE.id)
+                        loading(false)
+                        runOnUiThread {
+                            Toast.makeText(
+                                this@LoginActivity,
+                                it.message ?: getString(R.string.error_has_occurred),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 }
             }
-        })
+        )
 
-        loginViewModel.loginWithFacebookState().observe(this, Observer {
-            when (it.status) {
-                Status.LOADING -> {}
-                Status.SUCCESS -> {
-                    analytics.trackLoginEvent(LoginType.FACEBOOK.id, StatusEvent.SUCCESS.id)
-                    it.data?.let { data ->
-                        runOnUiThread { loading() }
-                        this.userAuthResponse = data
-                        loginViewModel.userTouch(data)
-                        CredentialKeeper(this@LoginActivity).save(data)
+        loginViewModel.loginWithFacebookState().observe(
+            this,
+            Observer {
+                when (it.status) {
+                    Status.LOADING -> {}
+                    Status.SUCCESS -> {
+                        analytics.trackLoginEvent(LoginType.FACEBOOK.id, StatusEvent.SUCCESS.id)
+                        it.data?.let { data ->
+                            runOnUiThread { loading() }
+                            this.userAuthResponse = data
+                            loginViewModel.userTouch(data)
+                            CredentialKeeper(this@LoginActivity).save(data)
+                        }
                     }
-                }
-                Status.ERROR -> {
-                    analytics.trackLoginEvent(LoginType.FACEBOOK.id, StatusEvent.FAILURE.id)
-                    loading(false)
-                    runOnUiThread {
-                        Toast.makeText(
-                            this@LoginActivity,
-                            it.message ?: getString(R.string.error_has_occurred),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                    Status.ERROR -> {
+                        analytics.trackLoginEvent(LoginType.FACEBOOK.id, StatusEvent.FAILURE.id)
+                        loading(false)
+                        runOnUiThread {
+                            Toast.makeText(
+                                this@LoginActivity,
+                                it.message ?: getString(R.string.error_has_occurred),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 }
             }
-        })
+        )
 
-        loginViewModel.loginWithGoogleState().observe(this, Observer {
-            when (it.status) {
-                Status.LOADING -> {}
-                Status.SUCCESS -> {
-                    analytics.trackLoginEvent(LoginType.GOOGLE.id, StatusEvent.SUCCESS.id)
-                    it.data?.let { data ->
-                        runOnUiThread { loading() }
-                        this.userAuthResponse = data
-                        loginViewModel.userTouch(data)
-                        CredentialKeeper(this@LoginActivity).save(data)
+        loginViewModel.loginWithGoogleState().observe(
+            this,
+            Observer {
+                when (it.status) {
+                    Status.LOADING -> {}
+                    Status.SUCCESS -> {
+                        analytics.trackLoginEvent(LoginType.GOOGLE.id, StatusEvent.SUCCESS.id)
+                        it.data?.let { data ->
+                            runOnUiThread { loading() }
+                            this.userAuthResponse = data
+                            loginViewModel.userTouch(data)
+                            CredentialKeeper(this@LoginActivity).save(data)
+                        }
                     }
-                }
-                Status.ERROR -> {
-                    analytics.trackLoginEvent(LoginType.GOOGLE.id, StatusEvent.FAILURE.id)
-                    loading(false)
-                    runOnUiThread {
-                        Toast.makeText(
-                            this@LoginActivity,
-                            it.message ?: getString(R.string.error_has_occurred),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                    Status.ERROR -> {
+                        analytics.trackLoginEvent(LoginType.GOOGLE.id, StatusEvent.FAILURE.id)
+                        loading(false)
+                        runOnUiThread {
+                            Toast.makeText(
+                                this@LoginActivity,
+                                it.message ?: getString(R.string.error_has_occurred),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 }
             }
-        })
+        )
 
-        loginViewModel.loginWithPhoneNumberState().observe(this, Observer {
-            when (it.status) {
-                Status.LOADING -> {}
-                Status.SUCCESS -> {
-                    analytics.trackLoginEvent(LoginType.SMS.id, StatusEvent.SUCCESS.id)
-                    it.data?.let { data ->
-                        runOnUiThread { loading() }
-                        this.userAuthResponse = data
-                        loginViewModel.userTouch(data)
-                        CredentialKeeper(this@LoginActivity).save(data)
+        loginViewModel.loginWithPhoneNumberState().observe(
+            this,
+            Observer {
+                when (it.status) {
+                    Status.LOADING -> {}
+                    Status.SUCCESS -> {
+                        analytics.trackLoginEvent(LoginType.SMS.id, StatusEvent.SUCCESS.id)
+                        it.data?.let { data ->
+                            runOnUiThread { loading() }
+                            this.userAuthResponse = data
+                            loginViewModel.userTouch(data)
+                            CredentialKeeper(this@LoginActivity).save(data)
+                        }
                     }
-                }
-                Status.ERROR -> {
-                    analytics.trackLoginEvent(LoginType.SMS.id, StatusEvent.FAILURE.id)
-                    loading(false)
-                    runOnUiThread {
-                        Toast.makeText(
-                            this@LoginActivity,
-                            it.message ?: getString(R.string.error_has_occurred),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                    Status.ERROR -> {
+                        analytics.trackLoginEvent(LoginType.SMS.id, StatusEvent.FAILURE.id)
+                        loading(false)
+                        runOnUiThread {
+                            Toast.makeText(
+                                this@LoginActivity,
+                                it.message ?: getString(R.string.error_has_occurred),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 }
             }
-        })
+        )
 
-        loginViewModel.userTouchState().observe(this, Observer {
-            when (it.status) {
-                Status.LOADING -> {}
-                Status.SUCCESS -> {
-                    it.data?.let { data ->
-                        loginViewModel.getFirebaseAuth(data)
+        loginViewModel.userTouchState().observe(
+            this,
+            Observer {
+                when (it.status) {
+                    Status.LOADING -> {}
+                    Status.SUCCESS -> {
+                        it.data?.let { data ->
+                            loginViewModel.getFirebaseAuth(data)
+                        }
                     }
-                }
-                Status.ERROR -> {
-                    loading(false)
-                    runOnUiThread {
-                        Toast.makeText(
-                            this@LoginActivity,
-                            it.message ?: getString(R.string.error_has_occurred),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                    Status.ERROR -> {
+                        loading(false)
+                        runOnUiThread {
+                            Toast.makeText(
+                                this@LoginActivity,
+                                it.message ?: getString(R.string.error_has_occurred),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 }
             }
-        })
+        )
 
-        loginViewModel.firebaseAuthState().observe(this, Observer {
-            when (it.status) {
-                Status.LOADING -> {}
-                Status.SUCCESS -> {
-                    it.data?.let { token ->
-                        loginViewModel.signInWithFirebaseToken(this, token)
+        loginViewModel.firebaseAuthState().observe(
+            this,
+            Observer {
+                when (it.status) {
+                    Status.LOADING -> {}
+                    Status.SUCCESS -> {
+                        it.data?.let { token ->
+                            loginViewModel.signInWithFirebaseToken(this, token)
+                        }
                     }
-                }
-                Status.ERROR -> {
-                    loading(false)
-                    runOnUiThread {
-                        Toast.makeText(
-                            this@LoginActivity,
-                            it.message ?: getString(R.string.error_has_occurred),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                    Status.ERROR -> {
+                        loading(false)
+                        runOnUiThread {
+                            Toast.makeText(
+                                this@LoginActivity,
+                                it.message ?: getString(R.string.error_has_occurred),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 }
             }
-        })
+        )
 
-        loginViewModel.signInWithFirebaseTokenState().observe(this, Observer {
-            when (it.status) {
-                Status.LOADING -> {}
-                Status.SUCCESS -> {
-                    it.data?.let { uid ->
-                        val preferences = Preferences.getInstance(this)
-                        preferences.putString(USER_FIREBASE_UID, uid)
-                        ProjectSelectActivity.startActivity(this@LoginActivity)
-                        finish()
+        loginViewModel.signInWithFirebaseTokenState().observe(
+            this,
+            Observer {
+                when (it.status) {
+                    Status.LOADING -> {}
+                    Status.SUCCESS -> {
+                        it.data?.let { uid ->
+                            val preferences = Preferences.getInstance(this)
+                            preferences.putString(USER_FIREBASE_UID, uid)
+                            ProjectSelectActivity.startActivity(this@LoginActivity)
+                            finish()
+                        }
                     }
-                }
-                Status.ERROR -> {
-                    loading(false)
-                    runOnUiThread {
-                        Toast.makeText(
-                            this@LoginActivity,
-                            it.message ?: getString(R.string.error_has_occurred),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                    Status.ERROR -> {
+                        loading(false)
+                        runOnUiThread {
+                            Toast.makeText(
+                                this@LoginActivity,
+                                it.message ?: getString(R.string.error_has_occurred),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 }
             }
-        })
+        )
     }
 
     private fun setupDisplayTheme() {

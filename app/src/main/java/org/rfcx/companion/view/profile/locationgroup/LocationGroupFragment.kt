@@ -27,7 +27,9 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class LocationGroupFragment : Fragment(), LocationGroupListener,
+class LocationGroupFragment :
+    Fragment(),
+    LocationGroupListener,
     SwipeRefreshLayout.OnRefreshListener {
     val realm: Realm = Realm.getInstance(RealmHelper.migrationConfig())
     private val locationGroupDb = ProjectDb(realm)
@@ -56,7 +58,8 @@ class LocationGroupFragment : Fragment(), LocationGroupListener,
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
@@ -177,5 +180,4 @@ class LocationGroupFragment : Fragment(), LocationGroupListener,
             }
         }
     }
-
 }

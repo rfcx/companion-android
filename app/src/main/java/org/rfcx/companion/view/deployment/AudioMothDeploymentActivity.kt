@@ -79,15 +79,21 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
     }
 
     private fun setObserver() {
-        audioMothDeploymentViewModel.getDeployments().observe(this, Observer {
-            this.deployments = it.filter { deployment -> deployment.isCompleted() }
-            setSiteItems()
-        })
+        audioMothDeploymentViewModel.getDeployments().observe(
+            this,
+            Observer {
+                this.deployments = it.filter { deployment -> deployment.isCompleted() }
+                setSiteItems()
+            }
+        )
 
-        audioMothDeploymentViewModel.getSites().observe(this, Observer {
-            this.sites = it
-            setSiteItems()
-        })
+        audioMothDeploymentViewModel.getSites().observe(
+            this,
+            Observer {
+                this.sites = it
+                setSiteItems()
+            }
+        )
     }
 
     private fun setSiteItems() {
@@ -259,7 +265,7 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
             }
             saveImages(it)
 
-            //track getting
+            // track getting
             if (preferences.getBoolean(ENABLE_LOCATION_TRACKING)) {
                 val track = audioMothDeploymentViewModel.getFirstTracking()
                 track?.let { t ->

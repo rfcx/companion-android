@@ -62,8 +62,10 @@ class DeploymentDb(private val realm: Realm) {
         var id = deployment.id
         realm.executeTransaction {
             if (deployment.id == 0) {
-                id = (it.where(Deployment::class.java).max(Deployment.FIELD_ID)
-                    ?.toInt() ?: 0) + 1
+                id = (
+                    it.where(Deployment::class.java).max(Deployment.FIELD_ID)
+                        ?.toInt() ?: 0
+                    ) + 1
                 deployment.id = id
             }
             deployment.stream = it.copyToRealm(location)
@@ -92,8 +94,10 @@ class DeploymentDb(private val realm: Realm) {
                     deployment.createdAt = deploymentResponse.createdAt ?: deployment.createdAt
                 } else {
                     val deploymentObj = deploymentResponse.toDeployment()
-                    val id = (it.where(Deployment::class.java).max(Deployment.FIELD_ID)
-                        ?.toInt() ?: 0) + 1
+                    val id = (
+                        it.where(Deployment::class.java).max(Deployment.FIELD_ID)
+                            ?.toInt() ?: 0
+                        ) + 1
                     deploymentObj.id = id
                     it.insert(deploymentObj)
                 }
@@ -255,7 +259,7 @@ class DeploymentDb(private val realm: Realm) {
                 guardianDeployment.updatedAt = Date()
                 guardianDeployment.syncState = SyncState.Unsent.key
 
-                //update location group
+                // update location group
                 if (guardianDeployment.stream?.project != null) {
                     guardianDeployment.stream?.project?.let {
                         it.name = locationGroup.name

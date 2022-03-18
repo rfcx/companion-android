@@ -19,4 +19,3 @@ fun GuardianConfiguration.toListForGuardian(): String {
     }
     return json.toString()
 }
-

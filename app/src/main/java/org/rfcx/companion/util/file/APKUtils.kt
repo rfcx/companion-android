@@ -18,26 +18,34 @@ object APKUtils {
         val files = getAllDownloadedSoftwaresVersion(context)
         files.forEach {
             when (it.key) {
-                GuardianSoftware.ADMIN.value -> softwares.add(Software(
-                    GuardianSoftware.ADMIN,
-                    it.value.first,
-                    it.value.second
-                ))
-                GuardianSoftware.CLASSIFY.value -> softwares.add(Software(
-                    GuardianSoftware.CLASSIFY,
-                    it.value.first,
-                    it.value.second
-                ))
-                GuardianSoftware.GUARDIAN.value -> softwares.add(Software(
-                    GuardianSoftware.GUARDIAN,
-                    it.value.first,
-                    it.value.second
-                ))
-                GuardianSoftware.UPDATER.value -> softwares.add(Software(
-                    GuardianSoftware.UPDATER,
-                    it.value.first,
-                    it.value.second
-                ))
+                GuardianSoftware.ADMIN.value -> softwares.add(
+                    Software(
+                        GuardianSoftware.ADMIN,
+                        it.value.first,
+                        it.value.second
+                    )
+                )
+                GuardianSoftware.CLASSIFY.value -> softwares.add(
+                    Software(
+                        GuardianSoftware.CLASSIFY,
+                        it.value.first,
+                        it.value.second
+                    )
+                )
+                GuardianSoftware.GUARDIAN.value -> softwares.add(
+                    Software(
+                        GuardianSoftware.GUARDIAN,
+                        it.value.first,
+                        it.value.second
+                    )
+                )
+                GuardianSoftware.UPDATER.value -> softwares.add(
+                    Software(
+                        GuardianSoftware.UPDATER,
+                        it.value.first,
+                        it.value.second
+                    )
+                )
             }
         }
         return softwares
