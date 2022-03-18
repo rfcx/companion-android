@@ -17,12 +17,11 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-        
-      - name: 'Build: Assemble Staging APK'
-        run: ./gradlew assembleInternalDevelopDebug
+          
+      - run: ls
         
       - name: Upload a Build APK
         uses: actions/upload-artifact@v3.0.0
         with:
           name: my-artifact
-          path: app/build/output/internalDevelop/debug/app-internalDevelop-debug.apk
+          path: /app/build/output/internalDevelop/debug/app-internalDevelop-debug.apk
