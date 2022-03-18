@@ -29,6 +29,3 @@ jobs:
 
       - name: 'Lint: Android'
         run: ./gradlew lintInternalDevelopDebug
-
-      - name: 'Build: Assemble Staging APK'
-        run: ./gradlew assembleInternalDevelopDebug
