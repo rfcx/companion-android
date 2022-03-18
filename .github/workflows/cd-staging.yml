@@ -21,6 +21,12 @@ jobs:
       - name: 'Build: Assemble Staging APK'
         run: ./gradlew assembleInternalDevelopDebug
         
+      - run: ls
+        
+      - run: cd /app/build/outputs/apk/internalDevelop/debug/
+        
+      - run: ls
+        
       - name: 'Upload a Build APK'
         uses: actions/upload-artifact@v3.0.0
         with:
