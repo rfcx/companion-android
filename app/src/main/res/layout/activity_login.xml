@@ -129,19 +129,6 @@
                 app:layout_constraintTop_toBottomOf="@+id/signInButton" />
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/facebookLoginButton"
-                style="@style/AudioMothButton.FacebookButton"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/button_height"
-                android:layout_margin="@dimen/margin_padding_normal"
-                android:layout_marginStart="@dimen/margin_padding_normal"
-                android:layout_marginEnd="@dimen/margin_padding_normal"
-                android:text="@string/connect_with_facebook"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/orTextView" />
-
-            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/googleLoginButton"
                 style="@style/AudioMothButton.GoogleButton"
                 android:layout_width="match_parent"
@@ -151,24 +138,7 @@
                 android:textColor="@android:color/black"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/facebookLoginButton" />
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/smsLoginButton"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/button_height"
-                android:layout_margin="@dimen/margin_padding_normal"
-                android:layout_marginStart="@dimen/margin_padding_normal"
-                android:layout_marginEnd="@dimen/margin_padding_normal"
-                android:background="@drawable/bg_sms_login_button"
-                android:fontFamily="@font/lato_regular"
-                android:lineSpacingExtra="0.5sp"
-                android:text="@string/connect_with_sms"
-                android:textSize="@dimen/text_button"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/googleLoginButton" />
+                app:layout_constraintTop_toBottomOf="@+id/rightLineView" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/poweredByTextView"
@@ -181,7 +151,7 @@
                 app:layout_constraintBottom_toTopOf="@id/rfcxLogoImageView"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/smsLoginButton" />
+                app:layout_constraintTop_toBottomOf="@id/googleLoginButton" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/rfcxLogoImageView"

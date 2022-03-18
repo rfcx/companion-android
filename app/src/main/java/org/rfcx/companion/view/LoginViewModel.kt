@@ -92,45 +92,6 @@ class LoginViewModel(
             })
     }
 
-    fun loginWithFacebook(activity: Activity) {
-        webAuthentication
-            .withConnection("facebook")
-            .withScope(context.getString(R.string.auth0_scopes))
-            .withScheme(context.getString(R.string.auth0_scheme))
-            .withAudience(context.getString(R.string.auth0_audience))
-            .start(activity, object : AuthCallback {
-                override fun onFailure(dialog: Dialog) {
-                    loginWithFacebook.postValue(
-                        Resource.error(
-                            context.getString(R.string.error_has_occurred),
-                            null
-                        )
-                    )
-                }
-
-                override fun onFailure(exception: AuthenticationException) {
-                    loginWithFacebook.postValue(
-                        Resource.error(
-                            context.getString(R.string.error_has_occurred),
-                            null
-                        )
-                    )
-                    exception.printStackTrace()
-                }
-
-                override fun onSuccess(credentials: Credentials) {
-                    when (val result = CredentialVerifier(context).verify(credentials)) {
-                        is Err -> {
-                            loginWithFacebook.postValue(Resource.error(result.error, null))
-                        }
-                        is Ok -> {
-                            loginWithFacebook.postValue(Resource.success(result.value))
-                        }
-                    }
-                }
-            })
-    }
-
     fun loginWithGoogle(activity: Activity) {
         webAuthentication
             .withConnection("google-oauth2")
@@ -164,44 +125,6 @@ class LoginViewModel(
                         }
                         is Ok -> {
                             loginWithGoogle.postValue(Resource.success(result.value))
-                        }
-                    }
-                }
-            })
-    }
-
-    fun loginMagicLink(activity: Activity) {
-        webAuthentication
-            .withConnection("")
-            .withScope(context.getString(R.string.auth0_scopes))
-            .withScheme(context.getString(R.string.auth0_scheme))
-            .withAudience(context.getString(R.string.auth0_audience))
-            .start(activity, object : AuthCallback {
-                override fun onFailure(dialog: Dialog) {
-                    loginWithPhoneNumber.postValue(
-                        Resource.error(
-                            context.getString(R.string.error_has_occurred),
-                            null
-                        )
-                    )
-                }
-
-                override fun onFailure(exception: AuthenticationException) {
-                    loginWithPhoneNumber.postValue(
-                        Resource.error(
-                            context.getString(R.string.error_has_occurred),
-                            null
-                        )
-                    )
-                }
-
-                override fun onSuccess(credentials: Credentials) {
-                    when (val result = CredentialVerifier(context).verify(credentials)) {
-                        is Err -> {
-                            loginWithPhoneNumber.postValue(Resource.error(result.error, null))
-                        }
-                        is Ok -> {
-                            loginWithPhoneNumber.postValue(Resource.success(result.value))
                         }
                     }
                 }

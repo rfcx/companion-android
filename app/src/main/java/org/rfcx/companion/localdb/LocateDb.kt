@@ -134,6 +134,6 @@ class LocateDb(private val realm: Realm) {
     fun getMaxUpdatedAt(): String? {
         return realm.where(Locate::class.java).isNotNull(Locate.FIELD_SERVER_ID)
             .isNotNull(Locate.FIELD_UPDATED_AT).findAll()
-            .maxBy { it.updatedAt!! }?.updatedAt?.toISO8601Format()
+            .maxByOrNull { it.updatedAt!! }?.updatedAt?.toISO8601Format()
     }
 }

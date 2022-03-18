@@ -7,12 +7,12 @@ apply plugin: 'realm-android'
 apply plugin: 'com.google.firebase.crashlytics'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     defaultConfig {
         applicationId "org.rfcx.companion"
         manifestPlaceholders = [auth0Domain: "@string/auth0_domain", auth0Scheme: "@string/auth0_scheme"]
-        minSdkVersion 19
-        targetSdkVersion 30
+        minSdkVersion 21
+        targetSdkVersion 31
         versionCode 74
         versionName "1.4.2"
         multiDexEnabled true
@@ -57,6 +57,10 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8
     }
+    lintOptions{
+        disable 'MissingTranslation'
+        disable 'ExtraTranslation'
+    }
 }
 
 configurations {
@@ -70,10 +74,10 @@ repositories {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.core:core-ktx:1.3.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
-    implementation 'androidx.work:work-runtime-ktx:2.4.0'
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
+    implementation 'androidx.work:work-runtime-ktx:2.7.1'
     implementation('com.journeyapps:zxing-android-embedded:4.1.0') { transitive = false }
     implementation 'com.google.zxing:core:3.3.0'
 
@@ -84,11 +88,11 @@ dependencies {
     implementation 'com.android.support:design:28.0.0'
 
     // Firebase
-    implementation 'com.google.firebase:firebase-analytics:17.4.4'
-    implementation 'com.google.firebase:firebase-firestore-ktx:21.5.0'
-    implementation 'com.google.firebase:firebase-storage:19.1.1'
-    implementation 'com.google.firebase:firebase-crashlytics:17.1.1'
-    implementation 'com.google.firebase:firebase-auth:19.3.2'
+    implementation 'com.google.firebase:firebase-analytics:20.1.0'
+    implementation 'com.google.firebase:firebase-firestore-ktx:24.0.2'
+    implementation 'com.google.firebase:firebase-storage:20.0.1'
+    implementation 'com.google.firebase:firebase-crashlytics:18.2.9'
+    implementation 'com.google.firebase:firebase-auth:21.0.2'
 
     // Kotlin Coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.5'
@@ -101,13 +105,13 @@ dependencies {
     implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-scalebar-v9:0.5.0'
     implementation 'com.mapbox.mapboxsdk:mapbox-android-telemetry:6.1.0'
 
-    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'com.google.android.material:material:1.5.0'
 
     //Preference
-    implementation "androidx.preference:preference-ktx:1.1.1"
+    implementation "androidx.preference:preference-ktx:1.2.0"
 
     // Glide
-    implementation 'com.google.android.gms:play-services-location:17.0.0'
+    implementation 'com.google.android.gms:play-services-location:19.0.1'
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     kapt 'com.github.bumptech.glide:compiler:4.11.0'
     implementation 'com.zhihu.android:matisse:0.5.3-beta3'
@@ -128,9 +132,9 @@ dependencies {
         exclude group: 'com.android.support', module: 'customtabs'
     }
     implementation 'com.auth0.android:jwtdecode:1.2.0'
-    implementation 'io.jsonwebtoken:jjwt-api:0.10.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.10.5'
-    runtimeOnly('io.jsonwebtoken:jjwt-orgjson:0.10.5') {
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.1'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.1'
+    runtimeOnly('io.jsonwebtoken:jjwt-orgjson:0.11.1') {
         exclude group: 'org.json', module: 'json' //provided by Android natively
     }
 
@@ -144,9 +148,9 @@ dependencies {
     ktlint "com.pinterest:ktlint:0.36.0"
 
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 }
 
 task ktlint(type: JavaExec, group: "verification") {

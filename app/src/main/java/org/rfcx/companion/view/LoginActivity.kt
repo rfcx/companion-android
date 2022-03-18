@@ -53,19 +53,9 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        facebookLoginButton.setOnClickListener {
-            loading()
-            loginViewModel.loginWithFacebook(this)
-        }
-
         googleLoginButton.setOnClickListener {
             loading()
             loginViewModel.loginWithGoogle(this)
-        }
-
-        smsLoginButton.setOnClickListener {
-            loading()
-            loginViewModel.loginMagicLink(this)
         }
     }
 

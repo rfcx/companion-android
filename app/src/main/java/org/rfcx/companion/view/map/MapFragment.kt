@@ -934,7 +934,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationGroupListener,
         currentLatLng: LatLng,
         sites: List<Locate>
     ): Locate? {
-        return sites.maxBy {
+        return sites.maxByOrNull {
             currentLatLng.distanceTo(LatLng(it.latitude, it.longitude))
         }
     }
