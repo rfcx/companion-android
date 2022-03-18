@@ -32,9 +32,11 @@ jobs:
       - run: cd app/build/outputs/apk/internalDevelop/
       
       - run: cd app/build/outputs/apk/internalDevelop/debug/
+      
+      - run: ls app/build/outputs/apk/internalDevelop/debug/
         
       - name: 'Upload a Build APK'
         uses: actions/upload-artifact@v3.0.0
         with:
           name: my-artifact
-          path: /app/build/outputs/apk/internalDevelop/debug/app-internalDevelop-debug.apk
+          path: app/build/outputs/apk/internalDevelop/debug/app-internalDevelop-debug.apk
