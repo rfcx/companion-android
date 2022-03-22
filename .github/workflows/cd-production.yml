@@ -21,7 +21,7 @@ jobs:
         with:
           java-version: 11
           
-      - name: 'Build: Assemble Staging APK'
+      - name: 'Build: Assemble APK'
         run: ./gradlew assembleInternalRelease
         
       - uses: r0adkll/sign-android-release@v1
@@ -49,4 +49,5 @@ jobs:
         with:
           token: ${{ secrets.SLACK_ALERT_COREDT_WEBHOOK }}
           path: ${{steps.sign_app.outputs.signedReleaseFile}}
-          channel: random
+          channel: build-guardians
+          initial_comment: 'test message'
