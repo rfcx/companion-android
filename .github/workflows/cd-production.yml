@@ -45,9 +45,9 @@ jobs:
           path: ${{steps.sign_app.outputs.signedReleaseFile}}
           
       - name: 'Upload Signed APK to Slack'
-        uses: adrey/slack-file-upload-action@master
+        uses: ravsamhq/notify-slack-action@v1
+        if: always()
         with:
-          token: ${{ secrets.SLACK_ALERT_COREDT_WEBHOOK }}
-          path: ${{steps.sign_app.outputs.signedReleaseFile}}
-          channel: build-guardians
-          initial_comment: 'test message'
+          status: ${{ job.status }} # required
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_ALERT_COREDT_WEBHOOK }} # required
