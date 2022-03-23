@@ -37,17 +37,51 @@ jobs:
         env:
           # override default build-tools version (29.0.3) -- optional
           BUILD_TOOLS_VERSION: "30.0.2"
-          
+
       - name: 'Upload a Signed APK'
         uses: actions/upload-artifact@v3.0.0
         with:
           name: companion-production
           path: ${{steps.sign_app.outputs.signedReleaseFile}}
-          
-      - name: 'Upload Signed APK to Slack'
+
+      # -------------------------------------------------- #
+      # Notify Slack                                       #
+      # -------------------------------------------------- #
+
+      - name: 'Notify: Get Slack User'
+        uses: kanga333/variable-mapper@v0
+        if: always()
+        with:
+          key: '${{ github.event.sender.login }}'
+          map: |
+            {
+              "Tooseriuz": { "SLACK_MENTION_USERS": "UC905TCTV" }
+            }
+
+      - name: 'Notify: Slack Failed'
         uses: ravsamhq/notify-slack-action@v1
         if: always()
         with:
-          status: ${{ job.status }} # required
+          notify_when: 'failure,warning'
+          status: ${{ job.status }}
+          notification_title: '❌ CD: Companion Production'
+          message_format: '*FAILED:* More detail in <{run_url}|${{ github.run_id }}>'
+          footer: '<{run_url}|{status_message}> at <{commit_url}|{commit_sha}> (triggered by ${{ env.SENDER }})'
+          mention_users_when: 'failure,warnings'
+          mention_users: ${{ env.SLACK_MENTION_USERS }}
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_ALERT_COREDT_WEBHOOK }} # required
+          SLACK_WEBHOOK_URL: ${{ env.SLACK_WEBHOOK_FAILURE }}
+          SENDER: ${{ github.event.sender.login }}
+          
+      - name: 'Notify: Slack Success'
+        uses: ravsamhq/notify-slack-action@v1
+        if: always()
+        with:
+          notify_when: 'success'
+          status: ${{ job.status }}
+          notification_title: '✅ CD: Companion Production'
+          message_format: '*SUCCESS:* Download Production APK in <{run_url}|here>'
+          footer: '<{run_url}|{status_message}> at <{commit_url}|{commit_sha}> (triggered by ${{ env.SENDER }})'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_ALERT_COREDT_WEBHOOK }}
+          SENDER: ${{ github.event.sender.login }}
