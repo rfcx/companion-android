@@ -1,4 +1,4 @@
-name: CD staging
+name: CD Test Publish
 
 on:
   push:
@@ -92,7 +92,7 @@ jobs:
           notify_when: 'success'
           status: ${{ job.status }}
           notification_title: '✅ CD: Publish Companion Staging/Production'
-          message_format: '*SUCCESS:* Download Production APK in <{run_url}|here>'
+          message_format: '*SUCCESS:* Download Staging/Prodution APKs in <{run_url}|here>'
           footer: '<{run_url}|{status_message}> at <{commit_url}|{commit_sha}> (triggered by ${{ env.SENDER }})'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_ALERT_COREDT_WEBHOOK }}
