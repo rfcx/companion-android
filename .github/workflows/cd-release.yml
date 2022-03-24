@@ -67,7 +67,7 @@ jobs:
         uses: r0adkll/upload-google-play@v1
         id: google-play
         with:
-          serviceAccountJson: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
           packageName: org.rfcx.companion
           releaseFiles: app/build/outputs/apk/internal/release/companion-production.apk
           track: internal
@@ -100,7 +100,7 @@ jobs:
           mention_users_when: 'failure,warnings'
           mention_users: ${{ env.SLACK_MENTION_USERS }}
         env:
-          SLACK_WEBHOOK_URL: ${{ env.SLACK_ALERT_COREDT_WEBHOOK }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_ALERT_COREDT_WEBHOOK }}
           SENDER: ${{ github.event.sender.login }}
           
       - name: 'Notify: Slack Success'
