@@ -94,7 +94,7 @@ jobs:
         with:
           notify_when: 'failure,warning'
           status: ${{ job.status }}
-          notification_title: '❌ CD: Companion Release Google Play'
+          notification_title: '❌ CD: Companion v${{ github.event.inputs.tag_id }} Release Google Play'
           message_format: '*FAILED:* More detail in <{run_url}|here>'
           footer: '<{run_url}|{status_message}> at <{commit_url}|{commit_sha}> (triggered by ${{ env.SENDER }})'
           mention_users_when: 'failure,warnings'
@@ -109,7 +109,7 @@ jobs:
         with:
           notify_when: 'success'
           status: ${{ job.status }}
-          notification_title: '✅ CD: Companion Release Google Play'
+          notification_title: '✅ CD: Companion v${{ github.event.inputs.tag_id }} Release Google Play'
           message_format: '*SUCCESS:* Release created in <${{ steps.release.outputs.url }}|here>, <https://play.google.com/store/apps/details?id=org.rfcx.companion | Google Play>'
           footer: '<{run_url}|{status_message}> at <{commit_url}|{commit_sha}> (triggered by ${{ env.SENDER }})'
         env:
