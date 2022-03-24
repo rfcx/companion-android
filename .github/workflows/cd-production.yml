@@ -2,6 +2,11 @@ name: CD production
 
 on:
   workflow_dispatch:
+    inputs:
+        what_new:
+          description: 'What changes in this release'     
+          required: true
+          default: ''
   release:
     types: [created]
 
