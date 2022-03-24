@@ -44,7 +44,7 @@ jobs:
           RELEASE_PATH: 'app/build/outputs/apk/internal/release'
           
       - name: 'Rename APK'
-        run: mv ${{steps.sign_app.outputs.signedReleaseFile}} ${{ env.FINAL_FILE_PATH }}
+        run: cp ${{steps.sign_app.outputs.signedReleaseFile}} ${{ env.FINAL_FILE_PATH }}
         env:
           FINAL_FILE_PATH: 'app/build/outputs/apk/internal/release/companion-production.apk'
 
@@ -69,7 +69,7 @@ jobs:
         with:
           serviceAccountJson: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
           packageName: org.rfcx.companion
-          releaseFile: 'app/build/outputs/apk/internal/release/companion-production.apk'
+          releaseFile: ${{steps.sign_app.outputs.signedReleaseFile}}
           track: internal
           whatsNewDirectory: releaseDetail/
           mappingFile: app/build/outputs/mapping/internalRelease/mapping.txt
@@ -100,7 +100,7 @@ jobs:
           mention_users_when: 'failure,warnings'
           mention_users: ${{ env.SLACK_MENTION_USERS }}
         env:
-          SLACK_WEBHOOK_URL: ${{ env.SLACK_WEBHOOK_FAILURE }}
+          SLACK_WEBHOOK_URL: ${{ env.SLACK_ALERT_COREDT_WEBHOOK }}
           SENDER: ${{ github.event.sender.login }}
           
       - name: 'Notify: Slack Success'
