@@ -1,12 +1,13 @@
-name: CD production
+name: CD Release
 
 on:
   workflow_dispatch:
     inputs:
-        what_new:
-          description: 'What changes in this release'     
-          required: true
-          default: ''
+          tag_id:
+            description: 'id of tag'     
+            required: true
+            default: ''
+          
   release:
     types: [created]
 
@@ -25,29 +26,59 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+
+      # -------------------------------------------------- #
+      # Build Production                                   #
+      # -------------------------------------------------- #
           
       - name: 'Build: Assemble APK'
         run: ./gradlew assembleInternalRelease
         
       - uses: r0adkll/sign-android-release@v1
-        name: 'Sign an APK'
+        name: Sign app APK
         # ID used to access action output
         id: sign_app
         with:
-          releaseDirectory: app/build/outputs/apk/internal/release
+          releaseDirectory: ${{ env.RELEASE_PATH }}
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-          alias: ${{ secrets.KEY_STORE_ALIAS }}
+          alias: ${{ secrets.ALIAS }}
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
         env:
           # override default build-tools version (29.0.3) -- optional
           BUILD_TOOLS_VERSION: "30.0.2"
+          RELEASE_PATH: 'app/build/outputs/apk/internal/release'
+          
+      - name: 'Rename APK'
+        run: mv ${{steps.sign_app.outputs.signedReleaseFile}} ${{ env.FINAL_FILE_PATH }}
+        env:
+          FINAL_FILE_PATH: 'app/build/outputs/apk/internal/release/companion-production.apk'
 
-      - name: 'Upload a Signed APK'
-        uses: actions/upload-artifact@v3.0.0
+      # -------------------------------------------------- #
+      # Create tag and release                             #
+      # -------------------------------------------------- #
+      
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        id: release
         with:
-          name: companion-production
-          path: ${{steps.sign_app.outputs.signedReleaseFile}}
+          tag_name: ${{ github.event.inputs.tag_id }}
+          body_path: 'releaseDetail/whatsnew-en-US'
+          files: 'app/build/outputs/apk/internal/release/companion-production.apk'
+          
+      - name: Output
+        run: echo ${{ steps.release.outputs.assets }}
+
+      - name: 'Release: publish to Google Play'
+        uses: r0adkll/upload-google-play@v1
+        id: google-play
+        with:
+          serviceAccountJson: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
+          packageName: org.rfcx.companion
+          releaseFile: 'app/build/outputs/apk/internal/release/companion-production.apk'
+          track: internal
+          whatsNewDirectory: releaseDetail/
+          mappingFile: app/build/outputs/mapping/internalRelease/mapping.txt
 
       # -------------------------------------------------- #
       # Notify Slack                                       #
@@ -69,7 +100,7 @@ jobs:
         with:
           notify_when: 'failure,warning'
           status: ${{ job.status }}
-          notification_title: '❌ CD: Companion Production'
+          notification_title: '❌ CD: Companion Release Google Play'
           message_format: '*FAILED:* More detail in <{run_url}|${{ github.run_id }}>'
           footer: '<{run_url}|{status_message}> at <{commit_url}|{commit_sha}> (triggered by ${{ env.SENDER }})'
           mention_users_when: 'failure,warnings'
@@ -84,8 +115,8 @@ jobs:
         with:
           notify_when: 'success'
           status: ${{ job.status }}
-          notification_title: '✅ CD: Companion Production'
-          message_format: '*SUCCESS:* Download Production APK in <{run_url}|here>'
+          notification_title: '✅ CD: Companion Release Google Play'
+          message_format: '*SUCCESS:* Release created in <${{ steps.release.outputs.url }}|here>, <https://play.google.com/store/apps/details?id=org.rfcx.companion | Google Play>'
           footer: '<{run_url}|{status_message}> at <{commit_url}|{commit_sha}> (triggered by ${{ env.SENDER }})'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_ALERT_COREDT_WEBHOOK }}
