@@ -69,7 +69,7 @@ jobs:
         with:
           serviceAccountJson: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
           packageName: org.rfcx.companion
-          releaseFile: ${{steps.sign_app.outputs.signedReleaseFile}}
+          releaseFiles: app/build/outputs/apk/internal/release/companion-production.apk
           track: internal
           whatsNewDirectory: releaseDetail/
           mappingFile: app/build/outputs/mapping/internalRelease/mapping.txt
@@ -95,7 +95,7 @@ jobs:
           notify_when: 'failure,warning'
           status: ${{ job.status }}
           notification_title: '❌ CD: Companion Release Google Play'
-          message_format: '*FAILED:* More detail in <{run_url}|${{ github.run_id }}>'
+          message_format: '*FAILED:* More detail in <{run_url}|here>'
           footer: '<{run_url}|{status_message}> at <{commit_url}|{commit_sha}> (triggered by ${{ env.SENDER }})'
           mention_users_when: 'failure,warnings'
           mention_users: ${{ env.SLACK_MENTION_USERS }}
