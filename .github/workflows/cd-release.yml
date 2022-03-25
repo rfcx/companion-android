@@ -84,7 +84,7 @@ jobs:
       # -------------------------------------------------- #
 
       - name: Prepare Slack message
-        run: echo "SLACK_MESSAGE=`awk '{printf "%s\\n", $0}' releaseDetail/whatsnew-en-US)`" >> $GITHUB_ENV
+        run: echo -e "SLACK_MESSAGE=$(awk '{printf "%s\\\\n", $0}' releaseDetail/whatsnew-en-US)" >> $GITHUB_ENV
 
       # -------------------------------------------------- #
       # Notify Slack                                       #
