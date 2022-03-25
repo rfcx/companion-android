@@ -80,6 +80,13 @@ jobs:
           mappingFile: app/build/outputs/mapping/internalRelease/mapping.txt
 
       # -------------------------------------------------- #
+      # Prepare Slack message                              #
+      # -------------------------------------------------- #
+
+      - name: Prepare Slack message
+        run: SLACK_MESSAGE=$(awk '{printf "%s\\n", $0}' releaseDetail/whatsnew-en-US)
+
+      # -------------------------------------------------- #
       # Notify Slack                                       #
       # -------------------------------------------------- #
 
@@ -115,7 +122,7 @@ jobs:
           notify_when: 'success'
           status: ${{ job.status }}
           notification_title: '✅ CD: Companion v${{ github.event.inputs.tag_id }} ${{ github.event.inputs.track }} Release Google Play'
-          message_format: '*SUCCESS:* Release created in <${{ steps.release.outputs.url }}|here>, <https://play.google.com/store/apps/details?id=org.rfcx.companion | Google Play>'
+          message_format: '*SUCCESS:* Release created in <${{ steps.release.outputs.url }}|here>, <https://play.google.com/store/apps/details?id=org.rfcx.companion | Google Play>\n$SLACK_MESSAGE'
           footer: '<{run_url}|{status_message}> at <{commit_url}|{commit_sha}> (triggered by ${{ env.SENDER }})'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_ALERT_COREDT_WEBHOOK }}
