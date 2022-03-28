@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_connect_guardian.*
@@ -120,13 +119,12 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
         lifecycleScope.launch {
             withContext(Dispatchers.Main) {
                 GuardianSocketManager.pingBlob.observe(
-                    viewLifecycleOwner,
-                    Observer {
-                        requireActivity().runOnUiThread {
-                            deploymentProtocol?.startCheckList()
-                        }
+                    viewLifecycleOwner
+                ) {
+                    requireActivity().runOnUiThread {
+                        deploymentProtocol?.startCheckList()
                     }
-                )
+                }
             }
         }
     }
