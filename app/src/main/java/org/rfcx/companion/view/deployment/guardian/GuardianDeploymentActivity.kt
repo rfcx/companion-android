@@ -264,6 +264,7 @@ class GuardianDeploymentActivity :
             satTimeOff = PingUtils.getSatTimeOffFromPrefs(it)
             guardianLocalTime = PingUtils.getGuardianLocalTime(it)
             guardianTimezone = PingUtils.getGuardianTimezone(it)
+            _sampleRate = PingUtils.getSampleRateFromPrefs(it) ?: 12000
         }
         AdminSocketManager.pingBlob.observeForever {
             network = PingUtils.getNetworkFromPing(it)
@@ -630,7 +631,7 @@ class GuardianDeploymentActivity :
                     reTriggerConnection()
                 }
             },
-            0, 5000
+            0, 10000
         )
     }
 

@@ -120,13 +120,15 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
         lifecycleScope.launch {
             withContext(Dispatchers.Main) {
                 GuardianSocketManager.pingBlob.observe(
-                    viewLifecycleOwner,
-                    Observer {
-                        requireActivity().runOnUiThread {
+                    viewLifecycleOwner
+                ) {
+                    requireActivity().runOnUiThread {
+                        // So that we know ping is received
+                        if (it.prefs != null) {
                             deploymentProtocol?.startCheckList()
                         }
                     }
-                )
+                }
             }
         }
     }

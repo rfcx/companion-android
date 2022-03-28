@@ -55,6 +55,12 @@ object PrefsUtils {
         return protocol
     }
 
+    fun getSampleRateFromPrefs(str: String?): Int? {
+        if (str == null) return null
+        val json = JsonParser.parseString(str).asJsonObject
+        return json.get("audio_stream_sample_rate").asInt
+    }
+
     fun getGuardianPlanFromPrefs(str: String?): GuardianPlan? {
         if (str == null) return null
         val json = JsonParser.parseString(str).asJsonObject
