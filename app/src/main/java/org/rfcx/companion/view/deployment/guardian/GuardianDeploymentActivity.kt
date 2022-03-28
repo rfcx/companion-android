@@ -201,11 +201,9 @@ class GuardianDeploymentActivity :
         val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
         when (container) {
             is GuardianAdvancedFragment -> {
-                reTriggerConnection()
                 startCheckList()
             }
             is MapPickerFragment -> {
-                reTriggerConnection()
                 startFragment(
                     DetailDeploymentSiteFragment.newInstance(
                         latitude,
@@ -225,7 +223,6 @@ class GuardianDeploymentActivity :
             }
             is ConnectGuardianFragment -> finish()
             else -> {
-                reTriggerConnection()
                 startCheckList()
             }
         }
@@ -308,7 +305,7 @@ class GuardianDeploymentActivity :
 
     override fun startCheckList() {
         registerWifiLost()
-//        periodicSocketHeartBreath()
+        periodicSocketHeartBreath()
         startFragment(GuardianCheckListFragment.newInstance())
     }
 
