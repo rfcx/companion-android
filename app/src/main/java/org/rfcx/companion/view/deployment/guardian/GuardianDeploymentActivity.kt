@@ -125,7 +125,7 @@ class GuardianDeploymentActivity :
     }
 
     private val wifiHotspotManager by lazy { WifiHotspotManager(this) }
-    private var timer = Timer()
+    private var timer: Timer? = null
 
     @SuppressLint("ResourceAsColor")
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -217,7 +217,7 @@ class GuardianDeploymentActivity :
                 setLastCheckInTime(null)
                 SocketUtils.stopAllConnections()
                 SocketUtils.clearAllBlobs()
-                timer.cancel()
+                stopPeriodicSocketHeartBreath()
                 passedChecks.clear() // remove all passed
                 startFragment(ConnectGuardianFragment.newInstance())
             }
@@ -618,12 +618,13 @@ class GuardianDeploymentActivity :
         siteLiveData.removeObserver(siteObserve)
         deploymentLiveData.removeObserver(guardianDeploymentObserve)
         SocketUtils.stopAllConnections()
-        timer.cancel()
+        stopPeriodicSocketHeartBreath()
     }
 
     private fun periodicSocketHeartBreath() {
+        if (timer != null) return
         timer = Timer()
-        timer.schedule(
+        timer!!.schedule(
             object : TimerTask() {
                 override fun run() {
                     reTriggerConnection()
@@ -631,6 +632,13 @@ class GuardianDeploymentActivity :
             },
             0, 5000
         )
+    }
+
+    private fun stopPeriodicSocketHeartBreath() {
+        if (timer == null) return
+        timer!!.cancel()
+        timer!!.purge()
+        timer = null
     }
 
     companion object {
