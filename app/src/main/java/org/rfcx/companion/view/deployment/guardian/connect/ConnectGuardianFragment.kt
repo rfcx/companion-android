@@ -122,7 +122,10 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
                     viewLifecycleOwner
                 ) {
                     requireActivity().runOnUiThread {
-                        deploymentProtocol?.startCheckList()
+                        // So that we know ping is received
+                        if (it.prefs != null) {
+                            deploymentProtocol?.startCheckList()
+                        }
                     }
                 }
             }

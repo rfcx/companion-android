@@ -97,6 +97,14 @@ object PingUtils {
         return null
     }
 
+    fun getSampleRateFromPrefs(guardianPing: GuardianPing?): Int? {
+        if (guardianPing?.prefs is JsonObject) {
+            val prefs = guardianPing.prefs.get("vals") ?: return null
+            return PrefsUtils.getSampleRateFromPrefs(Gson().toJson(prefs))
+        }
+        return null
+    }
+
     fun getSatTimeOffFromPrefs(guardianPing: GuardianPing?): List<String>? {
         if (guardianPing?.prefs is JsonObject) {
             val prefs = guardianPing.prefs.get("vals") ?: return null

@@ -30,7 +30,6 @@ class GuardianPrefsFragment :
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.prefs)
-        preferenceScreen.removeAll()
         val preferenceCategory = PreferenceCategory(preferenceScreen.context)
         preferenceCategory.title = ""
         preferenceScreen.addPreference(preferenceCategory)

@@ -306,7 +306,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
 
         private const val DELAY = 0L
 
-        private const val STACK_PERIOD = 20L
+        private const val STACK_PERIOD = 10L
 
         private const val DEF_SAMPLERATE = 12000
 

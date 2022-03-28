@@ -125,7 +125,7 @@ class GuardianDeploymentActivity :
     }
 
     private val wifiHotspotManager by lazy { WifiHotspotManager(this) }
-    private var timer = Timer()
+    private var timer: Timer? = null
 
     @SuppressLint("ResourceAsColor")
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -201,11 +201,9 @@ class GuardianDeploymentActivity :
         val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
         when (container) {
             is GuardianAdvancedFragment -> {
-                reTriggerConnection()
                 startCheckList()
             }
             is MapPickerFragment -> {
-                reTriggerConnection()
                 startFragment(
                     DetailDeploymentSiteFragment.newInstance(
                         latitude,
@@ -219,13 +217,12 @@ class GuardianDeploymentActivity :
                 setLastCheckInTime(null)
                 SocketUtils.stopAllConnections()
                 SocketUtils.clearAllBlobs()
-                timer.cancel()
+                stopPeriodicSocketHeartBreath()
                 passedChecks.clear() // remove all passed
                 startFragment(ConnectGuardianFragment.newInstance())
             }
             is ConnectGuardianFragment -> finish()
             else -> {
-                reTriggerConnection()
                 startCheckList()
             }
         }
@@ -267,6 +264,7 @@ class GuardianDeploymentActivity :
             satTimeOff = PingUtils.getSatTimeOffFromPrefs(it)
             guardianLocalTime = PingUtils.getGuardianLocalTime(it)
             guardianTimezone = PingUtils.getGuardianTimezone(it)
+            _sampleRate = PingUtils.getSampleRateFromPrefs(it) ?: 12000
         }
         AdminSocketManager.pingBlob.observeForever {
             network = PingUtils.getNetworkFromPing(it)
@@ -308,7 +306,7 @@ class GuardianDeploymentActivity :
 
     override fun startCheckList() {
         registerWifiLost()
-//        periodicSocketHeartBreath()
+        periodicSocketHeartBreath()
         startFragment(GuardianCheckListFragment.newInstance())
     }
 
@@ -621,19 +619,27 @@ class GuardianDeploymentActivity :
         siteLiveData.removeObserver(siteObserve)
         deploymentLiveData.removeObserver(guardianDeploymentObserve)
         SocketUtils.stopAllConnections()
-        timer.cancel()
+        stopPeriodicSocketHeartBreath()
     }
 
     private fun periodicSocketHeartBreath() {
+        if (timer != null) return
         timer = Timer()
-        timer.schedule(
+        timer!!.schedule(
             object : TimerTask() {
                 override fun run() {
                     reTriggerConnection()
                 }
             },
-            0, 5000
+            0, 10000
         )
+    }
+
+    private fun stopPeriodicSocketHeartBreath() {
+        if (timer == null) return
+        timer!!.cancel()
+        timer!!.purge()
+        timer = null
     }
 
     companion object {

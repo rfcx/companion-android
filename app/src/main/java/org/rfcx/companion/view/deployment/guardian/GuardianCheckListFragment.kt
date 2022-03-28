@@ -62,7 +62,6 @@ class GuardianCheckListFragment : Fragment(), (Int, String) -> Unit {
 
     override fun invoke(number: Int, name: String) {
         deploymentProtocol?.handleCheckClicked(number)
-        deploymentProtocol?.reTriggerConnection()
         deploymentProtocol?.setCurrentPage(name)
     }
 

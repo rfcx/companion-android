@@ -62,7 +62,7 @@ class GuardianRegisterFragment : Fragment() {
 
         registerFinishButton.setOnClickListener {
             analytics?.trackClickNextEvent(Screen.GUARDIAN_REGISTER.id)
-            deploymentProtocol?.startCheckList()
+            deploymentProtocol?.backStep()
         }
     }
 
