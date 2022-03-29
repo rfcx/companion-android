@@ -1,2 +1,3 @@
+
 - Fix users cannot login via Google Authentication
 - Upgrade Auth0 version
