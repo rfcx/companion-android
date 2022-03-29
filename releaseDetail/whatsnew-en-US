@@ -1,3 +1,2 @@
-- Fix that user have to connect the guardian again to see software updated
-- Fix wrong audio playback on Microphone testing
-- Fix the app crash when set nothing on change preferences page
+- Fix users cannot login via Google Authentication
+- Upgrade Auth0 version
