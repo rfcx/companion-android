@@ -70,8 +70,8 @@ class LoginViewModel(
             .setScope(context.getString(R.string.auth0_scopes))
             .setAudience(context.getString(R.string.auth0_audience))
             .start(object : BaseCallback<Credentials, AuthenticationException> {
-                override fun onSuccess(credentials: Credentials) {
-                    when (val result = CredentialVerifier(context).verify(credentials)) {
+                override fun onSuccess(credentials: Credentials?) {
+                    when (val result = CredentialVerifier(context).verify(credentials!!)) {
                         is Err -> {
                             loginWithEmailPassword.postValue(Resource.error(result.error, null))
                         }
