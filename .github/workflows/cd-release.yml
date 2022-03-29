@@ -84,7 +84,7 @@ jobs:
       # -------------------------------------------------- #
 
       - name: Prepare Slack message
-        run: echo -n SLACK_MESSAGE= >> $GITHUB_ENV && awk '{printf "%s\\n", $0}' releaseDetail/whatsnew-en-US >> $GITHUB_ENV
+        run: echo -n SLACK_MESSAGE= >> $GITHUB_ENV && awk '{printf "%s\x0a", $0}' releaseDetail/whatsnew-en-US >> $GITHUB_ENV
 
       # -------------------------------------------------- #
       # Notify Slack                                       #
@@ -121,7 +121,7 @@ jobs:
         with:
           notify_when: 'success'
           status: ${{ job.status }}
-          notification_title: '✅ *CD:* Companion v${{ github.event.inputs.tag_id }} _${{ github.event.inputs.track }}_ Release Google Play ${{ env.SLACK_MESSAGE }}'
+          notification_title: '✅ *CD:* Companion v${{ github.event.inputs.tag_id }} _${{ github.event.inputs.track }}_ Release Google Play \x0a ${{ env.SLACK_MESSAGE }}'
           message_format: '*SUCCESS:* Release created in <${{ steps.release.outputs.url }}|here>, <https://play.google.com/store/apps/details?id=org.rfcx.companion | Google Play>'
           footer: '<{run_url}|{status_message}> at <{commit_url}|{commit_sha}> (triggered by ${{ env.SENDER }})'
         env:

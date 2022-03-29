@@ -14,8 +14,8 @@ android {
         manifestPlaceholders = [auth0Domain: "@string/auth0_domain", auth0Scheme: "@string/auth0_scheme"]
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode 83
-        versionName "1.4.4"
+        versionCode 84
+        versionName "1.4.3"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
