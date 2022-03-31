@@ -50,6 +50,7 @@ object GuardianSocketManager {
         prefs.addProperty("api_protocol_escalation_order", "mqtt,rest")
         prefs.addProperty("api_satellite_off_hours", "23:55-23:56,23:57-23:59")
         prefs.addProperty("admin_system_timezone", TimeZone.getDefault().id)
+        prefs.addProperty("enable_reboot_forced_daily", "true")
         syncConfiguration(prefs.toString())
     }
 
@@ -64,6 +65,7 @@ object GuardianSocketManager {
         prefs.addProperty("api_protocol_escalation_order", "mqtt,rest,sms")
         prefs.addProperty("api_satellite_off_hours", "23:55-23:56,23:57-23:59")
         prefs.addProperty("admin_system_timezone", TimeZone.getDefault().id)
+        prefs.addProperty("enable_reboot_forced_daily", "true")
         syncConfiguration(prefs.toString())
     }
 
@@ -78,6 +80,7 @@ object GuardianSocketManager {
         prefs.addProperty("api_protocol_escalation_order", "sat")
         prefs.addProperty("api_satellite_off_hours", timeOff)
         prefs.addProperty("admin_system_timezone", TimeZone.getDefault().id)
+        prefs.addProperty("enable_reboot_forced_daily", "true")
         syncConfiguration(prefs.toString())
     }
 
