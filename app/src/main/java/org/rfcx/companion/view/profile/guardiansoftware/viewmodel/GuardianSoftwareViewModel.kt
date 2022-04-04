@@ -8,10 +8,8 @@ import okhttp3.ResponseBody
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.APK
 import org.rfcx.companion.entity.response.GuardianSoftwareResponse
-import org.rfcx.companion.util.Resource
+import org.rfcx.companion.util.*
 import org.rfcx.companion.util.file.APKUtils
-import org.rfcx.companion.util.getIdToken
-import org.rfcx.companion.util.insert
 import org.rfcx.companion.util.isNetworkAvailable
 import org.rfcx.companion.view.profile.guardiansoftware.repository.GuardianSoftwareRepository
 import retrofit2.Call
@@ -122,6 +120,10 @@ class GuardianSoftwareViewModel(
             roleMapToVersion[it.role] = it.version
         }
         softwareVersion = roleMapToVersion
+    }
+
+    fun deleteSoftware(role: String) {
+        APKUtils.deleteSoftware(role, context)
     }
 
     fun downloadSoftware(role: String) {

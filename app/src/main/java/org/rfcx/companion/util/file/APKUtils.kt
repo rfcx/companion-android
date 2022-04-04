@@ -134,5 +134,12 @@ object APKUtils {
         }
     }
 
+    fun deleteSoftware(role: String, context: Context) {
+        val files = getAllDownloadedSoftwares(context)
+        files?.filter { it.name.contains(role) }?.forEach {
+            it.delete()
+        }
+    }
+
     enum class APKStatus { NOT_INSTALLED, UP_TO_DATE, NEED_UPDATE }
 }
