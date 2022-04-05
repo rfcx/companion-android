@@ -68,6 +68,7 @@ class SoftwareUpdateAdapter(
                 (holder as SoftwareVersionViewHolder).apkVersion.text = versionItem.version
                 holder.apkVersion.apply {
                     val installedVersion = guardianSoftwareVersion[versionItem.parent]
+                    holder.apkInstalled.text = context.getString(R.string.installed_software, installedVersion)
                     if (!needLoading) {
                         if (installedVersion != null && calculateVersionValue(installedVersion) >= calculateVersionValue(versionItem.version)) {
                             holder.apkSendButton.visibility = View.GONE
@@ -125,6 +126,7 @@ class SoftwareUpdateAdapter(
     class SoftwareVersionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal var layout = itemView.country_item_child_container
         internal var apkVersion: TextView = itemView.apkVersionTextView
+        internal var apkInstalled: TextView = itemView.apkInstalledVersionTextView
         internal var apkSendButton: Button = itemView.apkSendButton
         internal var apkUpToDateText: TextView = itemView.apkUpToDateTextView
         internal var apkLoading: ProgressBar = itemView.apkLoading

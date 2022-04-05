@@ -522,4 +522,7 @@
     <string name="auto">auto</string>
     <string name="there_is_no_off_time_in_this_project">There is no off time in this project</string>
 
+    <string name="installed_software">(current %s installed)</string>
+    <string name="delete_from_local">delete from local</string>
+
 </resources>

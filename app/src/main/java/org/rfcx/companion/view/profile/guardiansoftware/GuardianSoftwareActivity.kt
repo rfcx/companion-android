@@ -42,15 +42,36 @@ class GuardianSoftwareActivity : AppCompatActivity() {
 
         adminDownloadButton.setOnClickListener {
             guardianSoftwareViewModel.downloadSoftware(ADMIN)
+            handleUIDownloadClicked(ADMIN)
         }
         classifyDownloadButton.setOnClickListener {
             guardianSoftwareViewModel.downloadSoftware(CLASSIFY)
+            handleUIDownloadClicked(CLASSIFY)
         }
         guardianDownloadButton.setOnClickListener {
             guardianSoftwareViewModel.downloadSoftware(GUARDIAN)
+            handleUIDownloadClicked(GUARDIAN)
         }
         updaterDownloadButton.setOnClickListener {
             guardianSoftwareViewModel.downloadSoftware(UPDATER)
+            handleUIDownloadClicked(UPDATER)
+        }
+
+        adminRoleDeleteButton.setOnClickListener {
+            guardianSoftwareViewModel.deleteSoftware(ADMIN)
+            handleUIDeleteClicked(ADMIN)
+        }
+        classifyRoleDeleteButton.setOnClickListener {
+            guardianSoftwareViewModel.deleteSoftware(CLASSIFY)
+            handleUIDeleteClicked(CLASSIFY)
+        }
+        guardianRoleDeleteButton.setOnClickListener {
+            guardianSoftwareViewModel.deleteSoftware(GUARDIAN)
+            handleUIDeleteClicked(GUARDIAN)
+        }
+        updaterRoleDeleteButton.setOnClickListener {
+            guardianSoftwareViewModel.deleteSoftware(UPDATER)
+            handleUIDeleteClicked(UPDATER)
         }
     }
 
@@ -92,34 +113,34 @@ class GuardianSoftwareActivity : AppCompatActivity() {
                                         ADMIN -> {
                                             if (it.value.status != APKUtils.APKStatus.UP_TO_DATE) {
                                                 adminDownloadButton.visibility = View.VISIBLE
-                                                adminDownloadButton.text = "${adminDownloadButton.text} ${it.value.version}"
                                             } else {
                                                 adminStatus.visibility = View.VISIBLE
                                             }
+                                            adminDownloadButton.text = "${adminDownloadButton.text} ${it.value.version}"
                                         }
                                         CLASSIFY -> {
                                             if (it.value.status != APKUtils.APKStatus.UP_TO_DATE) {
                                                 classifyDownloadButton.visibility = View.VISIBLE
-                                                classifyDownloadButton.text = "${classifyDownloadButton.text} ${it.value.version}"
                                             } else {
                                                 classifyStatus.visibility = View.VISIBLE
                                             }
+                                            classifyDownloadButton.text = "${classifyDownloadButton.text} ${it.value.version}"
                                         }
                                         GUARDIAN -> {
                                             if (it.value.status != APKUtils.APKStatus.UP_TO_DATE) {
                                                 guardianDownloadButton.visibility = View.VISIBLE
-                                                guardianDownloadButton.text = "${guardianDownloadButton.text} ${it.value.version}"
                                             } else {
                                                 guardianStatus.visibility = View.VISIBLE
                                             }
+                                            guardianDownloadButton.text = "${guardianDownloadButton.text} ${it.value.version}"
                                         }
                                         UPDATER -> {
                                             if (it.value.status != APKUtils.APKStatus.UP_TO_DATE) {
                                                 updaterDownloadButton.visibility = View.VISIBLE
-                                                updaterDownloadButton.text = "${updaterDownloadButton.text} ${it.value.version}"
                                             } else {
                                                 updaterStatus.visibility = View.VISIBLE
                                             }
+                                            updaterDownloadButton.text = "${updaterDownloadButton.text} ${it.value.version}"
                                         }
                                     }
                                 }
@@ -178,12 +199,24 @@ class GuardianSoftwareActivity : AppCompatActivity() {
 
     private fun setView() {
         val versions = guardianSoftwareViewModel.getCurrentDownloadedAPKsVersions()
-        versions?.forEach {
+        versions.forEach {
             when (it.key) {
-                ADMIN -> adminRoleVersion.text = "${it.value.first} (local)"
-                CLASSIFY -> classifyRoleVersion.text = "${it.value.first} (local)"
-                GUARDIAN -> guardianRoleVersion.text = "${it.value.first} (local)"
-                UPDATER -> updaterRoleVersion.text = "${it.value.first} (local)"
+                ADMIN -> {
+                    adminRoleVersion.visibility = View.GONE
+                    adminRoleDeleteButton.visibility = View.VISIBLE
+                }
+                CLASSIFY -> {
+                    classifyRoleVersion.visibility = View.GONE
+                    classifyRoleDeleteButton.visibility = View.VISIBLE
+                }
+                GUARDIAN -> {
+                    guardianRoleVersion.visibility = View.GONE
+                    guardianRoleDeleteButton.visibility = View.VISIBLE
+                }
+                UPDATER -> {
+                    updaterRoleVersion.visibility = View.GONE
+                    updaterRoleDeleteButton.visibility = View.VISIBLE
+                }
             }
         }
     }
@@ -236,6 +269,48 @@ class GuardianSoftwareActivity : AppCompatActivity() {
             UPDATER -> {
                 updaterLoading.visibility = View.GONE
                 updaterDownloadButton.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    private fun handleUIDeleteClicked(role: String) {
+        when (role) {
+            ADMIN -> {
+                adminRoleVersion.visibility = View.VISIBLE
+                adminRoleDeleteButton.visibility = View.GONE
+                adminDownloadButton.visibility = View.VISIBLE
+            }
+            CLASSIFY -> {
+                classifyRoleVersion.visibility = View.VISIBLE
+                classifyRoleDeleteButton.visibility = View.GONE
+                classifyDownloadButton.visibility = View.VISIBLE
+            }
+            GUARDIAN -> {
+                guardianRoleVersion.visibility = View.VISIBLE
+                guardianRoleDeleteButton.visibility = View.GONE
+                guardianDownloadButton.visibility = View.VISIBLE
+            }
+            UPDATER -> {
+                updaterRoleVersion.visibility = View.VISIBLE
+                updaterRoleDeleteButton.visibility = View.GONE
+                updaterDownloadButton.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    private fun handleUIDownloadClicked(role: String) {
+        when (role) {
+            ADMIN -> {
+                adminStatus.visibility = View.GONE
+            }
+            CLASSIFY -> {
+                classifyStatus.visibility = View.GONE
+            }
+            GUARDIAN -> {
+                guardianStatus.visibility = View.GONE
+            }
+            UPDATER -> {
+                updaterStatus.visibility = View.GONE
             }
         }
     }
