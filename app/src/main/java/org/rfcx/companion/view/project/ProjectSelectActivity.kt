@@ -138,6 +138,7 @@ class ProjectSelectActivity :
     }
 
     private fun showLoading() {
+        noContentTextView.visibility = View.GONE
         projectSwipeRefreshView.isRefreshing = true
     }
 
