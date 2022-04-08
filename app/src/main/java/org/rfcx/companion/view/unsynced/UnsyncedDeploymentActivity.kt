@@ -3,6 +3,7 @@ package org.rfcx.companion.view.unsynced
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -32,10 +33,12 @@ class UnsyncedDeploymentActivity : AppCompatActivity() {
     private lateinit var deploymentWorkInfoLiveData: LiveData<List<WorkInfo>>
 
     private var lastSyncingInfo: SyncInfo? = null
+    private var currentState: WorkInfo.State? = null
 
     private val deploymentWorkInfoObserve = Observer<List<WorkInfo>> {
         val currentWorkStatus = it?.getOrNull(0)
         if (currentWorkStatus != null) {
+            currentState = currentWorkStatus.state
             when (currentWorkStatus.state) {
                 WorkInfo.State.RUNNING -> updateSyncInfo(SyncInfo.Uploading)
                 WorkInfo.State.SUCCEEDED -> updateSyncInfo(SyncInfo.Uploaded)
@@ -105,12 +108,18 @@ class UnsyncedDeploymentActivity : AppCompatActivity() {
     }
 
     private fun setUnsyncedText(count: Int) {
-        if (count == 0) {
-            unsyncedTextView.text = getString(R.string.format_deploys_uploaded)
-            unsyncedButton.isEnabled = false
-        } else {
-            unsyncedTextView.text = getString(R.string.unsynced_text, count)
-            unsyncedButton.isEnabled = true
+        when {
+            count == 0 -> {
+                unsyncedTextView.text = getString(R.string.format_deploys_uploaded)
+                unsyncedButton.isEnabled = false
+            }
+            currentState == WorkInfo.State.RUNNING -> {
+                unsyncedTextView.text = getString(R.string.unsynced_text, count)
+            }
+            count > 0 && currentState != WorkInfo.State.RUNNING -> {
+                unsyncedTextView.text = getString(R.string.unsynced_text, count)
+                unsyncedButton.isEnabled = true
+            }
         }
     }
 
@@ -121,8 +130,8 @@ class UnsyncedDeploymentActivity : AppCompatActivity() {
                 unsyncedButton.text = getString(R.string.syncing)
             }
             SyncInfo.Uploaded -> {
-                unsyncedButton.text = getString(R.string.sync_now)
-                unsyncedButton.isEnabled = true
+                unsyncedButton.text = getString(R.string.synced)
+                unsyncedButton.isEnabled = false
             }
             // else also waiting network
             else -> {

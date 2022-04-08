@@ -529,5 +529,6 @@
     <string name="unsynced_deployments">Unsynced Deployments</string>
     <string name="unsynced_text">You have %d unsynced deployments</string>
     <string name="syncing">Syncing</string>
+    <string name="synced">Synced</string>
 
 </resources>
