@@ -14,23 +14,11 @@ import java.util.*
 class DeploymentDb(private val realm: Realm) {
 
     fun unsentCount(): Long {
-        val audioMoths = realm.where(Deployment::class.java)
-            .equalTo(Deployment.FIELD_DEVICE, Device.AUDIOMOTH.value)
-            .and()
-            .equalTo(Deployment.FIELD_STATE, DeploymentState.AudioMoth.ReadyToUpload.key)
-            .and()
-            .notEqualTo(Deployment.FIELD_SYNC_STATE, SyncState.Sent.key)
-            .count()
-
-        val guardians = realm.where(Deployment::class.java)
-            .equalTo(Deployment.FIELD_DEVICE, Device.GUARDIAN.value)
-            .and()
+        return realm.where(Deployment::class.java)
             .equalTo(Deployment.FIELD_STATE, DeploymentState.Guardian.ReadyToUpload.key)
             .and()
             .notEqualTo(Deployment.FIELD_SYNC_STATE, SyncState.Sent.key)
             .count()
-
-        return audioMoths + guardians
     }
 
     fun getAllResultsAsync(sort: Sort = Sort.DESCENDING): RealmResults<Deployment> {

@@ -275,6 +275,10 @@ class MapFragment :
             setOnClickProjectName()
         }
 
+        unSyncedDpNumber.setOnClickListener {
+
+        }
+
         projectSwipeRefreshView.apply {
             setOnRefreshListener {
                 mainViewModel.fetchProjects()
@@ -347,6 +351,10 @@ class MapFragment :
             hideLabel()
             searchLayoutSearchEditText.text = null
         }
+    }
+
+    private fun setOnClickUnsynced() {
+
     }
 
     private fun showLabel(isNotFound: Boolean) {
@@ -888,6 +896,10 @@ class MapFragment :
         mapboxMap?.easeCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 230), 1300)
     }
 
+    private fun updateUnsyncedCount(number: Int) {
+        unSyncedDpNumber.text = number.toString()
+    }
+
     private fun combinedData() {
         handleMarker(deploymentMarkers + siteMarkers)
 
@@ -1036,6 +1048,19 @@ class MapFragment :
                     Status.SUCCESS -> {
                         locations = it.data ?: listOf()
                         combinedData()
+                    }
+                    Status.ERROR -> {}
+                }
+            }
+        )
+
+        mainViewModel.getUnsyncedDeployments().observe(
+            viewLifecycleOwner,
+            Observer {
+                when (it.status) {
+                    Status.LOADING -> {}
+                    Status.SUCCESS -> {
+                        updateUnsyncedCount(it.data ?: 0)
                     }
                     Status.ERROR -> {}
                 }

@@ -43,6 +43,7 @@ class MainViewModel(
     private val deploymentMarkers = MutableLiveData<Resource<List<MapMarker.DeploymentMarker>>>()
     private val siteMarkers = MutableLiveData<Resource<List<MapMarker>>>()
     private val siteList = MutableLiveData<Resource<List<Locate>>>()
+    private val unsyncedDeploymentCount = MutableLiveData<Resource<Int>>()
     private val showDeployments = MutableLiveData<Resource<List<Deployment>>>()
 
     private var deployments = listOf<Deployment>()
@@ -238,7 +239,9 @@ class MainViewModel(
     }
 
     fun combinedData() {
-        var deploymentsForShow = this.deployments.filter { it.isCompleted() }
+        val deployments = this.deployments
+        val unsyncedDeployments = deployments.filter { it.isUnsynced() }
+        var deploymentsForShow = deployments.filter { it.isCompleted() }
         val usedSites = deploymentsForShow.map { it.stream?.coreId }
         var filteredShowLocations =
             sites.filter { loc -> !usedSites.contains(loc.serverId) || loc.serverId == null }
@@ -253,6 +256,7 @@ class MainViewModel(
         deploymentMarkers.postValue(Resource.success(deploymentMarkersList))
         siteMarkers.postValue(Resource.success(filteredShowLocations.map { it.toMark() }))
         showDeployments.postValue(Resource.success(deploymentsForShow))
+        unsyncedDeploymentCount.postValue(Resource.success(unsyncedDeployments.size))
     }
 
     fun updateStatusOfflineMap() {
@@ -372,6 +376,10 @@ class MainViewModel(
 
     fun getSites(): LiveData<Resource<List<Locate>>> {
         return siteList
+    }
+
+    fun getUnsyncedDeployments(): LiveData<Resource<Int>> {
+        return unsyncedDeploymentCount
     }
 
     fun getShowDeployments(): LiveData<Resource<List<Deployment>>> {
