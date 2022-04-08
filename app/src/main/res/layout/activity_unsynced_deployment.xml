@@ -33,17 +33,13 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/unsyncedButton"
+            style="@style/Companion.OrangeButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_padding_normal"
             android:layout_marginBottom="@dimen/margin_padding_normal"
-            android:background="@drawable/bg_curved_main_square"
             android:padding="@dimen/margin_padding_xlarge"
             android:text="@string/sync_now"
-            android:textColor="@color/black"
-            android:textStyle="bold"
-            android:fontFamily="@font/lato_regular"
-            android:textAllCaps="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

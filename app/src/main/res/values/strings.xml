@@ -526,4 +526,8 @@
     <string name="delete_from_local">delete from local</string>
     <string name="sync_now">Sync Now</string>
 
+    <string name="unsynced_deployments">Unsynced Deployments</string>
+    <string name="unsynced_text">You have %d unsynced deployments</string>
+    <string name="syncing">Syncing</string>
+
 </resources>
