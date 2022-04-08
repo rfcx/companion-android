@@ -81,6 +81,7 @@ import org.rfcx.companion.view.detail.DeploymentDetailActivity
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupAdapter
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupListener
+import org.rfcx.companion.view.unsynced.UnsyncedDeploymentActivity
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
@@ -113,6 +114,7 @@ class MapFragment :
     private var deploymentMarkers = listOf<MapMarker.DeploymentMarker>()
     private var siteMarkers = listOf<MapMarker>()
     private var showDeployments = listOf<Deployment>()
+    private var unsyncedDeploymentCount = 0
 
     private lateinit var deploymentWorkInfoLiveData: LiveData<List<WorkInfo>>
     private lateinit var downloadStreamsWorkInfoLiveData: LiveData<List<WorkInfo>>
@@ -276,7 +278,9 @@ class MapFragment :
         }
 
         unSyncedDpNumber.setOnClickListener {
-
+            if (unsyncedDeploymentCount != 0) {
+                UnsyncedDeploymentActivity.startActivity(requireContext())
+            }
         }
 
         projectSwipeRefreshView.apply {
@@ -1060,7 +1064,8 @@ class MapFragment :
                 when (it.status) {
                     Status.LOADING -> {}
                     Status.SUCCESS -> {
-                        updateUnsyncedCount(it.data ?: 0)
+                        unsyncedDeploymentCount = it.data ?: 0
+                        updateUnsyncedCount(unsyncedDeploymentCount)
                     }
                     Status.ERROR -> {}
                 }
