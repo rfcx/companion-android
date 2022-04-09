@@ -170,12 +170,12 @@ class ProjectDb(private val realm: Realm) {
         }
     }
 
-    fun deleteProjectsByCoreId(coreIds: List<String>) {
+    fun deleteProjectsByCoreId(projectRes: List<ProjectResponse>) {
         realm.executeTransaction {
-            coreIds.forEach { id ->
+            projectRes.forEach { projectObj ->
                 val project =
                     it.where(Project::class.java)
-                        .equalTo(Project.PROJECT_SERVER_ID, id)
+                        .equalTo(Project.PROJECT_SERVER_ID, projectObj.id)
                         .findFirst()
 
                 project?.deleteFromRealm()

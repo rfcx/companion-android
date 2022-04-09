@@ -167,7 +167,7 @@ class MainViewModel(
                 ) {
                     if (response.isSuccessful) {
                         response.body()?.let { projectsRes ->
-                            mainRepository.removeProjectFromLocal(projectsRes.map { it.id!! }) // remove project with these coreIds
+                            mainRepository.removeProjectFromLocal(projectsRes) // remove project with these coreIds
                             projects.postValue(Resource.success(null)) // no need to send project data
                         }
                     } else {
