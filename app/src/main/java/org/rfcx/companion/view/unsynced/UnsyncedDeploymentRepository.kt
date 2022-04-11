@@ -16,4 +16,8 @@ class UnsyncedDeploymentRepository(
     fun getAllDeploymentLocalResultsAsync(): RealmResults<Deployment> {
         return localDataHelper.getDeploymentLocalDb().getAllResultsAsync()
     }
+
+    fun deleteDeployment(id: Int) {
+        localDataHelper.getDeploymentLocalDb().deleteDeployment(id)
+    }
 }

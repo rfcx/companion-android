@@ -134,7 +134,7 @@
     </style>
 
     <style name="Companion.OrangeButton" parent="AudioMothButton">
-        <item name="android:background">@drawable/bg_curved_main_square</item>
+        <item name="android:background">@drawable/bg_curved_orange_button_square</item>
         <item name="android:textColor">@color/black</item>
         <item name="textAllCaps">false</item>
     </style>

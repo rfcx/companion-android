@@ -38,6 +38,10 @@ class UnsyncedDeploymentViewModel(
         return unsyncedDeploymentCount
     }
 
+    fun deleteDeployment(id: Int) {
+        repository.deleteDeployment(id)
+    }
+
     private fun getUnsentCount() {
         unsyncedDeploymentCount.postValue(Resource.success(repository.getUnsentDeployment().toInt()))
     }

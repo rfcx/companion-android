@@ -901,7 +901,13 @@ class MapFragment :
     }
 
     private fun updateUnsyncedCount(number: Int) {
-        unSyncedDpNumber.text = number.toString()
+        if (number == 0) {
+            unSyncedDpNumber.text = ""
+            unSyncedDpNumber.background = ContextCompat.getDrawable(requireContext(), R.drawable.ic_check_circledp)
+        } else {
+            unSyncedDpNumber.text = number.toString()
+            unSyncedDpNumber.background = ContextCompat.getDrawable(requireContext(), R.drawable.circle_unsynced)
+        }
     }
 
     private fun combinedData() {
