@@ -76,7 +76,7 @@ class ProjectSelectViewModel(
                 ) {
                     if (response.isSuccessful) {
                         response.body()?.let { projectsRes ->
-                            projectSelectRepository.removeProjectFromLocal(projectsRes.map { it.id!! }) // remove project with these coreIds
+                            projectSelectRepository.removeProjectFromLocal(projectsRes) // remove project with these coreIds
                             projects.postValue(Resource.success(null)) // no need to send project data
                         }
                     } else {

@@ -36,7 +36,7 @@ class ProjectSelectRepository(
         localDataHelper.getProjectLocalDb().insertOrUpdate(projectResponse)
     }
 
-    fun removeProjectFromLocal(coreIds: List<String>) {
-        localDataHelper.getProjectLocalDb().deleteProjectsByCoreId(coreIds)
+    fun removeProjectFromLocal(projectResponse: List<ProjectResponse>) {
+        localDataHelper.getProjectLocalDb().deleteProjectsByCoreId(projectResponse)
     }
 }

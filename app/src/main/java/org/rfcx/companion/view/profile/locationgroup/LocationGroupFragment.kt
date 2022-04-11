@@ -143,7 +143,7 @@ class LocationGroupFragment :
                 ) {
                     if (response.isSuccessful) {
                         response.body()?.let { projectsRes ->
-                            locationGroupDb.deleteProjectsByCoreId(projectsRes.map { it.id!! }) // remove project with these coreIds
+                            locationGroupDb.deleteProjectsByCoreId(projectsRes) // remove project with these coreIds
                         }
                         projectSwipeRefreshView.isRefreshing = false
                     }
