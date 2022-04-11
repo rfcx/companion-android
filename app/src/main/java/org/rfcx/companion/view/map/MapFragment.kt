@@ -357,10 +357,6 @@ class MapFragment :
         }
     }
 
-    private fun setOnClickUnsynced() {
-
-    }
-
     private fun showLabel(isNotFound: Boolean) {
         if (siteRecyclerView.visibility == View.VISIBLE && projectRecyclerView.visibility != View.VISIBLE) {
             showLabelLayout.visibility = View.VISIBLE
