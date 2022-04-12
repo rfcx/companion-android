@@ -10,6 +10,7 @@ import android.provider.MediaStore
 import android.util.TypedValue
 import android.view.View
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -50,7 +51,7 @@ import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.AudioMothDeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
 import java.io.File
 
-class DeploymentDetailActivity : OnMapReadyCallback, (DeploymentImageView) -> Unit {
+class DeploymentDetailActivity : AppCompatActivity(), OnMapReadyCallback, (DeploymentImageView) -> Unit {
     private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
     private lateinit var viewModel: DeploymentDetailViewModel
 

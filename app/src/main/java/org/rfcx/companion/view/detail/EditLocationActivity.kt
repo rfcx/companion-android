@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.activity_edit_location.*
@@ -26,7 +27,7 @@ import org.rfcx.companion.view.deployment.locate.MapPickerFragment
 import org.rfcx.companion.view.detail.DeploymentDetailActivity.Companion.DEPLOYMENT_REQUEST_CODE
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 
-class EditLocationActivity : MapPickerProtocol, EditLocationActivityListener {
+class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocationActivityListener {
     private lateinit var viewModel: EditLocationViewModel
 
     private var latitude: Double = 0.0
