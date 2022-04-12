@@ -133,7 +133,7 @@ class SpectrogramView : View {
                 logFrequency
             )
             j /= samplingRate.toFloat() / 2
-            if (_magnitudes != null) {
+            if (_magnitudes != null && _magnitudes!!.isNotEmpty()) {
                 val mag = _magnitudes!![(j * _magnitudes!!.size / 2).toInt()]
                 val db =
                     max(0.0, -20 * log10(mag.toDouble())).toFloat()
