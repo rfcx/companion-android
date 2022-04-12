@@ -13,10 +13,9 @@ import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.toLocationGroup
 import org.rfcx.companion.util.Preferences
-import org.rfcx.companion.view.BaseActivity
 import org.rfcx.companion.view.detail.EditLocationActivity.Companion.EXTRA_LOCATION_GROUP
 
-class LocationGroupActivity : BaseActivity(), LocationGroupProtocol {
+class LocationGroupActivity : LocationGroupProtocol {
 
     // For detail page to edit location group
     private var group: String? = null

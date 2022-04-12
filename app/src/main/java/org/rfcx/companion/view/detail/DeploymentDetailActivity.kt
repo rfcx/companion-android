@@ -47,11 +47,10 @@ import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.DownloadImagesWorker
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.*
-import org.rfcx.companion.view.BaseActivity
 import org.rfcx.companion.view.deployment.AudioMothDeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
 import java.io.File
 
-class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (DeploymentImageView) -> Unit {
+class DeploymentDetailActivity : OnMapReadyCallback, (DeploymentImageView) -> Unit {
     private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
     private lateinit var viewModel: DeploymentDetailViewModel
 
@@ -166,19 +165,16 @@ class DeploymentDetailActivity : BaseActivity(), OnMapReadyCallback, (Deployment
     }
 
     private fun onDeleteLocation() {
-        showLoading()
         deployment?.let {
             viewModel.deleteDeploymentLocation(
                 it.id,
                 object : DatabaseCallback {
                     override fun onSuccess() {
                         DeploymentSyncWorker.enqueue(this@DeploymentDetailActivity)
-                        hideLoading()
                         finish()
                     }
 
                     override fun onFailure(errorMessage: String) {
-                        hideLoading()
                         showCommonDialog(errorMessage)
                     }
                 }

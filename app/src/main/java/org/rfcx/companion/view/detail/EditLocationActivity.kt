@@ -22,12 +22,11 @@ import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.util.showCommonDialog
-import org.rfcx.companion.view.BaseActivity
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
 import org.rfcx.companion.view.detail.DeploymentDetailActivity.Companion.DEPLOYMENT_REQUEST_CODE
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
 
-class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActivityListener {
+class EditLocationActivity : MapPickerProtocol, EditLocationActivityListener {
     private lateinit var viewModel: EditLocationViewModel
 
     private var latitude: Double = 0.0
@@ -148,7 +147,6 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
 
     override fun updateDeploymentDetail(name: String, altitude: Double) {
         val group = groupName ?: ""
-        showLoading()
         deploymentId?.let { id ->
             viewModel.editStream(
                 id = id,
@@ -158,13 +156,11 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
                 altitude = altitude,
                 callback = object : DatabaseCallback {
                     override fun onSuccess() {
-                        hideLoading()
                         DeploymentSyncWorker.enqueue(this@EditLocationActivity)
                         finish()
                     }
 
                     override fun onFailure(errorMessage: String) {
-                        hideLoading()
                         showCommonDialog(errorMessage)
                     }
                 }
@@ -175,13 +171,11 @@ class EditLocationActivity : BaseActivity(), MapPickerProtocol, EditLocationActi
                 object :
                     DatabaseCallback {
                     override fun onSuccess() {
-                        hideLoading()
                         DeploymentSyncWorker.enqueue(this@EditLocationActivity)
                         finish()
                     }
 
                     override fun onFailure(errorMessage: String) {
-                        hideLoading()
                         showCommonDialog(errorMessage)
                     }
                 }
