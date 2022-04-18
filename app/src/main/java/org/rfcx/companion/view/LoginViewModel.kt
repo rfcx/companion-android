@@ -83,10 +83,7 @@ class LoginViewModel(
 
                 override fun onFailure(exception: AuthenticationException) {
                     loginWithEmailPassword.postValue(
-                        Resource.error(
-                            context.getString(R.string.login_failed),
-                            null
-                        )
+                        Resource.error(exception.description, null)
                     )
                 }
             })
@@ -112,10 +109,7 @@ class LoginViewModel(
 
                     override fun onFailure(exception: AuthenticationException) {
                         loginWithGoogle.postValue(
-                            Resource.error(
-                                context.getString(R.string.login_failed),
-                                null
-                            )
+                            Resource.error(exception.description, null)
                         )
                         exception.printStackTrace()
                     }
@@ -174,7 +168,7 @@ class LoginViewModel(
                 override fun onFailure(call: Call<FirebaseAuthResponse>, t: Throwable) {
                     firebaseAuth.postValue(
                         Resource.error(
-                            context.getString(R.string.firebase_authentication_failed),
+                            t.message ?: context.getString(R.string.firebase_authentication_failed),
                             null
                         )
                     )
@@ -207,6 +201,14 @@ class LoginViewModel(
                         )
                     )
                 }
+            }
+            .addOnFailureListener {
+                signInWithFirebaseToken.postValue(
+                    Resource.error(
+                        it.message ?: context.getString(R.string.firebase_authentication_failed),
+                        null
+                    )
+                )
             }
     }
 
