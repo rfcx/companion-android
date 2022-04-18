@@ -13,7 +13,10 @@ import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.activity_login.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
-import org.rfcx.companion.entity.*
+import org.rfcx.companion.entity.LoginType
+import org.rfcx.companion.entity.Screen
+import org.rfcx.companion.entity.StatusEvent
+import org.rfcx.companion.entity.UserAuthResponse
 import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
@@ -48,8 +51,16 @@ class LoginActivity : AppCompatActivity() {
             it.hideKeyboard()
 
             if (validateInput(email, password)) {
-                loading()
-                loginViewModel.login(email, password)
+                if (this.isNetworkAvailable()) {
+                    loading()
+                    loginViewModel.login(email, password)
+                } else {
+                    Toast.makeText(
+                        this@LoginActivity,
+                        getString(R.string.no_internet_connection),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
 
@@ -92,7 +103,7 @@ class LoginActivity : AppCompatActivity() {
                         runOnUiThread {
                             Toast.makeText(
                                 this@LoginActivity,
-                                it.message ?: getString(R.string.error_has_occurred),
+                                it.message ?: getString(R.string.login_failed),
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -227,7 +238,7 @@ class LoginActivity : AppCompatActivity() {
                         runOnUiThread {
                             Toast.makeText(
                                 this@LoginActivity,
-                                it.message ?: getString(R.string.error_has_occurred),
+                                it.message ?: getString(R.string.firebase_authentication_failed),
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -254,7 +265,7 @@ class LoginActivity : AppCompatActivity() {
                         runOnUiThread {
                             Toast.makeText(
                                 this@LoginActivity,
-                                it.message ?: getString(R.string.error_has_occurred),
+                                it.message ?: getString(R.string.firebase_authentication_failed),
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
