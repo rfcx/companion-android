@@ -525,4 +525,6 @@
     <string name="installed_software">(current %s installed)</string>
     <string name="delete_from_local">delete from local</string>
 
+    <string name="login_failed">Login failed. Please try again.</string>
+    <string name="firebase_authentication_failed">Firebase authentication failed. Please try again.</string>
 </resources>

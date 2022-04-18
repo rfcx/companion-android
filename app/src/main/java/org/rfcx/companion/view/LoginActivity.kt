@@ -92,7 +92,7 @@ class LoginActivity : AppCompatActivity() {
                         runOnUiThread {
                             Toast.makeText(
                                 this@LoginActivity,
-                                it.message ?: getString(R.string.error_has_occurred),
+                                it.message ?: getString(R.string.login_failed),
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -227,7 +227,7 @@ class LoginActivity : AppCompatActivity() {
                         runOnUiThread {
                             Toast.makeText(
                                 this@LoginActivity,
-                                it.message ?: getString(R.string.error_has_occurred),
+                                it.message ?: getString(R.string.firebase_authentication_failed),
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -254,7 +254,7 @@ class LoginActivity : AppCompatActivity() {
                         runOnUiThread {
                             Toast.makeText(
                                 this@LoginActivity,
-                                it.message ?: getString(R.string.error_has_occurred),
+                                it.message ?: getString(R.string.firebase_authentication_failed),
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
