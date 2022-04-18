@@ -11,6 +11,9 @@ import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_instruction_dialog.*
 import org.rfcx.companion.R
+import android.content.Intent
+import android.net.Uri
+
 
 class ConnectInstructionDialogFragment : DialogFragment() {
 
@@ -36,6 +39,12 @@ class ConnectInstructionDialogFragment : DialogFragment() {
 
         instructionButton.setOnClickListener {
             dismissDialog()
+        }
+
+        moreInfoButton.setOnClickListener {
+            val uriUrl = Uri.parse("https://support.rfcx.org/article/124-companion-unable-to-connect")
+            val launchBrowser = Intent(Intent.ACTION_VIEW, uriUrl)
+            startActivity(launchBrowser)
         }
     }
 
