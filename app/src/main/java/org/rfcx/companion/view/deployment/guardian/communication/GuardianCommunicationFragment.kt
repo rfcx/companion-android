@@ -274,12 +274,10 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
             if (checkedId == R.id.manualRadioButton) {
                 hideChips(false)
                 showChips(true)
-                handleNextButtonOnManual()
                 hideEmptyOffTimeText()
             } else {
                 hideChips(true)
                 showChips(false)
-                handleNextButtonOnAuto()
                 showEmptyOffTimeText()
             }
         }
@@ -358,7 +356,6 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
         if (manualTimeOff.contains(time)) return
         manualTimeOff.add(time)
         addChip(time)
-        handleNextButtonOnManual()
     }
 
     private fun showEmptyOffTimeText() {
@@ -367,14 +364,6 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
 
     private fun hideEmptyOffTimeText() {
         emptyOffTimeTextView.visibility = View.GONE
-    }
-
-    private fun handleNextButtonOnManual() {
-        nextButton.isEnabled = manualTimeOff.isNotEmpty()
-    }
-
-    private fun handleNextButtonOnAuto() {
-        nextButton.isEnabled = deploymentProtocol?.getCurrentProjectId() == "agk3cpurb5wm"
     }
 
     companion object {
@@ -387,7 +376,6 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
             val time = v.text
             manualTimeOff.remove(time)
             manualOffTimeChipGroup.removeView(v)
-            handleNextButtonOnManual()
         }
     }
 }
