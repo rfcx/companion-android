@@ -1,8 +1,10 @@
 package org.rfcx.companion.view.dialog
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -36,6 +38,12 @@ class ConnectInstructionDialogFragment : DialogFragment() {
 
         instructionButton.setOnClickListener {
             dismissDialog()
+        }
+
+        moreInfoButton.setOnClickListener {
+            val uriUrl = Uri.parse("https://support.rfcx.org/article/124-companion-unable-to-connect")
+            val launchBrowser = Intent(Intent.ACTION_VIEW, uriUrl)
+            startActivity(launchBrowser)
         }
     }
 

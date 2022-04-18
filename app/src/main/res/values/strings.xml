@@ -524,5 +524,6 @@
 
     <string name="installed_software">(current %s installed)</string>
     <string name="delete_from_local">delete from local</string>
+    <string name="more_info">More info</string>
 
 </resources>
