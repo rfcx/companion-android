@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_location_group.*
 import kotlinx.android.synthetic.main.toolbar_default.*
@@ -13,10 +14,9 @@ import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.toLocationGroup
 import org.rfcx.companion.util.Preferences
-import org.rfcx.companion.view.BaseActivity
 import org.rfcx.companion.view.detail.EditLocationActivity.Companion.EXTRA_LOCATION_GROUP
 
-class LocationGroupActivity : BaseActivity(), LocationGroupProtocol {
+class LocationGroupActivity : AppCompatActivity(), LocationGroupProtocol {
 
     // For detail page to edit location group
     private var group: String? = null

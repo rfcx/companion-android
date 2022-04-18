@@ -14,6 +14,8 @@ import org.rfcx.companion.view.deployment.AudioMothDeploymentRepository
 import org.rfcx.companion.view.deployment.AudioMothDeploymentViewModel
 import org.rfcx.companion.view.detail.DeploymentDetailRepository
 import org.rfcx.companion.view.detail.DeploymentDetailViewModel
+import org.rfcx.companion.view.detail.EditLocationRepository
+import org.rfcx.companion.view.detail.EditLocationViewModel
 import org.rfcx.companion.view.profile.guardiansoftware.repository.GuardianSoftwareRepository
 import org.rfcx.companion.view.profile.guardiansoftware.viewmodel.GuardianSoftwareViewModel
 import org.rfcx.companion.view.profile.offlinemap.ProjectOfflineMapRepository
@@ -55,6 +57,9 @@ class ViewModelFactory(
             }
             modelClass.isAssignableFrom(DeploymentDetailViewModel::class.java) -> {
                 return DeploymentDetailViewModel(application, DeploymentDetailRepository(deviceApiHelper, localDataHelper)) as T
+            }
+            modelClass.isAssignableFrom(EditLocationViewModel::class.java) -> {
+                return EditLocationViewModel(application, EditLocationRepository(deviceApiHelper, localDataHelper)) as T
             }
             else -> throw IllegalArgumentException("Unknown class name")
         }
