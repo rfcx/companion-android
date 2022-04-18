@@ -1,8 +1,10 @@
 package org.rfcx.companion.view.dialog
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,9 +13,6 @@ import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_instruction_dialog.*
 import org.rfcx.companion.R
-import android.content.Intent
-import android.net.Uri
-
 
 class ConnectInstructionDialogFragment : DialogFragment() {
 
