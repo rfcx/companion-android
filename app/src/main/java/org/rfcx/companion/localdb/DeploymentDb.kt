@@ -8,7 +8,6 @@ import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.toDeployment
-import org.rfcx.companion.entity.response.toDeploymentLocation
 import java.util.*
 
 class DeploymentDb(private val realm: Realm) {
@@ -58,7 +57,7 @@ class DeploymentDb(private val realm: Realm) {
         }
     }
 
-    fun insertOrUpdateDeployment(deployment: Deployment, location: DeploymentLocation): Int {
+    fun insertOrUpdateDeployment(deployment: Deployment, stream: Stream): Int {
         var id = deployment.id
         realm.executeTransaction {
             if (deployment.id == 0) {
@@ -68,7 +67,7 @@ class DeploymentDb(private val realm: Realm) {
                     ) + 1
                 deployment.id = id
             }
-            deployment.stream = it.copyToRealm(location)
+            deployment.stream = it.copyToRealm(stream)
             it.insertOrUpdate(deployment)
         }
         return id
@@ -86,17 +85,23 @@ class DeploymentDb(private val realm: Realm) {
                     deployment.serverId = deploymentResponse.id
                     deployment.deployedAt = deploymentResponse.deployedAt ?: deployment.deployedAt
 
-                    val newLocation = deploymentResponse.stream
-                    if (newLocation != null) {
-                        deployment.stream = it.copyToRealm(newLocation.toDeploymentLocation())
+                    val streamObj = deploymentResponse.stream
+                    if (streamObj != null) {
+                        val stream = it.where(Stream::class.java).equalTo(Stream.FIELD_SERVER_ID, streamObj.id).findFirst()
+                        deployment.stream = stream
                     }
 
                     deployment.createdAt = deploymentResponse.createdAt ?: deployment.createdAt
                 } else {
                     val deploymentObj = deploymentResponse.toDeployment()
+                    val streamObj = deploymentResponse.stream
+                    if (streamObj != null) {
+                        val stream = it.where(Stream::class.java).equalTo(Stream.FIELD_SERVER_ID, streamObj.id).findFirst()
+                        deployment?.stream = stream
+                    }
+
                     val id = (
-                        it.where(Deployment::class.java).max(Deployment.FIELD_ID)
-                            ?.toInt() ?: 0
+                        it.where(Deployment::class.java).max(Deployment.FIELD_ID)?.toInt() ?: 0
                         ) + 1
                     deploymentObj.id = id
                     it.insert(deploymentObj)
@@ -228,8 +233,8 @@ class DeploymentDb(private val realm: Realm) {
                 deployment.updatedAt = Date()
                 deployment.syncState = SyncState.Unsent.key
             }
-            val location = bgRealm.where(Locate::class.java)
-                .equalTo(Locate.FIELD_LAST_DEPLOYMENT_ID, id).findFirst()
+            val location = bgRealm.where(Stream::class.java)
+                .equalTo(Stream.FIELD_LAST_DEPLOYMENT_ID, id).findFirst()
 
             if (location != null) {
                 location.latitude = latitude
@@ -249,7 +254,7 @@ class DeploymentDb(private val realm: Realm) {
         })
     }
 
-    fun editProject(id: Int, locationGroup: LocationGroup, callback: DatabaseCallback) {
+    fun editProject(id: Int, project: Project, callback: DatabaseCallback) {
         realm.executeTransactionAsync({ bgRealm ->
             // do update deployment location
             val guardianDeployment =
@@ -260,21 +265,7 @@ class DeploymentDb(private val realm: Realm) {
                 guardianDeployment.syncState = SyncState.Unsent.key
 
                 // update location group
-                if (guardianDeployment.stream?.project != null) {
-                    guardianDeployment.stream?.project?.let {
-                        it.name = locationGroup.name
-                        it.color = locationGroup.color
-                        it.coreId = locationGroup.coreId
-                    }
-                } else {
-                    val locationGroupObj = bgRealm.createObject(LocationGroup::class.java)
-                    locationGroupObj.let {
-                        it.color = locationGroup.color
-                        it.name = locationGroup.name
-                        it.coreId = locationGroup.coreId
-                    }
-                    guardianDeployment.stream?.project = locationGroupObj
-                }
+                guardianDeployment.stream?.project = project
             }
         }, {
             // success
@@ -285,16 +276,6 @@ class DeploymentDb(private val realm: Realm) {
             realm.close()
             callback.onFailure(it.localizedMessage ?: "")
         })
-    }
-
-    fun updateDeploymentByServerId(deployment: Deployment) {
-        realm.executeTransaction {
-            it.where(Deployment::class.java)
-                .equalTo(Deployment.FIELD_SERVER_ID, deployment.serverId)
-                .findFirst()?.apply {
-                    stream?.coreId = deployment.stream?.coreId
-                }
-        }
     }
 
     fun updateIsActive(id: Int) {

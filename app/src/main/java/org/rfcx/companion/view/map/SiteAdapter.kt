@@ -6,12 +6,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_site.view.*
 import org.rfcx.companion.R
-import org.rfcx.companion.entity.Locate
+import org.rfcx.companion.entity.Stream
 import org.rfcx.companion.util.setFormatLabel
 import org.rfcx.companion.util.toTimeSinceStringAlternativeTimeAgo
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 
-class SiteAdapter(private val itemClickListener: (Locate, Boolean) -> Unit) :
+class SiteAdapter(private val itemClickListener: (Stream, Boolean) -> Unit) :
     RecyclerView.Adapter<SiteAdapter.SiteAdapterViewHolder>() {
     var items: ArrayList<SiteWithLastDeploymentItem> = arrayListOf()
         set(value) {
@@ -36,7 +36,7 @@ class SiteAdapter(private val itemClickListener: (Locate, Boolean) -> Unit) :
         val site = items[position]
         holder.bind(site)
         holder.itemView.setOnClickListener {
-            this.itemClickListener(site.locate, site.locate.id == -1)
+            this.itemClickListener(site.stream, site.stream.id == -1)
         }
     }
 
@@ -53,10 +53,10 @@ class SiteAdapter(private val itemClickListener: (Locate, Boolean) -> Unit) :
         private val iconAddImageView = itemView.iconAddImageView
 
         fun bind(site: SiteWithLastDeploymentItem) {
-            siteNameTextView.text = if (site.locate.id == -1) itemView.context.getString(
+            siteNameTextView.text = if (site.stream.id == -1) itemView.context.getString(
                 R.string.create_site,
-                site.locate.name
-            ) else site.locate.name
+                site.stream.name
+            ) else site.stream.name
             detailTextView.text = site.date?.toTimeSinceStringAlternativeTimeAgo(itemView.context)
                 ?: itemView.context.getString(R.string.no_deployments)
             if (site.distance != null) {
@@ -65,7 +65,7 @@ class SiteAdapter(private val itemClickListener: (Locate, Boolean) -> Unit) :
             } else {
                 distanceTextView.visibility = View.GONE
             }
-            setDistanceAndIconAdd(site.locate.id == -1)
+            setDistanceAndIconAdd(site.stream.id == -1)
         }
 
         private fun setDistanceAndIconAdd(boolean: Boolean) {

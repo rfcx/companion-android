@@ -29,7 +29,7 @@ class AudioMothDeploymentViewModel(
     private var audioMothConnector = AudioMothChimeConnector()
 
     private var deployments = MutableLiveData<List<Deployment>>()
-    private var sites = MutableLiveData<List<Locate>>()
+    private var sites = MutableLiveData<List<Stream>>()
     private var downloadStreamsWork = MutableLiveData<Resource<SyncInfo>>()
 
     private lateinit var deploymentLiveData: LiveData<List<Deployment>>
@@ -37,8 +37,8 @@ class AudioMothDeploymentViewModel(
         deployments.postValue(it)
     }
 
-    private lateinit var siteLiveData: LiveData<List<Locate>>
-    private val siteObserve = Observer<List<Locate>> {
+    private lateinit var siteLiveData: LiveData<List<Stream>>
+    private val siteObserve = Observer<List<Stream>> {
         sites.postValue(it)
     }
 
@@ -93,19 +93,19 @@ class AudioMothDeploymentViewModel(
         return deployments
     }
 
-    fun getSites(): LiveData<List<Locate>> {
+    fun getSites(): LiveData<List<Stream>> {
         return sites
     }
 
-    fun insertOrUpdate(locate: Locate) {
-        audioMothDeploymentRepository.insertOrUpdate(locate)
+    fun insertOrUpdate(stream: Stream) {
+        audioMothDeploymentRepository.insertOrUpdate(stream)
     }
 
-    fun insertOrUpdateLocate(deploymentId: Int, locate: Locate) {
-        audioMothDeploymentRepository.insertOrUpdateLocate(deploymentId, locate)
+    fun insertOrUpdateLocate(deploymentId: Int, stream: Stream) {
+        audioMothDeploymentRepository.insertOrUpdateLocate(deploymentId, stream)
     }
 
-    fun getLocateById(id: Int): Locate? {
+    fun getLocateById(id: Int): Stream? {
         return audioMothDeploymentRepository.getLocateById(id)
     }
 
@@ -144,8 +144,8 @@ class AudioMothDeploymentViewModel(
         audioMothDeploymentRepository.updateDeployment(deployment)
     }
 
-    fun insertOrUpdateDeployment(deployment: Deployment, location: DeploymentLocation): Int {
-        return audioMothDeploymentRepository.insertOrUpdateDeployment(deployment, location)
+    fun insertOrUpdateDeployment(deployment: Deployment, stream: Stream): Int {
+        return audioMothDeploymentRepository.insertOrUpdateDeployment(deployment, stream)
     }
 
     fun getDeploymentsBySiteId(streamId: String): ArrayList<Deployment> {

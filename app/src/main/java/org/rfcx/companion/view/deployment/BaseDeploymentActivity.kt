@@ -7,8 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
-import org.rfcx.companion.entity.DeploymentLocation
-import org.rfcx.companion.entity.Locate
+import org.rfcx.companion.entity.Stream
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
@@ -28,9 +27,9 @@ abstract class BaseDeploymentActivity :
     MapPickerProtocol {
 
     var _deployment: Deployment? = null
-    var _deployLocation: DeploymentLocation? = null
+    var _deployLocation: Stream? = null
     var _images: List<String> = listOf()
-    var _locate: Locate? = null
+    var _stream: Stream? = null
     var _siteItems = arrayListOf<SiteWithLastDeploymentItem>()
 
     var latitude = 0.0
@@ -88,7 +87,7 @@ abstract class BaseDeploymentActivity :
         startFragment(DetailDeploymentSiteFragment.newInstance(id, name, isNewSite))
     }
 
-    override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
+    override fun getDeploymentLocation(): Stream? = this._deployLocation
 
     override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
 

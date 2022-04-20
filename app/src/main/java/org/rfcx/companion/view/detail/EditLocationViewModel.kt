@@ -29,8 +29,8 @@ class EditLocationViewModel(
         )
     }
 
-    fun editProject(id: Int, locationGroup: LocationGroup, callback: DatabaseCallback) {
-        return editLocationRepository.editProject(id, locationGroup, callback)
+    fun editProject(id: Int, project: Project, callback: DatabaseCallback) {
+        return editLocationRepository.editProject(id, project, callback)
     }
 
     fun isExisted(name: String?): Boolean {

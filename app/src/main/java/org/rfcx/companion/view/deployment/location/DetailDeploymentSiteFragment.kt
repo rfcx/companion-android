@@ -32,8 +32,7 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import kotlinx.android.synthetic.main.fragment_detail_deployment_site.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
-import org.rfcx.companion.entity.Locate
-import org.rfcx.companion.entity.LocationGroup
+import org.rfcx.companion.entity.Stream
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.repo.api.CoreApiHelper
@@ -63,7 +62,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     var siteName: String = ""
     var isCreateNew: Boolean = false
     var isUseCurrentLocate: Boolean = false
-    var site: Locate? = null
+    var site: Stream? = null
     var fromMapPicker: Boolean = false
 
     // Location
@@ -239,20 +238,20 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         altitude: Double
     ) {
         setLatLngToDefault()
-        var locate = Locate()
+        var locate = Stream()
         site?.let {
-            locate = Locate(
-                it.id,
-                it.serverId,
-                getLocationGroup(it.locationGroup?.name ?: getString(R.string.none)),
-                it.name,
-                latitude,
-                longitude,
-                altitude,
-                it.createdAt,
-                it.updatedAt,
-                it.lastDeploymentId,
-                it.syncState
+            locate = Stream(
+                id = it.id,
+                serverId = it.serverId,
+                name = it.name,
+                latitude = latitude,
+                longitude = longitude,
+                altitude = altitude,
+                createdAt = it.createdAt,
+                updatedAt = it.updatedAt,
+                lastDeploymentId = it.lastDeploymentId,
+                syncState = it.syncState,
+                project = getLocationGroup(it.project?.name ?: getString(R.string.none))
             )
             createSiteSymbol(locate.getLatLng())
             moveCamera(LatLng(locate.getLatLng()), DefaultSetupMap.DEFAULT_ZOOM)
@@ -263,12 +262,12 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     private fun createSite() {
         val name = siteValueTextView.text.toString()
         userLocation?.let {
-            val locate = Locate(
+            val locate = Stream(
                 name = name,
                 latitude = it.latitude,
                 longitude = it.longitude,
                 altitude = altitude,
-                locationGroup = getLocationGroup(group ?: getString(R.string.none))
+                project = getLocationGroup(group ?: getString(R.string.none))
             )
             deploymentProtocol?.setDeployLocation(locate, false)
             deploymentProtocol?.nextStep()
@@ -277,29 +276,28 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
 
     private fun handleExistLocate() {
         site?.let {
-            val locate = Locate(
-                it.id,
-                it.serverId,
-                getLocationGroup(it.locationGroup?.name ?: getString(R.string.none)),
-                it.name,
-                if (userLocation?.latitude != 0.0) userLocation?.latitude
+            val locate = Stream(
+                id = it.id,
+                serverId = it.serverId,
+                name = it.name,
+                latitude = if (userLocation?.latitude != 0.0) userLocation?.latitude
                     ?: it.latitude else it.latitude,
-                if (userLocation?.longitude != 0.0) userLocation?.longitude
+                longitude = if (userLocation?.longitude != 0.0) userLocation?.longitude
                     ?: it.longitude else it.longitude,
-                currentUserLocation?.altitude ?: it.altitude,
-                it.createdAt,
-                it.updatedAt,
-                it.lastDeploymentId,
-                it.syncState
+                altitude = currentUserLocation?.altitude ?: it.altitude,
+                createdAt = it.createdAt,
+                updatedAt = it.updatedAt,
+                lastDeploymentId = it.lastDeploymentId,
+                syncState = it.syncState,
+                project = getLocationGroup(it.project?.name ?: getString(R.string.none))
             )
             deploymentProtocol?.setDeployLocation(locate, true)
             deploymentProtocol?.nextStep()
         }
     }
 
-    private fun getLocationGroup(group: String): LocationGroup {
-        val locationGroup = deploymentProtocol?.getLocationGroup(group) ?: Project()
-        return LocationGroup(locationGroup.name, locationGroup.color, locationGroup.serverId)
+    private fun getLocationGroup(group: String): Project {
+        return deploymentProtocol?.getLocationGroup(group) ?: Project()
     }
 
     private fun getLastLocation() {
@@ -330,7 +328,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             currentUserLocation?.let { setLatLngLabel(it.toLatLng(), it.altitude) }
         } else {
             site?.let { setLatLngLabel(it.toLatLng(), it.altitude) }
-            locationGroupValueTextView.text = site?.locationGroup?.name ?: getString(R.string.none)
+            locationGroupValueTextView.text = site?.project?.name ?: getString(R.string.none)
         }
         siteValueTextView.text = siteName
         changeProjectTextView.visibility = if (isCreateNew) View.VISIBLE else View.GONE

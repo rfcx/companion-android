@@ -23,8 +23,8 @@ class EditLocationRepository(
             .editStream(id, locationName, latitude, longitude, altitude, callback)
     }
 
-    fun editProject(id: Int, locationGroup: LocationGroup, callback: DatabaseCallback) {
-        return localDataHelper.getDeploymentLocalDb().editProject(id, locationGroup, callback)
+    fun editProject(id: Int, project: Project, callback: DatabaseCallback) {
+        return localDataHelper.getDeploymentLocalDb().editProject(id, project, callback)
     }
 
     fun isExisted(name: String?): Boolean {

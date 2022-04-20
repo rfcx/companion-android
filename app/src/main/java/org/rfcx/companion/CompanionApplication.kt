@@ -37,12 +37,15 @@ class CompanionApplication : Application() {
             val realm = Realm.getInstance(RealmHelper.migrationConfig())
             realm.close()
             Realm.setDefaultConfiguration(RealmHelper.migrationConfig())
+            if (RealmHelper.schemaVersion == 18L) {
+                realmNeedsMigration = true
+            }
         } catch (e: RealmMigrationNeededException) {
             realmNeedsMigration = true
         }
 
         // Falback for release (delete realm on error)
-        if (realmNeedsMigration && !BuildConfig.DEBUG) {
+        if (realmNeedsMigration && BuildConfig.DEBUG) {
             try {
                 val realm = Realm.getInstance(RealmHelper.fallbackConfig())
                 realm.close()

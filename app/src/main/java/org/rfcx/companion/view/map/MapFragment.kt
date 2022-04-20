@@ -54,8 +54,6 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.BitmapUtils
 import io.realm.Realm
-import kotlinx.android.synthetic.main.activity_project_select.*
-import kotlinx.android.synthetic.main.fragment_location_group.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.fragment_map.projectSwipeRefreshView
 import kotlinx.android.synthetic.main.layout_deployment_window_info.view.*
@@ -89,7 +87,7 @@ class MapFragment :
     Fragment(),
     OnMapReadyCallback,
     LocationGroupListener,
-    (Locate, Boolean) -> Unit {
+    (Stream, Boolean) -> Unit {
 
     private lateinit var mainViewModel: MainViewModel
 
@@ -106,7 +104,7 @@ class MapFragment :
     private val trackingDb by lazy { TrackingDb(realm) }
 
     // data
-    private var locations = listOf<Locate>()
+    private var locations = listOf<Stream>()
     private var locationGroups = listOf<Project>()
     private var lastSyncingInfo: SyncInfo? = null
 
@@ -383,7 +381,7 @@ class MapFragment :
                     adapterOfSearchSite?.let {
                         newList.addAll(
                             it.filter { site ->
-                                site.locate.name.toLowerCase().contains(text)
+                                site.stream.name.toLowerCase().contains(text)
                             }
                         )
 
@@ -598,7 +596,7 @@ class MapFragment :
             val type = deployment?.device ?: Device.AUDIOMOTH.value
             layout.deploymentTypeName.text = "type: ${type.toUpperCase()}"
 
-            val streamId = deployment?.stream?.coreId
+            val streamId = deployment?.stream?.serverId
             if (streamId != null) {
                 layout.deploymentStreamId.visibility = View.VISIBLE
                 layout.deploymentStreamId.text = "id: $streamId"
@@ -855,7 +853,7 @@ class MapFragment :
         return true
     }
 
-    fun gettingTracksAndMoveToPin(site: Locate?, markerId: String) {
+    fun gettingTracksAndMoveToPin(site: Stream?, markerId: String) {
         currentMarkId = markerId
         site?.let { obj ->
             showTrackOnMap(obj.id, obj.latitude, obj.longitude, markerId)
@@ -938,8 +936,8 @@ class MapFragment :
 
     private fun getFurthestSiteFromCurrentLocation(
         currentLatLng: LatLng,
-        sites: List<Locate>
-    ): Locate? {
+        sites: List<Stream>
+    ): Stream? {
         return sites.maxByOrNull {
             currentLatLng.distanceTo(LatLng(it.latitude, it.longitude))
         }
@@ -1043,7 +1041,7 @@ class MapFragment :
         )
     }
 
-    private fun setTrackObserver(site: Locate, markerId: String) {
+    private fun setTrackObserver(site: Stream, markerId: String) {
         mainViewModel.getTrackingFromRemote().observe(
             viewLifecycleOwner,
             Observer {
@@ -1263,7 +1261,7 @@ class MapFragment :
         mapboxMap?.locationComponent?.lastKnownLocation?.let { curLoc ->
             val currentLatLng = LatLng(curLoc.latitude, curLoc.longitude)
             val projectName = listener?.getProjectName()
-            val locations = this.locations.filter { it.locationGroup?.name == projectName }
+            val locations = this.locations.filter { it.project?.name == projectName }
             val furthestSite = getFurthestSiteFromCurrentLocation(
                 currentLatLng,
                 if (projectName != getString(R.string.none)) locations else this.locations
@@ -1447,13 +1445,13 @@ class MapFragment :
         }
     }
 
-    override fun invoke(locate: Locate, isNew: Boolean) {
+    override fun invoke(stream: Stream, isNew: Boolean) {
         view?.hideKeyboard()
         showSearchBar(false)
 
         val features = this.mapFeatures?.features()
-        val selectingDeployment = features?.firstOrNull { feature -> feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_TITLE) == locate.name }
-        val selectingSite = features?.firstOrNull { feature -> feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_NAME) == locate.name }
+        val selectingDeployment = features?.firstOrNull { feature -> feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_TITLE) == stream.name }
+        val selectingSite = features?.firstOrNull { feature -> feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_NAME) == stream.name }
 
         if (selectingDeployment == null) {
             if (selectingSite == null) return
@@ -1464,7 +1462,7 @@ class MapFragment :
             setFeatureSelectState(selectingDeployment, true)
         }
 
-        val item = mainViewModel.getLocateByName(locate.name)
+        val item = mainViewModel.getLocateByName(stream.name)
         item?.let {
             val pointF = mapboxMap?.projection?.toScreenLocation(it.getLatLng()) ?: PointF()
             val clusterFeatures = mapboxMap?.queryRenderedFeatures(pointF, "$DEPLOYMENT_CLUSTER-0")
@@ -1506,7 +1504,7 @@ class MapFragment :
             mainViewModel.combinedData()
             combinedData()
             val projects =
-                adapterOfSearchSite?.map { LatLng(it.locate.latitude, it.locate.longitude) }
+                adapterOfSearchSite?.map { LatLng(it.stream.latitude, it.stream.longitude) }
             if (projects != null && projects.isNotEmpty()) {
                 if (projects.size > 1) {
                     moveCameraWithLatLngList(projects)

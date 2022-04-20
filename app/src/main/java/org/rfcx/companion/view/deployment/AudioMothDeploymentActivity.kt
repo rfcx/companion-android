@@ -10,13 +10,11 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import io.realm.RealmList
-import kotlinx.android.synthetic.main.activity_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
-import org.rfcx.companion.localdb.*
 import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
@@ -47,7 +45,7 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
     private val analytics by lazy { Analytics(this) }
 
     private var deployments = listOf<Deployment>()
-    private var sites = listOf<Locate>()
+    private var sites = listOf<Stream>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -216,17 +214,17 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
         this._deployment = deployment
     }
 
-    override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
+    override fun setDeployLocation(stream: Stream, isExisted: Boolean) {
         val deployment = _deployment ?: Deployment()
         deployment.device = Device.AUDIOMOTH.value
-        deployment.isActive = locate.serverId == null
+        deployment.isActive = stream.serverId == null
         deployment.state = DeploymentState.AudioMoth.Locate.key // state
 
-        this._deployLocation = locate.asDeploymentLocation()
-        this._locate = locate
+        this._deployLocation = stream
+        this._stream = stream
         useExistedLocation = isExisted
         if (!useExistedLocation) {
-            audioMothDeploymentViewModel.insertOrUpdate(locate)
+            audioMothDeploymentViewModel.insertOrUpdate(stream)
         }
 
         setDeployment(deployment)
@@ -243,7 +241,7 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
 
             val deploymentId =
                 audioMothDeploymentViewModel.insertOrUpdateDeployment(it, _deployLocation!!)
-            this._locate?.let { loc ->
+            this._stream?.let { loc ->
                 audioMothDeploymentViewModel.insertOrUpdateLocate(
                     deploymentId,
                     loc
@@ -251,7 +249,7 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
             }
 
             if (useExistedLocation) {
-                this._locate?.let { locate ->
+                this._stream?.let { locate ->
                     val deployments =
                         locate.serverId?.let { it1 ->
                             audioMothDeploymentViewModel.getDeploymentsBySiteId(
@@ -272,7 +270,7 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
                     val point = t.points.toListDoubleArray()
                     val trackingFile = TrackingFile(
                         deploymentId = it.id,
-                        siteId = this._locate!!.id,
+                        siteId = this._stream!!.id,
                         localPath = GeoJsonUtils.generateGeoJson(
                             this,
                             GeoJsonUtils.generateFileName(it.deployedAt, it.deploymentKey!!),
@@ -297,7 +295,7 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
         when (number) {
             0 -> {
                 updateDeploymentState(DeploymentState.AudioMoth.Locate)
-                val site = this._locate
+                val site = this._stream
                 if (site == null) {
                     startFragment(
                         SetDeploymentSiteFragment.newInstance(

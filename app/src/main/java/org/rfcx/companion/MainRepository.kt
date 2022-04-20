@@ -44,7 +44,7 @@ class MainRepository(
     ) = localDataHelper.getTrackingFileLocalDb()
         .insertOrUpdate(deploymentAssetResponse, filePath, deploymentId)
 
-    fun getAllLocateResultsAsync(): RealmResults<Locate> {
+    fun getAllLocateResultsAsync(): RealmResults<Stream> {
         return localDataHelper.getLocateLocalDb().getAllResultsAsync()
     }
 
@@ -76,11 +76,11 @@ class MainRepository(
         return localDataHelper.getDeploymentLocalDb().getDeploymentById(id)
     }
 
-    fun getLocateByName(name: String): Locate? {
+    fun getLocateByName(name: String): Stream? {
         return localDataHelper.getLocateLocalDb().getLocateByName(name)
     }
 
-    fun getLocateById(id: Int): Locate? {
+    fun getLocateById(id: Int): Stream? {
         return localDataHelper.getLocateLocalDb().getLocateById(id)
     }
 

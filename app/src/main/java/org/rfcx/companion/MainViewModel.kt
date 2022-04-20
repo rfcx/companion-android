@@ -42,11 +42,11 @@ class MainViewModel(
     private val tracks = MutableLiveData<Resource<List<DeploymentAssetResponse>>>()
     private val deploymentMarkers = MutableLiveData<Resource<List<MapMarker.DeploymentMarker>>>()
     private val siteMarkers = MutableLiveData<Resource<List<MapMarker>>>()
-    private val siteList = MutableLiveData<Resource<List<Locate>>>()
+    private val siteList = MutableLiveData<Resource<List<Stream>>>()
     private val showDeployments = MutableLiveData<Resource<List<Deployment>>>()
 
     private var deployments = listOf<Deployment>()
-    private var sites = listOf<Locate>()
+    private var sites = listOf<Stream>()
 
     private lateinit var deploymentLiveData: LiveData<List<Deployment>>
     private val deploymentObserve = Observer<List<Deployment>> {
@@ -54,8 +54,8 @@ class MainViewModel(
         combinedData()
     }
 
-    private lateinit var siteLiveData: LiveData<List<Locate>>
-    private val siteObserve = Observer<List<Locate>> {
+    private lateinit var siteLiveData: LiveData<List<Stream>>
+    private val siteObserve = Observer<List<Stream>> {
         sites = it
         siteList.postValue(Resource.success(it))
         combinedData()
@@ -182,7 +182,7 @@ class MainViewModel(
             })
     }
 
-    fun getStreamAssets(site: Locate) {
+    fun getStreamAssets(site: Stream) {
         tracks.postValue(Resource.loading(null))
         mainRepository.getStreamAssets("Bearer ${context.getIdToken()}", site.serverId!!)
             .enqueue(object : Callback<List<DeploymentAssetResponse>> {
@@ -239,13 +239,13 @@ class MainViewModel(
 
     fun combinedData() {
         var deploymentsForShow = this.deployments.filter { it.isCompleted() }
-        val usedSites = deploymentsForShow.map { it.stream?.coreId }
+        val usedSites = deploymentsForShow.map { it.stream?.serverId }
         var filteredShowLocations =
             sites.filter { loc -> !usedSites.contains(loc.serverId) || loc.serverId == null }
         val projectName = getProjectName()
         if (projectName != context.getString(R.string.none)) {
             filteredShowLocations =
-                filteredShowLocations.filter { it.locationGroup?.name == projectName && it.lastDeploymentId == 0 }
+                filteredShowLocations.filter { it.project?.name == projectName && it.lastDeploymentId == 0 }
             deploymentsForShow =
                 deploymentsForShow.filter { it.stream?.project?.name == projectName }
         }
@@ -370,7 +370,7 @@ class MainViewModel(
         return siteMarkers
     }
 
-    fun getSites(): LiveData<Resource<List<Locate>>> {
+    fun getSites(): LiveData<Resource<List<Stream>>> {
         return siteList
     }
 
@@ -398,11 +398,11 @@ class MainViewModel(
         return mainRepository.getDeploymentById(id)
     }
 
-    fun getLocateByName(name: String): Locate? {
+    fun getLocateByName(name: String): Stream? {
         return mainRepository.getLocateByName(name)
     }
 
-    fun getLocateById(id: Int): Locate? {
+    fun getLocateById(id: Int): Stream? {
         return mainRepository.getLocateById(id)
     }
 

@@ -2,6 +2,8 @@ package org.rfcx.companion.entity
 
 import com.google.gson.annotations.Expose
 import io.realm.RealmModel
+import io.realm.RealmResults
+import io.realm.annotations.LinkingObjects
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
 import java.util.*
@@ -21,7 +23,8 @@ open class Project(
     var minLongitude: Double? = null,
     var maxLatitude: Double? = null,
     var maxLongitude: Double? = null,
-    var offlineMapState: String = OfflineMapState.DOWNLOAD_STATE.key
+    var offlineMapState: String = OfflineMapState.DOWNLOAD_STATE.key,
+    @LinkingObjects("project") val streams: RealmResults<Stream>? = null
 ) : RealmModel {
     companion object {
         const val TABLE_NAME = "LocationGroups"

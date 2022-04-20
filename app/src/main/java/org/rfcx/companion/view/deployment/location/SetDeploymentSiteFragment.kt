@@ -16,7 +16,7 @@ import kotlinx.android.synthetic.main.fragment_set_deployment_site.*
 import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
-import org.rfcx.companion.entity.Locate
+import org.rfcx.companion.entity.Stream
 import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
@@ -32,7 +32,7 @@ import org.rfcx.companion.view.map.SyncInfo
 
 class SetDeploymentSiteFragment :
     Fragment(),
-    (Locate, Boolean) -> Unit {
+    (Stream, Boolean) -> Unit {
     private lateinit var audioMothDeploymentViewModel: AudioMothDeploymentViewModel
 
     // Protocol
@@ -140,13 +140,13 @@ class SetDeploymentSiteFragment :
                     val newList: ArrayList<SiteWithLastDeploymentItem> = ArrayList()
                     newList.addAll(
                         sitesAdapter.filter {
-                            it.locate.name.toLowerCase().contains(text)
+                            it.stream.name.toLowerCase().contains(text)
                         }
                     )
                     noResultFound.visibility = View.GONE
                     val createNew = arrayListOf(
                         SiteWithLastDeploymentItem(
-                            Locate(
+                            Stream(
                                 id = -1,
                                 name = s.toString(),
                                 latitude = 0.0,
@@ -231,7 +231,7 @@ class SetDeploymentSiteFragment :
     }
 
     // On click site item
-    override fun invoke(site: Locate, isNewSite: Boolean) {
+    override fun invoke(site: Stream, isNewSite: Boolean) {
         deploymentProtocol?.startDetailDeploymentSite(site.id, site.name, isNewSite)
     }
 

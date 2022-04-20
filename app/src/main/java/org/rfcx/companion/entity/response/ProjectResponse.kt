@@ -14,7 +14,7 @@ data class ProjectResponse(
     var permissions: List<String> = listOf()
 )
 
-fun ProjectResponse.toLocationGroups(): Project {
+fun ProjectResponse.toProject(): Project {
     return Project(
         name = this.name,
         color = this.color,

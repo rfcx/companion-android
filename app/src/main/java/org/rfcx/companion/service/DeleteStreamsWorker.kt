@@ -8,7 +8,7 @@ import io.realm.Realm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.rfcx.companion.entity.response.StreamResponse
-import org.rfcx.companion.entity.response.toLocate
+import org.rfcx.companion.entity.response.toStream
 import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.localdb.LocateDb
 import org.rfcx.companion.repo.ApiManager
@@ -35,8 +35,8 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
         if (result) {
             val streamDb = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
             val deploymentDb = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
-            val savedStreams = streamDb.getLocations().filter { it.serverId != null && it.locationGroup?.coreId == PROJECT_ID }
-            val downloadedStreams = streams.map { it.toLocate().serverId }
+            val savedStreams = streamDb.getLocations().filter { it.serverId != null && it.project?.serverId == PROJECT_ID }
+            val downloadedStreams = streams.map { it.toStream().serverId }
             val filteredStreams =
                 savedStreams.filter { stream -> !downloadedStreams.contains(stream.serverId) }
             if (filteredStreams.isNotEmpty()) {

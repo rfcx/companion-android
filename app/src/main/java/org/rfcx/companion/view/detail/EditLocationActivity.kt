@@ -13,6 +13,7 @@ import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.LocationGroup
+import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.toLocationGroup
 import org.rfcx.companion.localdb.DatabaseCallback
@@ -186,8 +187,8 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
 
     override fun getLocationGroupName(): String = groupName ?: getString(R.string.none)
 
-    override fun getLocationGroup(name: String): LocationGroup {
-        return viewModel.getProjectByName(name)?.toLocationGroup() ?: LocationGroup()
+    override fun getLocationGroup(name: String): Project {
+        return viewModel.getProjectByName(name) ?: Project()
     }
 
     override fun startLocationGroupPage() {

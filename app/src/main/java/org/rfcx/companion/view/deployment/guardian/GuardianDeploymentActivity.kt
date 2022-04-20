@@ -117,9 +117,9 @@ class GuardianDeploymentActivity :
         setSiteItems()
     }
 
-    private lateinit var siteLiveData: LiveData<List<Locate>>
-    private var sites = listOf<Locate>()
-    private val siteObserve = Observer<List<Locate>> {
+    private lateinit var siteLiveData: LiveData<List<Stream>>
+    private var sites = listOf<Stream>()
+    private val siteObserve = Observer<List<Stream>> {
         this.sites = it
         setSiteItems()
     }
@@ -402,7 +402,7 @@ class GuardianDeploymentActivity :
         AdminSocketManager.connect()
     }
 
-    override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
+    override fun getDeploymentLocation(): Stream? = this._deployLocation
 
     override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
 
@@ -410,16 +410,16 @@ class GuardianDeploymentActivity :
         return projectDb.getProjectByName(name)
     }
 
-    override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
+    override fun setDeployLocation(stream: Stream, isExisted: Boolean) {
         val deployment = _deployment ?: Deployment()
-        deployment.isActive = locate.serverId == null
+        deployment.isActive = stream.serverId == null
         deployment.state = DeploymentState.Guardian.Locate.key // state
 
-        this._deployLocation = locate.asDeploymentLocation()
-        this._locate = locate
+        this._deployLocation = stream
+        this._stream = stream
         useExistedLocation = isExisted
         if (!useExistedLocation) {
-            locateDb.insertOrUpdate(locate)
+            locateDb.insertOrUpdate(stream)
         }
 
         setDeployment(deployment)
@@ -435,13 +435,13 @@ class GuardianDeploymentActivity :
             it.deviceParameters = Gson().toJson(DeviceParameter(getGuid()))
             setDeployment(it)
 
-            val deploymentId = deploymentDb.insertOrUpdateDeployment(it, _deployLocation!!)
-            this._locate?.let { loc ->
+            this._stream?.let { loc ->
+                val deploymentId = deploymentDb.insertOrUpdateDeployment(it, _stream!!)
                 locateDb.insertOrUpdateLocate(deploymentId, loc) // update locate - last deployment
             }
 
             if (useExistedLocation) {
-                this._locate?.let { locate ->
+                this._stream?.let { locate ->
                     val deployments =
                         locate.serverId?.let { it1 -> deploymentDb.getDeploymentsBySiteId(it1, Device.GUARDIAN.value) }
                     deployments?.forEach { deployment ->
@@ -459,7 +459,7 @@ class GuardianDeploymentActivity :
                     val point = t.points.toListDoubleArray()
                     val trackingFile = TrackingFile(
                         deploymentId = it.id,
-                        siteId = this._locate!!.id,
+                        siteId = this._stream!!.id,
                         localPath = GeoJsonUtils.generateGeoJson(
                             this,
                             GeoJsonUtils.generateFileName(it.deployedAt, getGuid()!!),
@@ -533,7 +533,7 @@ class GuardianDeploymentActivity :
             }
             6 -> {
                 updateDeploymentState(DeploymentState.Guardian.Locate)
-                val site = this._locate
+                val site = this._stream
                 if (site == null) {
                     startFragment(
                         SetDeploymentSiteFragment.newInstance(

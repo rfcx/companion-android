@@ -4,27 +4,25 @@ import android.content.Context
 import android.location.Location
 import android.location.LocationManager
 import org.rfcx.companion.R
-import org.rfcx.companion.entity.Locate
+import org.rfcx.companion.entity.Stream
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import java.util.*
 import kotlin.collections.ArrayList
 
 private fun findNearLocations(
-    locateItems: ArrayList<Locate>,
+    streamItems: List<Stream>,
     currentUserLocation: Location
-): List<Pair<Locate, Float>>? {
-    if (locateItems.isNotEmpty()) {
-        val itemsWithDistance = arrayListOf<Pair<Locate, Float>>()
+): List<Pair<Stream, Float>>? {
+    if (streamItems.isNotEmpty()) {
         // Find locate distances
-        locateItems.mapTo(itemsWithDistance, {
+        return streamItems.map {
             val loc = Location(LocationManager.GPS_PROVIDER)
             loc.latitude = it.latitude
             loc.longitude = it.longitude
             val distance = loc.distanceTo(currentUserLocation) // return in meters
             Pair(it, distance)
-        })
-        return itemsWithDistance
+        }
     }
     return null
 }
@@ -34,7 +32,7 @@ fun getListSite(
     deploymentList: List<Deployment>,
     projectName: String,
     currentUserLocation: Location,
-    locations: List<Locate>
+    locations: List<Stream>
 ): ArrayList<SiteWithLastDeploymentItem> {
     var deployments = deploymentList
     if (projectName != context.getString(R.string.none)) {
@@ -45,7 +43,7 @@ fun getListSite(
         findNearLocations(
             ArrayList(
                 locations.filter { loc ->
-                    loc.locationGroup?.name == projectName || projectName == context.getString(
+                    loc.project?.name == projectName || projectName == context.getString(
                         R.string.none
                     )
                 }
@@ -67,7 +65,7 @@ fun getListSite(
 
 fun isHaveDeployment(
     deployments: List<Deployment>,
-    locate: Locate
+    locate: Stream
 ): Date? {
     return deployments.find { dp -> dp.stream?.name == locate.name }?.deployedAt
 }
@@ -76,7 +74,7 @@ fun getListSiteWithOutCurrentLocation(
     context: Context,
     deployments: List<Deployment>,
     projectName: String,
-    locations: List<Locate>
+    locations: List<Stream>
 ): ArrayList<SiteWithLastDeploymentItem> {
     var showDeployments = deployments
     if (projectName != context.getString(R.string.none)) {
@@ -86,7 +84,7 @@ fun getListSiteWithOutCurrentLocation(
 
     val filterLocations = ArrayList(
         locations.filter { loc ->
-            loc.locationGroup?.name == projectName || projectName == context.getString(
+            loc.project?.name == projectName || projectName == context.getString(
                 R.string.none
             )
         }
@@ -96,7 +94,7 @@ fun getListSiteWithOutCurrentLocation(
         filterLocations.map {
             SiteWithLastDeploymentItem(
                 it,
-                isHaveDeployment(showDeployments, it),
+                null,
                 null
             )
         }

@@ -109,9 +109,9 @@ class CompanionRealmMigration : RealmMigration {
             addField("deletedAt", Date::class.java)
         }
 
-        val locate = realm.schema.get(Locate.TABLE_NAME)
+        val locate = realm.schema.get(Stream.TABLE_NAME)
         locate?.apply {
-            addField(Locate.FIELD_DELETED_AT, Date::class.java)
+            addField(Stream.FIELD_DELETED_AT, Date::class.java)
         }
     }
 
@@ -145,9 +145,9 @@ class CompanionRealmMigration : RealmMigration {
             addField(Project.PROJECT_DELETED_AT, Date::class.java)
         }
 
-        val locate = realm.schema.get(Locate.TABLE_NAME)
+        val locate = realm.schema.get(Stream.TABLE_NAME)
         locate?.apply {
-            addRealmObjectField(Locate.FIELD_LOCATION_GROUP, locationGroup)
+            addRealmObjectField(Stream.FIELD_LOCATION_GROUP, locationGroup)
         }
 
         val deploymentLocation = realm.schema.get(DeploymentLocation.TABLE_NAME)
@@ -208,9 +208,9 @@ class CompanionRealmMigration : RealmMigration {
     }
 
     private fun migrateToV8(realm: DynamicRealm) {
-        val locate = realm.schema.get(Locate.TABLE_NAME)
+        val locate = realm.schema.get(Stream.TABLE_NAME)
         locate?.apply {
-            addField(Locate.FIELD_ALTITUDE, Double::class.java)
+            addField(Stream.FIELD_ALTITUDE, Double::class.java)
         }
 
         val deploymentLocation = realm.schema.get(DeploymentLocation.TABLE_NAME)
@@ -259,18 +259,18 @@ class CompanionRealmMigration : RealmMigration {
     }
 
     private fun migrateToV11(realm: DynamicRealm) {
-        val locate = realm.schema.get(Locate.TABLE_NAME)
+        val locate = realm.schema.get(Stream.TABLE_NAME)
         locate?.apply {
             addField("updatedAt", Date::class.java)
         }
     }
 
     private fun migrateToV12(realm: DynamicRealm) {
-        val locate = realm.schema.get(Locate.TABLE_NAME)
+        val locate = realm.schema.get(Stream.TABLE_NAME)
         locate?.apply {
-            val hasDeletedAt = this.hasField(Locate.FIELD_DELETED_AT)
+            val hasDeletedAt = this.hasField(Stream.FIELD_DELETED_AT)
             if (hasDeletedAt) {
-                removeField(Locate.FIELD_DELETED_AT)
+                removeField(Stream.FIELD_DELETED_AT)
             }
         }
     }
@@ -371,7 +371,7 @@ class CompanionRealmMigration : RealmMigration {
     }
 
     private fun migrateToV18(realm: DynamicRealm) {
-        val locate = realm.schema.get(Locate.TABLE_NAME)
+        val locate = realm.schema.get(Stream.TABLE_NAME)
         locate?.apply {
             val lastDeploymentServerId = this.hasField("lastDeploymentServerId")
             if (lastDeploymentServerId) {

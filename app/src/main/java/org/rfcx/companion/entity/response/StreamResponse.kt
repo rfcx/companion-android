@@ -21,8 +21,8 @@ fun StreamResponse.convertToDeploymentResponse(): DeploymentResponse {
     return tempDeployment
 }
 
-fun StreamResponse.toLocate(): Locate {
-    return Locate(
+fun StreamResponse.toStream(): Stream {
+    return Stream(
         serverId = this.id,
         name = this.name ?: "-",
         latitude = this.latitude ?: 0.0,
@@ -30,7 +30,6 @@ fun StreamResponse.toLocate(): Locate {
         altitude = this.altitude ?: 0.0,
         createdAt = this.createdAt ?: Date(),
         updatedAt = this.updatedAt,
-        locationGroup = this.project?.toLocationGroup(),
         syncState = SyncState.Sent.key
     )
 }

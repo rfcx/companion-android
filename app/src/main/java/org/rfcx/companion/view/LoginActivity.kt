@@ -46,7 +46,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
         signInButton.setOnClickListener {
-            val email = loginEmailEditText.text.toString()
+            val email = loginEmailEditText.text.toString().trim()
             val password = loginPasswordEditText.text.toString()
             it.hideKeyboard()
 

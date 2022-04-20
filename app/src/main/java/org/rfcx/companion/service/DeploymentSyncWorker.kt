@@ -94,7 +94,6 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
         val updatedDp = ApiManager.getInstance().getDeviceApi()
             .getDeployment(token, id).execute().body()
         updatedDp?.let { dp ->
-            db.updateDeploymentByServerId(updatedDp.toDeployment())
             locateDb.updateSiteServerId(deploymentId, dp.stream!!.id!!)
         }
 
