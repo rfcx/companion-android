@@ -34,11 +34,7 @@ fun getListSite(
     currentUserLocation: Location,
     locations: List<Stream>
 ): ArrayList<SiteWithLastDeploymentItem> {
-    var deployments = deploymentList
-    if (projectName != context.getString(R.string.none)) {
-        deployments =
-            deploymentList.filter { it.stream?.project?.name == projectName }
-    }
+
     val nearLocations =
         findNearLocations(
             ArrayList(
@@ -52,10 +48,18 @@ fun getListSite(
         )?.sortedBy { it.second }
 
     val locationsItems: List<SiteWithLastDeploymentItem> =
-        nearLocations?.map {
+        nearLocations?.map { it ->
+            val deployments = it.first.deployments
+            var deployedAt: Date? = null
+            if (deployments != null) {
+                val sortedDp = deployments.filter { dp -> dp.isActive }.sortedByDescending { deployedAt }
+                if (sortedDp.isNotEmpty()) {
+                    deployedAt = sortedDp[0].deployedAt
+                }
+            }
             SiteWithLastDeploymentItem(
                 it.first,
-                isHaveDeployment(deployments, it.first),
+                deployedAt,
                 it.second
             )
         } ?: listOf()
@@ -76,11 +80,6 @@ fun getListSiteWithOutCurrentLocation(
     projectName: String,
     locations: List<Stream>
 ): ArrayList<SiteWithLastDeploymentItem> {
-    var showDeployments = deployments
-    if (projectName != context.getString(R.string.none)) {
-        showDeployments =
-            deployments.filter { it.stream?.project?.name == projectName }
-    }
 
     val filterLocations = ArrayList(
         locations.filter { loc ->
@@ -92,9 +91,18 @@ fun getListSiteWithOutCurrentLocation(
 
     val locationsItems: List<SiteWithLastDeploymentItem> =
         filterLocations.map {
+            val deploymentList = it.deployments
+            var deployedAt: Date? = null
+            if (deploymentList != null) {
+                val sortedDp = deploymentList.filter { dp -> dp.isActive }.sortedByDescending { deployedAt }
+                if (sortedDp.isNotEmpty()) {
+                    deployedAt = sortedDp[0].deployedAt
+                }
+            }
+
             SiteWithLastDeploymentItem(
                 it,
-                null,
+                deployedAt,
                 null
             )
         }
