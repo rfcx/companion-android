@@ -374,10 +374,6 @@ class MainViewModel(
         return mainRepository.getDeploymentById(id)
     }
 
-    fun getStreamByName(name: String): Stream? {
-        return mainRepository.getStreamByName(name)
-    }
-
     fun getStreamById(id: Int): Stream? {
         return mainRepository.getStreamById(id)
     }

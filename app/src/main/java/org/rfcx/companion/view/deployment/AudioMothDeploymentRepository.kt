@@ -33,10 +33,6 @@ class AudioMothDeploymentRepository(
         return localDataHelper.getProjectLocalDb().getProjectById(id)
     }
 
-    fun getProjectByName(name: String): Project? {
-        return localDataHelper.getProjectLocalDb().getProjectByName(name)
-    }
-
     fun deleteImages(id: Int) {
         localDataHelper.getDeploymentImageLocalDb().deleteImages(id)
     }

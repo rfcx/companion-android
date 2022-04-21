@@ -76,10 +76,6 @@ class MainRepository(
         return localDataHelper.getDeploymentLocalDb().getDeploymentById(id)
     }
 
-    fun getStreamByName(name: String): Stream? {
-        return localDataHelper.getStreamLocalDb().getStreamByName(name)
-    }
-
     fun getStreamById(id: Int): Stream? {
         return localDataHelper.getStreamLocalDb().getStreamById(id)
     }

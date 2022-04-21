@@ -65,7 +65,7 @@ class GuardianDeploymentActivity :
     WifiLostListener {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val locateDb by lazy { StreamDb(realm) }
+    private val streamDb by lazy { StreamDb(realm) }
     private val projectDb by lazy { ProjectDb(realm) }
     private val deploymentDb by lazy { DeploymentDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
@@ -237,7 +237,7 @@ class GuardianDeploymentActivity :
         val project = projectDb.getProjectById(projectId)
         val projectName = project?.name ?: getString(R.string.none)
         siteLiveData = Transformations.map(
-            locateDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()
+            streamDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()
         ) {
             it
         }
@@ -403,7 +403,7 @@ class GuardianDeploymentActivity :
     override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
 
     override fun getStream(id: Int): Stream? {
-        return locateDb.getStreamById(id)
+        return streamDb.getStreamById(id)
     }
 
     override fun getProject(id: Int): Project? {
@@ -419,7 +419,7 @@ class GuardianDeploymentActivity :
         this._stream = stream
         useExistedLocation = isExisted
         if (!useExistedLocation) {
-            locateDb.insertOrUpdate(stream)
+            streamDb.insertOrUpdate(stream)
         }
 
         setDeployment(deployment)
@@ -437,7 +437,7 @@ class GuardianDeploymentActivity :
 
             this._stream?.let { loc ->
                 val deploymentId = deploymentDb.insertOrUpdateDeployment(it, _stream!!)
-                locateDb.insertOrUpdateStream(deploymentId, loc) // update locate - last deployment
+                streamDb.insertOrUpdateStream(deploymentId, loc) // update locate - last deployment
             }
 
             if (useExistedLocation) {

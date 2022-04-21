@@ -129,11 +129,6 @@ class ProjectDb(private val realm: Realm) {
             .findAllAsync()
     }
 
-    fun getProjectByName(name: String): Project? {
-        return realm.where(Project::class.java)
-            .equalTo(Project.PROJECT_NAME, name).findFirst()
-    }
-
     fun getProjectById(id: Int): Project? {
         return realm.where(Project::class.java)
             .equalTo(Project.PROJECT_ID, id).findFirst()

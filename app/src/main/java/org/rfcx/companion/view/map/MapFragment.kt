@@ -579,7 +579,6 @@ class MapFragment :
         val markerId = feature.getProperty(
             PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID
         ).asString
-        val site = mainViewModel.getStreamByName(markerId.split(".")[0])
 
         val windowInfoImages = hashMapOf<String, Bitmap>()
         val inflater = LayoutInflater.from(context)
@@ -588,17 +587,18 @@ class MapFragment :
             inflater.inflate(R.layout.layout_deployment_window_info, null) as BubbleLayout
         val id = feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID) ?: ""
         val title = feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_TITLE)
+
+        var stream: Stream? = null
         val deploymentId = feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID)
         deploymentId?.let {
             val deployment = mainViewModel.getDeploymentById(it.toInt())
             val type = deployment?.device ?: Device.AUDIOMOTH.value
             layout.deploymentTypeName.text = "type: ${type.toUpperCase()}"
 
-            val streamId = deployment?.stream?.serverId
-            if (streamId != null) {
-                layout.deploymentStreamId.visibility = View.VISIBLE
-                layout.deploymentStreamId.text = "id: $streamId"
-            }
+            stream = deployment?.stream
+            val streamId = stream?.serverId
+            layout.deploymentStreamId.visibility = View.VISIBLE
+            layout.deploymentStreamId.text = "id: $streamId"
         }
         layout.deploymentSiteTitle.text = title
         val projectName = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_PROJECT_NAME)
@@ -608,7 +608,7 @@ class MapFragment :
         var latLng = ""
         context?.let { context ->
             latLng =
-                "${site?.latitude.latitudeCoordinates(context)}, ${site?.longitude.longitudeCoordinates(
+                "${stream?.latitude.latitudeCoordinates(context)}, ${stream?.longitude.longitudeCoordinates(
                     context
                 )}"
         }
@@ -778,7 +778,9 @@ class MapFragment :
                     val markerId = selectedFeature.getProperty(
                         PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID
                     ).asString
-                    val site = mainViewModel.getStreamByName(markerId.split(".")[0])
+                    val deploymentId = markerId.split(".")[1]
+                    val deployment = mainViewModel.getDeploymentById(deploymentId.toInt())
+                    val site = mainViewModel.getStreamById(deployment?.stream?.id ?: -1)
                     gettingTracksAndMoveToPin(site, markerId)
                     analytics?.trackClickPinEvent()
 
@@ -1439,7 +1441,7 @@ class MapFragment :
             setFeatureSelectState(selectingDeployment, true)
         }
 
-        val item = mainViewModel.getStreamByName(stream.name)
+        val item = mainViewModel.getStreamById(stream.id)
         item?.let {
             val pointF = mapboxMap?.projection?.toScreenLocation(it.getLatLng()) ?: PointF()
             val clusterFeatures = mapboxMap?.queryRenderedFeatures(pointF, "$DEPLOYMENT_CLUSTER-0")
