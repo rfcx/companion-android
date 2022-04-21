@@ -1,6 +1,5 @@
 package org.rfcx.companion.view.detail
 
-import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.Project
 
 interface EditLocationActivityListener {

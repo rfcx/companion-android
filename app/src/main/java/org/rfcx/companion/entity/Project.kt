@@ -6,6 +6,7 @@ import io.realm.RealmResults
 import io.realm.annotations.LinkingObjects
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
+import java.io.Serializable
 import java.util.*
 
 @RealmClass
@@ -25,7 +26,7 @@ open class Project(
     var maxLongitude: Double? = null,
     var offlineMapState: String = OfflineMapState.DOWNLOAD_STATE.key,
     @LinkingObjects("project") val streams: RealmResults<Stream>? = null
-) : RealmModel {
+) : RealmModel, Serializable {
     companion object {
         const val TABLE_NAME = "LocationGroups"
         const val PROJECT_ID = "id"
@@ -41,10 +42,6 @@ open class Project(
         const val PROJECT_MAX_LONGITUDE = "maxLongitude"
         const val PROJECT_OFFLINE_MAP_STATE = "offlineMapState"
     }
-}
-
-fun Project.toLocationGroup(): LocationGroup {
-    return LocationGroup(this.name, this.color, this.serverId)
 }
 
 fun Project.isGuest(): Boolean {

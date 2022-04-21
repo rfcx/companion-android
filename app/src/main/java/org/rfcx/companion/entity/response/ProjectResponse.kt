@@ -1,6 +1,5 @@
 package org.rfcx.companion.entity.response
 
-import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.Permissions
 import org.rfcx.companion.entity.Project
 
@@ -23,14 +22,6 @@ fun ProjectResponse.toProject(): Project {
     )
 }
 
-fun ProjectResponse.toLocationGroup(): LocationGroup {
-    return LocationGroup(
-        name = this.name,
-        color = this.color,
-        coreId = this.id
-    )
-}
-
 fun ProjectResponse.permissionsLabel(): String {
     return if (this.permissions.contains("C") && this.permissions.contains("R") && this.permissions.contains("U") && this.permissions.contains("D")) {
         Permissions.ADMIN.value
@@ -39,12 +30,4 @@ fun ProjectResponse.permissionsLabel(): String {
     } else {
         Permissions.GUEST.value
     }
-}
-
-fun LocationGroup.toLocationGroupsResponse(): ProjectResponse {
-    return ProjectResponse(
-        name = this.name ?: "",
-        color = this.color ?: "",
-        id = this.coreId
-    )
 }

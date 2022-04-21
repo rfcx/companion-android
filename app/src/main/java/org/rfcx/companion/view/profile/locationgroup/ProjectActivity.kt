@@ -9,14 +9,12 @@ import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_location_group.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
-import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Screen
-import org.rfcx.companion.entity.toLocationGroup
 import org.rfcx.companion.util.Preferences
-import org.rfcx.companion.view.detail.EditLocationActivity.Companion.EXTRA_LOCATION_GROUP
+import org.rfcx.companion.view.detail.EditLocationActivity.Companion.EXTRA_PROJECT
 
-class LocationGroupActivity : AppCompatActivity(), LocationGroupProtocol {
+class ProjectActivity : AppCompatActivity(), ProjectProtocol {
 
     // For detail page to edit location group
     private var group: String? = null
@@ -32,11 +30,11 @@ class LocationGroupActivity : AppCompatActivity(), LocationGroupProtocol {
 
         startFragment(LocationGroupFragment.newInstance(group, screen))
     }
-    override fun onLocationGroupClick(group: Project) {
-        locationGroupSelected(group.toLocationGroup())
+    override fun onProjectClick(project: Project) {
+        locationGroupSelected(project)
     }
 
-    private fun locationGroupSelected(group: LocationGroup) {
+    private fun locationGroupSelected(group: Project) {
         val screen: String? = intent?.getStringExtra(EXTRA_SCREEN)
         val preferences = Preferences.getInstance(this)
         when (screen) {
@@ -50,7 +48,7 @@ class LocationGroupActivity : AppCompatActivity(), LocationGroupProtocol {
             }
             Screen.EDIT_LOCATION.id -> {
                 val intent = Intent()
-                intent.putExtra(EXTRA_LOCATION_GROUP, group)
+                intent.putExtra(EXTRA_PROJECT, group)
                 setResult(RESULT_OK, intent)
                 finish()
             }
@@ -89,10 +87,8 @@ class LocationGroupActivity : AppCompatActivity(), LocationGroupProtocol {
         if (requestCode == LOCATION_GROUP_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 val locationGroup =
-                    data?.getSerializableExtra(EXTRA_LOCATION_GROUP) as LocationGroup
-                locationGroup.let {
-                    locationGroupSelected(it)
-                }
+                    data?.getSerializableExtra(EXTRA_PROJECT) as Project
+                locationGroupSelected(locationGroup)
             }
         }
     }
@@ -110,7 +106,7 @@ class LocationGroupActivity : AppCompatActivity(), LocationGroupProtocol {
             group: String? = null,
             screen: String = Screen.PROFILE.id
         ) {
-            val intent = Intent(context, LocationGroupActivity::class.java)
+            val intent = Intent(context, ProjectActivity::class.java)
             if (group != null)
                 intent.putExtra(EXTRA_GROUP, group)
             intent.putExtra(EXTRA_SCREEN, screen)
@@ -123,7 +119,7 @@ class LocationGroupActivity : AppCompatActivity(), LocationGroupProtocol {
             screen: String = Screen.PROFILE.id,
             requestCode: Int
         ) {
-            val intent = Intent(context, LocationGroupActivity::class.java)
+            val intent = Intent(context, ProjectActivity::class.java)
             if (group != null)
                 intent.putExtra(EXTRA_GROUP, group)
             intent.putExtra(EXTRA_SCREEN, screen)
@@ -137,7 +133,7 @@ class LocationGroupActivity : AppCompatActivity(), LocationGroupProtocol {
             screen: String = Screen.EDGE_DETAIL.id,
             requestCode: Int
         ) {
-            val intent = Intent(context, LocationGroupActivity::class.java)
+            val intent = Intent(context, ProjectActivity::class.java)
             if (group != null)
                 intent.putExtra(EXTRA_GROUP, group)
             if (deploymentId != null)

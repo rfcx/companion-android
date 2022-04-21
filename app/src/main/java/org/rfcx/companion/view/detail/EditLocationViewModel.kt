@@ -2,7 +2,6 @@ package org.rfcx.companion.view.detail
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.localdb.DatabaseCallback
 

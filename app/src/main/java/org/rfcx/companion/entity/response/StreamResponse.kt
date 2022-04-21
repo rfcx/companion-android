@@ -33,26 +33,3 @@ fun StreamResponse.toStream(): Stream {
         syncState = SyncState.Sent.key
     )
 }
-
-fun StreamResponse.toDeploymentLocation(): DeploymentLocation {
-    return DeploymentLocation(
-        coreId = this.id,
-        name = this.name ?: "-",
-        latitude = this.latitude ?: 0.0,
-        longitude = this.longitude ?: 0.0,
-        altitude = this.altitude ?: 0.0,
-        project = this.project?.toLocationGroup()
-    )
-}
-
-fun DeploymentLocation.toLocationResponse(): StreamResponse {
-    return StreamResponse(
-        id = this.coreId,
-        name = this.name,
-        latitude = this.latitude,
-        longitude = this.longitude,
-        altitude = this.altitude,
-        createdAt = Date(),
-        project = this.project?.toLocationGroupsResponse()
-    )
-}

@@ -32,17 +32,6 @@ open class Stream(
 
     fun getLatLng(): LatLng = LatLng(latitude, longitude)
 
-    fun asDeploymentLocation(): DeploymentLocation {
-        return DeploymentLocation(
-            coreId = serverId,
-            name = name,
-            latitude = latitude,
-            longitude = longitude,
-            altitude = altitude,
-            project = project?.toLocationGroup()
-        )
-    }
-
     companion object {
         const val TABLE_NAME = "Locate"
         const val FIELD_ID = "id"
@@ -57,5 +46,5 @@ open class Stream(
 }
 
 fun Stream.toMark(): MapMarker.SiteMarker {
-    return MapMarker.SiteMarker(id, name, latitude, longitude, altitude, project?.toLocationGroup()?.name, createdAt, MapFragment.SITE_MARKER)
+    return MapMarker.SiteMarker(id, name, latitude, longitude, altitude, project?.name, createdAt, MapFragment.SITE_MARKER)
 }

@@ -22,7 +22,7 @@ import org.rfcx.companion.util.*
 import org.rfcx.companion.util.Preferences.Companion.DISPLAY_THEME
 import org.rfcx.companion.view.profile.coordinates.CoordinatesActivity
 import org.rfcx.companion.view.profile.guardiansoftware.GuardianSoftwareActivity
-import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
+import org.rfcx.companion.view.profile.locationgroup.ProjectActivity
 import org.rfcx.companion.view.profile.offlinemap.OfflineMapActivity
 
 class ProfileFragment : Fragment() {
@@ -125,12 +125,12 @@ class ProfileFragment : Fragment() {
                 builder.show()
             }
             locationGroupLinearLayout.setOnClickListener {
-                context?.let { it1 -> LocationGroupActivity.startActivity(it1) }
+                context?.let { it1 -> ProjectActivity.startActivity(it1) }
             }
         }
 
         locationGroupLinearLayout.setOnClickListener {
-            context?.let { it1 -> LocationGroupActivity.startActivity(it1) }
+            context?.let { it1 -> ProjectActivity.startActivity(it1) }
         }
     }
 

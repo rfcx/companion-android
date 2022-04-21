@@ -12,10 +12,8 @@ import kotlinx.android.synthetic.main.activity_edit_location.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
-import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Screen
-import org.rfcx.companion.entity.toLocationGroup
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.CoreApiServiceImpl
@@ -26,7 +24,7 @@ import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.util.showCommonDialog
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
 import org.rfcx.companion.view.detail.DeploymentDetailActivity.Companion.DEPLOYMENT_REQUEST_CODE
-import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
+import org.rfcx.companion.view.profile.locationgroup.ProjectActivity
 
 class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocationActivityListener {
     private lateinit var viewModel: EditLocationViewModel
@@ -38,7 +36,7 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
     private var deploymentId: Int? = null
     private var groupName: String? = null
     private var device: String? = null
-    private var locationGroup: LocationGroup? = null
+    private var project: Project? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,11 +72,11 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == DEPLOYMENT_REQUEST_CODE) {
             when (resultCode) {
-                LocationGroupActivity.RESULT_OK -> {
-                    locationGroup =
-                        data?.getSerializableExtra(EXTRA_LOCATION_GROUP) as LocationGroup
-                    locationGroup?.let {
-                        val isGroupExisted = viewModel.isExisted(locationGroup?.name)
+                ProjectActivity.RESULT_OK -> {
+                    project =
+                        data?.getSerializableExtra(EXTRA_PROJECT) as Project
+                    project?.let {
+                        val isGroupExisted = viewModel.isExisted(project?.name)
                         groupName = if (isGroupExisted) {
                             it.name
                         } else {
@@ -86,8 +84,8 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
                         }
                     }
                 }
-                LocationGroupActivity.RESULT_DELETE -> {
-                    val group = data?.getStringExtra(LocationGroupActivity.EXTRA_GROUP)
+                ProjectActivity.RESULT_DELETE -> {
+                    val group = data?.getStringExtra(ProjectActivity.EXTRA_GROUP)
                     val isGroupExisted = viewModel.isExisted(group)
                     groupName = if (isGroupExisted) {
                         group
@@ -104,9 +102,9 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
             latitude = it.getDouble(EXTRA_LATITUDE)
             longitude = it.getDouble(EXTRA_LONGITUDE)
             altitude = it.getDouble(ARG_ALTITUDE)
-            nameLocation = it.getString(EXTRA_LOCATION_NAME)
+            nameLocation = it.getString(EXTRA_STREAM_NAME)
             deploymentId = it.getInt(EXTRA_DEPLOYMENT_ID)
-            groupName = it.getString(EXTRA_LOCATION_GROUP_NAME)
+            groupName = it.getString(EXTRA_PROJECT_NAME)
             device = it.getString(EXTRA_DEVICE)
         }
     }
@@ -194,7 +192,7 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
     override fun startLocationGroupPage() {
         val setLocationGroup = if (groupName == getString(R.string.none)) null else groupName
         intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)?.let { deploymentId ->
-            LocationGroupActivity.startActivity(
+            ProjectActivity.startActivity(
                 this,
                 setLocationGroup,
                 deploymentId,
@@ -233,10 +231,10 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
         const val EXTRA_LATITUDE = "EXTRA_LATITUDE"
         const val EXTRA_LONGITUDE = "EXTRA_LONGITUDE"
         const val ARG_ALTITUDE = "ARG_ALTITUDE"
-        const val EXTRA_LOCATION_NAME = "EXTRA_LOCATION_NAME"
+        const val EXTRA_STREAM_NAME = "EXTRA_STREAM_NAME"
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
-        const val EXTRA_LOCATION_GROUP_NAME = "EXTRA_LOCATION_GROUP_NAME"
-        const val EXTRA_LOCATION_GROUP = "EXTRA_LOCATION_GROUP"
+        const val EXTRA_PROJECT_NAME = "EXTRA_PROJECT_NAME"
+        const val EXTRA_PROJECT = "EXTRA_PROJECT"
         const val EXTRA_DEVICE = "EXTRA_DEVICE"
 
         fun startActivity(
@@ -254,9 +252,9 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
             intent.putExtra(EXTRA_LATITUDE, lat)
             intent.putExtra(EXTRA_LONGITUDE, lng)
             intent.putExtra(ARG_ALTITUDE, altitude)
-            intent.putExtra(EXTRA_LOCATION_NAME, name)
+            intent.putExtra(EXTRA_STREAM_NAME, name)
             intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
-            intent.putExtra(EXTRA_LOCATION_GROUP_NAME, groupName)
+            intent.putExtra(EXTRA_PROJECT_NAME, groupName)
             intent.putExtra(EXTRA_DEVICE, device)
             (context as Activity).startActivityForResult(intent, requestCode)
         }

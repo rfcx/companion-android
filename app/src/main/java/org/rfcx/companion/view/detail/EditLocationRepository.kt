@@ -1,6 +1,5 @@
 package org.rfcx.companion.view.detail
 
-import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.repo.api.DeviceApiHelper

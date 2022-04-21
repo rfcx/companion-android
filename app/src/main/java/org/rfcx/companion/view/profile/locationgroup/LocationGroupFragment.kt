@@ -13,10 +13,8 @@ import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import io.realm.Realm
-import kotlinx.android.synthetic.main.activity_project_select.*
 import kotlinx.android.synthetic.main.fragment_location_group.*
 import kotlinx.android.synthetic.main.fragment_location_group.projectSwipeRefreshView
-import kotlinx.android.synthetic.main.fragment_map.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.response.ProjectResponse
@@ -35,7 +33,7 @@ class LocationGroupFragment :
     private val locationGroupDb = ProjectDb(realm)
 
     private val locationGroupAdapter by lazy { LocationGroupAdapter(this) }
-    private var locationGroupProtocol: LocationGroupProtocol? = null
+    private var projectProtocol: ProjectProtocol? = null
     private var selectedGroup: String? = null
     private var screen: String? = null
 
@@ -49,7 +47,7 @@ class LocationGroupFragment :
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        locationGroupProtocol = (context as LocationGroupProtocol)
+        projectProtocol = (context as ProjectProtocol)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,7 +88,7 @@ class LocationGroupFragment :
     private fun initIntent() {
         arguments?.let {
             selectedGroup = it.getString(ARG_GROUP)
-            screen = it.getString(LocationGroupActivity.EXTRA_SCREEN)
+            screen = it.getString(ProjectActivity.EXTRA_SCREEN)
         }
     }
 
@@ -152,7 +150,7 @@ class LocationGroupFragment :
     }
 
     override fun onClicked(group: Project) {
-        locationGroupProtocol?.onLocationGroupClick(group)
+        projectProtocol?.onProjectClick(group)
     }
 
     override fun onLockImageClicked() {
@@ -176,7 +174,7 @@ class LocationGroupFragment :
         fun newInstance(group: String?, screen: String?) = LocationGroupFragment().apply {
             arguments = Bundle().apply {
                 putString(ARG_GROUP, group)
-                putString(LocationGroupActivity.EXTRA_SCREEN, screen)
+                putString(ProjectActivity.EXTRA_SCREEN, screen)
             }
         }
     }

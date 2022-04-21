@@ -76,7 +76,7 @@ import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.detail.DeploymentDetailActivity
-import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
+import org.rfcx.companion.view.profile.locationgroup.ProjectActivity
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupAdapter
 import org.rfcx.companion.view.profile.locationgroup.LocationGroupListener
 import java.io.File
@@ -201,7 +201,7 @@ class MapFragment :
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         locationPermissions?.handleActivityResult(requestCode, resultCode)
-        screen = data?.getStringExtra(LocationGroupActivity.EXTRA_SCREEN) ?: ""
+        screen = data?.getStringExtra(ProjectActivity.EXTRA_SCREEN) ?: ""
     }
 
     override fun onRequestPermissionsResult(

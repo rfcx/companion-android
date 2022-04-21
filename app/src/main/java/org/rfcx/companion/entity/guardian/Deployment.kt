@@ -4,12 +4,9 @@ import android.content.Context
 import com.google.gson.annotations.Expose
 import io.realm.RealmList
 import io.realm.RealmModel
-import io.realm.RealmResults
-import io.realm.annotations.LinkingObjects
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
 import org.rfcx.companion.R
-import org.rfcx.companion.entity.DeploymentLocation
 import org.rfcx.companion.entity.DeploymentState
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Stream

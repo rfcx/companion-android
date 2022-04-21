@@ -44,7 +44,7 @@ import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.AudioMothDeploymentViewModel
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.map.MapboxCameraUtils
-import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
+import org.rfcx.companion.view.profile.locationgroup.ProjectActivity
 
 class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     private val analytics by lazy { context?.let { Analytics(it) } }
@@ -157,7 +157,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             val group = locationGroupValueTextView.text.toString()
             val setLocationGroup = if (group == getString(R.string.none)) null else group
             context?.let { it1 ->
-                LocationGroupActivity.startActivity(
+                ProjectActivity.startActivity(
                     it1,
                     setLocationGroup,
                     Screen.DETAIL_DEPLOYMENT_SITE.id
