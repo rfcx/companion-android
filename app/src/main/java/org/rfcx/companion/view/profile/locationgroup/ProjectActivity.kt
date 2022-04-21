@@ -12,12 +12,12 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Preferences
-import org.rfcx.companion.view.detail.EditLocationActivity.Companion.EXTRA_PROJECT
+import org.rfcx.companion.view.detail.EditLocationActivity
 
 class ProjectActivity : AppCompatActivity(), ProjectProtocol {
 
     // For detail page to edit location group
-    private var group: String? = null
+    private var project: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,29 +26,29 @@ class ProjectActivity : AppCompatActivity(), ProjectProtocol {
         setupToolbar()
 
         val screen: String? = intent?.getStringExtra(EXTRA_SCREEN)
-        group = intent?.getStringExtra(EXTRA_GROUP)
+        project = intent?.getStringExtra(EXTRA_PROJECT)
 
-        startFragment(LocationGroupFragment.newInstance(group, screen))
+        startFragment(ProjectFragment.newInstance(project, screen))
     }
     override fun onProjectClick(project: Project) {
-        locationGroupSelected(project)
+        projectSelected(project.id)
     }
 
-    private fun locationGroupSelected(group: Project) {
+    private fun projectSelected(id: Int) {
         val screen: String? = intent?.getStringExtra(EXTRA_SCREEN)
         val preferences = Preferences.getInstance(this)
         when (screen) {
             Screen.LOCATION.id -> {
-                group.name?.let { preferences.putString(Preferences.GROUP, it) }
+                preferences.putInt(Preferences.EDIT_PROJECT, id)
                 finish()
             }
             Screen.DETAIL_DEPLOYMENT_SITE.id -> {
-                group.name?.let { preferences.putString(Preferences.GROUP, it) }
+                preferences.putInt(Preferences.EDIT_PROJECT, id)
                 finish()
             }
             Screen.EDIT_LOCATION.id -> {
                 val intent = Intent()
-                intent.putExtra(EXTRA_PROJECT, group)
+                intent.putExtra(EditLocationActivity.EXTRA_PROJECT_ID, id)
                 setResult(RESULT_OK, intent)
                 finish()
             }
@@ -77,7 +77,7 @@ class ProjectActivity : AppCompatActivity(), ProjectProtocol {
 
     override fun onBackPressed() {
         val intent = Intent()
-        intent.putExtra(EXTRA_GROUP, group)
+        intent.putExtra(EXTRA_PROJECT, project)
         setResult(RESULT_DELETE, intent)
         finish()
     }
@@ -86,15 +86,15 @@ class ProjectActivity : AppCompatActivity(), ProjectProtocol {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == LOCATION_GROUP_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                val locationGroup =
-                    data?.getSerializableExtra(EXTRA_PROJECT) as Project
-                locationGroupSelected(locationGroup)
+                val id =
+                    data?.getIntExtra(EditLocationActivity.EXTRA_PROJECT_ID, -1) ?: -1
+                projectSelected(id)
             }
         }
     }
 
     companion object {
-        const val EXTRA_GROUP = "EXTRA_GROUP"
+        const val EXTRA_PROJECT = "EXTRA_PROJECT"
         const val EXTRA_SCREEN = "EXTRA_SCREEN"
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
         const val RESULT_OK = 1
@@ -103,39 +103,26 @@ class ProjectActivity : AppCompatActivity(), ProjectProtocol {
 
         fun startActivity(
             context: Context,
-            group: String? = null,
+            project: Int? = -1,
             screen: String = Screen.PROFILE.id
         ) {
             val intent = Intent(context, ProjectActivity::class.java)
-            if (group != null)
-                intent.putExtra(EXTRA_GROUP, group)
+            if (project != null)
+                intent.putExtra(EXTRA_PROJECT, project)
             intent.putExtra(EXTRA_SCREEN, screen)
             context.startActivity(intent)
         }
 
         fun startActivity(
             context: Context,
-            group: String? = null,
-            screen: String = Screen.PROFILE.id,
-            requestCode: Int
-        ) {
-            val intent = Intent(context, ProjectActivity::class.java)
-            if (group != null)
-                intent.putExtra(EXTRA_GROUP, group)
-            intent.putExtra(EXTRA_SCREEN, screen)
-            (context as Activity).startActivityForResult(intent, requestCode)
-        }
-
-        fun startActivity(
-            context: Context,
-            group: String? = null,
+            project: Int? = -1,
             deploymentId: Int? = null,
             screen: String = Screen.EDGE_DETAIL.id,
             requestCode: Int
         ) {
             val intent = Intent(context, ProjectActivity::class.java)
-            if (group != null)
-                intent.putExtra(EXTRA_GROUP, group)
+            if (project != null)
+                intent.putExtra(EXTRA_PROJECT, project)
             if (deploymentId != null)
                 intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
             intent.putExtra(EXTRA_SCREEN, screen)

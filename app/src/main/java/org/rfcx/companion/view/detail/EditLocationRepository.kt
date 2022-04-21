@@ -1,6 +1,7 @@
 package org.rfcx.companion.view.detail
 
 import org.rfcx.companion.entity.Project
+import org.rfcx.companion.entity.Stream
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.local.LocalDataHelper
@@ -22,15 +23,15 @@ class EditLocationRepository(
             .editStream(id, locationName, latitude, longitude, altitude, callback)
     }
 
+    fun getStreamById(id: Int): Stream? {
+        return localDataHelper.getLocateLocalDb().getLocateById(id)
+    }
+
     fun editProject(id: Int, project: Project, callback: DatabaseCallback) {
         return localDataHelper.getDeploymentLocalDb().editProject(id, project, callback)
     }
 
-    fun isExisted(name: String?): Boolean {
-        return localDataHelper.getProjectLocalDb().isExisted(name)
-    }
-
-    fun getProjectByName(name: String): Project? {
-        return localDataHelper.getProjectLocalDb().getProjectByName(name)
+    fun getProjectById(id: Int): Project? {
+        return localDataHelper.getProjectLocalDb().getProjectById(id)
     }
 }

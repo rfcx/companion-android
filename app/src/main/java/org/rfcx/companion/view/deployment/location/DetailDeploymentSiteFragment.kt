@@ -66,7 +66,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     var fromMapPicker: Boolean = false
 
     // Location
-    private var group: String? = null
+    private var project: Project? = null
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     private var altitude: Double = 0.0
@@ -154,12 +154,10 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         updateView()
 
         changeProjectTextView.setOnClickListener {
-            val group = locationGroupValueTextView.text.toString()
-            val setLocationGroup = if (group == getString(R.string.none)) null else group
             context?.let { it1 ->
                 ProjectActivity.startActivity(
                     it1,
-                    setLocationGroup,
+                    this.project?.id ?: -1,
                     Screen.DETAIL_DEPLOYMENT_SITE.id
                 )
                 analytics?.trackChangeLocationGroupEvent(Screen.DETAIL_DEPLOYMENT_SITE.id)
@@ -198,12 +196,10 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 getLastLocation()
                 val siteLocation = userLocation
                 val siteId = if (isCreateNew) -1 else site?.id ?: -1
-                val nameSite = if (isCreateNew) siteName else site?.name ?: ""
                 it.startMapPicker(
                     siteLocation?.latitude ?: 0.0,
                     siteLocation?.longitude ?: 0.0,
-                    siteId,
-                    nameSite
+                    siteId
                 )
                 it.hideToolbar()
             }
@@ -251,7 +247,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 updatedAt = it.updatedAt,
                 lastDeploymentId = it.lastDeploymentId,
                 syncState = it.syncState,
-                project = getLocationGroup(it.project?.name ?: getString(R.string.none))
+                project = getProject(it.project?.id ?: 0)
             )
             createSiteSymbol(locate.getLatLng())
             moveCamera(LatLng(locate.getLatLng()), DefaultSetupMap.DEFAULT_ZOOM)
@@ -267,7 +263,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 latitude = it.latitude,
                 longitude = it.longitude,
                 altitude = altitude,
-                project = getLocationGroup(group ?: getString(R.string.none))
+                project = getProject(project?.id ?: -1)
             )
             deploymentProtocol?.setDeployLocation(locate, false)
             deploymentProtocol?.nextStep()
@@ -289,15 +285,15 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 updatedAt = it.updatedAt,
                 lastDeploymentId = it.lastDeploymentId,
                 syncState = it.syncState,
-                project = getLocationGroup(it.project?.name ?: getString(R.string.none))
+                project = getProject(it.project?.id ?: 0)
             )
             deploymentProtocol?.setDeployLocation(locate, true)
             deploymentProtocol?.nextStep()
         }
     }
 
-    private fun getLocationGroup(group: String): Project {
-        return deploymentProtocol?.getLocationGroup(group) ?: Project()
+    private fun getProject(id: Int): Project {
+        return deploymentProtocol?.getProject(id) ?: Project()
     }
 
     private fun getLastLocation() {
@@ -533,10 +529,11 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
 
         val projectId = preferences?.getInt(Preferences.SELECTED_PROJECT) ?: -1
         val selectedProject = audioMothDeploymentViewModel.getProjectById(projectId)
-        val selectedGroup = preferences?.getString(Preferences.GROUP)
+        val editProjectId = preferences?.getInt(Preferences.EDIT_PROJECT) ?: -1
+        val selectedEditProject = audioMothDeploymentViewModel.getProjectById(editProjectId)
 
-        group = selectedGroup ?: (selectedProject?.name ?: getString(R.string.none))
-        locationGroupValueTextView.text = group
+        this.project = selectedEditProject ?: selectedProject
+        locationGroupValueTextView.text = this.project?.name
     }
 
     override fun onPause() {

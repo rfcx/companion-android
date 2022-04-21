@@ -3,6 +3,7 @@ package org.rfcx.companion.view.detail
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import org.rfcx.companion.entity.Project
+import org.rfcx.companion.entity.Stream
 import org.rfcx.companion.localdb.DatabaseCallback
 
 class EditLocationViewModel(
@@ -28,15 +29,15 @@ class EditLocationViewModel(
         )
     }
 
+    fun getStreamById(id: Int): Stream? {
+        return editLocationRepository.getStreamById(id)
+    }
+
     fun editProject(id: Int, project: Project, callback: DatabaseCallback) {
         return editLocationRepository.editProject(id, project, callback)
     }
 
-    fun isExisted(name: String?): Boolean {
-        return editLocationRepository.isExisted(name)
-    }
-
-    fun getProjectByName(name: String): Project? {
-        return editLocationRepository.getProjectByName(name)
+    fun getProjectById(id: Int): Project? {
+        return editLocationRepository.getProjectById(id)
     }
 }

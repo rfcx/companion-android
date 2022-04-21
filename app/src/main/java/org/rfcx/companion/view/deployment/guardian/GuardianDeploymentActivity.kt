@@ -296,9 +296,6 @@ class GuardianDeploymentActivity :
         loc.longitude = 0.0
 
         _siteItems = getListSite(
-            this,
-            guardianDeployments,
-            getString(R.string.none),
             currentLocate ?: loc,
             sites
         )
@@ -406,8 +403,8 @@ class GuardianDeploymentActivity :
 
     override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
 
-    override fun getLocationGroup(name: String): Project? {
-        return projectDb.getProjectByName(name)
+    override fun getProject(id: Int): Project? {
+        return projectDb.getProjectById(id)
     }
 
     override fun setDeployLocation(stream: Stream, isExisted: Boolean) {

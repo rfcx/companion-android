@@ -144,7 +144,7 @@ class MapPickerFragment :
             latitude = it.getDouble(ARG_LATITUDE)
             longitude = it.getDouble(ARG_LONGITUDE)
             altitude = it.getDouble(ARG_ALTITUDE)
-            nameLocation = it.getString(ARG_LOCATION_NAME)
+            nameLocation = it.getString(ARG_STREAM_ID)
             siteId = it.getInt(ARG_SITE_ID)
         }
     }
@@ -449,7 +449,7 @@ class MapPickerFragment :
         private const val ARG_LATITUDE = "ARG_LATITUDE"
         private const val ARG_LONGITUDE = "ARG_LONGITUDE"
         private const val ARG_ALTITUDE = "ARG_ALTITUDE"
-        private const val ARG_LOCATION_NAME = "ARG_LOCATION_NAME"
+        private const val ARG_STREAM_ID = "ARG_STREAM_ID"
         private const val ARG_SITE_ID = "ARG_SITE_ID"
 
         const val REQUEST_PERMISSIONS_REQUEST_CODE = 34
@@ -457,25 +457,24 @@ class MapPickerFragment :
         const val DEFAULT_MAX_WAIT_TIME = DEFAULT_INTERVAL_IN_MILLISECONDS * 5
 
         @JvmStatic
-        fun newInstance(lat: Double, lng: Double, altitude: Double, name: String) =
+        fun newInstance(lat: Double, lng: Double, altitude: Double, id: Int) =
             MapPickerFragment()
                 .apply {
                     arguments = Bundle().apply {
                         putDouble(ARG_LATITUDE, lat)
                         putDouble(ARG_LONGITUDE, lng)
                         putDouble(ARG_ALTITUDE, altitude)
-                        putString(ARG_LOCATION_NAME, name)
+                        putInt(ARG_STREAM_ID, id)
                     }
                 }
 
-        fun newInstance(lat: Double, lng: Double, siteId: Int, name: String) =
+        fun newInstance(lat: Double, lng: Double, id: Int) =
             MapPickerFragment()
                 .apply {
                     arguments = Bundle().apply {
                         putDouble(ARG_LATITUDE, lat)
                         putDouble(ARG_LONGITUDE, lng)
-                        putString(ARG_LOCATION_NAME, name)
-                        putInt(ARG_SITE_ID, siteId)
+                        putInt(ARG_STREAM_ID, id)
                     }
                 }
     }

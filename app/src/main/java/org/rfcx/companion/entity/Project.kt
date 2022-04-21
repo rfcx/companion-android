@@ -28,7 +28,7 @@ open class Project(
     @LinkingObjects("project") val streams: RealmResults<Stream>? = null
 ) : RealmModel, Serializable {
     companion object {
-        const val TABLE_NAME = "LocationGroups"
+        const val TABLE_NAME = "Project"
         const val PROJECT_ID = "id"
         const val PROJECT_NAME = "name"
         const val PROJECT_COLOR = "color"

@@ -147,7 +147,7 @@ class CompanionRealmMigration : RealmMigration {
 
         val locate = realm.schema.get(Stream.TABLE_NAME)
         locate?.apply {
-            addRealmObjectField(Stream.FIELD_LOCATION_GROUP, locationGroup)
+            addRealmObjectField(Stream.FIELD_PROJECT, locationGroup)
         }
 
         val deploymentLocation = realm.schema.get("DeploymentLocation")

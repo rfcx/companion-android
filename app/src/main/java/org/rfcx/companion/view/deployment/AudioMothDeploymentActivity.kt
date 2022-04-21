@@ -100,9 +100,6 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
         loc.longitude = 0.0
 
         _siteItems = getListSite(
-            this,
-            deployments,
-            getString(R.string.none),
             currentLocate ?: loc,
             sites
         )
@@ -206,8 +203,8 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
         return this._deployment
     }
 
-    override fun getLocationGroup(name: String): Project? {
-        return audioMothDeploymentViewModel.getProjectByName(name)
+    override fun getProject(id: Int): Project? {
+        return audioMothDeploymentViewModel.getProjectById(id)
     }
 
     override fun setDeployment(deployment: Deployment) {

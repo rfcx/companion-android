@@ -6,7 +6,7 @@ import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 
 interface BaseDeploymentProtocol {
-    fun startMapPicker(latitude: Double, longitude: Double, siteId: Int, name: String)
+    fun startMapPicker(latitude: Double, longitude: Double, streamId: Int)
     fun startCheckList()
     fun startDetailDeploymentSite(id: Int, name: String?, isNewSite: Boolean)
 
@@ -17,7 +17,7 @@ interface BaseDeploymentProtocol {
 
     fun getDeploymentLocation(): Stream?
     fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem>
-    fun getLocationGroup(name: String): Project?
+    fun getProject(id: Int): Project?
     fun getImages(): List<String>
     fun getCurrentLocation(): Location
 

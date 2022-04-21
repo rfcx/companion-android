@@ -30,7 +30,6 @@ import com.mapbox.pluginscalebar.ScaleBarPlugin
 import com.zhihu.matisse.Matisse
 import com.zhihu.matisse.MimeType
 import kotlinx.android.synthetic.main.activity_deployment_detail.*
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.buttom_sheet_attach_image_layout.view.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.BuildConfig
@@ -111,20 +110,15 @@ class DeploymentDetailActivity : AppCompatActivity(), OnMapReadyCallback, (Deplo
 
         editButton.setOnClickListener {
             deployment?.let {
-                val location = deployment?.stream
-                location?.let { locate ->
-                    val group = locate.project?.name ?: getString(R.string.none)
-                    val isGroupExisted = viewModel.isExisted(locate.project?.name)
+                val stream = deployment?.stream
+                stream?.let { st ->
                     intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)?.let { deploymentId ->
                         analytics.trackEditLocationEvent()
                         EditLocationActivity.startActivity(
                             this,
-                            locate.latitude,
-                            locate.longitude,
-                            locate.altitude,
-                            locate.name,
+                            st.id,
                             deploymentId,
-                            if (isGroupExisted) group else getString(R.string.none),
+                            st.project?.id ?: -1,
                             Device.AUDIOMOTH.value,
                             DEPLOYMENT_REQUEST_CODE
                         )

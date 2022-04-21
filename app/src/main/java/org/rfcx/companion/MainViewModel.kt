@@ -41,23 +41,14 @@ class MainViewModel(
     private val projects = MutableLiveData<Resource<List<Project>>>()
     private val tracks = MutableLiveData<Resource<List<DeploymentAssetResponse>>>()
     private val deploymentMarkers = MutableLiveData<Resource<List<MapMarker.DeploymentMarker>>>()
-    private val siteMarkers = MutableLiveData<Resource<List<MapMarker>>>()
-    private val siteList = MutableLiveData<Resource<List<Stream>>>()
-    private val showDeployments = MutableLiveData<Resource<List<Deployment>>>()
+    private val streamMarkers = MutableLiveData<Resource<List<MapMarker>>>()
+    private val streamList = MutableLiveData<Resource<List<Stream>>>()
 
-    private var deployments = listOf<Deployment>()
-    private var sites = listOf<Stream>()
+    private var streams = listOf<Stream>()
 
-    private lateinit var deploymentLiveData: LiveData<List<Deployment>>
-    private val deploymentObserve = Observer<List<Deployment>> {
-        deployments = it
-        combinedData()
-    }
-
-    private lateinit var siteLiveData: LiveData<List<Stream>>
-    private val siteObserve = Observer<List<Stream>> {
-        sites = it
-        siteList.postValue(Resource.success(it))
+    private lateinit var streamLiveData: LiveData<List<Stream>>
+    private val streamObserve = Observer<List<Stream>> {
+        streams = it
         combinedData()
     }
 
@@ -66,14 +57,9 @@ class MainViewModel(
     }
 
     private fun fetchLiveData() {
-        siteLiveData =
+        streamLiveData =
             Transformations.map(mainRepository.getAllLocateResultsAsync().asLiveData()) { it }
-        siteLiveData.observeForever(siteObserve)
-
-        deploymentLiveData = Transformations.map(
-            mainRepository.getAllDeploymentLocateResultsAsync().asLiveData()
-        ) { it }
-        deploymentLiveData.observeForever(deploymentObserve)
+        streamLiveData.observeForever(streamObserve)
     }
 
     fun fetchProjects() {
@@ -238,21 +224,15 @@ class MainViewModel(
     }
 
     fun combinedData() {
-        var deploymentsForShow = this.deployments.filter { it.isCompleted() }
-        val usedSites = deploymentsForShow.map { it.stream?.serverId }
-        var filteredShowLocations =
-            sites.filter { loc -> !usedSites.contains(loc.serverId) || loc.serverId == null }
-        val projectName = getProjectName()
-        if (projectName != context.getString(R.string.none)) {
-            filteredShowLocations =
-                filteredShowLocations.filter { it.project?.name == projectName && it.lastDeploymentId == 0 }
-            deploymentsForShow =
-                deploymentsForShow.filter { it.stream?.project?.name == projectName }
-        }
-        val deploymentMarkersList = deploymentsForShow.map { it.toMark(context) }
+        val projectId = getSelectedProjectId()
+        val filteredStreams = this.streams.filter { it.project?.id == projectId }
+        val streams = filteredStreams.filter { it.deployments.isNullOrEmpty() }
+        val deployments = filteredStreams.mapNotNull { it.deployments }.flatten().filter { it.isCompleted() }
+
+        val deploymentMarkersList = deployments.map { it.toMark(context) }
         deploymentMarkers.postValue(Resource.success(deploymentMarkersList))
-        siteMarkers.postValue(Resource.success(filteredShowLocations.map { it.toMark() }))
-        showDeployments.postValue(Resource.success(deploymentsForShow))
+        streamMarkers.postValue(Resource.success(streams.map { it.toMark() }))
+        streamList.postValue(Resource.success(filteredStreams))
     }
 
     fun updateStatusOfflineMap() {
@@ -344,11 +324,11 @@ class MainViewModel(
         return jsonObject.getString("regionName")
     }
 
-    private fun getProjectName(): String {
+    private fun getSelectedProjectId(): Int {
         val preferences = Preferences.getInstance(context)
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
         val project = mainRepository.getProjectById(projectId)
-        return project?.name ?: context.getString(R.string.none)
+        return project?.id ?: 0
     }
 
     fun retrieveLocations() {
@@ -366,16 +346,12 @@ class MainViewModel(
         return deploymentMarkers
     }
 
-    fun getSiteMarkers(): LiveData<Resource<List<MapMarker>>> {
-        return siteMarkers
+    fun getStreamMarkers(): LiveData<Resource<List<MapMarker>>> {
+        return streamMarkers
     }
 
-    fun getSites(): LiveData<Resource<List<Stream>>> {
-        return siteList
-    }
-
-    fun getShowDeployments(): LiveData<Resource<List<Deployment>>> {
-        return showDeployments
+    fun getStreams(): LiveData<Resource<List<Stream>>> {
+        return streamList
     }
 
     fun getTrackingFromRemote(): LiveData<Resource<List<DeploymentAssetResponse>>> {
@@ -423,7 +399,6 @@ class MainViewModel(
     }
 
     fun onDestroy() {
-        deploymentLiveData.removeObserver(deploymentObserve)
-        siteLiveData.removeObserver(siteObserve)
+        streamLiveData.removeObserver(streamObserve)
     }
 }

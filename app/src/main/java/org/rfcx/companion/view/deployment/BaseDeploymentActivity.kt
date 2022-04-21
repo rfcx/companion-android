@@ -34,7 +34,6 @@ abstract class BaseDeploymentActivity :
 
     var latitude = 0.0
     var longitude = 0.0
-    var nameLocation: String = ""
     var siteId: Int = 0
 
     var currentCheckName = ""
@@ -71,16 +70,15 @@ abstract class BaseDeploymentActivity :
             .commit()
     }
 
-    private fun setLatLng(latitude: Double, longitude: Double, siteId: Int, name: String) {
+    private fun setLatLng(latitude: Double, longitude: Double, siteId: Int) {
         this.latitude = latitude
         this.longitude = longitude
         this.siteId = siteId
-        this.nameLocation = name
     }
 
-    override fun startMapPicker(latitude: Double, longitude: Double, siteId: Int, name: String) {
-        setLatLng(latitude, longitude, siteId, name)
-        startFragment(MapPickerFragment.newInstance(latitude, longitude, siteId, name))
+    override fun startMapPicker(latitude: Double, longitude: Double, streamId: Int) {
+        setLatLng(latitude, longitude, streamId)
+        startFragment(MapPickerFragment.newInstance(latitude, longitude, streamId))
     }
 
     override fun startDetailDeploymentSite(id: Int, name: String?, isNewSite: Boolean) {
