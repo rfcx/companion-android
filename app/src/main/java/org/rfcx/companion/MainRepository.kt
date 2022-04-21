@@ -45,7 +45,7 @@ class MainRepository(
         .insertOrUpdate(deploymentAssetResponse, filePath, deploymentId)
 
     fun getAllLocateResultsAsync(): RealmResults<Stream> {
-        return localDataHelper.getLocateLocalDb().getAllResultsAsync()
+        return localDataHelper.getStreamLocalDb().getAllResultsAsync()
     }
 
     fun getAllDeploymentLocateResultsAsync(): RealmResults<Deployment> {
@@ -76,12 +76,12 @@ class MainRepository(
         return localDataHelper.getDeploymentLocalDb().getDeploymentById(id)
     }
 
-    fun getLocateByName(name: String): Stream? {
-        return localDataHelper.getLocateLocalDb().getLocateByName(name)
+    fun getStreamByName(name: String): Stream? {
+        return localDataHelper.getStreamLocalDb().getStreamByName(name)
     }
 
-    fun getLocateById(id: Int): Stream? {
-        return localDataHelper.getLocateLocalDb().getLocateById(id)
+    fun getStreamById(id: Int): Stream? {
+        return localDataHelper.getStreamLocalDb().getStreamById(id)
     }
 
     fun updateOfflineState(state: String, id: String) {

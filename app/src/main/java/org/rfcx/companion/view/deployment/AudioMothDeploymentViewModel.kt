@@ -105,16 +105,12 @@ class AudioMothDeploymentViewModel(
         audioMothDeploymentRepository.insertOrUpdateLocate(deploymentId, stream)
     }
 
-    fun getLocateById(id: Int): Stream? {
+    fun getStreamById(id: Int): Stream? {
         return audioMothDeploymentRepository.getLocateById(id)
     }
 
     fun getProjectById(id: Int): Project? {
         return audioMothDeploymentRepository.getProjectById(id)
-    }
-
-    fun getProjectByName(name: String): Project? {
-        return audioMothDeploymentRepository.getProjectByName(name)
     }
 
     fun deleteImages(id: Int) {

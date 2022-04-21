@@ -10,7 +10,7 @@ import kotlinx.coroutines.withContext
 import org.rfcx.companion.entity.response.StreamResponse
 import org.rfcx.companion.entity.response.toStream
 import org.rfcx.companion.localdb.DeploymentDb
-import org.rfcx.companion.localdb.LocateDb
+import org.rfcx.companion.localdb.StreamDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.getIdToken
@@ -33,9 +33,9 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
         val token = "Bearer ${context.getIdToken()}"
         val result = getStreams(token, currentStreamsLoading)
         if (result) {
-            val streamDb = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
+            val streamDb = StreamDb(Realm.getInstance(RealmHelper.migrationConfig()))
             val deploymentDb = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
-            val savedStreams = streamDb.getLocations().filter { it.serverId != null && it.project?.serverId == PROJECT_ID }
+            val savedStreams = streamDb.getStreams().filter { it.serverId != null && it.project?.serverId == PROJECT_ID }
             val downloadedStreams = streams.map { it.toStream().serverId }
             val filteredStreams =
                 savedStreams.filter { stream -> !downloadedStreams.contains(stream.serverId) }
@@ -43,7 +43,7 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
                 filteredStreams.forEach {
                     Log.d(TAG, "remove stream: ${it.id}")
                     deploymentDb.deleteDeploymentByStreamId(it.serverId!!)
-                    streamDb.deleteLocate(it.id)
+                    streamDb.deleteStream(it.id)
                 }
                 // force delete deployment on device-api
                 DeploymentSyncWorker.enqueue(context)

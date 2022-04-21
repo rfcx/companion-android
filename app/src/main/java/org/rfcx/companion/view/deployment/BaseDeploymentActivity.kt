@@ -50,7 +50,6 @@ abstract class BaseDeploymentActivity :
                 latitude,
                 longitude,
                 siteId,
-                name,
                 true
             )
         )
@@ -81,8 +80,8 @@ abstract class BaseDeploymentActivity :
         startFragment(MapPickerFragment.newInstance(latitude, longitude, streamId))
     }
 
-    override fun startDetailDeploymentSite(id: Int, name: String?, isNewSite: Boolean) {
-        startFragment(DetailDeploymentSiteFragment.newInstance(id, name, isNewSite))
+    override fun startDetailDeploymentSite(id: Int, isNewSite: Boolean) {
+        startFragment(DetailDeploymentSiteFragment.newInstance(id, isNewSite))
     }
 
     override fun getDeploymentLocation(): Stream? = this._deployLocation

@@ -160,8 +160,7 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
                 DetailDeploymentSiteFragment.newInstance(
                     latitude,
                     longitude,
-                    siteId,
-                    nameLocation
+                    siteId
                 )
             )
             is AudioMothCheckListFragment -> {
@@ -188,6 +187,10 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
             is ChooseDeviceFragment -> finish()
             else -> startCheckList()
         }
+    }
+
+    override fun getStream(id: Int): Stream? {
+        return audioMothDeploymentViewModel.getStreamById(id)
     }
 
     override fun startCheckList() {
@@ -300,7 +303,7 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
                         )
                     )
                 } else {
-                    startDetailDeploymentSite(site.id, site.name, false)
+                    startDetailDeploymentSite(site.id, false)
                 }
             }
             1 -> {

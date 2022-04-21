@@ -10,7 +10,7 @@ import org.rfcx.companion.entity.response.toProject
 import org.rfcx.companion.entity.response.toStream
 import org.rfcx.companion.util.toISO8601Format
 
-class LocateDb(private val realm: Realm) {
+class StreamDb(private val realm: Realm) {
 
     fun getAllResultsAsync(sort: Sort = Sort.DESCENDING): RealmResults<Stream> {
         return realm.where(Stream::class.java)
@@ -28,19 +28,19 @@ class LocateDb(private val realm: Realm) {
             .findAllAsync()
     }
 
-    fun getLocations(): List<Stream> {
+    fun getStreams(): List<Stream> {
         return realm.where(Stream::class.java).findAll() ?: arrayListOf()
     }
 
-    fun getLocateByName(name: String): Stream? {
+    fun getStreamByName(name: String): Stream? {
         return realm.where(Stream::class.java).equalTo(Stream.FIELD_NAME, name).findFirst()
     }
 
-    fun getLocateById(id: Int): Stream? {
+    fun getStreamById(id: Int): Stream? {
         return realm.where(Stream::class.java).equalTo(Stream.FIELD_ID, id).findFirst()
     }
 
-    fun deleteLocate(id: Int) {
+    fun deleteStream(id: Int) {
         realm.executeTransaction {
             val locate =
                 it.where(Stream::class.java).equalTo(Stream.FIELD_ID, id)
@@ -49,7 +49,7 @@ class LocateDb(private val realm: Realm) {
         }
     }
 
-    fun insertOrUpdateLocate(deploymentId: Int, stream: Stream) {
+    fun insertOrUpdateStream(deploymentId: Int, stream: Stream) {
         realm.executeTransaction {
             if (stream.id == 0) {
                 val id = (

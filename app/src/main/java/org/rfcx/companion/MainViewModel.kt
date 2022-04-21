@@ -374,12 +374,12 @@ class MainViewModel(
         return mainRepository.getDeploymentById(id)
     }
 
-    fun getLocateByName(name: String): Stream? {
-        return mainRepository.getLocateByName(name)
+    fun getStreamByName(name: String): Stream? {
+        return mainRepository.getStreamByName(name)
     }
 
-    fun getLocateById(id: Int): Stream? {
-        return mainRepository.getLocateById(id)
+    fun getStreamById(id: Int): Stream? {
+        return mainRepository.getStreamById(id)
     }
 
     fun getTrackingFileBySiteId(id: Int): RealmResults<TrackingFile> {

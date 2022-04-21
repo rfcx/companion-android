@@ -13,20 +13,20 @@ class AudioMothDeploymentRepository(
 ) {
 
     fun getAllResultsAsyncWithinProject(projectName: String): RealmResults<Stream> {
-        return localDataHelper.getLocateLocalDb()
+        return localDataHelper.getStreamLocalDb()
             .getAllResultsAsyncWithinProject(project = projectName)
     }
 
     fun insertOrUpdate(stream: Stream) {
-        localDataHelper.getLocateLocalDb().insertOrUpdate(stream)
+        localDataHelper.getStreamLocalDb().insertOrUpdate(stream)
     }
 
     fun insertOrUpdateLocate(deploymentId: Int, stream: Stream) {
-        localDataHelper.getLocateLocalDb().insertOrUpdateLocate(deploymentId, stream)
+        localDataHelper.getStreamLocalDb().insertOrUpdateStream(deploymentId, stream)
     }
 
     fun getLocateById(id: Int): Stream? {
-        return localDataHelper.getLocateLocalDb().getLocateById(id)
+        return localDataHelper.getStreamLocalDb().getStreamById(id)
     }
 
     fun getProjectById(id: Int): Project? {

@@ -24,7 +24,7 @@ class EditLocationRepository(
     }
 
     fun getStreamById(id: Int): Stream? {
-        return localDataHelper.getLocateLocalDb().getLocateById(id)
+        return localDataHelper.getStreamLocalDb().getStreamById(id)
     }
 
     fun editProject(id: Int, project: Project, callback: DatabaseCallback) {

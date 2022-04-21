@@ -65,7 +65,7 @@ class GuardianDeploymentActivity :
     WifiLostListener {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val locateDb by lazy { LocateDb(realm) }
+    private val locateDb by lazy { StreamDb(realm) }
     private val projectDb by lazy { ProjectDb(realm) }
     private val deploymentDb by lazy { DeploymentDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
@@ -208,8 +208,7 @@ class GuardianDeploymentActivity :
                     DetailDeploymentSiteFragment.newInstance(
                         latitude,
                         longitude,
-                        siteId,
-                        nameLocation
+                        siteId
                     )
                 )
             }
@@ -403,6 +402,10 @@ class GuardianDeploymentActivity :
 
     override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
 
+    override fun getStream(id: Int): Stream? {
+        return locateDb.getStreamById(id)
+    }
+
     override fun getProject(id: Int): Project? {
         return projectDb.getProjectById(id)
     }
@@ -434,7 +437,7 @@ class GuardianDeploymentActivity :
 
             this._stream?.let { loc ->
                 val deploymentId = deploymentDb.insertOrUpdateDeployment(it, _stream!!)
-                locateDb.insertOrUpdateLocate(deploymentId, loc) // update locate - last deployment
+                locateDb.insertOrUpdateStream(deploymentId, loc) // update locate - last deployment
             }
 
             if (useExistedLocation) {
@@ -538,7 +541,7 @@ class GuardianDeploymentActivity :
                         )
                     )
                 } else {
-                    startDetailDeploymentSite(site.id, site.name, false)
+                    startDetailDeploymentSite(site.id, false)
                 }
             }
             7 -> {
