@@ -12,9 +12,9 @@ class AudioMothDeploymentRepository(
     private val localDataHelper: LocalDataHelper
 ) {
 
-    fun getAllResultsAsyncWithinProject(projectName: String): RealmResults<Stream> {
+    fun getAllResultsAsyncWithinProject(id: Int): RealmResults<Stream> {
         return localDataHelper.getStreamLocalDb()
-            .getAllResultsAsyncWithinProject(project = projectName)
+            .getAllResultsAsyncWithinProject(id = id)
     }
 
     fun insertOrUpdate(stream: Stream) {
@@ -56,18 +56,18 @@ class AudioMothDeploymentRepository(
         localDataHelper.getTrackingFileLocalDb().insertOrUpdate(file)
     }
 
-    fun getAllDeploymentResultsAsyncWithinProject(projectName: String): RealmResults<Deployment> {
+    fun getAllDeploymentResultsAsyncWithinProject(id: Int): RealmResults<Deployment> {
         return localDataHelper.getDeploymentLocalDb()
-            .getAllResultsAsyncWithinProject(project = projectName)
+            .getAllResultsAsyncWithinProject(id = id)
     }
 
     fun updateDeployment(deployment: Deployment) {
         localDataHelper.getDeploymentLocalDb().updateDeployment(deployment)
     }
 
-    fun insertOrUpdateDeployment(deployment: Deployment, stream: Stream): Int {
+    fun insertOrUpdateDeployment(deployment: Deployment, streamId: Int): Int {
         return localDataHelper.getDeploymentLocalDb()
-            .insertOrUpdateDeployment(deployment, stream)
+            .insertOrUpdateDeployment(deployment, streamId)
     }
 
     fun getDeploymentsBySiteId(streamId: String): ArrayList<Deployment> {

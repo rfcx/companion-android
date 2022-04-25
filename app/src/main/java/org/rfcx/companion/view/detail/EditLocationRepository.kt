@@ -11,24 +11,31 @@ class EditLocationRepository(
     private val localDataHelper: LocalDataHelper
 ) {
 
+    fun markDeploymentNeedUpdate(id: Int) {
+        return localDataHelper.getDeploymentLocalDb().markNeedUpdate(id)
+    }
+
     fun editStream(
         id: Int,
         locationName: String,
         latitude: Double,
         longitude: Double,
         altitude: Double,
-        callback: DatabaseCallback
+        projectId: Int
     ) {
-        return localDataHelper.getDeploymentLocalDb()
-            .editStream(id, locationName, latitude, longitude, altitude, callback)
+        return localDataHelper.getStreamLocalDb()
+            .updateValues(
+                id = id,
+                name = locationName,
+                latitude = latitude,
+                longitude = longitude,
+                altitude = altitude,
+                projectId = projectId
+            )
     }
 
     fun getStreamById(id: Int): Stream? {
         return localDataHelper.getStreamLocalDb().getStreamById(id)
-    }
-
-    fun editProject(id: Int, project: Project, callback: DatabaseCallback) {
-        return localDataHelper.getDeploymentLocalDb().editProject(id, project, callback)
     }
 
     fun getProjectById(id: Int): Project? {

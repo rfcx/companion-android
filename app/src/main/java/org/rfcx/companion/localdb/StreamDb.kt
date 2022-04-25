@@ -20,10 +20,10 @@ class StreamDb(private val realm: Realm) {
 
     fun getAllResultsAsyncWithinProject(
         sort: Sort = Sort.DESCENDING,
-        project: String
+        id: Int
     ): RealmResults<Stream> {
         return realm.where(Stream::class.java)
-            .equalTo("locationGroup.name", project)
+            .equalTo("project.id", id)
             .sort(Stream.FIELD_ID, sort)
             .findAllAsync()
     }
@@ -66,6 +66,7 @@ class StreamDb(private val realm: Realm) {
                 .equalTo(TrackingFile.FIELD_DEPLOYMENT_ID, deploymentId)
                 .findFirst()?.apply {
                     this.siteServerId = serverId
+                    this.syncState = SyncState.Sent.key
                 }
 
             // update server id in site
@@ -73,6 +74,7 @@ class StreamDb(private val realm: Realm) {
                 .equalTo(Stream.FIELD_LAST_DEPLOYMENT_ID, deploymentId)
                 .findFirst()?.apply {
                     this.serverId = serverId
+                    this.syncState = SyncState.Sent.key
                 }
         }
     }
@@ -87,6 +89,27 @@ class StreamDb(private val realm: Realm) {
                 stream.id = id
             }
             it.insertOrUpdate(stream)
+        }
+    }
+
+    fun updateValues(
+        id: Int,
+        name: String? = null,
+        latitude: Double? = null,
+        longitude: Double? = null,
+        altitude: Double? = null,
+        projectId: Int? = null
+    ) {
+        realm.executeTransaction {
+            val stream = it.where(Stream::class.java).equalTo(Stream.FIELD_ID, id).findFirst()
+            if (name != null) stream?.name = name
+            if (latitude != null) stream?.latitude = latitude
+            if (longitude != null) stream?.longitude = longitude
+            if (altitude != null) stream?.altitude = altitude
+            if (projectId != null) {
+                val project = it.where(Project::class.java).equalTo(Project.PROJECT_ID, projectId).findFirst()
+                stream?.project = project
+            }
         }
     }
 

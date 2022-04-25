@@ -38,9 +38,9 @@ class DeploymentDb(private val realm: Realm) {
             .findAllAsync()
     }
 
-    fun getAllResultsAsyncWithinProject(sort: Sort = Sort.DESCENDING, project: String): RealmResults<Deployment> {
+    fun getAllResultsAsyncWithinProject(sort: Sort = Sort.DESCENDING, id: Int): RealmResults<Deployment> {
         return realm.where(Deployment::class.java)
-            .equalTo("stream.project.name", project)
+            .equalTo("stream.project.id", id)
             .sort(Deployment.FIELD_ID, sort)
             .findAllAsync()
     }
@@ -57,7 +57,7 @@ class DeploymentDb(private val realm: Realm) {
         }
     }
 
-    fun insertOrUpdateDeployment(deployment: Deployment, stream: Stream): Int {
+    fun insertOrUpdateDeployment(deployment: Deployment, streamId: Int): Int {
         var id = deployment.id
         realm.executeTransaction {
             if (deployment.id == 0) {
@@ -67,7 +67,9 @@ class DeploymentDb(private val realm: Realm) {
                     ) + 1
                 deployment.id = id
             }
-            deployment.stream = it.copyToRealm(stream)
+
+            val stream = it.where(Stream::class.java).equalTo(Stream.FIELD_ID, streamId).findFirst()
+            deployment.stream = stream
             it.insertOrUpdate(deployment)
         }
         return id
@@ -209,73 +211,14 @@ class DeploymentDb(private val realm: Realm) {
         }
     }
 
-    /**
-     * Update Deployment Location and Locate
-     * */
-    fun editStream(
-        id: Int,
-        locationName: String,
-        latitude: Double,
-        longitude: Double,
-        altitude: Double,
-        callback: DatabaseCallback
-    ) {
-        realm.executeTransactionAsync({ bgRealm ->
-            // do update deployment location
+    fun markNeedUpdate(id: Int) {
+        realm.executeTransaction {
             val deployment =
-                bgRealm.where(Deployment::class.java).equalTo(Deployment.FIELD_ID, id)
+                it.where(Deployment::class.java).equalTo(Deployment.FIELD_ID, id)
                     .findFirst()
-            if (deployment?.stream != null) {
-                deployment.stream?.name = locationName
-                deployment.stream?.latitude = latitude
-                deployment.stream?.longitude = longitude
-                deployment.stream?.altitude = altitude
-                deployment.updatedAt = Date()
-                deployment.syncState = SyncState.Unsent.key
-            }
-            val location = bgRealm.where(Stream::class.java)
-                .equalTo(Stream.FIELD_LAST_DEPLOYMENT_ID, id).findFirst()
-
-            if (location != null) {
-                location.latitude = latitude
-                location.longitude = longitude
-                location.altitude = altitude
-                location.name = locationName
-                location.syncState = SyncState.Unsent.key
-            }
-        }, {
-            // success
-            realm.close()
-            callback.onSuccess()
-        }, {
-            // failure
-            realm.close()
-            callback.onFailure(it.localizedMessage ?: "")
-        })
-    }
-
-    fun editProject(id: Int, project: Project, callback: DatabaseCallback) {
-        realm.executeTransactionAsync({ bgRealm ->
-            // do update deployment location
-            val guardianDeployment =
-                bgRealm.where(Deployment::class.java).equalTo(Deployment.FIELD_ID, id)
-                    .findFirst()
-            if (guardianDeployment?.stream != null) {
-                guardianDeployment.updatedAt = Date()
-                guardianDeployment.syncState = SyncState.Unsent.key
-
-                // update location group
-                guardianDeployment.stream?.project = project
-            }
-        }, {
-            // success
-            realm.close()
-            callback.onSuccess()
-        }, {
-            // failure
-            realm.close()
-            callback.onFailure(it.localizedMessage ?: "")
-        })
+            deployment?.updatedAt = Date()
+            deployment?.syncState = SyncState.Unsent.key
+        }
     }
 
     fun updateIsActive(id: Int) {

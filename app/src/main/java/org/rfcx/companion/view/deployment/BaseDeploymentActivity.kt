@@ -27,7 +27,6 @@ abstract class BaseDeploymentActivity :
     MapPickerProtocol {
 
     var _deployment: Deployment? = null
-    var _deployLocation: Stream? = null
     var _images: List<String> = listOf()
     var _stream: Stream? = null
     var _siteItems = arrayListOf<SiteWithLastDeploymentItem>()
@@ -50,6 +49,7 @@ abstract class BaseDeploymentActivity :
                 latitude,
                 longitude,
                 siteId,
+                name,
                 true
             )
         )
@@ -75,16 +75,22 @@ abstract class BaseDeploymentActivity :
         this.siteId = siteId
     }
 
-    override fun startMapPicker(latitude: Double, longitude: Double, streamId: Int) {
+    override fun startMapPicker(
+        latitude: Double,
+        longitude: Double,
+        altitude: Double,
+        streamId: Int,
+        streamName: String
+    ) {
         setLatLng(latitude, longitude, streamId)
-        startFragment(MapPickerFragment.newInstance(latitude, longitude, streamId))
+        startFragment(MapPickerFragment.newInstance(latitude, longitude, altitude, streamId, streamName))
     }
 
-    override fun startDetailDeploymentSite(id: Int, isNewSite: Boolean) {
-        startFragment(DetailDeploymentSiteFragment.newInstance(id, isNewSite))
+    override fun startDetailDeploymentSite(id: Int, streamName: String, isNewSite: Boolean) {
+        startFragment(DetailDeploymentSiteFragment.newInstance(id, streamName, isNewSite))
     }
 
-    override fun getDeploymentLocation(): Stream? = this._deployLocation
+    override fun getDeploymentStream(): Stream? = this._stream
 
     override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
 

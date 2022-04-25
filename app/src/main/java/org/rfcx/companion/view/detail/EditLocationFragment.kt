@@ -265,7 +265,7 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         mapView.onResume()
 
         editLocationActivityListener?.let {
-            locationGroupValueTextView.text = it.getStream(streamId).name
+            locationGroupValueTextView.text = it.getStream(streamId).project?.name
         }
     }
 
@@ -297,13 +297,13 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         private const val REQUEST_PERMISSIONS_REQUEST_CODE = 34
 
         @JvmStatic
-        fun newInstance(lat: Double, lng: Double, altitude: Double, name: String) =
+        fun newInstance(lat: Double, lng: Double, altitude: Double, id: Int) =
             EditLocationFragment().apply {
                 arguments = Bundle().apply {
                     putDouble(ARG_LATITUDE, lat)
                     putDouble(ARG_LONGITUDE, lng)
                     putDouble(ARG_ALTITUDE, altitude)
-                    putString(ARG_STREAM_ID, name)
+                    putInt(ARG_STREAM_ID, id)
                 }
             }
     }

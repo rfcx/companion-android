@@ -232,7 +232,7 @@ class SetDeploymentSiteFragment :
 
     // On click site item
     override fun invoke(site: Stream, isNewSite: Boolean) {
-        deploymentProtocol?.startDetailDeploymentSite(site.id, isNewSite)
+        deploymentProtocol?.startDetailDeploymentSite(site.id, site.name, isNewSite)
     }
 
     override fun onDestroy() {

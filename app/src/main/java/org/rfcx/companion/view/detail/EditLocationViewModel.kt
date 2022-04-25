@@ -11,13 +11,17 @@ class EditLocationViewModel(
     private val editLocationRepository: EditLocationRepository
 ) : AndroidViewModel(application) {
 
+    fun markDeploymentNeedUpdate(id: Int) {
+        return editLocationRepository.markDeploymentNeedUpdate(id)
+    }
+
     fun editStream(
         id: Int,
         locationName: String,
         latitude: Double,
         longitude: Double,
         altitude: Double,
-        callback: DatabaseCallback
+        projectId: Int
     ) {
         return editLocationRepository.editStream(
             id,
@@ -25,16 +29,12 @@ class EditLocationViewModel(
             latitude,
             longitude,
             altitude,
-            callback
+            projectId
         )
     }
 
     fun getStreamById(id: Int): Stream? {
         return editLocationRepository.getStreamById(id)
-    }
-
-    fun editProject(id: Int, project: Project, callback: DatabaseCallback) {
-        return editLocationRepository.editProject(id, project, callback)
     }
 
     fun getProjectById(id: Int): Project? {

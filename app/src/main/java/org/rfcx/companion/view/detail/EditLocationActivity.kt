@@ -33,7 +33,7 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     private var altitude: Double = 0.0
-    private var stream: Int? = null
+    private var streamId: Int? = null
     private var deploymentId: Int? = null
     private var selectedProject: Int? = null
     private var device: String? = null
@@ -42,16 +42,17 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_location)
 
-        initIntent()
         setViewModel()
         setupToolbar()
+        initIntent()
         toolbarLayout.visibility = View.VISIBLE
+
         startFragment(
             MapPickerFragment.newInstance(
                 latitude,
                 longitude,
                 altitude,
-                stream ?: -1
+                streamId ?: -1
             )
         )
     }
@@ -85,10 +86,12 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
 
     private fun initIntent() {
         intent.extras?.let {
-            latitude = it.getDouble(EXTRA_LATITUDE)
-            longitude = it.getDouble(EXTRA_LONGITUDE)
-            altitude = it.getDouble(ARG_ALTITUDE)
-            stream = it.getInt(EXTRA_STREAM_ID)
+            streamId = it.getInt(EXTRA_STREAM_ID)
+            val stream = viewModel.getStreamById(streamId ?: -1)
+            latitude = stream?.latitude ?: 0.0
+            longitude = stream?.longitude ?: 0.0
+            altitude = stream?.altitude ?: 0.0
+
             deploymentId = it.getInt(EXTRA_DEPLOYMENT_ID)
             selectedProject = it.getInt(EXTRA_PROJECT_ID)
             device = it.getString(EXTRA_DEVICE)
@@ -117,7 +120,7 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
     ) {
         toolbarLayout.visibility = View.VISIBLE
         setLatLng(latitude, longitude, altitude)
-        startFragment(EditLocationFragment.newInstance(latitude, longitude, altitude, name))
+        startFragment(EditLocationFragment.newInstance(latitude, longitude, altitude, siteId))
     }
 
     override fun startMapPickerPage(
@@ -132,40 +135,20 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
     }
 
     override fun updateDeploymentDetail(name: String, altitude: Double) {
-        deploymentId?.let { id ->
+        val stream = viewModel.getStreamById(streamId ?: -1)
+        stream?.let { it ->
             viewModel.editStream(
-                id = id,
+                id = it.id,
                 locationName = name,
                 latitude = latitude,
                 longitude = longitude,
                 altitude = altitude,
-                callback = object : DatabaseCallback {
-                    override fun onSuccess() {
-                        DeploymentSyncWorker.enqueue(this@EditLocationActivity)
-                        finish()
-                    }
-
-                    override fun onFailure(errorMessage: String) {
-                        showCommonDialog(errorMessage)
-                    }
-                }
-            )
-
-            viewModel.editProject(
-                id, getProject(selectedProject ?: -1),
-                object :
-                    DatabaseCallback {
-                    override fun onSuccess() {
-                        DeploymentSyncWorker.enqueue(this@EditLocationActivity)
-                        finish()
-                    }
-
-                    override fun onFailure(errorMessage: String) {
-                        showCommonDialog(errorMessage)
-                    }
-                }
+                selectedProject ?: -1
             )
         }
+        viewModel.markDeploymentNeedUpdate(deploymentId ?: -1)
+        DeploymentSyncWorker.enqueue(this@EditLocationActivity)
+        finish()
     }
 
     override fun getStream(id: Int): Stream {
@@ -214,9 +197,6 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
     }
 
     companion object {
-        const val EXTRA_LATITUDE = "EXTRA_LATITUDE"
-        const val EXTRA_LONGITUDE = "EXTRA_LONGITUDE"
-        const val ARG_ALTITUDE = "ARG_ALTITUDE"
         const val EXTRA_STREAM_ID = "EXTRA_STREAM_ID"
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
         const val EXTRA_PROJECT_ID = "EXTRA_PROJECT_ID"

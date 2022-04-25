@@ -58,7 +58,8 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     private var symbolManager: SymbolManager? = null
 
     // Arguments
-    var siteId: Int = 0
+    var siteId: Int = -1
+    var siteName: String = ""
     var isCreateNew: Boolean = false
     var isUseCurrentLocate: Boolean = false
     var site: Stream? = null
@@ -120,6 +121,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     private fun initIntent() {
         arguments?.let {
             siteId = it.getInt(ARG_SITE_ID)
+            siteName = it.getString(ARG_SITE_NAME).toString()
             isCreateNew = it.getBoolean(ARG_IS_CREATE_NEW)
             latitude = it.getDouble(ARG_LATITUDE)
             longitude = it.getDouble(ARG_LONGITUDE)
@@ -197,7 +199,9 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 it.startMapPicker(
                     siteLocation?.latitude ?: 0.0,
                     siteLocation?.longitude ?: 0.0,
-                    siteId
+                    siteLocation?.altitude ?: 0.0,
+                    siteId,
+                    siteName
                 )
                 it.hideToolbar()
             }
@@ -324,8 +328,12 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             site?.let { setLatLngLabel(it.toLatLng(), it.altitude) }
             locationGroupValueTextView.text = site?.project?.name ?: getString(R.string.none)
         }
-        val stream = deploymentProtocol?.getStream(siteId)
-        siteValueTextView.text = stream?.name ?: getString(R.string.none)
+        if (siteId == -1) {
+            siteValueTextView.text = siteName
+        } else {
+            val stream = deploymentProtocol?.getStream(siteId)
+            siteValueTextView.text = stream?.name ?: getString(R.string.none)
+        }
         changeProjectTextView.visibility = if (isCreateNew) View.VISIBLE else View.GONE
     }
 
@@ -561,6 +569,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         const val DEFAULT_MAX_WAIT_TIME = DEFAULT_INTERVAL_IN_MILLISECONDS * 5
 
         private const val ARG_SITE_ID = "ARG_SITE_ID"
+        private const val ARG_SITE_NAME = "ARG_SITE_NAME"
         private const val ARG_IS_CREATE_NEW = "ARG_IS_CREATE_NEW"
         private const val ARG_LATITUDE = "ARG_LATITUDE"
         private const val ARG_LONGITUDE = "ARG_LONGITUDE"
@@ -571,10 +580,11 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         @JvmStatic
         fun newInstance() = DetailDeploymentSiteFragment()
 
-        fun newInstance(id: Int, isCreateNew: Boolean = false) =
+        fun newInstance(id: Int, name: String, isCreateNew: Boolean = false) =
             DetailDeploymentSiteFragment().apply {
                 arguments = Bundle().apply {
                     putInt(ARG_SITE_ID, id)
+                    putString(ARG_SITE_NAME, name)
                     putBoolean(ARG_IS_CREATE_NEW, isCreateNew)
                 }
             }
@@ -589,12 +599,13 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 }
             }
 
-        fun newInstance(lat: Double, lng: Double, siteId: Int, fromMapPicker: Boolean) =
+        fun newInstance(lat: Double, lng: Double, siteId: Int, siteName: String, fromMapPicker: Boolean) =
             DetailDeploymentSiteFragment().apply {
                 arguments = Bundle().apply {
                     putDouble(ARG_LATITUDE, lat)
                     putDouble(ARG_LONGITUDE, lng)
                     putInt(ARG_SITE_ID, siteId)
+                    putString(ARG_SITE_NAME, siteName)
                     putBoolean(ARG_IS_CREATE_NEW, siteId == -1)
                     putBoolean(ARG_FROM_MAP_PICKER, fromMapPicker)
                 }

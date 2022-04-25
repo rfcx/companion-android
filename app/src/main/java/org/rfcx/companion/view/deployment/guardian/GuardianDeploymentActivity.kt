@@ -164,7 +164,7 @@ class GuardianDeploymentActivity :
             if (deployment != null) {
                 setDeployment(deployment)
                 if (deployment.stream != null) {
-                    _deployLocation = deployment.stream
+                    _stream = deployment.stream
                 }
             }
         } else {
@@ -237,7 +237,7 @@ class GuardianDeploymentActivity :
         val project = projectDb.getProjectById(projectId)
         val projectName = project?.name ?: getString(R.string.none)
         siteLiveData = Transformations.map(
-            streamDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()
+            streamDb.getAllResultsAsyncWithinProject(id = projectId).asLiveData()
         ) {
             it
         }
@@ -245,7 +245,7 @@ class GuardianDeploymentActivity :
 
         deploymentLiveData =
             Transformations.map(
-                deploymentDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()
+                deploymentDb.getAllResultsAsyncWithinProject(id = projectId).asLiveData()
             ) {
                 it
             }
@@ -398,7 +398,7 @@ class GuardianDeploymentActivity :
         AdminSocketManager.connect()
     }
 
-    override fun getDeploymentLocation(): Stream? = this._deployLocation
+    override fun getDeploymentStream(): Stream? = this._stream
 
     override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
 
@@ -415,7 +415,6 @@ class GuardianDeploymentActivity :
         deployment.isActive = stream.serverId == null
         deployment.state = DeploymentState.Guardian.Locate.key // state
 
-        this._deployLocation = stream
         this._stream = stream
         useExistedLocation = isExisted
         if (!useExistedLocation) {
@@ -436,7 +435,7 @@ class GuardianDeploymentActivity :
             setDeployment(it)
 
             this._stream?.let { loc ->
-                val deploymentId = deploymentDb.insertOrUpdateDeployment(it, _stream!!)
+                val deploymentId = deploymentDb.insertOrUpdateDeployment(it, loc.id)
                 streamDb.insertOrUpdateStream(deploymentId, loc) // update locate - last deployment
             }
 
@@ -541,7 +540,7 @@ class GuardianDeploymentActivity :
                         )
                     )
                 } else {
-                    startDetailDeploymentSite(site.id, false)
+                    startDetailDeploymentSite(site.id, site.name, false)
                 }
             }
             7 -> {

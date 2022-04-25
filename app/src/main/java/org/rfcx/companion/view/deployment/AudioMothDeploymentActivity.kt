@@ -21,15 +21,19 @@ import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DeploymentSyncWorker
-import org.rfcx.companion.util.*
+import org.rfcx.companion.util.Analytics
+import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.Preferences.Companion.ENABLE_LOCATION_TRACKING
 import org.rfcx.companion.util.geojson.GeoJsonUtils
+import org.rfcx.companion.util.getLastLocation
+import org.rfcx.companion.util.getListSite
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
 import org.rfcx.companion.view.deployment.location.DetailDeploymentSiteFragment
 import org.rfcx.companion.view.deployment.location.SetDeploymentSiteFragment
 import org.rfcx.companion.view.deployment.sync.NewSyncFragment
-import org.rfcx.companion.view.dialog.*
+import org.rfcx.companion.view.dialog.CompleteFragment
+import org.rfcx.companion.view.dialog.LoadingDialogFragment
 import java.util.*
 
 class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymentProtocol {
@@ -174,7 +178,7 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
                 finish()
             }
             is DetailDeploymentSiteFragment -> {
-                if (_deployLocation == null) {
+                if (_stream == null) {
                     startFragment(
                         SetDeploymentSiteFragment.newInstance(
                             currentLocate?.latitude ?: 0.0, currentLocate?.longitude ?: 0.0
@@ -220,7 +224,6 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
         deployment.isActive = stream.serverId == null
         deployment.state = DeploymentState.AudioMoth.Locate.key // state
 
-        this._deployLocation = stream
         this._stream = stream
         useExistedLocation = isExisted
         if (!useExistedLocation) {
@@ -239,9 +242,8 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
             it.state = DeploymentState.AudioMoth.ReadyToUpload.key
             setDeployment(it)
 
-            val deploymentId =
-                audioMothDeploymentViewModel.insertOrUpdateDeployment(it, _deployLocation!!)
             this._stream?.let { loc ->
+                val deploymentId = audioMothDeploymentViewModel.insertOrUpdateDeployment(it, loc.id)
                 audioMothDeploymentViewModel.insertOrUpdateLocate(
                     deploymentId,
                     loc
@@ -303,7 +305,7 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
                         )
                     )
                 } else {
-                    startDetailDeploymentSite(site.id, false)
+                    startDetailDeploymentSite(site.id, site.name, false)
                 }
             }
             1 -> {
@@ -373,7 +375,7 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
             setDeployment(deployment)
 
             if (deployment.stream != null) {
-                _deployLocation = deployment.stream
+                _stream = deployment.stream
             }
 
             if (deployment.passedChecks != null) {
