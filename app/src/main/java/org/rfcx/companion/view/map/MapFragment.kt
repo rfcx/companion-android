@@ -20,8 +20,9 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.WorkInfo
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -55,7 +56,6 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.BitmapUtils
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_map.*
-import kotlinx.android.synthetic.main.fragment_map.projectSwipeRefreshView
 import kotlinx.android.synthetic.main.layout_deployment_window_info.view.*
 import kotlinx.android.synthetic.main.layout_map_window_info.view.*
 import kotlinx.android.synthetic.main.layout_search_view.*
@@ -63,8 +63,11 @@ import org.rfcx.companion.MainActivityListener
 import org.rfcx.companion.MainViewModel
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
-import org.rfcx.companion.entity.*
-import org.rfcx.companion.localdb.*
+import org.rfcx.companion.entity.Device
+import org.rfcx.companion.entity.Project
+import org.rfcx.companion.entity.Screen
+import org.rfcx.companion.entity.Stream
+import org.rfcx.companion.localdb.TrackingDb
 import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
@@ -80,13 +83,13 @@ import org.rfcx.companion.view.profile.locationgroup.ProjectAdapter
 import org.rfcx.companion.view.profile.locationgroup.ProjectListener
 import java.io.File
 import java.util.*
-import kotlin.collections.ArrayList
+import kotlin.collections.set
 
 class MapFragment :
     Fragment(),
     OnMapReadyCallback,
     ProjectListener,
-    (Stream, Boolean) -> Unit {
+        (Stream, Boolean) -> Unit {
 
     private lateinit var mainViewModel: MainViewModel
 
@@ -187,6 +190,67 @@ class MapFragment :
                     mainViewModel.updateStatusOfflineMap()
                 }
                 else -> updateSyncInfo(isSites = true)
+            }
+        }
+    }
+
+    private val getProjectsFromRemoteObserver = Observer<Resource<List<Project>>> {
+        when (it.status) {
+            Status.LOADING -> {
+            }
+            Status.SUCCESS -> {
+                mainViewModel.updateProjectBounds()
+                projectSwipeRefreshView.isRefreshing = false
+
+                this.projects = mainViewModel.getProjectsFromLocal()
+                locationGroupAdapter.items = listOf()
+                locationGroupAdapter.items = this.projects
+                locationGroupAdapter.notifyDataSetChanged()
+
+                combinedData()
+                mainViewModel.updateStatusOfflineMap()
+            }
+            Status.ERROR -> {
+                combinedData()
+                projectSwipeRefreshView.isRefreshing = false
+                showToast(it.message ?: getString(R.string.error_has_occurred))
+            }
+        }
+    }
+
+    private val getDeploymentMarkerObserver = Observer<Resource<List<MapMarker.DeploymentMarker>>> {
+        when (it.status) {
+            Status.LOADING -> {
+            }
+            Status.SUCCESS -> {
+                deploymentMarkers = it.data ?: listOf()
+            }
+            Status.ERROR -> {
+            }
+        }
+    }
+
+    private val getStreamMarkerObserver = Observer<Resource<List<MapMarker>>> {
+        when (it.status) {
+            Status.LOADING -> {
+            }
+            Status.SUCCESS -> {
+                streamMarkers = it.data ?: listOf()
+            }
+            Status.ERROR -> {
+            }
+        }
+    }
+
+    private val getStreamObserver = Observer<Resource<List<Stream>>> {
+        when (it.status) {
+            Status.LOADING -> {
+            }
+            Status.SUCCESS -> {
+                streams = it.data ?: listOf()
+                combinedData()
+            }
+            Status.ERROR -> {
             }
         }
     }
@@ -492,8 +556,8 @@ class MapFragment :
         override fun run() {
             context?.let {
                 trackingTextView.text = "${
-                LocationTracking.getDistance(trackingDb)
-                    .setFormatLabel()
+                    LocationTracking.getDistance(trackingDb)
+                        .setFormatLabel()
                 }  ${LocationTracking.getOnDutyTimeMinute(it)} min"
             }
             handler.postDelayed(this, 20 * 1000L)
@@ -608,9 +672,11 @@ class MapFragment :
         var latLng = ""
         context?.let { context ->
             latLng =
-                "${stream?.latitude.latitudeCoordinates(context)}, ${stream?.longitude.longitudeCoordinates(
-                    context
-                )}"
+                "${stream?.latitude.latitudeCoordinates(context)}, ${
+                    stream?.longitude.longitudeCoordinates(
+                        context
+                    )
+                }"
         }
         layout.latLngTextView.text = latLng
         val measureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
@@ -641,8 +707,10 @@ class MapFragment :
         val lng = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_LONGITUDE) ?: "0.0"
         context?.let { context ->
             latLng =
-                "${lat.toDouble().latitudeCoordinates(context)}, ${lng.toDouble()
-                    .longitudeCoordinates(context)}"
+                "${lat.toDouble().latitudeCoordinates(context)}, ${
+                    lng.toDouble()
+                        .longitudeCoordinates(context)
+                }"
         }
         bubbleLayout.latLngValue.text = latLng
         val measureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
@@ -892,7 +960,7 @@ class MapFragment :
         val state = listener?.getBottomSheetState() ?: 0
 
         if (deploymentMarkers.isNotEmpty() && state != BottomSheetBehavior.STATE_EXPANDED) {
-            val lastReport = deploymentMarkers.maxByOrNull { it.updatedAt!! }!!
+            val lastReport = deploymentMarkers.sortedByDescending { it.updatedAt }.first()
             mapboxMap?.let {
                 it.moveCamera(
                     CameraUpdateFactory.newLatLngZoom(
@@ -937,87 +1005,12 @@ class MapFragment :
     }
 
     private fun setObserver() {
-        mainViewModel.getProjectsFromRemote().observe(
-            viewLifecycleOwner,
-            Observer {
-                when (it.status) {
-                    Status.LOADING -> {}
-                    Status.SUCCESS -> {
-                        mainViewModel.updateProjectBounds()
-                        projectSwipeRefreshView.isRefreshing = false
-
-                        this.projects = mainViewModel.getProjectsFromLocal()
-                        locationGroupAdapter.items = listOf()
-                        locationGroupAdapter.items = this.projects
-                        locationGroupAdapter.notifyDataSetChanged()
-
-                        combinedData()
-                        mainViewModel.updateStatusOfflineMap()
-                    }
-                    Status.ERROR -> {
-                        combinedData()
-                        projectSwipeRefreshView.isRefreshing = false
-                        showToast(it.message ?: getString(R.string.error_has_occurred))
-                    }
-                }
-            }
-        )
-
-        mainViewModel.getDeploymentMarkers().observe(
-            viewLifecycleOwner,
-            Observer {
-                when (it.status) {
-                    Status.LOADING -> {}
-                    Status.SUCCESS -> {
-                        deploymentMarkers = it.data ?: listOf()
-                        combinedData()
-                    }
-                    Status.ERROR -> {}
-                }
-            }
-        )
-
-        mainViewModel.getStreamMarkers().observe(
-            viewLifecycleOwner,
-            Observer {
-                when (it.status) {
-                    Status.LOADING -> {}
-                    Status.SUCCESS -> {
-                        streamMarkers = it.data ?: listOf()
-                        combinedData()
-                    }
-                    Status.ERROR -> {}
-                }
-            }
-        )
-
-        mainViewModel.getStreamMarkers().observe(
-            viewLifecycleOwner,
-            Observer {
-                when (it.status) {
-                    Status.LOADING -> {}
-                    Status.SUCCESS -> {
-                        streamMarkers = it.data ?: listOf()
-                        combinedData()
-                    }
-                    Status.ERROR -> {}
-                }
-            }
-        )
-
-        mainViewModel.getStreams().observe(
-            viewLifecycleOwner,
-            Observer {
-                when (it.status) {
-                    Status.LOADING -> {}
-                    Status.SUCCESS -> {
-                        streams = it.data ?: listOf()
-                        combinedData()
-                    }
-                    Status.ERROR -> {}
-                }
-            }
-        )
+        mainViewModel.getProjectsFromRemote()
+            .observe(viewLifecycleOwner, getProjectsFromRemoteObserver)
+        mainViewModel.getDeploymentMarkers()
+            .observe(viewLifecycleOwner, getDeploymentMarkerObserver)
+        mainViewModel.getStreamMarkers().observe(viewLifecycleOwner, getStreamMarkerObserver)
+        mainViewModel.getStreams().observe(viewLifecycleOwner, getStreamObserver)
     }
 
     private fun setTrackObserver(site: Stream, markerId: String) {
@@ -1067,7 +1060,10 @@ class MapFragment :
                     getString(R.string.sites_downloading)
                 } else {
                     if (deploymentUnsentCount > 1) {
-                        getString(R.string.format_deploys_uploading, deploymentUnsentCount.toString())
+                        getString(
+                            R.string.format_deploys_uploading,
+                            deploymentUnsentCount.toString()
+                        )
                     } else {
                         getString(R.string.format_deploy_uploading)
                     }
@@ -1270,7 +1266,10 @@ class MapFragment :
     fun moveToDeploymentMarker(lat: Double, lng: Double) {
         mapboxMap?.let {
             it.moveCamera(
-                CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), mapboxMap?.cameraPosition?.zoom ?: DefaultSetupMap.DEFAULT_ZOOM)
+                CameraUpdateFactory.newLatLngZoom(
+                    LatLng(lat, lng),
+                    mapboxMap?.cameraPosition?.zoom ?: DefaultSetupMap.DEFAULT_ZOOM
+                )
             )
         }
     }
@@ -1364,6 +1363,10 @@ class MapFragment :
 
         if (::mainViewModel.isInitialized) {
             mainViewModel.onDestroy()
+            mainViewModel.getProjectsFromRemote().removeObserver(getProjectsFromRemoteObserver)
+            mainViewModel.getDeploymentMarkers().removeObserver(getDeploymentMarkerObserver)
+            mainViewModel.getStreamMarkers().removeObserver(getStreamMarkerObserver)
+            mainViewModel.getStreams().removeObserver(getStreamObserver)
         }
         if (::deploymentWorkInfoLiveData.isInitialized) {
             deploymentWorkInfoLiveData.removeObserver(deploymentWorkInfoObserve)
@@ -1429,8 +1432,12 @@ class MapFragment :
         showSearchBar(false)
 
         val features = this.mapFeatures?.features()
-        val selectingDeployment = features?.firstOrNull { feature -> feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_TITLE) == stream.name }
-        val selectingSite = features?.firstOrNull { feature -> feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_NAME) == stream.name }
+        val selectingDeployment = features?.firstOrNull { feature ->
+            feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_TITLE) == stream.name
+        }
+        val selectingSite = features?.firstOrNull { feature ->
+            feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_NAME) == stream.name
+        }
 
         if (selectingDeployment == null) {
             if (selectingSite == null) return

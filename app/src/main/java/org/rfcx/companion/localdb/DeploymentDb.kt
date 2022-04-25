@@ -97,7 +97,7 @@ class DeploymentDb(private val realm: Realm) {
                     val streamObj = deploymentResponse.stream
                     if (streamObj != null) {
                         val stream = it.where(Stream::class.java).equalTo(Stream.FIELD_SERVER_ID, streamObj.id).findFirst()
-                        deployment?.stream = stream
+                        deploymentObj.stream = stream
                     }
 
                     val id = (

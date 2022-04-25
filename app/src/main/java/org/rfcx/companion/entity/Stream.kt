@@ -31,6 +31,7 @@ open class Stream(
 ) : RealmModel {
 
     fun getActiveDeployment(): Deployment? {
+        if (this.deployments?.isValid == false) return null
         return this.deployments?.filter { dp -> dp.isActive }?.getOrNull(0)
     }
 

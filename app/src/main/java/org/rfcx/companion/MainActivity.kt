@@ -266,8 +266,9 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
 
     override fun onLogout() {
         DeploymentCleanupWorker.stopAllWork(this)
-        this.logout()
         LocationTracking.set(this, false)
+        mainViewModel.onDestroy()
+        this.logout()
         analytics.trackLogoutEvent()
         finish()
     }

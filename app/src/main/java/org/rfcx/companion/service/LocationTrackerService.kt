@@ -123,7 +123,7 @@ class LocationTrackerService : Service() {
             )
 
             trackingStatTimer?.cancel()
-            trackingStatTimer = fixedRateTimer("timer", false, 60 * 1000, 60 * 1000) {
+            trackingStatTimer = fixedRateTimer("timer", false, 60 * 1000L, 60 * 1000L) {
                 getNotificationManager().notify(
                     NOTIFICATION_LOCATION_ID,
                     createLocationTrackerNotification(isLocationAvailability)
