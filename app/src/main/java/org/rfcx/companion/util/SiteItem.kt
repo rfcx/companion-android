@@ -28,7 +28,7 @@ private fun findNearLocations(
 fun getListSite(
     currentUserLocation: Location,
     streams: List<Stream>
-): ArrayList<SiteWithLastDeploymentItem> {
+): List<SiteWithLastDeploymentItem> {
 
     val nearLocations =
         findNearLocations(
@@ -46,12 +46,12 @@ fun getListSite(
             )
         } ?: listOf()
 
-    return ArrayList(locationsItems)
+    return locationsItems
 }
 
 fun getListSiteWithOutCurrentLocation(
     streams: List<Stream>
-): ArrayList<SiteWithLastDeploymentItem> {
+): List<SiteWithLastDeploymentItem> {
     val locationsItems: List<SiteWithLastDeploymentItem> =
         streams.map {
             val deployment = it.getActiveDeployment()
@@ -62,5 +62,5 @@ fun getListSiteWithOutCurrentLocation(
             )
         }
 
-    return ArrayList(locationsItems.sortedByDescending { it.date })
+    return locationsItems.sortedByDescending { it.date }
 }

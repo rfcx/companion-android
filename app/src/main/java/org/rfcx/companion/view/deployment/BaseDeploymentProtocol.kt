@@ -17,14 +17,14 @@ interface BaseDeploymentProtocol {
     fun backStep()
 
     fun getDeploymentStream(): Stream?
-    fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem>
+    fun getSiteItem(): List<SiteWithLastDeploymentItem>
     fun getStream(id: Int): Stream?
     fun getProject(id: Int): Project?
     fun getImages(): List<String>
     fun getCurrentLocation(): Location
 
     fun setDeployLocation(stream: Stream, isExisted: Boolean)
-    fun setSiteItem(items: ArrayList<SiteWithLastDeploymentItem>)
+    fun setSiteItem(items: List<SiteWithLastDeploymentItem>)
     fun setImages(images: List<String>)
     fun setReadyToDeploy()
     fun setCurrentLocation(location: Location)

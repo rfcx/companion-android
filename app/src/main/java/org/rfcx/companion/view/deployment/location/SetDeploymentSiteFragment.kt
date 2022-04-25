@@ -40,7 +40,7 @@ class SetDeploymentSiteFragment :
 
     // Adapter
     private val existedSiteAdapter by lazy { SiteAdapter(this) }
-    private var sitesAdapter = arrayListOf<SiteWithLastDeploymentItem>()
+    private var sitesAdapter = listOf<SiteWithLastDeploymentItem>()
 
     private val preferences by lazy { Preferences.getInstance(requireContext()) }
 
@@ -169,12 +169,12 @@ class SetDeploymentSiteFragment :
 
     private fun setupView() {
         existedSiteAdapter.items = arrayListOf()
-        val items = deploymentProtocol?.getSiteItem() ?: arrayListOf()
+        val items = deploymentProtocol?.getSiteItem() ?: listOf()
         sitesAdapter = items
         handleItemsAdapter(items)
     }
 
-    private fun handleItemsAdapter(sites: ArrayList<SiteWithLastDeploymentItem>) {
+    private fun handleItemsAdapter(sites: List<SiteWithLastDeploymentItem>) {
         existedSiteAdapter.isNewSite = false
         existedSiteAdapter.items = sites
         deploymentProtocol?.setSiteItem(sites)

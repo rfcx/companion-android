@@ -13,7 +13,7 @@ import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 
 class SiteAdapter(private val itemClickListener: (Stream, Boolean) -> Unit) :
     RecyclerView.Adapter<SiteAdapter.SiteAdapterViewHolder>() {
-    var items: ArrayList<SiteWithLastDeploymentItem> = arrayListOf()
+    var items: List<SiteWithLastDeploymentItem> = listOf()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -40,9 +40,8 @@ class SiteAdapter(private val itemClickListener: (Stream, Boolean) -> Unit) :
         }
     }
 
-    fun setFilter(newList: ArrayList<SiteWithLastDeploymentItem>?) {
-        items = arrayListOf()
-        items.addAll(newList ?: arrayListOf())
+    fun setFilter(newList: List<SiteWithLastDeploymentItem>?) {
+        items = newList ?: listOf()
         notifyDataSetChanged()
     }
 

@@ -140,7 +140,7 @@ class MapFragment :
     private var screen = ""
 
     private val siteAdapter by lazy { SiteAdapter(this) }
-    private var adapterOfSearchSite: ArrayList<SiteWithLastDeploymentItem>? = null
+    private var adapterOfSearchSite: List<SiteWithLastDeploymentItem>? = null
 
     private val locationGroupAdapter by lazy { ProjectAdapter(this) }
 
@@ -415,18 +415,12 @@ class MapFragment :
         searchLayoutSearchEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 context?.let {
-                    val text = s.toString().toLowerCase()
-                    val newList: ArrayList<SiteWithLastDeploymentItem> = arrayListOf()
-                    adapterOfSearchSite?.let {
-                        newList.addAll(
-                            it.filter { site ->
-                                site.stream.name.toLowerCase().contains(text)
-                            }
-                        )
-
-                        if (newList.isEmpty()) showLabel(true) else hideLabel()
-                        siteAdapter.setFilter(ArrayList(newList))
-                    }
+                    val text = s.toString().lowercase(Locale.getDefault())
+                    val filtered = adapterOfSearchSite?.filter { site -> site.stream.name.lowercase(
+                        Locale.getDefault()
+                    ).contains(text) }
+                    if (filtered.isNullOrEmpty()) showLabel(true) else hideLabel()
+                    siteAdapter.setFilter(filtered)
                 }
             }
 
@@ -963,7 +957,7 @@ class MapFragment :
                 streams
             )
         }
-        siteAdapter.items = adapterOfSearchSite ?: arrayListOf()
+        siteAdapter.items = adapterOfSearchSite ?: listOf()
 
         if (adapterOfSearchSite.isNullOrEmpty()) {
             showLabel(false)

@@ -18,7 +18,6 @@ import org.rfcx.companion.view.deployment.sync.NewSyncFragment
 import org.rfcx.companion.view.detail.MapPickerProtocol
 import org.rfcx.companion.view.dialog.CompleteListener
 import org.rfcx.companion.view.dialog.SiteLoadingDialogFragment
-import java.util.*
 
 abstract class BaseDeploymentActivity :
     AppCompatActivity(),
@@ -29,7 +28,7 @@ abstract class BaseDeploymentActivity :
     var _deployment: Deployment? = null
     var _images: List<String> = listOf()
     var _stream: Stream? = null
-    var _siteItems = arrayListOf<SiteWithLastDeploymentItem>()
+    var _siteItems = listOf<SiteWithLastDeploymentItem>()
 
     var latitude = 0.0
     var longitude = 0.0
@@ -101,7 +100,7 @@ abstract class BaseDeploymentActivity :
 
     override fun getDeploymentStream(): Stream? = this._stream
 
-    override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
+    override fun getSiteItem(): List<SiteWithLastDeploymentItem> = this._siteItems
 
     override fun getImages(): List<String> {
         return this._images
@@ -114,7 +113,7 @@ abstract class BaseDeploymentActivity :
         this.currentLocate = location
     }
 
-    override fun setSiteItem(items: ArrayList<SiteWithLastDeploymentItem>) {
+    override fun setSiteItem(items: List<SiteWithLastDeploymentItem>) {
         this._siteItems = items
     }
 

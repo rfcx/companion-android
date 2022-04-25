@@ -400,7 +400,7 @@ class GuardianDeploymentActivity :
 
     override fun getDeploymentStream(): Stream? = this._stream
 
-    override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
+    override fun getSiteItem(): List<SiteWithLastDeploymentItem> = this._siteItems
 
     override fun getStream(id: Int): Stream? {
         return streamDb.getStreamById(id)
