@@ -88,16 +88,6 @@ class DownloadStreamsWorker(val context: Context, params: WorkerParameters) :
         private var isRunning = DownloadStreamState.NOT_RUNNING
         private var PROJECT_ID: String? = null
 
-        fun enqueue(context: Context) {
-            val constraints =
-                Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
-            val workRequest =
-                OneTimeWorkRequestBuilder<DownloadStreamsWorker>().setConstraints(constraints)
-                    .build()
-            WorkManager.getInstance(context)
-                .enqueueUniqueWork(UNIQUE_WORK_KEY, ExistingWorkPolicy.REPLACE, workRequest)
-        }
-
         fun enqueue(context: Context, projectId: String) {
             PROJECT_ID = projectId
             val constraints =

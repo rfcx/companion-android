@@ -17,12 +17,12 @@ class AudioMothDeploymentRepository(
             .getAllResultsAsyncWithinProject(id = id)
     }
 
-    fun insertOrUpdate(stream: Stream) {
-        localDataHelper.getStreamLocalDb().insertOrUpdate(stream)
+    fun insertOrUpdate(stream: Stream): Int {
+        return localDataHelper.getStreamLocalDb().insertOrUpdate(stream)
     }
 
-    fun insertOrUpdateLocate(deploymentId: Int, stream: Stream) {
-        localDataHelper.getStreamLocalDb().insertOrUpdateStream(deploymentId, stream)
+    fun updateDeploymentIdOnStream(deploymentId: Int, streamId: Int) {
+        localDataHelper.getStreamLocalDb().updateDeploymentIdOnStream(deploymentId, streamId)
     }
 
     fun getLocateById(id: Int): Stream? {
@@ -70,7 +70,7 @@ class AudioMothDeploymentRepository(
             .insertOrUpdateDeployment(deployment, streamId)
     }
 
-    fun getDeploymentsBySiteId(streamId: String): ArrayList<Deployment> {
+    fun getDeploymentsBySiteId(streamId: Int): ArrayList<Deployment> {
         return localDataHelper.getDeploymentLocalDb().getDeploymentsBySiteId(streamId, Device.AUDIOMOTH.value)
     }
 

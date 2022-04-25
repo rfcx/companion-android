@@ -97,12 +97,12 @@ class AudioMothDeploymentViewModel(
         return sites
     }
 
-    fun insertOrUpdate(stream: Stream) {
-        audioMothDeploymentRepository.insertOrUpdate(stream)
+    fun insertOrUpdate(stream: Stream): Int {
+        return audioMothDeploymentRepository.insertOrUpdate(stream)
     }
 
-    fun insertOrUpdateLocate(deploymentId: Int, stream: Stream) {
-        audioMothDeploymentRepository.insertOrUpdateLocate(deploymentId, stream)
+    fun updateDeploymentIdOnStream(deploymentId: Int, streamId: Int) {
+        audioMothDeploymentRepository.updateDeploymentIdOnStream(deploymentId, streamId)
     }
 
     fun getStreamById(id: Int): Stream? {
@@ -144,7 +144,7 @@ class AudioMothDeploymentViewModel(
         return audioMothDeploymentRepository.insertOrUpdateDeployment(deployment, streamId)
     }
 
-    fun getDeploymentsBySiteId(streamId: String): ArrayList<Deployment> {
+    fun getDeploymentsBySiteId(streamId: Int): ArrayList<Deployment> {
         return audioMothDeploymentRepository.getDeploymentsBySiteId(streamId)
     }
 

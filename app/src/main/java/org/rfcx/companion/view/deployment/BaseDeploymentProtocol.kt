@@ -9,6 +9,7 @@ interface BaseDeploymentProtocol {
     fun startMapPicker(latitude: Double, longitude: Double, altitude: Double, streamId: Int, streamName: String)
     fun startCheckList()
     fun startDetailDeploymentSite(id: Int, streamName: String, isNewSite: Boolean)
+    fun startDetailDeploymentSite(lat: Double, lng: Double, siteId: Int, siteName: String)
 
     fun isOpenedFromUnfinishedDeployment(): Boolean
 

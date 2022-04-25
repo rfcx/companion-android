@@ -232,13 +232,13 @@ class DeploymentDb(private val realm: Realm) {
         }
     }
 
-    fun getDeploymentsBySiteId(streamId: String, device: String): ArrayList<Deployment> {
+    fun getDeploymentsBySiteId(streamId: Int, device: String): ArrayList<Deployment> {
         val deployments = realm.where(Deployment::class.java)
             .equalTo(Deployment.FIELD_STATE, if (device == Device.GUARDIAN.value) DeploymentState.Guardian.ReadyToUpload.key else DeploymentState.AudioMoth.ReadyToUpload.key)
             .and()
             .equalTo(Deployment.FIELD_SYNC_STATE, SyncState.Sent.key)
             .and()
-            .equalTo("stream.coreId", streamId)
+            .equalTo("stream.id", streamId)
             .findAllAsync()
         val arrayOfId = arrayListOf<Deployment>()
         deployments.forEach {

@@ -45,17 +45,12 @@ class StreamDb(private val realm: Realm) {
         }
     }
 
-    fun insertOrUpdateStream(deploymentId: Int, stream: Stream) {
+    fun updateDeploymentIdOnStream(deploymentId: Int, streamId: Int) {
         realm.executeTransaction {
-            if (stream.id == 0) {
-                val id = (
-                    realm.where(Stream::class.java).max(Stream.FIELD_ID)
-                        ?.toInt() ?: 0
-                    ) + 1
-                stream.id = id
+            val stream = realm.where(Stream::class.java).equalTo(Stream.FIELD_ID, streamId).findFirst()
+            if (stream != null) {
+                stream.lastDeploymentId = deploymentId
             }
-            stream.lastDeploymentId = deploymentId
-            it.insertOrUpdate(stream)
         }
     }
 
@@ -79,10 +74,11 @@ class StreamDb(private val realm: Realm) {
         }
     }
 
-    fun insertOrUpdate(stream: Stream) {
+    fun insertOrUpdate(stream: Stream): Int {
+        var id = stream.id
         realm.executeTransaction {
             if (stream.id == 0) {
-                val id = (
+                id = (
                     realm.where(Stream::class.java).max(Stream.FIELD_ID)
                         ?.toInt() ?: 0
                     ) + 1
@@ -90,6 +86,7 @@ class StreamDb(private val realm: Realm) {
             }
             it.insertOrUpdate(stream)
         }
+        return id
     }
 
     fun updateValues(

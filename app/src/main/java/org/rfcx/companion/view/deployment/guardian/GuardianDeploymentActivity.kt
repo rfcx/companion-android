@@ -434,21 +434,20 @@ class GuardianDeploymentActivity :
             it.deviceParameters = Gson().toJson(DeviceParameter(getGuid()))
             setDeployment(it)
 
-            this._stream?.let { loc ->
-                val deploymentId = deploymentDb.insertOrUpdateDeployment(it, loc.id)
-                streamDb.insertOrUpdateStream(deploymentId, loc) // update locate - last deployment
-            }
-
+            // set all deployments in stream to active false
             if (useExistedLocation) {
                 this._stream?.let { locate ->
-                    val deployments =
-                        locate.serverId?.let { it1 -> deploymentDb.getDeploymentsBySiteId(it1, Device.GUARDIAN.value) }
-                    deployments?.forEach { deployment ->
-                        deploymentDb.updateIsActive(deployment.id)
+                    locate.deployments?.forEach { dp ->
+                        deploymentDb.updateIsActive(dp.id)
                     }
                 }
             }
 
+            this._stream?.let { loc ->
+                val streamId = streamDb.insertOrUpdate(loc)
+                val deploymentId = deploymentDb.insertOrUpdateDeployment(it, streamId)
+                streamDb.updateDeploymentIdOnStream(deploymentId, streamId) // update locate - last deployment
+            }
             saveImages(it)
 
             // track getting
@@ -540,7 +539,7 @@ class GuardianDeploymentActivity :
                         )
                     )
                 } else {
-                    startDetailDeploymentSite(site.id, site.name, false)
+                    startDetailDeploymentSite(site.latitude, site.longitude, site.id, site.name)
                 }
             }
             7 -> {

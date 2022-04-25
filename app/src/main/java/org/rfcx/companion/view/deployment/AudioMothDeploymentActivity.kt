@@ -6,6 +6,7 @@ import android.content.Intent
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -226,42 +227,35 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
 
         this._stream = stream
         useExistedLocation = isExisted
-        if (!useExistedLocation) {
-            audioMothDeploymentViewModel.insertOrUpdate(stream)
-        }
 
         setDeployment(deployment)
     }
 
     override fun setReadyToDeploy() {
         showLoading()
-        _deployment?.let {
+        _deployment?.let { it ->
             it.deployedAt = Date()
             it.updatedAt = Date()
             it.isActive = true
             it.state = DeploymentState.AudioMoth.ReadyToUpload.key
             setDeployment(it)
 
-            this._stream?.let { loc ->
-                val deploymentId = audioMothDeploymentViewModel.insertOrUpdateDeployment(it, loc.id)
-                audioMothDeploymentViewModel.insertOrUpdateLocate(
-                    deploymentId,
-                    loc
-                ) // update locate - last deployment
-            }
-
+            // set all deployments in stream to active false
             if (useExistedLocation) {
                 this._stream?.let { locate ->
-                    val deployments =
-                        locate.serverId?.let { it1 ->
-                            audioMothDeploymentViewModel.getDeploymentsBySiteId(
-                                it1
-                            )
-                        }
-                    deployments?.forEach { deployment ->
-                        audioMothDeploymentViewModel.updateIsActive(deployment.id)
+                    locate.deployments?.forEach { dp ->
+                        audioMothDeploymentViewModel.updateIsActive(dp.id)
                     }
                 }
+            }
+
+            this._stream?.let { loc ->
+                val streamId = audioMothDeploymentViewModel.insertOrUpdate(loc)
+                val deploymentId = audioMothDeploymentViewModel.insertOrUpdateDeployment(it, streamId)
+                audioMothDeploymentViewModel.updateDeploymentIdOnStream(
+                    deploymentId,
+                    streamId
+                ) // update locate - last deployment
             }
             saveImages(it)
 
@@ -305,7 +299,7 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
                         )
                     )
                 } else {
-                    startDetailDeploymentSite(site.id, site.name, false)
+                    startDetailDeploymentSite(site.latitude, site.longitude, site.id, site.name)
                 }
             }
             1 -> {

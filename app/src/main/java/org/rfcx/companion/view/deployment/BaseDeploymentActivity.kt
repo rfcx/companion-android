@@ -90,6 +90,15 @@ abstract class BaseDeploymentActivity :
         startFragment(DetailDeploymentSiteFragment.newInstance(id, streamName, isNewSite))
     }
 
+    override fun startDetailDeploymentSite(
+        lat: Double,
+        lng: Double,
+        siteId: Int,
+        siteName: String
+    ) {
+        startFragment(DetailDeploymentSiteFragment.newInstance(lat, lng, siteId, siteName))
+    }
+
     override fun getDeploymentStream(): Stream? = this._stream
 
     override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
