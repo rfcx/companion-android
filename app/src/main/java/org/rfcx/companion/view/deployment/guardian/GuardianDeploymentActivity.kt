@@ -417,9 +417,6 @@ class GuardianDeploymentActivity :
 
         this._stream = stream
         useExistedLocation = isExisted
-        if (!useExistedLocation) {
-            streamDb.insertOrUpdate(stream)
-        }
 
         setDeployment(deployment)
     }
