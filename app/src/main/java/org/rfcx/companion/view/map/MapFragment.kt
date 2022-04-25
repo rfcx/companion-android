@@ -218,41 +218,17 @@ class MapFragment :
         }
     }
 
-    private val getDeploymentMarkerObserver = Observer<Resource<List<MapMarker.DeploymentMarker>>> {
-        when (it.status) {
-            Status.LOADING -> {
-            }
-            Status.SUCCESS -> {
-                deploymentMarkers = it.data ?: listOf()
-            }
-            Status.ERROR -> {
-            }
-        }
+    private val getDeploymentMarkerObserver = Observer<List<MapMarker.DeploymentMarker>> {
+        deploymentMarkers = it ?: listOf()
     }
 
-    private val getStreamMarkerObserver = Observer<Resource<List<MapMarker>>> {
-        when (it.status) {
-            Status.LOADING -> {
-            }
-            Status.SUCCESS -> {
-                streamMarkers = it.data ?: listOf()
-            }
-            Status.ERROR -> {
-            }
-        }
+    private val getStreamMarkerObserver = Observer<List<MapMarker>> {
+        streamMarkers = it ?: listOf()
     }
 
-    private val getStreamObserver = Observer<Resource<List<Stream>>> {
-        when (it.status) {
-            Status.LOADING -> {
-            }
-            Status.SUCCESS -> {
-                streams = it.data ?: listOf()
-                combinedData()
-            }
-            Status.ERROR -> {
-            }
-        }
+    private val getStreamObserver = Observer<List<Stream>> {
+        streams = it ?: listOf()
+        combinedData()
     }
 
     override fun onAttach(context: Context) {
@@ -396,6 +372,7 @@ class MapFragment :
         } else {
             projectRecyclerView.visibility = View.VISIBLE
             projectSwipeRefreshView.visibility = View.VISIBLE
+            showSearchBar(false)
             searchButton.visibility = View.GONE
             trackingLayout.visibility = View.GONE
             hideButtonOnMap()

@@ -40,9 +40,9 @@ class MainViewModel(
     private val context = getApplication<Application>().applicationContext
     private val projects = MutableLiveData<Resource<List<Project>>>()
     private val tracks = MutableLiveData<Resource<List<DeploymentAssetResponse>>>()
-    private val deploymentMarkers = MutableLiveData<Resource<List<MapMarker.DeploymentMarker>>>()
-    private val streamMarkers = MutableLiveData<Resource<List<MapMarker>>>()
-    private val streamList = MutableLiveData<Resource<List<Stream>>>()
+    private val deploymentMarkers = MutableLiveData<List<MapMarker.DeploymentMarker>>()
+    private val streamMarkers = MutableLiveData<List<MapMarker>>()
+    private val streamList = MutableLiveData<List<Stream>>()
 
     private var streams = listOf<Stream>()
 
@@ -230,9 +230,9 @@ class MainViewModel(
         val deployments = filteredStreams.mapNotNull { it.deployments }.flatten().filter { it.isCompleted() }
 
         val deploymentMarkersList = deployments.map { it.toMark(context) }
-        deploymentMarkers.postValue(Resource.success(deploymentMarkersList))
-        streamMarkers.postValue(Resource.success(streams.map { it.toMark() }))
-        streamList.postValue(Resource.success(filteredStreams))
+        deploymentMarkers.postValue(deploymentMarkersList)
+        streamMarkers.postValue(streams.map { it.toMark() })
+        streamList.postValue(filteredStreams)
     }
 
     fun updateStatusOfflineMap() {
@@ -342,15 +342,15 @@ class MainViewModel(
         return projects
     }
 
-    fun getDeploymentMarkers(): LiveData<Resource<List<MapMarker.DeploymentMarker>>> {
+    fun getDeploymentMarkers(): LiveData<List<MapMarker.DeploymentMarker>> {
         return deploymentMarkers
     }
 
-    fun getStreamMarkers(): LiveData<Resource<List<MapMarker>>> {
+    fun getStreamMarkers(): LiveData<List<MapMarker>> {
         return streamMarkers
     }
 
-    fun getStreams(): LiveData<Resource<List<Stream>>> {
+    fun getStreams(): LiveData<List<Stream>> {
         return streamList
     }
 
