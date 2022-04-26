@@ -85,11 +85,7 @@ import java.io.File
 import java.util.*
 import kotlin.collections.set
 
-class MapFragment :
-    Fragment(),
-    OnMapReadyCallback,
-    ProjectListener,
-        (Stream, Boolean) -> Unit {
+class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Boolean) -> Unit {
 
     private lateinit var mainViewModel: MainViewModel
 
@@ -416,9 +412,11 @@ class MapFragment :
             override fun afterTextChanged(s: Editable?) {
                 context?.let {
                     val text = s.toString().lowercase(Locale.getDefault())
-                    val filtered = adapterOfSearchSite?.filter { site -> site.stream.name.lowercase(
-                        Locale.getDefault()
-                    ).contains(text) }
+                    val filtered = adapterOfSearchSite?.filter { site ->
+                        site.stream.name.lowercase(
+                            Locale.getDefault()
+                        ).contains(text)
+                    }
                     if (filtered.isNullOrEmpty()) showLabel(true) else hideLabel()
                     siteAdapter.setFilter(filtered)
                 }
@@ -527,8 +525,7 @@ class MapFragment :
         override fun run() {
             context?.let {
                 trackingTextView.text = "${
-                    LocationTracking.getDistance(trackingDb)
-                        .setFormatLabel()
+                    LocationTracking.getDistance(trackingDb).setFormatLabel()
                 }  ${LocationTracking.getOnDutyTimeMinute(it)} min"
             }
             handler.postDelayed(this, 20 * 1000L)
@@ -642,12 +639,9 @@ class MapFragment :
         layout.deployedAt.text = deployedAt
         var latLng = ""
         context?.let { context ->
-            latLng =
-                "${stream?.latitude.latitudeCoordinates(context)}, ${
-                    stream?.longitude.longitudeCoordinates(
-                        context
-                    )
-                }"
+            latLng = "${stream?.latitude.latitudeCoordinates(context)}, ${
+                stream?.longitude.longitudeCoordinates(context)
+            }"
         }
         layout.latLngTextView.text = latLng
         val measureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
@@ -677,11 +671,9 @@ class MapFragment :
         val lat = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_LATITUDE) ?: "0.0"
         val lng = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_LONGITUDE) ?: "0.0"
         context?.let { context ->
-            latLng =
-                "${lat.toDouble().latitudeCoordinates(context)}, ${
-                    lng.toDouble()
-                        .longitudeCoordinates(context)
-                }"
+            latLng = "${lat.toDouble().latitudeCoordinates(context)}, ${
+                lng.toDouble().longitudeCoordinates(context)
+            }"
         }
         bubbleLayout.latLngValue.text = latLng
         val measureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)

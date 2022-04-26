@@ -4,9 +4,11 @@ import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
 import io.realm.kotlin.deleteFromRealm
-import org.rfcx.companion.entity.*
+import org.rfcx.companion.entity.Project
+import org.rfcx.companion.entity.Stream
+import org.rfcx.companion.entity.SyncState
+import org.rfcx.companion.entity.TrackingFile
 import org.rfcx.companion.entity.response.StreamResponse
-import org.rfcx.companion.entity.response.toProject
 import org.rfcx.companion.entity.response.toStream
 import org.rfcx.companion.util.toISO8601Format
 
@@ -47,7 +49,8 @@ class StreamDb(private val realm: Realm) {
 
     fun updateDeploymentIdOnStream(deploymentId: Int, streamId: Int) {
         realm.executeTransaction {
-            val stream = realm.where(Stream::class.java).equalTo(Stream.FIELD_ID, streamId).findFirst()
+            val stream =
+                realm.where(Stream::class.java).equalTo(Stream.FIELD_ID, streamId).findFirst()
             if (stream != null) {
                 stream.lastDeploymentId = deploymentId
             }
@@ -78,10 +81,7 @@ class StreamDb(private val realm: Realm) {
         var id = stream.id
         realm.executeTransaction {
             if (stream.id == 0) {
-                id = (
-                    realm.where(Stream::class.java).max(Stream.FIELD_ID)
-                        ?.toInt() ?: 0
-                    ) + 1
+                id = (realm.where(Stream::class.java).max(Stream.FIELD_ID)?.toInt() ?: 0) + 1
                 stream.id = id
             }
             it.insertOrUpdate(stream)
@@ -104,7 +104,8 @@ class StreamDb(private val realm: Realm) {
             if (longitude != null) stream?.longitude = longitude
             if (altitude != null) stream?.altitude = altitude
             if (projectId != null) {
-                val project = it.where(Project::class.java).equalTo(Project.PROJECT_ID, projectId).findFirst()
+                val project =
+                    it.where(Project::class.java).equalTo(Project.PROJECT_ID, projectId).findFirst()
                 stream?.project = project
             }
         }
@@ -120,13 +121,11 @@ class StreamDb(private val realm: Realm) {
 
                 if (location == null) {
                     val locate = streamResponse.toStream()
-                    val project = it.where(Project::class.java).equalTo(Project.PROJECT_SERVER_ID, streamResponse.project?.id).findFirst()
+                    val project = it.where(Project::class.java)
+                        .equalTo(Project.PROJECT_SERVER_ID, streamResponse.project?.id).findFirst()
                     locate.project = project
 
-                    val id = (
-                        it.where(Stream::class.java).max(Stream.FIELD_ID)
-                            ?.toInt() ?: 0
-                        ) + 1
+                    val id = (it.where(Stream::class.java).max(Stream.FIELD_ID)?.toInt() ?: 0) + 1
                     locate.id = id
                     it.insert(locate)
                 } else if (location.syncState == SyncState.Sent.key) {
@@ -139,7 +138,8 @@ class StreamDb(private val realm: Realm) {
                     location.createdAt = streamResponse.createdAt ?: location.createdAt
                     location.updatedAt = streamResponse.updatedAt ?: location.updatedAt
 
-                    val project = it.where(Project::class.java).equalTo(Project.PROJECT_SERVER_ID, streamResponse.project?.id).findFirst()
+                    val project = it.where(Project::class.java)
+                        .equalTo(Project.PROJECT_SERVER_ID, streamResponse.project?.id).findFirst()
                     location.project = project
                 }
             }

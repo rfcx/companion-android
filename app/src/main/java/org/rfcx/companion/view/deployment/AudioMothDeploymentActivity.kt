@@ -6,7 +6,6 @@ import android.content.Intent
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -251,7 +250,8 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
 
             this._stream?.let { loc ->
                 val streamId = audioMothDeploymentViewModel.insertOrUpdate(loc)
-                val deploymentId = audioMothDeploymentViewModel.insertOrUpdateDeployment(it, streamId)
+                val deploymentId =
+                    audioMothDeploymentViewModel.insertOrUpdateDeployment(it, streamId)
                 audioMothDeploymentViewModel.updateDeploymentIdOnStream(
                     deploymentId,
                     streamId

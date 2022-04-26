@@ -2,7 +2,6 @@ package org.rfcx.companion.view.detail
 
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Stream
-import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.local.LocalDataHelper
 

@@ -1,12 +1,9 @@
 package org.rfcx.companion.util
 
-import android.content.Context
 import android.location.Location
 import android.location.LocationManager
-import org.rfcx.companion.R
 import org.rfcx.companion.entity.Stream
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
-import kotlin.collections.ArrayList
 
 private fun findNearLocations(
     streamItems: List<Stream>,

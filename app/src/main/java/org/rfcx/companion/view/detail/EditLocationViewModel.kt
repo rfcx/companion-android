@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Stream
-import org.rfcx.companion.localdb.DatabaseCallback
 
 class EditLocationViewModel(
     application: Application,
