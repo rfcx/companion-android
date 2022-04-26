@@ -525,7 +525,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         override fun run() {
             context?.let {
                 trackingTextView.text = "${
-                    LocationTracking.getDistance(trackingDb).setFormatLabel()
+                LocationTracking.getDistance(trackingDb).setFormatLabel()
                 }  ${LocationTracking.getOnDutyTimeMinute(it)} min"
             }
             handler.postDelayed(this, 20 * 1000L)
@@ -640,7 +640,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         var latLng = ""
         context?.let { context ->
             latLng = "${stream?.latitude.latitudeCoordinates(context)}, ${
-                stream?.longitude.longitudeCoordinates(context)
+            stream?.longitude.longitudeCoordinates(context)
             }"
         }
         layout.latLngTextView.text = latLng
@@ -672,7 +672,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         val lng = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_LONGITUDE) ?: "0.0"
         context?.let { context ->
             latLng = "${lat.toDouble().latitudeCoordinates(context)}, ${
-                lng.toDouble().longitudeCoordinates(context)
+            lng.toDouble().longitudeCoordinates(context)
             }"
         }
         bubbleLayout.latLngValue.text = latLng
