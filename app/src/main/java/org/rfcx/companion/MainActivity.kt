@@ -93,6 +93,9 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         val preferences = Preferences.getInstance(this)
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
         val project = mainViewModel.getProjectById(projectId)
+        if (project == null) {
+            logout()
+        }
         project?.let {
             if (it.isGuest()) {
                 preferences.putInt(Preferences.SELECTED_PROJECT, -1)
