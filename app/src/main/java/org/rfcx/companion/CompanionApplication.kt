@@ -31,13 +31,9 @@ class CompanionApplication : Application() {
     private fun setupRealm() {
         var realmNeedsMigration = false
         try {
-            if (RealmHelper.schemaVersion == 20L) {
-                realmNeedsMigration = true
-            } else {
-                val realm = Realm.getInstance(RealmHelper.migrationConfig())
-                realm.close()
-                Realm.setDefaultConfiguration(RealmHelper.migrationConfig())
-            }
+            val realm = Realm.getInstance(RealmHelper.migrationConfig())
+            realm.close()
+            Realm.setDefaultConfiguration(RealmHelper.migrationConfig())
         } catch (e: RealmMigrationNeededException) {
             realmNeedsMigration = true
         }
@@ -47,8 +43,8 @@ class CompanionApplication : Application() {
             try {
                 val realm = Realm.getInstance(RealmHelper.fallbackConfig())
                 realm.close()
-                logout()
             } catch (e: RealmMigrationNeededException) {
+                logout()
             }
         }
     }
