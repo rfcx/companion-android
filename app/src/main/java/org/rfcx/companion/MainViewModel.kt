@@ -49,6 +49,10 @@ class MainViewModel(
     private lateinit var streamLiveData: LiveData<List<Stream>>
     private val streamObserve = Observer<List<Stream>> {
         streams = it
+    }
+
+    private lateinit var deploymentLiveData: LiveData<List<Deployment>>
+    private val deploymentObserve = Observer<List<Deployment>> {
         combinedData()
     }
 
@@ -60,6 +64,11 @@ class MainViewModel(
         streamLiveData =
             Transformations.map(mainRepository.getAllLocateResultsAsync().asLiveData()) { it }
         streamLiveData.observeForever(streamObserve)
+
+        deploymentLiveData = Transformations.map(
+            mainRepository.getAllDeploymentLocateResultsAsync().asLiveData()
+        ) { it }
+        deploymentLiveData.observeForever(deploymentObserve)
     }
 
     fun fetchProjects() {
@@ -227,7 +236,8 @@ class MainViewModel(
         val projectId = getSelectedProjectId()
         val filteredStreams = this.streams.filter { it.project?.id == projectId }
         val streams = filteredStreams.filter { it.deployments.isNullOrEmpty() }
-        val deployments = filteredStreams.mapNotNull { it.deployments }.flatten().filter { it.isCompleted() }
+        val deployments =
+            filteredStreams.mapNotNull { it.deployments }.flatten().filter { it.isCompleted() }
 
         val deploymentMarkersList = deployments.map { it.toMark(context) }
         deploymentMarkers.postValue(deploymentMarkersList)
@@ -269,25 +279,25 @@ class MainViewModel(
                         object : OfflineManager.CreateOfflineRegionCallback {
                             override fun onCreate(offlineRegion: OfflineRegion) {
                                 offlineRegion.getStatus(object :
-                                        OfflineRegion.OfflineRegionStatusCallback {
-                                        override fun onStatus(status: OfflineRegionStatus?) {
-                                            if (status == null) return
-                                            if (status.requiredResourceCount > 10000) {
-                                                mainRepository.updateOfflineState(
-                                                    OfflineMapState.UNAVAILABLE.key,
-                                                    project.serverId ?: ""
-                                                )
-                                            } else {
-                                                mainRepository.updateOfflineState(
-                                                    OfflineMapState.DOWNLOAD_STATE.key,
-                                                    project.serverId ?: ""
-                                                )
-                                            }
-                                            deleteOfflineRegion(project, offlineManager)
+                                    OfflineRegion.OfflineRegionStatusCallback {
+                                    override fun onStatus(status: OfflineRegionStatus?) {
+                                        if (status == null) return
+                                        if (status.requiredResourceCount > 10000) {
+                                            mainRepository.updateOfflineState(
+                                                OfflineMapState.UNAVAILABLE.key,
+                                                project.serverId ?: ""
+                                            )
+                                        } else {
+                                            mainRepository.updateOfflineState(
+                                                OfflineMapState.DOWNLOAD_STATE.key,
+                                                project.serverId ?: ""
+                                            )
                                         }
+                                        deleteOfflineRegion(project, offlineManager)
+                                    }
 
-                                        override fun onError(error: String?) {}
-                                    })
+                                    override fun onError(error: String?) {}
+                                })
                             }
 
                             override fun onError(error: String) {}
@@ -396,5 +406,6 @@ class MainViewModel(
 
     fun onDestroy() {
         streamLiveData.removeObserver(streamObserve)
+        deploymentLiveData.removeObserver(deploymentObserve)
     }
 }

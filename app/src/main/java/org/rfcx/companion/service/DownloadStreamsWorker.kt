@@ -58,7 +58,7 @@ class DownloadStreamsWorker(val context: Context, params: WorkerParameters) :
                 val streamDb = StreamDb(Realm.getInstance(RealmHelper.migrationConfig()))
                 val deploymentDb = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
                 count += resultBody.size
-                streamDb.insertOrUpdate(resultBody)
+                streamDb.insertOrUpdate(it)
 
                 // insert deployments
                 val deploymentStreams = resultBody.filter { st -> st.deployment != null }
