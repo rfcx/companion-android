@@ -279,25 +279,25 @@ class MainViewModel(
                         object : OfflineManager.CreateOfflineRegionCallback {
                             override fun onCreate(offlineRegion: OfflineRegion) {
                                 offlineRegion.getStatus(object :
-                                    OfflineRegion.OfflineRegionStatusCallback {
-                                    override fun onStatus(status: OfflineRegionStatus?) {
-                                        if (status == null) return
-                                        if (status.requiredResourceCount > 10000) {
-                                            mainRepository.updateOfflineState(
-                                                OfflineMapState.UNAVAILABLE.key,
-                                                project.serverId ?: ""
-                                            )
-                                        } else {
-                                            mainRepository.updateOfflineState(
-                                                OfflineMapState.DOWNLOAD_STATE.key,
-                                                project.serverId ?: ""
-                                            )
+                                        OfflineRegion.OfflineRegionStatusCallback {
+                                        override fun onStatus(status: OfflineRegionStatus?) {
+                                            if (status == null) return
+                                            if (status.requiredResourceCount > 10000) {
+                                                mainRepository.updateOfflineState(
+                                                    OfflineMapState.UNAVAILABLE.key,
+                                                    project.serverId ?: ""
+                                                )
+                                            } else {
+                                                mainRepository.updateOfflineState(
+                                                    OfflineMapState.DOWNLOAD_STATE.key,
+                                                    project.serverId ?: ""
+                                                )
+                                            }
+                                            deleteOfflineRegion(project, offlineManager)
                                         }
-                                        deleteOfflineRegion(project, offlineManager)
-                                    }
 
-                                    override fun onError(error: String?) {}
-                                })
+                                        override fun onError(error: String?) {}
+                                    })
                             }
 
                             override fun onError(error: String) {}
