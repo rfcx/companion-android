@@ -391,7 +391,9 @@ class CompanionRealmMigration : RealmMigration {
     private fun migrateToV19(realm: DynamicRealm) {
         val deployment = realm.schema.get(Deployment.TABLE_NAME)
         deployment?.apply {
-            addField(Deployment.FIELD_DEVICE_PARAMETERS, String::class.java)
+            if (!this.hasField(Deployment.FIELD_DEVICE_PARAMETERS)) {
+                addField(Deployment.FIELD_DEVICE_PARAMETERS, String::class.java)
+            }
         }
     }
 
