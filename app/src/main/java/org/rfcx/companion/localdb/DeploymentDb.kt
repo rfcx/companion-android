@@ -48,7 +48,7 @@ class DeploymentDb(private val realm: Realm) {
     fun deleteDeploymentByStreamId(id: String) {
         realm.executeTransaction {
             val deployments =
-                it.where(Deployment::class.java).equalTo("stream.coreId", id)
+                it.where(Deployment::class.java).equalTo("stream.serverId", id)
                     .findAll()
             deployments.forEach { dp ->
                 dp.isActive = false
