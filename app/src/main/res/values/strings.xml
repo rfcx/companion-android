@@ -66,9 +66,9 @@
     <string name="detail_sec">%d second</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
-    <string name="delete_location">Delete site?</string>
+    <string name="delete_location">Delete deployment?</string>
     <string name="deployment_key">Deployment ID</string>
-    <string name="are_you_sure_delete_location">The device and its site will be removed</string>
+    <string name="are_you_sure_delete_location">The device will be removed</string>
 
     <!--  Perform Battery  -->
     <string name="test">test</string>
