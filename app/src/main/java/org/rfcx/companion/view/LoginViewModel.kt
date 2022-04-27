@@ -82,8 +82,10 @@ class LoginViewModel(
                 }
 
                 override fun onFailure(exception: AuthenticationException) {
+                    val errorText =
+                        if (exception.description == "Wrong email or password.") context.getString(R.string.incorrect_username_or_password) else exception.description
                     loginWithEmailPassword.postValue(
-                        Resource.error(exception.description, null)
+                        Resource.error(errorText, null)
                     )
                 }
             })
