@@ -235,14 +235,15 @@ class MainViewModel(
     fun combinedData() {
         val projectId = getSelectedProjectId()
         val filteredStreams = this.streams.filter { it.project?.id == projectId }
+        streamList.postValue(filteredStreams)
+
         val streams = filteredStreams.filter { it.deployments.isNullOrEmpty() }
+        streamMarkers.postValue(streams.map { it.toMark() })
+
         val deployments =
             filteredStreams.mapNotNull { it.deployments }.flatten().filter { it.isCompleted() }
-
         val deploymentMarkersList = deployments.map { it.toMark(context) }
         deploymentMarkers.postValue(deploymentMarkersList)
-        streamMarkers.postValue(streams.map { it.toMark() })
-        streamList.postValue(filteredStreams)
     }
 
     fun updateStatusOfflineMap() {

@@ -216,6 +216,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
 
     private val getDeploymentMarkerObserver = Observer<List<MapMarker.DeploymentMarker>> {
         deploymentMarkers = it ?: listOf()
+        combinedData()
     }
 
     private val getStreamMarkerObserver = Observer<List<MapMarker>> {
@@ -224,7 +225,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
 
     private val getStreamObserver = Observer<List<Stream>> {
         streams = it ?: listOf()
-        combinedData()
     }
 
     override fun onAttach(context: Context) {
@@ -525,7 +525,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         override fun run() {
             context?.let {
                 trackingTextView.text = "${
-                LocationTracking.getDistance(trackingDb).setFormatLabel()
+                    LocationTracking.getDistance(trackingDb).setFormatLabel()
                 }  ${LocationTracking.getOnDutyTimeMinute(it)} min"
             }
             handler.postDelayed(this, 20 * 1000L)
@@ -640,7 +640,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         var latLng = ""
         context?.let { context ->
             latLng = "${stream?.latitude.latitudeCoordinates(context)}, ${
-            stream?.longitude.longitudeCoordinates(context)
+                stream?.longitude.longitudeCoordinates(context)
             }"
         }
         layout.latLngTextView.text = latLng
@@ -672,7 +672,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         val lng = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_LONGITUDE) ?: "0.0"
         context?.let { context ->
             latLng = "${lat.toDouble().latitudeCoordinates(context)}, ${
-            lng.toDouble().longitudeCoordinates(context)
+                lng.toDouble().longitudeCoordinates(context)
             }"
         }
         bubbleLayout.latLngValue.text = latLng
@@ -1445,35 +1445,30 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
             // reload site to get sites from selected project
             mainViewModel.retrieveLocations()
         }
-        listener?.let { listener ->
-            projectNameTextView.text =
-                if (listener.getProjectName() != getString(R.string.none)) listener.getProjectName() else getString(
-                    R.string.projects
-                )
-            mainViewModel.combinedData()
-            combinedData()
-            val projects =
-                adapterOfSearchSite?.map { LatLng(it.stream.latitude, it.stream.longitude) }
-            if (projects != null && projects.isNotEmpty()) {
-                if (projects.size > 1) {
-                    moveCameraWithLatLngList(projects)
-                } else {
-                    moveCamera(
-                        LatLng(projects[0].latitude, projects[0].longitude),
-                        null,
-                        DefaultSetupMap.DEFAULT_ZOOM
-                    )
-                }
+
+        projectNameTextView.text = project.name
+        mainViewModel.combinedData()
+        val latLngBounds =
+            project.streams?.map { LatLng(it.latitude, it.longitude) } ?: listOf()
+        if (latLngBounds.isNotEmpty()) {
+            if (latLngBounds.size > 1) {
+                moveCameraWithLatLngList(latLngBounds)
             } else {
-                currentUserLocation?.let { current ->
-                    moveCamera(
-                        LatLng(
-                            current.latitude,
-                            current.longitude
-                        ),
-                        null, DefaultSetupMap.DEFAULT_ZOOM
-                    )
-                }
+                moveCamera(
+                    LatLng(latLngBounds[0].latitude, latLngBounds[0].longitude),
+                    null,
+                    DefaultSetupMap.DEFAULT_ZOOM
+                )
+            }
+        } else {
+            currentUserLocation?.let { current ->
+                moveCamera(
+                    LatLng(
+                        current.latitude,
+                        current.longitude
+                    ),
+                    null, DefaultSetupMap.DEFAULT_ZOOM
+                )
             }
         }
 
