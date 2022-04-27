@@ -342,7 +342,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     private fun setLatLngLabel(location: LatLng, altitude: Double) {
         context?.let {
             val latLng = "${location.latitude.latitudeCoordinates(it)}, ${
-                location.longitude.longitudeCoordinates(it)
+            location.longitude.longitudeCoordinates(it)
             }"
             coordinatesValueTextView.text = latLng
             altitudeValue.text = altitude.setFormatLabel()
