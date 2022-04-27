@@ -72,6 +72,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     private var altitude: Double = 0.0
     private var currentUserLocation: Location? = null
     private var userLocation: Location? = null
+    private var pinLocation: LatLng? = null
     private var locationEngine: LocationEngine? = null
     private val mapboxLocationChangeCallback =
         object : LocationEngineCallback<LocationEngineResult> {
@@ -79,7 +80,6 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 if (activity != null) {
                     val location = result?.lastLocation
                     location ?: return
-
                     currentUserLocation = location
                     updateView()
 
@@ -88,12 +88,9 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                             val latLng =
                                 LatLng(currentUserLocation.latitude, currentUserLocation.longitude)
                             moveCamera(latLng, null, DefaultSetupMap.DEFAULT_ZOOM)
-                            setCheckboxForResumeDeployment(
-                                currentUserLocation.toLatLng(),
-                                context?.getLastLocation()?.toLatLng() ?: LatLng()
-                            )
                         }
                     }
+                    pinLocation?.let { setCheckboxForResumeDeployment(location.toLatLng(), it) }
                 }
             }
 
@@ -324,11 +321,18 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         if (latitude != 0.0 && longitude != 0.0) {
             val alt = currentUserLocation?.altitude
             setLatLngLabel(LatLng(latitude, longitude), alt ?: 0.0)
+            pinLocation = LatLng(latitude, longitude)
         } else if (isCreateNew) {
-            currentUserLocation?.let { setLatLngLabel(it.toLatLng(), it.altitude) }
+            currentUserLocation?.let {
+                setLatLngLabel(it.toLatLng(), it.altitude)
+                pinLocation = it.toLatLng()
+            }
         } else {
             val alt = currentUserLocation?.altitude
-            site?.let { setLatLngLabel(it.toLatLng(), alt ?: 0.0) }
+            site?.let {
+                setLatLngLabel(it.toLatLng(), alt ?: 0.0)
+                pinLocation = it.toLatLng()
+            }
             locationGroupValueTextView.text = site?.project?.name ?: getString(R.string.none)
         }
         siteValueTextView.text = siteName
@@ -338,7 +342,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     private fun setLatLngLabel(location: LatLng, altitude: Double) {
         context?.let {
             val latLng = "${location.latitude.latitudeCoordinates(it)}, ${
-            location.longitude.longitudeCoordinates(it)
+                location.longitude.longitudeCoordinates(it)
             }"
             coordinatesValueTextView.text = latLng
             altitudeValue.text = altitude.setFormatLabel()
@@ -364,6 +368,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             moveCamera(curLoc, latLng, DefaultSetupMap.DEFAULT_ZOOM)
             createSiteSymbol(latLng)
             setCheckboxForResumeDeployment(curLoc, latLng)
+            pinLocation = latLng
         } else if (!isCreateNew) {
             site = audioMothDeploymentViewModel.getStreamById(siteId)
             site?.let { locate ->
@@ -374,9 +379,11 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                     latLng
                 )
                 createSiteSymbol(latLng)
+                pinLocation = latLng
             }
         } else {
             createSiteSymbol(curLoc)
+            pinLocation = curLoc
         }
     }
 
