@@ -1,6 +1,6 @@
 package org.rfcx.companion.entity.request
 
-import org.rfcx.companion.entity.DeploymentLocation
+import org.rfcx.companion.entity.Stream
 
 data class StreamRequest(
     var name: String = "",
@@ -11,13 +11,13 @@ data class StreamRequest(
     var id: String? = null
 )
 
-fun DeploymentLocation.toRequestBody(): StreamRequest {
+fun Stream.toRequestBody(): StreamRequest {
     return StreamRequest(
         name = this.name,
         latitude = this.latitude,
         longitude = this.longitude,
         altitude = this.altitude,
         project = if (this.project?.name == null) null else this.project?.toRequestBody(),
-        id = this.coreId
+        id = this.serverId
     )
 }

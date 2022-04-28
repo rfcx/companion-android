@@ -7,9 +7,9 @@ import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
 import org.rfcx.companion.R
-import org.rfcx.companion.entity.DeploymentLocation
 import org.rfcx.companion.entity.DeploymentState
 import org.rfcx.companion.entity.Device
+import org.rfcx.companion.entity.Stream
 import org.rfcx.companion.util.Pin
 import org.rfcx.companion.util.randomDeploymentId
 import org.rfcx.companion.view.map.MapMarker
@@ -26,7 +26,7 @@ open class Deployment(
     @Expose(serialize = false)
     var state: Int = 0, // 1 = Locate, 2 = Config, 3 = Sync, 4 = Verify, 5 = Deploy, 6 = Ready To Upload
     var device: String? = Device.GUARDIAN.value,
-    var stream: DeploymentLocation? = null,
+    var stream: Stream? = null,
     var createdAt: Date = Date(),
     var updatedAt: Date? = null,
     var isActive: Boolean = false,

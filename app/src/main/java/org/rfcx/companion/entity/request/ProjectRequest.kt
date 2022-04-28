@@ -1,6 +1,6 @@
 package org.rfcx.companion.entity.request
 
-import org.rfcx.companion.entity.LocationGroup
+import org.rfcx.companion.entity.Project
 
 data class ProjectRequest(
     var name: String? = null,
@@ -8,10 +8,10 @@ data class ProjectRequest(
     var id: String? = null
 )
 
-fun LocationGroup.toRequestBody(): ProjectRequest {
+fun Project.toRequestBody(): ProjectRequest {
     return ProjectRequest(
         name = this.name,
         color = this.color,
-        id = this.coreId
+        id = this.serverId
     )
 }

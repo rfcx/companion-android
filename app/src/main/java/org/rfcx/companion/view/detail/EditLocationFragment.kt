@@ -46,7 +46,7 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     private var altitude: Double = 0.0
-    private var nameLocation: String? = null
+    private var streamId: Int = -1
     private val analytics by lazy { context?.let { Analytics(it) } }
 
     private var editLocationActivityListener: EditLocationActivityListener? = null
@@ -79,7 +79,8 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
 
         setHideKeyboard()
 
-        locationNameEditText.setText(nameLocation)
+        val stream = editLocationActivityListener?.getStream(streamId)
+        locationNameEditText.setText(stream?.name ?: getString(R.string.none))
         altitudeEditText.setText(altitude.toString())
         locationValueTextView.text = context?.let { convertLatLngLabel(it, latitude, longitude) }
 
@@ -118,7 +119,7 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
             latitude,
             longitude,
             altitudeEditText.text.toString().toDouble(),
-            locationNameEditText.text.toString()
+            streamId
         )
     }
 
@@ -153,7 +154,7 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
             latitude = it.getDouble(ARG_LATITUDE)
             longitude = it.getDouble(ARG_LONGITUDE)
             altitude = it.getDouble(ARG_ALTITUDE)
-            nameLocation = it.getString(ARG_LOCATION_NAME)
+            streamId = it.getInt(ARG_STREAM_ID)
         }
     }
 
@@ -264,7 +265,7 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         mapView.onResume()
 
         editLocationActivityListener?.let {
-            locationGroupValueTextView.text = it.getLocationGroupName()
+            locationGroupValueTextView.text = it.getStream(streamId).project?.name
         }
     }
 
@@ -292,17 +293,17 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         private const val ARG_LATITUDE = "ARG_LATITUDE"
         private const val ARG_LONGITUDE = "ARG_LONGITUDE"
         private const val ARG_ALTITUDE = "ARG_ALTITUDE"
-        private const val ARG_LOCATION_NAME = "ARG_LOCATION_NAME"
+        private const val ARG_STREAM_ID = "ARG_STREAM_ID"
         private const val REQUEST_PERMISSIONS_REQUEST_CODE = 34
 
         @JvmStatic
-        fun newInstance(lat: Double, lng: Double, altitude: Double, name: String) =
+        fun newInstance(lat: Double, lng: Double, altitude: Double, id: Int) =
             EditLocationFragment().apply {
                 arguments = Bundle().apply {
                     putDouble(ARG_LATITUDE, lat)
                     putDouble(ARG_LONGITUDE, lng)
                     putDouble(ARG_ALTITUDE, altitude)
-                    putString(ARG_LOCATION_NAME, name)
+                    putInt(ARG_STREAM_ID, id)
                 }
             }
     }

@@ -4,10 +4,7 @@ import android.app.Application
 import io.realm.Realm
 import io.realm.exceptions.RealmMigrationNeededException
 import org.rfcx.companion.service.DeploymentCleanupWorker
-import org.rfcx.companion.util.LocationTracking
-import org.rfcx.companion.util.Preferences
-import org.rfcx.companion.util.RealmHelper
-import org.rfcx.companion.util.SocketUtils
+import org.rfcx.companion.util.*
 
 class CompanionApplication : Application() {
     override fun onCreate() {
@@ -41,12 +38,13 @@ class CompanionApplication : Application() {
             realmNeedsMigration = true
         }
 
-        // Falback for release (delete realm on error)
-        if (realmNeedsMigration && !BuildConfig.DEBUG) {
+        // Fallback for release (delete realm on error)
+        if (realmNeedsMigration) {
             try {
                 val realm = Realm.getInstance(RealmHelper.fallbackConfig())
                 realm.close()
             } catch (e: RealmMigrationNeededException) {
+                logout()
             }
         }
     }

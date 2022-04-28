@@ -65,7 +65,7 @@ class GuardianDeploymentActivity :
     WifiLostListener {
     // manager database
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val locateDb by lazy { LocateDb(realm) }
+    private val streamDb by lazy { StreamDb(realm) }
     private val projectDb by lazy { ProjectDb(realm) }
     private val deploymentDb by lazy { DeploymentDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
@@ -117,9 +117,9 @@ class GuardianDeploymentActivity :
         setSiteItems()
     }
 
-    private lateinit var siteLiveData: LiveData<List<Locate>>
-    private var sites = listOf<Locate>()
-    private val siteObserve = Observer<List<Locate>> {
+    private lateinit var siteLiveData: LiveData<List<Stream>>
+    private var sites = listOf<Stream>()
+    private val siteObserve = Observer<List<Stream>> {
         this.sites = it
         setSiteItems()
     }
@@ -164,7 +164,7 @@ class GuardianDeploymentActivity :
             if (deployment != null) {
                 setDeployment(deployment)
                 if (deployment.stream != null) {
-                    _deployLocation = deployment.stream
+                    _stream = deployment.stream
                 }
             }
         } else {
@@ -208,8 +208,7 @@ class GuardianDeploymentActivity :
                     DetailDeploymentSiteFragment.newInstance(
                         latitude,
                         longitude,
-                        siteId,
-                        nameLocation
+                        siteId
                     )
                 )
             }
@@ -238,7 +237,7 @@ class GuardianDeploymentActivity :
         val project = projectDb.getProjectById(projectId)
         val projectName = project?.name ?: getString(R.string.none)
         siteLiveData = Transformations.map(
-            locateDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()
+            streamDb.getAllResultsAsyncWithinProject(id = projectId).asLiveData()
         ) {
             it
         }
@@ -246,7 +245,7 @@ class GuardianDeploymentActivity :
 
         deploymentLiveData =
             Transformations.map(
-                deploymentDb.getAllResultsAsyncWithinProject(project = projectName).asLiveData()
+                deploymentDb.getAllResultsAsyncWithinProject(id = projectId).asLiveData()
             ) {
                 it
             }
@@ -296,9 +295,6 @@ class GuardianDeploymentActivity :
         loc.longitude = 0.0
 
         _siteItems = getListSite(
-            this,
-            guardianDeployments,
-            getString(R.string.none),
             currentLocate ?: loc,
             sites
         )
@@ -402,25 +398,25 @@ class GuardianDeploymentActivity :
         AdminSocketManager.connect()
     }
 
-    override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
+    override fun getDeploymentStream(): Stream? = this._stream
 
-    override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
+    override fun getSiteItem(): List<SiteWithLastDeploymentItem> = this._siteItems
 
-    override fun getLocationGroup(name: String): Project? {
-        return projectDb.getProjectByName(name)
+    override fun getStream(id: Int): Stream? {
+        return streamDb.getStreamById(id)
     }
 
-    override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
+    override fun getProject(id: Int): Project? {
+        return projectDb.getProjectById(id)
+    }
+
+    override fun setDeployLocation(stream: Stream, isExisted: Boolean) {
         val deployment = _deployment ?: Deployment()
-        deployment.isActive = locate.serverId == null
+        deployment.isActive = stream.serverId == null
         deployment.state = DeploymentState.Guardian.Locate.key // state
 
-        this._deployLocation = locate.asDeploymentLocation()
-        this._locate = locate
+        this._stream = stream
         useExistedLocation = isExisted
-        if (!useExistedLocation) {
-            locateDb.insertOrUpdate(locate)
-        }
 
         setDeployment(deployment)
     }
@@ -435,21 +431,20 @@ class GuardianDeploymentActivity :
             it.deviceParameters = Gson().toJson(DeviceParameter(getGuid()))
             setDeployment(it)
 
-            val deploymentId = deploymentDb.insertOrUpdateDeployment(it, _deployLocation!!)
-            this._locate?.let { loc ->
-                locateDb.insertOrUpdateLocate(deploymentId, loc) // update locate - last deployment
-            }
-
+            // set all deployments in stream to active false
             if (useExistedLocation) {
-                this._locate?.let { locate ->
-                    val deployments =
-                        locate.serverId?.let { it1 -> deploymentDb.getDeploymentsBySiteId(it1, Device.GUARDIAN.value) }
-                    deployments?.forEach { deployment ->
-                        deploymentDb.updateIsActive(deployment.id)
+                this._stream?.let { locate ->
+                    locate.deployments?.forEach { dp ->
+                        deploymentDb.updateIsActive(dp.id)
                     }
                 }
             }
 
+            this._stream?.let { loc ->
+                val streamId = streamDb.insertOrUpdate(loc)
+                val deploymentId = deploymentDb.insertOrUpdateDeployment(it, streamId)
+                streamDb.updateDeploymentIdOnStream(deploymentId, streamId) // update locate - last deployment
+            }
             saveImages(it)
 
             // track getting
@@ -459,7 +454,7 @@ class GuardianDeploymentActivity :
                     val point = t.points.toListDoubleArray()
                     val trackingFile = TrackingFile(
                         deploymentId = it.id,
-                        siteId = this._locate!!.id,
+                        siteId = this._stream!!.id,
                         localPath = GeoJsonUtils.generateGeoJson(
                             this,
                             GeoJsonUtils.generateFileName(it.deployedAt, getGuid()!!),
@@ -533,7 +528,7 @@ class GuardianDeploymentActivity :
             }
             6 -> {
                 updateDeploymentState(DeploymentState.Guardian.Locate)
-                val site = this._locate
+                val site = this._stream
                 if (site == null) {
                     startFragment(
                         SetDeploymentSiteFragment.newInstance(
@@ -541,7 +536,7 @@ class GuardianDeploymentActivity :
                         )
                     )
                 } else {
-                    startDetailDeploymentSite(site.id, site.name, false)
+                    startDetailDeploymentSite(site.latitude, site.longitude, site.id, site.name)
                 }
             }
             7 -> {

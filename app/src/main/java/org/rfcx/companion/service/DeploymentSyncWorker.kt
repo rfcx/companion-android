@@ -7,9 +7,8 @@ import androidx.work.*
 import io.realm.Realm
 import org.rfcx.companion.entity.request.EditDeploymentRequest
 import org.rfcx.companion.entity.request.toRequestBody
-import org.rfcx.companion.entity.response.toDeployment
 import org.rfcx.companion.localdb.DeploymentDb
-import org.rfcx.companion.localdb.LocateDb
+import org.rfcx.companion.localdb.StreamDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.RealmHelper
@@ -26,7 +25,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
         isRunning = DeploymentSyncState.RUNNING
 
         val db = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
-        val locateDb = LocateDb(Realm.getInstance(RealmHelper.migrationConfig()))
+        val locateDb = StreamDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val deployments = db.lockUnsent()
         val token = "Bearer ${context.getIdToken()}"
 
@@ -84,7 +83,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
     private fun markSentDeployment(
         id: String,
         db: DeploymentDb,
-        locateDb: LocateDb,
+        streamDb: StreamDb,
         deploymentId: Int,
         token: String
     ) {
@@ -94,8 +93,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
         val updatedDp = ApiManager.getInstance().getDeviceApi()
             .getDeployment(token, id).execute().body()
         updatedDp?.let { dp ->
-            db.updateDeploymentByServerId(updatedDp.toDeployment())
-            locateDb.updateSiteServerId(deploymentId, dp.stream!!.id!!)
+            streamDb.updateSiteServerId(deploymentId, dp.stream!!.id!!)
         }
 
         // send tracking if there is

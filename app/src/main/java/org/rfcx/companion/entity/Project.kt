@@ -2,8 +2,11 @@ package org.rfcx.companion.entity
 
 import com.google.gson.annotations.Expose
 import io.realm.RealmModel
+import io.realm.RealmResults
+import io.realm.annotations.LinkingObjects
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
+import java.io.Serializable
 import java.util.*
 
 @RealmClass
@@ -21,10 +24,11 @@ open class Project(
     var minLongitude: Double? = null,
     var maxLatitude: Double? = null,
     var maxLongitude: Double? = null,
-    var offlineMapState: String = OfflineMapState.DOWNLOAD_STATE.key
-) : RealmModel {
+    var offlineMapState: String = OfflineMapState.DOWNLOAD_STATE.key,
+    @LinkingObjects("project") val streams: RealmResults<Stream>? = null
+) : RealmModel, Serializable {
     companion object {
-        const val TABLE_NAME = "LocationGroups"
+        const val TABLE_NAME = "Project"
         const val PROJECT_ID = "id"
         const val PROJECT_NAME = "name"
         const val PROJECT_COLOR = "color"
@@ -38,10 +42,6 @@ open class Project(
         const val PROJECT_MAX_LONGITUDE = "maxLongitude"
         const val PROJECT_OFFLINE_MAP_STATE = "offlineMapState"
     }
-}
-
-fun Project.toLocationGroup(): LocationGroup {
-    return LocationGroup(this.name, this.color, this.serverId)
 }
 
 fun Project.isGuest(): Boolean {

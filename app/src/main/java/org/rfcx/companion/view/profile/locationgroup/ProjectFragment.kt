@@ -13,10 +13,8 @@ import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import io.realm.Realm
-import kotlinx.android.synthetic.main.activity_project_select.*
 import kotlinx.android.synthetic.main.fragment_location_group.*
 import kotlinx.android.synthetic.main.fragment_location_group.projectSwipeRefreshView
-import kotlinx.android.synthetic.main.fragment_map.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.response.ProjectResponse
@@ -27,29 +25,29 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class LocationGroupFragment :
+class ProjectFragment :
     Fragment(),
-    LocationGroupListener,
+    ProjectListener,
     SwipeRefreshLayout.OnRefreshListener {
     val realm: Realm = Realm.getInstance(RealmHelper.migrationConfig())
-    private val locationGroupDb = ProjectDb(realm)
+    private val projectGroupDb = ProjectDb(realm)
 
-    private val locationGroupAdapter by lazy { LocationGroupAdapter(this) }
-    private var locationGroupProtocol: LocationGroupProtocol? = null
-    private var selectedGroup: String? = null
+    private val projectAdapter by lazy { ProjectAdapter(this) }
+    private var projectProtocol: ProjectProtocol? = null
+    private var selectedProject: String? = null
     private var screen: String? = null
 
     private lateinit var locationGroupLiveData: LiveData<List<Project>>
     private val locationGroupObserve = Observer<List<Project>> {
-        locationGroupAdapter.apply {
-            items = locationGroupDb.getProjects()
+        projectAdapter.apply {
+            items = projectGroupDb.getProjects()
             notifyDataSetChanged()
         }
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        locationGroupProtocol = (context as LocationGroupProtocol)
+        projectProtocol = (context as ProjectProtocol)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,15 +69,15 @@ class LocationGroupFragment :
 
         locationGroupRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = locationGroupAdapter
+            adapter = projectAdapter
         }
 
         projectSwipeRefreshView.apply {
-            setOnRefreshListener(this@LocationGroupFragment)
+            setOnRefreshListener(this@ProjectFragment)
             setColorSchemeResources(R.color.colorPrimary)
         }
 
-        locationGroupAdapter.apply {
+        projectAdapter.apply {
             this.selectedGroup = selectedGroup
             this.screen = screen
         }
@@ -89,14 +87,14 @@ class LocationGroupFragment :
 
     private fun initIntent() {
         arguments?.let {
-            selectedGroup = it.getString(ARG_GROUP)
-            screen = it.getString(LocationGroupActivity.EXTRA_SCREEN)
+            selectedProject = it.getString(ARG_PROJECT)
+            screen = it.getString(ProjectActivity.EXTRA_SCREEN)
         }
     }
 
     private fun getProjects() {
         locationGroupLiveData =
-            Transformations.map(locationGroupDb.getAllResultsAsync().asLiveData()) {
+            Transformations.map(projectGroupDb.getAllResultsAsync().asLiveData()) {
                 it
             }
         locationGroupLiveData.observeForever(locationGroupObserve)
@@ -119,7 +117,7 @@ class LocationGroupFragment :
                     response: Response<List<ProjectResponse>>
                 ) {
                     response.body()?.forEach { item ->
-                        locationGroupDb.insertOrUpdate(item)
+                        projectGroupDb.insertOrUpdate(item)
                     }
                     deletedProjectsFromCore(context)
                 }
@@ -143,7 +141,7 @@ class LocationGroupFragment :
                 ) {
                     if (response.isSuccessful) {
                         response.body()?.let { projectsRes ->
-                            locationGroupDb.deleteProjectsByCoreId(projectsRes) // remove project with these coreIds
+                            projectGroupDb.deleteProjectsByCoreId(projectsRes) // remove project with these coreIds
                         }
                         projectSwipeRefreshView.isRefreshing = false
                     }
@@ -151,8 +149,8 @@ class LocationGroupFragment :
             })
     }
 
-    override fun onClicked(group: Project) {
-        locationGroupProtocol?.onLocationGroupClick(group)
+    override fun onClicked(project: Project) {
+        projectProtocol?.onProjectClick(project)
     }
 
     override fun onLockImageClicked() {
@@ -170,13 +168,13 @@ class LocationGroupFragment :
     }
 
     companion object {
-        private const val ARG_GROUP = "ARG_GROUP"
+        private const val ARG_PROJECT = "ARG_PROJECT"
 
         @JvmStatic
-        fun newInstance(group: String?, screen: String?) = LocationGroupFragment().apply {
+        fun newInstance(group: String?, screen: String?) = ProjectFragment().apply {
             arguments = Bundle().apply {
-                putString(ARG_GROUP, group)
-                putString(LocationGroupActivity.EXTRA_SCREEN, screen)
+                putString(ARG_PROJECT, group)
+                putString(ProjectActivity.EXTRA_SCREEN, screen)
             }
         }
     }

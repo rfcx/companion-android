@@ -11,8 +11,7 @@ import org.rfcx.companion.entity.SyncState
 import org.rfcx.companion.entity.response.ProjectByIdResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.entity.response.permissionsLabel
-import org.rfcx.companion.entity.response.toLocationGroups
-import java.util.*
+import org.rfcx.companion.entity.response.toProject
 
 class ProjectDb(private val realm: Realm) {
     fun insertOrUpdateProject(group: Project) {
@@ -130,11 +129,6 @@ class ProjectDb(private val realm: Realm) {
             .findAllAsync()
     }
 
-    fun getProjectByName(name: String): Project? {
-        return realm.where(Project::class.java)
-            .equalTo(Project.PROJECT_NAME, name).findFirst()
-    }
-
     fun getProjectById(id: Int): Project? {
         return realm.where(Project::class.java)
             .equalTo(Project.PROJECT_ID, id).findFirst()
@@ -153,7 +147,7 @@ class ProjectDb(private val realm: Realm) {
                     .findFirst()
 
             if (project == null) {
-                val projectObject = groupsResponse.toLocationGroups()
+                val projectObject = groupsResponse.toProject()
                 val id =
                     (
                         it.where(Project::class.java).max(Project.PROJECT_ID)
