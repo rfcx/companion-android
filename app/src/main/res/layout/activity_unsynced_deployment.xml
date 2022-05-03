@@ -51,7 +51,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_padding_normal"
-        android:background="@drawable/bg_curved_main_square"
+        android:background="@drawable/bg_curved_orange_square"
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/unsyncedLayout">
 
