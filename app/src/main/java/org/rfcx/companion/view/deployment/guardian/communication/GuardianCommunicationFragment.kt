@@ -180,8 +180,14 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
             Observer {
                 val time = deploymentProtocol?.getGuardianLocalTime()
                 if (time != null) {
+                    if ((System.currentTimeMillis() - time) > (1000 * 60 * 60 * 24)) {
+                        systemTimeCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_error, 0, 0, 0)
+                    } else {
+                        systemTimeCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
+                    }
                     guardianTimeValuesTextView.text = Date(time).toDateTimeString()
                 } else {
+                    systemTimeCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_error, 0, 0, 0)
                     guardianTimeValuesTextView.text = getString(R.string.guardian_local_time_null)
                 }
 
