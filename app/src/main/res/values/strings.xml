@@ -66,9 +66,9 @@
     <string name="detail_sec">%d second</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
-    <string name="delete_location">Delete site?</string>
+    <string name="delete_location">Delete deployment?</string>
     <string name="deployment_key">Deployment ID</string>
-    <string name="are_you_sure_delete_location">The device and its site will be removed</string>
+    <string name="are_you_sure_delete_location">The device will be removed</string>
 
     <!--  Perform Battery  -->
     <string name="test">test</string>
@@ -90,7 +90,7 @@
     <string name="optional">Optional</string>
     <string name="set_deployment_site">Set deployment site</string>
     <string name="synchronize_with_audioMoth">Synchronize with AudioMoth</string>
-    <string name="add_photo">Add Photo(s)</string>
+    <string name="add_photo">Take Photos</string>
 
     <!--  LocationFragment  -->
     <string name="latitude">Latitude</string>
@@ -203,7 +203,8 @@
     <string name="deployment_will_uploaded">Images will be uploaded to your account</string>
     <string name="almost_there">Almost there!</string>
     <string name="switch_to_deploy">Switch your device to DEPLOY</string>
-    <string name="take_photos">Take some photos of the deployment \nsite(optional)</string>
+    <string name="title_take_photos">Show off your installation skills</string>
+    <string name="take_photos">Include: device position in the tree, upwards view of the sky, brackets and antenna positions</string>
 
     <string name="read_storage_permission_msg">Deploy App would like to read your storage</string>
     <string name="go_to_setting">Settings</string>
@@ -530,5 +531,9 @@
     <string name="unsynced_text">You have %d unsynced deployments</string>
     <string name="syncing">Syncing</string>
     <string name="synced">Synced</string>
+    <string name="more_info">More info</string>
 
+    <string name="login_failed">Login failed. Please try again.</string>
+    <string name="incorrect_username_or_password">Incorrect email or password.</string>
+    <string name="firebase_authentication_failed">Firebase authentication failed. Please try again.</string>
 </resources>

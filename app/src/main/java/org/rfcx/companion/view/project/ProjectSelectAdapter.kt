@@ -10,9 +10,9 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.Permissions
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.isGuest
-import org.rfcx.companion.view.profile.locationgroup.LocationGroupListener
+import org.rfcx.companion.view.profile.locationgroup.ProjectListener
 
-class ProjectSelectAdapter(private val projectSelectListener: LocationGroupListener) :
+class ProjectSelectAdapter(private val projectSelectListener: ProjectListener) :
     RecyclerView.Adapter<ProjectSelectAdapter.ProjectSelectViewHolder>() {
 
     var selectedPosition = -1

@@ -142,7 +142,11 @@ class GuardianSolarPanelFragment : Fragment() {
     }
 
     private fun setMainBatteryPercentage(value: Double) {
-        mainBatteryValueTextView.text = "$value%"
+        if (value > 100.0) {
+            mainBatteryValueTextView.text = "100%"
+        } else {
+            mainBatteryValueTextView.text = "$value%"
+        }
     }
 
     private fun setInternalBatteryPercentage(value: Int) {

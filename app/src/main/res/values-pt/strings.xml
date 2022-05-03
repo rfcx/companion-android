@@ -40,7 +40,6 @@
     <string name="deploy">Instalar</string>
     <string name="set_deployment_site">Definir o local de instalação</string>
     <string name="synchronize_with_audioMoth">Sincronizar com o AudioMoth</string>
-    <string name="add_photo">Colocar foto</string>
 
     <!--  LocationFragment  -->
     <string name="latitude">Latitude</string>
@@ -107,7 +106,6 @@
     <string name="feedback_submission_failed">Houve uma falha ao enviar o comentário! Por favor tente novamente.</string>
 
     <!--  DeployFragment  -->
-    <string name="take_photos">Faça até 5 fotos do local de \ninstalação (opcional)</string>
     <string name="menu_camera">Câmera fotográfica</string>
     <string name="menu_gallery">Galeria</string>
     <string name="some_photo_already_exists">Algumas fotos já existem</string>

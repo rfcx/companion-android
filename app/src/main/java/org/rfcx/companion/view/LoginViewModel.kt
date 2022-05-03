@@ -82,11 +82,10 @@ class LoginViewModel(
                 }
 
                 override fun onFailure(exception: AuthenticationException) {
+                    val errorText =
+                        if (exception.description == "Wrong email or password.") context.getString(R.string.incorrect_username_or_password) else exception.description
                     loginWithEmailPassword.postValue(
-                        Resource.error(
-                            context.getString(R.string.error_has_occurred),
-                            null
-                        )
+                        Resource.error(errorText, null)
                     )
                 }
             })
@@ -104,7 +103,7 @@ class LoginViewModel(
                     override fun onFailure(dialog: Dialog) {
                         loginWithGoogle.postValue(
                             Resource.error(
-                                context.getString(R.string.error_has_occurred),
+                                context.getString(R.string.login_failed),
                                 null
                             )
                         )
@@ -112,10 +111,7 @@ class LoginViewModel(
 
                     override fun onFailure(exception: AuthenticationException) {
                         loginWithGoogle.postValue(
-                            Resource.error(
-                                context.getString(R.string.error_has_occurred),
-                                null
-                            )
+                            Resource.error(exception.description, null)
                         )
                         exception.printStackTrace()
                     }
@@ -141,7 +137,7 @@ class LoginViewModel(
                 override fun onFailure(call: Call<UserTouchResponse>, t: Throwable) {
                     userTouch.postValue(
                         Resource.error(
-                            t.message ?: context.getString(R.string.error_has_occurred),
+                            t.message ?: context.getString(R.string.login_failed),
                             null
                         )
                     )
@@ -158,7 +154,7 @@ class LoginViewModel(
                         } else {
                             userTouch.postValue(
                                 Resource.error(
-                                    context.getString(R.string.error_has_occurred),
+                                    context.getString(R.string.login_failed),
                                     null
                                 )
                             )
@@ -174,7 +170,7 @@ class LoginViewModel(
                 override fun onFailure(call: Call<FirebaseAuthResponse>, t: Throwable) {
                     firebaseAuth.postValue(
                         Resource.error(
-                            context.getString(R.string.an_error_occurred),
+                            t.message ?: context.getString(R.string.firebase_authentication_failed),
                             null
                         )
                     )
@@ -202,11 +198,19 @@ class LoginViewModel(
                 } else {
                     signInWithFirebaseToken.postValue(
                         Resource.error(
-                            context.getString(R.string.an_error_occurred),
+                            context.getString(R.string.firebase_authentication_failed),
                             null
                         )
                     )
                 }
+            }
+            .addOnFailureListener {
+                signInWithFirebaseToken.postValue(
+                    Resource.error(
+                        it.message ?: context.getString(R.string.firebase_authentication_failed),
+                        null
+                    )
+                )
             }
     }
 

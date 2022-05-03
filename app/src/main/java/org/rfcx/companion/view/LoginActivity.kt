@@ -2,18 +2,26 @@ package org.rfcx.companion.view
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration.UI_MODE_NIGHT_MASK
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+import androidx.appcompat.app.AppCompatDelegate.getDefaultNightMode
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.activity_login.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
-import org.rfcx.companion.entity.*
+import org.rfcx.companion.entity.LoginType
+import org.rfcx.companion.entity.Screen
+import org.rfcx.companion.entity.StatusEvent
+import org.rfcx.companion.entity.UserAuthResponse
 import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
@@ -43,13 +51,21 @@ class LoginActivity : AppCompatActivity() {
         }
 
         signInButton.setOnClickListener {
-            val email = loginEmailEditText.text.toString()
+            val email = loginEmailEditText.text.toString().trim()
             val password = loginPasswordEditText.text.toString()
             it.hideKeyboard()
 
             if (validateInput(email, password)) {
-                loading()
-                loginViewModel.login(email, password)
+                if (this.isNetworkAvailable()) {
+                    loading()
+                    loginViewModel.login(email, password)
+                } else {
+                    Toast.makeText(
+                        this@LoginActivity,
+                        getString(R.string.no_internet_connection),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
 
@@ -92,7 +108,7 @@ class LoginActivity : AppCompatActivity() {
                         runOnUiThread {
                             Toast.makeText(
                                 this@LoginActivity,
-                                it.message ?: getString(R.string.error_has_occurred),
+                                it.message ?: getString(R.string.login_failed),
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -227,7 +243,7 @@ class LoginActivity : AppCompatActivity() {
                         runOnUiThread {
                             Toast.makeText(
                                 this@LoginActivity,
-                                it.message ?: getString(R.string.error_has_occurred),
+                                it.message ?: getString(R.string.firebase_authentication_failed),
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -254,7 +270,7 @@ class LoginActivity : AppCompatActivity() {
                         runOnUiThread {
                             Toast.makeText(
                                 this@LoginActivity,
-                                it.message ?: getString(R.string.error_has_occurred),
+                                it.message ?: getString(R.string.firebase_authentication_failed),
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -264,10 +280,22 @@ class LoginActivity : AppCompatActivity() {
         )
     }
 
+    private val Context.isDarkMode
+        get() = if (getDefaultNightMode() == MODE_NIGHT_FOLLOW_SYSTEM)
+            resources.configuration.uiMode and UI_MODE_NIGHT_MASK == UI_MODE_NIGHT_YES
+        else getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
+
     private fun setupDisplayTheme() {
         val preferences = Preferences.getInstance(this)
         val themeOption = this.resources.getStringArray(R.array.theme_more_than_9)
-        val theme = when (preferences.getString(DISPLAY_THEME, themeOption[1])) {
+        var defaultTheme = themeOption[1]
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            defaultTheme = themeOption[2]
+            if (!this.isDarkMode) bellLogoImageView.setImageResource(R.drawable.ic_companion_icon)
+        }
+
+        val theme = when (preferences.getString(DISPLAY_THEME, defaultTheme)) {
             themeOption[0] -> {
                 AppCompatDelegate.MODE_NIGHT_NO
             }

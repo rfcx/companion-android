@@ -31,7 +31,6 @@ fun DeploymentResponse.toDeployment(): Deployment {
         deployedAt = this.deployedAt ?: Date(),
         state = if (this.isGuardian()) DeploymentState.Guardian.ReadyToUpload.key else DeploymentState.AudioMoth.ReadyToUpload.key,
         device = this.deploymentType,
-        stream = this.stream?.toDeploymentLocation(),
         createdAt = this.createdAt ?: Date(),
         syncState = SyncState.Sent.key,
         updatedAt = this.updatedAt,

@@ -53,7 +53,7 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name="org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity"
+            android:name="org.rfcx.companion.view.profile.locationgroup.ProjectActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name="org.rfcx.companion.view.detail.EditLocationActivity"

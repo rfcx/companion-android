@@ -1,6 +1,5 @@
 package org.rfcx.companion.entity.response
 
-import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.Permissions
 import org.rfcx.companion.entity.Project
 
@@ -14,20 +13,12 @@ data class ProjectResponse(
     var permissions: List<String> = listOf()
 )
 
-fun ProjectResponse.toLocationGroups(): Project {
+fun ProjectResponse.toProject(): Project {
     return Project(
         name = this.name,
         color = this.color,
         serverId = this.id,
         permissions = this.permissionsLabel()
-    )
-}
-
-fun ProjectResponse.toLocationGroup(): LocationGroup {
-    return LocationGroup(
-        name = this.name,
-        color = this.color,
-        coreId = this.id
     )
 }
 
@@ -39,12 +30,4 @@ fun ProjectResponse.permissionsLabel(): String {
     } else {
         Permissions.GUEST.value
     }
-}
-
-fun LocationGroup.toLocationGroupsResponse(): ProjectResponse {
-    return ProjectResponse(
-        name = this.name ?: "",
-        color = this.color ?: "",
-        id = this.coreId
-    )
 }

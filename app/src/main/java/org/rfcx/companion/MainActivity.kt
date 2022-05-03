@@ -19,7 +19,7 @@ import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
 import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.base.ViewModelFactory
-import org.rfcx.companion.entity.Locate
+import org.rfcx.companion.entity.Stream
 import org.rfcx.companion.entity.isGuest
 import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.CoreApiServiceImpl
@@ -93,6 +93,9 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         val preferences = Preferences.getInstance(this)
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
         val project = mainViewModel.getProjectById(projectId)
+        if (project == null) {
+            logout()
+        }
         project?.let {
             if (it.isGuest()) {
                 preferences.putInt(Preferences.SELECTED_PROJECT, -1)
@@ -266,8 +269,9 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
 
     override fun onLogout() {
         DeploymentCleanupWorker.stopAllWork(this)
-        this.logout()
         LocationTracking.set(this, false)
+        mainViewModel.onDestroy()
+        this.logout()
         analytics.trackLogoutEvent()
         finish()
     }
@@ -280,7 +284,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         }
     }
 
-    override fun showTrackOnMap(site: Locate?, markerLocationId: String) {
+    override fun showTrackOnMap(site: Stream?, markerLocationId: String) {
         val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
         if (mapFragment is MapFragment) {
             site?.let {
@@ -403,7 +407,7 @@ interface MainActivityListener {
     fun hideSnackbar()
     fun onLogout()
     fun moveMapIntoDeploymentMarker(lat: Double, lng: Double, markerLocationId: String)
-    fun showTrackOnMap(site: Locate?, markerLocationId: String)
+    fun showTrackOnMap(site: Stream?, markerLocationId: String)
     fun getProjectName(): String
     fun clearFeatureSelectedOnMap()
 }

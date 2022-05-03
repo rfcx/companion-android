@@ -10,7 +10,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import kotlinx.android.synthetic.main.activity_guardian_diagnostic.*
 import kotlinx.android.synthetic.main.activity_project_select.*
 import org.rfcx.companion.MainActivity
 import org.rfcx.companion.R
@@ -23,12 +22,12 @@ import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DeploymentCleanupWorker
 import org.rfcx.companion.util.*
-import org.rfcx.companion.view.profile.locationgroup.LocationGroupListener
+import org.rfcx.companion.view.profile.locationgroup.ProjectListener
 import org.rfcx.companion.view.project.viewmodel.ProjectSelectViewModel
 
 class ProjectSelectActivity :
     AppCompatActivity(),
-    LocationGroupListener,
+    ProjectListener,
     SwipeRefreshLayout.OnRefreshListener {
 
     private lateinit var projectSelectViewModel: ProjectSelectViewModel
@@ -157,8 +156,8 @@ class ProjectSelectActivity :
         }
     }
 
-    override fun onClicked(group: Project) {
-        selectedProject = group.id
+    override fun onClicked(project: Project) {
+        selectedProject = project.id
         selectProjectButton.isEnabled = true
     }
 
