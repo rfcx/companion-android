@@ -24,7 +24,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="@dimen/margin_padding_xlarge"
-            android:textColor="@color/white"
+            android:textColor="@color/text_primary"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -33,12 +33,11 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/unsyncedButton"
-            style="@style/Companion.OrangeButton"
+            style="@style/AudioMothButton.GreenButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_padding_normal"
             android:layout_marginBottom="@dimen/margin_padding_normal"
-            android:padding="@dimen/margin_padding_xlarge"
             android:text="@string/sync_now"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
