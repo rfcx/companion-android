@@ -6,10 +6,13 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.transition.TransitionManager
 import androidx.work.WorkInfo
 import kotlinx.android.synthetic.main.activity_unsynced_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
@@ -24,6 +27,7 @@ import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.util.Status
 import org.rfcx.companion.util.isNetworkAvailable
 import org.rfcx.companion.view.map.SyncInfo
+
 
 class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListener {
 
@@ -64,14 +68,32 @@ class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListen
 
         setupToolbar()
 
-        unsyncedButton.setOnClickListener {
-            viewModel.syncDeployment()
-        }
-
         unsyncedRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = unsyncedAdapter
+            val decoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
+            decoration.setDrawable(ContextCompat.getDrawable(context, R.drawable.divider)!!)
+            this.addItemDecoration(decoration)
         }
+
+        dismissButton.setOnClickListener {
+            hideBanner()
+        }
+
+        confirmButton.setOnClickListener {
+            viewModel.syncDeployment()
+        }
+
+    }
+
+    private fun showBanner() {
+        TransitionManager.beginDelayedTransition(rootView, UnsyncedBannerTransition())
+        banner.visibility = View.VISIBLE
+    }
+
+    private fun hideBanner() {
+        TransitionManager.beginDelayedTransition(rootView, UnsyncedBannerTransition())
+        banner.visibility = View.GONE
     }
 
     private fun setViewModel() {
@@ -123,15 +145,20 @@ class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListen
     private fun setUnsyncedText(count: Int) {
         when {
             count == 0 -> {
-                unsyncedTextView.text = getString(R.string.format_deploys_uploaded)
-                unsyncedButton.isEnabled = false
+                bannerText.text = getString(R.string.format_deploys_uploaded)
+                confirmButton.isEnabled = false
+                noContentTextView.visibility = View.VISIBLE
+                hideBanner()
             }
             currentState == WorkInfo.State.RUNNING -> {
-                unsyncedTextView.text = getString(R.string.unsynced_text, count)
+                bannerText.text = getString(R.string.unsynced_text, count)
+                noContentTextView.visibility = View.GONE
             }
             count > 0 && currentState != WorkInfo.State.RUNNING -> {
-                unsyncedTextView.text = getString(R.string.unsynced_text, count)
-                unsyncedButton.isEnabled = true
+                bannerText.text = getString(R.string.unsynced_text, count)
+                confirmButton.isEnabled = true
+                noContentTextView.visibility = View.GONE
+                showBanner()
             }
         }
     }
@@ -139,16 +166,16 @@ class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListen
     private fun setStatus(status: SyncInfo) {
         when (status) {
             SyncInfo.Starting, SyncInfo.Uploading -> {
-                unsyncedButton.text = getString(R.string.syncing)
-                unsyncedButton.isEnabled = false
+                confirmButton.text = getString(R.string.syncing)
+                confirmButton.isEnabled = false
             }
             SyncInfo.Uploaded -> {
-                unsyncedButton.text = getString(R.string.sync)
-                unsyncedButton.isEnabled = true
+                confirmButton.text = getString(R.string.sync)
+                confirmButton.isEnabled = true
             }
             SyncInfo.Failed, SyncInfo.Retry -> {
-                unsyncedButton.text = getString(R.string.sync)
-                unsyncedButton.isEnabled = true
+                confirmButton.text = getString(R.string.sync)
+                confirmButton.isEnabled = true
                 val errors = DeploymentSyncWorker.getErrors()
                 if (errors.isNotEmpty()) {
                     unsyncedAdapter.items = errors

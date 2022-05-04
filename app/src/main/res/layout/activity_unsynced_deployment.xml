@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/backgroundColor">
@@ -10,59 +10,79 @@
         android:id="@+id/toolbarLayout"
         layout="@layout/toolbar_default" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/unsyncedLayout"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/banner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_padding_normal"
-        android:background="@drawable/bg_curved_orange_square"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/toolbarLayout">
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/unsyncedTextView"
-            style="@style/AudioMothText.Body.Headline"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/bannerLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="@dimen/margin_padding_xlarge"
-            android:textColor="@color/text_primary"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="You have 0 unsynced report" />
+            android:background="@color/topBar">
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/unsyncedButton"
-            style="@style/AudioMothButton.GreenButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_padding_normal"
-            android:layout_marginBottom="@dimen/margin_padding_normal"
-            android:text="@string/sync_now"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/unsyncedTextView" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/bannerText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/margin_padding_normal"
+                android:paddingTop="@dimen/margin_padding_xlarge"
+                android:paddingBottom="@dimen/margin_padding_normal"
+                android:textColor="@color/text_primary"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/dismissButton"
+                style="@style/BannerButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/dismiss"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/confirmButton"
+                app:layout_constraintTop_toBottomOf="@id/bannerText" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/confirmButton"
+                style="@style/BannerButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sync"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/bannerText" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/unsyncedFailedLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_padding_normal"
-        android:background="@drawable/bg_curved_orange_square"
+        android:background="@color/topBar"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/unsyncedLayout">
+        app:layout_constraintTop_toBottomOf="@id/banner">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/unsyncedRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin_padding_normal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/noContentTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/format_deploys_uploaded"
+        android:textAlignment="center"
+        android:textColor="@color/text_primary"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbarLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
