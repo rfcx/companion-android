@@ -28,7 +28,6 @@ import org.rfcx.companion.util.Status
 import org.rfcx.companion.util.isNetworkAvailable
 import org.rfcx.companion.view.map.SyncInfo
 
-
 class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListener {
 
     private val unsyncedAdapter by lazy { UnsyncedDeploymentAdapter(this) }
@@ -83,7 +82,6 @@ class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListen
         confirmButton.setOnClickListener {
             viewModel.syncDeployment()
         }
-
     }
 
     private fun showBanner() {
