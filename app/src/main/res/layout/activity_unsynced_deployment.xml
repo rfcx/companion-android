@@ -10,12 +10,20 @@
         android:id="@+id/toolbarLayout"
         layout="@layout/toolbar_default" />
 
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/unsyncedIndicator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/toolbarLayout"/>
+
     <androidx.cardview.widget.CardView
         android:id="@+id/banner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/toolbarLayout">
+        app:layout_constraintTop_toBottomOf="@id/unsyncedIndicator">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/bannerLayout"
@@ -35,21 +43,12 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/dismissButton"
-                style="@style/BannerButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/dismiss"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/confirmButton"
-                app:layout_constraintTop_toBottomOf="@id/bannerText" />
-
-            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/confirmButton"
                 style="@style/BannerButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/sync"
+                android:text="@string/sync_now"
+                android:layout_margin="@dimen/margin_padding_normal"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/bannerText" />

@@ -75,12 +75,9 @@ class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListen
             this.addItemDecoration(decoration)
         }
 
-        dismissButton.setOnClickListener {
-            hideBanner()
-        }
-
         confirmButton.setOnClickListener {
             viewModel.syncDeployment()
+            it.isEnabled = false
         }
     }
 
@@ -144,7 +141,7 @@ class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListen
         when {
             count == 0 -> {
                 bannerText.text = getString(R.string.format_deploys_uploaded)
-                confirmButton.isEnabled = false
+                unsyncedAdapter.items = listOf()
                 noContentTextView.visibility = View.VISIBLE
                 hideBanner()
             }
@@ -154,7 +151,6 @@ class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListen
             }
             count > 0 && currentState != WorkInfo.State.RUNNING -> {
                 bannerText.text = getString(R.string.unsynced_text, count)
-                confirmButton.isEnabled = true
                 noContentTextView.visibility = View.GONE
                 showBanner()
             }
@@ -166,14 +162,19 @@ class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListen
             SyncInfo.Starting, SyncInfo.Uploading -> {
                 confirmButton.text = getString(R.string.syncing)
                 confirmButton.isEnabled = false
+                unsyncedIndicator.visibility = View.VISIBLE
             }
             SyncInfo.Uploaded -> {
                 confirmButton.text = getString(R.string.sync)
                 confirmButton.isEnabled = true
+                unsyncedIndicator.visibility = View.GONE
+                hideBanner()
             }
             SyncInfo.Failed, SyncInfo.Retry -> {
                 confirmButton.text = getString(R.string.sync)
                 confirmButton.isEnabled = true
+                unsyncedIndicator.visibility = View.GONE
+                showBanner()
                 val errors = DeploymentSyncWorker.getErrors()
                 if (errors.isNotEmpty()) {
                     unsyncedAdapter.items = errors

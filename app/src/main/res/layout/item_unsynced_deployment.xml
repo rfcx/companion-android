@@ -19,7 +19,7 @@
         android:id="@+id/unsyncedError"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textColor="@color/red"
+        android:textColor="@color/error"
         app:layout_constraintEnd_toStartOf="@id/deleteButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/unsyncedName"
@@ -31,6 +31,7 @@
         android:layout_height="24dp"
         android:background="@drawable/ic_baseline_delete_forever_24"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/unsyncedName" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

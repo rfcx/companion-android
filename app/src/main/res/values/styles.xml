@@ -312,7 +312,7 @@
         <item name="lineSpacing">0.5dp</item>
     </style>
 
-    <style name="BannerButton" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+    <style name="BannerButton" parent="Widget.AppCompat.TextView">
         <item name="android:textColor">@color/colorPrimary</item>
         <item name="android:textSize">14sp</item>
         <item name="textAllCaps">true</item>

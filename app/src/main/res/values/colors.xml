@@ -68,5 +68,6 @@
     <color name="widget_status_view_normal_bg">#FFFFFF</color>
 
     <color name="shadow">#DADADA</color>
+    <color name="error">#e41a1a</color>
 
 </resources>
