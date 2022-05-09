@@ -9,15 +9,6 @@
         app:iconTint="@color/iconColor"
         app:showAsAction="always"
         tools:ignore="MenuTitle">
-        <menu>
-            <item
-                android:id="@+id/camera"
-                android:title="@string/menu_camera" />
-
-            <item
-                android:id="@+id/gallery"
-                android:title="@string/menu_gallery" />
-        </menu>
     </item>
 
     <item
