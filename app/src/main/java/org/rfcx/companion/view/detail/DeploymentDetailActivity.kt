@@ -14,7 +14,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -49,7 +48,7 @@ import org.rfcx.companion.view.deployment.AudioMothDeploymentActivity.Companion.
 import java.io.File
 
 class DeploymentDetailActivity : AppCompatActivity(), OnMapReadyCallback,
-        (DeploymentImageView) -> Unit {
+    (DeploymentImageView) -> Unit {
     private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
     private lateinit var viewModel: DeploymentDetailViewModel
 
