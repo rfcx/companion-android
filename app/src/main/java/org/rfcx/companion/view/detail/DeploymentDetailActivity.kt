@@ -47,8 +47,9 @@ import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.AudioMothDeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
 import java.io.File
 
-class DeploymentDetailActivity : AppCompatActivity(), OnMapReadyCallback,
-    (DeploymentImageView) -> Unit {
+class DeploymentDetailActivity :
+    AppCompatActivity(), OnMapReadyCallback, (DeploymentImageView) -> Unit {
+    
     private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
     private lateinit var viewModel: DeploymentDetailViewModel
 
