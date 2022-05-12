@@ -49,7 +49,7 @@ import java.io.File
 
 class DeploymentDetailActivity :
     AppCompatActivity(), OnMapReadyCallback, (DeploymentImageView) -> Unit {
-    
+
     private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
     private lateinit var viewModel: DeploymentDetailViewModel
 
