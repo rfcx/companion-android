@@ -40,12 +40,8 @@ class GuardianDeployFragment : BaseImageFragment() {
 
         setupImageRecycler()
 
-        takePhotoButton.setOnClickListener {
-            takePhoto()
-        }
-
-        openGalleryButton.setOnClickListener {
-            openGallery()
+        addPhotoButton.setOnClickListener {
+            openGligarPicker()
         }
 
         finishButton.setOnClickListener {

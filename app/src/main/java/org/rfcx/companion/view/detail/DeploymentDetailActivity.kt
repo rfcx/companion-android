@@ -3,21 +3,17 @@ package org.rfcx.companion.view.detail
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.os.PersistableBundle
-import android.provider.MediaStore
 import android.util.TypedValue
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.FileProvider
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -27,15 +23,16 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.pluginscalebar.ScaleBarOptions
 import com.mapbox.pluginscalebar.ScaleBarPlugin
-import com.zhihu.matisse.Matisse
-import com.zhihu.matisse.MimeType
+import com.opensooq.supernova.gligar.GligarPicker
 import kotlinx.android.synthetic.main.activity_deployment_detail.*
-import kotlinx.android.synthetic.main.buttom_sheet_attach_image_layout.view.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
-import org.rfcx.companion.entity.*
+import org.rfcx.companion.entity.DeploymentImage
+import org.rfcx.companion.entity.Device
+import org.rfcx.companion.entity.Permissions
+import org.rfcx.companion.entity.StatusEvent
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.repo.api.CoreApiHelper
@@ -50,7 +47,9 @@ import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.AudioMothDeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
 import java.io.File
 
-class DeploymentDetailActivity : AppCompatActivity(), OnMapReadyCallback, (DeploymentImageView) -> Unit {
+class DeploymentDetailActivity :
+    AppCompatActivity(), OnMapReadyCallback, (DeploymentImageView) -> Unit {
+
     private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
     private lateinit var viewModel: DeploymentDetailViewModel
 
@@ -68,7 +67,6 @@ class DeploymentDetailActivity : AppCompatActivity(), OnMapReadyCallback, (Deplo
     }
 
     private var imageFile: File? = null
-    private lateinit var attachImageDialog: BottomSheetDialog
     private val cameraPermissions by lazy { CameraPermissions(this) }
     private val galleryPermissions by lazy { GalleryPermissions(this) }
 
@@ -100,7 +98,6 @@ class DeploymentDetailActivity : AppCompatActivity(), OnMapReadyCallback, (Deplo
             updateDeploymentDetailView(it)
             downloadPhotos(it.serverId)
         }
-        setupAttachImageDialog()
         setupClickListener()
 
         // setup onclick
@@ -180,7 +177,13 @@ class DeploymentDetailActivity : AppCompatActivity(), OnMapReadyCallback, (Deplo
     private fun setupClickListener() {
         deploymentImageAdapter.onImageAdapterClickListener = object : OnImageAdapterClickListener {
             override fun onAddImageClick() {
-                attachImageDialog.show()
+                if (!cameraPermissions.allowed() || !galleryPermissions.allowed()) {
+                    imageFile = null
+                    if (!cameraPermissions.allowed()) cameraPermissions.check { }
+                    if (!galleryPermissions.allowed()) galleryPermissions.check { }
+                } else {
+                    startOpenGligarPicker()
+                }
             }
 
             override fun onImageClick(deploymentImageView: DeploymentImageView) {
@@ -202,19 +205,16 @@ class DeploymentDetailActivity : AppCompatActivity(), OnMapReadyCallback, (Deplo
 
             override fun onDeleteImageClick(position: Int, imagePath: String) {
                 deploymentImageAdapter.removeAt(position)
-                dismissImagePickerOptionsDialog()
             }
         }
 
         deploymentImageAdapter.setImages(arrayListOf())
-        dismissImagePickerOptionsDialog()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        handleTakePhotoResult(requestCode, resultCode)
-        handleGalleryResult(requestCode, resultCode, data)
+        handleGligarPickerResult(requestCode, resultCode, data)
 
         if (requestCode == DEPLOYMENT_REQUEST_CODE) {
             forceUpdateDeployment()
@@ -229,7 +229,6 @@ class DeploymentDetailActivity : AppCompatActivity(), OnMapReadyCallback, (Deplo
                 val pathList = listOf(it.absolutePath)
                 deploymentImageAdapter.addImages(pathList)
             }
-            dismissImagePickerOptionsDialog()
         } else {
             // remove file image
             imageFile?.let {
@@ -239,23 +238,15 @@ class DeploymentDetailActivity : AppCompatActivity(), OnMapReadyCallback, (Deplo
         }
     }
 
-    private fun handleGalleryResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
+    private fun handleGligarPickerResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
         if (requestCode != ImageUtils.REQUEST_GALLERY || resultCode != Activity.RESULT_OK || intentData == null) return
 
         val pathList = mutableListOf<String>()
-        val results = Matisse.obtainResult(intentData)
-        results.forEach {
-            val imagePath = ImageFileUtils.findRealPath(this, it)
-            imagePath?.let { path ->
-                pathList.add(path)
-            }
+        val results = intentData.extras?.getStringArray(GligarPicker.IMAGES_RESULT)
+        results?.forEach {
+            pathList.add(it)
         }
         deploymentImageAdapter.addImages(pathList)
-        dismissImagePickerOptionsDialog()
-    }
-
-    private fun dismissImagePickerOptionsDialog() {
-        attachImageDialog.dismiss()
     }
 
     private fun forceUpdateDeployment() {
@@ -398,63 +389,14 @@ class DeploymentDetailActivity : AppCompatActivity(), OnMapReadyCallback, (Deplo
         mapView.onSaveInstanceState(outState)
     }
 
-    private fun setupAttachImageDialog() {
-        val bottomSheetView =
-            layoutInflater.inflate(R.layout.buttom_sheet_attach_image_layout, null)
-
-        bottomSheetView.menuGallery.setOnClickListener {
-            openGallery()
-        }
-
-        bottomSheetView.menuTakePhoto.setOnClickListener {
-            takePhoto()
-        }
-
-        attachImageDialog = BottomSheetDialog(this)
-        attachImageDialog.setContentView(bottomSheetView)
-    }
-
-    private fun takePhoto() {
-        if (!cameraPermissions.allowed()) {
-            imageFile = null
-            cameraPermissions.check { }
-        } else {
-            startTakePhoto()
-        }
-    }
-
-    private fun startTakePhoto() {
-        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        imageFile = ImageUtils.createImageFile()
-        if (imageFile != null) {
-            val photoURI =
-                FileProvider.getUriForFile(this, ImageUtils.FILE_CONTENT_PROVIDER, imageFile!!)
-            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-            startActivityForResult(takePictureIntent, ImageUtils.REQUEST_TAKE_PHOTO)
-        }
-    }
-
-    private fun openGallery() {
-        if (!galleryPermissions.allowed()) {
-            imageFile = null
-            galleryPermissions.check { }
-        } else {
-            startOpenGallery()
-        }
-    }
-
-    private fun startOpenGallery() {
+    private fun startOpenGligarPicker() {
         val remainingImage =
             DeploymentImageAdapter.MAX_IMAGE_SIZE - deploymentImageAdapter.getImageCount()
-        Matisse.from(this)
-            .choose(MimeType.ofImage())
-            .countable(true)
-            .maxSelectable(remainingImage)
-            .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-            .thumbnailScale(0.85f)
-            .imageEngine(GlideV4ImageEngine())
-            .theme(R.style.Matisse_Dracula)
-            .forResult(ImageUtils.REQUEST_GALLERY)
+        GligarPicker()
+            .requestCode(ImageUtils.REQUEST_GALLERY)
+            .limit(remainingImage)
+            .withActivity(this)
+            .show()
     }
 
     companion object {
