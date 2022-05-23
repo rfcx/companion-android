@@ -57,6 +57,26 @@ jobs:
           path: ${{steps.sign_app.outputs.signedReleaseFile}}
 
       # -------------------------------------------------- #
+      # Distribute to Testers                              #
+      # -------------------------------------------------- #
+
+      - name: Upload Prod to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{secrets.FIREBASE_APP_ID}}
+          token: ${{secrets.FIREBASE_TOKEN}}
+          groups: qa-team
+          file: ${{steps.sign_app.outputs.signedReleaseFile}}
+
+      - name: Upload Staging to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{secrets.FIREBASE_APP_ID}}
+          token: ${{secrets.FIREBASE_TOKEN}}
+          groups: qa-team
+          file: app/build/outputs/apk/internalDevelop/debug/app-internalDevelop-debug.apk
+
+      # -------------------------------------------------- #
       # Notify Slack                                       #
       # -------------------------------------------------- #
 
