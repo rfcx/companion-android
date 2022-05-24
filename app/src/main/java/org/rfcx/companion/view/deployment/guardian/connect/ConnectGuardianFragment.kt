@@ -16,7 +16,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.rfcx.companion.R
-import org.rfcx.companion.connection.socket.AdminSocketManager
 import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.connection.wifi.OnWifiListener
 import org.rfcx.companion.connection.wifi.WifiHotspotManager
@@ -56,7 +55,6 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
 
         deploymentProtocol?.hideToolbar()
 
-        showLoading()
         retryCountdown(SCAN)
 
         guardianHotspotRecyclerView.apply {
@@ -64,6 +62,7 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
             adapter = guardianHotspotAdapter
         }
 
+        showLoading()
         wifiHotspotManager = WifiHotspotManager(requireContext().applicationContext)
         wifiHotspotManager.nearbyHotspot(this)
 
@@ -101,7 +100,10 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
     }
 
     override fun onScanReceive(result: List<ScanResult>) {
-        hideLoading()
+        if (isFirstTime) {
+            hideLoading()
+            isFirstTime = false
+        }
         hideNotFound()
         hideRetry()
         countDownTimer.cancel()
@@ -114,8 +116,7 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
     }
 
     private fun checkConnection() {
-        GuardianSocketManager.getConnection()
-        AdminSocketManager.connect()
+        deploymentProtocol?.startPeriodicHeartbeat()
         lifecycleScope.launch {
             withContext(Dispatchers.Main) {
                 GuardianSocketManager.pingBlob.observe(
@@ -124,6 +125,8 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
                     requireActivity().runOnUiThread {
                         // So that we know ping is received
                         if (it.prefs != null) {
+                            hideLoading()
+                            deploymentProtocol?.stopPeriodicHeartbeat()
                             deploymentProtocol?.startCheckList()
                         }
                     }
@@ -163,7 +166,7 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
     }
 
     private fun retryCountdown(state: String) {
-        countDownTimer = object : CountDownTimer(20000, 1000) {
+        countDownTimer = object : CountDownTimer(10000, 1000) {
             override fun onFinish() {
                 if (state == SCAN) {
                     showNotFound()
@@ -199,8 +202,10 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
     companion object {
         private val SCAN = "scan"
         private val CONNECT = "connect"
+        private var isFirstTime = true
 
         fun newInstance(): ConnectGuardianFragment {
+            isFirstTime = true
             return ConnectGuardianFragment()
         }
     }

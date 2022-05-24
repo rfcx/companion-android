@@ -28,6 +28,8 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getPrefsSha1(): String?
     fun getLatestCheckIn(): JsonObject?
     fun reTriggerConnection()
+    fun startPeriodicHeartbeat()
+    fun stopPeriodicHeartbeat()
 
     fun getNetwork(): Int?
     fun getSwmNetwork(): Int?

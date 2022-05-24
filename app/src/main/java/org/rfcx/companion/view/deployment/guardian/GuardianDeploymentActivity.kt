@@ -398,6 +398,14 @@ class GuardianDeploymentActivity :
         AdminSocketManager.connect()
     }
 
+    override fun startPeriodicHeartbeat() {
+        periodicSocketHeartBreath()
+    }
+
+    override fun stopPeriodicHeartbeat() {
+        stopPeriodicSocketHeartBreath()
+    }
+
     override fun getDeploymentStream(): Stream? = this._stream
 
     override fun getSiteItem(): List<SiteWithLastDeploymentItem> = this._siteItems
