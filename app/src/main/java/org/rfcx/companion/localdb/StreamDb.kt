@@ -47,6 +47,15 @@ class StreamDb(private val realm: Realm) {
         }
     }
 
+    fun deleteStreamByCoreId(id: String) {
+        realm.executeTransaction {
+            val locate =
+                it.where(Stream::class.java).equalTo(Stream.FIELD_SERVER_ID, id)
+                    .findFirst()
+            locate?.deleteFromRealm()
+        }
+    }
+
     fun updateDeploymentIdOnStream(deploymentId: Int, streamId: Int) {
         realm.executeTransaction {
             val stream =

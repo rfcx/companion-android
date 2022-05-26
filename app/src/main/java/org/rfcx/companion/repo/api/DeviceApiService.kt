@@ -2,10 +2,7 @@ package org.rfcx.companion.repo.api
 
 import org.rfcx.companion.entity.UserTouchResponse
 import org.rfcx.companion.entity.request.GuardianRegisterRequest
-import org.rfcx.companion.entity.response.DeploymentAssetResponse
-import org.rfcx.companion.entity.response.GuardianRegisterResponse
-import org.rfcx.companion.entity.response.ProjectByIdResponse
-import org.rfcx.companion.entity.response.ProjectResponse
+import org.rfcx.companion.entity.response.*
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -49,4 +46,15 @@ interface DeviceApiService {
         @Header("Authorization") authUser: String,
         @Body guid: GuardianRegisterRequest
     ): Call<GuardianRegisterResponse>
+
+    @GET("streams")
+    fun getStreams(
+        @Header("Authorization") authUser: String,
+        @Query("limit") limit: Int = 100,
+        @Query("offset") offset: Int = 0,
+        @Query("updated_after", encoded = true) updatedAfter: String? = null,
+        @Query("only_deleted") onlyDeleted: Boolean = false,
+        @Query("sort", encoded = true) sort: String? = null,
+        @Query("projects") projects: List<String>? = null
+    ): Call<List<StreamResponse>>
 }

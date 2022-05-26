@@ -70,14 +70,4 @@ interface DeviceApiInterface {
         @Header("Authorization") authUser: String,
         @Path("id") id: String
     ): Call<ResponseBody>
-
-    @GET("streams")
-    fun getStreams(
-        @Header("Authorization") authUser: String,
-        @Query("limit") limit: Int = 100,
-        @Query("offset") offset: Int = 0,
-        @Query("updated_after", encoded = true) updatedAfter: String? = null,
-        @Query("sort", encoded = true) sort: String? = null,
-        @Query("projects") projects: List<String>? = null
-    ): Call<List<StreamResponse>>
 }

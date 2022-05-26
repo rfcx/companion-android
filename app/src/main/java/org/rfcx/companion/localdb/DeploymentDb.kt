@@ -33,7 +33,7 @@ class DeploymentDb(private val realm: Realm) {
             .findAllAsync()
     }
 
-    fun deleteDeploymentByStreamId(id: String) {
+    fun deleteDeploymentByStreamCoreId(id: String) {
         realm.executeTransaction {
             val deployments =
                 it.where(Deployment::class.java).equalTo("stream.serverId", id)

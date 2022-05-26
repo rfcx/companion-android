@@ -8,7 +8,6 @@ import io.realm.Realm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.rfcx.companion.entity.response.StreamResponse
-import org.rfcx.companion.entity.response.toStream
 import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.localdb.StreamDb
 import org.rfcx.companion.repo.ApiManager
@@ -35,17 +34,10 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
         if (result) {
             val streamDb = StreamDb(Realm.getInstance(RealmHelper.migrationConfig()))
             val deploymentDb = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
-            val savedStreams = streamDb.getStreams().filter { it.serverId != null && it.project?.serverId == PROJECT_ID }
-            val downloadedStreams = streams.map { it.toStream().serverId }
-            val filteredStreams =
-                savedStreams.filter { stream -> !downloadedStreams.contains(stream.serverId) }
-            if (filteredStreams.isNotEmpty()) {
-                filteredStreams.forEach {
-                    Log.d(TAG, "remove stream: ${it.id}")
-                    deploymentDb.deleteDeploymentByStreamId(it.serverId!!)
-                    streamDb.deleteStream(it.id)
-                }
-                // force delete deployment on device-api
+            streams.forEach {
+                deploymentDb.deleteDeploymentByStreamCoreId(it.id!!)
+                streamDb.deleteStreamByCoreId(it.id!!)
+                // set deployment to false in device-api
                 DeploymentSyncWorker.enqueue(context)
             }
         } else {
@@ -58,8 +50,8 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
     private suspend fun getStreams(token: String, offset: Int): Boolean =
         withContext(Dispatchers.IO) {
             val projectId = PROJECT_ID?.let { listOf(it) }
-            val result = ApiManager.getInstance().getDeviceApi()
-                .getStreams(token, SITES_LIMIT_GETTING, offset, null, null, projectId)
+            val result = ApiManager.getInstance().getDeviceApi2()
+                .getStreams(token, SITES_LIMIT_GETTING, offset, null, true, null, projectId)
                 .execute()
             if (result.isSuccessful) {
                 val resultBody = result.body()

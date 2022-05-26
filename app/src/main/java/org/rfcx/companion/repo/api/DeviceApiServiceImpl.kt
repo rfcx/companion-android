@@ -2,10 +2,7 @@ package org.rfcx.companion.repo.api
 
 import org.rfcx.companion.entity.UserTouchResponse
 import org.rfcx.companion.entity.request.GuardianRegisterRequest
-import org.rfcx.companion.entity.response.DeploymentAssetResponse
-import org.rfcx.companion.entity.response.GuardianRegisterResponse
-import org.rfcx.companion.entity.response.ProjectByIdResponse
-import org.rfcx.companion.entity.response.ProjectResponse
+import org.rfcx.companion.entity.response.*
 import org.rfcx.companion.repo.ApiManager
 import retrofit2.Call
 
@@ -51,5 +48,17 @@ class DeviceApiServiceImpl : DeviceApiService {
         guid: GuardianRegisterRequest
     ): Call<GuardianRegisterResponse> {
         return ApiManager.getInstance().getDeviceApi2().registerGuardian(authUser, guid)
+    }
+
+    override fun getStreams(
+        authUser: String,
+        limit: Int,
+        offset: Int,
+        updatedAfter: String?,
+        onlyDeleted: Boolean,
+        sort: String?,
+        projects: List<String>?
+    ): Call<List<StreamResponse>> {
+        return ApiManager.getInstance().getDeviceApi2().getStreams(authUser, limit, offset, updatedAfter, onlyDeleted, sort, projects)
     }
 }
