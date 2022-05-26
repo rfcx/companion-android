@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import io.realm.Realm
+import org.rfcx.companion.entity.UnsyncedDeployment
 import org.rfcx.companion.entity.request.EditDeploymentRequest
 import org.rfcx.companion.entity.request.toRequestBody
 import org.rfcx.companion.localdb.DeploymentDb
@@ -21,11 +22,13 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
+        errors.clear()
         Log.d(TAG, "doWork")
         isRunning = DeploymentSyncState.RUNNING
 
         val db = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val locateDb = StreamDb(Realm.getInstance(RealmHelper.migrationConfig()))
+        db.unlockSending()
         val deployments = db.lockUnsent()
         val token = "Bearer ${context.getIdToken()}"
 
@@ -39,16 +42,18 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                 val result = ApiManager.getInstance().getDeviceApi()
                     .createDeployment(token, it.toRequestBody()).execute()
 
+                val error = result.errorBody()?.string()
                 when {
                     result.isSuccessful -> {
                         val fullId = result.headers().get("Location")
                         val id = fullId?.substring(fullId.lastIndexOf("/") + 1, fullId.length) ?: ""
                         markSentDeployment(id, db, locateDb, it.id, token)
                     }
-                    result.errorBody()?.string()?.contains("this deploymentKey is already existed") ?: false -> {
+                    error?.contains("this deploymentKey is already existed") ?: false -> {
                         markSentDeployment(it.deploymentKey, db, locateDb, it.id, token)
                     }
                     else -> {
+                        errors.add(UnsyncedDeployment(it.id, it.stream!!.name, (error ?: "Unexpected error")))
                         db.markUnsent(it.id)
                         someFailed = true
                     }
@@ -69,6 +74,10 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                             .editDeployments(token, serverId, req).execute()
                         if (result.isSuccessful) {
                             db.markSent(it.serverId!!, it.id)
+                        } else {
+                            errors.add(UnsyncedDeployment(it.id, it.stream!!.name, (result.errorBody()?.string() ?: "Unexpected error")))
+                            db.markUnsent(it.id)
+                            someFailed = true
                         }
                     }
                 }
@@ -105,6 +114,8 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
         private const val UNIQUE_WORK_KEY = "DeploymentSyncWorkerUniqueKey"
         private var isRunning = DeploymentSyncState.NOT_RUNNING
 
+        private var errors = mutableListOf<UnsyncedDeployment>()
+
         fun enqueue(context: Context) {
             val constraints =
                 Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
@@ -116,6 +127,8 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
         }
 
         fun isRunning() = isRunning
+
+        fun getErrors() = errors
 
         fun workInfos(context: Context): LiveData<List<WorkInfo>> {
             return WorkManager.getInstance(context)

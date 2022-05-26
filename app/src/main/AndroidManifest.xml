@@ -90,6 +90,10 @@
             android:name=".view.profile.guardiansoftware.GuardianSoftwareActivity"
             android:screenOrientation="portrait"/>
 
+        <activity
+            android:name=".view.unsynced.UnsyncedDeploymentActivity"
+            android:screenOrientation="portrait"/>
+
         <service
             android:name=".service.LocationTrackerService"
             android:exported="false"

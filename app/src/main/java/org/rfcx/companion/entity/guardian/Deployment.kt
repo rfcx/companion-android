@@ -10,6 +10,7 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.DeploymentState
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Stream
+import org.rfcx.companion.entity.SyncState
 import org.rfcx.companion.util.Pin
 import org.rfcx.companion.util.randomDeploymentId
 import org.rfcx.companion.view.map.MapMarker
@@ -38,12 +39,11 @@ open class Deployment(
 ) : RealmModel, Serializable {
 
     fun isCompleted(): Boolean {
-        val stateOfDeployment = if (device == Device.GUARDIAN.value) {
-            state == DeploymentState.Guardian.ReadyToUpload.key
-        } else {
-            state == DeploymentState.AudioMoth.ReadyToUpload.key
-        }
-        return isActive && stateOfDeployment
+        return isActive && (state == DeploymentState.AudioMoth.ReadyToUpload.key)
+    }
+
+    fun isUnsynced(): Boolean {
+        return isActive && syncState != SyncState.Sent.key
     }
 
     companion object {

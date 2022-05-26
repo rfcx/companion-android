@@ -40,6 +40,7 @@ class MainViewModel(
     private val context = getApplication<Application>().applicationContext
     private val projects = MutableLiveData<Resource<List<Project>>>()
     private val tracks = MutableLiveData<Resource<List<DeploymentAssetResponse>>>()
+    private val unsyncedDeploymentCount = MutableLiveData<Int>()
     private val deploymentMarkers = MutableLiveData<List<MapMarker.DeploymentMarker>>()
     private val streamMarkers = MutableLiveData<List<MapMarker>>()
     private val streamList = MutableLiveData<List<Stream>>()
@@ -244,6 +245,9 @@ class MainViewModel(
             filteredStreams.mapNotNull { it.deployments }.flatten().filter { it.isCompleted() }
         val deploymentMarkersList = deployments.map { it.toMark(context) }
         deploymentMarkers.postValue(deploymentMarkersList)
+
+        val unsyncedDeployments = deployments.filter { it.isUnsynced() }
+        unsyncedDeploymentCount.postValue(unsyncedDeployments.size)
     }
 
     fun updateStatusOfflineMap() {
@@ -359,6 +363,10 @@ class MainViewModel(
 
     fun getStreamMarkers(): LiveData<List<MapMarker>> {
         return streamMarkers
+    }
+
+    fun getUnsyncedDeployments(): LiveData<Int> {
+        return unsyncedDeploymentCount
     }
 
     fun getStreams(): LiveData<List<Stream>> {

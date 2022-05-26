@@ -57,4 +57,7 @@
     <color name="step_enabled_true">#2AA841</color>
 
     <color name="bottom_bar_icon_default_tint">#999999</color>
+
+    <color name="shadow">#20213A</color>
+    <color name="error">#E12E2E</color>
 </resources>

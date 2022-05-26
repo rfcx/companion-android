@@ -81,6 +81,7 @@ import org.rfcx.companion.view.detail.DeploymentDetailActivity
 import org.rfcx.companion.view.profile.locationgroup.ProjectActivity
 import org.rfcx.companion.view.profile.locationgroup.ProjectAdapter
 import org.rfcx.companion.view.profile.locationgroup.ProjectListener
+import org.rfcx.companion.view.unsynced.UnsyncedDeploymentActivity
 import java.io.File
 import java.util.*
 import kotlin.collections.set
@@ -107,6 +108,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
     private var lastSyncingInfo: SyncInfo? = null
 
     private var deploymentMarkers = listOf<MapMarker.DeploymentMarker>()
+    private var unsyncedDeploymentCount = 0
     private var streamMarkers = listOf<MapMarker>()
 
     private lateinit var deploymentWorkInfoLiveData: LiveData<List<WorkInfo>>
@@ -227,6 +229,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         streams = it ?: listOf()
     }
 
+    private val getUnsyncedDeploymentsObserver = Observer<Int> {
+        unsyncedDeploymentCount = it ?: 0
+        updateUnsyncedCount(unsyncedDeploymentCount)
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         this.listener = context as MainActivityListener
@@ -305,6 +312,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
 
         projectNameTextView.setOnClickListener {
             setOnClickProjectName()
+        }
+
+        unSyncedDpNumber.setOnClickListener {
+            if (unsyncedDeploymentCount != 0) {
+                UnsyncedDeploymentActivity.startActivity(requireContext())
+            }
         }
 
         projectSwipeRefreshView.apply {
@@ -917,6 +930,16 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         mapboxMap?.easeCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 230), 1300)
     }
 
+    private fun updateUnsyncedCount(number: Int) {
+        if (number == 0) {
+            unSyncedDpNumber.text = ""
+            unSyncedDpNumber.background = ContextCompat.getDrawable(requireContext(), R.drawable.ic_check_circledp)
+        } else {
+            unSyncedDpNumber.text = number.toString()
+            unSyncedDpNumber.background = ContextCompat.getDrawable(requireContext(), R.drawable.circle_unsynced)
+        }
+    }
+
     private fun combinedData() {
         handleMarker(deploymentMarkers + streamMarkers)
 
@@ -968,6 +991,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
     }
 
     private fun setObserver() {
+        mainViewModel.getUnsyncedDeployments().observe(viewLifecycleOwner, getUnsyncedDeploymentsObserver)
         mainViewModel.getProjectsFromRemote()
             .observe(viewLifecycleOwner, getProjectsFromRemoteObserver)
         mainViewModel.getDeploymentMarkers()
@@ -1330,6 +1354,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
             mainViewModel.getDeploymentMarkers().removeObserver(getDeploymentMarkerObserver)
             mainViewModel.getStreamMarkers().removeObserver(getStreamMarkerObserver)
             mainViewModel.getStreams().removeObserver(getStreamObserver)
+            mainViewModel.getUnsyncedDeployments().removeObserver(getUnsyncedDeploymentsObserver)
         }
         if (::deploymentWorkInfoLiveData.isInitialized) {
             deploymentWorkInfoLiveData.removeObserver(deploymentWorkInfoObserve)

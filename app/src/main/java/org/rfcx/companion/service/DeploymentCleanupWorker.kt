@@ -51,8 +51,14 @@ class DeploymentCleanupWorker(val context: Context, params: WorkerParameters) :
         private const val UNIQUE_WORK_KEY = "DeploymentCleanupWorkerUniqueKey"
 
         fun enqueuePeriodically(context: Context) {
+            val constraints =
+                Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+
             val workRequest =
-                PeriodicWorkRequestBuilder<DeploymentCleanupWorker>(15, TimeUnit.MINUTES).build()
+                PeriodicWorkRequestBuilder<DeploymentCleanupWorker>(15, TimeUnit.MINUTES)
+                    .setConstraints(constraints)
+                    .build()
+
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 UNIQUE_WORK_KEY,
                 ExistingPeriodicWorkPolicy.REPLACE,

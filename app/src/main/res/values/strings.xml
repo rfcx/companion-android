@@ -525,9 +525,16 @@
 
     <string name="installed_software">(current %s installed)</string>
     <string name="delete_from_local">delete from local</string>
+    <string name="sync_now">Sync Now</string>
+
+    <string name="unsynced_deployments">Unsynced Deployments</string>
+    <string name="unsynced_text">You have %d unsynced deployments</string>
+    <string name="syncing">Syncing</string>
+    <string name="synced">Synced</string>
     <string name="more_info">More info</string>
 
     <string name="login_failed">Login failed. Please try again.</string>
     <string name="incorrect_username_or_password">Incorrect email or password.</string>
     <string name="firebase_authentication_failed">Firebase authentication failed. Please try again.</string>
+    <string name="dismiss">dismiss</string>
 </resources>
