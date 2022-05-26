@@ -47,15 +47,20 @@ class SiteAdapter(private val itemClickListener: (Stream, Boolean) -> Unit) :
 
     inner class SiteAdapterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val siteNameTextView = itemView.siteNameTextView
+        private val createdSiteNameTextView = itemView.createdSiteNameTextView
         private val detailTextView = itemView.detailTextView
         private val distanceTextView = itemView.distanceTextView
         private val iconAddImageView = itemView.iconAddImageView
 
         fun bind(site: SiteWithLastDeploymentItem) {
-            siteNameTextView.text = if (site.stream.id == -1) itemView.context.getString(
-                R.string.create_site,
-                site.stream.name
-            ) else site.stream.name
+            createdSiteNameTextView.text =
+                itemView.context.getString(R.string.create_site, site.stream.name)
+            siteNameTextView.text = site.stream.name
+
+            createdSiteNameTextView.visibility =
+                if (site.stream.id == -1) View.VISIBLE else View.GONE
+            siteNameTextView.visibility = if (site.stream.id != -1) View.VISIBLE else View.GONE
+
             detailTextView.text = site.date?.toTimeSinceStringAlternativeTimeAgo(itemView.context)
                 ?: itemView.context.getString(R.string.no_deployments)
             if (site.distance != null) {

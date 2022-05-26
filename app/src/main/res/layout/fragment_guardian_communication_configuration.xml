@@ -121,14 +121,25 @@
                 app:layout_constraintTop_toTopOf="@id/gpsDetectionCheckbox" />
 
             <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/systemTimeCheckbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:drawableStart="@drawable/ic_red_error"
+                android:drawablePadding="@dimen/margin_padding_normal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/gpsDetectionTextView" />
+
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/guardianTimeTextView"
                 style="@style/AudioMothText.Subhead.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_padding_normal"
                 android:text="@string/guardian_local_time"
-                app:layout_constraintStart_toStartOf="@id/gpsDetectionTextView"
-                app:layout_constraintTop_toBottomOf="@id/gpsDetectionTextView"/>
+                app:layout_constraintStart_toEndOf="@id/systemTimeCheckbox"
+                app:layout_constraintTop_toTopOf="@id/systemTimeCheckbox"
+                app:layout_constraintBottom_toBottomOf="@id/systemTimeCheckbox"/>
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/guardianTimeValuesTextView"

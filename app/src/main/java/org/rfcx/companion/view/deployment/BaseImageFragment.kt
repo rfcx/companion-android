@@ -2,17 +2,17 @@ package org.rfcx.companion.view.deployment
 
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
-import com.zhihu.matisse.Matisse
-import com.zhihu.matisse.MimeType
+import com.opensooq.supernova.gligar.GligarPicker
 import kotlinx.android.synthetic.main.fragment_deploy.*
-import org.rfcx.companion.R
-import org.rfcx.companion.util.*
+import org.rfcx.companion.util.CameraPermissions
+import org.rfcx.companion.util.GalleryPermissions
+import org.rfcx.companion.util.ImageFileUtils
+import org.rfcx.companion.util.ImageUtils
 import org.rfcx.companion.view.detail.DisplayImageActivity
 import java.io.File
 
@@ -62,7 +62,7 @@ abstract class BaseImageFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         handleTakePhotoResult(requestCode, resultCode)
-        handleGalleryResult(requestCode, resultCode, data)
+        handleGligarPickerResult(requestCode, resultCode, data)
     }
 
     private fun setupImages() {
@@ -134,38 +134,32 @@ abstract class BaseImageFragment : Fragment() {
         }
     }
 
-    fun openGallery() {
-        if (!galleryPermissions.allowed()) {
+    fun openGligarPicker() {
+        if (!cameraPermissions.allowed() || !galleryPermissions.allowed()) {
             filePath = null
-            galleryPermissions.check { }
+            if (!cameraPermissions.allowed()) cameraPermissions.check { }
+            if (!galleryPermissions.allowed()) galleryPermissions.check { }
         } else {
-            startOpenGallery()
+            startOpenGligarPicker()
         }
     }
 
-    private fun startOpenGallery() {
+    private fun startOpenGligarPicker() {
         val remainingImage = ImageAdapter.MAX_IMAGE_SIZE - getImageAdapter().getImageCount()
-        Matisse.from(this)
-            .choose(MimeType.ofImage())
-            .countable(true)
-            .maxSelectable(remainingImage)
-            .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-            .thumbnailScale(0.85f)
-            .imageEngine(GlideV4ImageEngine())
-            .theme(R.style.Matisse_Dracula)
-            .forResult(ImageUtils.REQUEST_GALLERY)
+        GligarPicker()
+            .requestCode(ImageUtils.REQUEST_GALLERY)
+            .limit(remainingImage)
+            .withFragment(this)
+            .show()
     }
 
-    private fun handleGalleryResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
+    private fun handleGligarPickerResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
         if (requestCode != ImageUtils.REQUEST_GALLERY || resultCode != Activity.RESULT_OK || intentData == null) return
 
         val pathList = mutableListOf<String>()
-        val results = Matisse.obtainResult(intentData)
-        results.forEach {
-            val imagePath = context?.let { it1 -> ImageFileUtils.findRealPath(it1, it) }
-            imagePath?.let { path ->
-                pathList.add(path)
-            }
+        val results = intentData.extras?.getStringArray(GligarPicker.IMAGES_RESULT)
+        results?.forEach {
+            pathList.add(it)
         }
         getImageAdapter().addImages(pathList)
         didAddImages(pathList)
@@ -173,7 +167,6 @@ abstract class BaseImageFragment : Fragment() {
     }
 
     private fun hideAddImagesButton() {
-        takePhotoButton.isEnabled = getImageAdapter().getImageCount() < 5
-        openGalleryButton.isEnabled = getImageAdapter().getImageCount() < 5
+        addPhotoButton.isEnabled = getImageAdapter().getImageCount() < 5
     }
 }

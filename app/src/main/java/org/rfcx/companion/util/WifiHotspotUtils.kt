@@ -15,10 +15,10 @@ object WifiHotspotUtils {
     private fun getCurrentWifiName(context: Context): String {
         var wifiName = ""
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             cm?.run {
                 cm.getNetworkCapabilities(cm.activeNetwork)?.run {
-                    if (hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                    if (hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || transportInfo == null) {
                         wifiName = getSSID(context)
                     }
                 }

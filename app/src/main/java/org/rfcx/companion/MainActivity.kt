@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_map.*
@@ -89,6 +90,8 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setViewModel()
+
+        FirebaseCrashlytics.getInstance().setCustomKey("Email", this.getEmailUser())
 
         val preferences = Preferences.getInstance(this)
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
@@ -376,6 +379,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
             mapFragment.showSearchBar(false)
         }
     }
+
     override fun clearFeatureSelectedOnMap() {
         val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
         if (mapFragment is MapFragment) {

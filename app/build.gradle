@@ -14,8 +14,8 @@ android {
         manifestPlaceholders = [auth0Domain: "@string/auth0_domain", auth0Scheme: "@string/auth0_scheme"]
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode 98
-        versionName "1.5.0"
+        versionCode 105
+        versionName "1.5.1"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -27,8 +27,9 @@ android {
         }
         
         release {
-            minifyEnabled false
-        proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             manifestPlaceholders = [enableCrashReporting:"true"]
         }
     }
@@ -42,6 +43,7 @@ android {
             buildConfigField 'String', 'FIREBASE_AUTH_DOMAIN', '"https://us-central1-rfcx-deployment.cloudfunctions.net/auth/"'
             buildConfigField 'String', 'DEVICE_API_DOMAIN', '"https://device-api.rfcx.org/"'
             buildConfigField 'String', 'DEPLOY_DOMAIN', '"https://api.rfcx.org/"'
+            versionNameSuffix="-prod"
         }
         internalDevelop {
             buildConfigField 'boolean', 'ENABLE_GUARDIAN', 'true'
@@ -49,6 +51,7 @@ android {
             buildConfigField 'String', 'DEVICE_API_DOMAIN', '"https://staging-device-api.rfcx.org/"'
             buildConfigField 'String', 'DEPLOY_DOMAIN', '"https://staging-api.rfcx.org/"'
             applicationIdSuffix '.dev'
+            versionNameSuffix="-staging"
         }
     }
     compileOptions {
@@ -115,7 +118,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:19.0.1'
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     kapt 'com.github.bumptech.glide:compiler:4.11.0'
-    implementation 'com.zhihu.android:matisse:0.5.3-beta3'
+    implementation 'com.opensooq.supernova:gligar:1.1.0'
     implementation 'jp.wasabeef:glide-transformations:3.0.1'
 
     implementation 'com.github.hkk595:Resizer:v1.5'

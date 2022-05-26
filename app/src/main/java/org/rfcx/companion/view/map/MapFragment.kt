@@ -822,7 +822,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
                     val markerId = selectedFeature.getProperty(
                         PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID
                     ).asString
-                    val deploymentId = markerId.split(".")[1]
+                    val deploymentId = markerId.split(".").last()
                     val deployment = mainViewModel.getDeploymentById(deploymentId.toInt())
                     val site = mainViewModel.getStreamById(deployment?.stream?.id ?: -1)
                     gettingTracksAndMoveToPin(site, markerId)
