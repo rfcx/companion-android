@@ -42,9 +42,11 @@ class GuardianPrefsFragment :
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        val value = sharedPreferences?.getString(key, "") ?: ""
+        val value = sharedPreferences?.getString(key, "")
 
-        prefsChanges[key!!] = value
+        if (value != null && value != "") {
+            prefsChanges[key!!] = value
+        }
 
         syncPreferenceListener?.showSyncButton()
         syncPreferenceListener?.setPrefsChanges(prefsChanges)
