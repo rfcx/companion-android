@@ -518,10 +518,10 @@ class GuardianDeploymentActivity :
                 startFragment(SoftwareUpdateFragment.newInstance())
             }
             1 -> {
-                startFragment(GuardianCommunicationFragment.newInstance())
+                startFragment(GuardianSolarPanelFragment.newInstance())
             }
             2 -> {
-                startFragment(GuardianSolarPanelFragment.newInstance())
+                startFragment(GuardianCommunicationFragment.newInstance())
             }
             3 -> {
                 updateDeploymentState(DeploymentState.Guardian.Register)
@@ -535,6 +535,10 @@ class GuardianDeploymentActivity :
                 startFragment(GuardianConfigureFragment.newInstance())
             }
             6 -> {
+                updateDeploymentState(DeploymentState.Guardian.Microphone)
+                startFragment(GuardianMicrophoneFragment.newInstance())
+            }
+            7 -> {
                 updateDeploymentState(DeploymentState.Guardian.Locate)
                 val site = this._stream
                 if (site == null) {
@@ -547,17 +551,13 @@ class GuardianDeploymentActivity :
                     startDetailDeploymentSite(site.latitude, site.longitude, site.id, site.name)
                 }
             }
-            7 -> {
-                updateDeploymentState(DeploymentState.Guardian.Microphone)
-                startFragment(GuardianMicrophoneFragment.newInstance())
-            }
             8 -> {
-                updateDeploymentState(DeploymentState.Guardian.Checkin)
-                startFragment(GuardianCheckInTestFragment.newInstance())
-            }
-            9 -> {
                 updateDeploymentState(DeploymentState.Guardian.Deploy)
                 startFragment(GuardianDeployFragment.newInstance())
+            }
+            9 -> {
+                updateDeploymentState(DeploymentState.Guardian.Checkin)
+                startFragment(GuardianCheckInTestFragment.newInstance())
             }
         }
     }

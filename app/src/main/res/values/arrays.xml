@@ -32,45 +32,23 @@
     </string-array>
     
     <!--  Guardian  -->
-    <string-array name="guardian_steps">
-        <item>Connect</item>
-        <item>Register</item>
-        <item>Signal</item>
-        <item>Config</item>
-        <item>Microphone</item>
-        <item>Solar Panel</item>
-        <item>Locate</item>
-        <item>CheckIn</item>
-        <item>Deploy</item>
-    </string-array>
-
     <string-array name="guardian_assembly_checks">
         <item>Software Update</item>
-        <item>Communication Configuration</item>
         <item>Power Diagnostics</item>
+        <item>Communication Configuration</item>
     </string-array>
 
     <string-array name="guardian_setup_checks">
         <item>Guardian Registration</item>
         <item>Network Signal Test</item>
         <item>Audio Parameter Config</item>
+        <item>Microphone Capture Test</item>
         <item>Guardian Installation Location</item>
     </string-array>
 
     <string-array name="guardian_optional_checks">
-        <item>Microphone Capture Test</item>
-        <item>Confirm CheckIn Status</item>
         <item>Add Photo(s)</item>
-    </string-array>
-
-    <string-array name="guardian_can_skip_steps">
-        <item>Connect</item>
-        <item>Config</item>
-        <item>Solar Panel</item>
-        <item>Signal</item>
-        <item>Microphone</item>
-        <item>CheckIn</item>
-        <item>Deploy</item>
+        <item>Confirm CheckIn Status</item>
     </string-array>
 
     <string-array name="guardian_connect_instructions">
