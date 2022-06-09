@@ -20,6 +20,15 @@ class DeploymentDb(private val realm: Realm) {
             .count()
     }
 
+    fun getUnsent(): List<Deployment> {
+        return realm.where(Deployment::class.java)
+            .equalTo(Deployment.FIELD_STATE, DeploymentState.Guardian.ReadyToUpload.key)
+            .and()
+            .notEqualTo(Deployment.FIELD_SYNC_STATE, SyncState.Sent.key)
+            .sort(Deployment.FIELD_ID, Sort.DESCENDING)
+            .findAll()
+    }
+
     fun getAllResultsAsync(sort: Sort = Sort.DESCENDING): RealmResults<Deployment> {
         return realm.where(Deployment::class.java)
             .sort(Deployment.FIELD_ID, sort)

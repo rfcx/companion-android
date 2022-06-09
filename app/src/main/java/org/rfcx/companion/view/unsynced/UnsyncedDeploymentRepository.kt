@@ -9,8 +9,8 @@ class UnsyncedDeploymentRepository(
     private val deviceApiHelper: DeviceApiHelper,
     private val localDataHelper: LocalDataHelper
 ) {
-    fun getUnsentDeployment(): Long {
-        return localDataHelper.getDeploymentLocalDb().unsentCount()
+    fun getUnsentDeployment(): List<Deployment> {
+        return localDataHelper.getDeploymentLocalDb().getUnsent()
     }
 
     fun getAllDeploymentLocalResultsAsync(): RealmResults<Deployment> {

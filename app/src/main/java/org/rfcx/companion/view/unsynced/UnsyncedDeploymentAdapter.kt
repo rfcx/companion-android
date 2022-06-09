@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_unsynced_deployment.view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.UnsyncedDeployment
+import org.rfcx.companion.util.toTimeAgo
 
 class UnsyncedDeploymentAdapter(private val unsyncedDeploymentListener: UnsyncedDeploymentListener) :
     RecyclerView.Adapter<UnsyncedDeploymentAdapter.UnsyncedDeploymentViewHolder>() {
@@ -35,11 +36,18 @@ class UnsyncedDeploymentAdapter(private val unsyncedDeploymentListener: Unsynced
     inner class UnsyncedDeploymentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val name = itemView.unsyncedName
         private val error = itemView.unsyncedError
+        private val deployedAt = itemView.deployedAt
         val deleteButton = itemView.deleteButton
 
         fun bind(unsynced: UnsyncedDeployment) {
             name.text = unsynced.name
-            error.text = unsynced.error
+            if (unsynced.error != null) {
+                error.visibility = View.VISIBLE
+                error.text = unsynced.error
+            } else {
+                error.visibility = View.GONE
+            }
+            deployedAt.text = unsynced.deployedAt.toTimeAgo(itemView.context)
         }
     }
 }

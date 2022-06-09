@@ -3,35 +3,60 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="@dimen/margin_padding_normal">
+    android:layout_height="wrap_content">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/unsyncedName"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/itemLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/margin_padding_normal"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/unsyncedName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_primary"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Site name" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/deployedAt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_secondary"
+            android:layout_marginTop="@dimen/margin_padding_small"
+            app:layout_constraintStart_toStartOf="@id/unsyncedName"
+            app:layout_constraintTop_toBottomOf="@id/unsyncedName"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/unsyncedError"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/error"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="@id/deployedAt"
+            app:layout_constraintTop_toBottomOf="@id/deployedAt"
+            tools:text="Error message" />
+
+        <TextView
+            android:id="@+id/deleteButton"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="@drawable/ic_baseline_delete_forever_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/text_primary"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Site name" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/unsyncedError"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textColor="@color/error"
-        app:layout_constraintEnd_toStartOf="@id/deleteButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/unsyncedName"
-        tools:text="Error message" />
-
-    <TextView
-        android:id="@+id/deleteButton"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:background="@drawable/ic_baseline_delete_forever_24"
+        android:layout_height="1.5dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        android:background="@color/shadow"
+        app:layout_constraintTop_toBottomOf="@id/itemLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

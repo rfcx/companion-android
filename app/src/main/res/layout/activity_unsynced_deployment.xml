@@ -57,11 +57,10 @@
     </androidx.cardview.widget.CardView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/unsyncedFailedLayout"
+        android:id="@+id/unsyncedLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/topBar"
-        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/banner">
 
         <androidx.recyclerview.widget.RecyclerView
