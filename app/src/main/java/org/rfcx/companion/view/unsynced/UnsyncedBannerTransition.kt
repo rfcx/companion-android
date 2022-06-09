@@ -10,7 +10,7 @@ class UnsyncedBannerTransition : TransitionSet() {
     }
 
     private fun init() {
-        ordering = ORDERING_SEQUENTIAL
+        ordering = ORDERING_TOGETHER
 
         addTransition(Slide(Gravity.TOP))
     }

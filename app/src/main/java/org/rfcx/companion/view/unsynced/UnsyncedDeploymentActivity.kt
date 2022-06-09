@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.UnsyncedDeployment
+import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
@@ -39,6 +40,7 @@ class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListen
 
     private var lastSyncingInfo: SyncInfo? = null
     private var currentState: WorkInfo.State? = null
+    private var unsyncedDeployments: List<Deployment>? = null
 
     private val deploymentWorkInfoObserve = Observer<List<WorkInfo>> {
         val currentWorkStatus = it?.getOrNull(0)
@@ -109,7 +111,13 @@ class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListen
             this
         ) {
             setUnsyncedText(it.size)
-            unsyncedAdapter.items = it.map { dp -> UnsyncedDeployment(dp.id, dp.stream?.name ?: getString(R.string.none), dp.deployedAt, null) }
+            unsyncedDeployments = it
+
+            val errors = DeploymentSyncWorker.getErrors()
+            unsyncedAdapter.items = it.map { dp ->
+                val error = errors.find { error -> error.id == dp.id }
+                UnsyncedDeployment(dp.id, dp.stream?.name ?: getString(R.string.none), dp.deployedAt, error?.error)
+            }
         }
     }
 
@@ -168,7 +176,13 @@ class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListen
                 confirmButton.isEnabled = true
                 unsyncedIndicator.visibility = View.GONE
                 showBanner()
-                unsyncedAdapter.items = DeploymentSyncWorker.getErrors()
+                val errors = DeploymentSyncWorker.getErrors()
+                unsyncedDeployments?.map { dp ->
+                    val error = errors.find { error -> error.id == dp.id }
+                    UnsyncedDeployment(dp.id, dp.stream?.name ?: getString(R.string.none), dp.deployedAt, error?.error)
+                }?.let {
+                    unsyncedAdapter.items = it
+                }
             }
             // else also waiting network
             else -> {
