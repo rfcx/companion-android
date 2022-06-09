@@ -80,12 +80,12 @@ class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListen
     }
 
     private fun showBanner() {
-        TransitionManager.beginDelayedTransition(rootView, UnsyncedBannerTransition())
+        TransitionManager.beginDelayedTransition(banner, UnsyncedBannerTransition())
         banner.visibility = View.VISIBLE
     }
 
     private fun hideBanner() {
-        TransitionManager.beginDelayedTransition(rootView, UnsyncedBannerTransition())
+        TransitionManager.beginDelayedTransition(banner, UnsyncedBannerTransition())
         banner.visibility = View.GONE
     }
 

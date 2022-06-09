@@ -25,15 +25,16 @@
             android:id="@+id/deployedAt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/text_secondary"
             android:layout_marginTop="@dimen/margin_padding_small"
+            android:textColor="@color/text_secondary"
             app:layout_constraintStart_toStartOf="@id/unsyncedName"
-            app:layout_constraintTop_toBottomOf="@id/unsyncedName"/>
+            app:layout_constraintTop_toBottomOf="@id/unsyncedName" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/unsyncedError"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_padding_small"
             android:textColor="@color/error"
             android:visibility="gone"
             app:layout_constraintStart_toStartOf="@id/deployedAt"
@@ -54,9 +55,9 @@
     <View
         android:layout_width="wrap_content"
         android:layout_height="1.5dp"
+        android:background="@color/shadow"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:background="@color/shadow"
         app:layout_constraintTop_toBottomOf="@id/itemLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
