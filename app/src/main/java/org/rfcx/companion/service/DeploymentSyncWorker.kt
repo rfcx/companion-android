@@ -17,7 +17,6 @@ import org.rfcx.companion.util.getIdToken
 import java.util.*
 import java.util.concurrent.ExecutionException
 
-
 /**
  * For syncing data to server. Ref from Ranger Android App
  */

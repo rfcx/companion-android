@@ -2,12 +2,8 @@ package org.rfcx.companion.view.unsynced
 
 import android.app.Application
 import androidx.lifecycle.*
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
 import org.rfcx.companion.entity.guardian.Deployment
-import org.rfcx.companion.service.DeploymentSyncState
 import org.rfcx.companion.service.DeploymentSyncWorker
-import org.rfcx.companion.util.Resource
 import org.rfcx.companion.util.asLiveData
 
 class UnsyncedDeploymentViewModel(

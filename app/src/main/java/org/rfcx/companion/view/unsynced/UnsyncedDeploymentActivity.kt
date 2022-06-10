@@ -6,11 +6,9 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionManager
 import androidx.work.WorkInfo
@@ -26,7 +24,6 @@ import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DeploymentSyncWorker
-import org.rfcx.companion.util.Status
 import org.rfcx.companion.util.isNetworkAvailable
 import org.rfcx.companion.view.map.SyncInfo
 
@@ -116,7 +113,12 @@ class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListen
             val errors = DeploymentSyncWorker.getErrors()
             unsyncedAdapter.items = it.map { dp ->
                 val error = errors.find { error -> error.id == dp.id }
-                UnsyncedDeployment(dp.id, dp.stream?.name ?: getString(R.string.none), dp.deployedAt, error?.error)
+                UnsyncedDeployment(
+                    dp.id,
+                    dp.stream?.name ?: getString(R.string.none),
+                    dp.deployedAt,
+                    error?.error
+                )
             }
         }
     }
@@ -179,7 +181,12 @@ class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListen
                 val errors = DeploymentSyncWorker.getErrors()
                 unsyncedDeployments?.map { dp ->
                     val error = errors.find { error -> error.id == dp.id }
-                    UnsyncedDeployment(dp.id, dp.stream?.name ?: getString(R.string.none), dp.deployedAt, error?.error)
+                    UnsyncedDeployment(
+                        dp.id,
+                        dp.stream?.name ?: getString(R.string.none),
+                        dp.deployedAt,
+                        error?.error
+                    )
                 }?.let {
                     unsyncedAdapter.items = it
                 }
