@@ -25,7 +25,9 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
 
     private var manualTimeOff = arrayListOf<String>()
-    private var autoTimeOff = listOf("00:00-01:20", "03:10-08:40", "11:30-13:15", "15:05-20:45", "23:30-23:59")
+    private var indoAutoTimeOff = listOf("00:00-01:20", "03:10-08:40", "11:30-13:15", "15:05-20:45", "23:30-23:59")
+    private var malayAutoTimeOff = listOf("00:00-01:15", "03:15-05:00", "06:00-09:00", "11:00-11:25", "12:00-13:20", "15:15-17:00", "18:00-20:45", "23:00-23:20")
+    private var brazilAutoTimeOff = listOf("00:30-01:30", "03:40-05:20", "06:20-08:40", "15:30-17:15", "18:10-21:15", "23:15-23:35")
     private var tempStartHourOff: String? = null
     private var tempEndHourOff: String? = null
     private var isSetFirstGuardianPlan = false
@@ -252,7 +254,17 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
             if (manualRadioButton.isChecked) {
                 GuardianSocketManager.sendSatOnlyPrefs(manualTimeOff.joinToString(","))
             } else {
-                GuardianSocketManager.sendSatOnlyPrefs(autoTimeOff.joinToString(","))
+                if (deploymentProtocol?.getCurrentProjectId() == "agk3cpurb5wm") {
+                    GuardianSocketManager.sendSatOnlyPrefs(indoAutoTimeOff.joinToString(","))
+                }
+
+                if (deploymentProtocol?.getCurrentProjectId() == "0cyons771mvx") {
+                    GuardianSocketManager.sendSatOnlyPrefs(malayAutoTimeOff.joinToString(","))
+                }
+
+                if (deploymentProtocol?.getCurrentProjectId() == "j8lnmj69yp45") {
+                    GuardianSocketManager.sendSatOnlyPrefs(brazilAutoTimeOff.joinToString(","))
+                }
             }
         }
     }
@@ -260,7 +272,19 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
     private fun observeOffTime() {
         // TODO: For preset project off time
         if (deploymentProtocol?.getCurrentProjectId() == "agk3cpurb5wm") {
-            autoTimeOff.forEach { time ->
+            indoAutoTimeOff.forEach { time ->
+                addChip(time, false)
+            }
+        }
+
+        if (deploymentProtocol?.getCurrentProjectId() == "0cyons771mvx") {
+            malayAutoTimeOff.forEach { time ->
+                addChip(time, false)
+            }
+        }
+
+        if (deploymentProtocol?.getCurrentProjectId() == "j8lnmj69yp45") {
+            brazilAutoTimeOff.forEach { time ->
                 addChip(time, false)
             }
         }
