@@ -1,5 +1,1 @@
-- Reduce app size
-- Check/Cross when guardian time is not in present
-- New page for unsynced deployment to manual deploy
-- Fix cannot take/upload photos on Android 11+
-- Re-order guardian checklist steps
+- Always show unsynced deployments in Unsynced screen

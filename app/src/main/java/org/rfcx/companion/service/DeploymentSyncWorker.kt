@@ -14,6 +14,8 @@ import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.getIdToken
+import java.util.*
+import java.util.concurrent.ExecutionException
 
 /**
  * For syncing data to server. Ref from Ranger Android App
@@ -53,7 +55,14 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                         markSentDeployment(it.deploymentKey, db, locateDb, it.id, token)
                     }
                     else -> {
-                        errors.add(UnsyncedDeployment(it.id, it.stream!!.name, (error ?: "Unexpected error")))
+                        errors.add(
+                            UnsyncedDeployment(
+                                it.id,
+                                it.stream!!.name,
+                                it.deployedAt,
+                                (error ?: "Unexpected error")
+                            )
+                        )
                         db.markUnsent(it.id)
                         someFailed = true
                     }
@@ -75,7 +84,14 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                         if (result.isSuccessful) {
                             db.markSent(it.serverId!!, it.id)
                         } else {
-                            errors.add(UnsyncedDeployment(it.id, it.stream!!.name, (result.errorBody()?.string() ?: "Unexpected error")))
+                            errors.add(
+                                UnsyncedDeployment(
+                                    it.id,
+                                    it.stream!!.name,
+                                    it.deployedAt,
+                                    (result.errorBody()?.string() ?: "Unexpected error")
+                                )
+                            )
                             db.markUnsent(it.id)
                             someFailed = true
                         }
@@ -117,18 +133,45 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
         private var errors = mutableListOf<UnsyncedDeployment>()
 
         fun enqueue(context: Context) {
-            val constraints =
-                Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
-            val workRequest =
-                OneTimeWorkRequestBuilder<DeploymentSyncWorker>().setConstraints(constraints)
-                    .build()
-            WorkManager.getInstance(context)
-                .enqueueUniqueWork(UNIQUE_WORK_KEY, ExistingWorkPolicy.REPLACE, workRequest)
+            // won't enqueue if worker is running
+            if (!isWorkRunning(context)) {
+                val constraints =
+                    Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+                val workRequest =
+                    OneTimeWorkRequestBuilder<DeploymentSyncWorker>().setConstraints(constraints)
+                        .build()
+                WorkManager.getInstance(context)
+                    .enqueueUniqueWork(UNIQUE_WORK_KEY, ExistingWorkPolicy.REPLACE, workRequest)
+            }
         }
 
         fun isRunning() = isRunning
 
         fun getErrors() = errors
+
+        private fun isWorkRunning(context: Context): Boolean {
+
+            val instance = WorkManager.getInstance(context)
+            val statuses = instance.getWorkInfosForUniqueWork(UNIQUE_WORK_KEY)
+
+            var running = false
+            var workInfoList = Collections.emptyList<WorkInfo>()
+
+            try {
+                workInfoList = statuses.get()
+            } catch (e: ExecutionException) {
+                Log.d(TAG, "ExecutionException in isWorkScheduled: $e")
+            } catch (e: InterruptedException) {
+                Log.d(TAG, "InterruptedException in isWorkScheduled: $e")
+            }
+
+            workInfoList.forEach {
+                val state = it.state
+                running = state == WorkInfo.State.RUNNING
+            }
+            Log.d(TAG, "now worker running state is $running")
+            return running
+        }
 
         fun workInfos(context: Context): LiveData<List<WorkInfo>> {
             return WorkManager.getInstance(context)

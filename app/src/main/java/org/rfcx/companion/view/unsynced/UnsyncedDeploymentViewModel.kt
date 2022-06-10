@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.lifecycle.*
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.service.DeploymentSyncWorker
-import org.rfcx.companion.util.Resource
 import org.rfcx.companion.util.asLiveData
 
 class UnsyncedDeploymentViewModel(
@@ -13,7 +12,7 @@ class UnsyncedDeploymentViewModel(
 ) : AndroidViewModel(application) {
 
     private lateinit var deploymentLiveData: LiveData<List<Deployment>>
-    private val unsyncedDeploymentCount = MutableLiveData<Resource<Int>>()
+    private val unsyncedDeploymentCount = MutableLiveData<List<Deployment>>()
 
     private val deploymentObserve = Observer<List<Deployment>> {
         getUnsentCount()
@@ -34,7 +33,7 @@ class UnsyncedDeploymentViewModel(
         DeploymentSyncWorker.enqueue(getApplication())
     }
 
-    fun getUnsyncedDeployments(): LiveData<Resource<Int>> {
+    fun getUnsyncedDeployments(): LiveData<List<Deployment>> {
         return unsyncedDeploymentCount
     }
 
@@ -43,6 +42,6 @@ class UnsyncedDeploymentViewModel(
     }
 
     private fun getUnsentCount() {
-        unsyncedDeploymentCount.postValue(Resource.success(repository.getUnsentDeployment().toInt()))
+        unsyncedDeploymentCount.postValue(repository.getUnsentDeployment())
     }
 }

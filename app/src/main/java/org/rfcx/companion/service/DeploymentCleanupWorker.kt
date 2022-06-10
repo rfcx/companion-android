@@ -26,7 +26,6 @@ class DeploymentCleanupWorker(val context: Context, params: WorkerParameters) :
         val realm = Realm.getInstance(RealmHelper.migrationConfig())
         val deploymentDb = DeploymentDb(realm)
         val deploymentUnsent = deploymentDb.unsentCount()
-        deploymentDb.unlockSending()
         if (deploymentUnsent > 0) {
             DeploymentSyncWorker.enqueue(context)
         }

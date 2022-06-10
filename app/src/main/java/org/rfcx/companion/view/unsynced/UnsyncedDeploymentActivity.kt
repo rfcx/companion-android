@@ -6,11 +6,9 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionManager
 import androidx.work.WorkInfo
@@ -18,13 +16,14 @@ import kotlinx.android.synthetic.main.activity_unsynced_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
+import org.rfcx.companion.entity.UnsyncedDeployment
+import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DeploymentSyncWorker
-import org.rfcx.companion.util.Status
 import org.rfcx.companion.util.isNetworkAvailable
 import org.rfcx.companion.view.map.SyncInfo
 
@@ -38,6 +37,7 @@ class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListen
 
     private var lastSyncingInfo: SyncInfo? = null
     private var currentState: WorkInfo.State? = null
+    private var unsyncedDeployments: List<Deployment>? = null
 
     private val deploymentWorkInfoObserve = Observer<List<WorkInfo>> {
         val currentWorkStatus = it?.getOrNull(0)
@@ -70,9 +70,6 @@ class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListen
         unsyncedRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = unsyncedAdapter
-            val decoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
-            decoration.setDrawable(ContextCompat.getDrawable(context, R.drawable.divider)!!)
-            this.addItemDecoration(decoration)
         }
 
         confirmButton.setOnClickListener {
@@ -82,12 +79,12 @@ class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListen
     }
 
     private fun showBanner() {
-        TransitionManager.beginDelayedTransition(rootView, UnsyncedBannerTransition())
+        TransitionManager.beginDelayedTransition(banner, UnsyncedBannerTransition())
         banner.visibility = View.VISIBLE
     }
 
     private fun hideBanner() {
-        TransitionManager.beginDelayedTransition(rootView, UnsyncedBannerTransition())
+        TransitionManager.beginDelayedTransition(banner, UnsyncedBannerTransition())
         banner.visibility = View.GONE
     }
 
@@ -110,12 +107,18 @@ class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListen
         viewModel.getUnsyncedDeployments().observe(
             this
         ) {
-            when (it.status) {
-                Status.LOADING -> {}
-                Status.SUCCESS -> {
-                    setUnsyncedText(it.data ?: 0)
-                }
-                Status.ERROR -> {}
+            setUnsyncedText(it.size)
+            unsyncedDeployments = it
+
+            val errors = DeploymentSyncWorker.getErrors()
+            unsyncedAdapter.items = it.map { dp ->
+                val error = errors.find { error -> error.id == dp.id }
+                UnsyncedDeployment(
+                    dp.id,
+                    dp.stream?.name ?: getString(R.string.none),
+                    dp.deployedAt,
+                    error?.error
+                )
             }
         }
     }
@@ -176,11 +179,16 @@ class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListen
                 unsyncedIndicator.visibility = View.GONE
                 showBanner()
                 val errors = DeploymentSyncWorker.getErrors()
-                if (errors.isNotEmpty()) {
-                    unsyncedAdapter.items = errors
-                    unsyncedFailedLayout.visibility = View.VISIBLE
-                } else {
-                    unsyncedFailedLayout.visibility = View.GONE
+                unsyncedDeployments?.map { dp ->
+                    val error = errors.find { error -> error.id == dp.id }
+                    UnsyncedDeployment(
+                        dp.id,
+                        dp.stream?.name ?: getString(R.string.none),
+                        dp.deployedAt,
+                        error?.error
+                    )
+                }?.let {
+                    unsyncedAdapter.items = it
                 }
             }
             // else also waiting network
@@ -198,9 +206,6 @@ class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListen
         viewModel.deleteDeployment(id)
         val updatedItems = unsyncedAdapter.items.filter { it.id != id }
         unsyncedAdapter.items = updatedItems
-        if (updatedItems.isEmpty()) {
-            unsyncedFailedLayout.visibility = View.GONE
-        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
