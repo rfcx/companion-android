@@ -13,6 +13,8 @@ object PrefsUtils {
     const val audioSampleRate = "audio_stream_sample_rate"
     const val audioCodec = "audio_stream_codec"
     const val audioBitrate = "audio_stream_bitrate"
+    const val enableSampling = "enable_cutoffs_sampling_ratio"
+    const val sampling = "audio_sampling_ratio"
 
     fun stringToPrefs(context: Context, str: String?): List<Preference> {
         if (str == null) {
