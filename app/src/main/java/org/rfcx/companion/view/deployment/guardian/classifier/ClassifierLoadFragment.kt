@@ -11,15 +11,11 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_classifier.*
-import kotlinx.android.synthetic.main.fragment_software_update.*
 import kotlinx.android.synthetic.main.fragment_software_update.nextButton
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.FileSocketManager
 import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.entity.Classifier
-import org.rfcx.companion.entity.Software
-import org.rfcx.companion.util.file.APKUtils
-import org.rfcx.companion.util.file.APKUtils.calculateVersionValue
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 
 class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {

@@ -39,6 +39,7 @@ import org.rfcx.companion.util.socket.PingUtils
 import org.rfcx.companion.view.deployment.BaseDeploymentActivity
 import org.rfcx.companion.view.deployment.guardian.advanced.GuardianAdvancedFragment
 import org.rfcx.companion.view.deployment.guardian.checkin.GuardianCheckInTestFragment
+import org.rfcx.companion.view.deployment.guardian.classifier.ClassifierLoadFragment
 import org.rfcx.companion.view.deployment.guardian.communication.GuardianCommunicationFragment
 import org.rfcx.companion.view.deployment.guardian.configure.GuardianConfigureFragment
 import org.rfcx.companion.view.deployment.guardian.connect.ConnectGuardianFragment
@@ -514,31 +515,33 @@ class GuardianDeploymentActivity :
         currentCheck = number
         when (number) {
             0 -> {
-                updateDeploymentState(DeploymentState.Guardian.SolarPanel)
                 startFragment(SoftwareUpdateFragment.newInstance())
             }
             1 -> {
-                startFragment(GuardianSolarPanelFragment.newInstance())
+                startFragment(ClassifierLoadFragment.newInstance())
             }
             2 -> {
-                startFragment(GuardianCommunicationFragment.newInstance())
+                startFragment(GuardianSolarPanelFragment.newInstance())
             }
             3 -> {
+                startFragment(GuardianCommunicationFragment.newInstance())
+            }
+            4 -> {
                 updateDeploymentState(DeploymentState.Guardian.Register)
                 startFragment(GuardianRegisterFragment.newInstance())
             }
-            4 -> {
+            5 -> {
                 updateDeploymentState(DeploymentState.Guardian.Signal)
                 startFragment(GuardianSignalFragment.newInstance())
             }
-            5 -> {
+            6 -> {
                 startFragment(GuardianConfigureFragment.newInstance())
             }
-            6 -> {
+            7 -> {
                 updateDeploymentState(DeploymentState.Guardian.Microphone)
                 startFragment(GuardianMicrophoneFragment.newInstance())
             }
-            7 -> {
+            8 -> {
                 updateDeploymentState(DeploymentState.Guardian.Locate)
                 val site = this._stream
                 if (site == null) {
@@ -551,11 +554,11 @@ class GuardianDeploymentActivity :
                     startDetailDeploymentSite(site.latitude, site.longitude, site.id, site.name)
                 }
             }
-            8 -> {
+            9 -> {
                 updateDeploymentState(DeploymentState.Guardian.Deploy)
                 startFragment(GuardianDeployFragment.newInstance())
             }
-            9 -> {
+            10 -> {
                 updateDeploymentState(DeploymentState.Guardian.Checkin)
                 startFragment(GuardianCheckInTestFragment.newInstance())
             }
