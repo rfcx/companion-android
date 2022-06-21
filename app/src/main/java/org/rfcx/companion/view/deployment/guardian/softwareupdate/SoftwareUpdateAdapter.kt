@@ -120,16 +120,16 @@ class SoftwareUpdateAdapter(
 
     class SoftwareHeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal var layout = itemView.country_item_parent_container
-        internal var appName: TextView = itemView.appNameTextView
+        internal var appName: TextView = itemView.fileNameTextView
     }
 
     class SoftwareVersionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal var layout = itemView.country_item_child_container
-        internal var apkVersion: TextView = itemView.apkVersionTextView
-        internal var apkInstalled: TextView = itemView.apkInstalledVersionTextView
-        internal var apkSendButton: Button = itemView.apkSendButton
-        internal var apkUpToDateText: TextView = itemView.apkUpToDateTextView
-        internal var apkLoading: ProgressBar = itemView.apkLoading
+        internal var apkVersion: TextView = itemView.fileVersionTextView
+        internal var apkInstalled: TextView = itemView.fileInstalledVersionTextView
+        internal var apkSendButton: Button = itemView.fileSendButton
+        internal var apkUpToDateText: TextView = itemView.fileUpToDateTextView
+        internal var apkLoading: ProgressBar = itemView.fileLoading
     }
 }
 

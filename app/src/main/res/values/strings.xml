@@ -469,7 +469,7 @@
     <string name="updater_role">updater</string>
     <string name="up_to_date">up to date</string>
 
-    <!-- SoftwareUpdateFragment -->
+    <!-- ClassifierLoadFragment -->
     <string name="guardian_version">Guardian version</string>
     <string name="admin_version">Admin version</string>
     <string name="classify_version">Classify version</string>

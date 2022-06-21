@@ -21,11 +21,11 @@ object FileSocketManager {
 
     val pingBlob = MutableLiveData<JsonObject>()
 
-    fun sendFile(filePath: String) {
-        sendMessage(APKUtils.getAPKFileFromPath(filePath))
+    fun sendFile(filePath: String, meta: String? = null) {
+        sendMessage(APKUtils.getAPKFileFromPath(filePath), meta)
     }
 
-    private fun sendMessage(file: File) {
+    private fun sendMessage(file: File, meta: String?) {
         clientThread = Thread {
             try {
                 socket = Socket("192.168.43.1", 9996)
@@ -36,6 +36,12 @@ object FileSocketManager {
                 var count: Int
                 val inp = file.inputStream()
                 outputStream?.write(file.name.toByteArray())
+                outputStream?.write("|".toByteArray())
+
+                if (meta != null) {
+                    outputStream?.write(meta.toByteArray())
+                }
+
                 outputStream?.write("|".toByteArray())
                 while (true) {
                     count = inp.read(buffer)
