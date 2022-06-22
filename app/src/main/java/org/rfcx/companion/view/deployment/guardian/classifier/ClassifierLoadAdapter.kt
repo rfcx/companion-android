@@ -10,8 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.expandable_child_item.view.*
 import kotlinx.android.synthetic.main.expandable_parent_item.view.*
 import org.rfcx.companion.R
-import org.rfcx.companion.entity.Classifier
-import org.rfcx.companion.entity.Software
+import org.rfcx.companion.entity.guardian.Classifier
 import org.rfcx.companion.util.file.APKUtils.calculateVersionValue
 
 class ClassifierLoadAdapter(
@@ -35,7 +34,7 @@ class ClassifierLoadAdapter(
         classifierGrouped.forEach { clsf ->
             classifierStateModelList.add(ClassifierItem.ClassifierHeader(clsf.key))
             clsf.value.forEach {
-                classifierStateModelList.add(ClassifierItem.ClassifierVersion(clsf.key, it.version, it.path))
+                classifierStateModelList.add(ClassifierItem.ClassifierVersion(it))
             }
         }
     }
@@ -66,17 +65,17 @@ class ClassifierLoadAdapter(
         when (holder.itemViewType) {
             VERSION_ITEM -> {
                 val versionItem = (classifierStateModelList[position] as ClassifierItem.ClassifierVersion)
-                (holder as ClassifierVersionViewHolder).modelVersion.text = versionItem.version
+                (holder as ClassifierVersionViewHolder).modelVersion.text = versionItem.classifier.version
                 holder.modelVersion.apply {
-                    val installedVersion = classifierVersion[versionItem.parent]
+                    val installedVersion = classifierVersion[versionItem.classifier.name]
                     holder.modelInstalled.text = context.getString(R.string.installed_software, installedVersion)
                     if (!needLoading) {
-                        if (installedVersion != null && calculateVersionValue(installedVersion) >= calculateVersionValue(versionItem.version)) {
+                        if (installedVersion != null && calculateVersionValue(installedVersion) >= calculateVersionValue(versionItem.classifier.version)) {
                             holder.modelSendButton.visibility = View.GONE
                             holder.modelUpToDateText.visibility = View.VISIBLE
                         } else {
                             holder.modelSendButton.visibility = View.VISIBLE
-                            holder.modelSendButton.text = "update to ${versionItem.version}"
+                            holder.modelSendButton.text = "update to ${versionItem.classifier.version}"
                             holder.modelUpToDateText.visibility = View.GONE
                         }
                     }
@@ -136,7 +135,7 @@ class ClassifierLoadAdapter(
 
 sealed class ClassifierItem {
     data class ClassifierHeader(val name: String) : ClassifierItem()
-    data class ClassifierVersion(val parent: String, val version: String, val path: String) : ClassifierItem()
+    data class ClassifierVersion(val classifier: Classifier) : ClassifierItem()
 }
 
 interface ChildrenClickedListener {

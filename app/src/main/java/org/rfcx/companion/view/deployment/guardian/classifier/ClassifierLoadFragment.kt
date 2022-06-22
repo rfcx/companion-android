@@ -10,12 +10,16 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_classifier.*
 import kotlinx.android.synthetic.main.fragment_software_update.nextButton
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.FileSocketManager
 import org.rfcx.companion.connection.socket.GuardianSocketManager
-import org.rfcx.companion.entity.Classifier
+import org.rfcx.companion.entity.guardian.Classifier
+import org.rfcx.companion.localdb.ClassifierDb
+import org.rfcx.companion.util.RealmHelper
+import org.rfcx.companion.util.file.ClassifierUtils
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 
 class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
@@ -68,38 +72,38 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
         }
 
         GuardianSocketManager.pingBlob.observe(
-            viewLifecycleOwner,
-            Observer {
-                requireActivity().runOnUiThread {
-//                    deploymentProtocol?.getSoftwareVersion()?.let {
-//                        classifierLoadAdapter?.classifierVersion = it
-//                        classifierLoadAdapter?.notifyDataSetChanged()
-//
-//                        selectedFile?.let { selected ->
-//                            val selectedVersion = selected.version
-//                            val installedVersion = it[selected.parent]
-//                            if (installedVersion != null && calculateVersionValue(installedVersion) == calculateVersionValue(selectedVersion)) {
-//                                classifierLoadAdapter?.hideLoading()
-//                                nextButton.isEnabled = true
-//
-//                                stopTimer()
-//                            }
-//                        }
-//                    }
+            viewLifecycleOwner
+        ) {
+            requireActivity().runOnUiThread {
+                deploymentProtocol?.getSoftwareVersion()?.let {
+                    classifierLoadAdapter?.classifierVersion = it
+                    classifierLoadAdapter?.notifyDataSetChanged()
+
+                    selectedFile?.let { selected ->
+                        val selectedVersion = selected.classifier.version
+                        val installedVersion = it[selected.classifier.version]
+                        if (installedVersion != null && installedVersion == selectedVersion) {
+                            classifierLoadAdapter?.hideLoading()
+                            nextButton.isEnabled = true
+
+                            stopTimer()
+                        }
+                    }
                 }
             }
-        )
+        }
 
         nextButton.setOnClickListener {
             deploymentProtocol?.nextStep()
         }
 
-//        val softwares = APKUtils.getAllDownloadedSoftwaresWithType(requireContext())
-//        if (softwares.isNullOrEmpty()) {
-//            noSoftwareText.visibility = View.VISIBLE
-//        } else {
-//            populateAdapterWithInfo(softwares)
-//        }
+        val db = ClassifierDb(Realm.getInstance(RealmHelper.migrationConfig()))
+        val classifiers = db.getAll()
+        if (classifiers.isNullOrEmpty()) {
+            noClassifierText.visibility = View.VISIBLE
+        } else {
+            populateAdapterWithInfo(classifiers)
+        }
     }
 
     private fun startTimer() {
@@ -130,7 +134,7 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
 
     override fun onItemClick(selectedClassifier: ClassifierItem.ClassifierVersion) {
         selectedFile = selectedClassifier
-        FileSocketManager.sendFile(selectedClassifier.path)
+        FileSocketManager.sendFile(selectedClassifier.classifier)
         nextButton.isEnabled = false
         startTimer()
     }
