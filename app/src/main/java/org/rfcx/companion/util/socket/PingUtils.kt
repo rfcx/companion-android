@@ -5,6 +5,7 @@ import androidx.preference.Preference
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import org.rfcx.companion.entity.guardian.ClassifierPing
 import org.rfcx.companion.entity.socket.response.*
 import org.rfcx.companion.util.prefs.GuardianPlan
 import org.rfcx.companion.util.prefs.PrefsUtils
@@ -65,9 +66,24 @@ object PingUtils {
             splitSentinelPower.forEach {
                 val splittedItem = it.split("*")
                 when (splittedItem[0]) {
-                    "system" -> system = SentinelSystem(splittedItem[2].toInt(), splittedItem[3].toInt(), splittedItem[4].toInt(), splittedItem[5].toInt())
-                    "input" -> input = SentinelInput(splittedItem[2].toInt(), splittedItem[3].toInt(), splittedItem[4].toInt(), splittedItem[5].toInt())
-                    "battery" -> batt = SentinelBattery(splittedItem[2].toInt(), splittedItem[3].toInt(), splittedItem[4].toDouble(), splittedItem[5].toInt())
+                    "system" -> system = SentinelSystem(
+                        splittedItem[2].toInt(),
+                        splittedItem[3].toInt(),
+                        splittedItem[4].toInt(),
+                        splittedItem[5].toInt()
+                    )
+                    "input" -> input = SentinelInput(
+                        splittedItem[2].toInt(),
+                        splittedItem[3].toInt(),
+                        splittedItem[4].toInt(),
+                        splittedItem[5].toInt()
+                    )
+                    "battery" -> batt = SentinelBattery(
+                        splittedItem[2].toInt(),
+                        splittedItem[3].toInt(),
+                        splittedItem[4].toDouble(),
+                        splittedItem[5].toInt()
+                    )
                 }
             }
         } catch (e: NumberFormatException) {
@@ -156,29 +172,79 @@ object PingUtils {
         return timezone.asString
     }
 
+    fun getClassifiers(ping: GuardianPing?): Map<String, ClassifierPing>? {
+        val library = ping?.library ?: return null
+        library.let { lib ->
+            if (lib.has("classifiers")) {
+                val classifiers = lib.get("classifiers").asJsonArray
+                if (classifiers.size() > 0) {
+                    val map = mutableMapOf<String, ClassifierPing>()
+                    classifiers.map { clsf ->
+                        ClassifierPing(
+                            id = clsf.asJsonObject.get("id").asString,
+                            name = clsf.asJsonObject.get("guid").asString.split("-v")[0],
+                            version = clsf.asJsonObject.get("guid").asString.split("-v")[1]
+                        )
+                    }.forEach { clsf ->
+                        map[clsf.id] = clsf
+                    }
+                    return map
+                }
+                return null
+            }
+            return null
+        }
+    }
+
+    fun getActiveClassifiers(ping: GuardianPing?): Map<String, ClassifierPing>? {
+        val library = ping?.activeClassifier ?: return null
+        library.let { lib ->
+            val activeClassifiers = lib.asJsonArray
+            if (activeClassifiers.size() > 0) {
+                val map = mutableMapOf<String, ClassifierPing>()
+                activeClassifiers.map { clsf ->
+                    ClassifierPing(
+                        id = clsf.asJsonObject.get("id").asString,
+                        name = clsf.asJsonObject.get("guid").asString.split("-v")[0],
+                        version = clsf.asJsonObject.get("guid").asString.split("-v")[1]
+                    )
+                }.forEach { clsf ->
+                    map[clsf.id] = clsf
+                }
+                return map
+            }
+            return null
+        }
+    }
+
     fun getSpeedTest(ping: AdminPing?): SpeedTest? {
         val speedTest = ping?.companion?.get("speed_test")?.asJsonObject ?: return null
         val downloadSpeed = speedTest.get("download_speed").asDouble
         val uploadSpeed = speedTest.get("upload_speed").asDouble
         val isFailed = speedTest.get("is_failed").asBoolean
-        val isTesting = if (speedTest.has("is_testing")) speedTest.get("is_testing").asBoolean else false
+        val isTesting =
+            if (speedTest.has("is_testing")) speedTest.get("is_testing").asBoolean else false
         val hasConnection = speedTest.get("connection_available").asBoolean
         return SpeedTest(downloadSpeed, uploadSpeed, isFailed, isTesting, hasConnection)
     }
 
     fun getSimDetectedFromPing(adminPing: AdminPing?): Boolean? {
-        return adminPing?.companion?.get("sim_info")?.asJsonObject?.get("has_sim")?.asBoolean ?: return null
+        return adminPing?.companion?.get("sim_info")?.asJsonObject?.get("has_sim")?.asBoolean
+            ?: return null
     }
 
     fun getGPSDetectedFromPing(adminPing: AdminPing?): Boolean? {
-        return adminPing?.companion?.get("sat_info")?.asJsonObject?.get("is_gps_connected")?.asBoolean ?: return null
+        return adminPing?.companion?.get("sat_info")?.asJsonObject?.get("is_gps_connected")?.asBoolean
+            ?: return null
     }
 
     fun getPhoneNumberFromPing(adminPing: AdminPing?): String? {
-        return adminPing?.companion?.get("sim_info")?.asJsonObject?.get("phone_number")?.asString ?: return null
+        return adminPing?.companion?.get("sim_info")?.asJsonObject?.get("phone_number")?.asString
+            ?: return null
     }
 
     fun getSwarmIdFromPing(adminPing: AdminPing?): String? {
-        return adminPing?.companion?.get("sat_info")?.asJsonObject?.get("sat_id")?.asString ?: return null
+        return adminPing?.companion?.get("sat_info")?.asJsonObject?.get("sat_id")?.asString
+            ?: return null
     }
 }

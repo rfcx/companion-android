@@ -25,6 +25,7 @@ import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.connection.wifi.WifiHotspotManager
 import org.rfcx.companion.connection.wifi.WifiLostListener
 import org.rfcx.companion.entity.*
+import org.rfcx.companion.entity.guardian.ClassifierPing
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.socket.response.GuardianPing
 import org.rfcx.companion.entity.socket.response.I2CAccessibility
@@ -92,6 +93,8 @@ class GuardianDeploymentActivity :
     private var speedTest: SpeedTest? = null
     private var guardianLocalTime: Long? = null
     private var guardianTimezone: String? = null
+    private var classifiers: Map<String, ClassifierPing>? = null
+    private var activeClassifiers: Map<String, ClassifierPing>? = null
 
     private var _sampleRate = 12000
 
@@ -265,6 +268,8 @@ class GuardianDeploymentActivity :
             guardianLocalTime = PingUtils.getGuardianLocalTime(it)
             guardianTimezone = PingUtils.getGuardianTimezone(it)
             _sampleRate = PingUtils.getSampleRateFromPrefs(it) ?: 12000
+            classifiers = PingUtils.getClassifiers(it)
+            activeClassifiers = PingUtils.getActiveClassifiers(it)
         }
         AdminSocketManager.pingBlob.observeForever {
             network = PingUtils.getNetworkFromPing(it)
@@ -373,6 +378,10 @@ class GuardianDeploymentActivity :
     override fun getGuardianLocalTime(): Long? = guardianLocalTime
 
     override fun getGuardianTimezone(): String? = guardianTimezone
+
+    override fun getClassifiers(): Map<String, ClassifierPing>? = classifiers
+
+    override fun getActiveClassifiers(): Map<String, ClassifierPing>? = activeClassifiers
 
     override fun getCurrentProjectId(): String? {
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)

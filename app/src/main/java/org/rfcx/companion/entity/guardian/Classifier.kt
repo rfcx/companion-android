@@ -60,3 +60,9 @@ open class Classifier(
         const val FIELD_CLASSIFICATION_FILTER_THRESHOLD = "classificationsFilterThreshold"
     }
 }
+
+data class ClassifierPing(
+    val id: String,
+    val name: String,
+    val version: String
+)

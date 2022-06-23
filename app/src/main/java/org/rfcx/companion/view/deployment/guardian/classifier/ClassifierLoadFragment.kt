@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.realm.Realm
@@ -17,9 +16,9 @@ import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.FileSocketManager
 import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.entity.guardian.Classifier
+import org.rfcx.companion.entity.guardian.ClassifierPing
 import org.rfcx.companion.localdb.ClassifierDb
 import org.rfcx.companion.util.RealmHelper
-import org.rfcx.companion.util.file.ClassifierUtils
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 
 class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
@@ -75,20 +74,25 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
             viewLifecycleOwner
         ) {
             requireActivity().runOnUiThread {
-                deploymentProtocol?.getSoftwareVersion()?.let {
+                val classifiers = deploymentProtocol?.getClassifiers()
+                classifiers?.let {
                     classifierLoadAdapter?.classifierVersion = it
                     classifierLoadAdapter?.notifyDataSetChanged()
-
                     selectedFile?.let { selected ->
-                        val selectedVersion = selected.classifier.version
-                        val installedVersion = it[selected.classifier.version]
-                        if (installedVersion != null && installedVersion == selectedVersion) {
+                        val selectedVersion = selected.classifier
+                        val installedVersion = it[selected.classifier.id]
+                        if (installedVersion != null && installedVersion.id == selectedVersion.id) {
                             classifierLoadAdapter?.hideLoading()
                             nextButton.isEnabled = true
 
                             stopTimer()
                         }
                     }
+                }
+                val activeClassifiers = deploymentProtocol?.getActiveClassifiers()
+                activeClassifiers?.let {
+                    classifierLoadAdapter?.activeClassifierVersion = it
+                    classifierLoadAdapter?.notifyDataSetChanged()
                 }
             }
         }
@@ -137,5 +141,11 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
         FileSocketManager.sendFile(selectedClassifier.classifier)
         nextButton.isEnabled = false
         startTimer()
+    }
+
+    override fun onActiveClick(selectedClassifier: ClassifierPing) {
+    }
+
+    override fun onDeActiveClick(selectedClassifier: ClassifierPing) {
     }
 }

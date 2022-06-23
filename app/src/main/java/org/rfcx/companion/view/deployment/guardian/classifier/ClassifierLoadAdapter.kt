@@ -1,5 +1,6 @@
 package org.rfcx.companion.view.deployment.guardian.classifier
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,11 +8,16 @@ import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.expandable_child_item.view.*
+import kotlinx.android.synthetic.main.classifier_item.view.*
+import kotlinx.android.synthetic.main.expandable_child_item.view.country_item_child_container
+import kotlinx.android.synthetic.main.expandable_child_item.view.fileLoading
+import kotlinx.android.synthetic.main.expandable_child_item.view.fileSendButton
+import kotlinx.android.synthetic.main.expandable_child_item.view.fileUpToDateTextView
+import kotlinx.android.synthetic.main.expandable_child_item.view.fileVersionTextView
 import kotlinx.android.synthetic.main.expandable_parent_item.view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.guardian.Classifier
-import org.rfcx.companion.util.file.APKUtils.calculateVersionValue
+import org.rfcx.companion.entity.guardian.ClassifierPing
 
 class ClassifierLoadAdapter(
     private var childrenClickedListener: ChildrenClickedListener,
@@ -25,7 +31,8 @@ class ClassifierLoadAdapter(
 
     private var classifierStateModelList = mutableListOf<ClassifierItem>()
 
-    var classifierVersion = mapOf<String, String>()
+    var classifierVersion = mapOf<String, ClassifierPing>()
+    var activeClassifierVersion = mapOf<String, ClassifierPing>()
 
     private var needLoading = false
 
@@ -44,7 +51,7 @@ class ClassifierLoadAdapter(
             VERSION_ITEM -> {
                 ClassifierVersionViewHolder(
                     LayoutInflater.from(parent.context).inflate(
-                        R.layout.expandable_child_item, parent, false
+                        R.layout.classifier_item, parent, false
                     )
                 )
             }
@@ -64,36 +71,72 @@ class ClassifierLoadAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder.itemViewType) {
             VERSION_ITEM -> {
-                val versionItem = (classifierStateModelList[position] as ClassifierItem.ClassifierVersion)
-                (holder as ClassifierVersionViewHolder).modelVersion.text = versionItem.classifier.version
-                holder.modelVersion.apply {
-                    val installedVersion = classifierVersion[versionItem.classifier.name]
-                    holder.modelInstalled.text = context.getString(R.string.installed_software, installedVersion)
-                    if (!needLoading) {
-                        if (installedVersion != null && calculateVersionValue(installedVersion) >= calculateVersionValue(versionItem.classifier.version)) {
-                            holder.modelSendButton.visibility = View.GONE
-                            holder.modelUpToDateText.visibility = View.VISIBLE
-                        } else {
-                            holder.modelSendButton.visibility = View.VISIBLE
-                            holder.modelSendButton.text = "update to ${versionItem.classifier.version}"
-                            holder.modelUpToDateText.visibility = View.GONE
-                        }
+                val versionItem =
+                    (classifierStateModelList[position] as ClassifierItem.ClassifierVersion)
+                (holder as ClassifierVersionViewHolder).modelVersion.text =
+                    "version ${versionItem.classifier.version}"
+
+                val installedVersion =
+                    classifierVersion[versionItem.classifier.id]
+
+                if (!needLoading) {
+                    if (installedVersion != null && installedVersion.version.toInt() >= versionItem.classifier.version.toInt()) {
+                        holder.modelSendButton.visibility = View.INVISIBLE
+                        holder.modelUpToDateText.visibility = View.VISIBLE
+                    } else {
+                        holder.modelSendButton.visibility = View.VISIBLE
+                        holder.modelSendButton.text =
+                            "load version ${versionItem.classifier.version}"
+                        holder.modelUpToDateText.visibility = View.GONE
                     }
                 }
 
-                holder.modelSendButton.isEnabled = !needLoading
+                if (installedVersion != null) {
+                    val activeInstalled = activeClassifierVersion[installedVersion.id]
+                    Log.d("COMPANION", activeClassifierVersion.keys.toString() + activeClassifierVersion.values.toString())
+                    if (activeInstalled != null) {
+                        holder.modelUpToDateText.visibility = View.GONE
+                        holder.modelDeActiveButton.visibility = View.VISIBLE
+                        holder.modelActiveButton.visibility = View.GONE
+                    } else {
+                        holder.modelUpToDateText.visibility = View.GONE
+                        holder.modelDeActiveButton.visibility = View.GONE
+                        holder.modelActiveButton.visibility = View.VISIBLE
+                    }
+                }
+
                 if (!needLoading && holder.modelLoading.visibility == View.VISIBLE) {
                     holder.modelLoading.visibility = View.GONE
                 }
+
+                holder.modelSendButton.isEnabled = !needLoading
                 holder.modelSendButton.setOnClickListener {
                     showLoading()
                     it.visibility = View.GONE
-                    holder.modelLoading.visibility = View.VISIBLE
+                    holder.showLoading()
                     childrenClickedListener.onItemClick(versionItem)
                 }
+
+                holder.modelActiveButton.isEnabled = !needLoading
+                holder.modelActiveButton.setOnClickListener {
+                    showLoading()
+                    it.visibility = View.GONE
+                    holder.showLoading()
+                    childrenClickedListener.onActiveClick(installedVersion!!)
+                }
+
+                holder.modelDeActiveButton.isEnabled = !needLoading
+                holder.modelDeActiveButton.setOnClickListener {
+                    showLoading()
+                    it.visibility = View.GONE
+                    holder.showLoading()
+                    childrenClickedListener.onDeActiveClick(installedVersion!!)
+                }
+
             }
             else -> {
-                val headerItem = (classifierStateModelList[position] as ClassifierItem.ClassifierHeader)
+                val headerItem =
+                    (classifierStateModelList[position] as ClassifierItem.ClassifierHeader)
                 (holder as ClassifierHeaderViewHolder).modelName.text = headerItem.name
             }
         }
@@ -126,10 +169,19 @@ class ClassifierLoadAdapter(
     class ClassifierVersionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal var layout = itemView.country_item_child_container
         internal var modelVersion: TextView = itemView.fileVersionTextView
-        internal var modelInstalled: TextView = itemView.fileInstalledVersionTextView
         internal var modelSendButton: Button = itemView.fileSendButton
         internal var modelUpToDateText: TextView = itemView.fileUpToDateTextView
         internal var modelLoading: ProgressBar = itemView.fileLoading
+        internal var modelActiveButton: Button = itemView.classifierActivateButton
+        internal var modelDeActiveButton: Button = itemView.classifierDeActivateButton
+
+        fun showLoading() {
+            modelLoading.visibility = View.VISIBLE
+        }
+
+        fun hideLoading() {
+            modelLoading.visibility = View.GONE
+        }
     }
 }
 
@@ -140,4 +192,6 @@ sealed class ClassifierItem {
 
 interface ChildrenClickedListener {
     fun onItemClick(selectedClassifier: ClassifierItem.ClassifierVersion)
+    fun onActiveClick(selectedClassifier: ClassifierPing)
+    fun onDeActiveClick(selectedClassifier: ClassifierPing)
 }

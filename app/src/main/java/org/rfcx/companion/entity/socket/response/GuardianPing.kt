@@ -1,6 +1,8 @@
 package org.rfcx.companion.entity.socket.response
 
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.google.gson.annotations.SerializedName
 
 data class GuardianPing(
     val prefs: JsonObject? = null,
@@ -9,5 +11,8 @@ data class GuardianPing(
     val instructions: JsonObject? = null,
     val companion: JsonObject? = null,
     val swm: String? = null,
-    val battery: String? = null
+    val battery: String? = null,
+    val library: JsonObject? = null,
+    @SerializedName("active-classifier")
+    val activeClassifier: JsonArray? = null,
 )
