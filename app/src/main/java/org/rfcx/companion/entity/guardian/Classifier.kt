@@ -1,5 +1,6 @@
 package org.rfcx.companion.entity.guardian
 
+import com.google.android.datatransport.cct.StringMerger
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
@@ -65,4 +66,9 @@ data class ClassifierPing(
     val id: String,
     val name: String,
     val version: String
+)
+
+data class ClassifierSet(
+    val type: String,
+    val id: String
 )

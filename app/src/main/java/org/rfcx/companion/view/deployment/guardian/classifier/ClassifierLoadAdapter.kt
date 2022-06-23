@@ -93,15 +93,16 @@ class ClassifierLoadAdapter(
 
                 if (installedVersion != null) {
                     val activeInstalled = activeClassifierVersion[installedVersion.id]
-                    Log.d("COMPANION", activeClassifierVersion.keys.toString() + activeClassifierVersion.values.toString())
-                    if (activeInstalled != null) {
-                        holder.modelUpToDateText.visibility = View.GONE
-                        holder.modelDeActiveButton.visibility = View.VISIBLE
-                        holder.modelActiveButton.visibility = View.GONE
-                    } else {
-                        holder.modelUpToDateText.visibility = View.GONE
-                        holder.modelDeActiveButton.visibility = View.GONE
-                        holder.modelActiveButton.visibility = View.VISIBLE
+                    if (!needLoading) {
+                        if (activeInstalled != null) {
+                            holder.modelUpToDateText.visibility = View.GONE
+                            holder.modelDeActiveButton.visibility = View.VISIBLE
+                            holder.modelActiveButton.visibility = View.GONE
+                        } else {
+                            holder.modelUpToDateText.visibility = View.GONE
+                            holder.modelDeActiveButton.visibility = View.GONE
+                            holder.modelActiveButton.visibility = View.VISIBLE
+                        }
                     }
                 }
 
@@ -120,7 +121,7 @@ class ClassifierLoadAdapter(
                 holder.modelActiveButton.isEnabled = !needLoading
                 holder.modelActiveButton.setOnClickListener {
                     showLoading()
-                    it.visibility = View.GONE
+                    holder.modelActiveButton.visibility = View.GONE
                     holder.showLoading()
                     childrenClickedListener.onActiveClick(installedVersion!!)
                 }
@@ -128,7 +129,7 @@ class ClassifierLoadAdapter(
                 holder.modelDeActiveButton.isEnabled = !needLoading
                 holder.modelDeActiveButton.setOnClickListener {
                     showLoading()
-                    it.visibility = View.GONE
+                    holder.modelDeActiveButton.visibility = View.GONE
                     holder.showLoading()
                     childrenClickedListener.onDeActiveClick(installedVersion!!)
                 }
