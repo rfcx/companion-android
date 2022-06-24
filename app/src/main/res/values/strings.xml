@@ -480,6 +480,7 @@
     <string name="cell">cell</string>
     <string name="swarm">swarm</string>
     <string name="download_softwares_from_guardian_softwares_page_first">Download softwares from Guardian softwares page first\nProfile -> Guardian software -> Download APKs you needed</string>
+    <string name="download_classifiers_from_guardian_classifier_page_first">Download classifiers from Guardian classifier page first\nProfile -> Classifier -> Download Classifiers you needed</string>
     <string name="ibattery_p">Internal Battery</string>
     <string name="mbattery_p">Main Battery</string>
     <string name="in_queue">In queue</string>
@@ -537,4 +538,6 @@
     <string name="incorrect_username_or_password">Incorrect email or password.</string>
     <string name="firebase_authentication_failed">Firebase authentication failed. Please try again.</string>
     <string name="dismiss">dismiss</string>
+    <string name="classifier">Classifier</string>
+    <string name="not_found_classifier_local">not found classifier(local)</string>
 </resources>

@@ -16,6 +16,8 @@ import org.rfcx.companion.view.detail.DeploymentDetailRepository
 import org.rfcx.companion.view.detail.DeploymentDetailViewModel
 import org.rfcx.companion.view.detail.EditLocationRepository
 import org.rfcx.companion.view.detail.EditLocationViewModel
+import org.rfcx.companion.view.profile.classifier.repository.GuardianClassifierRepository
+import org.rfcx.companion.view.profile.classifier.viewmodel.GuardianClassifierViewModel
 import org.rfcx.companion.view.profile.guardiansoftware.repository.GuardianSoftwareRepository
 import org.rfcx.companion.view.profile.guardiansoftware.viewmodel.GuardianSoftwareViewModel
 import org.rfcx.companion.view.profile.offlinemap.ProjectOfflineMapRepository
@@ -40,7 +42,10 @@ class ViewModelFactory(
                 ) as T
             }
             modelClass.isAssignableFrom(MainViewModel::class.java) -> {
-                return MainViewModel(application, MainRepository(deviceApiHelper, localDataHelper)) as T
+                return MainViewModel(
+                    application,
+                    MainRepository(deviceApiHelper, localDataHelper)
+                ) as T
             }
             modelClass.isAssignableFrom(ProjectOfflineMapViewModel::class.java) -> {
                 return ProjectOfflineMapViewModel(
@@ -49,16 +54,28 @@ class ViewModelFactory(
                 ) as T
             }
             modelClass.isAssignableFrom(GuardianSoftwareViewModel::class.java) -> {
-                return GuardianSoftwareViewModel(application, GuardianSoftwareRepository(coreApiHelper)) as T
+                return GuardianSoftwareViewModel(
+                    application,
+                    GuardianSoftwareRepository(coreApiHelper)
+                ) as T
             }
             modelClass.isAssignableFrom(LoginViewModel::class.java) -> {
-                return LoginViewModel(application, LoginRepository(deviceApiHelper, localDataHelper)) as T
+                return LoginViewModel(
+                    application,
+                    LoginRepository(deviceApiHelper, localDataHelper)
+                ) as T
             }
             modelClass.isAssignableFrom(AudioMothDeploymentViewModel::class.java) -> {
-                return AudioMothDeploymentViewModel(application, AudioMothDeploymentRepository(deviceApiHelper, localDataHelper)) as T
+                return AudioMothDeploymentViewModel(
+                    application,
+                    AudioMothDeploymentRepository(deviceApiHelper, localDataHelper)
+                ) as T
             }
             modelClass.isAssignableFrom(DeploymentDetailViewModel::class.java) -> {
-                return DeploymentDetailViewModel(application, DeploymentDetailRepository(deviceApiHelper, localDataHelper)) as T
+                return DeploymentDetailViewModel(
+                    application,
+                    DeploymentDetailRepository(deviceApiHelper, localDataHelper)
+                ) as T
             }
             modelClass.isAssignableFrom(UnsyncedDeploymentViewModel::class.java) -> {
                 return UnsyncedDeploymentViewModel(
@@ -67,7 +84,16 @@ class ViewModelFactory(
                 ) as T
             }
             modelClass.isAssignableFrom(EditLocationViewModel::class.java) -> {
-                return EditLocationViewModel(application, EditLocationRepository(deviceApiHelper, localDataHelper)) as T
+                return EditLocationViewModel(
+                    application,
+                    EditLocationRepository(deviceApiHelper, localDataHelper)
+                ) as T
+            }
+            modelClass.isAssignableFrom(EditLocationViewModel::class.java) -> {
+                return GuardianClassifierViewModel(
+                    application,
+                    GuardianClassifierRepository(coreApiHelper, localDataHelper)
+                ) as T
             }
             else -> throw IllegalArgumentException("Unknown class name")
         }

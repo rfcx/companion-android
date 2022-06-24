@@ -1,7 +1,10 @@
 package org.rfcx.companion.localdb
 
+import androidx.lifecycle.LiveData
 import io.realm.Realm
 import org.rfcx.companion.entity.guardian.Classifier
+import org.rfcx.companion.util.RealmLiveData
+import org.rfcx.companion.util.asLiveData
 
 class ClassifierDb(private val realm: Realm) {
 
@@ -34,6 +37,12 @@ class ClassifierDb(private val realm: Realm) {
         val classifiers = realm.where(Classifier::class.java)
             .findAll()
         return realm.copyFromRealm(classifiers)
+    }
+
+    fun getAllAsLiveData(): RealmLiveData<Classifier> {
+        val classifiers = realm.where(Classifier::class.java)
+            .findAll()
+        return classifiers.asLiveData()
     }
 
     fun insert(classifier: Classifier) {

@@ -1,6 +1,5 @@
 package org.rfcx.companion.view.deployment.guardian.classifier
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup

@@ -83,6 +83,10 @@ class ProfileFragment : Fragment() {
             context?.let { it1 -> GuardianSoftwareActivity.startActivity(it1) }
         }
 
+        classifierTextView.setOnClickListener {
+            context?.let { it1 -> GuardianSoftwareActivity.startActivity(it1) }
+        }
+
         coordinatesLinearLayout.setOnClickListener {
             context?.let { it1 -> CoordinatesActivity.startActivity(it1) }
         }

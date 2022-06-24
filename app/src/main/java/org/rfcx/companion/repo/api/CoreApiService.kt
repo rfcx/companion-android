@@ -1,6 +1,7 @@
 package org.rfcx.companion.repo.api
 
 import okhttp3.ResponseBody
+import org.rfcx.companion.entity.response.GuardianClassifierResponse
 import org.rfcx.companion.entity.response.GuardianSoftwareResponse
 import retrofit2.Call
 import retrofit2.http.GET
@@ -13,6 +14,11 @@ interface CoreApiService {
         @Header("Authorization") authUser: String
     ): Call<List<GuardianSoftwareResponse>>
 
+    @GET("")
+    fun checkAvailableClassifiers(
+        @Header("Authorization") authUser: String
+    ): Call<List<GuardianClassifierResponse>>
+
     @GET
-    fun downloadAPK(@Url url: String): Call<ResponseBody>
+    fun downloadFile(@Url url: String): Call<ResponseBody>
 }
