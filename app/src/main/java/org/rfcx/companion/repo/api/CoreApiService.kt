@@ -14,11 +14,6 @@ interface CoreApiService {
         @Header("Authorization") authUser: String
     ): Call<List<GuardianSoftwareResponse>>
 
-    @GET("")
-    fun checkAvailableClassifiers(
-        @Header("Authorization") authUser: String
-    ): Call<List<GuardianClassifierResponse>>
-
     @GET
     fun downloadFile(@Url url: String): Call<ResponseBody>
 }

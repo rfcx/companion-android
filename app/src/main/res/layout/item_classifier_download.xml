@@ -36,7 +36,16 @@
         android:text="@string/not_found_classifier_local"
         app:layout_constraintBottom_toBottomOf="@id/classifierName"
         app:layout_constraintStart_toEndOf="@id/guidelineVertical"
-        app:layout_constraintTop_toTopOf="@id/classifierName" />
+        app:layout_constraintTop_toTopOf="@id/classifierName"
+        app:layout_constraintEnd_toStartOf="@id/guidelineVertical2"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineVertical2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="114dp"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/classifierDeleteButton"
@@ -65,6 +74,15 @@
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/classifierName"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/classifierName" />
+
+    <ProgressBar
+        android:id="@+id/downloadLoading"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        app:layout_constraintBottom_toBottomOf="@id/classifierName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/guidelineVertical2"
         app:layout_constraintTop_toTopOf="@id/classifierName" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

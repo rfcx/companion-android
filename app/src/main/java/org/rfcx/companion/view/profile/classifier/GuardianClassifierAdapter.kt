@@ -1,5 +1,6 @@
 package org.rfcx.companion.view.profile.classifier
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,23 +23,30 @@ class GuardianClassifierAdapter(private val listener: ClassifierListener): Recyc
     var downloadedClassifiers: List<Classifier> = listOf()
         set(value) {
             field = value
-            notifyDataSetChanged()
         }
+
+    var needLoading = false
+    var selected = -1
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
     ): GuardianClassifierViewHolder {
         val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.item_unsynced_deployment, parent, false)
-        return GuardianClassifierViewHolder(view)    }
+            LayoutInflater.from(parent.context).inflate(R.layout.item_classifier_download, parent, false)
+        return GuardianClassifierViewHolder(view)
+    }
 
     override fun onBindViewHolder(holder: GuardianClassifierViewHolder, position: Int) {
         holder.bind(availableClassifiers[position])
         holder.deleteButton.setOnClickListener {
+            selected = position
             listener.onDeleteClicked(availableClassifiers[position].file as GuardianClassifierResponse)
         }
         holder.downloadButton.setOnClickListener {
+            selected = position
+            needLoading = true
+            notifyDataSetChanged()
             listener.onDownloadClicked(availableClassifiers[position].file as GuardianClassifierResponse)
         }
     }
@@ -50,6 +58,7 @@ class GuardianClassifierAdapter(private val listener: ClassifierListener): Recyc
         private val status = itemView.classifierStatus
         val downloadButton: Button = itemView.classifierDownloadButton
         val deleteButton: Button = itemView.classifierDeleteButton
+        private val loading = itemView.downloadLoading
 
         fun bind(file: File) {
             val classifier = (file.file as GuardianClassifierResponse)
@@ -58,23 +67,38 @@ class GuardianClassifierAdapter(private val listener: ClassifierListener): Recyc
             when(file.status) {
                 FileStatus.NOT_DOWNLOADED -> {
                     status.visibility = View.VISIBLE
+                    downloadButton.isEnabled = true
                     downloadButton.visibility = View.VISIBLE
                     deleteButton.visibility = View.GONE
                 }
                 FileStatus.NEED_UPDATE -> {
                     status.visibility = View.GONE
+                    downloadButton.isEnabled = true
                     downloadButton.visibility = View.VISIBLE
+                    deleteButton.isEnabled = true
                     deleteButton.visibility = View.VISIBLE
-                    deleteButton.text = "delete v${downloadedClassifier!!.version}"
                 }
                 FileStatus.UP_TO_DATE -> {
                     status.visibility = View.GONE
                     downloadButton.visibility = View.VISIBLE
                     downloadButton.isEnabled = false
                     downloadButton.text = itemView.context.getString(R.string.up_to_date)
+                    deleteButton.isEnabled = true
                     deleteButton.visibility = View.VISIBLE
                     deleteButton.text = "delete v${downloadedClassifier!!.version}"
                 }
+            }
+
+            if (needLoading && adapterPosition != selected) {
+                downloadButton.isEnabled = false
+                deleteButton.isEnabled = false
+                loading.visibility = View.GONE
+            } else if (needLoading && adapterPosition == selected) {
+                downloadButton.visibility = View.GONE
+                deleteButton.visibility = View.GONE
+                loading.visibility = View.VISIBLE
+            } else {
+                loading.visibility = View.GONE
             }
 
         }

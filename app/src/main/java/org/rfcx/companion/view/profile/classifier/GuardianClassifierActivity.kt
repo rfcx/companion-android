@@ -1,6 +1,9 @@
 package org.rfcx.companion.view.profile.classifier
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -23,7 +26,7 @@ import org.rfcx.companion.view.profile.classifier.viewmodel.GuardianClassifierVi
 class GuardianClassifierActivity : AppCompatActivity(), ClassifierListener {
 
     private lateinit var guardianClassifierViewModel: GuardianClassifierViewModel
-    private val adapter by lazy { GuardianClassifierAdapter(this) }
+    private val classifierAdapter by lazy { GuardianClassifierAdapter(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +38,7 @@ class GuardianClassifierActivity : AppCompatActivity(), ClassifierListener {
 
         classifierRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = adapter
+            adapter = classifierAdapter
         }
     }
 
@@ -69,8 +72,9 @@ class GuardianClassifierActivity : AppCompatActivity(), ClassifierListener {
                 Status.SUCCESS -> {
                     hideLoading()
                     res.data?.let { classifiers ->
-                        adapter.availableClassifiers = classifiers
-                        adapter.downloadedClassifiers = guardianClassifierViewModel.getDownloadedClassifiers() ?: listOf()
+                        classifierAdapter.availableClassifiers = classifiers
+                        classifierAdapter.downloadedClassifiers =
+                            guardianClassifierViewModel.getDownloadedClassifiers() ?: listOf()
                     }
                 }
                 Status.ERROR -> {
@@ -78,6 +82,31 @@ class GuardianClassifierActivity : AppCompatActivity(), ClassifierListener {
                     showToast(res.message ?: getString(R.string.error_has_occurred))
                 }
             }
+        }
+
+        guardianClassifierViewModel.getDownloadClassifier().observe(this) { res ->
+            when (res.status) {
+                Status.LOADING -> {}
+                Status.SUCCESS -> {
+                    classifierAdapter.needLoading = false
+                    classifierAdapter.selected = -1
+                    classifierAdapter.notifyDataSetChanged()
+                    res.data?.let { classifier ->
+                        guardianClassifierViewModel.saveClassifier(classifier)
+                    }
+                }
+                Status.ERROR -> {
+                    classifierAdapter.needLoading = false
+                    classifierAdapter.selected = -1
+                    classifierAdapter.notifyDataSetChanged()
+                    showToast(res.message ?: getString(R.string.error_has_occurred))
+                }
+            }
+        }
+
+        guardianClassifierViewModel.getDownloadedClassifiersLiveData().observe(this) { res ->
+            classifierAdapter.downloadedClassifiers = res
+            guardianClassifierViewModel.reCompareDownloadedClassifiersWithCacheResponse()
         }
     }
 
@@ -96,11 +125,23 @@ class GuardianClassifierActivity : AppCompatActivity(), ClassifierListener {
     }
 
     override fun onDownloadClicked(classifier: GuardianClassifierResponse) {
-        TODO("Not yet implemented")
+        guardianClassifierViewModel.downloadClassifier(classifier)
     }
 
     override fun onDeleteClicked(classifier: GuardianClassifierResponse) {
-        TODO("Not yet implemented")
+        guardianClassifierViewModel.deleteClassifier(classifier.id)
     }
 
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
+    }
+
+    companion object {
+
+        fun startActivity(context: Context) {
+            val intent = Intent(context, GuardianClassifierActivity::class.java)
+            context.startActivity(intent)
+        }
+    }
 }

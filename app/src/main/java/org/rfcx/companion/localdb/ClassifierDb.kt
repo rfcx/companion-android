@@ -50,4 +50,13 @@ class ClassifierDb(private val realm: Realm) {
             it.insertOrUpdate(classifier)
         }
     }
+
+    fun delete(id: String) {
+        realm.executeTransaction {
+            it.where(Classifier::class.java)
+                .equalTo(Classifier.FIELD_ID, id)
+                .findAll()
+                .deleteAllFromRealm()
+        }
+    }
 }

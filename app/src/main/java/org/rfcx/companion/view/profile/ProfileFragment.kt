@@ -20,6 +20,7 @@ import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.Theme
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.Preferences.Companion.DISPLAY_THEME
+import org.rfcx.companion.view.profile.classifier.GuardianClassifierActivity
 import org.rfcx.companion.view.profile.coordinates.CoordinatesActivity
 import org.rfcx.companion.view.profile.guardiansoftware.GuardianSoftwareActivity
 import org.rfcx.companion.view.profile.locationgroup.ProjectActivity
@@ -84,7 +85,7 @@ class ProfileFragment : Fragment() {
         }
 
         classifierTextView.setOnClickListener {
-            context?.let { it1 -> GuardianSoftwareActivity.startActivity(it1) }
+            context?.let { it1 -> GuardianClassifierActivity.startActivity(it1) }
         }
 
         coordinatesLinearLayout.setOnClickListener {

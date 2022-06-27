@@ -89,10 +89,10 @@ class ViewModelFactory(
                     EditLocationRepository(deviceApiHelper, localDataHelper)
                 ) as T
             }
-            modelClass.isAssignableFrom(EditLocationViewModel::class.java) -> {
+            modelClass.isAssignableFrom(GuardianClassifierViewModel::class.java) -> {
                 return GuardianClassifierViewModel(
                     application,
-                    GuardianClassifierRepository(coreApiHelper, localDataHelper)
+                    GuardianClassifierRepository(deviceApiHelper, localDataHelper)
                 ) as T
             }
             else -> throw IllegalArgumentException("Unknown class name")
