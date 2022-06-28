@@ -13,6 +13,7 @@ data class GuardianConfiguration(
 fun GuardianConfiguration.toListForGuardian(): String {
     val json = JsonObject().apply {
         addProperty(PrefsUtils.audioSampleRate, sampleRate)
+        addProperty(PrefsUtils.audioCastSampleRate, sampleRate)
         addProperty(PrefsUtils.audioBitrate, bitrate)
         addProperty(PrefsUtils.audioCodec, fileFormat)
         addProperty(PrefsUtils.audioDuration, duration)
