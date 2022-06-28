@@ -3,7 +3,6 @@ package org.rfcx.companion.view.deployment.guardian.classifier
 import android.content.Context
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,7 +17,7 @@ import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.FileSocketManager
 import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.entity.guardian.Classifier
-import org.rfcx.companion.entity.guardian.ClassifierPing
+import org.rfcx.companion.entity.guardian.ClassifierLite
 import org.rfcx.companion.entity.guardian.ClassifierSet
 import org.rfcx.companion.entity.socket.request.InstructionCommand
 import org.rfcx.companion.entity.socket.request.InstructionType
@@ -30,9 +29,11 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
     var classifierLoadAdapter: ClassifierLoadAdapter? = null
     private var selectedFile: ClassifierItem.ClassifierVersion? = null
-    private var selectedActivate: ClassifierPing? = null
-    private var selectedDeActivate: ClassifierPing? = null
+    private var selectedActivate: ClassifierLite? = null
+    private var selectedDeActivate: ClassifierLite? = null
     private var loadingTimer: CountDownTimer? = null
+
+    private val db by lazy { ClassifierDb(Realm.getInstance(RealmHelper.migrationConfig())) }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -51,7 +52,8 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
     private fun populateAdapterWithInfo(classifiers: List<Classifier>) {
         classifierLoadAdapter = ClassifierLoadAdapter(
             this,
-            classifiers
+            classifiers,
+            deploymentProtocol?.getClassifiers()
         )
         classifierLoadAdapter?.let {
             val layoutManager = LinearLayoutManager(context)
@@ -98,7 +100,6 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
                 val activeClassifiers = deploymentProtocol?.getActiveClassifiers()
                 if (activeClassifiers != null) {
                     classifierLoadAdapter?.activeClassifierVersion = activeClassifiers
-                    classifierLoadAdapter?.notifyDataSetChanged()
                     selectedActivate?.let { selected ->
                         val selectedId = selected.id
                         val activeId = activeClassifiers[selectedId]
@@ -116,10 +117,10 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
                             selectedDeActivate = null
                         }
                     }
+
                 } else if (selectedDeActivate != null) {
                     hideItemLoading()
                     classifierLoadAdapter?.activeClassifierVersion = mapOf()
-                    classifierLoadAdapter?.notifyDataSetChanged()
                     selectedDeActivate = null
                 }
             }
@@ -129,7 +130,6 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
             deploymentProtocol?.nextStep()
         }
 
-        val db = ClassifierDb(Realm.getInstance(RealmHelper.migrationConfig()))
         val classifiers = db.getAll()
         if (classifiers.isNullOrEmpty()) {
             noClassifierText.visibility = View.VISIBLE
@@ -172,18 +172,21 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
 
     override fun onItemClick(selectedClassifier: ClassifierItem.ClassifierVersion) {
         selectedFile = selectedClassifier
-        FileSocketManager.sendFile(selectedClassifier.classifier)
-        nextButton.isEnabled = false
-        startTimer()
+        val classifier = db.get(selectedClassifier.classifier.id)
+        classifier?.let {
+            FileSocketManager.sendFile(classifier)
+            nextButton.isEnabled = false
+            startTimer()
+        }
     }
 
-    override fun onActiveClick(selectedClassifier: ClassifierPing) {
+    override fun onActiveClick(selectedClassifier: ClassifierLite) {
         nextButton.isEnabled = false
         selectedActivate = selectedClassifier
         GuardianSocketManager.sendInstructionMessage(InstructionType.SET, InstructionCommand.CLASSIFIER, Gson().toJson(ClassifierSet("activate", selectedClassifier.id)))
     }
 
-    override fun onDeActiveClick(selectedClassifier: ClassifierPing) {
+    override fun onDeActiveClick(selectedClassifier: ClassifierLite) {
         nextButton.isEnabled = false
         selectedDeActivate = selectedClassifier
         GuardianSocketManager.sendInstructionMessage(InstructionType.SET, InstructionCommand.CLASSIFIER, Gson().toJson(ClassifierSet("deactivate", selectedClassifier.id)))

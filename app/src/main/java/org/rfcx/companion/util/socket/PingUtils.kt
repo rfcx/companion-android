@@ -5,7 +5,7 @@ import androidx.preference.Preference
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import org.rfcx.companion.entity.guardian.ClassifierPing
+import org.rfcx.companion.entity.guardian.ClassifierLite
 import org.rfcx.companion.entity.socket.response.*
 import org.rfcx.companion.util.prefs.GuardianPlan
 import org.rfcx.companion.util.prefs.PrefsUtils
@@ -172,15 +172,15 @@ object PingUtils {
         return timezone.asString
     }
 
-    fun getClassifiers(ping: GuardianPing?): Map<String, ClassifierPing>? {
+    fun getClassifiers(ping: GuardianPing?): Map<String, ClassifierLite>? {
         val library = ping?.library ?: return null
         library.let { lib ->
             if (lib.has("classifiers")) {
                 val classifiers = lib.get("classifiers").asJsonArray
                 if (classifiers.size() > 0) {
-                    val map = mutableMapOf<String, ClassifierPing>()
+                    val map = mutableMapOf<String, ClassifierLite>()
                     classifiers.map { clsf ->
-                        ClassifierPing(
+                        ClassifierLite(
                             id = clsf.asJsonObject.get("id").asString,
                             name = clsf.asJsonObject.get("guid").asString.split("-v")[0],
                             version = clsf.asJsonObject.get("guid").asString.split("-v")[1]
@@ -196,14 +196,14 @@ object PingUtils {
         }
     }
 
-    fun getActiveClassifiers(ping: GuardianPing?): Map<String, ClassifierPing>? {
+    fun getActiveClassifiers(ping: GuardianPing?): Map<String, ClassifierLite>? {
         val library = ping?.activeClassifier ?: return null
         library.let { lib ->
             val activeClassifiers = lib.asJsonArray
             if (activeClassifiers.size() > 0) {
-                val map = mutableMapOf<String, ClassifierPing>()
+                val map = mutableMapOf<String, ClassifierLite>()
                 activeClassifiers.map { clsf ->
-                    ClassifierPing(
+                    ClassifierLite(
                         id = clsf.asJsonObject.get("id").asString,
                         name = clsf.asJsonObject.get("guid").asString.split("-v")[0],
                         version = clsf.asJsonObject.get("guid").asString.split("-v")[1]

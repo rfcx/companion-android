@@ -62,7 +62,7 @@ open class Classifier(
     }
 }
 
-data class ClassifierPing(
+data class ClassifierLite(
     val id: String,
     val name: String,
     val version: String

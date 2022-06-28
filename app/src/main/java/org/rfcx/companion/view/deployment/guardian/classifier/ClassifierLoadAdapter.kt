@@ -16,11 +16,12 @@ import kotlinx.android.synthetic.main.expandable_child_item.view.fileVersionText
 import kotlinx.android.synthetic.main.expandable_parent_item.view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.guardian.Classifier
-import org.rfcx.companion.entity.guardian.ClassifierPing
+import org.rfcx.companion.entity.guardian.ClassifierLite
 
 class ClassifierLoadAdapter(
     private var childrenClickedListener: ChildrenClickedListener,
-    classifiers: List<Classifier>
+    classifiers: List<Classifier>,
+    installedClassifiers: Map<String, ClassifierLite>?
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -30,13 +31,14 @@ class ClassifierLoadAdapter(
 
     private var classifierStateModelList = mutableListOf<ClassifierItem>()
 
-    var classifierVersion = mapOf<String, ClassifierPing>()
-    var activeClassifierVersion = mapOf<String, ClassifierPing>()
+    var classifierVersion = mapOf<String, ClassifierLite>()
+    var activeClassifierVersion = mapOf<String, ClassifierLite>()
 
     private var needLoading = false
 
     init {
-        val classifierGrouped = classifiers.sortedBy { it.name }.groupBy { it.name }
+        val bothClassifiers = combineDownloadAndInstallClassifier(classifiers, installedClassifiers)
+        val classifierGrouped = bothClassifiers.sortedBy { it.name }.groupBy { it.name }
         classifierGrouped.forEach { clsf ->
             classifierStateModelList.add(ClassifierItem.ClassifierHeader(clsf.key))
             clsf.value.forEach {
@@ -142,6 +144,15 @@ class ClassifierLoadAdapter(
         }
     }
 
+    private fun combineDownloadAndInstallClassifier(downloads: List<Classifier>, installs: Map<String, ClassifierLite>?): List<ClassifierLite> {
+        if (installs != null) {
+            val installed = installs.map { ClassifierLite(it.value.id, it.value.name, it.value.version) }.filter { downloads.find { dwnl -> dwnl.id == it.id } == null }
+            val notInstalled = downloads.filter { installed.find { ins -> ins.id == it.id } == null }.map { ClassifierLite(it.id, it.name, it.version) }
+            return installed + notInstalled
+        }
+        return downloads.map { ClassifierLite(it.id, it.name, it.version) }
+    }
+
     fun showLoading() {
         needLoading = true
         notifyDataSetChanged()
@@ -187,11 +198,11 @@ class ClassifierLoadAdapter(
 
 sealed class ClassifierItem {
     data class ClassifierHeader(val name: String) : ClassifierItem()
-    data class ClassifierVersion(val classifier: Classifier) : ClassifierItem()
+    data class ClassifierVersion(val classifier: ClassifierLite) : ClassifierItem()
 }
 
 interface ChildrenClickedListener {
     fun onItemClick(selectedClassifier: ClassifierItem.ClassifierVersion)
-    fun onActiveClick(selectedClassifier: ClassifierPing)
-    fun onDeActiveClick(selectedClassifier: ClassifierPing)
+    fun onActiveClick(selectedClassifier: ClassifierLite)
+    fun onDeActiveClick(selectedClassifier: ClassifierLite)
 }

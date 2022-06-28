@@ -22,7 +22,7 @@ data class InstructionMessage(
 }
 
 data class Instruction(
-    val id: Int = Random.nextInt(1, 100),
+    val id: Int = Random.nextInt(1, 10000),
     val type: String,
     val cmd: String,
     val at: String = "",
