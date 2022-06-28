@@ -69,6 +69,7 @@ class GuardianClassifierAdapter(private val listener: ClassifierListener): Recyc
                     status.visibility = View.VISIBLE
                     downloadButton.isEnabled = true
                     downloadButton.visibility = View.VISIBLE
+                    downloadButton.text = itemView.context.getString(R.string.download)
                     deleteButton.visibility = View.GONE
                 }
                 FileStatus.NEED_UPDATE -> {

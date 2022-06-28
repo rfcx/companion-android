@@ -2,7 +2,6 @@ package org.rfcx.companion.view.profile.classifier.viewmodel
 
 import android.annotation.SuppressLint
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import okhttp3.ResponseBody
@@ -53,7 +52,6 @@ class GuardianClassifierViewModel(
                     response: Response<List<GuardianClassifierResponse>>
                 ) {
                     if (response.isSuccessful) {
-                        Log.d("Classifier", response.body().toString())
                         response.body()?.let { clsf ->
                             if (!clsf.isNullOrEmpty()) {
                                 cacheClassifiers = clsf
