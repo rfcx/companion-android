@@ -17,14 +17,17 @@
     <TextView
         android:id="@+id/classifierName"
         style="@style/AudioMothText.SubTitle"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"
         android:padding="@dimen/margin_padding_normal"
         android:textColor="@color/text_primary"
         android:textStyle="bold"
+        android:ellipsize="end"
+        android:maxLines="1"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/guidelineVertical"/>
 
     <TextView
         android:id="@+id/classifierStatus"
@@ -49,11 +52,10 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/classifierDeleteButton"
-        style="@style/GuardianButton.RedButton"
+        style="@style/ClassifierButton.DeActive"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
         android:layout_marginStart="@dimen/margin_padding_small"
-        android:minWidth="120dp"
         android:text="@string/delete_from_local"
         android:textSize="@dimen/text_xxsmall"
         android:visibility="gone"

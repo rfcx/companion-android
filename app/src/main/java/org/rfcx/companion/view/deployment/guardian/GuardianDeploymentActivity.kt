@@ -335,7 +335,7 @@ class GuardianDeploymentActivity :
 
     override fun addRegisteredToPassedCheck() {
         if (3 !in passedChecks) {
-            passedChecks.add(3)
+            passedChecks.add(4)
         }
     }
 
