@@ -9,4 +9,4 @@ data class GuardianSoftwareResponse(
     val size: Long,
     val url: String,
     val released: Date
-): FileResponse
+) : FileResponse
