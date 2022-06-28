@@ -1,9 +1,7 @@
 package org.rfcx.companion.entity.guardian
 
-import com.google.android.datatransport.cct.StringMerger
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import com.google.gson.annotations.SerializedName
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass

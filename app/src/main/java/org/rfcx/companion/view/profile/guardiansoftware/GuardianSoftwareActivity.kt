@@ -19,7 +19,6 @@ import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.util.Status
-import org.rfcx.companion.util.file.APKUtils
 import org.rfcx.companion.util.file.FileStatus
 import org.rfcx.companion.util.isNetworkAvailable
 import org.rfcx.companion.view.profile.guardiansoftware.viewmodel.GuardianSoftwareViewModel
@@ -119,7 +118,8 @@ class GuardianSoftwareActivity : AppCompatActivity() {
                                             } else {
                                                 adminStatus.visibility = View.VISIBLE
                                             }
-                                            adminDownloadButton.text = "${adminDownloadButton.text} ${(apk.version)}"
+                                            adminDownloadButton.text =
+                                                "${adminDownloadButton.text} ${(apk.version)}"
                                         }
                                         CLASSIFY -> {
                                             if (it.value.status != FileStatus.UP_TO_DATE) {
@@ -127,7 +127,8 @@ class GuardianSoftwareActivity : AppCompatActivity() {
                                             } else {
                                                 classifyStatus.visibility = View.VISIBLE
                                             }
-                                            classifyDownloadButton.text = "${classifyDownloadButton.text} ${apk.version}"
+                                            classifyDownloadButton.text =
+                                                "${classifyDownloadButton.text} ${apk.version}"
                                         }
                                         GUARDIAN -> {
                                             if (it.value.status != FileStatus.UP_TO_DATE) {
@@ -135,7 +136,8 @@ class GuardianSoftwareActivity : AppCompatActivity() {
                                             } else {
                                                 guardianStatus.visibility = View.VISIBLE
                                             }
-                                            guardianDownloadButton.text = "${guardianDownloadButton.text} ${apk.version}"
+                                            guardianDownloadButton.text =
+                                                "${guardianDownloadButton.text} ${apk.version}"
                                         }
                                         UPDATER -> {
                                             if (it.value.status != FileStatus.UP_TO_DATE) {
@@ -143,7 +145,8 @@ class GuardianSoftwareActivity : AppCompatActivity() {
                                             } else {
                                                 updaterStatus.visibility = View.VISIBLE
                                             }
-                                            updaterDownloadButton.text = "${updaterDownloadButton.text} ${apk.version}"
+                                            updaterDownloadButton.text =
+                                                "${updaterDownloadButton.text} ${apk.version}"
                                         }
                                     }
                                 }

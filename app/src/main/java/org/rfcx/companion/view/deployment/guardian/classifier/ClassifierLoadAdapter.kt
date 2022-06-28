@@ -134,7 +134,6 @@ class ClassifierLoadAdapter(
                     holder.showLoading()
                     childrenClickedListener.onDeActiveClick(installedVersion!!)
                 }
-
             }
             else -> {
                 val headerItem =

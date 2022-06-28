@@ -12,7 +12,8 @@ import org.rfcx.companion.entity.guardian.Classifier
 import org.rfcx.companion.entity.response.GuardianClassifierResponse
 import org.rfcx.companion.util.file.FileStatus
 
-class GuardianClassifierAdapter(private val listener: ClassifierListener): RecyclerView.Adapter<GuardianClassifierAdapter.GuardianClassifierViewHolder>() {
+class GuardianClassifierAdapter(private val listener: ClassifierListener) :
+    RecyclerView.Adapter<GuardianClassifierAdapter.GuardianClassifierViewHolder>() {
 
     var availableClassifiers: List<File> = listOf()
         set(value) {
@@ -32,7 +33,8 @@ class GuardianClassifierAdapter(private val listener: ClassifierListener): Recyc
         viewType: Int
     ): GuardianClassifierViewHolder {
         val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.item_classifier_download, parent, false)
+            LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_classifier_download, parent, false)
         return GuardianClassifierViewHolder(view)
     }
 
@@ -52,7 +54,7 @@ class GuardianClassifierAdapter(private val listener: ClassifierListener): Recyc
 
     override fun getItemCount(): Int = availableClassifiers.size
 
-    inner class GuardianClassifierViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+    inner class GuardianClassifierViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val name = itemView.classifierName
         private val status = itemView.classifierStatus
         val downloadButton: Button = itemView.classifierDownloadButton
@@ -63,7 +65,7 @@ class GuardianClassifierAdapter(private val listener: ClassifierListener): Recyc
             val classifier = (file.file as GuardianClassifierResponse)
             val downloadedClassifier = downloadedClassifiers.findLast { it.name == classifier.name }
             name.text = classifier.name
-            when(file.status) {
+            when (file.status) {
                 FileStatus.NOT_DOWNLOADED -> {
                     status.visibility = View.VISIBLE
                     downloadButton.isEnabled = true
@@ -100,7 +102,6 @@ class GuardianClassifierAdapter(private val listener: ClassifierListener): Recyc
             } else {
                 loading.visibility = View.GONE
             }
-
         }
     }
 }
@@ -109,4 +110,3 @@ interface ClassifierListener {
     fun onDownloadClicked(classifier: GuardianClassifierResponse)
     fun onDeleteClicked(classifier: GuardianClassifierResponse)
 }
-

@@ -48,7 +48,6 @@ interface DeviceApiService {
         @Body guid: GuardianRegisterRequest
     ): Call<GuardianRegisterResponse>
 
-
     @GET("classifiers")
     fun checkAvailableClassifiers(
         @Header("Authorization") authUser: String

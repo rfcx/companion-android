@@ -2,7 +2,7 @@ package org.rfcx.companion.entity.response
 
 import com.google.gson.annotations.SerializedName
 
-data class GuardianClassifierResponse (
+data class GuardianClassifierResponse(
     val id: String,
     val name: String,
     val version: String,
@@ -20,4 +20,4 @@ data class GuardianClassifierResponse (
     val classifications: String,
     @SerializedName("classifications_filter_threshold")
     val classificationsFilterThreshold: String
-): FileResponse
+) : FileResponse

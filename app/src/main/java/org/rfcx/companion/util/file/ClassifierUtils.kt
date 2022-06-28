@@ -2,7 +2,6 @@ package org.rfcx.companion.util.file
 
 import android.content.Context
 import okhttp3.ResponseBody
-import org.rfcx.companion.entity.guardian.Classifier
 import java.io.*
 
 object ClassifierUtils {

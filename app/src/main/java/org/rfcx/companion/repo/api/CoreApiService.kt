@@ -1,7 +1,6 @@
 package org.rfcx.companion.repo.api
 
 import okhttp3.ResponseBody
-import org.rfcx.companion.entity.response.GuardianClassifierResponse
 import org.rfcx.companion.entity.response.GuardianSoftwareResponse
 import retrofit2.Call
 import retrofit2.http.GET

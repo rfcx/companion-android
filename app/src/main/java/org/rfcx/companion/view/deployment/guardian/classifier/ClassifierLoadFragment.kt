@@ -117,7 +117,6 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
                             selectedDeActivate = null
                         }
                     }
-
                 } else if (selectedDeActivate != null) {
                     hideItemLoading()
                     classifierLoadAdapter?.activeClassifierVersion = mapOf()
@@ -190,6 +189,5 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
         nextButton.isEnabled = false
         selectedDeActivate = selectedClassifier
         GuardianSocketManager.sendInstructionMessage(InstructionType.SET, InstructionCommand.CLASSIFIER, Gson().toJson(ClassifierSet("deactivate", selectedClassifier.id)))
-
     }
 }
