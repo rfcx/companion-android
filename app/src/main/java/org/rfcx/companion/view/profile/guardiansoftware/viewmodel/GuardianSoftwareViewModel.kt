@@ -67,7 +67,7 @@ class GuardianSoftwareViewModel(
                 }
 
                 override fun onFailure(call: Call<List<GuardianSoftwareResponse>>, t: Throwable) {
-                    if (context.isNetworkAvailable()) {
+                    if (!context.isNetworkAvailable()) {
                         availableAPKs.postValue(
                             Resource.error(
                                 context.getString(R.string.network_not_available),
@@ -168,7 +168,7 @@ class GuardianSoftwareViewModel(
                     }
 
                     override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                        if (context.isNetworkAvailable()) {
+                        if (!context.isNetworkAvailable()) {
                             downloadAPKs.postValue(
                                 Resource.error(
                                     context.getString(R.string.network_not_available),

@@ -71,7 +71,7 @@ class GuardianClassifierViewModel(
                 }
 
                 override fun onFailure(call: Call<List<GuardianClassifierResponse>>, t: Throwable) {
-                    if (context.isNetworkAvailable()) {
+                    if (!context.isNetworkAvailable()) {
                         availableClassifiers.postValue(
                             Resource.error(
                                 context.getString(R.string.network_not_available),
@@ -161,7 +161,7 @@ class GuardianClassifierViewModel(
                 }
 
                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                    if (context.isNetworkAvailable()) {
+                    if (!context.isNetworkAvailable()) {
                         downloadClassifier.postValue(
                             Resource.error(
                                 context.getString(R.string.network_not_available),
