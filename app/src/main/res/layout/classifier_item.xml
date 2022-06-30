@@ -19,20 +19,6 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="TextView" />
 
-
-    <TextView
-        android:id="@+id/fileInstalledVersionTextView"
-        style="@style/AudioMothText.Label.Secondary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingStart="@dimen/margin_padding_normal"
-        android:paddingTop="@dimen/margin_padding_normal"
-        android:paddingEnd="@dimen/margin_padding_large"
-        android:paddingBottom="@dimen/margin_padding_normal"
-        app:layout_constraintStart_toEndOf="@id/fileVersionTextView"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="TextView" />
-
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/fileSendButton"
         style="@style/OfflineMapButton"
@@ -47,6 +33,36 @@
         app:layout_constraintBottom_toBottomOf="@id/fileVersionTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/fileVersionTextView" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/classifierDeActivateButton"
+        style="@style/ClassifierButton.DeActive"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center"
+        android:enabled="true"
+        android:text="deactivate"
+        android:textSize="@dimen/text_xxsmall"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/fileSendButton"
+        app:layout_constraintEnd_toEndOf="@id/fileSendButton"
+        app:layout_constraintStart_toStartOf="@id/fileSendButton"
+        app:layout_constraintTop_toTopOf="@id/fileSendButton" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/classifierActivateButton"
+        style="@style/ClassifierButton.Active"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center"
+        android:enabled="true"
+        android:text="activate"
+        android:textSize="@dimen/text_xxsmall"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/fileSendButton"
+        app:layout_constraintEnd_toEndOf="@id/fileSendButton"
+        app:layout_constraintStart_toStartOf="@id/fileSendButton"
+        app:layout_constraintTop_toTopOf="@id/fileSendButton" />
 
     <ProgressBar
         android:id="@+id/fileLoading"
@@ -68,7 +84,7 @@
         android:paddingTop="@dimen/margin_padding_normal"
         android:paddingEnd="@dimen/margin_padding_large"
         android:paddingBottom="@dimen/margin_padding_normal"
-        android:text="up to date"
+        android:text="loaded"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/fileVersionTextView"
         app:layout_constraintEnd_toEndOf="parent"

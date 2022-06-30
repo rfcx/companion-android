@@ -140,6 +140,4 @@ object APKUtils {
             it.delete()
         }
     }
-
-    enum class APKStatus { NOT_INSTALLED, UP_TO_DATE, NEED_UPDATE }
 }

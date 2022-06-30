@@ -6,10 +6,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import okhttp3.ResponseBody
 import org.rfcx.companion.R
-import org.rfcx.companion.entity.APK
+import org.rfcx.companion.entity.File
 import org.rfcx.companion.entity.response.GuardianSoftwareResponse
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.file.APKUtils
+import org.rfcx.companion.util.file.FileStatus
 import org.rfcx.companion.util.isNetworkAvailable
 import org.rfcx.companion.view.profile.guardiansoftware.repository.GuardianSoftwareRepository
 import retrofit2.Call
@@ -23,7 +24,7 @@ class GuardianSoftwareViewModel(
 
     @SuppressLint("StaticFieldLeak")
     private val context = getApplication<Application>().applicationContext
-    private val availableAPKs = MutableLiveData<Resource<Map<String, APK>>>()
+    private val availableAPKs = MutableLiveData<Resource<Map<String, File>>>()
     private val downloadAPKs = MutableLiveData<Resource<String>>()
     private var softwareDownloadUrl: Map<String, String>? = null
     private var softwareVersion: Map<String, String>? = null
@@ -66,7 +67,7 @@ class GuardianSoftwareViewModel(
                 }
 
                 override fun onFailure(call: Call<List<GuardianSoftwareResponse>>, t: Throwable) {
-                    if (context.isNetworkAvailable()) {
+                    if (!context.isNetworkAvailable()) {
                         availableAPKs.postValue(
                             Resource.error(
                                 context.getString(R.string.network_not_available),
@@ -82,25 +83,25 @@ class GuardianSoftwareViewModel(
         extractDownloadUrl(softwares)
         extractVersion(softwares)
         val roleMappedVersion = APKUtils.getAllDownloadedSoftwaresVersion(context)
-        val roleStatus = mutableMapOf<String, APK>()
+        val roleStatus = mutableMapOf<String, File>()
         softwares.forEach { res ->
             if (roleMappedVersion.values.map { it.first }.contains(res.version)) {
                 val isUpToDate = res.version == roleMappedVersion[res.role]?.first
                 if (isUpToDate) {
-                    roleStatus[res.role] = APK(res.role, res.version, APKUtils.APKStatus.UP_TO_DATE)
+                    roleStatus[res.role] = File(res, FileStatus.UP_TO_DATE)
                 } else {
                     if (APKUtils.compareVersionsIfNeedToUpdate(
                             res.version,
                             roleMappedVersion[res.version]?.first
                         )
                     ) {
-                        roleStatus[res.role] = APK(res.role, res.version, APKUtils.APKStatus.NEED_UPDATE)
+                        roleStatus[res.role] = File(res, FileStatus.NEED_UPDATE)
                     } else {
-                        roleStatus[res.role] = APK(res.role, res.version, APKUtils.APKStatus.UP_TO_DATE)
+                        roleStatus[res.role] = File(res, FileStatus.UP_TO_DATE)
                     }
                 }
             } else {
-                roleStatus[res.role] = APK(res.role, res.version, APKUtils.APKStatus.NOT_INSTALLED)
+                roleStatus[res.role] = File(res, FileStatus.NOT_DOWNLOADED)
             }
         }
         availableAPKs.postValue(Resource.success(roleStatus))
@@ -167,7 +168,7 @@ class GuardianSoftwareViewModel(
                     }
 
                     override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                        if (context.isNetworkAvailable()) {
+                        if (!context.isNetworkAvailable()) {
                             downloadAPKs.postValue(
                                 Resource.error(
                                     context.getString(R.string.network_not_available),

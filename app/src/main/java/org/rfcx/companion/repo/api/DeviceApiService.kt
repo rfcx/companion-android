@@ -1,11 +1,9 @@
 package org.rfcx.companion.repo.api
 
+import okhttp3.ResponseBody
 import org.rfcx.companion.entity.UserTouchResponse
 import org.rfcx.companion.entity.request.GuardianRegisterRequest
-import org.rfcx.companion.entity.response.DeploymentAssetResponse
-import org.rfcx.companion.entity.response.GuardianRegisterResponse
-import org.rfcx.companion.entity.response.ProjectByIdResponse
-import org.rfcx.companion.entity.response.ProjectResponse
+import org.rfcx.companion.entity.response.*
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -49,4 +47,12 @@ interface DeviceApiService {
         @Header("Authorization") authUser: String,
         @Body guid: GuardianRegisterRequest
     ): Call<GuardianRegisterResponse>
+
+    @GET("classifiers")
+    fun checkAvailableClassifiers(
+        @Header("Authorization") authUser: String
+    ): Call<List<GuardianClassifierResponse>>
+
+    @GET
+    fun downloadFile(@Url url: String): Call<ResponseBody>
 }

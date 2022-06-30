@@ -25,6 +25,7 @@ import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.connection.wifi.WifiHotspotManager
 import org.rfcx.companion.connection.wifi.WifiLostListener
 import org.rfcx.companion.entity.*
+import org.rfcx.companion.entity.guardian.ClassifierLite
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.socket.response.GuardianPing
 import org.rfcx.companion.entity.socket.response.I2CAccessibility
@@ -39,6 +40,7 @@ import org.rfcx.companion.util.socket.PingUtils
 import org.rfcx.companion.view.deployment.BaseDeploymentActivity
 import org.rfcx.companion.view.deployment.guardian.advanced.GuardianAdvancedFragment
 import org.rfcx.companion.view.deployment.guardian.checkin.GuardianCheckInTestFragment
+import org.rfcx.companion.view.deployment.guardian.classifier.ClassifierLoadFragment
 import org.rfcx.companion.view.deployment.guardian.communication.GuardianCommunicationFragment
 import org.rfcx.companion.view.deployment.guardian.configure.GuardianConfigureFragment
 import org.rfcx.companion.view.deployment.guardian.connect.ConnectGuardianFragment
@@ -91,6 +93,8 @@ class GuardianDeploymentActivity :
     private var speedTest: SpeedTest? = null
     private var guardianLocalTime: Long? = null
     private var guardianTimezone: String? = null
+    private var classifiers: Map<String, ClassifierLite>? = null
+    private var activeClassifiers: Map<String, ClassifierLite>? = null
 
     private var _sampleRate = 12000
 
@@ -264,6 +268,8 @@ class GuardianDeploymentActivity :
             guardianLocalTime = PingUtils.getGuardianLocalTime(it)
             guardianTimezone = PingUtils.getGuardianTimezone(it)
             _sampleRate = PingUtils.getSampleRateFromPrefs(it) ?: 12000
+            classifiers = PingUtils.getClassifiers(it)
+            activeClassifiers = PingUtils.getActiveClassifiers(it)
         }
         AdminSocketManager.pingBlob.observeForever {
             network = PingUtils.getNetworkFromPing(it)
@@ -329,7 +335,7 @@ class GuardianDeploymentActivity :
 
     override fun addRegisteredToPassedCheck() {
         if (3 !in passedChecks) {
-            passedChecks.add(3)
+            passedChecks.add(4)
         }
     }
 
@@ -372,6 +378,10 @@ class GuardianDeploymentActivity :
     override fun getGuardianLocalTime(): Long? = guardianLocalTime
 
     override fun getGuardianTimezone(): String? = guardianTimezone
+
+    override fun getClassifiers(): Map<String, ClassifierLite>? = classifiers
+
+    override fun getActiveClassifiers(): Map<String, ClassifierLite>? = activeClassifiers
 
     override fun getCurrentProjectId(): String? {
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
@@ -514,31 +524,33 @@ class GuardianDeploymentActivity :
         currentCheck = number
         when (number) {
             0 -> {
-                updateDeploymentState(DeploymentState.Guardian.SolarPanel)
                 startFragment(SoftwareUpdateFragment.newInstance())
             }
             1 -> {
-                startFragment(GuardianSolarPanelFragment.newInstance())
+                startFragment(ClassifierLoadFragment.newInstance())
             }
             2 -> {
-                startFragment(GuardianCommunicationFragment.newInstance())
+                startFragment(GuardianSolarPanelFragment.newInstance())
             }
             3 -> {
+                startFragment(GuardianCommunicationFragment.newInstance())
+            }
+            4 -> {
                 updateDeploymentState(DeploymentState.Guardian.Register)
                 startFragment(GuardianRegisterFragment.newInstance())
             }
-            4 -> {
+            5 -> {
                 updateDeploymentState(DeploymentState.Guardian.Signal)
                 startFragment(GuardianSignalFragment.newInstance())
             }
-            5 -> {
+            6 -> {
                 startFragment(GuardianConfigureFragment.newInstance())
             }
-            6 -> {
+            7 -> {
                 updateDeploymentState(DeploymentState.Guardian.Microphone)
                 startFragment(GuardianMicrophoneFragment.newInstance())
             }
-            7 -> {
+            8 -> {
                 updateDeploymentState(DeploymentState.Guardian.Locate)
                 val site = this._stream
                 if (site == null) {
@@ -551,11 +563,11 @@ class GuardianDeploymentActivity :
                     startDetailDeploymentSite(site.latitude, site.longitude, site.id, site.name)
                 }
             }
-            8 -> {
+            9 -> {
                 updateDeploymentState(DeploymentState.Guardian.Deploy)
                 startFragment(GuardianDeployFragment.newInstance())
             }
-            9 -> {
+            10 -> {
                 updateDeploymentState(DeploymentState.Guardian.Checkin)
                 startFragment(GuardianCheckInTestFragment.newInstance())
             }

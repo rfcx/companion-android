@@ -45,6 +45,20 @@
         <item name="android:textSize">@dimen/text_xxsmall</item>
     </style>
 
+    <style name="ClassifierButton.Active" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/bg_color_active_button</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/color_activate_text</item>
+        <item name="android:textSize">@dimen/text_xxsmall</item>
+    </style>
+
+    <style name="ClassifierButton.DeActive" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/bg_color_deactive_button</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/color_deactive_text</item>
+        <item name="android:textSize">@dimen/text_xxsmall</item>
+    </style>
+
     <style name="AudioMothButton.Primary" parent="AudioMothButton">
         <item name="android:background">@drawable/bg_color_primary_button</item>
         <item name="android:textAllCaps">false</item>

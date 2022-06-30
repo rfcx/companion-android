@@ -140,7 +140,7 @@ class LocationTrackerService : Service() {
         val intent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
             this, 0,
-            intent, PendingIntent.FLAG_UPDATE_CURRENT
+            intent, PendingIntent.FLAG_IMMUTABLE
         )
         return NotificationCompat.Builder(this, NOTIFICATION_LOCATION_CHANNEL_ID).apply {
             setContentTitle(getString(R.string.tracking_enabled))

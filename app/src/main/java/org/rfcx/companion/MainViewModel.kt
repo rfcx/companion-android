@@ -77,7 +77,7 @@ class MainViewModel(
         mainRepository.getProjectsFromRemote("Bearer ${context.getIdToken()}")
             .enqueue(object : Callback<List<ProjectResponse>> {
                 override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
-                    if (context.isNetworkAvailable()) {
+                    if (!context.isNetworkAvailable()) {
                         projects.postValue(
                             Resource.error(
                                 context.getString(R.string.network_not_available),
@@ -147,7 +147,7 @@ class MainViewModel(
         mainRepository.getDeletedProjectsFromRemote("Bearer ${context.getIdToken()}")
             .enqueue(object : Callback<List<ProjectResponse>> {
                 override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
-                    if (context.isNetworkAvailable()) {
+                    if (!context.isNetworkAvailable()) {
                         projects.postValue(
                             Resource.error(
                                 context.getString(R.string.network_not_available),

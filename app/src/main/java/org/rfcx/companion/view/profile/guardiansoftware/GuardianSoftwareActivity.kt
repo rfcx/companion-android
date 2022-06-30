@@ -12,13 +12,14 @@ import kotlinx.android.synthetic.main.activity_guardian_software.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
+import org.rfcx.companion.entity.response.GuardianSoftwareResponse
 import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.util.Status
-import org.rfcx.companion.util.file.APKUtils
+import org.rfcx.companion.util.file.FileStatus
 import org.rfcx.companion.util.isNetworkAvailable
 import org.rfcx.companion.view.profile.guardiansoftware.viewmodel.GuardianSoftwareViewModel
 
@@ -109,38 +110,43 @@ class GuardianSoftwareActivity : AppCompatActivity() {
                         roleStatuses.data?.let { roleStatus ->
                             if (roleStatus.isNotEmpty()) {
                                 roleStatus.forEach {
+                                    val apk = (it.value.file) as GuardianSoftwareResponse
                                     when (it.key) {
                                         ADMIN -> {
-                                            if (it.value.status != APKUtils.APKStatus.UP_TO_DATE) {
+                                            if (it.value.status != FileStatus.UP_TO_DATE) {
                                                 adminDownloadButton.visibility = View.VISIBLE
                                             } else {
                                                 adminStatus.visibility = View.VISIBLE
                                             }
-                                            adminDownloadButton.text = "${adminDownloadButton.text} ${it.value.version}"
+                                            adminDownloadButton.text =
+                                                "${adminDownloadButton.text} ${(apk.version)}"
                                         }
                                         CLASSIFY -> {
-                                            if (it.value.status != APKUtils.APKStatus.UP_TO_DATE) {
+                                            if (it.value.status != FileStatus.UP_TO_DATE) {
                                                 classifyDownloadButton.visibility = View.VISIBLE
                                             } else {
                                                 classifyStatus.visibility = View.VISIBLE
                                             }
-                                            classifyDownloadButton.text = "${classifyDownloadButton.text} ${it.value.version}"
+                                            classifyDownloadButton.text =
+                                                "${classifyDownloadButton.text} ${apk.version}"
                                         }
                                         GUARDIAN -> {
-                                            if (it.value.status != APKUtils.APKStatus.UP_TO_DATE) {
+                                            if (it.value.status != FileStatus.UP_TO_DATE) {
                                                 guardianDownloadButton.visibility = View.VISIBLE
                                             } else {
                                                 guardianStatus.visibility = View.VISIBLE
                                             }
-                                            guardianDownloadButton.text = "${guardianDownloadButton.text} ${it.value.version}"
+                                            guardianDownloadButton.text =
+                                                "${guardianDownloadButton.text} ${apk.version}"
                                         }
                                         UPDATER -> {
-                                            if (it.value.status != APKUtils.APKStatus.UP_TO_DATE) {
+                                            if (it.value.status != FileStatus.UP_TO_DATE) {
                                                 updaterDownloadButton.visibility = View.VISIBLE
                                             } else {
                                                 updaterStatus.visibility = View.VISIBLE
                                             }
-                                            updaterDownloadButton.text = "${updaterDownloadButton.text} ${it.value.version}"
+                                            updaterDownloadButton.text =
+                                                "${updaterDownloadButton.text} ${apk.version}"
                                         }
                                     }
                                 }
