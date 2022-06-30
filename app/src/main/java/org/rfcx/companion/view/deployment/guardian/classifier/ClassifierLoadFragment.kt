@@ -3,7 +3,6 @@ package org.rfcx.companion.view.deployment.guardian.classifier
 import android.content.Context
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -132,7 +131,6 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
             viewLifecycleOwner
         ) {
             requireActivity().runOnUiThread {
-                Log.d("UploadingProgress", "$it")
                 if (it != tempProgress) {
                     tempProgress = it
                     classifierLoadAdapter?.progress = it
@@ -160,7 +158,7 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
 
     private fun startTimer() {
         loadingTimer = object : CountDownTimer(120000, 1000) {
-            override fun onTick(millisUntilFinished: Long) { }
+            override fun onTick(millisUntilFinished: Long) {}
 
             override fun onFinish() {
                 classifierLoadAdapter?.let {
@@ -197,12 +195,20 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
     override fun onActiveClick(selectedClassifier: ClassifierLite) {
         nextButton.isEnabled = false
         selectedActivate = selectedClassifier
-        GuardianSocketManager.sendInstructionMessage(InstructionType.SET, InstructionCommand.CLASSIFIER, Gson().toJson(ClassifierSet("activate", selectedClassifier.id)))
+        GuardianSocketManager.sendInstructionMessage(
+            InstructionType.SET,
+            InstructionCommand.CLASSIFIER,
+            Gson().toJson(ClassifierSet("activate", selectedClassifier.id))
+        )
     }
 
     override fun onDeActiveClick(selectedClassifier: ClassifierLite) {
         nextButton.isEnabled = false
         selectedDeActivate = selectedClassifier
-        GuardianSocketManager.sendInstructionMessage(InstructionType.SET, InstructionCommand.CLASSIFIER, Gson().toJson(ClassifierSet("deactivate", selectedClassifier.id)))
+        GuardianSocketManager.sendInstructionMessage(
+            InstructionType.SET,
+            InstructionCommand.CLASSIFIER,
+            Gson().toJson(ClassifierSet("deactivate", selectedClassifier.id))
+        )
     }
 }

@@ -48,13 +48,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/fileVersionTextView" />
 
-    <ProgressBar
+    <com.google.android.material.progressindicator.LinearProgressIndicator
         android:id="@+id/fileLoading"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="30dp"
         android:layout_gravity="center"
         android:layout_marginEnd="@dimen/margin_padding_normal"
         android:visibility="gone"
+        app:layout_constraintStart_toEndOf="@id/fileInstalledVersionTextView"
         app:layout_constraintBottom_toBottomOf="@id/fileVersionTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/fileVersionTextView" />

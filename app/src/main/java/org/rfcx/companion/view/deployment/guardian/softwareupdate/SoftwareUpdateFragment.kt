@@ -26,6 +26,8 @@ class SoftwareUpdateFragment : Fragment(), ChildrenClickedListener {
     private var selectedFile: SoftwareItem.SoftwareVersion? = null
     private var loadingTimer: CountDownTimer? = null
 
+    private var tempProgress = 0
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         deploymentProtocol = (context as GuardianDeploymentProtocol)
@@ -91,6 +93,17 @@ class SoftwareUpdateFragment : Fragment(), ChildrenClickedListener {
                 }
             }
         )
+
+        FileSocketManager.uploadingProgress.observe(
+            viewLifecycleOwner
+        ) {
+            requireActivity().runOnUiThread {
+                if (it != tempProgress) {
+                    tempProgress = it
+                    softwareUpdateAdapter?.progress = it
+                }
+            }
+        }
 
         nextButton.setOnClickListener {
             deploymentProtocol?.nextStep()
