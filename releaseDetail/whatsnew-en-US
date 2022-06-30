@@ -1,3 +1,1 @@
-- New screen for Classification loader to Guardian
-- New screen for Classification download
-- Add UI for sampling ratio
+- Change from normal circle loading to linear loading with progress
