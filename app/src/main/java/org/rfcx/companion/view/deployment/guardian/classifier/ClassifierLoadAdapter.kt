@@ -7,12 +7,8 @@ import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import kotlinx.android.synthetic.main.classifier_item.view.*
-import kotlinx.android.synthetic.main.expandable_child_item.view.country_item_child_container
-import kotlinx.android.synthetic.main.expandable_child_item.view.fileLoading
-import kotlinx.android.synthetic.main.expandable_child_item.view.fileSendButton
-import kotlinx.android.synthetic.main.expandable_child_item.view.fileUpToDateTextView
-import kotlinx.android.synthetic.main.expandable_child_item.view.fileVersionTextView
 import kotlinx.android.synthetic.main.expandable_parent_item.view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.guardian.Classifier
@@ -34,7 +30,13 @@ class ClassifierLoadAdapter(
     var classifierVersion = mapOf<String, ClassifierLite>()
     var activeClassifierVersion = mapOf<String, ClassifierLite>()
 
-    private var needLoading = false
+    private var isSettingActivation = false
+    private var isUploading = false
+    var progress = 0
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
 
     init {
         val bothClassifiers = combineDownloadAndInstallClassifier(classifiers, installedClassifiers)
@@ -80,59 +82,63 @@ class ClassifierLoadAdapter(
                 val installedVersion =
                     classifierVersion[versionItem.classifier.id]
 
-                if (!needLoading) {
+                if (!isUploading) {
                     if (installedVersion != null && installedVersion.version.toInt() >= versionItem.classifier.version.toInt()) {
                         holder.modelSendButton.visibility = View.INVISIBLE
-                        holder.modelUpToDateText.visibility = View.VISIBLE
                     } else {
                         holder.modelSendButton.visibility = View.VISIBLE
                         holder.modelSendButton.text =
                             "load version ${versionItem.classifier.version}"
-                        holder.modelUpToDateText.visibility = View.GONE
                     }
                 }
 
                 if (installedVersion != null) {
                     val activeInstalled = activeClassifierVersion[installedVersion.id]
-                    if (!needLoading) {
+                    if (!isSettingActivation) {
                         if (activeInstalled != null) {
-                            holder.modelUpToDateText.visibility = View.GONE
+                            holder.hideSettingLoading()
                             holder.modelDeActiveButton.visibility = View.VISIBLE
                             holder.modelActiveButton.visibility = View.GONE
                         } else {
-                            holder.modelUpToDateText.visibility = View.GONE
+                            holder.hideSettingLoading()
                             holder.modelDeActiveButton.visibility = View.GONE
                             holder.modelActiveButton.visibility = View.VISIBLE
                         }
                     }
                 }
 
-                if (!needLoading && holder.modelLoading.visibility == View.VISIBLE) {
-                    holder.modelLoading.visibility = View.GONE
+                if (!isUploading && holder.modelProgress.visibility == View.VISIBLE) {
+                    holder.hideUploadingProgress()
                 }
 
-                holder.modelSendButton.isEnabled = !needLoading
+                holder.modelSendButton.isEnabled = !isUploading
                 holder.modelSendButton.setOnClickListener {
-                    showLoading()
+                    showProgressUploading()
                     it.visibility = View.GONE
-                    holder.showLoading()
+                    holder.showUploadingProgress()
                     childrenClickedListener.onItemClick(versionItem)
                 }
 
-                holder.modelActiveButton.isEnabled = !needLoading
+                holder.modelActiveButton.isEnabled = !isSettingActivation
                 holder.modelActiveButton.setOnClickListener {
-                    showLoading()
+                    showSettingLoading()
                     holder.modelActiveButton.visibility = View.GONE
-                    holder.showLoading()
+                    holder.showSettingLoading()
                     childrenClickedListener.onActiveClick(installedVersion!!)
                 }
 
-                holder.modelDeActiveButton.isEnabled = !needLoading
+                holder.modelDeActiveButton.isEnabled = !isSettingActivation
                 holder.modelDeActiveButton.setOnClickListener {
-                    showLoading()
+                    showSettingLoading()
                     holder.modelDeActiveButton.visibility = View.GONE
-                    holder.showLoading()
+                    holder.showSettingLoading()
                     childrenClickedListener.onDeActiveClick(installedVersion!!)
+                }
+
+                if (progress != 100) {
+                    holder.setProgress(progress)
+                } else {
+                    holder.modelProgress.isIndeterminate = true
                 }
             }
             else -> {
@@ -152,17 +158,27 @@ class ClassifierLoadAdapter(
         return downloads.map { ClassifierLite(it.id, it.name, it.version) }
     }
 
-    fun showLoading() {
-        needLoading = true
+    private fun showProgressUploading() {
+        isUploading = true
         notifyDataSetChanged()
     }
 
-    fun hideLoading() {
-        needLoading = false
+    fun hideProgressUploading() {
+        isUploading = false
         notifyDataSetChanged()
     }
 
-    fun getLoading(): Boolean = needLoading
+    fun getProgressUploading(): Boolean = isUploading
+
+    private fun showSettingLoading() {
+        isSettingActivation = true
+        notifyDataSetChanged()
+    }
+
+    fun hideSettingLoading() {
+        isSettingActivation = false
+        notifyDataSetChanged()
+    }
 
     override fun getItemViewType(position: Int): Int {
         return when (classifierStateModelList[position]) {
@@ -180,17 +196,29 @@ class ClassifierLoadAdapter(
         internal var layout = itemView.country_item_child_container
         internal var modelVersion: TextView = itemView.fileVersionTextView
         internal var modelSendButton: Button = itemView.fileSendButton
-        internal var modelUpToDateText: TextView = itemView.fileUpToDateTextView
         internal var modelLoading: ProgressBar = itemView.fileLoading
+        internal var modelProgress: LinearProgressIndicator = itemView.uploadingProgress
         internal var modelActiveButton: Button = itemView.classifierActivateButton
         internal var modelDeActiveButton: Button = itemView.classifierDeActivateButton
 
-        fun showLoading() {
+        fun showSettingLoading() {
             modelLoading.visibility = View.VISIBLE
         }
 
-        fun hideLoading() {
+        fun hideSettingLoading() {
             modelLoading.visibility = View.GONE
+        }
+
+        fun showUploadingProgress() {
+            modelProgress.visibility = View.VISIBLE
+        }
+
+        fun hideUploadingProgress() {
+            modelProgress.visibility = View.GONE
+        }
+
+        fun setProgress(value: Int) {
+            modelProgress.setProgressCompat(value, true)
         }
     }
 }

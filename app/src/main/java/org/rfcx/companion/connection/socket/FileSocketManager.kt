@@ -1,6 +1,7 @@
 package org.rfcx.companion.connection.socket
 
 import android.os.SystemClock
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -10,6 +11,7 @@ import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.File
 import java.net.Socket
+import kotlin.math.roundToInt
 
 object FileSocketManager {
 
@@ -21,6 +23,7 @@ object FileSocketManager {
     private lateinit var inComingMessageThread: Thread
 
     val pingBlob = MutableLiveData<JsonObject>()
+    val uploadingProgress = MutableLiveData<Int>()
 
     fun sendFile(filePath: String, meta: String? = null) {
         sendMessage(APKUtils.getAPKFileFromPath(filePath), meta)
@@ -37,6 +40,9 @@ object FileSocketManager {
                 socket?.keepAlive = true
                 startInComingMessageThread()
                 outputStream = DataOutputStream(socket?.getOutputStream())
+
+                val fileSize = file.length()
+                var progress = 0
                 val buffer = ByteArray(8192)
                 var count: Int
                 val inp = file.inputStream()
@@ -50,15 +56,18 @@ object FileSocketManager {
                 outputStream?.write("|".toByteArray())
                 while (true) {
                     count = inp.read(buffer)
+                    progress += count
                     if (count < 0) {
                         break
                     }
                     outputStream?.write(buffer, 0, count)
+                    Log.d("UpdatingProgress", "$progress $fileSize")
+                    uploadingProgress.postValue(((progress.toDouble() / fileSize.toDouble()) * 100).roundToInt())
                 }
 
                 outputStream?.flush()
 
-                SystemClock.sleep(10000)
+                SystemClock.sleep(1000)
 
                 outputStream?.write("****".toByteArray())
                 outputStream?.flush()

@@ -3,6 +3,7 @@ package org.rfcx.companion.view.deployment.guardian.classifier
 import android.content.Context
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,6 +33,8 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
     private var selectedActivate: ClassifierLite? = null
     private var selectedDeActivate: ClassifierLite? = null
     private var loadingTimer: CountDownTimer? = null
+
+    private var tempProgress = 0
 
     private val db by lazy { ClassifierDb(Realm.getInstance(RealmHelper.migrationConfig())) }
 
@@ -91,7 +94,7 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
                         val selectedVersion = selected.classifier
                         val installedVersion = it[selected.classifier.id]
                         if (installedVersion != null && installedVersion.id == selectedVersion.id) {
-                            classifierLoadAdapter?.hideLoading()
+                            classifierLoadAdapter?.hideProgressUploading()
                             nextButton.isEnabled = true
                             stopTimer()
                         }
@@ -125,6 +128,18 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
             }
         }
 
+        FileSocketManager.uploadingProgress.observe(
+            viewLifecycleOwner
+        ) {
+            requireActivity().runOnUiThread {
+                Log.d("UploadingProgress", "$it")
+                if (it != tempProgress) {
+                    tempProgress = it
+                    classifierLoadAdapter?.progress = it
+                }
+            }
+        }
+
         nextButton.setOnClickListener {
             deploymentProtocol?.nextStep()
         }
@@ -138,7 +153,7 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
     }
 
     private fun hideItemLoading() {
-        classifierLoadAdapter?.hideLoading()
+        classifierLoadAdapter?.hideSettingLoading()
         nextButton.isEnabled = true
         stopTimer()
     }
@@ -149,8 +164,8 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
 
             override fun onFinish() {
                 classifierLoadAdapter?.let {
-                    if (it.getLoading()) {
-                        it.hideLoading()
+                    if (it.getProgressUploading()) {
+                        it.hideProgressUploading()
                     }
                 }
                 stopTimer()
