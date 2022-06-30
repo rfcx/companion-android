@@ -268,6 +268,8 @@
     <string name="choose_bitrate">Choose Bitrate (kbs)</string>
     <string name="choose_file_format">Choose Audio Format</string>
     <string name="choose_duration_cycle">Choose Recording Duration Cycle (secs)</string>
+    <string name="choose_enable_sampling">Choose Enable Sampling Ratio</string>
+    <string name="choose_sampling">Choose Sampling Ratio</string>
     <string name="advanced_config">Guardian Preferences</string>
 
     <!-- GuardianPreferences -->
@@ -540,4 +542,6 @@
     <string name="dismiss">dismiss</string>
     <string name="classifier">Classifier</string>
     <string name="not_found_classifier_local">not found</string>
+    <string name="enable_sampling_ratio">Enable Sampling ratio</string>
+    <string name="sampling_ratio">Sampling ratio</string>
 </resources>

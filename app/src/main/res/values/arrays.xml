@@ -145,6 +145,30 @@
         <item>180</item>
     </string-array>
 
+    <string-array name="enable_sampling_entries">
+        <item>true</item>
+        <item>false</item>
+    </string-array>
+
+    <string-array name="enable_sampling_values">
+        <item>true</item>
+        <item>false</item>
+    </string-array>
+
+    <string-array name="sampling_entries">
+        <item>1:2</item>
+        <item>1:3</item>
+        <item>1:4</item>
+        <item>1:5</item>
+    </string-array>
+
+    <string-array name="sampling_values">
+        <item>1:2</item>
+        <item>1:3</item>
+        <item>1:4</item>
+        <item>1:5</item>
+    </string-array>
+
     <string-array name="prefs_values_true_or_false">
         <item>true</item>
         <item>false</item>
