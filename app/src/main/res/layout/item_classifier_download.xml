@@ -35,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"
-        android:padding="@dimen/margin_padding_normal"
+        android:layout_marginStart="@dimen/margin_padding_small"
         android:text="@string/not_found_classifier_local"
         app:layout_constraintBottom_toBottomOf="@id/classifierName"
         app:layout_constraintStart_toEndOf="@id/guidelineVertical"
@@ -61,7 +61,8 @@
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/classifierName"
         app:layout_constraintStart_toEndOf="@id/guidelineVertical"
-        app:layout_constraintTop_toTopOf="@id/classifierName" />
+        app:layout_constraintTop_toTopOf="@id/classifierName"
+        app:layout_constraintEnd_toStartOf="@id/guidelineVertical2" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/classifierDownloadButton"

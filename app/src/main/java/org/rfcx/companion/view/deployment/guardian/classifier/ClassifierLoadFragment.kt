@@ -6,6 +6,7 @@ import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,6 +24,7 @@ import org.rfcx.companion.entity.socket.request.InstructionCommand
 import org.rfcx.companion.entity.socket.request.InstructionType
 import org.rfcx.companion.localdb.ClassifierDb
 import org.rfcx.companion.util.RealmHelper
+import org.rfcx.companion.util.file.APKUtils
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 
 class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
@@ -34,6 +36,8 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
     private var loadingTimer: CountDownTimer? = null
 
     private var tempProgress = 0
+
+    private val REQUIRED_VERSION = 10100
 
     private val db by lazy { ClassifierDb(Realm.getInstance(RealmHelper.migrationConfig())) }
 
@@ -79,6 +83,10 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
             it.setMenuToolbar(false)
             it.showToolbar()
             it.setToolbarTitle()
+        }
+
+        if (!isSoftwareCompatible()) {
+            showAlert()
         }
 
         GuardianSocketManager.pingBlob.observe(
@@ -148,6 +156,32 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
         } else {
             populateAdapterWithInfo(classifiers)
         }
+    }
+
+    private fun isSoftwareCompatible(): Boolean {
+        val software = deploymentProtocol?.getSoftwareVersion() ?: return false
+
+        if (!software.containsKey("guardian")) return false
+        val guardian = software["guardian"] ?: return false
+        if (APKUtils.calculateVersionValue(guardian) < REQUIRED_VERSION) return false
+
+        if (!software.containsKey("classify")) return false
+        val classify = software["classify"] ?: return false
+        if (APKUtils.calculateVersionValue(classify) < REQUIRED_VERSION) return false
+
+        return true
+    }
+
+    private fun showAlert() {
+        val dialogBuilder: AlertDialog.Builder =
+            AlertDialog.Builder(requireContext()).apply {
+                setTitle(null)
+                setMessage(R.string.guardian_software_not_allowed)
+                setPositiveButton(R.string.go_back) { _, _ ->
+                    deploymentProtocol?.backStep()
+                }
+            }
+        dialogBuilder.create().show()
     }
 
     private fun hideItemLoading() {
