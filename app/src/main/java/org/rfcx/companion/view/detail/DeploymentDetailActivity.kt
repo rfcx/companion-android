@@ -14,6 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -29,10 +30,7 @@ import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
-import org.rfcx.companion.entity.DeploymentImage
-import org.rfcx.companion.entity.Device
-import org.rfcx.companion.entity.Permissions
-import org.rfcx.companion.entity.StatusEvent
+import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.repo.api.CoreApiHelper
@@ -56,6 +54,7 @@ class DeploymentDetailActivity :
     private lateinit var mapView: MapView
     private lateinit var mapBoxMap: MapboxMap
     private val analytics by lazy { Analytics(this) }
+    private val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
 
     // data
     private var deployment: Deployment? = null
@@ -111,6 +110,7 @@ class DeploymentDetailActivity :
                 stream?.let { st ->
                     intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)?.let { deploymentId ->
                         analytics.trackEditLocationEvent()
+                        firebaseCrashlytics.setCustomKey(CrashlyticsKey.EditLocation.key, st.serverId ?: "")
                         EditLocationActivity.startActivity(
                             this,
                             st.id,
@@ -163,6 +163,7 @@ class DeploymentDetailActivity :
                 object : DatabaseCallback {
                     override fun onSuccess() {
                         DeploymentSyncWorker.enqueue(this@DeploymentDetailActivity)
+                        firebaseCrashlytics.setCustomKey(CrashlyticsKey.DeleteLocation.key, it.serverId ?: "")
                         finish()
                     }
 
@@ -190,20 +191,17 @@ class DeploymentDetailActivity :
                 val list = deploymentImages.map {
                     if (it.remotePath != null) BuildConfig.DEVICE_API_DOMAIN + it.remotePath else "file://${it.localPath}"
                 } as ArrayList
+                val selectedImage = deploymentImageView.remotePath ?: "file://${deploymentImageView.localPath}"
 
-                val index = list.indexOf(
-                    deploymentImageView.remotePath ?: "file://${deploymentImageView.localPath}"
-                )
+                val index = list.indexOf(selectedImage)
                 list.removeAt(index)
-                list.add(
-                    0,
-                    deploymentImageView.remotePath ?: "file://${deploymentImageView.localPath}"
-                )
-
+                list.add(0, selectedImage)
+                firebaseCrashlytics.setCustomKey(CrashlyticsKey.OnClickImage.key, selectedImage)
                 DisplayImageActivity.startActivity(this@DeploymentDetailActivity, list)
             }
 
             override fun onDeleteImageClick(position: Int, imagePath: String) {
+                firebaseCrashlytics.setCustomKey(CrashlyticsKey.OnDeleteImage.key, imagePath)
                 deploymentImageAdapter.removeAt(position)
             }
         }

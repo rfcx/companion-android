@@ -20,6 +20,7 @@ import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
 import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.base.ViewModelFactory
+import org.rfcx.companion.entity.CrashlyticsKey
 import org.rfcx.companion.entity.Stream
 import org.rfcx.companion.entity.isGuest
 import org.rfcx.companion.repo.api.CoreApiHelper
@@ -46,6 +47,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
 
     private var addTooltip: SimpleTooltip? = null
     private val analytics by lazy { Analytics(this) }
+    private val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -91,7 +93,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         setContentView(R.layout.activity_main)
         setViewModel()
 
-        FirebaseCrashlytics.getInstance().setCustomKey("Email", this.getEmailUser())
+        firebaseCrashlytics.setCustomKey(CrashlyticsKey.EmailUser.key, this.getEmailUser())
 
         val preferences = Preferences.getInstance(this)
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
