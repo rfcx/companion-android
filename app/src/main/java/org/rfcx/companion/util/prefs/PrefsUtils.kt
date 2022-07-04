@@ -89,7 +89,7 @@ object PrefsUtils {
         }
         val json = JsonParser.parseString(str).asJsonObject
         val keys = json.keySet()
-        val audioPrefs = listOf(audioDuration, audioSampleRate, audioCodec, audioBitrate)
+        val audioPrefs = listOf(audioDuration, audioSampleRate, audioCodec, audioBitrate, enableSampling, sampling)
         val audioKeys = keys.filter { audioPrefs.contains(it) }
         val audioJson = JsonObject()
         audioKeys.toList().forEach {
