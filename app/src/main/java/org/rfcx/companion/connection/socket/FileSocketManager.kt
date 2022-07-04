@@ -1,7 +1,6 @@
 package org.rfcx.companion.connection.socket
 
 import android.os.SystemClock
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -61,7 +60,6 @@ object FileSocketManager {
                         break
                     }
                     outputStream?.write(buffer, 0, count)
-                    Log.d("UpdatingProgress", "$progress $fileSize")
                     uploadingProgress.postValue(((progress.toDouble() / fileSize.toDouble()) * 100).roundToInt())
                 }
 
