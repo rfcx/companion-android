@@ -34,7 +34,7 @@
     <!--  Guardian  -->
     <string-array name="guardian_assembly_checks">
         <item>Software Update</item>
-        <item>Classifier Loader</item>
+        <item>Classifier Upload</item>
         <item>Power Diagnostics</item>
         <item>Communication Configuration</item>
     </string-array>

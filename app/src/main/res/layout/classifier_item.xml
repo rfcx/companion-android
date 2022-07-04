@@ -75,6 +75,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/fileVersionTextView" />
 
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/uploadingProgress"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginEnd="@dimen/margin_padding_normal"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/fileVersionTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/fileVersionTextView" />
+
     <TextView
         android:id="@+id/fileUpToDateTextView"
         style="@style/AudioMothText.Label.Secondary"

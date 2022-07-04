@@ -33,6 +33,8 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
     private var selectedDeActivate: ClassifierLite? = null
     private var loadingTimer: CountDownTimer? = null
 
+    private var tempProgress = 0
+
     private val db by lazy { ClassifierDb(Realm.getInstance(RealmHelper.migrationConfig())) }
 
     override fun onAttach(context: Context) {
@@ -91,7 +93,7 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
                         val selectedVersion = selected.classifier
                         val installedVersion = it[selected.classifier.id]
                         if (installedVersion != null && installedVersion.id == selectedVersion.id) {
-                            classifierLoadAdapter?.hideLoading()
+                            classifierLoadAdapter?.hideProgressUploading()
                             nextButton.isEnabled = true
                             stopTimer()
                         }
@@ -125,6 +127,17 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
             }
         }
 
+        FileSocketManager.uploadingProgress.observe(
+            viewLifecycleOwner
+        ) {
+            requireActivity().runOnUiThread {
+                if (it != tempProgress) {
+                    tempProgress = it
+                    classifierLoadAdapter?.progress = it
+                }
+            }
+        }
+
         nextButton.setOnClickListener {
             deploymentProtocol?.nextStep()
         }
@@ -138,19 +151,19 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
     }
 
     private fun hideItemLoading() {
-        classifierLoadAdapter?.hideLoading()
+        classifierLoadAdapter?.hideSettingLoading()
         nextButton.isEnabled = true
         stopTimer()
     }
 
     private fun startTimer() {
         loadingTimer = object : CountDownTimer(120000, 1000) {
-            override fun onTick(millisUntilFinished: Long) { }
+            override fun onTick(millisUntilFinished: Long) {}
 
             override fun onFinish() {
                 classifierLoadAdapter?.let {
-                    if (it.getLoading()) {
-                        it.hideLoading()
+                    if (it.getProgressUploading()) {
+                        it.hideProgressUploading()
                     }
                 }
                 stopTimer()
@@ -182,12 +195,20 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
     override fun onActiveClick(selectedClassifier: ClassifierLite) {
         nextButton.isEnabled = false
         selectedActivate = selectedClassifier
-        GuardianSocketManager.sendInstructionMessage(InstructionType.SET, InstructionCommand.CLASSIFIER, Gson().toJson(ClassifierSet("activate", selectedClassifier.id)))
+        GuardianSocketManager.sendInstructionMessage(
+            InstructionType.SET,
+            InstructionCommand.CLASSIFIER,
+            Gson().toJson(ClassifierSet("activate", selectedClassifier.id))
+        )
     }
 
     override fun onDeActiveClick(selectedClassifier: ClassifierLite) {
         nextButton.isEnabled = false
         selectedDeActivate = selectedClassifier
-        GuardianSocketManager.sendInstructionMessage(InstructionType.SET, InstructionCommand.CLASSIFIER, Gson().toJson(ClassifierSet("deactivate", selectedClassifier.id)))
+        GuardianSocketManager.sendInstructionMessage(
+            InstructionType.SET,
+            InstructionCommand.CLASSIFIER,
+            Gson().toJson(ClassifierSet("deactivate", selectedClassifier.id))
+        )
     }
 }
