@@ -4,7 +4,6 @@ import okhttp3.ResponseBody
 import org.rfcx.companion.entity.UserTouchResponse
 import org.rfcx.companion.entity.request.GuardianRegisterRequest
 import org.rfcx.companion.entity.response.*
-import org.rfcx.companion.repo.OnAttachmentDownloadListener
 import retrofit2.Call
 import retrofit2.http.*
 
