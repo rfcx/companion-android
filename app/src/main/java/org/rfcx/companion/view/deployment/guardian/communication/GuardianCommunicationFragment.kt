@@ -401,7 +401,7 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
     }
 
     private fun showEmptyOffTimeText() {
-        if (supportedSites.contains(deploymentProtocol?.getCurrentProjectId())) emptyOffTimeTextView.visibility = View.VISIBLE
+        if (!supportedSites.contains(deploymentProtocol?.getCurrentProjectId())) emptyOffTimeTextView.visibility = View.VISIBLE
     }
 
     private fun hideEmptyOffTimeText() {
