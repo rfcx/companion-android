@@ -73,7 +73,7 @@ object FileSocketManager {
 
                 outputStream?.flush()
 
-                SystemClock.sleep(1000)
+                SystemClock.sleep(5000)
 
                 outputStream?.write("****".toByteArray())
                 outputStream?.flush()
