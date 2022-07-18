@@ -32,7 +32,7 @@
         style="@style/AudioMothText.Body.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/download_softwares_from_guardian_softwares_page_first"
+        android:text="@string/download_classifiers_from_guardian_classifier_page_first"
         android:textAlignment="center"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/nextButton"

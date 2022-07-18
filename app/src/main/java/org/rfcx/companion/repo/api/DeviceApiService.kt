@@ -53,6 +53,7 @@ interface DeviceApiService {
         @Header("Authorization") authUser: String
     ): Call<List<GuardianClassifierResponse>>
 
+    @Streaming
     @GET
     fun downloadFile(@Url url: String): Call<ResponseBody>
 }

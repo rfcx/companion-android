@@ -544,4 +544,7 @@
     <string name="not_found_classifier_local">not found</string>
     <string name="enable_sampling_ratio">Enable Sampling ratio</string>
     <string name="sampling_ratio">Sampling ratio</string>
+
+    <string name="guardian_software_not_allowed">Your guardian software version is not compatible with this feature.</string>
+    <string name="go_back">go back</string>
 </resources>

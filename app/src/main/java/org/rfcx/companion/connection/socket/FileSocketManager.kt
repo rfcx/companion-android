@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import org.rfcx.companion.entity.guardian.Classifier
 import org.rfcx.companion.util.file.APKUtils
+import org.rfcx.companion.util.socket.PingUtils
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.File
@@ -48,11 +49,18 @@ object FileSocketManager {
                 outputStream?.write(file.name.toByteArray())
                 outputStream?.write("|".toByteArray())
 
-                if (meta != null) {
-                    outputStream?.write(meta.toByteArray())
+                val guardian = PingUtils.getSoftwareVersionFromPing(GuardianSocketManager.pingBlob.value)
+                if (guardian != null) {
+                    val version = guardian["guardian"]
+                    if (APKUtils.calculateVersionValue(version!!) >= 10100) {
+                        if (meta != null) {
+                            outputStream?.write(meta.toByteArray())
+                        }
+
+                        outputStream?.write("|".toByteArray())
+                    }
                 }
 
-                outputStream?.write("|".toByteArray())
                 while (true) {
                     count = inp.read(buffer)
                     progress += count
@@ -65,7 +73,7 @@ object FileSocketManager {
 
                 outputStream?.flush()
 
-                SystemClock.sleep(1000)
+                SystemClock.sleep(5000)
 
                 outputStream?.write("****".toByteArray())
                 outputStream?.flush()
