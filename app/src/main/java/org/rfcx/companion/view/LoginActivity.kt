@@ -15,7 +15,6 @@ import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
 import androidx.appcompat.app.AppCompatDelegate.getDefaultNightMode
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.android.synthetic.main.activity_login.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
@@ -35,7 +34,7 @@ class LoginActivity : AppCompatActivity() {
     private val analytics by lazy { Analytics(this) }
     private lateinit var loginViewModel: LoginViewModel
     private var userAuthResponse: UserAuthResponse? = null
-    private val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
+    private val firebaseCrashlytics by lazy { Crashlytics() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

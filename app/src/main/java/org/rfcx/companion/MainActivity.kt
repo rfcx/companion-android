@@ -13,7 +13,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_map.*
@@ -47,7 +46,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
 
     private var addTooltip: SimpleTooltip? = null
     private val analytics by lazy { Analytics(this) }
-    private val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
+    private val firebaseCrashlytics by lazy { Crashlytics() }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -151,24 +150,24 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
 
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetContainer)
         bottomSheetBehavior.addBottomSheetCallback(object :
-                BottomSheetBehavior.BottomSheetCallback() {
-                override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+            BottomSheetBehavior.BottomSheetCallback() {
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
 
-                override fun onStateChanged(bottomSheet: View, newState: Int) {
-                    if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
-                        val bottomSheetFragment =
-                            supportFragmentManager.findFragmentByTag(BOTTOM_SHEET)
-                        if (bottomSheetFragment != null) {
-                            supportFragmentManager.beginTransaction()
-                                .remove(bottomSheetFragment)
-                                .commit()
-                        }
-                    }
-                    if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                        hideBottomAppBar()
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                    val bottomSheetFragment =
+                        supportFragmentManager.findFragmentByTag(BOTTOM_SHEET)
+                    if (bottomSheetFragment != null) {
+                        supportFragmentManager.beginTransaction()
+                            .remove(bottomSheetFragment)
+                            .commit()
                     }
                 }
-            })
+                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                    hideBottomAppBar()
+                }
+            }
+        })
     }
 
     private fun setupSimpleTooltip() {
@@ -333,7 +332,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         hideSnackbar()
         hideBottomAppBar()
         val layoutParams: CoordinatorLayout.LayoutParams = bottomSheetContainer.layoutParams
-            as CoordinatorLayout.LayoutParams
+                as CoordinatorLayout.LayoutParams
         layoutParams.anchorGravity = Gravity.BOTTOM
         bottomSheetContainer.layoutParams = layoutParams
         supportFragmentManager.beginTransaction()

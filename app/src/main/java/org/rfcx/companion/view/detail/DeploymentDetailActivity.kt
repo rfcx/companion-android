@@ -14,7 +14,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -54,7 +53,7 @@ class DeploymentDetailActivity :
     private lateinit var mapView: MapView
     private lateinit var mapBoxMap: MapboxMap
     private val analytics by lazy { Analytics(this) }
-    private val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
+    private val firebaseCrashlytics by lazy { Crashlytics() }
 
     // data
     private var deployment: Deployment? = null
@@ -110,7 +109,10 @@ class DeploymentDetailActivity :
                 stream?.let { st ->
                     intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)?.let { deploymentId ->
                         analytics.trackEditLocationEvent()
-                        firebaseCrashlytics.setCustomKey(CrashlyticsKey.EditLocation.key, st.serverId ?: "")
+                        firebaseCrashlytics.setCustomKey(
+                            CrashlyticsKey.EditLocation.key,
+                            st.serverId ?: ""
+                        )
                         EditLocationActivity.startActivity(
                             this,
                             st.id,
@@ -163,7 +165,10 @@ class DeploymentDetailActivity :
                 object : DatabaseCallback {
                     override fun onSuccess() {
                         DeploymentSyncWorker.enqueue(this@DeploymentDetailActivity)
-                        firebaseCrashlytics.setCustomKey(CrashlyticsKey.DeleteLocation.key, it.serverId ?: "")
+                        firebaseCrashlytics.setCustomKey(
+                            CrashlyticsKey.DeleteLocation.key,
+                            it.serverId ?: ""
+                        )
                         finish()
                     }
 
@@ -191,7 +196,8 @@ class DeploymentDetailActivity :
                 val list = deploymentImages.map {
                     if (it.remotePath != null) BuildConfig.DEVICE_API_DOMAIN + it.remotePath else "file://${it.localPath}"
                 } as ArrayList
-                val selectedImage = deploymentImageView.remotePath ?: "file://${deploymentImageView.localPath}"
+                val selectedImage =
+                    deploymentImageView.remotePath ?: "file://${deploymentImageView.localPath}"
 
                 val index = list.indexOf(selectedImage)
                 list.removeAt(index)
