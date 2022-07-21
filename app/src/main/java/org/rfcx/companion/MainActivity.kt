@@ -150,24 +150,24 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
 
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetContainer)
         bottomSheetBehavior.addBottomSheetCallback(object :
-            BottomSheetBehavior.BottomSheetCallback() {
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+                BottomSheetBehavior.BottomSheetCallback() {
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {}
 
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
-                    val bottomSheetFragment =
-                        supportFragmentManager.findFragmentByTag(BOTTOM_SHEET)
-                    if (bottomSheetFragment != null) {
-                        supportFragmentManager.beginTransaction()
-                            .remove(bottomSheetFragment)
-                            .commit()
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                        val bottomSheetFragment =
+                            supportFragmentManager.findFragmentByTag(BOTTOM_SHEET)
+                        if (bottomSheetFragment != null) {
+                            supportFragmentManager.beginTransaction()
+                                .remove(bottomSheetFragment)
+                                .commit()
+                        }
+                    }
+                    if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                        hideBottomAppBar()
                     }
                 }
-                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                    hideBottomAppBar()
-                }
-            }
-        })
+            })
     }
 
     private fun setupSimpleTooltip() {
@@ -332,7 +332,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         hideSnackbar()
         hideBottomAppBar()
         val layoutParams: CoordinatorLayout.LayoutParams = bottomSheetContainer.layoutParams
-                as CoordinatorLayout.LayoutParams
+            as CoordinatorLayout.LayoutParams
         layoutParams.anchorGravity = Gravity.BOTTOM
         bottomSheetContainer.layoutParams = layoutParams
         supportFragmentManager.beginTransaction()
