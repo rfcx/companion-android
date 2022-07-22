@@ -1,4 +1,5 @@
 - Change from normal circle loading to linear loading with progress
 - Fix "no time off" text show up even there is a time off
+- Add more the information in the crashlytics
 - Show alert if software version not match
 - Fix typo when no classifier
