@@ -3,3 +3,4 @@
 - Add more the information in the crashlytics
 - Show alert if software version not match
 - Fix typo when no classifier
+- Fix Guardian Preference not update with changed
