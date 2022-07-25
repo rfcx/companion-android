@@ -196,6 +196,10 @@ class GuardianDeploymentActivity :
                 passedChecks.add(currentCheck)
             }
             currentCheck = -1 // reset check
+        } else {
+            getPrefs().forEach {
+                this.prefsEditor?.remove(it.key)?.apply()
+            }
         }
         startCheckList()
     }
@@ -205,6 +209,9 @@ class GuardianDeploymentActivity :
         val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
         when (container) {
             is GuardianAdvancedFragment -> {
+                getPrefs().forEach {
+                    this.prefsEditor?.remove(it.key)?.apply()
+                }
                 startCheckList()
             }
             is MapPickerFragment -> {
