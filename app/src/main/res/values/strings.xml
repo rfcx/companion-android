@@ -268,6 +268,8 @@
     <string name="choose_bitrate">Choose Bitrate (kbs)</string>
     <string name="choose_file_format">Choose Audio Format</string>
     <string name="choose_duration_cycle">Choose Recording Duration Cycle (secs)</string>
+    <string name="choose_enable_sampling">Choose Enable Sampling Ratio</string>
+    <string name="choose_sampling">Choose Sampling Ratio</string>
     <string name="advanced_config">Guardian Preferences</string>
 
     <!-- GuardianPreferences -->
@@ -469,7 +471,7 @@
     <string name="updater_role">updater</string>
     <string name="up_to_date">up to date</string>
 
-    <!-- SoftwareUpdateFragment -->
+    <!-- ClassifierLoadFragment -->
     <string name="guardian_version">Guardian version</string>
     <string name="admin_version">Admin version</string>
     <string name="classify_version">Classify version</string>
@@ -480,6 +482,7 @@
     <string name="cell">cell</string>
     <string name="swarm">swarm</string>
     <string name="download_softwares_from_guardian_softwares_page_first">Download softwares from Guardian softwares page first\nProfile -> Guardian software -> Download APKs you needed</string>
+    <string name="download_classifiers_from_guardian_classifier_page_first">Download classifiers from Guardian classifier page first\nProfile -> Classifier -> Download Classifiers you needed</string>
     <string name="ibattery_p">Internal Battery</string>
     <string name="mbattery_p">Main Battery</string>
     <string name="in_queue">In queue</string>
@@ -537,4 +540,11 @@
     <string name="incorrect_username_or_password">Incorrect email or password.</string>
     <string name="firebase_authentication_failed">Firebase authentication failed. Please try again.</string>
     <string name="dismiss">dismiss</string>
+    <string name="classifier">Classifier</string>
+    <string name="not_found_classifier_local">not found</string>
+    <string name="enable_sampling_ratio">Enable Sampling ratio</string>
+    <string name="sampling_ratio">Sampling ratio</string>
+
+    <string name="guardian_software_not_allowed">Your guardian software version is not compatible with this feature.</string>
+    <string name="go_back">go back</string>
 </resources>

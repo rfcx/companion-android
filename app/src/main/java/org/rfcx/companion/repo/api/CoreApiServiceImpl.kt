@@ -10,7 +10,7 @@ class CoreApiServiceImpl : CoreApiService {
         return ApiManager.getInstance().coreApi.checkSoftwareVersion(authUser)
     }
 
-    override fun downloadAPK(url: String): Call<ResponseBody> {
-        return ApiManager.getInstance().coreApi.downloadAPK(url)
+    override fun downloadFile(url: String): Call<ResponseBody> {
+        return ApiManager.getInstance().coreApi.downloadFile(url)
     }
 }

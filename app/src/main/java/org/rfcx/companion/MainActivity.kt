@@ -13,13 +13,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
 import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.base.ViewModelFactory
+import org.rfcx.companion.entity.CrashlyticsKey
 import org.rfcx.companion.entity.Stream
 import org.rfcx.companion.entity.isGuest
 import org.rfcx.companion.repo.api.CoreApiHelper
@@ -46,6 +46,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
 
     private var addTooltip: SimpleTooltip? = null
     private val analytics by lazy { Analytics(this) }
+    private val firebaseCrashlytics by lazy { Crashlytics() }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -91,7 +92,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         setContentView(R.layout.activity_main)
         setViewModel()
 
-        FirebaseCrashlytics.getInstance().setCustomKey("Email", this.getEmailUser())
+        firebaseCrashlytics.setCustomKey(CrashlyticsKey.EmailUser.key, this.getEmailUser())
 
         val preferences = Preferences.getInstance(this)
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)

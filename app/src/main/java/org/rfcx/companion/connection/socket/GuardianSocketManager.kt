@@ -103,7 +103,7 @@ object GuardianSocketManager {
         sendInstructionMessage(InstructionType.CTRL, InstructionCommand.SPEED_TEST)
     }
 
-    private fun sendInstructionMessage(type: InstructionType, command: InstructionCommand, meta: String = "{}") {
+    fun sendInstructionMessage(type: InstructionType, command: InstructionCommand, meta: String = "{}") {
         val data = gson.toJson(InstructionMessage.toMessage(type, command, meta))
         sendMessage(data)
     }

@@ -18,10 +18,7 @@ import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.activity_login.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
-import org.rfcx.companion.entity.LoginType
-import org.rfcx.companion.entity.Screen
-import org.rfcx.companion.entity.StatusEvent
-import org.rfcx.companion.entity.UserAuthResponse
+import org.rfcx.companion.entity.*
 import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
@@ -37,6 +34,7 @@ class LoginActivity : AppCompatActivity() {
     private val analytics by lazy { Analytics(this) }
     private lateinit var loginViewModel: LoginViewModel
     private var userAuthResponse: UserAuthResponse? = null
+    private val firebaseCrashlytics by lazy { Crashlytics() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +51,7 @@ class LoginActivity : AppCompatActivity() {
         signInButton.setOnClickListener {
             val email = loginEmailEditText.text.toString().trim()
             val password = loginPasswordEditText.text.toString()
+            firebaseCrashlytics.setCustomKey(CrashlyticsKey.LoginWith.key, email)
             it.hideKeyboard()
 
             if (validateInput(email, password)) {

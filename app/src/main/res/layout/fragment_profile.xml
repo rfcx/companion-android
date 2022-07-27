@@ -252,12 +252,25 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/guardianSectionTextView" />
 
+    <TextView
+        android:id="@+id/classifierTextView"
+        style="@style/AudioMothText.SubTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:padding="@dimen/margin_padding_normal"
+        android:text="@string/classifier"
+        android:textColor="@color/text_primary"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/softwareTextView" />
+
     <View
         android:id="@+id/viewProject"
         android:layout_width="match_parent"
         android:layout_height="@dimen/separate_line_size"
         android:background="@color/separateLine"
-        app:layout_constraintTop_toBottomOf="@id/softwareTextView" />
+        app:layout_constraintTop_toBottomOf="@id/classifierTextView" />
 
     <TextView
 
@@ -273,7 +286,7 @@
         android:textColor="@color/text_secondary"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/softwareTextView" />
+        app:layout_constraintTop_toBottomOf="@id/classifierTextView" />
 
     <TextView
         android:id="@+id/feedbackTextView"

@@ -4,18 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.deployment.guardian.classifier.ClassifierFragment">
+    tools:context=".view.deployment.guardian.classifier.ClassifierLoadFragment">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/versionRecyclerView"
+        android:id="@+id/classifierRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginBottom="@dimen/margin_padding_normal"
-        app:layout_constraintBottom_toTopOf="@id/updateButton"
+        app:layout_constraintBottom_toTopOf="@id/nextButton"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/updateButton"
+        android:id="@+id/nextButton"
         style="@style/AudioMothButton.GreenButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,7 +23,20 @@
         android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginEnd="@dimen/margin_padding_large"
         android:layout_marginBottom="@dimen/margin_padding_normal"
-        android:enabled="false"
-        android:text="@string/update"
+        android:enabled="true"
+        android:text="@string/next"
         app:layout_constraintBottom_toBottomOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/noClassifierText"
+        style="@style/AudioMothText.Body.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/download_classifiers_from_guardian_classifier_page_first"
+        android:textAlignment="center"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/nextButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

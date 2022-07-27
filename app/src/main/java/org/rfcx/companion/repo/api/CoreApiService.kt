@@ -14,5 +14,5 @@ interface CoreApiService {
     ): Call<List<GuardianSoftwareResponse>>
 
     @GET
-    fun downloadAPK(@Url url: String): Call<ResponseBody>
+    fun downloadFile(@Url url: String): Call<ResponseBody>
 }

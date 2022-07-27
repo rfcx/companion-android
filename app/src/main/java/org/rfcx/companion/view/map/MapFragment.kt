@@ -63,10 +63,7 @@ import org.rfcx.companion.MainActivityListener
 import org.rfcx.companion.MainViewModel
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
-import org.rfcx.companion.entity.Device
-import org.rfcx.companion.entity.Project
-import org.rfcx.companion.entity.Screen
-import org.rfcx.companion.entity.Stream
+import org.rfcx.companion.entity.*
 import org.rfcx.companion.localdb.TrackingDb
 import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.CoreApiServiceImpl
@@ -121,6 +118,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
     private var currentUserLocation: Location? = null
 
     private val analytics by lazy { context?.let { Analytics(it) } }
+    private val firebaseCrashlytics by lazy { Crashlytics() }
 
     private val handler: Handler = Handler()
 
@@ -652,9 +650,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         layout.deployedAt.text = deployedAt
         var latLng = ""
         context?.let { context ->
-            latLng = "${stream?.latitude.latitudeCoordinates(context)}, ${
-            stream?.longitude.longitudeCoordinates(context)
-            }"
+            latLng = "${stream?.latitude.latitudeCoordinates(context)}, ${stream?.longitude.longitudeCoordinates(context)}"
         }
         layout.latLngTextView.text = latLng
         val measureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
@@ -665,6 +661,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         windowInfoImages[id] = bitmap
 
         setWindowInfoImageGenResults(windowInfoImages)
+
+        firebaseCrashlytics.setCustomKey(
+            CrashlyticsKey.WindowInfoDeployment.key,
+            "Site: $title, Project: $projectName"
+        )
     }
 
     private fun setSiteDetail(feature: Feature) {
@@ -684,9 +685,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         val lat = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_LATITUDE) ?: "0.0"
         val lng = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_LONGITUDE) ?: "0.0"
         context?.let { context ->
-            latLng = "${lat.toDouble().latitudeCoordinates(context)}, ${
-            lng.toDouble().longitudeCoordinates(context)
-            }"
+            latLng = "${lat.toDouble().latitudeCoordinates(context)}, ${lng.toDouble().longitudeCoordinates(context)}"
         }
         bubbleLayout.latLngValue.text = latLng
         val measureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
@@ -697,6 +696,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         windowInfoImages[id] = bitmap
 
         setWindowInfoImageGenResults(windowInfoImages)
+        firebaseCrashlytics.setCustomKey(
+            CrashlyticsKey.WindowInfoSite.key,
+            "Site: $title, Project: $projectName"
+        )
     }
 
     private fun setupImages(style: Style) {
@@ -886,8 +889,15 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
 
     private fun handleClickCallout(feature: Feature): Boolean {
         val deploymentId = feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID)
+        val siteName = feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_TITLE)
+        val projectName = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_PROJECT_NAME)
+
         if (deploymentId != null) {
             context?.let {
+                firebaseCrashlytics.setCustomKey(
+                    CrashlyticsKey.OnClickSeeDetail.key,
+                    "Site: $siteName, Project: $projectName"
+                )
                 DeploymentDetailActivity.startActivity(it, deploymentId.toInt())
                 analytics?.trackSeeDetailEvent()
             }
@@ -933,10 +943,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
     private fun updateUnsyncedCount(number: Int) {
         if (number == 0) {
             unSyncedDpNumber.text = ""
-            unSyncedDpNumber.background = ContextCompat.getDrawable(requireContext(), R.drawable.ic_check_circledp)
+            unSyncedDpNumber.background =
+                ContextCompat.getDrawable(requireContext(), R.drawable.ic_check_circledp)
         } else {
             unSyncedDpNumber.text = number.toString()
-            unSyncedDpNumber.background = ContextCompat.getDrawable(requireContext(), R.drawable.circle_unsynced)
+            unSyncedDpNumber.background =
+                ContextCompat.getDrawable(requireContext(), R.drawable.circle_unsynced)
         }
     }
 
@@ -991,7 +1003,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
     }
 
     private fun setObserver() {
-        mainViewModel.getUnsyncedDeployments().observe(viewLifecycleOwner, getUnsyncedDeploymentsObserver)
+        mainViewModel.getUnsyncedDeployments()
+            .observe(viewLifecycleOwner, getUnsyncedDeploymentsObserver)
         mainViewModel.getProjectsFromRemote()
             .observe(viewLifecycleOwner, getProjectsFromRemoteObserver)
         mainViewModel.getDeploymentMarkers()

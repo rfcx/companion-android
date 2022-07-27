@@ -4,11 +4,14 @@ import android.os.SystemClock
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import org.rfcx.companion.entity.guardian.Classifier
 import org.rfcx.companion.util.file.APKUtils
+import org.rfcx.companion.util.socket.PingUtils
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.File
 import java.net.Socket
+import kotlin.math.roundToInt
 
 object FileSocketManager {
 
@@ -20,34 +23,57 @@ object FileSocketManager {
     private lateinit var inComingMessageThread: Thread
 
     val pingBlob = MutableLiveData<JsonObject>()
+    val uploadingProgress = MutableLiveData<Int>()
 
-    fun sendFile(filePath: String) {
-        sendMessage(APKUtils.getAPKFileFromPath(filePath))
+    fun sendFile(filePath: String, meta: String? = null) {
+        sendMessage(APKUtils.getAPKFileFromPath(filePath), meta)
     }
 
-    private fun sendMessage(file: File) {
+    fun sendFile(classifier: Classifier) {
+        sendMessage(APKUtils.getAPKFileFromPath(classifier.path), classifier.toGuardianClassifier())
+    }
+
+    private fun sendMessage(file: File, meta: String?) {
         clientThread = Thread {
             try {
                 socket = Socket("192.168.43.1", 9996)
                 socket?.keepAlive = true
                 startInComingMessageThread()
                 outputStream = DataOutputStream(socket?.getOutputStream())
+
+                val fileSize = file.length()
+                var progress = 0
                 val buffer = ByteArray(8192)
                 var count: Int
                 val inp = file.inputStream()
                 outputStream?.write(file.name.toByteArray())
                 outputStream?.write("|".toByteArray())
+
+                val guardian = PingUtils.getSoftwareVersionFromPing(GuardianSocketManager.pingBlob.value)
+                if (guardian != null) {
+                    val version = guardian["guardian"]
+                    if (APKUtils.calculateVersionValue(version!!) >= 10100) {
+                        if (meta != null) {
+                            outputStream?.write(meta.toByteArray())
+                        }
+
+                        outputStream?.write("|".toByteArray())
+                    }
+                }
+
                 while (true) {
                     count = inp.read(buffer)
+                    progress += count
                     if (count < 0) {
                         break
                     }
                     outputStream?.write(buffer, 0, count)
+                    uploadingProgress.postValue(((progress.toDouble() / fileSize.toDouble()) * 100).roundToInt())
                 }
 
                 outputStream?.flush()
 
-                SystemClock.sleep(10000)
+                SystemClock.sleep(5000)
 
                 outputStream?.write("****".toByteArray())
                 outputStream?.flush()

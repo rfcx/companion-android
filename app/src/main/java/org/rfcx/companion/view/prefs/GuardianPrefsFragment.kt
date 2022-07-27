@@ -56,11 +56,4 @@ class GuardianPrefsFragment :
         super.onPause()
         preferenceScreen.sharedPreferences?.unregisterOnSharedPreferenceChangeListener(this)
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        prefs.forEach {
-            preferenceScreen.sharedPreferences?.edit()?.remove(it.key)?.apply()
-        }
-    }
 }
