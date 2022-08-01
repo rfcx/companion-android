@@ -58,7 +58,7 @@ object GuardianSocketManager {
         val prefs = JsonObject()
         prefs.addProperty("api_satellite_protocol", "off")
         prefs.addProperty("enable_audio_classify", "true")
-        prefs.addProperty("enable_checkin_publish", "false")
+        prefs.addProperty("enable_checkin_publish", "true")
         prefs.addProperty("api_ping_cycle_fields", "sms,battery,sentinel_power,software,swm,detections,storage,memory,cpu")
         prefs.addProperty("enable_audio_cast", "true")
         prefs.addProperty("enable_file_socket", "true")
