@@ -89,6 +89,7 @@ class ClassifierLoadAdapter(
                         holder.modelSendButton.visibility = View.VISIBLE
                         holder.modelSendButton.text =
                             "load version ${versionItem.classifier.version}"
+                        holder.modelStatus.text = "not found"
                     }
                 }
 
@@ -99,10 +100,12 @@ class ClassifierLoadAdapter(
                             holder.hideSettingLoading()
                             holder.modelDeActiveButton.visibility = View.VISIBLE
                             holder.modelActiveButton.visibility = View.GONE
+                            holder.modelStatus.text = "activated"
                         } else {
                             holder.hideSettingLoading()
                             holder.modelDeActiveButton.visibility = View.GONE
                             holder.modelActiveButton.visibility = View.VISIBLE
+                            holder.modelStatus.text = "not activated"
                         }
                     }
                 }
@@ -200,6 +203,7 @@ class ClassifierLoadAdapter(
         internal var modelProgress: LinearProgressIndicator = itemView.uploadingProgress
         internal var modelActiveButton: Button = itemView.classifierActivateButton
         internal var modelDeActiveButton: Button = itemView.classifierDeActivateButton
+        internal var modelStatus: TextView = itemView.fileStatusTextView
 
         fun showSettingLoading() {
             modelLoading.visibility = View.VISIBLE

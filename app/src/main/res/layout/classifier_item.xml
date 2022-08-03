@@ -19,6 +19,19 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="TextView" />
 
+    <TextView
+        android:id="@+id/fileStatusTextView"
+        style="@style/AudioMothText.Label.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/margin_padding_xlarge"
+        android:paddingTop="@dimen/margin_padding_normal"
+        android:paddingEnd="@dimen/margin_padding_large"
+        android:paddingBottom="@dimen/margin_padding_normal"
+        app:layout_constraintStart_toEndOf="@id/fileVersionTextView"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="TextView" />
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/fileSendButton"
         style="@style/OfflineMapButton"
