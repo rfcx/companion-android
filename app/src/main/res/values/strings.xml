@@ -547,4 +547,6 @@
 
     <string name="guardian_software_not_allowed">Your guardian software version is not compatible with this feature.</string>
     <string name="go_back">go back</string>
+    <string name="battery_voltage">Battery Voltage</string>
+    <string name="system_voltage">System Voltage</string>
 </resources>

@@ -100,15 +100,19 @@ class GuardianSolarPanelFragment : Fragment() {
                         val voltage = input.voltage.toFloat()
                         val current = input.current.toFloat()
                         val power = input.power.toFloat()
-                        val mainBattery = sentinelResponse.battery.percentage
-                        val internalBattery = deploymentProtocol?.getInternalBattery() ?: -1
 
-                        // set 4 top value
                         setVoltageValue(voltage)
                         setCurrentValue(current)
                         setPowerValue(power)
+
+                        val mainBattery = sentinelResponse.battery.percentage
+                        val internalBattery = deploymentProtocol?.getInternalBattery() ?: -1
+                        val batteryVoltage = sentinelResponse.battery.voltage
+                        val systemVoltage = sentinelResponse.system.voltage
                         setMainBatteryPercentage(mainBattery)
                         setInternalBatteryPercentage(internalBattery)
+                        setBatteryVoltage(batteryVoltage)
+                        setSystemVoltage(systemVoltage)
 
                         // update power and voltage to chart
                         updateData(power)
@@ -151,6 +155,14 @@ class GuardianSolarPanelFragment : Fragment() {
 
     private fun setInternalBatteryPercentage(value: Int) {
         internalBatteryValueTextView.text = "$value%"
+    }
+
+    private fun setBatteryVoltage(value: Int) {
+        batteryVoltageValueTextView.text = "${value}mV"
+    }
+
+    private fun setSystemVoltage(value: Int) {
+        systemVoltageValueTextView.text = "${value}mV"
     }
 
     private fun convertPowerToEntry(power: Float): Entry {
