@@ -199,6 +199,65 @@
         </LinearLayout>
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/voltageI2cLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:layout_marginEnd="@dimen/margin_padding_large"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/batteryI2cLayout">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/batteryVoltageTextView"
+                style="@style/AudioMothText.Body.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/battery_voltage" />
+
+            <TextView
+                android:id="@+id/batteryVoltageValueTextView"
+                style="@style/AudioMothText.Body.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:paddingBottom="@dimen/margin_padding_small"
+                tools:text="100" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/systemVoltageTextView"
+                style="@style/AudioMothText.Body.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/system_voltage" />
+
+            <TextView
+                android:id="@+id/systemVoltageValueTextView"
+                style="@style/AudioMothText.Body.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:paddingBottom="@dimen/margin_padding_small"
+                tools:text="100" />
+        </LinearLayout>
+    </LinearLayout>
+
     <TextView
         android:id="@+id/solarWarnTextView"
         style="@style/AudioMothText.Body.Small"

@@ -6,6 +6,7 @@ import android.media.AudioManager
 import android.media.AudioTrack
 import android.os.Build
 import android.util.Base64
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 class MicrophoneTestUtils {
     private var sampleRate = 12000
@@ -57,11 +58,19 @@ class MicrophoneTestUtils {
     }
 
     fun setTrack() {
-        audioTrack?.write(buffer, 0, buffer.size)
+        try {
+            audioTrack?.write(buffer, 0, buffer.size)
+        } catch (e: Exception) {
+            FirebaseCrashlytics.getInstance().recordException(e)
+        }
     }
 
     fun play() {
-        audioTrack?.play()
+        try {
+            audioTrack?.play()
+        } catch (e: Exception) {
+            FirebaseCrashlytics.getInstance().recordException(e)
+        }
     }
 
     fun stop() {
