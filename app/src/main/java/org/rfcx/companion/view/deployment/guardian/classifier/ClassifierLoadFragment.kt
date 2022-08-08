@@ -122,6 +122,11 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
                                 hideItemLoading()
                                 selectedActivate = null
                             }
+
+                            val sampleRate = db.get(selectedId)?.getSampleRateAsPref()
+                            if (sampleRate != null) {
+                                GuardianSocketManager.syncConfiguration(sampleRate)
+                            }
                         }
 
                         selectedDeActivate?.let { selected ->
