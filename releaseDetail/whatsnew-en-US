@@ -1,3 +1,1 @@
-- Add Classifier activation status for more understanding
-- Avoid app crash when AudioPlayer cannot play audio data
-- Add battery and system voltage to Solar Panel step
+- Change guardian plan preference
