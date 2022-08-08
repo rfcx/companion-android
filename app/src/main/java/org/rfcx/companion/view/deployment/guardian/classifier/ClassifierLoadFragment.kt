@@ -86,7 +86,11 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
         }
 
         if (!isSoftwareCompatible()) {
-            showAlert()
+            showAlert(getString(R.string.guardian_software_not_allowed))
+        }
+
+        if (!isSMSOrSatGuardian()) {
+            showAlert(getString(R.string.guardian_type_not_allowed))
         }
 
         GuardianSocketManager.pingBlob.observe(
@@ -172,11 +176,15 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
         return true
     }
 
-    private fun showAlert() {
+    private fun isSMSOrSatGuardian(): Boolean {
+        return deploymentProtocol?.isSMSOrSatGuardian() ?: return false
+    }
+
+    private fun showAlert(text: String) {
         val dialogBuilder: AlertDialog.Builder =
             AlertDialog.Builder(requireContext()).apply {
                 setTitle(null)
-                setMessage(R.string.guardian_software_not_allowed)
+                setMessage(text)
                 setPositiveButton(R.string.go_back) { _, _ ->
                     deploymentProtocol?.backStep()
                 }

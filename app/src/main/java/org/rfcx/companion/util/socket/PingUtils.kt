@@ -134,6 +134,14 @@ object PingUtils {
         return isRegistered.asBoolean
     }
 
+    fun isSMSOrSatGuardian(guardianPing: GuardianPing?): Boolean {
+        if (guardianPing?.prefs is JsonObject) {
+            val prefs = guardianPing.prefs.get("vals") ?: return false
+            return PrefsUtils.isSMSOrSatGuardian(Gson().toJson(prefs))
+        }
+        return false
+    }
+
     fun getSoftwareVersionFromPing(ping: GuardianPing?): Map<String, String>? {
         val software = ping?.software ?: return null
         val softwareList = software.split("|")
