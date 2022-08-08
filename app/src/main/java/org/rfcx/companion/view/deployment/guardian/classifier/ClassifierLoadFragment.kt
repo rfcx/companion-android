@@ -112,29 +112,37 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
                     }
                 }
                 val activeClassifiers = deploymentProtocol?.getActiveClassifiers()
-                if (activeClassifiers != null) {
-                    classifierLoadAdapter?.activeClassifierVersion = activeClassifiers
-                    selectedActivate?.let { selected ->
-                        val selectedId = selected.id
-                        val activeId = activeClassifiers[selectedId]
-                        if (activeId != null && activeId.id == selectedId) {
-                            hideItemLoading()
-                            selectedActivate = null
+                when {
+                    activeClassifiers != null -> {
+                        classifierLoadAdapter?.activeClassifierVersion = activeClassifiers
+                        selectedActivate?.let { selected ->
+                            val selectedId = selected.id
+                            val activeId = activeClassifiers[selectedId]
+                            if (activeId != null && activeId.id == selectedId) {
+                                hideItemLoading()
+                                selectedActivate = null
+                            }
                         }
-                    }
 
-                    selectedDeActivate?.let { selected ->
-                        val selectedId = selected.id
-                        val activeId = activeClassifiers[selectedId]
-                        if (activeId == null) {
-                            hideItemLoading()
-                            selectedDeActivate = null
+                        selectedDeActivate?.let { selected ->
+                            val selectedId = selected.id
+                            val activeId = activeClassifiers[selectedId]
+                            if (activeId == null) {
+                                hideItemLoading()
+                                selectedDeActivate = null
+                            }
                         }
+
+                        nextButton.isEnabled = true
                     }
-                } else if (selectedDeActivate != null) {
-                    hideItemLoading()
-                    classifierLoadAdapter?.activeClassifierVersion = mapOf()
-                    selectedDeActivate = null
+                    selectedDeActivate != null -> {
+                        hideItemLoading()
+                        classifierLoadAdapter?.activeClassifierVersion = mapOf()
+                        selectedDeActivate = null
+                    }
+                    else -> {
+                        nextButton.isEnabled = false
+                    }
                 }
             }
         }
