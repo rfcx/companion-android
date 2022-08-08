@@ -121,6 +121,15 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
                             if (activeId != null && activeId.id == selectedId) {
                                 hideItemLoading()
                                 selectedActivate = null
+
+                                if (activeClassifiers.size > 1) {
+                                    // getting other active classifiers
+                                    val otherClassifiers = activeClassifiers.filter { it.key != selectedId }
+                                    // disable non-select classifiers
+                                    otherClassifiers.forEach {
+                                        onDeActiveClick(it.value)
+                                    }
+                                }
                             }
 
                             val sampleRate = db.get(selectedId)?.getSampleRateAsPref()
