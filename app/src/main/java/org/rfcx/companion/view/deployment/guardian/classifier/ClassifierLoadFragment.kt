@@ -33,6 +33,7 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
     private var selectedFile: ClassifierItem.ClassifierVersion? = null
     private var selectedActivate: ClassifierLite? = null
     private var selectedDeActivate: ClassifierLite? = null
+    private var otherActive: Map<String, ClassifierLite>? = null
     private var loadingTimer: CountDownTimer? = null
 
     private var tempProgress = 0
@@ -115,46 +116,37 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
                 when {
                     activeClassifiers != null -> {
                         classifierLoadAdapter?.activeClassifierVersion = activeClassifiers
-                        selectedActivate?.let { selected ->
-                            val selectedId = selected.id
-                            val activeId = activeClassifiers[selectedId]
-                            if (activeId != null && activeId.id == selectedId) {
-                                hideItemLoading()
-                                selectedActivate = null
 
-                                if (activeClassifiers.size > 1) {
-                                    // getting other active classifiers
-                                    val otherClassifiers = activeClassifiers.filter { it.key != selectedId }
-                                    // disable non-select classifiers
-                                    otherClassifiers.forEach {
-                                        onDeActiveClick(it.value)
-                                    }
+                        if (selectedActivate != null) {
+                            val selectedId = selectedActivate?.id
+                            activeClassifiers[selectedId]?.let {
+                                selectedActivate = null
+                            }
+                        }
+
+                        if (otherActive == null && selectedDeActivate == null) {
+                            hideItemLoading()
+                            solarWarnTextView.visibility = View.GONE
+                            nextButton.isEnabled = true
+                        } else {
+                            otherActive?.forEach {
+                                if (activeClassifiers[it.key] == null) {
+                                    hideItemLoading()
+                                    solarWarnTextView.visibility = View.GONE
+                                    nextButton.isEnabled = true
                                 }
                             }
-
-                            val sampleRate = db.get(selectedId)?.getSampleRateAsPref()
-                            if (sampleRate != null) {
-                                GuardianSocketManager.syncConfiguration(sampleRate)
-                            }
                         }
-
-                        selectedDeActivate?.let { selected ->
-                            val selectedId = selected.id
-                            val activeId = activeClassifiers[selectedId]
-                            if (activeId == null) {
-                                hideItemLoading()
-                                selectedDeActivate = null
-                            }
-                        }
-
-                        nextButton.isEnabled = true
                     }
                     selectedDeActivate != null -> {
                         hideItemLoading()
                         classifierLoadAdapter?.activeClassifierVersion = mapOf()
                         selectedDeActivate = null
+                        solarWarnTextView.visibility = View.VISIBLE
+                        nextButton.isEnabled = false
                     }
                     else -> {
+                        solarWarnTextView.visibility = View.VISIBLE
                         nextButton.isEnabled = false
                     }
                 }
@@ -259,6 +251,7 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
     override fun onActiveClick(selectedClassifier: ClassifierLite) {
         nextButton.isEnabled = false
         selectedActivate = selectedClassifier
+        otherActive = deploymentProtocol?.getActiveClassifiers()?.filter { it.key != selectedClassifier.id }
         GuardianSocketManager.sendInstructionMessage(
             InstructionType.SET,
             InstructionCommand.CLASSIFIER,

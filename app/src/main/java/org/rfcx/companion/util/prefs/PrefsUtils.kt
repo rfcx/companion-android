@@ -91,7 +91,7 @@ object PrefsUtils {
         var isSMSOrSat = false
         expect.forEach {
             if (order.contains(it, false)) {
-                isSMSOrSat = false
+                isSMSOrSat = true
             }
         }
         return isSMSOrSat
