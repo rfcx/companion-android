@@ -85,7 +85,7 @@ object PrefsUtils {
 
     fun isSMSOrSatGuardian(str: String?): Boolean {
         if (str == null) return false
-        val expect =  listOf("sms", "sat")
+        val expect = listOf("sms", "sat")
         val json = JsonParser.parseString(str).asJsonObject
         val order = json.get("api_protocol_escalation_order").asString
         var isSMSOrSat = false
