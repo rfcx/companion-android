@@ -124,7 +124,7 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
                             }
                         }
 
-                        if (otherActive == null && selectedDeActivate == null) {
+                        if (selectedActivate == null && otherActive == null && selectedDeActivate == null) {
                             hideItemLoading()
                             solarWarnTextView.visibility = View.GONE
                             nextButton.isEnabled = true
@@ -262,6 +262,7 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
     override fun onDeActiveClick(selectedClassifier: ClassifierLite) {
         nextButton.isEnabled = false
         selectedDeActivate = selectedClassifier
+        otherActive = deploymentProtocol?.getActiveClassifiers()
         GuardianSocketManager.sendInstructionMessage(
             InstructionType.SET,
             InstructionCommand.CLASSIFIER,
