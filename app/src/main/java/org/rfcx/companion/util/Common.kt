@@ -2,6 +2,8 @@ package org.rfcx.companion.util
 
 import android.content.Context
 import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
@@ -9,11 +11,13 @@ import androidx.core.content.ContextCompat
 internal fun Context?.isNetworkAvailable(): Boolean {
     if (this == null) return false
     val cm = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    val activeNetwork = cm.activeNetworkInfo
-    if (activeNetwork != null) {
-        return activeNetwork.isConnected
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        val capabilities = cm.getNetworkCapabilities(cm.activeNetwork)
+        capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+    } else {
+        val activeNetworkInfo = cm.activeNetworkInfo
+        activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting;
     }
-    return false
 }
 
 fun Context.getIntColor(res: Int): Int {
