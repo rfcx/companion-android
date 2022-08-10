@@ -5,6 +5,7 @@ import com.google.gson.JsonObject
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
+import org.rfcx.companion.util.prefs.PrefsUtils
 
 @RealmClass
 open class Classifier(
@@ -42,6 +43,14 @@ open class Classifier(
         obj.addProperty("checksum", sha1)
         obj.addProperty("meta_json_blob", gson.toJson(subObj))
         return gson.toJson(obj)
+    }
+
+    fun getSampleRateAsPref(): String {
+        val json = JsonObject().apply {
+            addProperty(PrefsUtils.audioSampleRate, sampleRate)
+            addProperty(PrefsUtils.audioCastSampleRate, sampleRate)
+        }
+        return json.toString()
     }
 
     companion object {

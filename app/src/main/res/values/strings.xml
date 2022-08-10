@@ -546,7 +546,9 @@
     <string name="sampling_ratio">Sampling ratio</string>
 
     <string name="guardian_software_not_allowed">Your guardian software version is not compatible with this feature.</string>
+    <string name="guardian_type_not_allowed">Your guardian is not SMS nor Satellite, not compatible.</string>
     <string name="go_back">go back</string>
     <string name="battery_voltage">Battery Voltage</string>
     <string name="system_voltage">System Voltage</string>
+    <string name="require_an_active_classifier_to_process_next">Require an active classifier to process next</string>
 </resources>
