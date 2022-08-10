@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import io.realm.Realm
+import org.rfcx.companion.entity.RegisterGuardian
+import org.rfcx.companion.entity.UnsyncedDeployment
 import org.rfcx.companion.localdb.GuardianRegistrationDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.RealmHelper
@@ -24,13 +26,20 @@ class RegisterGuardianWorker(val context: Context, params: WorkerParameters) :
 
         val token = "Bearer ${context.getIdToken()}"
         registrations?.forEach {
-            val result = ApiManager.getInstance().getDeviceApi2()
+            val result = ApiManager.getInstance().getDeviceApi2(it.env == "production")
                 .registerGuardian(token, it.toRequest()).execute()
 
+            val error = result.errorBody()?.string()
             if (result.isSuccessful) {
                 db.delete(it.guid)
                 Log.d(TAG, "doWork: success $result")
             } else {
+                errors.add(
+                    RegisterGuardian(
+                        it.guid,
+                        (error ?: "Unexpected error")
+                    )
+                )
                 someFailed = true
             }
         }
@@ -41,6 +50,10 @@ class RegisterGuardianWorker(val context: Context, params: WorkerParameters) :
     companion object {
         private const val TAG = "RegisterGuardianWorker"
         private const val UNIQUE_WORK_KEY = "RegisterGuardianWorkerUniqueKey"
+
+        private var errors = mutableListOf<RegisterGuardian>()
+
+        fun getErrors() = errors
 
         fun enqueue(context: Context) {
             val constraints =

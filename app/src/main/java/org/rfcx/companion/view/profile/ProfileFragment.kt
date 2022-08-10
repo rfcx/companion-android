@@ -22,6 +22,7 @@ import org.rfcx.companion.util.*
 import org.rfcx.companion.util.Preferences.Companion.DISPLAY_THEME
 import org.rfcx.companion.view.profile.classifier.GuardianClassifierActivity
 import org.rfcx.companion.view.profile.coordinates.CoordinatesActivity
+import org.rfcx.companion.view.profile.guardianregistration.RegisterGuardianActivity
 import org.rfcx.companion.view.profile.guardiansoftware.GuardianSoftwareActivity
 import org.rfcx.companion.view.profile.locationgroup.ProjectActivity
 import org.rfcx.companion.view.profile.offlinemap.OfflineMapActivity
@@ -78,6 +79,10 @@ class ProfileFragment : Fragment() {
 
         offlineMapTextView.setOnClickListener {
             context?.let { it1 -> OfflineMapActivity.startActivity(it1) }
+        }
+
+        registerTextView.setOnClickListener {
+            context?.let { it -> RegisterGuardianActivity.startActivity(it) }
         }
 
         softwareTextView.setOnClickListener {

@@ -132,7 +132,8 @@ class GuardianRegisterFragment : Fragment() {
                 pinCode = pinCode,
                 apiMqttHost = apiMqttHost,
                 apiSmsAddress = apiSmsAddress,
-                keystorePassphrase = keystorePassphrase
+                keystorePassphrase = keystorePassphrase,
+                env = if (isProductionSelected()) "production" else "staging"
             )
             GuardianSocketManager.sendGuardianRegistration(registration)
             db.insert(registration)

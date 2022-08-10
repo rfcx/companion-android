@@ -1,6 +1,7 @@
 package org.rfcx.companion.localdb
 
 import io.realm.Realm
+import io.realm.RealmResults
 import org.rfcx.companion.entity.guardian.GuardianRegistration
 
 class GuardianRegistrationDb(private val realm: Realm) {
@@ -14,6 +15,11 @@ class GuardianRegistrationDb(private val realm: Realm) {
         val registrations = realm.where(GuardianRegistration::class.java)
             .findAll()
         return realm.copyFromRealm(registrations)
+    }
+
+    fun getAllResultsAsync(): RealmResults<GuardianRegistration> {
+        return realm.where(GuardianRegistration::class.java)
+            .findAllAsync()
     }
 
     fun insert(registration: GuardianRegistration) {

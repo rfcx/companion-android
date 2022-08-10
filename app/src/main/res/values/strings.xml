@@ -536,6 +536,13 @@
     <string name="synced">Synced</string>
     <string name="more_info">More info</string>
 
+    <string name="s_register_guardian">registering a guardian</string>
+    <string name="s_register_guardian_text">You have %d guardian registration</string>
+    <string name="s_registering">Registering</string>
+    <string name="s_registered">Registered</string>
+    <string name="s_guardian_registered">All guardians registered</string>
+    <string name="s_guardian_registered_no_conntection">Unable to register while there is no connection</string>
+
     <string name="login_failed">Login failed. Please try again.</string>
     <string name="incorrect_username_or_password">Incorrect email or password.</string>
     <string name="firebase_authentication_failed">Firebase authentication failed. Please try again.</string>
@@ -549,4 +556,5 @@
     <string name="go_back">go back</string>
     <string name="battery_voltage">Battery Voltage</string>
     <string name="system_voltage">System Voltage</string>
+    <string name="guardian_registration">Guardian registration</string>
 </resources>

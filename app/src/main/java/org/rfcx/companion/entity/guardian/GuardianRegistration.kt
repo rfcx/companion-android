@@ -2,11 +2,14 @@ package org.rfcx.companion.entity.guardian
 
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
+import io.realm.annotations.RealmClass
 import org.rfcx.companion.entity.request.GuardianRegisterRequest
 import org.rfcx.companion.entity.response.GuardianRegisterResponse
+import java.io.Serializable
 import java.security.SecureRandom
 
-data class GuardianRegistration(
+@RealmClass
+open class GuardianRegistration(
     @PrimaryKey
     var guid: String = "",
     var token: String = "",

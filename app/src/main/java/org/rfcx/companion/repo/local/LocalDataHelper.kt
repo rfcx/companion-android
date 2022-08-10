@@ -14,6 +14,7 @@ class LocalDataHelper {
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val deploymentDb by lazy { DeploymentDb(realm) }
     private val classifierDb by lazy { ClassifierDb(realm) }
+    private val guardianRegistrationDb by lazy { GuardianRegistrationDb(realm) }
 
     fun getStreamLocalDb() = streamDb
     fun getProjectLocalDb() = projectDb
@@ -22,4 +23,5 @@ class LocalDataHelper {
     fun getDeploymentImageLocalDb() = deploymentImageDb
     fun getDeploymentLocalDb() = deploymentDb
     fun getClassifierLocalDb() = classifierDb
+    fun getGuardianRegistration() = guardianRegistrationDb
 }

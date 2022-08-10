@@ -98,6 +98,10 @@
             android:name=".view.profile.classifier.GuardianClassifierActivity"
             android:screenOrientation="portrait"/>
 
+        <activity
+            android:name=".view.profile.guardianregistration.RegisterGuardianActivity"
+            android:screenOrientation="portrait"/>
+
         <service
             android:name=".service.LocationTrackerService"
             android:exported="false"
