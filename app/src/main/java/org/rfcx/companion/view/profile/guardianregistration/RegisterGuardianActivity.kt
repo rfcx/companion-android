@@ -141,7 +141,7 @@ class RegisterGuardianActivity : AppCompatActivity(), RegisterGuardianListener {
     private fun setRegisterText(count: Int) {
         when {
             count == 0 -> {
-                bannerText.text = getString(R.string.s_register_guardian)
+                bannerText.text = getString(R.string.s_guardian_registered)
                 registerAdapter.items = listOf()
                 noContentTextView.visibility = View.VISIBLE
                 hideBanner()
@@ -175,7 +175,6 @@ class RegisterGuardianActivity : AppCompatActivity(), RegisterGuardianListener {
                 confirmButton.text = getString(R.string.register)
                 confirmButton.isEnabled = true
                 registerGuardianIndicator.visibility = View.GONE
-                showBanner()
                 val errors = RegisterGuardianWorker.getErrors()
                 register?.map { rg ->
                     val error = errors.find { error -> error.guid == rg.guid }
@@ -211,6 +210,11 @@ class RegisterGuardianActivity : AppCompatActivity(), RegisterGuardianListener {
 
     override fun onBackPressed() {
         finish()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        registerWorkInfoLiveData.removeObserver(registerWorkInfoObserve)
     }
 
     companion object {

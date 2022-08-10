@@ -119,6 +119,7 @@ class GuardianRegisterFragment : Fragment() {
     }
 
     private fun registerGuardianWithoutInternet() {
+        setUIWaitingRegisterResponse()
         val guid = deploymentProtocol?.getGuid()
         val token = generateSecureRandomHash(40)
         val pinCode = generateSecureRandomHash(4)
