@@ -102,19 +102,21 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
                 classifiers?.let {
                     classifierLoadAdapter?.classifierVersion = it
                     classifierLoadAdapter?.notifyDataSetChanged()
-                    selectedFile?.let { selected ->
-                        val selectedVersion = selected.classifier
-                        val installedVersion = it[selected.classifier.id]
-                        if (installedVersion != null && installedVersion.id == selectedVersion.id) {
-                            classifierLoadAdapter?.hideProgressUploading()
-                            nextButton.isEnabled = true
-                            stopTimer()
-                        }
-                    }
                 }
                 val activeClassifiers = deploymentProtocol?.getActiveClassifiers()
                 when {
                     activeClassifiers != null -> {
+                        selectedFile?.let { selected ->
+                            val selectedVersion = selected.classifier
+                            val installedVersion = activeClassifiers[selected.classifier.id]
+                            otherActive = deploymentProtocol?.getActiveClassifiers()?.filter { it.key != selected.classifier.id }
+                            if (installedVersion != null && installedVersion.id == selectedVersion.id && otherActive.isNullOrEmpty()) {
+                                classifierLoadAdapter?.hideProgressUploading()
+                                stopTimer()
+                                selectedFile = null
+                            }
+                        }
+
                         classifierLoadAdapter?.activeClassifierVersion = activeClassifiers
 
                         if (selectedActivate != null) {
@@ -124,7 +126,7 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
                             }
                         }
 
-                        if (selectedActivate == null && otherActive == null && selectedDeActivate == null) {
+                        if (selectedActivate == null && selectedDeActivate == null && otherActive.isNullOrEmpty() ) {
                             hideItemLoading()
                             solarWarnTextView.visibility = View.GONE
                             nextButton.isEnabled = true
