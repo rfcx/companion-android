@@ -83,6 +83,20 @@ object PrefsUtils {
         return timeOff.split(",")
     }
 
+    fun isSMSOrSatGuardian(str: String?): Boolean {
+        if (str == null) return false
+        val expect = listOf("sms", "sat")
+        val json = JsonParser.parseString(str).asJsonObject
+        val order = json.get("api_protocol_escalation_order").asString
+        var isSMSOrSat = false
+        expect.forEach {
+            if (order.contains(it, false)) {
+                isSMSOrSat = true
+            }
+        }
+        return isSMSOrSat
+    }
+
     fun stringToAudioPrefs(str: String?): JsonObject? {
         if (str == null) {
             return null
