@@ -12,9 +12,8 @@ class GuardianRegistrationDb(private val realm: Realm) {
     }
 
     fun getAll(): List<GuardianRegistration>? {
-        val registrations = realm.where(GuardianRegistration::class.java)
+        return realm.where(GuardianRegistration::class.java)
             .findAll()
-        return realm.copyFromRealm(registrations)
     }
 
     fun getAllResultsAsync(): RealmResults<GuardianRegistration> {

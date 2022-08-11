@@ -136,6 +136,7 @@ class GuardianRegisterFragment : Fragment() {
                 keystorePassphrase = keystorePassphrase,
                 env = if (isProductionSelected()) "production" else "staging"
             )
+            isWaitingRegistration = true
             GuardianSocketManager.sendGuardianRegistration(registration)
             db.insert(registration)
             RegisterGuardianWorker.enqueue(requireContext())
