@@ -2,6 +2,7 @@ package org.rfcx.companion.connection.socket
 
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
+import org.rfcx.companion.entity.socket.request.SocketRequest
 import org.rfcx.companion.entity.socket.response.AdminPing
 import java.io.DataInputStream
 import java.io.DataOutputStream
@@ -22,7 +23,12 @@ object AdminSocketManager {
 
     // just to connect to server
     fun connect() {
-        sendMessage("")
+        val data = Gson().toJson(
+            SocketRequest(
+                "connection"
+            )
+        )
+        sendMessage(data)
     }
 
     private fun sendMessage(message: String) {
