@@ -5,7 +5,6 @@ import okhttp3.ResponseBody
 import org.rfcx.companion.entity.GuardianSoftware
 import org.rfcx.companion.entity.Software
 import java.io.*
-import java.lang.Exception
 
 object APKUtils {
 
@@ -90,6 +89,8 @@ object APKUtils {
             if (!dir.exists()) {
                 dir.mkdir()
             }
+            // remove older version of specific role
+            deleteSoftware(role, context)
             val file = File(dir, "$role-$version.apk.gz")
             var inputStream: InputStream? = null
             var outputStream: OutputStream? = null
