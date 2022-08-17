@@ -126,7 +126,7 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
                             }
                         }
 
-                        if (selectedActivate == null && selectedDeActivate == null && otherActive.isNullOrEmpty() ) {
+                        if (selectedActivate == null && selectedDeActivate == null && otherActive.isNullOrEmpty()) {
                             hideItemLoading()
                             solarWarnTextView.visibility = View.GONE
                             nextButton.isEnabled = true

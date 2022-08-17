@@ -1,6 +1,1 @@
-- Change guardian plan preference
-- Fix incorrect theme after logged in
-- Cell guardian no need to do Classifier step
-- Auto set sample rate when activate Classifier
-- Require 1 classifier activated to pass the step
-- Allow only 1 actived classifier
+- Add connection command to admin socket
