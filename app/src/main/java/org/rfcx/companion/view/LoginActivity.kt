@@ -293,6 +293,7 @@ class LoginActivity : AppCompatActivity() {
             defaultTheme = themeOption[2]
             if (!this.isDarkMode) bellLogoImageView.setImageResource(R.drawable.ic_companion_icon)
         }
+        preferences.putString(DISPLAY_THEME, defaultTheme)
 
         val theme = when (preferences.getString(DISPLAY_THEME, defaultTheme)) {
             themeOption[0] -> {
