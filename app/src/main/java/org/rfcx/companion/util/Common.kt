@@ -16,7 +16,7 @@ internal fun Context?.isNetworkAvailable(): Boolean {
         capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
     } else {
         val activeNetworkInfo = cm.activeNetworkInfo
-        activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting;
+        activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting
     }
 }
 

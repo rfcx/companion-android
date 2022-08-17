@@ -5,7 +5,6 @@ import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
 import org.rfcx.companion.entity.request.GuardianRegisterRequest
 import org.rfcx.companion.entity.response.GuardianRegisterResponse
-import java.io.Serializable
 import java.security.SecureRandom
 
 @RealmClass

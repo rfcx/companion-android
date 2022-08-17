@@ -6,7 +6,6 @@ import androidx.lifecycle.LiveData
 import androidx.work.*
 import io.realm.Realm
 import org.rfcx.companion.entity.RegisterGuardian
-import org.rfcx.companion.entity.UnsyncedDeployment
 import org.rfcx.companion.localdb.GuardianRegistrationDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.RealmHelper
