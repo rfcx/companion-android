@@ -116,6 +116,7 @@ class ClassifierLoadAdapter(
 
                 holder.modelSendButton.isEnabled = !isUploading
                 holder.modelSendButton.setOnClickListener {
+                    showSettingLoading()
                     showProgressUploading()
                     it.visibility = View.GONE
                     holder.showUploadingProgress()

@@ -33,6 +33,7 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
     private var selectedFile: ClassifierItem.ClassifierVersion? = null
     private var selectedActivate: ClassifierLite? = null
     private var selectedDeActivate: ClassifierLite? = null
+    private var otherActive: Map<String, ClassifierLite>? = null
     private var loadingTimer: CountDownTimer? = null
 
     private var tempProgress = 0
@@ -86,7 +87,11 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
         }
 
         if (!isSoftwareCompatible()) {
-            showAlert()
+            showAlert(getString(R.string.guardian_software_not_allowed))
+        }
+
+        if (!isSMSOrSatGuardian()) {
+            showAlert(getString(R.string.guardian_type_not_allowed))
         }
 
         GuardianSocketManager.pingBlob.observe(
@@ -97,40 +102,55 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
                 classifiers?.let {
                     classifierLoadAdapter?.classifierVersion = it
                     classifierLoadAdapter?.notifyDataSetChanged()
-                    selectedFile?.let { selected ->
-                        val selectedVersion = selected.classifier
-                        val installedVersion = it[selected.classifier.id]
-                        if (installedVersion != null && installedVersion.id == selectedVersion.id) {
-                            classifierLoadAdapter?.hideProgressUploading()
-                            nextButton.isEnabled = true
-                            stopTimer()
-                        }
-                    }
                 }
                 val activeClassifiers = deploymentProtocol?.getActiveClassifiers()
-                if (activeClassifiers != null) {
-                    classifierLoadAdapter?.activeClassifierVersion = activeClassifiers
-                    selectedActivate?.let { selected ->
-                        val selectedId = selected.id
-                        val activeId = activeClassifiers[selectedId]
-                        if (activeId != null && activeId.id == selectedId) {
-                            hideItemLoading()
-                            selectedActivate = null
+                when {
+                    activeClassifiers != null -> {
+                        selectedFile?.let { selected ->
+                            val selectedVersion = selected.classifier
+                            val installedVersion = activeClassifiers[selected.classifier.id]
+                            otherActive = deploymentProtocol?.getActiveClassifiers()?.filter { it.key != selected.classifier.id }
+                            if (installedVersion != null && installedVersion.id == selectedVersion.id && otherActive.isNullOrEmpty()) {
+                                classifierLoadAdapter?.hideProgressUploading()
+                                stopTimer()
+                                selectedFile = null
+                            }
                         }
-                    }
 
-                    selectedDeActivate?.let { selected ->
-                        val selectedId = selected.id
-                        val activeId = activeClassifiers[selectedId]
-                        if (activeId == null) {
+                        classifierLoadAdapter?.activeClassifierVersion = activeClassifiers
+
+                        if (selectedActivate != null) {
+                            val selectedId = selectedActivate?.id
+                            activeClassifiers[selectedId]?.let {
+                                selectedActivate = null
+                            }
+                        }
+
+                        if (selectedActivate == null && selectedDeActivate == null && otherActive.isNullOrEmpty() ) {
                             hideItemLoading()
-                            selectedDeActivate = null
+                            solarWarnTextView.visibility = View.GONE
+                            nextButton.isEnabled = true
+                        } else {
+                            otherActive?.forEach {
+                                if (activeClassifiers[it.key] == null) {
+                                    hideItemLoading()
+                                    solarWarnTextView.visibility = View.GONE
+                                    nextButton.isEnabled = true
+                                }
+                            }
                         }
                     }
-                } else if (selectedDeActivate != null) {
-                    hideItemLoading()
-                    classifierLoadAdapter?.activeClassifierVersion = mapOf()
-                    selectedDeActivate = null
+                    selectedDeActivate != null -> {
+                        hideItemLoading()
+                        classifierLoadAdapter?.activeClassifierVersion = mapOf()
+                        selectedDeActivate = null
+                        solarWarnTextView.visibility = View.VISIBLE
+                        nextButton.isEnabled = false
+                    }
+                    else -> {
+                        solarWarnTextView.visibility = View.VISIBLE
+                        nextButton.isEnabled = false
+                    }
                 }
             }
         }
@@ -172,11 +192,15 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
         return true
     }
 
-    private fun showAlert() {
+    private fun isSMSOrSatGuardian(): Boolean {
+        return deploymentProtocol?.isSMSOrSatGuardian() ?: return false
+    }
+
+    private fun showAlert(text: String) {
         val dialogBuilder: AlertDialog.Builder =
             AlertDialog.Builder(requireContext()).apply {
                 setTitle(null)
-                setMessage(R.string.guardian_software_not_allowed)
+                setMessage(text)
                 setPositiveButton(R.string.go_back) { _, _ ->
                     deploymentProtocol?.backStep()
                 }
@@ -229,6 +253,7 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
     override fun onActiveClick(selectedClassifier: ClassifierLite) {
         nextButton.isEnabled = false
         selectedActivate = selectedClassifier
+        otherActive = deploymentProtocol?.getActiveClassifiers()?.filter { it.key != selectedClassifier.id }
         GuardianSocketManager.sendInstructionMessage(
             InstructionType.SET,
             InstructionCommand.CLASSIFIER,
@@ -239,6 +264,7 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
     override fun onDeActiveClick(selectedClassifier: ClassifierLite) {
         nextButton.isEnabled = false
         selectedDeActivate = selectedClassifier
+        otherActive = deploymentProtocol?.getActiveClassifiers()
         GuardianSocketManager.sendInstructionMessage(
             InstructionType.SET,
             InstructionCommand.CLASSIFIER,

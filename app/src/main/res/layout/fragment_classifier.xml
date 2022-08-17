@@ -14,6 +14,19 @@
         app:layout_constraintBottom_toTopOf="@id/nextButton"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/solarWarnTextView"
+        style="@style/AudioMothText.Body.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_padding_small"
+        android:text="@string/require_an_active_classifier_to_process_next"
+        android:textColor="@color/text_error"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toTopOf="@id/nextButton"
+        app:layout_constraintEnd_toEndOf="@id/nextButton"
+        app:layout_constraintStart_toStartOf="@id/nextButton" />
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/nextButton"
         style="@style/AudioMothButton.GreenButton"
@@ -23,7 +36,7 @@
         android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginEnd="@dimen/margin_padding_large"
         android:layout_marginBottom="@dimen/margin_padding_normal"
-        android:enabled="true"
+        android:enabled="false"
         android:text="@string/next"
         app:layout_constraintBottom_toBottomOf="parent" />
 
