@@ -16,7 +16,7 @@ import org.rfcx.companion.entity.guardian.ClassifierLite
 
 class ClassifierLoadAdapter(
     private var childrenClickedListener: ChildrenClickedListener,
-    classifiers: List<Classifier>,
+    classifiers: List<Classifier>?,
     installedClassifiers: Map<String, ClassifierLite>?
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -153,13 +153,13 @@ class ClassifierLoadAdapter(
         }
     }
 
-    private fun combineDownloadAndInstallClassifier(downloads: List<Classifier>, installs: Map<String, ClassifierLite>?): List<ClassifierLite> {
+    private fun combineDownloadAndInstallClassifier(downloads: List<Classifier>?, installs: Map<String, ClassifierLite>?): List<ClassifierLite> {
         if (installs != null) {
-            val installed = installs.map { ClassifierLite(it.value.id, it.value.name, it.value.version) }.filter { downloads.find { dwnl -> dwnl.id == it.id } == null }
-            val notInstalled = downloads.filter { installed.find { ins -> ins.id == it.id } == null }.map { ClassifierLite(it.id, it.name, it.version) }
+            val installed = installs.map { ClassifierLite(it.value.id, it.value.name, it.value.version) }.filter { downloads?.find { dwnl -> dwnl.id == it.id } == null }
+            val notInstalled = downloads?.filter { installed.find { ins -> ins.id == it.id } == null }?.map { ClassifierLite(it.id, it.name, it.version) } ?: listOf()
             return installed + notInstalled
         }
-        return downloads.map { ClassifierLite(it.id, it.name, it.version) }
+        return downloads?.map { ClassifierLite(it.id, it.name, it.version) } ?: listOf()
     }
 
     private fun showProgressUploading() {

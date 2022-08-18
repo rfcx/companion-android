@@ -550,5 +550,5 @@
     <string name="go_back">go back</string>
     <string name="battery_voltage">Battery Voltage</string>
     <string name="system_voltage">System Voltage</string>
-    <string name="require_an_active_classifier_to_process_next">Require an active classifier to process next</string>
+    <string name="require_an_active_classifier_to_process_next">Please activate a classifier to proceed to the next step</string>
 </resources>
