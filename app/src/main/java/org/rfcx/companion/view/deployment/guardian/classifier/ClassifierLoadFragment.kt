@@ -56,7 +56,7 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
         return inflater.inflate(R.layout.fragment_classifier, container, false)
     }
 
-    private fun populateAdapterWithInfo(classifiers: List<Classifier>) {
+    private fun populateAdapterWithInfo(classifiers: List<Classifier>?) {
         classifierLoadAdapter = ClassifierLoadAdapter(
             this,
             classifiers,
@@ -171,7 +171,7 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
         }
 
         val classifiers = db.getAll()
-        if (classifiers.isNullOrEmpty()) {
+        if (classifiers.isNullOrEmpty() && deploymentProtocol?.getClassifiers().isNullOrEmpty()) {
             noClassifierText.visibility = View.VISIBLE
         } else {
             populateAdapterWithInfo(classifiers)
