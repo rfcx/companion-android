@@ -5,3 +5,4 @@
 - Require 1 classifier activated to pass the step
 - Allow only 1 actived classifier
 - Add Colombia swarm off time
+- Add connection command to admin socket
