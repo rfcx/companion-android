@@ -4,3 +4,4 @@
 - Auto set sample rate when activate Classifier
 - Require 1 classifier activated to pass the step
 - Allow only 1 actived classifier
+- Add Colombia swarm off time
