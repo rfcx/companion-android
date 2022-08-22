@@ -250,19 +250,6 @@
                 app:layout_constraintTop_toBottomOf="@id/viewGuardian" />
 
             <TextView
-                android:id="@+id/registerTextView"
-                style="@style/AudioMothText.SubTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
-                android:padding="@dimen/margin_padding_normal"
-                android:text="@string/guardian_registration"
-                android:textColor="@color/text_primary"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/guardianSectionTextView" />
-
-            <TextView
                 android:id="@+id/softwareTextView"
                 style="@style/AudioMothText.SubTitle"
                 android:layout_width="match_parent"
@@ -273,7 +260,7 @@
                 android:textColor="@color/text_primary"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/registerTextView" />
+                app:layout_constraintTop_toBottomOf="@id/guardianSectionTextView" />
 
             <TextView
                 android:id="@+id/classifierTextView"

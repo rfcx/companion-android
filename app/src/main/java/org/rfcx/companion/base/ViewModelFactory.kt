@@ -18,8 +18,6 @@ import org.rfcx.companion.view.detail.EditLocationRepository
 import org.rfcx.companion.view.detail.EditLocationViewModel
 import org.rfcx.companion.view.profile.classifier.repository.GuardianClassifierRepository
 import org.rfcx.companion.view.profile.classifier.viewmodel.GuardianClassifierViewModel
-import org.rfcx.companion.view.profile.guardianregistration.RegisterGuardianRepository
-import org.rfcx.companion.view.profile.guardianregistration.RegisterGuardianViewModel
 import org.rfcx.companion.view.profile.guardiansoftware.repository.GuardianSoftwareRepository
 import org.rfcx.companion.view.profile.guardiansoftware.viewmodel.GuardianSoftwareViewModel
 import org.rfcx.companion.view.profile.offlinemap.ProjectOfflineMapRepository
@@ -95,12 +93,6 @@ class ViewModelFactory(
                 return GuardianClassifierViewModel(
                     application,
                     GuardianClassifierRepository(deviceApiHelper, localDataHelper)
-                ) as T
-            }
-            modelClass.isAssignableFrom(RegisterGuardianViewModel::class.java) -> {
-                return RegisterGuardianViewModel(
-                    application,
-                    RegisterGuardianRepository(deviceApiHelper, localDataHelper)
                 ) as T
             }
             else -> throw IllegalArgumentException("Unknown class name")

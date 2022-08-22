@@ -4,6 +4,7 @@ import android.content.Context
 import io.realm.RealmResults
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
+import org.rfcx.companion.entity.guardian.GuardianRegistration
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.ProjectByIdResponse
 import org.rfcx.companion.entity.response.ProjectResponse
@@ -50,6 +51,14 @@ class MainRepository(
 
     fun getAllDeploymentLocateResultsAsync(): RealmResults<Deployment> {
         return localDataHelper.getDeploymentLocalDb().getAllResultsAsync()
+    }
+
+    fun getAllRegistrationResultsAsync(): RealmResults<GuardianRegistration> {
+        return localDataHelper.getGuardianRegistration().getAllResultsAsync()
+    }
+
+    fun test() {
+        localDataHelper.getGuardianRegistration().insert(GuardianRegistration("7reiqrq38m87"))
     }
 
     fun saveProjectToLocal(projectResponse: ProjectResponse) {

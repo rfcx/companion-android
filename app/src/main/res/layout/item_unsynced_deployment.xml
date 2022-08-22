@@ -9,7 +9,10 @@
         android:id="@+id/itemLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/margin_padding_normal"
+        android:paddingStart="@dimen/margin_padding_xlarge"
+        android:paddingTop="@dimen/margin_padding_normal"
+        android:paddingEnd="@dimen/margin_padding_normal"
+        android:paddingBottom="@dimen/margin_padding_normal"
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.AppCompatTextView

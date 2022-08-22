@@ -1003,7 +1003,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
     }
 
     private fun setObserver() {
-        mainViewModel.getUnsyncedDeployments()
+        mainViewModel.getUnsyncedWorks()
             .observe(viewLifecycleOwner, getUnsyncedDeploymentsObserver)
         mainViewModel.getProjectsFromRemote()
             .observe(viewLifecycleOwner, getProjectsFromRemoteObserver)
@@ -1367,7 +1367,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
             mainViewModel.getDeploymentMarkers().removeObserver(getDeploymentMarkerObserver)
             mainViewModel.getStreamMarkers().removeObserver(getStreamMarkerObserver)
             mainViewModel.getStreams().removeObserver(getStreamObserver)
-            mainViewModel.getUnsyncedDeployments().removeObserver(getUnsyncedDeploymentsObserver)
+            mainViewModel.getUnsyncedWorks().removeObserver(getUnsyncedDeploymentsObserver)
         }
         if (::deploymentWorkInfoLiveData.isInitialized) {
             deploymentWorkInfoLiveData.removeObserver(deploymentWorkInfoObserve)

@@ -18,6 +18,7 @@ import io.realm.RealmResults
 import org.json.JSONObject
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
+import org.rfcx.companion.entity.guardian.GuardianRegistration
 import org.rfcx.companion.entity.guardian.toMark
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.ProjectByIdResponse
@@ -40,12 +41,13 @@ class MainViewModel(
     private val context = getApplication<Application>().applicationContext
     private val projects = MutableLiveData<Resource<List<Project>>>()
     private val tracks = MutableLiveData<Resource<List<DeploymentAssetResponse>>>()
-    private val unsyncedDeploymentCount = MutableLiveData<Int>()
+    private val unsyncedWorksCount = MutableLiveData<Int>()
     private val deploymentMarkers = MutableLiveData<List<MapMarker.DeploymentMarker>>()
     private val streamMarkers = MutableLiveData<List<MapMarker>>()
     private val streamList = MutableLiveData<List<Stream>>()
 
     private var streams = listOf<Stream>()
+    private var registrationCount = 0
 
     private lateinit var streamLiveData: LiveData<List<Stream>>
     private val streamObserve = Observer<List<Stream>> {
@@ -56,6 +58,12 @@ class MainViewModel(
     private val deploymentObserve = Observer<List<Deployment>> {
         combinedData()
     }
+    private lateinit var registrationLiveData: LiveData<List<GuardianRegistration>>
+    private val registrationObserve = Observer<List<GuardianRegistration>> {
+        registrationCount = it.size
+        combinedData()
+    }
+
 
     init {
         fetchLiveData()
@@ -70,6 +78,11 @@ class MainViewModel(
             mainRepository.getAllDeploymentLocateResultsAsync().asLiveData()
         ) { it }
         deploymentLiveData.observeForever(deploymentObserve)
+
+        registrationLiveData = Transformations.map(
+            mainRepository.getAllRegistrationResultsAsync().asLiveData()
+        ) { it }
+        registrationLiveData.observeForever(registrationObserve)
     }
 
     fun fetchProjects() {
@@ -247,7 +260,7 @@ class MainViewModel(
         deploymentMarkers.postValue(deploymentMarkersList)
 
         val unsyncedDeployments = deployments.filter { it.isUnsynced() }
-        unsyncedDeploymentCount.postValue(unsyncedDeployments.size)
+        unsyncedWorksCount.postValue(unsyncedDeployments.size + this.registrationCount)
     }
 
     fun updateStatusOfflineMap() {
@@ -284,25 +297,25 @@ class MainViewModel(
                         object : OfflineManager.CreateOfflineRegionCallback {
                             override fun onCreate(offlineRegion: OfflineRegion) {
                                 offlineRegion.getStatus(object :
-                                        OfflineRegion.OfflineRegionStatusCallback {
-                                        override fun onStatus(status: OfflineRegionStatus?) {
-                                            if (status == null) return
-                                            if (status.requiredResourceCount > 10000) {
-                                                mainRepository.updateOfflineState(
-                                                    OfflineMapState.UNAVAILABLE.key,
-                                                    project.serverId ?: ""
-                                                )
-                                            } else {
-                                                mainRepository.updateOfflineState(
-                                                    OfflineMapState.DOWNLOAD_STATE.key,
-                                                    project.serverId ?: ""
-                                                )
-                                            }
-                                            deleteOfflineRegion(project, offlineManager)
+                                    OfflineRegion.OfflineRegionStatusCallback {
+                                    override fun onStatus(status: OfflineRegionStatus?) {
+                                        if (status == null) return
+                                        if (status.requiredResourceCount > 10000) {
+                                            mainRepository.updateOfflineState(
+                                                OfflineMapState.UNAVAILABLE.key,
+                                                project.serverId ?: ""
+                                            )
+                                        } else {
+                                            mainRepository.updateOfflineState(
+                                                OfflineMapState.DOWNLOAD_STATE.key,
+                                                project.serverId ?: ""
+                                            )
                                         }
+                                        deleteOfflineRegion(project, offlineManager)
+                                    }
 
-                                        override fun onError(error: String?) {}
-                                    })
+                                    override fun onError(error: String?) {}
+                                })
                             }
 
                             override fun onError(error: String) {}
@@ -365,8 +378,12 @@ class MainViewModel(
         return streamMarkers
     }
 
-    fun getUnsyncedDeployments(): LiveData<Int> {
-        return unsyncedDeploymentCount
+    fun getUnsyncedWorks(): LiveData<Int> {
+        return unsyncedWorksCount
+    }
+
+    fun test() {
+        mainRepository.test()
     }
 
     fun getStreams(): LiveData<List<Stream>> {

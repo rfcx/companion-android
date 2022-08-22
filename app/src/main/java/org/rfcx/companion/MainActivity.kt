@@ -70,6 +70,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
                 LocalDataHelper()
             )
         ).get(MainViewModel::class.java)
+        mainViewModel.test()
     }
 
     override fun onRequestPermissionsResult(

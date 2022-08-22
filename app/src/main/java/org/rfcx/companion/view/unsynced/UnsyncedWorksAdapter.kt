@@ -19,6 +19,7 @@ class UnsyncedWorksAdapter(private val unsyncedDeploymentListener: UnsyncedWorkL
 
     fun setUnsynceds(unsynceds: List<UnsyncedWorksViewItem>) {
         listOfUnsynced = unsynceds
+        notifyDataSetChanged()
     }
 
     companion object {
@@ -50,7 +51,7 @@ class UnsyncedWorksAdapter(private val unsyncedDeploymentListener: UnsyncedWorkL
             )
             else -> HeaderItemViewHolder(
                 LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_checklist_header, parent, false)
+                    .inflate(R.layout.item_unsynced_header, parent, false)
             )
         }
     }
@@ -107,7 +108,7 @@ class UnsyncedWorksAdapter(private val unsyncedDeploymentListener: UnsyncedWorkL
     }
 
     inner class HeaderItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val headerName = itemView.findViewById<TextView>(R.id.checkHeader)
+        private val headerName = itemView.findViewById<TextView>(R.id.unsyncedHeader)
         fun bind(header: UnsyncedWorksViewItem.Header) {
             headerName.text = header.name
         }
