@@ -11,7 +11,7 @@ class GuardianRegistrationDb(private val realm: Realm) {
             .count().toInt()
     }
 
-    fun getAll(): List<GuardianRegistration>? {
+    fun getAll(): List<GuardianRegistration> {
         return realm.where(GuardianRegistration::class.java)
             .findAll()
     }

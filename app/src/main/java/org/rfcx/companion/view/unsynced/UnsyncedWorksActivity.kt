@@ -12,12 +12,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionManager
 import androidx.work.WorkInfo
-import kotlinx.android.synthetic.main.activity_unsynced_deployment.*
+import kotlinx.android.synthetic.main.activity_unsynced_works.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
+import org.rfcx.companion.adapter.UnsyncedWorksViewItem
 import org.rfcx.companion.base.ViewModelFactory
-import org.rfcx.companion.entity.UnsyncedDeployment
-import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
@@ -27,17 +26,18 @@ import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.util.isNetworkAvailable
 import org.rfcx.companion.view.map.SyncInfo
 
-class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListener {
+class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
 
-    private val unsyncedAdapter by lazy { UnsyncedDeploymentAdapter(this) }
+    private val unsyncedWorksAdapter by lazy { UnsyncedWorksAdapter(this) }
 
-    private lateinit var viewModel: UnsyncedDeploymentViewModel
+    private lateinit var viewModel: UnsyncedWorksViewModel
 
     private lateinit var deploymentWorkInfoLiveData: LiveData<List<WorkInfo>>
+    private lateinit var registrationWorkInfoLiveData: LiveData<List<WorkInfo>>
 
     private var lastSyncingInfo: SyncInfo? = null
     private var currentState: WorkInfo.State? = null
-    private var unsyncedDeployments: List<Deployment>? = null
+    private var unsyncedWork: List<UnsyncedWorksViewItem>? = null
 
     private val deploymentWorkInfoObserve = Observer<List<WorkInfo>> {
         val currentWorkStatus = it?.getOrNull(0)
@@ -60,7 +60,7 @@ class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListen
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_unsynced_deployment)
+        setContentView(R.layout.activity_unsynced_works)
 
         setViewModel()
         setObserve()
@@ -69,7 +69,7 @@ class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListen
 
         unsyncedRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = unsyncedAdapter
+            adapter = unsyncedWorksAdapter
         }
 
         confirmButton.setOnClickListener {
@@ -97,29 +97,19 @@ class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListen
                 CoreApiHelper(CoreApiServiceImpl()),
                 LocalDataHelper()
             )
-        ).get(UnsyncedDeploymentViewModel::class.java)
+        ).get(UnsyncedWorksViewModel::class.java)
     }
 
     private fun setObserve() {
         deploymentWorkInfoLiveData = DeploymentSyncWorker.workInfos(this)
         deploymentWorkInfoLiveData.observeForever(deploymentWorkInfoObserve)
 
-        viewModel.getUnsyncedDeployments().observe(
+        viewModel.getUnsyncedWorkLiveData().observe(
             this
         ) {
-            setUnsyncedText(it.size)
-            unsyncedDeployments = it
-
-            val errors = DeploymentSyncWorker.getErrors()
-            unsyncedAdapter.items = it.map { dp ->
-                val error = errors.find { error -> error.id == dp.id }
-                UnsyncedDeployment(
-                    dp.id,
-                    dp.stream?.name ?: getString(R.string.none),
-                    dp.deployedAt,
-                    error?.error
-                )
-            }
+            setUnsyncedText(it.count { item -> item is UnsyncedWorksViewItem.Deployment }, it.count { item -> item is UnsyncedWorksViewItem.Registration })
+            unsyncedWork = it
+            unsyncedWorksAdapter.setUnsynceds(it)
         }
     }
 
@@ -140,20 +130,26 @@ class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListen
         setStatus(status)
     }
 
-    private fun setUnsyncedText(count: Int) {
+    private fun setUnsyncedText(deploymentCount: Int, registrationCount: Int) {
         when {
-            count == 0 -> {
-                bannerText.text = getString(R.string.format_deploys_uploaded)
-                unsyncedAdapter.items = listOf()
+            deploymentCount == 0 && registrationCount == 0 -> {
+                bannerText.text = getString(R.string.all_works_synced)
+                unsyncedWorksAdapter.setUnsynceds(listOf())
                 noContentTextView.visibility = View.VISIBLE
                 hideBanner()
             }
-            currentState == WorkInfo.State.RUNNING -> {
-                bannerText.text = getString(R.string.unsynced_text, count)
-                noContentTextView.visibility = View.GONE
-            }
-            count > 0 && currentState != WorkInfo.State.RUNNING -> {
-                bannerText.text = getString(R.string.unsynced_text, count)
+            else -> {
+                when {
+                    deploymentCount == 0 -> {
+                        bannerText.text = getString(R.string.unsynced_registration_text, registrationCount)
+                    }
+                    registrationCount == 0 -> {
+                        bannerText.text = getString(R.string.unsynced_deployment_text, deploymentCount)
+                    }
+                    else -> {
+                        bannerText.text = getString(R.string.unsynced_all_text, deploymentCount, registrationCount)
+                    }
+                }
                 noContentTextView.visibility = View.GONE
                 showBanner()
             }
@@ -178,18 +174,7 @@ class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListen
                 confirmButton.isEnabled = true
                 unsyncedIndicator.visibility = View.GONE
                 showBanner()
-                val errors = DeploymentSyncWorker.getErrors()
-                unsyncedDeployments?.map { dp ->
-                    val error = errors.find { error -> error.id == dp.id }
-                    UnsyncedDeployment(
-                        dp.id,
-                        dp.stream?.name ?: getString(R.string.none),
-                        dp.deployedAt,
-                        error?.error
-                    )
-                }?.let {
-                    unsyncedAdapter.items = it
-                }
+                viewModel.updateUnsyncedWorks()
             }
             // else also waiting network
             else -> {
@@ -202,10 +187,12 @@ class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListen
         }
     }
 
-    override fun onClick(id: Int) {
+    override fun onDeploymentClick(id: Int) {
         viewModel.deleteDeployment(id)
-        val updatedItems = unsyncedAdapter.items.filter { it.id != id }
-        unsyncedAdapter.items = updatedItems
+    }
+
+    override fun onRegistrationClick(id: String) {
+        viewModel.deleteRegistration(id)
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -219,7 +206,7 @@ class UnsyncedDeploymentActivity : AppCompatActivity(), UnsyncedDeploymentListen
 
     companion object {
         fun startActivity(context: Context) {
-            val intent = Intent(context, UnsyncedDeploymentActivity::class.java)
+            val intent = Intent(context, UnsyncedWorksActivity::class.java)
             context.startActivity(intent)
         }
     }
