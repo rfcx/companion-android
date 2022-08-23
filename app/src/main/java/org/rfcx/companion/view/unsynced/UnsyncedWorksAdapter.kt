@@ -59,7 +59,7 @@ class UnsyncedWorksAdapter(private val unsyncedDeploymentListener: UnsyncedWorkL
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder.itemViewType) {
             DEPLOYMENT_ITEM -> (holder as UnsyncedDeploymentViewHolder).bind(listOfUnsynced[position] as UnsyncedWorksViewItem.Deployment)
-            REGISTRATION_ITEM ->(holder as UnsyncedRegistrationViewHolder).bind(listOfUnsynced[position] as UnsyncedWorksViewItem.Registration)
+            REGISTRATION_ITEM -> (holder as UnsyncedRegistrationViewHolder).bind(listOfUnsynced[position] as UnsyncedWorksViewItem.Registration)
             else -> (holder as HeaderItemViewHolder).bind(listOfUnsynced[position] as UnsyncedWorksViewItem.Header)
         }
     }

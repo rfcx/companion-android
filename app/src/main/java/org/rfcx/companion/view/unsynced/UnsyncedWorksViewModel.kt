@@ -21,7 +21,6 @@ class UnsyncedWorksViewModel(
 
     private val unsyncedWork = MutableLiveData<List<UnsyncedWorksViewItem>>()
 
-
     private val deploymentObserve = Observer<List<Deployment>> {
         updateUnsyncedWorks()
     }
