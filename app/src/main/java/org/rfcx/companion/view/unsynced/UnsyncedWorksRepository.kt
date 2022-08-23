@@ -14,7 +14,7 @@ class UnsyncedWorksRepository(
         return localDataHelper.getDeploymentLocalDb().getUnsent()
     }
 
-    fun getUnsetRegistration(): List<GuardianRegistration> {
+    fun getUnsentRegistration(): List<GuardianRegistration> {
         return localDataHelper.getGuardianRegistration().getAll()
     }
 

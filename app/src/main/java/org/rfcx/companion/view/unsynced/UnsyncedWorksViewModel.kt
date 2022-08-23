@@ -68,6 +68,6 @@ class UnsyncedWorksViewModel(
     fun updateUnsyncedWorks() {
         val deploymentErrors = DeploymentSyncWorker.getErrors()
         val registrationErrors = RegisterGuardianWorker.getErrors()
-        unsyncedWork.postValue(UnsyncedWork(repository.getUnsentDeployment(), repository.getUnsetRegistration()).toAdapterItem(deploymentErrors, registrationErrors))
+        unsyncedWork.postValue(UnsyncedWork(repository.getUnsentDeployment(), repository.getUnsentRegistration()).toAdapterItem(deploymentErrors, registrationErrors))
     }
 }
