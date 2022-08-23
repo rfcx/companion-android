@@ -382,10 +382,6 @@ class MainViewModel(
         return unsyncedWorksCount
     }
 
-    fun test() {
-        mainRepository.test()
-    }
-
     fun getStreams(): LiveData<List<Stream>> {
         return streamList
     }

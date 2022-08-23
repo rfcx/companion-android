@@ -57,10 +57,6 @@ class MainRepository(
         return localDataHelper.getGuardianRegistration().getAllResultsAsync()
     }
 
-    fun test() {
-        localDataHelper.getGuardianRegistration().insert(GuardianRegistration("7reiqrq38m87"))
-    }
-
     fun saveProjectToLocal(projectResponse: ProjectResponse) {
         localDataHelper.getProjectLocalDb().insertOrUpdate(projectResponse)
     }

@@ -194,7 +194,7 @@ class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
             deploymentStatus == SyncInfo.Uploading || registrationStatus == SyncInfo.Uploading -> {
                 showSyncingState()
             }
-            deploymentStatus == SyncInfo.Uploaded && registrationStatus == SyncInfo.Uploaded -> {
+            deploymentStatus == SyncInfo.Uploaded && registrationStatus == SyncInfo.Uploaded && unsyncedWork?.size == 0 -> {
                 showSyncedState()
                 hideBanner()
             }
@@ -204,6 +204,11 @@ class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
                 viewModel.updateUnsyncedWorks()
             }
             deploymentStatus == SyncInfo.Retry || registrationStatus == SyncInfo.Retry -> {
+                showSyncedState()
+                showBanner()
+                viewModel.updateUnsyncedWorks()
+            }
+            unsyncedWork?.size != 0 -> {
                 showSyncedState()
                 showBanner()
                 viewModel.updateUnsyncedWorks()
