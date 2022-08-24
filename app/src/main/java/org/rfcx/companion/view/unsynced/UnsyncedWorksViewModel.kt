@@ -1,9 +1,12 @@
 package org.rfcx.companion.view.unsynced
 
+import android.annotation.SuppressLint
 import android.app.Application
 import androidx.lifecycle.*
+import org.rfcx.companion.R
 import org.rfcx.companion.adapter.UnsyncedWorksViewItem
-import org.rfcx.companion.entity.UnsyncedWork
+import org.rfcx.companion.entity.RegisterGuardian
+import org.rfcx.companion.entity.UnsyncedDeployment
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.guardian.GuardianRegistration
 import org.rfcx.companion.service.DeploymentSyncWorker
@@ -15,6 +18,8 @@ class UnsyncedWorksViewModel(
     private val repository: UnsyncedWorksRepository
 ) : AndroidViewModel(application) {
 
+    @SuppressLint("StaticFieldLeak")
+    private val context = getApplication<Application>().applicationContext
     private lateinit var deploymentLiveData: LiveData<List<Deployment>>
 
     private lateinit var registrationLiveData: LiveData<List<GuardianRegistration>>
@@ -68,6 +73,44 @@ class UnsyncedWorksViewModel(
     fun updateUnsyncedWorks() {
         val deploymentErrors = DeploymentSyncWorker.getErrors()
         val registrationErrors = RegisterGuardianWorker.getErrors()
-        unsyncedWork.postValue(UnsyncedWork(repository.getUnsentDeployment(), repository.getUnsentRegistration()).toAdapterItem(deploymentErrors, registrationErrors))
+        unsyncedWork.postValue(
+            convertToAdapterItem(
+                repository.getUnsentDeployment(),
+                repository.getUnsentRegistration(),
+                deploymentErrors,
+                registrationErrors
+            )
+        )
+    }
+
+    private fun convertToAdapterItem(
+        deployments: List<Deployment>?,
+        registrations: List<GuardianRegistration>?,
+        dpErrors: List<UnsyncedDeployment>,
+        rgErrors: List<RegisterGuardian>
+    ): List<UnsyncedWorksViewItem> {
+        val list = mutableListOf<UnsyncedWorksViewItem>()
+        if (!deployments.isNullOrEmpty()) {
+            list.add(UnsyncedWorksViewItem.Header(context.getString(R.string.deployment)))
+            deployments.forEach {
+                val dp = dpErrors.find { error -> error.id == it.id }
+                list.add(
+                    UnsyncedWorksViewItem.Deployment(
+                        it.id,
+                        it.stream?.name ?: "",
+                        it.deployedAt,
+                        dp?.error
+                    )
+                )
+            }
+        }
+        if (!registrations.isNullOrEmpty()) {
+            list.add(UnsyncedWorksViewItem.Header(context.getString(R.string.registration)))
+            registrations.forEach {
+                val rg = rgErrors.find { error -> error.guid == it.guid }
+                list.add(UnsyncedWorksViewItem.Registration(it.guid, rg?.error))
+            }
+        }
+        return list
     }
 }

@@ -557,4 +557,6 @@
     <string name="unsynced_registration_text">You have %d registrations</string>
     <string name="unsynced_deployment_text">You have %d unsynced deployments</string>
     <string name="unsynced_all_text">You have %d unsynced deployments and %d registrations</string>
+    <string name="deployment">Deployment</string>
+    <string name="registration">Registration</string>
 </resources>
