@@ -41,5 +41,6 @@ enum class InstructionCommand(val value: String) {
     PING("ping"),
     IDENTITY("identity"),
     SPEED_TEST("speed_test"),
-    CLASSIFIER("classifier")
+    CLASSIFIER("classifier"),
+    RESTART("restart")
 }
