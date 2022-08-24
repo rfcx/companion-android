@@ -78,7 +78,7 @@ import org.rfcx.companion.view.detail.DeploymentDetailActivity
 import org.rfcx.companion.view.profile.locationgroup.ProjectActivity
 import org.rfcx.companion.view.profile.locationgroup.ProjectAdapter
 import org.rfcx.companion.view.profile.locationgroup.ProjectListener
-import org.rfcx.companion.view.unsynced.UnsyncedDeploymentActivity
+import org.rfcx.companion.view.unsynced.UnsyncedWorksActivity
 import java.io.File
 import java.util.*
 import kotlin.collections.set
@@ -314,7 +314,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
 
         unSyncedDpNumber.setOnClickListener {
             if (unsyncedDeploymentCount != 0) {
-                UnsyncedDeploymentActivity.startActivity(requireContext())
+                UnsyncedWorksActivity.startActivity(requireContext())
             }
         }
 
@@ -1003,7 +1003,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
     }
 
     private fun setObserver() {
-        mainViewModel.getUnsyncedDeployments()
+        mainViewModel.getUnsyncedWorks()
             .observe(viewLifecycleOwner, getUnsyncedDeploymentsObserver)
         mainViewModel.getProjectsFromRemote()
             .observe(viewLifecycleOwner, getProjectsFromRemoteObserver)
@@ -1367,7 +1367,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
             mainViewModel.getDeploymentMarkers().removeObserver(getDeploymentMarkerObserver)
             mainViewModel.getStreamMarkers().removeObserver(getStreamMarkerObserver)
             mainViewModel.getStreams().removeObserver(getStreamObserver)
-            mainViewModel.getUnsyncedDeployments().removeObserver(getUnsyncedDeploymentsObserver)
+            mainViewModel.getUnsyncedWorks().removeObserver(getUnsyncedDeploymentsObserver)
         }
         if (::deploymentWorkInfoLiveData.isInitialized) {
             deploymentWorkInfoLiveData.removeObserver(deploymentWorkInfoObserve)

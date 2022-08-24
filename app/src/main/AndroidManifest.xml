@@ -91,7 +91,7 @@
             android:screenOrientation="portrait"/>
 
         <activity
-            android:name=".view.unsynced.UnsyncedDeploymentActivity"
+            android:name=".view.unsynced.UnsyncedWorksActivity"
             android:screenOrientation="portrait"/>
 
         <activity

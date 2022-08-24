@@ -76,7 +76,7 @@
         android:id="@+id/noContentTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/format_deploys_uploaded"
+        android:text="@string/all_works_synced"
         android:textAlignment="center"
         android:textColor="@color/text_primary"
         android:visibility="gone"

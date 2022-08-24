@@ -24,8 +24,8 @@ import org.rfcx.companion.view.profile.offlinemap.ProjectOfflineMapRepository
 import org.rfcx.companion.view.profile.offlinemap.ProjectOfflineMapViewModel
 import org.rfcx.companion.view.project.repository.ProjectSelectRepository
 import org.rfcx.companion.view.project.viewmodel.ProjectSelectViewModel
-import org.rfcx.companion.view.unsynced.UnsyncedDeploymentRepository
-import org.rfcx.companion.view.unsynced.UnsyncedDeploymentViewModel
+import org.rfcx.companion.view.unsynced.UnsyncedWorksRepository
+import org.rfcx.companion.view.unsynced.UnsyncedWorksViewModel
 
 class ViewModelFactory(
     private val application: Application,
@@ -77,10 +77,10 @@ class ViewModelFactory(
                     DeploymentDetailRepository(deviceApiHelper, localDataHelper)
                 ) as T
             }
-            modelClass.isAssignableFrom(UnsyncedDeploymentViewModel::class.java) -> {
-                return UnsyncedDeploymentViewModel(
+            modelClass.isAssignableFrom(UnsyncedWorksViewModel::class.java) -> {
+                return UnsyncedWorksViewModel(
                     application,
-                    UnsyncedDeploymentRepository(deviceApiHelper, localDataHelper)
+                    UnsyncedWorksRepository(deviceApiHelper, localDataHelper)
                 ) as T
             }
             modelClass.isAssignableFrom(EditLocationViewModel::class.java) -> {

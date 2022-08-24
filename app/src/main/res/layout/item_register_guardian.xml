@@ -16,7 +16,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/unsyncedName"
+            android:id="@+id/registerGuardianName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/text_primary"
@@ -25,23 +25,14 @@
             tools:text="Site name" />
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/deployedAt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_padding_small"
-            android:textColor="@color/text_secondary"
-            app:layout_constraintStart_toStartOf="@id/unsyncedName"
-            app:layout_constraintTop_toBottomOf="@id/unsyncedName" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/unsyncedError"
+            android:id="@+id/registerGuardianError"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_padding_small"
             android:textColor="@color/error"
             android:visibility="gone"
-            app:layout_constraintStart_toStartOf="@id/deployedAt"
-            app:layout_constraintTop_toBottomOf="@id/deployedAt"
+            app:layout_constraintStart_toStartOf="@id/registerGuardianName"
+            app:layout_constraintTop_toBottomOf="@id/registerGuardianName"
             tools:text="Error message" />
 
         <TextView

@@ -18,6 +18,7 @@ import io.realm.RealmResults
 import org.json.JSONObject
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
+import org.rfcx.companion.entity.guardian.GuardianRegistration
 import org.rfcx.companion.entity.guardian.toMark
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.ProjectByIdResponse
@@ -40,12 +41,13 @@ class MainViewModel(
     private val context = getApplication<Application>().applicationContext
     private val projects = MutableLiveData<Resource<List<Project>>>()
     private val tracks = MutableLiveData<Resource<List<DeploymentAssetResponse>>>()
-    private val unsyncedDeploymentCount = MutableLiveData<Int>()
+    private val unsyncedWorksCount = MutableLiveData<Int>()
     private val deploymentMarkers = MutableLiveData<List<MapMarker.DeploymentMarker>>()
     private val streamMarkers = MutableLiveData<List<MapMarker>>()
     private val streamList = MutableLiveData<List<Stream>>()
 
     private var streams = listOf<Stream>()
+    private var registrationCount = 0
 
     private lateinit var streamLiveData: LiveData<List<Stream>>
     private val streamObserve = Observer<List<Stream>> {
@@ -54,6 +56,11 @@ class MainViewModel(
 
     private lateinit var deploymentLiveData: LiveData<List<Deployment>>
     private val deploymentObserve = Observer<List<Deployment>> {
+        combinedData()
+    }
+    private lateinit var registrationLiveData: LiveData<List<GuardianRegistration>>
+    private val registrationObserve = Observer<List<GuardianRegistration>> {
+        registrationCount = it.size
         combinedData()
     }
 
@@ -70,6 +77,11 @@ class MainViewModel(
             mainRepository.getAllDeploymentLocateResultsAsync().asLiveData()
         ) { it }
         deploymentLiveData.observeForever(deploymentObserve)
+
+        registrationLiveData = Transformations.map(
+            mainRepository.getAllRegistrationResultsAsync().asLiveData()
+        ) { it }
+        registrationLiveData.observeForever(registrationObserve)
     }
 
     fun fetchProjects() {
@@ -247,7 +259,7 @@ class MainViewModel(
         deploymentMarkers.postValue(deploymentMarkersList)
 
         val unsyncedDeployments = deployments.filter { it.isUnsynced() }
-        unsyncedDeploymentCount.postValue(unsyncedDeployments.size)
+        unsyncedWorksCount.postValue(unsyncedDeployments.size + this.registrationCount)
     }
 
     fun updateStatusOfflineMap() {
@@ -365,8 +377,8 @@ class MainViewModel(
         return streamMarkers
     }
 
-    fun getUnsyncedDeployments(): LiveData<Int> {
-        return unsyncedDeploymentCount
+    fun getUnsyncedWorks(): LiveData<Int> {
+        return unsyncedWorksCount
     }
 
     fun getStreams(): LiveData<List<Stream>> {
