@@ -40,6 +40,8 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
 
     private val REQUIRED_VERSION = 10100
 
+    private lateinit var dialogBuilder: AlertDialog
+
     private val db by lazy { ClassifierDb(Realm.getInstance(RealmHelper.migrationConfig())) }
 
     override fun onAttach(context: Context) {
@@ -222,6 +224,7 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
                 classifierLoadAdapter?.let {
                     if (it.getProgressUploading()) {
                         it.hideProgressUploading()
+                        showRestartGuardianServices()
                     }
                 }
                 stopTimer()
@@ -233,6 +236,21 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
     private fun stopTimer() {
         loadingTimer?.cancel()
         loadingTimer = null
+    }
+
+    private fun showRestartGuardianServices() {
+        dialogBuilder =
+            AlertDialog.Builder(requireContext()).apply {
+                setTitle(null)
+                setMessage("Look like you have a trouble with updating.\nTry restarting Guardian?")
+                setPositiveButton("restart") { _, _ ->
+                    GuardianSocketManager.restartService("file-socket")
+                }
+                setNegativeButton("cancel") { _, _ ->
+                    dialogBuilder.dismiss()
+                }
+            }.create()
+        dialogBuilder.show()
     }
 
     companion object {
