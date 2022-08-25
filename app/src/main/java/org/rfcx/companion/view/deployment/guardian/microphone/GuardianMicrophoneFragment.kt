@@ -87,6 +87,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
             setUiByState(MicTestingState.FINISH)
             spectrogramStack.clear()
             microphoneTestUtils.stop()
+            stopSocketTimer()
         }
 
         listenAgainAudioButton.setOnClickListener {
@@ -94,6 +95,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
             isTimerPause = false
             setUiByState(MicTestingState.LISTENING)
             microphoneTestUtils.play()
+            scheduleSocketTimer()
         }
 
         finishButton.setOnClickListener {
@@ -247,6 +249,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
                         nullStackThreshold++
                         if (nullStackThreshold >= 50) {
                             nullStackThreshold = 0
+                            AudioCastSocketManager.connect(microphoneTestUtils)
                         }
                     }
                 }
@@ -290,7 +293,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     }
 
     private fun scheduleSocketTimer() {
-        socketTimer = object : CountDownTimer(30000, 1000) {
+        socketTimer = object : CountDownTimer(10000, 1000) {
             override fun onTick(millisUntilFinished: Long) { }
 
             override fun onFinish() {
