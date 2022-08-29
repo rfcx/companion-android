@@ -16,12 +16,9 @@ import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.FileSocketManager
 import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.entity.Software
-import org.rfcx.companion.entity.socket.request.InstructionCommand
-import org.rfcx.companion.entity.socket.request.InstructionType
 import org.rfcx.companion.util.file.APKUtils
 import org.rfcx.companion.util.file.APKUtils.calculateVersionValue
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
-import java.util.*
 
 class SoftwareUpdateFragment : Fragment(), ChildrenClickedListener {
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
