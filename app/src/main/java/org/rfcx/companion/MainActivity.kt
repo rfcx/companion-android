@@ -89,7 +89,6 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
 
         if (requestCode == UPDATE_REQUEST_CODE) {
             when (resultCode) {
-                Activity.RESULT_OK -> showSnackbarForUpdateState("Update is downloading")
                 Activity.RESULT_CANCELED -> showSnackbarForUpdateState("Updating is canceled")
                 ActivityResult.RESULT_IN_APP_UPDATE_FAILED -> showSnackbarForUpdateState("Download update is failed")
             }
@@ -344,18 +343,18 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
     }
 
     override fun showSnackbar(msg: String, duration: Int) {
-        snackbar = Snackbar.make(rootView, msg, duration)
+        snackbar = Snackbar.make(mainRootView, msg, duration)
         snackbar?.anchorView = createLocationButton
         snackbar?.show()
     }
 
     override fun showSnackbarForUpdateState(msg: String) {
-        snackbar = Snackbar.make(rootView, msg, Snackbar.LENGTH_LONG)
+        snackbar = Snackbar.make(mainRootView, msg, Snackbar.LENGTH_LONG)
         snackbar?.show()
     }
 
     override fun showSnackbarForCompleteUpdate() {
-        snackbar = Snackbar.make(rootView, "Update is successfully downloaded", Snackbar.LENGTH_INDEFINITE)
+        snackbar = Snackbar.make(mainRootView, "Update is successfully downloaded", Snackbar.LENGTH_INDEFINITE)
             .apply {
             setAction("RESTART") {
                 appUpdateManager.completeUpdate()
