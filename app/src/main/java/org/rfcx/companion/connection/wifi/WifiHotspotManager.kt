@@ -93,8 +93,8 @@ class WifiHotspotManager(private val context: Context) {
             wifiConfig.allowedProtocols.set(WifiConfiguration.Protocol.RSN)
             wifiConfig.allowedProtocols.set(WifiConfiguration.Protocol.WPA)
 
-            val netId = wifiManager!!.addNetwork(wifiConfig)
             wifiManager!!.disconnect()
+            val netId = wifiManager!!.addNetwork(wifiConfig)
             wifiManager!!.enableNetwork(netId, true)
             wifiManager!!.reconnect()
         }
