@@ -143,11 +143,11 @@ class SoftwareUpdateFragment : Fragment(), ChildrenClickedListener {
         dialogBuilder =
             AlertDialog.Builder(requireContext()).apply {
                 setTitle(null)
-                setMessage("Look like you have a trouble with updating.\nTry restarting Guardian?")
-                setPositiveButton("restart") { _, _ ->
+                setMessage(R.string.dialog_start_service_update)
+                setPositiveButton(R.string.restart) { _, _ ->
                     GuardianSocketManager.restartService("file-socket")
                 }
-                setNegativeButton("cancel") { _, _ ->
+                setNegativeButton(R.string.cancel) { _, _ ->
                     dialogBuilder.dismiss()
                 }
             }.create()

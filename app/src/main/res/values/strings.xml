@@ -552,6 +552,11 @@
     <string name="guardian_registration">Guardian registration</string>
     <string name="require_an_active_classifier_to_process_next">Please activate a classifier to proceed to the next step</string>
 
+    <string name="dialog_start_service_upload">Look like you have a trouble with uploading.\nTry restarting service?</string>
+    <string name="dialog_start_service_update">Look like you have a trouble with updating.\nTry restarting service?</string>
+    <string name="dialog_start_service_mic">Look like you have a trouble with microphone.\nTry restarting service?</string>
+    <string name="restart">Restart</string>
+
     <!-- Unsynced Activity -->
     <string name="all_works_synced">All works synced</string>
     <string name="unsynced_registration_text">You have %d registrations</string>

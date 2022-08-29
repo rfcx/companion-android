@@ -282,11 +282,11 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         dialogBuilder =
             AlertDialog.Builder(requireContext()).apply {
                 setTitle(null)
-                setMessage("Look like you have a trouble with microphone.\nTry restarting service?")
-                setPositiveButton("restart") { _, _ ->
+                setMessage(R.string.dialog_start_service_mic)
+                setPositiveButton(R.string.restart) { _, _ ->
                     GuardianSocketManager.restartService("audio-cast-socket")
                 }
-                setNegativeButton("cancel") { _, _ ->
+                setNegativeButton(R.string.cancel) { _, _ ->
                     dialogBuilder.dismiss()
                 }
             }.create()
