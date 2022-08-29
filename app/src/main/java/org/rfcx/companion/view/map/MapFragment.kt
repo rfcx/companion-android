@@ -221,10 +221,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
 
     private val getStreamMarkerObserver = Observer<List<MapMarker>> {
         streamMarkers = it ?: listOf()
+        combinedData()
     }
 
     private val getStreamObserver = Observer<List<Stream>> {
         streams = it ?: listOf()
+        combinedData()
     }
 
     private val getUnsyncedDeploymentsObserver = Observer<Int> {

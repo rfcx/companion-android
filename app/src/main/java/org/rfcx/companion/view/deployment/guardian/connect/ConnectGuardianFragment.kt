@@ -119,15 +119,17 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
         deploymentProtocol?.startPeriodicHeartbeat()
         lifecycleScope.launch {
             withContext(Dispatchers.Main) {
-                GuardianSocketManager.pingBlob.observe(
-                    viewLifecycleOwner
-                ) {
-                    requireActivity().runOnUiThread {
-                        // So that we know ping is received
-                        if (it.prefs != null) {
-                            hideLoading()
-                            deploymentProtocol?.stopPeriodicHeartbeat()
-                            deploymentProtocol?.startCheckList()
+                if (view != null) {
+                    GuardianSocketManager.pingBlob.observe(
+                        viewLifecycleOwner
+                    ) {
+                        requireActivity().runOnUiThread {
+                            // So that we know ping is received
+                            if (it.prefs != null) {
+                                hideLoading()
+                                deploymentProtocol?.stopPeriodicHeartbeat()
+                                deploymentProtocol?.startCheckList()
+                            }
                         }
                     }
                 }
