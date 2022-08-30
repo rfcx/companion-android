@@ -104,7 +104,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     private fun checkTestingRequirement() {
         deploymentProtocol?.getAudioCapturing()?.let {
             if (!it.isCapturing) {
-                showAlert(it.msg ?: "unknown error")
+                showAlert(it.msg ?: getString(R.string.unknown_error))
             }
         }
     }
@@ -114,9 +114,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
             AlertDialog.Builder(requireContext()).apply {
                 setTitle(null)
                 setMessage(text)
-                setPositiveButton(R.string.go_back) { _, _ ->
-
-                }
+                setPositiveButton(R.string.ok) { _, _ -> }
             }
         dialogBuilder.create().show()
     }
