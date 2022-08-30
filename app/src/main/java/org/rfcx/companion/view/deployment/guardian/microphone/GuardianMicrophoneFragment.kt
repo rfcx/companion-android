@@ -102,9 +102,9 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     }
 
     private fun checkTestingRequirement() {
-        deploymentProtocol?.getSentinelPower()?.battery?.percentage?.let {
-            if (it < 30.0) {
-                showAlert("Guardian battery is lower than 30%\n Please charge it first")
+        deploymentProtocol?.getAudioCapturing()?.let {
+            if (!it.isCapturing) {
+                showAlert(it.msg ?: "unknown error")
             }
         }
     }

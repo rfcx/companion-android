@@ -225,6 +225,12 @@ object PingUtils {
         }
     }
 
+    fun getAudioCaptureStatus(ping: GuardianPing?): AudioCaptureStatus? {
+        val isCapturing = ping?.companion?.get("is_audio_capturing") ?: return null
+        val captureMsg = ping.companion.get("audio_capturing_message") ?: null
+        return AudioCaptureStatus(isCapturing.asBoolean, captureMsg?.asString)
+    }
+
     fun getSpeedTest(ping: AdminPing?): SpeedTest? {
         val speedTest = ping?.companion?.get("speed_test")?.asJsonObject ?: return null
         val downloadSpeed = speedTest.get("download_speed").asDouble
