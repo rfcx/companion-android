@@ -3,6 +3,7 @@ package org.rfcx.companion.view.deployment.guardian
 import com.google.gson.JsonObject
 import org.rfcx.companion.entity.guardian.ClassifierLite
 import org.rfcx.companion.entity.guardian.Deployment
+import org.rfcx.companion.entity.socket.response.AudioCaptureStatus
 import org.rfcx.companion.entity.socket.response.I2CAccessibility
 import org.rfcx.companion.entity.socket.response.SentinelInfo
 import org.rfcx.companion.entity.socket.response.SpeedTest
@@ -50,6 +51,7 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getGuardianTimezone(): String?
     fun getClassifiers(): Map<String, ClassifierLite>?
     fun getActiveClassifiers(): Map<String, ClassifierLite>?
+    fun getAudioCapturing(): AudioCaptureStatus?
 
     fun getCurrentProjectId(): String?
 
