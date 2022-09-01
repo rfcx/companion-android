@@ -1,1 +1,2 @@
 - Add alert to microphone testing not working
+- Alert restarting service when cannot receive message within time

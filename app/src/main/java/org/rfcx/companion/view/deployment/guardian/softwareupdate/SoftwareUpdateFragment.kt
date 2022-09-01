@@ -6,6 +6,7 @@ import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -18,7 +19,6 @@ import org.rfcx.companion.entity.Software
 import org.rfcx.companion.util.file.APKUtils
 import org.rfcx.companion.util.file.APKUtils.calculateVersionValue
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
-import java.util.*
 
 class SoftwareUpdateFragment : Fragment(), ChildrenClickedListener {
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
@@ -27,6 +27,8 @@ class SoftwareUpdateFragment : Fragment(), ChildrenClickedListener {
     private var loadingTimer: CountDownTimer? = null
 
     private var tempProgress = 0
+
+    private lateinit var dialogBuilder: AlertDialog
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -125,6 +127,7 @@ class SoftwareUpdateFragment : Fragment(), ChildrenClickedListener {
                 softwareUpdateAdapter?.let {
                     if (it.getLoading()) {
                         it.hideLoading()
+                        showRestartGuardianServices()
                     }
                 }
                 stopTimer()
@@ -133,9 +136,29 @@ class SoftwareUpdateFragment : Fragment(), ChildrenClickedListener {
         loadingTimer?.start()
     }
 
+    private fun showRestartGuardianServices() {
+        dialogBuilder =
+            AlertDialog.Builder(requireContext()).apply {
+                setTitle(null)
+                setMessage(R.string.dialog_start_service_update)
+                setPositiveButton(R.string.restart) { _, _ ->
+                    GuardianSocketManager.restartService("file-socket")
+                }
+                setNegativeButton(R.string.cancel) { _, _ ->
+                    dialogBuilder.dismiss()
+                }
+            }.create()
+        dialogBuilder.show()
+    }
+
     private fun stopTimer() {
         loadingTimer?.cancel()
         loadingTimer = null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stopTimer()
     }
 
     companion object {
