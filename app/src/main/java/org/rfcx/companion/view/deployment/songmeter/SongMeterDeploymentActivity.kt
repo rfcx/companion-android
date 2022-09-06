@@ -5,11 +5,10 @@ import android.content.Intent
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.View
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.google.gson.Gson
 import io.realm.RealmList
 import kotlinx.android.synthetic.main.toolbar_default.*
@@ -32,12 +31,10 @@ import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.geojson.GeoJsonUtils
-import org.rfcx.companion.util.getLastLocation
 import org.rfcx.companion.util.getListSite
 import org.rfcx.companion.view.deployment.BaseDeploymentActivity
 import org.rfcx.companion.view.deployment.DeployFragment
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
-import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.deployment.location.DetailDeploymentSiteFragment
 import org.rfcx.companion.view.deployment.location.SetDeploymentSiteFragment
 import org.rfcx.companion.view.deployment.songmeter.connect.SongMeterConnectFragment
@@ -52,13 +49,13 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
 
     private var currentCheck = 0
     private var passedChecks = RealmList<Int>()
-    private var currentLocation: Location? = null
     private var useExistedLocation: Boolean = false
 
     private lateinit var songMeterViewModel: SongMeterViewModel
 
     private var deployments = listOf<Deployment>()
-    private var sites = listOf<Locate>()
+    private var sites = listOf<Stream>()
+    private var stream: Stream? = null
 
     private var songMeterId: String? = null
 
@@ -87,7 +84,6 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
         startCheckList()
         setViewModel()
         setObserver()
-        this.currentLocation = this.getLastLocation()
         preferences.clearSelectedProject()
     }
 
@@ -137,27 +133,9 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
         startFragment(SongMeterConnectFragment.newInstance(advertisement))
     }
 
-    override fun startMapPicker(latitude: Double, longitude: Double, siteId: Int, name: String) {
-        setLatLng(latitude, longitude, siteId, name)
-        startFragment(MapPickerFragment.newInstance(latitude, longitude, siteId, name))
-    }
-
-    private fun setLatLng(latitude: Double, longitude: Double, siteId: Int, name: String) {
-        this.latitude = latitude
-        this.longitude = longitude
-        this.siteId = siteId
-        this.nameLocation = name
-    }
-
     override fun startCheckList() {
         startFragment(SongMeterCheckListFragment.newInstance())
     }
-
-    override fun startDetailDeploymentSite(id: Int, name: String?, isNewSite: Boolean) {
-        startFragment(DetailDeploymentSiteFragment.newInstance(id, name, isNewSite))
-    }
-
-    override fun isOpenedFromUnfinishedDeployment(): Boolean = false
 
     override fun nextStep() {
         if (passedChecks.contains(2) && _images.isNullOrEmpty()) {
@@ -181,10 +159,7 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
         loc.longitude = 0.0
 
         _siteItems = getListSite(
-            this,
-            deployments,
-            getString(R.string.none),
-            currentLocation ?: loc,
+            currentLocate ?: loc,
             sites
         )
     }
@@ -195,8 +170,7 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
                 DetailDeploymentSiteFragment.newInstance(
                     latitude,
                     longitude,
-                    siteId,
-                    nameLocation
+                    siteId
                 )
             )
             is SongMeterCheckListFragment -> {
@@ -209,10 +183,10 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
                 finish()
             }
             is DetailDeploymentSiteFragment -> {
-                if (_deployLocation == null) {
+                if (stream == null) {
                     startFragment(
                         SetDeploymentSiteFragment.newInstance(
-                            currentLocation?.latitude ?: 0.0, currentLocation?.longitude ?: 0.0
+                            currentLocate?.latitude ?: 0.0, currentLocate?.longitude ?: 0.0
                         )
                     )
                 } else {
@@ -221,6 +195,14 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
             }
             else -> startCheckList()
         }
+    }
+
+    override fun getStream(id: Int): Stream? {
+        return songMeterViewModel.getStreamById(id)
+    }
+
+    override fun getProject(id: Int): Project? {
+        return songMeterViewModel.getProjectById(id)
     }
 
     override fun onBackPressed() {
@@ -237,42 +219,16 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
         songMeterViewModel.insertImage(deployment, _images)
     }
 
-    override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
-
-    override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
-
-    override fun getLocationGroup(name: String): Project? {
-        return songMeterViewModel.getProjectByName(name)
-    }
-
-    override fun getImages(): List<String> {
-        return this._images
-    }
-
-    override fun getCurrentLocation(): Location = currentLocation ?: Location(LocationManager.GPS_PROVIDER)
-
-    override fun setDeployLocation(locate: Locate, isExisted: Boolean) {
+    override fun setDeployLocation(stream: Stream, isExisted: Boolean) {
         val deployment = _deployment ?: Deployment()
         deployment.device = Device.SONGMETER.value
-        deployment.isActive = locate.serverId == null
+        deployment.isActive = stream.serverId == null
         deployment.state = DeploymentState.SongMeter.Locate.key // state
 
-        this._deployLocation = locate.asDeploymentLocation()
-        this._locate = locate
+        this._stream = stream
         useExistedLocation = isExisted
-        if (!useExistedLocation) {
-            songMeterViewModel.setLocateInsertOrUpdate(locate)
-        }
 
         setDeployment(deployment)
-    }
-
-    override fun setSiteItem(items: ArrayList<SiteWithLastDeploymentItem>) {
-        this._siteItems = items
-    }
-
-    override fun setImages(images: List<String>) {
-        this._images = images
     }
 
     override fun setReadyToDeploy() {
@@ -285,24 +241,23 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
             it.deviceParameters = Gson().toJson(SongMeterParameters(songMeterId))
             setDeployment(it)
 
-            val deploymentId = songMeterViewModel.insertOrUpdateDeployment(it, _deployLocation!!)
-            this._locate?.let { loc ->
-                songMeterViewModel.insetOrUpdateStream(deploymentId, loc) // update locate - last deployment
-                Log.d("SONGMETER", "success deploy save")
-            }
-
+            // set all deployments in stream to active false
             if (useExistedLocation) {
-                this._locate?.let { locate ->
-                    val deployments =
-                        locate.serverId?.let { it1 ->
-                            songMeterViewModel.getDeploymentsBySiteId(
-                                it1
-                            )
-                        }
-                    deployments?.forEach { deployment ->
-                        songMeterViewModel.updateIsActive(deployment.id)
+                this._stream?.let { locate ->
+                    locate.deployments?.forEach { dp ->
+                        songMeterViewModel.updateIsActive(dp.id)
                     }
                 }
+            }
+
+            this._stream?.let { loc ->
+                val streamId = songMeterViewModel.insertOrUpdate(loc)
+                val deploymentId =
+                    songMeterViewModel.insertOrUpdateDeployment(it, streamId)
+                songMeterViewModel.updateDeploymentIdOnStream(
+                    deploymentId,
+                    streamId
+                ) // update locate - last deployment
             }
             saveImages(it)
 
@@ -313,7 +268,7 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
                     val point = t.points.toListDoubleArray()
                     val trackingFile = TrackingFile(
                         deploymentId = it.id,
-                        siteId = this._locate!!.id,
+                        siteId = this.stream!!.id,
                         localPath = GeoJsonUtils.generateGeoJson(
                             this,
                             GeoJsonUtils.generateFileName(it.deployedAt, it.deploymentKey),
@@ -359,7 +314,7 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
 
 
     override fun setCurrentLocation(location: Location) {
-        this.currentLocation = location
+        this.currentLocate = location
     }
 
     override fun handleCheckClicked(number: Int) {
@@ -367,11 +322,11 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
         currentCheck = number
         when (number) {
             0 -> {
-                val site = this._locate
+                val site = this.stream
                 if (site == null) {
                     startFragment(
                         SetDeploymentSiteFragment.newInstance(
-                            currentLocation?.latitude ?: 0.0, currentLocation?.longitude ?: 0.0
+                            currentLocate?.latitude ?: 0.0, currentLocate?.longitude ?: 0.0
                         )
                     )
                 } else {

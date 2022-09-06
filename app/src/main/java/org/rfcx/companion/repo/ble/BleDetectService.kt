@@ -8,6 +8,7 @@ import android.content.Context
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.MutableLiveData
 import org.rfcx.companion.entity.songmeter.Advertisement
@@ -37,6 +38,7 @@ class BleDetectService(context: Context) {
             super.onScanResult(callbackType, result)
 
             if (result != null) {
+                Log.d("BLE", result.device.address)
                 if (result.device.address.split(":").joinToString("").substring(0,6) == "9C25BE") {
                     address = result.device.address
                     advertisementUtils.convertAdvertisementToObject(result.scanRecord!!.bytes)
@@ -61,23 +63,15 @@ class BleDetectService(context: Context) {
     fun getAdvertisement() = advertisement
 
     fun scanBle(isEnable: Boolean) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            val scanner = bluetoothAdapter.bluetoothLeScanner
+        val scanner = bluetoothAdapter.bluetoothLeScanner
 
-            if (isEnable) {
-                Handler(Looper.getMainLooper()).postDelayed({
-                    advertisement.postValue(Resource.success(null))
-                    isScanning = false
-                    scanner.stopScan(scannerCallback)
-                }, 10000)
-
-                advertisement.postValue(Resource.loading(null))
-                isScanning = true
-                scanner.startScan(scannerCallback)
-            } else {
-                isScanning = false
-                scanner.stopScan(scannerCallback)
-            }
+        if (isEnable) {
+            advertisement.postValue(Resource.loading(null))
+            isScanning = true
+            scanner.startScan(scannerCallback)
+        } else {
+            isScanning = false
+            scanner.stopScan(scannerCallback)
         }
     }
 

@@ -27,10 +27,9 @@ class SongMeterViewModel(
 
     @SuppressLint("StaticFieldLeak")
     private val context = getApplication<Application>().applicationContext
-    private var audioMothConnector = AudioMothChimeConnector()
 
     private var deployments = MutableLiveData<List<Deployment>>()
-    private var sites = MutableLiveData<List<Locate>>()
+    private var sites = MutableLiveData<List<Stream>>()
     private var downloadStreamsWork = MutableLiveData<Resource<SyncInfo>>()
 
     private lateinit var deploymentLiveData: LiveData<List<Deployment>>
@@ -38,8 +37,8 @@ class SongMeterViewModel(
         deployments.postValue(it)
     }
 
-    private lateinit var siteLiveData: LiveData<List<Locate>>
-    private val siteObserve = Observer<List<Locate>> {
+    private lateinit var siteLiveData: LiveData<List<Stream>>
+    private val siteObserve = Observer<List<Stream>> {
         sites.postValue(it)
     }
 
@@ -68,56 +67,53 @@ class SongMeterViewModel(
     private fun fetchLiveData() {
         val preferences = Preferences.getInstance(context)
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
-        val project = getProjectById(projectId)
-        val projectName = project?.name ?: context.getString(R.string.none)
         siteLiveData =
             Transformations.map(
-                songMeterRepository.getAllResultsAsyncWithinProject(projectName)
+                songMeterRepository.getAllResultsAsyncWithinProject(projectId)
                     .asLiveData()
             ) { it }
         siteLiveData.observeForever(siteObserve)
 
         deploymentLiveData = Transformations.map(
-            songMeterRepository.getAllDeploymentResultsAsyncWithinProject(projectName)
+            songMeterRepository.getAllDeploymentResultsAsyncWithinProject(projectId)
                 .asLiveData()
         ) { it }
         deploymentLiveData.observeForever(deploymentObserve)
 
         downloadStreamsWorkInfoLiveData = DownloadStreamsWorker.workInfos(context)
         downloadStreamsWorkInfoLiveData.observeForever(downloadStreamsWorkInfoObserve)
+    }
 
+    fun downloadStreamsWork(): LiveData<Resource<SyncInfo>> {
+        return downloadStreamsWork
     }
 
     fun getDeployments(): LiveData<List<Deployment>> {
         return deployments
     }
 
-    fun getSites(): LiveData<List<Locate>> {
+    fun getSites(): LiveData<List<Stream>> {
         return sites
     }
 
-    fun getDeploymentsFromLocal(): List<Deployment> {
-        return songMeterRepository.getDeploymentFromLocal()
-    }
-
-    fun getLocatesFromLocal(): List<Locate> {
-        return songMeterRepository.getLocateFromLocal()
+    fun getStreamById(id: Int): Stream? {
+        return songMeterRepository.getStreamById(id)
     }
 
     fun getProjectById(id: Int): Project? {
         return songMeterRepository.getProjectById(id)
     }
 
-    fun getProjectByName(name: String): Project? {
-        return songMeterRepository.getProjectByName(name)
+    fun insertOrUpdate(stream: Stream): Int {
+        return songMeterRepository.insertOrUpdate(stream)
     }
 
-    fun setLocateInsertOrUpdate(locate: Locate) {
-        songMeterRepository.setLocateInsertOrUpdate(locate)
+    fun updateDeploymentIdOnStream(deploymentId: Int, streamId: Int) {
+        songMeterRepository.updateDeploymentIdOnStream(deploymentId, streamId)
     }
 
-    fun updateDeployment(deployment: Deployment) {
-        songMeterRepository.updateDeployment(deployment)
+    fun getImageByDeploymentId(id: Int): List<DeploymentImage> {
+        return songMeterRepository.getImageByDeploymentId(id)
     }
 
     fun deleteImages(deployment: Deployment) {
@@ -167,16 +163,16 @@ class SongMeterViewModel(
         songMeterRepository.setPrefixes(prefixes)
     }
 
-    fun insertOrUpdateDeployment(deployment: Deployment, deploymentLocation: DeploymentLocation): Int {
-        return songMeterRepository.insertOrUpdateDeployment(deployment, deploymentLocation)
+    fun getDeploymentById(id: Int): Deployment? {
+        return songMeterRepository.getDeploymentById(id)
     }
 
-    fun insetOrUpdateStream(deploymentId: Int, stream: Locate) {
-        songMeterRepository.insertOrUpdateStream(deploymentId, stream)
+    fun updateDeployment(deployment: Deployment) {
+        songMeterRepository.updateDeployment(deployment)
     }
 
-    fun getDeploymentsBySiteId(streamId: String): ArrayList<Deployment> {
-        return songMeterRepository.getDeploymentsBySiteId(streamId)
+    fun insertOrUpdateDeployment(deployment: Deployment, streamId: Int): Int {
+        return songMeterRepository.insertOrUpdateDeployment(deployment, streamId)
     }
 
     fun updateIsActive(id: Int) {

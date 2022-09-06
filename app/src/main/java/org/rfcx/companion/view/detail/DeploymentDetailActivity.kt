@@ -29,10 +29,7 @@ import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
-import org.rfcx.companion.entity.DeploymentImage
-import org.rfcx.companion.entity.Device
-import org.rfcx.companion.entity.Permissions
-import org.rfcx.companion.entity.StatusEvent
+import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.repo.api.CoreApiHelper

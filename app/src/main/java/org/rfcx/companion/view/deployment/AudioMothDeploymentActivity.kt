@@ -132,10 +132,6 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
         finish()
     }
 
-    override fun isOpenedFromUnfinishedDeployment(): Boolean {
-        return fromUnfinishedDeployment
-    }
-
     override fun onSupportNavigateUp(): Boolean {
         backStep()
         return true
@@ -458,7 +454,6 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
 
     override fun onDestroy() {
         super.onDestroy()
-        fromUnfinishedDeployment = false
 
         if (::audioMothDeploymentViewModel.isInitialized) {
             audioMothDeploymentViewModel.onDestroy()
@@ -470,24 +465,10 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
         const val TONE_DURATION = 10000
 
-        private var fromUnfinishedDeployment = false
 
         fun startActivity(context: Context) {
             val intent = Intent(context, AudioMothDeploymentActivity::class.java)
             context.startActivity(intent)
-        }
-
-        fun startActivity(context: Context, deploymentId: Int) {
-            val intent = Intent(context, AudioMothDeploymentActivity::class.java)
-            intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
-            context.startActivity(intent)
-        }
-
-        fun startActivity(context: Context, deploymentId: Int, requestCode: Int) {
-            val intent = Intent(context, AudioMothDeploymentActivity::class.java)
-            intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
-            fromUnfinishedDeployment = true
-            (context as Activity).startActivityForResult(intent, requestCode)
         }
     }
 }

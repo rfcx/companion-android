@@ -66,8 +66,6 @@ class AudioMothDeploymentViewModel(
     private fun fetchLiveData() {
         val preferences = Preferences.getInstance(context)
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
-        val project = getProjectById(projectId)
-        val projectName = project?.name ?: context.getString(R.string.none)
         siteLiveData =
             Transformations.map(
                 audioMothDeploymentRepository.getAllResultsAsyncWithinProject(projectId)
@@ -142,10 +140,6 @@ class AudioMothDeploymentViewModel(
 
     fun insertOrUpdateDeployment(deployment: Deployment, streamId: Int): Int {
         return audioMothDeploymentRepository.insertOrUpdateDeployment(deployment, streamId)
-    }
-
-    fun getDeploymentsBySiteId(streamId: Int): ArrayList<Deployment> {
-        return audioMothDeploymentRepository.getDeploymentsBySiteId(streamId)
     }
 
     fun updateIsActive(id: Int) {

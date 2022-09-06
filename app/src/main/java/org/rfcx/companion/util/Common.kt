@@ -46,3 +46,4 @@ fun View.showKeyboard() {
 
 private val chars = ('A'..'F') + ('0'..'9')
 fun randomDeploymentId(): String = List(16) { chars.random() }.joinToString("")
+fun randomPrefixes(): String = List(12) { chars.random() }.joinToString("")

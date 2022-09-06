@@ -13,28 +13,35 @@ class SongMeterRepository(
     private val localDataHelper: LocalDataHelper,
     private val bleHelper: BleHelper
 ) {
-    fun getAllResultsAsyncWithinProject(projectName: String): RealmResults<Locate> {
-        return localDataHelper.getLocateLocalDb()
-            .getAllResultsAsyncWithinProject(project = projectName)
+    fun getAllResultsAsyncWithinProject(id: Int): RealmResults<Stream> {
+        return localDataHelper.getStreamLocalDb()
+            .getAllResultsAsyncWithinProject(id = id)
     }
 
-    fun getAllDeploymentResultsAsyncWithinProject(projectName: String): RealmResults<Deployment> {
+    fun getAllDeploymentResultsAsyncWithinProject(id: Int): RealmResults<Deployment> {
         return localDataHelper.getDeploymentLocalDb()
-            .getAllResultsAsyncWithinProject(project = projectName)
+            .getAllResultsAsyncWithinProject(id = id)
     }
 
-    fun getDeploymentFromLocal() = localDataHelper.getDeploymentLocalDb().getDeployments()
-
-    fun getLocateFromLocal() = localDataHelper.getLocateLocalDb().getLocations()
-
-    fun setLocateInsertOrUpdate(locate: Locate) =
-        localDataHelper.getLocateLocalDb().insertOrUpdate(locate)
+    fun getStreamById(id: Int): Stream? {
+        return localDataHelper.getStreamLocalDb().getStreamById(id)
+    }
 
     fun getProjectById(id: Int): Project? {
         return localDataHelper.getProjectLocalDb().getProjectById(id)
     }
 
-    fun getProjectByName(name: String) = localDataHelper.getProjectLocalDb().getProjectByName(name)
+    fun insertOrUpdate(stream: Stream): Int {
+        return localDataHelper.getStreamLocalDb().insertOrUpdate(stream)
+    }
+
+    fun updateDeploymentIdOnStream(deploymentId: Int, streamId: Int) {
+        localDataHelper.getStreamLocalDb().updateDeploymentIdOnStream(deploymentId, streamId)
+    }
+
+    fun getImageByDeploymentId(id: Int): List<DeploymentImage> {
+        return localDataHelper.getDeploymentImageLocalDb().getImageByDeploymentId(id)
+    }
 
     fun deleteImages(deployment: Deployment) =
         localDataHelper.getDeploymentImageLocalDb().deleteImages(deployment.id)
@@ -81,25 +88,21 @@ class SongMeterRepository(
         bleHelper.setPrefixes(prefixes)
     }
 
+    fun getDeploymentById(id: Int): Deployment? {
+        return localDataHelper.getDeploymentLocalDb().getDeploymentById(id)
+    }
+
     fun updateDeployment(deployment: Deployment) {
         localDataHelper.getDeploymentLocalDb().updateDeployment(deployment)
     }
 
-    fun insertOrUpdateDeployment(deployment: Deployment, location: DeploymentLocation): Int {
+    fun insertOrUpdateDeployment(deployment: Deployment, streamId: Int): Int {
         return localDataHelper.getDeploymentLocalDb()
-            .insertOrUpdateDeployment(deployment, location)
-    }
-
-    fun getDeploymentsBySiteId(streamId: String): ArrayList<Deployment> {
-        return localDataHelper.getDeploymentLocalDb().getDeploymentsBySiteId(streamId, Device.SONGMETER.value)
+            .insertOrUpdateDeployment(deployment, streamId)
     }
 
     fun updateIsActive(id: Int) {
         localDataHelper.getDeploymentLocalDb().updateIsActive(id)
-    }
-
-    fun insertOrUpdateStream(deploymentId: Int, locate: Locate) {
-        localDataHelper.getLocateLocalDb().insertOrUpdateLocate(deploymentId, locate)
     }
 
     fun insertOrUpdateTrackingFile(file: TrackingFile) {

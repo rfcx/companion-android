@@ -123,7 +123,11 @@ class SongMeterDetectFragment: Fragment(), (Advertisement) -> Unit {
 
     override fun onPause() {
         super.onPause()
+        songMeterViewModel.stopBle()
+    }
 
+    override fun onDestroy() {
+        super.onDestroy()
         songMeterViewModel.stopBle()
     }
 

@@ -2,7 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/songMeterConnectTitle"
@@ -26,25 +27,52 @@
         app:layout_constraintStart_toStartOf="@id/songMeterConnectTitle"
         app:layout_constraintTop_toBottomOf="@id/songMeterConnectTitle" />
 
-    <androidx.appcompat.widget.AppCompatEditText
-        android:id="@+id/songMeterSiteIdEditText"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/prefixedLayout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_padding_small"
+        android:hint="device id"
         android:visibility="gone"
-        android:maxLength="12"
-        android:enabled="false"
+        app:counterEnabled="true"
+        app:counterMaxLength="12"
+        app:errorEnabled="true"
+        app:helperText="All caps, numbers"
+        app:helperTextEnabled="true"
         app:layout_constraintEnd_toEndOf="@id/songMeterConnectDesc"
         app:layout_constraintStart_toStartOf="@id/songMeterConnectDesc"
-        app:layout_constraintTop_toBottomOf="@id/songMeterConnectDesc" />
+        app:layout_constraintTop_toBottomOf="@id/songMeterConnectDesc">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/songMeterSiteIdEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLength="12"
+            android:enabled="false" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/randomPrefixes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_normal"
+        android:layout_marginTop="@dimen/margin_padding_small"
+        android:layout_marginBottom="@dimen/margin_padding_large"
+        android:background="@drawable/ic_random"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/prefixedLayout"
+        app:layout_constraintStart_toEndOf="@id/prefixedLayout"
+        app:layout_constraintTop_toTopOf="@id/prefixedLayout" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/songMeterSuggestTextView"
         style="@style/AudioMothText.Subhead.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAlignment="center"
         android:text="@string/hold_press_on_bluetooth_button_to_connect_this_device"
+        android:textAlignment="center"
         app:layout_constraintBottom_toTopOf="@id/finishSongMeterButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -86,13 +86,13 @@ class BleConnectDelegate(private val context: Context) {
                 BleConnectService.ACTION_CHA_CHANGE -> {
                     when {
                         intent.getStringExtra(BleConnectService.CHARACTERISTICS)!!
-                            .toUpperCase() == SongMeterConstant.kUUIDCharConfigRtoA -> {
+                            .uppercase() == SongMeterConstant.kUUIDCharConfigRtoA -> {
                             intent.getByteArrayExtra(BleConnectService.EXTRA_DATA)?.let {
                                 manageRtoAChanges(it)
                             }
                         }
                         intent.getStringExtra(BleConnectService.CHARACTERISTICS)!!
-                            .toUpperCase() == SongMeterConstant.kUUIDCharStatus -> {
+                            .uppercase() == SongMeterConstant.kUUIDCharStatus -> {
                             requestCurrentConfig()
                         }
                     }

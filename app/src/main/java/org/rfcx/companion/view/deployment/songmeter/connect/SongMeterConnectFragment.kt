@@ -26,6 +26,7 @@ import org.rfcx.companion.repo.ble.BleDetectService
 import org.rfcx.companion.repo.ble.BleHelper
 import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.util.Status
+import org.rfcx.companion.util.randomPrefixes
 import org.rfcx.companion.view.deployment.songmeter.SongMeterDeploymentProtocol
 import org.rfcx.companion.view.deployment.songmeter.viewmodel.SongMeterViewModel
 
@@ -36,6 +37,8 @@ class SongMeterConnectFragment : Fragment(), TextWatcher {
     private var deploymentProtocol: SongMeterDeploymentProtocol? = null
 
     private lateinit var songMeterViewModel: SongMeterViewModel
+
+    private var isSettingPrefixes = false
 
     private fun setViewModel() {
         songMeterViewModel = ViewModelProvider(
@@ -75,6 +78,7 @@ class SongMeterConnectFragment : Fragment(), TextWatcher {
         observeGetConfig()
 
         finishSongMeterButton.setOnClickListener {
+            isSettingPrefixes = true
             songMeterViewModel.setPrefixes(songMeterSiteIdEditText.text.toString())
             deploymentProtocol?.setSongMeterId(songMeterSiteIdEditText.text.toString())
         }
@@ -83,6 +87,9 @@ class SongMeterConnectFragment : Fragment(), TextWatcher {
         songMeterViewModel.registerGattReceiver()
 
         songMeterSiteIdEditText.addTextChangedListener(this)
+        randomPrefixes.setOnClickListener{
+            songMeterSiteIdEditText.setText(randomPrefixes())
+        }
     }
 
     private fun getArgument() {
@@ -108,8 +115,6 @@ class SongMeterConnectFragment : Fragment(), TextWatcher {
                     it.data?.let { result ->
                         if (result) {
                             deploymentProtocol?.nextStep()
-                        } else {
-                            enableUI()
                         }
                     }
                 }
@@ -136,8 +141,10 @@ class SongMeterConnectFragment : Fragment(), TextWatcher {
     }
 
     private fun enableUI() {
-        finishSongMeterButton.isEnabled = true
-        songMeterSiteIdEditText.isEnabled = true
+        if (!isSettingPrefixes) {
+            finishSongMeterButton.isEnabled = true
+            songMeterSiteIdEditText.isEnabled = true
+        }
     }
 
     private fun observeGattConnection() {
@@ -167,12 +174,16 @@ class SongMeterConnectFragment : Fragment(), TextWatcher {
     private fun showConfigUI() {
         songMeterConnectTitle.visibility = View.VISIBLE
         songMeterConnectDesc.visibility = View.VISIBLE
+        prefixedLayout.visibility = View.VISIBLE
+        randomPrefixes.visibility = View.VISIBLE
         songMeterSiteIdEditText.visibility = View.VISIBLE
     }
 
     private fun hideConfigUI() {
         songMeterConnectTitle.visibility = View.GONE
         songMeterConnectDesc.visibility = View.GONE
+        prefixedLayout.visibility = View.GONE
+        randomPrefixes.visibility = View.GONE
         songMeterSiteIdEditText.visibility = View.GONE
     }
 
@@ -184,13 +195,18 @@ class SongMeterConnectFragment : Fragment(), TextWatcher {
         songMeterSuggestTextView.visibility = View.GONE
     }
 
+    override fun onResume() {
+        super.onResume()
+        songMeterViewModel.registerGattReceiver()
+    }
+
     override fun onPause() {
         super.onPause()
         songMeterViewModel.unRegisterGattReceiver()
     }
 
-    override fun onDetach() {
-        super.onDetach()
+    override fun onDestroy() {
+        super.onDestroy()
         songMeterViewModel.unBindConnectService()
     }
 
@@ -211,19 +227,28 @@ class SongMeterConnectFragment : Fragment(), TextWatcher {
     }
 
     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        finishSongMeterButton.isEnabled = isIdPassTheRequirement(songMeterSiteIdEditText.text.toString())
+        val isRequired = isIdPassTheRequirement(songMeterSiteIdEditText.text.toString())
+        if (isRequired.first) {
+            finishSongMeterButton.isEnabled = true
+            prefixedLayout.error = null
+        } else {
+            finishSongMeterButton.isEnabled = false
+            prefixedLayout.error = isRequired.second
+        }
+
     }
 
     override fun afterTextChanged(s: Editable?) {
         // nothing to do here
     }
 
-    private val upperCase = "(.*[A-Z].*)"
-    private val symbol = "(.*[:?!@#$%^&*()].*)"
-    private fun isIdPassTheRequirement(id: String?): Boolean {
-        if (id.isNullOrBlank()) return false
-        if (id.matches(Regex(upperCase))) return false
-        if (id.matches(Regex(symbol))) return false
-        return true
+    private val lowercase = "(.*[a-z].*)"
+    private val symbol = "(.*[:?!@#$%^&*();/-].*)"
+    private fun isIdPassTheRequirement(id: String?): Pair<Boolean, String> {
+        if (id.isNullOrBlank()) return Pair(false, "empty")
+        if (id.matches(Regex(lowercase))) return Pair(false, "lower not allowed")
+        if (id.matches(Regex(symbol))) return return Pair(false, "symbol not allowed")
+        if (id.length != 12) return Pair(false, "require 12 characters")
+        return Pair(true, "")
     }
 }
