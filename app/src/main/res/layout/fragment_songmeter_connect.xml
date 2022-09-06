@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_padding_small"
-        android:text="Recorder name is used as audio file prefix name"
+        android:text="@string/recorder_name_is_used_as_audio_file_prefix_name"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="@id/songMeterConnectTitle"
         app:layout_constraintTop_toBottomOf="@id/songMeterConnectTitle" />
@@ -33,7 +33,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_padding_small"
-        android:hint="device id"
+        android:hint="@string/device_id"
         android:visibility="gone"
         app:counterEnabled="true"
         app:counterMaxLength="12"

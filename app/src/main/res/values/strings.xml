@@ -493,6 +493,13 @@
     <string name="turn_recorder_on_to_detect">Turn recorder on to detect</string>
     <string name="hold_press_on_bluetooth_button_to_connect_this_device">Hold press on bluetooth button\nto connect this device</string>
     <string name="set_recorder_name">Set recorder name</string>
+    <string name="recorder_name_is_used_as_audio_file_prefix_name">Recorder name is used as audio file prefix name</string>
+    <string name="device_id">device id</string>
+    <string name="empty">empty</string>
+    <string name="lower_not_allowed">lower not allowed</string>
+    <string name="symbole_not_allowed">symbol not allowed</string>
+    <string name="req_12_char">require 12 characters</string>
+
 
     <string name="download_softwares_from_guardian_softwares_page_first">Download softwares from Guardian softwares page first\nProfile -> Guardian software -> Download APKs you needed</string>
     <string name="download_classifiers_from_guardian_classifier_page_first">Download classifiers from Guardian classifier page first\nProfile -> Classifier -> Download Classifiers you needed</string>

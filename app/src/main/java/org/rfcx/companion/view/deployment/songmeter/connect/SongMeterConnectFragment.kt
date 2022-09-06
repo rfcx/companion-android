@@ -245,10 +245,10 @@ class SongMeterConnectFragment : Fragment(), TextWatcher {
     private val lowercase = "(.*[a-z].*)"
     private val symbol = "(.*[:?!@#$%^&*();/-].*)"
     private fun isIdPassTheRequirement(id: String?): Pair<Boolean, String> {
-        if (id.isNullOrBlank()) return Pair(false, "empty")
-        if (id.matches(Regex(lowercase))) return Pair(false, "lower not allowed")
-        if (id.matches(Regex(symbol))) return return Pair(false, "symbol not allowed")
-        if (id.length != 12) return Pair(false, "require 12 characters")
+        if (id.isNullOrBlank()) return Pair(false, getString(R.string.empty))
+        if (id.matches(Regex(lowercase))) return Pair(false, getString(R.string.lower_not_allowed))
+        if (id.matches(Regex(symbol))) return Pair(false, getString(R.string.symbole_not_allowed))
+        if (id.length != 12) return Pair(false, getString(R.string.req_12_char))
         return Pair(true, "")
     }
 }
