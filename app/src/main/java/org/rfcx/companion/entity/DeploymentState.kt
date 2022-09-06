@@ -20,7 +20,7 @@ sealed class DeploymentState {
     }
 
     enum class SongMeter(val key: Int) {
-        Locate(1), Sync(2), Deploy(3), ReadyToUpload(4);
+        Locate(1), Sync(2), Deploy(3), ReadyToUpload(11);
 
         companion object {
             private val map = AudioMoth.values().associateBy(DeploymentState.AudioMoth::key)
