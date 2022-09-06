@@ -29,7 +29,7 @@ class AudioMothDeploymentViewModel(
     private var audioMothConnector = AudioMothChimeConnector()
 
     private var deployments = MutableLiveData<List<Deployment>>()
-    private var sites = MutableLiveData<List<Locate>>()
+    private var sites = MutableLiveData<List<Stream>>()
     private var downloadStreamsWork = MutableLiveData<Resource<SyncInfo>>()
 
     private lateinit var deploymentLiveData: LiveData<List<Deployment>>
@@ -37,8 +37,8 @@ class AudioMothDeploymentViewModel(
         deployments.postValue(it)
     }
 
-    private lateinit var siteLiveData: LiveData<List<Locate>>
-    private val siteObserve = Observer<List<Locate>> {
+    private lateinit var siteLiveData: LiveData<List<Stream>>
+    private val siteObserve = Observer<List<Stream>> {
         sites.postValue(it)
     }
 
@@ -55,7 +55,6 @@ class AudioMothDeploymentViewModel(
                         null
                     )
                 )
-
             }
         }
     }
@@ -71,20 +70,19 @@ class AudioMothDeploymentViewModel(
         val projectName = project?.name ?: context.getString(R.string.none)
         siteLiveData =
             Transformations.map(
-                audioMothDeploymentRepository.getAllResultsAsyncWithinProject(projectName)
+                audioMothDeploymentRepository.getAllResultsAsyncWithinProject(projectId)
                     .asLiveData()
             ) { it }
         siteLiveData.observeForever(siteObserve)
 
         deploymentLiveData = Transformations.map(
-            audioMothDeploymentRepository.getAllDeploymentResultsAsyncWithinProject(projectName)
+            audioMothDeploymentRepository.getAllDeploymentResultsAsyncWithinProject(projectId)
                 .asLiveData()
         ) { it }
         deploymentLiveData.observeForever(deploymentObserve)
 
         downloadStreamsWorkInfoLiveData = DownloadStreamsWorker.workInfos(context)
         downloadStreamsWorkInfoLiveData.observeForever(downloadStreamsWorkInfoObserve)
-
     }
 
     fun downloadStreamsWork(): LiveData<Resource<SyncInfo>> {
@@ -95,28 +93,24 @@ class AudioMothDeploymentViewModel(
         return deployments
     }
 
-    fun getSites(): LiveData<List<Locate>> {
+    fun getSites(): LiveData<List<Stream>> {
         return sites
     }
 
-    fun insertOrUpdate(locate: Locate) {
-        audioMothDeploymentRepository.insertOrUpdate(locate)
+    fun insertOrUpdate(stream: Stream): Int {
+        return audioMothDeploymentRepository.insertOrUpdate(stream)
     }
 
-    fun insertOrUpdateLocate(deploymentId: Int, locate: Locate) {
-        audioMothDeploymentRepository.insertOrUpdateLocate(deploymentId, locate)
+    fun updateDeploymentIdOnStream(deploymentId: Int, streamId: Int) {
+        audioMothDeploymentRepository.updateDeploymentIdOnStream(deploymentId, streamId)
     }
 
-    fun getLocateById(id: Int): Locate? {
+    fun getStreamById(id: Int): Stream? {
         return audioMothDeploymentRepository.getLocateById(id)
     }
 
     fun getProjectById(id: Int): Project? {
         return audioMothDeploymentRepository.getProjectById(id)
-    }
-
-    fun getProjectByName(name: String): Project? {
-        return audioMothDeploymentRepository.getProjectByName(name)
     }
 
     fun deleteImages(id: Int) {
@@ -146,11 +140,11 @@ class AudioMothDeploymentViewModel(
         audioMothDeploymentRepository.updateDeployment(deployment)
     }
 
-    fun insertOrUpdateDeployment(deployment: Deployment, location: DeploymentLocation): Int {
-        return audioMothDeploymentRepository.insertOrUpdateDeployment(deployment, location)
+    fun insertOrUpdateDeployment(deployment: Deployment, streamId: Int): Int {
+        return audioMothDeploymentRepository.insertOrUpdateDeployment(deployment, streamId)
     }
 
-    fun getDeploymentsBySiteId(streamId: String): ArrayList<Deployment> {
+    fun getDeploymentsBySiteId(streamId: Int): ArrayList<Deployment> {
         return audioMothDeploymentRepository.getDeploymentsBySiteId(streamId)
     }
 

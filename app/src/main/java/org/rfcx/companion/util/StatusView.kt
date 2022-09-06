@@ -95,14 +95,18 @@ class StatusView : FrameLayout {
     }
 
     private val backgroundColor
-        get() = ContextCompat.getDrawable(context,
+        get() = ContextCompat.getDrawable(
+            context,
             if (theme == BACKGROUND_NORMAL) R.color.widget_status_view_normal_bg
-            else R.color.widget_status_view_dark_bg)
+            else R.color.widget_status_view_dark_bg
+        )
 
     private val fontColor
-        get() = ContextCompat.getColor(context,
+        get() = ContextCompat.getColor(
+            context,
             if (theme == BACKGROUND_NORMAL) R.color.colorPrimary
-            else R.color.white)
+            else R.color.white
+        )
 
     companion object {
         private const val BACKGROUND_DARK = 0

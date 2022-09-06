@@ -8,7 +8,6 @@ import androidx.lifecycle.MutableLiveData
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.response.ProjectResponse
-import org.rfcx.companion.entity.response.toLocationGroups
 import org.rfcx.companion.util.Resource
 import org.rfcx.companion.util.getIdToken
 import org.rfcx.companion.util.isNetworkAvailable
@@ -35,7 +34,7 @@ class ProjectSelectViewModel(
         projectSelectRepository.getProjectsFromRemote("Bearer ${context.getIdToken()}")
             .enqueue(object : Callback<List<ProjectResponse>> {
                 override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
-                    if (context.isNetworkAvailable()) {
+                    if (!context.isNetworkAvailable()) {
                         projects.postValue(Resource.error(context.getString(R.string.network_not_available), null))
                     }
                 }
@@ -66,7 +65,7 @@ class ProjectSelectViewModel(
         projectSelectRepository.getDeletedProjectsFromRemote("Bearer ${context.getIdToken()}")
             .enqueue(object : Callback<List<ProjectResponse>> {
                 override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
-                    if (context.isNetworkAvailable()) {
+                    if (!context.isNetworkAvailable()) {
                         projects.postValue(Resource.error(context.getString(R.string.network_not_available), null))
                     }
                 }
@@ -77,7 +76,7 @@ class ProjectSelectViewModel(
                 ) {
                     if (response.isSuccessful) {
                         response.body()?.let { projectsRes ->
-                            projectSelectRepository.removeProjectFromLocal(projectsRes.map { it.id!! }) // remove project with these coreIds
+                            projectSelectRepository.removeProjectFromLocal(projectsRes) // remove project with these coreIds
                             projects.postValue(Resource.success(null)) // no need to send project data
                         }
                     } else {

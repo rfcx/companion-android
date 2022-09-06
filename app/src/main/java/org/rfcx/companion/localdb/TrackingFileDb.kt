@@ -72,8 +72,10 @@ class TrackingFileDb(private val realm: Realm) {
         realm.executeTransaction {
             if (file.id == 0) {
                 val id =
-                    (realm.where(Tracking::class.java).max(Tracking.TRACKING_ID)
-                        ?.toInt() ?: 0) + 1
+                    (
+                        realm.where(Tracking::class.java).max(Tracking.TRACKING_ID)
+                            ?.toInt() ?: 0
+                        ) + 1
                 file.id = id
             }
             it.insertOrUpdate(file)
@@ -93,8 +95,10 @@ class TrackingFileDb(private val realm: Realm) {
 
             if (file == null && deploymentId != null) {
                 val deploymentTracking = deploymentAssetResponse.toDeploymentTrack()
-                val id = (it.where(TrackingFile::class.java).max(TrackingFile.FIELD_ID)?.toInt()
-                    ?: 0) + 1
+                val id = (
+                    it.where(TrackingFile::class.java).max(TrackingFile.FIELD_ID)?.toInt()
+                        ?: 0
+                    ) + 1
                 deploymentTracking.id = id
                 deploymentTracking.siteId = deploymentId
                 deploymentTracking.syncState = SyncState.Sent.key

@@ -2,6 +2,7 @@ package org.rfcx.companion.connection.socket
 
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
+import org.rfcx.companion.entity.socket.request.SocketRequest
 import org.rfcx.companion.entity.socket.response.AdminPing
 import java.io.DataInputStream
 import java.io.DataOutputStream
@@ -20,9 +21,14 @@ object AdminSocketManager {
 
     val pingBlob = MutableLiveData<AdminPing>()
 
-    //just to connect to server
+    // just to connect to server
     fun connect() {
-        sendMessage("")
+        val data = Gson().toJson(
+            SocketRequest(
+                "connection"
+            )
+        )
+        sendMessage(data)
     }
 
     private fun sendMessage(message: String) {
@@ -30,6 +36,7 @@ object AdminSocketManager {
             try {
                 socket = Socket("192.168.43.1", 9997)
                 socket?.keepAlive = true
+                socket?.soTimeout = 10000
                 startInComingMessageThread()
                 outputStream = DataOutputStream(socket?.getOutputStream())
                 outputStream?.writeUTF(message)
@@ -51,7 +58,6 @@ object AdminSocketManager {
 
                         val ping = gson.fromJson(dataInput, AdminPing::class.java)
                         pingBlob.postValue(ping)
-
                     }
                 }
             } catch (e: Exception) {
@@ -59,6 +65,10 @@ object AdminSocketManager {
             }
         }
         inComingMessageThread.start()
+    }
+
+    fun clearValue() {
+        pingBlob.value = AdminPing()
     }
 
     fun stopConnection() {

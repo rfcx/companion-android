@@ -72,7 +72,7 @@ class Analytics(context: Context) {
         val bundle = Bundle()
         trackEvent(Event.SAVE_NEW_GROUP.id, bundle)
     }
-    
+
     fun trackDeleteLocationGroupEvent(status: String) {
         val bundle = Bundle()
         bundle.putString(STATUS, status)

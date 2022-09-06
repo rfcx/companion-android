@@ -31,8 +31,20 @@
             android:layout_marginTop="@dimen/margin_padding_normal"
             android:text="@string/got_it"
             app:layout_constraintTop_toBottomOf="@id/instructionView"
-            app:layout_constraintStart_toStartOf="@id/instructionView"
+            app:layout_constraintStart_toEndOf="@id/moreInfoButton"
             app:layout_constraintEnd_toEndOf="@id/instructionView"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/moreInfoButton"
+            style="@style/AudioMothButton.GreenButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_padding_normal"
+            android:text="@string/more_info"
+            android:layout_marginEnd="@dimen/margin_padding_normal"
+            app:layout_constraintTop_toBottomOf="@id/instructionView"
+            app:layout_constraintStart_toStartOf="@id/instructionView"
+            app:layout_constraintEnd_toStartOf="@id/instructionButton"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>

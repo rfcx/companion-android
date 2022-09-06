@@ -17,7 +17,7 @@ data class SentinelData(
             SentinelInput(inputData[2].toInt(), inputData[3].toInt(), inputData[4].toInt(), inputData[5].toInt()),
             SentinelSystem(systemData[2].toInt(), systemData[3].toInt(), systemData[4].toInt(), systemData[5].toInt()),
             SentinelBattery(batteryData[2].toInt(), batteryData[3].toInt(), batteryData[4].toDouble(), batteryData[5].toInt())
-            )
+        )
     }
 }
 

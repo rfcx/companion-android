@@ -7,5 +7,4 @@ class GuardianSoftwareRepository(
 ) {
     fun checkSoftwareVersion(authUser: String) = coreApiHelper.checkSoftwareVersion(authUser)
     fun downloadAPK(url: String) = coreApiHelper.downloadAPK(url)
-
 }

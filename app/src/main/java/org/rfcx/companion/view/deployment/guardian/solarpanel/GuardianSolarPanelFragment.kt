@@ -15,21 +15,19 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
-import java.util.*
 import kotlinx.android.synthetic.main.fragment_guardian_solar_panel.*
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.AdminSocketManager
-import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.socket.response.SentinelInput
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
+import java.util.*
 
 class GuardianSolarPanelFragment : Fragment() {
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
 
-    private lateinit var voltageLineDataSet: LineDataSet
     private lateinit var powerLineDataSet: LineDataSet
 
     private val analytics by lazy { context?.let { Analytics(it) } }
@@ -64,63 +62,112 @@ class GuardianSolarPanelFragment : Fragment() {
 
         setFeedbackChart()
         setChartDataSetting()
+        getI2CAccessibility()
         getSentinelValue()
     }
 
-    private fun getSentinelValue() {
-        AdminSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
-            val sentinelResponse = deploymentProtocol?.getSentinelPower()
-            sentinelResponse?.let {
-                val input = sentinelResponse.input
-                if (isSentinelConnected(input)) {
-                    hideAssembleWarn()
-
-                    val voltage = input.voltage.toFloat() / 1000
-                    val current = input.current.toFloat() / 1000
-                    val power = input.power.toFloat() / 1000
-
-                    // set 3 top value
-                    setVoltageValue(voltage)
-                    setCurrentValue(current)
-                    setPowerValue(power)
-
-                    // update power and voltage to chart
-                    updateData(voltage, power)
-
-                    // expand xAxis line
-                    expandXAxisLine()
-
-                    solarFinishButton.isEnabled = true
-                } else {
-                    showAssembleWarn()
+    private fun getI2CAccessibility() {
+        AdminSocketManager.pingBlob.observe(
+            viewLifecycleOwner,
+            Observer {
+                val i2CAccessibility = deploymentProtocol?.getI2cAccessibility()
+                i2CAccessibility?.let {
+                    if (it.isAccessible) {
+                        i2cCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_checklist_passed, 0, 0, 0)
+                        i2cCheckTextView.text = getString(R.string.sentinel_module_detect)
+                        i2cFailMessage.visibility = View.GONE
+                    } else {
+                        i2cCheckbox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_error, 0, 0, 0)
+                        i2cCheckTextView.text = getString(R.string.sentinel_module_not_detect)
+                        i2cFailMessage.text = it.message
+                        i2cFailMessage.visibility = View.VISIBLE
+                    }
                 }
             }
-        })
+        )
+    }
+
+    private fun getSentinelValue() {
+        AdminSocketManager.pingBlob.observe(
+            viewLifecycleOwner,
+            Observer {
+                val sentinelResponse = deploymentProtocol?.getSentinelPower()
+                sentinelResponse?.let {
+                    val input = sentinelResponse.input
+                    if (isSentinelConnected(input)) {
+                        hideAssembleWarn()
+
+                        val voltage = input.voltage.toFloat()
+                        val current = input.current.toFloat()
+                        val power = input.power.toFloat()
+
+                        setVoltageValue(voltage)
+                        setCurrentValue(current)
+                        setPowerValue(power)
+
+                        val mainBattery = sentinelResponse.battery.percentage
+                        val internalBattery = deploymentProtocol?.getInternalBattery() ?: -1
+                        val batteryVoltage = sentinelResponse.battery.voltage
+                        val systemVoltage = sentinelResponse.system.voltage
+                        setMainBatteryPercentage(mainBattery)
+                        setInternalBatteryPercentage(internalBattery)
+                        setBatteryVoltage(batteryVoltage)
+                        setSystemVoltage(systemVoltage)
+
+                        // update power and voltage to chart
+                        updateData(power)
+
+                        // expand xAxis line
+                        expandXAxisLine()
+
+                        solarFinishButton.isEnabled = true
+                    } else {
+                        showAssembleWarn()
+                    }
+                }
+            }
+        )
     }
 
     private fun isSentinelConnected(input: SentinelInput): Boolean {
-        return input.voltage != 0 && input.current != 0 && input.power != 0
+        return input.voltage != 0 || input.current != 0 || input.power != 0
     }
 
     private fun setVoltageValue(value: Float) {
-        voltageValueTextView.text = value.toString()
+        voltageValueTextView.text = "${value}mV"
     }
 
     private fun setCurrentValue(value: Float) {
-        currentValueTextView.text = value.toString()
+        currentValueTextView.text = "${value}mA"
     }
 
     private fun setPowerValue(value: Float) {
-        powerValueTextView.text = value.toString()
+        powerValueTextView.text = "${value}mW"
     }
 
-    private fun convertVoltageAndPowerToEntry(voltage: Float, power: Float): Pair<Entry, Entry> {
-        val voltageDataSet = feedbackChart.data.getDataSetByIndex(0) as LineDataSet
-        val powerDataSet = feedbackChart.data.getDataSetByIndex(1) as LineDataSet
-        return Pair(
-            Entry((voltageDataSet.entryCount - 1).toFloat(), voltage),
-            Entry((powerDataSet.entryCount - 1).toFloat(), power)
-        )
+    private fun setMainBatteryPercentage(value: Double) {
+        if (value > 100.0) {
+            mainBatteryValueTextView.text = "100%"
+        } else {
+            mainBatteryValueTextView.text = "$value%"
+        }
+    }
+
+    private fun setInternalBatteryPercentage(value: Int) {
+        internalBatteryValueTextView.text = "$value%"
+    }
+
+    private fun setBatteryVoltage(value: Int) {
+        batteryVoltageValueTextView.text = "${value}mV"
+    }
+
+    private fun setSystemVoltage(value: Int) {
+        systemVoltageValueTextView.text = "${value}mV"
+    }
+
+    private fun convertPowerToEntry(power: Float): Entry {
+        val powerDataSet = feedbackChart.data.getDataSetByIndex(0) as LineDataSet
+        return Entry((powerDataSet.entryCount - 1).toFloat(), power)
     }
 
     private fun setFeedbackChart() {
@@ -129,9 +176,6 @@ class GuardianSolarPanelFragment : Fragment() {
             legend.textColor = ContextCompat.getColor(requireContext(), R.color.text_primary)
             setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.backgroundColor))
             description.isEnabled = false /* description inside chart */
-            setTouchEnabled(false)
-            isDragEnabled = true
-            setScaleEnabled(true)
         }
 
         // set x axis
@@ -151,18 +195,11 @@ class GuardianSolarPanelFragment : Fragment() {
             axisLineWidth = AXIS_LINE_WIDTH
             textColor = ContextCompat.getColor(requireContext(), R.color.text_primary)
         }
-        feedbackChart.axisRight.apply {
-            axisMaximum = RIGHT_AXIS_MAXIMUM
-            axisMinimum = AXIS_MINIMUM
-            axisLineWidth = AXIS_LINE_WIDTH
-            axisLineColor = Color.BLUE
-            textColor = ContextCompat.getColor(requireContext(), R.color.text_primary)
-        }
     }
 
     private fun setChartDataSetting() {
         // set line data set
-        voltageLineDataSet = LineDataSet(arrayListOf<Entry>(), "Voltage").apply {
+        powerLineDataSet = LineDataSet(arrayListOf<Entry>(), "Power").apply {
             setDrawIcons(false)
             color = Color.RED
             lineWidth = CHART_LINE_WIDTH
@@ -174,50 +211,30 @@ class GuardianSolarPanelFragment : Fragment() {
             valueTextSize = CHART_TEXT_SIZE
             enableDashedHighlightLine(10f, 5f, 0f)
         }
-        powerLineDataSet = LineDataSet(arrayListOf<Entry>(), "Power").apply {
-            setDrawIcons(false)
-            color = Color.BLUE
-            lineWidth = CHART_LINE_WIDTH
-            setDrawCircles(false)
-            setDrawCircleHole(false)
-            formLineWidth = CHART_LINE_WIDTH
-            formLineDashEffect = DashPathEffect(floatArrayOf(10f, 5f), 0f)
-            formSize = FORM_SIZE
-            valueTextSize = CHART_TEXT_SIZE
-            enableDashedHighlightLine(10f, 5f, 0f)
-        }
 
         val dataSets = arrayListOf<ILineDataSet>()
-        dataSets.add(voltageLineDataSet)
         dataSets.add(powerLineDataSet)
 
         val lineData = LineData(dataSets)
         feedbackChart.data = lineData
     }
 
-    private fun updateData(voltage: Float, power: Float) {
-        val pair = convertVoltageAndPowerToEntry(voltage, power)
-        // get voltage data set
-        voltageLineDataSet = feedbackChart.data.getDataSetByIndex(0) as LineDataSet
-        voltageLineDataSet.addEntry(pair.first)
-        voltageLineDataSet.notifyDataSetChanged()
+    private fun updateData(power: Float) {
+        val powerEntry = convertPowerToEntry(power)
 
         // get power data set
-        powerLineDataSet = feedbackChart.data.getDataSetByIndex(1) as LineDataSet
-        powerLineDataSet.addEntry(pair.second)
-        powerLineDataSet.notifyDataSetChanged()
+        powerLineDataSet = feedbackChart.data.getDataSetByIndex(0) as LineDataSet
+        powerLineDataSet.addEntry(powerEntry)
 
         // notify and re-view
-        feedbackChart.data.notifyDataChanged()
         feedbackChart.notifyDataSetChanged()
         feedbackChart.invalidate()
     }
 
     private fun expandXAxisLine() {
-        // both voltage and power will have the same size
-        val voltageDataSet = feedbackChart.data.getDataSetByIndex(0) as LineDataSet
-        if (voltageDataSet.entryCount > X_AXIS_MAXIMUM) {
-            feedbackChart.xAxis.axisMaximum = voltageDataSet.entryCount.toFloat()
+        val powerDataSet = feedbackChart.data.getDataSetByIndex(0) as LineDataSet
+        if (powerDataSet.entryCount > X_AXIS_MAXIMUM) {
+            feedbackChart.xAxis.axisMaximum = powerDataSet.entryCount.toFloat()
             feedbackChart.invalidate()
         }
     }
@@ -237,8 +254,7 @@ class GuardianSolarPanelFragment : Fragment() {
 
     companion object {
         private const val X_AXIS_MAXIMUM = 100f
-        private const val LEFT_AXIS_MAXIMUM = 30f
-        private const val RIGHT_AXIS_MAXIMUM = 30f
+        private const val LEFT_AXIS_MAXIMUM = 15000f
         private const val AXIS_MINIMUM = 0f
         private const val AXIS_LINE_WIDTH = 2f
 

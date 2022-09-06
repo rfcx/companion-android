@@ -11,4 +11,3 @@ class PointEvaluator : TypeEvaluator<Point?> {
         )
     }
 }
-

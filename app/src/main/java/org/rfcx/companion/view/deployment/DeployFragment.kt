@@ -7,8 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_deploy.*
-import kotlinx.android.synthetic.main.fragment_deploy.attachImageRecycler
-import kotlinx.android.synthetic.main.fragment_deploy.finishButton
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Screen
@@ -66,12 +64,8 @@ class DeployFragment : BaseImageFragment() {
 
         setupImageRecycler()
 
-        takePhotoButton.setOnClickListener {
-            takePhoto()
-        }
-
-        openGalleryButton.setOnClickListener {
-            openGallery()
+        addPhotoButton.setOnClickListener {
+            openGligarPicker()
         }
 
         finishButton.setOnClickListener {

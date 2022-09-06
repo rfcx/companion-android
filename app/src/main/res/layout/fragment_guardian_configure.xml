@@ -127,6 +127,56 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="@color/separateLine" />
+
+                <TextView
+                    android:id="@+id/enableSamplingTextView"
+                    style="@style/AudioMothText.Subhead.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_padding_large"
+                    android:layout_marginEnd="@dimen/margin_padding_large"
+                    android:paddingTop="@dimen/margin_padding_normal"
+                    android:text="@string/enable_sampling_ratio" />
+
+                <TextView
+                    android:id="@+id/enableSamplingValueTextView"
+                    style="@style/AudioMothText.Body.Secondary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_padding_large"
+                    android:layout_marginEnd="@dimen/margin_padding_large"
+                    android:paddingBottom="@dimen/margin_padding_normal"
+                    tools:text="true" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/separateLine" />
+
+                <TextView
+                    android:id="@+id/samplingTextView"
+                    style="@style/AudioMothText.Subhead.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_padding_large"
+                    android:layout_marginEnd="@dimen/margin_padding_large"
+                    android:paddingTop="@dimen/margin_padding_normal"
+                    android:text="@string/sampling_ratio" />
+
+                <TextView
+                    android:id="@+id/samplingValueTextView"
+                    style="@style/AudioMothText.Body.Secondary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_padding_large"
+                    android:layout_marginEnd="@dimen/margin_padding_large"
+                    android:paddingBottom="@dimen/margin_padding_normal"
+                    tools:text="1:2" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/separateLine" />
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

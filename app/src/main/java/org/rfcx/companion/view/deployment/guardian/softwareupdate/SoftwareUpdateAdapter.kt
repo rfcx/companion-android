@@ -4,9 +4,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import kotlinx.android.synthetic.main.expandable_child_item.view.*
 import kotlinx.android.synthetic.main.expandable_parent_item.view.*
 import org.rfcx.companion.R
@@ -28,6 +28,12 @@ class SoftwareUpdateAdapter(
     var guardianSoftwareVersion = mapOf<String, String>()
 
     private var needLoading = false
+
+    var progress = 0
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
 
     init {
         val softwaresGrouped = softwares.sortedBy { it.name.value }.groupBy { it.name }
@@ -68,13 +74,14 @@ class SoftwareUpdateAdapter(
                 (holder as SoftwareVersionViewHolder).apkVersion.text = versionItem.version
                 holder.apkVersion.apply {
                     val installedVersion = guardianSoftwareVersion[versionItem.parent]
+                    holder.apkInstalled.text = context.getString(R.string.installed_software, installedVersion)
                     if (!needLoading) {
                         if (installedVersion != null && calculateVersionValue(installedVersion) >= calculateVersionValue(versionItem.version)) {
                             holder.apkSendButton.visibility = View.GONE
                             holder.apkUpToDateText.visibility = View.VISIBLE
                         } else {
                             holder.apkSendButton.visibility = View.VISIBLE
-                            holder.apkSendButton.text = "${holder.apkSendButton.text} ${versionItem.version}"
+                            holder.apkSendButton.text = "update to ${versionItem.version}"
                             holder.apkUpToDateText.visibility = View.GONE
                         }
                     }
@@ -89,6 +96,12 @@ class SoftwareUpdateAdapter(
                     it.visibility = View.GONE
                     holder.apkLoading.visibility = View.VISIBLE
                     childrenClickedListener.onItemClick(versionItem)
+                }
+
+                if (progress != 100) {
+                    holder.setProgress(progress)
+                } else {
+                    holder.apkLoading.isIndeterminate = true
                 }
             }
             else -> {
@@ -111,7 +124,7 @@ class SoftwareUpdateAdapter(
     fun getLoading(): Boolean = needLoading
 
     override fun getItemViewType(position: Int): Int {
-        return when(softwareUpdateStateModelList[position]) {
+        return when (softwareUpdateStateModelList[position]) {
             is SoftwareItem.SoftwareVersion -> VERSION_ITEM
             else -> HEADER_ITEM
         }
@@ -119,21 +132,26 @@ class SoftwareUpdateAdapter(
 
     class SoftwareHeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal var layout = itemView.country_item_parent_container
-        internal var appName: TextView = itemView.appNameTextView
+        internal var appName: TextView = itemView.fileNameTextView
     }
 
     class SoftwareVersionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal var layout = itemView.country_item_child_container
-        internal var apkVersion: TextView = itemView.apkVersionTextView
-        internal var apkSendButton: Button = itemView.apkSendButton
-        internal var apkUpToDateText: TextView = itemView.apkUpToDateTextView
-        internal var apkLoading: ProgressBar = itemView.apkLoading
+        internal var apkVersion: TextView = itemView.fileVersionTextView
+        internal var apkInstalled: TextView = itemView.fileInstalledVersionTextView
+        internal var apkSendButton: Button = itemView.fileSendButton
+        internal var apkUpToDateText: TextView = itemView.fileUpToDateTextView
+        internal var apkLoading: LinearProgressIndicator = itemView.fileLoading
+
+        fun setProgress(value: Int) {
+            apkLoading.setProgressCompat(value, true)
+        }
     }
 }
 
 sealed class SoftwareItem {
     data class SoftwareHeader(val name: String) : SoftwareItem()
-    data class SoftwareVersion(val parent: String, val version: String, val path: String): SoftwareItem()
+    data class SoftwareVersion(val parent: String, val version: String, val path: String) : SoftwareItem()
 }
 
 interface ChildrenClickedListener {

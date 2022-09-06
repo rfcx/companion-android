@@ -4,6 +4,7 @@ import android.content.Context
 import io.realm.RealmResults
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
+import org.rfcx.companion.entity.guardian.GuardianRegistration
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.ProjectByIdResponse
 import org.rfcx.companion.entity.response.ProjectResponse
@@ -44,20 +45,24 @@ class MainRepository(
     ) = localDataHelper.getTrackingFileLocalDb()
         .insertOrUpdate(deploymentAssetResponse, filePath, deploymentId)
 
-    fun getAllLocateResultsAsync(): RealmResults<Locate> {
-        return localDataHelper.getLocateLocalDb().getAllResultsAsync()
+    fun getAllLocateResultsAsync(): RealmResults<Stream> {
+        return localDataHelper.getStreamLocalDb().getAllResultsAsync()
     }
 
     fun getAllDeploymentLocateResultsAsync(): RealmResults<Deployment> {
         return localDataHelper.getDeploymentLocalDb().getAllResultsAsync()
     }
 
+    fun getAllRegistrationResultsAsync(): RealmResults<GuardianRegistration> {
+        return localDataHelper.getGuardianRegistration().getAllResultsAsync()
+    }
+
     fun saveProjectToLocal(projectResponse: ProjectResponse) {
         localDataHelper.getProjectLocalDb().insertOrUpdate(projectResponse)
     }
 
-    fun removeProjectFromLocal(coreIds: List<String>) {
-        localDataHelper.getProjectLocalDb().deleteProjectsByCoreId(coreIds)
+    fun removeProjectFromLocal(projectResponse: List<ProjectResponse>) {
+        localDataHelper.getProjectLocalDb().deleteProjectsByCoreId(projectResponse)
     }
 
     fun getProjectById(id: Int): Project? {
@@ -76,12 +81,8 @@ class MainRepository(
         return localDataHelper.getDeploymentLocalDb().getDeploymentById(id)
     }
 
-    fun getLocateByName(name: String): Locate? {
-        return localDataHelper.getLocateLocalDb().getLocateByName(name)
-    }
-
-    fun getLocateById(id: Int): Locate? {
-        return localDataHelper.getLocateLocalDb().getLocateById(id)
+    fun getStreamById(id: Int): Stream? {
+        return localDataHelper.getStreamLocalDb().getStreamById(id)
     }
 
     fun updateOfflineState(state: String, id: String) {

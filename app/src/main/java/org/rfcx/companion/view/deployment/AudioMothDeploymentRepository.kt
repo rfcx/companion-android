@@ -12,29 +12,25 @@ class AudioMothDeploymentRepository(
     private val localDataHelper: LocalDataHelper
 ) {
 
-    fun getAllResultsAsyncWithinProject(projectName: String): RealmResults<Locate> {
-        return localDataHelper.getLocateLocalDb()
-            .getAllResultsAsyncWithinProject(project = projectName)
+    fun getAllResultsAsyncWithinProject(id: Int): RealmResults<Stream> {
+        return localDataHelper.getStreamLocalDb()
+            .getAllResultsAsyncWithinProject(id = id)
     }
 
-    fun insertOrUpdate(locate: Locate) {
-        localDataHelper.getLocateLocalDb().insertOrUpdate(locate)
+    fun insertOrUpdate(stream: Stream): Int {
+        return localDataHelper.getStreamLocalDb().insertOrUpdate(stream)
     }
 
-    fun insertOrUpdateLocate(deploymentId: Int, locate: Locate) {
-        localDataHelper.getLocateLocalDb().insertOrUpdateLocate(deploymentId, locate)
+    fun updateDeploymentIdOnStream(deploymentId: Int, streamId: Int) {
+        localDataHelper.getStreamLocalDb().updateDeploymentIdOnStream(deploymentId, streamId)
     }
 
-    fun getLocateById(id: Int): Locate? {
-        return localDataHelper.getLocateLocalDb().getLocateById(id)
+    fun getLocateById(id: Int): Stream? {
+        return localDataHelper.getStreamLocalDb().getStreamById(id)
     }
 
     fun getProjectById(id: Int): Project? {
         return localDataHelper.getProjectLocalDb().getProjectById(id)
-    }
-
-    fun getProjectByName(name: String): Project? {
-        return localDataHelper.getProjectLocalDb().getProjectByName(name)
     }
 
     fun deleteImages(id: Int) {
@@ -60,21 +56,21 @@ class AudioMothDeploymentRepository(
         localDataHelper.getTrackingFileLocalDb().insertOrUpdate(file)
     }
 
-    fun getAllDeploymentResultsAsyncWithinProject(projectName: String): RealmResults<Deployment> {
+    fun getAllDeploymentResultsAsyncWithinProject(id: Int): RealmResults<Deployment> {
         return localDataHelper.getDeploymentLocalDb()
-            .getAllResultsAsyncWithinProject(project = projectName)
+            .getAllResultsAsyncWithinProject(id = id)
     }
 
     fun updateDeployment(deployment: Deployment) {
         localDataHelper.getDeploymentLocalDb().updateDeployment(deployment)
     }
 
-    fun insertOrUpdateDeployment(deployment: Deployment, location: DeploymentLocation): Int {
+    fun insertOrUpdateDeployment(deployment: Deployment, streamId: Int): Int {
         return localDataHelper.getDeploymentLocalDb()
-            .insertOrUpdateDeployment(deployment, location)
+            .insertOrUpdateDeployment(deployment, streamId)
     }
 
-    fun getDeploymentsBySiteId(streamId: String): ArrayList<Deployment> {
+    fun getDeploymentsBySiteId(streamId: Int): ArrayList<Deployment> {
         return localDataHelper.getDeploymentLocalDb().getDeploymentsBySiteId(streamId, Device.AUDIOMOTH.value)
     }
 
@@ -85,5 +81,4 @@ class AudioMothDeploymentRepository(
     fun getDeploymentById(id: Int): Deployment? {
         return localDataHelper.getDeploymentLocalDb().getDeploymentById(id)
     }
-
 }

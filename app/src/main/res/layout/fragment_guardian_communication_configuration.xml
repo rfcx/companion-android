@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/nextButton"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/simDetectionCheckbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:drawableStart="@drawable/ic_red_error"
+                android:drawablePadding="@dimen/margin_padding_normal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/simDetectionTextView"
+                style="@style/AudioMothText.Subhead.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sim_detected"
+                app:layout_constraintBottom_toBottomOf="@id/simDetectionCheckbox"
+                app:layout_constraintStart_toEndOf="@+id/simDetectionCheckbox"
+                app:layout_constraintTop_toTopOf="@id/simDetectionCheckbox" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/phoneNumberTextView"
+                style="@style/AudioMothText.Subhead.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/margin_padding_small"
+                android:text="@string/phone_number"
+                app:layout_constraintStart_toStartOf="@+id/simDetectionTextView"
+                app:layout_constraintTop_toBottomOf="@id/simDetectionTextView" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/phoneNumberValueTextView"
+                style="@style/AudioMothText.Subhead.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/margin_padding_small"
+                android:paddingTop="@dimen/margin_padding_small"
+                app:layout_constraintStart_toEndOf="@+id/phoneNumberTextView"
+                app:layout_constraintTop_toBottomOf="@id/simDetectionTextView"
+                tools:text="01111111" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/satDetectionCheckbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:drawableStart="@drawable/ic_red_error"
+                android:drawablePadding="@dimen/margin_padding_normal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/phoneNumberTextView" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/satDetectionTextView"
+                style="@style/AudioMothText.Subhead.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/satellite_module_detected"
+                app:layout_constraintBottom_toBottomOf="@id/satDetectionCheckbox"
+                app:layout_constraintStart_toEndOf="@+id/satDetectionCheckbox"
+                app:layout_constraintTop_toTopOf="@id/satDetectionCheckbox" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/swarmIdTextView"
+                style="@style/AudioMothText.Subhead.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/margin_padding_small"
+                android:text="@string/swarm_id"
+                app:layout_constraintStart_toStartOf="@+id/satDetectionTextView"
+                app:layout_constraintTop_toBottomOf="@id/satDetectionTextView" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/swarmValueTextView"
+                style="@style/AudioMothText.Subhead.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/margin_padding_small"
+                android:paddingTop="@dimen/margin_padding_small"
+                app:layout_constraintStart_toEndOf="@+id/swarmIdTextView"
+                app:layout_constraintTop_toBottomOf="@id/satDetectionTextView"
+                tools:text="01111111" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/gpsDetectionCheckbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:drawableStart="@drawable/ic_red_error"
+                android:drawablePadding="@dimen/margin_padding_normal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/swarmIdTextView" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/gpsDetectionTextView"
+                style="@style/AudioMothText.Subhead.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/satellite_gps_detected"
+                app:layout_constraintBottom_toBottomOf="@id/gpsDetectionCheckbox"
+                app:layout_constraintStart_toEndOf="@+id/gpsDetectionCheckbox"
+                app:layout_constraintTop_toTopOf="@id/gpsDetectionCheckbox" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/systemTimeCheckbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:drawableStart="@drawable/ic_red_error"
+                android:drawablePadding="@dimen/margin_padding_normal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/gpsDetectionTextView" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/guardianTimeTextView"
+                style="@style/AudioMothText.Subhead.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/guardian_local_time"
+                app:layout_constraintStart_toEndOf="@id/systemTimeCheckbox"
+                app:layout_constraintTop_toTopOf="@id/systemTimeCheckbox"
+                app:layout_constraintBottom_toBottomOf="@id/systemTimeCheckbox"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/guardianTimeValuesTextView"
+                style="@style/AudioMothText.Subhead.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_small"
+                app:layout_constraintBottom_toBottomOf="@id/guardianTimeTextView"
+                app:layout_constraintStart_toEndOf="@id/guardianTimeTextView"
+                app:layout_constraintTop_toTopOf="@id/guardianTimeTextView"
+                tools:text="19:00" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/timezoneTextView"
+                style="@style/AudioMothText.Subhead.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_padding_normal"
+                android:text="@string/guardian_timezone"
+                app:layout_constraintStart_toStartOf="@id/guardianTimeTextView"
+                app:layout_constraintTop_toBottomOf="@id/guardianTimeTextView" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/timezoneValuesTextView"
+                style="@style/AudioMothText.Subhead.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_small"
+                app:layout_constraintBottom_toBottomOf="@id/timezoneTextView"
+                app:layout_constraintStart_toEndOf="@id/timezoneTextView"
+                app:layout_constraintTop_toTopOf="@id/timezoneTextView"
+                tools:text="Asia/Bangkok" />
+
+            <View
+                android:id="@+id/sectionDivide"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginTop="@dimen/margin_padding_large"
+                android:layout_marginEnd="@dimen/margin_padding_large"
+                android:background="@color/colorPrimary"
+                app:layout_constraintTop_toBottomOf="@id/timezoneValuesTextView" />
+
+            <RadioGroup
+                android:id="@+id/guardianPlanGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/margin_padding_normal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/sectionDivide">
+
+                <RadioButton
+                    android:id="@+id/cellOnlyRadioButton"
+                    style="@style/AudioMothRadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/cell_data_only" />
+
+                <RadioButton
+                    android:id="@+id/cellSmsRadioButton"
+                    style="@style/AudioMothRadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/cell_data_sms_fallback_experimental" />
+
+                <RadioButton
+                    android:id="@+id/satOnlyRadioButton"
+                    style="@style/AudioMothRadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/satellite_only" />
+            </RadioGroup>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/passTimesTextView"
+                style="@style/AudioMothText.Body.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pass_times_local_time"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/guardianPlanGroup" />
+
+            <RadioGroup
+                android:id="@+id/timeOffRadioGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="@dimen/margin_padding_large"
+                android:paddingTop="@dimen/margin_padding_small"
+                android:paddingEnd="@dimen/margin_padding_large"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/passTimesTextView">
+
+                <androidx.appcompat.widget.AppCompatRadioButton
+                    android:id="@+id/manualRadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="@string/manual"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_small" />
+
+                <androidx.appcompat.widget.AppCompatRadioButton
+                    android:id="@+id/presetRadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/auto"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_small" />
+            </RadioGroup>
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/manualOffTimeChipGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginEnd="@dimen/margin_padding_normal"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/timeOffRadioGroup">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/passTimeAddChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/plus" />
+            </com.google.android.material.chip.ChipGroup>
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/autoOffTimeChipGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_padding_large"
+                android:layout_marginEnd="@dimen/margin_padding_normal"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/timeOffRadioGroup" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/emptyOffTimeTextView"
+                style="@style/AudioMothText.Subhead.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_padding_small"
+                android:text="@string/there_is_no_off_time_in_this_project"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/timeOffRadioGroup" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/nextButton"
+        style="@style/AudioMothButton.GreenButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_padding_large"
+        android:layout_marginEnd="@dimen/margin_padding_large"
+        android:layout_marginBottom="@dimen/margin_padding_normal"
+        android:enabled="true"
+        android:text="@string/next"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

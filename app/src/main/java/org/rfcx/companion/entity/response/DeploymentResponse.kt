@@ -3,7 +3,6 @@ package org.rfcx.companion.entity.response
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonNull
-import com.google.gson.JsonObject
 import org.rfcx.companion.entity.DeploymentState
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.SyncState
@@ -32,7 +31,6 @@ fun DeploymentResponse.toDeployment(): Deployment {
         deployedAt = this.deployedAt ?: Date(),
         state = if (this.isGuardian()) DeploymentState.Guardian.ReadyToUpload.key else DeploymentState.AudioMoth.ReadyToUpload.key,
         device = this.deploymentType,
-        stream = this.stream?.toDeploymentLocation(),
         createdAt = this.createdAt ?: Date(),
         syncState = SyncState.Sent.key,
         updatedAt = this.updatedAt,

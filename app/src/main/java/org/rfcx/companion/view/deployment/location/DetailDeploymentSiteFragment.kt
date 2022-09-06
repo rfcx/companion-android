@@ -32,10 +32,9 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import kotlinx.android.synthetic.main.fragment_detail_deployment_site.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
-import org.rfcx.companion.entity.Locate
-import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Screen
+import org.rfcx.companion.entity.Stream
 import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
@@ -45,7 +44,7 @@ import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.AudioMothDeploymentViewModel
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.map.MapboxCameraUtils
-import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
+import org.rfcx.companion.view.profile.locationgroup.ProjectActivity
 
 class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     private val analytics by lazy { context?.let { Analytics(it) } }
@@ -59,20 +58,21 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     private var symbolManager: SymbolManager? = null
 
     // Arguments
-    var siteId: Int = 0
+    var siteId: Int = -1
     var siteName: String = ""
     var isCreateNew: Boolean = false
     var isUseCurrentLocate: Boolean = false
-    var site: Locate? = null
+    var site: Stream? = null
     var fromMapPicker: Boolean = false
 
     // Location
-    private var group: String? = null
+    private var project: Project? = null
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     private var altitude: Double = 0.0
     private var currentUserLocation: Location? = null
     private var userLocation: Location? = null
+    private var pinLocation: LatLng? = null
     private var locationEngine: LocationEngine? = null
     private val mapboxLocationChangeCallback =
         object : LocationEngineCallback<LocationEngineResult> {
@@ -80,7 +80,6 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 if (activity != null) {
                     val location = result?.lastLocation
                     location ?: return
-
                     currentUserLocation = location
                     updateView()
 
@@ -89,12 +88,9 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                             val latLng =
                                 LatLng(currentUserLocation.latitude, currentUserLocation.longitude)
                             moveCamera(latLng, null, DefaultSetupMap.DEFAULT_ZOOM)
-                            setCheckboxForResumeDeployment(
-                                currentUserLocation.toLatLng(),
-                                context?.getLastLocation()?.toLatLng() ?: LatLng()
-                            )
                         }
                     }
+                    pinLocation?.let { setCheckboxForResumeDeployment(location.toLatLng(), it) }
                 }
             }
 
@@ -122,7 +118,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     private fun initIntent() {
         arguments?.let {
             siteId = it.getInt(ARG_SITE_ID)
-            siteName = it.getString(ARG_SITE_NAME) ?: ""
+            siteName = it.getString(ARG_SITE_NAME).toString()
             isCreateNew = it.getBoolean(ARG_IS_CREATE_NEW)
             latitude = it.getDouble(ARG_LATITUDE)
             longitude = it.getDouble(ARG_LONGITUDE)
@@ -131,7 +127,8 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
@@ -154,12 +151,10 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         updateView()
 
         changeProjectTextView.setOnClickListener {
-            val group = locationGroupValueTextView.text.toString()
-            val setLocationGroup = if (group == getString(R.string.none)) null else group
             context?.let { it1 ->
-                LocationGroupActivity.startActivity(
+                ProjectActivity.startActivity(
                     it1,
-                    setLocationGroup,
+                    this.project?.id ?: -1,
                     Screen.DETAIL_DEPLOYMENT_SITE.id
                 )
                 analytics?.trackChangeLocationGroupEvent(Screen.DETAIL_DEPLOYMENT_SITE.id)
@@ -198,12 +193,12 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 getLastLocation()
                 val siteLocation = userLocation
                 val siteId = if (isCreateNew) -1 else site?.id ?: -1
-                val nameSite = if (isCreateNew) siteName else site?.name ?: ""
                 it.startMapPicker(
                     siteLocation?.latitude ?: 0.0,
                     siteLocation?.longitude ?: 0.0,
+                    siteLocation?.altitude ?: 0.0,
                     siteId,
-                    nameSite
+                    siteName
                 )
                 it.hideToolbar()
             }
@@ -238,20 +233,21 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         altitude: Double
     ) {
         setLatLngToDefault()
-        var locate = Locate()
+        var locate = Stream()
         site?.let {
-            locate = Locate(
-                it.id,
-                it.serverId,
-                getLocationGroup(it.locationGroup?.name ?: getString(R.string.none)),
-                it.name,
-                latitude,
-                longitude,
-                altitude,
-                it.createdAt,
-                it.updatedAt,
-                it.lastDeploymentId,
-                it.syncState
+            locate = Stream(
+                id = it.id,
+                serverId = it.serverId,
+                name = it.name,
+                latitude = latitude,
+                longitude = longitude,
+                altitude = altitude,
+                createdAt = it.createdAt,
+                updatedAt = it.updatedAt,
+                lastDeploymentId = it.lastDeploymentId,
+                syncState = it.syncState,
+                project = getProject(it.project?.id ?: 0),
+                deployments = it.deployments
             )
             createSiteSymbol(locate.getLatLng())
             moveCamera(LatLng(locate.getLatLng()), DefaultSetupMap.DEFAULT_ZOOM)
@@ -262,12 +258,12 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     private fun createSite() {
         val name = siteValueTextView.text.toString()
         userLocation?.let {
-            val locate = Locate(
+            val locate = Stream(
                 name = name,
                 latitude = it.latitude,
                 longitude = it.longitude,
                 altitude = altitude,
-                locationGroup = getLocationGroup(group ?: getString(R.string.none))
+                project = getProject(project?.id ?: -1)
             )
             deploymentProtocol?.setDeployLocation(locate, false)
             deploymentProtocol?.nextStep()
@@ -276,29 +272,29 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
 
     private fun handleExistLocate() {
         site?.let {
-            val locate = Locate(
-                it.id,
-                it.serverId,
-                getLocationGroup(it.locationGroup?.name ?: getString(R.string.none)),
-                it.name,
-                if (userLocation?.latitude != 0.0) userLocation?.latitude
+            val locate = Stream(
+                id = it.id,
+                serverId = it.serverId,
+                name = it.name,
+                latitude = if (userLocation?.latitude != 0.0) userLocation?.latitude
                     ?: it.latitude else it.latitude,
-                if (userLocation?.longitude != 0.0) userLocation?.longitude
+                longitude = if (userLocation?.longitude != 0.0) userLocation?.longitude
                     ?: it.longitude else it.longitude,
-                currentUserLocation?.altitude ?: it.altitude,
-                it.createdAt,
-                it.updatedAt,
-                it.lastDeploymentId,
-                it.syncState
+                altitude = currentUserLocation?.altitude ?: it.altitude,
+                createdAt = it.createdAt,
+                updatedAt = it.updatedAt,
+                lastDeploymentId = it.lastDeploymentId,
+                syncState = it.syncState,
+                project = getProject(it.project?.id ?: 0),
+                deployments = it.deployments
             )
             deploymentProtocol?.setDeployLocation(locate, true)
             deploymentProtocol?.nextStep()
         }
     }
 
-    private fun getLocationGroup(group: String): LocationGroup {
-        val locationGroup = deploymentProtocol?.getLocationGroup(group) ?: Project()
-        return LocationGroup(locationGroup.name, locationGroup.color, locationGroup.serverId)
+    private fun getProject(id: Int): Project {
+        return deploymentProtocol?.getProject(id) ?: Project()
     }
 
     private fun getLastLocation() {
@@ -321,26 +317,33 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     }
 
     fun updateView() {
-        if (!isCreateNew) site = site ?: audioMothDeploymentViewModel.getLocateById(siteId)
+        if (!isCreateNew) site = site ?: audioMothDeploymentViewModel.getStreamById(siteId)
         if (latitude != 0.0 && longitude != 0.0) {
-            val alt = if (isCreateNew) currentUserLocation?.altitude else site?.altitude
+            val alt = currentUserLocation?.altitude
             setLatLngLabel(LatLng(latitude, longitude), alt ?: 0.0)
+            pinLocation = LatLng(latitude, longitude)
         } else if (isCreateNew) {
-            currentUserLocation?.let { setLatLngLabel(it.toLatLng(), it.altitude) }
+            currentUserLocation?.let {
+                setLatLngLabel(it.toLatLng(), it.altitude)
+                pinLocation = it.toLatLng()
+            }
         } else {
-            site?.let { setLatLngLabel(it.toLatLng(), it.altitude) }
-            locationGroupValueTextView.text = site?.locationGroup?.name ?: getString(R.string.none)
+            val alt = currentUserLocation?.altitude
+            site?.let {
+                setLatLngLabel(it.toLatLng(), alt ?: 0.0)
+                pinLocation = it.toLatLng()
+            }
+            locationGroupValueTextView.text = site?.project?.name ?: getString(R.string.none)
         }
         siteValueTextView.text = siteName
-        changeProjectTextView.visibility = if (isCreateNew) View.VISIBLE else View.GONE
+        changeProjectTextView.visibility = View.GONE
     }
 
     private fun setLatLngLabel(location: LatLng, altitude: Double) {
         context?.let {
-            val latLng =
-                "${location.latitude.latitudeCoordinates(it)}, ${location.longitude.longitudeCoordinates(
-                    it
-                )}"
+            val latLng = "${location.latitude.latitudeCoordinates(it)}, ${
+            location.longitude.longitudeCoordinates(it)
+            }"
             coordinatesValueTextView.text = latLng
             altitudeValue.text = altitude.setFormatLabel()
         }
@@ -365,8 +368,9 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             moveCamera(curLoc, latLng, DefaultSetupMap.DEFAULT_ZOOM)
             createSiteSymbol(latLng)
             setCheckboxForResumeDeployment(curLoc, latLng)
+            pinLocation = latLng
         } else if (!isCreateNew) {
-            site = audioMothDeploymentViewModel.getLocateById(siteId)
+            site = audioMothDeploymentViewModel.getStreamById(siteId)
             site?.let { locate ->
                 val latLng = locate.getLatLng()
                 moveCamera(curLoc, latLng, DefaultSetupMap.DEFAULT_ZOOM)
@@ -375,9 +379,11 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                     latLng
                 )
                 createSiteSymbol(latLng)
+                pinLocation = latLng
             }
         } else {
             createSiteSymbol(curLoc)
+            pinLocation = curLoc
         }
     }
 
@@ -494,7 +500,6 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         mapboxMap?.moveCamera(MapboxCameraUtils.calculateLatLngForZoom(latLng, null, zoom))
     }
 
-
     private fun setCheckboxForResumeDeployment(curLoc: LatLng, target: LatLng) {
         val distance = curLoc.distanceTo(target)
         if (distance <= 20) {
@@ -535,10 +540,11 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
 
         val projectId = preferences?.getInt(Preferences.SELECTED_PROJECT) ?: -1
         val selectedProject = audioMothDeploymentViewModel.getProjectById(projectId)
-        val selectedGroup = preferences?.getString(Preferences.GROUP)
+        val editProjectId = preferences?.getInt(Preferences.EDIT_PROJECT) ?: -1
+        val selectedEditProject = audioMothDeploymentViewModel.getProjectById(editProjectId)
 
-        group = selectedGroup ?: (selectedProject?.name ?: getString(R.string.none))
-        locationGroupValueTextView.text = group
+        this.project = selectedEditProject ?: selectedProject
+        locationGroupValueTextView.text = this.project?.name
     }
 
     override fun onPause() {
@@ -578,7 +584,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         @JvmStatic
         fun newInstance() = DetailDeploymentSiteFragment()
 
-        fun newInstance(id: Int, name: String?, isCreateNew: Boolean = false) =
+        fun newInstance(id: Int, name: String, isCreateNew: Boolean = false) =
             DetailDeploymentSiteFragment().apply {
                 arguments = Bundle().apply {
                     putInt(ARG_SITE_ID, id)
@@ -587,26 +593,42 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 }
             }
 
-        fun newInstance(lat: Double, lng: Double, siteId: Int, name: String) =
+        fun newInstance(lat: Double, lng: Double, siteId: Int) =
             DetailDeploymentSiteFragment().apply {
                 arguments = Bundle().apply {
                     putDouble(ARG_LATITUDE, lat)
                     putDouble(ARG_LONGITUDE, lng)
                     putInt(ARG_SITE_ID, siteId)
-                    putString(ARG_SITE_NAME, name)
                     putBoolean(ARG_IS_CREATE_NEW, siteId == -1)
                 }
             }
 
-        fun newInstance(lat: Double, lng: Double, siteId: Int, name: String, fromMapPicker: Boolean) =
+        fun newInstance(
+            lat: Double,
+            lng: Double,
+            siteId: Int,
+            siteName: String,
+            fromMapPicker: Boolean
+        ) =
             DetailDeploymentSiteFragment().apply {
                 arguments = Bundle().apply {
                     putDouble(ARG_LATITUDE, lat)
                     putDouble(ARG_LONGITUDE, lng)
                     putInt(ARG_SITE_ID, siteId)
-                    putString(ARG_SITE_NAME, name)
+                    putString(ARG_SITE_NAME, siteName)
                     putBoolean(ARG_IS_CREATE_NEW, siteId == -1)
                     putBoolean(ARG_FROM_MAP_PICKER, fromMapPicker)
+                }
+            }
+
+        fun newInstance(lat: Double, lng: Double, siteId: Int, siteName: String) =
+            DetailDeploymentSiteFragment().apply {
+                arguments = Bundle().apply {
+                    putDouble(ARG_LATITUDE, lat)
+                    putDouble(ARG_LONGITUDE, lng)
+                    putInt(ARG_SITE_ID, siteId)
+                    putString(ARG_SITE_NAME, siteName)
+                    putBoolean(ARG_IS_CREATE_NEW, siteId == -1)
                 }
             }
     }

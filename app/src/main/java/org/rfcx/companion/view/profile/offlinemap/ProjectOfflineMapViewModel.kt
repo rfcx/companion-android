@@ -117,7 +117,8 @@ class ProjectOfflineMapViewModel(
             }
 
             if (metadata != null) {
-                offlineManager?.createOfflineRegion(definition, metadata,
+                offlineManager?.createOfflineRegion(
+                    definition, metadata,
                     object : OfflineManager.CreateOfflineRegionCallback {
                         override fun onCreate(offlineRegion: OfflineRegion) {
                             hideDownloadButton.postValue(true)
@@ -133,7 +134,8 @@ class ProjectOfflineMapViewModel(
                             stateOfflineMap.postValue(OfflineMapState.DOWNLOAD_STATE.key)
                             Log.e(OfflineMapFragment.TAG, "Error: $error")
                         }
-                    })
+                    }
+                )
             }
         }
     }

@@ -4,16 +4,12 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkCapabilities
-import android.net.NetworkRequest
+import android.net.*
 import android.net.wifi.ScanResult
 import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
 import android.net.wifi.WifiNetworkSpecifier
 import android.os.Build
-import android.os.PatternMatcher
 import androidx.annotation.RequiresApi
 import org.rfcx.companion.util.WifiHotspotUtils
 
@@ -25,7 +21,7 @@ class WifiHotspotManager(private val context: Context) {
     private lateinit var wifiScanReceiver: WifiScanReceiver
     private lateinit var wifiConnectionReceiver: WifiConnectionReceiver
     private var isConnected = false
-    private var isRegisterCallback = false
+    private var isRegisteredCallback = false
 
     private var wifiName = ""
 
@@ -77,7 +73,8 @@ class WifiHotspotManager(private val context: Context) {
                         super.onUnavailable()
                         println("unavailable")
                     }
-                })
+                }
+            )
         } else {
             wifiConnectionReceiver = WifiConnectionReceiver(onWifiListener)
             context.registerReceiver(
@@ -96,8 +93,8 @@ class WifiHotspotManager(private val context: Context) {
             wifiConfig.allowedProtocols.set(WifiConfiguration.Protocol.RSN)
             wifiConfig.allowedProtocols.set(WifiConfiguration.Protocol.WPA)
 
-            val netId = wifiManager!!.addNetwork(wifiConfig)
             wifiManager!!.disconnect()
+            val netId = wifiManager!!.addNetwork(wifiConfig)
             wifiManager!!.enableNetwork(netId, true)
             wifiManager!!.reconnect()
         }
@@ -110,6 +107,10 @@ class WifiHotspotManager(private val context: Context) {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    fun unRegisterWifiLost() {
+        unregisterWifiConnectionLost()
     }
 
     private inner class WifiScanReceiver(private val onWifiListener: OnWifiListener) :
@@ -154,26 +155,24 @@ class WifiHotspotManager(private val context: Context) {
     }
 
     fun registerWifiConnectionLost(wifiLostListener: WifiLostListener) {
+        if (isRegisteredCallback) return
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             connectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             val networkRequest = NetworkRequest.Builder().also {
                 it.addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
             }.build()
             networkCallback = WifiLostCallback(wifiLostListener)
-            if (!isRegisterCallback) {
-                isRegisterCallback = true
-                connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
-            }
+            connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
+            isRegisteredCallback = true
         }
     }
 
-    fun unregisterWifiConnectionLost() {
+    private fun unregisterWifiConnectionLost() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (::connectivityManager.isInitialized)
-                if (isRegisterCallback) {
-                    isRegisterCallback = false
-                    connectivityManager.unregisterNetworkCallback(networkCallback)
-                }
+            if (isRegisteredCallback) {
+                connectivityManager.unregisterNetworkCallback(networkCallback)
+                isRegisteredCallback = false
+            }
         }
     }
 }

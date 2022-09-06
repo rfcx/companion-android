@@ -161,7 +161,7 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
     inner class AddImageViewHolder(
         itemView: View,
         private val onImageAdapterClickListener: OnImageAdapterClickListener?
-    ) : RecyclerView.ViewHolder(itemView) {}
+    ) : RecyclerView.ViewHolder(itemView)
 
     class ImageAdapterDiffUtil : DiffUtil.ItemCallback<BaseListItem>() {
         override fun areItemsTheSame(oldItem: BaseListItem, newItem: BaseListItem): Boolean {

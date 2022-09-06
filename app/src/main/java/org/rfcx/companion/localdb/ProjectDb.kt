@@ -1,7 +1,6 @@
 package org.rfcx.companion.localdb
 
 import io.realm.Realm
-import io.realm.RealmList
 import io.realm.RealmResults
 import io.realm.Sort
 import io.realm.kotlin.deleteFromRealm
@@ -12,16 +11,17 @@ import org.rfcx.companion.entity.SyncState
 import org.rfcx.companion.entity.response.ProjectByIdResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.entity.response.permissionsLabel
-import org.rfcx.companion.entity.response.toLocationGroups
-import java.util.*
+import org.rfcx.companion.entity.response.toProject
 
 class ProjectDb(private val realm: Realm) {
     fun insertOrUpdateProject(group: Project) {
         realm.executeTransaction {
             if (group.id == 0) {
                 val id =
-                    (realm.where(Project::class.java).max(Project.PROJECT_ID)
-                        ?.toInt() ?: 0) + 1
+                    (
+                        realm.where(Project::class.java).max(Project.PROJECT_ID)
+                            ?.toInt() ?: 0
+                        ) + 1
                 group.id = id
             }
             it.insertOrUpdate(group)
@@ -103,8 +103,10 @@ class ProjectDb(private val realm: Realm) {
 
     fun getOfflineDownloading(): Project? {
         return realm.where(Project::class.java)
-            .equalTo(Project.PROJECT_OFFLINE_MAP_STATE,
-                OfflineMapState.DOWNLOADING_STATE.key).findFirst()
+            .equalTo(
+                Project.PROJECT_OFFLINE_MAP_STATE,
+                OfflineMapState.DOWNLOADING_STATE.key
+            ).findFirst()
     }
 
     fun markUnsent(id: Int) {
@@ -127,11 +129,6 @@ class ProjectDb(private val realm: Realm) {
             .findAllAsync()
     }
 
-    fun getProjectByName(name: String): Project? {
-        return realm.where(Project::class.java)
-            .equalTo(Project.PROJECT_NAME, name).findFirst()
-    }
-
     fun getProjectById(id: Int): Project? {
         return realm.where(Project::class.java)
             .equalTo(Project.PROJECT_ID, id).findFirst()
@@ -150,10 +147,12 @@ class ProjectDb(private val realm: Realm) {
                     .findFirst()
 
             if (project == null) {
-                val projectObject = groupsResponse.toLocationGroups()
+                val projectObject = groupsResponse.toProject()
                 val id =
-                    (it.where(Project::class.java).max(Project.PROJECT_ID)
-                        ?.toInt() ?: 0) + 1
+                    (
+                        it.where(Project::class.java).max(Project.PROJECT_ID)
+                            ?.toInt() ?: 0
+                        ) + 1
                 projectObject.id = id
                 it.insert(projectObject)
             } else if (project.syncState == SyncState.Sent.key) {
@@ -165,12 +164,12 @@ class ProjectDb(private val realm: Realm) {
         }
     }
 
-    fun deleteProjectsByCoreId(coreIds: List<String>) {
+    fun deleteProjectsByCoreId(projectRes: List<ProjectResponse>) {
         realm.executeTransaction {
-            coreIds.forEach { id ->
+            projectRes.forEach { projectObj ->
                 val project =
                     it.where(Project::class.java)
-                        .equalTo(Project.PROJECT_SERVER_ID, id)
+                        .equalTo(Project.PROJECT_SERVER_ID, projectObj.id)
                         .findFirst()
 
                 project?.deleteFromRealm()

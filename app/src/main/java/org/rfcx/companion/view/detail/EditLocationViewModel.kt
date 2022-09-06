@@ -2,14 +2,17 @@ package org.rfcx.companion.view.detail
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import org.rfcx.companion.entity.LocationGroup
 import org.rfcx.companion.entity.Project
-import org.rfcx.companion.localdb.DatabaseCallback
+import org.rfcx.companion.entity.Stream
 
 class EditLocationViewModel(
     application: Application,
     private val editLocationRepository: EditLocationRepository
 ) : AndroidViewModel(application) {
+
+    fun markDeploymentNeedUpdate(id: Int) {
+        return editLocationRepository.markDeploymentNeedUpdate(id)
+    }
 
     fun editStream(
         id: Int,
@@ -17,7 +20,7 @@ class EditLocationViewModel(
         latitude: Double,
         longitude: Double,
         altitude: Double,
-        callback: DatabaseCallback
+        projectId: Int
     ) {
         return editLocationRepository.editStream(
             id,
@@ -25,19 +28,15 @@ class EditLocationViewModel(
             latitude,
             longitude,
             altitude,
-            callback
+            projectId
         )
     }
 
-    fun editProject(id: Int, locationGroup: LocationGroup, callback: DatabaseCallback) {
-        return editLocationRepository.editProject(id, locationGroup, callback)
+    fun getStreamById(id: Int): Stream? {
+        return editLocationRepository.getStreamById(id)
     }
 
-    fun isExisted(name: String?): Boolean {
-        return editLocationRepository.isExisted(name)
-    }
-
-    fun getProjectByName(name: String): Project? {
-        return editLocationRepository.getProjectByName(name)
+    fun getProjectById(id: Int): Project? {
+        return editLocationRepository.getProjectById(id)
     }
 }

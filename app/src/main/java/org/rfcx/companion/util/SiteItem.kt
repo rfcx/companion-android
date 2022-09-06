@@ -1,101 +1,63 @@
 package org.rfcx.companion.util
 
-import android.content.Context
 import android.location.Location
 import android.location.LocationManager
-import org.rfcx.companion.R
-import org.rfcx.companion.entity.Locate
-import org.rfcx.companion.entity.guardian.Deployment
+import org.rfcx.companion.entity.Stream
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
-import java.util.*
-import kotlin.collections.ArrayList
 
 private fun findNearLocations(
-    locateItems: ArrayList<Locate>,
+    streamItems: List<Stream>,
     currentUserLocation: Location
-): List<Pair<Locate, Float>>? {
-    if (locateItems.isNotEmpty()) {
-        val itemsWithDistance = arrayListOf<Pair<Locate, Float>>()
+): List<Pair<Stream, Float>>? {
+    if (streamItems.isNotEmpty()) {
         // Find locate distances
-        locateItems.mapTo(itemsWithDistance, {
+        return streamItems.map {
             val loc = Location(LocationManager.GPS_PROVIDER)
             loc.latitude = it.latitude
             loc.longitude = it.longitude
             val distance = loc.distanceTo(currentUserLocation) // return in meters
             Pair(it, distance)
-        })
-        return itemsWithDistance
+        }
     }
     return null
 }
 
 fun getListSite(
-    context: Context,
-    deploymentList: List<Deployment>,
-    projectName: String,
     currentUserLocation: Location,
-    locations: List<Locate>
-): ArrayList<SiteWithLastDeploymentItem> {
-    var deployments = deploymentList
-    if (projectName != context.getString(R.string.none)) {
-        deployments =
-            deploymentList.filter { it.stream?.project?.name == projectName }
-    }
+    streams: List<Stream>
+): List<SiteWithLastDeploymentItem> {
+
     val nearLocations =
-        findNearLocations(ArrayList(locations.filter { loc ->
-            loc.locationGroup?.name == projectName || projectName == context.getString(
-                R.string.none
-            )
-        }), currentUserLocation)?.sortedBy { it.second }
+        findNearLocations(
+            streams,
+            currentUserLocation
+        )?.sortedBy { it.second }
 
     val locationsItems: List<SiteWithLastDeploymentItem> =
-        nearLocations?.map {
+        nearLocations?.map { it ->
+            val deployment = it.first.getActiveDeployment()
             SiteWithLastDeploymentItem(
                 it.first,
-                isHaveDeployment(deployments, it.first),
+                deployment?.deployedAt,
                 it.second
             )
         } ?: listOf()
 
-    return ArrayList(locationsItems)
-}
-
-fun isHaveDeployment(
-    deployments: List<Deployment>,
-    locate: Locate
-): Date? {
-    return deployments.find { dp -> dp.stream?.name == locate.name }?.deployedAt
+    return locationsItems
 }
 
 fun getListSiteWithOutCurrentLocation(
-    context: Context,
-    deployments: List<Deployment>,
-    projectName: String,
-    locations: List<Locate>
-): ArrayList<SiteWithLastDeploymentItem> {
-    var showDeployments = deployments
-    if (projectName != context.getString(R.string.none)) {
-        showDeployments =
-            deployments.filter { it.stream?.project?.name == projectName }
-    }
-
-    val filterLocations = ArrayList(locations.filter { loc ->
-        loc.locationGroup?.name == projectName || projectName == context.getString(
-            R.string.none
-        )
-    })
-
+    streams: List<Stream>
+): List<SiteWithLastDeploymentItem> {
     val locationsItems: List<SiteWithLastDeploymentItem> =
-        filterLocations.map {
+        streams.map {
+            val deployment = it.getActiveDeployment()
             SiteWithLastDeploymentItem(
                 it,
-                isHaveDeployment(showDeployments, it),
+                deployment?.deployedAt,
                 null
             )
         }
 
-    val sortDate = locationsItems.filter { it.date != null }.sortedByDescending { it.date }
-    val notDeployment = locationsItems.filter { it.date == null }
-    return ArrayList(sortDate + notDeployment)
+    return locationsItems.sortedByDescending { it.date }
 }
-

@@ -47,6 +47,14 @@
     <color name="grey_light">#F0F0F0</color>
     <color name="grey_active">#5A6978</color>
     <color name="red">#e41a1a</color>
+    <color name="red_disable">#831111</color>
+    <color name="orange">#FF9800</color>
+    <color name="yellow">#FFEB3B</color>
+    <color name="dark_gray">#5A6978</color>
+    <color name="dark_orange">#DF9321</color>
+    <color name="black">#000000</color>
+    <color name="blue">#1E8CAB</color>
+    <color name="blue_disable">#165A6E</color>
 
     <color name="button_facebook_login">#37509f</color>
     <color name="transparent">@android:color/transparent</color>
@@ -61,5 +69,8 @@
     <!-- status view -->
     <color name="widget_status_view_dark_bg">#AD131313</color>
     <color name="widget_status_view_normal_bg">#FFFFFF</color>
+
+    <color name="shadow">#F1F1F1</color>
+    <color name="error">#e41a1a</color>
 
 </resources>

@@ -4,9 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.Menu
@@ -16,13 +14,10 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
-import com.zhihu.matisse.Matisse
-import com.zhihu.matisse.MimeType
-import java.io.File
+import com.opensooq.supernova.gligar.GligarPicker
 import kotlinx.android.synthetic.main.activity_feedback.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
@@ -31,6 +26,7 @@ import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.StatusEvent
 import org.rfcx.companion.repo.Firestore
 import org.rfcx.companion.util.*
+import java.io.File
 
 class FeedbackActivity : AppCompatActivity() {
     private var imageFile: File? = null
@@ -91,8 +87,7 @@ class FeedbackActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        handleGalleryResult(requestCode, resultCode, data)
-        handleTakePhotoResult(requestCode, resultCode)
+        handleGligarPickerResult(requestCode, resultCode, data)
     }
 
     @SuppressLint("ResourceAsColor")
@@ -107,8 +102,15 @@ class FeedbackActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> finish()
-            R.id.camera -> takePhoto()
-            R.id.gallery -> openGallery()
+            R.id.attachView -> {
+                if (!cameraPermissions.allowed() || !galleryPermissions.allowed()) {
+                    imageFile = null
+                    if (!cameraPermissions.allowed()) cameraPermissions.check { }
+                    if (!galleryPermissions.allowed()) galleryPermissions.check { }
+                } else {
+                    startOpenGligarPicker()
+                }
+            }
             R.id.sendFeedbackView -> sendFeedback()
         }
         return super.onOptionsItemSelected(item)
@@ -130,86 +132,27 @@ class FeedbackActivity : AppCompatActivity() {
         }
     }
 
-    private fun openGallery() {
-        if (!galleryPermissions.allowed()) {
-            imageFile = null
-            galleryPermissions.check { }
-        } else {
-            startOpenGallery()
-        }
-    }
-
-    private fun takePhoto() {
-        if (!cameraPermissions.allowed()) {
-            imageFile = null
-            cameraPermissions.check { }
-        } else {
-            startTakePhoto()
-        }
-    }
-
-    private fun startTakePhoto() {
-        if (feedbackImageAdapter.getImageCount() < FeedbackImageAdapter.MAX_IMAGE_SIZE) {
-            val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            imageFile = ImageUtils.createImageFile()
-            if (imageFile != null) {
-                val photoURI = imageFile?.let {
-                    FileProvider.getUriForFile(this, ImageUtils.FILE_CONTENT_PROVIDER, it)
-                }
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-                startActivityForResult(takePictureIntent, ImageUtils.REQUEST_TAKE_PHOTO)
-            }
-        } else {
-            Toast.makeText(this, R.string.maximum_number_of_attachments, Toast.LENGTH_LONG).show()
-        }
-    }
-
-    private fun startOpenGallery() {
+    private fun startOpenGligarPicker() {
         if (feedbackImageAdapter.getImageCount() < FeedbackImageAdapter.MAX_IMAGE_SIZE) {
             val remainingImage =
                 FeedbackImageAdapter.MAX_IMAGE_SIZE - feedbackImageAdapter.getImageCount()
-            Matisse.from(this)
-                .choose(MimeType.ofImage())
-                .countable(true)
-                .maxSelectable(remainingImage)
-                .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-                .thumbnailScale(0.85f)
-                .imageEngine(GlideV4ImageEngine())
-                .theme(R.style.Matisse_Dracula)
-                .forResult(ImageUtils.REQUEST_GALLERY)
+            GligarPicker()
+                .requestCode(ImageUtils.REQUEST_GALLERY)
+                .limit(remainingImage)
+                .withActivity(this)
+                .show()
         } else {
             Toast.makeText(this, R.string.maximum_number_of_attachments, Toast.LENGTH_LONG).show()
         }
     }
 
-    private fun handleTakePhotoResult(requestCode: Int, resultCode: Int) {
-        if (requestCode != ImageUtils.REQUEST_TAKE_PHOTO) return
-
-        if (resultCode == Activity.RESULT_OK) {
-            imageFile?.let {
-                val pathList = listOf(it.absolutePath)
-                analytics.trackAddFeedbackImagesEvent()
-                feedbackImageAdapter.addImages(pathList)
-            }
-        } else {
-            // remove file image
-            imageFile?.let {
-                ImageFileUtils.removeFile(it)
-                this.imageFile = null
-            }
-        }
-    }
-
-    private fun handleGalleryResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
+    private fun handleGligarPickerResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
         if (requestCode != ImageUtils.REQUEST_GALLERY || resultCode != Activity.RESULT_OK || intentData == null) return
 
         val pathList = mutableListOf<String>()
-        val results = Matisse.obtainResult(intentData)
-        results.forEach {
-            val imagePath = ImageFileUtils.findRealPath(this, it)
-            imagePath?.let { path ->
-                pathList.add(path)
-            }
+        val results = intentData.extras?.getStringArray(GligarPicker.IMAGES_RESULT)
+        results?.forEach {
+            pathList.add(it)
         }
         analytics.trackAddFeedbackImagesEvent()
         feedbackImageAdapter.addImages(pathList)
@@ -228,28 +171,28 @@ class FeedbackActivity : AppCompatActivity() {
 
         Firestore(this)
             .saveFeedback(feedbackInput, pathListArray) { success ->
-            if (success) {
-                val intent = Intent()
-                setResult(ProfileFragment.RESULT_CODE, intent)
-                analytics.trackSendFeedbackEvent(StatusEvent.SUCCESS.id)
+                if (success) {
+                    val intent = Intent()
+                    setResult(ProfileFragment.RESULT_CODE, intent)
+                    analytics.trackSendFeedbackEvent(StatusEvent.SUCCESS.id)
 
-                if(pathListArray != null){
-                    analytics.trackAddFeedbackImagesEvent()
+                    if (pathListArray != null) {
+                        analytics.trackAddFeedbackImagesEvent()
+                    }
+
+                    finish()
+                } else {
+                    feedbackGroupView.visibility = View.VISIBLE
+                    feedbackProgressBar.visibility = View.GONE
+                    analytics.trackSendFeedbackEvent(StatusEvent.FAILURE.id)
+
+                    Snackbar.make(
+                        contextView,
+                        R.string.feedback_submission_failed,
+                        Snackbar.LENGTH_LONG
+                    ).setAction(R.string.snackbar_retry) { sendFeedback() }.show()
                 }
-
-                finish()
-            } else {
-                feedbackGroupView.visibility = View.VISIBLE
-                feedbackProgressBar.visibility = View.GONE
-                analytics.trackSendFeedbackEvent(StatusEvent.FAILURE.id)
-
-                Snackbar.make(
-                    contextView,
-                    R.string.feedback_submission_failed,
-                    Snackbar.LENGTH_LONG
-                ).setAction(R.string.snackbar_retry) { sendFeedback() }.show()
             }
-        }
     }
 
     private fun View.hideKeyboard() = this.let {

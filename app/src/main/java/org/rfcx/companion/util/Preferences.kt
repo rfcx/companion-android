@@ -32,7 +32,7 @@ class Preferences(context: Context) {
         const val COORDINATES_FORMAT = "${PREFIX}COORDINATES_FORMAT"
         const val USER_FIREBASE_UID = "${PREFIX}USER_FIREBASE_UID"
         const val DISPLAY_THEME = "${PREFIX}DISPLAY_THEME"
-        const val GROUP = "${PREFIX}GROUP"
+        const val EDIT_PROJECT = "${PREFIX}EDIT_PROJECT"
         const val SELECTED_PROJECT = "${PREFIX}SELECTED_PROJECT"
         const val TOKEN_EXPIRES_AT = "${PREFIX}TOKEN_EXPIRES_AT"
         const val ENABLE_LOCATION_TRACKING = "${PREFIX}ENABLE_LOCATION_TRACKING"
@@ -41,8 +41,8 @@ class Preferences(context: Context) {
         const val LASTEST_GET_LOCATION_TIME = "${PREFIX}LASTEST_GET_LOCATION_TIME"
         const val LAST_LATITUDE = "${PREFIX}LAST_LATITUDE"
         const val LAST_LONGITUDE = "${PREFIX}LAST_LONGITUDE"
-        const val OFFLINE_MAP_STATE  = "${PREFIX}OFFLINE_MAP_STATE"
-        const val OFFLINE_MAP_SERVER_ID  = "${PREFIX}OFFLINE_MAP_SERVER_ID"
+        const val OFFLINE_MAP_STATE = "${PREFIX}OFFLINE_MAP_STATE"
+        const val OFFLINE_MAP_SERVER_ID = "${PREFIX}OFFLINE_MAP_SERVER_ID"
     }
 
     init {
@@ -103,7 +103,7 @@ class Preferences(context: Context) {
     }
 
     fun clearSelectedProject() {
-        sharedPreferences.edit().remove(GROUP).apply()
+        sharedPreferences.edit().remove(EDIT_PROJECT).apply()
     }
 
     fun clearOfflineMapName() {

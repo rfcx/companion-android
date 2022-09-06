@@ -52,7 +52,7 @@ class GuardianAdvancedFragment : Fragment() {
             currentPrefsSha1 = it.getPrefsSha1()
         }
 
-        //start guardian prefs fragment once view created
+        // start guardian prefs fragment once view created
         parentFragmentManager.beginTransaction()
             .replace(advancedContainer.id, GuardianPrefsFragment())
             .commit()
@@ -68,21 +68,19 @@ class GuardianAdvancedFragment : Fragment() {
         val prefs = syncPreferenceListener?.getPrefsChanges() ?: JsonObject()
         needCheckSha1 = prefs.size() > 0
         GuardianSocketManager.syncConfiguration(prefs.toString())
-        GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
-            requireActivity().runOnUiThread {
-                if (!needCheckSha1) {
-                    deploymentProtocol?.nextStep()
-                }
-                if (currentPrefsSha1 != deploymentProtocol?.getPrefsSha1()) {
-                    deploymentProtocol?.nextStep()
+        GuardianSocketManager.pingBlob.observe(
+            viewLifecycleOwner,
+            Observer {
+                requireActivity().runOnUiThread {
+                    if (!needCheckSha1) {
+                        deploymentProtocol?.nextStep()
+                    }
+                    if (currentPrefsSha1 != deploymentProtocol?.getPrefsSha1()) {
+                        deploymentProtocol?.nextStep()
+                    }
                 }
             }
-        })
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        GuardianSocketManager.resetPrefsValue()
+        )
     }
 
     companion object {

@@ -26,13 +26,16 @@ class SoftwareUpdateFragment : Fragment(), ChildrenClickedListener {
     private var selectedFile: SoftwareItem.SoftwareVersion? = null
     private var loadingTimer: CountDownTimer? = null
 
+    private var tempProgress = 0
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         deploymentProtocol = (context as GuardianDeploymentProtocol)
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
@@ -68,25 +71,39 @@ class SoftwareUpdateFragment : Fragment(), ChildrenClickedListener {
             it.setToolbarTitle()
         }
 
-        GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
-            requireActivity().runOnUiThread {
-                deploymentProtocol?.getSoftwareVersion()?.let {
-                    softwareUpdateAdapter?.guardianSoftwareVersion = it
-                    softwareUpdateAdapter?.notifyDataSetChanged()
+        GuardianSocketManager.pingBlob.observe(
+            viewLifecycleOwner,
+            Observer {
+                requireActivity().runOnUiThread {
+                    deploymentProtocol?.getSoftwareVersion()?.let {
+                        softwareUpdateAdapter?.guardianSoftwareVersion = it
+                        softwareUpdateAdapter?.notifyDataSetChanged()
 
-                    selectedFile?.let { selected ->
-                        val selectedVersion = selected.version
-                        val installedVersion = it[selected.parent]
-                        if (installedVersion != null && calculateVersionValue(installedVersion) == calculateVersionValue(selectedVersion)) {
-                            softwareUpdateAdapter?.hideLoading()
-                            nextButton.isEnabled = true
+                        selectedFile?.let { selected ->
+                            val selectedVersion = selected.version
+                            val installedVersion = it[selected.parent]
+                            if (installedVersion != null && calculateVersionValue(installedVersion) == calculateVersionValue(selectedVersion)) {
+                                softwareUpdateAdapter?.hideLoading()
+                                nextButton.isEnabled = true
 
-                            stopTimer()
+                                stopTimer()
+                            }
                         }
                     }
                 }
             }
-        })
+        )
+
+        FileSocketManager.uploadingProgress.observe(
+            viewLifecycleOwner
+        ) {
+            requireActivity().runOnUiThread {
+                if (it != tempProgress) {
+                    tempProgress = it
+                    softwareUpdateAdapter?.progress = it
+                }
+            }
+        }
 
         nextButton.setOnClickListener {
             deploymentProtocol?.nextStep()
@@ -101,7 +118,7 @@ class SoftwareUpdateFragment : Fragment(), ChildrenClickedListener {
     }
 
     private fun startTimer() {
-        loadingTimer = object: CountDownTimer(60000, 1000) {
+        loadingTimer = object : CountDownTimer(60000, 1000) {
             override fun onTick(millisUntilFinished: Long) { }
 
             override fun onFinish() {

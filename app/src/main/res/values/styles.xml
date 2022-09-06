@@ -45,6 +45,20 @@
         <item name="android:textSize">@dimen/text_xxsmall</item>
     </style>
 
+    <style name="ClassifierButton.Active" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/bg_color_active_button</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/color_activate_text</item>
+        <item name="android:textSize">@dimen/text_xxsmall</item>
+    </style>
+
+    <style name="ClassifierButton.DeActive" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/bg_color_deactive_button</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/color_deactive_text</item>
+        <item name="android:textSize">@dimen/text_xxsmall</item>
+    </style>
+
     <style name="AudioMothButton.Primary" parent="AudioMothButton">
         <item name="android:background">@drawable/bg_color_primary_button</item>
         <item name="android:textAllCaps">false</item>
@@ -54,6 +68,14 @@
     <style name="AudioMothButton.GreenButton" parent="AudioMothButton">
         <item name="android:background">@drawable/bg_color_primary_button</item>
         <item name="android:textColor">@color/color_button_text</item>
+    </style>
+
+    <style name="AudioMothButton.GreenButton.TextSmall" parent="AudioMothButton">
+        <item name="android:background">@drawable/bg_color_primary_button</item>
+        <item name="android:textColor">@color/color_button_text</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="textAllCaps">false</item>
     </style>
 
     <style name="AudioMothButton.WhiteButton" parent="AudioMothButton">
@@ -90,9 +112,45 @@
         <item name="android:textColor">@color/color_button_outline_text</item>
     </style>
 
+    <style name="GuardianButton.GreenButton.Line.Small" parent="AudioMothButton">
+        <item name="android:background">@drawable/bg_button_green_static_outline</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="GuardianButton.YellowButton.Line.Small" parent="AudioMothButton">
+        <item name="android:background">@drawable/bg_button_yellow_outline</item>
+        <item name="android:textColor">@color/yellow</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="GuardianButton.OrangeButton.Line.Small" parent="AudioMothButton">
+        <item name="android:background">@drawable/bg_button_orange_outline</item>
+        <item name="android:textColor">@color/orange</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="GuardianButton.RedButton.Line.Small" parent="AudioMothButton">
+        <item name="android:background">@drawable/bg_button_red_outline</item>
+        <item name="android:textColor">@color/red</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="GuardianButton.GrayButton.Line.Small" parent="AudioMothButton">
+        <item name="android:background">@drawable/bg_button_gray_outline</item>
+        <item name="android:textColor">@color/grey_active</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
     <style name="GuardianButton.RedButton" parent="AudioMothButton">
         <item name="android:background">@drawable/bg_color_red_button</item>
         <item name="android:textColor">@color/color_button_text</item>
+    </style>
+
+    <style name="Companion.OrangeButton" parent="AudioMothButton">
+        <item name="android:background">@drawable/bg_curved_orange_button_square</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="textAllCaps">false</item>
     </style>
 
     <!-- TextView -->
@@ -104,6 +162,11 @@
 
     <style name="AudioMothText.Subhead.Secondary" parent="Base.TextAppearance.AppCompat.Subhead">
         <item name="android:textColor">@color/text_secondary</item>
+    </style>
+
+    <style name="AudioMothText.Subhead.Secondary.xSmall" parent="Base.TextAppearance.AppCompat.Subhead">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">10sp</item>
     </style>
 
     <style name="AudioMothText.Subhead.Bold" parent="Base.TextAppearance.AppCompat.Small">
@@ -261,6 +324,27 @@
     <style name="NegativeButton" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
         <item name="android:textColor">@color/colorPrimary</item>
         <item name="lineSpacing">0.5dp</item>
+    </style>
+
+    <style name="BannerButton" parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="textAllCaps">true</item>
+        <item name="lineSpacing">0.5dp</item>
+    </style>
+
+    <!-- Checkbox -->
+    <style name="AudioMothCheckBox" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">@dimen/text_small</item>
+        <item name="android:fontFamily">@font/lato_regular</item>
+    </style>
+
+    <!-- RadioButton -->
+    <style name="AudioMothRadioButton" parent="@android:style/Widget.CompoundButton.RadioButton">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">@dimen/text_small</item>
+        <item name="android:fontFamily">@font/lato_regular</item>
     </style>
 
 </resources>

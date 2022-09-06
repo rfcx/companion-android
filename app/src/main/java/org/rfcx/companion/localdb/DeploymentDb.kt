@@ -8,29 +8,25 @@ import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.toDeployment
-import org.rfcx.companion.entity.response.toDeploymentLocation
 import java.util.*
 
 class DeploymentDb(private val realm: Realm) {
 
     fun unsentCount(): Long {
-        val audioMoths = realm.where(Deployment::class.java)
-            .equalTo(Deployment.FIELD_DEVICE, Device.AUDIOMOTH.value)
-            .and()
-            .equalTo(Deployment.FIELD_STATE, DeploymentState.AudioMoth.ReadyToUpload.key)
-            .and()
-            .notEqualTo(Deployment.FIELD_SYNC_STATE, SyncState.Sent.key)
-            .count()
-
-        val guardians = realm.where(Deployment::class.java)
-            .equalTo(Deployment.FIELD_DEVICE, Device.GUARDIAN.value)
-            .and()
+        return realm.where(Deployment::class.java)
             .equalTo(Deployment.FIELD_STATE, DeploymentState.Guardian.ReadyToUpload.key)
             .and()
             .notEqualTo(Deployment.FIELD_SYNC_STATE, SyncState.Sent.key)
             .count()
+    }
 
-        return audioMoths + guardians
+    fun getUnsent(): List<Deployment> {
+        return realm.where(Deployment::class.java)
+            .equalTo(Deployment.FIELD_STATE, DeploymentState.Guardian.ReadyToUpload.key)
+            .and()
+            .notEqualTo(Deployment.FIELD_SYNC_STATE, SyncState.Sent.key)
+            .sort(Deployment.FIELD_ID, Sort.DESCENDING)
+            .findAll()
     }
 
     fun getAllResultsAsync(sort: Sort = Sort.DESCENDING): RealmResults<Deployment> {
@@ -39,15 +35,9 @@ class DeploymentDb(private val realm: Realm) {
             .findAllAsync()
     }
 
-    fun getDeployments(): List<Deployment> {
+    fun getAllResultsAsyncWithinProject(sort: Sort = Sort.DESCENDING, id: Int): RealmResults<Deployment> {
         return realm.where(Deployment::class.java)
-            .sort(Deployment.FIELD_ID, Sort.DESCENDING)
-            .findAll() ?: arrayListOf()
-    }
-
-    fun getAllResultsAsyncWithinProject(sort: Sort = Sort.DESCENDING, project: String): RealmResults<Deployment> {
-        return realm.where(Deployment::class.java)
-            .equalTo("stream.project.name", project)
+            .equalTo("stream.project.id", id)
             .sort(Deployment.FIELD_ID, sort)
             .findAllAsync()
     }
@@ -55,7 +45,7 @@ class DeploymentDb(private val realm: Realm) {
     fun deleteDeploymentByStreamId(id: String) {
         realm.executeTransaction {
             val deployments =
-                it.where(Deployment::class.java).equalTo("stream.coreId", id)
+                it.where(Deployment::class.java).equalTo("stream.serverId", id)
                     .findAll()
             deployments.forEach { dp ->
                 dp.isActive = false
@@ -64,15 +54,19 @@ class DeploymentDb(private val realm: Realm) {
         }
     }
 
-    fun insertOrUpdateDeployment(deployment: Deployment, location: DeploymentLocation): Int {
+    fun insertOrUpdateDeployment(deployment: Deployment, streamId: Int): Int {
         var id = deployment.id
         realm.executeTransaction {
             if (deployment.id == 0) {
-                id = (it.where(Deployment::class.java).max(Deployment.FIELD_ID)
-                    ?.toInt() ?: 0) + 1
+                id = (
+                    it.where(Deployment::class.java).max(Deployment.FIELD_ID)
+                        ?.toInt() ?: 0
+                    ) + 1
                 deployment.id = id
             }
-            deployment.stream = it.copyToRealm(location)
+
+            val stream = it.where(Stream::class.java).equalTo(Stream.FIELD_ID, streamId).findFirst()
+            deployment.stream = stream
             it.insertOrUpdate(deployment)
         }
         return id
@@ -90,16 +84,24 @@ class DeploymentDb(private val realm: Realm) {
                     deployment.serverId = deploymentResponse.id
                     deployment.deployedAt = deploymentResponse.deployedAt ?: deployment.deployedAt
 
-                    val newLocation = deploymentResponse.stream
-                    if (newLocation != null) {
-                        deployment.stream = it.copyToRealm(newLocation.toDeploymentLocation())
+                    val streamObj = deploymentResponse.stream
+                    if (streamObj != null) {
+                        val stream = it.where(Stream::class.java).equalTo(Stream.FIELD_SERVER_ID, streamObj.id).findFirst()
+                        deployment.stream = stream
                     }
 
                     deployment.createdAt = deploymentResponse.createdAt ?: deployment.createdAt
                 } else {
                     val deploymentObj = deploymentResponse.toDeployment()
-                    val id = (it.where(Deployment::class.java).max(Deployment.FIELD_ID)
-                        ?.toInt() ?: 0) + 1
+                    val streamObj = deploymentResponse.stream
+                    if (streamObj != null) {
+                        val stream = it.where(Stream::class.java).equalTo(Stream.FIELD_SERVER_ID, streamObj.id).findFirst()
+                        deploymentObj.stream = stream
+                    }
+
+                    val id = (
+                        it.where(Deployment::class.java).max(Deployment.FIELD_ID)?.toInt() ?: 0
+                        ) + 1
                     deploymentObj.id = id
                     it.insert(deploymentObj)
                 }
@@ -214,96 +216,13 @@ class DeploymentDb(private val realm: Realm) {
         }
     }
 
-    /**
-     * Update Deployment Location and Locate
-     * */
-    fun editStream(
-        id: Int,
-        locationName: String,
-        latitude: Double,
-        longitude: Double,
-        altitude: Double,
-        callback: DatabaseCallback
-    ) {
-        realm.executeTransactionAsync({ bgRealm ->
-            // do update deployment location
-            val deployment =
-                bgRealm.where(Deployment::class.java).equalTo(Deployment.FIELD_ID, id)
-                    .findFirst()
-            if (deployment?.stream != null) {
-                deployment.stream?.name = locationName
-                deployment.stream?.latitude = latitude
-                deployment.stream?.longitude = longitude
-                deployment.stream?.altitude = altitude
-                deployment.updatedAt = Date()
-                deployment.syncState = SyncState.Unsent.key
-            }
-            val location = bgRealm.where(Locate::class.java)
-                .equalTo(Locate.FIELD_LAST_DEPLOYMENT_ID, id).findFirst()
-
-            if (location != null) {
-                location.latitude = latitude
-                location.longitude = longitude
-                location.altitude = altitude
-                location.name = locationName
-                location.syncState = SyncState.Unsent.key
-            }
-        }, {
-            // success
-            realm.close()
-            callback.onSuccess()
-        }, {
-            // failure
-            realm.close()
-            callback.onFailure(it.localizedMessage ?: "")
-        })
-    }
-
-    fun editProject(id: Int, locationGroup: LocationGroup, callback: DatabaseCallback) {
-        realm.executeTransactionAsync({ bgRealm ->
-            // do update deployment location
-            val guardianDeployment =
-                bgRealm.where(Deployment::class.java).equalTo(Deployment.FIELD_ID, id)
-                    .findFirst()
-            if (guardianDeployment?.stream != null) {
-                guardianDeployment.updatedAt = Date()
-                guardianDeployment.syncState = SyncState.Unsent.key
-
-                //update location group
-                if (guardianDeployment.stream?.project != null) {
-                    guardianDeployment.stream?.project?.let {
-                        it.name = locationGroup.name
-                        it.color = locationGroup.color
-                        it.coreId = locationGroup.coreId
-                    }
-                } else {
-                    val locationGroupObj = bgRealm.createObject(LocationGroup::class.java)
-                    locationGroupObj.let {
-                        it.color = locationGroup.color
-                        it.name = locationGroup.name
-                        it.coreId = locationGroup.coreId
-                    }
-                    guardianDeployment.stream?.project = locationGroupObj
-                }
-            }
-        }, {
-            // success
-            realm.close()
-            callback.onSuccess()
-        }, {
-            // failure
-            realm.close()
-            callback.onFailure(it.localizedMessage ?: "")
-        })
-    }
-
-    fun updateDeploymentByServerId(deployment: Deployment) {
+    fun markNeedUpdate(id: Int) {
         realm.executeTransaction {
-            it.where(Deployment::class.java)
-                .equalTo(Deployment.FIELD_SERVER_ID, deployment.serverId)
-                .findFirst()?.apply {
-                    stream?.coreId = deployment.stream?.coreId
-                }
+            val deployment =
+                it.where(Deployment::class.java).equalTo(Deployment.FIELD_ID, id)
+                    .findFirst()
+            deployment?.updatedAt = Date()
+            deployment?.syncState = SyncState.Unsent.key
         }
     }
 
@@ -318,13 +237,13 @@ class DeploymentDb(private val realm: Realm) {
         }
     }
 
-    fun getDeploymentsBySiteId(streamId: String, device: String): ArrayList<Deployment> {
+    fun getDeploymentsBySiteId(streamId: Int, device: String): ArrayList<Deployment> {
         val deployments = realm.where(Deployment::class.java)
             .equalTo(Deployment.FIELD_STATE, if (device == Device.GUARDIAN.value) DeploymentState.Guardian.ReadyToUpload.key else DeploymentState.AudioMoth.ReadyToUpload.key)
             .and()
             .equalTo(Deployment.FIELD_SYNC_STATE, SyncState.Sent.key)
             .and()
-            .equalTo("stream.coreId", streamId)
+            .equalTo("stream.id", streamId)
             .findAllAsync()
         val arrayOfId = arrayListOf<Deployment>()
         deployments.forEach {

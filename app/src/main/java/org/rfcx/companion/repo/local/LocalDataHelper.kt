@@ -7,18 +7,21 @@ import org.rfcx.companion.util.RealmHelper
 
 class LocalDataHelper {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
-    private val locateDb by lazy { LocateDb(realm) }
+    private val streamDb by lazy { StreamDb(realm) }
     private val projectDb by lazy { ProjectDb(realm) }
     private val trackingDb by lazy { TrackingDb(realm) }
     private val trackingFileDb by lazy { TrackingFileDb(realm) }
     private val deploymentImageDb by lazy { DeploymentImageDb(realm) }
     private val deploymentDb by lazy { DeploymentDb(realm) }
+    private val classifierDb by lazy { ClassifierDb(realm) }
+    private val guardianRegistrationDb by lazy { GuardianRegistrationDb(realm) }
 
-    fun getLocateLocalDb() = locateDb
+    fun getStreamLocalDb() = streamDb
     fun getProjectLocalDb() = projectDb
     fun getTrackingLocalDb() = trackingDb
     fun getTrackingFileLocalDb() = trackingFileDb
     fun getDeploymentImageLocalDb() = deploymentImageDb
     fun getDeploymentLocalDb() = deploymentDb
-
+    fun getClassifierLocalDb() = classifierDb
+    fun getGuardianRegistration() = guardianRegistrationDb
 }

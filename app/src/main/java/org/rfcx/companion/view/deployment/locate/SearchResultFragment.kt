@@ -10,7 +10,6 @@ import com.mapbox.api.geocoding.v5.MapboxGeocoding
 import com.mapbox.api.geocoding.v5.models.CarmenFeature
 import com.mapbox.api.geocoding.v5.models.GeocodingResponse
 import com.mapbox.mapboxsdk.geometry.LatLng
-import java.util.*
 import kotlinx.android.synthetic.main.layout_search_result.*
 import org.rfcx.companion.R
 import org.rfcx.companion.adapter.BaseListItem
@@ -19,6 +18,7 @@ import org.rfcx.companion.util.Analytics
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.*
 
 class SearchResultFragment : Fragment() {
     private val analytics by lazy { context?.let { Analytics(it) } }

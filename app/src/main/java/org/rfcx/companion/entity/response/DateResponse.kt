@@ -2,7 +2,7 @@ package org.rfcx.companion.entity.response
 
 import com.google.gson.annotations.SerializedName
 
-data class DateResponse (
+data class DateResponse(
     @SerializedName("_seconds")
     val seconds: Long = 0,
 

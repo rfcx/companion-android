@@ -69,14 +69,14 @@ class SearchLocationResultDiffCallback : DiffUtil.ItemCallback<BaseListItem>() {
         return when {
             oldItem is SearchResult && newItem is SearchResult -> {
                 oldItem.placeName == newItem.placeName &&
-                        oldItem.latitude == newItem.latitude &&
-                        oldItem.longitude == newItem.longitude
+                    oldItem.latitude == newItem.latitude &&
+                    oldItem.longitude == newItem.longitude
             }
 
             oldItem is SearchResultError && newItem is SearchResultError -> {
                 oldItem.title == newItem.title &&
-                        oldItem.message == newItem.message &&
-                        oldItem.icon == newItem.icon
+                    oldItem.message == newItem.message &&
+                    oldItem.icon == newItem.icon
             }
             else -> false
         }
@@ -99,7 +99,8 @@ class SearchLocationViewHolder(
                     R.layout.item_search_location_result,
                     parent,
                     false
-                ), onItemClick
+                ),
+                onItemClick
             )
         }
     }

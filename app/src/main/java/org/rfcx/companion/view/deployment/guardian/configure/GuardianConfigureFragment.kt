@@ -30,15 +30,20 @@ class GuardianConfigureFragment : Fragment() {
     private var fileFormatList: Array<String>? = null
     private var durationEntries: Array<String>? = null
     private var durationValues: Array<String>? = null
+    private var enableSamplingEntries: Array<String>? = null
+    private var enableSamplingValues: Array<String>? = null
+    private var samplingEntries: Array<String>? = null
+    private var samplingValues: Array<String>? = null
 
     private var sampleRate = 24000 // default guardian sampleRate is 24000
     private var bitrate = 28672 // default guardian bitrate is 28672
     private var fileFormat = "opus" // default guardian file format is opus
     private var duration = 90 // default guardian duration is 90
+    private var enableSampling = false
+    private var sampling = "1:2"
 
     private var needCheckSha1 = false
     private var currentPrefsSha1: String? = null
-
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -77,6 +82,10 @@ class GuardianConfigureFragment : Fragment() {
         fileFormatList = context.resources.getStringArray(R.array.audio_codec)
         durationEntries = context.resources.getStringArray(R.array.duration_cycle_entries)
         durationValues = context.resources.getStringArray(R.array.duration_cycle_values)
+        enableSamplingEntries = context.resources.getStringArray(R.array.enable_sampling_entries)
+        enableSamplingValues = context.resources.getStringArray(R.array.enable_sampling_entries)
+        samplingEntries = context.resources.getStringArray(R.array.sampling_entries)
+        samplingValues = context.resources.getStringArray(R.array.sampling_entries)
     }
 
     private fun setNextButton(show: Boolean) {
@@ -95,20 +104,23 @@ class GuardianConfigureFragment : Fragment() {
 
     private fun syncConfig() {
         GuardianSocketManager.syncConfiguration(getConfiguration().toListForGuardian())
-        GuardianSocketManager.pingBlob.observe(viewLifecycleOwner, Observer {
-            requireActivity().runOnUiThread {
-                if (!needCheckSha1) {
-                    deploymentProtocol?.nextStep()
-                }
-                if (currentPrefsSha1 != deploymentProtocol?.getPrefsSha1()) {
-                    deploymentProtocol?.nextStep()
+        GuardianSocketManager.pingBlob.observe(
+            viewLifecycleOwner,
+            Observer {
+                requireActivity().runOnUiThread {
+                    if (!needCheckSha1) {
+                        deploymentProtocol?.nextStep()
+                    }
+                    if (currentPrefsSha1 != deploymentProtocol?.getPrefsSha1()) {
+                        deploymentProtocol?.nextStep()
+                    }
                 }
             }
-        })
+        )
     }
 
     private fun getConfiguration(): GuardianConfiguration {
-        return GuardianConfiguration(sampleRate, bitrate, fileFormat, duration)
+        return GuardianConfiguration(sampleRate, bitrate, fileFormat, duration, enableSampling, sampling)
     }
 
     private fun retrieveCurrentConfigure() {
@@ -117,11 +129,15 @@ class GuardianConfigureFragment : Fragment() {
             sampleRate = it.get(PrefsUtils.audioSampleRate).asInt
             duration = it.get(PrefsUtils.audioDuration).asInt
             fileFormat = it.get(PrefsUtils.audioCodec).asString
+            enableSampling = it.get(PrefsUtils.enableSampling).asBoolean
+            sampling = it.get(PrefsUtils.sampling).asString
         }
         setFileFormatLayout()
         setSampleRateLayout()
         setBitrateLayout()
         setDuration()
+        setEnableSampling()
+        setSampling()
         setNextOnClick()
     }
 
@@ -228,6 +244,70 @@ class GuardianConfigureFragment : Fragment() {
                             } else {
                                 durationValueTextView.text = durationEntries!![i]
                                 duration = durationValues!![i].toInt()
+                                needCheckSha1 = true
+                            }
+                        } catch (e: IllegalArgumentException) {
+                            dialog.dismiss()
+                        }
+                    }
+                val dialog = builder.create()
+                dialog.show()
+            }
+        }
+    }
+
+    private fun setEnableSampling() {
+
+        val indexOfValue = enableSamplingValues?.indexOf(enableSampling.toString()) ?: 0
+        if (indexOfValue == -1) {
+            enableSamplingValueTextView.text = "false"
+        } else {
+            enableSamplingValueTextView.text = enableSamplingEntries!![indexOfValue]
+        }
+
+        enableSamplingValueTextView.setOnClickListener {
+            val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
+            if (builder != null) {
+                builder.setTitle(R.string.choose_enable_sampling)
+                    ?.setItems(enableSamplingEntries) { dialog, i ->
+                        try {
+                            if (enableSamplingValues!![i].toBoolean() == enableSampling) {
+                                needCheckSha1 = false
+                            } else {
+                                enableSamplingValueTextView.text = enableSamplingEntries!![i]
+                                enableSampling = enableSamplingValues!![i].toBoolean()
+                                needCheckSha1 = true
+                            }
+                        } catch (e: IllegalArgumentException) {
+                            dialog.dismiss()
+                        }
+                    }
+                val dialog = builder.create()
+                dialog.show()
+            }
+        }
+    }
+
+    private fun setSampling() {
+
+        val indexOfValue = samplingValues?.indexOf(sampling) ?: 0
+        if (indexOfValue == -1) {
+            samplingValueTextView.text = "1:2"
+        } else {
+            samplingValueTextView.text = samplingEntries!![indexOfValue]
+        }
+
+        samplingValueTextView.setOnClickListener {
+            val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
+            if (builder != null) {
+                builder.setTitle(R.string.choose_sampling)
+                    ?.setItems(samplingEntries) { dialog, i ->
+                        try {
+                            if (samplingValues!![i] == sampling) {
+                                needCheckSha1 = false
+                            } else {
+                                samplingValueTextView.text = samplingEntries!![i]
+                                sampling = samplingValues!![i]
                                 needCheckSha1 = true
                             }
                         } catch (e: IllegalArgumentException) {

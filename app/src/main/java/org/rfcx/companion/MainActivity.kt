@@ -19,7 +19,8 @@ import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
 import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.base.ViewModelFactory
-import org.rfcx.companion.entity.Locate
+import org.rfcx.companion.entity.CrashlyticsKey
+import org.rfcx.companion.entity.Stream
 import org.rfcx.companion.entity.isGuest
 import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.CoreApiServiceImpl
@@ -46,6 +47,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
 
     private var addTooltip: SimpleTooltip? = null
     private val analytics by lazy { Analytics(this) }
+    private val firebaseCrashlytics by lazy { Crashlytics() }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -91,11 +93,16 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         setContentView(R.layout.activity_main)
         setViewModel()
 
+        firebaseCrashlytics.setCustomKey(CrashlyticsKey.EmailUser.key, this.getEmailUser())
+
         val preferences = Preferences.getInstance(this)
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
         val project = mainViewModel.getProjectById(projectId)
+        if (project == null) {
+            logout()
+        }
         project?.let {
-            if(it.isGuest()) {
+            if (it.isGuest()) {
                 preferences.putInt(Preferences.SELECTED_PROJECT, -1)
                 ProjectSelectActivity.startActivity(this)
                 finish()
@@ -149,24 +156,24 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
 
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetContainer)
         bottomSheetBehavior.addBottomSheetCallback(object :
-            BottomSheetBehavior.BottomSheetCallback() {
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+                BottomSheetBehavior.BottomSheetCallback() {
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {}
 
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
-                    val bottomSheetFragment =
-                        supportFragmentManager.findFragmentByTag(BOTTOM_SHEET)
-                    if (bottomSheetFragment != null) {
-                        supportFragmentManager.beginTransaction()
-                            .remove(bottomSheetFragment)
-                            .commit()
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                        val bottomSheetFragment =
+                            supportFragmentManager.findFragmentByTag(BOTTOM_SHEET)
+                        if (bottomSheetFragment != null) {
+                            supportFragmentManager.beginTransaction()
+                                .remove(bottomSheetFragment)
+                                .commit()
+                        }
+                    }
+                    if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                        hideBottomAppBar()
                     }
                 }
-                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                    hideBottomAppBar()
-                }
-            }
-        })
+            })
     }
 
     private fun setupSimpleTooltip() {
@@ -272,8 +279,9 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
 
     override fun onLogout() {
         DeploymentCleanupWorker.stopAllWork(this)
-        this.logout()
         LocationTracking.set(this, false)
+        mainViewModel.onDestroy()
+        this.logout()
         analytics.trackLogoutEvent()
         finish()
     }
@@ -286,7 +294,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         }
     }
 
-    override fun showTrackOnMap(site: Locate?, markerLocationId: String) {
+    override fun showTrackOnMap(site: Stream?, markerLocationId: String) {
         val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
         if (mapFragment is MapFragment) {
             site?.let {
@@ -330,7 +338,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         hideSnackbar()
         hideBottomAppBar()
         val layoutParams: CoordinatorLayout.LayoutParams = bottomSheetContainer.layoutParams
-                as CoordinatorLayout.LayoutParams
+            as CoordinatorLayout.LayoutParams
         layoutParams.anchorGravity = Gravity.BOTTOM
         bottomSheetContainer.layoutParams = layoutParams
         supportFragmentManager.beginTransaction()
@@ -378,6 +386,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
             mapFragment.showSearchBar(false)
         }
     }
+
     override fun clearFeatureSelectedOnMap() {
         val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
         if (mapFragment is MapFragment) {
@@ -409,7 +418,7 @@ interface MainActivityListener {
     fun hideSnackbar()
     fun onLogout()
     fun moveMapIntoDeploymentMarker(lat: Double, lng: Double, markerLocationId: String)
-    fun showTrackOnMap(site: Locate?, markerLocationId: String)
+    fun showTrackOnMap(site: Stream?, markerLocationId: String)
     fun getProjectName(): String
     fun clearFeatureSelectedOnMap()
 }

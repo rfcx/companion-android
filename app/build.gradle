@@ -5,17 +5,17 @@ apply plugin: 'com.google.gms.google-services'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'realm-android'
 apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'org.jlleitschuh.gradle.ktlint'
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "29.0.3"
+    compileSdkVersion 31
     defaultConfig {
         applicationId "org.rfcx.companion"
         manifestPlaceholders = [auth0Domain: "@string/auth0_domain", auth0Scheme: "@string/auth0_scheme"]
-        minSdkVersion 19
-        targetSdkVersion 30
-        versionCode 62
-        versionName "1.4.0"
+        minSdkVersion 21
+        targetSdkVersion 31
+        versionCode 133
+        versionName "1.6.5"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -27,8 +27,9 @@ android {
         }
         
         release {
-            minifyEnabled false
-        proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             manifestPlaceholders = [enableCrashReporting:"true"]
         }
     }
@@ -42,6 +43,7 @@ android {
             buildConfigField 'String', 'FIREBASE_AUTH_DOMAIN', '"https://us-central1-rfcx-deployment.cloudfunctions.net/auth/"'
             buildConfigField 'String', 'DEVICE_API_DOMAIN', '"https://device-api.rfcx.org/"'
             buildConfigField 'String', 'DEPLOY_DOMAIN', '"https://api.rfcx.org/"'
+            versionNameSuffix="-prod"
         }
         internalDevelop {
             buildConfigField 'boolean', 'ENABLE_GUARDIAN', 'true'
@@ -49,6 +51,7 @@ android {
             buildConfigField 'String', 'DEVICE_API_DOMAIN', '"https://staging-device-api.rfcx.org/"'
             buildConfigField 'String', 'DEPLOY_DOMAIN', '"https://staging-api.rfcx.org/"'
             applicationIdSuffix '.dev'
+            versionNameSuffix="-staging"
         }
     }
     compileOptions {
@@ -57,6 +60,10 @@ android {
     }
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8
+    }
+    lintOptions{
+        disable 'MissingTranslation'
+        disable 'ExtraTranslation'
     }
 }
 
@@ -71,10 +78,10 @@ repositories {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.core:core-ktx:1.3.1'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation 'androidx.work:work-runtime-ktx:2.4.0'
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
+    implementation 'androidx.work:work-runtime-ktx:2.7.1'
     implementation('com.journeyapps:zxing-android-embedded:4.1.0') { transitive = false }
     implementation 'com.google.zxing:core:3.3.0'
 
@@ -85,11 +92,11 @@ dependencies {
     implementation 'com.android.support:design:28.0.0'
 
     // Firebase
-    implementation 'com.google.firebase:firebase-analytics:17.4.4'
-    implementation 'com.google.firebase:firebase-firestore-ktx:21.5.0'
-    implementation 'com.google.firebase:firebase-storage:19.1.1'
-    implementation 'com.google.firebase:firebase-crashlytics:17.1.1'
-    implementation 'com.google.firebase:firebase-auth:19.3.2'
+    implementation 'com.google.firebase:firebase-analytics:21.0.0'
+    implementation 'com.google.firebase:firebase-firestore-ktx:24.0.2'
+    implementation 'com.google.firebase:firebase-storage:20.0.1'
+    implementation 'com.google.firebase:firebase-crashlytics:18.2.11'
+    implementation 'com.google.firebase:firebase-auth:21.0.5'
 
     // Kotlin Coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.5'
@@ -102,16 +109,16 @@ dependencies {
     implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-scalebar-v9:0.5.0'
     implementation 'com.mapbox.mapboxsdk:mapbox-android-telemetry:6.1.0'
 
-    implementation 'com.google.android.material:material:1.3.0-alpha02'
+    implementation 'com.google.android.material:material:1.5.0'
 
     //Preference
-    implementation "androidx.preference:preference-ktx:1.1.1"
+    implementation "androidx.preference:preference-ktx:1.2.0"
 
     // Glide
-    implementation 'com.google.android.gms:play-services-location:17.0.0'
+    implementation 'com.google.android.gms:play-services-location:19.0.1'
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     kapt 'com.github.bumptech.glide:compiler:4.11.0'
-    implementation 'com.zhihu.android:matisse:0.5.3-beta3'
+    implementation 'com.github.omkar-tenkale:Gligar:78d8110102e0be4e1e2f939b5307ae5f645e6761'
     implementation 'jp.wasabeef:glide-transformations:3.0.1'
 
     implementation 'com.github.hkk595:Resizer:v1.5'
@@ -125,13 +132,13 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:3.12.7'
 
     /* auth0 */
-    implementation('com.auth0.android:auth0:1.14.1') {
+    implementation('com.auth0.android:auth0:1.30.0') {
         exclude group: 'com.android.support', module: 'customtabs'
     }
     implementation 'com.auth0.android:jwtdecode:1.2.0'
-    implementation 'io.jsonwebtoken:jjwt-api:0.10.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.10.5'
-    runtimeOnly('io.jsonwebtoken:jjwt-orgjson:0.10.5') {
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.1'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.1'
+    runtimeOnly('io.jsonwebtoken:jjwt-orgjson:0.11.1') {
         exclude group: 'org.json', module: 'json' //provided by Android natively
     }
 
@@ -141,26 +148,16 @@ dependencies {
     /* Chart */
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 
-    /* ktlint */
-    ktlint "com.pinterest:ktlint:0.36.0"
-
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 }
 
-task ktlint(type: JavaExec, group: "verification") {
-    description = "Check Kotlin code style."
-    main = "com.pinterest.ktlint.Main"
-    classpath = configurations.ktlint
-    args "src/**/*.kt"
-}
-check.dependsOn ktlint
-
-task ktlintFormat(type: JavaExec, group: "formatting") {
-    description = "Fix Kotlin code style deviations."
-    main = "com.pinterest.ktlint.Main"
-    classpath = configurations.ktlint
-    args "-F", "src/**/*.kt"
+ktlint {
+    disabledRules = ["no-wildcard-imports"]
+    reporters {
+        reporter "plain"
+        reporter "checkstyle"
+    }
 }

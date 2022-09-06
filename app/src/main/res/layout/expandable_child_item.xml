@@ -7,9 +7,9 @@
     android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/apkVersionTextView"
+        android:id="@+id/fileVersionTextView"
         style="@style/AudioMothText.Label.Secondary"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingStart="@dimen/margin_padding_xlarge"
         android:paddingTop="@dimen/margin_padding_normal"
@@ -19,8 +19,22 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="TextView" />
 
+
+    <TextView
+        android:id="@+id/fileInstalledVersionTextView"
+        style="@style/AudioMothText.Label.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/margin_padding_normal"
+        android:paddingTop="@dimen/margin_padding_normal"
+        android:paddingEnd="@dimen/margin_padding_large"
+        android:paddingBottom="@dimen/margin_padding_normal"
+        app:layout_constraintStart_toEndOf="@id/fileVersionTextView"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="TextView" />
+
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/apkSendButton"
+        android:id="@+id/fileSendButton"
         style="@style/OfflineMapButton"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
@@ -30,23 +44,24 @@
         android:text="@string/update_to"
         android:textSize="@dimen/text_xxsmall"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/apkVersionTextView"
+        app:layout_constraintBottom_toBottomOf="@id/fileVersionTextView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/apkVersionTextView" />
+        app:layout_constraintTop_toTopOf="@id/fileVersionTextView" />
 
-    <ProgressBar
-        android:id="@+id/apkLoading"
-        android:layout_width="wrap_content"
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/fileLoading"
+        android:layout_width="0dp"
         android:layout_height="30dp"
         android:layout_gravity="center"
         android:layout_marginEnd="@dimen/margin_padding_normal"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/apkVersionTextView"
+        app:layout_constraintStart_toEndOf="@id/fileInstalledVersionTextView"
+        app:layout_constraintBottom_toBottomOf="@id/fileVersionTextView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/apkVersionTextView" />
+        app:layout_constraintTop_toTopOf="@id/fileVersionTextView" />
 
     <TextView
-        android:id="@+id/apkUpToDateTextView"
+        android:id="@+id/fileUpToDateTextView"
         style="@style/AudioMothText.Label.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -56,8 +71,8 @@
         android:paddingBottom="@dimen/margin_padding_normal"
         android:text="up to date"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/apkVersionTextView"
+        app:layout_constraintBottom_toBottomOf="@id/fileVersionTextView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/apkVersionTextView" />
+        app:layout_constraintTop_toTopOf="@id/fileVersionTextView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,9 +7,9 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import org.rfcx.companion.R
-import org.rfcx.companion.util.socket.PingUtils
 
-class GuardianPrefsFragment : PreferenceFragmentCompat(),
+class GuardianPrefsFragment :
+    PreferenceFragmentCompat(),
     SharedPreferences.OnSharedPreferenceChangeListener {
 
     private val prefsChanges = mutableMapOf<String, String>()
@@ -20,7 +20,7 @@ class GuardianPrefsFragment : PreferenceFragmentCompat(),
 
     override fun onResume() {
         super.onResume()
-        preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+        preferenceScreen.sharedPreferences?.registerOnSharedPreferenceChangeListener(this)
     }
 
     override fun onAttach(context: Context) {
@@ -38,13 +38,15 @@ class GuardianPrefsFragment : PreferenceFragmentCompat(),
         prefs.forEach {
             preferenceCategory.addPreference(it)
         }
-        syncPreferenceListener?.setEditor(preferenceScreen.sharedPreferences.edit())
+        syncPreferenceListener?.setEditor(preferenceScreen.sharedPreferences?.edit()!!)
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        val value = sharedPreferences?.getString(key, "") ?: ""
+        val value = sharedPreferences?.getString(key, "")
 
-        prefsChanges[key!!] = value
+        if (value != null && value != "") {
+            prefsChanges[key!!] = value
+        }
 
         syncPreferenceListener?.showSyncButton()
         syncPreferenceListener?.setPrefsChanges(prefsChanges)
@@ -52,6 +54,6 @@ class GuardianPrefsFragment : PreferenceFragmentCompat(),
 
     override fun onPause() {
         super.onPause()
-        preferenceScreen.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
+        preferenceScreen.sharedPreferences?.unregisterOnSharedPreferenceChangeListener(this)
     }
 }

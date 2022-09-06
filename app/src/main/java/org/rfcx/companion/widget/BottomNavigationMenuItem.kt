@@ -89,13 +89,17 @@ class BottomNavigationMenuItem @JvmOverloads constructor(
             titleTextView.visibility = View.VISIBLE
             titleTextView.setTextColor(titleColorSelected)
             if (iconTintColor != 0)
-                iconImageView.setColorFilter(titleColorSelected,
-                    PorterDuff.Mode.SRC_IN)
+                iconImageView.setColorFilter(
+                    titleColorSelected,
+                    PorterDuff.Mode.SRC_IN
+                )
         } else {
             titleTextView.visibility = View.VISIBLE
             titleTextView.setTextColor(titleColor)
-            iconImageView.setColorFilter(titleColor,
-                PorterDuff.Mode.SRC_IN)
+            iconImageView.setColorFilter(
+                titleColor,
+                PorterDuff.Mode.SRC_IN
+            )
             updateBadge()
         }
     }
@@ -105,14 +109,20 @@ class BottomNavigationMenuItem @JvmOverloads constructor(
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.BottomNavigationMenuItem)
 
         title = typedArray.getString(R.styleable.BottomNavigationMenuItem_title)
-        titleColor = ContextCompat.getColor(context,
-            typedArray.getResourceId(R.styleable.BottomNavigationMenuItem_titleColor, R.color.grey_active))
-        titleColorSelected = ContextCompat.getColor(context,
-            typedArray.getResourceId(R.styleable.BottomNavigationMenuItem_titleColorSelected, R.color.grey_active))
+        titleColor = ContextCompat.getColor(
+            context,
+            typedArray.getResourceId(R.styleable.BottomNavigationMenuItem_titleColor, R.color.grey_active)
+        )
+        titleColorSelected = ContextCompat.getColor(
+            context,
+            typedArray.getResourceId(R.styleable.BottomNavigationMenuItem_titleColorSelected, R.color.grey_active)
+        )
 
         icon = typedArray.getDrawable(R.styleable.BottomNavigationMenuItem_icon)
-        iconTintColor = ContextCompat.getColor(context,
-            typedArray.getResourceId(R.styleable.BottomNavigationMenuItem_iconTintColor, android.R.color.transparent))
+        iconTintColor = ContextCompat.getColor(
+            context,
+            typedArray.getResourceId(R.styleable.BottomNavigationMenuItem_iconTintColor, android.R.color.transparent)
+        )
         menuSelected = typedArray.getBoolean(R.styleable.BottomNavigationMenuItem_menuSelected, false)
         isShowBadge = typedArray.getBoolean(R.styleable.BottomNavigationMenuItem_showBadge, false)
 

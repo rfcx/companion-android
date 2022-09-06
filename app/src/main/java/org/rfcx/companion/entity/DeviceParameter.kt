@@ -1,6 +1,6 @@
 package org.rfcx.companion.entity
 
-data class GuardianDeviceParameters(
+data class DeviceParameter(
     val guid: String?
 )
 

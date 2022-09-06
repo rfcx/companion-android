@@ -6,6 +6,7 @@
     <uses-sdk tools:overrideLibrary="com.google.zxing.client.android" />
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -39,16 +40,6 @@
             android:name="firebase_crashlytics_collection_enabled"
             android:value="${enableCrashReporting}" />
 
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
-        </provider>
-
         <activity android:name=".view.profile.offlinemap.OfflineMapActivity"
             android:screenOrientation="portrait"/>
 
@@ -57,10 +48,7 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name="org.rfcx.companion.view.profile.locationgroup.CreateNewGroupActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name="org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity"
+            android:name="org.rfcx.companion.view.profile.locationgroup.ProjectActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name="org.rfcx.companion.view.detail.EditLocationActivity"
@@ -76,7 +64,8 @@
             android:screenOrientation="portrait" />
         <activity
             android:name="org.rfcx.companion.view.LoginActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -103,16 +92,19 @@
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation" />
 
         <activity
-            android:name="org.rfcx.companion.view.diagnostic.DiagnosticActivity"
-            android:screenOrientation="portrait"
-            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation" />
-
-        <activity
             android:name=".view.project.ProjectSelectActivity"
             android:screenOrientation="portrait" />
 
         <activity
             android:name=".view.profile.guardiansoftware.GuardianSoftwareActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".view.unsynced.UnsyncedWorksActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".view.profile.classifier.GuardianClassifierActivity"
             android:screenOrientation="portrait"/>
 
         <service

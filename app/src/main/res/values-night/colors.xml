@@ -47,6 +47,9 @@
     <color name="grey_light">#F0F0F0</color>
     <color name="grey_active">#5A6978</color>
     <color name="red">#e41a1a</color>
+    <color name="red_disable">#831111</color>
+    <color name="blue">#1E8CAB</color>
+    <color name="blue_disable">#165A6E</color>
 
     <color name="button_facebook_login">#37509f</color>
     <color name="transparent">@android:color/transparent</color>
@@ -57,4 +60,7 @@
     <color name="step_enabled_true">#2AA841</color>
 
     <color name="bottom_bar_icon_default_tint">#999999</color>
+
+    <color name="shadow">#20213A</color>
+    <color name="error">#E12E2E</color>
 </resources>

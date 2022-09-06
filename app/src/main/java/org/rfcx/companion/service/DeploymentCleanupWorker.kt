@@ -4,9 +4,10 @@ import android.content.Context
 import android.util.Log
 import androidx.work.*
 import io.realm.Realm
-import org.rfcx.companion.localdb.DeploymentImageDb
-import org.rfcx.companion.localdb.TrackingFileDb
 import org.rfcx.companion.localdb.DeploymentDb
+import org.rfcx.companion.localdb.DeploymentImageDb
+import org.rfcx.companion.localdb.GuardianRegistrationDb
+import org.rfcx.companion.localdb.TrackingFileDb
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.RealmHelper
 import java.util.concurrent.TimeUnit
@@ -26,7 +27,6 @@ class DeploymentCleanupWorker(val context: Context, params: WorkerParameters) :
         val realm = Realm.getInstance(RealmHelper.migrationConfig())
         val deploymentDb = DeploymentDb(realm)
         val deploymentUnsent = deploymentDb.unsentCount()
-        deploymentDb.unlockSending()
         if (deploymentUnsent > 0) {
             DeploymentSyncWorker.enqueue(context)
         }
@@ -44,6 +44,12 @@ class DeploymentCleanupWorker(val context: Context, params: WorkerParameters) :
         if (trackingFileUnsent > 0) {
             TrackingSyncWorker.enqueue(context)
         }
+
+        val registrationDb = GuardianRegistrationDb(realm)
+        val registrationUnsent = registrationDb.count()
+        if (registrationUnsent > 0) {
+            RegisterGuardianWorker.enqueue(context)
+        }
     }
 
     companion object {
@@ -51,8 +57,14 @@ class DeploymentCleanupWorker(val context: Context, params: WorkerParameters) :
         private const val UNIQUE_WORK_KEY = "DeploymentCleanupWorkerUniqueKey"
 
         fun enqueuePeriodically(context: Context) {
+            val constraints =
+                Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+
             val workRequest =
-                PeriodicWorkRequestBuilder<DeploymentCleanupWorker>(15, TimeUnit.MINUTES).build()
+                PeriodicWorkRequestBuilder<DeploymentCleanupWorker>(15, TimeUnit.MINUTES)
+                    .setConstraints(constraints)
+                    .build()
+
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 UNIQUE_WORK_KEY,
                 ExistingPeriodicWorkPolicy.REPLACE,

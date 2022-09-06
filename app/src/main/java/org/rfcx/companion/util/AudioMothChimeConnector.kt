@@ -42,11 +42,9 @@ class AudioMothChimeConnector {
         if (value) {
 
             state.bytes[byte] = state.bytes[byte] or (1 shl bit)
-
         }
 
         state.index += 1
-
     }
 
     private fun setBits(state: State, value: Int, length: Int) {
@@ -56,16 +54,14 @@ class AudioMothChimeConnector {
             val mask = (1 shl i)
 
             setBit(state, (value and mask) == mask)
-
         }
-
     }
 
     private fun setTimeData(calendar: Calendar, state: State) {
 
         /* Calculate timestamp and offset */
 
-        val timestamp: Int = ((calendar.timeInMillis + MILLISECONDS_IN_SECOND / 2 ) / MILLISECONDS_IN_SECOND).toInt()
+        val timestamp: Int = ((calendar.timeInMillis + MILLISECONDS_IN_SECOND / 2) / MILLISECONDS_IN_SECOND).toInt()
 
         val timezoneMinutes: Int =
             (calendar.timeZone.rawOffset + calendar.timeZone.dstSavings) / SECONDS_IN_MINUTE / MILLISECONDS_IN_SECOND
@@ -75,7 +71,6 @@ class AudioMothChimeConnector {
         setBits(state, timestamp, BITS_IN_INT32)
 
         setBits(state, timezoneMinutes, BITS_IN_INT16)
-
     }
 
     /* Public interface function */
@@ -83,7 +78,6 @@ class AudioMothChimeConnector {
     fun playTone(duration: Int) {
 
         audioMothChime.tone(duration, arrayOf("C5:1"))
-
     }
 
     fun playTime(calendar: Calendar) {
@@ -122,7 +116,6 @@ class AudioMothChimeConnector {
                 "C5:3"
             )
         )
-
     }
 
     fun playTimeAndDeploymentID(calendar: Calendar, deploymentID: Array<Int>) {
@@ -134,7 +127,6 @@ class AudioMothChimeConnector {
             println("AUDIOMOTHCHIME_CONNECTOR: Deployment ID is incorrect length")
 
             return
-
         }
 
         /* Set up array */
@@ -166,7 +158,6 @@ class AudioMothChimeConnector {
         for (i in 0 until LENGTH_OF_DEPLOYMENT_ID) {
 
             data[size - 1 - i] = deploymentID[i] and 0xFF
-
         }
 
         /* Play the data */
@@ -185,11 +176,9 @@ class AudioMothChimeConnector {
                 "E5:5"
             )
         )
-
     }
 
     fun stopPlay() {
         audioMothChime.stop()
     }
-
 }

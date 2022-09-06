@@ -35,7 +35,8 @@ class NewSyncFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         arguments?.let { step = it.getInt(STEP) }
@@ -73,7 +74,7 @@ class NewSyncFragment : Fragment() {
         }
         flashingRedAnimation.start()
 
-        if(step != null){
+        if (step != null) {
             val stepSync = step
             stepSync?.let { setStep(it) }
         } else {
@@ -158,9 +159,9 @@ class NewSyncFragment : Fragment() {
         var isPortuguese = Locale.getDefault().language == "pt"
 
         val spannableString = SpannableString(getString(R.string.lights_audiomoth))
-        val red = ForegroundColorSpan(Color.RED) //red color
-        val green = ForegroundColorSpan(ContextCompat.getColor(view.context, R.color.colorPrimary)) //green color
-        if(isPortuguese) {
+        val red = ForegroundColorSpan(Color.RED) // red color
+        val green = ForegroundColorSpan(ContextCompat.getColor(view.context, R.color.colorPrimary)) // green color
+        if (isPortuguese) {
             spannableString.setSpan(red, 34, 44, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             spannableString.setSpan(green, 46, 61, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         } else {
@@ -170,7 +171,7 @@ class NewSyncFragment : Fragment() {
         lightsAudiomothTextView.text = spannableString
 
         val confirmLight = SpannableString(getString(R.string.six))
-        if(isPortuguese) {
+        if (isPortuguese) {
             confirmLight.setSpan(red, 22, 30, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         } else {
             confirmLight.setSpan(red, 20, 23, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)

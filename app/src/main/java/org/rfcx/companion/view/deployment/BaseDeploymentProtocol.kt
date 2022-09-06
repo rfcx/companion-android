@@ -6,27 +6,28 @@ import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 
 interface BaseDeploymentProtocol {
-    fun startMapPicker(latitude: Double, longitude: Double, siteId: Int, name: String)
+    fun startMapPicker(latitude: Double, longitude: Double, altitude: Double, streamId: Int, streamName: String)
     fun startCheckList()
-    fun startDetailDeploymentSite(id: Int, name: String?, isNewSite: Boolean)
+    fun startDetailDeploymentSite(id: Int, streamName: String, isNewSite: Boolean)
+    fun startDetailDeploymentSite(lat: Double, lng: Double, siteId: Int, siteName: String)
 
     fun isOpenedFromUnfinishedDeployment(): Boolean
 
     fun nextStep()
     fun backStep()
 
-    fun getDeploymentLocation(): DeploymentLocation?
-    fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem>
-    fun getLocationGroup(name: String): Project?
+    fun getDeploymentStream(): Stream?
+    fun getSiteItem(): List<SiteWithLastDeploymentItem>
+    fun getStream(id: Int): Stream?
+    fun getProject(id: Int): Project?
     fun getImages(): List<String>
     fun getCurrentLocation(): Location
 
-    fun setDeployLocation(locate: Locate, isExisted: Boolean)
-    fun setSiteItem(items: ArrayList<SiteWithLastDeploymentItem>)
+    fun setDeployLocation(stream: Stream, isExisted: Boolean)
+    fun setSiteItem(items: List<SiteWithLastDeploymentItem>)
     fun setImages(images: List<String>)
     fun setReadyToDeploy()
     fun setCurrentLocation(location: Location)
-
 
     fun handleCheckClicked(number: Int)
     fun getPassedChecks(): List<Int>

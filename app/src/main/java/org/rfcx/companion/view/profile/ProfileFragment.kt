@@ -20,9 +20,10 @@ import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.Theme
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.Preferences.Companion.DISPLAY_THEME
+import org.rfcx.companion.view.profile.classifier.GuardianClassifierActivity
 import org.rfcx.companion.view.profile.coordinates.CoordinatesActivity
 import org.rfcx.companion.view.profile.guardiansoftware.GuardianSoftwareActivity
-import org.rfcx.companion.view.profile.locationgroup.LocationGroupActivity
+import org.rfcx.companion.view.profile.locationgroup.ProjectActivity
 import org.rfcx.companion.view.profile.offlinemap.OfflineMapActivity
 
 class ProfileFragment : Fragment() {
@@ -83,6 +84,10 @@ class ProfileFragment : Fragment() {
             context?.let { it1 -> GuardianSoftwareActivity.startActivity(it1) }
         }
 
+        classifierTextView.setOnClickListener {
+            context?.let { it1 -> GuardianClassifierActivity.startActivity(it1) }
+        }
+
         coordinatesLinearLayout.setOnClickListener {
             context?.let { it1 -> CoordinatesActivity.startActivity(it1) }
         }
@@ -95,7 +100,8 @@ class ProfileFragment : Fragment() {
             if (builder != null) {
                 builder.setTitle(getString(R.string.theme))
 
-                builder.setSingleChoiceItems(themeOption, selectedRadioItem,
+                builder.setSingleChoiceItems(
+                    themeOption, selectedRadioItem,
                     DialogInterface.OnClickListener { dialog, which ->
                         when (themeOption[which]) {
                             themeOption[0] -> {
@@ -124,12 +130,12 @@ class ProfileFragment : Fragment() {
                 builder.show()
             }
             locationGroupLinearLayout.setOnClickListener {
-                context?.let { it1 -> LocationGroupActivity.startActivity(it1) }
+                context?.let { it1 -> ProjectActivity.startActivity(it1) }
             }
         }
 
         locationGroupLinearLayout.setOnClickListener {
-            context?.let { it1 -> LocationGroupActivity.startActivity(it1) }
+            context?.let { it1 -> ProjectActivity.startActivity(it1) }
         }
     }
 

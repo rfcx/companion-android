@@ -46,7 +46,6 @@ class LocationTrackerService : Service() {
                 if ((System.currentTimeMillis() - Preferences.getInstance(this@LocationTrackerService).getLong(LASTEST_GET_LOCATION_TIME, 0L)) > 10 * 1000L) {
                     getNotificationManager().notify(NOTIFICATION_LOCATION_ID, createLocationTrackerNotification(true))
                 }
-
             } else if (status == LocationProvider.OUT_OF_SERVICE) {
                 getNotificationManager().notify(NOTIFICATION_LOCATION_ID, createLocationTrackerNotification(false))
             }
@@ -124,7 +123,7 @@ class LocationTrackerService : Service() {
             )
 
             trackingStatTimer?.cancel()
-            trackingStatTimer = fixedRateTimer("timer", false, 60 * 1000, 60 * 1000) {
+            trackingStatTimer = fixedRateTimer("timer", false, 60 * 1000L, 60 * 1000L) {
                 getNotificationManager().notify(
                     NOTIFICATION_LOCATION_ID,
                     createLocationTrackerNotification(isLocationAvailability)
@@ -141,7 +140,7 @@ class LocationTrackerService : Service() {
         val intent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
             this, 0,
-            intent, PendingIntent.FLAG_UPDATE_CURRENT
+            intent, PendingIntent.FLAG_IMMUTABLE
         )
         return NotificationCompat.Builder(this, NOTIFICATION_LOCATION_CHANNEL_ID).apply {
             setContentTitle(getString(R.string.tracking_enabled))
@@ -198,7 +197,7 @@ class LocationTrackerService : Service() {
         const val NOTIFICATION_LOCATION_NAME = "Track location"
         const val NOTIFICATION_LOCATION_CHANNEL_ID = "Location"
         private const val LOCATION_INTERVAL = 1000L * 20L // 20 seconds
-        private const val LOCATION_DISTANCE = 0f// 0 meter
+        private const val LOCATION_DISTANCE = 0f // 0 meter
         private const val TAG = "LocationTrackerService"
     }
 }

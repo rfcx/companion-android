@@ -18,6 +18,7 @@ import io.realm.RealmResults
 import org.json.JSONObject
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
+import org.rfcx.companion.entity.guardian.GuardianRegistration
 import org.rfcx.companion.entity.guardian.toMark
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.ProjectByIdResponse
@@ -40,24 +41,26 @@ class MainViewModel(
     private val context = getApplication<Application>().applicationContext
     private val projects = MutableLiveData<Resource<List<Project>>>()
     private val tracks = MutableLiveData<Resource<List<DeploymentAssetResponse>>>()
-    private val deploymentMarkers = MutableLiveData<Resource<List<MapMarker.DeploymentMarker>>>()
-    private val siteMarkers = MutableLiveData<Resource<List<MapMarker>>>()
-    private val siteList = MutableLiveData<Resource<List<Locate>>>()
-    private val showDeployments = MutableLiveData<Resource<List<Deployment>>>()
+    private val unsyncedWorksCount = MutableLiveData<Int>()
+    private val deploymentMarkers = MutableLiveData<List<MapMarker.DeploymentMarker>>()
+    private val streamMarkers = MutableLiveData<List<MapMarker>>()
+    private val streamList = MutableLiveData<List<Stream>>()
 
-    private var deployments = listOf<Deployment>()
-    private var sites = listOf<Locate>()
+    private var streams = listOf<Stream>()
+    private var registrationCount = 0
+
+    private lateinit var streamLiveData: LiveData<List<Stream>>
+    private val streamObserve = Observer<List<Stream>> {
+        streams = it
+    }
 
     private lateinit var deploymentLiveData: LiveData<List<Deployment>>
     private val deploymentObserve = Observer<List<Deployment>> {
-        deployments = it
         combinedData()
     }
-
-    private lateinit var siteLiveData: LiveData<List<Locate>>
-    private val siteObserve = Observer<List<Locate>> {
-        sites = it
-        siteList.postValue(Resource.success(it))
+    private lateinit var registrationLiveData: LiveData<List<GuardianRegistration>>
+    private val registrationObserve = Observer<List<GuardianRegistration>> {
+        registrationCount = it.size
         combinedData()
     }
 
@@ -66,14 +69,19 @@ class MainViewModel(
     }
 
     private fun fetchLiveData() {
-        siteLiveData =
+        streamLiveData =
             Transformations.map(mainRepository.getAllLocateResultsAsync().asLiveData()) { it }
-        siteLiveData.observeForever(siteObserve)
+        streamLiveData.observeForever(streamObserve)
 
         deploymentLiveData = Transformations.map(
             mainRepository.getAllDeploymentLocateResultsAsync().asLiveData()
         ) { it }
         deploymentLiveData.observeForever(deploymentObserve)
+
+        registrationLiveData = Transformations.map(
+            mainRepository.getAllRegistrationResultsAsync().asLiveData()
+        ) { it }
+        registrationLiveData.observeForever(registrationObserve)
     }
 
     fun fetchProjects() {
@@ -81,7 +89,7 @@ class MainViewModel(
         mainRepository.getProjectsFromRemote("Bearer ${context.getIdToken()}")
             .enqueue(object : Callback<List<ProjectResponse>> {
                 override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
-                    if (context.isNetworkAvailable()) {
+                    if (!context.isNetworkAvailable()) {
                         projects.postValue(
                             Resource.error(
                                 context.getString(R.string.network_not_available),
@@ -151,7 +159,7 @@ class MainViewModel(
         mainRepository.getDeletedProjectsFromRemote("Bearer ${context.getIdToken()}")
             .enqueue(object : Callback<List<ProjectResponse>> {
                 override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
-                    if (context.isNetworkAvailable()) {
+                    if (!context.isNetworkAvailable()) {
                         projects.postValue(
                             Resource.error(
                                 context.getString(R.string.network_not_available),
@@ -167,7 +175,7 @@ class MainViewModel(
                 ) {
                     if (response.isSuccessful) {
                         response.body()?.let { projectsRes ->
-                            mainRepository.removeProjectFromLocal(projectsRes.map { it.id!! }) // remove project with these coreIds
+                            mainRepository.removeProjectFromLocal(projectsRes) // remove project with these coreIds
                             projects.postValue(Resource.success(null)) // no need to send project data
                         }
                     } else {
@@ -182,7 +190,7 @@ class MainViewModel(
             })
     }
 
-    fun getStreamAssets(site: Locate) {
+    fun getStreamAssets(site: Stream) {
         tracks.postValue(Resource.loading(null))
         mainRepository.getStreamAssets("Bearer ${context.getIdToken()}", site.serverId!!)
             .enqueue(object : Callback<List<DeploymentAssetResponse>> {
@@ -238,21 +246,20 @@ class MainViewModel(
     }
 
     fun combinedData() {
-        var deploymentsForShow = this.deployments.filter { it.isCompleted() }
-        val usedSites = deploymentsForShow.map { it.stream?.coreId }
-        var filteredShowLocations =
-            sites.filter { loc -> !usedSites.contains(loc.serverId) || loc.serverId == null }
-        val projectName = getProjectName()
-        if (projectName != context.getString(R.string.none)) {
-            filteredShowLocations =
-                filteredShowLocations.filter { it.locationGroup?.name == projectName && it.lastDeploymentId == 0 }
-            deploymentsForShow =
-                deploymentsForShow.filter { it.stream?.project?.name == projectName }
-        }
-        val deploymentMarkersList = deploymentsForShow.map { it.toMark(context) }
-        deploymentMarkers.postValue(Resource.success(deploymentMarkersList))
-        siteMarkers.postValue(Resource.success(filteredShowLocations.map { it.toMark() }))
-        showDeployments.postValue(Resource.success(deploymentsForShow))
+        val projectId = getSelectedProjectId()
+        val filteredStreams = this.streams.filter { it.project?.id == projectId }
+        streamList.postValue(filteredStreams)
+
+        val streams = filteredStreams.filter { it.deployments.isNullOrEmpty() }
+        streamMarkers.postValue(streams.map { it.toMark() })
+
+        val deployments =
+            filteredStreams.mapNotNull { it.deployments }.flatten().filter { it.isCompleted() }
+        val deploymentMarkersList = deployments.map { it.toMark(context) }
+        deploymentMarkers.postValue(deploymentMarkersList)
+
+        val unsyncedDeployments = deployments.filter { it.isUnsynced() }
+        unsyncedWorksCount.postValue(unsyncedDeployments.size + this.registrationCount)
     }
 
     fun updateStatusOfflineMap() {
@@ -284,33 +291,35 @@ class MainViewModel(
                         context?.resources?.displayMetrics?.density ?: 0.0F
                     )
 
-                    offlineManager?.createOfflineRegion(definition, regionName.toByteArray(),
+                    offlineManager?.createOfflineRegion(
+                        definition, regionName.toByteArray(),
                         object : OfflineManager.CreateOfflineRegionCallback {
                             override fun onCreate(offlineRegion: OfflineRegion) {
                                 offlineRegion.getStatus(object :
-                                    OfflineRegion.OfflineRegionStatusCallback {
-                                    override fun onStatus(status: OfflineRegionStatus?) {
-                                        if (status == null) return
-                                        if (status.requiredResourceCount > 10000) {
-                                            mainRepository.updateOfflineState(
-                                                OfflineMapState.UNAVAILABLE.key,
-                                                project.serverId ?: ""
-                                            )
-                                        } else {
-                                            mainRepository.updateOfflineState(
-                                                OfflineMapState.DOWNLOAD_STATE.key,
-                                                project.serverId ?: ""
-                                            )
+                                        OfflineRegion.OfflineRegionStatusCallback {
+                                        override fun onStatus(status: OfflineRegionStatus?) {
+                                            if (status == null) return
+                                            if (status.requiredResourceCount > 10000) {
+                                                mainRepository.updateOfflineState(
+                                                    OfflineMapState.UNAVAILABLE.key,
+                                                    project.serverId ?: ""
+                                                )
+                                            } else {
+                                                mainRepository.updateOfflineState(
+                                                    OfflineMapState.DOWNLOAD_STATE.key,
+                                                    project.serverId ?: ""
+                                                )
+                                            }
+                                            deleteOfflineRegion(project, offlineManager)
                                         }
-                                        deleteOfflineRegion(project, offlineManager)
-                                    }
 
-                                    override fun onError(error: String?) {}
-                                })
+                                        override fun onError(error: String?) {}
+                                    })
                             }
 
                             override fun onError(error: String) {}
-                        })
+                        }
+                    )
                 }
             }
         }
@@ -342,11 +351,11 @@ class MainViewModel(
         return jsonObject.getString("regionName")
     }
 
-    private fun getProjectName(): String {
+    private fun getSelectedProjectId(): Int {
         val preferences = Preferences.getInstance(context)
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
         val project = mainRepository.getProjectById(projectId)
-        return project?.name ?: context.getString(R.string.none)
+        return project?.id ?: 0
     }
 
     fun retrieveLocations() {
@@ -360,20 +369,20 @@ class MainViewModel(
         return projects
     }
 
-    fun getDeploymentMarkers(): LiveData<Resource<List<MapMarker.DeploymentMarker>>> {
+    fun getDeploymentMarkers(): LiveData<List<MapMarker.DeploymentMarker>> {
         return deploymentMarkers
     }
 
-    fun getSiteMarkers(): LiveData<Resource<List<MapMarker>>> {
-        return siteMarkers
+    fun getStreamMarkers(): LiveData<List<MapMarker>> {
+        return streamMarkers
     }
 
-    fun getSites(): LiveData<Resource<List<Locate>>> {
-        return siteList
+    fun getUnsyncedWorks(): LiveData<Int> {
+        return unsyncedWorksCount
     }
 
-    fun getShowDeployments(): LiveData<Resource<List<Deployment>>> {
-        return showDeployments
+    fun getStreams(): LiveData<List<Stream>> {
+        return streamList
     }
 
     fun getTrackingFromRemote(): LiveData<Resource<List<DeploymentAssetResponse>>> {
@@ -396,12 +405,8 @@ class MainViewModel(
         return mainRepository.getDeploymentById(id)
     }
 
-    fun getLocateByName(name: String): Locate? {
-        return mainRepository.getLocateByName(name)
-    }
-
-    fun getLocateById(id: Int): Locate? {
-        return mainRepository.getLocateById(id)
+    fun getStreamById(id: Int): Stream? {
+        return mainRepository.getStreamById(id)
     }
 
     fun getTrackingFileBySiteId(id: Int): RealmResults<TrackingFile> {
@@ -421,7 +426,7 @@ class MainViewModel(
     }
 
     fun onDestroy() {
+        streamLiveData.removeObserver(streamObserve)
         deploymentLiveData.removeObserver(deploymentObserve)
-        siteLiveData.removeObserver(siteObserve)
     }
 }

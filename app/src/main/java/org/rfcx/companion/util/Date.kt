@@ -23,6 +23,13 @@ private val outputStandardDateSdf by lazy {
     sdf.timeZone = TimeZone.getDefault()
     sdf
 }
+
+private val outputStandardDateSdfEng by lazy {
+    val sdf = SimpleDateFormat(standardDateFormat, Locale.ENGLISH)
+    sdf.timeZone = TimeZone.getDefault()
+    sdf
+}
+
 private val outputDateSdf by lazy {
     val sdf = SimpleDateFormat(dateFormat, Locale.getDefault())
     sdf.timeZone = TimeZone.getDefault()
@@ -41,8 +48,12 @@ private val isoSdf by lazy {
     sdf
 }
 
-fun Date.toDateTimeString(): String {
-    return outputStandardDateSdf.format(this)
+fun Date.toDateTimeString(timeZone: String? = null): String {
+    val sdf = SimpleDateFormat(standardDateFormat, Locale.ENGLISH)
+    if (timeZone != null) {
+        sdf.timeZone = TimeZone.getTimeZone(timeZone)
+    }
+    return sdf.format(this)
 }
 
 fun Date.toDateString(): String {
@@ -71,6 +82,11 @@ fun String.toDate(): Date {
 
 fun Date.toISO8601Format(): String {
     return iso8601DateSdf.format(this)
+}
+
+fun timestampToDateString(timestamp: Long?): String {
+    if (timestamp == null) return "-"
+    return outputStandardDateSdfEng.format(Date(timestamp))
 }
 
 @SuppressLint("SimpleDateFormat")

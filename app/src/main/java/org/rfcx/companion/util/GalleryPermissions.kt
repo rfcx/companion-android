@@ -37,16 +37,20 @@ class GalleryPermissions(val activity: Activity) {
     fun handleRequestResult(requestCode: Int, grantResults: IntArray) {
         if (requestCode == REQUEST_PERMISSIONS_READ_STORAGE) {
             if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                val shouldProvideRationale = ActivityCompat.shouldShowRequestPermissionRationale(activity,
-                    Manifest.permission.READ_EXTERNAL_STORAGE)
+                val shouldProvideRationale = ActivityCompat.shouldShowRequestPermissionRationale(
+                    activity,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                )
                 if (!shouldProvideRationale) {
                     val dialogBuilder: AlertDialog.Builder =
                         AlertDialog.Builder(activity).apply {
                             setTitle(null)
                             setMessage(R.string.read_storage_permission_msg)
                             setPositiveButton(R.string.go_to_setting) { _, _ ->
-                                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                                    Uri.parse("package:${activity.packageName}"))
+                                val intent = Intent(
+                                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                    Uri.parse("package:${activity.packageName}")
+                                )
                                 intent.addCategory(Intent.CATEGORY_DEFAULT)
                                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                                 activity.startActivity(intent)

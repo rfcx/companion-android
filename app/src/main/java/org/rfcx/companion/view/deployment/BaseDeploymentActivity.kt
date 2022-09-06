@@ -7,8 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
-import org.rfcx.companion.entity.DeploymentLocation
-import org.rfcx.companion.entity.Locate
+import org.rfcx.companion.entity.Stream
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
@@ -19,20 +18,20 @@ import org.rfcx.companion.view.deployment.sync.NewSyncFragment
 import org.rfcx.companion.view.detail.MapPickerProtocol
 import org.rfcx.companion.view.dialog.CompleteListener
 import org.rfcx.companion.view.dialog.SiteLoadingDialogFragment
-import java.util.*
 
-abstract class BaseDeploymentActivity : AppCompatActivity(), CompleteListener,
-    BaseDeploymentProtocol, MapPickerProtocol {
+abstract class BaseDeploymentActivity :
+    AppCompatActivity(),
+    CompleteListener,
+    BaseDeploymentProtocol,
+    MapPickerProtocol {
 
     var _deployment: Deployment? = null
-    var _deployLocation: DeploymentLocation? = null
     var _images: List<String> = listOf()
-    var _locate: Locate? = null
-    var _siteItems = arrayListOf<SiteWithLastDeploymentItem>()
+    var _stream: Stream? = null
+    var _siteItems = listOf<SiteWithLastDeploymentItem>()
 
     var latitude = 0.0
     var longitude = 0.0
-    var nameLocation: String = ""
     var siteId: Int = 0
 
     var currentCheckName = ""
@@ -69,25 +68,39 @@ abstract class BaseDeploymentActivity : AppCompatActivity(), CompleteListener,
             .commit()
     }
 
-    private fun setLatLng(latitude: Double, longitude: Double, siteId: Int, name: String) {
+    private fun setLatLng(latitude: Double, longitude: Double, siteId: Int) {
         this.latitude = latitude
         this.longitude = longitude
         this.siteId = siteId
-        this.nameLocation = name
     }
 
-    override fun startMapPicker(latitude: Double, longitude: Double, siteId: Int, name: String) {
-        setLatLng(latitude, longitude, siteId, name)
-        startFragment(MapPickerFragment.newInstance(latitude, longitude, siteId, name))
+    override fun startMapPicker(
+        latitude: Double,
+        longitude: Double,
+        altitude: Double,
+        streamId: Int,
+        streamName: String
+    ) {
+        setLatLng(latitude, longitude, streamId)
+        startFragment(MapPickerFragment.newInstance(latitude, longitude, altitude, streamId, streamName))
     }
 
-    override fun startDetailDeploymentSite(id: Int, name: String?, isNewSite: Boolean) {
-        startFragment(DetailDeploymentSiteFragment.newInstance(id, name, isNewSite))
+    override fun startDetailDeploymentSite(id: Int, streamName: String, isNewSite: Boolean) {
+        startFragment(DetailDeploymentSiteFragment.newInstance(id, streamName, isNewSite))
     }
 
-    override fun getDeploymentLocation(): DeploymentLocation? = this._deployLocation
+    override fun startDetailDeploymentSite(
+        lat: Double,
+        lng: Double,
+        siteId: Int,
+        siteName: String
+    ) {
+        startFragment(DetailDeploymentSiteFragment.newInstance(lat, lng, siteId, siteName))
+    }
 
-    override fun getSiteItem(): ArrayList<SiteWithLastDeploymentItem> = this._siteItems
+    override fun getDeploymentStream(): Stream? = this._stream
+
+    override fun getSiteItem(): List<SiteWithLastDeploymentItem> = this._siteItems
 
     override fun getImages(): List<String> {
         return this._images
@@ -100,7 +113,7 @@ abstract class BaseDeploymentActivity : AppCompatActivity(), CompleteListener,
         this.currentLocate = location
     }
 
-    override fun setSiteItem(items: ArrayList<SiteWithLastDeploymentItem>) {
+    override fun setSiteItem(items: List<SiteWithLastDeploymentItem>) {
         this._siteItems = items
     }
 

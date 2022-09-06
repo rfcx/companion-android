@@ -70,8 +70,8 @@ class LoginViewModel(
             .setScope(context.getString(R.string.auth0_scopes))
             .setAudience(context.getString(R.string.auth0_audience))
             .start(object : BaseCallback<Credentials, AuthenticationException> {
-                override fun onSuccess(credentials: Credentials) {
-                    when (val result = CredentialVerifier(context).verify(credentials)) {
+                override fun onSuccess(credentials: Credentials?) {
+                    when (val result = CredentialVerifier(context).verify(credentials!!)) {
                         is Err -> {
                             loginWithEmailPassword.postValue(Resource.error(result.error, null))
                         }
@@ -82,51 +82,11 @@ class LoginViewModel(
                 }
 
                 override fun onFailure(exception: AuthenticationException) {
+                    val errorText =
+                        if (exception.description == "Wrong email or password.") context.getString(R.string.incorrect_username_or_password) else exception.description
                     loginWithEmailPassword.postValue(
-                        Resource.error(
-                            context.getString(R.string.error_has_occurred),
-                            null
-                        )
+                        Resource.error(errorText, null)
                     )
-                }
-            })
-    }
-
-    fun loginWithFacebook(activity: Activity) {
-        webAuthentication
-            .withConnection("facebook")
-            .withScope(context.getString(R.string.auth0_scopes))
-            .withScheme(context.getString(R.string.auth0_scheme))
-            .withAudience(context.getString(R.string.auth0_audience))
-            .start(activity, object : AuthCallback {
-                override fun onFailure(dialog: Dialog) {
-                    loginWithFacebook.postValue(
-                        Resource.error(
-                            context.getString(R.string.error_has_occurred),
-                            null
-                        )
-                    )
-                }
-
-                override fun onFailure(exception: AuthenticationException) {
-                    loginWithFacebook.postValue(
-                        Resource.error(
-                            context.getString(R.string.error_has_occurred),
-                            null
-                        )
-                    )
-                    exception.printStackTrace()
-                }
-
-                override fun onSuccess(credentials: Credentials) {
-                    when (val result = CredentialVerifier(context).verify(credentials)) {
-                        is Err -> {
-                            loginWithFacebook.postValue(Resource.error(result.error, null))
-                        }
-                        is Ok -> {
-                            loginWithFacebook.postValue(Resource.success(result.value))
-                        }
-                    }
                 }
             })
     }
@@ -137,75 +97,37 @@ class LoginViewModel(
             .withScope(context.getString(R.string.auth0_scopes))
             .withScheme(context.getString(R.string.auth0_scheme))
             .withAudience(context.getString(R.string.auth0_audience))
-            .start(activity, object : AuthCallback {
-                override fun onFailure(dialog: Dialog) {
-                    loginWithGoogle.postValue(
-                        Resource.error(
-                            context.getString(R.string.error_has_occurred),
-                            null
+            .start(
+                activity,
+                object : AuthCallback {
+                    override fun onFailure(dialog: Dialog) {
+                        loginWithGoogle.postValue(
+                            Resource.error(
+                                context.getString(R.string.login_failed),
+                                null
+                            )
                         )
-                    )
-                }
+                    }
 
-                override fun onFailure(exception: AuthenticationException) {
-                    loginWithGoogle.postValue(
-                        Resource.error(
-                            context.getString(R.string.error_has_occurred),
-                            null
+                    override fun onFailure(exception: AuthenticationException) {
+                        loginWithGoogle.postValue(
+                            Resource.error(exception.description, null)
                         )
-                    )
-                    exception.printStackTrace()
-                }
+                        exception.printStackTrace()
+                    }
 
-                override fun onSuccess(credentials: Credentials) {
-                    when (val result = CredentialVerifier(context).verify(credentials)) {
-                        is Err -> {
-                            loginWithGoogle.postValue(Resource.error(result.error, null))
-                        }
-                        is Ok -> {
-                            loginWithGoogle.postValue(Resource.success(result.value))
+                    override fun onSuccess(credentials: Credentials) {
+                        when (val result = CredentialVerifier(context).verify(credentials)) {
+                            is Err -> {
+                                loginWithGoogle.postValue(Resource.error(result.error, null))
+                            }
+                            is Ok -> {
+                                loginWithGoogle.postValue(Resource.success(result.value))
+                            }
                         }
                     }
                 }
-            })
-    }
-
-    fun loginMagicLink(activity: Activity) {
-        webAuthentication
-            .withConnection("")
-            .withScope(context.getString(R.string.auth0_scopes))
-            .withScheme(context.getString(R.string.auth0_scheme))
-            .withAudience(context.getString(R.string.auth0_audience))
-            .start(activity, object : AuthCallback {
-                override fun onFailure(dialog: Dialog) {
-                    loginWithPhoneNumber.postValue(
-                        Resource.error(
-                            context.getString(R.string.error_has_occurred),
-                            null
-                        )
-                    )
-                }
-
-                override fun onFailure(exception: AuthenticationException) {
-                    loginWithPhoneNumber.postValue(
-                        Resource.error(
-                            context.getString(R.string.error_has_occurred),
-                            null
-                        )
-                    )
-                }
-
-                override fun onSuccess(credentials: Credentials) {
-                    when (val result = CredentialVerifier(context).verify(credentials)) {
-                        is Err -> {
-                            loginWithPhoneNumber.postValue(Resource.error(result.error, null))
-                        }
-                        is Ok -> {
-                            loginWithPhoneNumber.postValue(Resource.success(result.value))
-                        }
-                    }
-                }
-            })
+            )
     }
 
     fun userTouch(result: UserAuthResponse) {
@@ -215,7 +137,7 @@ class LoginViewModel(
                 override fun onFailure(call: Call<UserTouchResponse>, t: Throwable) {
                     userTouch.postValue(
                         Resource.error(
-                            t.message ?: context.getString(R.string.error_has_occurred),
+                            t.message ?: context.getString(R.string.login_failed),
                             null
                         )
                     )
@@ -232,7 +154,7 @@ class LoginViewModel(
                         } else {
                             userTouch.postValue(
                                 Resource.error(
-                                    context.getString(R.string.error_has_occurred),
+                                    context.getString(R.string.login_failed),
                                     null
                                 )
                             )
@@ -248,7 +170,7 @@ class LoginViewModel(
                 override fun onFailure(call: Call<FirebaseAuthResponse>, t: Throwable) {
                     firebaseAuth.postValue(
                         Resource.error(
-                            context.getString(R.string.an_error_occurred),
+                            t.message ?: context.getString(R.string.firebase_authentication_failed),
                             null
                         )
                     )
@@ -260,7 +182,6 @@ class LoginViewModel(
                 ) {
                     response.body()?.let {
                         firebaseAuth.postValue(Resource.success(it.firebaseToken))
-
                     }
                 }
             })
@@ -277,11 +198,19 @@ class LoginViewModel(
                 } else {
                     signInWithFirebaseToken.postValue(
                         Resource.error(
-                            context.getString(R.string.an_error_occurred),
+                            context.getString(R.string.firebase_authentication_failed),
                             null
                         )
                     )
                 }
+            }
+            .addOnFailureListener {
+                signInWithFirebaseToken.postValue(
+                    Resource.error(
+                        it.message ?: context.getString(R.string.firebase_authentication_failed),
+                        null
+                    )
+                )
             }
     }
 

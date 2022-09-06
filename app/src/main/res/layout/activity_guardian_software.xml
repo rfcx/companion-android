@@ -27,7 +27,7 @@
         <TextView
             android:id="@+id/adminRole"
             style="@style/AudioMothText.SubTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
             android:padding="@dimen/margin_padding_normal"
@@ -45,6 +45,20 @@
             android:background="?attr/selectableItemBackground"
             android:padding="@dimen/margin_padding_normal"
             android:text="@string/not_found_software"
+            app:layout_constraintBottom_toBottomOf="@id/adminRole"
+            app:layout_constraintStart_toEndOf="@id/guidelineVertical"
+            app:layout_constraintTop_toTopOf="@id/adminRole" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/adminRoleDeleteButton"
+            style="@style/GuardianButton.RedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_marginStart="@dimen/margin_padding_small"
+            android:minWidth="120dp"
+            android:text="@string/delete_from_local"
+            android:textSize="@dimen/text_xxsmall"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/adminRole"
             app:layout_constraintStart_toEndOf="@id/guidelineVertical"
             app:layout_constraintTop_toTopOf="@id/adminRole" />
@@ -113,6 +127,20 @@
             app:layout_constraintTop_toTopOf="@id/classifyRole" />
 
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/classifyRoleDeleteButton"
+            style="@style/GuardianButton.RedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_marginStart="@dimen/margin_padding_small"
+            android:minWidth="120dp"
+            android:text="@string/delete_from_local"
+            android:textSize="@dimen/text_xxsmall"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/classifyRole"
+            app:layout_constraintStart_toEndOf="@id/guidelineVertical"
+            app:layout_constraintTop_toTopOf="@id/classifyRole" />
+
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/classifyDownloadButton"
             style="@style/OfflineMapButton"
             android:layout_width="wrap_content"
@@ -176,6 +204,20 @@
             app:layout_constraintTop_toTopOf="@id/guardianRole" />
 
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/guardianRoleDeleteButton"
+            style="@style/GuardianButton.RedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_marginStart="@dimen/margin_padding_small"
+            android:minWidth="120dp"
+            android:text="@string/delete_from_local"
+            android:textSize="@dimen/text_xxsmall"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/guardianRole"
+            app:layout_constraintStart_toEndOf="@id/guidelineVertical"
+            app:layout_constraintTop_toTopOf="@id/guardianRole" />
+
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/guardianDownloadButton"
             style="@style/OfflineMapButton"
             android:layout_width="wrap_content"
@@ -234,6 +276,20 @@
             android:background="?attr/selectableItemBackground"
             android:padding="@dimen/margin_padding_normal"
             android:text="@string/not_found_software"
+            app:layout_constraintBottom_toBottomOf="@id/updaterRole"
+            app:layout_constraintStart_toEndOf="@id/guidelineVertical"
+            app:layout_constraintTop_toTopOf="@id/updaterRole" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/updaterRoleDeleteButton"
+            style="@style/GuardianButton.RedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_marginStart="@dimen/margin_padding_small"
+            android:minWidth="120dp"
+            android:text="@string/delete_from_local"
+            android:textSize="@dimen/text_xxsmall"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/updaterRole"
             app:layout_constraintStart_toEndOf="@id/guidelineVertical"
             app:layout_constraintTop_toTopOf="@id/updaterRole" />

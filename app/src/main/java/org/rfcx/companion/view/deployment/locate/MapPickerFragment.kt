@@ -19,7 +19,6 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.toColorInt
 import androidx.fragment.app.Fragment
 import com.mapbox.android.core.location.*
 import com.mapbox.mapboxsdk.Mapbox
@@ -34,8 +33,6 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.pluginscalebar.ScaleBarOptions
 import com.mapbox.pluginscalebar.ScaleBarPlugin
-import java.util.*
-import kotlin.concurrent.schedule
 import kotlinx.android.synthetic.main.fragment_map_picker.*
 import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.R
@@ -46,8 +43,12 @@ import org.rfcx.companion.util.latitudeCoordinates
 import org.rfcx.companion.util.longitudeCoordinates
 import org.rfcx.companion.view.detail.EditLocationActivityListener
 import org.rfcx.companion.view.detail.MapPickerProtocol
+import java.util.*
+import kotlin.concurrent.schedule
 
-class MapPickerFragment : Fragment(), OnMapReadyCallback,
+class MapPickerFragment :
+    Fragment(),
+    OnMapReadyCallback,
     SearchResultFragment.OnSearchResultListener {
     private var mapboxMap: MapboxMap? = null
     private lateinit var mapView: MapView
@@ -143,8 +144,8 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
             latitude = it.getDouble(ARG_LATITUDE)
             longitude = it.getDouble(ARG_LONGITUDE)
             altitude = it.getDouble(ARG_ALTITUDE)
-            nameLocation = it.getString(ARG_LOCATION_NAME)
-            siteId = it.getInt(ARG_SITE_ID)
+            nameLocation = it.getString(ARG_STREAM_NAME)
+            siteId = it.getInt(ARG_STREAM_ID)
         }
     }
 
@@ -448,33 +449,34 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback,
         private const val ARG_LATITUDE = "ARG_LATITUDE"
         private const val ARG_LONGITUDE = "ARG_LONGITUDE"
         private const val ARG_ALTITUDE = "ARG_ALTITUDE"
-        private const val ARG_LOCATION_NAME = "ARG_LOCATION_NAME"
-        private const val ARG_SITE_ID = "ARG_SITE_ID"
+        private const val ARG_STREAM_ID = "ARG_STREAM_ID"
+        private const val ARG_STREAM_NAME = "ARG_STREAM_NAME"
 
         const val REQUEST_PERMISSIONS_REQUEST_CODE = 34
         const val DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L
         const val DEFAULT_MAX_WAIT_TIME = DEFAULT_INTERVAL_IN_MILLISECONDS * 5
 
         @JvmStatic
-        fun newInstance(lat: Double, lng: Double, altitude: Double, name: String) =
+        fun newInstance(lat: Double, lng: Double, altitude: Double, id: Int, name: String) =
             MapPickerFragment()
                 .apply {
                     arguments = Bundle().apply {
                         putDouble(ARG_LATITUDE, lat)
                         putDouble(ARG_LONGITUDE, lng)
                         putDouble(ARG_ALTITUDE, altitude)
-                        putString(ARG_LOCATION_NAME, name)
+                        putInt(ARG_STREAM_ID, id)
+                        putString(ARG_STREAM_NAME, name)
                     }
                 }
 
-        fun newInstance(lat: Double, lng: Double, siteId: Int, name: String) =
+        fun newInstance(lat: Double, lng: Double, altitude: Double, id: Int) =
             MapPickerFragment()
                 .apply {
                     arguments = Bundle().apply {
                         putDouble(ARG_LATITUDE, lat)
                         putDouble(ARG_LONGITUDE, lng)
-                        putString(ARG_LOCATION_NAME, name)
-                        putInt(ARG_SITE_ID, siteId)
+                        putDouble(ARG_ALTITUDE, altitude)
+                        putInt(ARG_STREAM_ID, id)
                     }
                 }
     }

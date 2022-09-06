@@ -11,8 +11,8 @@ import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.isGuest
 
-class LocationGroupAdapter(private val locationGroupListener: LocationGroupListener) :
-    RecyclerView.Adapter<LocationGroupAdapter.LocationGroupAdapterViewHolder>() {
+class ProjectAdapter(private val projectListener: ProjectListener) :
+    RecyclerView.Adapter<ProjectAdapter.ProjectViewHolder>() {
     var selectedGroup: String = ""
     var screen: String = ""
     var items: List<Project> = arrayListOf()
@@ -24,23 +24,23 @@ class LocationGroupAdapter(private val locationGroupListener: LocationGroupListe
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): LocationGroupAdapterViewHolder {
+    ): ProjectViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.item_location_group, parent, false)
-        return LocationGroupAdapterViewHolder(view)
+        return ProjectViewHolder(view)
     }
 
     override fun getItemCount(): Int = items.size
 
-    override fun onBindViewHolder(holder: LocationGroupAdapterViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ProjectViewHolder, position: Int) {
         holder.bind(items[position])
         holder.itemView.setOnClickListener {
-            locationGroupListener.onClicked(items[position])
+            projectListener.onClicked(items[position])
         }
     }
 
-    inner class LocationGroupAdapterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val locationGroupTextView = itemView.locationGroupTextView
+    inner class ProjectViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val projectTextView = itemView.locationGroupTextView
         private val checkImageView = itemView.checkImageView
         private val lockImageView = itemView.lockImageView
 
@@ -50,23 +50,27 @@ class LocationGroupAdapter(private val locationGroupListener: LocationGroupListe
                     if (project.name == selectedGroup) View.VISIBLE else View.GONE
             }
 
-            locationGroupTextView.text = project.name ?: itemView.context.getString(R.string.none)
+            projectTextView.text = project.name ?: itemView.context.getString(R.string.none)
 
             lockImageView.visibility =
                 if (project.isGuest()) View.VISIBLE else View.GONE
             setClickable(itemView, project.isGuest())
 
             if (project.isGuest()) {
-                locationGroupTextView.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_secondary))
+                projectTextView.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_secondary))
             } else {
-                locationGroupTextView.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_black))
+                projectTextView.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_black))
             }
 
-            lockImageView.setColorFilter(ContextCompat.getColor(itemView.context,
-                R.color.text_secondary))
+            lockImageView.setColorFilter(
+                ContextCompat.getColor(
+                    itemView.context,
+                    R.color.text_secondary
+                )
+            )
 
             lockImageView.setOnClickListener {
-                locationGroupListener.onLockImageClicked()
+                projectListener.onLockImageClicked()
             }
         }
     }
@@ -84,7 +88,7 @@ class LocationGroupAdapter(private val locationGroupListener: LocationGroupListe
     }
 }
 
-interface LocationGroupListener {
-    fun onClicked(group: Project)
+interface ProjectListener {
+    fun onClicked(project: Project)
     fun onLockImageClicked()
 }

@@ -1,6 +1,6 @@
 package org.rfcx.companion.repo.api
 
-//TODO: Convert Old device api to MVVM pattern
+// TODO: Convert Old device api to MVVM pattern
 
 class DeviceApiHelper(private val deviceApiService: DeviceApiService) {
     fun getProjects(
@@ -26,5 +26,7 @@ class DeviceApiHelper(private val deviceApiService: DeviceApiService) {
     ) = deviceApiService.getStreamAssets(token, id)
 
     fun userTouch(token: String) = deviceApiService.userTouch(token)
-}
 
+    fun checkAvailableClassifier(authUser: String) = deviceApiService.checkAvailableClassifiers(authUser)
+    fun downloadAPK(url: String) = deviceApiService.downloadFile(url)
+}

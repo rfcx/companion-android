@@ -36,7 +36,6 @@ class ApiManager {
             setRetrofitBaseUrl(BuildConfig.DEVICE_API_DOMAIN).create(DeviceApiService::class.java)
     }
 
-
     fun getDeviceApi(): DeviceApiInterface = deviceApi
 
     fun getDeviceApi2(): DeviceApiService = deviceApi2

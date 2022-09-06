@@ -9,22 +9,26 @@ import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.ble.BleHelper
 import org.rfcx.companion.repo.local.LocalDataHelper
-import org.rfcx.companion.view.profile.guardiansoftware.repository.GuardianSoftwareRepository
-import org.rfcx.companion.view.profile.guardiansoftware.viewmodel.GuardianSoftwareViewModel
-import org.rfcx.companion.view.deployment.AudioMothDeploymentRepository
-import org.rfcx.companion.view.deployment.AudioMothDeploymentViewModel
 import org.rfcx.companion.view.LoginRepository
 import org.rfcx.companion.view.LoginViewModel
 import org.rfcx.companion.view.deployment.songmeter.repository.SongMeterRepository
 import org.rfcx.companion.view.deployment.songmeter.viewmodel.SongMeterViewModel
 import org.rfcx.companion.view.detail.EditLocationRepository
 import org.rfcx.companion.view.detail.EditLocationViewModel
+import org.rfcx.companion.view.deployment.AudioMothDeploymentRepository
+import org.rfcx.companion.view.deployment.AudioMothDeploymentViewModel
 import org.rfcx.companion.view.detail.DeploymentDetailRepository
 import org.rfcx.companion.view.detail.DeploymentDetailViewModel
+import org.rfcx.companion.view.profile.classifier.repository.GuardianClassifierRepository
+import org.rfcx.companion.view.profile.classifier.viewmodel.GuardianClassifierViewModel
+import org.rfcx.companion.view.profile.guardiansoftware.repository.GuardianSoftwareRepository
+import org.rfcx.companion.view.profile.guardiansoftware.viewmodel.GuardianSoftwareViewModel
 import org.rfcx.companion.view.profile.offlinemap.ProjectOfflineMapRepository
 import org.rfcx.companion.view.profile.offlinemap.ProjectOfflineMapViewModel
 import org.rfcx.companion.view.project.repository.ProjectSelectRepository
 import org.rfcx.companion.view.project.viewmodel.ProjectSelectViewModel
+import org.rfcx.companion.view.unsynced.UnsyncedWorksRepository
+import org.rfcx.companion.view.unsynced.UnsyncedWorksViewModel
 
 class ViewModelFactory(
     private val application: Application,
@@ -42,7 +46,10 @@ class ViewModelFactory(
                 ) as T
             }
             modelClass.isAssignableFrom(MainViewModel::class.java) -> {
-                return MainViewModel(application, MainRepository(deviceApiHelper, localDataHelper)) as T
+                return MainViewModel(
+                    application,
+                    MainRepository(deviceApiHelper, localDataHelper)
+                ) as T
             }
             modelClass.isAssignableFrom(ProjectOfflineMapViewModel::class.java) -> {
                 return ProjectOfflineMapViewModel(
@@ -51,16 +58,46 @@ class ViewModelFactory(
                 ) as T
             }
             modelClass.isAssignableFrom(GuardianSoftwareViewModel::class.java) -> {
-                return GuardianSoftwareViewModel(application, GuardianSoftwareRepository(coreApiHelper)) as T
+                return GuardianSoftwareViewModel(
+                    application,
+                    GuardianSoftwareRepository(coreApiHelper)
+                ) as T
             }
             modelClass.isAssignableFrom(LoginViewModel::class.java) -> {
-                return LoginViewModel(application, LoginRepository(deviceApiHelper, localDataHelper)) as T
+                return LoginViewModel(
+                    application,
+                    LoginRepository(deviceApiHelper, localDataHelper)
+                ) as T
             }
             modelClass.isAssignableFrom(AudioMothDeploymentViewModel::class.java) -> {
-                return AudioMothDeploymentViewModel(application, AudioMothDeploymentRepository(deviceApiHelper, localDataHelper)) as T
+                return AudioMothDeploymentViewModel(
+                    application,
+                    AudioMothDeploymentRepository(deviceApiHelper, localDataHelper)
+                ) as T
             }
             modelClass.isAssignableFrom(DeploymentDetailViewModel::class.java) -> {
-                return DeploymentDetailViewModel(application, DeploymentDetailRepository(deviceApiHelper, localDataHelper)) as T
+                return DeploymentDetailViewModel(
+                    application,
+                    DeploymentDetailRepository(deviceApiHelper, localDataHelper)
+                ) as T
+            }
+            modelClass.isAssignableFrom(UnsyncedWorksViewModel::class.java) -> {
+                return UnsyncedWorksViewModel(
+                    application,
+                    UnsyncedWorksRepository(deviceApiHelper, localDataHelper)
+                ) as T
+            }
+            modelClass.isAssignableFrom(EditLocationViewModel::class.java) -> {
+                return EditLocationViewModel(
+                    application,
+                    EditLocationRepository(deviceApiHelper, localDataHelper)
+                ) as T
+            }
+            modelClass.isAssignableFrom(GuardianClassifierViewModel::class.java) -> {
+                return GuardianClassifierViewModel(
+                    application,
+                    GuardianClassifierRepository(deviceApiHelper, localDataHelper)
+                ) as T
             }
             modelClass.isAssignableFrom(SongMeterViewModel::class.java) -> {
                 return SongMeterViewModel(

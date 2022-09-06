@@ -12,7 +12,7 @@ sealed class MapMarker {
         val projectName: String?,
         val createdAt: Date,
         val pin: String
-    ): MapMarker()
+    ) : MapMarker()
 
     data class DeploymentMarker(
         val id: Int,
@@ -27,5 +27,5 @@ sealed class MapMarker {
         val createdAt: Date,
         val deploymentAt: Date,
         val updatedAt: Date?
-    ): MapMarker()
+    ) : MapMarker()
 }

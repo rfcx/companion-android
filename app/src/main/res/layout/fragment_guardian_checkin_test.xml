@@ -67,6 +67,26 @@
             android:text="@string/dash"
             tools:text="12 seconds ago" />
 
+        <TextView
+            android:id="@+id/checkInQueueTextView"
+            style="@style/AudioMothText.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/in_queue"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_small"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/checkInQueueValueTextView"
+            style="@style/AudioMothText.Body.Secondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/margin_padding_small"
+            android:text="@string/dash"
+            android:visibility="gone"
+            tools:text="23 messages" />
+
     </LinearLayout>
 
     <TextView
@@ -85,10 +105,10 @@
         style="@style/AudioMothButton.GreenButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:enabled="false"
         android:layout_marginStart="@dimen/margin_padding_large"
         android:layout_marginEnd="@dimen/margin_padding_large"
         android:layout_marginBottom="@dimen/margin_padding_normal"
+        android:enabled="false"
         android:text="@string/next"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
