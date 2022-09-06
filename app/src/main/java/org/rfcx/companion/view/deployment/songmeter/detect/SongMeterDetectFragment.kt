@@ -74,10 +74,6 @@ class SongMeterDetectFragment: Fragment(), (Advertisement) -> Unit {
             adapter = songMeterAdapter
         }
 
-        retryScanButton.setOnClickListener {
-            songMeterViewModel.scanBle(true)
-        }
-
         connectSongMeterButton.setOnClickListener {
             deploymentProtocol?.redirectToConnectSongMeter(advertisement!!)
             songMeterViewModel.stopBle()
@@ -95,12 +91,10 @@ class SongMeterDetectFragment: Fragment(), (Advertisement) -> Unit {
         songMeterViewModel.observeAdvertisement().observe(viewLifecycleOwner, Observer {
             when (it.status) {
                 Status.LOADING -> {
-                    retryScanButton.isEnabled = false
                     songMeterLoading.show()
                 }
                 Status.SUCCESS -> {
                     if (it.data == null) {
-                        retryScanButton.isEnabled = true
                         songMeterLoading.hide()
                     } else {
                         songMeterSuggestTextView.visibility = View.GONE
