@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_padding_small"
-        android:text="Recorder name is RFCx site id"
+        android:text="Recorder name is used as audio file prefix name"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="@id/songMeterConnectTitle"
         app:layout_constraintTop_toBottomOf="@id/songMeterConnectTitle" />
