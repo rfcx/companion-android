@@ -111,6 +111,12 @@ object GuardianSocketManager {
         sendInstructionMessage(InstructionType.CTRL, InstructionCommand.SPEED_TEST)
     }
 
+    fun restartService(svc: String) {
+        val json = JsonObject()
+        json.addProperty("service", svc)
+        sendInstructionMessage(InstructionType.CTRL, InstructionCommand.RESTART, gson.toJson(json))
+    }
+
     fun sendInstructionMessage(type: InstructionType, command: InstructionCommand, meta: String = "{}") {
         val data = gson.toJson(InstructionMessage.toMessage(type, command, meta))
         sendMessage(data)
