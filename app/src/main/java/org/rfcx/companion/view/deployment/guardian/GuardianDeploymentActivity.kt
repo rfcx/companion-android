@@ -27,10 +27,7 @@ import org.rfcx.companion.connection.wifi.WifiLostListener
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.ClassifierLite
 import org.rfcx.companion.entity.guardian.Deployment
-import org.rfcx.companion.entity.socket.response.GuardianPing
-import org.rfcx.companion.entity.socket.response.I2CAccessibility
-import org.rfcx.companion.entity.socket.response.SentinelInfo
-import org.rfcx.companion.entity.socket.response.SpeedTest
+import org.rfcx.companion.entity.socket.response.*
 import org.rfcx.companion.localdb.*
 import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.util.*
@@ -96,6 +93,7 @@ class GuardianDeploymentActivity :
     private var guardianTimezone: String? = null
     private var classifiers: Map<String, ClassifierLite>? = null
     private var activeClassifiers: Map<String, ClassifierLite>? = null
+    private var audioCaptureStatus: AudioCaptureStatus? = null
 
     private var _sampleRate = 12000
 
@@ -279,6 +277,7 @@ class GuardianDeploymentActivity :
             _sampleRate = PingUtils.getSampleRateFromPrefs(it) ?: 12000
             classifiers = PingUtils.getClassifiers(it)
             activeClassifiers = PingUtils.getActiveClassifiers(it)
+            audioCaptureStatus = PingUtils.getAudioCaptureStatus(it)
         }
         AdminSocketManager.pingBlob.observeForever {
             network = PingUtils.getNetworkFromPing(it)
@@ -391,6 +390,8 @@ class GuardianDeploymentActivity :
     override fun getClassifiers(): Map<String, ClassifierLite>? = classifiers
 
     override fun getActiveClassifiers(): Map<String, ClassifierLite>? = activeClassifiers
+
+    override fun getAudioCapturing(): AudioCaptureStatus? = audioCaptureStatus
 
     override fun getCurrentProjectId(): String? {
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)

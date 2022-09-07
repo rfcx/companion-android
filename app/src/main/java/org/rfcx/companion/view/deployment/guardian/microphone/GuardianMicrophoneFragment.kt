@@ -66,6 +66,8 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
             it.setToolbarTitle()
         }
 
+        checkTestingRequirement()
+
         setupAudioTrack()
         setupSpectrogram()
         setupSpectrogramSpeed()
@@ -102,6 +104,24 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
             analytics?.trackClickNextEvent(Screen.GUARDIAN_MICROPHONE.id)
             deploymentProtocol?.nextStep()
         }
+    }
+
+    private fun checkTestingRequirement() {
+        deploymentProtocol?.getAudioCapturing()?.let {
+            if (!it.isCapturing) {
+                showAlert(it.msg ?: getString(R.string.unknown_error))
+            }
+        }
+    }
+
+    private fun showAlert(text: String) {
+        val dialogBuilder: AlertDialog.Builder =
+            AlertDialog.Builder(requireContext()).apply {
+                setTitle(null)
+                setMessage(text)
+                setPositiveButton(R.string.ok) { _, _ -> }
+            }
+        dialogBuilder.create().show()
     }
 
     private fun setupAudioTrack() {

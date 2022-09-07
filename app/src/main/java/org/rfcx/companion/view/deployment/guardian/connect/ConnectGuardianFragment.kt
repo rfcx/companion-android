@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_connect_guardian.*
@@ -20,6 +21,7 @@ import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.connection.wifi.OnWifiListener
 import org.rfcx.companion.connection.wifi.WifiHotspotManager
 import org.rfcx.companion.entity.Screen
+import org.rfcx.companion.entity.socket.response.GuardianPing
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.WifiHotspotUtils
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
@@ -33,7 +35,7 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
 
     private lateinit var countDownTimer: CountDownTimer
 
-    private var connectionCount = 0
+    private var pingLiveData: MutableLiveData<GuardianPing>? = null
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
@@ -54,6 +56,7 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
         super.onViewCreated(view, savedInstanceState)
 
         deploymentProtocol?.hideToolbar()
+        setObserve()
 
         retryCountdown(SCAN)
 
@@ -117,11 +120,13 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
 
     private fun checkConnection() {
         deploymentProtocol?.startPeriodicHeartbeat()
+    }
+
+    private fun setObserve() {
+        pingLiveData = GuardianSocketManager.pingBlob
         lifecycleScope.launch {
             withContext(Dispatchers.Main) {
-                GuardianSocketManager.pingBlob.observe(
-                    viewLifecycleOwner
-                ) {
+                pingLiveData?.observe(viewLifecycleOwner) {
                     requireActivity().runOnUiThread {
                         // So that we know ping is received
                         if (it.prefs != null) {
@@ -133,6 +138,15 @@ class ConnectGuardianFragment : Fragment(), OnWifiListener, (ScanResult) -> Unit
                 }
             }
         }
+    }
+
+    private fun unRegisterObserve() {
+        pingLiveData?.removeObservers(viewLifecycleOwner)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        unRegisterObserve()
     }
 
     private fun showLoading() {
