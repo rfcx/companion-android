@@ -433,7 +433,7 @@
 
     <!-- SongMeterCheckListFragment -->
     <string name="song_meter_checklist">SongMeter Setup Checklist:</string>
-    <string name="synchronize_with_song_meter">Synchronize with Song Meter</string>
+    <string name="synchronize_with_song_meter">Synchronize with SongMeter</string>
 
     <!-- ConnectInstructionDiaglogFragment -->
     <string name="got_it">Got It</string>
