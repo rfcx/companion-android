@@ -1,10 +1,14 @@
 package org.rfcx.companion.util.songmeter
 
+import android.util.Log
+
 class AdvertisementUtils {
 
     private val manufacturingCompanyIndexes = listOf(5, 6)
+    private val readyToPairIndex = 3
     private val beaconIdIndex = 7
     private val serialNumberIndexes = listOf(8, 10)
+    private val serialNumberIndexesWhenPair = listOf(7, 9)
     private val prefixIndexed = listOf(11, 15)
     private var telemetryPrefixes: String? = null
     private var timeRecordingPrefixes: String? = null
@@ -22,7 +26,13 @@ class AdvertisementUtils {
         val beaconIdBinary = beaconIdByte.toBinaryString()
         val payloadType = getPayloadType(beaconIdBinary)
 
+        Log.d("ADV", advertisement.contentToString())
+
         val prefixesBytes = advertisement.copyOfRange(prefixIndexed[0], prefixIndexed[1] + 1)
+        Log.d("ADV", prefixesBytes.contentToString())
+        Log.d("PAIR-ID", advertisement[readyToPairIndex].toBinaryString())
+        Log.d("Serial1", bytesToSerialNumber(advertisement.copyOfRange(serialNumberIndexes[0], serialNumberIndexes[1] + 1)))
+        Log.d("Serial2", bytesToSerialNumber(advertisement.copyOfRange(serialNumberIndexesWhenPair[0], serialNumberIndexesWhenPair[1] + 1)))
         when (payloadType.id) {
             PayloadType.Telemetry.id -> {
                 telemetryPrefixes = binaryToPrefixes(prefixesBytes.toBinaryString())

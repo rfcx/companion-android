@@ -239,6 +239,7 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
             it.isActive = true
             it.state = DeploymentState.SongMeter.ReadyToUpload.key
             it.deviceParameters = Gson().toJson(SongMeterParameters(songMeterId))
+            it.deploymentKey = "SM-$songMeterId"
             setDeployment(it)
 
             // set all deployments in stream to active false
