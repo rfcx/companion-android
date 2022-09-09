@@ -54,6 +54,17 @@ android {
             versionNameSuffix="-staging"
         }
     }
+    bundle {
+        language {
+            enableSplit = true
+        }
+        density {
+            enableSplit = true
+        }
+        abi {
+            enableSplit = true
+        }
+    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -84,6 +95,10 @@ dependencies {
     implementation 'androidx.work:work-runtime-ktx:2.7.1'
     implementation('com.journeyapps:zxing-android-embedded:4.1.0') { transitive = false }
     implementation 'com.google.zxing:core:3.3.0'
+
+    //in-app update
+    implementation 'com.google.android.play:app-update:2.0.0'
+    implementation 'com.google.android.play:app-update-ktx:2.0.0'
 
     //timeLineView
     implementation 'com.github.vipulasri:timelineview:1.1.5'
