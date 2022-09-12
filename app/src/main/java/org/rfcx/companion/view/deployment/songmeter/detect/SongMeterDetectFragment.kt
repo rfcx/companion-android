@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -25,7 +26,7 @@ import org.rfcx.companion.util.Status
 import org.rfcx.companion.view.deployment.songmeter.SongMeterDeploymentProtocol
 import org.rfcx.companion.view.deployment.songmeter.viewmodel.SongMeterViewModel
 
-class SongMeterDetectFragment: Fragment(), (Advertisement) -> Unit {
+class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
 
     private val songMeterAdapter by lazy { SongMeterAdapter(this) }
 
@@ -65,7 +66,11 @@ class SongMeterDetectFragment: Fragment(), (Advertisement) -> Unit {
         setViewModel()
         setupTopBar()
         setObserveAdvertisement()
-        songMeterViewModel.scanBle(true)
+        if (songMeterViewModel.isBluetoothEnabled()) {
+            songMeterViewModel.scanBle(true)
+        } else {
+            showAlertBluetooth()
+        }
 
         songMeterRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
@@ -77,6 +82,7 @@ class SongMeterDetectFragment: Fragment(), (Advertisement) -> Unit {
         deploymentProtocol?.let {
             it.showToolbar()
             it.setToolbarTitle()
+            it.setMenuToolbar(true)
         }
     }
 
@@ -94,9 +100,21 @@ class SongMeterDetectFragment: Fragment(), (Advertisement) -> Unit {
                         songMeterAdapter.items = it.data
                     }
                 }
-                Status.ERROR -> { }
+                Status.ERROR -> {}
             }
         })
+    }
+
+    private fun showAlertBluetooth() {
+        val dialogBuilder: AlertDialog.Builder =
+            AlertDialog.Builder(requireContext()).apply {
+                setTitle(null)
+                setMessage(R.string.alert_songmeter)
+                setPositiveButton(R.string.go_back) { _, _ ->
+                    deploymentProtocol?.backStep()
+                }
+            }
+        dialogBuilder.create().show()
     }
 
     override fun invoke(ads: Advertisement) {

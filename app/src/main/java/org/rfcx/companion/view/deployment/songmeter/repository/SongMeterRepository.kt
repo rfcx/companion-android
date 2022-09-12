@@ -52,6 +52,10 @@ class SongMeterRepository(
     ) = localDataHelper.getDeploymentImageLocalDb()
         .insertImage(deployment, attachImages)
 
+    fun isBluetoothEnabled(): Boolean {
+        return bleHelper.isBluetoothEnabled()
+    }
+
     fun scanBle(isEnabled: Boolean) {
         bleHelper.scanBle(isEnabled)
     }

@@ -3,6 +3,10 @@ package org.rfcx.companion.repo.ble
 import androidx.lifecycle.LiveData
 
 class BleHelper(private val detectService: BleDetectService, private val connectService: BleConnectDelegate) {
+    fun isBluetoothEnabled(): Boolean {
+        return detectService.isBluetoothEnabled()
+    }
+
     fun scanBle(isEnabled: Boolean) {
         detectService.scanBle(isEnabled)
     }

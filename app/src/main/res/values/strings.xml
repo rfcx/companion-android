@@ -499,6 +499,7 @@
     <string name="lower_not_allowed">lower not allowed</string>
     <string name="symbole_not_allowed">symbol not allowed</string>
     <string name="req_12_char">require 12 characters</string>
+    <string name="alert_songmeter">Bluetooth need to be enabled before doing this step</string>
 
 
     <string name="download_softwares_from_guardian_softwares_page_first">Download softwares from Guardian softwares page first\nProfile -> Guardian software -> Download APKs you needed</string>

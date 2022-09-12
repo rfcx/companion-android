@@ -127,6 +127,10 @@ class SongMeterViewModel(
         songMeterRepository.insertImage(deployment, attachImages)
     }
 
+    fun isBluetoothEnabled(): Boolean {
+        return songMeterRepository.isBluetoothEnabled()
+    }
+
     fun scanBle(isEnabled: Boolean) {
         songMeterRepository.scanBle(isEnabled)
     }

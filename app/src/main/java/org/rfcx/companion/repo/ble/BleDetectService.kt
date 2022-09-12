@@ -67,16 +67,22 @@ class BleDetectService(context: Context) {
 
     fun getAdvertisement() = advertisement
 
-    fun scanBle(isEnable: Boolean) {
-        val scanner = bluetoothAdapter.bluetoothLeScanner
+    fun isBluetoothEnabled(): Boolean {
+        return bluetoothAdapter.isEnabled
+    }
 
-        if (isEnable) {
-            advertisement.postValue(Resource.loading(null))
-            isScanning = true
-            scanner.startScan(scannerCallback)
-        } else {
-            isScanning = false
-            scanner.stopScan(scannerCallback)
+    fun scanBle(isEnable: Boolean) {
+        if (isBluetoothEnabled()) {
+            val scanner = bluetoothAdapter.bluetoothLeScanner
+
+            if (isEnable) {
+                advertisement.postValue(Resource.loading(null))
+                isScanning = true
+                scanner.startScan(scannerCallback)
+            } else {
+                isScanning = false
+                scanner.stopScan(scannerCallback)
+            }
         }
     }
 
