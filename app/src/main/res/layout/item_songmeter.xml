@@ -8,10 +8,11 @@
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/songMeterPrefixesTextView"
         style="@style/AudioMothText.Body.Secondary"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"
         android:paddingTop="@dimen/margin_padding_normal"
+        app:layout_constraintEnd_toStartOf="@id/songMeterPair"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="PREFIXES-METER" />
@@ -19,12 +20,27 @@
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/songMeterSerialNumberTextView"
         style="@style/AudioMothText.Body.Secondary"
-        android:textSize="@dimen/text_xxsmall"
-        android:background="?attr/selectableItemBackground"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/songMeterPrefixesTextView"
+        android:background="?attr/selectableItemBackground"
+        android:textSize="@dimen/text_xxsmall"
+        app:layout_constraintEnd_toStartOf="@id/songMeterPair"
         app:layout_constraintStart_toStartOf="@id/songMeterPrefixesTextView"
-        tools:text="SMM-01269"/>
+        app:layout_constraintTop_toBottomOf="@id/songMeterPrefixesTextView"
+        tools:text="SMM-01269" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/songMeterPair"
+        style="@style/AudioMothText.Body.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center"
+        android:text="Pair"
+        android:textColor="@color/colorPrimary"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/songMeterSerialNumberTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/songMeterPrefixesTextView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

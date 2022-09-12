@@ -27,8 +27,6 @@ import org.rfcx.companion.view.deployment.songmeter.viewmodel.SongMeterViewModel
 
 class SongMeterDetectFragment: Fragment(), (Advertisement) -> Unit {
 
-    private var advertisement: Advertisement? = null
-
     private val songMeterAdapter by lazy { SongMeterAdapter(this) }
 
     private var deploymentProtocol: SongMeterDeploymentProtocol? = null
@@ -73,11 +71,6 @@ class SongMeterDetectFragment: Fragment(), (Advertisement) -> Unit {
             layoutManager = LinearLayoutManager(context)
             adapter = songMeterAdapter
         }
-
-        connectSongMeterButton.setOnClickListener {
-            deploymentProtocol?.redirectToConnectSongMeter(advertisement!!)
-            songMeterViewModel.stopBle()
-        }
     }
 
     private fun setupTopBar() {
@@ -98,7 +91,7 @@ class SongMeterDetectFragment: Fragment(), (Advertisement) -> Unit {
                         songMeterLoading.hide()
                     } else {
                         songMeterSuggestTextView.visibility = View.GONE
-                        songMeterAdapter.items = listOf(it.data)
+                        songMeterAdapter.items = it.data
                     }
                 }
                 Status.ERROR -> { }
@@ -106,13 +99,9 @@ class SongMeterDetectFragment: Fragment(), (Advertisement) -> Unit {
         })
     }
 
-    private fun enableConnectButton() {
-        connectSongMeterButton.isEnabled = true
-    }
-
     override fun invoke(ads: Advertisement) {
-        advertisement = ads
-        enableConnectButton()
+        deploymentProtocol?.redirectToConnectSongMeter(ads)
+        songMeterViewModel.stopBle()
     }
 
     override fun onPause() {

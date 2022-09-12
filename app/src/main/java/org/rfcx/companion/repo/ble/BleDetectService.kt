@@ -20,9 +20,11 @@ class BleDetectService(context: Context) {
     private var serialNumber: String? = null
     private var prefixes: String? = null
     private var address: String? = null
+    private var readyToPair: Boolean? = null
     private val advertisementUtils by lazy { AdvertisementUtils() }
 
-    private var advertisement = MutableLiveData<Resource<Advertisement>>()
+    private var advertisement = MutableLiveData<Resource<List<Advertisement>>>()
+    private val advertisements = mutableListOf<Advertisement>()
 
     private val scannerCallback = @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     object : ScanCallback() {
@@ -40,6 +42,7 @@ class BleDetectService(context: Context) {
                     advertisementUtils.convertAdvertisementToObject(result.scanRecord!!.bytes)
                     serialNumber = advertisementUtils.getSerialNumber()
                     prefixes = advertisementUtils.getPrefixes()
+                    readyToPair = advertisementUtils.getReadyToPair()
                     updateAdvertisement()
                 }
             }
@@ -47,9 +50,15 @@ class BleDetectService(context: Context) {
     }
 
     fun updateAdvertisement() {
-        if (prefixes != null && serialNumber != null) {
-            advertisement.postValue(Resource.success(Advertisement(prefixes!!, "SMM${serialNumber!!}", address!!)))
-        } else if (prefixes != null || serialNumber != null) {
+        if (prefixes != null && serialNumber != null && readyToPair != null) {
+            val advm = advertisements.find { it.serialName == "SMM${serialNumber!!}" }
+            if (advm == null) {
+                advertisements.add(Advertisement(prefixes!!, "SMM${serialNumber!!}", address!!, readyToPair!!))
+            } else {
+                advm.isReadyToPair = readyToPair!!
+            }
+            advertisement.postValue(Resource.success(advertisements))
+        } else if (prefixes != null || serialNumber != null || readyToPair != null) {
             advertisement.postValue(Resource.loading(null))
         } else {
             advertisement.postValue(Resource.success(null))

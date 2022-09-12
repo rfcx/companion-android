@@ -14,6 +14,7 @@ class AdvertisementUtils {
     private var timeRecordingPrefixes: String? = null
     private var fullPrefixes: String? = null
     private var serialNumber: String? = null
+    private var readyToPair: Boolean = false
 
     private enum class PayloadType(val id: Int) { Telemetry(0), TimeRecording(1) }
 
@@ -21,18 +22,18 @@ class AdvertisementUtils {
 
     fun getPrefixes() = fullPrefixes
 
+    fun getReadyToPair() = readyToPair
+
     fun convertAdvertisementToObject(advertisement: ByteArray) {
         val beaconIdByte = advertisement[beaconIdIndex]
         val beaconIdBinary = beaconIdByte.toBinaryString()
         val payloadType = getPayloadType(beaconIdBinary)
 
-        Log.d("ADV", advertisement.contentToString())
 
         val prefixesBytes = advertisement.copyOfRange(prefixIndexed[0], prefixIndexed[1] + 1)
-        Log.d("ADV", prefixesBytes.contentToString())
         Log.d("PAIR-ID", advertisement[readyToPairIndex].toBinaryString())
-        Log.d("Serial1", bytesToSerialNumber(advertisement.copyOfRange(serialNumberIndexes[0], serialNumberIndexes[1] + 1)))
-        Log.d("Serial2", bytesToSerialNumber(advertisement.copyOfRange(serialNumberIndexesWhenPair[0], serialNumberIndexesWhenPair[1] + 1)))
+        val readyToPairBytes = advertisement[readyToPairIndex]
+        readyToPair = getIsReadyToPair(readyToPairBytes.toBinaryString())
         when (payloadType.id) {
             PayloadType.Telemetry.id -> {
                 telemetryPrefixes = binaryToPrefixes(prefixesBytes.toBinaryString())
@@ -41,12 +42,15 @@ class AdvertisementUtils {
                 timeRecordingPrefixes = binaryToPrefixes(prefixesBytes.toBinaryString())
             }
         }
-        if (!telemetryPrefixes.isNullOrBlank() && !timeRecordingPrefixes.isNullOrBlank()) {
+        if (!telemetryPrefixes.isNullOrBlank() && !timeRecordingPrefixes.isNullOrBlank() && !readyToPair) {
             fullPrefixes = telemetryPrefixes + timeRecordingPrefixes
         }
 
-        val serialNumberBytes =
+        val serialNumberBytes = if (readyToPair) {
+            advertisement.copyOfRange(serialNumberIndexesWhenPair[0], serialNumberIndexesWhenPair[1] + 1)
+        } else {
             advertisement.copyOfRange(serialNumberIndexes[0], serialNumberIndexes[1] + 1)
+        }
         serialNumber = bytesToSerialNumber(serialNumberBytes)
     }
 
@@ -78,6 +82,17 @@ class AdvertisementUtils {
     private fun getPayloadType(beaconIdBinary: String): PayloadType {
         val type = beaconIdBinary[0].toString().toInt()
         return PayloadType.values()[type]
+    }
+
+    /**
+     * Is ready to pair defined by first index of binary String (3rd bit)
+     * 00011011 = not ready
+     * 00001111 = ready
+     */
+    private fun getIsReadyToPair(pairBinary: String): Boolean {
+        if (pairBinary == "00011011") return false
+        else if (pairBinary == "00001111") return true
+        return false
     }
 
     fun Byte.toBinaryString() = String.format("%8s", Integer.toBinaryString((this + 256) % 256))

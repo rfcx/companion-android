@@ -19,7 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/turn_recorder_on_to_detect"
-        app:layout_constraintBottom_toTopOf="@id/connectSongMeterButton"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -33,17 +33,5 @@
         android:layout_marginEnd="@dimen/margin_padding_large"
         android:layout_marginBottom="@dimen/margin_padding_normal"
         app:layout_constraintTop_toBottomOf="@id/songMeterLoading" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/connectSongMeterButton"
-        style="@style/AudioMothButton.GreenButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_padding_large"
-        android:layout_marginEnd="@dimen/margin_padding_large"
-        android:layout_marginBottom="@dimen/margin_padding_normal"
-        android:enabled="false"
-        android:text="@string/connect"
-        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
