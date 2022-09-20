@@ -24,6 +24,14 @@ class AdvertisementUtils {
 
     fun getReadyToPair() = readyToPair
 
+    fun clear() {
+        serialNumber = null
+        fullPrefixes = null
+        readyToPair = false
+        telemetryPrefixes = null
+        timeRecordingPrefixes = null
+    }
+
     fun convertAdvertisementToObject(advertisement: ByteArray) {
         val beaconIdByte = advertisement[beaconIdIndex]
         val beaconIdBinary = beaconIdByte.toBinaryString()
@@ -31,18 +39,17 @@ class AdvertisementUtils {
 
 
         val prefixesBytes = advertisement.copyOfRange(prefixIndexed[0], prefixIndexed[1] + 1)
-        Log.d("PAIR-ID", advertisement[readyToPairIndex].toBinaryString())
         val readyToPairBytes = advertisement[readyToPairIndex]
         readyToPair = getIsReadyToPair(readyToPairBytes.toBinaryString())
         when (payloadType.id) {
             PayloadType.Telemetry.id -> {
-                telemetryPrefixes = binaryToPrefixes(prefixesBytes.toBinaryString())
+                if (!readyToPair) telemetryPrefixes = binaryToPrefixes(prefixesBytes.toBinaryString())
             }
             PayloadType.TimeRecording.id -> {
-                timeRecordingPrefixes = binaryToPrefixes(prefixesBytes.toBinaryString())
+                if (!readyToPair) timeRecordingPrefixes = binaryToPrefixes(prefixesBytes.toBinaryString())
             }
         }
-        if (!telemetryPrefixes.isNullOrBlank() && !timeRecordingPrefixes.isNullOrBlank() && !readyToPair) {
+        if (!telemetryPrefixes.isNullOrBlank() && !timeRecordingPrefixes.isNullOrBlank()) {
             fullPrefixes = telemetryPrefixes + timeRecordingPrefixes
         }
 

@@ -8,10 +8,12 @@ import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.MutableLiveData
 import org.rfcx.companion.entity.songmeter.SongMeterConstant
 import org.rfcx.companion.util.Resource
+import java.lang.IllegalArgumentException
 import java.util.*
 
 class BleConnectDelegate(private val context: Context) {
@@ -241,12 +243,20 @@ class BleConnectDelegate(private val context: Context) {
     fun observeGattConnection() = gattConnection
 
     fun registerReceiver() {
-        context.registerReceiver(gattUpdateReceiver, makeGattUpdateIntentFilter())
-        bleConnectService?.connect(deviceAddress)
+        try {
+            context.registerReceiver(gattUpdateReceiver, makeGattUpdateIntentFilter())
+            bleConnectService?.connect(deviceAddress)
+        } catch (e: IllegalArgumentException) {
+            e.printStackTrace();
+        }
     }
 
     fun unRegisterReceiver() {
-        context.unregisterReceiver(gattUpdateReceiver)
+        try {
+            context.unregisterReceiver(gattUpdateReceiver)
+        } catch (e: IllegalArgumentException) {
+            e.printStackTrace();
+        }
     }
 
     fun bindService(address: String) {

@@ -139,6 +139,8 @@ class SongMeterViewModel(
         songMeterRepository.stopBle()
     }
 
+    fun clearAdvertisement() = songMeterRepository.clearAdvertisement()
+
     fun observeAdvertisement() = songMeterRepository.observeAdvertisement()
 
     fun observeGattConnection() = songMeterRepository.observeGattConnection()

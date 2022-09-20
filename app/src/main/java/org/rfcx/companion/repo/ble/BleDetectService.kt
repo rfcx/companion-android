@@ -6,6 +6,7 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.MutableLiveData
 import org.rfcx.companion.entity.songmeter.Advertisement
@@ -49,13 +50,25 @@ class BleDetectService(context: Context) {
         }
     }
 
+    fun clear() {
+        serialNumber = null
+        prefixes = null
+        address = null
+        readyToPair = null
+        advertisementUtils.clear()
+    }
+
     fun updateAdvertisement() {
         if (prefixes != null && serialNumber != null && readyToPair != null) {
+            Log.d("asdasdasd", prefixes.toString());
             val advm = advertisements.find { it.serialName == "SMM${serialNumber!!}" }
             if (advm == null) {
                 advertisements.add(Advertisement(prefixes!!, "SMM${serialNumber!!}", address!!, readyToPair!!))
             } else {
                 advm.isReadyToPair = readyToPair!!
+                if (readyToPair == false) {
+                    advm.prefixes = prefixes!!
+                }
             }
             advertisement.postValue(Resource.success(advertisements))
         } else if (prefixes != null || serialNumber != null || readyToPair != null) {

@@ -64,6 +64,8 @@ class SongMeterRepository(
         bleHelper.stopScanBle()
     }
 
+    fun clearAdvertisement() = bleHelper.clearAdvertisement()
+
     fun observeAdvertisement() = bleHelper.observeAdvertisement()
 
     fun observeGattConnection() = bleHelper.observeGattConnection()

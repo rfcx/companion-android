@@ -12,11 +12,18 @@ import org.rfcx.companion.entity.songmeter.Advertisement
 
 class SongMeterAdapter(private val onRecorderClickListener: (Advertisement) -> Unit) : RecyclerView.Adapter<SongMeterAdapter.SongMeterViewHolder>() {
 
+    var selectedPosition = -1
+
     var items: List<Advertisement> = arrayListOf()
         set(value) {
             field = value
             notifyDataSetChanged()
         }
+
+    fun clear() {
+        selectedPosition = -1
+        items = listOf()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongMeterViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_songmeter, parent, false)
@@ -30,7 +37,34 @@ class SongMeterAdapter(private val onRecorderClickListener: (Advertisement) -> U
 
         val songMeter = items[position]
         holder.bind(songMeter)
-        holder.pairButton.setOnClickListener {
+
+        if (selectedPosition == position) {
+            holder.itemView.apply {
+                songMeterPrefixesTextView.setTextColor(ContextCompat.getColor(this.context, R.color.colorPrimary))
+                songMeterSerialNumberTextView.setTextColor(ContextCompat.getColor(this.context, R.color.colorPrimary))
+                songMeterPrefixesTextView.setCompoundDrawablesWithIntrinsicBounds(
+                    0,
+                    0,
+                    R.drawable.ic_hotspot_selected,
+                    0
+                )
+            }
+        } else {
+            holder.itemView.apply {
+                songMeterPrefixesTextView.setTextColor(ContextCompat.getColor(this.context, R.color.text_secondary))
+                songMeterSerialNumberTextView.setTextColor(ContextCompat.getColor(this.context, R.color.text_secondary))
+                songMeterPrefixesTextView.setCompoundDrawablesWithIntrinsicBounds(
+                    0,
+                    0,
+                    0,
+                    0
+                )
+            }
+        }
+
+        holder.itemView.setOnClickListener {
+            selectedPosition = position
+            notifyDataSetChanged()
             this.onRecorderClickListener(songMeter)
         }
     }
@@ -38,17 +72,10 @@ class SongMeterAdapter(private val onRecorderClickListener: (Advertisement) -> U
     inner class SongMeterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val prefixes = itemView.songMeterPrefixesTextView
         private val serialName = itemView.songMeterSerialNumberTextView
-        val pairButton: AppCompatTextView = itemView.songMeterPair
 
         fun bind(ads: Advertisement) {
             prefixes.text = ads.prefixes
             serialName.text = ads.serialName
-
-            if (ads.isReadyToPair) {
-                pairButton.visibility = View.VISIBLE
-            } else {
-                pairButton.visibility = View.GONE
-            }
         }
     }
 }

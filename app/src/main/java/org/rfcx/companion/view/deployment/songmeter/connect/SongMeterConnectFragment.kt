@@ -10,10 +10,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.observe
 import kotlinx.android.synthetic.main.fragment_songmeter_connect.*
-import kotlinx.android.synthetic.main.fragment_songmeter_detect.*
-import kotlinx.android.synthetic.main.fragment_songmeter_detect.songMeterSuggestTextView
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.songmeter.Advertisement

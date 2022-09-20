@@ -15,6 +15,8 @@ class BleHelper(private val detectService: BleDetectService, private val connect
         detectService.stopScanBle()
     }
 
+    fun clearAdvertisement() = detectService.clear()
+
     fun observeAdvertisement() = detectService.getAdvertisement()
 
     fun observeGattConnection() = connectService.observeGattConnection()
@@ -28,6 +30,7 @@ class BleHelper(private val detectService: BleDetectService, private val connect
     }
 
     fun bindConnectService(address: String) {
+        connectService.firstTime = true
         connectService.bindService(address)
     }
 

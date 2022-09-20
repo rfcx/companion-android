@@ -1,37 +1,374 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
-    <com.google.android.material.progressindicator.LinearProgressIndicator
-        android:id="@+id/songMeterLoading"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:indeterminate="true"
-        android:visibility="invisible"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/songMeterSuggestTextView"
-        style="@style/AudioMothText.Subhead.Secondary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/turn_recorder_on_to_detect"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/songMeterRecyclerView"
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/syncScrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginStart="@dimen/margin_padding_large"
-        android:layout_marginTop="@dimen/margin_padding_normal"
-        android:layout_marginEnd="@dimen/margin_padding_large"
-        android:layout_marginBottom="@dimen/margin_padding_normal"
-        app:layout_constraintTop_toBottomOf="@id/songMeterLoading" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_padding_normal"
+            android:layout_marginTop="@dimen/margin_padding_normal"
+            android:layout_marginEnd="@dimen/margin_padding_normal"
+            android:layout_marginBottom="@dimen/margin_padding_normal">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/stepOneLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/stepOneLabel"
+                    style="@style/AudioMothText.Body.Small"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/one"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/stepOneImageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/songmeter_step_one"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/stepOneLabel" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/stepOneTextView"
+                    style="@style/AudioMothText.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_padding_small"
+                    android:gravity="center"
+                    android:text="Switch recorder On"
+                    app:layout_constraintTop_toBottomOf="@id/stepOneImageView" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/stepOneButton"
+                    style="@style/AudioMothButton.GreenButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_padding_normal"
+                    android:text="@string/next"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/stepOneTextView" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/stepOneFinishLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/margin_padding_normal"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/stepOneLayout">
+
+                <TextView
+                    style="@style/AudioMothText.Subhead.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1) The recorder is on..."
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/stepTwoLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/stepOneFinishLayout">
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guidelineVertical1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.4" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/stepTwoTextView"
+                    style="@style/AudioMothText.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="2) Do you see a device ? Select one to sync"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/stepTwoLoading"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:indeterminate="true"
+                    android:visibility="invisible"
+                    android:layout_marginTop="@dimen/margin_padding_normal"
+                    app:layout_constraintTop_toBottomOf="@id/stepTwoTextView"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/stepTwoRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="@dimen/margin_padding_large"
+                    android:layout_marginEnd="@dimen/margin_padding_large"
+                    android:layout_marginBottom="@dimen/margin_padding_normal"
+                    app:layout_constraintTop_toBottomOf="@id/stepTwoLoading" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/stepTwoNoButton"
+                    style="@style/GuardianButton.RedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/margin_padding_normal"
+                    android:layout_marginEnd="@dimen/margin_padding_small"
+                    android:gravity="center"
+                    android:text="@string/no"
+                    app:layout_constraintEnd_toStartOf="@id/guidelineVertical1"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/stepTwoRecyclerView" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/stepTwoYesButton"
+                    style="@style/AudioMothButton.GreenButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_padding_small"
+                    android:layout_marginTop="@dimen/margin_padding_normal"
+                    android:text="@string/yes"
+                    android:enabled="false"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/guidelineVertical1"
+                    app:layout_constraintTop_toBottomOf="@id/stepTwoRecyclerView" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/stepTwoFinishLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/margin_padding_normal"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/stepTwoLayout">
+
+                <TextView
+                    style="@style/AudioMothText.Subhead.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2) Device is detected..."
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/stepThreeLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/stepTwoFinishLayout">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/stepThreeLabel"
+                    style="@style/AudioMothText.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="3)"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guidelineVertical3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.4" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/stepThreeImageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/songmeter_step_three"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/stepThreeLabel" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/stepThreeTextView"
+                    style="@style/AudioMothText.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_padding_small"
+                    android:gravity="center"
+                    android:text="Hold-press on Switch until Bluetooth blinking"
+                    app:layout_constraintTop_toBottomOf="@id/stepThreeImageView" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/selectedLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_padding_large"
+                    android:layout_marginEnd="@dimen/margin_padding_large"
+                    app:layout_constraintTop_toBottomOf="@id/stepThreeTextView">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/stepThreePrefixesTextView"
+                        style="@style/AudioMothText.Body.Secondary"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:paddingTop="@dimen/margin_padding_normal"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:text="PREFIXES-METER" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/stepThreeSerialNumberTextView"
+                        style="@style/AudioMothText.Body.Secondary"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:textSize="@dimen/text_xxsmall"
+                        app:layout_constraintStart_toStartOf="@id/stepThreePrefixesTextView"
+                        app:layout_constraintTop_toBottomOf="@id/stepThreePrefixesTextView"
+                        tools:text="SMM-01269" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/stepThreeNoButton"
+                    style="@style/GuardianButton.RedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/margin_padding_normal"
+                    android:layout_marginEnd="@dimen/margin_padding_small"
+                    android:gravity="center"
+                    android:text="@string/go_back"
+                    app:layout_constraintEnd_toStartOf="@id/guidelineVertical3"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/selectedLayout" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/stepThreeSyncButton"
+                    style="@style/AudioMothButton.GreenButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_padding_small"
+                    android:layout_marginTop="@dimen/margin_padding_normal"
+                    android:text="@string/sync"
+                    android:enabled="false"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/guidelineVertical3"
+                    app:layout_constraintTop_toBottomOf="@id/selectedLayout" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/stepThreeFinishLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/margin_padding_normal"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/stepThreeLayout">
+
+                <TextView
+                    style="@style/AudioMothText.Subhead.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="3) Device is synced..."
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/stepFourLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/stepThreeFinishLayout">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/stepFourTextView"
+                    style="@style/AudioMothText.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="4) Confirm that the DEVICE NAME is changed"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guidelineVertical2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.4" />
+
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/stepFourLoading"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:indeterminate="true"
+                    android:visibility="invisible"
+                    android:layout_marginTop="@dimen/margin_padding_normal"
+                    app:layout_constraintTop_toBottomOf="@id/stepFourTextView"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/stepFourRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="@dimen/margin_padding_large"
+                    android:layout_marginEnd="@dimen/margin_padding_large"
+                    android:layout_marginBottom="@dimen/margin_padding_normal"
+                    app:layout_constraintTop_toBottomOf="@id/stepFourLoading" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/stepFourNoButton"
+                    style="@style/GuardianButton.RedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/margin_padding_normal"
+                    android:layout_marginEnd="@dimen/margin_padding_small"
+                    android:gravity="center"
+                    android:text="@string/no"
+                    app:layout_constraintEnd_toStartOf="@id/guidelineVertical2"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/stepFourRecyclerView" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/stepFourYesButton"
+                    style="@style/AudioMothButton.GreenButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_padding_small"
+                    android:layout_marginTop="@dimen/margin_padding_normal"
+                    android:text="@string/yes"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/guidelineVertical2"
+                    app:layout_constraintTop_toBottomOf="@id/stepFourRecyclerView" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
