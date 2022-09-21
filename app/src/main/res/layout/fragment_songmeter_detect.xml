@@ -51,7 +51,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_small"
                     android:gravity="center"
-                    android:text="Switch recorder On"
+                    android:text="@string/switch_recorder_on"
                     app:layout_constraintTop_toBottomOf="@id/stepOneImageView" />
 
                 <androidx.appcompat.widget.AppCompatButton
@@ -79,7 +79,7 @@
                     style="@style/AudioMothText.Subhead.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="1) The recorder is on..."
+                    android:text="@string/_1_the_recorder_is_on"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -104,7 +104,7 @@
                     style="@style/AudioMothText.Body"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="2) Do you see a device ? Select one to sync"
+                    android:text="@string/_2_do_you_see_a_device_select_one_to_sync"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -169,7 +169,7 @@
                     style="@style/AudioMothText.Subhead.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="2) Device is detected..."
+                    android:text="@string/_2_device_is_detected"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -187,7 +187,7 @@
                     style="@style/AudioMothText.Body"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="3)"
+                    android:text="@string/_3"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -214,7 +214,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_small"
                     android:gravity="center"
-                    android:text="Hold-press on Switch until Bluetooth blinking"
+                    android:text="@string/hold_press_on_switch_until_bluetooth_blinking"
                     app:layout_constraintTop_toBottomOf="@id/stepThreeImageView" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -290,7 +290,7 @@
                     style="@style/AudioMothText.Subhead.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="3) Device is synced..."
+                    android:text="@string/_3_device_is_synced"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -308,7 +308,7 @@
                     style="@style/AudioMothText.Body"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="4) Confirm that the DEVICE NAME is changed"
+                    android:text="@string/_4_confirm_that_the_device_name_is_changed"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 

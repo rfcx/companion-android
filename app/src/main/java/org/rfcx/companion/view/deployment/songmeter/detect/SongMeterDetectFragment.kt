@@ -217,7 +217,7 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
             4 -> {
                 currentStep = 4
                 stepFourLoading.show()
-                stepFourTextView.text = "4) Confirm that the DEVICE NAME is $setPrefixes"
+                stepFourTextView.text = getString(R.string.step_4_with_id, setPrefixes)
                 stepOneLayout.visibility = View.GONE
                 stepOneFinishLayout.visibility = View.VISIBLE
                 stepTwoLayout.visibility = View.GONE
