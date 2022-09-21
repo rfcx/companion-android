@@ -6,7 +6,6 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.MutableLiveData
 import org.rfcx.companion.entity.songmeter.Advertisement
@@ -38,7 +37,7 @@ class BleDetectService(context: Context) {
             super.onScanResult(callbackType, result)
 
             if (result != null) {
-                if (result.device.address.split(":").joinToString("").substring(0,6) == "9C25BE") {
+                if (result.device.address.split(":").joinToString("").substring(0, 6) == "9C25BE") {
                     address = result.device.address
                     advertisementUtils.convertAdvertisementToObject(result.scanRecord!!.bytes)
                     serialNumber = advertisementUtils.getSerialNumber()
@@ -60,7 +59,6 @@ class BleDetectService(context: Context) {
 
     fun updateAdvertisement() {
         if (prefixes != null && serialNumber != null && readyToPair != null) {
-            Log.d("asdasdasd", prefixes.toString());
             val advm = advertisements.find { it.serialName == "SMM${serialNumber!!}" }
             if (advm == null) {
                 advertisements.add(Advertisement(prefixes!!, "SMM${serialNumber!!}", address!!, readyToPair!!))

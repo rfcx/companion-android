@@ -54,7 +54,7 @@ class BleConnectDelegate(private val context: Context) {
             bleConnectService = (service as BleConnectService.LocalBinder).service
             bleConnectService?.let {
                 if (!it.initialize()) {
-                    //TODO: finish
+                    // TODO: finish
                 }
                 it.connect(deviceAddress)
             }
@@ -241,7 +241,7 @@ class BleConnectDelegate(private val context: Context) {
             context.registerReceiver(gattUpdateReceiver, makeGattUpdateIntentFilter())
             bleConnectService?.connect(deviceAddress)
         } catch (e: IllegalArgumentException) {
-            e.printStackTrace();
+            e.printStackTrace()
         }
     }
 
@@ -249,7 +249,7 @@ class BleConnectDelegate(private val context: Context) {
         try {
             context.unregisterReceiver(gattUpdateReceiver)
         } catch (e: IllegalArgumentException) {
-            e.printStackTrace();
+            e.printStackTrace()
         }
     }
 

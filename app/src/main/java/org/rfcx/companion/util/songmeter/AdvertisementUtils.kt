@@ -1,7 +1,5 @@
 package org.rfcx.companion.util.songmeter
 
-import android.util.Log
-
 class AdvertisementUtils {
 
     private val manufacturingCompanyIndexes = listOf(5, 6)
@@ -36,7 +34,6 @@ class AdvertisementUtils {
         val beaconIdByte = advertisement[beaconIdIndex]
         val beaconIdBinary = beaconIdByte.toBinaryString()
         val payloadType = getPayloadType(beaconIdBinary)
-
 
         val prefixesBytes = advertisement.copyOfRange(prefixIndexed[0], prefixIndexed[1] + 1)
         val readyToPairBytes = advertisement[readyToPairIndex]
@@ -78,7 +75,8 @@ class AdvertisementUtils {
     private fun binaryToPrefixes(prefixesBinary: String): String {
         return PrefixesMapper.toPrefixesString(
             prefixesBinary.substring(0, prefixesBinary.length - 4).chunked(6)
-                .map { Integer.parseInt(it, 2) })
+                .map { Integer.parseInt(it, 2) }
+        )
     }
 
     /**

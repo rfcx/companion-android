@@ -47,8 +47,8 @@ class BleConnectService : Service() {
                 Log.i(TAG, "Connected to GATT server.")
                 // Attempts to discover services after successful connection.
                 Log.i(
-                    TAG, "Attempting to start service discovery:" +
-                            mBluetoothGatt!!.discoverServices()
+                    TAG,
+                    "Attempting to start service discovery:" + mBluetoothGatt!!.discoverServices()
                 )
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 intentAction = ACTION_GATT_DISCONNECTED
@@ -111,7 +111,7 @@ class BleConnectService : Service() {
                 if (status == BluetoothGatt.GATT_SUCCESS) {
                     broadcastUpdate(ACTION_DESCRIPTOR_WRITTEN, descriptor.characteristic)
                 }
-                //close gatt after set chars notification to false
+                // close gatt after set chars notification to false
                 if (!enabled) {
                     val data = ByteArray(3)
                     data[0] = (1).toByte()

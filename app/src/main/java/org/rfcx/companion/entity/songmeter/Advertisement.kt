@@ -7,4 +7,4 @@ data class Advertisement(
     val serialName: String,
     val address: String,
     var isReadyToPair: Boolean
-): Serializable
+) : Serializable

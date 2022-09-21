@@ -27,7 +27,7 @@ enum class Event(val id: String) {
     ADD_DEPLOYMENT_IMAGE("add_deployment_image"),
     CREATE_AUDIOMOTH_DEPLOYMENT("create_audiomoth_deployment"),
     CREATE_SONGMETER_DEPLOYMENT("create_songmeter_deployment"),
-    SELECT_GUARDIAN_HOTSPOT ("select_guardian_hotspot"),
+    SELECT_GUARDIAN_HOTSPOT("select_guardian_hotspot"),
     CONNECT_GUARDIAN_HOTSPOT("connect_guardian_hotspot"),
     RETRY_GUARDIAN_HOTSPOT("retry_guardian_hotspot"),
     CLICK_NEXT("click_next"),
