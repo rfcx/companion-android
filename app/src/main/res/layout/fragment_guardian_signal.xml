@@ -219,6 +219,22 @@
             tools:text="-105 dB" />
 
         <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/satErrorSignalQuality"
+            style="@style/GuardianButton.RedButton.Line.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_padding_small"
+            android:minWidth="70dp"
+            android:minHeight="20dp"
+            android:text="@string/error"
+            android:textStyle="normal"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/satSignalValues"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/satSignalValues"
+            app:layout_constraintTop_toTopOf="@id/satSignalValues" />
+
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/satPerfectSignalQuality"
             style="@style/GuardianButton.GreenButton.Line.Small"
             android:layout_width="wrap_content"
@@ -326,7 +342,32 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/satSignalGoodText" />
 
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/satSignalErrorText"
+            style="@style/AudioMothText.Subhead.Secondary.xSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_padding_xsmall"
+            android:text="@string/lt_110_error"
+            android:textColor="@color/red"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/satSignalPerfectText" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/satSignalErrorAlert"
+        style="@style/AudioMothText.Subhead.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/red"
+        android:text="@string/signal_error"
+        android:padding="@dimen/margin_padding_normal"
+        android:textAlignment="center"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/satSignalLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/finishButton"

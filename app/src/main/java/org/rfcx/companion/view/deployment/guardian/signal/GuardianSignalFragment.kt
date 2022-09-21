@@ -27,7 +27,8 @@ class GuardianSignalFragment : Fragment() {
             satBadSignalQuality,
             satOKSignalQuality,
             satGoodSignalQuality,
-            satPerfectSignalQuality
+            satPerfectSignalQuality,
+            satErrorSignalQuality
         )
     }
 
@@ -175,11 +176,26 @@ class GuardianSignalFragment : Fragment() {
                     satSignalValues.text = getString(R.string.speed_test_failed)
                 } else {
                     when {
-                        swmStrength < -104 -> showSatSignalTagStrength(SignalState.MAX)
-                        swmStrength < -100 -> showSatSignalTagStrength(SignalState.HIGH)
-                        swmStrength < -97 -> showSatSignalTagStrength(SignalState.NORMAL)
-                        swmStrength < -93 -> showSatSignalTagStrength(SignalState.LOW)
-                        else -> showSatSignalTagStrength(SignalState.LOW)
+                        swmStrength <= 110 -> {
+                            showSatSignalTagStrength(SignalState.ERROR)
+                            satSignalErrorAlert.visibility = View.VISIBLE
+                        }
+                        swmStrength < -104 -> {
+                            showSatSignalTagStrength(SignalState.MAX)
+                            satSignalErrorAlert.visibility = View.GONE
+                        }
+                        swmStrength < -100 -> {
+                            showSatSignalTagStrength(SignalState.HIGH)
+                            satSignalErrorAlert.visibility = View.GONE
+                        }
+                        swmStrength < -97 -> {
+                            showSatSignalTagStrength(SignalState.NORMAL)
+                            satSignalErrorAlert.visibility = View.GONE
+                        }
+                        swmStrength < -93 -> {
+                            showSatSignalTagStrength(SignalState.LOW)
+                            satSignalErrorAlert.visibility = View.GONE
+                        }
                     }
                     satSignalValues.text = getString(R.string.signal_value, swmStrength)
                 }
@@ -218,7 +234,7 @@ class GuardianSignalFragment : Fragment() {
     companion object {
 
         private enum class SignalState(val value: Int) {
-            NONE(0), LOW(1), NORMAL(2), HIGH(3), MAX(4)
+            NONE(0), LOW(1), NORMAL(2), HIGH(3), MAX(4), ERROR(5)
         }
 
         private fun GradientDrawable.setBackground(context: Context, color: Int) {
