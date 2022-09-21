@@ -139,11 +139,9 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
         songMeterViewModel.getSetSiteLiveData().observe(viewLifecycleOwner, Observer {
             when (it.status) {
                 Status.SUCCESS -> {
-                    it.data?.let { result ->
-                        if (result) {
-                            showStep(4)
-                            songMeterViewModel.unBindConnectService()
-                        }
+                    it.data?.let {
+                        showStep(4)
+                        songMeterViewModel.unBindConnectService()
                     }
                 }
             }

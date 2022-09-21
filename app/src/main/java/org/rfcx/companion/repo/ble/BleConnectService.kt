@@ -90,8 +90,9 @@ class BleConnectService : Service() {
             status: Int
         ) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                if (characteristic != null)
+                if (characteristic != null) {
                     broadcastUpdate(ACTION_CHA_WRITE, characteristic)
+                }
             }
         }
 
@@ -108,9 +109,6 @@ class BleConnectService : Service() {
                 setCharacteristicNotification(characteristic!!, enabled)
             } else {
                 notifyCharacteristicsPosition = 0
-                if (status == BluetoothGatt.GATT_SUCCESS) {
-                    broadcastUpdate(ACTION_DESCRIPTOR_WRITTEN, descriptor.characteristic)
-                }
                 // close gatt after set chars notification to false
                 if (!enabled) {
                     val data = ByteArray(3)
@@ -121,6 +119,10 @@ class BleConnectService : Service() {
                     writeCharacteristic(commandChar)
                     close()
                     broadcastUpdate(ACTION_GATT_DISCONNECTED)
+                } else {
+                    if (status == BluetoothGatt.GATT_SUCCESS) {
+                        broadcastUpdate(ACTION_DESCRIPTOR_WRITTEN, descriptor.characteristic)
+                    }
                 }
             }
         }
