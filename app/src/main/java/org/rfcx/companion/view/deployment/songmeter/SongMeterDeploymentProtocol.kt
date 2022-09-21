@@ -9,6 +9,4 @@ interface SongMeterDeploymentProtocol : BaseDeploymentProtocol {
 
     fun getDeployment(): Deployment?
     fun setDeployment(deployment: Deployment)
-
-    fun redirectToConnectSongMeter(advertisement: Advertisement)
 }

@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.fragment_songmeter_connect.*
 import kotlinx.android.synthetic.main.fragment_songmeter_detect.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
@@ -39,6 +38,7 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
     private var selectedAdvertisement: Advertisement? = null
     private var setPrefixes = ""
     private var currentStep = 1
+    private var isReadyToSet = true
 
     private fun setViewModel() {
         songMeterViewModel = ViewModelProvider(
@@ -142,6 +142,7 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
                     it.data?.let { result ->
                         if (result) {
                             showStep(4)
+                            songMeterViewModel.unBindConnectService()
                         }
                     }
                 }
@@ -153,10 +154,13 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
         songMeterViewModel.getRequestConfigLiveData().observe(viewLifecycleOwner, Observer {
             when (it.status) {
                 Status.SUCCESS -> {
-                    val randomPrefixes = "SM-${randomPrefixes()}"
-                    setPrefixes = randomPrefixes
-                    songMeterViewModel.setPrefixes(randomPrefixes)
-                    deploymentProtocol?.setSongMeterId(randomPrefixes)
+                    if (isReadyToSet) {
+                        val randomPrefixes = "SM-${randomPrefixes()}"
+                        setPrefixes = randomPrefixes
+                        songMeterViewModel.setPrefixes(randomPrefixes)
+                        deploymentProtocol?.setSongMeterId(randomPrefixes)
+                        isReadyToSet = false
+                    }
                 }
             }
         })
@@ -165,6 +169,7 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
     private fun backToBeginning() {
         selectedAdvertisement = null
         setPrefixes = ""
+        isReadyToSet = true
         songMeterViewModel.unRegisterGattReceiver()
         songMeterViewModel.unBindConnectService()
         songMeterViewModel.stopBle()
@@ -212,6 +217,7 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
             4 -> {
                 currentStep = 4
                 stepFourLoading.show()
+                stepFourTextView.text = "4) Confirm that the DEVICE NAME is $setPrefixes"
                 stepOneLayout.visibility = View.GONE
                 stepOneFinishLayout.visibility = View.VISIBLE
                 stepTwoLayout.visibility = View.GONE
@@ -251,7 +257,7 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
                             }
                         }
                         if (currentStep == 4) {
-                            it.data.find { detect -> detect.serialName == setPrefixes }?.let {
+                            it.data.find { detect -> detect.prefixes == setPrefixes }?.let {
                                 stepFourYesButton.isEnabled = true
                             }
                         }

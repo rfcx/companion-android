@@ -8,12 +8,10 @@ import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.MutableLiveData
 import org.rfcx.companion.entity.songmeter.SongMeterConstant
 import org.rfcx.companion.util.Resource
-import java.lang.IllegalArgumentException
 import java.util.*
 
 class BleConnectDelegate(private val context: Context) {
@@ -76,11 +74,6 @@ class BleConnectDelegate(private val context: Context) {
                 }
                 BleConnectService.ACTION_GATT_DISCONNECTED -> {
                     gattConnection.postValue(Resource.success(false))
-                    // Send after close connection
-                    if (needCheck) {
-                        setSiteLiveData.postValue(Resource.success(true))
-                        needCheck = false
-                    }
                 }
                 BleConnectService.ACTION_GATT_SERVICES_DISCOVERED -> {
                     setGattServices(bleConnectService?.supportedGattServices)
@@ -120,15 +113,16 @@ class BleConnectDelegate(private val context: Context) {
             if (expectedPrefixes != null) {
                 val actualPrefixes = changes.copyOfRange(6, 18)
                 actualPrefixes.forEachIndexed { index, byte ->
-                    if (byte != expectedPrefixes!![index]) {
+                    needCheck = if (byte != expectedPrefixes!![index]) {
                         // If not match then fail
                         setSiteLiveData.postValue(Resource.success(false))
-                        needCheck = false
+                        false
+                    } else {
+                        setSiteLiveData.postValue(Resource.success(true))
+                        false
                     }
                 }
                 expectedPrefixes = null
-                // Disconnect gatt
-                unbindService()
             }
         }
     }
@@ -137,7 +131,7 @@ class BleConnectDelegate(private val context: Context) {
         configAtoRData?.also {
             setSiteLiveData.postValue(Resource.loading(null))
             expectedPrefixes = prefixes.toByteArray()
-            requestConfigVersion++
+            requestConfigVersion = (++it[0]).toInt()
             it[0] = requestConfigVersion.toByte()
             for (index in 0..11) {
                 it[index + 6] = expectedPrefixes?.getOrNull(index) ?: (0).toByte()

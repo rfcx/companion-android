@@ -36,11 +36,9 @@ import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.util.getListSite
 import org.rfcx.companion.view.deployment.BaseDeploymentActivity
 import org.rfcx.companion.view.deployment.DeployFragment
-import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
 import org.rfcx.companion.view.deployment.location.DetailDeploymentSiteFragment
 import org.rfcx.companion.view.deployment.location.SetDeploymentSiteFragment
-import org.rfcx.companion.view.deployment.songmeter.connect.SongMeterConnectFragment
 import org.rfcx.companion.view.deployment.songmeter.detect.SongMeterDetectFragment
 import org.rfcx.companion.view.deployment.songmeter.viewmodel.SongMeterViewModel
 import org.rfcx.companion.view.dialog.*
@@ -129,10 +127,6 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
 
     override fun setDeployment(deployment: Deployment) {
         this._deployment = deployment
-    }
-
-    override fun redirectToConnectSongMeter(advertisement: Advertisement) {
-        startFragment(SongMeterConnectFragment.newInstance(advertisement))
     }
 
     override fun startCheckList() {
@@ -241,7 +235,7 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
             it.isActive = true
             it.state = DeploymentState.SongMeter.ReadyToUpload.key
             it.deviceParameters = Gson().toJson(SongMeterParameters(songMeterId))
-            it.deploymentKey = "SM-$songMeterId"
+            it.deploymentKey = songMeterId!!
             setDeployment(it)
 
             // set all deployments in stream to active false
@@ -359,35 +353,8 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
         toolbar.visibility = View.GONE
     }
 
-    @SuppressLint("ResourceAsColor")
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuAll = menu
-        val inflater = menuInflater
-        inflater.inflate(R.menu.help_menu, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> backStep()
-            R.id.helpSongMeter -> onClickHelp()
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    private fun onClickHelp() {
-        val helpDialog: SongMeterHelpDialogFragment =
-            supportFragmentManager.findFragmentByTag(TAG_HELP_DIALOG) as SongMeterHelpDialogFragment?
-                ?: run {
-                    SongMeterHelpDialogFragment()
-                }
-        helpDialog.show(supportFragmentManager,
-            TAG_HELP_DIALOG
-        )
-    }
-
     override fun setMenuToolbar(isVisibility: Boolean) {
-        menuAll?.findItem(R.id.helpSongMeter)?.isVisible = isVisibility
+        // do nothing
     }
 
     override fun setToolbarTitle() {
