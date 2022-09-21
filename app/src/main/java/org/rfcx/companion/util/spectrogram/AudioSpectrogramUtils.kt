@@ -1,5 +1,6 @@
 package org.rfcx.companion.util.spectrogram
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import org.jtransforms.fft.FloatFFT_1D
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -49,26 +50,30 @@ object AudioSpectrogramUtils {
     }
 
     fun getTrunks(recordBuffer: ShortArray, spectrogramListener: SpectrogramListener) {
-        val n = fftResolution
-        if (bufferStack != null) {
-            // Trunks are consecutive n/2 length samples
-            for (i in 0 until bufferStack!!.size - 1) {
-                System.arraycopy(
-                    recordBuffer,
-                    n / 2 * i,
-                    bufferStack!![i + 1],
-                    0,
-                    n / 2
-                )
-            }
+        try {
+            val n = fftResolution
+            if (bufferStack != null) {
+                // Trunks are consecutive n/2 length samples
+                for (i in 0 until bufferStack!!.size - 1) {
+                    System.arraycopy(
+                        recordBuffer,
+                        n / 2 * i,
+                        bufferStack!![i + 1],
+                        0,
+                        n / 2
+                    )
+                }
 
-            // Build n length buffers for processing
-            // Are build from consecutive trunks
-            for (i in 0 until bufferStack!!.size - 1) {
-                System.arraycopy(bufferStack!![i], 0, fftBuffer!!, 0, n / 2)
-                System.arraycopy(bufferStack!![i + 1], 0, fftBuffer!!, n / 2, n / 2)
-                process(spectrogramListener)
+                // Build n length buffers for processing
+                // Are build from consecutive trunks
+                for (i in 0 until bufferStack!!.size - 1) {
+                    System.arraycopy(bufferStack!![i], 0, fftBuffer!!, 0, n / 2)
+                    System.arraycopy(bufferStack!![i + 1], 0, fftBuffer!!, n / 2, n / 2)
+                    process(spectrogramListener)
+                }
             }
+        } catch (e: Exception) {
+            FirebaseCrashlytics.getInstance().recordException(e)
         }
     }
 
