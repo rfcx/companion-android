@@ -509,7 +509,7 @@
     <string name="lt_100_ok"><![CDATA[< -100 Good]]></string>
     <string name="lt_104_perfect"><![CDATA[< -104 Perfect]]></string>
     <string name="lt_110_error"><![CDATA[< -110 Error]]></string>
-    <string name="signal_error">Satellite Background Noise in this range usually indicates a disconnected antenna\nPlease refer to your installation instructions for additional information</string>
+    <string name="signal_error">Satellite Background Noise in this range usually indicates a disconnected antenna\n\nPlease refer to your installation instructions for additional information</string>
     <string name="phone_number">phone number:</string>
     <string name="swarm_id">swarm id:</string>
     <string name="cell_data_only">Cell data only</string>
