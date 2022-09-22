@@ -15,7 +15,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.InstallState
 import com.google.android.play.core.install.InstallStateUpdatedListener
@@ -76,7 +75,8 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
                         appUpdateInfo,
                         AppUpdateType.IMMEDIATE,
                         this,
-                        UPDATE_REQUEST_CODE)
+                        UPDATE_REQUEST_CODE
+                    )
                 }
             } catch (e: IntentSender.SendIntentException) {
                 e.printStackTrace()
@@ -350,12 +350,12 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
     override fun showSnackbarForCompleteUpdate() {
         snackbar = Snackbar.make(mainRootView, "Update is successfully downloaded", Snackbar.LENGTH_INDEFINITE)
             .apply {
-            setAction("RESTART") {
-                appUpdateManager.completeUpdate()
-                appUpdateManager.unregisterListener(this@MainActivity)
+                setAction("RESTART") {
+                    appUpdateManager.completeUpdate()
+                    appUpdateManager.unregisterListener(this@MainActivity)
+                }
+                show()
             }
-            show()
-        }
         snackbar?.show()
     }
 
