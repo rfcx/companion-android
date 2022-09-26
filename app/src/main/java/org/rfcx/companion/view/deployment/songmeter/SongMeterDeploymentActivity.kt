@@ -1,13 +1,11 @@
 package org.rfcx.companion.view.deployment.songmeter
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
 import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -18,7 +16,6 @@ import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
-import org.rfcx.companion.entity.songmeter.Advertisement
 import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
@@ -41,10 +38,12 @@ import org.rfcx.companion.view.deployment.location.DetailDeploymentSiteFragment
 import org.rfcx.companion.view.deployment.location.SetDeploymentSiteFragment
 import org.rfcx.companion.view.deployment.songmeter.detect.SongMeterDetectFragment
 import org.rfcx.companion.view.deployment.songmeter.viewmodel.SongMeterViewModel
-import org.rfcx.companion.view.dialog.*
+import org.rfcx.companion.view.dialog.CompleteFragment
+import org.rfcx.companion.view.dialog.LoadingDialogFragment
+import org.rfcx.companion.view.dialog.SiteLoadingDialogFragment
 import java.util.*
 
-class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymentProtocol{
+class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymentProtocol {
 
     private var currentCheck = 0
     private var passedChecks = RealmList<Int>()
@@ -101,15 +100,21 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
     }
 
     private fun setObserver() {
-        songMeterViewModel.getDeployments().observe(this, Observer {
-            this.deployments = it.filter { deployment -> deployment.isCompleted() }
-            setSiteItems()
-        })
+        songMeterViewModel.getDeployments().observe(
+            this,
+            Observer {
+                this.deployments = it.filter { deployment -> deployment.isCompleted() }
+                setSiteItems()
+            }
+        )
 
-        songMeterViewModel.getSites().observe(this, Observer {
-            this.sites = it
-            setSiteItems()
-        })
+        songMeterViewModel.getSites().observe(
+            this,
+            Observer {
+                this.sites = it
+                setSiteItems()
+            }
+        )
     }
 
     override fun setSongMeterId(id: String) {
@@ -258,7 +263,7 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
             }
             saveImages(it)
 
-            //track getting
+            // track getting
             if (preferences.getBoolean(Preferences.ENABLE_LOCATION_TRACKING)) {
                 val track = songMeterViewModel.getFirstTracking()
                 track?.let { t ->
@@ -308,7 +313,6 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
         completeFragment.isCancelable = false
         completeFragment.show(supportFragmentManager, CompleteFragment.tag)
     }
-
 
     override fun setCurrentLocation(location: Location) {
         this.currentLocate = location

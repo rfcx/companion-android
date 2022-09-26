@@ -2,23 +2,17 @@ package org.rfcx.companion.view.deployment.songmeter.viewmodel
 
 import android.annotation.SuppressLint
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.*
 import androidx.work.WorkInfo
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.service.DownloadStreamsWorker
-import org.rfcx.companion.util.AudioMothChimeConnector
 import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.Resource
 import org.rfcx.companion.util.asLiveData
 import org.rfcx.companion.view.deployment.songmeter.repository.SongMeterRepository
 import org.rfcx.companion.view.map.SyncInfo
-import java.util.ArrayList
 
 class SongMeterViewModel(
     application: Application,
@@ -55,7 +49,6 @@ class SongMeterViewModel(
                         null
                     )
                 )
-
             }
         }
     }
@@ -192,5 +185,4 @@ class SongMeterViewModel(
     fun insertOrUpdateTrackingFile(file: TrackingFile) {
         songMeterRepository.insertOrUpdateTrackingFile(file)
     }
-
 }

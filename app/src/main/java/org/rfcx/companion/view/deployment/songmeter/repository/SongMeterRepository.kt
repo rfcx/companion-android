@@ -6,7 +6,6 @@ import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.ble.BleHelper
 import org.rfcx.companion.repo.local.LocalDataHelper
-import java.util.ArrayList
 
 class SongMeterRepository(
     private val deviceApiHelper: DeviceApiHelper,
@@ -118,5 +117,4 @@ class SongMeterRepository(
     fun getFirstTracking(): Tracking? {
         return localDataHelper.getTrackingLocalDb().getFirstTracking()
     }
-
 }
