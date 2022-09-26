@@ -258,69 +258,20 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
             if (manualRadioButton.isChecked) {
                 GuardianSocketManager.sendSatOnlyPrefs(manualTimeOff.joinToString(","))
             } else {
-                if (deploymentProtocol?.getCurrentProjectId() == "agk3cpurb5wm") {
-                    GuardianSocketManager.sendSatOnlyPrefs(indoAutoTimeOff.joinToString(","))
-                }
-
-                if (deploymentProtocol?.getCurrentProjectId() == "0cyons771mvx") {
-                    GuardianSocketManager.sendSatOnlyPrefs(malayAutoTimeOff.joinToString(","))
-                }
-
-                if (deploymentProtocol?.getCurrentProjectId() == "j8lnmj69yp45") {
-                    GuardianSocketManager.sendSatOnlyPrefs(brazilAutoTimeOff.joinToString(","))
-                }
-
-                if (deploymentProtocol?.getCurrentProjectId() == "ceyn7evv79sy") {
-                    GuardianSocketManager.sendSatOnlyPrefs(tembeAutoTimeOff.joinToString(","))
-                }
-
-                if (deploymentProtocol?.getCurrentProjectId() == "4zk1ixfnoe9m") {
-                    GuardianSocketManager.sendSatOnlyPrefs(colombiaAutoTimeOff.joinToString(","))
-                }
-
-                if (deploymentProtocol?.getCurrentProjectId() == "54fy3nkjn92o") {
-                    GuardianSocketManager.sendSatOnlyPrefs(surinameAutoTimeOff.joinToString(","))
+                val currentProject = deploymentProtocol?.getCurrentProject()
+                val offTimes = currentProject?.offTimes
+                if (offTimes != null) {
+                    GuardianSocketManager.sendSatOnlyPrefs(offTimes)
                 }
             }
         }
     }
 
     private fun observeOffTime() {
-        // TODO: For preset project off time
-        if (deploymentProtocol?.getCurrentProjectId() == "agk3cpurb5wm") {
-            indoAutoTimeOff.forEach { time ->
-                addChip(time, false)
-            }
-        }
-
-        if (deploymentProtocol?.getCurrentProjectId() == "0cyons771mvx") {
-            malayAutoTimeOff.forEach { time ->
-                addChip(time, false)
-            }
-        }
-
-        if (deploymentProtocol?.getCurrentProjectId() == "j8lnmj69yp45") {
-            brazilAutoTimeOff.forEach { time ->
-                addChip(time, false)
-            }
-        }
-
-        if (deploymentProtocol?.getCurrentProjectId() == "ceyn7evv79sy") {
-            tembeAutoTimeOff.forEach { time ->
-                addChip(time, false)
-            }
-        }
-
-        if (deploymentProtocol?.getCurrentProjectId() == "4zk1ixfnoe9m") {
-            colombiaAutoTimeOff.forEach { time ->
-                addChip(time, false)
-            }
-        }
-
-        if (deploymentProtocol?.getCurrentProjectId() == "54fy3nkjn92o") {
-            surinameAutoTimeOff.forEach { time ->
-                addChip(time, false)
-            }
+        val currentProject = deploymentProtocol?.getCurrentProject()
+        val offTimes = currentProject?.offTimes
+        offTimes?.split(",")?.forEach { time ->
+            addChip(time, false)
         }
 
         GuardianSocketManager.pingBlob.observe(

@@ -399,6 +399,11 @@ class GuardianDeploymentActivity :
         return project?.serverId
     }
 
+    override fun getCurrentProject(): Project? {
+        val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
+        return projectDb.getProjectById(projectId)
+    }
+
     override fun getGuid(): String? = PingUtils.getGuidFromPing(guardianPingBlob)
 
     override fun getGuardianPurpose(): String? = PingUtils.getPurposeFromPrefs(guardianPingBlob)
