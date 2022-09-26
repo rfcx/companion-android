@@ -1,6 +1,5 @@
 package org.rfcx.companion.view.deployment
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.location.Location
@@ -464,7 +463,6 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
         const val loadingDialogTag = "LoadingDialog"
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
         const val TONE_DURATION = 10000
-
 
         fun startActivity(context: Context) {
             val intent = Intent(context, AudioMothDeploymentActivity::class.java)

@@ -19,8 +19,6 @@ import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
-import org.rfcx.companion.repo.ble.BleDetectService
-import org.rfcx.companion.repo.ble.BleHelper
 import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DeploymentCleanupWorker
 import org.rfcx.companion.util.*

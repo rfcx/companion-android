@@ -136,32 +136,38 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
     }
 
     private fun observeSetSite() {
-        songMeterViewModel.getSetSiteLiveData().observe(viewLifecycleOwner, Observer {
-            when (it.status) {
-                Status.SUCCESS -> {
-                    it.data?.let {
-                        showStep(4)
-                        songMeterViewModel.unBindConnectService()
+        songMeterViewModel.getSetSiteLiveData().observe(
+            viewLifecycleOwner,
+            Observer {
+                when (it.status) {
+                    Status.SUCCESS -> {
+                        it.data?.let {
+                            showStep(4)
+                            songMeterViewModel.unBindConnectService()
+                        }
                     }
                 }
             }
-        })
+        )
     }
 
     private fun observeGetConfig() {
-        songMeterViewModel.getRequestConfigLiveData().observe(viewLifecycleOwner, Observer {
-            when (it.status) {
-                Status.SUCCESS -> {
-                    if (isReadyToSet) {
-                        val randomPrefixes = "SM-${randomPrefixes()}"
-                        setPrefixes = randomPrefixes
-                        songMeterViewModel.setPrefixes(randomPrefixes)
-                        deploymentProtocol?.setSongMeterId(randomPrefixes)
-                        isReadyToSet = false
+        songMeterViewModel.getRequestConfigLiveData().observe(
+            viewLifecycleOwner,
+            Observer {
+                when (it.status) {
+                    Status.SUCCESS -> {
+                        if (isReadyToSet) {
+                            val randomPrefixes = "SM-${randomPrefixes()}"
+                            setPrefixes = randomPrefixes
+                            songMeterViewModel.setPrefixes(randomPrefixes)
+                            deploymentProtocol?.setSongMeterId(randomPrefixes)
+                            isReadyToSet = false
+                        }
                     }
                 }
             }
-        })
+        )
     }
 
     private fun backToBeginning() {
@@ -175,7 +181,7 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
     }
 
     private fun showStep(step: Int) {
-        when(step) {
+        when (step) {
             1 -> {
                 currentStep = 1
                 stepTwoYesButton.isEnabled = false
@@ -237,32 +243,36 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
     }
 
     private fun setObserveAdvertisement() {
-        songMeterViewModel.observeAdvertisement().observe(viewLifecycleOwner, Observer {
-            when (it.status) {
-                Status.SUCCESS -> {
-                    if (it.data != null) {
-                        songMeterAdapter.items = it.data
-                        if (currentStep == 2) {
-                            stepTwoLoading.visibility = View.GONE
-                        } else if (currentStep == 4) {
-                            stepFourLoading.visibility = View.GONE
-                        }
-                        if (currentStep == 3) {
-                            it.data.find { detect -> detect.serialName == selectedAdvertisement?.serialName }?.let { filtered ->
-                                if (filtered.isReadyToPair) {
-                                    stepThreeSyncButton.isEnabled = true
-                                }
+        songMeterViewModel.observeAdvertisement().observe(
+            viewLifecycleOwner,
+            Observer {
+                when (it.status) {
+                    Status.SUCCESS -> {
+                        if (it.data != null) {
+                            songMeterAdapter.items = it.data
+                            if (currentStep == 2) {
+                                stepTwoLoading.visibility = View.GONE
+                            } else if (currentStep == 4) {
+                                stepFourLoading.visibility = View.GONE
                             }
-                        }
-                        if (currentStep == 4) {
-                            it.data.find { detect -> detect.prefixes == setPrefixes }?.let {
-                                stepFourYesButton.isEnabled = true
+                            if (currentStep == 3) {
+                                it.data.find { detect -> detect.serialName == selectedAdvertisement?.serialName }
+                                    ?.let { filtered ->
+                                        if (filtered.isReadyToPair) {
+                                            stepThreeSyncButton.isEnabled = true
+                                        }
+                                    }
+                            }
+                            if (currentStep == 4) {
+                                it.data.find { detect -> detect.prefixes == setPrefixes }?.let {
+                                    stepFourYesButton.isEnabled = true
+                                }
                             }
                         }
                     }
                 }
             }
-        })
+        )
     }
 
     private fun showAlertBluetooth() {
@@ -292,7 +302,6 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
     override fun onPause() {
         super.onPause()
         songMeterViewModel.unRegisterGattReceiver()
-
     }
 
     override fun onDestroy() {

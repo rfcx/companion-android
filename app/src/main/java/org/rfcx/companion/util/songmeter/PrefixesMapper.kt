@@ -39,7 +39,7 @@ private val characterTable = mapOf(
     35 to "8",
     36 to "9",
     37 to "-"
-    )
+)
 
 object PrefixesMapper {
     fun toPrefixesString(binaries: List<Int>): String {

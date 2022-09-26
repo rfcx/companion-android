@@ -22,7 +22,7 @@ class DeployFragment : BaseImageFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        when(context) {
+        when (context) {
             is AudioMothDeploymentProtocol -> audioMothDeploymentProtocol = context
             is SongMeterDeploymentProtocol -> songMeterDeploymentProtocol = context
         }
@@ -72,13 +72,13 @@ class DeployFragment : BaseImageFragment() {
             val images = getImageAdapter().getNewAttachImage()
 
             if (screen == Screen.AUDIO_MOTH_CHECK_LIST.id) {
-                if(images.isNotEmpty()) {
+                if (images.isNotEmpty()) {
                     analytics?.trackAddDeploymentImageEvent(Device.AUDIOMOTH.value)
                 }
                 audioMothDeploymentProtocol?.setImages(images)
                 audioMothDeploymentProtocol?.nextStep()
             } else if (screen == Screen.SONG_METER_CHECK_LIST.id) {
-                if(images.isNotEmpty()) {
+                if (images.isNotEmpty()) {
                     analytics?.trackAddDeploymentImageEvent(Device.SONGMETER.value)
                 }
                 songMeterDeploymentProtocol?.setImages(images)
