@@ -491,16 +491,16 @@
     <string name="swarm">swarm</string>
 
     <!-- SongMeterConnectFragment -->
-    <string name="_4_confirm_that_the_device_name_is_changed">4) Confirm that the DEVICE NAME is changed</string>
-    <string name="step_4_with_id">4) Confirm that the %s is changed</string>
+    <string name="_4_confirm_that_the_device_name_is_changed">4) Confirm that the device name has changed</string>
+    <string name="step_4_with_id">4) Confirm that the device name has changed to %s</string>
     <string name="_3_device_is_synced">3) Device is synced…</string>
-    <string name="hold_press_on_switch_until_bluetooth_blinking">Hold-press on Switch until Bluetooth blinking</string>
+    <string name="hold_press_on_switch_until_bluetooth_blinking">Hold and press the button until bluetooth led light is blinking</string>
     <string name="_3">3)</string>
     <string name="_2_device_is_detected">2) Device is detected…</string>
     <string name="_2_do_you_see_a_device_select_one_to_sync">2) Do you see a device ? Select one to sync</string>
     <string name="_1_the_recorder_is_on">1) The recorder is on…</string>
-    <string name="switch_recorder_on">Switch recorder On</string>
-    <string name="alert_songmeter">Bluetooth need to be enabled before doing this step</string>
+    <string name="switch_recorder_on">Turn recorder/SongMeter on</string>
+    <string name="alert_songmeter">Bluetooth needs to be enabled before advancing to the next step</string>
 
     <string name="download_softwares_from_guardian_softwares_page_first">Download softwares from Guardian softwares page first\nProfile -> Guardian software -> Download APKs you needed</string>
     <string name="download_classifiers_from_guardian_classifier_page_first">Download classifiers from Guardian classifier page first\nProfile -> Classifier -> Download Classifiers you needed</string>
