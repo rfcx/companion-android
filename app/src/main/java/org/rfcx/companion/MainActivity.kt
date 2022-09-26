@@ -1,7 +1,9 @@
 package org.rfcx.companion
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.IntentSender
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -13,6 +15,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.install.InstallState
+import com.google.android.play.core.install.InstallStateUpdatedListener
+import com.google.android.play.core.install.model.ActivityResult
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.InstallStatus
+import com.google.android.play.core.install.model.UpdateAvailability
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_map.*
@@ -37,7 +46,7 @@ import org.rfcx.companion.view.profile.ProfileFragment
 import org.rfcx.companion.view.project.ProjectSelectActivity
 import org.rfcx.companion.widget.BottomNavigationMenuItem
 
-class MainActivity : AppCompatActivity(), MainActivityListener {
+class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpdatedListener {
     private lateinit var mainViewModel: MainViewModel
 
     private var currentFragment: Fragment? = null
@@ -49,14 +58,48 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
     private val analytics by lazy { Analytics(this) }
     private val firebaseCrashlytics by lazy { Crashlytics() }
 
+    private val appUpdateManager by lazy {
+        AppUpdateManagerFactory.create(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
+            if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
+                showSnackbarForCompleteUpdate()
+            }
+
+            try {
+                if (appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
+                    // If an in-app update is already running, resume the update.
+                    appUpdateManager.startUpdateFlowForResult(
+                        appUpdateInfo,
+                        AppUpdateType.IMMEDIATE,
+                        this,
+                        UPDATE_REQUEST_CODE
+                    )
+                }
+            } catch (e: IntentSender.SendIntentException) {
+                e.printStackTrace()
+            }
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        locationPermissions.handleActivityResult(requestCode, resultCode)
+        if (requestCode == UPDATE_REQUEST_CODE) {
+            when (resultCode) {
+                Activity.RESULT_CANCELED -> showSnackbarForUpdateState("Updating is canceled")
+                ActivityResult.RESULT_IN_APP_UPDATE_FAILED -> showSnackbarForUpdateState("Download update is failed")
+            }
+        } else {
+            locationPermissions.handleActivityResult(requestCode, resultCode)
 
-        currentFragment?.let {
-            if (it is MapFragment) {
-                it.onActivityResult(requestCode, resultCode, data)
+            currentFragment?.let {
+                if (it is MapFragment) {
+                    it.onActivityResult(requestCode, resultCode, data)
+                }
             }
         }
     }
@@ -91,6 +134,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        checkInAppUpdate()
         setViewModel()
 
         firebaseCrashlytics.setCustomKey(CrashlyticsKey.EmailUser.key, this.getEmailUser())
@@ -174,6 +218,37 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
                     }
                 }
             })
+    }
+
+    private fun checkInAppUpdate() {
+        val appUpdateInfoTask = appUpdateManager.appUpdateInfo
+        appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+            ) {
+                if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE) && (appUpdateInfo.clientVersionStalenessDays() ?: -1) >= 10) {
+                    appUpdateManager.startUpdateFlowForResult(
+                        appUpdateInfo,
+                        AppUpdateType.IMMEDIATE,
+                        this,
+                        UPDATE_REQUEST_CODE
+                    )
+                    appUpdateManager.registerListener(this)
+                }
+            }
+
+            if (appUpdateInfo.installStatus() == InstallStatus.INSTALLED) {
+                showSnackbarForUpdateState("An update has just been downloaded.")
+            }
+        }
+    }
+
+    override fun onStateUpdate(state: InstallState) {
+        if (state.installStatus() == InstallStatus.DOWNLOADED) {
+            showSnackbarForCompleteUpdate()
+        } else if (state.installStatus() == InstallStatus.INSTALLED) {
+            showSnackbarForUpdateState("Update success")
+            appUpdateManager.unregisterListener(this@MainActivity)
+        }
     }
 
     private fun setupSimpleTooltip() {
@@ -268,8 +343,25 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
     }
 
     override fun showSnackbar(msg: String, duration: Int) {
-        snackbar = Snackbar.make(rootView, msg, duration)
+        snackbar = Snackbar.make(mainRootView, msg, duration)
         snackbar?.anchorView = createLocationButton
+        snackbar?.show()
+    }
+
+    override fun showSnackbarForUpdateState(msg: String) {
+        snackbar = Snackbar.make(mainRootView, msg, Snackbar.LENGTH_LONG)
+        snackbar?.show()
+    }
+
+    override fun showSnackbarForCompleteUpdate() {
+        snackbar = Snackbar.make(mainRootView, "Update is successfully downloaded", Snackbar.LENGTH_INDEFINITE)
+            .apply {
+                setAction("RESTART") {
+                    appUpdateManager.completeUpdate()
+                    appUpdateManager.unregisterListener(this@MainActivity)
+                }
+                show()
+            }
         snackbar?.show()
     }
 
@@ -394,9 +486,15 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
         }
     }
 
+    override fun onDestroy() {
+        appUpdateManager.unregisterListener(this)
+        super.onDestroy()
+    }
+
     companion object {
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
         private const val BOTTOM_SHEET = "BOTTOM_SHEET"
+        private const val UPDATE_REQUEST_CODE = 10000
 
         fun startActivity(context: Context, deploymentId: String? = null) {
             val intent = Intent(context, MainActivity::class.java)
@@ -415,6 +513,8 @@ interface MainActivityListener {
     fun hideBottomSheet()
     fun hideBottomSheetAndBottomAppBar()
     fun showSnackbar(msg: String, duration: Int)
+    fun showSnackbarForUpdateState(msg: String)
+    fun showSnackbarForCompleteUpdate()
     fun hideSnackbar()
     fun onLogout()
     fun moveMapIntoDeploymentMarker(lat: Double, lng: Double, markerLocationId: String)

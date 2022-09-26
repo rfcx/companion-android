@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_guardian_microphone.*
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.AudioCastSocketManager
+import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.MicrophoneTestUtils
@@ -25,11 +27,12 @@ import java.util.*
 class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
 
     private val analytics by lazy { context?.let { Analytics(it) } }
-    private var timer: Timer? = null
     private var spectrogramTimer: Timer? = null
-    private var recorderTimer: Timer? = null
+    private var socketTimer: CountDownTimer? = null
     private val spectrogramStack = arrayListOf<FloatArray>()
     private var isTimerPause = false
+
+    private lateinit var dialogBuilder: AlertDialog
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
     private val microphoneTestUtils by lazy {
@@ -63,6 +66,8 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
             it.setToolbarTitle()
         }
 
+        checkTestingRequirement()
+
         setupAudioTrack()
         setupSpectrogram()
         setupSpectrogramSpeed()
@@ -84,6 +89,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
             setUiByState(MicTestingState.FINISH)
             spectrogramStack.clear()
             microphoneTestUtils.stop()
+            stopSocketTimer()
         }
 
         listenAgainAudioButton.setOnClickListener {
@@ -91,12 +97,31 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
             isTimerPause = false
             setUiByState(MicTestingState.LISTENING)
             microphoneTestUtils.play()
+            scheduleSocketTimer()
         }
 
         finishButton.setOnClickListener {
             analytics?.trackClickNextEvent(Screen.GUARDIAN_MICROPHONE.id)
             deploymentProtocol?.nextStep()
         }
+    }
+
+    private fun checkTestingRequirement() {
+        deploymentProtocol?.getAudioCapturing()?.let {
+            if (!it.isCapturing) {
+                showAlert(it.msg ?: getString(R.string.unknown_error))
+            }
+        }
+    }
+
+    private fun showAlert(text: String) {
+        val dialogBuilder: AlertDialog.Builder =
+            AlertDialog.Builder(requireContext()).apply {
+                setTitle(null)
+                setMessage(text)
+                setPositiveButton(R.string.ok) { _, _ -> }
+            }
+        dialogBuilder.create().show()
     }
 
     private fun setupAudioTrack() {
@@ -226,7 +251,6 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     }
 
     private fun retrieveLiveAudioBuffer() {
-        timer = Timer()
         spectrogramTimer = Timer()
 
         AudioCastSocketManager.connect(microphoneTestUtils)
@@ -245,12 +269,16 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
                         nullStackThreshold++
                         if (nullStackThreshold >= 50) {
                             nullStackThreshold = 0
+                            AudioCastSocketManager.connect(microphoneTestUtils)
                         }
                     }
                 }
             },
             DELAY, STACK_PERIOD
         )
+
+        setDialog()
+        scheduleSocketTimer()
 
         AudioCastSocketManager.spectrogram.observe(
             viewLifecycleOwner,
@@ -262,14 +290,54 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
                         for (chunk in audioChunks) {
                             AudioSpectrogramUtils.getTrunks(chunk, this)
                         }
+                        stopSocketTimer()
+                        scheduleSocketTimer()
                     }
                 }
             }
         )
     }
 
+    private fun setDialog() {
+        dialogBuilder =
+            AlertDialog.Builder(requireContext()).apply {
+                setTitle(null)
+                setMessage(R.string.dialog_start_service_mic)
+                setPositiveButton(R.string.restart) { _, _ ->
+                    GuardianSocketManager.restartService("audio-cast-socket")
+                }
+                setNegativeButton(R.string.cancel) { _, _ ->
+                    dialogBuilder.dismiss()
+                }
+            }.create()
+    }
+
+    private fun scheduleSocketTimer() {
+        socketTimer = object : CountDownTimer(10000, 1000) {
+            override fun onTick(millisUntilFinished: Long) { }
+
+            override fun onFinish() {
+                showRestartGuardianServices()
+                stopSocketTimer()
+            }
+        }
+        socketTimer?.start()
+    }
+
+    private fun stopSocketTimer() {
+        socketTimer?.cancel()
+        socketTimer = null
+    }
+
     override fun onProcessed(mag: FloatArray) {
         spectrogramStack.add(mag)
+    }
+
+    private fun showRestartGuardianServices() {
+        if (::dialogBuilder.isInitialized && dialogBuilder.isShowing) {
+            return
+        }
+        dialogBuilder.show()
     }
 
     override fun onDetach() {
@@ -280,12 +348,10 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         }
         spectrogramTimer?.cancel()
         spectrogramTimer = null
-        recorderTimer?.cancel()
-        recorderTimer = null
+
+        stopSocketTimer()
 
         if (isMicTesting) {
-            timer?.cancel()
-            timer = null
             isMicTesting = false
         }
         AudioCastSocketManager.resetAllValuesToDefault()
@@ -307,6 +373,8 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
         private const val DELAY = 0L
 
         private const val STACK_PERIOD = 10L
+
+        private const val SOCKET_PERIOD = 120000L
 
         private const val DEF_SAMPLERATE = 12000
 

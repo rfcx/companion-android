@@ -205,6 +205,7 @@
     <string name="switch_to_deploy">Switch your device to DEPLOY</string>
     <string name="title_take_photos">Show off your installation skills</string>
     <string name="take_photos">Include: device position in the tree, upwards view of the sky, brackets and antenna positions</string>
+    <string name="take_photos_audiomoth">Include: AudioMoth ID visible, specific location in tree/bush/vine/etc (1–3m), installation site (~10m), pulled back view of site (~15–20m)</string>
 
     <string name="read_storage_permission_msg">Deploy App would like to read your storage</string>
     <string name="go_to_setting">Settings</string>
@@ -394,6 +395,8 @@
     <string name="choose_play_back">Choose audio playback</string>
     <string name="play_back">Playback</string>
     <string name="mic_recorder_warn">Recorder service is not started yet.\nPlease try again later.</string>
+    <string name="unknown_error">unknown error</string>
+
 
     <!-- GuardianCheckinTestFragment -->
     <string name="testing_guardian_checkin">Guardian CheckIn Check</string>
@@ -518,10 +521,13 @@
     <string name="perfect">Perfect</string>
     <string name="good">Good</string>
     <string name="bad">Bad</string>
+    <string name="error">Error</string>
     <string name="lt_93_bad"><![CDATA[< -93 Bad]]></string>
     <string name="lt_97_ok"><![CDATA[< -97 OK]]></string>
     <string name="lt_100_ok"><![CDATA[< -100 Good]]></string>
     <string name="lt_104_perfect"><![CDATA[< -104 Perfect]]></string>
+    <string name="lt_110_error"><![CDATA[< -110 Error]]></string>
+    <string name="signal_error">Satellite Background Noise in this range usually indicates a disconnected antenna\n\nPlease refer to your installation instructions for additional information</string>
     <string name="phone_number">phone number:</string>
     <string name="swarm_id">swarm id:</string>
     <string name="cell_data_only">Cell data only</string>
@@ -569,6 +575,11 @@
     <string name="system_voltage">System Voltage</string>
     <string name="guardian_registration">Guardian registration</string>
     <string name="require_an_active_classifier_to_process_next">Please activate a classifier to proceed to the next step</string>
+
+    <string name="dialog_start_service_upload">Look like you have a trouble with uploading.\nTry restarting service?</string>
+    <string name="dialog_start_service_update">Look like you have a trouble with updating.\nTry restarting service?</string>
+    <string name="dialog_start_service_mic">Look like you have a trouble with microphone.\nTry restarting service?</string>
+    <string name="restart">Restart</string>
 
     <!-- Unsynced Activity -->
     <string name="all_works_synced">All works synced</string>
