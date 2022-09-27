@@ -20,6 +20,8 @@ class DeviceApiHelper(private val deviceApiService: DeviceApiService) {
         fields: List<String> = listOf("id")
     ) = deviceApiService.getDeletedProjects(token, limit, offset, onlyDeleted, fields)
 
+    fun getProjectOffTime(token: String, projectId: String) = deviceApiService.getProjectOffTime(token, projectId)
+
     fun getStreamAssets(
         token: String,
         id: String

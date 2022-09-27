@@ -109,6 +109,18 @@ class ProjectDb(private val realm: Realm) {
             ).findFirst()
     }
 
+    fun updateOffTimeByProjectId(id: String, offTimes: String) {
+        realm.executeTransaction {
+            val project =
+                it.where(Project::class.java)
+                    .equalTo(Project.PROJECT_SERVER_ID, id)
+                    .findFirst()
+            if (project != null) {
+                project.offTimes = offTimes
+            }
+        }
+    }
+
     fun markUnsent(id: Int) {
         mark(id = id, syncState = SyncState.Unsent.key)
     }

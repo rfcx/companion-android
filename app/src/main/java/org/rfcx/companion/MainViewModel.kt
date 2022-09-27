@@ -22,6 +22,7 @@ import org.rfcx.companion.entity.guardian.GuardianRegistration
 import org.rfcx.companion.entity.guardian.toMark
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.ProjectByIdResponse
+import org.rfcx.companion.entity.response.ProjectOffTimeResponse
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
@@ -178,6 +179,7 @@ class MainViewModel(
                             mainRepository.removeProjectFromLocal(projectsRes) // remove project with these coreIds
                             projects.postValue(Resource.success(null)) // no need to send project data
                         }
+                        getProjectOffTimes() // get offtimes after fetch deleted projects
                     } else {
                         projects.postValue(
                             Resource.error(
@@ -188,6 +190,44 @@ class MainViewModel(
                     }
                 }
             })
+    }
+
+    private fun getProjectOffTimes() {
+        val projectsLocal =
+            getProjectsFromLocal().filter { project -> project.serverId != null }
+        projectsLocal.forEach {
+            mainRepository.getProjectOffTimeFromRemote("Bearer ${context.getIdToken()}", it.serverId!!)
+                .enqueue(object : Callback<ProjectOffTimeResponse> {
+                    override fun onFailure(call: Call<ProjectOffTimeResponse>, t: Throwable) {
+                        if (!context.isNetworkAvailable()) {
+                            projects.postValue(
+                                Resource.error(
+                                    context.getString(R.string.network_not_available),
+                                    null
+                                )
+                            )
+                        }
+                    }
+
+                    override fun onResponse(
+                        call: Call<ProjectOffTimeResponse>,
+                        response: Response<ProjectOffTimeResponse>
+                    ) {
+                        if (response.isSuccessful) {
+                            response.body()?.let { offTimesRes ->
+                                mainRepository.getProjectLocalDb().updateOffTimeByProjectId(offTimesRes.id, offTimesRes.offTimes)
+                            }
+                        } else {
+                            projects.postValue(
+                                Resource.error(
+                                    context.getString(R.string.something_went_wrong),
+                                    null
+                                )
+                            )
+                        }
+                    }
+                })
+        }
     }
 
     fun getStreamAssets(site: Stream) {

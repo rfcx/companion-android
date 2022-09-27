@@ -34,6 +34,8 @@ class MainRepository(
         fields: List<String> = listOf("id")
     ) = deviceApiHelper.getDeletedProjects(token, limit, offset, onlyDeleted, fields)
 
+    fun getProjectOffTimeFromRemote(token: String, projectId: String) = deviceApiHelper.getProjectOffTime(token, projectId)
+
     fun getStreamAssets(token: String, id: String) = deviceApiHelper.getStreamAssets(token, id)
 
     fun getProjectsFromLocal() = localDataHelper.getProjectLocalDb().getProjects()
