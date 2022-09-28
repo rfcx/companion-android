@@ -109,7 +109,8 @@ class ProjectDb(private val realm: Realm) {
             ).findFirst()
     }
 
-    fun updateOffTimeByProjectId(id: String, offTimes: String) {
+    fun updateOffTimeByProjectId(id: String?, offTimes: String?) {
+        if (id == null || offTimes == null) return
         realm.executeTransaction {
             val project =
                 it.where(Project::class.java)
