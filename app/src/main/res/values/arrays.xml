@@ -77,7 +77,7 @@
     </string-array>
 
     <string-array name="songmeter_connect_instructions">
-        <item>After SongMeter appear, long-pressed Bluetooth button</item>
+        <item>After Song Meter appear, long-pressed Bluetooth button</item>
         <item>Press until green led blinking on bluetooth</item>
         <item>Back to the app, press connect</item>
     </string-array>
