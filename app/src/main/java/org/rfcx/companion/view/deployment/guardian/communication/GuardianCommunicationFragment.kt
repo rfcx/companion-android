@@ -25,13 +25,6 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
 
     private var manualTimeOff = arrayListOf<String>()
-    private var indoAutoTimeOff = listOf("00:00-01:20", "03:10-08:40", "11:30-13:15", "15:05-20:45", "23:30-23:59")
-    private var malayAutoTimeOff = listOf("00:00-01:15", "03:15-05:00", "06:00-09:00", "11:00-11:25", "12:00-13:20", "15:15-17:00", "18:00-20:45", "23:00-23:20")
-    private var brazilAutoTimeOff = listOf("00:30-01:30", "03:40-05:20", "06:20-08:40", "15:30-17:15", "18:10-21:15", "23:15-23:35")
-    private var tembeAutoTimeOff = listOf("00:30-01:45", "03:25-04:30", "05:20-05:50", "06:40-08:40", "10:50-11:20", "12:15-13:45", "15:20-16:30", "17:00-17:40", "18:40-20:30", "21:25-23:10")
-    private var colombiaAutoTimeOff = listOf("00:00-01:00", "03:10-04:30", "05:15-05:25", "06:40-08:30", "09:00-09:15", "12:15-13:30", "15:10-16:20", "18:25-20:20", "20:55-21:15")
-    private var surinameAutoTimeOff = listOf("00:50-02:00", "03:50-05:20", "07:20-09:15", "09:55-10:30", "12:50-14:00", "16:00-17:15", "19:15-21:10", "21:55-22:15")
-    private var supportedSites = listOf("agk3cpurb5wm", "0cyons771mvx", "j8lnmj69yp45", "ceyn7evv79sy", "4zk1ixfnoe9m", "54fy3nkjn92o")
     private var tempStartHourOff: String? = null
     private var tempEndHourOff: String? = null
     private var isSetFirstGuardianPlan = false
