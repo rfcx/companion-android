@@ -1,32 +1,26 @@
-package org.rfcx.companion.view.deployment
+package org.rfcx.companion.view.deployment.songmeter.viewmodel
 
 import android.annotation.SuppressLint
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.*
 import androidx.work.WorkInfo
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.service.DownloadStreamsWorker
-import org.rfcx.companion.util.AudioMothChimeConnector
 import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.Resource
 import org.rfcx.companion.util.asLiveData
+import org.rfcx.companion.view.deployment.songmeter.repository.SongMeterRepository
 import org.rfcx.companion.view.map.SyncInfo
-import java.util.*
 
-class AudioMothDeploymentViewModel(
+class SongMeterViewModel(
     application: Application,
-    private val audioMothDeploymentRepository: AudioMothDeploymentRepository
+    private val songMeterRepository: SongMeterRepository
 ) : AndroidViewModel(application) {
 
     @SuppressLint("StaticFieldLeak")
     private val context = getApplication<Application>().applicationContext
-    private var audioMothConnector = AudioMothChimeConnector()
 
     private var deployments = MutableLiveData<List<Deployment>>()
     private var sites = MutableLiveData<List<Stream>>()
@@ -68,13 +62,13 @@ class AudioMothDeploymentViewModel(
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
         siteLiveData =
             Transformations.map(
-                audioMothDeploymentRepository.getAllResultsAsyncWithinProject(projectId)
+                songMeterRepository.getAllResultsAsyncWithinProject(projectId)
                     .asLiveData()
             ) { it }
         siteLiveData.observeForever(siteObserve)
 
         deploymentLiveData = Transformations.map(
-            audioMothDeploymentRepository.getAllDeploymentResultsAsyncWithinProject(projectId)
+            songMeterRepository.getAllDeploymentResultsAsyncWithinProject(projectId)
                 .asLiveData()
         ) { it }
         deploymentLiveData.observeForever(deploymentObserve)
@@ -95,79 +89,100 @@ class AudioMothDeploymentViewModel(
         return sites
     }
 
-    fun insertOrUpdate(stream: Stream): Int {
-        return audioMothDeploymentRepository.insertOrUpdate(stream)
-    }
-
-    fun updateDeploymentIdOnStream(deploymentId: Int, streamId: Int) {
-        audioMothDeploymentRepository.updateDeploymentIdOnStream(deploymentId, streamId)
-    }
-
     fun getStreamById(id: Int): Stream? {
-        return audioMothDeploymentRepository.getLocateById(id)
+        return songMeterRepository.getStreamById(id)
     }
 
     fun getProjectById(id: Int): Project? {
-        return audioMothDeploymentRepository.getProjectById(id)
+        return songMeterRepository.getProjectById(id)
     }
 
-    fun deleteImages(id: Int) {
-        audioMothDeploymentRepository.deleteImages(id)
+    fun insertOrUpdate(stream: Stream): Int {
+        return songMeterRepository.insertOrUpdate(stream)
+    }
+
+    fun updateDeploymentIdOnStream(deploymentId: Int, streamId: Int) {
+        songMeterRepository.updateDeploymentIdOnStream(deploymentId, streamId)
     }
 
     fun getImageByDeploymentId(id: Int): List<DeploymentImage> {
-        return audioMothDeploymentRepository.getImageByDeploymentId(id)
+        return songMeterRepository.getImageByDeploymentId(id)
+    }
+
+    fun deleteImages(deployment: Deployment) {
+        songMeterRepository.deleteImages(deployment)
     }
 
     fun insertImage(
         deployment: Deployment? = null,
         attachImages: List<String>
     ) {
-        audioMothDeploymentRepository.insertImage(deployment, attachImages)
+        songMeterRepository.insertImage(deployment, attachImages)
     }
 
-    fun getFirstTracking(): Tracking? {
-        return audioMothDeploymentRepository.getFirstTracking()
+    fun isBluetoothEnabled(): Boolean {
+        return songMeterRepository.isBluetoothEnabled()
     }
 
-    fun insertOrUpdateTrackingFile(file: TrackingFile) {
-        audioMothDeploymentRepository.insertOrUpdateTrackingFile(file)
+    fun scanBle(isEnabled: Boolean) {
+        songMeterRepository.scanBle(isEnabled)
     }
 
-    fun updateDeployment(deployment: Deployment) {
-        audioMothDeploymentRepository.updateDeployment(deployment)
+    fun stopBle() {
+        songMeterRepository.stopBle()
     }
 
-    fun insertOrUpdateDeployment(deployment: Deployment, streamId: Int): Int {
-        return audioMothDeploymentRepository.insertOrUpdateDeployment(deployment, streamId)
+    fun clearAdvertisement() = songMeterRepository.clearAdvertisement()
+
+    fun observeAdvertisement() = songMeterRepository.observeAdvertisement()
+
+    fun observeGattConnection() = songMeterRepository.observeGattConnection()
+
+    fun registerGattReceiver() {
+        songMeterRepository.registerGattReceiver()
     }
 
-    fun updateIsActive(id: Int) {
-        audioMothDeploymentRepository.updateIsActive(id)
+    fun unRegisterGattReceiver() {
+        songMeterRepository.unRegisterGattReceiver()
+    }
+
+    fun bindConnectService(address: String) {
+        songMeterRepository.bindConnectService(address)
+    }
+
+    fun unBindConnectService() {
+        songMeterRepository.unBindConnectService()
+    }
+
+    fun getSetSiteLiveData() = songMeterRepository.getSetSiteLiveData()
+
+    fun getRequestConfigLiveData() = songMeterRepository.getRequestConfigLiveData()
+
+    fun setPrefixes(prefixes: String) {
+        songMeterRepository.setPrefixes(prefixes)
     }
 
     fun getDeploymentById(id: Int): Deployment? {
-        return audioMothDeploymentRepository.getDeploymentById(id)
+        return songMeterRepository.getDeploymentById(id)
     }
 
-    fun playSyncSound(calendar: Calendar, deploymentID: Array<Int>) {
-        audioMothConnector.playTimeAndDeploymentID(
-            calendar,
-            deploymentID
-        )
+    fun updateDeployment(deployment: Deployment) {
+        songMeterRepository.updateDeployment(deployment)
     }
 
-    fun playTone(duration: Int) {
-        audioMothConnector.playTone(duration)
+    fun insertOrUpdateDeployment(deployment: Deployment, streamId: Int): Int {
+        return songMeterRepository.insertOrUpdateDeployment(deployment, streamId)
     }
 
-    fun stopPlaySound() {
-        audioMothConnector.stopPlay()
+    fun updateIsActive(id: Int) {
+        songMeterRepository.updateIsActive(id)
     }
 
-    fun onDestroy() {
-        deploymentLiveData.removeObserver(deploymentObserve)
-        siteLiveData.removeObserver(siteObserve)
-        downloadStreamsWorkInfoLiveData.removeObserver(downloadStreamsWorkInfoObserve)
+    fun getFirstTracking(): Tracking? {
+        return songMeterRepository.getFirstTracking()
+    }
+
+    fun insertOrUpdateTrackingFile(file: TrackingFile) {
+        songMeterRepository.insertOrUpdateTrackingFile(file)
     }
 }

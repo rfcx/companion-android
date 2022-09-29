@@ -58,6 +58,7 @@
 
     <!-- Tooltip -->
     <dimen name="tooltip_icon_size">24dp</dimen>
+    <dimen name="tooltip_song_meter_micro_icon_size">30dp</dimen>
 
     <!-- Map -->
     <dimen name="current_loc_size">50dp</dimen>

@@ -11,6 +11,8 @@ enum class Screen(val id: String) {
     LOCATION("Location"),
     DETAIL_DEPLOYMENT_SITE("Detail Deployment Site"),
     PROJECT("Project"),
+    AUDIO_MOTH_CHECK_LIST("AudioMoth Check List"),
+    SONG_METER_CHECK_LIST("Song Meter Check List"),
     SYNC("Sync"),
     EDGE_DETAIL("Edge Detail"),
     MAP_PICKER("Map Picker"),

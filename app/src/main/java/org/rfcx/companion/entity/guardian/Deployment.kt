@@ -69,6 +69,9 @@ fun Deployment.toMark(context: Context): MapMarker.DeploymentMarker {
         DeploymentState.Guardian.ReadyToUpload.key -> {
             Pin.PIN_GREEN
         }
+        DeploymentState.SongMeter.ReadyToUpload.key -> {
+            Pin.PIN_GREEN
+        }
         else -> {
             Pin.PIN_GREY
         }

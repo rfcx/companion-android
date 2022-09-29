@@ -1,6 +1,5 @@
 package org.rfcx.companion.view.deployment
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.location.Location
@@ -130,10 +129,6 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
     override fun openWithGuardianDevice() {
         GuardianDeploymentActivity.startActivity(this)
         finish()
-    }
-
-    override fun isOpenedFromUnfinishedDeployment(): Boolean {
-        return fromUnfinishedDeployment
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -269,7 +264,7 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
                         siteId = this._stream!!.id,
                         localPath = GeoJsonUtils.generateGeoJson(
                             this,
-                            GeoJsonUtils.generateFileName(it.deployedAt, it.deploymentKey!!),
+                            GeoJsonUtils.generateFileName(it.deployedAt, it.deploymentKey),
                             point
                         ).absolutePath
                     )
@@ -308,7 +303,7 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
             }
             2 -> {
                 updateDeploymentState(DeploymentState.AudioMoth.Deploy)
-                startFragment(DeployFragment.newInstance())
+                startFragment(DeployFragment.newInstance(Screen.AUDIO_MOTH_CHECK_LIST.id))
             }
         }
     }
@@ -458,7 +453,6 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
 
     override fun onDestroy() {
         super.onDestroy()
-        fromUnfinishedDeployment = false
 
         if (::audioMothDeploymentViewModel.isInitialized) {
             audioMothDeploymentViewModel.onDestroy()
@@ -470,24 +464,9 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
         const val EXTRA_DEPLOYMENT_ID = "EXTRA_DEPLOYMENT_ID"
         const val TONE_DURATION = 10000
 
-        private var fromUnfinishedDeployment = false
-
         fun startActivity(context: Context) {
             val intent = Intent(context, AudioMothDeploymentActivity::class.java)
             context.startActivity(intent)
-        }
-
-        fun startActivity(context: Context, deploymentId: Int) {
-            val intent = Intent(context, AudioMothDeploymentActivity::class.java)
-            intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
-            context.startActivity(intent)
-        }
-
-        fun startActivity(context: Context, deploymentId: Int, requestCode: Int) {
-            val intent = Intent(context, AudioMothDeploymentActivity::class.java)
-            intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
-            fromUnfinishedDeployment = true
-            (context as Activity).startActivityForResult(intent, requestCode)
         }
     }
 }

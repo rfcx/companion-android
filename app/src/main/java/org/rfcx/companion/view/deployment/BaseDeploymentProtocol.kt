@@ -11,8 +11,6 @@ interface BaseDeploymentProtocol {
     fun startDetailDeploymentSite(id: Int, streamName: String, isNewSite: Boolean)
     fun startDetailDeploymentSite(lat: Double, lng: Double, siteId: Int, siteName: String)
 
-    fun isOpenedFromUnfinishedDeployment(): Boolean
-
     fun nextStep()
     fun backStep()
 

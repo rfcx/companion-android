@@ -40,6 +40,7 @@ import org.rfcx.companion.service.DeploymentCleanupWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.AudioMothDeploymentActivity
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
+import org.rfcx.companion.view.deployment.songmeter.SongMeterDeploymentActivity
 import org.rfcx.companion.view.map.MapFragment
 import org.rfcx.companion.view.profile.ProfileFragment
 import org.rfcx.companion.view.project.ProjectSelectActivity
@@ -170,12 +171,17 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
                     val addEdgeOrAudioMoth =
                         tip.findViewById<ConstraintLayout>(R.id.audioMothLayout)
                     val addGuardian = tip.findViewById<ConstraintLayout>(R.id.guardianLayout)
+                    val addSongMeter = tip.findViewById<ConstraintLayout>(R.id.songMeterLayout)
                     addEdgeOrAudioMoth?.setOnClickListener {
                         AudioMothDeploymentActivity.startActivity(this)
                         tip.dismiss()
                     }
                     addGuardian?.setOnClickListener {
                         GuardianDeploymentActivity.startActivity(this)
+                        tip.dismiss()
+                    }
+                    addSongMeter?.setOnClickListener {
+                        SongMeterDeploymentActivity.startActivity(this)
                         tip.dismiss()
                     }
                     tip.show()

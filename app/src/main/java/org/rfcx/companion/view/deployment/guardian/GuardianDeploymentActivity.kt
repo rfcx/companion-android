@@ -320,9 +320,6 @@ class GuardianDeploymentActivity :
         startFragment(GuardianCheckListFragment.newInstance())
     }
 
-    override fun isOpenedFromUnfinishedDeployment(): Boolean =
-        false // guardian not have this feature so return false
-
     override fun getDeployment(): Deployment? = this._deployment ?: Deployment()
 
     override fun setDeployment(deployment: Deployment) {

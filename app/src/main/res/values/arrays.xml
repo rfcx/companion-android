@@ -30,7 +30,17 @@
     <string-array name="edge_optional_checks">
         <item>@string/add_photo</item>
     </string-array>
-    
+
+    <!--  Song Meter  -->
+    <string-array name="song_meter_setup_checks">
+        <item>@string/set_deployment_site</item>
+        <item>@string/synchronize_with_song_meter</item>
+    </string-array>
+
+    <string-array name="song_meter_optional_checks">
+        <item>@string/add_photo</item>
+    </string-array>
+
     <!--  Guardian  -->
     <string-array name="guardian_assembly_checks">
         <item>Software Update</item>
@@ -64,6 +74,12 @@
         <item>Mid to high volume set on phone</item>
         <item>AudioMoth microphone close to phone speaker</item>
         <item>Not too much background noise</item>
+    </string-array>
+
+    <string-array name="songmeter_connect_instructions">
+        <item>After Song Meter appear, long-pressed Bluetooth button</item>
+        <item>Press until green led blinking on bluetooth</item>
+        <item>Back to the app, press connect</item>
     </string-array>
 
     <string-array name="bitrate_entries">
