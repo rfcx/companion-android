@@ -27,6 +27,12 @@ interface DeviceApiService {
         @Query("fields") fields: List<String> = listOf("id")
     ): Call<List<ProjectResponse>>
 
+    @GET("projects/{id}/offtimes")
+    fun getProjectOffTime(
+        @Header("Authorization") authUser: String,
+        @Path("id") id: String
+    ): Call<ProjectOffTimeResponse>
+
     @GET("streams/{id}/assets")
     fun getStreamAssets(
         @Header("Authorization") authUser: String,

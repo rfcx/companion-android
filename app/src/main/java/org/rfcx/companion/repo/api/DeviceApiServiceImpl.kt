@@ -29,6 +29,13 @@ class DeviceApiServiceImpl : DeviceApiService {
         return ApiManager.getInstance().getDeviceApi2().getDeletedProjects(authUser, limit, offset, onlyDeleted, fields)
     }
 
+    override fun getProjectOffTime(
+        authUser: String,
+        id: String
+    ): Call<ProjectOffTimeResponse> {
+        return ApiManager.getInstance().getDeviceApi2().getProjectOffTime(authUser, id)
+    }
+
     override fun getStreamAssets(
         authUser: String,
         id: String
