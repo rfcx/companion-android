@@ -1,6 +1,7 @@
 package org.rfcx.companion.view.deployment.guardian
 
 import com.google.gson.JsonObject
+import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.guardian.ClassifierLite
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.socket.response.AudioCaptureStatus
@@ -54,6 +55,7 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getAudioCapturing(): AudioCaptureStatus?
 
     fun getCurrentProjectId(): String?
+    fun getCurrentProject(): Project?
 
     fun setDeployment(deployment: Deployment)
     fun setSampleRate(sampleRate: Int)

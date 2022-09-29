@@ -25,6 +25,7 @@ open class Project(
     var maxLatitude: Double? = null,
     var maxLongitude: Double? = null,
     var offlineMapState: String = OfflineMapState.DOWNLOAD_STATE.key,
+    var offTimes: String? = null,
     @LinkingObjects("project") val streams: RealmResults<Stream>? = null
 ) : RealmModel, Serializable {
     companion object {
@@ -41,6 +42,7 @@ open class Project(
         const val PROJECT_MAX_LATITUDE = "maxLatitude"
         const val PROJECT_MAX_LONGITUDE = "maxLongitude"
         const val PROJECT_OFFLINE_MAP_STATE = "offlineMapState"
+        const val PROJECT_OFF_TIMES = "offTimes"
     }
 }
 

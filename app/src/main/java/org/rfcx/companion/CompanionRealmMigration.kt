@@ -74,6 +74,10 @@ class CompanionRealmMigration : RealmMigration {
         if (oldVersion < 19L && newVersion >= 19L) {
             migrateToV19(realm)
         }
+
+        if (oldVersion < 20L && newVersion >= 20L) {
+            migrateToV20(realm)
+        }
     }
 
     private fun migrateToV2(realm: DynamicRealm) {
@@ -393,6 +397,15 @@ class CompanionRealmMigration : RealmMigration {
         deployment?.apply {
             if (!this.hasField(Deployment.FIELD_DEVICE_PARAMETERS)) {
                 addField(Deployment.FIELD_DEVICE_PARAMETERS, String::class.java)
+            }
+        }
+    }
+
+    private fun migrateToV20(realm: DynamicRealm) {
+        val deployment = realm.schema.get(Deployment.TABLE_NAME)
+        deployment?.apply {
+            if (!this.hasField(Project.PROJECT_OFF_TIMES)) {
+                addField(Project.PROJECT_OFF_TIMES, String::class.java)
             }
         }
     }
