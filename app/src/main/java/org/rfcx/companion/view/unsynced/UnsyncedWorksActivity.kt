@@ -155,7 +155,7 @@ class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
             this.lastRegistrationSyncingInfo = status
         }
 
-        if (this.lastRegistrationSyncingInfo != null && this.lastRegistrationSyncingInfo != null) {
+        if (this.lastDeploymentSyncingInfo != null && this.lastRegistrationSyncingInfo != null) {
             setStatus(this.lastDeploymentSyncingInfo!!, this.lastRegistrationSyncingInfo!!)
         }
     }
