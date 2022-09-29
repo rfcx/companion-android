@@ -176,7 +176,7 @@ class GuardianSignalFragment : Fragment() {
                     satSignalValues.text = getString(R.string.speed_test_failed)
                 } else {
                     when {
-                        swmStrength <= 110 -> {
+                        swmStrength <= -110 -> {
                             showSatSignalTagStrength(SignalState.ERROR)
                             satSignalErrorAlert.visibility = View.VISIBLE
                         }
