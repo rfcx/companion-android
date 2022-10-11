@@ -54,12 +54,14 @@ class DeployFragment : BaseImageFragment() {
             it.showToolbar()
             it.setCurrentPage(requireContext().resources.getStringArray(R.array.edge_optional_checks)[0])
             it.setToolbarTitle()
+            takePhotosTextView.text = getString(R.string.take_photos_audiomoth)
         }
 
         songMeterDeploymentProtocol?.let {
             it.showToolbar()
             it.setCurrentPage(requireContext().resources.getStringArray(R.array.song_meter_optional_checks)[0])
             it.setToolbarTitle()
+            takePhotosTextView.text = getString(R.string.take_photos_songmeter)
         }
 
         setupImageRecycler()

@@ -141,7 +141,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                     OneTimeWorkRequestBuilder<DeploymentSyncWorker>().setConstraints(constraints)
                         .build()
                 WorkManager.getInstance(context)
-                    .enqueueUniqueWork(UNIQUE_WORK_KEY, ExistingWorkPolicy.REPLACE, workRequest)
+                    .enqueueUniqueWork(UNIQUE_WORK_KEY, ExistingWorkPolicy.KEEP, workRequest)
             }
         }
 
@@ -168,8 +168,8 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
             workInfoList.forEach {
                 val state = it.state
                 running = state == WorkInfo.State.RUNNING
+                Log.d(TAG, "now worker running state is $running")
             }
-            Log.d(TAG, "now worker running state is $running")
             return running
         }
 
