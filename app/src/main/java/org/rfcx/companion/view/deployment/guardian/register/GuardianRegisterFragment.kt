@@ -139,7 +139,6 @@ class GuardianRegisterFragment : Fragment() {
             isWaitingRegistration = true
             GuardianSocketManager.sendGuardianRegistration(registration)
             db.insert(registration)
-            RegisterGuardianWorker.enqueue(requireContext())
         } else {
             Toast.makeText(requireContext(), "Register failed: guid is null", Toast.LENGTH_LONG).show()
         }

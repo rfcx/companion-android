@@ -16,6 +16,16 @@ class GuardianRegistrationDb(private val realm: Realm) {
             .findAll()
     }
 
+    fun getAllForWorker(): List<GuardianRegistration> {
+        var unsent: List<GuardianRegistration> = listOf()
+        realm.executeTransaction {
+            val registrations = realm.where(GuardianRegistration::class.java)
+                .findAll().createSnapshot()
+            unsent = registrations
+        }
+        return unsent
+    }
+
     fun getAllResultsAsync(): RealmResults<GuardianRegistration> {
         return realm.where(GuardianRegistration::class.java)
             .findAllAsync()
