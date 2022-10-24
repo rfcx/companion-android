@@ -53,6 +53,7 @@ class MainViewModel(
     private lateinit var streamLiveData: LiveData<List<Stream>>
     private val streamObserve = Observer<List<Stream>> {
         streams = it
+        combinedData()
     }
 
     private lateinit var deploymentLiveData: LiveData<List<Deployment>>
