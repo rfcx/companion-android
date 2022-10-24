@@ -295,13 +295,16 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
                 ?: run {
                     LoadingDialogFragment()
                 }
+        if (loadingDialog.isVisible || loadingDialog.isAdded) return
         loadingDialog.show(supportFragmentManager, loadingDialogTag)
     }
 
     private fun hideLoading() {
-        val loadingDialog: LoadingDialogFragment? =
+        val loadingDialog: LoadingDialogFragment =
             supportFragmentManager.findFragmentByTag(loadingDialogTag) as LoadingDialogFragment?
-        loadingDialog?.dismissDialog()
+                ?: return
+        if (!loadingDialog.isVisible || !loadingDialog.isAdded) return
+        loadingDialog.dismissDialog()
     }
 
     private fun showComplete() {
@@ -375,22 +378,6 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
 
     override fun isSiteLoading(): DownloadStreamState {
         return DownloadStreamsWorker.isRunning()
-    }
-
-    override fun showSiteLoadingDialog(text: String) {
-        var siteLoadingDialog: SiteLoadingDialogFragment =
-            supportFragmentManager.findFragmentByTag(TAG_SITE_LOADING_DIALOG) as SiteLoadingDialogFragment?
-                ?: run {
-                    SiteLoadingDialogFragment(text)
-                }
-        if (siteLoadingDialog.isAdded) {
-            siteLoadingDialog.dismiss()
-            siteLoadingDialog = SiteLoadingDialogFragment(text)
-        }
-        siteLoadingDialog.show(
-            supportFragmentManager,
-            TAG_SITE_LOADING_DIALOG
-        )
     }
 
     private fun setupToolbar() {

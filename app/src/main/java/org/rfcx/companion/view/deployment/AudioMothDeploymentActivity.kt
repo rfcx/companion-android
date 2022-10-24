@@ -401,6 +401,7 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
                 ?: run {
                     LoadingDialogFragment()
                 }
+        if (loadingDialog.isVisible || loadingDialog.isAdded) return
         loadingDialog.show(supportFragmentManager, loadingDialogTag)
     }
 
@@ -415,9 +416,11 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
     }
 
     private fun hideLoading() {
-        val loadingDialog: LoadingDialogFragment? =
+        val loadingDialog: LoadingDialogFragment =
             supportFragmentManager.findFragmentByTag(loadingDialogTag) as LoadingDialogFragment?
-        loadingDialog?.dismissDialog()
+                ?: return
+        if (!loadingDialog.isVisible || !loadingDialog.isAdded) return
+        loadingDialog.dismissDialog()
     }
 
     override fun onBackPressed() {
