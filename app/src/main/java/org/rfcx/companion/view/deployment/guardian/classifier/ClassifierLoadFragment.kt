@@ -253,6 +253,16 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
         dialogBuilder.show()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        stopTimer()
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        stopTimer()
+    }
+
     companion object {
         @JvmStatic
         fun newInstance() = ClassifierLoadFragment()
