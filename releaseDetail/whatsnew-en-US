@@ -1,2 +1,3 @@
-- Saving Guardian off times from server
-- Song Meter integration
+- Fix error when app show loading indicator
+- Fix classifier timer not cancel when close
+- Fix location service error when not activate service
