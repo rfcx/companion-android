@@ -40,7 +40,6 @@ import org.rfcx.companion.view.deployment.songmeter.detect.SongMeterDetectFragme
 import org.rfcx.companion.view.deployment.songmeter.viewmodel.SongMeterViewModel
 import org.rfcx.companion.view.dialog.CompleteFragment
 import org.rfcx.companion.view.dialog.LoadingDialogFragment
-import org.rfcx.companion.view.dialog.SiteLoadingDialogFragment
 import java.util.*
 
 class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymentProtocol {
