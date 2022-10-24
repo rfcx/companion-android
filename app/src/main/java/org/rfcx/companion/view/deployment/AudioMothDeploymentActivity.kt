@@ -330,8 +330,9 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
             audioMothDeploymentViewModel.playSyncSound(Calendar.getInstance(), deploymentIdArrayInt)
             this@AudioMothDeploymentActivity.runOnUiThread {
                 val fragment =
-                    supportFragmentManager.findFragmentById(R.id.contentContainer) as NewSyncFragment
-                fragment.showRepeatSync()
+                    supportFragmentManager.findFragmentById(R.id.contentContainer)
+                if (fragment is NewSyncFragment)
+                    fragment.showRepeatSync()
             }
         }.start()
     }
