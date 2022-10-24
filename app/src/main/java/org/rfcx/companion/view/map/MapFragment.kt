@@ -1197,7 +1197,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         }
 
         val locationComponentActivationOptions =
-            context?.let {
+            requireContext().let {
                 LocationComponentActivationOptions.builder(it, style)
                     .locationComponentOptions(customLocationComponentOptions)
                     .build()
@@ -1207,11 +1207,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
             it.locationComponent.apply {
                 if (locationComponentActivationOptions != null) {
                     activateLocationComponent(locationComponentActivationOptions)
+                    isLocationComponentEnabled = true
+                    cameraMode = CameraMode.TRACKING
+                    renderMode = RenderMode.COMPASS
                 }
-
-                isLocationComponentEnabled = true
-                cameraMode = CameraMode.TRACKING
-                renderMode = RenderMode.COMPASS
             }
         }
 
