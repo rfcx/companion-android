@@ -610,6 +610,7 @@ class GuardianDeploymentActivity :
                 ?: run {
                     LoadingDialogFragment()
                 }
+        if (loadingDialog.isVisible || loadingDialog.isAdded) return
         loadingDialog.show(supportFragmentManager, TAG_LOADING_DIALOG)
     }
 
@@ -623,9 +624,11 @@ class GuardianDeploymentActivity :
     }
 
     override fun hideLoading() {
-        val loadingDialog: LoadingDialogFragment? =
+        val loadingDialog: LoadingDialogFragment =
             supportFragmentManager.findFragmentByTag(TAG_LOADING_DIALOG) as LoadingDialogFragment?
-        loadingDialog?.dismissDialog()
+                ?: return
+        if (!loadingDialog.isVisible || !loadingDialog.isAdded) return
+        loadingDialog.dismissDialog()
     }
 
     override fun setMenuToolbar(isVisibility: Boolean) {

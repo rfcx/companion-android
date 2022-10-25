@@ -330,8 +330,9 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
             audioMothDeploymentViewModel.playSyncSound(Calendar.getInstance(), deploymentIdArrayInt)
             this@AudioMothDeploymentActivity.runOnUiThread {
                 val fragment =
-                    supportFragmentManager.findFragmentById(R.id.contentContainer) as NewSyncFragment
-                fragment.showRepeatSync()
+                    supportFragmentManager.findFragmentById(R.id.contentContainer)
+                if (fragment is NewSyncFragment)
+                    fragment.showRepeatSync()
             }
         }.start()
     }
@@ -401,6 +402,7 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
                 ?: run {
                     LoadingDialogFragment()
                 }
+        if (loadingDialog.isVisible || loadingDialog.isAdded) return
         loadingDialog.show(supportFragmentManager, loadingDialogTag)
     }
 
@@ -415,9 +417,11 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
     }
 
     private fun hideLoading() {
-        val loadingDialog: LoadingDialogFragment? =
+        val loadingDialog: LoadingDialogFragment =
             supportFragmentManager.findFragmentByTag(loadingDialogTag) as LoadingDialogFragment?
-        loadingDialog?.dismissDialog()
+                ?: return
+        if (!loadingDialog.isVisible || !loadingDialog.isAdded) return
+        loadingDialog.dismissDialog()
     }
 
     override fun onBackPressed() {

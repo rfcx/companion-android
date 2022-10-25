@@ -13,6 +13,7 @@ import android.os.*
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import io.realm.Realm
 import org.rfcx.companion.MainActivity
 import org.rfcx.companion.R
@@ -91,7 +92,11 @@ class LocationTrackerService : Service() {
             longitude = location.longitude,
             altitude = location.altitude
         )
-        trackingDb.insertOrUpdate(tracking, coordinate)
+        try {
+            trackingDb.insertOrUpdate(tracking, coordinate)
+        } catch (e: IllegalStateException) {
+            FirebaseCrashlytics.getInstance().recordException(e)
+        }
         Preferences.getInstance(this).putLong(LASTEST_GET_LOCATION_TIME, System.currentTimeMillis())
     }
 
