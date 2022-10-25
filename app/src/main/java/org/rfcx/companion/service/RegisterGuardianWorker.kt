@@ -18,7 +18,7 @@ class RegisterGuardianWorker(val context: Context, params: WorkerParameters) :
         Log.d(TAG, "doWork RegisterGuardianWorker")
 
         val db = GuardianRegistrationDb(Realm.getInstance(RealmHelper.migrationConfig()))
-        val registrations = db.getAll()
+        val registrations = db.getAllForWorker()
 
         Log.d(TAG, "doWork: found ${registrations?.size ?: 0} unsent")
         var someFailed = false
