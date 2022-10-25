@@ -1,6 +1,5 @@
 package org.rfcx.companion.repo.api
 
-import okhttp3.ResponseBody
 import org.rfcx.companion.entity.UserTouchResponse
 import org.rfcx.companion.entity.response.*
 import retrofit2.Call

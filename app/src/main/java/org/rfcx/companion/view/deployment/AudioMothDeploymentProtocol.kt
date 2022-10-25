@@ -2,7 +2,6 @@ package org.rfcx.companion.view.deployment
 
 import org.rfcx.companion.entity.Deployment
 
-
 interface AudioMothDeploymentProtocol : BaseDeploymentProtocol {
     fun openWithEdgeDevice()
 

@@ -7,10 +7,6 @@ import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
 import org.rfcx.companion.R
-import org.rfcx.companion.entity.DeploymentState
-import org.rfcx.companion.entity.Device
-import org.rfcx.companion.entity.Stream
-import org.rfcx.companion.entity.SyncState
 import org.rfcx.companion.util.Pin
 import org.rfcx.companion.util.randomDeploymentId
 import org.rfcx.companion.view.map.MapMarker
