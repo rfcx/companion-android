@@ -39,7 +39,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/selectColorTextView"
-        style="@style/AudioMothText.Subhead.Bold"
+        style="@style/CompanionText.Subhead.Bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_normal"
@@ -64,7 +64,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/saveButton"
-        style="@style/AudioMothButton.GreenButton"
+        style="@style/CompanionButton.GreenButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_normal"

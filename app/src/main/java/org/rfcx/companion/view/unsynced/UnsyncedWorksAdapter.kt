@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_register_guardian.view.*
 import kotlinx.android.synthetic.main.item_unsynced_deployment.view.*
 import kotlinx.android.synthetic.main.item_unsynced_deployment.view.deleteButton
 import org.rfcx.companion.R
@@ -24,14 +23,12 @@ class UnsyncedWorksAdapter(private val unsyncedDeploymentListener: UnsyncedWorkL
 
     companion object {
         const val DEPLOYMENT_ITEM = 1
-        const val REGISTRATION_ITEM = 2
         const val HEADER_ITEM = 3
     }
 
     override fun getItemViewType(position: Int): Int {
         return when (listOfUnsynced[position]) {
             is UnsyncedWorksViewItem.Deployment -> DEPLOYMENT_ITEM
-            is UnsyncedWorksViewItem.Registration -> REGISTRATION_ITEM
             else -> HEADER_ITEM
         }
     }
@@ -45,10 +42,6 @@ class UnsyncedWorksAdapter(private val unsyncedDeploymentListener: UnsyncedWorkL
                 LayoutInflater.from(parent.context)
                     .inflate(R.layout.item_unsynced_deployment, parent, false)
             )
-            REGISTRATION_ITEM -> UnsyncedRegistrationViewHolder(
-                LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_register_guardian, parent, false)
-            )
             else -> HeaderItemViewHolder(
                 LayoutInflater.from(parent.context)
                     .inflate(R.layout.item_unsynced_header, parent, false)
@@ -59,7 +52,6 @@ class UnsyncedWorksAdapter(private val unsyncedDeploymentListener: UnsyncedWorkL
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder.itemViewType) {
             DEPLOYMENT_ITEM -> (holder as UnsyncedDeploymentViewHolder).bind(listOfUnsynced[position] as UnsyncedWorksViewItem.Deployment)
-            REGISTRATION_ITEM -> (holder as UnsyncedRegistrationViewHolder).bind(listOfUnsynced[position] as UnsyncedWorksViewItem.Registration)
             else -> (holder as HeaderItemViewHolder).bind(listOfUnsynced[position] as UnsyncedWorksViewItem.Header)
         }
     }
@@ -88,25 +80,6 @@ class UnsyncedWorksAdapter(private val unsyncedDeploymentListener: UnsyncedWorkL
         }
     }
 
-    inner class UnsyncedRegistrationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val guid = itemView.registerGuardianName
-        private val error = itemView.registerGuardianError
-        val deleteButton = itemView.deleteButton
-
-        fun bind(registration: UnsyncedWorksViewItem.Registration) {
-            guid.text = registration.guid
-            if (registration.error != null) {
-                error.visibility = View.VISIBLE
-                error.text = registration.error
-            } else {
-                error.visibility = View.GONE
-            }
-            deleteButton.setOnClickListener {
-                unsyncedDeploymentListener.onRegistrationClick(registration.guid)
-            }
-        }
-    }
-
     inner class HeaderItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val headerName = itemView.findViewById<TextView>(R.id.unsyncedHeader)
         fun bind(header: UnsyncedWorksViewItem.Header) {
@@ -117,5 +90,4 @@ class UnsyncedWorksAdapter(private val unsyncedDeploymentListener: UnsyncedWorkL
 
 interface UnsyncedWorkListener {
     fun onDeploymentClick(id: Int)
-    fun onRegistrationClick(id: String)
 }

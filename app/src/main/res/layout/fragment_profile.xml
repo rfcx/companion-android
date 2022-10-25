@@ -22,7 +22,7 @@
 
             <TextView
                 android:id="@+id/userNameTextView"
-                style="@style/AudioMothText.Headline"
+                style="@style/CompanionText.Headline"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_normal"
@@ -49,7 +49,7 @@
 
                 <TextView
                     android:id="@+id/userLocationTextView"
-                    style="@style/AudioMothText.Label.Secondary"
+                    style="@style/CompanionText.Label.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="@dimen/margin_padding_small"
@@ -72,7 +72,7 @@
 
             <TextView
                 android:id="@+id/locationTextView"
-                style="@style/AudioMothText.Title"
+                style="@style/CompanionText.Title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingStart="@dimen/margin_padding_normal"
@@ -98,7 +98,7 @@
 
                 <TextView
                     android:id="@+id/coordinatesTextViewTextView"
-                    style="@style/AudioMothText.SubTitle"
+                    style="@style/CompanionText.SubTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_padding_normal"
@@ -109,7 +109,7 @@
 
                 <TextView
                     android:id="@+id/formatCoordinatesTextView"
-                    style="@style/AudioMothText.Body.Secondary"
+                    style="@style/CompanionText.Body.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_padding_normal"
@@ -120,7 +120,7 @@
 
             <TextView
                 android:id="@+id/displayTextView"
-                style="@style/AudioMothText.Title"
+                style="@style/CompanionText.Title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingStart="@dimen/margin_padding_normal"
@@ -148,7 +148,7 @@
 
                 <TextView
                     android:id="@+id/darkThemeTextView"
-                    style="@style/AudioMothText.SubTitle"
+                    style="@style/CompanionText.SubTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
@@ -158,7 +158,7 @@
 
                 <TextView
                     android:id="@+id/themeSelectTextView"
-                    style="@style/AudioMothText.Body.Secondary"
+                    style="@style/CompanionText.Body.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/dark_theme" />
@@ -177,7 +177,7 @@
 
                 <TextView
                     android:id="@+id/locationGroupTextView"
-                    style="@style/AudioMothText.SubTitle"
+                    style="@style/CompanionText.SubTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_padding_normal"
@@ -196,7 +196,7 @@
 
             <TextView
                 android:id="@+id/projectTextView"
-                style="@style/AudioMothText.Title"
+                style="@style/CompanionText.Title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingStart="@dimen/margin_padding_normal"
@@ -213,7 +213,7 @@
 
             <TextView
                 android:id="@+id/offlineMapTextView"
-                style="@style/AudioMothText.SubTitle"
+                style="@style/CompanionText.SubTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
@@ -226,66 +226,16 @@
                 app:layout_constraintTop_toBottomOf="@id/projectTextView" />
 
             <View
-                android:id="@+id/viewGuardian"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/separate_line_size"
-                android:background="@color/separateLine"
-                android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@id/offlineMapTextView" />
-
-            <TextView
-                android:id="@+id/guardianSectionTextView"
-                style="@style/AudioMothText.Title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingStart="@dimen/margin_padding_normal"
-                android:paddingTop="@dimen/margin_padding_small"
-                android:paddingEnd="@dimen/margin_padding_normal"
-                android:paddingBottom="@dimen/margin_padding_small"
-                android:text="@string/guardian"
-                android:textAllCaps="false"
-                android:textColor="@color/text_secondary"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/viewGuardian" />
-
-            <TextView
-                android:id="@+id/softwareTextView"
-                style="@style/AudioMothText.SubTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
-                android:padding="@dimen/margin_padding_normal"
-                android:text="@string/guardian_softwares"
-                android:textColor="@color/text_primary"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/guardianSectionTextView" />
-
-            <TextView
-                android:id="@+id/classifierTextView"
-                style="@style/AudioMothText.SubTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
-                android:padding="@dimen/margin_padding_normal"
-                android:text="@string/classifier"
-                android:textColor="@color/text_primary"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/softwareTextView" />
-
-            <View
                 android:id="@+id/viewProject"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/separate_line_size"
                 android:background="@color/separateLine"
-                app:layout_constraintTop_toBottomOf="@id/classifierTextView" />
+                app:layout_constraintTop_toBottomOf="@id/offlineMapTextView" />
 
             <TextView
 
                 android:id="@+id/additionalTextView"
-                style="@style/AudioMothText.Title"
+                style="@style/CompanionText.Title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingStart="@dimen/margin_padding_normal"
@@ -296,11 +246,11 @@
                 android:textColor="@color/text_secondary"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/classifierTextView" />
+                app:layout_constraintTop_toBottomOf="@id/offlineMapTextView" />
 
             <TextView
                 android:id="@+id/feedbackTextView"
-                style="@style/AudioMothText.SubTitle"
+                style="@style/CompanionText.SubTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
@@ -313,7 +263,7 @@
 
             <TextView
                 android:id="@+id/appVersionTextView"
-                style="@style/AudioMothText.Body.Secondary"
+                style="@style/CompanionText.Body.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_normal"
@@ -325,7 +275,7 @@
 
             <TextView
                 android:id="@+id/versionTextView"
-                style="@style/AudioMothText.Body.Secondary"
+                style="@style/CompanionText.Body.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_normal"
@@ -343,7 +293,7 @@
 
             <TextView
                 android:id="@+id/accountTextView"
-                style="@style/AudioMothText.Title"
+                style="@style/CompanionText.Title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingStart="@dimen/margin_padding_normal"
@@ -358,7 +308,7 @@
 
             <TextView
                 android:id="@+id/logoutTextView"
-                style="@style/AudioMothText.SubTitle"
+                style="@style/CompanionText.SubTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"

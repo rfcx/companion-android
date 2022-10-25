@@ -29,7 +29,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        style="@style/AudioMothText.Body.Small"
+        style="@style/CompanionText.Body.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"
@@ -42,7 +42,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/syncInstruction4Text"
-        style="@style/AudioMothText.Body.Secondary"
+        style="@style/CompanionText.Body.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/syncing_instruction"
@@ -55,7 +55,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/playSyncToneButton"
-        style="@style/AudioMothButton.GreenButton"
+        style="@style/CompanionButton.GreenButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"

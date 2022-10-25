@@ -7,7 +7,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/distanceTextView"
-        style="@style/AudioMothText.Body.Secondary"
+        style="@style/CompanionText.Body.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="@dimen/margin_padding_normal"
@@ -38,7 +38,7 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/siteTextView"
-            style="@style/AudioMothText.Subhead"
+            style="@style/CompanionText.Subhead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"

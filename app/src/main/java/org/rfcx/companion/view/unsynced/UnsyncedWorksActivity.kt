@@ -17,13 +17,10 @@ import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.adapter.UnsyncedWorksViewItem
 import org.rfcx.companion.base.ViewModelFactory
-import org.rfcx.companion.repo.api.CoreApiHelper
-import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DeploymentSyncWorker
-import org.rfcx.companion.service.RegisterGuardianWorker
 import org.rfcx.companion.util.isNetworkAvailable
 import org.rfcx.companion.view.map.SyncInfo
 
@@ -34,23 +31,16 @@ class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
     private lateinit var viewModel: UnsyncedWorksViewModel
 
     private lateinit var deploymentWorkInfoLiveData: LiveData<List<WorkInfo>>
-    private lateinit var registrationWorkInfoLiveData: LiveData<List<WorkInfo>>
 
     private var lastDeploymentSyncingInfo: SyncInfo? = null
-    private var lastRegistrationSyncingInfo: SyncInfo? = null
     private var currentDeploymentState: WorkInfo.State? = null
-    private var currentRegistrationState: WorkInfo.State? = null
 
     private var unsyncedWork: List<UnsyncedWorksViewItem>? = null
 
-    private enum class WorkType { DEPLOYMENT, REGISTRATION }
+    private enum class WorkType { DEPLOYMENT }
 
     private val deploymentWorkInfoObserve = Observer<List<WorkInfo>> {
         updateWorkState(it, WorkType.DEPLOYMENT)
-    }
-
-    private val registrationWorkInfoObserve = Observer<List<WorkInfo>> {
-        updateWorkState(it, WorkType.REGISTRATION)
     }
 
     private fun updateWorkState(works: List<WorkInfo>?, type: WorkType) {
@@ -58,8 +48,6 @@ class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
         if (currentWorkStatus != null) {
             if (type == WorkType.DEPLOYMENT) {
                 currentDeploymentState = currentWorkStatus.state
-            } else {
-                currentRegistrationState = currentWorkStatus.state
             }
             when (currentWorkStatus.state) {
                 WorkInfo.State.RUNNING -> updateSyncInfo(SyncInfo.Uploading, type)
@@ -92,7 +80,6 @@ class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
 
         confirmButton.setOnClickListener {
             viewModel.syncDeployment()
-            viewModel.syncRegistration()
             it.isEnabled = false
         }
     }
@@ -113,7 +100,6 @@ class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
             ViewModelFactory(
                 application,
                 DeviceApiHelper(DeviceApiServiceImpl()),
-                CoreApiHelper(CoreApiServiceImpl()),
                 LocalDataHelper()
             )
         ).get(UnsyncedWorksViewModel::class.java)
@@ -123,13 +109,10 @@ class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
         deploymentWorkInfoLiveData = DeploymentSyncWorker.workInfos(this)
         deploymentWorkInfoLiveData.observeForever(deploymentWorkInfoObserve)
 
-        registrationWorkInfoLiveData = RegisterGuardianWorker.workInfos(this)
-        registrationWorkInfoLiveData.observeForever(registrationWorkInfoObserve)
-
         viewModel.getUnsyncedWorkLiveData().observe(
             this
         ) {
-            setUnsyncedText(it.count { item -> item is UnsyncedWorksViewItem.Deployment }, it.count { item -> item is UnsyncedWorksViewItem.Registration })
+            setUnsyncedText(it.count { item -> item is UnsyncedWorksViewItem.Deployment })
             unsyncedWork = it
             unsyncedWorksAdapter.setUnsynceds(it)
         }
@@ -150,58 +133,45 @@ class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
         if (type == WorkType.DEPLOYMENT) {
             if (this.lastDeploymentSyncingInfo == SyncInfo.Uploaded && status == SyncInfo.Uploaded) return
             this.lastDeploymentSyncingInfo = status
-        } else {
-            if (this.lastRegistrationSyncingInfo == SyncInfo.Uploaded && status == SyncInfo.Uploaded) return
-            this.lastRegistrationSyncingInfo = status
         }
 
-        setStatus(this.lastDeploymentSyncingInfo, this.lastRegistrationSyncingInfo)
+        setStatus(this.lastDeploymentSyncingInfo)
     }
 
-    private fun setUnsyncedText(deploymentCount: Int, registrationCount: Int) {
-        when {
-            deploymentCount == 0 && registrationCount == 0 -> {
+    private fun setUnsyncedText(deploymentCount: Int) {
+        when (deploymentCount) {
+            0 -> {
                 bannerText.text = getString(R.string.all_works_synced)
                 unsyncedWorksAdapter.setUnsynceds(listOf())
                 noContentTextView.visibility = View.VISIBLE
                 hideBanner()
             }
             else -> {
-                when {
-                    deploymentCount == 0 -> {
-                        bannerText.text = getString(R.string.unsynced_registration_text, registrationCount)
-                    }
-                    registrationCount == 0 -> {
-                        bannerText.text = getString(R.string.unsynced_deployment_text, deploymentCount)
-                    }
-                    else -> {
-                        bannerText.text = getString(R.string.unsynced_all_text, deploymentCount, registrationCount)
-                    }
-                }
+                bannerText.text = getString(R.string.unsynced_deployment_text, deploymentCount)
                 noContentTextView.visibility = View.GONE
                 showBanner()
             }
         }
     }
 
-    private fun setStatus(deploymentStatus: SyncInfo?, registrationStatus: SyncInfo?) {
+    private fun setStatus(deploymentStatus: SyncInfo?) {
         when {
-            deploymentStatus == SyncInfo.Starting || registrationStatus == SyncInfo.Starting -> {
+            deploymentStatus == SyncInfo.Starting -> {
                 showSyncingState()
             }
-            deploymentStatus == SyncInfo.Uploading || registrationStatus == SyncInfo.Uploading -> {
+            deploymentStatus == SyncInfo.Uploading -> {
                 showSyncingState()
             }
-            deploymentStatus == SyncInfo.Uploaded && registrationStatus == SyncInfo.Uploaded && unsyncedWork?.size == 0 -> {
+            deploymentStatus == SyncInfo.Uploaded && unsyncedWork?.size == 0 -> {
                 showSyncedState()
                 hideBanner()
             }
-            deploymentStatus == SyncInfo.Failed || registrationStatus == SyncInfo.Failed -> {
+            deploymentStatus == SyncInfo.Failed -> {
                 showSyncedState()
                 showBanner()
                 viewModel.updateUnsyncedWorks()
             }
-            deploymentStatus == SyncInfo.Retry || registrationStatus == SyncInfo.Retry -> {
+            deploymentStatus == SyncInfo.Retry -> {
                 showSyncedState()
                 showBanner()
                 viewModel.updateUnsyncedWorks()
@@ -236,10 +206,6 @@ class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
 
     override fun onDeploymentClick(id: Int) {
         viewModel.deleteDeployment(id)
-    }
-
-    override fun onRegistrationClick(id: String) {
-        viewModel.deleteRegistration(id)
     }
 
     override fun onSupportNavigateUp(): Boolean {

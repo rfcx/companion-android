@@ -34,7 +34,7 @@
 
             <TextView
                 android:id="@+id/deploymentLocationTitle"
-                style="@style/GuardianText.Title.Bold"
+                style="@style/CompanionText.Title.Bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/location"
@@ -44,7 +44,7 @@
 
             <TextView
                 android:id="@+id/latitudeLabel"
-                style="@style/GuardianText.Label.Bold"
+                style="@style/CompanionText.Label.Bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/latitude"
@@ -53,7 +53,7 @@
 
             <TextView
                 android:id="@+id/latitudeValue"
-                style="@style/GuardianText.Label.Value"
+                style="@style/CompanionText.Label.Value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="@id/latitudeLabel"
@@ -75,7 +75,7 @@
 
             <TextView
                 android:id="@+id/longitudeLabel"
-                style="@style/GuardianText.Label.Bold"
+                style="@style/CompanionText.Label.Bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="0dp"
@@ -85,7 +85,7 @@
 
             <TextView
                 android:id="@+id/longitudeValue"
-                style="@style/GuardianText.Label.Value"
+                style="@style/CompanionText.Label.Value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="@id/longitudeLabel"
@@ -94,7 +94,7 @@
 
             <TextView
                 android:id="@+id/altitudeLabel"
-                style="@style/GuardianText.Label.Bold"
+                style="@style/CompanionText.Label.Bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="0dp"
@@ -104,7 +104,7 @@
 
             <TextView
                 android:id="@+id/altitudeValue"
-                style="@style/GuardianText.Label.Value"
+                style="@style/CompanionText.Label.Value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="@id/altitudeLabel"
@@ -113,7 +113,7 @@
 
             <TextView
                 android:id="@+id/deploymentIdLabel"
-                style="@style/GuardianText.Label.Bold"
+                style="@style/CompanionText.Label.Bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="0dp"
@@ -132,7 +132,7 @@
 
                 <TextView
                     android:id="@+id/deploymentIdTextView"
-                    style="@style/AudioMothText.Body.Secondary"
+                    style="@style/CompanionText.Body.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     tools:text="ABCDEFGHIJKLM1234" />
@@ -161,7 +161,7 @@
 
             <TextView
                 android:id="@+id/photoLabel"
-                style="@style/GuardianText.Title.Bold"
+                style="@style/CompanionText.Title.Bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/photos"
@@ -189,7 +189,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/deleteButton"
-        style="@style/GuardianButton.GreenButton.Line"
+        style="@style/CompanionButton.GreenButton.Line"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"

@@ -84,7 +84,7 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/withinTextView"
-                style="@style/AudioMothText.Body.Secondary"
+                style="@style/CompanionText.Body.Secondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_large"
@@ -99,7 +99,7 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/siteTitleTextView"
-                style="@style/AudioMothText.Body.Secondary"
+                style="@style/CompanionText.Body.Secondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_large"
@@ -112,7 +112,7 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/siteValueTextView"
-                style="@style/AudioMothText.Body"
+                style="@style/CompanionText.Body"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_large"
@@ -123,7 +123,7 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/coordinatesTitleTextView"
-                style="@style/AudioMothText.Body.Secondary"
+                style="@style/CompanionText.Body.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_large"
@@ -135,7 +135,7 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/coordinatesValueTextView"
-                style="@style/AudioMothText.Body"
+                style="@style/CompanionText.Body"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_large"
@@ -146,7 +146,7 @@
 
             <TextView
                 android:id="@+id/altitudeLabel"
-                style="@style/AudioMothText.Body.Secondary"
+                style="@style/CompanionText.Body.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_padding_normal"
@@ -157,7 +157,7 @@
 
             <TextView
                 android:id="@+id/altitudeValue"
-                style="@style/AudioMothText.Body"
+                style="@style/CompanionText.Body"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_padding_small"
@@ -167,7 +167,7 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/locationGroupTitleTextView"
-                style="@style/AudioMothText.Body.Secondary"
+                style="@style/CompanionText.Body.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_large"
@@ -179,7 +179,7 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/locationGroupValueTextView"
-                style="@style/AudioMothText.Body"
+                style="@style/CompanionText.Body"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_large"
@@ -206,7 +206,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/nextButton"
-        style="@style/AudioMothButton.GreenButton"
+        style="@style/CompanionButton.GreenButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"

@@ -13,9 +13,6 @@ import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
-import org.rfcx.companion.entity.guardian.Deployment
-import org.rfcx.companion.repo.api.CoreApiHelper
-import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
@@ -26,7 +23,6 @@ import org.rfcx.companion.util.Preferences.Companion.ENABLE_LOCATION_TRACKING
 import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.util.getLastLocation
 import org.rfcx.companion.util.getListSite
-import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
 import org.rfcx.companion.view.deployment.location.DetailDeploymentSiteFragment
 import org.rfcx.companion.view.deployment.location.SetDeploymentSiteFragment
@@ -73,7 +69,6 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
             ViewModelFactory(
                 application,
                 DeviceApiHelper(DeviceApiServiceImpl()),
-                CoreApiHelper(CoreApiServiceImpl()),
                 LocalDataHelper()
             )
         ).get(AudioMothDeploymentViewModel::class.java)
@@ -124,11 +119,6 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
 
     override fun openWithEdgeDevice() {
         startCheckList()
-    }
-
-    override fun openWithGuardianDevice() {
-        GuardianDeploymentActivity.startActivity(this)
-        finish()
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -183,7 +173,6 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
                     startCheckList()
                 }
             }
-            is ChooseDeviceFragment -> finish()
             else -> startCheckList()
         }
     }

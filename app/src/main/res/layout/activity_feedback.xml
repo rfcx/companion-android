@@ -33,7 +33,7 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/fromEmailTextView"
-                style="@style/AudioMothText.Body"
+                style="@style/CompanionText.Body"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_xlarge"
@@ -54,7 +54,7 @@
 
             <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/feedbackEditText"
-                style="@style/AudioMothEditText.NoBackground"
+                style="@style/CompanionEditText.NoBackground"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_normal"

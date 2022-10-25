@@ -35,7 +35,7 @@
 
             <TextView
                 android:id="@+id/deploymentSiteTitle"
-                style="@style/AudioMothText.Body.Small"
+                style="@style/CompanionText.Body.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -44,7 +44,7 @@
 
             <TextView
                 android:id="@+id/projectName"
-                style="@style/AudioMothText.Body.Secondary"
+                style="@style/CompanionText.Body.Secondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_normal"
@@ -60,7 +60,7 @@
 
             <TextView
                 android:id="@+id/deploymentStreamId"
-                style="@style/AudioMothText.Body.Secondary"
+                style="@style/CompanionText.Body.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/margin_padding_normal"
@@ -69,7 +69,7 @@
 
             <TextView
                 android:id="@+id/deploymentTypeName"
-                style="@style/AudioMothText.Body.Secondary"
+                style="@style/CompanionText.Body.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="AudioMoth" />
@@ -92,7 +92,7 @@
 
             <TextView
                 android:id="@+id/deployedAtLabel"
-                style="@style/AudioMothText.Body.Secondary"
+                style="@style/CompanionText.Body.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_xsmall"
@@ -100,7 +100,7 @@
 
             <TextView
                 android:id="@+id/deployedAt"
-                style="@style/AudioMothText.Body.Secondary"
+                style="@style/CompanionText.Body.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_xsmall"
@@ -122,7 +122,7 @@
 
             <TextView
                 android:id="@+id/latLngTextView"
-                style="@style/AudioMothText.Body.Secondary"
+                style="@style/CompanionText.Body.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_xsmall"
@@ -137,7 +137,7 @@
             android:orientation="horizontal">
 
             <TextView
-                style="@style/AudioMothText.Body.Small"
+                style="@style/CompanionText.Body.Small"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"

@@ -28,7 +28,4 @@ class DeviceApiHelper(private val deviceApiService: DeviceApiService) {
     ) = deviceApiService.getStreamAssets(token, id)
 
     fun userTouch(token: String) = deviceApiService.userTouch(token)
-
-    fun checkAvailableClassifier(authUser: String) = deviceApiService.checkAvailableClassifiers(authUser)
-    fun downloadAPK(url: String) = deviceApiService.downloadFile(url)
 }

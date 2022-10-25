@@ -20,7 +20,7 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/takePhotosTitleTextView"
-                style="@style/AudioMothText.Subhead"
+                style="@style/CompanionText.Subhead"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_large"
@@ -34,7 +34,7 @@
             
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/takePhotosTextView"
-                style="@style/AudioMothText.Subhead.Small"
+                style="@style/CompanionText.Subhead.Small"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_large"
@@ -48,7 +48,7 @@
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/addPhotoButton"
-                style="@style/GuardianButton.GreenButton.Line"
+                style="@style/CompanionButton.GreenButton.Line"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_large"
@@ -77,7 +77,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/finishButton"
-        style="@style/AudioMothButton.GreenButton"
+        style="@style/CompanionButton.GreenButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"

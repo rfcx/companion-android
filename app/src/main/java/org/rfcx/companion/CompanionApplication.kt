@@ -20,13 +20,6 @@ class CompanionApplication : Application() {
         if (state) {
             LocationTracking.set(this, true)
         }
-
-        val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
-        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
-            defaultHandler?.uncaughtException(thread, throwable)
-
-            SocketUtils.stopAllConnections()
-        }
     }
 
     private fun setupRealm() {
@@ -48,10 +41,5 @@ class CompanionApplication : Application() {
                 logout()
             }
         }
-    }
-
-    override fun onTerminate() {
-        super.onTerminate()
-        SocketUtils.stopAllConnections()
     }
 }

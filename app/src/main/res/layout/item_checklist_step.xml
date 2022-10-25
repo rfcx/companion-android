@@ -7,7 +7,7 @@
 
     <TextView
         android:id="@+id/checkName"
-        style="@style/AudioMothText.Body.Secondary"
+        style="@style/CompanionText.Body.Secondary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"

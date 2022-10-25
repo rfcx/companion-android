@@ -7,7 +7,6 @@ import io.realm.RealmResults
 import io.realm.annotations.LinkingObjects
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
-import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.view.map.MapFragment
 import org.rfcx.companion.view.map.MapMarker
 import java.util.*

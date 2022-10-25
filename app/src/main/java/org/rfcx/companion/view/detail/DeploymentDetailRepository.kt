@@ -1,9 +1,9 @@
 package org.rfcx.companion.view.detail
 
 import io.realm.RealmResults
+import org.rfcx.companion.entity.Deployment
 import org.rfcx.companion.entity.DeploymentImage
 import org.rfcx.companion.entity.Project
-import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.local.LocalDataHelper

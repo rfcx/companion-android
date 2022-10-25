@@ -39,7 +39,7 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/protectingRainforestsTextView"
-                style="@style/AudioMothText.Body.Headline"
+                style="@style/CompanionText.Body.Headline"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_normal"
@@ -54,7 +54,7 @@
 
             <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/loginEmailEditText"
-                style="@style/AudioMothEditText.Background"
+                style="@style/CompanionEditText.Background"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_normal"
@@ -69,7 +69,7 @@
 
             <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/loginPasswordEditText"
-                style="@style/AudioMothEditText.Background"
+                style="@style/CompanionEditText.Background"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_normal"
@@ -83,7 +83,7 @@
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/signInButton"
-                style="@style/AudioMothButton.GreenButton"
+                style="@style/CompanionButton.GreenButton"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/button_height"
                 android:layout_margin="@dimen/margin_padding_normal"
@@ -107,7 +107,7 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/orTextView"
-                style="@style/AudioMothText.Label.Secondary"
+                style="@style/CompanionText.Label.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/margin_padding_normal"
@@ -130,7 +130,7 @@
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/googleLoginButton"
-                style="@style/AudioMothButton.GoogleButton"
+                style="@style/CompanionButton.GoogleButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/margin_padding_normal"
@@ -142,7 +142,7 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/poweredByTextView"
-                style="@style/AudioMothText.Body.Secondary"
+                style="@style/CompanionText.Body.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_padding_xlarge"

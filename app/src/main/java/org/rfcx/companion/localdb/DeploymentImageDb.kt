@@ -3,6 +3,7 @@ package org.rfcx.companion.localdb
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
+import org.rfcx.companion.entity.Deployment
 import org.rfcx.companion.entity.DeploymentImage
 import org.rfcx.companion.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_ID
 import org.rfcx.companion.entity.DeploymentImage.Companion.FIELD_DEPLOYMENT_SERVER_ID
@@ -10,7 +11,6 @@ import org.rfcx.companion.entity.DeploymentImage.Companion.FIELD_DEVICE
 import org.rfcx.companion.entity.DeploymentImage.Companion.FIELD_ID
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.SyncState
-import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 
 class DeploymentImageDb(private val realm: Realm) {

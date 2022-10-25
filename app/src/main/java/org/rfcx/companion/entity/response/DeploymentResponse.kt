@@ -3,10 +3,10 @@ package org.rfcx.companion.entity.response
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonNull
+import org.rfcx.companion.entity.Deployment
 import org.rfcx.companion.entity.DeploymentState
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.SyncState
-import org.rfcx.companion.entity.guardian.Deployment
 import java.util.*
 
 data class DeploymentResponse(
@@ -20,8 +20,8 @@ data class DeploymentResponse(
     var deviceParameters: JsonElement? = null
 )
 
-fun DeploymentResponse.isGuardian(): Boolean {
-    return this.deploymentType == Device.GUARDIAN.value
+fun DeploymentResponse.isAudioMoth(): Boolean {
+    return this.deploymentType == Device.AUDIOMOTH.value
 }
 
 fun DeploymentResponse.toDeployment(): Deployment {
@@ -29,7 +29,7 @@ fun DeploymentResponse.toDeployment(): Deployment {
         serverId = this.id,
         deploymentKey = this.id ?: "",
         deployedAt = this.deployedAt ?: Date(),
-        state = if (this.isGuardian()) DeploymentState.Guardian.ReadyToUpload.key else DeploymentState.AudioMoth.ReadyToUpload.key,
+        state = if (this.isAudioMoth()) DeploymentState.AudioMoth.ReadyToUpload.key else DeploymentState.SongMeter.ReadyToUpload.key,
         device = this.deploymentType,
         createdAt = this.createdAt ?: Date(),
         syncState = SyncState.Sent.key,

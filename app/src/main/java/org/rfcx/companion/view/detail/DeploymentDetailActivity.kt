@@ -30,10 +30,7 @@ import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
-import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.localdb.DatabaseCallback
-import org.rfcx.companion.repo.api.CoreApiHelper
-import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
@@ -133,7 +130,6 @@ class DeploymentDetailActivity :
             ViewModelFactory(
                 application,
                 DeviceApiHelper(DeviceApiServiceImpl()),
-                CoreApiHelper(CoreApiServiceImpl()),
                 LocalDataHelper()
             )
         ).get(DeploymentDetailViewModel::class.java)
@@ -269,7 +265,7 @@ class DeploymentDetailActivity :
 
     private fun updateDeploymentDetailView(deployment: Deployment) {
         // setup deployment images view
-        observeDeploymentImage(deployment.id, deployment.device ?: Device.GUARDIAN.value)
+        observeDeploymentImage(deployment.id, deployment.device ?: Device.AUDIOMOTH.value)
         val location = deployment.stream
         location?.let { locate ->
             latitudeValue.text = locate.latitude.latitudeCoordinates(this)

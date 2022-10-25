@@ -17,7 +17,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/timelineTextView"
-        style="@style/GuardianText.Label.Value"
+        style="@style/CompanionText.Label.Value"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/timeline_padding"

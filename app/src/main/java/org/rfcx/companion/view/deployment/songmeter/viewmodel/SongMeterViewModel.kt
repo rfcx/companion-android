@@ -6,7 +6,6 @@ import androidx.lifecycle.*
 import androidx.work.WorkInfo
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
-import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.Resource

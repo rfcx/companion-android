@@ -7,7 +7,7 @@
 
     <TextView
         android:id="@+id/checkHeader"
-        style="@style/AudioMothText.Body.Small"
+        style="@style/CompanionText.Body.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/padding_top_header"

@@ -28,7 +28,7 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/stepOneTextView"
-                    style="@style/AudioMothText.Body.Small"
+                    style="@style/CompanionText.Body.Small"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/one"
@@ -46,7 +46,7 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/switchToOffTextView"
-                    style="@style/AudioMothText.Body"
+                    style="@style/CompanionText.Body"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_small"
@@ -57,7 +57,7 @@
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/beginSyncButton"
-                    style="@style/AudioMothButton.GreenButton"
+                    style="@style/CompanionButton.GreenButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_normal"
@@ -77,7 +77,7 @@
                 app:layout_constraintTop_toBottomOf="@id/setHardwareSwitchToOffLayout">
 
                 <TextView
-                    style="@style/AudioMothText.Subhead.Secondary"
+                    style="@style/CompanionText.Subhead.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/one_text"
@@ -101,7 +101,7 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/stepTwoTextView"
-                    style="@style/AudioMothText.Body"
+                    style="@style/CompanionText.Body"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/two"
@@ -110,7 +110,7 @@
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/notHearButton"
-                    style="@style/GuardianButton.RedButton"
+                    style="@style/CompanionButton.RedButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -124,7 +124,7 @@
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/hearButton"
-                    style="@style/AudioMothButton.GreenButton"
+                    style="@style/CompanionButton.GreenButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_normal"
@@ -145,7 +145,7 @@
                 app:layout_constraintTop_toBottomOf="@id/hearAudioToneLayout">
 
                 <TextView
-                    style="@style/AudioMothText.Subhead.Secondary"
+                    style="@style/CompanionText.Subhead.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/two_text"
@@ -162,7 +162,7 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/stepThreeTextView"
-                    style="@style/AudioMothText.Body"
+                    style="@style/CompanionText.Body"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/three"
@@ -186,7 +186,7 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/switchCustomTextView"
-                    style="@style/AudioMothText.Body"
+                    style="@style/CompanionText.Body"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_normal"
@@ -197,7 +197,7 @@
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/notSwitchButton"
-                    style="@style/GuardianButton.RedButton"
+                    style="@style/CompanionButton.RedButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -211,7 +211,7 @@
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/switchButton"
-                    style="@style/AudioMothButton.GreenButton"
+                    style="@style/CompanionButton.GreenButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_normal"
@@ -232,7 +232,7 @@
                 app:layout_constraintTop_toBottomOf="@id/switchToCustomLayout">
 
                 <TextView
-                    style="@style/AudioMothText.Subhead.Secondary"
+                    style="@style/CompanionText.Subhead.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/three_text"
@@ -256,7 +256,7 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/stepFourTextView"
-                    style="@style/AudioMothText.Body"
+                    style="@style/CompanionText.Body"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/four"
@@ -273,7 +273,7 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/lightsAudiomothTextView"
-                    style="@style/AudioMothText.Body"
+                    style="@style/CompanionText.Body"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_normal"
@@ -284,7 +284,7 @@
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/notSeeLightsAudiomothButton"
-                    style="@style/GuardianButton.RedButton"
+                    style="@style/CompanionButton.RedButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -298,7 +298,7 @@
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/seeLightsAudiomothButton"
-                    style="@style/AudioMothButton.GreenButton"
+                    style="@style/CompanionButton.GreenButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_normal"
@@ -319,7 +319,7 @@
                 app:layout_constraintTop_toBottomOf="@id/lightsAudiomothLayout">
 
                 <TextView
-                    style="@style/AudioMothText.Subhead.Secondary"
+                    style="@style/CompanionText.Subhead.Secondary"
                     android:id="@+id/firstText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -328,7 +328,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    style="@style/AudioMothText.Subhead.Secondary"
+                    style="@style/CompanionText.Subhead.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/four_text_two"
@@ -360,7 +360,7 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/stepFiveTextView"
-                    style="@style/AudioMothText.Body"
+                    style="@style/CompanionText.Body"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/five"
@@ -379,7 +379,7 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/movePhoneNearTextView"
-                    style="@style/AudioMothText.Body"
+                    style="@style/CompanionText.Body"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
@@ -389,7 +389,7 @@
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/syncAudioMothButton"
-                    style="@style/AudioMothButton.GreenButton"
+                    style="@style/CompanionButton.GreenButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_normal"
@@ -400,7 +400,7 @@
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/syncAudioMothFinishButton"
-                    style="@style/AudioMothButton.GreenButton"
+                    style="@style/CompanionButton.GreenButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_normal"
@@ -421,7 +421,7 @@
                 app:layout_constraintTop_toBottomOf="@id/movePhoneNearLayout">
 
                 <TextView
-                    style="@style/AudioMothText.Subhead.Secondary"
+                    style="@style/CompanionText.Subhead.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/five_text"
@@ -445,7 +445,7 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/stepSixTextView"
-                    style="@style/AudioMothText.Body"
+                    style="@style/CompanionText.Body"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/six"
@@ -454,7 +454,7 @@
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/notConfirmLightButton"
-                    style="@style/GuardianButton.RedButton"
+                    style="@style/CompanionButton.RedButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -468,7 +468,7 @@
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/confirmLightButton"
-                    style="@style/AudioMothButton.GreenButton"
+                    style="@style/CompanionButton.GreenButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_normal"

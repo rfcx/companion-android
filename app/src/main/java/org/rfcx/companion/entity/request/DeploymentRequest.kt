@@ -2,7 +2,7 @@ package org.rfcx.companion.entity.request
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import org.rfcx.companion.entity.guardian.Deployment
+import org.rfcx.companion.entity.Deployment
 import org.rfcx.companion.util.toISO8601Format
 import java.util.*
 

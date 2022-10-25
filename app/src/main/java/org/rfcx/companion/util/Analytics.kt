@@ -170,45 +170,10 @@ class Analytics(context: Context) {
         trackEvent(Event.CREATE_SONGMETER_DEPLOYMENT.id, bundle)
     }
 
-    fun trackSelectGuardianHotspotEvent() {
-        val bundle = Bundle()
-        trackEvent(Event.SELECT_GUARDIAN_HOTSPOT.id, bundle)
-    }
-
-    fun trackConnectGuardianHotspotEvent() {
-        val bundle = Bundle()
-        trackEvent(Event.CONNECT_GUARDIAN_HOTSPOT.id, bundle)
-    }
-
-    fun trackRetryGuardianHotspotEvent() {
-        val bundle = Bundle()
-        trackEvent(Event.RETRY_GUARDIAN_HOTSPOT.id, bundle)
-    }
-
     fun trackClickNextEvent(page: String) {
         val bundle = Bundle()
         bundle.putString(FROM_PAGE, page)
         trackEvent(Event.CLICK_NEXT.id, bundle)
-    }
-
-    fun trackRegisterGuardianEvent() {
-        val bundle = Bundle()
-        trackEvent(Event.REGISTER_GUARDIAN.id, bundle)
-    }
-
-    fun trackSelectGuardianProfileEvent() {
-        val bundle = Bundle()
-        trackEvent(Event.SELECT_GUARDIAN_PROFILE.id, bundle)
-    }
-
-    fun trackCreateNewGuardianProfileEvent() {
-        val bundle = Bundle()
-        trackEvent(Event.CREATE_NEW_GUARDIAN_PROFILE.id, bundle)
-    }
-
-    fun trackCreateGuardianDeploymentEvent() {
-        val bundle = Bundle()
-        trackEvent(Event.CREATE_GUARDIAN_DEPLOYMENT.id, bundle)
     }
 
     companion object {

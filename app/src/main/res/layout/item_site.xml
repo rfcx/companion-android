@@ -36,7 +36,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/siteNameTextView"
-        style="@style/AudioMothText.Subhead"
+        style="@style/CompanionText.Subhead"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
@@ -51,7 +51,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/createdSiteNameTextView"
-        style="@style/AudioMothText.Subhead"
+        style="@style/CompanionText.Subhead"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
@@ -68,7 +68,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/distanceTextView"
-        style="@style/AudioMothText.Body.Secondary"
+        style="@style/CompanionText.Body.Secondary"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="2"
@@ -83,7 +83,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/detailTextView"
-        style="@style/AudioMothText.Body.Secondary"
+        style="@style/CompanionText.Body.Secondary"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/margin_padding_normal"

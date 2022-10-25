@@ -3,9 +3,9 @@ package org.rfcx.companion.view.detail
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import io.realm.RealmResults
+import org.rfcx.companion.entity.Deployment
 import org.rfcx.companion.entity.DeploymentImage
 import org.rfcx.companion.entity.Project
-import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.localdb.DatabaseCallback
 
 class DeploymentDetailViewModel(

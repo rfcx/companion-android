@@ -5,7 +5,6 @@ import io.realm.RealmResults
 import io.realm.Sort
 import io.realm.kotlin.deleteFromRealm
 import org.rfcx.companion.entity.*
-import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.toDeployment
 import java.util.*
@@ -14,7 +13,7 @@ class DeploymentDb(private val realm: Realm) {
 
     fun unsentCount(): Long {
         return realm.where(Deployment::class.java)
-            .equalTo(Deployment.FIELD_STATE, DeploymentState.Guardian.ReadyToUpload.key)
+            .equalTo(Deployment.FIELD_STATE, DeploymentState.AudioMoth.ReadyToUpload.key)
             .and()
             .notEqualTo(Deployment.FIELD_SYNC_STATE, SyncState.Sent.key)
             .count()
@@ -22,7 +21,7 @@ class DeploymentDb(private val realm: Realm) {
 
     fun getUnsent(): List<Deployment> {
         return realm.where(Deployment::class.java)
-            .equalTo(Deployment.FIELD_STATE, DeploymentState.Guardian.ReadyToUpload.key)
+            .equalTo(Deployment.FIELD_STATE, DeploymentState.AudioMoth.ReadyToUpload.key)
             .and()
             .notEqualTo(Deployment.FIELD_SYNC_STATE, SyncState.Sent.key)
             .sort(Deployment.FIELD_ID, Sort.DESCENDING)
@@ -159,14 +158,6 @@ class DeploymentDb(private val realm: Realm) {
     fun lockUnsent(): List<Deployment> {
         var unsentCopied: List<Deployment> = listOf()
         realm.executeTransaction {
-            val unsentGuardian = it.where(Deployment::class.java)
-                .equalTo(Deployment.FIELD_DEVICE, Device.GUARDIAN.value)
-                .and()
-                .equalTo(Deployment.FIELD_STATE, DeploymentState.Guardian.ReadyToUpload.key)
-                .and()
-                .equalTo(Deployment.FIELD_SYNC_STATE, SyncState.Unsent.key).findAll()
-                .createSnapshot()
-
             val unsentAudioMoth = it.where(Deployment::class.java)
                 .equalTo(Deployment.FIELD_DEVICE, Device.AUDIOMOTH.value)
                 .and()
@@ -183,7 +174,7 @@ class DeploymentDb(private val realm: Realm) {
                 .equalTo(Deployment.FIELD_SYNC_STATE, SyncState.Unsent.key).findAll()
                 .createSnapshot()
 
-            unsentCopied = (unsentGuardian + unsentAudioMoth + unsentSongMeter)
+            unsentCopied = (unsentAudioMoth + unsentSongMeter)
             unsentCopied.forEach { deployment ->
                 deployment.syncState = SyncState.Sending.key
             }
@@ -239,7 +230,7 @@ class DeploymentDb(private val realm: Realm) {
 
     fun getDeploymentsBySiteId(streamId: Int, device: String): ArrayList<Deployment> {
         val deployments = realm.where(Deployment::class.java)
-            .equalTo(Deployment.FIELD_STATE, if (device == Device.GUARDIAN.value) DeploymentState.Guardian.ReadyToUpload.key else DeploymentState.AudioMoth.ReadyToUpload.key)
+            .equalTo(Deployment.FIELD_STATE, if (device == Device.AUDIOMOTH.value) DeploymentState.AudioMoth.ReadyToUpload.key else DeploymentState.SongMeter.ReadyToUpload.key)
             .and()
             .equalTo(Deployment.FIELD_SYNC_STATE, SyncState.Sent.key)
             .and()

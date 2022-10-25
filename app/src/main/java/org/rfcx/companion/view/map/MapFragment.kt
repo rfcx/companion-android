@@ -65,8 +65,6 @@ import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.localdb.TrackingDb
-import org.rfcx.companion.repo.api.CoreApiHelper
-import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
@@ -358,7 +356,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
             ViewModelFactory(
                 requireActivity().application,
                 DeviceApiHelper(DeviceApiServiceImpl()),
-                CoreApiHelper(CoreApiServiceImpl()),
                 LocalDataHelper()
             )
         ).get(MainViewModel::class.java)

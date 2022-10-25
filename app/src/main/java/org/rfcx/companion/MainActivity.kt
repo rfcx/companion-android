@@ -31,15 +31,12 @@ import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.CrashlyticsKey
 import org.rfcx.companion.entity.Stream
 import org.rfcx.companion.entity.isGuest
-import org.rfcx.companion.repo.api.CoreApiHelper
-import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DeploymentCleanupWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.AudioMothDeploymentActivity
-import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.companion.view.deployment.songmeter.SongMeterDeploymentActivity
 import org.rfcx.companion.view.map.MapFragment
 import org.rfcx.companion.view.profile.ProfileFragment
@@ -110,7 +107,6 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
             ViewModelFactory(
                 application,
                 DeviceApiHelper(DeviceApiServiceImpl()),
-                CoreApiHelper(CoreApiServiceImpl()),
                 LocalDataHelper()
             )
         ).get(MainViewModel::class.java)
@@ -153,41 +149,32 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
             }
         }
 
-        createLocationButton.setOnClickListener {
-            if (BuildConfig.ENABLE_GUARDIAN) {
-                addTooltip = SimpleTooltip.Builder(this)
-                    .arrowColor(ContextCompat.getColor(this, R.color.tooltipColor))
-                    .anchorView(createLocationButton)
-                    .gravity(Gravity.TOP)
-                    .modal(true)
-                    .dismissOnInsideTouch(false)
-                    .animationPadding(10F)
-                    .contentView(R.layout.tooltip_add_device)
-                    .animated(false)
-                    .transparentOverlay(true)
-                    .build()
+        createDeploymentButton.setOnClickListener {
+            addTooltip = SimpleTooltip.Builder(this)
+                .arrowColor(ContextCompat.getColor(this, R.color.tooltipColor))
+                .anchorView(createDeploymentButton)
+                .gravity(Gravity.TOP)
+                .modal(true)
+                .dismissOnInsideTouch(false)
+                .animationPadding(10F)
+                .contentView(R.layout.tooltip_add_device)
+                .animated(false)
+                .transparentOverlay(true)
+                .build()
 
-                addTooltip?.let { tip ->
-                    val addEdgeOrAudioMoth =
-                        tip.findViewById<ConstraintLayout>(R.id.audioMothLayout)
-                    val addGuardian = tip.findViewById<ConstraintLayout>(R.id.guardianLayout)
-                    val addSongMeter = tip.findViewById<ConstraintLayout>(R.id.songMeterLayout)
-                    addEdgeOrAudioMoth?.setOnClickListener {
-                        AudioMothDeploymentActivity.startActivity(this)
-                        tip.dismiss()
-                    }
-                    addGuardian?.setOnClickListener {
-                        GuardianDeploymentActivity.startActivity(this)
-                        tip.dismiss()
-                    }
-                    addSongMeter?.setOnClickListener {
-                        SongMeterDeploymentActivity.startActivity(this)
-                        tip.dismiss()
-                    }
-                    tip.show()
+            addTooltip?.let { tip ->
+                val addEdgeOrAudioMoth =
+                    tip.findViewById<ConstraintLayout>(R.id.audioMothLayout)
+                val addSongMeter = tip.findViewById<ConstraintLayout>(R.id.songMeterLayout)
+                addEdgeOrAudioMoth?.setOnClickListener {
+                    AudioMothDeploymentActivity.startActivity(this)
+                    tip.dismiss()
                 }
-            } else {
-                AudioMothDeploymentActivity.startActivity(this)
+                addSongMeter?.setOnClickListener {
+                    SongMeterDeploymentActivity.startActivity(this)
+                    tip.dismiss()
+                }
+                tip.show()
             }
         }
 
@@ -260,7 +247,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
 
             SimpleTooltip.Builder(this)
                 .arrowColor(ContextCompat.getColor(this, R.color.backgroundColor))
-                .anchorView(createLocationButton)
+                .anchorView(createDeploymentButton)
                 .text(getString(R.string.setup_first_device, this.getUserNickname()))
                 .gravity(Gravity.TOP)
                 .animationPadding(10F)
@@ -344,7 +331,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
 
     override fun showSnackbar(msg: String, duration: Int) {
         snackbar = Snackbar.make(mainRootView, msg, duration)
-        snackbar?.anchorView = createLocationButton
+        snackbar?.anchorView = createDeploymentButton
         snackbar?.show()
     }
 
@@ -403,7 +390,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
     }
 
     override fun hideBottomAppBar() {
-        createLocationButton.visibility = View.GONE
+        createDeploymentButton.visibility = View.GONE
         bottomBar.visibility = View.GONE
 
         val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
@@ -414,7 +401,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
 
     override fun showBottomAppBar() {
         bottomBar.visibility = View.VISIBLE
-        createLocationButton.visibility = View.VISIBLE
+        createDeploymentButton.visibility = View.VISIBLE
 
         val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
         if (mapFragment is MapFragment) {

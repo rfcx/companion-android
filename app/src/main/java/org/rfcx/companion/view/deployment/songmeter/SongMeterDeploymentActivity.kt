@@ -15,9 +15,6 @@ import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
-import org.rfcx.companion.entity.guardian.Deployment
-import org.rfcx.companion.repo.api.CoreApiHelper
-import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.ble.BleConnectDelegate
@@ -91,7 +88,6 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
             ViewModelFactory(
                 application,
                 DeviceApiHelper(DeviceApiServiceImpl()),
-                CoreApiHelper(CoreApiServiceImpl()),
                 LocalDataHelper(),
                 BleHelper(BleDetectService(this), BleConnectDelegate(this))
             )

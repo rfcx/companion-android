@@ -32,7 +32,7 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/letConfigureTextView"
-                style="@style/AudioMothText.Subhead.Bold"
+                style="@style/CompanionText.Subhead.Bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="@dimen/margin_padding_normal"
@@ -64,14 +64,14 @@
 
                 <TextView
                     android:id="@+id/sampleRateTextView"
-                    style="@style/AudioMothText.Body.Small"
+                    style="@style/CompanionText.Body.Small"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/sample_rate" />
 
                 <TextView
                     android:id="@+id/sampleRateValueTextView"
-                    style="@style/AudioMothText.Body.Secondary"
+                    style="@style/CompanionText.Body.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingBottom="@dimen/margin_padding_small"
@@ -99,14 +99,14 @@
 
                 <TextView
                     android:id="@+id/gainTextView"
-                    style="@style/AudioMothText.Body.Small"
+                    style="@style/CompanionText.Body.Small"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/gain" />
 
                 <TextView
                     android:id="@+id/gainValueTextView"
-                    style="@style/AudioMothText.Body.Secondary"
+                    style="@style/CompanionText.Body.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/text_xsmall"
@@ -121,7 +121,7 @@
 
             <TextView
                 android:id="@+id/durationTextView"
-                style="@style/AudioMothText.Body.Small"
+                style="@style/CompanionText.Body.Small"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_padding_normal"
@@ -247,7 +247,7 @@
 
                     <TextView
                         android:id="@+id/customRecordingPeriodTextView"
-                        style="@style/AudioMothText.Body.Small"
+                        style="@style/CompanionText.Body.Small"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
@@ -255,7 +255,7 @@
 
                     <TextView
                         android:id="@+id/alwaysRecordingTextView"
-                        style="@style/AudioMothText.Body.Secondary"
+                        style="@style/CompanionText.Body.Secondary"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/always_recording"
@@ -319,7 +319,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/nextButton"
-        style="@style/AudioMothButton.GreenButton"
+        style="@style/CompanionButton.GreenButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"

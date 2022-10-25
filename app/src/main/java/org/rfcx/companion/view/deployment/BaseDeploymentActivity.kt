@@ -7,8 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_deployment.*
 import kotlinx.android.synthetic.main.toolbar_default.*
+import org.rfcx.companion.entity.Deployment
 import org.rfcx.companion.entity.Stream
-import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.service.DownloadStreamState
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment

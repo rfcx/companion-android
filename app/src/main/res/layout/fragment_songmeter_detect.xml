@@ -28,7 +28,7 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/stepOneLabel"
-                    style="@style/AudioMothText.Body.Small"
+                    style="@style/CompanionText.Body.Small"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/one"
@@ -46,7 +46,7 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/stepOneTextView"
-                    style="@style/AudioMothText.Body"
+                    style="@style/CompanionText.Body"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_small"
@@ -56,7 +56,7 @@
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/stepOneButton"
-                    style="@style/AudioMothButton.GreenButton"
+                    style="@style/CompanionButton.GreenButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_normal"
@@ -76,7 +76,7 @@
                 app:layout_constraintTop_toBottomOf="@id/stepOneLayout">
 
                 <TextView
-                    style="@style/AudioMothText.Subhead.Secondary"
+                    style="@style/CompanionText.Subhead.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/_1_the_recorder_is_on"
@@ -101,7 +101,7 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/stepTwoTextView"
-                    style="@style/AudioMothText.Body"
+                    style="@style/CompanionText.Body"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/_2_do_you_see_a_device_select_one_to_sync"
@@ -130,7 +130,7 @@
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/stepTwoNoButton"
-                    style="@style/GuardianButton.RedButton"
+                    style="@style/CompanionButton.RedButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -144,7 +144,7 @@
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/stepTwoYesButton"
-                    style="@style/AudioMothButton.GreenButton"
+                    style="@style/CompanionButton.GreenButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_padding_small"
@@ -166,7 +166,7 @@
                 app:layout_constraintTop_toBottomOf="@id/stepTwoLayout">
 
                 <TextView
-                    style="@style/AudioMothText.Subhead.Secondary"
+                    style="@style/CompanionText.Subhead.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/_2_device_is_detected"
@@ -184,7 +184,7 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/stepThreeLabel"
-                    style="@style/AudioMothText.Body"
+                    style="@style/CompanionText.Body"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/_3"
@@ -209,7 +209,7 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/stepThreeTextView"
-                    style="@style/AudioMothText.Body"
+                    style="@style/CompanionText.Body"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_padding_small"
@@ -227,7 +227,7 @@
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/stepThreePrefixesTextView"
-                        style="@style/AudioMothText.Body.Secondary"
+                        style="@style/CompanionText.Body.Secondary"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:background="?attr/selectableItemBackground"
@@ -238,7 +238,7 @@
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/stepThreeSerialNumberTextView"
-                        style="@style/AudioMothText.Body.Secondary"
+                        style="@style/CompanionText.Body.Secondary"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:background="?attr/selectableItemBackground"
@@ -251,7 +251,7 @@
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/stepThreeNoButton"
-                    style="@style/GuardianButton.RedButton"
+                    style="@style/CompanionButton.RedButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -265,7 +265,7 @@
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/stepThreeSyncButton"
-                    style="@style/AudioMothButton.GreenButton"
+                    style="@style/CompanionButton.GreenButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_padding_small"
@@ -287,7 +287,7 @@
                 app:layout_constraintTop_toBottomOf="@id/stepThreeLayout">
 
                 <TextView
-                    style="@style/AudioMothText.Subhead.Secondary"
+                    style="@style/CompanionText.Subhead.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/_3_device_is_synced"
@@ -305,7 +305,7 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/stepFourTextView"
-                    style="@style/AudioMothText.Body"
+                    style="@style/CompanionText.Body"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/_4_confirm_that_the_device_name_is_changed"
@@ -341,7 +341,7 @@
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/stepFourNoButton"
-                    style="@style/GuardianButton.RedButton"
+                    style="@style/CompanionButton.RedButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -355,7 +355,7 @@
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/stepFourYesButton"
-                    style="@style/AudioMothButton.GreenButton"
+                    style="@style/CompanionButton.GreenButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_padding_small"

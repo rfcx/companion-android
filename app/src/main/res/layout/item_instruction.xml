@@ -16,7 +16,7 @@
 
     <TextView
         android:id="@+id/instructionNumberText"
-        style="@style/AudioMothText.Body.Secondary"
+        style="@style/CompanionText.Body.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/text_primary"
@@ -29,7 +29,7 @@
 
     <TextView
         android:id="@+id/instructionDescText"
-        style="@style/AudioMothText.Body.Secondary"
+        style="@style/CompanionText.Body.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_normal"

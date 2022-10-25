@@ -127,7 +127,7 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/notHaveSiteTextView"
-            style="@style/AudioMothText.Subhead.Bold"
+            style="@style/CompanionText.Subhead.Bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/not_have_sites"
@@ -139,7 +139,7 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/notHaveResultTextView"
-            style="@style/AudioMothText.Subhead.Bold"
+            style="@style/CompanionText.Subhead.Bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/no_result_found"
@@ -173,7 +173,7 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/trackingTextView"
-            style="@style/AudioMothText.Subhead.Small"
+            style="@style/CompanionText.Subhead.Small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_padding_small"

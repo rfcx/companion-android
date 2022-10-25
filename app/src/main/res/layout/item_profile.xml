@@ -10,7 +10,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/nameProfileTextView"
-        style="@style/AudioMothText.Subhead"
+        style="@style/CompanionText.Subhead"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
@@ -21,7 +21,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/detailProfileTextView"
-        style="@style/AudioMothText.Body.Secondary"
+        style="@style/CompanionText.Body.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ellipsize="end"

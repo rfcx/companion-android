@@ -35,7 +35,7 @@
 
                 <TextView
                     android:id="@+id/ddTextView"
-                    style="@style/AudioMothText.Subhead.Bold"
+                    style="@style/CompanionText.Subhead.Bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_padding_normal"
@@ -43,7 +43,7 @@
                     android:text="@string/dd_coordinates" />
 
                 <TextView
-                    style="@style/AudioMothText.Body.Secondary"
+                    style="@style/CompanionText.Body.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_padding_normal"
@@ -88,7 +88,7 @@
 
                 <TextView
                     android:id="@+id/ddmTextView"
-                    style="@style/AudioMothText.Subhead.Bold"
+                    style="@style/CompanionText.Subhead.Bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_padding_normal"
@@ -96,7 +96,7 @@
                     android:text="@string/ddm_coordinates" />
 
                 <TextView
-                    style="@style/AudioMothText.Body.Secondary"
+                    style="@style/CompanionText.Body.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_padding_normal"
@@ -143,7 +143,7 @@
 
                 <TextView
                     android:id="@+id/dmsTextView"
-                    style="@style/AudioMothText.Subhead.Bold"
+                    style="@style/CompanionText.Subhead.Bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_padding_normal"
@@ -151,7 +151,7 @@
                     android:text="@string/dms_coordinates" />
 
                 <TextView
-                    style="@style/AudioMothText.Body.Secondary"
+                    style="@style/CompanionText.Body.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_padding_normal"

@@ -27,7 +27,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/readySendConfigureTextView"
-        style="@style/AudioMothText.Subhead.Bold"
+        style="@style/CompanionText.Subhead.Bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -59,7 +59,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/syncSwitchDescText"
-        style="@style/AudioMothText.Subhead.Small"
+        style="@style/CompanionText.Subhead.Small"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_padding_normal"
@@ -71,7 +71,7 @@
 
     <TextView
         android:id="@+id/syncInstruction1Text"
-        style="@style/AudioMothText.Body.Secondary"
+        style="@style/CompanionText.Body.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/margin_padding_small"
@@ -84,7 +84,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/playToneButton"
-        style="@style/AudioMothButton.GreenButton"
+        style="@style/CompanionButton.GreenButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_large"

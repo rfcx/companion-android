@@ -4,7 +4,6 @@ import io.realm.DynamicRealm
 import io.realm.FieldAttribute
 import io.realm.RealmMigration
 import org.rfcx.companion.entity.*
-import org.rfcx.companion.entity.guardian.Deployment
 import java.util.*
 
 class CompanionRealmMigration : RealmMigration {

@@ -15,7 +15,7 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/siteLoadingText"
-            style="@style/AudioMothText.Body.Secondary"
+            style="@style/CompanionText.Body.Secondary"
             android:text="@string/sites_loading_dialog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -27,7 +27,7 @@
 
         <Button
             android:id="@+id/siteLoadingButton"
-            style="@style/AudioMothButton.GreenButton"
+            style="@style/CompanionButton.GreenButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_padding_normal"

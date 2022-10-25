@@ -17,9 +17,6 @@ import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition
 import io.realm.RealmResults
 import org.json.JSONObject
 import org.rfcx.companion.entity.*
-import org.rfcx.companion.entity.guardian.Deployment
-import org.rfcx.companion.entity.guardian.GuardianRegistration
-import org.rfcx.companion.entity.guardian.toMark
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.ProjectByIdResponse
 import org.rfcx.companion.entity.response.ProjectOffTimeResponse
@@ -60,11 +57,6 @@ class MainViewModel(
     private val deploymentObserve = Observer<List<Deployment>> {
         combinedData()
     }
-    private lateinit var registrationLiveData: LiveData<List<GuardianRegistration>>
-    private val registrationObserve = Observer<List<GuardianRegistration>> {
-        registrationCount = it.size
-        combinedData()
-    }
 
     init {
         fetchLiveData()
@@ -79,11 +71,6 @@ class MainViewModel(
             mainRepository.getAllDeploymentLocateResultsAsync().asLiveData()
         ) { it }
         deploymentLiveData.observeForever(deploymentObserve)
-
-        registrationLiveData = Transformations.map(
-            mainRepository.getAllRegistrationResultsAsync().asLiveData()
-        ) { it }
-        registrationLiveData.observeForever(registrationObserve)
     }
 
     fun fetchProjects() {

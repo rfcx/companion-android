@@ -1,8 +1,7 @@
 package org.rfcx.companion.view.unsynced
 
 import io.realm.RealmResults
-import org.rfcx.companion.entity.guardian.Deployment
-import org.rfcx.companion.entity.guardian.GuardianRegistration
+import org.rfcx.companion.entity.Deployment
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.local.LocalDataHelper
 
@@ -14,23 +13,11 @@ class UnsyncedWorksRepository(
         return localDataHelper.getDeploymentLocalDb().getUnsent()
     }
 
-    fun getUnsentRegistration(): List<GuardianRegistration> {
-        return localDataHelper.getGuardianRegistration().getAll()
-    }
-
     fun getAllDeploymentLocalResultsAsync(): RealmResults<Deployment> {
         return localDataHelper.getDeploymentLocalDb().getAllResultsAsync()
     }
 
-    fun getAllRegistrationLocalResultsAsync(): RealmResults<GuardianRegistration> {
-        return localDataHelper.getGuardianRegistration().getAllResultsAsync()
-    }
-
     fun deleteDeployment(id: Int) {
         localDataHelper.getDeploymentLocalDb().deleteDeployment(id)
-    }
-
-    fun deleteRegistration(id: String) {
-        localDataHelper.getGuardianRegistration().delete(id)
     }
 }

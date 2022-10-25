@@ -44,7 +44,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/countTextView"
-        style="@style/AudioMothText.Body.Secondary"
+        style="@style/CompanionText.Body.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"

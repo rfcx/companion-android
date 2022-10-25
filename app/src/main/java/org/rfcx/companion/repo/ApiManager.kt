@@ -3,7 +3,6 @@ package org.rfcx.companion.repo
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.rfcx.companion.BuildConfig
-import org.rfcx.companion.repo.api.CoreApiService
 import org.rfcx.companion.repo.api.DeviceApiService
 import org.rfcx.companion.util.insert
 import retrofit2.Retrofit
@@ -11,7 +10,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 class ApiManager {
-    var coreApi: CoreApiService
     var apiFirebaseAuth: FirebaseAuthInterface
     private var deviceApi: DeviceApiInterface
     private var deviceApi2: DeviceApiService
@@ -27,7 +25,6 @@ class ApiManager {
     }
 
     init {
-        coreApi = setRetrofitBaseUrl(BuildConfig.DEPLOY_DOMAIN).create(CoreApiService::class.java)
         apiFirebaseAuth =
             setRetrofitBaseUrl(BuildConfig.FIREBASE_AUTH_DOMAIN).create(FirebaseAuthInterface::class.java)
         deviceApi =

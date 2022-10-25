@@ -7,7 +7,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/selectProjectTitleTextView"
-        style="@style/AudioMothText.Headline"
+        style="@style/CompanionText.Headline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_normal"
@@ -20,7 +20,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/selectProjectDescTextView"
-        style="@style/AudioMothText.Subhead.Secondary"
+        style="@style/CompanionText.Subhead.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_padding_normal"
@@ -30,7 +30,7 @@
 
     <TextView
         android:id="@+id/noContentTextView"
-        style="@style/AudioMothText.Subhead.Secondary"
+        style="@style/CompanionText.Subhead.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_padding_normal"
@@ -65,7 +65,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/logoutButton"
-        style="@style/GuardianButton.GreenButton.Line"
+        style="@style/CompanionButton.GreenButton.Line"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_padding_normal"
@@ -77,7 +77,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/selectProjectButton"
-        style="@style/AudioMothButton.GreenButton"
+        style="@style/CompanionButton.GreenButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_padding_normal"
