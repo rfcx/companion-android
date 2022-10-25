@@ -13,15 +13,6 @@
         <item>@string/dark_theme</item>
     </string-array>
 
-    <!--  Edge  -->
-    <string-array name="edge_gains">
-        <item>Low</item>
-        <item>Low - Medium</item>
-        <item>Medium</item>
-        <item>Medium - High</item>
-        <item>High</item>
-    </string-array>
-
     <string-array name="edge_setup_checks">
         <item>@string/set_deployment_site</item>
         <item>@string/synchronize_with_audioMoth</item>
