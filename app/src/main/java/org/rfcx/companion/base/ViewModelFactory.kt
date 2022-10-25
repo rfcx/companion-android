@@ -31,7 +31,8 @@ class ViewModelFactory(
     private val localDataHelper: LocalDataHelper,
     private val bleHelper: BleHelper? = null
 ) : ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         when {
             modelClass.isAssignableFrom(ProjectSelectViewModel::class.java) -> {
                 return ProjectSelectViewModel(

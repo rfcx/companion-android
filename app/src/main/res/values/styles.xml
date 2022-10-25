@@ -219,8 +219,6 @@
         <item name="android:background">@color/dialogColor</item>
         <item name="android:textColorAlertDialogListItem">@color/text_primary</item>
         <item name="android:textColorSecondary">@color/text_primary</item>
-        <item name="positiveButtonText">@style/PositiveButton</item>
-        <item name="negativeButtonText">@style/NegativeButton</item>
         <item name="buttonBarPositiveButtonStyle">@style/PositiveButton</item>
         <item name="buttonBarNegativeButtonStyle">@style/NegativeButton</item>
     </style>
