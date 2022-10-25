@@ -19,7 +19,6 @@ import org.rfcx.companion.entity.request.GuardianRegisterRequest
 import org.rfcx.companion.entity.response.GuardianRegisterResponse
 import org.rfcx.companion.localdb.GuardianRegistrationDb
 import org.rfcx.companion.repo.ApiManager
-import org.rfcx.companion.service.RegisterGuardianWorker
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.getIdToken
@@ -139,7 +138,6 @@ class GuardianRegisterFragment : Fragment() {
             isWaitingRegistration = true
             GuardianSocketManager.sendGuardianRegistration(registration)
             db.insert(registration)
-            RegisterGuardianWorker.enqueue(requireContext())
         } else {
             Toast.makeText(requireContext(), "Register failed: guid is null", Toast.LENGTH_LONG).show()
         }

@@ -2,3 +2,4 @@
 - Fix classifier timer not cancel when close
 - Fix location service error when not activate service
 - Fix audiomoth play sound step error report
+- Fix Companion register old record

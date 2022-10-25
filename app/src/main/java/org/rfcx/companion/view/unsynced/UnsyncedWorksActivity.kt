@@ -155,9 +155,7 @@ class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
             this.lastRegistrationSyncingInfo = status
         }
 
-        if (this.lastRegistrationSyncingInfo != null && this.lastRegistrationSyncingInfo != null) {
-            setStatus(this.lastDeploymentSyncingInfo!!, this.lastRegistrationSyncingInfo!!)
-        }
+        setStatus(this.lastDeploymentSyncingInfo, this.lastRegistrationSyncingInfo)
     }
 
     private fun setUnsyncedText(deploymentCount: Int, registrationCount: Int) {
@@ -186,7 +184,7 @@ class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
         }
     }
 
-    private fun setStatus(deploymentStatus: SyncInfo, registrationStatus: SyncInfo) {
+    private fun setStatus(deploymentStatus: SyncInfo?, registrationStatus: SyncInfo?) {
         when {
             deploymentStatus == SyncInfo.Starting || registrationStatus == SyncInfo.Starting -> {
                 showSyncingState()
