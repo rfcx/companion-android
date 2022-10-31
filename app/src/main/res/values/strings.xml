@@ -590,4 +590,9 @@
     <string name="unsynced_all_text">You have %d unsynced deployments and %d registrations</string>
     <string name="deployment">Deployment</string>
     <string name="registration">Registration</string>
+
+    <!-- Guardian Storage Fragment -->
+    <string name="internal_storage">Internal Storage</string>
+    <string name="storage_format">%s/%s</string>
+    <string name="external_storage">External Storage</string>
 </resources>

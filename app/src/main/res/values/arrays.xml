@@ -54,6 +54,7 @@
         <item>Network Signal Test</item>
         <item>Audio Parameter Config</item>
         <item>Microphone Capture Test</item>
+        <item>Storage Inspector</item>
         <item>Guardian Installation Location</item>
     </string-array>
 
