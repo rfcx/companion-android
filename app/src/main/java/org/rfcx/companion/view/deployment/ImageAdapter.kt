@@ -177,7 +177,7 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
 
     companion object {
         const val VIEW_TYPE_IMAGE = 1
-        const val MAX_IMAGE_SIZE = 5
+        const val MAX_IMAGE_SIZE = 10
     }
 }
 
