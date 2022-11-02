@@ -255,8 +255,22 @@
         <item>#5e7c8b</item>
     </string-array>
 
-    <string-array name="guardian_image_labels">
-        <item>guardian</item>
+    <string-array name="audiomoth_labels">
+        <item>device</item>
+        <item>tree</item>
+        <item>canopy</item>
+        <item>bush</item>
+    </string-array>
+
+    <string-array name="songmeter_labels">
+        <item>device</item>
+        <item>tree</item>
+        <item>canopy</item>
+        <item>bush</item>
+    </string-array>
+
+    <string-array name="guardian_labels">
+        <item>device</item>
         <item>tree</item>
         <item>canopy</item>
         <item>above guardian</item>

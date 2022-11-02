@@ -1,8 +1,6 @@
 package org.rfcx.companion.view.deployment
 
-import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +10,6 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
-import org.rfcx.companion.view.deployment.songmeter.SongMeterDeploymentProtocol
 
 class DeployFragment : BaseImageFragment() {
 

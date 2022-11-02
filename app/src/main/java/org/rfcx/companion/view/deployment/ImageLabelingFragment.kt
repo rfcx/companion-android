@@ -12,6 +12,8 @@ import com.bumptech.glide.Glide
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_image_labeling.*
 import org.rfcx.companion.R
+import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
+import org.rfcx.companion.view.deployment.songmeter.SongMeterDeploymentProtocol
 
 class ImageLabelingFragment : Fragment() {
 
@@ -21,12 +23,16 @@ class ImageLabelingFragment : Fragment() {
     private var currentImage = -1
     private var checkedLabel: Chip? = null
     private var mapImageLabel: MutableMap<String, String> = mutableMapOf()
+    private var labelId = -1
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         when (context) {
-            is BaseDeploymentProtocol -> deploymentProtocol = context
+            is AudioMothDeploymentProtocol -> labelId = R.array.audiomoth_labels
+            is SongMeterDeploymentProtocol -> labelId = R.array.audiomoth_labels
+            is GuardianDeploymentProtocol -> labelId = R.array.audiomoth_labels
         }
+        deploymentProtocol = context as BaseDeploymentProtocol
     }
 
     override fun onCreateView(
@@ -61,14 +67,14 @@ class ImageLabelingFragment : Fragment() {
     }
 
     private fun addLabels() {
-        val labels = requireContext().resources.getStringArray(R.array.guardian_image_labels)
+        val labels = requireContext().resources.getStringArray(labelId)
         labels.forEach {
             addChip(it)
         }
 
         labelChipGroup.setOnCheckedChangeListener { group, checkedId ->
-            Log.d("Companion", "check $checkedId")
             checkedLabel = group.findViewById(checkedId)
+            nextButton.isEnabled = true
         }
     }
 
