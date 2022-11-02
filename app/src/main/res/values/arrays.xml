@@ -254,4 +254,11 @@
         <item>#7a5547</item>
         <item>#5e7c8b</item>
     </string-array>
+
+    <string-array name="guardian_image_labels">
+        <item>guardian</item>
+        <item>tree</item>
+        <item>canopy</item>
+        <item>above guardian</item>
+    </string-array>
 </resources>

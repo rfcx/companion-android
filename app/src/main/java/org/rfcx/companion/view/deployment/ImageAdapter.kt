@@ -1,6 +1,7 @@
 package org.rfcx.companion.view.deployment
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -47,6 +48,7 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
     }
 
     fun getNewAttachImage(): List<String> {
+        Log.d("Companion", "get new images " + imagesSource.size.toString())
         return imagesSource.filter {
             (it is LocalImageItem && it.canDelete)
         }.map {
@@ -157,11 +159,6 @@ class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAda
             deleteButton.visibility = if (canDelete) View.VISIBLE else View.INVISIBLE
         }
     }
-
-    inner class AddImageViewHolder(
-        itemView: View,
-        private val onImageAdapterClickListener: OnImageAdapterClickListener?
-    ) : RecyclerView.ViewHolder(itemView)
 
     class ImageAdapterDiffUtil : DiffUtil.ItemCallback<BaseListItem>() {
         override fun areItemsTheSame(oldItem: BaseListItem, newItem: BaseListItem): Boolean {

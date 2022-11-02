@@ -2,6 +2,7 @@ package org.rfcx.companion.view.deployment
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,18 +16,8 @@ import org.rfcx.companion.view.deployment.songmeter.SongMeterDeploymentProtocol
 
 class DeployFragment : BaseImageFragment() {
 
-    private var audioMothDeploymentProtocol: AudioMothDeploymentProtocol? = null
-    private var songMeterDeploymentProtocol: SongMeterDeploymentProtocol? = null
     private val analytics by lazy { context?.let { Analytics(it) } }
     private var screen: String? = null
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        when (context) {
-            is AudioMothDeploymentProtocol -> audioMothDeploymentProtocol = context
-            is SongMeterDeploymentProtocol -> songMeterDeploymentProtocol = context
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -72,7 +63,6 @@ class DeployFragment : BaseImageFragment() {
 
         finishButton.setOnClickListener {
             val images = getImageAdapter().getNewAttachImage()
-
             if (screen == Screen.AUDIO_MOTH_CHECK_LIST.id) {
                 if (images.isNotEmpty()) {
                     analytics?.trackAddDeploymentImageEvent(Device.AUDIOMOTH.value)
@@ -105,10 +95,6 @@ class DeployFragment : BaseImageFragment() {
         }
         getImageAdapter().setImages(arrayListOf())
     }
-
-    override fun didAddImages(imagePaths: List<String>) {}
-
-    override fun didRemoveImage(imagePath: String) {}
 
     companion object {
         private const val ARG_SCREEN = "screen"

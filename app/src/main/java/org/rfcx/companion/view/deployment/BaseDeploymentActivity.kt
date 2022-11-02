@@ -27,6 +27,7 @@ abstract class BaseDeploymentActivity :
 
     var _deployment: Deployment? = null
     var _images: List<String> = listOf()
+    var _imageLabels: Map<String, String> = mapOf()
     var _stream: Stream? = null
     var _siteItems = listOf<SiteWithLastDeploymentItem>()
 
@@ -106,6 +107,10 @@ abstract class BaseDeploymentActivity :
         return this._images
     }
 
+    override fun getImageLabels(): Map<String, String> {
+        return this._imageLabels
+    }
+
     override fun getCurrentLocation(): Location =
         currentLocate ?: Location(LocationManager.GPS_PROVIDER)
 
@@ -119,6 +124,10 @@ abstract class BaseDeploymentActivity :
 
     override fun setImages(images: List<String>) {
         this._images = images
+    }
+
+    override fun setImageLabels(labels: Map<String, String>) {
+        this._imageLabels = labels
     }
 
     override fun showToolbar() {

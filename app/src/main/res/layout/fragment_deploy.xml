@@ -31,7 +31,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-            
+
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/takePhotosTextView"
                 style="@style/AudioMothText.Subhead.Small"
@@ -52,8 +52,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_padding_large"
-                android:layout_marginEnd="@dimen/margin_padding_normal"
                 android:layout_marginTop="@dimen/margin_padding_normal"
+                android:layout_marginEnd="@dimen/margin_padding_normal"
                 android:text="@string/take_photo"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

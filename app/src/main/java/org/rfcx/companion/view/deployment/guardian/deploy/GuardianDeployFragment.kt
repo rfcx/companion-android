@@ -60,7 +60,6 @@ class GuardianDeployFragment : BaseImageFragment() {
                 pathList.add(it)
             }
             getImageAdapter().addImages(pathList)
-            didAddImages(pathList)
         }
     }
 
@@ -72,10 +71,6 @@ class GuardianDeployFragment : BaseImageFragment() {
         }
         getImageAdapter().setImages(arrayListOf())
     }
-
-    override fun didAddImages(imagePaths: List<String>) {}
-
-    override fun didRemoveImage(imagePath: String) {}
 
     override fun onResume() {
         super.onResume()
