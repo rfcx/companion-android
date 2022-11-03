@@ -4,12 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.LinearLayoutManager
+import android.widget.Button
+import androidx.recyclerview.widget.GridLayoutManager
 import kotlinx.android.synthetic.main.fragment_deploy.*
 import org.rfcx.companion.R
-import org.rfcx.companion.entity.Device
-import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
+import org.rfcx.companion.view.detail.DisplayImageActivity
+import org.rfcx.companion.view.dialog.PhotoGuidelineDialogFragment
 
 class DeployFragment : BaseImageFragment() {
 
@@ -22,6 +23,29 @@ class DeployFragment : BaseImageFragment() {
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_deploy, container, false)
+    }
+
+    override fun onPlaceHolderClick() {
+        val guidelineDialog: PhotoGuidelineDialogFragment =
+            this.parentFragmentManager.findFragmentByTag("PhotoGuidelineDialogFragment") as PhotoGuidelineDialogFragment?
+                ?: run {
+                    PhotoGuidelineDialogFragment(this)
+                }
+        if (guidelineDialog.isVisible || guidelineDialog.isAdded) return
+        guidelineDialog.show(this.parentFragmentManager, "PhotoGuidelineDialogFragment")
+    }
+
+    override fun onImageClick(path: String?) {
+        if (path == null) return
+        context?.let { DisplayImageActivity.startActivity(it, arrayOf("file://$path")) }
+    }
+
+    override fun onDeleteClick() {
+        getImageAdapter().removeImage()
+    }
+
+    override fun onContinueClick() {
+        openGligarPicker()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,37 +66,31 @@ class DeployFragment : BaseImageFragment() {
             it.showToolbar()
             it.setCurrentPage(requireContext().resources.getStringArray(R.array.edge_optional_checks)[0])
             it.setToolbarTitle()
-            takePhotosTextView.text = getString(R.string.take_photos_audiomoth)
         }
 
         songMeterDeploymentProtocol?.let {
             it.showToolbar()
             it.setCurrentPage(requireContext().resources.getStringArray(R.array.song_meter_optional_checks)[0])
             it.setToolbarTitle()
-            takePhotosTextView.text = getString(R.string.take_photos_songmeter)
         }
 
         setupImageRecycler()
 
-        addPhotoButton.setOnClickListener {
-            openGligarPicker()
-        }
-
         finishButton.setOnClickListener {
-            val images = getImageAdapter().getNewAttachImage()
-            if (screen == Screen.AUDIO_MOTH_CHECK_LIST.id) {
-                if (images.isNotEmpty()) {
-                    analytics?.trackAddDeploymentImageEvent(Device.AUDIOMOTH.value)
-                }
-                audioMothDeploymentProtocol?.setImages(images)
-                audioMothDeploymentProtocol?.nextStep()
-            } else if (screen == Screen.SONG_METER_CHECK_LIST.id) {
-                if (images.isNotEmpty()) {
-                    analytics?.trackAddDeploymentImageEvent(Device.SONGMETER.value)
-                }
-                songMeterDeploymentProtocol?.setImages(images)
-                songMeterDeploymentProtocol?.nextStep()
-            }
+//            val images = getImageAdapter().getNewAttachImage()
+//            if (screen == Screen.AUDIO_MOTH_CHECK_LIST.id) {
+//                if (images.isNotEmpty()) {
+//                    analytics?.trackAddDeploymentImageEvent(Device.AUDIOMOTH.value)
+//                }
+//                audioMothDeploymentProtocol?.setImages(images)
+//                audioMothDeploymentProtocol?.nextStep()
+//            } else if (screen == Screen.SONG_METER_CHECK_LIST.id) {
+//                if (images.isNotEmpty()) {
+//                    analytics?.trackAddDeploymentImageEvent(Device.SONGMETER.value)
+//                }
+//                songMeterDeploymentProtocol?.setImages(images)
+//                songMeterDeploymentProtocol?.nextStep()
+//            }
         }
 
         val deployment = audioMothDeploymentProtocol?.getImages()
@@ -87,10 +105,9 @@ class DeployFragment : BaseImageFragment() {
     private fun setupImageRecycler() {
         attachImageRecycler.apply {
             adapter = getImageAdapter()
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-            setHasFixedSize(true)
+            layoutManager = GridLayoutManager(context, 3)
         }
-        getImageAdapter().setImages(arrayListOf())
+//        getImageAdapter().setImages(arrayListOf())
     }
 
     companion object {

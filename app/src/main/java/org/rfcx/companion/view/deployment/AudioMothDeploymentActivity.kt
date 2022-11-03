@@ -184,7 +184,7 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
                 }
             }
             is ChooseDeviceFragment -> finish()
-            is ImageLabelingFragment -> {
+            is ChoosePhotosFragment -> {
                 supportFragmentManager.popBackStack()
             }
             else -> startCheckList()

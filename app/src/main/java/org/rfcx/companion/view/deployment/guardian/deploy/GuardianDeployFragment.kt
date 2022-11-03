@@ -8,13 +8,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_guardian_deploy.*
 import org.rfcx.companion.R
-import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.view.deployment.BaseImageFragment
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 
-class GuardianDeployFragment : BaseImageFragment() {
+class GuardianDeployFragment() : BaseImageFragment() {
 
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
     private val analytics by lazy { context?.let { Analytics(it) } }
@@ -45,12 +44,12 @@ class GuardianDeployFragment : BaseImageFragment() {
         }
 
         finishButton.setOnClickListener {
-            val images = getImageAdapter().getNewAttachImage()
-            if (images.isNotEmpty()) {
-                analytics?.trackAddDeploymentImageEvent(Device.AUDIOMOTH.value)
-            }
-            deploymentProtocol?.setImages(images)
-            deploymentProtocol?.nextStep()
+//            val images = getImageAdapter().getNewAttachImage()
+//            if (images.isNotEmpty()) {
+//                analytics?.trackAddDeploymentImageEvent(Device.AUDIOMOTH.value)
+//            }
+//            deploymentProtocol?.setImages(images)
+//            deploymentProtocol?.nextStep()
         }
 
         val deployment = deploymentProtocol?.getImages()
@@ -59,7 +58,7 @@ class GuardianDeployFragment : BaseImageFragment() {
             deployment.forEach {
                 pathList.add(it)
             }
-            getImageAdapter().addImages(pathList)
+//            getImageAdapter().addImages(pathList)
         }
     }
 
@@ -69,12 +68,28 @@ class GuardianDeployFragment : BaseImageFragment() {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             setHasFixedSize(true)
         }
-        getImageAdapter().setImages(arrayListOf())
+//        getImageAdapter().setImages(arrayListOf())
     }
 
     override fun onResume() {
         super.onResume()
         analytics?.trackScreen(Screen.GUARDIAN_DEPLOY)
+    }
+
+    override fun onPlaceHolderClick() {
+        TODO("Not yet implemented")
+    }
+
+    override fun onImageClick(path: String?) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onDeleteClick() {
+        TODO("Not yet implemented")
+    }
+
+    override fun onContinueClick() {
+        TODO("Not yet implemented")
     }
 
     companion object {

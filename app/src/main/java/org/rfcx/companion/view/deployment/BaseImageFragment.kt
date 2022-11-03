@@ -13,8 +13,9 @@ import org.rfcx.companion.util.GalleryPermissions
 import org.rfcx.companion.util.ImageUtils
 import org.rfcx.companion.view.deployment.songmeter.SongMeterDeploymentProtocol
 import org.rfcx.companion.view.detail.DisplayImageActivity
+import org.rfcx.companion.view.dialog.GuidelineButtonClickListener
 
-abstract class BaseImageFragment : Fragment() {
+abstract class BaseImageFragment : Fragment(), ImageClickListener, GuidelineButtonClickListener {
 
     private var imageAdapter: ImageAdapter? = null
     private var filePath: String? = null
@@ -39,7 +40,7 @@ abstract class BaseImageFragment : Fragment() {
         if (imageAdapter != null) {
             return imageAdapter!!
         }
-        imageAdapter = ImageAdapter()
+        imageAdapter = ImageAdapter(this)
         return imageAdapter!!
     }
 
@@ -71,39 +72,7 @@ abstract class BaseImageFragment : Fragment() {
     }
 
     private fun setupImages() {
-        getImageAdapter().onImageAdapterClickListener =
-            object :
-                OnImageAdapterClickListener {
-
-                override fun onDeleteImageClick(position: Int, imagePath: String) {
-                    getImageAdapter().removeAt(position)
-                    hideAddImagesButton()
-
-                    audioMothDeploymentProtocol?.let {
-                        removeLabel(it, imagePath)
-                    }
-                    songMeterDeploymentProtocol?.let {
-                        removeLabel(it, imagePath)
-                    }
-                }
-
-                override fun onImageClick(imagePath: String) {
-                    val list = arrayListOf<String>()
-                    getImageAdapter().getNewAttachImage().forEach { list.add("file://$it") }
-                    val index = list.indexOf("file://$imagePath")
-                    list.removeAt(index)
-                    list.add(0, "file://$imagePath")
-
-                    context?.let { DisplayImageActivity.startActivity(it, list) }
-                }
-            }
-
-        getImageAdapter().setImages(arrayListOf())
-    }
-
-    private fun removeLabel(protocol: BaseDeploymentProtocol, deletedPath: String) {
-        val labels = protocol.getImageLabels()
-        protocol.setImageLabels(labels.filter { map -> map.key != deletedPath })
+        getImageAdapter().setPlaceHolders(listOf("device", "bush", "tree", "sky", "over view"))
     }
 
     fun openGligarPicker() {
@@ -117,35 +86,19 @@ abstract class BaseImageFragment : Fragment() {
     }
 
     private fun startOpenGligarPicker() {
-        val remainingImage = ImageAdapter.MAX_IMAGE_SIZE - getImageAdapter().getImageCount()
         GligarPicker()
             .requestCode(ImageUtils.REQUEST_GALLERY)
-            .limit(remainingImage)
+            .limit(1)
             .withFragment(this)
             .show()
-    }
-
-    private fun startImageLabeling() {
-        parentFragmentManager.beginTransaction()
-            .add(this.id, ImageLabelingFragment.newInstance(getImageAdapter().getNewAttachImage().toTypedArray()))
-            .addToBackStack(ImageLabelingFragment::class.java.name)
-            .commit()
     }
 
     private fun handleGligarPickerResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
         if (requestCode != ImageUtils.REQUEST_GALLERY || resultCode != Activity.RESULT_OK || intentData == null) return
 
-        val pathList = mutableListOf<String>()
         val results = intentData.extras?.getStringArray(GligarPicker.IMAGES_RESULT)
         results?.forEach {
-            pathList.add(it)
+            getImageAdapter().updateTakeOrChooseImage(it)
         }
-        getImageAdapter().addImages(pathList)
-        hideAddImagesButton()
-        startImageLabeling()
-    }
-
-    private fun hideAddImagesButton() {
-        addPhotoButton.isEnabled = getImageAdapter().getImageCount() < ImageAdapter.MAX_IMAGE_SIZE
     }
 }

@@ -41,23 +41,10 @@
                 android:layout_marginTop="@dimen/margin_padding_normal"
                 android:layout_marginEnd="@dimen/margin_padding_large"
                 android:gravity="center"
-                android:text="@string/take_photos_audiomoth"
+                android:text="Press on each boxes and take or choose a photo\nfollowing guideline"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/takePhotosTitleTextView" />
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/addPhotoButton"
-                style="@style/GuardianButton.GreenButton.Line"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_large"
-                android:layout_marginTop="@dimen/margin_padding_normal"
-                android:layout_marginEnd="@dimen/margin_padding_normal"
-                android:text="@string/take_photo"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/takePhotosTextView" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/attachImageRecycler"
@@ -69,9 +56,9 @@
                 android:clipToPadding="false"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/addPhotoButton"
+                app:layout_constraintTop_toBottomOf="@+id/takePhotosTextView"
                 tools:layoutManager="android.support.v7.widget.LinearLayoutManager"
-                tools:orientation="horizontal" />
+                tools:orientation="vertical" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
