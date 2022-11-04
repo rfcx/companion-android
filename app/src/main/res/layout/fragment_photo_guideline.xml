@@ -33,13 +33,30 @@
             android:text="Take or Choose a photo that show........"
             android:textAlignment="center" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/continueButton"
-            style="@style/AudioMothButton.GreenButton"
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:text="continue" />
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/takePhotoButton"
+                style="@style/AudioMothButton.GreenButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginEnd="@dimen/margin_padding_small"
+                android:layout_weight="1"
+                android:text="Take" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/choosePhotoButton"
+                style="@style/AudioMothButton.GreenButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:text="Choose" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 

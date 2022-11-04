@@ -4,10 +4,12 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.opensooq.supernova.gligar.GligarPicker
@@ -15,15 +17,13 @@ import kotlinx.android.synthetic.main.fragment_deploy.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Screen
-import org.rfcx.companion.util.Analytics
-import org.rfcx.companion.util.CameraPermissions
-import org.rfcx.companion.util.GalleryPermissions
-import org.rfcx.companion.util.ImageUtils
+import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 import org.rfcx.companion.view.deployment.songmeter.SongMeterDeploymentProtocol
 import org.rfcx.companion.view.detail.DisplayImageActivity
 import org.rfcx.companion.view.dialog.GuidelineButtonClickListener
 import org.rfcx.companion.view.dialog.PhotoGuidelineDialogFragment
+import java.io.File
 
 class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListener {
 
@@ -89,6 +89,7 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        handleTakePhotoResult(requestCode, resultCode)
         handleGligarPickerResult(requestCode, resultCode, data)
     }
 
@@ -183,6 +184,22 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
         }
     }
 
+    private fun handleTakePhotoResult(requestCode: Int, resultCode: Int) {
+        if (requestCode != ImageUtils.REQUEST_TAKE_PHOTO) return
+
+        if (resultCode == Activity.RESULT_OK) {
+            filePath?.let {
+                getImageAdapter().updateTakeOrChooseImage(it)
+            }
+        } else {
+            // remove file image
+            filePath?.let {
+                ImageFileUtils.removeFile(File(it))
+                this.filePath = null
+            }
+        }
+    }
+
     private fun handleGligarPickerResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
         if (requestCode != ImageUtils.REQUEST_GALLERY || resultCode != Activity.RESULT_OK || intentData == null) return
 
@@ -214,17 +231,46 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
         setCacheImages()
     }
 
-    override fun onContinueClick() {
+    override fun onTakePhotoClick() {
+        openTakePhoto()
+    }
+
+    override fun onChoosePhotoClick() {
         openGligarPicker()
     }
 
+    private fun startTakePhoto() {
+        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        val imageFile = ImageUtils.createImageFile()
+        filePath = imageFile.absolutePath
+        val imageUri =
+            context?.let {
+                FileProvider.getUriForFile(
+                    it,
+                    ImageUtils.FILE_CONTENT_PROVIDER,
+                    imageFile
+                )
+            }
+        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+        startActivityForResult(takePictureIntent, ImageUtils.REQUEST_TAKE_PHOTO)
+    }
+
+    private fun openTakePhoto() {
+        if (checkPermission()) startTakePhoto()
+    }
+
     private fun openGligarPicker() {
-        if (!cameraPermissions.allowed() || !galleryPermissions.allowed()) {
+        if (checkPermission()) startOpenGligarPicker()
+    }
+
+    private fun checkPermission(): Boolean {
+        return if (!cameraPermissions.allowed() || !galleryPermissions.allowed()) {
             filePath = null
             if (!cameraPermissions.allowed()) cameraPermissions.check { }
             if (!galleryPermissions.allowed()) galleryPermissions.check { }
+            false
         } else {
-            startOpenGligarPicker()
+            true
         }
     }
 
@@ -233,6 +279,7 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
             .requestCode(ImageUtils.REQUEST_GALLERY)
             .limit(1)
             .withFragment(this)
+            .disableCamera(true)
             .show()
     }
 

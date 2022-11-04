@@ -37,9 +37,14 @@ class PhotoGuidelineDialogFragment(private val guidelineButtonClickListener: Gui
 
         guidelineTextView.text = guidelineText
 
-        continueButton.setOnClickListener {
+        takePhotoButton.setOnClickListener {
             dismiss()
-            guidelineButtonClickListener.onContinueClick()
+            guidelineButtonClickListener.onTakePhotoClick()
+        }
+
+        choosePhotoButton.setOnClickListener {
+            dismiss()
+            guidelineButtonClickListener.onChoosePhotoClick()
         }
     }
 
@@ -62,5 +67,6 @@ class PhotoGuidelineDialogFragment(private val guidelineButtonClickListener: Gui
 }
 
 interface GuidelineButtonClickListener {
-    fun onContinueClick()
+    fun onTakePhotoClick()
+    fun onChoosePhotoClick()
 }
