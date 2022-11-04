@@ -35,13 +35,13 @@ import org.rfcx.companion.util.geojson.GeoJsonUtils
 import org.rfcx.companion.util.prefs.GuardianPlan
 import org.rfcx.companion.util.socket.PingUtils
 import org.rfcx.companion.view.deployment.BaseDeploymentActivity
+import org.rfcx.companion.view.deployment.DeployFragment
 import org.rfcx.companion.view.deployment.guardian.advanced.GuardianAdvancedFragment
 import org.rfcx.companion.view.deployment.guardian.checkin.GuardianCheckInTestFragment
 import org.rfcx.companion.view.deployment.guardian.classifier.ClassifierLoadFragment
 import org.rfcx.companion.view.deployment.guardian.communication.GuardianCommunicationFragment
 import org.rfcx.companion.view.deployment.guardian.configure.GuardianConfigureFragment
 import org.rfcx.companion.view.deployment.guardian.connect.ConnectGuardianFragment
-import org.rfcx.companion.view.deployment.guardian.deploy.GuardianDeployFragment
 import org.rfcx.companion.view.deployment.guardian.microphone.GuardianMicrophoneFragment
 import org.rfcx.companion.view.deployment.guardian.register.GuardianRegisterFragment
 import org.rfcx.companion.view.deployment.guardian.signal.GuardianSignalFragment
@@ -189,10 +189,19 @@ class GuardianDeploymentActivity :
     }
 
     override fun nextStep() {
+        if (passedChecks.contains(2) && _images.isNullOrEmpty() || _images.none { it.path != null }) {
+            passedChecks.remove(2)
+        }
+
         val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
         if (container !is GuardianAdvancedFragment) {
             if (currentCheck !in passedChecks) {
-                passedChecks.add(currentCheck)
+                if (currentCheck == 2 && _images.isNullOrEmpty() || _images.none { it.path != null }) {
+                    startCheckList()
+                    return
+                } else {
+                    passedChecks.add(currentCheck)
+                }
             }
             currentCheck = -1 // reset check
         } else {
@@ -506,7 +515,7 @@ class GuardianDeploymentActivity :
 
     private fun saveImages(deployment: Deployment) {
         deploymentImageDb.deleteImages(deployment.id)
-        deploymentImageDb.insertImage(deployment, _images)
+        deploymentImageDb.insertImage(deployment, _images.filter { it.path != null }.map { it.path!! })
     }
 
     override fun startConnectGuardian() {
@@ -579,7 +588,7 @@ class GuardianDeploymentActivity :
             }
             9 -> {
                 updateDeploymentState(DeploymentState.Guardian.Deploy)
-                startFragment(GuardianDeployFragment.newInstance())
+                startFragment(DeployFragment.newInstance(Screen.GUARDIAN_CHECK_LIST.id))
             }
             10 -> {
                 updateDeploymentState(DeploymentState.Guardian.Checkin)

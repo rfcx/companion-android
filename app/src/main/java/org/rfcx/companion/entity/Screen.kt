@@ -13,6 +13,7 @@ enum class Screen(val id: String) {
     PROJECT("Project"),
     AUDIO_MOTH_CHECK_LIST("AudioMoth Check List"),
     SONG_METER_CHECK_LIST("Song Meter Check List"),
+    GUARDIAN_CHECK_LIST("Guardian Check List"),
     SYNC("Sync"),
     EDGE_DETAIL("Edge Detail"),
     MAP_PICKER("Map Picker"),

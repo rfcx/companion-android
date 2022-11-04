@@ -18,14 +18,12 @@ interface BaseDeploymentProtocol {
     fun getSiteItem(): List<SiteWithLastDeploymentItem>
     fun getStream(id: Int): Stream?
     fun getProject(id: Int): Project?
-    fun getImages(): List<String>
-    fun getImageLabels(): Map<String, String>
+    fun getImages(): List<Image>
     fun getCurrentLocation(): Location
 
     fun setDeployLocation(stream: Stream, isExisted: Boolean)
     fun setSiteItem(items: List<SiteWithLastDeploymentItem>)
-    fun setImages(images: List<String>)
-    fun setImageLabels(labels: Map<String, String>)
+    fun setImages(images: List<Image>)
     fun setReadyToDeploy()
     fun setCurrentLocation(location: Location)
 

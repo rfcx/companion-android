@@ -2,6 +2,7 @@ package org.rfcx.companion.view.deployment
 
 import android.location.Location
 import android.location.LocationManager
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -26,8 +27,7 @@ abstract class BaseDeploymentActivity :
     MapPickerProtocol {
 
     var _deployment: Deployment? = null
-    var _images: List<String> = listOf()
-    var _imageLabels: Map<String, String> = mapOf()
+    var _images: List<Image> = listOf()
     var _stream: Stream? = null
     var _siteItems = listOf<SiteWithLastDeploymentItem>()
 
@@ -103,12 +103,8 @@ abstract class BaseDeploymentActivity :
 
     override fun getSiteItem(): List<SiteWithLastDeploymentItem> = this._siteItems
 
-    override fun getImages(): List<String> {
+    override fun getImages(): List<Image> {
         return this._images
-    }
-
-    override fun getImageLabels(): Map<String, String> {
-        return this._imageLabels
     }
 
     override fun getCurrentLocation(): Location =
@@ -122,12 +118,9 @@ abstract class BaseDeploymentActivity :
         this._siteItems = items
     }
 
-    override fun setImages(images: List<String>) {
+    override fun setImages(images: List<Image>) {
+        Log.d("Companion-set", images.toString())
         this._images = images
-    }
-
-    override fun setImageLabels(labels: Map<String, String>) {
-        this._imageLabels = labels
     }
 
     override fun showToolbar() {

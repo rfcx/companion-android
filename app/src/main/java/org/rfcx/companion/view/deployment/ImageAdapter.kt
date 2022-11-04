@@ -23,6 +23,13 @@ class ImageAdapter(private val imageClickListener: ImageClickListener) :
         notifyDataSetChanged()
     }
 
+    fun updateImagesFromSavedImages(images: List<Image>) {
+        images.forEach {
+            imageItems.add(it)
+        }
+        notifyDataSetChanged()
+    }
+
     fun updateTakeOrChooseImage(path: String) {
         if (currentPosition == -1) return
         imageItems[currentPosition].path = path
@@ -34,6 +41,8 @@ class ImageAdapter(private val imageClickListener: ImageClickListener) :
         imageItems[currentPosition].path = null
         notifyDataSetChanged()
     }
+
+    fun getCurrentImagePaths() = imageItems
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -49,7 +58,7 @@ class ImageAdapter(private val imageClickListener: ImageClickListener) :
 
         holder.placeHolderButton.setOnClickListener {
             currentPosition = position
-            imageClickListener.onPlaceHolderClick()
+            imageClickListener.onPlaceHolderClick(position)
         }
         holder.imageView.setOnClickListener {
             currentPosition = position
@@ -94,7 +103,7 @@ data class Image(
 )
 
 interface ImageClickListener {
-    fun onPlaceHolderClick()
+    fun onPlaceHolderClick(position: Int)
     fun onImageClick(path: String?)
     fun onDeleteClick()
 }
