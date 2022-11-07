@@ -15,7 +15,7 @@ import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianStorageFragment : Fragment() {
 
-    private val deploymentProtocol by lazy { (context?.let { it as GuardianDeploymentProtocol } ) }
+    private val deploymentProtocol by lazy { (context?.let { it as GuardianDeploymentProtocol }) }
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
