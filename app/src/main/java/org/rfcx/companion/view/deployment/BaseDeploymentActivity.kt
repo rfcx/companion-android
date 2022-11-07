@@ -2,7 +2,6 @@ package org.rfcx.companion.view.deployment
 
 import android.location.Location
 import android.location.LocationManager
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -119,7 +118,6 @@ abstract class BaseDeploymentActivity :
     }
 
     override fun setImages(images: List<Image>) {
-        Log.d("Companion-set", images.toString())
         this._images = images
     }
 
