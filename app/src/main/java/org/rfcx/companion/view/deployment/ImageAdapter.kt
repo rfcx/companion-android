@@ -74,30 +74,30 @@ class ImageAdapter(private val imageClickListener: ImageClickListener) :
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): ImageAdapter.ImageAdapterViewHolder {
+    ): ImageAdapterViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.item_photo_advise, parent, false)
         return ImageAdapterViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ImageAdapter.ImageAdapterViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ImageAdapterViewHolder, position: Int) {
         holder.bind(imageItems[position])
 
         holder.placeHolderButton.setOnClickListener {
-            currentPosition = position
+            currentPosition = holder.adapterPosition
             currentType = ImageType.NORMAL
             if (position == itemCount - 1) {
                 currentType = ImageType.OTHER
             }
-            imageClickListener.onPlaceHolderClick(position)
+            imageClickListener.onPlaceHolderClick(currentPosition)
         }
         holder.imageView.setOnClickListener {
-            currentPosition = position
-            imageClickListener.onImageClick(imageItems[position])
+            currentPosition = holder.adapterPosition
+            imageClickListener.onImageClick(imageItems[currentPosition])
         }
         holder.deleteButton.setOnClickListener {
-            currentPosition = position
-            imageClickListener.onDeleteClick(imageItems[position])
+            currentPosition = holder.adapterPosition
+            imageClickListener.onDeleteClick(imageItems[currentPosition])
         }
     }
 
