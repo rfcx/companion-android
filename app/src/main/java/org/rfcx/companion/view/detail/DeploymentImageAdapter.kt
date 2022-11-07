@@ -27,7 +27,7 @@ class DeploymentImageAdapter :
     companion object {
         const val VIEW_TYPE_IMAGE = 1
         const val VIEW_TYPE_ADD_IMAGE = 2
-        const val MAX_IMAGE_SIZE = 5
+        const val MAX_IMAGE_SIZE = 10
     }
 
     fun getImageCount(): Int = if (imagesSource[imagesSource.count() - 1] is AddImageItem) imagesSource.count() - 1

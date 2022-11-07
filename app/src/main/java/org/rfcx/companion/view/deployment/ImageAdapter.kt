@@ -15,11 +15,18 @@ class ImageAdapter(private val imageClickListener: ImageClickListener) :
     RecyclerView.Adapter<ImageAdapter.ImageAdapterViewHolder>() {
     private var imageItems = arrayListOf<Image>()
     private var currentPosition = -1
+    private var currentType: ImageType = ImageType.NORMAL
+
+    companion object {
+        private const val MAX_IMAGES = 10
+    }
 
     fun setPlaceHolders(type: List<String>) {
         type.forEach {
-            imageItems.add(Image(it, null))
+            imageItems.add(Image(it, ImageType.NORMAL, null))
         }
+        // For other images that out of type scoped
+        imageItems.add(Image(ImageType.OTHER.value, ImageType.OTHER, null))
         notifyDataSetChanged()
     }
 
@@ -32,14 +39,34 @@ class ImageAdapter(private val imageClickListener: ImageClickListener) :
 
     fun updateTakeOrChooseImage(path: String) {
         if (currentPosition == -1) return
-        imageItems[currentPosition].path = path
+        if (currentType == ImageType.OTHER) {
+            if (itemCount == MAX_IMAGES) {
+                imageItems.removeLast()
+            }
+            imageItems.add(itemCount - 1, Image(ImageType.OTHER.value, ImageType.OTHER, path))
+        } else {
+            imageItems[currentPosition].path = path
+        }
         notifyDataSetChanged()
     }
 
-    fun removeImage() {
+    fun removeImage(image: Image) {
         if (currentPosition == -1) return
-        imageItems[currentPosition].path = null
+        if (image.type == ImageType.OTHER) {
+            if (getAvailableImagesLeft() == 0) {
+                imageItems.add(Image(ImageType.OTHER.value, ImageType.OTHER, null))
+            }
+            imageItems.remove(image)
+        } else {
+            imageItems[currentPosition].path = null
+        }
         notifyDataSetChanged()
+    }
+
+    private fun getOtherCount() = imageItems.filter { it.type == ImageType.OTHER && it.path != null }.size
+    private fun getNormalCount() = imageItems.filter { it.type == ImageType.NORMAL }.size
+    private fun getAvailableImagesLeft(): Int {
+        return (MAX_IMAGES - (getOtherCount() + getNormalCount()))
     }
 
     fun getCurrentImagePaths() = imageItems
@@ -58,15 +85,19 @@ class ImageAdapter(private val imageClickListener: ImageClickListener) :
 
         holder.placeHolderButton.setOnClickListener {
             currentPosition = position
+            currentType = ImageType.NORMAL
+            if (position == itemCount - 1) {
+                currentType = ImageType.OTHER
+            }
             imageClickListener.onPlaceHolderClick(position)
         }
         holder.imageView.setOnClickListener {
             currentPosition = position
-            imageClickListener.onImageClick(imageItems[position].path)
+            imageClickListener.onImageClick(imageItems[position])
         }
         holder.deleteButton.setOnClickListener {
             currentPosition = position
-            imageClickListener.onDeleteClick()
+            imageClickListener.onDeleteClick(imageItems[position])
         }
     }
 
@@ -77,7 +108,7 @@ class ImageAdapter(private val imageClickListener: ImageClickListener) :
 
         fun bind(image: Image) {
             if (image.path == null) {
-                placeHolderButton.text = image.type
+                placeHolderButton.text = image.name
                 imageView.visibility = View.GONE
                 placeHolderButton.visibility = View.VISIBLE
                 deleteButton.visibility = View.GONE
@@ -98,12 +129,18 @@ class ImageAdapter(private val imageClickListener: ImageClickListener) :
 }
 
 data class Image(
-    val type: String,
+    val name: String,
+    val type: ImageType,
     var path: String?
 )
 
+enum class ImageType(val value: String) {
+    NORMAL("normal"),
+    OTHER("other"),
+}
+
 interface ImageClickListener {
     fun onPlaceHolderClick(position: Int)
-    fun onImageClick(path: String?)
-    fun onDeleteClick()
+    fun onImageClick(image: Image)
+    fun onDeleteClick(image: Image)
 }

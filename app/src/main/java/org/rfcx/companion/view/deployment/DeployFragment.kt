@@ -125,7 +125,6 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
     private fun setupImages() {
         val savedImages =
             audioMothDeploymentProtocol?.getImages()
-        Log.d("Companion", savedImages.toString())
         if (savedImages != null && savedImages.isNotEmpty()) {
             getImageAdapter().updateImagesFromSavedImages(savedImages)
         } else {
@@ -221,13 +220,13 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
         showGuidelineDialog(position)
     }
 
-    override fun onImageClick(path: String?) {
-        if (path == null) return
-        context?.let { DisplayImageActivity.startActivity(it, arrayOf("file://$path")) }
+    override fun onImageClick(image: Image) {
+        if (image.path == null) return
+        context?.let { DisplayImageActivity.startActivity(it, arrayOf("file://${image.path}")) }
     }
 
-    override fun onDeleteClick() {
-        getImageAdapter().removeImage()
+    override fun onDeleteClick(image: Image) {
+        getImageAdapter().removeImage(image)
         setCacheImages()
     }
 
@@ -290,6 +289,7 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
                     PhotoGuidelineDialogFragment.newInstance(
                         this,
                         imageGuidelineTexts.getOrNull(position)
+                            ?: "Take or Choose a photo that extra from the required ones"
                     )
                 }
         if (guidelineDialog.isVisible || guidelineDialog.isAdded) return

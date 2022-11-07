@@ -119,12 +119,12 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
     }
 
     override fun nextStep() {
-        if (passedChecks.contains(2) && _images.isNullOrEmpty() || _images.none { it.path != null }) {
+        if (passedChecks.contains(2) && (_images.isNullOrEmpty() || _images.none { it.path != null })) {
             passedChecks.remove(2)
         }
 
         if (currentCheck !in passedChecks) {
-            if (currentCheck == 2 && _images.isNullOrEmpty() || _images.none { it.path != null }) {
+            if (currentCheck == 2 && (_images.isNullOrEmpty() || _images.none { it.path != null })) {
                 startCheckList()
                 return
             } else {
@@ -144,6 +144,10 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
                     siteId
                 )
             )
+            is AudioMothCheckListFragment -> {
+                passedChecks.clear() // remove all passed
+                finish()
+            }
             is DetailDeploymentSiteFragment -> {
                 if (_stream == null) {
                     startFragment(
