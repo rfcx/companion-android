@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -114,10 +113,8 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
 
     private fun getImageAdapter(): ImageAdapter {
         if (imageAdapter != null) {
-            Log.d("com-", "old adapter")
             return imageAdapter!!
         }
-        Log.d("com-", "new adapter")
         imageAdapter = ImageAdapter(this)
         return imageAdapter!!
     }
@@ -284,16 +281,19 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
 
     private fun showGuidelineDialog(position: Int) {
         val guidelineDialog: PhotoGuidelineDialogFragment =
-            this.parentFragmentManager.findFragmentByTag("PhotoGuidelineDialogFragment") as PhotoGuidelineDialogFragment?
+            this.parentFragmentManager.findFragmentByTag(PhotoGuidelineDialogFragment::class.java.name) as PhotoGuidelineDialogFragment?
                 ?: run {
                     PhotoGuidelineDialogFragment.newInstance(
                         this,
                         imageGuidelineTexts.getOrNull(position)
-                            ?: "Take or Choose a photo that extra from the required ones"
+                            ?: getString(R.string.take_other)
                     )
                 }
         if (guidelineDialog.isVisible || guidelineDialog.isAdded) return
-        guidelineDialog.show(this.parentFragmentManager, "PhotoGuidelineDialogFragment")
+        guidelineDialog.show(
+            this.parentFragmentManager,
+            PhotoGuidelineDialogFragment::class.java.name
+        )
     }
 
     companion object {
