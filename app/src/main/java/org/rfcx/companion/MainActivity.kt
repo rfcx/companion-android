@@ -371,7 +371,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
 
     override fun onLogout() {
         DeploymentCleanupWorker.stopAllWork(this)
-        LocationTracking.set(this, false)
+        LocationTrackingManager.set(this, false)
         mainViewModel.onDestroy()
         this.logout()
         analytics.trackLogoutEvent()

@@ -1,15 +1,17 @@
 package org.rfcx.companion.util
 
+import android.app.ForegroundServiceStartNotAllowedException
 import android.content.Context
 import android.content.Intent
-import androidx.core.content.ContextCompat
+import android.os.Build
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.mapbox.mapboxsdk.geometry.LatLng
 import org.rfcx.companion.localdb.TrackingDb
 import org.rfcx.companion.service.LocationTrackerService
 
-class LocationTracking {
+class LocationTrackingManager {
     companion object {
-
+        private const val TAG = "LocationTrackingManager"
         private const val TRACKING_ON = true
         private const val TRACKING_OFF = false
         private const val MILLI_SECS_PER_MINUTE = (60 * 1000).toLong()
@@ -31,10 +33,27 @@ class LocationTracking {
 
         private fun updateService(context: Context) {
             if (isTrackingOn(context)) {
-                ContextCompat.startForegroundService(
-                    context,
-                    Intent(context, LocationTrackerService::class.java)
-                )
+                when {
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+                        try {
+                            context.startForegroundService(
+                                Intent(context, LocationTrackerService::class.java)
+                            )
+                        } catch (e: ForegroundServiceStartNotAllowedException) {
+                            FirebaseCrashlytics.getInstance().recordException(e)
+                        }
+                    }
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> {
+                        context.startForegroundService(
+                            Intent(context, LocationTrackerService::class.java)
+                        )
+                    }
+                    else -> {
+                        context.startService(
+                            Intent(context, LocationTrackerService::class.java)
+                        )
+                    }
+                }
                 startDutyTracking(context)
             } else {
                 context.stopService(Intent(context, LocationTrackerService::class.java))

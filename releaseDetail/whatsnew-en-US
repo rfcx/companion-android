@@ -2,6 +2,9 @@
 =======
 - Add photo guideline for all deployments
 - Location Tracking background error on Android 12
+<<<<<<< HEAD
 >>>>>>> 0602f59c (Merge remote-tracking branch 'origin/develop' into feature/location-tracking-fix-android12)
 - Add Guardian internal/external storage in deployment step
 - Save Guardian vital to server after deployment
+=======
+>>>>>>> aa13c87e (#628 Android 12 Location tracking avoid crash on background)
