@@ -285,7 +285,7 @@ object PingUtils {
             }
         )
     }
-    
+
     fun getGuardianVitalFromPing(adminPing: AdminPing?, guardianPing: GuardianPing?): String? {
         val admin = adminPing?.toJson()?.apply {
             remove("companion")
