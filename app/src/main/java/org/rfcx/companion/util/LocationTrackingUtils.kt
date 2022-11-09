@@ -40,10 +40,7 @@ class LocationTrackingUtils(private val context: Context) {
 
         override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
             if (status == LocationProvider.TEMPORARILY_UNAVAILABLE) {
-                if ((System.currentTimeMillis() - Preferences.getInstance(context).getLong(
-                        Preferences.LASTEST_GET_LOCATION_TIME, 0L
-                    )) > 10 * 1000L
-                ) {
+                if ((System.currentTimeMillis() - Preferences.getInstance(context).getLong(Preferences.LASTEST_GET_LOCATION_TIME, 0L)) > 10 * 1000L) {
                     getNotificationManager().notify(
                         NOTIFICATION_LOCATION_ID,
                         createLocationTrackerNotification(true)
