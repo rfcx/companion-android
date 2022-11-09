@@ -7,7 +7,7 @@ import java.util.*
 
 object ImageUtils {
 
-    const val FILE_CONTENT_PROVIDER = BuildConfig.APPLICATION_ID + ".fileprovider"
+    const val FILE_CONTENT_PROVIDER = BuildConfig.APPLICATION_ID + ".provider"
     const val REQUEST_TAKE_PHOTO = 4001
     const val REQUEST_GALLERY = 5001
 

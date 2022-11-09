@@ -203,7 +203,7 @@ class DeploymentDetailActivity :
                 list.removeAt(index)
                 list.add(0, selectedImage)
                 firebaseCrashlytics.setCustomKey(CrashlyticsKey.OnClickImage.key, selectedImage)
-                DisplayImageActivity.startActivity(this@DeploymentDetailActivity, list)
+                DisplayImageActivity.startActivity(this@DeploymentDetailActivity, list.toTypedArray())
             }
 
             override fun onDeleteImageClick(position: Int, imagePath: String) {
@@ -424,6 +424,6 @@ class DeploymentDetailActivity :
         list.removeAt(index)
         list.add(0, deploymentImage.remotePath ?: "file://${deploymentImage.localPath}")
 
-        DisplayImageActivity.startActivity(this, list)
+        DisplayImageActivity.startActivity(this, list.toTypedArray())
     }
 }

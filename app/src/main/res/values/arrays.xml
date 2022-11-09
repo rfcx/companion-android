@@ -255,4 +255,52 @@
         <item>#7a5547</item>
         <item>#5e7c8b</item>
     </string-array>
+
+    <string-array name="audiomoth_placeholders">
+        <item>device</item>
+        <item>tree</item>
+        <item>canopy</item>
+        <item>bush</item>
+        <item>overview</item>
+    </string-array>
+
+    <string-array name="audiomoth_guideline_texts">
+        <item>Take or Choose a photo that show a device id</item>
+        <item>Take or Choose a photo that show a installation tree</item>
+        <item>Take or Choose a photo that show a canopy with sky</item>
+        <item>Take or Choose a photo that show a installation bush</item>
+        <item>Take or Choose a photo that show overview location</item>
+    </string-array>
+
+    <string-array name="songmeter_placeholders">
+        <item>device</item>
+        <item>tree</item>
+        <item>canopy</item>
+        <item>bush</item>
+        <item>overview</item>
+    </string-array>
+
+    <string-array name="songmeter_guideline_texts">
+        <item>Take or Choose a photo that show a device id</item>
+        <item>Take or Choose a photo that show a installation tree</item>
+        <item>Take or Choose a photo that show a canopy with sky</item>
+        <item>Take or Choose a photo that show a installation bush</item>
+        <item>Take or Choose a photo that show overview location</item>
+    </string-array>
+
+    <string-array name="guardian_placeholders">
+        <item>device</item>
+        <item>tree</item>
+        <item>canopy</item>
+        <item>above guardian</item>
+        <item>overview</item>
+    </string-array>
+
+    <string-array name="guardian_guideline_texts">
+        <item>Take or Choose a photo that show a guardian</item>
+        <item>Take or Choose a photo that show a installation tree</item>
+        <item>Take or Choose a photo that show a canopy with sky</item>
+        <item>Take or Choose a photo that show a installation bush</item>
+        <item>Take or Choose a photo that show overview location</item>
+    </string-array>
 </resources>

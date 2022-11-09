@@ -3,9 +3,6 @@ package org.rfcx.companion.view.deployment
 import org.rfcx.companion.entity.guardian.Deployment
 
 interface AudioMothDeploymentProtocol : BaseDeploymentProtocol {
-    fun openWithEdgeDevice()
-    fun openWithGuardianDevice()
-
     fun startSyncing(status: String)
 
     fun getDeployment(): Deployment?
