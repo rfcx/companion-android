@@ -272,6 +272,20 @@ object PingUtils {
             ?: return null
     }
 
+    fun getStorageFromPing(adminPing: AdminPing?): GuardianStorage? {
+        val storage = adminPing?.storage?.split("|") ?: return null
+        return GuardianStorage(
+            storage.getOrNull(0)?.let {
+                val values = it.split("*")
+                Storage(values[2].toLong(), values[2].toLong() + values[3].toLong())
+            },
+            storage.getOrNull(1)?.let {
+                val values = it.split("*")
+                Storage(values[2].toLong(), values[2].toLong() + values[3].toLong())
+            }
+        )
+    }
+    
     fun getGuardianVitalFromPing(adminPing: AdminPing?, guardianPing: GuardianPing?): String? {
         val admin = adminPing?.toJson()?.apply {
             remove("companion")

@@ -47,6 +47,7 @@ import org.rfcx.companion.view.deployment.guardian.register.GuardianRegisterFrag
 import org.rfcx.companion.view.deployment.guardian.signal.GuardianSignalFragment
 import org.rfcx.companion.view.deployment.guardian.softwareupdate.SoftwareUpdateFragment
 import org.rfcx.companion.view.deployment.guardian.solarpanel.GuardianSolarPanelFragment
+import org.rfcx.companion.view.deployment.guardian.storage.GuardianStorageFragment
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.deployment.location.DetailDeploymentSiteFragment
@@ -95,6 +96,7 @@ class GuardianDeploymentActivity :
     private var classifiers: Map<String, ClassifierLite>? = null
     private var activeClassifiers: Map<String, ClassifierLite>? = null
     private var audioCaptureStatus: AudioCaptureStatus? = null
+    private var guardianStorage: GuardianStorage? = null
 
     private var _sampleRate = 12000
 
@@ -290,7 +292,7 @@ class GuardianDeploymentActivity :
             isGPSDetected = PingUtils.getGPSDetectedFromPing(it)
             phoneNumber = PingUtils.getPhoneNumberFromPing(it)
             speedTest = PingUtils.getSpeedTest(it)
-            PingUtils.getGuardianVitalFromPing(adminPingBlob, guardianPingBlob)
+            guardianStorage = PingUtils.getStorageFromPing(it)
         }
         deploymentLiveData.observeForever(guardianDeploymentObserve)
     }
@@ -392,6 +394,8 @@ class GuardianDeploymentActivity :
     override fun getActiveClassifiers(): Map<String, ClassifierLite>? = activeClassifiers
 
     override fun getAudioCapturing(): AudioCaptureStatus? = audioCaptureStatus
+
+    override fun getStorage(): GuardianStorage? = guardianStorage
 
     override fun getCurrentProjectId(): String? {
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
@@ -570,6 +574,9 @@ class GuardianDeploymentActivity :
                 startFragment(GuardianMicrophoneFragment.newInstance())
             }
             8 -> {
+                startFragment(GuardianStorageFragment.newInstance())
+            }
+            9 -> {
                 updateDeploymentState(DeploymentState.Guardian.Locate)
                 val site = this._stream
                 if (site == null) {
@@ -582,11 +589,11 @@ class GuardianDeploymentActivity :
                     startDetailDeploymentSite(site.latitude, site.longitude, site.id, site.name)
                 }
             }
-            9 -> {
+            10 -> {
                 updateDeploymentState(DeploymentState.Guardian.Deploy)
                 startFragment(GuardianDeployFragment.newInstance())
             }
-            10 -> {
+            11 -> {
                 updateDeploymentState(DeploymentState.Guardian.Checkin)
                 startFragment(GuardianCheckInTestFragment.newInstance())
             }
