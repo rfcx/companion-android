@@ -29,5 +29,6 @@ enum class Screen(val id: String) {
     GUARDIAN_CHECKIN_TEST("Guardian CheckIn Test"),
     GUARDIAN_DEPLOY("Guardian Deploy"),
     GUARDIAN_ADVANCED("Guardian Advanced"),
-    GUARDIAN_DIAGNOSTIC("Guardian Diagnostic")
+    GUARDIAN_DIAGNOSTIC("Guardian Diagnostic"),
+    GUARDIAN_STORAGE("Guardian Storage")
 }

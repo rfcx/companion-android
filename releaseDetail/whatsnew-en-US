@@ -1,2 +1,4 @@
 - Add photo guideline for all deployments
 - Location Tracking background error on Android 12
+- Add Guardian internal/external storage in deployment step
+- Save Guardian vital to server after deployment

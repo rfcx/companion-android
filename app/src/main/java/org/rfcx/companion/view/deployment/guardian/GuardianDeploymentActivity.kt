@@ -47,6 +47,7 @@ import org.rfcx.companion.view.deployment.guardian.register.GuardianRegisterFrag
 import org.rfcx.companion.view.deployment.guardian.signal.GuardianSignalFragment
 import org.rfcx.companion.view.deployment.guardian.softwareupdate.SoftwareUpdateFragment
 import org.rfcx.companion.view.deployment.guardian.solarpanel.GuardianSolarPanelFragment
+import org.rfcx.companion.view.deployment.guardian.storage.GuardianStorageFragment
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
 import org.rfcx.companion.view.deployment.location.DetailDeploymentSiteFragment
@@ -74,6 +75,7 @@ class GuardianDeploymentActivity :
     private var useExistedLocation: Boolean = false
 
     private var guardianPingBlob: GuardianPing? = null
+    private var adminPingBlob: AdminPing? = null
     private var network: Int? = null
     private var swmNetwork: Int? = null
     private var swmUnsentMsgs: Int? = null
@@ -94,6 +96,7 @@ class GuardianDeploymentActivity :
     private var classifiers: Map<String, ClassifierLite>? = null
     private var activeClassifiers: Map<String, ClassifierLite>? = null
     private var audioCaptureStatus: AudioCaptureStatus? = null
+    private var guardianStorage: GuardianStorage? = null
 
     private var _sampleRate = 12000
 
@@ -289,6 +292,7 @@ class GuardianDeploymentActivity :
             audioCaptureStatus = PingUtils.getAudioCaptureStatus(it)
         }
         AdminSocketManager.pingBlob.observeForever {
+            adminPingBlob = it
             network = PingUtils.getNetworkFromPing(it)
             sentinelPower = PingUtils.getSentinelPowerFromPing(it)
             i2cAccessibility = PingUtils.getI2cAccessibilityFromPing(it)
@@ -297,6 +301,7 @@ class GuardianDeploymentActivity :
             isGPSDetected = PingUtils.getGPSDetectedFromPing(it)
             phoneNumber = PingUtils.getPhoneNumberFromPing(it)
             speedTest = PingUtils.getSpeedTest(it)
+            guardianStorage = PingUtils.getStorageFromPing(it)
         }
         deploymentLiveData.observeForever(guardianDeploymentObserve)
     }
@@ -399,6 +404,8 @@ class GuardianDeploymentActivity :
 
     override fun getAudioCapturing(): AudioCaptureStatus? = audioCaptureStatus
 
+    override fun getStorage(): GuardianStorage? = guardianStorage
+
     override fun getCurrentProjectId(): String? {
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
         val project = projectDb.getProjectById(projectId)
@@ -411,6 +418,8 @@ class GuardianDeploymentActivity :
     }
 
     override fun getGuid(): String? = PingUtils.getGuidFromPing(guardianPingBlob)
+
+    override fun getGuardianToken(): String? = PingUtils.getGuardianTokenFromPing(guardianPingBlob)
 
     override fun getGuardianPurpose(): String? = PingUtils.getPurposeFromPrefs(guardianPingBlob)
 
@@ -469,7 +478,7 @@ class GuardianDeploymentActivity :
             it.updatedAt = Date()
             it.isActive = true
             it.state = DeploymentState.Guardian.ReadyToUpload.key
-            it.deviceParameters = Gson().toJson(DeviceParameter(getGuid()))
+            it.deviceParameters = Gson().toJson(DeviceParameter(getGuid(), getGuardianToken(), PingUtils.getGuardianVitalFromPing(adminPingBlob, guardianPingBlob)))
             setDeployment(it)
 
             // set all deployments in stream to active false
@@ -574,6 +583,9 @@ class GuardianDeploymentActivity :
                 startFragment(GuardianMicrophoneFragment.newInstance())
             }
             8 -> {
+                startFragment(GuardianStorageFragment.newInstance())
+            }
+            9 -> {
                 updateDeploymentState(DeploymentState.Guardian.Locate)
                 val site = this._stream
                 if (site == null) {
@@ -586,11 +598,11 @@ class GuardianDeploymentActivity :
                     startDetailDeploymentSite(site.latitude, site.longitude, site.id, site.name)
                 }
             }
-            9 -> {
+            10 -> {
                 updateDeploymentState(DeploymentState.Guardian.Deploy)
                 startFragment(DeployFragment.newInstance(Screen.GUARDIAN_CHECK_LIST.id))
             }
-            10 -> {
+            11 -> {
                 updateDeploymentState(DeploymentState.Guardian.Checkin)
                 startFragment(GuardianCheckInTestFragment.newInstance())
             }
