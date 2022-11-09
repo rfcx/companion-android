@@ -21,6 +21,7 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getSampleRate(): Int
     fun getLastCheckInTime(): Long?
     fun getGuid(): String?
+    fun getGuardianToken(): String?
     fun getGuardianPurpose(): String?
     fun isGuardianRegistered(): Boolean?
     fun isSMSOrSatGuardian(): Boolean

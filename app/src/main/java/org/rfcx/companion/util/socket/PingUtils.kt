@@ -1,6 +1,7 @@
 package org.rfcx.companion.util.socket
 
 import android.content.Context
+import android.util.Base64
 import androidx.preference.Preference
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
@@ -9,6 +10,10 @@ import org.rfcx.companion.entity.guardian.ClassifierLite
 import org.rfcx.companion.entity.socket.response.*
 import org.rfcx.companion.util.prefs.GuardianPlan
 import org.rfcx.companion.util.prefs.PrefsUtils
+import java.io.ByteArrayOutputStream
+import java.net.URLEncoder
+import java.util.zip.Deflater
+import java.util.zip.GZIPOutputStream
 
 object PingUtils {
 
@@ -95,6 +100,11 @@ object PingUtils {
     fun getGuidFromPing(ping: GuardianPing?): String? {
         val guid = ping?.companion?.get("guardian")?.asJsonObject?.get("guid") ?: return null
         return guid.asString
+    }
+
+    fun getGuardianTokenFromPing(ping: GuardianPing?): String? {
+        val token = ping?.companion?.get("guardian")?.asJsonObject?.get("token") ?: return null
+        return token.asString
     }
 
     fun getPurposeFromPrefs(guardianPing: GuardianPing?): String? {
@@ -274,5 +284,43 @@ object PingUtils {
                 Storage(values[2].toLong(), values[2].toLong() + values[3].toLong())
             }
         )
+    }
+    
+    fun getGuardianVitalFromPing(adminPing: AdminPing?, guardianPing: GuardianPing?): String? {
+        val admin = adminPing?.toJson()?.apply {
+            remove("companion")
+            remove("speed_test")
+            remove("i2c")
+            remove("sim_info")
+        } ?: return null
+        val guardian = guardianPing?.toJson()?.apply {
+            remove("companion")
+        } ?: return null
+        val combinedPing = JsonObject()
+        admin.keySet().forEach {
+            combinedPing.add(it, admin.get(it))
+        }
+        guardian.keySet().forEach {
+            combinedPing.add(it, guardian.get(it))
+        }
+
+        return gzip(Gson().toJson(combinedPing))
+    }
+
+    private fun gzip(content: String): String {
+
+        val byteArrayOutputStream = ByteArrayOutputStream()
+
+        var gZIPOutputStream: GZIPOutputStream? = null
+        gZIPOutputStream = object : GZIPOutputStream(byteArrayOutputStream) {
+            init {
+                def.setLevel(Deflater.BEST_COMPRESSION)
+            }
+        }
+        gZIPOutputStream.write(content.toByteArray(Charsets.UTF_8))
+
+        gZIPOutputStream.close()
+
+        return URLEncoder.encode(Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.NO_WRAP), "UTF-8")
     }
 }

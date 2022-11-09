@@ -75,6 +75,7 @@ class GuardianDeploymentActivity :
     private var useExistedLocation: Boolean = false
 
     private var guardianPingBlob: GuardianPing? = null
+    private var adminPingBlob: AdminPing? = null
     private var network: Int? = null
     private var swmNetwork: Int? = null
     private var swmUnsentMsgs: Int? = null
@@ -282,6 +283,7 @@ class GuardianDeploymentActivity :
             audioCaptureStatus = PingUtils.getAudioCaptureStatus(it)
         }
         AdminSocketManager.pingBlob.observeForever {
+            adminPingBlob = it
             network = PingUtils.getNetworkFromPing(it)
             sentinelPower = PingUtils.getSentinelPowerFromPing(it)
             i2cAccessibility = PingUtils.getI2cAccessibilityFromPing(it)
@@ -408,6 +410,8 @@ class GuardianDeploymentActivity :
 
     override fun getGuid(): String? = PingUtils.getGuidFromPing(guardianPingBlob)
 
+    override fun getGuardianToken(): String? = PingUtils.getGuardianTokenFromPing(guardianPingBlob)
+
     override fun getGuardianPurpose(): String? = PingUtils.getPurposeFromPrefs(guardianPingBlob)
 
     override fun isGuardianRegistered(): Boolean? = isGuardianRegistered
@@ -465,7 +469,7 @@ class GuardianDeploymentActivity :
             it.updatedAt = Date()
             it.isActive = true
             it.state = DeploymentState.Guardian.ReadyToUpload.key
-            it.deviceParameters = Gson().toJson(DeviceParameter(getGuid()))
+            it.deviceParameters = Gson().toJson(DeviceParameter(getGuid(), getGuardianToken(), PingUtils.getGuardianVitalFromPing(adminPingBlob, guardianPingBlob)))
             setDeployment(it)
 
             // set all deployments in stream to active false
