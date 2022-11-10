@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_guardian_storage.*
+import kotlinx.android.synthetic.main.fragment_new_sync.*
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.AdminSocketManager
 import org.rfcx.companion.entity.Screen
@@ -35,6 +36,10 @@ class GuardianStorageFragment : Fragment() {
             it.setMenuToolbar(false)
             it.showToolbar()
             it.setToolbarTitle()
+        }
+
+        internalFinishButton.setOnClickListener {
+            deploymentProtocol?.nextStep()
         }
 
         updateInternalStorage()
