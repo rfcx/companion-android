@@ -83,7 +83,7 @@ class GuardianDeploymentActivity :
     private var internalBattery: Int? = null
     private var i2cAccessibility: I2CAccessibility? = null
     private var isGuardianRegistered: Boolean? = null
-    private var isSMSOrSatGuardian: Boolean = false
+    private var canGuardianClassify: Boolean = false
     private var isSimDetected: Boolean? = null
     private var satId: String? = null
     private var isGPSDetected: Boolean? = null
@@ -269,7 +269,7 @@ class GuardianDeploymentActivity :
             if (isGuardianRegistered == true) {
                 addRegisteredToPassedCheck()
             }
-            isSMSOrSatGuardian = PingUtils.isSMSOrSatGuardian(it)
+            canGuardianClassify = PingUtils.canGuardianClassify(it)
             swmNetwork = PingUtils.getSwarmNetworkFromPing(it)
             swmUnsentMsgs = PingUtils.getSwarmUnsetMessagesFromPing(it)
             internalBattery = PingUtils.getInternalBatteryFromPing(it)
@@ -416,7 +416,7 @@ class GuardianDeploymentActivity :
 
     override fun isGuardianRegistered(): Boolean? = isGuardianRegistered
 
-    override fun isSMSOrSatGuardian(): Boolean = isSMSOrSatGuardian
+    override fun canGuardianClassify(): Boolean = canGuardianClassify
 
     override fun getSoftwareVersion(): Map<String, String>? = PingUtils.getSoftwareVersionFromPing(guardianPingBlob)
 
