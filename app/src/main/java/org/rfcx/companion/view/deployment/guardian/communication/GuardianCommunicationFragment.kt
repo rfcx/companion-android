@@ -258,6 +258,9 @@ class GuardianCommunicationFragment : Fragment(), View.OnClickListener {
                 }
             }
         }
+        if (offlineModeRadioButton.isChecked) {
+            GuardianSocketManager.sendOfflineModePrefs()
+        }
     }
 
     private fun observeOffTime() {

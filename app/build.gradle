@@ -15,7 +15,11 @@ android {
         minSdkVersion 21
         targetSdkVersion 31
         versionCode 150
+<<<<<<< HEAD
         versionName "1.7.2"
+=======
+        versionName "1.7.3"
+>>>>>>> 2f9c887b (#635 Add option for guardian offline mode in Communication Configuration screen)
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

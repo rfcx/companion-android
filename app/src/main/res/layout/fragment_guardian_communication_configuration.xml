@@ -212,6 +212,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/satellite_only" />
+
+                <RadioButton
+                    android:id="@+id/offlineModeRadioButton"
+                    style="@style/AudioMothRadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/offline_mode" />
             </RadioGroup>
 
             <androidx.appcompat.widget.AppCompatTextView
