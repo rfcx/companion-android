@@ -536,6 +536,7 @@
     <string name="cell_data_only">Cell data only</string>
     <string name="cell_data_sms_fallback_experimental">Cell data + SMS fallback (experimental)</string>
     <string name="satellite_only">Satellite only</string>
+    <string name="offline_mode">Offline mode</string>
     <string name="pass_times_local_time">Off times (local time)</string>
     <string name="plus">+</string>
 

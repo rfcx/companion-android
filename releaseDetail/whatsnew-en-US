@@ -1,3 +1,1 @@
-- Add photo guideline for all deployments
-- Add Guardian internal/external storage in deployment step
-- Save Guardian vital to server after deployment
+- Option for guardian offline mode
