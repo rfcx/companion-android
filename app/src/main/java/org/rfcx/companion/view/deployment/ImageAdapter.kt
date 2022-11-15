@@ -26,7 +26,9 @@ class ImageAdapter(private val imageClickListener: ImageClickListener) :
             imageItems.add(Image(it, ImageType.NORMAL, null))
         }
         // For other images that out of type scoped
-        imageItems.add(Image(ImageType.OTHER.value, ImageType.OTHER, null))
+        if (imageItems.size < MAX_IMAGES) {
+            imageItems.add(Image(ImageType.OTHER.value, ImageType.OTHER, null))
+        }
         notifyDataSetChanged()
     }
 
@@ -85,10 +87,7 @@ class ImageAdapter(private val imageClickListener: ImageClickListener) :
 
         holder.placeHolderButton.setOnClickListener {
             currentPosition = holder.adapterPosition
-            currentType = ImageType.NORMAL
-            if (position == itemCount - 1) {
-                currentType = ImageType.OTHER
-            }
+            currentType = imageItems[currentPosition].type
             imageClickListener.onPlaceHolderClick(currentPosition)
         }
         holder.imageView.setOnClickListener {

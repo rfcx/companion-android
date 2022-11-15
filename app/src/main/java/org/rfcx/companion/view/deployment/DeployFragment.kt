@@ -17,6 +17,7 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.*
+import org.rfcx.companion.util.prefs.GuardianPlan
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 import org.rfcx.companion.view.deployment.songmeter.SongMeterDeploymentProtocol
 import org.rfcx.companion.view.detail.DisplayImageActivity
@@ -42,7 +43,7 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
 
     private var audioMothDeploymentProtocol: BaseDeploymentProtocol? = null
     private var songMeterDeploymentProtocol: BaseDeploymentProtocol? = null
-    private var guardianDeploymentProtocol: BaseDeploymentProtocol? = null
+    private var guardianDeploymentProtocol: GuardianDeploymentProtocol? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -78,10 +79,22 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
                     it.setCurrentPage(requireContext().resources.getStringArray(R.array.guardian_optional_checks)[0])
                     it.setToolbarTitle()
                 }
-                imagePlaceHolders =
-                    context.resources.getStringArray(R.array.guardian_placeholders).toList()
-                imageGuidelineTexts =
-                    context.resources.getStringArray(R.array.guardian_guideline_texts).toList()
+
+                val guardianPlan = guardianDeploymentProtocol?.getGuardianPlan()
+                when (guardianPlan) {
+                    GuardianPlan.SAT_ONLY -> {
+                        imagePlaceHolders =
+                            context.resources.getStringArray(R.array.sat_guardian_placeholders).toList()
+                        imageGuidelineTexts =
+                            context.resources.getStringArray(R.array.sat_guardian_guideline_texts).toList()
+                    }
+                    else -> {
+                        imagePlaceHolders =
+                            context.resources.getStringArray(R.array.cell_guardian_placeholders).toList()
+                        imageGuidelineTexts =
+                            context.resources.getStringArray(R.array.cell_guardian_guideline_texts).toList()
+                    }
+                }
             }
         }
     }
@@ -121,7 +134,7 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
 
     private fun setupImages() {
         val savedImages =
-            audioMothDeploymentProtocol?.getImages()
+            audioMothDeploymentProtocol?.getImages() ?: songMeterDeploymentProtocol?.getImages() ?: guardianDeploymentProtocol?.getImages()
         if (savedImages != null && savedImages.isNotEmpty()) {
             getImageAdapter().updateImagesFromSavedImages(savedImages)
         } else {
