@@ -40,6 +40,7 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
 
     private var imagePlaceHolders = listOf<String>()
     private var imageGuidelineTexts = listOf<String>()
+    private var imageExamples = listOf<String>()
 
     private var audioMothDeploymentProtocol: BaseDeploymentProtocol? = null
     private var songMeterDeploymentProtocol: BaseDeploymentProtocol? = null
@@ -84,15 +85,23 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
                 when (guardianPlan) {
                     GuardianPlan.SAT_ONLY -> {
                         imagePlaceHolders =
-                            context.resources.getStringArray(R.array.sat_guardian_placeholders).toList()
+                            context.resources.getStringArray(R.array.sat_guardian_placeholders)
+                                .toList()
                         imageGuidelineTexts =
-                            context.resources.getStringArray(R.array.sat_guardian_guideline_texts).toList()
+                            context.resources.getStringArray(R.array.sat_guardian_guideline_texts)
+                                .toList()
+                        imageExamples =
+                            context.resources.getStringArray(R.array.sat_guardian_photos).toList()
                     }
                     else -> {
                         imagePlaceHolders =
-                            context.resources.getStringArray(R.array.cell_guardian_placeholders).toList()
+                            context.resources.getStringArray(R.array.cell_guardian_placeholders)
+                                .toList()
                         imageGuidelineTexts =
-                            context.resources.getStringArray(R.array.cell_guardian_guideline_texts).toList()
+                            context.resources.getStringArray(R.array.cell_guardian_guideline_texts)
+                                .toList()
+                        imageExamples =
+                            context.resources.getStringArray(R.array.cell_guardian_photos).toList()
                     }
                 }
             }
@@ -134,7 +143,8 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
 
     private fun setupImages() {
         val savedImages =
-            audioMothDeploymentProtocol?.getImages() ?: songMeterDeploymentProtocol?.getImages() ?: guardianDeploymentProtocol?.getImages()
+            audioMothDeploymentProtocol?.getImages() ?: songMeterDeploymentProtocol?.getImages()
+            ?: guardianDeploymentProtocol?.getImages()
         if (savedImages != null && savedImages.isNotEmpty()) {
             getImageAdapter().updateImagesFromSavedImages(savedImages)
         } else {
@@ -299,7 +309,8 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
                     PhotoGuidelineDialogFragment.newInstance(
                         this,
                         imageGuidelineTexts.getOrNull(position)
-                            ?: getString(R.string.take_other)
+                            ?: getString(R.string.take_other),
+                        imageExamples.getOrNull(position)
                     )
                 }
         if (guidelineDialog.isVisible || guidelineDialog.isAdded) return

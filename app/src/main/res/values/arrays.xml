@@ -339,4 +339,30 @@
         <item>This picture should show the micro is covered with the cover and secure with a cable tie.</item>
         <item>The GSM antenna should be placed snugly in the mount secured by at least 2 cable ties. The paddle antenna should be pointing upwards towards the sky as high in the tree as possible.</item>
     </string-array>
+
+    <string-array name="sat_guardian_photos">
+        <item>guardian_1</item>
+        <item>guardian_2</item>
+        <item>guardian_3</item>
+        <item>guardian_4</item>
+        <item>guardian_5</item>
+        <item>guardian_6</item>
+        <item>guardian_7</item>
+        <item>guardian_8</item>
+        <item>guardian_sat_1</item>
+        <item>guardian_sat_2</item>
+        <item>guardian_sat_3</item>
+    </string-array>
+
+    <string-array name="cell_guardian_photos">
+        <item>guardian_1</item>
+        <item>guardian_2</item>
+        <item>guardian_3</item>
+        <item>guardian_4</item>
+        <item>guardian_5</item>
+        <item>guardian_6</item>
+        <item>guardian_7</item>
+        <item>guardian_8</item>
+        <item>guardian_cell_1</item>
+    </string-array>
 </resources>
