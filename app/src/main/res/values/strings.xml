@@ -207,7 +207,7 @@
     <string name="take_photos">Include: device position in the tree, upwards view of the sky, brackets and antenna positions</string>
     <string name="take_photos_audiomoth">Include: AudioMoth ID visible, specific location in tree/bush/vine/etc (1–3m), installation site (~10m), pulled back view of site (~15–20m)</string>
     <string name="take_photos_songmeter">Include: Specific location in tree/bush/vine/etc (1–3m), installation site (~10m), pulled back view of site (~15–20m)</string>
-    <string name="take_other">Take or Choose a photo that extra from the required ones</string>
+    <string name="take_other">Take or Choose any other photo that will be helpful in relocating the device or characterizing the site</string>
 
 
     <string name="read_storage_permission_msg">Deploy App would like to read your storage</string>

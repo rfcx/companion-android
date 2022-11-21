@@ -60,6 +60,8 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
                     context.resources.getStringArray(R.array.audiomoth_placeholders).toList()
                 imageGuidelineTexts =
                     context.resources.getStringArray(R.array.audiomoth_guideline_texts).toList()
+                imageExamples =
+                    context.resources.getStringArray(R.array.audiomoth_photos).toList()
             }
             is SongMeterDeploymentProtocol -> {
                 songMeterDeploymentProtocol = context
@@ -72,6 +74,8 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
                     context.resources.getStringArray(R.array.songmeter_placeholders).toList()
                 imageGuidelineTexts =
                     context.resources.getStringArray(R.array.songmeter_guideline_texts).toList()
+                imageExamples =
+                    context.resources.getStringArray(R.array.audiomoth_photos).toList()
             }
             is GuardianDeploymentProtocol -> {
                 guardianDeploymentProtocol = context
@@ -81,8 +85,7 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
                     it.setToolbarTitle()
                 }
 
-                val guardianPlan = guardianDeploymentProtocol?.getGuardianPlan()
-                when (guardianPlan) {
+                when (guardianDeploymentProtocol?.getGuardianPlan()) {
                     GuardianPlan.SAT_ONLY -> {
                         imagePlaceHolders =
                             context.resources.getStringArray(R.array.sat_guardian_placeholders)
@@ -310,7 +313,7 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
                         this,
                         imageGuidelineTexts.getOrNull(position)
                             ?: getString(R.string.take_other),
-                        imageExamples.getOrNull(position)
+                        imageExamples.getOrNull(position) ?: "other"
                     )
                 }
         if (guidelineDialog.isVisible || guidelineDialog.isAdded) return

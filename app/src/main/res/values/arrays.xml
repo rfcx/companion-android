@@ -257,35 +257,35 @@
     </string-array>
 
     <string-array name="audiomoth_placeholders">
-        <item>device</item>
-        <item>tree</item>
-        <item>canopy</item>
-        <item>bush</item>
-        <item>overview</item>
+        <item>device id</item>
+        <item>placement</item>
+        <item>location</item>
+        <item>approach</item>
+        <item>trail</item>
     </string-array>
 
     <string-array name="audiomoth_guideline_texts">
-        <item>Take or Choose a photo that show a device id</item>
-        <item>Take or Choose a photo that show a installation tree</item>
-        <item>Take or Choose a photo that show a canopy with sky</item>
-        <item>Take or Choose a photo that show a installation bush</item>
-        <item>Take or Choose a photo that show overview location</item>
+        <item>Take or Choose a photo that shows the device id\npurpose is to serve as redundancy for which device is where if there were to be a metadata issue</item>
+        <item>Take or Choose a photo that shows the device placement within 1–3 meters\nhelps to find the AM if it’s in dense vegetation</item>
+        <item>Take or Choose a photo that shows the device location (tree/bush/vine) within 5–10 meters\nhelps to spot the tree/bush/vine that the AM is in</item>
+        <item>Take or Choose a photo that shows the broader location or view from the approach within 15–20 meters\nhelps to recognize the surroundings when looking for the tree/bush/vine</item>
+        <item>Take or Choose a photo that shows the place to exit the road or trail\nhelps recognize the area to leave the road or trail if it’s off trail/there’s no path</item>
     </string-array>
 
     <string-array name="songmeter_placeholders">
-        <item>device</item>
-        <item>tree</item>
-        <item>canopy</item>
-        <item>bush</item>
-        <item>overview</item>
+        <item>device id</item>
+        <item>placement</item>
+        <item>location</item>
+        <item>approach</item>
+        <item>trail</item>
     </string-array>
 
     <string-array name="songmeter_guideline_texts">
-        <item>Take or Choose a photo that show a device id</item>
-        <item>Take or Choose a photo that show a installation tree</item>
-        <item>Take or Choose a photo that show a canopy with sky</item>
-        <item>Take or Choose a photo that show a installation bush</item>
-        <item>Take or Choose a photo that show overview location</item>
+        <item>Take or Choose a photo that shows the device id\npurpose is to serve as redundancy for which device is where if there were to be a metadata issue</item>
+        <item>Take or Choose a photo that shows the device placement within 1–3 meters\nhelps to find the AM if it’s in dense vegetation</item>
+        <item>Take or Choose a photo that shows the device location (tree/bush/vine) within 5–10 meters\nhelps to spot the tree/bush/vine that the AM is in</item>
+        <item>Take or Choose a photo that shows the broader location or view from the approach within 15–20 meters\nhelps to recognize the surroundings when looking for the tree/bush/vine</item>
+        <item>Take or Choose a photo that shows the place to exit the road or trail\nhelps recognize the area to leave the road or trail if it’s off trail/there’s no path</item>
     </string-array>
 
     <string-array name="sat_guardian_placeholders">
@@ -364,5 +364,21 @@
         <item>guardian_7</item>
         <item>guardian_8</item>
         <item>guardian_cell_1</item>
+    </string-array>
+
+    <string-array name="audiomoth_photos">
+        <item>audiomoth_1</item>
+        <item>audiomoth_2</item>
+        <item>audiomoth_3</item>
+        <item>audiomoth_4</item>
+        <item>audiomoth_5</item>
+    </string-array>
+
+    <string-array name="songmeter_photos">
+        <item>audiomoth_1</item>
+        <item>audiomoth_2</item>
+        <item>audiomoth_3</item>
+        <item>audiomoth_4</item>
+        <item>audiomoth_5</item>
     </string-array>
 </resources>
