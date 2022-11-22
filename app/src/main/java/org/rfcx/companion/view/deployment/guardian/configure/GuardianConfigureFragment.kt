@@ -138,6 +138,7 @@ class GuardianConfigureFragment : Fragment() {
         setDuration()
         setEnableSampling()
         setSampling()
+        setRecordSchedule()
         setNextOnClick()
     }
 
@@ -318,6 +319,10 @@ class GuardianConfigureFragment : Fragment() {
                 dialog.show()
             }
         }
+    }
+
+    private fun setRecordSchedule() {
+        scheduleChipGroup.fragmentManager = parentFragmentManager
     }
 
     override fun onResume() {

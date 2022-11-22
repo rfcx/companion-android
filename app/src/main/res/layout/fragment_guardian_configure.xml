@@ -171,7 +171,36 @@
                     android:layout_marginStart="@dimen/margin_padding_large"
                     android:layout_marginEnd="@dimen/margin_padding_large"
                     android:paddingBottom="@dimen/margin_padding_normal"
-                    tools:text="1:2" />
+                    tools:text="record 1 files, rest 3 cycles" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/separateLine" />
+
+                <TextView
+                    android:id="@+id/scheduleTextView"
+                    style="@style/AudioMothText.Subhead.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_padding_large"
+                    android:layout_marginEnd="@dimen/margin_padding_large"
+                    android:paddingTop="@dimen/margin_padding_normal"
+                    android:text="Recording schedule" />
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <org.rfcx.companion.widget.StartStopTimePicker
+                        android:id="@+id/scheduleChipGroup"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="@dimen/margin_padding_normal"
+                        android:paddingEnd="@dimen/margin_padding_large"
+                        android:paddingBottom="@dimen/margin_padding_small"
+                        app:allowAdd="true" />
+                </HorizontalScrollView>
 
                 <View
                     android:layout_width="match_parent"

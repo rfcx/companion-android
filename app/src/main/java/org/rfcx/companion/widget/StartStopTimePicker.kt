@@ -13,6 +13,10 @@ import com.google.android.material.chip.ChipGroup
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import org.rfcx.companion.R
+import org.rfcx.companion.entity.time.Time
+import org.rfcx.companion.entity.time.TimeRange
+import org.rfcx.companion.util.time.toListTimeRange
+import org.rfcx.companion.util.time.toTimeRange
 
 class StartStopTimePicker @JvmOverloads constructor(
     context: Context,
@@ -37,9 +41,9 @@ class StartStopTimePicker @JvmOverloads constructor(
     var startTitle: String? = "Select start time"
     var stopTitle: String? = "Select stop time"
 
-    private var tempStartTime: String = ""
-    private var tempStopTime: String = ""
-    var listOfTime = arrayListOf<String>()
+    private var tempStartTime: Time = Time()
+    private var tempStopTime: Time = Time()
+    var listOfTime = arrayListOf<TimeRange>()
 
     init {
         View.inflate(context, R.layout.widget_start_stop_timepicker, this)
@@ -94,23 +98,16 @@ class StartStopTimePicker @JvmOverloads constructor(
             .build()
 
         startPicker.addOnPositiveButtonClickListener {
-            val hour =
-                if (startPicker.hour.toString().length == 1) "0${startPicker.hour}" else startPicker.hour.toString()
-            val minute =
-                if (startPicker.minute.toString().length == 1) "0${startPicker.minute}" else startPicker.minute.toString()
-            tempStartTime = "$hour:$minute"
+            val time = Time(startPicker.hour, startPicker.minute)
+            tempStartTime = time
             if (fragmentManager == null) return@addOnPositiveButtonClickListener
             stopPicker.show(fragmentManager!!, "StopTimePicker")
         }
 
         stopPicker.addOnPositiveButtonClickListener {
-            val hour =
-                if (stopPicker.hour.toString().length == 1) "0${stopPicker.hour}" else stopPicker.hour.toString()
-            val minute =
-                if (stopPicker.minute.toString().length == 1) "0${stopPicker.minute}" else stopPicker.minute.toString()
-            tempStopTime = "$hour:$minute"
-            val fullTime = "$tempStartTime-$tempStopTime"
-            addTimeOff(fullTime)
+            val time = Time(stopPicker.hour, stopPicker.minute)
+            tempStopTime = time
+            addTimeOff(TimeRange(tempStartTime, tempStopTime))
         }
 
         addChip.setOnClickListener {
@@ -119,10 +116,10 @@ class StartStopTimePicker @JvmOverloads constructor(
         }
     }
 
-    fun setTimes(times: List<String>?) {
+    fun setTimes(times: String?) {
         if (times == null) return
         listOfTime.clear()
-        listOfTime.addAll(times)
+        listOfTime.addAll(times.toListTimeRange())
         setChip(listOfTime, allowAdd)
     }
 
@@ -130,17 +127,17 @@ class StartStopTimePicker @JvmOverloads constructor(
         chipGroup.removeViews(1, chipGroup.childCount - 1)
     }
 
-    private fun setChip(times: List<String>, isAddAllowed: Boolean) {
+    private fun setChip(times: List<TimeRange>, isAddAllowed: Boolean) {
         clearAllChips()
         times.forEach {
-            addChip(it, isAddAllowed)
+            addChip(it.toStringFormat(), isAddAllowed)
         }
     }
 
-    private fun addTimeOff(time: String) {
-        if (listOfTime.contains(time)) return
-        listOfTime.add(time)
-        addChip(time)
+    private fun addTimeOff(timeRange: TimeRange) {
+        if (listOfTime.contains(timeRange)) return
+        listOfTime.add(timeRange)
+        addChip(timeRange.toStringFormat())
     }
 
     private fun addChip(time: String, allowDelete: Boolean = true) {
@@ -159,7 +156,7 @@ class StartStopTimePicker @JvmOverloads constructor(
     override fun onClick(view: View?) {
         if (view is Chip) {
             val time = view.text
-            listOfTime.remove(time)
+            listOfTime.remove(time.toString().toTimeRange())
             chipGroup.removeView(view)
         }
     }

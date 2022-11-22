@@ -76,11 +76,10 @@ object PrefsUtils {
         }
     }
 
-    fun getSatTimeOffFromPrefs(str: String?): List<String>? {
+    fun getSatTimeOffFromPrefs(str: String?): String? {
         if (str == null) return null
         val json = JsonParser.parseString(str).asJsonObject
-        val timeOff = json.get("api_satellite_off_hours").asString
-        return timeOff.split(",")
+        return json.get("api_satellite_off_hours").asString
     }
 
     fun canGuardianClassify(str: String?): Boolean {

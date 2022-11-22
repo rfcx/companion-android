@@ -271,7 +271,7 @@ class GuardianCommunicationFragment : Fragment() {
         }
         if (satOnlyRadioButton.isChecked) {
             if (manualRadioButton.isChecked) {
-                GuardianSocketManager.sendSatOnlyPrefs(offTimeChipGroup.listOfTime.joinToString(","))
+                GuardianSocketManager.sendSatOnlyPrefs(offTimeChipGroup.listOfTime.joinToString(",") { it.toStringFormat() })
             } else {
                 val currentProject = deploymentProtocol?.getCurrentProject()
                 val offTimes = currentProject?.offTimes
@@ -295,7 +295,7 @@ class GuardianCommunicationFragment : Fragment() {
                 hideEmptyOffTimeText()
             } else {
                 offTimeChipGroup.allowAdd = false
-                offTimeChipGroup.setTimes(deploymentProtocol?.getCurrentProject()?.offTimes?.split(","))
+                offTimeChipGroup.setTimes(deploymentProtocol?.getCurrentProject()?.offTimes)
                 showEmptyOffTimeText()
             }
         }

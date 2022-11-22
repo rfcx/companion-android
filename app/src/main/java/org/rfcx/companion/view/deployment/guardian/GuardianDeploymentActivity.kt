@@ -89,7 +89,7 @@ class GuardianDeploymentActivity :
     private var isGPSDetected: Boolean? = null
     private var phoneNumber: String? = null
     private var guardianPlan: GuardianPlan? = null
-    private var satTimeOff: List<String>? = null
+    private var satTimeOff: String? = null
     private var speedTest: SpeedTest? = null
     private var guardianLocalTime: Long? = null
     private var guardianTimezone: String? = null
@@ -381,7 +381,7 @@ class GuardianDeploymentActivity :
 
     override fun getGuardianPlan(): GuardianPlan? = guardianPlan
 
-    override fun getSatTimeOff(): List<String>? = satTimeOff
+    override fun getSatTimeOff(): String? = satTimeOff
 
     override fun getSpeedTest(): SpeedTest? = speedTest
 
