@@ -44,7 +44,7 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getGPSDetected(): Boolean?
     fun getPhoneNumber(): String?
     fun getGuardianPlan(): GuardianPlan?
-    fun getSatTimeOff(): List<String>?
+    fun getSatTimeOff(): String?
     fun getSpeedTest(): SpeedTest?
     fun getGuardianLocalTime(): Long?
     fun getGuardianTimezone(): String?
