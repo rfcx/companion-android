@@ -1,8 +1,8 @@
 package org.rfcx.companion.entity.time
 
 data class TimeRange(
-    val start: Time,
-    val stop: Time
+    var start: Time,
+    var stop: Time
 ) {
     fun toStringFormat(): String {
         return "${start.toStringFormat()}-${stop.toStringFormat()}"
@@ -10,8 +10,8 @@ data class TimeRange(
 }
 
 data class Time(
-    val hour: Int = 0,
-    val minute: Int = 0
+    var hour: Int = 0,
+    var minute: Int = 0
 ) {
     fun toStringFormat(): String {
         val hour =

@@ -3,8 +3,7 @@ package org.rfcx.companion.util.time
 import org.rfcx.companion.entity.time.Time
 import org.rfcx.companion.entity.time.TimeRange
 
-object TimeRangeUtils {
-
+fun ArrayList<TimeRange>.addTimeRange(timeRange: TimeRange) {
 
 }
 
