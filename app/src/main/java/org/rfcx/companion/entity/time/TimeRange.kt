@@ -20,4 +20,32 @@ data class Time(
             if (this.minute.toString().length == 1) "0${this.minute}" else this.minute.toString()
         return "$hour:$minute"
     }
+
+    fun toIntValue(): Int {
+        val hour =
+            if (this.hour.toString().length == 1) "0${this.hour}" else this.hour.toString()
+        val minute =
+            if (this.minute.toString().length == 1) "0${this.minute}" else this.minute.toString()
+        return "$hour$minute".toInt()
+    }
+
+    fun plusOneMinute(): Time {
+        if (this.minute == 59) {
+            this.minute = 0
+            this.hour = this.hour + 1
+        } else {
+            this.minute = this.minute + 1
+        }
+        return this
+    }
+
+    fun minusOneMinute(): Time {
+        if (this.minute == 0) {
+            this.minute = 59
+            this.hour = this.hour - 1
+        } else {
+            this.minute = this.minute - 1
+        }
+        return this
+    }
 }
