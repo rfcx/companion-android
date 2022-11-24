@@ -81,7 +81,7 @@ class ProjectSelectActivity :
         logoutButton.setOnClickListener {
             DeploymentCleanupWorker.stopAllWork(this)
             this.logout()
-            LocationTracking.set(this, false)
+            LocationTrackingManager.set(this, false)
             analytics.trackLogoutEvent()
             finish()
         }
