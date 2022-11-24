@@ -33,6 +33,7 @@ data class Time(
         if (this.minute == 59) {
             this.minute = 0
             this.hour = this.hour + 1
+            if (this.hour == 24) this.hour = 0
         } else {
             this.minute = this.minute + 1
         }
@@ -43,6 +44,7 @@ data class Time(
         if (this.minute == 0) {
             this.minute = 59
             this.hour = this.hour - 1
+            if (this.hour == -1) this.hour = 23
         } else {
             this.minute = this.minute - 1
         }

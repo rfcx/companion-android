@@ -16,6 +16,7 @@ object PrefsUtils {
     const val audioCastSampleRate = "audio_cast_sample_rate_minimum"
     const val enableSampling = "enable_cutoffs_sampling_ratio"
     const val sampling = "audio_sampling_ratio"
+    const val schedule = "audio_capture_schedule_off_hours"
 
     fun stringToPrefs(context: Context, str: String?): List<Preference> {
         if (str == null) {
@@ -102,7 +103,7 @@ object PrefsUtils {
         }
         val json = JsonParser.parseString(str).asJsonObject
         val keys = json.keySet()
-        val audioPrefs = listOf(audioDuration, audioSampleRate, audioCodec, audioBitrate, enableSampling, sampling)
+        val audioPrefs = listOf(audioDuration, audioSampleRate, audioCodec, audioBitrate, enableSampling, sampling, schedule)
         val audioKeys = keys.filter { audioPrefs.contains(it) }
         val audioJson = JsonObject()
         audioKeys.toList().forEach {

@@ -5,11 +5,26 @@ import org.rfcx.companion.entity.time.TimeRange
 
 object TimeRangeUtils {
 
-    fun toOppositeTimes(timeRanges: ArrayList<TimeRange>): ArrayList<TimeRange> {
+    fun toOppositeTimes(timeRanges: List<TimeRange>): List<TimeRange> {
         val temp = arrayListOf<TimeRange>()
-        for (index in 0 until timeRanges.size) {
-            if (index == 0 && timeRanges[index].start.toIntValue() != 0) {
-                temp.add(TimeRange(Time(0, 0), timeRanges[index].start.minusOneMinute()))
+        for (index in timeRanges.indices) {
+            if (index == 0) {
+                if (timeRanges.size == 1) {
+                    if ((timeRanges[index].start.toIntValue() == 0)) {
+                        temp.add(TimeRange(timeRanges[index].stop.plusOneMinute(), Time(23, 59)))
+                        continue
+                    }
+                    if (timeRanges[index].stop.toIntValue() == 2359) {
+                        temp.add(TimeRange(Time(0, 0), timeRanges[index].start.minusOneMinute()))
+                        continue
+                    }
+                    temp.add(TimeRange(Time(0, 0), timeRanges[index].start.minusOneMinute()))
+                    temp.add(TimeRange(timeRanges[index].stop.plusOneMinute(), Time(23, 59)))
+                } else {
+                    if (timeRanges[index].start.toIntValue() != 0) {
+                        temp.add(TimeRange(Time(0, 0), timeRanges[index].start.minusOneMinute()))
+                    }
+                }
                 continue
             }
             if (index == timeRanges.size - 1) {
@@ -17,13 +32,17 @@ object TimeRangeUtils {
                     temp.add(TimeRange(timeRanges[index].stop.plusOneMinute(), Time(23, 59)))
                 }
             }
-            temp.add(TimeRange(timeRanges[index - 1].stop.plusOneMinute(), timeRanges[index].start.minusOneMinute()))
+            if (timeRanges.size != 1) {
+                if (timeRanges[index - 1].stop.plusOneMinute() !=  timeRanges[index].start) {
+                    temp.add(TimeRange(timeRanges[index - 1].stop, timeRanges[index].start.minusOneMinute()))
+                }
+            }
             continue
         }
         return ArrayList(temp.map { it.copy() }.sortedBy { it.start.toIntValue() })
     }
 
-    fun simplifyTimes(timeRanges: ArrayList<TimeRange>): ArrayList<TimeRange> {
+    fun simplifyTimes(timeRanges: List<TimeRange>): List<TimeRange> {
         if (timeRanges.size == 1) {
             return timeRanges
         }
@@ -93,10 +112,14 @@ object TimeRangeUtils {
     }
 }
 
+fun ArrayList<TimeRange>.toGuardianFormat(): String {
+    return TimeRangeUtils.toOppositeTimes(this).joinToString(",") { it.toStringFormat() }
+}
+
 fun String.toListTimeRange(): List<TimeRange> {
     val list = arrayListOf<TimeRange>()
     val time =
-        "(?<starthh>\\d{1,2})[:](?<startmm>\\d{1,2})-(?<stophh>\\d{1,2})[:](?<stopmm>\\d{1,2})+,?".toRegex()
+        "(?<starthh>\\d{1,2}):(?<startmm>\\d{1,2})-(?<stophh>\\d{1,2}):(?<stopmm>\\d{1,2})+,?".toRegex()
             .findAll(this)
     time.forEach {
         val (startHH, startMM, stopHH, stopMM) = it.destructured
@@ -112,7 +135,7 @@ fun String.toListTimeRange(): List<TimeRange> {
 
 fun String.toTimeRange(): TimeRange? {
     val time =
-        "(?<starthh>\\d{1,2})[:](?<startmm>\\d{1,2})-(?<stophh>\\d{1,2})[:](?<stopmm>\\d{1,2})+,?".toRegex()
+        "(?<starthh>\\d{1,2}):(?<startmm>\\d{1,2})-(?<stophh>\\d{1,2}):(?<stopmm>\\d{1,2})+,?".toRegex()
             .find(this)
     val (startHH, startMM, stopHH, stopMM) = time?.destructured ?: return null
     return TimeRange(Time(startHH.toInt(), startMM.toInt()), Time(stopHH.toInt(), stopMM.toInt()))

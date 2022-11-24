@@ -15,6 +15,7 @@ import com.google.android.material.timepicker.TimeFormat
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.time.Time
 import org.rfcx.companion.entity.time.TimeRange
+import org.rfcx.companion.util.time.TimeRangeUtils
 import org.rfcx.companion.util.time.toListTimeRange
 import org.rfcx.companion.util.time.toTimeRange
 
@@ -116,10 +117,14 @@ class StartStopTimePicker @JvmOverloads constructor(
         }
     }
 
-    fun setTimes(times: String?) {
+    fun setTimes(times: String?, toOpposite: Boolean = false) {
         if (times == null) return
         listOfTime.clear()
-        listOfTime.addAll(times.toListTimeRange())
+        if (toOpposite) {
+            listOfTime.addAll(TimeRangeUtils.toOppositeTimes(times.toListTimeRange()))
+        } else {
+            listOfTime.addAll(times.toListTimeRange())
+        }
         setChip(listOfTime, allowAdd)
     }
 
@@ -137,7 +142,8 @@ class StartStopTimePicker @JvmOverloads constructor(
     private fun addTimeOff(timeRange: TimeRange) {
         if (listOfTime.contains(timeRange)) return
         listOfTime.add(timeRange)
-        addChip(timeRange.toStringFormat())
+        listOfTime = ArrayList(TimeRangeUtils.simplifyTimes(listOfTime).map { it.copy() })
+        setChip(listOfTime, true)
     }
 
     private fun addChip(time: String, allowDelete: Boolean = true) {
