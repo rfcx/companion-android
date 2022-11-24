@@ -3,6 +3,7 @@ package org.rfcx.companion.view.deployment.guardian.configure
 import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +17,7 @@ import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import org.rfcx.companion.entity.guardian.toListForGuardian
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.prefs.PrefsUtils
+import org.rfcx.companion.util.time.toGuardianFormat
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianConfigureFragment : Fragment() {
@@ -41,6 +43,7 @@ class GuardianConfigureFragment : Fragment() {
     private var duration = 90 // default guardian duration is 90
     private var enableSampling = false
     private var sampling = "1:2"
+    private var schedule = "23:55-23:56,23:57-23:59"
 
     private var needCheckSha1 = false
     private var currentPrefsSha1: String? = null
@@ -97,6 +100,7 @@ class GuardianConfigureFragment : Fragment() {
         nextButton.setOnClickListener {
             analytics?.trackClickNextEvent(Screen.GUARDIAN_CONFIGURE.id)
             setNextButton(false)
+            schedule = if (scheduleChipGroup.listOfTime.isNullOrEmpty()) "23:55-23:56,23:57-23:59" else scheduleChipGroup.listOfTime.toGuardianFormat()
             syncConfig()
             deploymentProtocol?.setSampleRate(sampleRate)
         }
@@ -120,7 +124,7 @@ class GuardianConfigureFragment : Fragment() {
     }
 
     private fun getConfiguration(): GuardianConfiguration {
-        return GuardianConfiguration(sampleRate, bitrate, fileFormat, duration, enableSampling, sampling)
+        return GuardianConfiguration(sampleRate, bitrate, fileFormat, duration, enableSampling, sampling, schedule)
     }
 
     private fun retrieveCurrentConfigure() {
@@ -131,6 +135,7 @@ class GuardianConfigureFragment : Fragment() {
             fileFormat = it.get(PrefsUtils.audioCodec).asString
             enableSampling = it.get(PrefsUtils.enableSampling).asBoolean
             sampling = it.get(PrefsUtils.sampling).asString
+            schedule = it.get(PrefsUtils.schedule).asString
         }
         setFileFormatLayout()
         setSampleRateLayout()
@@ -323,6 +328,7 @@ class GuardianConfigureFragment : Fragment() {
 
     private fun setRecordSchedule() {
         scheduleChipGroup.fragmentManager = parentFragmentManager
+        scheduleChipGroup.setTimes(schedule, true)
     }
 
     override fun onResume() {
