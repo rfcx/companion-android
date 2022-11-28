@@ -352,7 +352,5 @@ class TimeRangeUtilsTest {
         assertEquals(55, result[1].start.minute)
         assertEquals(23, result[1].stop.hour)
         assertEquals(59, result[1].stop.minute)
-
     }
-
 }
