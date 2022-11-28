@@ -13,6 +13,7 @@ Change logs
 - Add Guardian internal/external storage in deployment step
 - Save Guardian vital to server after deployment
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> aa13c87e (#628 Android 12 Location tracking avoid crash on background)
 =======
@@ -30,6 +31,9 @@ Your device is configured for Cell/GSM. Please switch to SMS or Satellite to act
 +Offline mode
 >>>>>>> 8de6e9d9 (#635 Add text changes in release note)
 =======
+=======
+- Add recording schedule and rename sampling ratio
+>>>>>>> d72ae610 (#636 Add change log)
 
 Text adding/updating/removing
 -Choose Enable Sampling Ratio
