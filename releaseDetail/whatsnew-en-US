@@ -1,3 +1,14 @@
+Change logs
 - Add photo guideline for all deployments
 - Add Guardian internal/external storage in deployment step
 - Save Guardian vital to server after deployment
+
+Text adding/updating/removing
+-Choose Enable Sampling Ratio
+-Enable Sampling ratio
+Choose Sampling Ratio -> Choose Recording Strategy
+Sampling Ratio -> Recording Strategy
++Select start time
++Select stop time
++Record seamlessly
++Record 1 in every %s cycles
