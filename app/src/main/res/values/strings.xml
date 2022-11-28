@@ -273,9 +273,11 @@
     <string name="choose_bitrate">Choose Bitrate (kbs)</string>
     <string name="choose_file_format">Choose Audio Format</string>
     <string name="choose_duration_cycle">Choose Recording Duration Cycle (secs)</string>
-    <string name="choose_enable_sampling">Choose Enable Sampling Ratio</string>
-    <string name="choose_sampling">Choose Sampling Ratio</string>
+    <string name="choose_sampling">Choose Recording Strategy</string>
+    <string name="sampling_ratio">Recording Strategy</string>
     <string name="advanced_config">Guardian Preferences</string>
+    <string name="schedule_start_time">Select start time</string>
+    <string name="schedule_stop_time">Select stop time</string>
 
     <!-- GuardianPreferences -->
     <bool name="prefs_value_default_show_ui">true</bool>
@@ -568,8 +570,6 @@
     <string name="dismiss">dismiss</string>
     <string name="classifier">Classifier</string>
     <string name="not_found_classifier_local">not found</string>
-    <string name="enable_sampling_ratio">Enable Sampling ratio</string>
-    <string name="sampling_ratio">Sampling ratio</string>
 
     <string name="guardian_software_not_allowed">Your guardian software version is not compatible with this feature.</string>
     <string name="guardian_type_not_allowed">Your device is configured for Cell/GSM. Please switch to SMS or Satellite to activate a classifier.</string>

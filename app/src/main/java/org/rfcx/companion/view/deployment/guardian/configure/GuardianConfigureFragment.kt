@@ -32,8 +32,6 @@ class GuardianConfigureFragment : Fragment() {
     private var fileFormatList: Array<String>? = null
     private var durationEntries: Array<String>? = null
     private var durationValues: Array<String>? = null
-    private var enableSamplingEntries: Array<String>? = null
-    private var enableSamplingValues: Array<String>? = null
     private var samplingEntries: Array<String>? = null
     private var samplingValues: Array<String>? = null
 
@@ -85,10 +83,8 @@ class GuardianConfigureFragment : Fragment() {
         fileFormatList = context.resources.getStringArray(R.array.audio_codec)
         durationEntries = context.resources.getStringArray(R.array.duration_cycle_entries)
         durationValues = context.resources.getStringArray(R.array.duration_cycle_values)
-        enableSamplingEntries = context.resources.getStringArray(R.array.enable_sampling_entries)
-        enableSamplingValues = context.resources.getStringArray(R.array.enable_sampling_entries)
         samplingEntries = context.resources.getStringArray(R.array.sampling_entries)
-        samplingValues = context.resources.getStringArray(R.array.sampling_entries)
+        samplingValues = context.resources.getStringArray(R.array.sampling_values)
     }
 
     private fun setNextButton(show: Boolean) {
@@ -141,7 +137,6 @@ class GuardianConfigureFragment : Fragment() {
         setSampleRateLayout()
         setBitrateLayout()
         setDuration()
-        setEnableSampling()
         setSampling()
         setRecordSchedule()
         setNextOnClick()
@@ -262,45 +257,16 @@ class GuardianConfigureFragment : Fragment() {
         }
     }
 
-    private fun setEnableSampling() {
-
-        val indexOfValue = enableSamplingValues?.indexOf(enableSampling.toString()) ?: 0
-        if (indexOfValue == -1) {
-            enableSamplingValueTextView.text = "false"
-        } else {
-            enableSamplingValueTextView.text = enableSamplingEntries!![indexOfValue]
-        }
-
-        enableSamplingValueTextView.setOnClickListener {
-            val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
-            if (builder != null) {
-                builder.setTitle(R.string.choose_enable_sampling)
-                    ?.setItems(enableSamplingEntries) { dialog, i ->
-                        try {
-                            if (enableSamplingValues!![i].toBoolean() == enableSampling) {
-                                needCheckSha1 = false
-                            } else {
-                                enableSamplingValueTextView.text = enableSamplingEntries!![i]
-                                enableSampling = enableSamplingValues!![i].toBoolean()
-                                needCheckSha1 = true
-                            }
-                        } catch (e: IllegalArgumentException) {
-                            dialog.dismiss()
-                        }
-                    }
-                val dialog = builder.create()
-                dialog.show()
-            }
-        }
-    }
-
     private fun setSampling() {
-
-        val indexOfValue = samplingValues?.indexOf(sampling) ?: 0
-        if (indexOfValue == -1) {
-            samplingValueTextView.text = "1:2"
+        if (!enableSampling) {
+            samplingValueTextView.text = samplingEntries!![0]
         } else {
-            samplingValueTextView.text = samplingEntries!![indexOfValue]
+            val indexOfValue = samplingValues!!.indexOf(sampling)
+            if (indexOfValue == -1) {
+                samplingValueTextView.text = samplingEntries!![0]
+            } else {
+                samplingValueTextView.text = samplingEntries!![indexOfValue]
+            }
         }
 
         samplingValueTextView.setOnClickListener {
@@ -309,12 +275,17 @@ class GuardianConfigureFragment : Fragment() {
                 builder.setTitle(R.string.choose_sampling)
                     ?.setItems(samplingEntries) { dialog, i ->
                         try {
-                            if (samplingValues!![i] == sampling) {
-                                needCheckSha1 = false
-                            } else {
-                                samplingValueTextView.text = samplingEntries!![i]
-                                sampling = samplingValues!![i]
-                                needCheckSha1 = true
+                            when {
+                                samplingValues!![i] == "0" && !enableSampling -> needCheckSha1 = false
+                                samplingValues!![i] == sampling -> needCheckSha1 = false
+                                else -> {
+                                    samplingValueTextView.text = samplingEntries!![i]
+                                    if (samplingValues!![i] != "0") {
+                                        sampling = samplingValues!![i]
+                                    }
+                                    enableSampling = samplingValues!![i] != "0"
+                                    needCheckSha1 = true
+                                }
                             }
                         } catch (e: IllegalArgumentException) {
                             dialog.dismiss()
