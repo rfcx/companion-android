@@ -89,6 +89,8 @@ class StartStopTimePicker @JvmOverloads constructor(
             .setHour(0)
             .setMinute(0)
             .setTitleText(startTitle)
+            .setPositiveButtonText(R.string.next)
+            .setNegativeButtonText(R.string.cancel)
             .build()
 
         val stopPicker = MaterialTimePicker.Builder()
@@ -96,6 +98,8 @@ class StartStopTimePicker @JvmOverloads constructor(
             .setHour(0)
             .setMinute(0)
             .setTitleText(stopTitle)
+            .setPositiveButtonText(R.string.next)
+            .setNegativeButtonText(R.string.cancel)
             .build()
 
         startPicker.addOnPositiveButtonClickListener {

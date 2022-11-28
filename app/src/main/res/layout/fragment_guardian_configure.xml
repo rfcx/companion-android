@@ -199,6 +199,8 @@
                         android:paddingStart="@dimen/margin_padding_normal"
                         android:paddingEnd="@dimen/margin_padding_large"
                         android:paddingBottom="@dimen/margin_padding_small"
+                        app:startTitle="@string/schedule_start_time"
+                        app:stopTitle="@string/schedule_stop_time"
                         app:allowAdd="true" />
                 </HorizontalScrollView>
 
