@@ -3,6 +3,8 @@
 - [x] Resolves #XXX
 - [ ] Release notes updated
 - [ ] Version bumped
+- [ ] HelpScout documentation updates proposed / na
+- [ ] Translation is reviewed (by screenshots) / na
 
 _(use na when Release notes, etc do not need to be updated)_
 
