@@ -6,3 +6,5 @@ Change logs
 - Save Guardian vital to server after deployment
 
 Text adding/updating/removing
+Your device is configured for Cell/GSM. Please switch to SMS or Satellite to activate a classifier. -> Your device is configured for Cell/GSM. Please switch to SMS, Satellite or Offline mode to activate a classifier.
++Offline mode
