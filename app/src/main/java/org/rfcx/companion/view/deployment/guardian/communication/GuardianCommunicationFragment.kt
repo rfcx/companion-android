@@ -253,7 +253,6 @@ class GuardianCommunicationFragment : Fragment() {
                 passTimesTextView.visibility = View.GONE
                 timeOffRadioGroup.visibility = View.GONE
                 offTimeChipGroup.visibility = View.GONE
-
             }
         }
     }

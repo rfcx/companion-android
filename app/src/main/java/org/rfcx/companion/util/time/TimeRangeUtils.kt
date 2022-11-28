@@ -33,7 +33,7 @@ object TimeRangeUtils {
                 }
             }
             if (timeRanges.size != 1) {
-                if (timeRanges[index - 1].stop.plusOneMinute() !=  timeRanges[index].start) {
+                if (timeRanges[index - 1].stop.plusOneMinute() != timeRanges[index].start) {
                     temp.add(TimeRange(timeRanges[index - 1].stop, timeRanges[index].start.minusOneMinute()))
                 }
             }
