@@ -140,14 +140,14 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
         if (imageAdapter != null) {
             return imageAdapter!!
         }
-        imageAdapter = ImageAdapter(this)
+        imageAdapter = ImageAdapter(this, imageExamples)
         return imageAdapter!!
     }
 
     private fun setupImages() {
         val savedImages =
             audioMothDeploymentProtocol?.getImages() ?: songMeterDeploymentProtocol?.getImages()
-            ?: guardianDeploymentProtocol?.getImages()
+                ?: guardianDeploymentProtocol?.getImages()
         if (savedImages != null && savedImages.isNotEmpty()) {
             getImageAdapter().updateImagesFromSavedImages(savedImages)
         } else {

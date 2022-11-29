@@ -6,12 +6,13 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.item_photo_advise.view.*
 import org.rfcx.companion.R
 
-class ImageAdapter(private val imageClickListener: ImageClickListener) :
+class ImageAdapter(private val imageClickListener: ImageClickListener, private val thumbnails: List<String>) :
     RecyclerView.Adapter<ImageAdapter.ImageAdapterViewHolder>() {
     private var imageItems = arrayListOf<Image>()
     private var currentPosition = -1
@@ -90,6 +91,7 @@ class ImageAdapter(private val imageClickListener: ImageClickListener) :
             currentType = imageItems[currentPosition].type
             imageClickListener.onPlaceHolderClick(currentPosition)
         }
+
         holder.imageView.setOnClickListener {
             currentPosition = holder.adapterPosition
             imageClickListener.onImageClick(imageItems[currentPosition])
@@ -111,6 +113,15 @@ class ImageAdapter(private val imageClickListener: ImageClickListener) :
                 imageView.visibility = View.GONE
                 placeHolderButton.visibility = View.VISIBLE
                 deleteButton.visibility = View.GONE
+                placeHolderButton.apply {
+                    val example = thumbnails.getOrNull(adapterPosition) ?: thumbnails[thumbnails.size - 1]
+                    val id = this.context.resources.getIdentifier(example, "drawable", this.context.packageName)
+                    ContextCompat.getDrawable(this.context, id)?.let {
+                        val drawable = it.mutate()
+                        drawable.alpha = 100
+                        placeHolderButton.background = drawable
+                    }
+                }
             } else {
                 Glide.with(itemView.context)
                     .load(image.path)
