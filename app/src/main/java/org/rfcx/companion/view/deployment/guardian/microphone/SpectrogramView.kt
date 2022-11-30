@@ -134,15 +134,17 @@ class SpectrogramView : View {
             )
             j /= samplingRate.toFloat() / 2
             if (_magnitudes != null && _magnitudes!!.isNotEmpty()) {
-                val mag = _magnitudes!![(j * _magnitudes!!.size / 2).toInt()]
-                val db =
-                    max(0.0, -20 * log10(mag.toDouble())).toFloat()
-                val c = getInterpolatedColor(colors, db * 0.009f)
-                paint.color = c
-                val x = pos % rWidth
-                val y = i
-                this.canvas!!.drawPoint(x.toFloat(), y.toFloat(), paint)
-                this.canvas!!.drawPoint(x.toFloat(), y.toFloat(), paint)
+                val mag = _magnitudes!!.getOrNull((j * _magnitudes!!.size / 2).toInt())
+                mag?.let {
+                    val db =
+                        max(0.0, -20 * log10(it.toDouble())).toFloat()
+                    val c = getInterpolatedColor(colors, db * 0.009f)
+                    paint.color = c
+                    val x = pos % rWidth
+                    val y = i
+                    this.canvas!!.drawPoint(x.toFloat(), y.toFloat(), paint)
+                    this.canvas!!.drawPoint(x.toFloat(), y.toFloat(), paint)
+                }
             }
         }
 
