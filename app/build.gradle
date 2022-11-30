@@ -15,8 +15,12 @@ android {
         minSdkVersion 21
         targetSdkVersion 31
 <<<<<<< HEAD
+<<<<<<< HEAD
         versionCode 150
 <<<<<<< HEAD
+=======
+        versionCode 151
+>>>>>>> 5c5ddd90 (#639 bump version, add changelog)
         versionName "1.7.2"
 =======
         versionName "1.7.3"

@@ -14,6 +14,7 @@ Change logs
 - Save Guardian vital to server after deployment
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> aa13c87e (#628 Android 12 Location tracking avoid crash on background)
 =======
@@ -45,3 +46,6 @@ Sampling Ratio -> Recording Strategy
 +Record seamlessly
 +Record 1 in every %s cycles
 >>>>>>> e85bc0e7 (#636 Add change logs)
+=======
+- Fix crashlytics
+>>>>>>> 5c5ddd90 (#639 bump version, add changelog)
