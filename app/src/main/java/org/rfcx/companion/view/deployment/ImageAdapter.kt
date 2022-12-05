@@ -115,11 +115,13 @@ class ImageAdapter(private val imageClickListener: ImageClickListener, private v
                 deleteButton.visibility = View.GONE
                 placeHolderButton.apply {
                     val example = thumbnails.getOrNull(adapterPosition) ?: thumbnails[thumbnails.size - 1]
-                    val id = this.context.resources.getIdentifier(example, "drawable", this.context.packageName)
-                    ContextCompat.getDrawable(this.context, id)?.let {
-                        val drawable = it.mutate()
-                        drawable.alpha = 100
-                        placeHolderButton.background = drawable
+                    val id = this.context.resources.getIdentifier("${example}_tbn", "drawable", this.context.packageName)
+                    if (id != 0) {
+                        ContextCompat.getDrawable(this.context, id)?.let {
+                            val drawable = it.mutate()
+                            drawable.alpha = 100
+                            placeHolderButton.background = drawable
+                        }
                     }
                 }
             } else {

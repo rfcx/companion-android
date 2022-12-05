@@ -283,11 +283,15 @@
     <string-array name="sat_guardian_placeholders">
         <item>antenna connections</item>
         <item>cable tied box</item>
-        <item>solar panel connections</item>
+        <item>solar panel connection 1</item>
+        <item>solar panel connection 2</item>
+        <item>solar panel connection 3</item>
+        <item>solar panel connection 4</item>
         <item>view of solar panels</item>
-        <item>base plate</item>
+        <item>baseplate without guardian</item>
+        <item>baseplate with guardian</item>
         <item>arm angle</item>
-        <item>canopy above guardian</item>
+        <item>canopy above solar panels</item>
         <item>mic and cover</item>
         <item>canopy above swarm antenna</item>
         <item>swarm antenna attachment</item>
@@ -297,39 +301,51 @@
     <string-array name="cell_guardian_placeholders">
         <item>antennas</item>
         <item>cable tied box</item>
-        <item>solar panels</item>
+        <item>solar panel connection 1</item>
+        <item>solar panel connection 2</item>
+        <item>solar panel connection 3</item>
+        <item>solar panel connection 4</item>
         <item>view of solar panels</item>
-        <item>base plate</item>
+        <item>baseplate without guardian</item>
+        <item>baseplate with guardian</item>
         <item>arm angle</item>
-        <item>canopy above guardian</item>
+        <item>canopy above solar panels</item>
         <item>mic and cover</item>
         <item>gsm antenna</item>
     </string-array>
 
     <string-array name="sat_guardian_guideline_texts">
-        <item>This picture should show that all the antennas are in the right position and that they are securely attached.</item>
-        <item>This picture should show that the frame is securely attached to the guardian box by at least two cable ties.</item>
-        <item>This picture should show an that the panels are securely attached to the frame.</item>
-        <item>This picture should show all the solar panels are securely attached to the frame using nuts and that the panels aren’t overly shaded.</item>
-        <item>This picture should show the baseplate is flatly mounted, either horizontally on an adequately sized branch or vertically on the trunk with at least 6 to 8 screws.</item>
-        <item>This picture should show the arm (if used) angled downwards.</item>
-        <item>This picture should show a clear sky above the panels so nothing is blocking sunlight access.</item>
-        <item>This picture should show the microphone is covered with the cover and secure with a cable tie.</item>
-        <item>The swarm antenna can tolerate some canopy cover, but ideally there should be as much clear sky as possible.</item>
-        <item>The swarm antenna should be pointing towards the sky and be secured to the mount with two to three cable ties. The radials shouldn’t be touching the tree. Moreover, the antenna should be placed at least 1m from the Guardian box itself.</item>
-        <item>The GPS antenna should be installed flat on a horizontal branch with two screws. The Antenna shouldn’t be vertical or at an angle.</item>
+        <item>Take a photo showing the antennas are securely in the right connections, as well as the base plate adaptor connecting to the Guardian is secure and pointing towards the sky.</item>
+        <item>Show two cable ties securing the frame to the Guardian.</item>
+        <item>Take a photo of each of the 4 solar panels connections showing they are completely pushed into the frame plug.</item>
+        <item>Take a photo of each of the 4 solar panels connections showing they are completely pushed into the frame plug.</item>
+        <item>Take a photo of each of the 4 solar panels connections showing they are completely pushed into the frame plug.</item>
+        <item>Take a photo of each of the 4 solar panels connections showing they are completely pushed into the frame plug.</item>
+        <item>Show all solar panels are secured to the frame using the bolts, show all panels and some background.</item>
+        <item>Show base plate orientation and number of screws and whether flat or vertical. Showing at least 6 to 8 screws securing the baseplate.</item>
+        <item>Show the baseplate is flatly mounted, either horizontally on an adequately sized branch or vertically on the trunk with the Guardian attached.</item>
+        <item>Take a photo of the arm being angled 45 downs, if used.</item>
+        <item>Set your camera phone to a 10 second timer, place the camera on top of the panels facing the sky and take a photo of what is directly above the panels. (There should be ample clear sky)</item>
+        <item>Take a photo of the microphone cover cable tied to the mic mount.</item>
+        <item>Take a photo of the canopy above the satellite antenna (you should ideally show no to very little canopy cover)</item>
+        <item>Take a photo of the satellite antenna, directly facing towards the sky, none of the radials (legs) touching the tree, cabled tied to the mount and 1 meter away from the Guardian box</item>
+        <item>Take a photo of the GPS antenna flat on a horizontal branch with 2 screws.</item>
     </string-array>
 
     <string-array name="cell_guardian_guideline_texts">
-        <item>This picture should show that all the antennas are in the right position and that they are securely attached.</item>
-        <item>This picture should show that the frame is securely attached to the guardian box by at least two cable ties.</item>
-        <item>This picture should show an that the panels are securely attached to the frame.</item>
-        <item>This picture should show all the solar panels are securely attached to the frame using nuts and that the panels aren’t overly shaded.</item>
-        <item>This picture should show the base plate is flatly mounted, either horizontally on an adequately sized branch or vertically on the trunk with at least 6 to 8 screws.</item>
-        <item>This picture should show the arm (if used) angled downwards.</item>
-        <item>This picture should show a clear sky above the panels so nothing is blocking sunlight access.</item>
-        <item>This picture should show the micro is covered with the cover and secure with a cable tie.</item>
-        <item>The GSM antenna should be placed snugly in the mount secured by at least 2 cable ties. The paddle antenna should be pointing upwards towards the sky as high in the tree as possible.</item>
+        <item>Take a photo showing the antennas are securely in the right connections, as well as the base plate adaptor connecting to the Guardian is secure and pointing towards the sky.</item>
+        <item>Show two cable ties securing the frame to the Guardian.</item>
+        <item>Take a photo of each of the 4 solar panels connections showing they are completely pushed into the frame plug.</item>
+        <item>Take a photo of each of the 4 solar panels connections showing they are completely pushed into the frame plug.</item>
+        <item>Take a photo of each of the 4 solar panels connections showing they are completely pushed into the frame plug.</item>
+        <item>Take a photo of each of the 4 solar panels connections showing they are completely pushed into the frame plug.</item>
+        <item>Show all solar panels are secured to the frame using the bolts, show all panels and some background.</item>
+        <item>Show base plate orientation and number of screws and whether flat or vertical. Showing at least 6 to 8 screws securing the baseplate.</item>
+        <item>Show the baseplate is flatly mounted, either horizontally on an adequately sized branch or vertically on the trunk with the Guardian attached.</item>
+        <item>Take a photo of the arm being angled 45 downs, if used.</item>
+        <item>Set your camera phone to a 10 second timer, place the camera on top of the panels facing the sky and take a photo of what is directly above the panels. (There should be ample clear sky)</item>
+        <item>Take a photo of the microphone cover cable tied to the mic mount.</item>
+        <item>Take a photo of the GSM antenna pointing towards the sky, cable tied to the mount which is screwed to the branch with 2 screws.</item>
     </string-array>
 
     <string-array name="sat_guardian_photos">
@@ -341,6 +357,10 @@
         <item>guardian_6</item>
         <item>guardian_7</item>
         <item>guardian_8</item>
+        <item>guardian_9</item>
+        <item>guardian_10</item>
+        <item>guardian_11</item>
+        <item>guardian_12</item>
         <item>guardian_sat_1</item>
         <item>guardian_sat_2</item>
         <item>guardian_sat_3</item>
@@ -355,6 +375,10 @@
         <item>guardian_6</item>
         <item>guardian_7</item>
         <item>guardian_8</item>
+        <item>guardian_9</item>
+        <item>guardian_10</item>
+        <item>guardian_11</item>
+        <item>guardian_12</item>
         <item>guardian_cell_1</item>
     </string-array>
 
