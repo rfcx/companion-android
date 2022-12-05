@@ -100,14 +100,18 @@ class GuardianRegisterFragment : Fragment() {
                         if (regResponse != null) {
                             GuardianSocketManager.sendGuardianRegistration(regResponse)
                         } else {
-                            Toast.makeText(requireContext(), "Register failed: empty response", Toast.LENGTH_LONG).show()
-                            resetUI()
+                            context?.let {
+                                Toast.makeText(it, "Register failed: empty response", Toast.LENGTH_LONG).show()
+                                resetUI()
+                            }
                         }
                     }
 
                     override fun onFailure(call: Call<GuardianRegisterResponse>, t: Throwable) {
-                        Toast.makeText(requireContext(), "Register failed: ${t.message}", Toast.LENGTH_LONG).show()
-                        resetUI()
+                        context?.let {
+                            Toast.makeText(it, "Register failed: ${t.message}", Toast.LENGTH_LONG).show()
+                            resetUI()
+                        }
                     }
                 }
             )
