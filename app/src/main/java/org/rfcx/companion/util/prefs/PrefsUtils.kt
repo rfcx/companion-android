@@ -67,11 +67,11 @@ object PrefsUtils {
     fun getGuardianPlanFromPrefs(str: String?): GuardianPlan? {
         if (str == null) return null
         val json = JsonParser.parseString(str).asJsonObject
-        val order = json.get("api_protocol_escalation_order").asString
-        return when (order) {
+        return when (json.get("api_protocol_escalation_order").asString) {
             "mqtt,rest" -> GuardianPlan.CELL_ONLY
             "mqtt,rest,sms" -> GuardianPlan.CELL_SMS
             "sat" -> GuardianPlan.SAT_ONLY
+            "" -> GuardianPlan.OFFLINE_MODE
             else -> null
         }
     }
@@ -83,18 +83,18 @@ object PrefsUtils {
         return timeOff.split(",")
     }
 
-    fun isSMSOrSatGuardian(str: String?): Boolean {
+    fun canGuardianClassify(str: String?): Boolean {
         if (str == null) return false
-        val expect = listOf("sms", "sat")
+        val expect = listOf("sms", "sat", "")
         val json = JsonParser.parseString(str).asJsonObject
         val order = json.get("api_protocol_escalation_order").asString
-        var isSMSOrSat = false
+        var canClassify = false
         expect.forEach {
             if (order.contains(it, false)) {
-                isSMSOrSat = true
+                canClassify = true
             }
         }
-        return isSMSOrSat
+        return canClassify
     }
 
     fun stringToAudioPrefs(str: String?): JsonObject? {
@@ -114,5 +114,5 @@ object PrefsUtils {
 }
 
 enum class GuardianPlan {
-    CELL_ONLY, CELL_SMS, SAT_ONLY
+    CELL_ONLY, CELL_SMS, SAT_ONLY, OFFLINE_MODE
 }
