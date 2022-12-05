@@ -1197,7 +1197,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         }
 
         val locationComponentActivationOptions =
-            requireContext().let {
+            context?.let {
                 LocationComponentActivationOptions.builder(it, style)
                     .locationComponentOptions(customLocationComponentOptions)
                     .build()
