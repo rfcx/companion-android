@@ -137,9 +137,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/guardian_local_time"
+                app:layout_constraintBottom_toBottomOf="@id/systemTimeCheckbox"
                 app:layout_constraintStart_toEndOf="@id/systemTimeCheckbox"
-                app:layout_constraintTop_toTopOf="@id/systemTimeCheckbox"
-                app:layout_constraintBottom_toBottomOf="@id/systemTimeCheckbox"/>
+                app:layout_constraintTop_toTopOf="@id/systemTimeCheckbox" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/guardianTimeValuesTextView"
@@ -263,30 +263,17 @@
                     android:textSize="@dimen/text_small" />
             </RadioGroup>
 
-            <com.google.android.material.chip.ChipGroup
-                android:id="@+id/manualOffTimeChipGroup"
+            <org.rfcx.companion.widget.StartStopTimePicker
+                android:id="@+id/offTimeChipGroup"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginStart="@dimen/margin_padding_large"
                 android:layout_marginEnd="@dimen/margin_padding_normal"
                 android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@id/timeOffRadioGroup">
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/passTimeAddChip"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/plus" />
-            </com.google.android.material.chip.ChipGroup>
-
-            <com.google.android.material.chip.ChipGroup
-                android:id="@+id/autoOffTimeChipGroup"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_padding_large"
-                android:layout_marginEnd="@dimen/margin_padding_normal"
-                android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@id/timeOffRadioGroup" />
+                app:allowAdd="true"
+                app:layout_constraintTop_toBottomOf="@id/timeOffRadioGroup"
+                app:startTitle="@string/sat_start_time"
+                app:stopTitle="@string/sat_end_time" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/emptyOffTimeTextView"

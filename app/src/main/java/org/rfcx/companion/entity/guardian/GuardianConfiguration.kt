@@ -9,7 +9,8 @@ data class GuardianConfiguration(
     var fileFormat: String = "opus",
     var duration: Int = 90,
     var enableSampling: Boolean = false,
-    var sampling: String = "1:2"
+    var sampling: String = "1:2",
+    var schedule: String = "23:55-23:56,23:57-23:59"
 )
 
 fun GuardianConfiguration.toListForGuardian(): String {
@@ -21,6 +22,7 @@ fun GuardianConfiguration.toListForGuardian(): String {
         addProperty(PrefsUtils.audioDuration, duration)
         addProperty(PrefsUtils.enableSampling, enableSampling)
         addProperty(PrefsUtils.sampling, sampling)
+        addProperty(PrefsUtils.schedule, schedule)
     }
     return json.toString()
 }

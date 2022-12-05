@@ -131,7 +131,7 @@ object PingUtils {
         return null
     }
 
-    fun getSatTimeOffFromPrefs(guardianPing: GuardianPing?): List<String>? {
+    fun getSatTimeOffFromPrefs(guardianPing: GuardianPing?): String? {
         if (guardianPing?.prefs is JsonObject) {
             val prefs = guardianPing.prefs.get("vals") ?: return null
             return PrefsUtils.getSatTimeOffFromPrefs(Gson().toJson(prefs))
