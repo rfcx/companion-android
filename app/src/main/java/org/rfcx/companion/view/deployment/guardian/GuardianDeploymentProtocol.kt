@@ -24,7 +24,7 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getGuardianToken(): String?
     fun getGuardianPurpose(): String?
     fun isGuardianRegistered(): Boolean?
-    fun isSMSOrSatGuardian(): Boolean
+    fun canGuardianClassify(): Boolean
     fun getSoftwareVersion(): Map<String, String>?
     fun getAudioConfiguration(): JsonObject?
     fun getPrefsSha1(): String?

@@ -233,10 +233,14 @@ class GuardianCommunicationFragment : Fragment() {
                         GuardianPlan.SAT_ONLY -> {
                             satOnlyRadioButton.isChecked = true
                         }
+                        GuardianPlan.OFFLINE_MODE -> {
+                            offlineModeRadioButton.isChecked = true
+                        }
                         null -> {
                             cellOnlyRadioButton.isChecked = false
                             cellSmsRadioButton.isChecked = false
                             satOnlyRadioButton.isChecked = false
+                            offlineModeRadioButton.isChecked = false
                         }
                     }
                     isSetFirstGuardianPlan = true
@@ -274,6 +278,9 @@ class GuardianCommunicationFragment : Fragment() {
                     GuardianSocketManager.sendSatOnlyPrefs(offTimes)
                 }
             }
+        }
+        if (offlineModeRadioButton.isChecked) {
+            GuardianSocketManager.sendOfflineModePrefs()
         }
     }
 

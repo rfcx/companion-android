@@ -144,10 +144,10 @@ object PingUtils {
         return isRegistered.asBoolean
     }
 
-    fun isSMSOrSatGuardian(guardianPing: GuardianPing?): Boolean {
+    fun canGuardianClassify(guardianPing: GuardianPing?): Boolean {
         if (guardianPing?.prefs is JsonObject) {
             val prefs = guardianPing.prefs.get("vals") ?: return false
-            return PrefsUtils.isSMSOrSatGuardian(Gson().toJson(prefs))
+            return PrefsUtils.canGuardianClassify(Gson().toJson(prefs))
         }
         return false
     }
