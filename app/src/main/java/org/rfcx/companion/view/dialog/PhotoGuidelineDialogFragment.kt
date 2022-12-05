@@ -37,11 +37,8 @@ class PhotoGuidelineDialogFragment(private val guidelineButtonClickListener: Gui
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (photoId.isNotEmpty()) {
-            guidelineImage.setImageResource(resources.getIdentifier(photoId, "drawable", requireContext().packageName))
-        }
-
-        guidelineTextView.text = guidelineText
+        setExamplePhoto(photoId)
+        setExampleText(guidelineText)
 
         takePhotoButton.setOnClickListener {
             dismiss()
@@ -52,6 +49,19 @@ class PhotoGuidelineDialogFragment(private val guidelineButtonClickListener: Gui
             dismiss()
             guidelineButtonClickListener.onChoosePhotoClick()
         }
+    }
+
+    private fun setExamplePhoto(photoId: String) {
+        if (photoId.isEmpty()) return
+
+        val id = resources.getIdentifier(photoId, "drawable", requireContext().packageName)
+        if (id == 0) return
+
+        guidelineImage.setImageResource(resources.getIdentifier(photoId, "drawable", requireContext().packageName))
+    }
+
+    private fun setExampleText(text: String) {
+        guidelineTextView.text = text.ifEmpty { getString(R.string.take_other) }
     }
 
     companion object {
