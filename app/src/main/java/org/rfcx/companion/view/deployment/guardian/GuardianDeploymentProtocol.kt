@@ -24,7 +24,7 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getGuardianToken(): String?
     fun getGuardianPurpose(): String?
     fun isGuardianRegistered(): Boolean?
-    fun isSMSOrSatGuardian(): Boolean
+    fun canGuardianClassify(): Boolean
     fun getSoftwareVersion(): Map<String, String>?
     fun getAudioConfiguration(): JsonObject?
     fun getPrefsSha1(): String?
@@ -44,7 +44,7 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getGPSDetected(): Boolean?
     fun getPhoneNumber(): String?
     fun getGuardianPlan(): GuardianPlan?
-    fun getSatTimeOff(): List<String>?
+    fun getSatTimeOff(): String?
     fun getSpeedTest(): SpeedTest?
     fun getGuardianLocalTime(): Long?
     fun getGuardianTimezone(): String?

@@ -131,7 +131,7 @@ object PingUtils {
         return null
     }
 
-    fun getSatTimeOffFromPrefs(guardianPing: GuardianPing?): List<String>? {
+    fun getSatTimeOffFromPrefs(guardianPing: GuardianPing?): String? {
         if (guardianPing?.prefs is JsonObject) {
             val prefs = guardianPing.prefs.get("vals") ?: return null
             return PrefsUtils.getSatTimeOffFromPrefs(Gson().toJson(prefs))
@@ -144,10 +144,10 @@ object PingUtils {
         return isRegistered.asBoolean
     }
 
-    fun isSMSOrSatGuardian(guardianPing: GuardianPing?): Boolean {
+    fun canGuardianClassify(guardianPing: GuardianPing?): Boolean {
         if (guardianPing?.prefs is JsonObject) {
             val prefs = guardianPing.prefs.get("vals") ?: return false
-            return PrefsUtils.isSMSOrSatGuardian(Gson().toJson(prefs))
+            return PrefsUtils.canGuardianClassify(Gson().toJson(prefs))
         }
         return false
     }
@@ -285,7 +285,7 @@ object PingUtils {
             }
         )
     }
-    
+
     fun getGuardianVitalFromPing(adminPing: AdminPing?, guardianPing: GuardianPing?): String? {
         val admin = adminPing?.toJson()?.apply {
             remove("companion")

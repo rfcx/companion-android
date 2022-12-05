@@ -279,7 +279,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         showSearchBar(false)
         hideLabel()
 
-        context?.let { setTextTrackingButton(LocationTracking.isTrackingOn(it)) }
+        context?.let { setTextTrackingButton(LocationTrackingManager.isTrackingOn(it)) }
         projectNameTextView.text =
             if (listener?.getProjectName() != getString(R.string.none)) listener?.getProjectName() else getString(
                 R.string.projects
@@ -442,7 +442,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
 
         trackingLayout.setOnClickListener {
             context?.let { context ->
-                if (LocationTracking.isTrackingOn(context)) {
+                if (LocationTrackingManager.isTrackingOn(context)) {
                     setLocationTrackingService(context, false)
                 } else {
                     val tracking = mainViewModel.getFirstTracking()
@@ -504,7 +504,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
 
     private fun setLocationTrackingService(context: Context, isOn: Boolean) {
         setTextTrackingButton(isOn)
-        LocationTracking.set(context, isOn)
+        LocationTrackingManager.set(context, isOn)
     }
 
     private fun setTextTrackingButton(isOn: Boolean) {
@@ -538,8 +538,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         override fun run() {
             context?.let {
                 trackingTextView.text = "${
-                LocationTracking.getDistance(trackingDb).setFormatLabel()
-                }  ${LocationTracking.getOnDutyTimeMinute(it)} min"
+                LocationTrackingManager.getDistance(trackingDb).setFormatLabel()
+                }  ${LocationTrackingManager.getOnDutyTimeMinute(it)} min"
             }
             handler.postDelayed(this, 20 * 1000L)
         }
@@ -1197,7 +1197,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         }
 
         val locationComponentActivationOptions =
-            requireContext().let {
+            context?.let {
                 LocationComponentActivationOptions.builder(it, style)
                     .locationComponentOptions(customLocationComponentOptions)
                     .build()

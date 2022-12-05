@@ -18,7 +18,7 @@ class CompanionApplication : Application() {
         val preferences = Preferences.getInstance(this)
         val state = preferences.getBoolean(Preferences.ENABLE_LOCATION_TRACKING, false)
         if (state) {
-            LocationTracking.set(this, true)
+            LocationTrackingManager.set(this, true)
         }
 
         val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()

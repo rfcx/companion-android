@@ -83,13 +83,13 @@ class GuardianDeploymentActivity :
     private var internalBattery: Int? = null
     private var i2cAccessibility: I2CAccessibility? = null
     private var isGuardianRegistered: Boolean? = null
-    private var isSMSOrSatGuardian: Boolean = false
+    private var canGuardianClassify: Boolean = false
     private var isSimDetected: Boolean? = null
     private var satId: String? = null
     private var isGPSDetected: Boolean? = null
     private var phoneNumber: String? = null
     private var guardianPlan: GuardianPlan? = null
-    private var satTimeOff: List<String>? = null
+    private var satTimeOff: String? = null
     private var speedTest: SpeedTest? = null
     private var guardianLocalTime: Long? = null
     private var guardianTimezone: String? = null
@@ -192,14 +192,14 @@ class GuardianDeploymentActivity :
     }
 
     override fun nextStep() {
-        if (passedChecks.contains(2) && (_images.isNullOrEmpty() || _images.none { it.path != null })) {
-            passedChecks.remove(2)
+        if (passedChecks.contains(10) && (_images.isNullOrEmpty() || _images.none { it.path != null })) {
+            passedChecks.remove(10)
         }
 
         val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
         if (container !is GuardianAdvancedFragment) {
             if (currentCheck !in passedChecks) {
-                if (currentCheck == 2 && (_images.isNullOrEmpty() || _images.none { it.path != null })) {
+                if (currentCheck == 10 && (_images.isNullOrEmpty() || _images.none { it.path != null })) {
                     startCheckList()
                     return
                 } else {
@@ -278,7 +278,7 @@ class GuardianDeploymentActivity :
             if (isGuardianRegistered == true) {
                 addRegisteredToPassedCheck()
             }
-            isSMSOrSatGuardian = PingUtils.isSMSOrSatGuardian(it)
+            canGuardianClassify = PingUtils.canGuardianClassify(it)
             swmNetwork = PingUtils.getSwarmNetworkFromPing(it)
             swmUnsentMsgs = PingUtils.getSwarmUnsetMessagesFromPing(it)
             internalBattery = PingUtils.getInternalBatteryFromPing(it)
@@ -390,7 +390,7 @@ class GuardianDeploymentActivity :
 
     override fun getGuardianPlan(): GuardianPlan? = guardianPlan
 
-    override fun getSatTimeOff(): List<String>? = satTimeOff
+    override fun getSatTimeOff(): String? = satTimeOff
 
     override fun getSpeedTest(): SpeedTest? = speedTest
 
@@ -425,7 +425,7 @@ class GuardianDeploymentActivity :
 
     override fun isGuardianRegistered(): Boolean? = isGuardianRegistered
 
-    override fun isSMSOrSatGuardian(): Boolean = isSMSOrSatGuardian
+    override fun canGuardianClassify(): Boolean = canGuardianClassify
 
     override fun getSoftwareVersion(): Map<String, String>? = PingUtils.getSoftwareVersionFromPing(guardianPingBlob)
 
