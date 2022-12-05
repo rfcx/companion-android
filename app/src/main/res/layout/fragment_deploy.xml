@@ -41,7 +41,7 @@
                 android:layout_marginTop="@dimen/margin_padding_normal"
                 android:layout_marginEnd="@dimen/margin_padding_large"
                 android:gravity="center"
-                android:text="Press on each boxes and take or choose a photo\nfollowing guideline"
+                android:text="@string/press_on_each_boxes_and_take_or_choose_a_photo_nfollowing_guideline"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/takePhotosTitleTextView" />

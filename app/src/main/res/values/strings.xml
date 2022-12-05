@@ -200,14 +200,9 @@
     <string name="snackbar_retry">RETRY</string>
 
     <!--  DeployFragment  -->
-    <string name="deployment_will_uploaded">Images will be uploaded to your account</string>
-    <string name="almost_there">Almost there!</string>
-    <string name="switch_to_deploy">Switch your device to DEPLOY</string>
     <string name="title_take_photos">Show off your installation skills</string>
-    <string name="take_photos">Include: device position in the tree, upwards view of the sky, brackets and antenna positions</string>
-    <string name="take_photos_audiomoth">Include: AudioMoth ID visible, specific location in tree/bush/vine/etc (1–3m), installation site (~10m), pulled back view of site (~15–20m)</string>
-    <string name="take_photos_songmeter">Include: Specific location in tree/bush/vine/etc (1–3m), installation site (~10m), pulled back view of site (~15–20m)</string>
     <string name="take_other">Take or Choose any other photo that will be helpful in relocating the device or characterizing the site</string>
+    <string name="press_on_each_boxes_and_take_or_choose_a_photo_nfollowing_guideline">Press on each boxes and take or choose a photo\nfollowing guideline</string>
 
 
     <string name="read_storage_permission_msg">Deploy App would like to read your storage</string>
