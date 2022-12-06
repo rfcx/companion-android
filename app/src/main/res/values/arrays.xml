@@ -281,7 +281,7 @@
     </string-array>
 
     <string-array name="sat_guardian_placeholders">
-        <item>antenna connections</item>
+        <item>antenna connection</item>
         <item>cable tied box</item>
         <item>solar panel connection 1</item>
         <item>solar panel connection 2</item>
