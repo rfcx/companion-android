@@ -202,7 +202,7 @@
     <!--  DeployFragment  -->
     <string name="title_take_photos">Show off your installation skills</string>
     <string name="take_other">Take or Choose any other photo that will be helpful in relocating the device or characterizing the site</string>
-    <string name="press_on_each_boxes_and_take_or_choose_a_photo_nfollowing_guideline">Take photos following below boxes</string>
+    <string name="photo_taken">Photo taken: %d / %d</string>
 
 
     <string name="read_storage_permission_msg">Deploy App would like to read your storage</string>

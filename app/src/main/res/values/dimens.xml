@@ -8,6 +8,8 @@
     <dimen name="margin_padding_large">24dp</dimen>
     <dimen name="margin_padding_xlarge">32dp</dimen>
 
+    <dimen name="margin_padding_advise_photo">64dp</dimen>
+
     <!-- Text size -->
     <dimen name="text_large">18sp</dimen>
     <dimen name="text_medium">16sp</dimen>

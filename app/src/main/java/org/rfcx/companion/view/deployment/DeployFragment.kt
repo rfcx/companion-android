@@ -179,6 +179,7 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
         }
 
         setupImageRecycler()
+        updatePhotoTakenNumber()
 
         finishButton.setOnClickListener {
             setCacheImages()
@@ -212,6 +213,8 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
         if (resultCode == Activity.RESULT_OK) {
             filePath?.let {
                 getImageAdapter().updateTakeOrChooseImage(it)
+                setCacheImages()
+                updatePhotoTakenNumber()
             }
         } else {
             // remove file image
@@ -230,6 +233,7 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
             getImageAdapter().updateTakeOrChooseImage(it)
         }
         setCacheImages()
+        updatePhotoTakenNumber()
     }
 
     private fun setCacheImages() {
@@ -237,6 +241,11 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
         audioMothDeploymentProtocol?.setImages(images)
         songMeterDeploymentProtocol?.setImages(images)
         guardianDeploymentProtocol?.setImages(images)
+    }
+
+    private fun updatePhotoTakenNumber() {
+        val number = getImageAdapter().getCurrentImagePaths().count { it.path != null }
+        photoTakenTextView.text = getString(R.string.photo_taken, number, getImageAdapter().itemCount)
     }
 
     override fun onPlaceHolderClick(position: Int) {
@@ -251,6 +260,7 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
     override fun onDeleteClick(image: Image) {
         getImageAdapter().removeImage(image)
         setCacheImages()
+        updatePhotoTakenNumber()
     }
 
     override fun onTakePhotoClick() {

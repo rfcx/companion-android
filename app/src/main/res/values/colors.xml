@@ -74,5 +74,5 @@
     <color name="error">#e41a1a</color>
 
     <!-- photo advise -->
-    <color name="photo_advise_color">#2AA841</color>
+    <color name="photo_advise_color">@color/black</color>
 </resources>
