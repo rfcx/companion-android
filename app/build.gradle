@@ -14,21 +14,8 @@ android {
         manifestPlaceholders = [auth0Domain: "@string/auth0_domain", auth0Scheme: "@string/auth0_scheme"]
         minSdkVersion 21
         targetSdkVersion 31
-<<<<<<< HEAD
-<<<<<<< HEAD
-        versionCode 150
-<<<<<<< HEAD
-=======
-        versionCode 151
->>>>>>> 5c5ddd90 (#639 bump version, add changelog)
-        versionName "1.7.2"
-=======
+        versionCode 152
         versionName "1.7.3"
->>>>>>> 2f9c887b (#635 Add option for guardian offline mode in Communication Configuration screen)
-=======
-        versionCode 151
-        versionName "1.8.0"
->>>>>>> 08842159 (#636 bump version)
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
