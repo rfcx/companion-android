@@ -1,5 +1,51 @@
-- Fix error when app show loading indicator
-- Fix classifier timer not cancel when close
-- Fix location service error when not activate service
-- Fix audiomoth play sound step error report
-- Fix Companion register old record
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+Change logs
+>>>>>>> e85bc0e7 (#636 Add change logs)
+- Add photo guideline for all deployments
+- Location Tracking background error on Android 12
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 0602f59c (Merge remote-tracking branch 'origin/develop' into feature/location-tracking-fix-android12)
+- Add Guardian internal/external storage in deployment step
+- Save Guardian vital to server after deployment
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> aa13c87e (#628 Android 12 Location tracking avoid crash on background)
+=======
+- Add Guardian internal/external storage in deployment step
+- Save Guardian vital to server after deployment
+<<<<<<< HEAD
+>>>>>>> 0602f59c (Merge remote-tracking branch 'origin/develop' into feature/location-tracking-fix-android12)
+=======
+- Option for guardian offline mode
+>>>>>>> 2f9c887b (#635 Add option for guardian offline mode in Communication Configuration screen)
+=======
+
+Text adding/updating/removing
+Your device is configured for Cell/GSM. Please switch to SMS or Satellite to activate a classifier. -> Your device is configured for Cell/GSM. Please switch to SMS, Satellite or Offline mode to activate a classifier.
++Offline mode
+>>>>>>> 8de6e9d9 (#635 Add text changes in release note)
+=======
+=======
+- Add recording schedule and rename sampling ratio
+>>>>>>> d72ae610 (#636 Add change log)
+
+Text adding/updating/removing
+-Choose Enable Sampling Ratio
+-Enable Sampling ratio
+Choose Sampling Ratio -> Choose Recording Strategy
+Sampling Ratio -> Recording Strategy
++Select start time
++Select stop time
++Record seamlessly
++Record 1 in every %s cycles
+>>>>>>> e85bc0e7 (#636 Add change logs)
+=======
+- Fix crashlytics
+>>>>>>> 5c5ddd90 (#639 bump version, add changelog)

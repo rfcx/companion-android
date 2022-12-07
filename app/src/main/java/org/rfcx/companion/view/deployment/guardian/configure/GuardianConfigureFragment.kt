@@ -16,6 +16,7 @@ import org.rfcx.companion.entity.guardian.GuardianConfiguration
 import org.rfcx.companion.entity.guardian.toListForGuardian
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.prefs.PrefsUtils
+import org.rfcx.companion.util.time.toGuardianFormat
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianConfigureFragment : Fragment() {
@@ -30,8 +31,6 @@ class GuardianConfigureFragment : Fragment() {
     private var fileFormatList: Array<String>? = null
     private var durationEntries: Array<String>? = null
     private var durationValues: Array<String>? = null
-    private var enableSamplingEntries: Array<String>? = null
-    private var enableSamplingValues: Array<String>? = null
     private var samplingEntries: Array<String>? = null
     private var samplingValues: Array<String>? = null
 
@@ -41,6 +40,7 @@ class GuardianConfigureFragment : Fragment() {
     private var duration = 90 // default guardian duration is 90
     private var enableSampling = false
     private var sampling = "1:2"
+    private var schedule = "23:55-23:56,23:57-23:59"
 
     private var needCheckSha1 = false
     private var currentPrefsSha1: String? = null
@@ -82,10 +82,8 @@ class GuardianConfigureFragment : Fragment() {
         fileFormatList = context.resources.getStringArray(R.array.audio_codec)
         durationEntries = context.resources.getStringArray(R.array.duration_cycle_entries)
         durationValues = context.resources.getStringArray(R.array.duration_cycle_values)
-        enableSamplingEntries = context.resources.getStringArray(R.array.enable_sampling_entries)
-        enableSamplingValues = context.resources.getStringArray(R.array.enable_sampling_entries)
         samplingEntries = context.resources.getStringArray(R.array.sampling_entries)
-        samplingValues = context.resources.getStringArray(R.array.sampling_entries)
+        samplingValues = context.resources.getStringArray(R.array.sampling_values)
     }
 
     private fun setNextButton(show: Boolean) {
@@ -97,6 +95,7 @@ class GuardianConfigureFragment : Fragment() {
         nextButton.setOnClickListener {
             analytics?.trackClickNextEvent(Screen.GUARDIAN_CONFIGURE.id)
             setNextButton(false)
+            schedule = if (scheduleChipGroup.listOfTime.isNullOrEmpty()) "23:55-23:56,23:57-23:59" else scheduleChipGroup.listOfTime.toGuardianFormat()
             syncConfig()
             deploymentProtocol?.setSampleRate(sampleRate)
         }
@@ -120,7 +119,7 @@ class GuardianConfigureFragment : Fragment() {
     }
 
     private fun getConfiguration(): GuardianConfiguration {
-        return GuardianConfiguration(sampleRate, bitrate, fileFormat, duration, enableSampling, sampling)
+        return GuardianConfiguration(sampleRate, bitrate, fileFormat, duration, enableSampling, sampling, schedule)
     }
 
     private fun retrieveCurrentConfigure() {
@@ -131,13 +130,14 @@ class GuardianConfigureFragment : Fragment() {
             fileFormat = it.get(PrefsUtils.audioCodec).asString
             enableSampling = it.get(PrefsUtils.enableSampling).asBoolean
             sampling = it.get(PrefsUtils.sampling).asString
+            schedule = it.get(PrefsUtils.schedule).asString
         }
         setFileFormatLayout()
         setSampleRateLayout()
         setBitrateLayout()
         setDuration()
-        setEnableSampling()
         setSampling()
+        setRecordSchedule()
         setNextOnClick()
     }
 
@@ -256,27 +256,40 @@ class GuardianConfigureFragment : Fragment() {
         }
     }
 
-    private fun setEnableSampling() {
-
-        val indexOfValue = enableSamplingValues?.indexOf(enableSampling.toString()) ?: 0
-        if (indexOfValue == -1) {
-            enableSamplingValueTextView.text = "false"
+    private fun setSampling() {
+        if (!enableSampling) {
+            samplingValueTextView.text = samplingEntries!![0]
         } else {
-            enableSamplingValueTextView.text = enableSamplingEntries!![indexOfValue]
+            val indexOfValue = samplingValues!!.indexOf(sampling)
+            if (indexOfValue == -1) {
+                samplingValueTextView.text = samplingEntries!![0]
+            } else {
+                samplingValueTextView.text = samplingEntries!![indexOfValue]
+            }
         }
 
-        enableSamplingValueTextView.setOnClickListener {
+        samplingValueTextView.setOnClickListener {
             val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
             if (builder != null) {
-                builder.setTitle(R.string.choose_enable_sampling)
-                    ?.setItems(enableSamplingEntries) { dialog, i ->
+                builder.setTitle(R.string.choose_sampling)
+                    ?.setItems(samplingEntries) { dialog, i ->
                         try {
-                            if (enableSamplingValues!![i].toBoolean() == enableSampling) {
-                                needCheckSha1 = false
-                            } else {
-                                enableSamplingValueTextView.text = enableSamplingEntries!![i]
-                                enableSampling = enableSamplingValues!![i].toBoolean()
-                                needCheckSha1 = true
+                            when {
+                                samplingValues!![i] == "0" && !enableSampling -> needCheckSha1 = false
+                                samplingValues!![i] == sampling && enableSampling -> needCheckSha1 = false
+                                samplingValues!![i] == sampling && !enableSampling ->  {
+                                    samplingValueTextView.text = samplingEntries!![i]
+                                    enableSampling = true
+                                    needCheckSha1 = true
+                                }
+                                else -> {
+                                    samplingValueTextView.text = samplingEntries!![i]
+                                    if (samplingValues!![i] != "0") {
+                                        sampling = samplingValues!![i]
+                                    }
+                                    enableSampling = samplingValues!![i] != "0"
+                                    needCheckSha1 = true
+                                }
                             }
                         } catch (e: IllegalArgumentException) {
                             dialog.dismiss()
@@ -288,36 +301,9 @@ class GuardianConfigureFragment : Fragment() {
         }
     }
 
-    private fun setSampling() {
-
-        val indexOfValue = samplingValues?.indexOf(sampling) ?: 0
-        if (indexOfValue == -1) {
-            samplingValueTextView.text = "1:2"
-        } else {
-            samplingValueTextView.text = samplingEntries!![indexOfValue]
-        }
-
-        samplingValueTextView.setOnClickListener {
-            val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
-            if (builder != null) {
-                builder.setTitle(R.string.choose_sampling)
-                    ?.setItems(samplingEntries) { dialog, i ->
-                        try {
-                            if (samplingValues!![i] == sampling) {
-                                needCheckSha1 = false
-                            } else {
-                                samplingValueTextView.text = samplingEntries!![i]
-                                sampling = samplingValues!![i]
-                                needCheckSha1 = true
-                            }
-                        } catch (e: IllegalArgumentException) {
-                            dialog.dismiss()
-                        }
-                    }
-                val dialog = builder.create()
-                dialog.show()
-            }
-        }
+    private fun setRecordSchedule() {
+        scheduleChipGroup.fragmentManager = parentFragmentManager
+        scheduleChipGroup.setTimes(schedule, true)
     }
 
     override fun onResume() {

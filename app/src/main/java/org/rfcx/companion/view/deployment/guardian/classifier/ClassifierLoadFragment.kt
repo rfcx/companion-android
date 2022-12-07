@@ -92,7 +92,7 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
             showAlert(getString(R.string.guardian_software_not_allowed))
         }
 
-        if (!isSMSOrSatGuardian()) {
+        if (!isGuardianModeCompatible()) {
             showAlert(getString(R.string.guardian_type_not_allowed))
         }
 
@@ -194,8 +194,8 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
         return true
     }
 
-    private fun isSMSOrSatGuardian(): Boolean {
-        return deploymentProtocol?.isSMSOrSatGuardian() ?: return false
+    private fun isGuardianModeCompatible(): Boolean {
+        return deploymentProtocol?.canGuardianClassify() ?: return false
     }
 
     private fun showAlert(text: String) {

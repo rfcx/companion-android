@@ -16,6 +16,7 @@ object PrefsUtils {
     const val audioCastSampleRate = "audio_cast_sample_rate_minimum"
     const val enableSampling = "enable_cutoffs_sampling_ratio"
     const val sampling = "audio_sampling_ratio"
+    const val schedule = "audio_capture_schedule_off_hours"
 
     fun stringToPrefs(context: Context, str: String?): List<Preference> {
         if (str == null) {
@@ -67,34 +68,33 @@ object PrefsUtils {
     fun getGuardianPlanFromPrefs(str: String?): GuardianPlan? {
         if (str == null) return null
         val json = JsonParser.parseString(str).asJsonObject
-        val order = json.get("api_protocol_escalation_order").asString
-        return when (order) {
+        return when (json.get("api_protocol_escalation_order").asString) {
             "mqtt,rest" -> GuardianPlan.CELL_ONLY
             "mqtt,rest,sms" -> GuardianPlan.CELL_SMS
             "sat" -> GuardianPlan.SAT_ONLY
+            "" -> GuardianPlan.OFFLINE_MODE
             else -> null
         }
     }
 
-    fun getSatTimeOffFromPrefs(str: String?): List<String>? {
+    fun getSatTimeOffFromPrefs(str: String?): String? {
         if (str == null) return null
         val json = JsonParser.parseString(str).asJsonObject
-        val timeOff = json.get("api_satellite_off_hours").asString
-        return timeOff.split(",")
+        return json.get("api_satellite_off_hours").asString
     }
 
-    fun isSMSOrSatGuardian(str: String?): Boolean {
+    fun canGuardianClassify(str: String?): Boolean {
         if (str == null) return false
-        val expect = listOf("sms", "sat")
+        val expect = listOf("sms", "sat", "")
         val json = JsonParser.parseString(str).asJsonObject
         val order = json.get("api_protocol_escalation_order").asString
-        var isSMSOrSat = false
+        var canClassify = false
         expect.forEach {
             if (order.contains(it, false)) {
-                isSMSOrSat = true
+                canClassify = true
             }
         }
-        return isSMSOrSat
+        return canClassify
     }
 
     fun stringToAudioPrefs(str: String?): JsonObject? {
@@ -103,7 +103,7 @@ object PrefsUtils {
         }
         val json = JsonParser.parseString(str).asJsonObject
         val keys = json.keySet()
-        val audioPrefs = listOf(audioDuration, audioSampleRate, audioCodec, audioBitrate, enableSampling, sampling)
+        val audioPrefs = listOf(audioDuration, audioSampleRate, audioCodec, audioBitrate, enableSampling, sampling, schedule)
         val audioKeys = keys.filter { audioPrefs.contains(it) }
         val audioJson = JsonObject()
         audioKeys.toList().forEach {
@@ -114,5 +114,5 @@ object PrefsUtils {
 }
 
 enum class GuardianPlan {
-    CELL_ONLY, CELL_SMS, SAT_ONLY
+    CELL_ONLY, CELL_SMS, SAT_ONLY, OFFLINE_MODE
 }

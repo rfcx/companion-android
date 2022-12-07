@@ -272,9 +272,11 @@
     <string name="choose_bitrate">Choose Bitrate (kbs)</string>
     <string name="choose_file_format">Choose Audio Format</string>
     <string name="choose_duration_cycle">Choose Recording Duration Cycle (secs)</string>
-    <string name="choose_enable_sampling">Choose Enable Sampling Ratio</string>
-    <string name="choose_sampling">Choose Sampling Ratio</string>
+    <string name="choose_sampling">Choose Recording Strategy</string>
+    <string name="sampling_ratio">Recording Strategy</string>
     <string name="advanced_config">Guardian Preferences</string>
+    <string name="schedule_start_time">Select start time</string>
+    <string name="schedule_stop_time">Select stop time</string>
 
     <!-- GuardianPreferences -->
     <bool name="prefs_value_default_show_ui">true</bool>
@@ -535,6 +537,7 @@
     <string name="cell_data_only">Cell data only</string>
     <string name="cell_data_sms_fallback_experimental">Cell data + SMS fallback (experimental)</string>
     <string name="satellite_only">Satellite only</string>
+    <string name="offline_mode">Offline mode</string>
     <string name="pass_times_local_time">Off times (local time)</string>
     <string name="plus">+</string>
 
@@ -567,11 +570,9 @@
     <string name="dismiss">dismiss</string>
     <string name="classifier">Classifier</string>
     <string name="not_found_classifier_local">not found</string>
-    <string name="enable_sampling_ratio">Enable Sampling ratio</string>
-    <string name="sampling_ratio">Sampling ratio</string>
 
     <string name="guardian_software_not_allowed">Your guardian software version is not compatible with this feature.</string>
-    <string name="guardian_type_not_allowed">Your device is configured for Cell/GSM. Please switch to SMS or Satellite to activate a classifier.</string>
+    <string name="guardian_type_not_allowed">Your device is configured for Cell/GSM. Please switch to SMS, Satellite or Offline mode to activate a classifier.</string>
     <string name="go_back">go back</string>
     <string name="battery_voltage">Battery Voltage</string>
     <string name="system_voltage">System Voltage</string>
@@ -590,4 +591,9 @@
     <string name="unsynced_all_text">You have %d unsynced deployments and %d registrations</string>
     <string name="deployment">Deployment</string>
     <string name="registration">Registration</string>
+
+    <!-- Guardian Storage Fragment -->
+    <string name="internal_storage">Internal Storage</string>
+    <string name="storage_format">%s/%s</string>
+    <string name="external_storage">External Storage</string>
 </resources>

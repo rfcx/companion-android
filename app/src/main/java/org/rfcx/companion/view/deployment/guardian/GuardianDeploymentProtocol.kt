@@ -4,10 +4,7 @@ import com.google.gson.JsonObject
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.guardian.ClassifierLite
 import org.rfcx.companion.entity.guardian.Deployment
-import org.rfcx.companion.entity.socket.response.AudioCaptureStatus
-import org.rfcx.companion.entity.socket.response.I2CAccessibility
-import org.rfcx.companion.entity.socket.response.SentinelInfo
-import org.rfcx.companion.entity.socket.response.SpeedTest
+import org.rfcx.companion.entity.socket.response.*
 import org.rfcx.companion.util.prefs.GuardianPlan
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 
@@ -24,9 +21,10 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getSampleRate(): Int
     fun getLastCheckInTime(): Long?
     fun getGuid(): String?
+    fun getGuardianToken(): String?
     fun getGuardianPurpose(): String?
     fun isGuardianRegistered(): Boolean?
-    fun isSMSOrSatGuardian(): Boolean
+    fun canGuardianClassify(): Boolean
     fun getSoftwareVersion(): Map<String, String>?
     fun getAudioConfiguration(): JsonObject?
     fun getPrefsSha1(): String?
@@ -46,13 +44,14 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getGPSDetected(): Boolean?
     fun getPhoneNumber(): String?
     fun getGuardianPlan(): GuardianPlan?
-    fun getSatTimeOff(): List<String>?
+    fun getSatTimeOff(): String?
     fun getSpeedTest(): SpeedTest?
     fun getGuardianLocalTime(): Long?
     fun getGuardianTimezone(): String?
     fun getClassifiers(): Map<String, ClassifierLite>?
     fun getActiveClassifiers(): Map<String, ClassifierLite>?
     fun getAudioCapturing(): AudioCaptureStatus?
+    fun getStorage(): GuardianStorage?
 
     fun getCurrentProjectId(): String?
     fun getCurrentProject(): Project?
