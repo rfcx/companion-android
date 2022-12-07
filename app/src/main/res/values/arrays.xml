@@ -257,11 +257,11 @@
     </string-array>
 
     <string-array name="audiomoth_guideline_texts">
-        <item>Take or Choose a photo that shows the device id\npurpose is to serve as redundancy for which device is where if there were to be a metadata issue</item>
-        <item>Take or Choose a photo that shows the device placement within 1–3 meters\nhelps to find the AM if it’s in dense vegetation</item>
-        <item>Take or Choose a photo that shows the device location (tree/bush/vine) within 5–10 meters\nhelps to spot the tree/bush/vine that the AM is in</item>
-        <item>Take or Choose a photo that shows the broader location or view from the approach within 15–20 meters\nhelps to recognize the surroundings when looking for the tree/bush/vine</item>
-        <item>Take or Choose a photo that shows the place to exit the road or trail\nhelps recognize the area to leave the road or trail if it’s off trail/there’s no path</item>
+        <item>Take a close-up photo of the device showing the device identifier (if used)</item>
+        <item>Take a photo from 1–3 meters showing the placement to help find the device if it’s in dense vegetation</item>
+        <item>Take a photo from 5–10 meters showing the tree/bush/vine where the device is located</item>
+        <item>Take a photo from 15–20 meters showing the broader location or view from the approach to help recognize the surroundings</item>
+        <item>Take a photo showing the exit point from the road or trail used to access the device (if off-trail)</item>
     </string-array>
 
     <string-array name="songmeter_placeholders">
@@ -273,11 +273,11 @@
     </string-array>
 
     <string-array name="songmeter_guideline_texts">
-        <item>Take or Choose a photo that shows the device id\npurpose is to serve as redundancy for which device is where if there were to be a metadata issue</item>
-        <item>Take or Choose a photo that shows the device placement within 1–3 meters\nhelps to find the AM if it’s in dense vegetation</item>
-        <item>Take or Choose a photo that shows the device location (tree/bush/vine) within 5–10 meters\nhelps to spot the tree/bush/vine that the AM is in</item>
-        <item>Take or Choose a photo that shows the broader location or view from the approach within 15–20 meters\nhelps to recognize the surroundings when looking for the tree/bush/vine</item>
-        <item>Take or Choose a photo that shows the place to exit the road or trail\nhelps recognize the area to leave the road or trail if it’s off trail/there’s no path</item>
+        <item>Take a close-up photo of the device showing the device identifier (if used)</item>
+        <item>Take a photo from 1–3 meters showing the placement to help find the device if it’s in dense vegetation</item>
+        <item>Take a photo from 5–10 meters showing the tree/bush/vine where the device is located</item>
+        <item>Take a photo from 15–20 meters showing the broader location or view from the approach to help recognize the surroundings</item>
+        <item>Take a photo showing the exit point from the road or trail used to access the device (if off-trail)</item>
     </string-array>
 
     <string-array name="sat_guardian_placeholders">

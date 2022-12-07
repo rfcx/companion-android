@@ -201,7 +201,7 @@
 
     <!--  DeployFragment  -->
     <string name="title_take_photos">Show off your installation skills</string>
-    <string name="take_other">Take or Choose any other photo that will be helpful in relocating the device or characterizing the site</string>
+    <string name="take_other">Take any other photo that will be helpful in relocating the device or characterizing the site</string>
     <string name="photo_taken">Photos taken: %d / %d</string>
 
 
