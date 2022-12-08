@@ -22,6 +22,11 @@ class GuardianCommunicationFragment : Fragment() {
 
     private var isSetFirstGuardianPlan = false
 
+    private var needCheckSha1 = false
+    private var currentPrefsSha1: String? = null
+    private var currentPlan: GuardianPlan? = null
+    private var currentOffTimes: String? = null
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         deploymentProtocol = (context as GuardianDeploymentProtocol)
@@ -47,6 +52,9 @@ class GuardianCommunicationFragment : Fragment() {
             it.setMenuToolbar(false)
             it.showToolbar()
             it.setToolbarTitle()
+            currentPrefsSha1 = it.getPrefsSha1()
+            currentPlan = it.getGuardianPlan()
+            currentOffTimes = it.getSatTimeOff()
         }
 
         setSimDetected()
@@ -58,8 +66,22 @@ class GuardianCommunicationFragment : Fragment() {
         setOffTime()
 
         nextButton.setOnClickListener {
+            nextButton.visibility = View.INVISIBLE
+            progressBar.visibility = View.VISIBLE
             handlePlanSelection()
-            deploymentProtocol?.nextStep()
+            GuardianSocketManager.pingBlob.observe(
+                viewLifecycleOwner,
+                Observer {
+                    requireActivity().runOnUiThread {
+                        if (!needCheckSha1) {
+                            deploymentProtocol?.nextStep()
+                        }
+                        if (currentPrefsSha1 != deploymentProtocol?.getPrefsSha1()) {
+                            deploymentProtocol?.nextStep()
+                        }
+                    }
+                }
+            )
         }
     }
 
@@ -263,23 +285,29 @@ class GuardianCommunicationFragment : Fragment() {
 
     private fun handlePlanSelection() {
         if (cellOnlyRadioButton.isChecked) {
+            if (currentPlan != GuardianPlan.CELL_ONLY) needCheckSha1 = true
             GuardianSocketManager.sendCellOnlyPrefs()
         }
         if (cellSmsRadioButton.isChecked) {
+            if (currentPlan != GuardianPlan.CELL_SMS) needCheckSha1 = true
             GuardianSocketManager.sendCellSMSPrefs()
         }
         if (satOnlyRadioButton.isChecked) {
+            if (currentPlan != GuardianPlan.SAT_ONLY) needCheckSha1 = true
             if (manualRadioButton.isChecked) {
+                if (currentOffTimes != offTimeChipGroup.listOfTime.joinToString(",")) needCheckSha1 = true
                 GuardianSocketManager.sendSatOnlyPrefs(offTimeChipGroup.listOfTime.joinToString(",") { it.toStringFormat() })
             } else {
                 val currentProject = deploymentProtocol?.getCurrentProject()
                 val offTimes = currentProject?.offTimes
                 if (offTimes != null) {
+                    if (currentOffTimes != offTimes) needCheckSha1 = true
                     GuardianSocketManager.sendSatOnlyPrefs(offTimes)
                 }
             }
         }
         if (offlineModeRadioButton.isChecked) {
+            if (currentPlan != GuardianPlan.OFFLINE_MODE) needCheckSha1 = true
             GuardianSocketManager.sendOfflineModePrefs()
         }
     }

@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import org.rfcx.companion.entity.socket.request.SocketRequest
 import org.rfcx.companion.entity.socket.response.AdminPing
+import org.rfcx.companion.util.socket.PingUtils
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.Socket
@@ -54,9 +55,9 @@ object AdminSocketManager {
                 while (true) {
                     inputStream = DataInputStream(socket!!.getInputStream())
                     val dataInput = inputStream?.readUTF()
-                    if (!dataInput.isNullOrBlank()) {
-
-                        val ping = gson.fromJson(dataInput, AdminPing::class.java)
+                    val message = PingUtils.unGzipString(dataInput)
+                    if (!message.isNullOrBlank()) {
+                        val ping = gson.fromJson(message, AdminPing::class.java)
                         pingBlob.postValue(ping)
                     }
                 }
