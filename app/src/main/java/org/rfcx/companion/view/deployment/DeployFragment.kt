@@ -8,6 +8,7 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
@@ -183,27 +184,9 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
 
         finishButton.setOnClickListener {
             setCacheImages()
-            val images = getImageAdapter().getCurrentImagePaths()
-            when (screen) {
-                Screen.AUDIO_MOTH_CHECK_LIST.id -> {
-                    if (images.isNotEmpty()) {
-                        analytics?.trackAddDeploymentImageEvent(Device.AUDIOMOTH.value)
-                    }
-                    audioMothDeploymentProtocol?.nextStep()
-                }
-                Screen.SONG_METER_CHECK_LIST.id -> {
-                    if (images.isNotEmpty()) {
-                        analytics?.trackAddDeploymentImageEvent(Device.SONGMETER.value)
-                    }
-                    songMeterDeploymentProtocol?.nextStep()
-                }
-                Screen.GUARDIAN_CHECK_LIST.id -> {
-                    if (images.isNotEmpty()) {
-                        analytics?.trackAddDeploymentImageEvent(Device.GUARDIAN.value)
-                    }
-                    guardianDeploymentProtocol?.nextStep()
-                }
-            }
+            val images = getImageAdapter().getExistingImages()
+            val missing = getImageAdapter().getMissingImages()
+            showFinishDialog(images, missing)
         }
     }
 
@@ -244,7 +227,7 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
     }
 
     private fun updatePhotoTakenNumber() {
-        val number = getImageAdapter().getCurrentImagePaths().count { it.path != null }
+        val number = getImageAdapter().getExistingImages().size
         photoTakenTextView.text = getString(R.string.photo_taken, number, getImageAdapter().itemCount)
     }
 
@@ -331,6 +314,43 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
             this.parentFragmentManager,
             PhotoGuidelineDialogFragment::class.java.name
         )
+    }
+
+    private fun showFinishDialog(existing: List<Image>, missing: List<Image>) {
+        val dialogBuilder: AlertDialog.Builder =
+            AlertDialog.Builder(requireContext()).apply {
+                setTitle("Are you sure to finish ?")
+                setMessage("There are missing photos by following ${missing.map { it.name }.joinToString("\n")}")
+                setPositiveButton(R.string.go_back) { _, _ ->
+                }
+                setNegativeButton("Skip anyway") { _, _ ->
+                    handleNextStep(existing)
+                }
+            }
+        dialogBuilder.create().show()
+    }
+
+    private fun handleNextStep(images: List<Image>) {
+        when (screen) {
+            Screen.AUDIO_MOTH_CHECK_LIST.id -> {
+                if (images.isNotEmpty()) {
+                    analytics?.trackAddDeploymentImageEvent(Device.AUDIOMOTH.value)
+                }
+                audioMothDeploymentProtocol?.nextStep()
+            }
+            Screen.SONG_METER_CHECK_LIST.id -> {
+                if (images.isNotEmpty()) {
+                    analytics?.trackAddDeploymentImageEvent(Device.SONGMETER.value)
+                }
+                songMeterDeploymentProtocol?.nextStep()
+            }
+            Screen.GUARDIAN_CHECK_LIST.id -> {
+                if (images.isNotEmpty()) {
+                    analytics?.trackAddDeploymentImageEvent(Device.GUARDIAN.value)
+                }
+                guardianDeploymentProtocol?.nextStep()
+            }
+        }
     }
 
     companion object {

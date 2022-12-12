@@ -74,6 +74,9 @@ class ImageAdapter(private val imageClickListener: ImageClickListener, private v
 
     fun getCurrentImagePaths() = imageItems
 
+    fun getMissingImages() = imageItems.filter { it.path == null && it.type != ImageType.OTHER }
+    fun getExistingImages() = imageItems.filter { it.path != null }
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
