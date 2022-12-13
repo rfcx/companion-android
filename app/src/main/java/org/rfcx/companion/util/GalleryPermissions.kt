@@ -7,15 +7,16 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.rfcx.companion.R
 
 class GalleryPermissions(val activity: Activity) {
     private var onCompletionCallback: ((Boolean) -> Unit)? = null
 
     fun allowed(): Boolean {
-        val permissionState = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE)
+        val permissionState =
+            ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE)
         return permissionState == PackageManager.PERMISSION_GRANTED
     }
 
@@ -28,7 +29,10 @@ class GalleryPermissions(val activity: Activity) {
 
     private fun request() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            activity.requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), REQUEST_PERMISSIONS_READ_STORAGE)
+            activity.requestPermissions(
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                REQUEST_PERMISSIONS_READ_STORAGE
+            )
         } else {
             throw Exception("Request permissions not required before API 23 (should never happen)")
         }
@@ -42,8 +46,8 @@ class GalleryPermissions(val activity: Activity) {
                     Manifest.permission.READ_EXTERNAL_STORAGE
                 )
                 if (!shouldProvideRationale) {
-                    val dialogBuilder: AlertDialog.Builder =
-                        AlertDialog.Builder(activity).apply {
+                    val dialogBuilder =
+                        MaterialAlertDialogBuilder(activity, R.style.BaseAlertDialog).apply {
                             setTitle(null)
                             setMessage(R.string.read_storage_permission_msg)
                             setPositiveButton(R.string.go_to_setting) { _, _ ->

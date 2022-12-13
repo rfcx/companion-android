@@ -63,4 +63,7 @@
 
     <color name="shadow">#20213A</color>
     <color name="error">#E12E2E</color>
+
+    <!-- photo advise -->
+    <color name="photo_advise_color">@color/white</color>
 </resources>

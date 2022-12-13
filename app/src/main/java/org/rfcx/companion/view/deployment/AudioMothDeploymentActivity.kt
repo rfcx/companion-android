@@ -5,8 +5,6 @@ import android.content.Intent
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
-import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import io.realm.RealmList
 import kotlinx.android.synthetic.main.toolbar_default.*
@@ -24,9 +22,7 @@ import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.Preferences.Companion.ENABLE_LOCATION_TRACKING
 import org.rfcx.companion.util.geojson.GeoJsonUtils
-import org.rfcx.companion.util.getLastLocation
 import org.rfcx.companion.util.getListSite
-import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity
 import org.rfcx.companion.view.deployment.locate.MapPickerFragment
 import org.rfcx.companion.view.deployment.location.DetailDeploymentSiteFragment
 import org.rfcx.companion.view.deployment.location.SetDeploymentSiteFragment
@@ -55,16 +51,10 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
         setContentView(R.layout.activity_deployment)
 
         setupToolbar()
+        startCheckList()
         setViewModel()
         setObserver()
         preferences.clearSelectedProject()
-        this.currentLocate = this.getLastLocation()
-        val deploymentId = intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
-        if (deploymentId != null) {
-            handleDeploymentStep(deploymentId)
-        } else {
-            openWithEdgeDevice()
-        }
     }
 
     private fun setViewModel() {
@@ -81,20 +71,18 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
 
     private fun setObserver() {
         audioMothDeploymentViewModel.getDeployments().observe(
-            this,
-            Observer {
-                this.deployments = it.filter { deployment -> deployment.isCompleted() }
-                setSiteItems()
-            }
-        )
+            this
+        ) {
+            this.deployments = it.filter { deployment -> deployment.isCompleted() }
+            setSiteItems()
+        }
 
         audioMothDeploymentViewModel.getSites().observe(
-            this,
-            Observer {
-                this.sites = it
-                setSiteItems()
-            }
-        )
+            this
+        ) {
+            this.sites = it
+            setSiteItems()
+        }
     }
 
     private fun setSiteItems() {
@@ -119,16 +107,10 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
 
     private fun saveImages(deployment: Deployment) {
         audioMothDeploymentViewModel.deleteImages(deployment.id)
-        audioMothDeploymentViewModel.insertImage(deployment, _images)
-    }
-
-    override fun openWithEdgeDevice() {
-        startCheckList()
-    }
-
-    override fun openWithGuardianDevice() {
-        GuardianDeploymentActivity.startActivity(this)
-        finish()
+        audioMothDeploymentViewModel.insertImage(
+            deployment,
+            _images.filter { it.path != null }.map { it.path!! }
+        )
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -137,18 +119,10 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
     }
 
     override fun nextStep() {
-        if (passedChecks.contains(2) && _images.isNullOrEmpty()) {
-            passedChecks.remove(2)
-        }
-
         if (currentCheck !in passedChecks) {
-            if (currentCheck == 2 && _images.isNullOrEmpty()) {
-                startCheckList()
-                return
-            } else {
-                passedChecks.add(currentCheck)
-            }
+            passedChecks.add(currentCheck)
         }
+        currentCheck = -1 // reset check
         startCheckList()
     }
 
@@ -163,12 +137,6 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
                 )
             )
             is AudioMothCheckListFragment -> {
-                _deployment?.let {
-                    it.passedChecks = passedChecks
-                    audioMothDeploymentViewModel.updateDeployment(it)
-
-                    saveImages(it)
-                }
                 passedChecks.clear() // remove all passed
                 finish()
             }
@@ -183,7 +151,6 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
                     startCheckList()
                 }
             }
-            is ChooseDeviceFragment -> finish()
             else -> startCheckList()
         }
     }
@@ -359,38 +326,6 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
         audioMothDeploymentViewModel.stopPlaySound()
     }
 
-    private fun handleDeploymentStep(deploymentId: Int) {
-        val deployment = audioMothDeploymentViewModel.getDeploymentById(deploymentId)
-        if (deployment != null) {
-            setDeployment(deployment)
-
-            if (deployment.stream != null) {
-                _stream = deployment.stream
-            }
-
-            if (deployment.passedChecks != null) {
-                val passedChecks = deployment.passedChecks
-                this.passedChecks = passedChecks ?: RealmList<Int>()
-            }
-
-            val images = audioMothDeploymentViewModel.getImageByDeploymentId(deployment.id)
-            if (images.isNotEmpty()) {
-                val localPaths = arrayListOf<String>()
-                images.forEach {
-                    localPaths.add(it.localPath)
-                }
-                _images = localPaths
-            }
-
-            currentCheck = if (deployment.state == 1) {
-                deployment.state
-            } else {
-                deployment.state - 1
-            }
-            openWithEdgeDevice()
-        }
-    }
-
     private fun updateDeploymentState(state: DeploymentState.AudioMoth) {
         this._deployment?.state = state.key
         this._deployment?.let { audioMothDeploymentViewModel.updateDeployment(it) }
@@ -434,25 +369,6 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
             supportFragmentManager.findFragmentByTag("DetailDeploymentSiteFragment") as DetailDeploymentSiteFragment?
                 ?: DetailDeploymentSiteFragment.newInstance()
         fragment.onActivityResult(requestCode, resultCode, data)
-    }
-
-    private fun handleNestedFragmentBackStack(fragmentManager: FragmentManager): Boolean {
-        val childFragmentList = fragmentManager.fragments
-        if (childFragmentList.size > 0) {
-            for (index in childFragmentList.size - 1 downTo 0) {
-                val fragment = childFragmentList[index]
-                val isPopped = handleNestedFragmentBackStack(fragment.childFragmentManager)
-                return when {
-                    isPopped -> true
-                    fragmentManager.backStackEntryCount > 0 -> {
-                        fragmentManager.popBackStack()
-                        true
-                    }
-                    else -> false
-                }
-            }
-        }
-        return false
     }
 
     override fun onDestroy() {

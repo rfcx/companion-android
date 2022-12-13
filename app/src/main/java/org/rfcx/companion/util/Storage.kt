@@ -54,10 +54,15 @@ class Storage(val context: Context) {
         if (file.length() <= 0) {
             return file
         }
-        return Resizer(context)
+        val resized = Resizer(context)
             .setTargetLength(1920)
             .setQuality(80)
             .setSourceImage(file)
             .resizedFile
+        return if (resized.length() > 1000000) {
+            compressFile(context, resized)
+        } else {
+            resized
+        }
     }
 }

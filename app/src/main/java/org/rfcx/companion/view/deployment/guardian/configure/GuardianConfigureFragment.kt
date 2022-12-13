@@ -1,6 +1,5 @@
 package org.rfcx.companion.view.deployment.guardian.configure
 
-import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.NumberPicker
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.fragment_guardian_configure.*
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.GuardianSocketManager
@@ -148,10 +148,10 @@ class GuardianConfigureFragment : Fragment() {
         bitrateValueTextView.text = bitrateEntries!![indexOfValue]
 
         bitrateValueTextView.setOnClickListener {
-            val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
+            val builder = context?.let { it1 -> MaterialAlertDialogBuilder(it1, R.style.BaseAlertDialog) }
             if (builder != null) {
                 builder.setTitle(R.string.choose_bitrate)
-                    ?.setItems(bitrateEntries) { dialog, i ->
+                    .setItems(bitrateEntries) { dialog, i ->
                         try {
                             if (bitrateValues!![i].toInt() == bitrate) {
                                 needCheckSha1 = false
@@ -175,10 +175,10 @@ class GuardianConfigureFragment : Fragment() {
         fileFormatValueTextView.text = fileFormat
 
         fileFormatValueTextView.setOnClickListener {
-            val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
+            val builder = context?.let { it1 -> MaterialAlertDialogBuilder(it1, R.style.BaseAlertDialog) }
             if (builder != null) {
                 builder.setTitle(R.string.choose_file_format)
-                    ?.setItems(fileFormatList) { dialog, i ->
+                    .setItems(fileFormatList) { dialog, i ->
                         try {
                             if (fileFormatList!![i] == fileFormat) {
                                 needCheckSha1 = false
@@ -203,10 +203,10 @@ class GuardianConfigureFragment : Fragment() {
         sampleRateValueTextView.text = sampleRateEntries!![indexOfValue]
 
         sampleRateValueTextView.setOnClickListener {
-            val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
+            val builder = context?.let { it1 -> MaterialAlertDialogBuilder(it1, R.style.BaseAlertDialog) }
             if (builder != null) {
                 builder.setTitle(R.string.choose_sample_rate)
-                    ?.setItems(sampleRateEntries) { dialog, i ->
+                    .setItems(sampleRateEntries) { dialog, i ->
                         try {
                             if (sampleRateValues!![i].toInt() == sampleRate) {
                                 needCheckSha1 = false
@@ -235,10 +235,10 @@ class GuardianConfigureFragment : Fragment() {
         }
 
         durationValueTextView.setOnClickListener {
-            val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
+            val builder = context?.let { it1 -> MaterialAlertDialogBuilder(it1, R.style.BaseAlertDialog) }
             if (builder != null) {
                 builder.setTitle(R.string.choose_duration_cycle)
-                    ?.setItems(durationEntries) { dialog, i ->
+                    .setItems(durationEntries) { dialog, i ->
                         try {
                             if (durationValues!![i].toInt() == duration) {
                                 needCheckSha1 = false
@@ -272,10 +272,10 @@ class GuardianConfigureFragment : Fragment() {
         samplingValueTextView.setOnClickListener {
             val wheelScroll = context?.let { NumberPicker(it) }
             wheelScroll.create
-            val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
+            val builder = context?.let { it1 -> MaterialAlertDialogBuilder(it1, R.style.BaseAlertDialog) }
             if (builder != null) {
                 builder.setTitle(R.string.choose_sampling)
-                    ?.setItems(samplingEntries) { dialog, i ->
+                    .setItems(samplingEntries) { dialog, i ->
                         try {
                             when {
                                 samplingValues!![i] == "0" && !enableSampling -> needCheckSha1 = false

@@ -14,8 +14,8 @@ class DisplayImageActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_display_image)
 
-        val paths = intent.extras?.getStringArrayList(PATH_IMAGE) ?: arrayListOf()
-        val adapter = DisplayImageAdapter(paths, this)
+        val paths = intent.extras?.getStringArray(PATH_IMAGE) ?: arrayOf()
+        val adapter = DisplayImageAdapter(paths.toList(), this)
         imageViewPager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
         imageViewPager.adapter = adapter
     }
@@ -23,9 +23,9 @@ class DisplayImageActivity : AppCompatActivity() {
     companion object {
         const val PATH_IMAGE = "PATH_IMAGE"
 
-        fun startActivity(context: Context, paths: ArrayList<String>) {
+        fun startActivity(context: Context, paths: Array<String>) {
             val intent = Intent(context, DisplayImageActivity::class.java)
-            intent.putStringArrayListExtra(PATH_IMAGE, paths)
+            intent.putExtra(PATH_IMAGE, paths)
             context.startActivity(intent)
         }
     }

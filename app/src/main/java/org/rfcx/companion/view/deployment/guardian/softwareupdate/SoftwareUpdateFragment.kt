@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.fragment_software_update.*
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.FileSocketManager
@@ -138,7 +139,7 @@ class SoftwareUpdateFragment : Fragment(), ChildrenClickedListener {
 
     private fun showRestartGuardianServices() {
         dialogBuilder =
-            AlertDialog.Builder(requireContext()).apply {
+            MaterialAlertDialogBuilder(requireContext(), R.style.BaseAlertDialog).apply {
                 setTitle(null)
                 setMessage(R.string.dialog_start_service_update)
                 setPositiveButton(R.string.restart) { _, _ ->

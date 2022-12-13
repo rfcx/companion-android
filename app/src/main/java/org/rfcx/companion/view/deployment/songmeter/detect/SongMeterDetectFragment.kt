@@ -5,11 +5,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.fragment_songmeter_detect.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
@@ -276,8 +276,8 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
     }
 
     private fun showAlertBluetooth() {
-        val dialogBuilder: AlertDialog.Builder =
-            AlertDialog.Builder(requireContext()).apply {
+        val dialogBuilder =
+            MaterialAlertDialogBuilder(requireContext(), R.style.BaseAlertDialog).apply {
                 setTitle(null)
                 setMessage(R.string.alert_songmeter)
                 setPositiveButton(R.string.go_back) { _, _ ->

@@ -14,6 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -140,7 +141,7 @@ class DeploymentDetailActivity :
     }
 
     private fun confirmationDialog() {
-        val builder = AlertDialog.Builder(this, R.style.DialogCustom)
+        val builder = MaterialAlertDialogBuilder(this, R.style.BaseAlertDialog)
         builder.setTitle(getString(R.string.delete_location))
         builder.setMessage(getString(R.string.are_you_sure_delete_location))
 
@@ -203,7 +204,10 @@ class DeploymentDetailActivity :
                 list.removeAt(index)
                 list.add(0, selectedImage)
                 firebaseCrashlytics.setCustomKey(CrashlyticsKey.OnClickImage.key, selectedImage)
-                DisplayImageActivity.startActivity(this@DeploymentDetailActivity, list)
+                DisplayImageActivity.startActivity(
+                    this@DeploymentDetailActivity,
+                    list.toTypedArray()
+                )
             }
 
             override fun onDeleteImageClick(position: Int, imagePath: String) {
@@ -424,6 +428,6 @@ class DeploymentDetailActivity :
         list.removeAt(index)
         list.add(0, deploymentImage.remotePath ?: "file://${deploymentImage.localPath}")
 
-        DisplayImageActivity.startActivity(this, list)
+        DisplayImageActivity.startActivity(this, list.toTypedArray())
     }
 }

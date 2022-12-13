@@ -1,6 +1,5 @@
 package org.rfcx.companion.view.deployment.guardian.microphone
 
-import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
@@ -8,8 +7,10 @@ import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.fragment_guardian_microphone.*
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.AudioCastSocketManager
@@ -115,8 +116,8 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     }
 
     private fun showAlert(text: String) {
-        val dialogBuilder: AlertDialog.Builder =
-            AlertDialog.Builder(requireContext()).apply {
+        val dialogBuilder =
+            MaterialAlertDialogBuilder(requireContext(), R.style.BaseAlertDialog).apply {
                 setTitle(null)
                 setMessage(text)
                 setPositiveButton(R.string.ok) { _, _ -> }
@@ -138,10 +139,10 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     private fun setupSpectrogramSpeed() {
         speedValueTextView.text = speed[0]
         speedValueTextView.setOnClickListener {
-            val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
+            val builder = context?.let { it1 -> MaterialAlertDialogBuilder(it1, R.style.BaseAlertDialog) }
             if (builder != null) {
                 builder.setTitle(R.string.choose_speed)
-                    ?.setItems(speed) { dialog, i ->
+                    .setItems(speed) { dialog, i ->
                         try {
                             speedValueTextView.text = speed[i]
                             AudioSpectrogramUtils.setSpeed(speed[i])
@@ -161,10 +162,10 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     private fun setupSpectrogramFreqMenu() {
         freqScaleValueTextView.text = freq[0]
         freqScaleValueTextView.setOnClickListener {
-            val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
+            val builder = context?.let { it1 -> MaterialAlertDialogBuilder(it1, R.style.BaseAlertDialog) }
             if (builder != null) {
                 builder.setTitle(R.string.choose_freq)
-                    ?.setItems(freq) { dialog, i ->
+                    .setItems(freq) { dialog, i ->
                         try {
                             freqScaleValueTextView.text = freq[i]
                             spectrogramView.freqScale = freq[i]
@@ -182,10 +183,10 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     private fun setupSpectrogramColorMenu() {
         colorSpecValueTextView.text = color[0]
         colorSpecValueTextView.setOnClickListener {
-            val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
+            val builder = context?.let { it1 -> MaterialAlertDialogBuilder(it1, R.style.BaseAlertDialog) }
             if (builder != null) {
                 builder.setTitle(R.string.choose_color)
-                    ?.setItems(color) { dialog, i ->
+                    .setItems(color) { dialog, i ->
                         try {
                             colorSpecValueTextView.text = color[i]
                             spectrogramView.colorScale = color[i]
@@ -203,10 +204,10 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
     private fun setupAudioPlaybackMenu() {
         playbackValueTextView.text = playback[0]
         playbackValueTextView.setOnClickListener {
-            val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
+            val builder = context?.let { it1 -> MaterialAlertDialogBuilder(it1, R.style.BaseAlertDialog) }
             if (builder != null) {
                 builder.setTitle(R.string.choose_play_back)
-                    ?.setItems(playback) { dialog, i ->
+                    .setItems(playback) { dialog, i ->
                         try {
                             playbackValueTextView.text = playback[i]
                             if (i == 0) {
@@ -300,7 +301,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
 
     private fun setDialog() {
         dialogBuilder =
-            AlertDialog.Builder(requireContext()).apply {
+            MaterialAlertDialogBuilder(requireContext(), R.style.BaseAlertDialog).apply {
                 setTitle(null)
                 setMessage(R.string.dialog_start_service_mic)
                 setPositiveButton(R.string.restart) { _, _ ->

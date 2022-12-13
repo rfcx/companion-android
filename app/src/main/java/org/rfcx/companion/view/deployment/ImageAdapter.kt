@@ -1,187 +1,162 @@
 package org.rfcx.companion.view.deployment
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
+import android.widget.ImageButton
+import android.widget.ImageView
+import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import kotlinx.android.synthetic.main.item_image.view.*
+import kotlinx.android.synthetic.main.item_photo_advise.view.*
 import org.rfcx.companion.R
-import org.rfcx.companion.adapter.BaseListItem
-import org.rfcx.companion.adapter.LocalImageItem
-import org.rfcx.companion.adapter.RemoteImageItem
-import org.rfcx.companion.entity.DeploymentImage
 
-class ImageAdapter : ListAdapter<BaseListItem, RecyclerView.ViewHolder>(ImageAdapterDiffUtil()) {
-    var onImageAdapterClickListener: OnImageAdapterClickListener? = null
-    private var context: Context? = null
-    private var imagesSource = arrayListOf<BaseListItem>()
-
-    fun setImages(images: List<DeploymentImage>) {
-        imagesSource = arrayListOf()
-        var index = 0
-        images.forEach {
-            if (it.remotePath != null) {
-                imagesSource.add(RemoteImageItem(index, it.remotePath!!, false))
-            } else {
-                imagesSource.add(
-                    LocalImageItem(
-                        index,
-                        it.localPath,
-                        false
-                    )
-                )
-            }
-            index++
-        }
-        submitList(ArrayList(imagesSource))
-    }
-
-    fun removeAt(index: Int) {
-        imagesSource.removeAt(index)
-        submitList(ArrayList(imagesSource))
-    }
-
-    fun getNewAttachImage(): List<String> {
-        return imagesSource.filter {
-            (it is LocalImageItem && it.canDelete)
-        }.map {
-            (it as LocalImageItem).localPath
-        }
-    }
-
-    fun addImages(uris: List<String>) {
-        val allLocalPathImages = getNewAttachImage() + uris
-        val groups = allLocalPathImages.groupBy { it }
-        val localPathImages = groups.filter { it.value.size < 2 }
-        val localPathImagesForAdd = ArrayList<String>()
-
-        localPathImages.forEach {
-            if (it.key !in getNewAttachImage()) {
-                localPathImagesForAdd.add(it.key)
-            }
-        }
-
-        var index: Int = if (imagesSource.isEmpty()) 0 else {
-            imagesSource[imagesSource.count() - 1].getItemId() + 1
-        }
-
-        if (localPathImagesForAdd.isNotEmpty()) {
-            if (context != null) {
-                if (localPathImagesForAdd.size != uris.size) {
-                    Toast.makeText(context, R.string.some_photo_already_exists, Toast.LENGTH_SHORT)
-                        .show()
-                }
-            }
-
-            localPathImagesForAdd.forEach {
-                imagesSource.add(LocalImageItem(index, it, true))
-                index++
-            }
-        } else {
-            if (context != null) {
-                if (uris.size > 1) {
-                    Toast.makeText(
-                        context,
-                        R.string.these_photos_already_exists,
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
-                } else {
-                    Toast.makeText(context, R.string.this_photo_already_exists, Toast.LENGTH_SHORT)
-                        .show()
-                }
-            }
-        }
-        submitList(ArrayList(imagesSource))
-    }
-
-    fun getImageCount(): Int = imagesSource.count()
-
-    override fun getItemViewType(position: Int): Int {
-        return when (getItem(position)) {
-            is LocalImageItem -> VIEW_TYPE_IMAGE
-            is RemoteImageItem -> VIEW_TYPE_IMAGE
-            else -> throw IllegalStateException("Item class not found ${getItem(position)::class.java.simpleName}")
-        }
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        context = parent.context
-
-        return when (viewType) {
-            VIEW_TYPE_IMAGE -> {
-                val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_image, parent, false)
-                ImageAdapterViewHolder(view, onImageAdapterClickListener)
-            }
-            else -> throw IllegalAccessException("View type $viewType not found.")
-        }
-    }
-
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (holder is ImageAdapterViewHolder && getItem(position) is LocalImageItem) {
-            val itemImage = getItem(position) as LocalImageItem
-            holder.bind(itemImage.localPath, itemImage.canDelete)
-        } else if (holder is ImageAdapterViewHolder && getItem(position) is RemoteImageItem) {
-            val itemImage = getItem(position) as RemoteImageItem
-            holder.bind(itemImage.remotePath, false)
-        }
-    }
-
-    inner class ImageAdapterViewHolder(
-        itemView: View,
-        private val onImageAdapterClickListener: OnImageAdapterClickListener?
-    ) : RecyclerView.ViewHolder(itemView) {
-        private val imageView = itemView.image
-        private val deleteButton = itemView.deleteImageButton
-
-        fun bind(imagePath: String, canDelete: Boolean) {
-            Glide.with(itemView.context)
-                .load(imagePath)
-                .placeholder(R.drawable.bg_placeholder_light)
-                .error(R.drawable.bg_placeholder_light)
-                .into(imageView)
-
-            itemView.setOnClickListener {
-                onImageAdapterClickListener?.onImageClick(imagePath)
-            }
-
-            deleteButton.setOnClickListener {
-                onImageAdapterClickListener?.onDeleteImageClick(adapterPosition, imagePath)
-            }
-            deleteButton.visibility = if (canDelete) View.VISIBLE else View.INVISIBLE
-        }
-    }
-
-    inner class AddImageViewHolder(
-        itemView: View,
-        private val onImageAdapterClickListener: OnImageAdapterClickListener?
-    ) : RecyclerView.ViewHolder(itemView)
-
-    class ImageAdapterDiffUtil : DiffUtil.ItemCallback<BaseListItem>() {
-        override fun areItemsTheSame(oldItem: BaseListItem, newItem: BaseListItem): Boolean {
-            return oldItem.getItemId() == newItem.getItemId()
-        }
-
-        override fun areContentsTheSame(oldItem: BaseListItem, newItem: BaseListItem): Boolean {
-            return if (newItem is LocalImageItem && oldItem is LocalImageItem) {
-                (newItem.imageId == oldItem.imageId && newItem.localPath == oldItem.localPath)
-            } else newItem is RemoteImageItem && oldItem is RemoteImageItem
-        }
-    }
+class ImageAdapter(private val imageClickListener: ImageClickListener, private val thumbnails: List<String>) :
+    RecyclerView.Adapter<ImageAdapter.ImageAdapterViewHolder>() {
+    private var imageItems = arrayListOf<Image>()
+    private var currentPosition = -1
+    private var currentType: ImageType = ImageType.NORMAL
 
     companion object {
-        const val VIEW_TYPE_IMAGE = 1
-        const val MAX_IMAGE_SIZE = 5
+        private const val MAX_IMAGES = 10
     }
+
+    fun setPlaceHolders(type: List<String>) {
+        type.forEachIndexed { index, it ->
+            imageItems.add(Image(index + 1, it, ImageType.NORMAL, null))
+        }
+        // For other images that out of type scoped
+        if (imageItems.size < MAX_IMAGES) {
+            imageItems.add(Image(imageItems.size + 1, ImageType.OTHER.value, ImageType.OTHER, null))
+        }
+        notifyDataSetChanged()
+    }
+
+    fun updateImagesFromSavedImages(images: List<Image>) {
+        images.map { it.copy() }.forEach {
+            imageItems.add(it)
+        }
+        notifyDataSetChanged()
+    }
+
+    fun updateTakeOrChooseImage(path: String) {
+        if (currentPosition == -1) return
+        if (currentType == ImageType.OTHER) {
+            if (itemCount == MAX_IMAGES) {
+                imageItems.removeLast()
+            }
+            imageItems.add(itemCount - 1, Image(itemCount, ImageType.OTHER.value, ImageType.OTHER, path))
+        } else {
+            imageItems[currentPosition].path = path
+        }
+        notifyDataSetChanged()
+    }
+
+    fun removeImage(image: Image) {
+        if (currentPosition == -1) return
+        if (image.type == ImageType.OTHER) {
+            if (getAvailableImagesLeft() == 0) {
+                imageItems.add(Image(currentPosition, ImageType.OTHER.value, ImageType.OTHER, null))
+            }
+            imageItems.remove(image)
+        } else {
+            imageItems[currentPosition].path = null
+        }
+        notifyDataSetChanged()
+    }
+
+    private fun getOtherCount() = imageItems.filter { it.type == ImageType.OTHER && it.path != null }.size
+    private fun getNormalCount() = imageItems.filter { it.type == ImageType.NORMAL }.size
+    private fun getAvailableImagesLeft(): Int {
+        return (MAX_IMAGES - (getOtherCount() + getNormalCount()))
+    }
+
+    fun getCurrentImagePaths() = imageItems
+
+    fun getMissingImages() = imageItems.filter { it.path == null && it.type != ImageType.OTHER }
+    fun getExistingImages() = imageItems.filter { it.path != null }
+
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): ImageAdapterViewHolder {
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.item_photo_advise, parent, false)
+        return ImageAdapterViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ImageAdapterViewHolder, position: Int) {
+        holder.bind(imageItems[position])
+
+        holder.placeHolderButton.setOnClickListener {
+            currentPosition = holder.adapterPosition
+            currentType = imageItems[currentPosition].type
+            imageClickListener.onPlaceHolderClick(currentPosition)
+        }
+
+        holder.imageView.setOnClickListener {
+            currentPosition = holder.adapterPosition
+            imageClickListener.onImageClick(imageItems[currentPosition])
+        }
+        holder.deleteButton.setOnClickListener {
+            currentPosition = holder.adapterPosition
+            imageClickListener.onDeleteClick(imageItems[currentPosition])
+        }
+    }
+
+    inner class ImageAdapterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val placeHolderButton: AppCompatButton = itemView.placeHolderButton
+        val imageView: ImageView = itemView.image
+        val deleteButton: ImageButton = itemView.deleteImageButton
+
+        fun bind(image: Image) {
+            if (image.path == null) {
+                placeHolderButton.text = image.name
+                imageView.visibility = View.GONE
+                placeHolderButton.visibility = View.VISIBLE
+                deleteButton.visibility = View.GONE
+                placeHolderButton.apply {
+                    val example = thumbnails.getOrNull(adapterPosition) ?: thumbnails[thumbnails.size - 1]
+                    val id = this.context.resources.getIdentifier("${example}_tbn", "drawable", this.context.packageName)
+                    if (id != 0) {
+                        ContextCompat.getDrawable(this.context, id)?.let {
+                            val drawable = it.mutate()
+                            drawable.alpha = 100
+                            placeHolderButton.background = drawable
+                        }
+                    }
+                }
+            } else {
+                Glide.with(itemView.context)
+                    .load(image.path)
+                    .placeholder(R.drawable.bg_placeholder_light)
+                    .error(R.drawable.bg_placeholder_light)
+                    .into(imageView)
+                imageView.visibility = View.VISIBLE
+                placeHolderButton.visibility = View.GONE
+                deleteButton.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    override fun getItemCount() = imageItems.size
 }
 
-interface OnImageAdapterClickListener {
-    fun onDeleteImageClick(position: Int, imagePath: String)
-    fun onImageClick(imagePath: String)
+data class Image(
+    val id: Int,
+    val name: String,
+    val type: ImageType,
+    var path: String?
+)
+
+enum class ImageType(val value: String) {
+    NORMAL("normal"),
+    OTHER("other"),
+}
+
+interface ImageClickListener {
+    fun onPlaceHolderClick(position: Int)
+    fun onImageClick(image: Image)
+    fun onDeleteClick(image: Image)
 }

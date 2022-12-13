@@ -303,27 +303,28 @@
     </style>
   
     <!-- Dialog -->
-    <style name="DialogCustom" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+    <style name="BaseAlertDialog" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="materialAlertDialogTitleTextStyle">@style/BaseAlertTitle</item>
         <item name="colorAccent">@color/colorPrimary</item>
         <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="android:background">@color/dialogColor</item>
-        <item name="android:textColorAlertDialogListItem">@color/text_primary</item>
-        <item name="android:textColorSecondary">@color/text_primary</item>
-        <item name="positiveButtonText">@style/PositiveButton</item>
-        <item name="negativeButtonText">@style/NegativeButton</item>
-        <item name="buttonBarPositiveButtonStyle">@style/PositiveButton</item>
-        <item name="buttonBarNegativeButtonStyle">@style/NegativeButton</item>
+        <item name="buttonBarPositiveButtonStyle">@style/BaseAlertButton</item>
+        <item name="buttonBarNegativeButtonStyle">@style/BaseAlertButton</item>
+    </style>
+    <style name="BaseAlertTitle" parent="@style/MaterialAlertDialog.MaterialComponents.Title.Text">
+        <item name="android:textAppearance">@style/BaseAlertSub</item>
+    </style>
+    <style name="BaseAlertSub" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="fontFamily">@font/lato_regular</item>
+        <item name="android:fontFamily">@font/lato_regular</item>
     </style>
 
-    <style name="PositiveButton" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+    <style name="BaseAlertButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textColor">@color/colorPrimary</item>
-        <item name="lineSpacing">0.5dp</item>
-    </style>
-
-    <style name="NegativeButton" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
-        <item name="android:textColor">@color/colorPrimary</item>
-        <item name="lineSpacing">0.5dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:letterSpacing">0</item>
     </style>
 
     <style name="BannerButton" parent="Widget.AppCompat.TextView">
@@ -345,6 +346,18 @@
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">@dimen/text_small</item>
         <item name="android:fontFamily">@font/lato_regular</item>
+    </style>
+
+    <!-- Chip -->
+    <style name="ChipChoice" parent="Widget.MaterialComponents.Chip.Choice"/>
+
+    <!-- Advise Photo -->
+    <style name="AdvisePhoto">
+        <item name="android:background">@drawable/bg_square_green</item>
+        <item name="android:textColor">@color/photo_advise_color</item>
+        <item name="android:textSize">@dimen/text_small</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
 </resources>
