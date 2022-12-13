@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.NumberPicker
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_guardian_configure.*
@@ -269,6 +270,8 @@ class GuardianConfigureFragment : Fragment() {
         }
 
         samplingValueTextView.setOnClickListener {
+            val wheelScroll = context?.let { NumberPicker(it) }
+            wheelScroll.create
             val builder = context?.let { it1 -> AlertDialog.Builder(it1, R.style.DialogCustom) }
             if (builder != null) {
                 builder.setTitle(R.string.choose_sampling)

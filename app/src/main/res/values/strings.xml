@@ -268,15 +268,16 @@
 
     <!-- GuardianConfigureFragment -->
     <string name="bitrate">Bitrate</string>
-    <string name="duration">Duration (per file)</string>
+    <string name="duration">Recording cycle duration (per file)</string>
     <string name="choose_bitrate">Choose Bitrate (kbs)</string>
     <string name="choose_file_format">Choose Audio Format</string>
     <string name="choose_duration_cycle">Choose Recording Duration Cycle (secs)</string>
     <string name="choose_sampling">Choose Recording Strategy</string>
-    <string name="sampling_ratio">Recording Strategy</string>
+    <string name="sampling_ratio">Cycle skipped between recording</string>
     <string name="advanced_config">Guardian Preferences</string>
     <string name="schedule_start_time">Select start time</string>
     <string name="schedule_stop_time">Select stop time</string>
+    <string name="recording_schedule">Recording schedule</string>
 
     <!-- GuardianPreferences -->
     <bool name="prefs_value_default_show_ui">true</bool>
