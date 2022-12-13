@@ -192,19 +192,10 @@ class GuardianDeploymentActivity :
     }
 
     override fun nextStep() {
-        if (passedChecks.contains(10) && (_images.isNullOrEmpty() || _images.none { it.path != null })) {
-            passedChecks.remove(10)
-        }
-
         val container = supportFragmentManager.findFragmentById(R.id.contentContainer)
         if (container !is GuardianAdvancedFragment) {
             if (currentCheck !in passedChecks) {
-                if (currentCheck == 10 && (_images.isNullOrEmpty() || _images.none { it.path != null })) {
-                    startCheckList()
-                    return
-                } else {
-                    passedChecks.add(currentCheck)
-                }
+                passedChecks.add(currentCheck)
             }
             currentCheck = -1 // reset check
         } else {

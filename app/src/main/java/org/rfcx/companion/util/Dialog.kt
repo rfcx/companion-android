@@ -3,7 +3,7 @@ package org.rfcx.companion.util
 import android.app.Activity
 import android.content.DialogInterface
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.rfcx.companion.R
 
 fun Activity.showCommonDialog(message: String) {
@@ -17,7 +17,7 @@ fun Activity.showCommonDialog(
 ) {
     if (isDestroyed || isFinishing) return
 
-    AlertDialog.Builder(this)
+    MaterialAlertDialogBuilder(this, R.style.BaseAlertDialog)
         .setTitle(title)
         .setMessage(message)
         .setPositiveButton(getString(R.string.ok), onClick)

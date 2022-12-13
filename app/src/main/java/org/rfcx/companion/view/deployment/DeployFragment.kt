@@ -8,13 +8,14 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.opensooq.supernova.gligar.GligarPicker
 import kotlinx.android.synthetic.main.fragment_deploy.*
 import org.rfcx.companion.R
+import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.*
@@ -148,7 +149,7 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
     private fun setupImages() {
         val savedImages =
             audioMothDeploymentProtocol?.getImages() ?: songMeterDeploymentProtocol?.getImages()
-                ?: guardianDeploymentProtocol?.getImages()
+            ?: guardianDeploymentProtocol?.getImages()
         if (savedImages != null && savedImages.isNotEmpty()) {
             getImageAdapter().updateImagesFromSavedImages(savedImages)
         } else {
@@ -183,10 +184,13 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
         updatePhotoTakenNumber()
 
         finishButton.setOnClickListener {
-            setCacheImages()
-            val images = getImageAdapter().getExistingImages()
+            val existing = getImageAdapter().getExistingImages()
             val missing = getImageAdapter().getMissingImages()
-            showFinishDialog(images, missing)
+            if (missing.isEmpty()) {
+                handleNextStep(existing)
+            } else {
+                showFinishDialog(existing, missing)
+            }
         }
     }
 
@@ -196,7 +200,6 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
         if (resultCode == Activity.RESULT_OK) {
             filePath?.let {
                 getImageAdapter().updateTakeOrChooseImage(it)
-                setCacheImages()
                 updatePhotoTakenNumber()
             }
         } else {
@@ -215,7 +218,6 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
         results?.forEach {
             getImageAdapter().updateTakeOrChooseImage(it)
         }
-        setCacheImages()
         updatePhotoTakenNumber()
     }
 
@@ -228,7 +230,8 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
 
     private fun updatePhotoTakenNumber() {
         val number = getImageAdapter().getExistingImages().size
-        photoTakenTextView.text = getString(R.string.photo_taken, number, getImageAdapter().itemCount)
+        photoTakenTextView.text =
+            getString(R.string.photo_taken, number, getImageAdapter().itemCount)
     }
 
     override fun onPlaceHolderClick(position: Int) {
@@ -242,7 +245,6 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
 
     override fun onDeleteClick(image: Image) {
         getImageAdapter().removeImage(image)
-        setCacheImages()
         updatePhotoTakenNumber()
     }
 
@@ -317,20 +319,21 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
     }
 
     private fun showFinishDialog(existing: List<Image>, missing: List<Image>) {
-        val dialogBuilder: AlertDialog.Builder =
-            AlertDialog.Builder(requireContext()).apply {
-                setTitle("Are you sure to finish ?")
-                setMessage("There are missing photos by following ${missing.map { it.name }.joinToString("\n")}")
-                setPositiveButton(R.string.go_back) { _, _ ->
-                }
-                setNegativeButton("Skip anyway") { _, _ ->
-                    handleNextStep(existing)
-                }
+        MaterialAlertDialogBuilder(requireContext(), R.style.BaseAlertDialog).apply {
+            setTitle(context.getString(R.string.missing_dialog_title))
+            setMessage(context.getString(
+                R.string.follow_missing,
+                missing.joinToString("\n") { "${it.id}. ${it.name}" }
+            ))
+            setPositiveButton(R.string.cancel) { _, _ -> }
+            setNegativeButton(R.string.button_continue) { _, _ ->
+                handleNextStep(existing)
             }
-        dialogBuilder.create().show()
+        }.create().show()
     }
 
     private fun handleNextStep(images: List<Image>) {
+        setCacheImages()
         when (screen) {
             Screen.AUDIO_MOTH_CHECK_LIST.id -> {
                 if (images.isNotEmpty()) {

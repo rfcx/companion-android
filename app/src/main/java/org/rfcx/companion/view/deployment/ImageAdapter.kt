@@ -23,18 +23,18 @@ class ImageAdapter(private val imageClickListener: ImageClickListener, private v
     }
 
     fun setPlaceHolders(type: List<String>) {
-        type.forEach {
-            imageItems.add(Image(it, ImageType.NORMAL, null))
+        type.forEachIndexed { index, it ->
+            imageItems.add(Image(index + 1, it, ImageType.NORMAL, null))
         }
         // For other images that out of type scoped
         if (imageItems.size < MAX_IMAGES) {
-            imageItems.add(Image(ImageType.OTHER.value, ImageType.OTHER, null))
+            imageItems.add(Image(imageItems.size + 1, ImageType.OTHER.value, ImageType.OTHER, null))
         }
         notifyDataSetChanged()
     }
 
     fun updateImagesFromSavedImages(images: List<Image>) {
-        images.forEach {
+        images.map { it.copy() }.forEach {
             imageItems.add(it)
         }
         notifyDataSetChanged()
@@ -46,7 +46,7 @@ class ImageAdapter(private val imageClickListener: ImageClickListener, private v
             if (itemCount == MAX_IMAGES) {
                 imageItems.removeLast()
             }
-            imageItems.add(itemCount - 1, Image(ImageType.OTHER.value, ImageType.OTHER, path))
+            imageItems.add(itemCount - 1, Image(itemCount, ImageType.OTHER.value, ImageType.OTHER, path))
         } else {
             imageItems[currentPosition].path = path
         }
@@ -57,7 +57,7 @@ class ImageAdapter(private val imageClickListener: ImageClickListener, private v
         if (currentPosition == -1) return
         if (image.type == ImageType.OTHER) {
             if (getAvailableImagesLeft() == 0) {
-                imageItems.add(Image(ImageType.OTHER.value, ImageType.OTHER, null))
+                imageItems.add(Image(currentPosition, ImageType.OTHER.value, ImageType.OTHER, null))
             }
             imageItems.remove(image)
         } else {
@@ -144,6 +144,7 @@ class ImageAdapter(private val imageClickListener: ImageClickListener, private v
 }
 
 data class Image(
+    val id: Int,
     val name: String,
     val type: ImageType,
     var path: String?

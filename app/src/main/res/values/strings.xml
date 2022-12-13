@@ -203,6 +203,9 @@
     <string name="title_take_photos">Show off your installation skills</string>
     <string name="take_other">Take any other photo that will be helpful in relocating the device or characterizing the site</string>
     <string name="photo_taken">Photos taken: %d / %d</string>
+    <string name="missing_dialog_title">Are you sure to continue?</string>
+    <string name="button_continue">continue</string>
+    <string name="follow_missing">Following are missing\n%s</string>
 
 
     <string name="read_storage_permission_msg">Deploy App would like to read your storage</string>

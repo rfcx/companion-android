@@ -138,18 +138,10 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
     }
 
     override fun nextStep() {
-        if (passedChecks.contains(2) && (_images.isNullOrEmpty() || _images.none { it.path != null })) {
-            passedChecks.remove(2)
-        }
-
         if (currentCheck !in passedChecks) {
-            if (currentCheck == 2 && (_images.isNullOrEmpty() || _images.none { it.path != null })) {
-                startCheckList()
-                return
-            } else {
-                passedChecks.add(currentCheck)
-            }
+            passedChecks.add(currentCheck)
         }
+        currentCheck = -1 // reset check
         startCheckList()
     }
 
