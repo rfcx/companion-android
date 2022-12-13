@@ -15,7 +15,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.opensooq.supernova.gligar.GligarPicker
 import kotlinx.android.synthetic.main.fragment_deploy.*
 import org.rfcx.companion.R
-import org.rfcx.companion.connection.socket.GuardianSocketManager
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.*
@@ -149,7 +148,7 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
     private fun setupImages() {
         val savedImages =
             audioMothDeploymentProtocol?.getImages() ?: songMeterDeploymentProtocol?.getImages()
-            ?: guardianDeploymentProtocol?.getImages()
+                ?: guardianDeploymentProtocol?.getImages()
         if (savedImages != null && savedImages.isNotEmpty()) {
             getImageAdapter().updateImagesFromSavedImages(savedImages)
         } else {
@@ -321,10 +320,11 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
     private fun showFinishDialog(existing: List<Image>, missing: List<Image>) {
         MaterialAlertDialogBuilder(requireContext(), R.style.BaseAlertDialog).apply {
             setTitle(context.getString(R.string.missing_dialog_title))
-            setMessage(context.getString(
-                R.string.follow_missing,
-                missing.joinToString("\n") { "${it.id}. ${it.name}" }
-            ))
+            setMessage(
+                context.getString(
+                    R.string.follow_missing, missing.joinToString("\n") { "${it.id}. ${it.name}" }
+                )
+            )
             setPositiveButton(R.string.cancel) { _, _ -> }
             setNegativeButton(R.string.button_continue) { _, _ ->
                 handleNextStep(existing)
