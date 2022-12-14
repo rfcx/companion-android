@@ -270,7 +270,7 @@
     <string name="duration">Recording cycle duration (per file)</string>
     <string name="choose_bitrate">Choose Bitrate (kbs)</string>
     <string name="choose_file_format">Choose Audio Format</string>
-    <string name="choose_duration_cycle">Choose Recording Duration Cycle (secs)</string>
+    <string name="choose_duration_cycle">Choose recording cycle duration (secs)</string>
     <string name="choose_sampling">Choose Recording Strategy</string>
     <string name="sampling_ratio">Cycle skipped between recording</string>
     <string name="advanced_config">Guardian Preferences</string>

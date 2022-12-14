@@ -89,8 +89,9 @@ class StartStopTimePicker @JvmOverloads constructor(
             .setHour(0)
             .setMinute(0)
             .setTitleText(startTitle)
-            .setPositiveButtonText(R.string.next)
-            .setNegativeButtonText(R.string.cancel)
+            .setPositiveButtonText(R.string.cancel)
+            .setNegativeButtonText(R.string.next)
+            .setTheme(R.style.BaseTimePicker)
             .build()
 
         val stopPicker = MaterialTimePicker.Builder()
@@ -98,18 +99,19 @@ class StartStopTimePicker @JvmOverloads constructor(
             .setHour(0)
             .setMinute(0)
             .setTitleText(stopTitle)
-            .setPositiveButtonText(R.string.next)
-            .setNegativeButtonText(R.string.cancel)
+            .setPositiveButtonText(R.string.cancel)
+            .setNegativeButtonText(R.string.next)
+            .setTheme(R.style.BaseTimePicker)
             .build()
 
-        startPicker.addOnPositiveButtonClickListener {
+        startPicker.addOnNegativeButtonClickListener {
             val time = Time(startPicker.hour, startPicker.minute)
             tempStartTime = time
-            if (fragmentManager == null) return@addOnPositiveButtonClickListener
+            if (fragmentManager == null) return@addOnNegativeButtonClickListener
             stopPicker.show(fragmentManager!!, "StopTimePicker")
         }
 
-        stopPicker.addOnPositiveButtonClickListener {
+        stopPicker.addOnNegativeButtonClickListener {
             val time = Time(stopPicker.hour, stopPicker.minute)
             tempStopTime = time
             addTimeOff(TimeRange(tempStartTime, tempStopTime))
