@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.NumberPicker
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -19,10 +18,10 @@ import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.prefs.PrefsUtils
 import org.rfcx.companion.util.time.toGuardianFormat
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
+import org.rfcx.companion.view.dialog.NumberPickerButtonClickListener
 import org.rfcx.companion.view.dialog.NumberPickerDialog
-import org.rfcx.companion.view.dialog.PhotoGuidelineDialogFragment
 
-class GuardianConfigureFragment : Fragment() {
+class GuardianConfigureFragment : Fragment(), NumberPickerButtonClickListener {
     private val analytics by lazy { context?.let { Analytics(it) } }
     private var deploymentProtocol: GuardianDeploymentProtocol? = null
 
@@ -98,7 +97,8 @@ class GuardianConfigureFragment : Fragment() {
         nextButton.setOnClickListener {
             analytics?.trackClickNextEvent(Screen.GUARDIAN_CONFIGURE.id)
             setNextButton(false)
-            schedule = if (scheduleChipGroup.listOfTime.isNullOrEmpty()) "23:55-23:56,23:57-23:59" else scheduleChipGroup.listOfTime.toGuardianFormat()
+            schedule =
+                if (scheduleChipGroup.listOfTime.isNullOrEmpty()) "23:55-23:56,23:57-23:59" else scheduleChipGroup.listOfTime.toGuardianFormat()
             syncConfig()
             deploymentProtocol?.setSampleRate(sampleRate)
         }
@@ -122,7 +122,15 @@ class GuardianConfigureFragment : Fragment() {
     }
 
     private fun getConfiguration(): GuardianConfiguration {
-        return GuardianConfiguration(sampleRate, bitrate, fileFormat, duration, enableSampling, sampling, schedule)
+        return GuardianConfiguration(
+            sampleRate,
+            bitrate,
+            fileFormat,
+            duration,
+            enableSampling,
+            sampling,
+            schedule
+        )
     }
 
     private fun retrieveCurrentConfigure() {
@@ -150,7 +158,8 @@ class GuardianConfigureFragment : Fragment() {
         bitrateValueTextView.text = bitrateEntries!![indexOfValue]
 
         bitrateValueTextView.setOnClickListener {
-            val builder = context?.let { it1 -> MaterialAlertDialogBuilder(it1, R.style.BaseAlertDialog) }
+            val builder =
+                context?.let { it1 -> MaterialAlertDialogBuilder(it1, R.style.BaseAlertDialog) }
             if (builder != null) {
                 builder.setTitle(R.string.choose_bitrate)
                     .setItems(bitrateEntries) { dialog, i ->
@@ -177,7 +186,8 @@ class GuardianConfigureFragment : Fragment() {
         fileFormatValueTextView.text = fileFormat
 
         fileFormatValueTextView.setOnClickListener {
-            val builder = context?.let { it1 -> MaterialAlertDialogBuilder(it1, R.style.BaseAlertDialog) }
+            val builder =
+                context?.let { it1 -> MaterialAlertDialogBuilder(it1, R.style.BaseAlertDialog) }
             if (builder != null) {
                 builder.setTitle(R.string.choose_file_format)
                     .setItems(fileFormatList) { dialog, i ->
@@ -205,7 +215,8 @@ class GuardianConfigureFragment : Fragment() {
         sampleRateValueTextView.text = sampleRateEntries!![indexOfValue]
 
         sampleRateValueTextView.setOnClickListener {
-            val builder = context?.let { it1 -> MaterialAlertDialogBuilder(it1, R.style.BaseAlertDialog) }
+            val builder =
+                context?.let { it1 -> MaterialAlertDialogBuilder(it1, R.style.BaseAlertDialog) }
             if (builder != null) {
                 builder.setTitle(R.string.choose_sample_rate)
                     .setItems(sampleRateEntries) { dialog, i ->
@@ -237,7 +248,8 @@ class GuardianConfigureFragment : Fragment() {
         }
 
         durationValueTextView.setOnClickListener {
-            val builder = context?.let { it1 -> MaterialAlertDialogBuilder(it1, R.style.BaseAlertDialog) }
+            val builder =
+                context?.let { it1 -> MaterialAlertDialogBuilder(it1, R.style.BaseAlertDialog) }
             if (builder != null) {
                 builder.setTitle(R.string.choose_duration_cycle)
                     .setItems(durationEntries) { dialog, i ->
@@ -261,62 +273,48 @@ class GuardianConfigureFragment : Fragment() {
 
     private fun setSampling() {
         if (!enableSampling) {
-            samplingValueTextView.text = samplingEntries!![0]
+            samplingValueTextView.text = "0"
         } else {
-            val indexOfValue = samplingValues!!.indexOf(sampling)
-            if (indexOfValue == -1) {
-                samplingValueTextView.text = samplingEntries!![0]
-            } else {
-                samplingValueTextView.text = samplingEntries!![indexOfValue]
-            }
+            samplingValueTextView.text = sampling.split(":").getOrNull(1) ?: "0"
         }
 
         samplingValueTextView.setOnClickListener {
-            val wheelScroll = context?.let { NumberPicker(it) }
             val guidelineDialog: NumberPickerDialog =
                 this.parentFragmentManager.findFragmentByTag(NumberPickerDialog::class.java.name) as NumberPickerDialog?
                     ?: run {
-                        NumberPickerDialog.newInstance()
+                        NumberPickerDialog.newInstance(if (!enableSampling) 0 else (sampling.split(":").getOrNull(1) ?: "0").toInt(), this)
                     }
             guidelineDialog.show(
                 this.parentFragmentManager,
                 NumberPickerDialog::class.java.name
             )
-//            val builder = context?.let { it1 -> MaterialAlertDialogBuilder(it1, R.style.BaseAlertDialog) }
-//            if (builder != null) {
-//                builder.setTitle(R.string.choose_sampling)
-//                    .setItems(samplingEntries) { dialog, i ->
-//                        try {
-//                            when {
-//                                samplingValues!![i] == "0" && !enableSampling -> needCheckSha1 = false
-//                                samplingValues!![i] == sampling && enableSampling -> needCheckSha1 = false
-//                                samplingValues!![i] == sampling && !enableSampling ->  {
-//                                    samplingValueTextView.text = samplingEntries!![i]
-//                                    enableSampling = true
-//                                    needCheckSha1 = true
-//                                }
-//                                else -> {
-//                                    samplingValueTextView.text = samplingEntries!![i]
-//                                    if (samplingValues!![i] != "0") {
-//                                        sampling = samplingValues!![i]
-//                                    }
-//                                    enableSampling = samplingValues!![i] != "0"
-//                                    needCheckSha1 = true
-//                                }
-//                            }
-//                        } catch (e: IllegalArgumentException) {
-//                            dialog.dismiss()
-//                        }
-//                    }
-//                val dialog = builder.create()
-//                dialog.show()
-//            }
         }
     }
 
     private fun setRecordSchedule() {
         scheduleChipGroup.fragmentManager = parentFragmentManager
         scheduleChipGroup.setTimes(schedule, true)
+    }
+
+    override fun onNextClicked(number: Int) {
+        val tempSamplingRatio = "1:$number"
+        when {
+            number == 0 && !enableSampling -> needCheckSha1 = false
+            tempSamplingRatio == sampling && enableSampling -> needCheckSha1 = false
+            tempSamplingRatio == sampling && !enableSampling -> {
+                samplingValueTextView.text = number.toString()
+                enableSampling = true
+                needCheckSha1 = true
+            }
+            else -> {
+                samplingValueTextView.text = number.toString()
+                if (number != 0) {
+                    sampling = tempSamplingRatio
+                }
+                enableSampling = number != 0
+                needCheckSha1 = true
+            }
+        }
     }
 
     override fun onResume() {

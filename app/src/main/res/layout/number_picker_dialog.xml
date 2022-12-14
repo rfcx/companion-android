@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/outsidePicker"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,43 +11,50 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="@color/dialogColor"
         android:layout_margin="@dimen/margin_padding_large"
-        android:padding="@dimen/margin_padding_large">
+        android:background="@color/dialogColor"
+        android:paddingStart="@dimen/margin_padding_large"
+        android:paddingTop="@dimen/margin_padding_large">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/numberPickerTitle"
             style="@style/BaseAlertTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Select cycle...."
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"/>
+            android:text="Select cycle to skip between recording"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <NumberPicker
             android:id="@+id/numberPicker"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/numberPickerTitle"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginEnd="@dimen/margin_padding_large"
+            app:layout_constraintBottom_toTopOf="@id/nextButton"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/nextButton"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/numberPickerTitle" />
 
-        <androidx.appcompat.widget.AppCompatButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/nextButton"
             style="@style/BaseAlertButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minHeight="48dp"
             android:text="@string/next"
+            android:layout_marginBottom="@dimen/margin_padding_small"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/cancelButton"/>
+            app:layout_constraintEnd_toStartOf="@id/cancelButton" />
 
-        <androidx.appcompat.widget.AppCompatButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/cancelButton"
             style="@style/BaseAlertButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minHeight="48dp"
             android:text="@string/cancel"
+            android:layout_marginEnd="@dimen/margin_padding_small"
+            android:layout_marginBottom="@dimen/margin_padding_small"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
