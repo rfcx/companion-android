@@ -19,6 +19,8 @@ import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.prefs.PrefsUtils
 import org.rfcx.companion.util.time.toGuardianFormat
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
+import org.rfcx.companion.view.dialog.NumberPickerDialog
+import org.rfcx.companion.view.dialog.PhotoGuidelineDialogFragment
 
 class GuardianConfigureFragment : Fragment() {
     private val analytics by lazy { context?.let { Analytics(it) } }
@@ -271,36 +273,44 @@ class GuardianConfigureFragment : Fragment() {
 
         samplingValueTextView.setOnClickListener {
             val wheelScroll = context?.let { NumberPicker(it) }
-            wheelScroll.create
-            val builder = context?.let { it1 -> MaterialAlertDialogBuilder(it1, R.style.BaseAlertDialog) }
-            if (builder != null) {
-                builder.setTitle(R.string.choose_sampling)
-                    .setItems(samplingEntries) { dialog, i ->
-                        try {
-                            when {
-                                samplingValues!![i] == "0" && !enableSampling -> needCheckSha1 = false
-                                samplingValues!![i] == sampling && enableSampling -> needCheckSha1 = false
-                                samplingValues!![i] == sampling && !enableSampling ->  {
-                                    samplingValueTextView.text = samplingEntries!![i]
-                                    enableSampling = true
-                                    needCheckSha1 = true
-                                }
-                                else -> {
-                                    samplingValueTextView.text = samplingEntries!![i]
-                                    if (samplingValues!![i] != "0") {
-                                        sampling = samplingValues!![i]
-                                    }
-                                    enableSampling = samplingValues!![i] != "0"
-                                    needCheckSha1 = true
-                                }
-                            }
-                        } catch (e: IllegalArgumentException) {
-                            dialog.dismiss()
-                        }
+            val guidelineDialog: NumberPickerDialog =
+                this.parentFragmentManager.findFragmentByTag(NumberPickerDialog::class.java.name) as NumberPickerDialog?
+                    ?: run {
+                        NumberPickerDialog.newInstance()
                     }
-                val dialog = builder.create()
-                dialog.show()
-            }
+            guidelineDialog.show(
+                this.parentFragmentManager,
+                NumberPickerDialog::class.java.name
+            )
+//            val builder = context?.let { it1 -> MaterialAlertDialogBuilder(it1, R.style.BaseAlertDialog) }
+//            if (builder != null) {
+//                builder.setTitle(R.string.choose_sampling)
+//                    .setItems(samplingEntries) { dialog, i ->
+//                        try {
+//                            when {
+//                                samplingValues!![i] == "0" && !enableSampling -> needCheckSha1 = false
+//                                samplingValues!![i] == sampling && enableSampling -> needCheckSha1 = false
+//                                samplingValues!![i] == sampling && !enableSampling ->  {
+//                                    samplingValueTextView.text = samplingEntries!![i]
+//                                    enableSampling = true
+//                                    needCheckSha1 = true
+//                                }
+//                                else -> {
+//                                    samplingValueTextView.text = samplingEntries!![i]
+//                                    if (samplingValues!![i] != "0") {
+//                                        sampling = samplingValues!![i]
+//                                    }
+//                                    enableSampling = samplingValues!![i] != "0"
+//                                    needCheckSha1 = true
+//                                }
+//                            }
+//                        } catch (e: IllegalArgumentException) {
+//                            dialog.dismiss()
+//                        }
+//                    }
+//                val dialog = builder.create()
+//                dialog.show()
+//            }
         }
     }
 

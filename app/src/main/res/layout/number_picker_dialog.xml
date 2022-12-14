@@ -7,30 +7,48 @@
     android:orientation="vertical">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="@color/backgroundColor"
-        android:padding="@dimen/margin_padding_normal">
+        android:background="@color/dialogColor"
+        android:layout_margin="@dimen/margin_padding_large"
+        android:padding="@dimen/margin_padding_large">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/numberPickerTitle"
+            style="@style/BaseAlertTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select cycle...."
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
 
         <NumberPicker
             android:id="@+id/numberPicker"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/numberPickerTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/nextButton"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/nextButton"
+            style="@style/BaseAlertButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            android:text="@string/next"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/cancelButton"/>
 
-        <Button
-            android:id="@+id/wifiLostButton"
-            style="@style/AudioMothButton.GreenButton"
-            android:layout_width="match_parent"
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/cancelButton"
+            style="@style/BaseAlertButton"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_padding_normal"
-            android:text="@string/got_it"
-            app:layout_constraintEnd_toEndOf="@id/numberPicker"
-            app:layout_constraintStart_toStartOf="@id/numberPicker"
-            app:layout_constraintTop_toBottomOf="@id/numberPicker" />
+            android:text="@string/cancel"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>
