@@ -272,7 +272,8 @@
     <string name="choose_file_format">Choose Audio Format</string>
     <string name="choose_duration_cycle">Choose recording cycle duration (secs)</string>
     <string name="choose_sampling">Choose Recording Strategy</string>
-    <string name="sampling_ratio">Cycle skipped between recording</string>
+    <string name="sampling_ratio">Cycle(s) skipped between recordings</string>
+    <string name="select_cycle_s_to_skip_between_recordings">Select cycle(s) to skip between recordings</string>
     <string name="advanced_config">Guardian Preferences</string>
     <string name="schedule_start_time">Select start time</string>
     <string name="schedule_stop_time">Select stop time</string>
