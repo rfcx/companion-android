@@ -125,7 +125,7 @@ class ProfileFragment : Fragment() {
                         dialog.dismiss()
                     }
                 )
-                builder.setPositiveButton(getString(R.string.cancel)) { dialog, which ->
+                builder.setPositiveButton(getString(R.string.back)) { dialog, which ->
                     dialog.dismiss()
                 }
                 builder.show()

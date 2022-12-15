@@ -307,7 +307,7 @@ class GuardianMicrophoneFragment : Fragment(), SpectrogramListener {
                 setPositiveButton(R.string.restart) { _, _ ->
                     GuardianSocketManager.restartService("audio-cast-socket")
                 }
-                setNegativeButton(R.string.cancel) { _, _ ->
+                setNegativeButton(R.string.back) { _, _ ->
                     dialogBuilder.dismiss()
                 }
             }.create()
