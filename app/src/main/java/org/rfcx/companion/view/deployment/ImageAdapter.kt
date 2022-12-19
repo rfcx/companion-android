@@ -6,12 +6,13 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.item_photo_advise.view.*
 import org.rfcx.companion.R
 
-class ImageAdapter(private val imageClickListener: ImageClickListener) :
+class ImageAdapter(private val imageClickListener: ImageClickListener, private val thumbnails: List<String>) :
     RecyclerView.Adapter<ImageAdapter.ImageAdapterViewHolder>() {
     private var imageItems = arrayListOf<Image>()
     private var currentPosition = -1
@@ -22,16 +23,18 @@ class ImageAdapter(private val imageClickListener: ImageClickListener) :
     }
 
     fun setPlaceHolders(type: List<String>) {
-        type.forEach {
-            imageItems.add(Image(it, ImageType.NORMAL, null))
+        type.forEachIndexed { index, it ->
+            imageItems.add(Image(index + 1, it, ImageType.NORMAL, null))
         }
         // For other images that out of type scoped
-        imageItems.add(Image(ImageType.OTHER.value, ImageType.OTHER, null))
+        if (imageItems.size < MAX_IMAGES) {
+            imageItems.add(Image(imageItems.size + 1, ImageType.OTHER.value, ImageType.OTHER, null))
+        }
         notifyDataSetChanged()
     }
 
     fun updateImagesFromSavedImages(images: List<Image>) {
-        images.forEach {
+        images.map { it.copy() }.forEach {
             imageItems.add(it)
         }
         notifyDataSetChanged()
@@ -43,7 +46,7 @@ class ImageAdapter(private val imageClickListener: ImageClickListener) :
             if (itemCount == MAX_IMAGES) {
                 imageItems.removeLast()
             }
-            imageItems.add(itemCount - 1, Image(ImageType.OTHER.value, ImageType.OTHER, path))
+            imageItems.add(itemCount - 1, Image(itemCount, ImageType.OTHER.value, ImageType.OTHER, path))
         } else {
             imageItems[currentPosition].path = path
         }
@@ -54,7 +57,7 @@ class ImageAdapter(private val imageClickListener: ImageClickListener) :
         if (currentPosition == -1) return
         if (image.type == ImageType.OTHER) {
             if (getAvailableImagesLeft() == 0) {
-                imageItems.add(Image(ImageType.OTHER.value, ImageType.OTHER, null))
+                imageItems.add(Image(currentPosition, ImageType.OTHER.value, ImageType.OTHER, null))
             }
             imageItems.remove(image)
         } else {
@@ -71,6 +74,14 @@ class ImageAdapter(private val imageClickListener: ImageClickListener) :
 
     fun getCurrentImagePaths() = imageItems
 
+    fun getMissingImages(): List<Image> {
+        val missing = imageItems.filter { it.path == null && it.type != ImageType.OTHER }
+        if (getExistingImages().find { it.id == 9 } != null) return missing.filter { it.id != 10 }
+        if (getExistingImages().find { it.id == 10 } != null) return missing.filter { it.id != 9 }
+        return missing
+    }
+    fun getExistingImages() = imageItems.filter { it.path != null }
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -85,12 +96,10 @@ class ImageAdapter(private val imageClickListener: ImageClickListener) :
 
         holder.placeHolderButton.setOnClickListener {
             currentPosition = holder.adapterPosition
-            currentType = ImageType.NORMAL
-            if (position == itemCount - 1) {
-                currentType = ImageType.OTHER
-            }
+            currentType = imageItems[currentPosition].type
             imageClickListener.onPlaceHolderClick(currentPosition)
         }
+
         holder.imageView.setOnClickListener {
             currentPosition = holder.adapterPosition
             imageClickListener.onImageClick(imageItems[currentPosition])
@@ -112,6 +121,17 @@ class ImageAdapter(private val imageClickListener: ImageClickListener) :
                 imageView.visibility = View.GONE
                 placeHolderButton.visibility = View.VISIBLE
                 deleteButton.visibility = View.GONE
+                placeHolderButton.apply {
+                    val example = thumbnails.getOrNull(adapterPosition) ?: thumbnails[thumbnails.size - 1]
+                    val id = this.context.resources.getIdentifier("${example}_tbn", "drawable", this.context.packageName)
+                    if (id != 0) {
+                        ContextCompat.getDrawable(this.context, id)?.let {
+                            val drawable = it.mutate()
+                            drawable.alpha = 100
+                            placeHolderButton.background = drawable
+                        }
+                    }
+                }
             } else {
                 Glide.with(itemView.context)
                     .load(image.path)
@@ -129,6 +149,7 @@ class ImageAdapter(private val imageClickListener: ImageClickListener) :
 }
 
 data class Image(
+    val id: Int,
     val name: String,
     val type: ImageType,
     var path: String?

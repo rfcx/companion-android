@@ -249,50 +249,152 @@
     </string-array>
 
     <string-array name="audiomoth_placeholders">
-        <item>device</item>
-        <item>tree</item>
-        <item>canopy</item>
-        <item>bush</item>
-        <item>overview</item>
+        <item>device id</item>
+        <item>placement</item>
+        <item>location</item>
+        <item>approach</item>
+        <item>trail</item>
     </string-array>
 
     <string-array name="audiomoth_guideline_texts">
-        <item>Take or Choose a photo that show a device id</item>
-        <item>Take or Choose a photo that show a installation tree</item>
-        <item>Take or Choose a photo that show a canopy with sky</item>
-        <item>Take or Choose a photo that show a installation bush</item>
-        <item>Take or Choose a photo that show overview location</item>
+        <item>Take a close-up photo of the device showing the device identifier (if used)</item>
+        <item>Take a photo from 1–3 meters showing the placement to help find the device if it’s in dense vegetation</item>
+        <item>Take a photo from 5–10 meters showing the tree/bush/vine where the device is located</item>
+        <item>Take a photo from 15–20 meters showing the broader location or view from the approach to help recognize the surroundings</item>
+        <item>Take a photo showing the exit point from the road or trail used to access the device (if off-trail)</item>
     </string-array>
 
     <string-array name="songmeter_placeholders">
-        <item>device</item>
-        <item>tree</item>
-        <item>canopy</item>
-        <item>bush</item>
-        <item>overview</item>
+        <item>device id</item>
+        <item>placement</item>
+        <item>location</item>
+        <item>approach</item>
+        <item>trail</item>
     </string-array>
 
     <string-array name="songmeter_guideline_texts">
-        <item>Take or Choose a photo that show a device id</item>
-        <item>Take or Choose a photo that show a installation tree</item>
-        <item>Take or Choose a photo that show a canopy with sky</item>
-        <item>Take or Choose a photo that show a installation bush</item>
-        <item>Take or Choose a photo that show overview location</item>
+        <item>Take a close-up photo of the device showing the device identifier (if used)</item>
+        <item>Take a photo from 1–3 meters showing the placement to help find the device if it’s in dense vegetation</item>
+        <item>Take a photo from 5–10 meters showing the tree/bush/vine where the device is located</item>
+        <item>Take a photo from 15–20 meters showing the broader location or view from the approach to help recognize the surroundings</item>
+        <item>Take a photo showing the exit point from the road or trail used to access the device (if off-trail)</item>
     </string-array>
 
-    <string-array name="guardian_placeholders">
-        <item>device</item>
-        <item>tree</item>
-        <item>canopy</item>
-        <item>above guardian</item>
-        <item>overview</item>
+    <string-array name="sat_guardian_placeholders">
+        <item>antenna connection</item>
+        <item>cable tied box</item>
+        <item>solar panel connection 1</item>
+        <item>solar panel connection 2</item>
+        <item>solar panel connection 3</item>
+        <item>solar panel connection 4</item>
+        <item>view of solar panels</item>
+        <item>baseplate without guardian</item>
+        <item>baseplate with guardian</item>
+        <item>arm angle</item>
+        <item>canopy above solar panels</item>
+        <item>mic and cover</item>
+        <item>canopy above swarm antenna</item>
+        <item>swarm antenna attachment</item>
+        <item>gps antenna attachment</item>
     </string-array>
 
-    <string-array name="guardian_guideline_texts">
-        <item>Take or Choose a photo that show a guardian</item>
-        <item>Take or Choose a photo that show a installation tree</item>
-        <item>Take or Choose a photo that show a canopy with sky</item>
-        <item>Take or Choose a photo that show a installation bush</item>
-        <item>Take or Choose a photo that show overview location</item>
+    <string-array name="cell_guardian_placeholders">
+        <item>antennas</item>
+        <item>cable tied box</item>
+        <item>solar panel connection 1</item>
+        <item>solar panel connection 2</item>
+        <item>solar panel connection 3</item>
+        <item>solar panel connection 4</item>
+        <item>view of solar panels</item>
+        <item>baseplate without guardian</item>
+        <item>baseplate with guardian</item>
+        <item>arm angle</item>
+        <item>canopy above solar panels</item>
+        <item>mic and cover</item>
+        <item>gsm antenna</item>
+    </string-array>
+
+    <string-array name="sat_guardian_guideline_texts">
+        <item>Take a photo showing the antennas are securely in the right connections, as well as the base plate adaptor connecting to the Guardian is secure and pointing towards the sky.</item>
+        <item>Show two cable ties securing the frame to the Guardian.</item>
+        <item>Take a photo of each of the 4 solar panels connections showing they are completely pushed into the frame plug.</item>
+        <item>Take a photo of each of the 4 solar panels connections showing they are completely pushed into the frame plug.</item>
+        <item>Take a photo of each of the 4 solar panels connections showing they are completely pushed into the frame plug.</item>
+        <item>Take a photo of each of the 4 solar panels connections showing they are completely pushed into the frame plug.</item>
+        <item>Show all solar panels are secured to the frame using the bolts, show all panels and some background.</item>
+        <item>Show base plate orientation and number of screws and whether flat or vertical. Showing at least 6 to 8 screws securing the baseplate.</item>
+        <item>Show the baseplate is flatly mounted, either horizontally on an adequately sized branch or vertically on the trunk with the Guardian attached.</item>
+        <item>Take a photo of the arm being angled 45 downs, if used.</item>
+        <item>Set your camera phone to a 10 second timer, place the camera on top of the panels facing the sky and take a photo of what is directly above the panels. (There should be ample clear sky)</item>
+        <item>Take a photo of the microphone cover cable tied to the mic mount.</item>
+        <item>Take a photo of the canopy above the satellite antenna (you should ideally show no to very little canopy cover)</item>
+        <item>Take a photo of the satellite antenna, directly facing towards the sky, none of the radials (legs) touching the tree, cabled tied to the mount and 1 meter away from the Guardian box</item>
+        <item>Take a photo of the GPS antenna flat on a horizontal branch with 2 screws.</item>
+    </string-array>
+
+    <string-array name="cell_guardian_guideline_texts">
+        <item>Take a photo showing the antennas are securely in the right connections, as well as the base plate adaptor connecting to the Guardian is secure and pointing towards the sky.</item>
+        <item>Show two cable ties securing the frame to the Guardian.</item>
+        <item>Take a photo of each of the 4 solar panels connections showing they are completely pushed into the frame plug.</item>
+        <item>Take a photo of each of the 4 solar panels connections showing they are completely pushed into the frame plug.</item>
+        <item>Take a photo of each of the 4 solar panels connections showing they are completely pushed into the frame plug.</item>
+        <item>Take a photo of each of the 4 solar panels connections showing they are completely pushed into the frame plug.</item>
+        <item>Show all solar panels are secured to the frame using the bolts, show all panels and some background.</item>
+        <item>Show base plate orientation and number of screws and whether flat or vertical. Showing at least 6 to 8 screws securing the baseplate.</item>
+        <item>Show the baseplate is flatly mounted, either horizontally on an adequately sized branch or vertically on the trunk with the Guardian attached.</item>
+        <item>Take a photo of the arm being angled 45 downs, if used.</item>
+        <item>Set your camera phone to a 10 second timer, place the camera on top of the panels facing the sky and take a photo of what is directly above the panels. (There should be ample clear sky)</item>
+        <item>Take a photo of the microphone cover cable tied to the mic mount.</item>
+        <item>Take a photo of the GSM antenna pointing towards the sky, cable tied to the mount which is screwed to the branch with 2 screws.</item>
+    </string-array>
+
+    <string-array name="sat_guardian_photos">
+        <item>guardian_1</item>
+        <item>guardian_2</item>
+        <item>guardian_3</item>
+        <item>guardian_4</item>
+        <item>guardian_5</item>
+        <item>guardian_6</item>
+        <item>guardian_7</item>
+        <item>guardian_8</item>
+        <item>guardian_9</item>
+        <item>guardian_10</item>
+        <item>guardian_11</item>
+        <item>guardian_12</item>
+        <item>guardian_sat_1</item>
+        <item>guardian_sat_2</item>
+        <item>guardian_sat_3</item>
+    </string-array>
+
+    <string-array name="cell_guardian_photos">
+        <item>guardian_1</item>
+        <item>guardian_2</item>
+        <item>guardian_3</item>
+        <item>guardian_4</item>
+        <item>guardian_5</item>
+        <item>guardian_6</item>
+        <item>guardian_7</item>
+        <item>guardian_8</item>
+        <item>guardian_9</item>
+        <item>guardian_10</item>
+        <item>guardian_11</item>
+        <item>guardian_12</item>
+        <item>guardian_cell_1</item>
+    </string-array>
+
+    <string-array name="audiomoth_photos">
+        <item>audiomoth_1</item>
+        <item>audiomoth_2</item>
+        <item>audiomoth_3</item>
+        <item>audiomoth_4</item>
+        <item>audiomoth_5</item>
+    </string-array>
+
+    <string-array name="songmeter_photos">
+        <item>audiomoth_1</item>
+        <item>audiomoth_2</item>
+        <item>audiomoth_3</item>
+        <item>audiomoth_4</item>
+        <item>audiomoth_5</item>
     </string-array>
 </resources>

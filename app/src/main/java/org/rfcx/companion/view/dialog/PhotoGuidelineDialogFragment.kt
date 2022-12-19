@@ -12,6 +12,7 @@ class PhotoGuidelineDialogFragment(private val guidelineButtonClickListener: Gui
     DialogFragment() {
 
     private var guidelineText = ""
+    private var photoId = ""
 
     override fun onStart() {
         super.onStart()
@@ -29,13 +30,15 @@ class PhotoGuidelineDialogFragment(private val guidelineButtonClickListener: Gui
         savedInstanceState: Bundle?
     ): View? {
         guidelineText = arguments?.getString(ARG_TEXT) ?: ""
+        photoId = arguments?.getString(ARG_PHOTO) ?: ""
         return inflater.inflate(R.layout.fragment_photo_guideline, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        guidelineTextView.text = guidelineText
+        setExamplePhoto(photoId)
+        setExampleText(guidelineText)
 
         takePhotoButton.setOnClickListener {
             dismiss()
@@ -48,18 +51,33 @@ class PhotoGuidelineDialogFragment(private val guidelineButtonClickListener: Gui
         }
     }
 
+    private fun setExamplePhoto(photoId: String) {
+        if (photoId.isEmpty()) return
+
+        val id = resources.getIdentifier(photoId, "drawable", requireContext().packageName)
+        if (id == 0) return
+
+        guidelineImage.setImageResource(resources.getIdentifier(photoId, "drawable", requireContext().packageName))
+    }
+
+    private fun setExampleText(text: String) {
+        guidelineTextView.text = text.ifEmpty { getString(R.string.take_other) }
+    }
+
     companion object {
         private const val ARG_TEXT = "ARG_TEXT"
-        private const val ARG_IMAGE_PATH = "ARG_IMAGE_PATH"
+        private const val ARG_PHOTO = "ARG_PHOTO"
 
         fun newInstance(
             callback: GuidelineButtonClickListener,
-            guidelineText: String?
+            guidelineText: String?,
+            guidelinePhotoId: String?
         ): PhotoGuidelineDialogFragment {
 
             return PhotoGuidelineDialogFragment(callback).apply {
                 arguments = Bundle().apply {
                     putString(ARG_TEXT, guidelineText)
+                    putString(ARG_PHOTO, guidelinePhotoId)
                 }
             }
         }

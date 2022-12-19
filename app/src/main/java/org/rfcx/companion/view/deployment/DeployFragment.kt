@@ -11,12 +11,14 @@ import android.view.ViewGroup
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.opensooq.supernova.gligar.GligarPicker
 import kotlinx.android.synthetic.main.fragment_deploy.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.*
+import org.rfcx.companion.util.prefs.GuardianPlan
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 import org.rfcx.companion.view.deployment.songmeter.SongMeterDeploymentProtocol
 import org.rfcx.companion.view.detail.DisplayImageActivity
@@ -39,10 +41,11 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
 
     private var imagePlaceHolders = listOf<String>()
     private var imageGuidelineTexts = listOf<String>()
+    private var imageExamples = listOf<String>()
 
     private var audioMothDeploymentProtocol: BaseDeploymentProtocol? = null
     private var songMeterDeploymentProtocol: BaseDeploymentProtocol? = null
-    private var guardianDeploymentProtocol: BaseDeploymentProtocol? = null
+    private var guardianDeploymentProtocol: GuardianDeploymentProtocol? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -58,6 +61,8 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
                     context.resources.getStringArray(R.array.audiomoth_placeholders).toList()
                 imageGuidelineTexts =
                     context.resources.getStringArray(R.array.audiomoth_guideline_texts).toList()
+                imageExamples =
+                    context.resources.getStringArray(R.array.audiomoth_photos).toList()
             }
             is SongMeterDeploymentProtocol -> {
                 songMeterDeploymentProtocol = context
@@ -70,6 +75,8 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
                     context.resources.getStringArray(R.array.songmeter_placeholders).toList()
                 imageGuidelineTexts =
                     context.resources.getStringArray(R.array.songmeter_guideline_texts).toList()
+                imageExamples =
+                    context.resources.getStringArray(R.array.audiomoth_photos).toList()
             }
             is GuardianDeploymentProtocol -> {
                 guardianDeploymentProtocol = context
@@ -78,10 +85,29 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
                     it.setCurrentPage(requireContext().resources.getStringArray(R.array.guardian_optional_checks)[0])
                     it.setToolbarTitle()
                 }
-                imagePlaceHolders =
-                    context.resources.getStringArray(R.array.guardian_placeholders).toList()
-                imageGuidelineTexts =
-                    context.resources.getStringArray(R.array.guardian_guideline_texts).toList()
+
+                when (guardianDeploymentProtocol?.getGuardianPlan()) {
+                    GuardianPlan.SAT_ONLY -> {
+                        imagePlaceHolders =
+                            context.resources.getStringArray(R.array.sat_guardian_placeholders)
+                                .toList()
+                        imageGuidelineTexts =
+                            context.resources.getStringArray(R.array.sat_guardian_guideline_texts)
+                                .toList()
+                        imageExamples =
+                            context.resources.getStringArray(R.array.sat_guardian_photos).toList()
+                    }
+                    else -> {
+                        imagePlaceHolders =
+                            context.resources.getStringArray(R.array.cell_guardian_placeholders)
+                                .toList()
+                        imageGuidelineTexts =
+                            context.resources.getStringArray(R.array.cell_guardian_guideline_texts)
+                                .toList()
+                        imageExamples =
+                            context.resources.getStringArray(R.array.cell_guardian_photos).toList()
+                    }
+                }
             }
         }
     }
@@ -115,13 +141,14 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
         if (imageAdapter != null) {
             return imageAdapter!!
         }
-        imageAdapter = ImageAdapter(this)
+        imageAdapter = ImageAdapter(this, imageExamples)
         return imageAdapter!!
     }
 
     private fun setupImages() {
         val savedImages =
-            audioMothDeploymentProtocol?.getImages()
+            audioMothDeploymentProtocol?.getImages() ?: songMeterDeploymentProtocol?.getImages()
+                ?: guardianDeploymentProtocol?.getImages()
         if (savedImages != null && savedImages.isNotEmpty()) {
             getImageAdapter().updateImagesFromSavedImages(savedImages)
         } else {
@@ -153,29 +180,15 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
         }
 
         setupImageRecycler()
+        updatePhotoTakenNumber()
 
         finishButton.setOnClickListener {
-            setCacheImages()
-            val images = getImageAdapter().getCurrentImagePaths()
-            when (screen) {
-                Screen.AUDIO_MOTH_CHECK_LIST.id -> {
-                    if (images.isNotEmpty()) {
-                        analytics?.trackAddDeploymentImageEvent(Device.AUDIOMOTH.value)
-                    }
-                    audioMothDeploymentProtocol?.nextStep()
-                }
-                Screen.SONG_METER_CHECK_LIST.id -> {
-                    if (images.isNotEmpty()) {
-                        analytics?.trackAddDeploymentImageEvent(Device.SONGMETER.value)
-                    }
-                    songMeterDeploymentProtocol?.nextStep()
-                }
-                Screen.GUARDIAN_CHECK_LIST.id -> {
-                    if (images.isNotEmpty()) {
-                        analytics?.trackAddDeploymentImageEvent(Device.GUARDIAN.value)
-                    }
-                    guardianDeploymentProtocol?.nextStep()
-                }
+            val existing = getImageAdapter().getExistingImages()
+            val missing = getImageAdapter().getMissingImages()
+            if (missing.isEmpty()) {
+                handleNextStep(existing)
+            } else {
+                showFinishDialog(existing, missing)
             }
         }
     }
@@ -186,6 +199,7 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
         if (resultCode == Activity.RESULT_OK) {
             filePath?.let {
                 getImageAdapter().updateTakeOrChooseImage(it)
+                updatePhotoTakenNumber()
             }
         } else {
             // remove file image
@@ -203,7 +217,7 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
         results?.forEach {
             getImageAdapter().updateTakeOrChooseImage(it)
         }
-        setCacheImages()
+        updatePhotoTakenNumber()
     }
 
     private fun setCacheImages() {
@@ -211,6 +225,12 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
         audioMothDeploymentProtocol?.setImages(images)
         songMeterDeploymentProtocol?.setImages(images)
         guardianDeploymentProtocol?.setImages(images)
+    }
+
+    private fun updatePhotoTakenNumber() {
+        val number = getImageAdapter().getExistingImages().size
+        photoTakenTextView.text =
+            getString(R.string.photo_taken, number, getImageAdapter().itemCount)
     }
 
     override fun onPlaceHolderClick(position: Int) {
@@ -224,7 +244,7 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
 
     override fun onDeleteClick(image: Image) {
         getImageAdapter().removeImage(image)
-        setCacheImages()
+        updatePhotoTakenNumber()
     }
 
     override fun onTakePhotoClick() {
@@ -286,7 +306,8 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
                     PhotoGuidelineDialogFragment.newInstance(
                         this,
                         imageGuidelineTexts.getOrNull(position)
-                            ?: getString(R.string.take_other)
+                            ?: getString(R.string.take_other),
+                        imageExamples.getOrNull(position) ?: "other"
                     )
                 }
         if (guidelineDialog.isVisible || guidelineDialog.isAdded) return
@@ -294,6 +315,45 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
             this.parentFragmentManager,
             PhotoGuidelineDialogFragment::class.java.name
         )
+    }
+
+    private fun showFinishDialog(existing: List<Image>, missing: List<Image>) {
+        MaterialAlertDialogBuilder(requireContext(), R.style.BaseAlertDialog).apply {
+            setTitle(context.getString(R.string.missing_dialog_title))
+            setMessage(
+                context.getString(
+                    R.string.follow_missing, missing.joinToString("\n") { "${it.id}. ${it.name}" }
+                )
+            )
+            setPositiveButton(R.string.back) { _, _ -> }
+            setNegativeButton(R.string.button_continue) { _, _ ->
+                handleNextStep(existing)
+            }
+        }.create().show()
+    }
+
+    private fun handleNextStep(images: List<Image>) {
+        setCacheImages()
+        when (screen) {
+            Screen.AUDIO_MOTH_CHECK_LIST.id -> {
+                if (images.isNotEmpty()) {
+                    analytics?.trackAddDeploymentImageEvent(Device.AUDIOMOTH.value)
+                }
+                audioMothDeploymentProtocol?.nextStep()
+            }
+            Screen.SONG_METER_CHECK_LIST.id -> {
+                if (images.isNotEmpty()) {
+                    analytics?.trackAddDeploymentImageEvent(Device.SONGMETER.value)
+                }
+                songMeterDeploymentProtocol?.nextStep()
+            }
+            Screen.GUARDIAN_CHECK_LIST.id -> {
+                if (images.isNotEmpty()) {
+                    analytics?.trackAddDeploymentImageEvent(Device.GUARDIAN.value)
+                }
+                guardianDeploymentProtocol?.nextStep()
+            }
+        }
     }
 
     companion object {
