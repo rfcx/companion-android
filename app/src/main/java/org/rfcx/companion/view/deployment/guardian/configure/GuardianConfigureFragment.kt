@@ -276,7 +276,12 @@ class GuardianConfigureFragment : Fragment() {
                         try {
                             when {
                                 samplingValues!![i] == "0" && !enableSampling -> needCheckSha1 = false
-                                samplingValues!![i] == sampling -> needCheckSha1 = false
+                                samplingValues!![i] == sampling && enableSampling -> needCheckSha1 = false
+                                samplingValues!![i] == sampling && !enableSampling ->  {
+                                    samplingValueTextView.text = samplingEntries!![i]
+                                    enableSampling = true
+                                    needCheckSha1 = true
+                                }
                                 else -> {
                                     samplingValueTextView.text = samplingEntries!![i]
                                     if (samplingValues!![i] != "0") {
