@@ -26,7 +26,6 @@ import org.rfcx.companion.view.profile.guardiansoftware.GuardianSoftwareActivity
 import org.rfcx.companion.view.profile.locationgroup.ProjectActivity
 import org.rfcx.companion.view.profile.offlinemap.OfflineMapActivity
 
-
 class ProfileFragment : Fragment() {
     lateinit var listener: MainActivityListener
     private val analytics by lazy { context?.let { Analytics(it) } }
@@ -125,7 +124,7 @@ class ProfileFragment : Fragment() {
                         dialog.dismiss()
                     }
                 )
-                builder.setPositiveButton(getString(R.string.cancel)) { dialog, which ->
+                builder.setPositiveButton(getString(R.string.back)) { dialog, which ->
                     dialog.dismiss()
                 }
                 builder.show()

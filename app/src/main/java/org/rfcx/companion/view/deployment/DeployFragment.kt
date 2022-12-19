@@ -325,7 +325,7 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
                     R.string.follow_missing, missing.joinToString("\n") { "${it.id}. ${it.name}" }
                 )
             )
-            setPositiveButton(R.string.cancel) { _, _ -> }
+            setPositiveButton(R.string.back) { _, _ -> }
             setNegativeButton(R.string.button_continue) { _, _ ->
                 handleNextStep(existing)
             }

@@ -145,7 +145,7 @@ class SoftwareUpdateFragment : Fragment(), ChildrenClickedListener {
                 setPositiveButton(R.string.restart) { _, _ ->
                     GuardianSocketManager.restartService("file-socket")
                 }
-                setNegativeButton(R.string.cancel) { _, _ ->
+                setNegativeButton(R.string.back) { _, _ ->
                     dialogBuilder.dismiss()
                 }
             }.create()

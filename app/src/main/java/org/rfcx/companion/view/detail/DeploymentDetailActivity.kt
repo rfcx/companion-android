@@ -149,7 +149,7 @@ class DeploymentDetailActivity :
             onDeleteLocation()
             analytics.trackDeleteDeploymentEvent(StatusEvent.SUCCESS.id)
         }
-        builder.setNegativeButton(getString(R.string.cancel)) { _, _ -> }
+        builder.setNegativeButton(getString(R.string.back)) { _, _ -> }
 
         val dialog: AlertDialog = builder.create()
         dialog.show()
