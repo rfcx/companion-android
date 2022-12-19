@@ -14,6 +14,7 @@
     <color name="snackbarBtColor">@color/colorPrimary</color>
     <color name="snackbarTxtColor">#FFFFFF</color>
     <color name="dialogColor">#ffffff</color>
+    <color name="dialogSecondaryColor">#DADADA</color>
     <color name="tooltipColor">#1F2D3D</color>
     <color name="tooltipTextColor">#ffffff</color>
     <color name="statusColor">#aaa</color>

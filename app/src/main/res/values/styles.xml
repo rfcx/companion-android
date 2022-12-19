@@ -360,4 +360,23 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <!-- Time Picker -->
+    <style name="BaseTimePicker" parent="ThemeOverlay.MaterialComponents.TimePicker">
+        <!-- just override the colors used in the default style -->
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorSurface">@color/dialogColor</item>
+        <item name="materialTimePickerTitleStyle">@style/BaseAlertTitle</item>
+        <item name="borderlessButtonStyle">@style/BaseTimePickerButton</item>
+        <item name="materialClockStyle">@style/BaseClock</item>
+    </style>
+    <style name="BaseClock" parent="Widget.Material3.MaterialTimePicker.Clock">
+        <item name="clockFaceBackgroundColor">@color/dialogSecondaryColor</item>
+        <item name="clockHandColor">@color/colorPrimary</item>
+        <item name="clockNumberTextColor">@color/text_primary</item>
+    </style>
+    <style name="BaseTimePickerButton" parent="@style/BaseAlertButton">
+        <item name="textAllCaps">true</item>
+    </style>
+
 </resources>
