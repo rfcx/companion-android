@@ -1,19 +1,15 @@
 package org.rfcx.companion.widget
 
 import android.content.Context
-import android.graphics.Color
 import android.os.Parcel
 import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
-import com.google.android.material.timepicker.MaterialTimePicker
-import com.google.android.material.timepicker.TimeFormat
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.time.Time
