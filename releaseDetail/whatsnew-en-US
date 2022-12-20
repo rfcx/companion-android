@@ -1,3 +1,4 @@
 Change logs
 - Rename Recording strategy to Skipping recording cycle
 - Add photo guideline for all deployments
+- Can receive GzipBase64 message from Guardian
