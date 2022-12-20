@@ -1,17 +1,20 @@
 package org.rfcx.companion.widget
 
 import android.content.Context
+import android.graphics.Color
 import android.os.Parcel
 import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
+import com.wdullaer.materialdatetimepicker.time.TimePickerDialog
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.time.Time
 import org.rfcx.companion.entity.time.TimeRange
@@ -84,35 +87,38 @@ class StartStopTimePicker @JvmOverloads constructor(
     }
 
     private fun setupView() {
-        val startPicker = MaterialTimePicker.Builder()
-            .setTimeFormat(TimeFormat.CLOCK_24H)
-            .setHour(0)
-            .setMinute(0)
-            .setTitleText(startTitle)
-            .setPositiveButtonText(R.string.back)
-            .setNegativeButtonText(R.string.next)
-            .setTheme(R.style.BaseTimePicker)
-            .build()
+        val startPicker = TimePickerDialog.newInstance(
+            { _, _, _, _ -> },
+            0,
+            0,
+            true
+        ).apply {
+            title = startTitle
+            setOkText(R.string.back)
+            setCancelText(R.string.next)
+        }
 
-        val stopPicker = MaterialTimePicker.Builder()
-            .setTimeFormat(TimeFormat.CLOCK_24H)
-            .setHour(0)
-            .setMinute(0)
-            .setTitleText(stopTitle)
-            .setPositiveButtonText(R.string.back)
-            .setNegativeButtonText(R.string.next)
-            .setTheme(R.style.BaseTimePicker)
-            .build()
+        val stopPicker = TimePickerDialog.newInstance(
+            { _, _, _, _ -> },
+            0,
+            0,
+            true
+        ).apply {
+            title = stopTitle
+            setOkText(R.string.back)
+            setCancelText(R.string.next)
+        }
 
-        startPicker.addOnNegativeButtonClickListener {
-            val time = Time(startPicker.hour, startPicker.minute)
+        startPicker.setOnCancelListener {
+            val time = Time(startPicker.selectedTime.hour, startPicker.selectedTime.minute)
             tempStartTime = time
-            if (fragmentManager == null) return@addOnNegativeButtonClickListener
+            if (fragmentManager == null) return@setOnCancelListener
+            stopPicker.setMinTime(time.hour, time.minute, 0)
             stopPicker.show(fragmentManager!!, "StopTimePicker")
         }
 
-        stopPicker.addOnNegativeButtonClickListener {
-            val time = Time(stopPicker.hour, stopPicker.minute)
+        stopPicker.setOnCancelListener {
+            val time = Time(stopPicker.selectedTime.hour, stopPicker.selectedTime.minute)
             tempStopTime = time
             addTimeOff(TimeRange(tempStartTime, tempStopTime))
         }
@@ -127,7 +133,7 @@ class StartStopTimePicker @JvmOverloads constructor(
         if (times == null) return
         listOfTime.clear()
         if (toOpposite) {
-            listOfTime.addAll(TimeRangeUtils.toOppositeTimes(times.toListTimeRange()))
+            listOfTime.addAll(if (times.isEmpty()) listOf(TimeRange(Time(0, 0), Time(23, 59))) else TimeRangeUtils.toOppositeTimes(times.toListTimeRange()))
         } else {
             listOfTime.addAll(times.toListTimeRange())
         }

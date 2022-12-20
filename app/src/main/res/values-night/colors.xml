@@ -67,4 +67,17 @@
 
     <!-- photo advise -->
     <color name="photo_advise_color">@color/white</color>
+
+    <color name="mdtp_background_color" xmlns:tools="http://schemas.android.com/tools"
+        tools:override="true">@color/dialogColor</color>
+
+    <color name="mdtp_circle_color" xmlns:tools="http://schemas.android.com/tools"
+        tools:override="true">@color/dialogSecondaryColor</color>
+
+    <color name="mdtp_numbers_text_color" xmlns:tools="http://schemas.android.com/tools"
+        tools:override="true">@color/text_primary</color>
+
+    <color name="mdtp_date_picker_text_disabled" xmlns:tools="http://schemas.android.com/tools"
+        tools:override="true">@color/text_secondary</color>
+
 </resources>

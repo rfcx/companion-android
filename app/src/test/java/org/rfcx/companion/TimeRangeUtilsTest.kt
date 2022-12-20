@@ -353,4 +353,45 @@ class TimeRangeUtilsTest {
         assertEquals(23, result[1].stop.hour)
         assertEquals(59, result[1].stop.minute)
     }
+
+    @Test
+    fun canConvertToOppositeRange10() {
+        val exists = arrayListOf(
+            TimeRange(Time(0, 0), Time(23, 59))
+        )
+
+        val result = TimeRangeUtils.toOppositeTimes(exists)
+
+        assertEquals(0, result.size)
+    }
+
+    @Test
+    fun canConvertToOppositeRange11() {
+        val exists = arrayListOf(
+            TimeRange(Time(0, 0), Time(23, 58))
+        )
+
+        val result = TimeRangeUtils.toOppositeTimes(exists)
+
+        assertEquals(1, result.size)
+        assertEquals(23, result[0].start.hour)
+        assertEquals(59, result[0].start.minute)
+        assertEquals(23, result[0].stop.hour)
+        assertEquals(59, result[0].stop.minute)
+    }
+
+    @Test
+    fun canConvertToOppositeRange12() {
+        val exists = arrayListOf(
+            TimeRange(Time(0, 0), Time(23, 57))
+        )
+
+        val result = TimeRangeUtils.toOppositeTimes(exists)
+
+        assertEquals(1, result.size)
+        assertEquals(23, result[0].start.hour)
+        assertEquals(58, result[0].start.minute)
+        assertEquals(23, result[0].stop.hour)
+        assertEquals(59, result[0].stop.minute)
+    }
 }

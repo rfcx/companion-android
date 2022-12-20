@@ -10,6 +10,9 @@ object TimeRangeUtils {
         for (index in timeRanges.indices) {
             if (index == 0) {
                 if (timeRanges.size == 1) {
+                    if ((timeRanges[index].start.toIntValue() == 0) && timeRanges[index].stop.toIntValue() == 2359) {
+                        continue
+                    }
                     if ((timeRanges[index].start.toIntValue() == 0)) {
                         temp.add(TimeRange(timeRanges[index].stop.plusOneMinute(), Time(23, 59)))
                         continue
