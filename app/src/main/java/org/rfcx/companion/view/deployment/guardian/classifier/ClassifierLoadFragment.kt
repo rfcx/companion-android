@@ -10,6 +10,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_classifier.*
@@ -199,8 +200,8 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
     }
 
     private fun showAlert(text: String) {
-        val dialogBuilder: AlertDialog.Builder =
-            AlertDialog.Builder(requireContext()).apply {
+        val dialogBuilder =
+            MaterialAlertDialogBuilder(requireContext(), R.style.BaseAlertDialog).apply {
                 setTitle(null)
                 setMessage(text)
                 setPositiveButton(R.string.go_back) { _, _ ->
@@ -240,13 +241,13 @@ class ClassifierLoadFragment : Fragment(), ChildrenClickedListener {
 
     private fun showRestartGuardianServices() {
         dialogBuilder =
-            AlertDialog.Builder(requireContext()).apply {
+            MaterialAlertDialogBuilder(requireContext(), R.style.BaseAlertDialog).apply {
                 setTitle(null)
                 setMessage(R.string.dialog_start_service_upload)
                 setPositiveButton(R.string.restart) { _, _ ->
                     GuardianSocketManager.restartService("file-socket")
                 }
-                setNegativeButton(R.string.cancel) { _, _ ->
+                setNegativeButton(R.string.back) { _, _ ->
                     dialogBuilder.dismiss()
                 }
             }.create()

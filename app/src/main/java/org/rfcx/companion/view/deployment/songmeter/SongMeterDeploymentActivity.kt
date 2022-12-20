@@ -138,18 +138,10 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
     }
 
     override fun nextStep() {
-        if (passedChecks.contains(2) && _images.isNullOrEmpty()) {
-            passedChecks.remove(2)
-        }
-
         if (currentCheck !in passedChecks) {
-            if (currentCheck == 2 && _images.isNullOrEmpty()) {
-                startCheckList()
-                return
-            } else {
-                passedChecks.add(currentCheck)
-            }
+            passedChecks.add(currentCheck)
         }
+        currentCheck = -1 // reset check
         startCheckList()
     }
 
@@ -216,7 +208,7 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
 
     private fun saveImages(deployment: Deployment) {
         songMeterViewModel.deleteImages(deployment)
-        songMeterViewModel.insertImage(deployment, _images)
+        songMeterViewModel.insertImage(deployment, _images.filter { it.path != null }.map { it.path!! })
     }
 
     override fun setDeployLocation(stream: Stream, isExisted: Boolean) {

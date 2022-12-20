@@ -1,5 +1,7 @@
 <resources>
 
+    <string name="back">back</string>
+
     <!-- LoginActivity -->
     <string name="rfcx_companion">RFCx Companion</string>
     <string name="email">Email</string>
@@ -200,13 +202,12 @@
     <string name="snackbar_retry">RETRY</string>
 
     <!--  DeployFragment  -->
-    <string name="deployment_will_uploaded">Images will be uploaded to your account</string>
-    <string name="almost_there">Almost there!</string>
-    <string name="switch_to_deploy">Switch your device to DEPLOY</string>
     <string name="title_take_photos">Show off your installation skills</string>
-    <string name="take_photos">Include: device position in the tree, upwards view of the sky, brackets and antenna positions</string>
-    <string name="take_photos_audiomoth">Include: AudioMoth ID visible, specific location in tree/bush/vine/etc (1–3m), installation site (~10m), pulled back view of site (~15–20m)</string>
-    <string name="take_photos_songmeter">Include: Specific location in tree/bush/vine/etc (1–3m), installation site (~10m), pulled back view of site (~15–20m)</string>
+    <string name="take_other">Take any other photo that will be helpful in relocating the device or characterizing the site</string>
+    <string name="photo_taken">Photos taken: %d / %d</string>
+    <string name="missing_dialog_title">Are you sure you want to continue?</string>
+    <string name="button_continue">continue</string>
+    <string name="follow_missing">The following photos are missing:\n%s</string>
 
 
     <string name="read_storage_permission_msg">Deploy App would like to read your storage</string>
@@ -268,15 +269,17 @@
 
     <!-- GuardianConfigureFragment -->
     <string name="bitrate">Bitrate</string>
-    <string name="duration">Duration (per file)</string>
+    <string name="duration">Recording cycle duration (per file)</string>
     <string name="choose_bitrate">Choose Bitrate (kbs)</string>
     <string name="choose_file_format">Choose Audio Format</string>
-    <string name="choose_duration_cycle">Choose Recording Duration Cycle (secs)</string>
+    <string name="choose_duration_cycle">Choose recording cycle duration (secs)</string>
     <string name="choose_sampling">Choose Recording Strategy</string>
-    <string name="sampling_ratio">Recording Strategy</string>
+    <string name="sampling_ratio">Cycle(s) skipped between recordings</string>
+    <string name="select_cycle_s_to_skip_between_recordings">Select cycle(s) to skip between recordings</string>
     <string name="advanced_config">Guardian Preferences</string>
     <string name="schedule_start_time">Select start time</string>
     <string name="schedule_stop_time">Select stop time</string>
+    <string name="recording_schedule">Recording schedule</string>
 
     <!-- GuardianPreferences -->
     <bool name="prefs_value_default_show_ui">true</bool>

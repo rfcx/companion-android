@@ -8,11 +8,11 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.Task
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.rfcx.companion.R
 
 class LocationPermissions(private val activity: Activity) {
@@ -55,8 +55,8 @@ class LocationPermissions(private val activity: Activity) {
                     Manifest.permission.ACCESS_FINE_LOCATION
                 )
                 if (!shouldProvideRationale) {
-                    val dialogBuilder: AlertDialog.Builder =
-                        AlertDialog.Builder(activity).apply {
+                    val dialogBuilder =
+                        MaterialAlertDialogBuilder(activity, R.style.BaseAlertDialog).apply {
                             setTitle(null)
                             setMessage(R.string.location_permission_msg)
                             setPositiveButton(R.string.go_to_setting) { _, _ ->

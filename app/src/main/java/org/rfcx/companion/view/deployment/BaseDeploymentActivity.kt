@@ -26,7 +26,7 @@ abstract class BaseDeploymentActivity :
     MapPickerProtocol {
 
     var _deployment: Deployment? = null
-    var _images: List<String> = listOf()
+    var _images: List<Image> = listOf()
     var _stream: Stream? = null
     var _siteItems = listOf<SiteWithLastDeploymentItem>()
 
@@ -102,7 +102,7 @@ abstract class BaseDeploymentActivity :
 
     override fun getSiteItem(): List<SiteWithLastDeploymentItem> = this._siteItems
 
-    override fun getImages(): List<String> {
+    override fun getImages(): List<Image> {
         return this._images
     }
 
@@ -117,7 +117,7 @@ abstract class BaseDeploymentActivity :
         this._siteItems = items
     }
 
-    override fun setImages(images: List<String>) {
+    override fun setImages(images: List<Image>) {
         this._images = images
     }
 
