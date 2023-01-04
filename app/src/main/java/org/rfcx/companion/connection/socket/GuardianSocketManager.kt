@@ -10,6 +10,7 @@ import org.rfcx.companion.entity.socket.request.InstructionMessage
 import org.rfcx.companion.entity.socket.request.InstructionType
 import org.rfcx.companion.entity.socket.request.SocketRequest
 import org.rfcx.companion.entity.socket.response.GuardianPing
+import org.rfcx.companion.util.socket.PingUtils
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.Socket
@@ -45,7 +46,10 @@ object GuardianSocketManager {
         prefs.addProperty("api_satellite_protocol", "off")
         prefs.addProperty("enable_audio_classify", "false")
         prefs.addProperty("enable_checkin_publish", "true")
-        prefs.addProperty("api_ping_cycle_fields", "checkins,instructions,prefs,sms,meta,detections,purged")
+        prefs.addProperty(
+            "api_ping_cycle_fields",
+            "checkins,instructions,prefs,sms,meta,detections,purged"
+        )
         prefs.addProperty("enable_audio_cast", "true")
         prefs.addProperty("enable_file_socket", "true")
         prefs.addProperty("api_protocol_escalation_order", "mqtt,rest")
@@ -62,7 +66,10 @@ object GuardianSocketManager {
         prefs.addProperty("api_satellite_protocol", "off")
         prefs.addProperty("enable_audio_classify", "true")
         prefs.addProperty("enable_checkin_publish", "true")
-        prefs.addProperty("api_ping_cycle_fields", "sms,battery,sentinel_power,software,detections,storage,memory,cpu")
+        prefs.addProperty(
+            "api_ping_cycle_fields",
+            "sms,battery,sentinel_power,software,detections,storage,memory,cpu"
+        )
         prefs.addProperty("enable_audio_cast", "true")
         prefs.addProperty("enable_file_socket", "true")
         prefs.addProperty("api_protocol_escalation_order", "mqtt,rest,sms")
@@ -79,7 +86,10 @@ object GuardianSocketManager {
         prefs.addProperty("api_satellite_protocol", "swm")
         prefs.addProperty("enable_audio_classify", "true")
         prefs.addProperty("enable_checkin_publish", "false")
-        prefs.addProperty("api_ping_cycle_fields", "battery,sentinel_power,software,swm,detections,storage,memory,cpu")
+        prefs.addProperty(
+            "api_ping_cycle_fields",
+            "battery,sentinel_power,software,swm,detections,storage,memory,cpu"
+        )
         prefs.addProperty("enable_audio_cast", "true")
         prefs.addProperty("enable_file_socket", "true")
         prefs.addProperty("api_protocol_escalation_order", "sat")
@@ -96,7 +106,10 @@ object GuardianSocketManager {
         prefs.addProperty("api_satellite_protocol", "off")
         prefs.addProperty("enable_audio_classify", "true")
         prefs.addProperty("enable_checkin_publish", "false")
-        prefs.addProperty("api_ping_cycle_fields", "checkins,instructions,prefs,sms,meta,detections,purged")
+        prefs.addProperty(
+            "api_ping_cycle_fields",
+            "checkins,instructions,prefs,sms,meta,detections,purged"
+        )
         prefs.addProperty("enable_audio_cast", "true")
         prefs.addProperty("enable_file_socket", "true")
         prefs.addProperty("api_protocol_escalation_order", "")
@@ -120,7 +133,11 @@ object GuardianSocketManager {
         renamedJson.addProperty("pin_code", response.pinCode)
         renamedJson.addProperty("api_mqtt_host", response.apiMqttHost)
         renamedJson.addProperty("api_sms_address", response.apiSmsAddress)
-        sendInstructionMessage(InstructionType.SET, InstructionCommand.IDENTITY, gson.toJson(renamedJson))
+        sendInstructionMessage(
+            InstructionType.SET,
+            InstructionCommand.IDENTITY,
+            gson.toJson(renamedJson)
+        )
     }
 
     fun sendGuardianRegistration(registration: GuardianRegistration) {
@@ -137,7 +154,11 @@ object GuardianSocketManager {
         sendInstructionMessage(InstructionType.CTRL, InstructionCommand.RESTART, gson.toJson(json))
     }
 
-    fun sendInstructionMessage(type: InstructionType, command: InstructionCommand, meta: String = "{}") {
+    fun sendInstructionMessage(
+        type: InstructionType,
+        command: InstructionCommand,
+        meta: String = "{}"
+    ) {
         val data = gson.toJson(InstructionMessage.toMessage(type, command, meta))
         sendMessage(data)
     }
@@ -165,8 +186,9 @@ object GuardianSocketManager {
                 while (true) {
                     inputStream = DataInputStream(socket!!.getInputStream())
                     val dataInput = inputStream?.readUTF()
-                    if (!dataInput.isNullOrBlank()) {
-                        val ping = gson.fromJson(dataInput, GuardianPing::class.java)
+                    val message = PingUtils.unGzipString(dataInput)
+                    if (!message.isNullOrBlank()) {
+                        val ping = gson.fromJson(message, GuardianPing::class.java)
                         pingBlob.postValue(ping)
                     }
                 }
