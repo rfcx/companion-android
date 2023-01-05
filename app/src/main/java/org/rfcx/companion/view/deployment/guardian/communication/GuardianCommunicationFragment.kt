@@ -295,7 +295,7 @@ class GuardianCommunicationFragment : Fragment() {
         if (satOnlyRadioButton.isChecked) {
             if (currentPlan != GuardianPlan.SAT_ONLY) needCheckSha1 = true
             if (manualRadioButton.isChecked) {
-                if (currentOffTimes != offTimeChipGroup.listOfTime.joinToString(",")) needCheckSha1 = true
+                if (currentOffTimes != offTimeChipGroup.listOfTime.joinToString(",") { it.toStringFormat() }) needCheckSha1 = true
                 GuardianSocketManager.sendSatOnlyPrefs(offTimeChipGroup.listOfTime.joinToString(",") { it.toStringFormat() })
             } else {
                 val currentProject = deploymentProtocol?.getCurrentProject()
