@@ -12,6 +12,7 @@ import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.AdminSocketManager
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
+import org.rfcx.companion.util.audiocoverage.AudioCoverageUtils
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianStorageFragment : Fragment() {
@@ -43,6 +44,10 @@ class GuardianStorageFragment : Fragment() {
         }
 
         updateInternalStorage()
+
+        deploymentProtocol?.getArchived()?.let {
+//            AudioCoverageUtils.calculateAudioCoverage(it)
+        }
     }
 
     private fun updateInternalStorage() {

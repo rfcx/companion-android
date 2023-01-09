@@ -52,6 +52,7 @@ interface GuardianDeploymentProtocol : BaseDeploymentProtocol {
     fun getActiveClassifiers(): Map<String, ClassifierLite>?
     fun getAudioCapturing(): AudioCaptureStatus?
     fun getStorage(): GuardianStorage?
+    fun getArchived(): List<GuardianArchived>?
 
     fun getCurrentProjectId(): String?
     fun getCurrentProject(): Project?

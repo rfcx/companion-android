@@ -13,6 +13,7 @@ import org.rfcx.companion.util.prefs.PrefsUtils
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.net.URLEncoder
+import java.util.*
 import java.util.zip.Deflater
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
@@ -307,6 +308,21 @@ object PingUtils {
         }
 
         return gzip(Gson().toJson(combinedPing))
+    }
+
+    fun getGuardianArchivedAudios(guardianPing: GuardianPing?): List<GuardianArchived>? {
+        val archived = guardianPing?.companion?.get("archived-audio")?.asString ?: return null
+        val listOfArchived = archived.split("|")
+        return listOfArchived.map {
+            val data = it.split("*")
+            GuardianArchived(
+                data[0].toLong(),
+                data[1].toLong(),
+                data[2].toInt(),
+                data[3].toInt(),
+                data[4].toInt()
+            )
+        }
     }
 
     private fun gzip(content: String): String {

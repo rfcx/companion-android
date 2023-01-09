@@ -97,6 +97,7 @@ class GuardianDeploymentActivity :
     private var activeClassifiers: Map<String, ClassifierLite>? = null
     private var audioCaptureStatus: AudioCaptureStatus? = null
     private var guardianStorage: GuardianStorage? = null
+    private var guardianArchived: List<GuardianArchived>? = null
 
     private var _sampleRate = 12000
 
@@ -281,6 +282,7 @@ class GuardianDeploymentActivity :
             classifiers = PingUtils.getClassifiers(it)
             activeClassifiers = PingUtils.getActiveClassifiers(it)
             audioCaptureStatus = PingUtils.getAudioCaptureStatus(it)
+            guardianArchived = PingUtils.getGuardianArchivedAudios(it)
         }
         AdminSocketManager.pingBlob.observeForever {
             adminPingBlob = it
@@ -396,6 +398,8 @@ class GuardianDeploymentActivity :
     override fun getAudioCapturing(): AudioCaptureStatus? = audioCaptureStatus
 
     override fun getStorage(): GuardianStorage? = guardianStorage
+
+    override fun getArchived(): List<GuardianArchived>? = guardianArchived
 
     override fun getCurrentProjectId(): String? {
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
