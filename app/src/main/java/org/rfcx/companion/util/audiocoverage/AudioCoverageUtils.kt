@@ -4,7 +4,7 @@ import com.google.gson.JsonObject
 import java.util.*
 
 object AudioCoverageUtils {
-    
+
     fun toDateTimeStructure(listOfArchived: List<Long>): JsonObject {
         if (listOfArchived.isEmpty()) return JsonObject()
 

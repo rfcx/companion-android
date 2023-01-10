@@ -74,6 +74,13 @@
         app:layout_constraintStart_toStartOf="@id/externalLayout"
         app:layout_constraintTop_toBottomOf="@id/externalLayout" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/archivedHeatmap"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_padding_normal"
+        app:layout_constraintTop_toBottomOf="@id/externalStorageBar"/>
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/internalFinishButton"
         style="@style/AudioMothButton.GreenButton"

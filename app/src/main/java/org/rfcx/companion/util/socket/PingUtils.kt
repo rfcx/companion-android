@@ -13,7 +13,6 @@ import org.rfcx.companion.util.prefs.PrefsUtils
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.net.URLEncoder
-import java.util.*
 import java.util.zip.Deflater
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream

@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_guardian_storage.*
-import kotlinx.android.synthetic.main.fragment_new_sync.*
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.AdminSocketManager
 import org.rfcx.companion.entity.Screen
@@ -22,9 +21,7 @@ class GuardianStorageFragment : Fragment() {
     private val analytics by lazy { context?.let { Analytics(it) } }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_guardian_storage, container, false)
     }
@@ -46,7 +43,9 @@ class GuardianStorageFragment : Fragment() {
         updateInternalStorage()
 
         deploymentProtocol?.getArchived()?.let {
-//            AudioCoverageUtils.calculateAudioCoverage(it)
+            val archived =
+                AudioCoverageUtils.toDateTimeStructure(it.map { archived -> archived.toListOfTimestamp() }
+                    .flatten().sorted())
         }
     }
 
@@ -57,7 +56,11 @@ class GuardianStorageFragment : Fragment() {
             storage?.internal?.let { str ->
                 val used = str.used
                 val all = str.all
-                internalSizeTextView.text = getString(R.string.storage_format, Formatter.formatFileSize(requireContext(), used), Formatter.formatFileSize(requireContext(), all))
+                internalSizeTextView.text = getString(
+                    R.string.storage_format,
+                    Formatter.formatFileSize(requireContext(), used),
+                    Formatter.formatFileSize(requireContext(), all)
+                )
                 internalStorageBar.max = 100
                 internalStorageBar.progress = ((used.toFloat() / all.toFloat()) * 100).toInt()
                 internalStorageBar.show()
@@ -66,7 +69,11 @@ class GuardianStorageFragment : Fragment() {
             storage?.external?.let { str ->
                 val used = str.used
                 val all = str.all
-                externalSizeTextView.text = getString(R.string.storage_format, Formatter.formatFileSize(requireContext(), used), Formatter.formatFileSize(requireContext(), all))
+                externalSizeTextView.text = getString(
+                    R.string.storage_format,
+                    Formatter.formatFileSize(requireContext(), used),
+                    Formatter.formatFileSize(requireContext(), all)
+                )
                 externalStorageBar.max = 100
                 externalStorageBar.progress = ((used.toFloat() / all.toFloat()) * 100).toInt()
                 externalStorageBar.show()
