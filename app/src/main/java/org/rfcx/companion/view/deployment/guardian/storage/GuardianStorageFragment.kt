@@ -69,24 +69,10 @@ class GuardianStorageFragment : Fragment() {
                     HeatmapItem.Normal(40),
                     HeatmapItem.Normal(50),
 
-                    HeatmapItem.YAxis("01:00"),
-                    HeatmapItem.Normal(10),
-                    HeatmapItem.Normal(0),
-                    HeatmapItem.Normal(0),
-                    HeatmapItem.Normal(0),
-                    HeatmapItem.Normal(0),
-
                     HeatmapItem.YAxis("02:00"),
                     HeatmapItem.Normal(0),
                     HeatmapItem.Normal(20),
                     HeatmapItem.Normal(0),
-                    HeatmapItem.Normal(0),
-                    HeatmapItem.Normal(0),
-
-                    HeatmapItem.YAxis("03:00"),
-                    HeatmapItem.Normal(0),
-                    HeatmapItem.Normal(0),
-                    HeatmapItem.Normal(30),
                     HeatmapItem.Normal(0),
                     HeatmapItem.Normal(0),
 
@@ -97,25 +83,11 @@ class GuardianStorageFragment : Fragment() {
                     HeatmapItem.Normal(0),
                     HeatmapItem.Normal(0),
 
-                    HeatmapItem.YAxis("05:00"),
-                    HeatmapItem.Normal(0),
-                    HeatmapItem.Normal(0),
-                    HeatmapItem.Normal(50),
-                    HeatmapItem.Normal(0),
-                    HeatmapItem.Normal(0),
-
                     HeatmapItem.YAxis("06:00"),
                     HeatmapItem.Normal(0),
                     HeatmapItem.Normal(20),
                     HeatmapItem.Normal(0),
                     HeatmapItem.Normal(10),
-                    HeatmapItem.Normal(0),
-
-                    HeatmapItem.YAxis("07:00"),
-                    HeatmapItem.Normal(10),
-                    HeatmapItem.Normal(0),
-                    HeatmapItem.Normal(0),
-                    HeatmapItem.Normal(30),
                     HeatmapItem.Normal(0),
 
                     HeatmapItem.YAxis("08:00"),
@@ -125,23 +97,9 @@ class GuardianStorageFragment : Fragment() {
                     HeatmapItem.Normal(40),
                     HeatmapItem.Normal(0),
 
-                    HeatmapItem.YAxis("09:00"),
-                    HeatmapItem.Normal(0),
-                    HeatmapItem.Normal(0),
-                    HeatmapItem.Normal(0),
-                    HeatmapItem.Normal(30),
-                    HeatmapItem.Normal(0),
-
                     HeatmapItem.YAxis("10:00"),
                     HeatmapItem.Normal(0),
                     HeatmapItem.Normal(20),
-                    HeatmapItem.Normal(0),
-                    HeatmapItem.Normal(0),
-                    HeatmapItem.Normal(0),
-
-                    HeatmapItem.YAxis("11:00"),
-                    HeatmapItem.Normal(0),
-                    HeatmapItem.Normal(10),
                     HeatmapItem.Normal(0),
                     HeatmapItem.Normal(0),
                     HeatmapItem.Normal(0),
@@ -153,25 +111,11 @@ class GuardianStorageFragment : Fragment() {
                     HeatmapItem.Normal(0),
                     HeatmapItem.Normal(0),
 
-                    HeatmapItem.YAxis("13:00"),
-                    HeatmapItem.Normal(0),
-                    HeatmapItem.Normal(30),
-                    HeatmapItem.Normal(0),
-                    HeatmapItem.Normal(10),
-                    HeatmapItem.Normal(0),
-
                     HeatmapItem.YAxis("14:00"),
                     HeatmapItem.Normal(10),
                     HeatmapItem.Normal(10),
                     HeatmapItem.Normal(20),
                     HeatmapItem.Normal(0),
-                    HeatmapItem.Normal(0),
-
-                    HeatmapItem.YAxis("15:00"),
-                    HeatmapItem.Normal(0),
-                    HeatmapItem.Normal(30),
-                    HeatmapItem.Normal(30),
-                    HeatmapItem.Normal(30),
                     HeatmapItem.Normal(0),
 
                     HeatmapItem.YAxis("16:00"),
@@ -181,26 +125,12 @@ class GuardianStorageFragment : Fragment() {
                     HeatmapItem.Normal(0),
                     HeatmapItem.Normal(0),
 
-                    HeatmapItem.YAxis("17:00"),
-                    HeatmapItem.Normal(0),
-                    HeatmapItem.Normal(10),
-                    HeatmapItem.Normal(10),
-                    HeatmapItem.Normal(20),
-                    HeatmapItem.Normal(0),
-
                     HeatmapItem.YAxis("18:00"),
                     HeatmapItem.Normal(0),
                     HeatmapItem.Normal(30),
                     HeatmapItem.Normal(20),
                     HeatmapItem.Normal(0),
                     HeatmapItem.Normal(0),
-
-                    HeatmapItem.YAxis("19:00"),
-                    HeatmapItem.Normal(0),
-                    HeatmapItem.Normal(10),
-                    HeatmapItem.Normal(10),
-                    HeatmapItem.Normal(10),
-                    HeatmapItem.Normal(10),
 
                     HeatmapItem.YAxis("20:00"),
                     HeatmapItem.Normal(10),
@@ -209,25 +139,11 @@ class GuardianStorageFragment : Fragment() {
                     HeatmapItem.Normal(0),
                     HeatmapItem.Normal(10),
 
-                    HeatmapItem.YAxis("21:00"),
-                    HeatmapItem.Normal(10),
-                    HeatmapItem.Normal(10),
-                    HeatmapItem.Normal(10),
-                    HeatmapItem.Normal(20),
-                    HeatmapItem.Normal(0),
-
                     HeatmapItem.YAxis("22:00"),
                     HeatmapItem.Normal(20),
                     HeatmapItem.Normal(20),
                     HeatmapItem.Normal(10),
                     HeatmapItem.Normal(20),
-                    HeatmapItem.Normal(0),
-
-                    HeatmapItem.YAxis("23:00"),
-                    HeatmapItem.Normal(10),
-                    HeatmapItem.Normal(40),
-                    HeatmapItem.Normal(20),
-                    HeatmapItem.Normal(10),
                     HeatmapItem.Normal(0),
                 )
             )
