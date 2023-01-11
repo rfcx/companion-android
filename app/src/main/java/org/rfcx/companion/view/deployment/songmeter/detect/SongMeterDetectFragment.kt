@@ -146,6 +146,8 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
                             songMeterViewModel.unBindConnectService()
                         }
                     }
+                    Status.ERROR -> {}
+                    Status.LOADING -> {}
                 }
             }
         )
@@ -165,6 +167,8 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
                             isReadyToSet = false
                         }
                     }
+                    Status.ERROR -> {}
+                    Status.LOADING -> {}
                 }
             }
         )
@@ -270,6 +274,8 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
                             }
                         }
                     }
+                    Status.ERROR -> {}
+                    Status.LOADING -> {}
                 }
             }
         )

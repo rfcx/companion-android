@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/yyLabelTextView"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/xyAxisHeatmap"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/xyAxisHeatmap"
+        tools:text="Dec" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/xxLabelTextView"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_padding_small"
+        app:layout_constraintEnd_toEndOf="@id/xyAxisHeatmap"
+        app:layout_constraintStart_toStartOf="@id/xyAxisHeatmap"
+        app:layout_constraintTop_toBottomOf="@id/xyAxisHeatmap"
+        tools:text="Dec" />
+
+    <FrameLayout
+        android:id="@+id/xyAxisHeatmap"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="4:1"
+        android:layout_marginStart="@dimen/margin_padding_small"
+        android:background="@color/grey"
+        app:layout_constraintStart_toEndOf="@id/yyLabelTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

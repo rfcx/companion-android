@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
 import kotlinx.android.synthetic.main.fragment_guardian_storage.*
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.AdminSocketManager
@@ -19,6 +20,8 @@ class GuardianStorageFragment : Fragment() {
     private val deploymentProtocol by lazy { (context?.let { it as GuardianDeploymentProtocol }) }
 
     private val analytics by lazy { context?.let { Analytics(it) } }
+
+    private val archivedHeatmapAdapter by lazy { ArchivedHeatmapAdapter() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -46,6 +49,23 @@ class GuardianStorageFragment : Fragment() {
             val archived =
                 AudioCoverageUtils.toDateTimeStructure(it.map { archived -> archived.toListOfTimestamp() }
                     .flatten().sorted())
+
+            archivedHeatmap.apply {
+                adapter = archivedHeatmapAdapter
+                layoutManager = GridLayoutManager(context, 4)
+            }
+            archivedHeatmapAdapter.setData(
+                listOf(
+                    HeatmapItem.YAxis("JAN", 0),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.XYAxis("FEB", "0", 0),
+                    HeatmapItem.XAxis("15", 0),
+                    HeatmapItem.XAxis("45", 0),
+                    HeatmapItem.XAxis("60", 0),
+                )
+            )
         }
     }
 
