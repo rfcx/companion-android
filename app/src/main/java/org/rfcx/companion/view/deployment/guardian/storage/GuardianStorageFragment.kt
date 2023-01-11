@@ -5,8 +5,13 @@ import android.text.format.Formatter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.android.material.resources.TextAppearance
 import kotlinx.android.synthetic.main.fragment_guardian_storage.*
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.AdminSocketManager
@@ -52,20 +57,213 @@ class GuardianStorageFragment : Fragment() {
 
             archivedHeatmap.apply {
                 adapter = archivedHeatmapAdapter
-                layoutManager = GridLayoutManager(context, 4)
+                layoutManager = GridLayoutManager(context, 6)
             }
+
             archivedHeatmapAdapter.setData(
                 listOf(
-                    HeatmapItem.YAxis("JAN", 0),
+                    HeatmapItem.YAxis("00:00"),
+                    HeatmapItem.Normal(10),
+                    HeatmapItem.Normal(20),
+                    HeatmapItem.Normal(30),
+                    HeatmapItem.Normal(40),
+                    HeatmapItem.Normal(50),
+
+                    HeatmapItem.YAxis("01:00"),
+                    HeatmapItem.Normal(10),
                     HeatmapItem.Normal(0),
                     HeatmapItem.Normal(0),
                     HeatmapItem.Normal(0),
-                    HeatmapItem.XYAxis("FEB", "0", 0),
-                    HeatmapItem.XAxis("15", 0),
-                    HeatmapItem.XAxis("45", 0),
-                    HeatmapItem.XAxis("60", 0),
+                    HeatmapItem.Normal(0),
+
+                    HeatmapItem.YAxis("02:00"),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(20),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(0),
+
+                    HeatmapItem.YAxis("03:00"),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(30),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(0),
+
+                    HeatmapItem.YAxis("04:00"),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(40),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(0),
+
+                    HeatmapItem.YAxis("05:00"),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(50),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(0),
+
+                    HeatmapItem.YAxis("06:00"),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(20),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(10),
+                    HeatmapItem.Normal(0),
+
+                    HeatmapItem.YAxis("07:00"),
+                    HeatmapItem.Normal(10),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(30),
+                    HeatmapItem.Normal(0),
+
+                    HeatmapItem.YAxis("08:00"),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(20),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(40),
+                    HeatmapItem.Normal(0),
+
+                    HeatmapItem.YAxis("09:00"),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(30),
+                    HeatmapItem.Normal(0),
+
+                    HeatmapItem.YAxis("10:00"),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(20),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(0),
+
+                    HeatmapItem.YAxis("11:00"),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(10),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(0),
+
+                    HeatmapItem.YAxis("12:00"),
+                    HeatmapItem.Normal(20),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(0),
+
+                    HeatmapItem.YAxis("13:00"),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(30),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(10),
+                    HeatmapItem.Normal(0),
+
+                    HeatmapItem.YAxis("14:00"),
+                    HeatmapItem.Normal(10),
+                    HeatmapItem.Normal(10),
+                    HeatmapItem.Normal(20),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(0),
+
+                    HeatmapItem.YAxis("15:00"),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(30),
+                    HeatmapItem.Normal(30),
+                    HeatmapItem.Normal(30),
+                    HeatmapItem.Normal(0),
+
+                    HeatmapItem.YAxis("16:00"),
+                    HeatmapItem.Normal(20),
+                    HeatmapItem.Normal(10),
+                    HeatmapItem.Normal(30),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(0),
+
+                    HeatmapItem.YAxis("17:00"),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(10),
+                    HeatmapItem.Normal(10),
+                    HeatmapItem.Normal(20),
+                    HeatmapItem.Normal(0),
+
+                    HeatmapItem.YAxis("18:00"),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(30),
+                    HeatmapItem.Normal(20),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(0),
+
+                    HeatmapItem.YAxis("19:00"),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(10),
+                    HeatmapItem.Normal(10),
+                    HeatmapItem.Normal(10),
+                    HeatmapItem.Normal(10),
+
+                    HeatmapItem.YAxis("20:00"),
+                    HeatmapItem.Normal(10),
+                    HeatmapItem.Normal(20),
+                    HeatmapItem.Normal(30),
+                    HeatmapItem.Normal(0),
+                    HeatmapItem.Normal(10),
+
+                    HeatmapItem.YAxis("21:00"),
+                    HeatmapItem.Normal(10),
+                    HeatmapItem.Normal(10),
+                    HeatmapItem.Normal(10),
+                    HeatmapItem.Normal(20),
+                    HeatmapItem.Normal(0),
+
+                    HeatmapItem.YAxis("22:00"),
+                    HeatmapItem.Normal(20),
+                    HeatmapItem.Normal(20),
+                    HeatmapItem.Normal(10),
+                    HeatmapItem.Normal(20),
+                    HeatmapItem.Normal(0),
+
+                    HeatmapItem.YAxis("23:00"),
+                    HeatmapItem.Normal(10),
+                    HeatmapItem.Normal(40),
+                    HeatmapItem.Normal(20),
+                    HeatmapItem.Normal(10),
+                    HeatmapItem.Normal(0),
                 )
             )
+            val xAxisLabels = listOf(
+                TextView(context).apply {
+                    text = ""
+                    textAlignment = View.TEXT_ALIGNMENT_CENTER
+                },
+                TextView(context).apply {
+                    text = "1 Jan"
+                    textAlignment = View.TEXT_ALIGNMENT_CENTER
+                },
+                TextView(context).apply {
+                    text = "2 Jan"
+                    textAlignment = View.TEXT_ALIGNMENT_CENTER
+                },
+                TextView(context).apply {
+                    text = "3 Jan"
+                    textAlignment = View.TEXT_ALIGNMENT_CENTER
+                },
+                TextView(context).apply {
+                    text = "4 Jan"
+                    textAlignment = View.TEXT_ALIGNMENT_CENTER
+                },
+                TextView(context).apply {
+                    text = "5 Jan"
+                    textAlignment = View.TEXT_ALIGNMENT_CENTER
+                }
+            )
+            xAxisLabels.forEach { view ->
+                xAxisLayout.addView(view)
+                val params = view.layoutParams as LinearLayout.LayoutParams
+                params.width = 0
+                params.weight = 1f
+                view.layoutParams = params
+            }
         }
     }
 

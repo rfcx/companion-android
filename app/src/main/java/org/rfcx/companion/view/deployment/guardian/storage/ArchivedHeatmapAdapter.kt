@@ -3,12 +3,11 @@ package org.rfcx.companion.view.deployment.guardian.storage
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_heatmap_xaxis.view.*
-import kotlinx.android.synthetic.main.item_heatmap_xyaxis.view.*
 import kotlinx.android.synthetic.main.item_heatmap_yaxis.view.*
 import org.rfcx.companion.R
-import org.rfcx.companion.view.deployment.CheckListAdapter
 
 class ArchivedHeatmapAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -57,11 +56,26 @@ class ArchivedHeatmapAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        holder.setIsRecyclable(false)
         when (holder.itemViewType) {
             X_AXIS_CELL -> (holder as XAxisHeatmapViewHolder).bind(data[position] as HeatmapItem.XAxis)
-            Y_AXIS_CELL -> (holder as YAxisHeatmapViewHolder).bind(data[position] as HeatmapItem.YAxis)
-            XY_AXIS_CELL -> (holder as XYAxisHeatmapViewHolder).bind(data[position] as HeatmapItem.XYAxis)
-            else -> (holder as NormalHeatmapViewHolder).bind(data[position] as HeatmapItem.Normal)
+            Y_AXIS_CELL -> {
+                val layoutParam = (holder as YAxisHeatmapViewHolder).itemView.layoutParams as GridLayoutManager.LayoutParams
+                val width = layoutParam.width
+                layoutParam.width = width / 2
+                holder.itemView.layoutParams = layoutParam
+                holder.bind(data[position] as HeatmapItem.YAxis)
+            }
+            XY_AXIS_CELL -> {
+                val layoutParam = (holder as XYAxisHeatmapViewHolder).itemView.layoutParams as GridLayoutManager.LayoutParams
+                val width = layoutParam.width
+                layoutParam.width = width / 2
+                holder.itemView.layoutParams = layoutParam
+                holder.bind(data[position] as HeatmapItem.XYAxis)
+            }
+            else -> {
+                (holder as NormalHeatmapViewHolder).bind(data[position] as HeatmapItem.Normal)
+            }
         }
     }
 
@@ -69,7 +83,20 @@ class ArchivedHeatmapAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     inner class NormalHeatmapViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(item: HeatmapItem.Normal) {
-
+            when{
+                item.value >= 30 -> {
+                    itemView.setBackgroundResource(R.color.red)
+                }
+                item.value >= 20 -> {
+                    itemView.setBackgroundResource(R.color.orange)
+                }
+                item.value >= 10 -> {
+                    itemView.setBackgroundResource(R.color.yellow)
+                }
+                item.value >= 0 -> {
+                    itemView.setBackgroundResource(R.color.backgroundColor)
+                }
+            }
         }
     }
 
@@ -88,11 +115,8 @@ class ArchivedHeatmapAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     inner class XYAxisHeatmapViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val labelLeftText = itemView.yyLabelTextView
-        private val labelBottomText = itemView.xxLabelTextView
         fun bind(item: HeatmapItem.XYAxis) {
-            labelLeftText.text = item.labelLeft
-            labelBottomText.text = item.labelBottom
+
         }
     }
 
@@ -100,8 +124,7 @@ class ArchivedHeatmapAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 sealed class HeatmapItem {
     data class Normal(val value: Int) : HeatmapItem()
-    data class XAxis(val label: String, val value: Int) : HeatmapItem()
-    data class YAxis(val label: String, val value: Int) : HeatmapItem()
-    data class XYAxis(val labelLeft: String, val labelBottom: String, val value: Int) :
-        HeatmapItem()
+    data class XAxis(val label: String) : HeatmapItem()
+    data class YAxis(val label: String) : HeatmapItem()
+    object XYAxis : HeatmapItem()
 }

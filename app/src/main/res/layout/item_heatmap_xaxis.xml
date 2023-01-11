@@ -7,22 +7,14 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/xLabelTextView"
-        android:layout_width="30dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_padding_small"
-        app:layout_constraintEnd_toEndOf="@id/xAxisHeatmap"
-        app:layout_constraintStart_toStartOf="@id/xAxisHeatmap"
-        app:layout_constraintTop_toBottomOf="@id/xAxisHeatmap"
-        tools:text="Dec" />
-
-    <FrameLayout
-        android:id="@+id/xAxisHeatmap"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintDimensionRatio="4:1"
-        android:background="@color/grey"
-        app:layout_constraintStart_toStartOf="parent"
+        android:textAlignment="center"
+        android:layout_marginTop="@dimen/margin_padding_small"
+        app:layout_constraintDimensionRatio="3:1"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Dec" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 

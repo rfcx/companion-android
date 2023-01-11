@@ -77,9 +77,21 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/archivedHeatmap"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_margin="@dimen/margin_padding_normal"
+        app:layout_constraintBottom_toTopOf="@id/xAxisLayout"
         app:layout_constraintTop_toBottomOf="@id/externalStorageBar"/>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/xAxisLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="@dimen/margin_padding_normal"
+        app:layout_constraintStart_toStartOf="@id/archivedHeatmap"
+        app:layout_constraintEnd_toEndOf="@id/archivedHeatmap"
+        app:layout_constraintTop_toBottomOf="@id/archivedHeatmap"
+        app:layout_constraintBottom_toTopOf="@id/internalFinishButton"/>
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/internalFinishButton"
