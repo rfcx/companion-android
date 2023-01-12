@@ -34,7 +34,7 @@ class HeatmapAudioCoverageActivity : AppCompatActivity() {
 
         val mock = arrayListOf<HeatmapItem>()
         for (i in 1..30) {
-            mock.add(HeatmapItem.YAxis("$i"))
+            mock.add(HeatmapItem.YAxis("${i} Jan"))
             for (j in 1..24) {
                 val rand = (0..30).random()
                 mock.add(HeatmapItem.Normal(rand))
@@ -53,9 +53,9 @@ class HeatmapAudioCoverageActivity : AppCompatActivity() {
                     if (k < 10) {
                         val text2 = TextView(this).apply {
                             textAlignment = View.TEXT_ALIGNMENT_CENTER
-                            textSize = 12f
+                            textSize = 8f
                         }
-                        text2.text = "0$k"
+                        text2.text = "0${k}"
                         hoursLayout.addView(text2)
                         val params2 = text2.layoutParams as LinearLayout.LayoutParams
                         params2.width = 0
@@ -64,9 +64,9 @@ class HeatmapAudioCoverageActivity : AppCompatActivity() {
                     } else {
                         val text3 = TextView(this).apply {
                             textAlignment = View.TEXT_ALIGNMENT_CENTER
-                            textSize = 12f
+                            textSize = 8f
                         }
-                        text3.text = "$k"
+                        text3.text = "${k}"
                         hoursLayout.addView(text3)
                         val params3 = text3.layoutParams as LinearLayout.LayoutParams
                         params3.width = 0
