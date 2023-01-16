@@ -1,6 +1,7 @@
 package org.rfcx.companion.util.audiocoverage
 
 import com.google.gson.JsonObject
+import org.rfcx.companion.view.deployment.guardian.storage.HeatmapItem
 import java.util.*
 
 object AudioCoverageUtils {
@@ -75,5 +76,44 @@ object AudioCoverageUtils {
         }
 
         return tree
+    }
+
+    fun filterByMonthYear(item: JsonObject, month: Int, year: Int): List<HeatmapItem> {
+        val obj = item.getAsJsonObject(year.toString()).getAsJsonObject((month + 1).toString())
+
+        val months = arrayOf("Jan","Feb","Mar","Apr","May","Jun","Jul",
+            "Aug","Sep","Oct","Nov","Dec")
+        val heatmapItems = arrayListOf<HeatmapItem>()
+        obj.keySet().forEach { day ->
+            heatmapItems.add(HeatmapItem.YAxis("$day ${months[month]}"))
+            obj.getAsJsonObject(day.toString()).keySet().forEach { hour ->
+                val value = obj.getAsJsonObject(day.toString()).get(hour.toString()).asInt
+                heatmapItems.add(HeatmapItem.Normal(value))
+            }
+        }
+
+        return heatmapItems
+    }
+
+    fun getLatestMonthYear(item: List<Long>): Pair<Int, Int> {
+        val cal = Calendar.getInstance()
+        if (item.isNotEmpty()) {
+            cal.time = Date(item.last())
+        }
+        return Pair(cal.get(Calendar.MONTH), cal.get(Calendar.YEAR))
+    }
+
+    fun getMinMaxYear(item: List<Long>): Pair<Int, Int> {
+        val cal = Calendar.getInstance()
+        var min = cal.get(Calendar.YEAR)
+        var max = cal.get(Calendar.YEAR)
+        if (item.isNotEmpty()) {
+            cal.time = Date(item.first())
+            min = cal.get(Calendar.YEAR)
+
+            cal.time = Date(item.last())
+            max = cal.get(Calendar.YEAR)
+        }
+        return Pair(min, max)
     }
 }

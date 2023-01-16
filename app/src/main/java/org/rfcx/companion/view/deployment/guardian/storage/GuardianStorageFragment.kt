@@ -52,9 +52,6 @@ class GuardianStorageFragment : Fragment() {
 
         audioCoverageButton.setOnClickListener {
             deploymentProtocol?.getArchived()?.let {
-                val archived =
-                    AudioCoverageUtils.toDateTimeStructure(it.map { archived -> archived.toListOfTimestamp() }
-                        .flatten().sorted())
                 HeatmapAudioCoverageActivity.startActivity(requireContext(), it)
             }
         }

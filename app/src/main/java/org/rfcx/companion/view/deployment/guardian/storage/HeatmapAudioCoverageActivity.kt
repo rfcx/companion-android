@@ -3,24 +3,32 @@ package org.rfcx.companion.view.deployment.guardian.storage
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.activity_heatmap_audio_coverage.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.socket.response.GuardianArchived
+import org.rfcx.companion.util.audiocoverage.AudioCoverageUtils
+import org.rfcx.companion.view.dialog.MonthYearPickerDialog
 
-class HeatmapAudioCoverageActivity : AppCompatActivity() {
+class HeatmapAudioCoverageActivity : AppCompatActivity(), MonthYearPickerDialog.OnPickListener {
 
     private val archivedHeatmapAdapter by lazy { ArchivedHeatmapAdapter() }
 
     private var archivedAudios = listOf<Long>()
+    private var archivedAudioStructure = JsonObject()
+    private lateinit var minMaxYear: Pair<Int, Int>
+    private var selectedMonth = 0
+    private var selectedYear = 1995
+
+    private var menuAll: Menu? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +40,23 @@ class HeatmapAudioCoverageActivity : AppCompatActivity() {
             layoutManager = GridLayoutManager(context, 25)
         }
 
+        addHoursItem()
+        val latestMonthYear = AudioCoverageUtils.getLatestMonthYear(archivedAudios)
+        selectedMonth = latestMonthYear.first
+        selectedYear = latestMonthYear.second
+        minMaxYear = AudioCoverageUtils.getMinMaxYear(archivedAudios)
+        archivedHeatmapAdapter.setData(AudioCoverageUtils.filterByMonthYear(archivedAudioStructure, selectedMonth, selectedYear))
+    }
+
+    private fun getExtra() {
+        val parcel = intent?.extras?.getParcelableArray(EXTRA_ARCHIVED_AUDIO) ?: return
+        archivedAudios =
+            parcel.map { it as GuardianArchived }.map { archived -> archived.toListOfTimestamp() }
+                .flatten().sorted()
+        archivedAudioStructure = AudioCoverageUtils.toDateTimeStructure(archivedAudios)
+    }
+
+    private fun addHoursItem() {
         val mock = arrayListOf<HeatmapItem>()
         for (i in 1..30) {
             mock.add(HeatmapItem.YAxis("${i} Jan"))
@@ -78,11 +103,7 @@ class HeatmapAudioCoverageActivity : AppCompatActivity() {
         }
 
         archivedHeatmapAdapter.setData(mock)
-    }
 
-    private fun getExtra() {
-        val parcel = intent?.extras?.getParcelableArray(EXTRA_ARCHIVED_AUDIO) ?: return
-        archivedAudios = parcel.map { it as GuardianArchived }.map { archived -> archived.toListOfTimestamp() }.flatten().sorted()
     }
 
     private fun setupToolbar() {
@@ -97,6 +118,31 @@ class HeatmapAudioCoverageActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuAll = menu
+        val inflater = menuInflater
+        inflater.inflate(R.menu.month_year_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> onBackPressed()
+            R.id.picker -> {
+                MonthYearPickerDialog.newInstance(System.currentTimeMillis(), selectedMonth, selectedYear, minMaxYear.first, minMaxYear.second, this)
+                    .show(supportFragmentManager, MonthYearPickerDialog::class.java.name)
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onPick(month: Int, year: Int) {
+        selectedMonth = month
+        selectedYear = year
+        val filtered = AudioCoverageUtils.filterByMonthYear(archivedAudioStructure, selectedMonth, selectedYear)
+        archivedHeatmapAdapter.setData(filtered)
     }
 
     companion object {
