@@ -51,9 +51,8 @@ class GuardianStorageFragment : Fragment() {
         updateInternalStorage()
 
         audioCoverageButton.setOnClickListener {
-            deploymentProtocol?.getArchived()?.let {
-                HeatmapAudioCoverageActivity.startActivity(requireContext(), it)
-            }
+            val archived =  deploymentProtocol?.getArchived() ?: listOf()
+            HeatmapAudioCoverageActivity.startActivity(requireContext(), archived)
         }
     }
 
