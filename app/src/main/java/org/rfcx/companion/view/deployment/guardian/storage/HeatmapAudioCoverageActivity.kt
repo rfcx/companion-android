@@ -45,7 +45,7 @@ class HeatmapAudioCoverageActivity : AppCompatActivity(), MonthYearPickerDialog.
         selectedMonth = latestMonthYear.first
         selectedYear = latestMonthYear.second
         minMaxYear = AudioCoverageUtils.getMinMaxYear(archivedAudios)
-        archivedHeatmapAdapter.setData(AudioCoverageUtils.filterByMonthYear(archivedAudioStructure, selectedMonth, selectedYear))
+        getData(archivedAudioStructure, selectedMonth, selectedYear)
     }
 
     private fun getExtra() {
@@ -57,53 +57,40 @@ class HeatmapAudioCoverageActivity : AppCompatActivity(), MonthYearPickerDialog.
     }
 
     private fun addHoursItem() {
-        val mock = arrayListOf<HeatmapItem>()
-        for (i in 1..30) {
-            mock.add(HeatmapItem.YAxis("${i} Jan"))
-            for (j in 1..24) {
-                val rand = (0..30).random()
-                mock.add(HeatmapItem.Normal(rand))
-            }
-            if (i == 30) {
-                val text = TextView(this).apply {
+        val text = TextView(this).apply {
+            textAlignment = View.TEXT_ALIGNMENT_CENTER
+            textSize = 8f
+        }
+        hoursLayout.addView(text)
+        val params = text.layoutParams as LinearLayout.LayoutParams
+        params.width = 0
+        params.weight = 1f
+        text.layoutParams = params
+        for (k in 0..23) {
+            if (k < 10) {
+                val text2 = TextView(this).apply {
                     textAlignment = View.TEXT_ALIGNMENT_CENTER
-                    textSize = 12f
+                    textSize = 8f
                 }
-                hoursLayout.addView(text)
-                val params = text.layoutParams as LinearLayout.LayoutParams
-                params.width = 0
-                params.weight = 1f
-                text.layoutParams = params
-                for (k in 0..23) {
-                    if (k < 10) {
-                        val text2 = TextView(this).apply {
-                            textAlignment = View.TEXT_ALIGNMENT_CENTER
-                            textSize = 8f
-                        }
-                        text2.text = "0${k}"
-                        hoursLayout.addView(text2)
-                        val params2 = text2.layoutParams as LinearLayout.LayoutParams
-                        params2.width = 0
-                        params2.weight = 1f
-                        text2.layoutParams = params2
-                    } else {
-                        val text3 = TextView(this).apply {
-                            textAlignment = View.TEXT_ALIGNMENT_CENTER
-                            textSize = 8f
-                        }
-                        text3.text = "${k}"
-                        hoursLayout.addView(text3)
-                        val params3 = text3.layoutParams as LinearLayout.LayoutParams
-                        params3.width = 0
-                        params3.weight = 1f
-                        text3.layoutParams = params3
-                    }
+                text2.text = "0${k}"
+                hoursLayout.addView(text2)
+                val params2 = text2.layoutParams as LinearLayout.LayoutParams
+                params2.width = 0
+                params2.weight = 1f
+                text2.layoutParams = params2
+            } else {
+                val text3 = TextView(this).apply {
+                    textAlignment = View.TEXT_ALIGNMENT_CENTER
+                    textSize = 8f
                 }
+                text3.text = "${k}"
+                hoursLayout.addView(text3)
+                val params3 = text3.layoutParams as LinearLayout.LayoutParams
+                params3.width = 0
+                params3.weight = 1f
+                text3.layoutParams = params3
             }
         }
-
-        archivedHeatmapAdapter.setData(mock)
-
     }
 
     private fun setupToolbar() {
@@ -141,7 +128,14 @@ class HeatmapAudioCoverageActivity : AppCompatActivity(), MonthYearPickerDialog.
     override fun onPick(month: Int, year: Int) {
         selectedMonth = month
         selectedYear = year
-        val filtered = AudioCoverageUtils.filterByMonthYear(archivedAudioStructure, selectedMonth, selectedYear)
+        getData(archivedAudioStructure, selectedMonth, selectedYear)
+    }
+
+    private fun getData(obj: JsonObject, month: Int, year: Int) {
+        val months = arrayOf("Jan","Feb","Mar","Apr","May","Jun","Jul",
+            "Aug","Sep","Oct","Nov","Dec")
+        archivedDate.text = "Data from ${months[month]} $year"
+        val filtered = AudioCoverageUtils.filterByMonthYear(obj, month, year)
         archivedHeatmapAdapter.setData(filtered)
     }
 

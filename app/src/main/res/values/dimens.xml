@@ -2,6 +2,7 @@
 
 <resources>
     <!-- Margin/Padding size -->
+    <dimen name="margin_padding_xxsmall">2dp</dimen>
     <dimen name="margin_padding_xsmall">4dp</dimen>
     <dimen name="margin_padding_small">8dp</dimen>
     <dimen name="margin_padding_normal">16dp</dimen>

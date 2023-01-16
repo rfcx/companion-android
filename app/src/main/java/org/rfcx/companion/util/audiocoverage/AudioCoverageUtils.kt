@@ -81,11 +81,9 @@ object AudioCoverageUtils {
     fun filterByMonthYear(item: JsonObject, month: Int, year: Int): List<HeatmapItem> {
         val obj = item.getAsJsonObject(year.toString()).getAsJsonObject((month + 1).toString())
 
-        val months = arrayOf("Jan","Feb","Mar","Apr","May","Jun","Jul",
-            "Aug","Sep","Oct","Nov","Dec")
         val heatmapItems = arrayListOf<HeatmapItem>()
         obj.keySet().forEach { day ->
-            heatmapItems.add(HeatmapItem.YAxis("$day ${months[month]}"))
+            heatmapItems.add(HeatmapItem.YAxis(day))
             obj.getAsJsonObject(day.toString()).keySet().forEach { hour ->
                 val value = obj.getAsJsonObject(day.toString()).get(hour.toString()).asInt
                 heatmapItems.add(HeatmapItem.Normal(value))
