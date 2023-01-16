@@ -83,7 +83,7 @@
         android:layout_marginEnd="@dimen/margin_padding_large"
         android:layout_marginBottom="@dimen/margin_padding_normal"
         android:layout_marginTop="@dimen/margin_padding_large"
-        android:text="See audio coverage"
+        android:text="@string/see_audio_coverage"
         app:layout_constraintTop_toBottomOf="@id/externalStorageBar" />
 
     <androidx.appcompat.widget.AppCompatButton

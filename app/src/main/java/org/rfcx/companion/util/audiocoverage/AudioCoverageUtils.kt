@@ -42,8 +42,7 @@ object AudioCoverageUtils {
                 }
                 for (d in 1..day) {
                     tree.get(year).asJsonObject.get(month).asJsonObject.add(
-                        d.toString(),
-                        JsonObject()
+                        d.toString(), JsonObject()
                     )
                 }
             }
@@ -55,8 +54,7 @@ object AudioCoverageUtils {
                 tree.get(year).asJsonObject.get(month).asJsonObject.keySet().forEach { day ->
                     for (hour in 0..23) {
                         tree.get(year).asJsonObject.get(month).asJsonObject.get(day).asJsonObject.addProperty(
-                            hour.toString(),
-                            0
+                            hour.toString(), 0
                         )
                     }
                 }
@@ -71,8 +69,11 @@ object AudioCoverageUtils {
             val day = cal.get(Calendar.DAY_OF_MONTH).toString()
             val hour = cal.get(Calendar.HOUR_OF_DAY).toString()
 
-            var currentAmount = tree.getAsJsonObject(year).getAsJsonObject(month).getAsJsonObject(day).get(hour).asInt
-            tree.getAsJsonObject(year).getAsJsonObject(month).getAsJsonObject(day).addProperty(hour, ++currentAmount)
+            var currentAmount =
+                tree.getAsJsonObject(year).getAsJsonObject(month).getAsJsonObject(day)
+                    .get(hour).asInt
+            tree.getAsJsonObject(year).getAsJsonObject(month).getAsJsonObject(day)
+                .addProperty(hour, ++currentAmount)
         }
 
         return tree

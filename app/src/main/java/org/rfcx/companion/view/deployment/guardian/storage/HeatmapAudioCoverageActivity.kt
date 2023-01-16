@@ -72,7 +72,7 @@ class HeatmapAudioCoverageActivity : AppCompatActivity(), MonthYearPickerDialog.
                     textAlignment = View.TEXT_ALIGNMENT_CENTER
                     textSize = 8f
                 }
-                text2.text = "0${k}"
+                text2.text = getString(R.string.hour_less_than_10, k)
                 hoursLayout.addView(text2)
                 val params2 = text2.layoutParams as LinearLayout.LayoutParams
                 params2.width = 0
@@ -83,7 +83,7 @@ class HeatmapAudioCoverageActivity : AppCompatActivity(), MonthYearPickerDialog.
                     textAlignment = View.TEXT_ALIGNMENT_CENTER
                     textSize = 8f
                 }
-                text3.text = "${k}"
+                text3.text = k.toString()
                 hoursLayout.addView(text3)
                 val params3 = text3.layoutParams as LinearLayout.LayoutParams
                 params3.width = 0
@@ -98,7 +98,7 @@ class HeatmapAudioCoverageActivity : AppCompatActivity(), MonthYearPickerDialog.
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
-            title = "Audio Coverage"
+            title = getString(R.string.audio_coverage)
         }
     }
 
@@ -118,8 +118,14 @@ class HeatmapAudioCoverageActivity : AppCompatActivity(), MonthYearPickerDialog.
         when (item.itemId) {
             android.R.id.home -> onBackPressed()
             R.id.picker -> {
-                MonthYearPickerDialog.newInstance(System.currentTimeMillis(), selectedMonth, selectedYear, minMaxYear.first, minMaxYear.second, this)
-                    .show(supportFragmentManager, MonthYearPickerDialog::class.java.name)
+                MonthYearPickerDialog.newInstance(
+                    System.currentTimeMillis(),
+                    selectedMonth,
+                    selectedYear,
+                    minMaxYear.first,
+                    minMaxYear.second,
+                    this
+                ).show(supportFragmentManager, MonthYearPickerDialog::class.java.name)
             }
         }
         return super.onOptionsItemSelected(item)
@@ -132,9 +138,10 @@ class HeatmapAudioCoverageActivity : AppCompatActivity(), MonthYearPickerDialog.
     }
 
     private fun getData(obj: JsonObject, month: Int, year: Int) {
-        val months = arrayOf("Jan","Feb","Mar","Apr","May","Jun","Jul",
-            "Aug","Sep","Oct","Nov","Dec")
-        archivedDate.text = "Data from ${months[month]} $year"
+        val months = arrayOf(
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        )
+        archivedDate.text = getString(R.string.coverage_on, months[month], year)
         val filtered = AudioCoverageUtils.filterByMonthYear(obj, month, year)
         archivedHeatmapAdapter.setData(filtered)
     }

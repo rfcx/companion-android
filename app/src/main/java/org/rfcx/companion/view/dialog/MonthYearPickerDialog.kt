@@ -63,7 +63,7 @@ class MonthYearPickerDialog(val callback: OnPickListener) : DialogFragment() {
         }
 
         return AlertDialog.Builder(requireContext(), R.style.BaseAlertDialog)
-            .setTitle("Please Select Month Year")
+            .setTitle(R.string.select_month_year)
             .setView(view)
             .setPositiveButton(R.string.ok) { _, _ -> callback.onPick(monthView.value, yearView.value) }
             .setNegativeButton(R.string.cancel) { _, _ -> dialog?.cancel() }
