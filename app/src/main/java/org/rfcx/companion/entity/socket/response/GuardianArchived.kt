@@ -22,7 +22,7 @@ data class GuardianArchived(
     fun toListOfTimestamp(): List<Long> {
         val timestamps = arrayListOf<Long>()
         for (i in 0 until count) {
-            timestamps.add(archivedStart + (60000 * i))
+            timestamps.add(archivedStart + (duration * 1000 * i) + (duration * 1000 * skipping))
         }
         return timestamps
     }
