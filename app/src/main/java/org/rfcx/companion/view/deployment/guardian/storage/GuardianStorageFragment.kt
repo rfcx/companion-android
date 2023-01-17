@@ -5,19 +5,12 @@ import android.text.format.Formatter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.google.android.material.resources.TextAppearance
 import kotlinx.android.synthetic.main.fragment_guardian_storage.*
 import org.rfcx.companion.R
 import org.rfcx.companion.connection.socket.AdminSocketManager
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
-import org.rfcx.companion.util.audiocoverage.AudioCoverageUtils
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 
 class GuardianStorageFragment : Fragment() {

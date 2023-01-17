@@ -13,6 +13,6 @@ class AudioCoverageUtilsTest {
 
         val result = AudioCoverageUtils.toDateTimeStructure(listOfTimestamp)
 
-        assertEquals(result.getAsJsonObject("2023").getAsJsonObject("1").getAsJsonObject("9").get("18").asInt, 1)
+        assertEquals(result.getAsJsonObject("2023").getAsJsonObject("0").getAsJsonObject("9").get("18").asInt, 1)
     }
 }
