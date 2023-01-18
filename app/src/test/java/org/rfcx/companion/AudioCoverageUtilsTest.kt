@@ -2,13 +2,14 @@ package org.rfcx.companion
 
 import junit.framework.Assert.assertEquals
 import org.junit.Test
+import org.rfcx.companion.entity.socket.response.GuardianArchivedCoverage
 import org.rfcx.companion.util.audiocoverage.AudioCoverageUtils
 
 class AudioCoverageUtilsTest {
     @Test
     fun canExtractListOfTimestampToStructure() {
         val listOfTimestamp = listOf(
-            1673263960000L
+            GuardianArchivedCoverage(60, listOf(1673263960000L))
         )
 
         val result = AudioCoverageUtils.toDateTimeStructure(listOfTimestamp)

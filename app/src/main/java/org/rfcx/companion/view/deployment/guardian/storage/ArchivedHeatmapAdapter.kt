@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.android.synthetic.main.item_heatmap_normal.view.*
 import kotlinx.android.synthetic.main.item_heatmap_yaxis.view.*
 import org.rfcx.companion.R
 
@@ -52,20 +53,28 @@ class ArchivedHeatmapAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun getItemCount(): Int = data.size
 
     inner class NormalHeatmapViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val valueText = itemView.normalValue
         fun bind(item: HeatmapItem.Normal) {
+            val countAsPercent = (item.value.toFloat() / item.maximum.toFloat()) * 100
             when{
-                item.value >= 30 -> {
-                    itemView.setBackgroundResource(R.color.red)
+                countAsPercent >= 96 -> {
+                    itemView.setBackgroundResource(R.color.colorPrimary)
                 }
-                item.value >= 20 -> {
-                    itemView.setBackgroundResource(R.color.orange)
-                }
-                item.value >= 10 -> {
+                countAsPercent >= 76 -> {
                     itemView.setBackgroundResource(R.color.yellow)
                 }
-                item.value >= 0 -> {
+                countAsPercent >= 51 -> {
+                    itemView.setBackgroundResource(R.color.orange)
+                }
+                countAsPercent > 0 -> {
+                    itemView.setBackgroundResource(R.color.red)
+                }
+                else -> {
                     itemView.setBackgroundResource(R.color.backgroundColor)
                 }
+            }
+            if (item.value != 0) {
+                valueText.text = item.value.toString()
             }
         }
     }
@@ -80,6 +89,6 @@ class ArchivedHeatmapAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 }
 
 sealed class HeatmapItem {
-    data class Normal(val value: Int) : HeatmapItem()
+    data class Normal(val value: Int, val maximum: Int) : HeatmapItem()
     data class YAxis(val label: String) : HeatmapItem()
 }

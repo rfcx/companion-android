@@ -9,11 +9,13 @@
         android:id="@+id/pickerYear"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp" />
+        android:layout_marginEnd="20dp"
+        android:descendantFocusability="blocksDescendants" />
 
     <NumberPicker
         android:id="@+id/pickerMonth"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:descendantFocusability="blocksDescendants" />
 
 </androidx.appcompat.widget.LinearLayoutCompat>

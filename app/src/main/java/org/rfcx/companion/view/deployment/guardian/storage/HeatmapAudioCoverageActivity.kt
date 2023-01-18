@@ -16,6 +16,7 @@ import kotlinx.android.synthetic.main.toolbar_default.*
 import kotlinx.coroutines.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.socket.response.GuardianArchived
+import org.rfcx.companion.entity.socket.response.GuardianArchivedCoverage
 import org.rfcx.companion.util.audiocoverage.AudioCoverageUtils
 import org.rfcx.companion.view.dialog.MonthYearPickerDialog
 import kotlin.coroutines.CoroutineContext
@@ -31,7 +32,7 @@ class HeatmapAudioCoverageActivity :
 
     private val archivedHeatmapAdapter by lazy { ArchivedHeatmapAdapter() }
 
-    private var archivedAudios = listOf<Long>()
+    private var archivedAudios = listOf<GuardianArchivedCoverage>()
     private var archivedAudioStructure = JsonObject()
     private var availableYearMonths = hashMapOf<Int, List<Int>>()
     private var selectedMonth = 0
@@ -62,8 +63,7 @@ class HeatmapAudioCoverageActivity :
     private fun getExtra() {
         val parcel = intent?.extras?.getParcelableArray(EXTRA_ARCHIVED_AUDIO) ?: return
         archivedAudios =
-            parcel.map { it as GuardianArchived }.map { archived -> archived.toListOfTimestamp() }
-                .flatten().sorted()
+            parcel.map { it as GuardianArchived }.map { archived -> archived.toListOfTimestamp() }.sortedBy { it.listOfFile.first() }
         archivedAudioStructure = AudioCoverageUtils.toDateTimeStructure(archivedAudios)
     }
 

@@ -3,6 +3,11 @@ package org.rfcx.companion.entity.socket.response
 import android.os.Parcel
 import android.os.Parcelable
 
+data class GuardianArchivedCoverage(
+    val maximumFileCount: Int,
+    val listOfFile: List<Long>
+)
+
 data class GuardianArchived(
     val archivedStart: Long,
     val archivedEnd: Long,
@@ -16,15 +21,19 @@ data class GuardianArchived(
         parcel.readInt(),
         parcel.readInt(),
         parcel.readInt()
-    ) {
-    }
+    )
 
-    fun toListOfTimestamp(): List<Long> {
+    fun toListOfTimestamp(): GuardianArchivedCoverage {
+        // Calculate all timestamp
         val timestamps = arrayListOf<Long>()
+        val durationSecond = duration * 1000
         for (i in 0 until count) {
-            timestamps.add(archivedStart + (duration * 1000 * i) + (duration * 1000 * skipping))
+            timestamps.add(archivedStart + (durationSecond * i) + (durationSecond * skipping))
         }
-        return timestamps
+
+        // Calculate maximum file count per hour of this archive
+        val maximum = (1000 * 60 * 60) / (durationSecond + (durationSecond * skipping))
+        return GuardianArchivedCoverage(maximum, timestamps)
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
