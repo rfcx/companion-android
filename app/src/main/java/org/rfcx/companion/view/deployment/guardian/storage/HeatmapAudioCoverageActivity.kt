@@ -63,7 +63,7 @@ class HeatmapAudioCoverageActivity :
     private fun getExtra() {
         val parcel = intent?.extras?.getParcelableArray(EXTRA_ARCHIVED_AUDIO) ?: return
         archivedAudios =
-            parcel.map { it as GuardianArchived }.map { archived -> archived.toListOfTimestamp() }.sortedBy { it.listOfFile.first() }
+            parcel.map { it as GuardianArchived }.map { archived -> archived.toListOfTimestamp() }.sortedBy { it.listOfFile.firstOrNull() }
         archivedAudioStructure = AudioCoverageUtils.toDateTimeStructure(archivedAudios)
     }
 
