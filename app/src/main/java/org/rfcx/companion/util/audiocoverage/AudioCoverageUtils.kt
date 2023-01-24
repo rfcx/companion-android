@@ -60,7 +60,12 @@ object AudioCoverageUtils {
     }
 
     fun filterByMonthYear(item: JsonObject, month: Int, year: Int): List<HeatmapItem> {
-        val obj = item.getAsJsonObject(year.toString()).getAsJsonObject((month).toString())
+        var obj = JsonObject()
+        if (item.has(year.toString())) {
+            if (item.getAsJsonObject(year.toString()).has(month.toString())) {
+                obj = item.getAsJsonObject(year.toString()).getAsJsonObject((month).toString())
+            }
+        }
 
         val cal = Calendar.getInstance()
         cal.set(Calendar.YEAR, year)
@@ -96,6 +101,9 @@ object AudioCoverageUtils {
     }
 
     fun getAvailableMonths(item: JsonObject): HashMap<Int, List<Int>> {
+        val cal = Calendar.getInstance()
+        if (item.keySet().isEmpty()) return hashMapOf(cal.get(Calendar.YEAR) to listOf(cal.get(Calendar.MONTH)))
+
         val map = hashMapOf<Int, List<Int>>()
         item.keySet().forEach { year ->
             val months = arrayListOf<Int>()
