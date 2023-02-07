@@ -23,6 +23,7 @@ import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
+import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
@@ -200,24 +201,24 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
 
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetContainer)
         bottomSheetBehavior.addBottomSheetCallback(object :
-                BottomSheetBehavior.BottomSheetCallback() {
-                override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+            BottomSheetBehavior.BottomSheetCallback() {
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
 
-                override fun onStateChanged(bottomSheet: View, newState: Int) {
-                    if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
-                        val bottomSheetFragment =
-                            supportFragmentManager.findFragmentByTag(BOTTOM_SHEET)
-                        if (bottomSheetFragment != null) {
-                            supportFragmentManager.beginTransaction()
-                                .remove(bottomSheetFragment)
-                                .commit()
-                        }
-                    }
-                    if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                        hideBottomAppBar()
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                    val bottomSheetFragment =
+                        supportFragmentManager.findFragmentByTag(BOTTOM_SHEET)
+                    if (bottomSheetFragment != null) {
+                        supportFragmentManager.beginTransaction()
+                            .remove(bottomSheetFragment)
+                            .commit()
                     }
                 }
-            })
+                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                    hideBottomAppBar()
+                }
+            }
+        })
     }
 
     private fun checkInAppUpdate() {
@@ -225,7 +226,9 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
         appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
             if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
             ) {
-                if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE) && (appUpdateInfo.clientVersionStalenessDays() ?: -1) >= 10) {
+                if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE) && (appUpdateInfo.clientVersionStalenessDays()
+                        ?: -1) >= 10
+                ) {
                     appUpdateManager.startUpdateFlowForResult(
                         appUpdateInfo,
                         AppUpdateType.IMMEDIATE,
@@ -354,7 +357,11 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
     }
 
     override fun showSnackbarForCompleteUpdate() {
-        snackbar = Snackbar.make(mainRootView, "Update is successfully downloaded", Snackbar.LENGTH_INDEFINITE)
+        snackbar = Snackbar.make(
+            mainRootView,
+            "Update is successfully downloaded",
+            Snackbar.LENGTH_INDEFINITE
+        )
             .apply {
                 setAction("RESTART") {
                     appUpdateManager.completeUpdate()
@@ -430,7 +437,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
         hideSnackbar()
         hideBottomAppBar()
         val layoutParams: CoordinatorLayout.LayoutParams = bottomSheetContainer.layoutParams
-            as CoordinatorLayout.LayoutParams
+                as CoordinatorLayout.LayoutParams
         layoutParams.anchorGravity = Gravity.BOTTOM
         bottomSheetContainer.layoutParams = layoutParams
         supportFragmentManager.beginTransaction()
@@ -488,6 +495,8 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
 
     override fun onDestroy() {
         appUpdateManager.unregisterListener(this)
+        // Close realm when app destroyed
+        Realm.getInstance(RealmHelper.migrationConfig()).close()
         super.onDestroy()
     }
 
