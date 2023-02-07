@@ -21,7 +21,7 @@ class LocationPermissions(private val activity: Activity) {
     }
     private var onCompletionCallback: ((Boolean) -> Unit)? = null
 
-    private fun allowed(): Boolean {
+    fun allowed(): Boolean {
         val permissionState =
             ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION)
         return permissionState == PackageManager.PERMISSION_GRANTED
