@@ -194,12 +194,11 @@ class DeploymentDetailActivity :
             }
 
             override fun onImageClick(deploymentImageView: DeploymentImageView) {
-                val list = deploymentImages.map {
+                val list = (deploymentImages.map {
                     if (it.remotePath != null) BuildConfig.DEVICE_API_DOMAIN + it.remotePath else "file://${it.localPath}"
-                } as ArrayList
+                } + deploymentImageAdapter.getNewAttachImage().map { "file://$it" }) as ArrayList
                 val selectedImage =
                     deploymentImageView.remotePath ?: "file://${deploymentImageView.localPath}"
-
                 val index = list.indexOf(selectedImage)
                 list.removeAt(index)
                 list.add(0, selectedImage)
