@@ -72,10 +72,10 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8
     }
-    lintOptions{
-        disable 'MissingTranslation'
-        disable 'ExtraTranslation'
+    lint {
+        disable 'MissingTranslation', 'ExtraTranslation'
     }
+    namespace 'org.rfcx.companion'
 }
 
 configurations {
