@@ -348,7 +348,7 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
                     CompleteFragment()
                 }
         completeFragment.isCancelable = false
-        completeFragment.show(supportFragmentManager, CompleteFragment.tag)
+        if (!completeFragment.isVisible) completeFragment.show(supportFragmentManager, CompleteFragment.tag)
     }
 
     private fun hideLoading() {

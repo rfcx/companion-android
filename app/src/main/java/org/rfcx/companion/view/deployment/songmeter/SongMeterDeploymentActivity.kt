@@ -305,7 +305,7 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
                     CompleteFragment()
                 }
         completeFragment.isCancelable = false
-        completeFragment.show(supportFragmentManager, CompleteFragment.tag)
+        if (!completeFragment.isVisible) completeFragment.show(supportFragmentManager, CompleteFragment.tag)
     }
 
     override fun setCurrentLocation(location: Location) {

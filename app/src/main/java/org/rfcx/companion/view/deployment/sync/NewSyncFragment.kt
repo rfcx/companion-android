@@ -152,7 +152,7 @@ class NewSyncFragment : Fragment() {
                     CompleteFragment()
                 }
         completeFragment.isCancelable = false
-        completeFragment.show(childFragmentManager, CompleteFragment.tag)
+        if (!completeFragment.isVisible) completeFragment.show(childFragmentManager, CompleteFragment.tag)
     }
 
     private fun setLabelColor(view: View) {
