@@ -201,24 +201,25 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
 
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetContainer)
         bottomSheetBehavior.addBottomSheetCallback(object :
-            BottomSheetBehavior.BottomSheetCallback() {
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+                BottomSheetBehavior.BottomSheetCallback() {
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {}
 
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
-                    val bottomSheetFragment =
-                        supportFragmentManager.findFragmentByTag(BOTTOM_SHEET)
-                    if (bottomSheetFragment != null) {
-                        supportFragmentManager.beginTransaction()
-                            .remove(bottomSheetFragment)
-                            .commit()
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                        val bottomSheetFragment =
+                            supportFragmentManager.findFragmentByTag(BOTTOM_SHEET)
+                        if (bottomSheetFragment != null) {
+                            supportFragmentManager.beginTransaction()
+                                .remove(bottomSheetFragment)
+                                .commit()
+                        }
+                    }
+                    if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                        hideBottomAppBar()
                     }
                 }
-                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                    hideBottomAppBar()
-                }
             }
-        })
+        )
     }
 
     private fun checkInAppUpdate() {
@@ -226,9 +227,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
         appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
             if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
             ) {
-                if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE) && (appUpdateInfo.clientVersionStalenessDays()
-                        ?: -1) >= 10
-                ) {
+                if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE) && (appUpdateInfo.clientVersionStalenessDays() ?: -1) >= 10) {
                     appUpdateManager.startUpdateFlowForResult(
                         appUpdateInfo,
                         AppUpdateType.IMMEDIATE,
@@ -436,8 +435,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
     override fun showBottomSheet(fragment: Fragment) {
         hideSnackbar()
         hideBottomAppBar()
-        val layoutParams: CoordinatorLayout.LayoutParams = bottomSheetContainer.layoutParams
-                as CoordinatorLayout.LayoutParams
+        val layoutParams: CoordinatorLayout.LayoutParams = bottomSheetContainer.layoutParams as CoordinatorLayout.LayoutParams
         layoutParams.anchorGravity = Gravity.BOTTOM
         bottomSheetContainer.layoutParams = layoutParams
         supportFragmentManager.beginTransaction()
