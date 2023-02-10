@@ -442,7 +442,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
 
         trackingLayout.setOnClickListener {
             if (locationPermissions?.allowed() == false) {
-                locationPermissions?.check{ /* do nothing */ }
+                locationPermissions?.check { /* do nothing */ }
             } else {
                 onTrackingClicked()
             }
