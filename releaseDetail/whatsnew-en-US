@@ -1,2 +1,3 @@
 Change logs
+- Fix bunch of Crashlytics reports
 - Companion can detect Song Meter than name shorter than 7 characters

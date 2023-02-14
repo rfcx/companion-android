@@ -274,11 +274,9 @@ class DeploymentDb(private val realm: Realm) {
             }
         }, {
             // success
-            realm.close()
             callback.onSuccess()
         }, {
             // failure
-            realm.close()
             callback.onFailure(it.localizedMessage ?: "")
         })
     }

@@ -632,7 +632,8 @@ class GuardianDeploymentActivity :
                 ?: run {
                     CompleteFragment()
                 }
-        completeFragment.show(supportFragmentManager, CompleteFragment.tag)
+        completeFragment.isCancelable = false
+        if (!completeFragment.isVisible) completeFragment.show(supportFragmentManager, CompleteFragment.tag)
     }
 
     override fun hideLoading() {

@@ -441,24 +441,32 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         })
 
         trackingLayout.setOnClickListener {
-            context?.let { context ->
-                if (LocationTrackingManager.isTrackingOn(context)) {
-                    setLocationTrackingService(context, false)
-                } else {
-                    val tracking = mainViewModel.getFirstTracking()
-                    if (tracking != null) {
-                        val time = tracking.stopAt?.time?.plus(WITHIN_TIME * 60000)
-                        time?.let {
-                            if (it > Date().time) {
-                                setLocationTrackingService(context, true)
-                            } else {
-                                mainViewModel.deleteTracking(1, context)
-                                setLocationTrackingService(context, true)
-                            }
+            if (locationPermissions?.allowed() == false) {
+                locationPermissions?.check { /* do nothing */ }
+            } else {
+                onTrackingClicked()
+            }
+        }
+    }
+
+    private fun onTrackingClicked() {
+        context?.let { context ->
+            if (LocationTrackingManager.isTrackingOn(context)) {
+                setLocationTrackingService(context, false)
+            } else {
+                val tracking = mainViewModel.getFirstTracking()
+                if (tracking != null) {
+                    val time = tracking.stopAt?.time?.plus(WITHIN_TIME * 60000)
+                    time?.let {
+                        if (it > Date().time) {
+                            setLocationTrackingService(context, true)
+                        } else {
+                            mainViewModel.deleteTracking(1, context)
+                            setLocationTrackingService(context, true)
                         }
-                    } else {
-                        setLocationTrackingService(context, true)
                     }
+                } else {
+                    setLocationTrackingService(context, true)
                 }
             }
         }

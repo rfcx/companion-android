@@ -14,7 +14,7 @@ android {
         manifestPlaceholders = [auth0Domain: "@string/auth0_domain", auth0Scheme: "@string/auth0_scheme"]
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode 157
+        versionCode 158
         versionName "1.8.1"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -72,10 +72,10 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8
     }
-    lintOptions{
-        disable 'MissingTranslation'
-        disable 'ExtraTranslation'
+    lint {
+        disable 'MissingTranslation', 'ExtraTranslation'
     }
+    namespace 'org.rfcx.companion'
 }
 
 configurations {

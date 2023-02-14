@@ -104,7 +104,7 @@ object GuardianSocketManager {
     fun sendOfflineModePrefs() {
         val prefs = JsonObject()
         prefs.addProperty("api_satellite_protocol", "off")
-        prefs.addProperty("enable_audio_classify", "true")
+        prefs.addProperty("enable_audio_classify", "false")
         prefs.addProperty("enable_checkin_publish", "false")
         prefs.addProperty(
             "api_ping_cycle_fields",
