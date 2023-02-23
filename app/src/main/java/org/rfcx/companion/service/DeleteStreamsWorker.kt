@@ -48,6 +48,16 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
                 // force delete deployment on device-api
                 DeploymentSyncWorker.enqueue(context)
             }
+
+            val savedUnSyncedStreams = streamDb.getStreams().filter { it.serverId == null && it.project?.serverId == PROJECT_ID }
+            // unsynced site which same name (should not have this case in real life but just in case)
+            val filteredUnSyncedStreams = savedUnSyncedStreams.filter { stream -> filteredStreams.map { it.name }.contains(stream.name) }
+            if (filteredUnSyncedStreams.isNotEmpty()) {
+                filteredUnSyncedStreams.forEach {
+                    Log.d(TAG, "remove stream: ${it.id}")
+                    streamDb.deleteStream(it.id)
+                }
+            }
         } else {
             someFailed = true
         }
