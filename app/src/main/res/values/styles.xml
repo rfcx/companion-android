@@ -259,8 +259,7 @@
     <style name="AudioMothEditText" parent="Widget.AppCompat.EditText" />
 
     <style name="AudioMothEditText.Background" parent="AudioMothEditText">
-        <item name="android:padding">@dimen/margin_padding_normal</item>
-        <item name="android:backgroundTint" tools:targetApi="lollipop">@color/gray_30</item>
+        <item name="android:backgroundTint">@color/backgroundColor</item>
     </style>
 
     <style name="AudioMothEditText.NoBackground" parent="AudioMothEditText">
