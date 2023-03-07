@@ -22,7 +22,7 @@
     <dimen name="size_battery_lv_button">56dp</dimen>
     <dimen name="button_battery">46dp</dimen>
     <dimen name="progress_bar">40dp</dimen>
-    <dimen name="button_height">44dp</dimen>
+    <dimen name="button_height">48dp</dimen>
     <dimen name="size_complete">150dp</dimen>
     <dimen name="size_view_complete">170dp</dimen>
     <dimen name="mark_size">15dp</dimen>

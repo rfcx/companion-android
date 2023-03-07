@@ -24,7 +24,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="visible"
-                app:constraint_referenced_ids="googleLoginButton,smsLoginButton,poweredByTextView,rfcxLogoImageView,loginEmailEditText,loginPasswordEditText,leftLineView,orTextView,rightLineView,facebookLoginButton,signInButton" />
+                app:constraint_referenced_ids="googleLoginButton,poweredByTextView,rfcxLogoImageView,loginEmailLayout,loginPasswordLayout,leftLineView,orTextView,rightLineView,signInButton" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/bellLogoImageView"
