@@ -18,6 +18,7 @@ open class DeploymentImage(
     var remotePath: String? = null,
     var createdAt: Date = Date(),
     var device: String = "",
+    var imageLabel: String = "",
     @Expose(serialize = false)
     var syncState: Int = 0,
     @Expose(serialize = false)
@@ -31,6 +32,7 @@ open class DeploymentImage(
         const val FIELD_REMOTE_PATH = "remotePath"
         const val FIELD_LOCAL_PATH = "localPath"
         const val FIELD_DEVICE = "device"
+        const val FIELD_IMAGE_LABEL = "imageLabel"
         const val FIELD_DEPLOYMENT_SERVER_ID = "deploymentServerId"
     }
 }

@@ -11,6 +11,7 @@ import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.Resource
 import org.rfcx.companion.util.asLiveData
+import org.rfcx.companion.view.deployment.Image
 import org.rfcx.companion.view.deployment.songmeter.repository.SongMeterRepository
 import org.rfcx.companion.view.map.SyncInfo
 
@@ -115,7 +116,7 @@ class SongMeterViewModel(
 
     fun insertImage(
         deployment: Deployment? = null,
-        attachImages: List<String>
+        attachImages: List<Image>
     ) {
         songMeterRepository.insertImage(deployment, attachImages)
     }

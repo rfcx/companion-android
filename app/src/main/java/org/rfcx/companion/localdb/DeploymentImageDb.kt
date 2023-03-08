@@ -12,6 +12,7 @@ import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.SyncState
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
+import org.rfcx.companion.view.deployment.Image
 
 class DeploymentImageDb(private val realm: Realm) {
 
@@ -106,7 +107,7 @@ class DeploymentImageDb(private val realm: Realm) {
 
     fun insertImage(
         deployment: Deployment? = null,
-        attachImages: List<String>
+        attachImages: List<Image>
     ) {
         deployment?.let { dp ->
             val imageCreateAt = dp.deployedAt
@@ -118,9 +119,10 @@ class DeploymentImageDb(private val realm: Realm) {
                     val deploymentImage = DeploymentImage(
                         id = imageId,
                         deploymentId = dp.id,
-                        localPath = attachImage,
+                        localPath = attachImage.path!!,
                         createdAt = imageCreateAt,
                         device = dp.device ?: "",
+                        imageLabel = attachImage.name,
                         deploymentServerId = dp.serverId
                     )
                     it.insertOrUpdate(deploymentImage)
