@@ -8,6 +8,7 @@ import io.realm.Realm
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import org.rfcx.companion.entity.request.AssetRequest
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.FileUtils.getMimeType
@@ -37,7 +38,7 @@ class ImageSyncWorker(val context: Context, params: WorkerParameters) :
             val requestFile = RequestBody.create(MediaType.parse(mimeType), storage.compressFile(context, file))
             val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
             val result = ApiManager.getInstance().getDeviceApi()
-                .uploadAssets(token, it.deploymentServerId!!, body).execute()
+                .uploadAssets(token, it.deploymentServerId!!, body, AssetRequest(it.imageLabel)).execute()
 
             if (result.isSuccessful) {
                 val assetPath = result.headers().get("Location")
