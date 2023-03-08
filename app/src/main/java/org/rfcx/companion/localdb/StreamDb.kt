@@ -31,7 +31,8 @@ class StreamDb(private val realm: Realm) {
     }
 
     fun getStreams(): List<Stream> {
-        return realm.where(Stream::class.java).findAll() ?: arrayListOf()
+        val streams = realm.where(Stream::class.java).findAll()
+        return realm.copyFromRealm(streams) ?: listOf()
     }
 
     fun getStreamById(id: Int): Stream? {
