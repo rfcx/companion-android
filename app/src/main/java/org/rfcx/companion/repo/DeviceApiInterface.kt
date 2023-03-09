@@ -52,7 +52,7 @@ interface DeviceApiInterface {
         @Header("Authorization") authUser: String,
         @Path("id") id: String,
         @Part file: MultipartBody.Part,
-        @Part("label") label: RequestBody? = null,
+        @Part("assetParameters") params: RequestBody? = null,
     ): Call<ResponseBody>
 
     @GET("deployments/{id}/assets")
