@@ -37,8 +37,11 @@ class ImageSyncWorker(val context: Context, params: WorkerParameters) :
             val mimeType = file.getMimeType()
             val requestFile = RequestBody.create(MediaType.parse(mimeType), storage.compressFile(context, file))
             val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
+
+            val label = RequestBody.create(MediaType.parse("multipart/form-data"), it.imageLabel)
+
             val result = ApiManager.getInstance().getDeviceApi()
-                .uploadAssets(token, it.deploymentServerId!!, body, AssetRequest(it.imageLabel)).execute()
+                .uploadAssets(token, it.deploymentServerId!!, body, label).execute()
 
             if (result.isSuccessful) {
                 val assetPath = result.headers().get("Location")

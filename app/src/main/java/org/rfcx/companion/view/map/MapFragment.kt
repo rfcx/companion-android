@@ -1064,6 +1064,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
 
     private fun setSnackbar(status: SyncInfo, isSites: Boolean) {
         val deploymentUnsentCount = mainViewModel.getDeploymentUnsentCount()
+        Log.d("Comp", "$status")
         when (status) {
             SyncInfo.Starting, SyncInfo.Uploading -> {
                 val msg = if (isSites) {
