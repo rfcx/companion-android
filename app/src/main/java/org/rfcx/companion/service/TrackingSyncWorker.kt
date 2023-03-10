@@ -33,7 +33,7 @@ class TrackingSyncWorker(val context: Context, params: WorkerParameters) :
             val mimeType = file.getMimeType()
             val requestFile = RequestBody.create(MediaType.parse(mimeType), file)
             val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
-            val result = ApiManager.getInstance().getDeviceApi()
+            val result = ApiManager.getInstance().getDeviceApi(context)
                 .uploadAssets(token, it.deploymentServerId!!, body).execute()
 
             if (result.isSuccessful) {

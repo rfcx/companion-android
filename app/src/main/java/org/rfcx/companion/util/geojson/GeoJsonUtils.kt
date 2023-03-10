@@ -103,7 +103,7 @@ object GeoJsonUtils {
         deployedAt: Date,
         callback: DownloadTrackCallback
     ) {
-        ApiManager.getInstance().getDeviceApi().getGeoJsonFile(token, asset.id)
+        ApiManager.getInstance().getDeviceApi(context).getGeoJsonFile(token, asset.id)
             .enqueue(object : Callback<ResponseBody> {
                 override fun onResponse(
                     call: Call<ResponseBody>,

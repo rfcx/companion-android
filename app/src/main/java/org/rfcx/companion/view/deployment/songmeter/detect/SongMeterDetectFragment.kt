@@ -45,8 +45,8 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
             this,
             ViewModelFactory(
                 requireActivity().application,
-                DeviceApiHelper(DeviceApiServiceImpl()),
-                CoreApiHelper(CoreApiServiceImpl()),
+                DeviceApiHelper(DeviceApiServiceImpl(requireContext())),
+                CoreApiHelper(CoreApiServiceImpl(requireContext())),
                 LocalDataHelper(),
                 BleHelper(BleDetectService(requireContext()), BleConnectDelegate(requireContext()))
             )

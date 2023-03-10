@@ -41,7 +41,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
             Log.d(TAG, "doWork: sending id ${it.id}")
 
             if (it.serverId == null) {
-                val result = ApiManager.getInstance().getDeviceApi()
+                val result = ApiManager.getInstance().getDeviceApi(context)
                     .createDeployment(token, it.toRequestBody()).execute()
 
                 val error = result.errorBody()?.string()
@@ -72,14 +72,14 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                 val serverId = it.serverId ?: ""
                 deploymentLocation?.let { location ->
                     if (it.deletedAt != null) {
-                        val result = ApiManager.getInstance().getDeviceApi()
+                        val result = ApiManager.getInstance().getDeviceApi(context)
                             .deleteDeployments(token, serverId).execute()
                         if (result.isSuccessful) {
                             db.deleteDeployment(it.id)
                         }
                     } else {
                         val req = EditDeploymentRequest(location.toRequestBody())
-                        val result = ApiManager.getInstance().getDeviceApi()
+                        val result = ApiManager.getInstance().getDeviceApi(context)
                             .editDeployments(token, serverId, req).execute()
                         if (result.isSuccessful) {
                             db.markSent(it.serverId!!, it.id)
@@ -115,7 +115,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
         db.markSent(id, deploymentId)
 
         // update core siteId when deployment created
-        val updatedDp = ApiManager.getInstance().getDeviceApi()
+        val updatedDp = ApiManager.getInstance().getDeviceApi(context)
             .getDeployment(token, id).execute().body()
         updatedDp?.let { dp ->
             streamDb.updateSiteServerId(deploymentId, dp.stream!!.id!!)

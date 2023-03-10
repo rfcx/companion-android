@@ -50,7 +50,7 @@ class DownloadStreamsWorker(val context: Context, params: WorkerParameters) :
     private suspend fun getStreams(token: String, offset: Int, maxUpdatedAt: String? = null): Boolean = withContext(Dispatchers.IO) {
         isRunning = DownloadStreamState.RUNNING
         val projectId = PROJECT_ID?.let { listOf(it) }
-        val result = ApiManager.getInstance().getDeviceApi()
+        val result = ApiManager.getInstance().getDeviceApi(context)
             .getStreams(token, SITES_LIMIT_GETTING, offset, maxUpdatedAt, "updated_at,name", projectId).execute()
         if (result.isSuccessful) {
             val resultBody = result.body()

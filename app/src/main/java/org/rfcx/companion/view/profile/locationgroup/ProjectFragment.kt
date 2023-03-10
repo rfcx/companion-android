@@ -102,7 +102,7 @@ class ProjectFragment :
 
     private fun retrieveProjects(context: Context) {
         val token = "Bearer ${context.getIdToken()}"
-        ApiManager.getInstance().getDeviceApi2().getProjects(token)
+        ApiManager.getInstance().getDeviceApi2(context).getProjects(token)
             .enqueue(object : Callback<List<ProjectResponse>> {
                 override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
                     if (context.isNetworkAvailable()) {
@@ -126,7 +126,7 @@ class ProjectFragment :
 
     private fun deletedProjectsFromCore(context: Context) {
         val token = "Bearer ${context.getIdToken()}"
-        ApiManager.getInstance().getDeviceApi2().getDeletedProjects(token)
+        ApiManager.getInstance().getDeviceApi2(context).getDeletedProjects(token)
             .enqueue(object : Callback<List<ProjectResponse>> {
                 override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
                     if (context.isNetworkAvailable()) {

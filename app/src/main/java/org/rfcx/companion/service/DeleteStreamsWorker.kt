@@ -68,7 +68,7 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
     private suspend fun getStreams(token: String, offset: Int): Boolean =
         withContext(Dispatchers.IO) {
             val projectId = PROJECT_ID?.let { listOf(it) }
-            val result = ApiManager.getInstance().getDeviceApi()
+            val result = ApiManager.getInstance().getDeviceApi(context)
                 .getStreams(token, SITES_LIMIT_GETTING, offset, null, null, projectId)
                 .execute()
             if (result.isSuccessful) {

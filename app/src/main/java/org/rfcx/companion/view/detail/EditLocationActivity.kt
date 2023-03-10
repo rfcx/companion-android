@@ -60,8 +60,8 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
             this,
             ViewModelFactory(
                 application,
-                DeviceApiHelper(DeviceApiServiceImpl()),
-                CoreApiHelper(CoreApiServiceImpl()),
+                DeviceApiHelper(DeviceApiServiceImpl(this)),
+                CoreApiHelper(CoreApiServiceImpl(this)),
                 LocalDataHelper()
             )
         ).get(EditLocationViewModel::class.java)

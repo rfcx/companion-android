@@ -25,7 +25,7 @@ class RegisterGuardianWorker(val context: Context, params: WorkerParameters) :
 
         val token = "Bearer ${context.getIdToken()}"
         registrations?.forEach {
-            val result = ApiManager.getInstance().getDeviceApi2(it.env == "production")
+            val result = ApiManager.getInstance().getDeviceApi2(it.env == "production", context)
                 .registerGuardian(token, it.toRequest()).execute()
 
             val error = result.errorBody()?.string()

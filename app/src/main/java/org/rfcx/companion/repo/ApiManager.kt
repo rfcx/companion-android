@@ -1,20 +1,22 @@
 package org.rfcx.companion.repo
 
+import android.content.Context
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.repo.api.CoreApiService
 import org.rfcx.companion.repo.api.DeviceApiService
+import org.rfcx.companion.repo.api.TokenAuthenticator
 import org.rfcx.companion.util.insert
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 class ApiManager {
-    var coreApi: CoreApiService
-    var apiFirebaseAuth: FirebaseAuthInterface
-    private var deviceApi: DeviceApiInterface
-    private var deviceApi2: DeviceApiService
+    private lateinit var coreApi: CoreApiService
+    private lateinit var apiFirebaseAuth: FirebaseAuthInterface
+    private lateinit var deviceApi: DeviceApiInterface
+    private lateinit var deviceApi2: DeviceApiService
 
     companion object {
         @Volatile
@@ -26,21 +28,28 @@ class ApiManager {
             }
     }
 
-    init {
-        coreApi = setRetrofitBaseUrl(BuildConfig.DEPLOY_DOMAIN).create(CoreApiService::class.java)
-        apiFirebaseAuth =
-            setRetrofitBaseUrl(BuildConfig.FIREBASE_AUTH_DOMAIN).create(FirebaseAuthInterface::class.java)
-        deviceApi =
-            setRetrofitBaseUrl(BuildConfig.DEVICE_API_DOMAIN).create(DeviceApiInterface::class.java)
-        deviceApi2 =
-            setRetrofitBaseUrl(BuildConfig.DEVICE_API_DOMAIN).create(DeviceApiService::class.java)
+    fun getCoreApi(context: Context): CoreApiService {
+        coreApi = setRetrofitBaseUrl(BuildConfig.DEPLOY_DOMAIN, context).create(CoreApiService::class.java)
+        return coreApi
     }
 
-    fun getDeviceApi(): DeviceApiInterface = deviceApi
+    fun getApiFirebaseAuth(context: Context): FirebaseAuthInterface {
+        apiFirebaseAuth = setRetrofitBaseUrl(BuildConfig.FIREBASE_AUTH_DOMAIN, context).create(FirebaseAuthInterface::class.java)
+        return apiFirebaseAuth
 
-    fun getDeviceApi2(): DeviceApiService = deviceApi2
+    }
 
-    fun getDeviceApi2(isProduction: Boolean? = null): DeviceApiService {
+    fun getDeviceApi(context: Context): DeviceApiInterface {
+        deviceApi = setRetrofitBaseUrl(BuildConfig.DEVICE_API_DOMAIN, context).create(DeviceApiInterface::class.java)
+        return deviceApi
+    }
+
+    fun getDeviceApi2(context: Context): DeviceApiService {
+        deviceApi2 = setRetrofitBaseUrl(BuildConfig.DEVICE_API_DOMAIN, context).create(DeviceApiService::class.java)
+        return deviceApi2
+    }
+
+    fun getDeviceApi2(isProduction: Boolean? = null, context: Context): DeviceApiService {
         return if (isProduction == null) {
             deviceApi2
         } else {
@@ -52,19 +61,19 @@ class ApiManager {
             if (!isProduction) {
                 url = url.insert(8, staging)
             }
-            setRetrofitBaseUrl(url).create(DeviceApiService::class.java)
+            setRetrofitBaseUrl(url, context).create(DeviceApiService::class.java)
         }
     }
 
-    private fun setRetrofitBaseUrl(baseUrl: String): Retrofit {
+    private fun setRetrofitBaseUrl(baseUrl: String, context: Context): Retrofit {
         return Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
             .baseUrl(baseUrl)
-            .client(createClient())
+            .client(createClient(context))
             .build()
     }
 
-    private fun createClient(): OkHttpClient {
+    private fun createClient(context: Context): OkHttpClient {
         // okHttp log
         val httpLoggingInterceptor = HttpLoggingInterceptor()
         httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
@@ -79,6 +88,7 @@ class ApiManager {
                 chain.proceed(request)
             }
             .addInterceptor(httpLoggingInterceptor)
+            .authenticator(TokenAuthenticator(context))
             .build()
     }
 }
