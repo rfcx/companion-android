@@ -8,6 +8,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
+import com.auth0.android.Auth0
+import com.auth0.android.authentication.AuthenticationAPIClient
+import com.auth0.android.authentication.AuthenticationException
+import com.auth0.android.callback.BaseCallback
+import com.auth0.android.result.Credentials
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.offline.OfflineManager
@@ -32,6 +37,8 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class MainViewModel(
     application: Application,
@@ -64,6 +71,21 @@ class MainViewModel(
     private val registrationObserve = Observer<List<GuardianRegistration>> {
         registrationCount = it.size
         combinedData()
+    }
+
+    private val auth0 by lazy {
+        val auth0 =
+            Auth0(
+                context.getString(R.string.auth0_client_id),
+                context.getString(R.string.auth0_domain)
+            )
+        auth0.isOIDCConformant = true
+        auth0.isLoggingEnabled = true
+        auth0
+    }
+
+    private val authentication by lazy {
+        AuthenticationAPIClient(auth0)
     }
 
     init {
@@ -469,5 +491,47 @@ class MainViewModel(
     fun onDestroy() {
         streamLiveData.removeObserver(streamObserve)
         deploymentLiveData.removeObserver(deploymentObserve)
+    }
+
+
+    suspend fun shouldBackToLogin(): Boolean {
+        val credentialKeeper = CredentialKeeper(context)
+        val credentialVerifier = CredentialVerifier(context)
+        val refreshToken = Preferences.getInstance(context).getString(Preferences.REFRESH_TOKEN)
+        val token = Preferences.getInstance(context).getString(Preferences.ID_TOKEN)
+
+        if (refreshToken == null) {
+            return true
+        }
+        if (token == null) {
+            return true
+        }
+        if (credentialKeeper.hasValidCredentials()) {
+            return false
+        }
+
+        return suspendCoroutine { cont ->
+            authentication.renewAuth(refreshToken).start(object : BaseCallback<Credentials, AuthenticationException> {
+                override fun onSuccess(credentials: Credentials?) {
+                    if (credentials == null) cont.resume(true)
+
+                    val result = credentialVerifier.verify(credentials!!)
+                    when (result) {
+                        is Err -> {
+                            cont.resume(true)
+                        }
+                        is Ok -> {
+                            val userAuthResponse = result.value
+                            credentialKeeper.save(userAuthResponse)
+                            cont.resume(false)
+                        }
+                    }
+                }
+
+                override fun onFailure(error: AuthenticationException) {
+                    cont.resume(true)
+                }
+            })
+        }
     }
 }

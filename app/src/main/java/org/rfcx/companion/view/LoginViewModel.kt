@@ -23,6 +23,7 @@ import org.rfcx.companion.entity.UserTouchResponse
 import org.rfcx.companion.entity.response.FirebaseAuthResponse
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.CredentialVerifier
+import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.Resource
 import retrofit2.Call
 import retrofit2.Callback
@@ -218,16 +219,8 @@ class LoginViewModel(
         return loginWithEmailPassword
     }
 
-    fun loginWithFacebookState(): LiveData<Resource<UserAuthResponse>> {
-        return loginWithFacebook
-    }
-
     fun loginWithGoogleState(): LiveData<Resource<UserAuthResponse>> {
         return loginWithGoogle
-    }
-
-    fun loginWithPhoneNumberState(): LiveData<Resource<UserAuthResponse>> {
-        return loginWithPhoneNumber
     }
 
     fun userTouchState(): LiveData<Resource<String>> {
@@ -240,5 +233,9 @@ class LoginViewModel(
 
     fun signInWithFirebaseTokenState(): LiveData<Resource<String>> {
         return firebaseAuth
+    }
+
+    fun getSelectedProject(): Int {
+        return Preferences.getInstance(context).getInt(Preferences.SELECTED_PROJECT)
     }
 }

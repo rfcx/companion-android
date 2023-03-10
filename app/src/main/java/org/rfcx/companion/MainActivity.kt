@@ -28,6 +28,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
 import kotlinx.android.synthetic.main.layout_search_view.*
+import kotlinx.coroutines.runBlocking
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.CrashlyticsKey
 import org.rfcx.companion.entity.Stream
@@ -61,6 +62,15 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
 
     private val appUpdateManager by lazy {
         AppUpdateManagerFactory.create(this)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        runBlocking {
+            if (mainViewModel.shouldBackToLogin()) {
+                logout()
+            }
+        }
     }
 
     override fun onResume() {

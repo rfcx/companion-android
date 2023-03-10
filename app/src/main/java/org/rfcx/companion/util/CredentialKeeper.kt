@@ -1,6 +1,7 @@
 package org.rfcx.companion.util
 
 import android.content.Context
+import android.util.Log
 import org.rfcx.companion.entity.UserAuthResponse
 
 class CredentialKeeper(val context: Context) {

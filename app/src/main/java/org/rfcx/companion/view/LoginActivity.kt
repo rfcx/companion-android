@@ -43,7 +43,7 @@ class LoginActivity : AppCompatActivity() {
         setObserver()
         setupDisplayTheme()
 
-        if (CredentialKeeper(this).hasValidCredentials()) {
+        if (this.getIdToken() != null && loginViewModel.getSelectedProject() != -1) {
             ProjectSelectActivity.startActivity(this@LoginActivity)
             finish()
         }
@@ -116,35 +116,6 @@ class LoginActivity : AppCompatActivity() {
             }
         )
 
-        loginViewModel.loginWithFacebookState().observe(
-            this,
-            Observer {
-                when (it.status) {
-                    Status.LOADING -> {}
-                    Status.SUCCESS -> {
-                        analytics.trackLoginEvent(LoginType.FACEBOOK.id, StatusEvent.SUCCESS.id)
-                        it.data?.let { data ->
-                            runOnUiThread { loading() }
-                            this.userAuthResponse = data
-                            loginViewModel.userTouch(data)
-                            CredentialKeeper(this@LoginActivity).save(data)
-                        }
-                    }
-                    Status.ERROR -> {
-                        analytics.trackLoginEvent(LoginType.FACEBOOK.id, StatusEvent.FAILURE.id)
-                        loading(false)
-                        runOnUiThread {
-                            Toast.makeText(
-                                this@LoginActivity,
-                                it.message ?: getString(R.string.error_has_occurred),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
-                }
-            }
-        )
-
         loginViewModel.loginWithGoogleState().observe(
             this,
             Observer {
@@ -161,35 +132,6 @@ class LoginActivity : AppCompatActivity() {
                     }
                     Status.ERROR -> {
                         analytics.trackLoginEvent(LoginType.GOOGLE.id, StatusEvent.FAILURE.id)
-                        loading(false)
-                        runOnUiThread {
-                            Toast.makeText(
-                                this@LoginActivity,
-                                it.message ?: getString(R.string.error_has_occurred),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
-                }
-            }
-        )
-
-        loginViewModel.loginWithPhoneNumberState().observe(
-            this,
-            Observer {
-                when (it.status) {
-                    Status.LOADING -> {}
-                    Status.SUCCESS -> {
-                        analytics.trackLoginEvent(LoginType.SMS.id, StatusEvent.SUCCESS.id)
-                        it.data?.let { data ->
-                            runOnUiThread { loading() }
-                            this.userAuthResponse = data
-                            loginViewModel.userTouch(data)
-                            CredentialKeeper(this@LoginActivity).save(data)
-                        }
-                    }
-                    Status.ERROR -> {
-                        analytics.trackLoginEvent(LoginType.SMS.id, StatusEvent.FAILURE.id)
                         loading(false)
                         runOnUiThread {
                             Toast.makeText(
