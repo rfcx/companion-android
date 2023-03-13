@@ -152,7 +152,7 @@ class LoginActivity : AppCompatActivity() {
                     Status.LOADING -> {}
                     Status.SUCCESS -> {
                         it.data?.let { data ->
-                            loginViewModel.getFirebaseAuth(data)
+                            loginViewModel.getFirebaseAuth()
                         }
                     }
                     Status.ERROR -> {

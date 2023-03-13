@@ -164,8 +164,8 @@ class LoginViewModel(
             })
     }
 
-    fun getFirebaseAuth(authUser: String) {
-        ApiManager.getInstance().getApiFirebaseAuth(context).firebaseAuth(authUser)
+    fun getFirebaseAuth() {
+        ApiManager.getInstance().getApiFirebaseAuth(context).firebaseAuth()
             .enqueue(object : Callback<FirebaseAuthResponse> {
                 override fun onFailure(call: Call<FirebaseAuthResponse>, t: Throwable) {
                     firebaseAuth.postValue(
