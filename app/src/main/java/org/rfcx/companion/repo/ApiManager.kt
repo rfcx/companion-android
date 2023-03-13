@@ -37,7 +37,6 @@ class ApiManager {
     fun getApiFirebaseAuth(context: Context): FirebaseAuthInterface {
         apiFirebaseAuth = setRetrofitBaseUrl(BuildConfig.FIREBASE_AUTH_DOMAIN, context).create(FirebaseAuthInterface::class.java)
         return apiFirebaseAuth
-
     }
 
     fun getDeviceApi(context: Context): DeviceApiInterface {
@@ -84,9 +83,9 @@ class ApiManager {
                 readTimeout(60, TimeUnit.SECONDS)
                 writeTimeout(60, TimeUnit.SECONDS)
             }
-                // auto refresh token if 401
+            // auto refresh token if 401
             .authenticator(TokenAuthenticator(context))
-                // auto attach token all requests
+            // auto attach token all requests
             .addInterceptor(TokenInterceptor(context))
             .addInterceptor { chain ->
                 val request = chain.request().newBuilder().addHeader("User-Agent", "Companion/${BuildConfig.VERSION_NAME}/${BuildConfig.VERSION_CODE}").build()

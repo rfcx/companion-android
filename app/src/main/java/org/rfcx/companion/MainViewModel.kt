@@ -492,7 +492,6 @@ class MainViewModel(
         deploymentLiveData.removeObserver(deploymentObserve)
     }
 
-
     suspend fun shouldBackToLogin(): Boolean {
         val credentialKeeper = CredentialKeeper(context)
         val credentialVerifier = CredentialVerifier(context)

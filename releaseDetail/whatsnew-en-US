@@ -1,3 +1,4 @@
 Change logs
 - Fix duplicated sites not entire removed
 - Eye password icon in login screen
+- Renew token if 401 request occurred

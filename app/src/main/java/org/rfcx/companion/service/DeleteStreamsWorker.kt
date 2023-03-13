@@ -13,7 +13,6 @@ import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.localdb.StreamDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.RealmHelper
-import org.rfcx.companion.util.getIdToken
 
 class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
@@ -34,7 +33,8 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
         if (result) {
             val streamDb = StreamDb(Realm.getInstance(RealmHelper.migrationConfig()))
             val deploymentDb = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
-            val savedStreams = streamDb.getStreams().filter { it.serverId != null && it.project?.serverId == PROJECT_ID }
+            val savedStreams = streamDb.getStreams()
+                .filter { it.serverId != null && it.project?.serverId == PROJECT_ID }
             val downloadedStreams = streams.map { it.toStream().serverId }
             val filteredStreams =
                 savedStreams.filter { stream -> !downloadedStreams.contains(stream.serverId) }
@@ -48,9 +48,12 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
                 DeploymentSyncWorker.enqueue(context)
             }
 
-            val savedUnSyncedStreams = streamDb.getStreams().filter { it.serverId == null && it.project?.serverId == PROJECT_ID }
+            val savedUnSyncedStreams = streamDb.getStreams()
+                .filter { it.serverId == null && it.project?.serverId == PROJECT_ID }
             // unsynced site which same name (should not have this case in real life but just in case)
-            val filteredUnSyncedStreams = savedUnSyncedStreams.filter { stream -> filteredStreams.map { it.name }.contains(stream.name) }
+            val filteredUnSyncedStreams = savedUnSyncedStreams.filter { stream ->
+                filteredStreams.map { it.name }.contains(stream.name)
+            }
             if (filteredUnSyncedStreams.isNotEmpty()) {
                 filteredUnSyncedStreams.forEach {
                     Log.d(TAG, "remove stream: ${it.id}")
