@@ -12,7 +12,6 @@ import org.rfcx.companion.localdb.TrackingFileDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.FileUtils.getMimeType
 import org.rfcx.companion.util.RealmHelper
-import org.rfcx.companion.util.getIdToken
 import java.io.File
 
 class TrackingSyncWorker(val context: Context, params: WorkerParameters) :

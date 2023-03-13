@@ -13,7 +13,6 @@ import org.rfcx.companion.localdb.StreamDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.RealmHelper
-import org.rfcx.companion.util.getIdToken
 import java.util.*
 import java.util.concurrent.ExecutionException
 

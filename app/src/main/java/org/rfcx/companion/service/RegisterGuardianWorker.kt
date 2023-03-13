@@ -9,7 +9,6 @@ import org.rfcx.companion.entity.RegisterGuardian
 import org.rfcx.companion.localdb.GuardianRegistrationDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.RealmHelper
-import org.rfcx.companion.util.getIdToken
 
 class RegisterGuardianWorker(val context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {

@@ -9,7 +9,6 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.util.Resource
-import org.rfcx.companion.util.getIdToken
 import org.rfcx.companion.util.isNetworkAvailable
 import org.rfcx.companion.view.project.repository.ProjectSelectRepository
 import retrofit2.Call

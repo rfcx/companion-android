@@ -9,7 +9,6 @@ import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.RealmHelper
-import org.rfcx.companion.util.getIdToken
 
 class DownloadImagesWorker(val context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {

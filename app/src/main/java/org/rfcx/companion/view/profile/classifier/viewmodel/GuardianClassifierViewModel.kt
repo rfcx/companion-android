@@ -12,7 +12,6 @@ import org.rfcx.companion.entity.response.GuardianClassifierResponse
 import org.rfcx.companion.util.Resource
 import org.rfcx.companion.util.file.ClassifierUtils
 import org.rfcx.companion.util.file.FileStatus
-import org.rfcx.companion.util.getIdToken
 import org.rfcx.companion.util.isNetworkAvailable
 import org.rfcx.companion.view.profile.classifier.repository.GuardianClassifierRepository
 import retrofit2.Call
