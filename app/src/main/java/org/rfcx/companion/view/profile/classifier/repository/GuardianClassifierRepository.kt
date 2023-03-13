@@ -8,8 +8,8 @@ class GuardianClassifierRepository(
     private val deviceApiHelper: DeviceApiHelper,
     private val localDataHelper: LocalDataHelper
 ) {
-    fun checkAvailableClassifiers(authUser: String) =
-        deviceApiHelper.checkAvailableClassifier(authUser)
+    fun checkAvailableClassifiers() =
+        deviceApiHelper.checkAvailableClassifier()
 
     fun downloadClassifier(url: String) = deviceApiHelper.downloadAPK(url)
 

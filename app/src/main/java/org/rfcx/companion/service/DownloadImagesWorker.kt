@@ -27,8 +27,7 @@ class DownloadImagesWorker(val context: Context, params: WorkerParameters) :
         }
 
         deployment?.let { dp ->
-            val token = "Bearer ${context.getIdToken()}"
-            val result = ApiManager.getInstance().getDeviceApi(context).getDeploymentAssets(token, dp.second!!).execute()
+            val result = ApiManager.getInstance().getDeviceApi(context).getDeploymentAssets(dp.second!!).execute()
             if (result.isSuccessful) {
                 val dpAssets = result.body()
                 dpAssets?.forEach { item ->

@@ -31,7 +31,7 @@ class ProjectSelectViewModel(
 
     private fun fetchProjects() {
         projects.postValue(Resource.loading(null))
-        projectSelectRepository.getProjectsFromRemote("Bearer ${context.getIdToken()}")
+        projectSelectRepository.getProjectsFromRemote()
             .enqueue(object : Callback<List<ProjectResponse>> {
                 override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
                     if (!context.isNetworkAvailable()) {
@@ -62,7 +62,7 @@ class ProjectSelectViewModel(
     }
 
     private fun fetchDeletedProjects() {
-        projectSelectRepository.getDeletedProjectsFromRemote("Bearer ${context.getIdToken()}")
+        projectSelectRepository.getDeletedProjectsFromRemote()
             .enqueue(object : Callback<List<ProjectResponse>> {
                 override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
                     if (!context.isNetworkAvailable()) {

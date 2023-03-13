@@ -33,7 +33,7 @@ class GuardianClassifierViewModel(
     private var cacheClassifiers: List<GuardianClassifierResponse>? = null
 
     init {
-        checkAvailableClassifiers("Bearer ${context.getIdToken()}")
+        checkAvailableClassifiers()
     }
 
     fun getDownloadedClassifiersLiveData() =
@@ -43,9 +43,9 @@ class GuardianClassifierViewModel(
     fun getDownloadedClassifiers() = guardianClassifierRepository.getDownloadedClassifier()
     fun getAvailableClassifiers() = availableClassifiers
 
-    private fun checkAvailableClassifiers(userToken: String) {
+    private fun checkAvailableClassifiers() {
         availableClassifiers.postValue(Resource.loading(null))
-        guardianClassifierRepository.checkAvailableClassifiers(userToken)
+        guardianClassifierRepository.checkAvailableClassifiers()
             .enqueue(object : Callback<List<GuardianClassifierResponse>> {
                 override fun onResponse(
                     call: Call<List<GuardianClassifierResponse>>,

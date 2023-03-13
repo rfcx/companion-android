@@ -132,8 +132,7 @@ class LoginViewModel(
     }
 
     fun userTouch(result: UserAuthResponse) {
-        val authUser = "Bearer ${result.idToken}"
-        loginRepository.userTouch(authUser)
+        loginRepository.userTouch()
             .enqueue(object : Callback<UserTouchResponse> {
                 override fun onFailure(call: Call<UserTouchResponse>, t: Throwable) {
                     userTouch.postValue(
@@ -151,7 +150,7 @@ class LoginViewModel(
 
                     response.body()?.let {
                         if (it.success) {
-                            userTouch.postValue(Resource.success(authUser))
+                            userTouch.postValue(Resource.success(result.idToken))
                         } else {
                             userTouch.postValue(
                                 Resource.error(

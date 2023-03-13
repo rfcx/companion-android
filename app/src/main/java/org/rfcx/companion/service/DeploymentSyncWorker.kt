@@ -32,7 +32,6 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
         val locateDb = StreamDb(Realm.getInstance(RealmHelper.migrationConfig()))
         db.unlockSending()
         val deployments = db.lockUnsent()
-        val token = "Bearer ${context.getIdToken()}"
 
         Log.d(TAG, "doWork: found ${deployments.size} unsent")
         var someFailed = false
@@ -42,17 +41,17 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
 
             if (it.serverId == null) {
                 val result = ApiManager.getInstance().getDeviceApi(context)
-                    .createDeployment(token, it.toRequestBody()).execute()
+                    .createDeployment(it.toRequestBody()).execute()
 
                 val error = result.errorBody()?.string()
                 when {
                     result.isSuccessful -> {
                         val fullId = result.headers().get("Location")
                         val id = fullId?.substring(fullId.lastIndexOf("/") + 1, fullId.length) ?: ""
-                        markSentDeployment(id, db, locateDb, it.id, token)
+                        markSentDeployment(id, db, locateDb, it.id)
                     }
                     error?.contains("this deploymentKey is already existed") ?: false -> {
-                        markSentDeployment(it.deploymentKey, db, locateDb, it.id, token)
+                        markSentDeployment(it.deploymentKey, db, locateDb, it.id)
                     }
                     else -> {
                         errors.add(
@@ -73,14 +72,14 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
                 deploymentLocation?.let { location ->
                     if (it.deletedAt != null) {
                         val result = ApiManager.getInstance().getDeviceApi(context)
-                            .deleteDeployments(token, serverId).execute()
+                            .deleteDeployments(serverId).execute()
                         if (result.isSuccessful) {
                             db.deleteDeployment(it.id)
                         }
                     } else {
                         val req = EditDeploymentRequest(location.toRequestBody())
                         val result = ApiManager.getInstance().getDeviceApi(context)
-                            .editDeployments(token, serverId, req).execute()
+                            .editDeployments(serverId, req).execute()
                         if (result.isSuccessful) {
                             db.markSent(it.serverId!!, it.id)
                         } else {
@@ -109,14 +108,13 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
         id: String,
         db: DeploymentDb,
         streamDb: StreamDb,
-        deploymentId: Int,
-        token: String
+        deploymentId: Int
     ) {
         db.markSent(id, deploymentId)
 
         // update core siteId when deployment created
         val updatedDp = ApiManager.getInstance().getDeviceApi(context)
-            .getDeployment(token, id).execute().body()
+            .getDeployment(id).execute().body()
         updatedDp?.let { dp ->
             streamDb.updateSiteServerId(deploymentId, dp.stream!!.id!!)
         }

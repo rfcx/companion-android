@@ -9,9 +9,7 @@ import retrofit2.http.Url
 
 interface CoreApiService {
     @GET("v2/guardians/software/all")
-    fun checkSoftwareVersion(
-        @Header("Authorization") authUser: String
-    ): Call<List<GuardianSoftwareResponse>>
+    fun checkSoftwareVersion(): Call<List<GuardianSoftwareResponse>>
 
     @GET
     fun downloadFile(@Url url: String): Call<ResponseBody>

@@ -110,7 +110,7 @@ class MainViewModel(
 
     fun fetchProjects() {
         projects.postValue(Resource.loading(null))
-        mainRepository.getProjectsFromRemote("Bearer ${context.getIdToken()}")
+        mainRepository.getProjectsFromRemote()
             .enqueue(object : Callback<List<ProjectResponse>> {
                 override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
                     if (!context.isNetworkAvailable()) {
@@ -156,7 +156,7 @@ class MainViewModel(
         updateProjectBounds.map { projectBounds ->
             val token = "Bearer ${context?.getIdToken()}"
             projectBounds.serverId?.let { serverId ->
-                mainRepository.getProjectsByIdFromCore(token, serverId)
+                mainRepository.getProjectsByIdFromCore(serverId)
                     .enqueue(object : Callback<ProjectByIdResponse> {
                         override fun onFailure(call: Call<ProjectByIdResponse>, t: Throwable) {}
                         override fun onResponse(
@@ -180,7 +180,7 @@ class MainViewModel(
     }
 
     private fun fetchDeletedProjects() {
-        mainRepository.getDeletedProjectsFromRemote("Bearer ${context.getIdToken()}")
+        mainRepository.getDeletedProjectsFromRemote()
             .enqueue(object : Callback<List<ProjectResponse>> {
                 override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
                     if (!context.isNetworkAvailable()) {
@@ -219,7 +219,7 @@ class MainViewModel(
         val projectsLocal =
             getProjectsFromLocal().filter { project -> project.serverId != null }
         projectsLocal.forEach {
-            mainRepository.getProjectOffTimeFromRemote("Bearer ${context.getIdToken()}", it.serverId!!)
+            mainRepository.getProjectOffTimeFromRemote(it.serverId!!)
                 .enqueue(object : Callback<ProjectOffTimeResponse> {
                     override fun onFailure(call: Call<ProjectOffTimeResponse>, t: Throwable) {
                         if (!context.isNetworkAvailable()) {
@@ -255,7 +255,7 @@ class MainViewModel(
 
     fun getStreamAssets(site: Stream) {
         tracks.postValue(Resource.loading(null))
-        mainRepository.getStreamAssets("Bearer ${context.getIdToken()}", site.serverId!!)
+        mainRepository.getStreamAssets(site.serverId!!)
             .enqueue(object : Callback<List<DeploymentAssetResponse>> {
                 override fun onResponse(
                     call: Call<List<DeploymentAssetResponse>>,
@@ -269,7 +269,6 @@ class MainViewModel(
                             fileCount += 1
                             GeoJsonUtils.downloadGeoJsonFile(
                                 context,
-                                "Bearer ${context.getIdToken()}",
                                 item,
                                 site.serverId!!,
                                 Date(),

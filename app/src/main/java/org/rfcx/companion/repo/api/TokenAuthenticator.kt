@@ -1,6 +1,7 @@
 package org.rfcx.companion.repo.api
 
 import android.content.Context
+import android.util.Log
 import com.auth0.android.Auth0
 import com.auth0.android.authentication.AuthenticationAPIClient
 import com.auth0.android.authentication.AuthenticationException
@@ -54,6 +55,7 @@ class TokenAuthenticator(private val context: Context) : Authenticator {
                 .header("Authorization", "Bearer $token")
                 .build()
         } else {
+            Log.d("Comp", "failed")
             // Refresh token failed, you can logout user or retry couple of times
             // Returning null is critical here, it will stop the current request
             // If you do not return null, you will end up in a loop calling refresh
@@ -76,7 +78,6 @@ class TokenAuthenticator(private val context: Context) : Authenticator {
         if (credentialKeeper.hasValidCredentials()) {
             return true
         }
-
         return suspendCoroutine { cont ->
             authentication.renewAuth(refreshToken).start(object : BaseCallback<Credentials, AuthenticationException> {
                 override fun onSuccess(credentials: Credentials?) {

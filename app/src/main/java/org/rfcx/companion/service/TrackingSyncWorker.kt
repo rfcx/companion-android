@@ -27,14 +27,13 @@ class TrackingSyncWorker(val context: Context, params: WorkerParameters) :
         var someFailed = false
         Log.d(TAG, "doWork: found ${tracking.size} unsent")
 
-        val token = "Bearer ${context.getIdToken()}"
         tracking.forEach {
             val file = File(it.localPath)
             val mimeType = file.getMimeType()
             val requestFile = RequestBody.create(MediaType.parse(mimeType), file)
             val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
             val result = ApiManager.getInstance().getDeviceApi(context)
-                .uploadAssets(token, it.deploymentServerId!!, body).execute()
+                .uploadAssets(it.deploymentServerId!!, body).execute()
 
             if (result.isSuccessful) {
                 val assetPath = result.headers().get("Location")

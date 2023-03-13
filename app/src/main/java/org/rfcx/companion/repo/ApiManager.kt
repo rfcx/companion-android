@@ -7,6 +7,7 @@ import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.repo.api.CoreApiService
 import org.rfcx.companion.repo.api.DeviceApiService
 import org.rfcx.companion.repo.api.TokenAuthenticator
+import org.rfcx.companion.repo.api.TokenInterceptor
 import org.rfcx.companion.util.insert
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -83,12 +84,15 @@ class ApiManager {
                 readTimeout(60, TimeUnit.SECONDS)
                 writeTimeout(60, TimeUnit.SECONDS)
             }
+                // auto refresh token if 401
+            .authenticator(TokenAuthenticator(context))
+                // auto attach token all requests
+            .addInterceptor(TokenInterceptor(context))
             .addInterceptor { chain ->
                 val request = chain.request().newBuilder().addHeader("User-Agent", "Companion/${BuildConfig.VERSION_NAME}/${BuildConfig.VERSION_CODE}").build()
                 chain.proceed(request)
             }
             .addInterceptor(httpLoggingInterceptor)
-            .authenticator(TokenAuthenticator(context))
             .build()
     }
 }

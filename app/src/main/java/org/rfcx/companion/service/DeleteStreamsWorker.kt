@@ -30,8 +30,7 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
 
         Log.d(TAG, "doWork on DeleteStreams")
 
-        val token = "Bearer ${context.getIdToken()}"
-        val result = getStreams(token, currentStreamsLoading)
+        val result = getStreams(currentStreamsLoading)
         if (result) {
             val streamDb = StreamDb(Realm.getInstance(RealmHelper.migrationConfig()))
             val deploymentDb = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
@@ -65,11 +64,11 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
         return if (someFailed) Result.retry() else Result.success()
     }
 
-    private suspend fun getStreams(token: String, offset: Int): Boolean =
+    private suspend fun getStreams(offset: Int): Boolean =
         withContext(Dispatchers.IO) {
             val projectId = PROJECT_ID?.let { listOf(it) }
             val result = ApiManager.getInstance().getDeviceApi(context)
-                .getStreams(token, SITES_LIMIT_GETTING, offset, null, null, projectId)
+                .getStreams(SITES_LIMIT_GETTING, offset, null, null, projectId)
                 .execute()
             if (result.isSuccessful) {
                 val resultBody = result.body()
@@ -77,7 +76,7 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
                     streams = streams + it
                     if (it.size == SITES_LIMIT_GETTING) {
                         currentStreamsLoading += SITES_LIMIT_GETTING
-                        return@withContext getStreams(token, currentStreamsLoading)
+                        return@withContext getStreams(currentStreamsLoading)
                     }
                 }
             } else {

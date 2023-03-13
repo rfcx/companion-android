@@ -97,13 +97,12 @@ object GeoJsonUtils {
 
     fun downloadGeoJsonFile(
         context: Context,
-        token: String,
         asset: DeploymentAssetResponse,
         deploymentId: String,
         deployedAt: Date,
         callback: DownloadTrackCallback
     ) {
-        ApiManager.getInstance().getDeviceApi(context).getGeoJsonFile(token, asset.id)
+        ApiManager.getInstance().getDeviceApi(context).getGeoJsonFile(asset.id)
             .enqueue(object : Callback<ResponseBody> {
                 override fun onResponse(
                     call: Call<ResponseBody>,

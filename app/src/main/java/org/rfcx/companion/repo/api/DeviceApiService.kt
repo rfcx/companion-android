@@ -12,7 +12,6 @@ import retrofit2.http.*
 interface DeviceApiService {
     @GET("projects")
     fun getProjects(
-        @Header("Authorization") authUser: String,
         @Query("limit") limit: Int = 100,
         @Query("offset") offset: Int = 0,
         @Query("fields") fields: List<String> = listOf("id", "name", "permissions")
@@ -20,7 +19,6 @@ interface DeviceApiService {
 
     @GET("projects")
     fun getDeletedProjects(
-        @Header("Authorization") authUser: String,
         @Query("limit") limit: Int = 100,
         @Query("offset") offset: Int = 0,
         @Query("only_deleted") onlyDeleted: Boolean = true,
@@ -29,35 +27,29 @@ interface DeviceApiService {
 
     @GET("projects/{id}/offtimes")
     fun getProjectOffTime(
-        @Header("Authorization") authUser: String,
         @Path("id") id: String
     ): Call<ProjectOffTimeResponse>
 
     @GET("streams/{id}/assets")
     fun getStreamAssets(
-        @Header("Authorization") authUser: String,
         @Path("id") id: String
     ): Call<List<DeploymentAssetResponse>>
 
     @GET("usertouch")
-    fun userTouch(@Header("Authorization") authUser: String): Call<UserTouchResponse>
+    fun userTouch(): Call<UserTouchResponse>
 
     @GET("projects/{id}")
     fun getProjectsById(
-        @Header("Authorization") authUser: String,
         @Path("id") id: String
     ): Call<ProjectByIdResponse>
 
     @POST("guardians")
     fun registerGuardian(
-        @Header("Authorization") authUser: String,
         @Body guid: GuardianRegisterRequest
     ): Call<GuardianRegisterResponse>
 
     @GET("classifiers")
-    fun checkAvailableClassifiers(
-        @Header("Authorization") authUser: String
-    ): Call<List<GuardianClassifierResponse>>
+    fun checkAvailableClassifiers(): Call<List<GuardianClassifierResponse>>
 
     @Streaming
     @GET

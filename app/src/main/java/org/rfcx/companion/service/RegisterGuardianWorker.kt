@@ -23,10 +23,9 @@ class RegisterGuardianWorker(val context: Context, params: WorkerParameters) :
         Log.d(TAG, "doWork: found ${registrations?.size ?: 0} unsent")
         var someFailed = false
 
-        val token = "Bearer ${context.getIdToken()}"
         registrations?.forEach {
             val result = ApiManager.getInstance().getDeviceApi2(it.env == "production", context)
-                .registerGuardian(token, it.toRequest()).execute()
+                .registerGuardian(it.toRequest()).execute()
 
             val error = result.errorBody()?.string()
             if (result.isSuccessful) {

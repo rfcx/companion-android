@@ -30,14 +30,13 @@ class ImageSyncWorker(val context: Context, params: WorkerParameters) :
         Log.d(TAG, "doWork: found ${deploymentImage.size} unsent")
         var someFailed = false
 
-        val token = "Bearer ${context.getIdToken()}"
         deploymentImage.forEach {
             val file = File(it.localPath)
             val mimeType = file.getMimeType()
             val requestFile = RequestBody.create(MediaType.parse(mimeType), storage.compressFile(context, file))
             val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
             val result = ApiManager.getInstance().getDeviceApi(context)
-                .uploadAssets(token, it.deploymentServerId!!, body).execute()
+                .uploadAssets(it.deploymentServerId!!, body).execute()
 
             if (result.isSuccessful) {
                 val assetPath = result.headers().get("Location")
