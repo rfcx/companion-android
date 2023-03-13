@@ -53,5 +53,6 @@ interface DeviceApiService {
 
     @Streaming
     @GET
+    @Headers("No-Authentication: true")
     fun downloadFile(@Url url: String): Call<ResponseBody>
 }

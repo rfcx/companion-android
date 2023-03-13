@@ -40,6 +40,10 @@ class TokenAuthenticator(private val context: Context) : Authenticator {
     }
 
     override fun authenticate(route: Route?, response: Response): Request? {
+        // No need to refresh token on no-authentication request
+        if (response.request().header("No-Authentication") != null) {
+            return null
+        }
 
         var refreshResult = false
         runBlocking {
